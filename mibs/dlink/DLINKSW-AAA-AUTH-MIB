@@ -1,0 +1,305 @@
+-- *****************************************************************
+-- DLINKSW-AAA-AUTH-MIB: D-Link AAA Authentication MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-AAA-AUTH-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,  OBJECT-TYPE
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+        RowStatus
+                FROM SNMPv2-TC
+        dAaaMIBObjects, DAaaSessionType,
+        DAaaMethodListName, DAaaMethodPriority,
+        DAaaMethodName
+            FROM DLINKSW-AAA-COMMON-MIB;
+
+
+    dlinkSwAaaAuthenticationMIB MODULE-IDENTITY
+        LAST-UPDATED    "201304250000Z"
+        ORGANIZATION    "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+                Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                        Taipei City 114, Taiwan, R.O.C
+                Tel:     +886-2-66000123
+                E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for authentication feature
+            which is based on Authentication, Authorization,
+            Accounting (AAA) protocols."
+        REVISION        "201304250000Z"
+        DESCRIPTION
+            "This is the first version of the MIB. 
+            "
+       ::= { dAaaMIBObjects 4 }
+
+
+-- ----------------------------------------------------------------------------- 
+    dAaaAuthMIBNotifications 	OBJECT IDENTIFIER ::= { dlinkSwAaaAuthenticationMIB 0 }
+    dAaaAuthMIBObjects	        OBJECT IDENTIFIER ::= { dlinkSwAaaAuthenticationMIB 1 }
+    dAaaAuthMIBConformance	    OBJECT IDENTIFIER ::= { dlinkSwAaaAuthenticationMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dAaaAuthGenericMethodTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAaaAuthGenericMethodEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains entries for AAA authentication
+            methods configured for Login/enable/dot1x/MAC authentication/web/jwac.
+
+            The following table describes the examples.
+
+            Type     Method List Name    Priority Method
+            -----    ------------------  -------- ------------
+            login    default             1        radius
+            login    default             2        auth_rad
+            login    default             3        tacacs+
+            login    default             4        none
+            login    ssh_login           1        radius
+            login    ssh_login           2        none
+            login    tel_login           1        tacacs+
+            enable   default             1        radius
+            enable   default             2        tacacs+
+            dot1x    default             1        radius
+            dot1x    default             2        local
+            macAuth  default             1        radius
+            macAuth  default             2        local
+            web      default             1        radius
+            web      default             2        local
+            jwac     default             1        radius
+            jwac     default             2        local
+           "
+        ::= { dAaaAuthMIBObjects 1 }
+
+    dAaaAuthGenericMethodEntry OBJECT-TYPE
+        SYNTAX          DAaaAuthGenericMethodEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defines a method which is groupped into a method list. 
+            "
+        INDEX       {
+            dAaaAuthGenMethodLstType,
+            dAaaAuthGenMethodLstName,
+            dAaaAuthGenMethodPriority
+        }
+        ::= { dAaaAuthGenericMethodTable 1 }
+
+    DAaaAuthGenericMethodEntry ::=
+        SEQUENCE {
+            dAaaAuthGenMethodLstType      INTEGER,
+            dAaaAuthGenMethodLstName      DAaaMethodListName,
+            dAaaAuthGenMethodPriority     DAaaMethodPriority,
+            dAaaAuthGenMethodName         DAaaMethodName,
+            dAaaAuthGenMethodRowStatus    RowStatus
+        }
+
+    dAaaAuthGenMethodLstType OBJECT-TYPE
+	    SYNTAX	        INTEGER {
+			enable(1),
+			login(2),
+			dot1x(3),
+			jwac(4),
+			macAuth(5),
+			web(6),
+            igmpAuth(7),
+            mldAuth(8)
+		}
+	    MAX-ACCESS      not-accessible
+	    STATUS	        current
+	    DESCRIPTION
+	        "This object indicates the type for which the method 
+	        list will be used.
+	         
+		    enable(1) - for determining the access to the privileged EXEC level.
+		    login(2) - for login authentication.
+		    dot1x(3) -  for 802.1x authentication.
+		    jwac(4)  - for JWAC authentication.
+		    macAuth(5) - for MAC authentication.
+            web(6) - for Web authentication.
+            igmpAuth(7) - for IGMP authentication.
+            mldAuth(8) - for MLD authentication.
+			
+            Note: Not all method list types defined need to be supported.
+	       "
+	    ::= { dAaaAuthGenericMethodEntry 1 }
+	    
+    dAaaAuthGenMethodLstName OBJECT-TYPE
+        SYNTAX          DAaaMethodListName
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the authentication method list.
+           
+            If dAaaAuthGenMethodLstType is not 'login', only 'default' 
+            can be specified for dAaaAuthGenMethodLstName.
+            For the type which only supports 'default' method list name, the
+            configured method list will take effect without being explicitly applied. 
+            If the type is 'login', the method list will take effect after
+            the method list is applied in dAaaAuthLoginApplyTable.           
+           "
+       ::= { dAaaAuthGenericMethodEntry 2 }
+
+    dAaaAuthGenMethodPriority OBJECT-TYPE
+        SYNTAX          DAaaMethodPriority
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This is the method priority of a method within a method list.
+           "
+       ::= { dAaaAuthGenericMethodEntry 3 }
+
+
+    dAaaAuthGenMethodName OBJECT-TYPE
+        SYNTAX          DAaaMethodName
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the authentication method name.
+            "
+       ::= { dAaaAuthGenericMethodEntry 4 }
+
+
+    dAaaAuthGenMethodRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "The status of entry.
+          
+           Before modify the higher method, must destroy the lower method in method list.
+          "
+       ::= { dAaaAuthGenericMethodEntry 5 }
+
+-- -----------------------------------------------------------------------------
+    dAaaAuthLogin    OBJECT IDENTIFIER ::= { dAaaAuthMIBObjects 2 }
+    
+    dAaaAuthLoginApplyTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAaaAuthLoginApplyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+          "This table contains entries for AAA authentication
+           apply configured for Login.
+
+           The following table describes the authentication commands apply.
+
+           Session MethodListName
+           ------- ------------------
+           telnet  default
+           console cons_auth
+           ssh     ssh_login
+           "
+        ::= { dAaaAuthLogin 1 }
+
+    dAaaAuthLoginApplyEntry OBJECT-TYPE
+        SYNTAX          DAaaAuthLoginApplyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry containing the session of an authentication
+             application used for Login.
+            "
+        INDEX       {
+              dAaaAuthLoginApplySession
+        }
+        ::= { dAaaAuthLoginApplyTable 1 }
+
+
+    DAaaAuthLoginApplyEntry ::=        SEQUENCE {
+        dAaaAuthLoginApplySession       DAaaSessionType,
+        dAaaAuthLoginApplyListName      DAaaMethodListName,
+        dAaaAuthLoginApplyRowStatus     RowStatus
+    }
+
+    dAaaAuthLoginApplySession OBJECT-TYPE
+        SYNTAX           DAaaSessionType
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION
+          "This object indicates the session type of the entry.       
+          "
+       ::= { dAaaAuthLoginApplyEntry 1 }
+
+    dAaaAuthLoginApplyListName OBJECT-TYPE
+        SYNTAX          DAaaMethodListName
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the method list name of the entry.           
+            "
+        ::= { dAaaAuthLoginApplyEntry 2 }
+        
+    dAaaAuthLoginApplyRowStatus OBJECT-TYPE
+       SYNTAX           RowStatus
+       MAX-ACCESS       read-create
+       STATUS           current
+       DESCRIPTION
+          "The status of this entry.
+          "
+       ::= { dAaaAuthLoginApplyEntry 3 }
+
+
+
+--****************************************************************************
+-- Conformance
+--****************************************************************************
+  
+    dAaaAuthMIBCompliances OBJECT IDENTIFIER ::= { dAaaAuthMIBConformance 1 }
+
+
+-- compliance statements
+
+    dAaaAuthMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for entities which
+             implement the DLINKSW-AAA-AUTH-MIB."
+        MODULE      -- this module
+        MANDATORY-GROUPS       {
+            dAaaAuthMethodListGroup,
+            dAaaAuthcLoginMethodApplyGroup              
+        }              
+        ::= { dAaaAuthMIBCompliances 1 }
+
+-- units of conformance
+
+    dAaaAuthMIBGroups      OBJECT IDENTIFIER ::=  { dAaaAuthMIBConformance 2 }
+
+    dAaaAuthMethodListGroup OBJECT-GROUP
+        OBJECTS {
+            dAaaAuthGenMethodName,     
+            dAaaAuthGenMethodRowStatus
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects provides the method list for  AAA
+            authentication.
+            "
+        ::= { dAaaAuthMIBGroups 1 }
+
+
+    dAaaAuthcLoginMethodApplyGroup OBJECT-GROUP
+        OBJECTS {
+            dAaaAuthLoginApplyListName,
+            dAaaAuthLoginApplyRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects provides configuration to apply
+            AAA method list for login authentication.
+            "
+        ::= { dAaaAuthMIBGroups 2 }
+
+END
+
+

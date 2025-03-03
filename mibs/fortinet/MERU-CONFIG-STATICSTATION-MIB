@@ -1,0 +1,109 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-STATICSTATION-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    ;
+
+  mwConfigStaticStation  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Static Station Configuration infrastructure"
+    ::= { mwConfiguration 16 } 
+  
+    
+  
+  mwStaticStationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwStaticStationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Static Station Table "
+    ::= { mwConfigStaticStation 1 }
+
+  mwStaticStationEntry  OBJECT-TYPE
+    SYNTAX MwStaticStationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Static Station Table "
+    INDEX {  mwStaticStationTableIndex  }
+    ::= { mwStaticStationTable 1 }
+
+  MwStaticStationEntry  ::=  SEQUENCE { 
+       mwStaticStationTableIndex                                   Integer32, 
+       mwStaticStationIpAddress                                    IpAddress,
+       mwStaticStationMacAddress                                   MacAddress,
+       mwStaticStationRowStatus                                    RowStatus 
+  }
+   
+   
+  mwStaticStationTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwStaticStationEntry 1 }
+
+  mwStaticStationIpAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Client IP (V4)"
+    ::= { mwStaticStationEntry    2 }
+
+  mwStaticStationMacAddress  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwStaticStationEntry    3 }
+
+  mwStaticStationRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwStaticStationEntry 4 }
+
+  
+END
+   

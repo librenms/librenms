@@ -1,0 +1,2458 @@
+-- extracted from draft-kchapman-sonet-sup-mib-00.txt
+-- at Mon Nov 15 17:11:07 1999
+
+SL-SONET-SUP-PM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32,
+    transmission, Gauge32
+        FROM SNMPv2-SMI
+    TruthValue, DateAndTime
+        FROM SNMPv2-TC
+    OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    PerfCurrentCount, PerfIntervalCount, PerfTotalCount
+        FROM PerfHist-TC-MIB
+    sonetMediumEntry, sonetSectionCurrentEntry,
+    sonetSectionIntervalEntry, sonetLineCurrentEntry,
+    sonetLineIntervalEntry, sonetFarEndLineCurrentEntry,
+    sonetFarEndLineIntervalEntry, sonetPathCurrentEntry,
+    sonetPathIntervalEntry, sonetFarEndPathCurrentEntry,
+    sonetFarEndPathIntervalEntry, sonetVTCurrentEntry,
+    sonetVTIntervalEntry, sonetFarEndVTCurrentEntry,
+    sonetFarEndVTIntervalEntry
+        FROM SONET-MIB
+    ifIndex
+        FROM IF-MIB
+	slSonetMib				      		FROM SL-SONET-MIB;
+
+sonetSupPmMIB MODULE-IDENTITY
+    LAST-UPDATED   "199807131752Z"  -- 13-Jul-98 1:52 PM EST
+    ORGANIZATION   "Argon Networks, Inc."
+    CONTACT-INFO
+       "        Ken Chapman
+        Postal: Argon Networks, Inc.
+                25 Porter Road
+                Littleton, MA  01460
+                USA
+        Phone:  +1 978 486 0665
+        Fax:    +1 978 486 9379
+        Email:  KChapman@Argon.com"
+    DESCRIPTION
+        "This MIB module provides extensions to the SONET-MIB (RFC 2558)
+        objects.  It provides definitions for management information
+        that supports those parts of ANSI T1.231-1997 that are not
+        covered by the SONET-MIB."
+    ::= { slSonetMib 3 }
+
+
+--  This is the MIB extension module for the SONET objects
+
+sonetSupObjects         OBJECT IDENTIFIER ::= { sonetSupPmMIB 1 }
+sonetSupObjectsPath     OBJECT IDENTIFIER ::= { sonetSupPmMIB 2 }
+sonetSupObjectsVT       OBJECT IDENTIFIER ::= { sonetSupPmMIB 3 }
+
+--  groups in the SONET MIB extension module
+
+sonetSupConfig          OBJECT IDENTIFIER ::= { sonetSupObjects 1 }
+sonetSupMedium          OBJECT IDENTIFIER ::= { sonetSupObjects 2 }
+sonetSupSection         OBJECT IDENTIFIER ::= { sonetSupObjects 3 }
+sonetSupLine            OBJECT IDENTIFIER ::= { sonetSupObjects 4 }
+sonetSupFarEndLine      OBJECT IDENTIFIER ::= { sonetSupObjects 5 }
+sonetSupPath            OBJECT IDENTIFIER ::= { sonetSupObjectsPath 1 }
+sonetSupFarEndPath      OBJECT IDENTIFIER ::= { sonetSupObjectsPath 2 }
+sonetSupVT              OBJECT IDENTIFIER ::= { sonetSupObjectsVT 1 }
+sonetSupFarEndVT        OBJECT IDENTIFIER ::= { sonetSupObjectsVT 2 }
+
+
+-- *********************************************************************
+--  SONET Section group object definitions.
+--
+--  SONET Section default threshold value object definitions.
+--  These default values apply to all section interfaces.
+-- *********************************************************************
+
+sonetSectionDefaultThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetSectionDefaultThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of default thresholds for SONET section counters."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSupSection 1 }
+
+sonetSectionDefaultThresholdEntry OBJECT-TYPE
+    SYNTAX      SonetSectionDefaultThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the table of default thresholds.  The table has a
+        variable for each counter type and accumulation period
+        combination, but uses an index to indetify the digital signal
+        rate.  The agent must provide a set of default threshold values
+        for all rates that the NE supports.  The agent may make these
+        variables read-only."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    INDEX       { sonetSectionDefaultThresholdRate }
+    ::= { sonetSectionDefaultThresholdTable 1 }
+
+SonetSectionDefaultThresholdEntry ::=
+    SEQUENCE {
+        sonetSectionDefaultThresholdRate        INTEGER,
+        sonetSectionDefaultCVThreshold          INTEGER,
+        sonetSectionDefaultESThreshold          INTEGER,
+        sonetSectionDefaultSESThreshold         INTEGER,
+        sonetSectionDefaultSEFSThreshold        INTEGER,
+        sonetSectionDefaultDayCVThreshold       INTEGER,
+        sonetSectionDefaultDayESThreshold       INTEGER,
+        sonetSectionDefaultDaySESThreshold      INTEGER,
+        sonetSectionDefaultDaySEFSThreshold     INTEGER
+    }
+
+sonetSectionDefaultThresholdRate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    oc1(1),
+                    oc3(2),
+                    oc12(3),
+                    oc24(4),
+                    oc48(5),
+                    oc192(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The digital signal rate for which the default threshold values
+        apply."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSectionDefaultThresholdEntry 1 }
+
+sonetSectionDefaultCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET CV-S counter 15-minute interval
+        thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSectionDefaultThresholdEntry 2 }
+
+sonetSectionDefaultESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET ES-S counter 15-minute interval
+        thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSectionDefaultThresholdEntry 3 }
+
+sonetSectionDefaultSESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET SES-S counter 15-minute interval
+        thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSectionDefaultThresholdEntry 6 }
+
+sonetSectionDefaultSEFSThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET SEFS-S counter 15-minute interval
+        thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSectionDefaultThresholdEntry 7 }
+
+sonetSectionDefaultDayCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET CV-S counter 15-minute interval
+        thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSectionDefaultThresholdEntry 8 }
+
+sonetSectionDefaultDayESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET ES-S counter 15-minute interval
+        thresholds."
+
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSectionDefaultThresholdEntry 9 }
+
+sonetSectionDefaultDaySESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET SES-S counter 15-minute interval
+        thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSectionDefaultThresholdEntry 12 }
+
+sonetSectionDefaultDaySEFSThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET SEFS-S counter 15-minute interval
+        thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSectionDefaultThresholdEntry 13 }
+
+
+-- *********************************************************************
+--  SONET Section threshold value object definitions.  This table is an
+--  extension to the sonetSectionCurrentTable found in the SONET-MIB.
+-- *********************************************************************
+
+sonetSectionThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetSectionThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of trap threshold values for SONET section counters."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSupSection 2 }
+
+sonetSectionThresholdEntry OBJECT-TYPE
+    SYNTAX      SonetSectionThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the table of SONET Section trap thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    AUGMENTS    { sonetSectionCurrentEntry }
+    ::= { sonetSectionThresholdTable 1 }
+
+SonetSectionThresholdEntry ::=
+    SEQUENCE {
+        sonetSectionCurrentCVThreshold    INTEGER,
+        sonetSectionCurrentESThreshold    INTEGER,
+        sonetSectionCurrentSESThreshold   INTEGER,
+        sonetSectionCurrentSEFSThreshold  INTEGER,
+        sonetSectionDayCVThreshold        INTEGER,
+        sonetSectionDayESThreshold        INTEGER,
+        sonetSectionDaySESThreshold       INTEGER,
+        sonetSectionDaySEFSThreshold      INTEGER
+    }
+
+sonetSectionCurrentCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval CV-S counter.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetSectionThresholdEntry 1 }
+
+sonetSectionCurrentESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval ES-S counter.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetSectionThresholdEntry 2 }
+
+sonetSectionCurrentSESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval SES-S counter.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetSectionThresholdEntry 5 }
+
+sonetSectionCurrentSEFSThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval SEFS-S counter.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetSectionThresholdEntry 6 }
+
+sonetSectionDayCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current day CV-S
+        counter.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetSectionThresholdEntry 7 }
+
+sonetSectionDayESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current day ES-S
+        counter.  A value of zero indicates that the default threshold
+        value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetSectionThresholdEntry 8 }
+
+sonetSectionDaySESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current day SES-S
+        counter.  A value of zero indicates that the default threshold
+        value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetSectionThresholdEntry 11 }
+
+sonetSectionDaySEFSThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current day SEFS-S
+        counter.  A value of zero indicates that the default threshold
+        value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetSectionThresholdEntry 12 }
+
+
+-- *********************************************************************
+--  The SONET Section Day Table.
+-- *********************************************************************
+
+sonetSectionDayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetSectionDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SONET Section Day table.  Contains various statistics
+        collected by each SONET Section over multiple 1-day
+        intervals of operation."
+    ::= { sonetSupSection 15 }
+
+sonetSectionDayEntry OBJECT-TYPE
+    SYNTAX      SonetSectionDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the SONET Section Day table."
+    INDEX       { ifIndex, sonetSectionDayNumber }
+    ::= { sonetSectionDayTable 1 }
+
+SonetSectionDayEntry ::=
+    SEQUENCE {
+        sonetSectionDayNumber           INTEGER,
+        sonetSectionDayStartTime        DateAndTime,
+        sonetSectionDayValidData        TruthValue,
+        sonetSectionDayCVs              PerfTotalCount,
+        sonetSectionDayESs              PerfTotalCount,
+        sonetSectionDaySESs             PerfTotalCount,
+        sonetSectionDaySEFSs            PerfTotalCount,
+        sonetSectionDayTcaFlag    		TruthValue,
+        sonetSectionDayReset 			INTEGER
+    }
+
+sonetSectionDayNumber OBJECT-TYPE
+    SYNTAX      INTEGER (0..33)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A number which identifies the 1-day interval for which the set
+        of section related statistics is available.  The number is
+        between 1 and n, where n is the number of 1-day intervals
+        supported by the agent.  The interval identified by 1 is the
+        current 1-day interval, 2 is the previous (most recently
+        completed) 1-day interval and n is the least recently completed
+        1-day interval.
+        Interval 0 is used for the Untimed counters."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetSectionDayEntry 1 }
+
+sonetSectionDayStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the date and time at which this 1-day
+        interval of sections measurements began on this interface."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.1."
+    ::= { sonetSectionDayEntry 2 }
+
+sonetSectionDayValidData OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This variable assumes the value true(1) if the data stored for
+        this interval is both valid and complete.  It is set to false(2)
+        if the data stored for this interval is incomplete or otherwise
+        invalid because (a) the data stored for this interval is for a
+        period greater or less than 24 hours, or (b) some data is
+        missing."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.2."
+    ::= { sonetSectionDayEntry 3 }
+
+sonetSectionDayCVs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The section code violation (CV-S) count is the number of BIP-8
+        errors which were detected at the SONET section layer
+        interface in a previous 1-day interval.  Each section BIP-8
+        can detect up to eight errors per STS-N frame, with each error
+        incrementing the CV counter.  CVs for the section layer are
+        collected using the BIP-8 in the B1 byte located in the
+        section overhead of STS-1 number 1."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.2.1.1."
+    ::= { sonetSectionDayEntry 4 }
+
+sonetSectionDayESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The section errored second (ES-S) count is the number of
+        1-second intervals containing one or more BIP-8 error (B1
+        byte), one or more SEF defects, or one or more LOS defects
+        which were encountered by the SONET section layer
+        interface in a previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.2.2."
+    ::= { sonetSectionDayEntry 5 }
+
+sonetSectionDaySESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The section severely errored second (SES-S) count is the
+        number of 1-second intervals containing
+        sonetSevereErrorThreshold or more BIP-8 errors (B1 byte), one
+        or more SEF defects, or one or more LOS defects which were
+        encountered by the SONET section layer interface in a
+        previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.2.5."
+    ::= { sonetSectionDayEntry 8 }
+
+sonetSectionDaySEFSs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The section severely errored frame second (SEFS-S) count is
+        the number of 1-second intervals containing one or more SEF
+        defects which were encountered by the SONET section layer
+        interface in a previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.2.6."
+    ::= { sonetSectionDayEntry 9 }
+
+sonetSectionDayTcaFlag OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "TRUE if one of the counters crossed the
+       threshold during the day."
+    ::= { sonetSectionDayEntry 10 }
+
+sonetSectionDayReset OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Writing this object reset the PM counters of this interval."
+    ::= { sonetSectionDayEntry 11 }
+
+
+-- *********************************************************************
+--  SONET Line group object definitions.
+--
+--  SONET Line default threshold value object definitions.  These
+--  default values apply to both near-end and far-end line interfaces.
+-- *********************************************************************
+
+sonetLineDefaultThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetLineDefaultThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of default thresholds for SONET Line counters."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSupLine 1 }
+
+sonetLineDefaultThresholdEntry OBJECT-TYPE
+    SYNTAX      SonetLineDefaultThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the table of default thresholds.  The table has a
+        variable for each counter type and accumulation period
+        combination, but uses indexes to indetify the digital signal
+        direction and rate.  The agent must provide a set of default
+        threshold values for all rates that the NE supports.  The agent
+        may make these variables read-only."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    INDEX       { sonetLineDefaultThresholdDirection,
+                  sonetLineDefaultThresholdRate }
+    ::= { sonetLineDefaultThresholdTable 1 }
+
+SonetLineDefaultThresholdEntry ::=
+    SEQUENCE {
+        sonetLineDefaultThresholdDirection  INTEGER,
+        sonetLineDefaultThresholdRate       INTEGER,
+        sonetLineDefaultCVThreshold         INTEGER,
+        sonetLineDefaultESThreshold         INTEGER,
+        sonetLineDefaultSESThreshold        INTEGER,
+        sonetLineDefaultUASThreshold        INTEGER,
+        sonetLineDefaultDayCVThreshold      INTEGER,
+        sonetLineDefaultDayESThreshold      INTEGER,
+        sonetLineDefaultDaySESThreshold     INTEGER,
+        sonetLineDefaultDayUASThreshold     INTEGER
+    }
+
+sonetLineDefaultThresholdDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    nearEnd(1),
+                    farEnd(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The digital signal direction for which the default threshold
+        values apply."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineDefaultThresholdEntry 1 }
+
+sonetLineDefaultThresholdRate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    vt1dot5(1),
+                    vtg(2),
+                    oc1(3),
+                    oc3(4),
+                    oc12(5),
+                    oc24(6),
+                    oc48(7),
+                    oc192(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The digital signal rate for which the default threshold values
+        apply."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineDefaultThresholdEntry 2 }
+
+sonetLineDefaultCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET CV-L and CV-LFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineDefaultThresholdEntry 3 }
+
+sonetLineDefaultESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET ES-L and ES-LFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineDefaultThresholdEntry 4 }
+
+sonetLineDefaultSESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET SES-L and SES-LFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineDefaultThresholdEntry 7 }
+
+sonetLineDefaultUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET UAS-L and UAS-LFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineDefaultThresholdEntry 9 }
+
+sonetLineDefaultDayCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET CV-L and CV-LFE counter 15-minute
+        interval thresholds."
+
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineDefaultThresholdEntry 10 }
+
+sonetLineDefaultDayESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET ES-L and ES-LFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineDefaultThresholdEntry 11 }
+
+sonetLineDefaultDaySESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET SES-L and SES-LFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineDefaultThresholdEntry 14 }
+
+sonetLineDefaultDayUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET UAS-L and UAS-LFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineDefaultThresholdEntry 16 }
+
+
+-- *********************************************************************
+--  SONET Line threshold value object definitions.  This table is an
+--  extension to the sonetLineCurrentTable found in the SONET-MIB.
+-- *********************************************************************
+
+sonetLineThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetLineThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of trap threshold values for SONET Line counters."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSupLine 2 }
+
+sonetLineThresholdEntry OBJECT-TYPE
+    SYNTAX      SonetLineThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the table of SONET Line trap thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    INDEX    { ifIndex,
+    		   sonetLineThresholdDirection }
+    ::= { sonetLineThresholdTable 1 }
+
+SonetLineThresholdEntry ::=
+    SEQUENCE {
+		sonetLineThresholdDirection 	INTEGER,
+        sonetLineCurrentCVThreshold     INTEGER,
+        sonetLineCurrentESThreshold     INTEGER,
+        sonetLineCurrentSESThreshold    INTEGER,
+        sonetLineCurrentUASThreshold    INTEGER,
+        sonetLineDayCVThreshold         INTEGER,
+        sonetLineDayESThreshold         INTEGER,
+        sonetLineDaySESThreshold        INTEGER,
+        sonetLineDayUASThreshold        INTEGER
+    }
+
+sonetLineThresholdDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    nearEnd(1),
+                    farEnd(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The digital signal direction for which the threshold
+        values apply."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetLineThresholdEntry 1 }
+
+sonetLineCurrentCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval CV-L and CV-LFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetLineThresholdEntry 2 }
+
+sonetLineCurrentESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval ES-L and ES-LFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetLineThresholdEntry 3 }
+
+sonetLineCurrentSESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval SES-L and SES-LFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetLineThresholdEntry 4 }
+
+sonetLineCurrentUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval UAS-L and UAS-LFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetLineThresholdEntry 5 }
+
+sonetLineDayCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current day CV-L
+        and CV-LFE counters.  A value of zero indicates that the default
+        threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetLineThresholdEntry 6 }
+
+sonetLineDayESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current day ES-L
+        and ES-LFE counters.  A value of zero indicates that the default
+        threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetLineThresholdEntry 7 }
+
+sonetLineDaySESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current day SES-L
+        and SES-LFE counters.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetLineThresholdEntry 8 }
+
+sonetLineDayUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current day UAS-L
+        and UAS-LFE counters.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetLineThresholdEntry 9 }
+
+-- *******************************************************************
+-- The SONET Line Day Table.
+-- *******************************************************************
+
+sonetLineDayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetLineDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SONET Line Day table.  Contains various statistics
+        collected by each SONET line over multiple 1-day
+        intervals of operation."
+    ::= { sonetSupLine 5 }
+
+sonetLineDayEntry OBJECT-TYPE
+    SYNTAX      SonetLineDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the SONET Line Day table."
+    INDEX       { ifIndex, sonetLineDayNumber }
+    ::= { sonetLineDayTable 1 }
+
+SonetLineDayEntry ::=
+    SEQUENCE {
+        sonetLineDayNumber      INTEGER,
+        sonetLineDayStartTime   DateAndTime,
+        sonetLineDayValidData   TruthValue,
+        sonetLineDayCVs         PerfTotalCount,
+        sonetLineDayESs         PerfTotalCount,
+        sonetLineDaySESs        PerfTotalCount,
+        sonetLineDayUASs        PerfTotalCount,
+        sonetLineDayPSC         PerfTotalCount,
+        sonetLineDayPSD         PerfTotalCount,
+        sonetLineDayFCs         PerfTotalCount,
+        sonetLineDayTcaFlag    	TruthValue,
+        sonetLineDayReset 		INTEGER
+    }
+
+sonetLineDayNumber OBJECT-TYPE
+    SYNTAX      INTEGER (0..33)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A number which identifies the 1-day interval for which the set
+        of near-end line related statistics is available.  The number is
+        between 1 and n, where n is the number of 1-day intervals
+        supported by the agent.  The interval identified by 1 is the
+        current 1-day interval, 2 is the previous (most recently
+        completed) 1-day interval and n is the least recently completed
+        1-day interval.
+        Interval 0 is used for the Untimed counters."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetLineDayEntry 1 }
+
+sonetLineDayStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the date and time at which this 1-day
+        interval of near-end line measurements began on this interface."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.1."
+    ::= { sonetLineDayEntry 2 }
+
+sonetLineDayValidData OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This variable assumes the value true(1) if the data stored for
+        this interval is both valid and complete.  It is set to false(2)
+        if the data stored for this interval is incomplete or otherwise
+        invalid because (a) the data stored for this interval is for a
+        period greater or less than 24 hours, or (b) some data is
+        missing."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.2."
+    ::= { sonetLineDayEntry 3 }
+
+sonetLineDayCVs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The line code violation (CV-L) count is the number of BIP-8
+        errors which were detected at the SONET line layer
+        interface in a previous 1-day interval.  Each line BIP-8
+        can detect up to eight errors per STS-1 frame, with each error
+        incrementing the CV counter.  CVs for the line layer are
+        collected using the BIP-8s in the B2 byte located in the
+        line overhead of STS-1.  (Since all CVs on an STS-N line are
+        counted together, this is equivalent to counting each error in
+        the BIP-8N contained in the B2 bytes of the STS-N line
+        overhead.)  Thus, on an STS-N signal, up to 8 x N CVs may
+        occure in each STS-N frame."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.3.1.1.1."
+    ::= { sonetLineDayEntry 5 }
+
+sonetLineDayESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The line errored second (ES-L) count is the number of 1-second
+        intervals containing one or more EDC error (B2 byte), or one
+        or more AIS-L defects which were encountered by the SONET
+        line layer interface in a previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.3.1.2."
+    ::= { sonetLineDayEntry 6 }
+
+sonetLineDaySESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The line severely errored second (SES-L) is a count of 1-second
+        intervals containing sonetSevereErrorThreshold or more EDC
+        errors (B2 byte) or one or more AIS-L defects which were
+        encountered by the SONET line layer interface in a previous
+        1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.3.1.5."
+   ::= { sonetLineDayEntry 9 }
+
+sonetLineDayUASs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The line unavailable second (UAS-L) is a count of 1-second
+        intervals for which the SONET line was unavailable during a
+        previous 1-day interval.  The SONET line becomes unavailable at
+        the onset of 10 contiguous SES-Ls.  The 10 SES-Ls are included
+        in unavailable time.  Once unavailable, the SONET line becomes
+        available at the onset of 10 contiguous seconds with no SES-Ls.
+        The 10 seconds with no SES-Ls are excluded from unavailable
+        time."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.3.1.6."
+    ::= { sonetLineDayEntry 10 }
+
+sonetLineDayPSC OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of protection switching occured."
+    REFERENCE   "ANSI T1.231-1997 clause 8.3.5."
+    ::= { sonetLineDayEntry 11 }
+
+sonetLineDayPSD OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The length of time in seconds, where the protection unit was in service
+        and the working unit was out of service, during the day."
+    REFERENCE   "ANSI T1.231-1997 clause 8.3.6."
+    ::= { sonetLineDayEntry 12 }
+
+sonetLineDayFCs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of failure counts occured during the day."
+    REFERENCE   "ANSI T1.231-1997 clause 8.3.7."
+    ::= { sonetLineDayEntry 13 }
+
+sonetLineDayTcaFlag OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "TRUE if one of the counters crossed the
+       threshold during the day."
+    ::= { sonetLineDayEntry 14 }
+
+sonetLineDayReset OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Writing this object reset the PM counters of this interval."
+    ::= { sonetLineDayEntry 15 }
+
+
+-- *******************************************************************
+-- The SONET Far End Line Day Table.
+-- *******************************************************************
+
+sonetFarEndLineDayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetFarEndLineDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SONET Far End Line Day table.  Contains various
+        statistics collected by each SONET line over multiple
+        1-day intervals of operation."
+    ::= { sonetSupFarEndLine 3 }
+
+sonetFarEndLineDayEntry OBJECT-TYPE
+    SYNTAX      SonetFarEndLineDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry in the SONET Far End Line Day table."
+    INDEX       { ifIndex, sonetFarEndLineDayNumber }
+    ::= { sonetFarEndLineDayTable 1 }
+
+SonetFarEndLineDayEntry ::=
+    SEQUENCE {
+        sonetFarEndLineDayNumber      INTEGER,
+        sonetFarEndLineDayStartTime   DateAndTime,
+        sonetFarEndLineDayValidData   TruthValue,
+        sonetFarEndLineDayCVs         PerfTotalCount,
+        sonetFarEndLineDayESs         PerfTotalCount,
+        sonetFarEndLineDaySESs        PerfTotalCount,
+        sonetFarEndLineDayUASs        PerfTotalCount,
+        sonetFarEndLineDayFCs         PerfTotalCount,
+        sonetFarEndLineDayTcaFlag     TruthValue,
+        sonetFarEndLineDayReset       INTEGER
+    }
+
+sonetFarEndLineDayNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..33)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A number which identifies the 1-day interval for which the set
+        of far-end line related statistics is available.  The number is
+        between 1 and n, where n is the number of 1-day intervals
+        supported by the agent.  The interval identified by 1 is the
+        current 1-day interval, 2 is the previous (most recently
+        completed) 1-day interval and n is the least recently completed
+        1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetFarEndLineDayEntry 1 }
+
+sonetFarEndLineDayStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the date and time at which this 1-day
+        interval of far-end line measurements began on this interface."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.1."
+    ::= { sonetFarEndLineDayEntry 2 }
+
+sonetFarEndLineDayValidData OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This variable assumes the value true(1) if the data stored for
+        this interval is both valid and complete.  It is set to false(2)
+        if the data stored for this interval is incomplete or otherwise
+        invalid because (a) the data stored for this interval is for a
+        period greater or less than 24 hours, or (b) some data is
+        missing (e.g., when a near-end defect prevents some far-end data
+        from being collected)."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.2."
+    ::= { sonetFarEndLineDayEntry 3 }
+
+sonetFarEndLineDayCVs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end line code violation (CV-LFE) count is the number of
+        REI-Ls which were detected at the SONET line layer interface in
+        a previous 1-day interval.  For EC-1 or OC-1, REI-L is bits 5 to
+        8 of the M0 byte; for EC-N or OC-N (N>2), M1 byte."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.4.1."
+    ::= { sonetFarEndLineDayEntry 5 }
+
+sonetFarEndLineDayESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end line errored second (ES-LFE) count is the number of
+        1-second intervals containing one or more REDC-Ls, or one or
+        more RDI-L defects which were encountered by the SONET line
+        layer interface in a previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.4.1."
+    ::= { sonetFarEndLineDayEntry 6 }
+
+sonetFarEndLineDaySESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end line severely errored second (SES-LFE) is a count
+        of 1-second intervals containing sonetSevereErrorThreshold or
+        more REDC-Ls or one or more RDI-L defects which were detected by
+        the SONET line layer interface in a previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.4.1."
+   ::= { sonetFarEndLineDayEntry 9 }
+
+sonetFarEndLineDayUASs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end line unavailable second (UAS-LFE) is a count of
+        1-second intervals for which the SONET line was unavailable
+        during a previous 1-day interval.  The SONET line becomes
+        unavailable at the onset of 10 contiguous SES-LEFs.  The 10
+        SES-LEFs are included in unavailable time.  Once unavailable,
+        the SONET line becomes available at the onset of 10 contiguous
+        seconds with no SES-LEFs.  The 10 seconds with no SES-LEFs are
+        excluded from unavailable time."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.4.1."
+    ::= { sonetFarEndLineDayEntry 10 }
+
+sonetFarEndLineDayFCs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end line failures count."
+    REFERENCE   "ANSI T1.231-1997 clause 8.3.7."
+    ::= { sonetFarEndLineDayEntry 11 }
+
+sonetFarEndLineDayTcaFlag OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "TRUE if one of the counters crossed the
+       threshold during the day."
+    ::= { sonetFarEndLineDayEntry 12 }
+
+sonetFarEndLineDayReset OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Writing this object reset the PM counters of this interval."
+    ::= { sonetFarEndLineDayEntry 13 }
+
+
+-- *********************************************************************
+--  SONET STS-Path group object definitions.
+--
+--  SONET STS-Path default threshold value object definitions.  These
+--  default values apply to both near-end and far-end Path interfaces.
+-- *********************************************************************
+
+sonetPathDefaultThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetPathDefaultThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of default thresholds for SONET Path counters."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSupPath 1 }
+
+sonetPathDefaultThresholdEntry OBJECT-TYPE
+    SYNTAX      SonetPathDefaultThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the table of default thresholds.  The table has a
+        variable for each counter type and accumulation period
+        combination, but uses indexes to indetify the digital signal
+        direction and rate.  The agent must provide a set of default
+        threshold values for all rates that the NE supports.  The agent
+        may make these variables read-only."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    INDEX     { sonetPathDefaultThresholdDirection,
+                sonetPathDefaultThresholdRate }
+    ::= { sonetPathDefaultThresholdTable 1 }
+
+SonetPathDefaultThresholdEntry ::=
+    SEQUENCE {
+        sonetPathDefaultThresholdDirection  INTEGER,
+        sonetPathDefaultThresholdRate       INTEGER,
+        sonetPathDefaultCVThreshold         INTEGER,
+        sonetPathDefaultESThreshold         INTEGER,
+        sonetPathDefaultSESThreshold        INTEGER,
+        sonetPathDefaultUASThreshold        INTEGER,
+        sonetPathDefaultDayCVThreshold      INTEGER,
+        sonetPathDefaultDayESThreshold      INTEGER,
+        sonetPathDefaultDaySESThreshold     INTEGER,
+        sonetPathDefaultDayUASThreshold     INTEGER
+    }
+
+sonetPathDefaultThresholdDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    nearEnd(1),
+                    farEnd(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The digital signal direction for which the default threshold
+        values apply."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathDefaultThresholdEntry 1 }
+
+sonetPathDefaultThresholdRate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    sts1(1),
+                    sts3(2),
+                    sts12(3),
+                    sts24(4),
+                    sts48(5),
+                    sts192(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path digital signal rate for which the default threshold
+        values apply."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathDefaultThresholdEntry 2 }
+
+sonetPathDefaultCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET CV-P and CV-PFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathDefaultThresholdEntry 3 }
+
+sonetPathDefaultESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET ES-P and ES-PFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathDefaultThresholdEntry 4 }
+
+sonetPathDefaultSESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET SES-P and SES-PFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathDefaultThresholdEntry 7 }
+
+sonetPathDefaultUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET UAS-P and UAS-PFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathDefaultThresholdEntry 8 }
+
+sonetPathDefaultDayCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET CV-P and CV-PFE counter 1-day
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathDefaultThresholdEntry 16 }
+
+sonetPathDefaultDayESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET ES-P and ES-PFE counter 1-day
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathDefaultThresholdEntry 17 }
+
+sonetPathDefaultDaySESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET SES-P and SES-PFE counter 1-day
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathDefaultThresholdEntry 20 }
+
+sonetPathDefaultDayUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET UAS-P and UAS-PFE counter 1-day
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathDefaultThresholdEntry 21 }
+
+
+-- *********************************************************************
+--  SONET Path threshold value object definitions.  This table is an
+--  extension to the sonetPathCurrentTable found in the SONET-MIB.
+-- *********************************************************************
+sonetPathThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetPathThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of trap threshold values for SONET Path counters."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSupPath 2 }
+
+sonetPathThresholdEntry OBJECT-TYPE
+    SYNTAX      SonetPathThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the table of SONET Path trap thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    INDEX    { ifIndex,
+    		   sonetPathThresholdDirection }
+    ::= { sonetPathThresholdTable 1 }
+
+SonetPathThresholdEntry ::=
+    SEQUENCE {
+        sonetPathThresholdDirection         INTEGER,
+        sonetPathCurrentCVThreshold         INTEGER,
+        sonetPathCurrentESThreshold         INTEGER,
+        sonetPathCurrentSESThreshold        INTEGER,
+        sonetPathCurrentUASThreshold        INTEGER,
+        sonetPathDayCVThreshold             INTEGER,
+        sonetPathDayESThreshold             INTEGER,
+        sonetPathDaySESThreshold            INTEGER,
+        sonetPathDayUASThreshold            INTEGER
+    }
+
+sonetPathThresholdDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    nearEnd(1),
+                    farEnd(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The digital signal direction for which the threshold
+        values apply."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetPathThresholdEntry 1 }
+
+sonetPathCurrentCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval CV-P and CV-PFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetPathThresholdEntry 2 }
+
+sonetPathCurrentESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval ES-P and ES-PFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetPathThresholdEntry 3 }
+
+sonetPathCurrentSESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval SES-P and SES-PFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetPathThresholdEntry 4 }
+
+sonetPathCurrentUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval UAS-P and UAS-PFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetPathThresholdEntry 5 }
+
+sonetPathDayCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 1-day CV-P
+        and CV-PFE counters.  A value of zero indicates that the default
+        threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetPathThresholdEntry 6 }
+
+sonetPathDayESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 1-day ES-P
+        and ES-PFE counters.  A value of zero indicates that the default
+        threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetPathThresholdEntry 7 }
+
+
+sonetPathDaySESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 1-day
+        SES-P and SES-PFE counters.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetPathThresholdEntry 8 }
+
+sonetPathDayUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 1-day
+        UAS-P and UAS-PFE counters.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetPathThresholdEntry 9 }
+
+
+-- *******************************************************************
+--  The SONET Path Day Table.
+-- *******************************************************************
+
+sonetPathDayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetPathDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SONET Path Day table.  Contains performance statistics
+        collected by each SONET Path over multiple 1-day
+        intervals of operation."
+    ::= { sonetSupPath 17 }
+
+sonetPathDayEntry OBJECT-TYPE
+    SYNTAX      SonetPathDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the SONET Path Day table."
+    INDEX       { ifIndex, sonetPathDayNumber }
+    ::= { sonetPathDayTable 1 }
+
+SonetPathDayEntry ::=
+    SEQUENCE {
+        sonetPathDayNumber      INTEGER,
+        sonetPathDayStartTime   DateAndTime,
+        sonetPathDayValidData   TruthValue,
+        sonetPathDayCVs         PerfTotalCount,
+        sonetPathDayESs         PerfTotalCount,
+        sonetPathDaySESs        PerfTotalCount,
+        sonetPathDayUASs        PerfTotalCount,
+        sonetPathDayFCs         PerfTotalCount,
+        sonetPathDayTcaFlag     TruthValue, 
+        sonetPathDayEBs			PerfTotalCount,
+        sonetPathDayReset       INTEGER
+    }
+
+sonetPathDayNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..33)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A number which identifies the 1-day interval for which the set
+        of near-end path related statistics is available.  The number is
+        between 1 and n, where n is the number of 1-day intervals
+        supported by the agent.  The interval identified by 1 is the
+        current 1-day interval, 2 is the previous (most recently
+        completed) 1-day interval and n is the least recently completed
+        1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetPathDayEntry 1 }
+
+sonetPathDayStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the date and time at which the 1-day
+        interval of measurements began on this interface."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetPathDayEntry 2 }
+
+sonetPathDayValidData OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This variable assumes the value true(1) if the data stored for
+        this interval is both valid and complete.  It is set to false(2)
+        if the data stored for this interval is incomplete or otherwise
+        invalid because (a) the data stored for this interval is for a
+        period greater or less than 24 hours, or (b) some data is
+        missing."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.2."
+    ::= { sonetPathDayEntry 3 }
+
+sonetPathDayCVs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path code violation (CV-P) count is the number of BIP-8
+        errors which were detected at the STS-path layer interface in a
+        previous 1-day interval.  CVs for the path layer are collected
+        using the BIP-8 in the B3 byte located in the STS-path
+        overhead."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.1.1."
+    ::= { sonetPathDayEntry 5 }
+
+sonetPathDayESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path errored second (ES-P) count is the number of 1-second
+        intervals containing one or more EDC error (B3 byte), or one or
+        more AIS-P, LOP-P, TIM-P or UNEQ-P defects which were
+        encountered by the SONET path layer interface in a previous
+        1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.2."
+    ::= { sonetPathDayEntry 6 }
+
+
+sonetPathDaySESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path severely errored second (SES-P) is a count of 1-second
+        intervals containing sonetSevereErrorThreshold or more EDC error
+        (B3 byte), or one or more AIS-P, LOP-P, TIM-P or UNEQ-P defects
+        which were encountered by the SONET path layer interface in a
+        previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.5."
+    ::= { sonetPathDayEntry 9 }
+
+sonetPathDayUASs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path unavailable second (UAS-P) is a count of 1-second
+        intervals for which the SONET STS-path was unavailable during a
+        previous 1-day interval.  The SONET STS-path becomes unavailable
+        at the onset of 10 contiguous SES-Ps.  The 10 SES-Ps are
+        included in unavailable time.  Once unavailable, the SONET
+        STS-path becomes available at the onset of 10 contiguous seconds
+        with no SES-Ps.  The 10 seconds with no SES-Ps are excluded from
+        unavailable time."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.6."
+    ::= { sonetPathDayEntry 10 }
+
+sonetPathDayFCs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number path failures count during a day."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.6."
+    ::= { sonetPathDayEntry 11 }
+
+sonetPathDayTcaFlag OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "TRUE if one of the counters crossed the
+       threshold during the day."
+    ::= { sonetPathDayEntry 12 }
+
+sonetPathDayEBs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number path blocks in which one or more bits are in error counted during a day."
+    REFERENCE   "ITU-G.826"
+    ::= { sonetPathDayEntry 13 }
+
+sonetPathDayReset OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Writing this object reset the PM counters of this interval."
+    ::= { sonetPathDayEntry 14 }
+
+
+-- *******************************************************************
+-- The SONET Far End Path Day Table.
+-- *******************************************************************
+
+sonetFarEndPathDayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetFarEndPathDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SONET Far End Path Day table.  Contains various
+        statistics collected by each SONET Far End Path over
+        multiple 1-day intervals of operation."
+    ::= { sonetSupFarEndPath 3 }
+
+sonetFarEndPathDayEntry OBJECT-TYPE
+    SYNTAX      SonetFarEndPathDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry in the SONET Far End Path Day table."
+    INDEX       { ifIndex, sonetFarEndPathDayNumber }
+    ::= { sonetFarEndPathDayTable 1 }
+
+SonetFarEndPathDayEntry ::=
+    SEQUENCE {
+        sonetFarEndPathDayNumber      INTEGER,
+        sonetFarEndPathDayStartTime   DateAndTime,
+        sonetFarEndPathDayValidData   TruthValue,
+        sonetFarEndPathDayCVs         PerfTotalCount,
+        sonetFarEndPathDayESs         PerfTotalCount,
+        sonetFarEndPathDaySESs        PerfTotalCount,
+        sonetFarEndPathDayUASs        PerfTotalCount,
+        sonetFarEndPathDayFCs         PerfTotalCount,
+        sonetFarEndPathDayTcaFlag     TruthValue,
+        sonetFarEndPathDayEBs         PerfTotalCount,
+        sonetFarEndPathDayReset       INTEGER
+    }
+
+sonetFarEndPathDayNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..4)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A number which identifies the 1-day interval for which the set
+        of far-end path related statistics is available.  The number is
+        between 1 and n, where n is the number of 1-day intervals
+        supported by the agent.  The interval identified by 1 is the
+        current 1-day interval, 2 is the previous (most recently
+        completed) 1-day interval and n is the least recently completed
+        1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetFarEndPathDayEntry 1 }
+
+sonetFarEndPathDayStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the date and time at which the current
+        interval of measurements began."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetFarEndPathDayEntry 2 }
+
+sonetFarEndPathDayValidData OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This variable assumes the value true(1) if the data stored for
+        this interval is both valid and complete.  It is set to false(2)
+        if the data stored for this interval is incomplete or otherwise
+        invalid because (a) the data stored for this interval is for a
+        period greater or less than 24 hours, or (b) some data is
+        missing (e.g., when a near-end defect prevents some far-end data
+        from being collected)."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.2."
+    ::= { sonetFarEndPathDayEntry 3 }
+
+sonetFarEndPathDayCVs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end path code violation (CV-PFE) count is the number
+        of REI-Ps (bit 1-4 in G1 byte) which were detected at the
+        SONET STS-path layer interface in a previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.6."
+    ::= { sonetFarEndPathDayEntry 5 }
+
+sonetFarEndPathDayESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end path errored second (ES-PFE) count is the number of
+        1-second intervals containing one or more REDC-P, or one or more
+        RDI-P, ERDI-P server or ERDI-P connectivity defects which were
+        encountered by the SONET STS-path layer interface in a previous
+        1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.6."
+    ::= { sonetFarEndPathDayEntry 6 }
+
+sonetFarEndPathDaySESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end path severely errored second (SES-PFE) is a count
+        of 1-second intervals containing sonetSevereErrorThreshold or
+        more REDC-Ps or one or more RDI-P, ERDI-P server or ERDI-P
+        connectivity defects which were detected by the SONET STS-path
+        layer interface in a previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5."
+   ::= { sonetFarEndPathDayEntry 9 }
+
+sonetFarEndPathDayUASs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end path unavailable second (UAS-PFE) is a count of
+        1-second intervals for which the SONET STS-path was unavailable
+        during a previous 1-day interval.  The SONET STS-path becomes
+        unavailable at the onset of 10 contiguous SES-PFEs.  The 10
+        SES-PFEs are included in unavailable time.  Once unavailable,
+        the SONET STS-path becomes available at the onset of 10
+        contiguous seconds with no SES-PFEs.  The 10 seconds with no
+        SES-PFEs are excluded from unavailable time."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.1."
+    ::= { sonetFarEndPathDayEntry 10 }
+
+sonetFarEndPathDayFCs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end path failures count."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.1."
+    ::= { sonetFarEndPathDayEntry 11 }
+
+sonetFarEndPathDayTcaFlag OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "TRUE if one of the counters crossed the
+       threshold during the day."
+    ::= { sonetFarEndPathDayEntry 12 }
+
+sonetFarEndPathDayEBs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The count of far-end path blocks in which one or more bits are in error."
+    REFERENCE   "ITU G.826"
+    ::= { sonetFarEndPathDayEntry 13 }
+
+sonetFarEndPathDayReset OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Writing this object reset the PM counters of this interval."
+    ::= { sonetFarEndPathDayEntry 14 }
+
+
+
+-- *********************************************************************
+--  SONET VT-Path group object definitions.
+--
+--  SONET VT-Path default threshold value object definitions.  These
+--  default values apply to both near-end and far-end Path interfaces.
+-- *********************************************************************
+
+sonetVTDefaultThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetVTDefaultThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of default thresholds for SONET Path counters."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSupVT 1 }
+
+sonetVTDefaultThresholdEntry OBJECT-TYPE
+    SYNTAX      SonetVTDefaultThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the table of default thresholds.  The table has a
+        variable for each counter type and accumulation period
+        combination, but uses indexes to indetify the digital signal
+        direction and rate.  The agent must provide a set of default
+        threshold values for all rates that the NE supports.  The agent
+        may make these variables read-only."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    INDEX     { sonetVTDefaultThresholdDirection,
+                sonetVTDefaultThresholdRate }
+    ::= { sonetVTDefaultThresholdTable 1 }
+
+SonetVTDefaultThresholdEntry ::=
+    SEQUENCE {
+        sonetVTDefaultThresholdDirection  INTEGER,
+        sonetVTDefaultThresholdRate       INTEGER,
+        sonetVTDefaultCVThreshold         INTEGER,
+        sonetVTDefaultESThreshold         INTEGER,
+        sonetVTDefaultSESThreshold        INTEGER,
+        sonetVTDefaultUASThreshold        INTEGER,
+        sonetVTDefaultDayCVThreshold      INTEGER,
+        sonetVTDefaultDayESThreshold      INTEGER,
+        sonetVTDefaultDaySESThreshold     INTEGER,
+        sonetVTDefaultDayUASThreshold     INTEGER
+    }
+
+sonetVTDefaultThresholdDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    nearEnd(1),
+                    farEnd(2)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The digital signal direction for which the default threshold
+        values apply."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetVTDefaultThresholdEntry 1 }
+
+sonetVTDefaultThresholdRate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    vt1dot5(1),
+                    vtg(2)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The path digital signal rate for which the default threshold
+        values apply."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetVTDefaultThresholdEntry 2 }
+
+sonetVTDefaultCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (1..16383)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET CV-V and CV-VFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetVTDefaultThresholdEntry 3 }
+
+sonetVTDefaultESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (1..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET ES-V and ES-VFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetVTDefaultThresholdEntry 4 }
+
+sonetVTDefaultSESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (1..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET SES-V and SES-VFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetVTDefaultThresholdEntry 5 }
+
+sonetVTDefaultUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (1..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET UAS-V and UAS-VFE counter 15-minute
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetVTDefaultThresholdEntry 6 }
+
+sonetVTDefaultDayCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (1..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET CV-V and CV-VFE counter 1-day
+        interval thresholds."
+
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetVTDefaultThresholdEntry 7 }
+
+sonetVTDefaultDayESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET ES-V and ES-VFE counter 1-day
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetVTDefaultThresholdEntry 8 }
+
+sonetVTDefaultDaySESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET SES-V and SES-VFE counter 1-day
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetVTDefaultThresholdEntry 9 }
+
+sonetVTDefaultDayUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default value for SONET UAS-V and UAS-VFE counter 1-day
+        interval thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetVTDefaultThresholdEntry 10 }
+
+
+-- *********************************************************************
+--  SONET VT threshold value object definitions.  This table is an
+--  extension to the sonetVTCurrentTable found in the SONET-MIB.
+-- *********************************************************************
+
+sonetVTThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetVTThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of trap threshold values for SONET Path counters."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    ::= { sonetSupVT 2 }
+
+sonetVTThresholdEntry OBJECT-TYPE
+    SYNTAX      SonetVTThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the table of SONET Path trap thresholds."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    AUGMENTS    { sonetVTCurrentEntry }
+    ::= { sonetVTThresholdTable 1 }
+
+SonetVTThresholdEntry ::=
+    SEQUENCE {
+        sonetVTCurrentCVThreshold         INTEGER,
+        sonetVTCurrentESThreshold         INTEGER,
+        sonetVTCurrentSESThreshold        INTEGER,
+        sonetVTCurrentUASThreshold        INTEGER,
+        sonetVTDayCVThreshold             INTEGER,
+        sonetVTDayESThreshold             INTEGER,
+        sonetVTDaySESThreshold            INTEGER,
+        sonetVTDayUASThreshold            INTEGER
+    }
+
+sonetVTCurrentCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval CV-V and CV-VFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetVTThresholdEntry 1 }
+
+sonetVTCurrentESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval ES-V and ES-VFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetVTThresholdEntry 2 }
+
+sonetVTCurrentSESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval SES-V and SES-VFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetVTThresholdEntry 3 }
+
+sonetVTCurrentUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 15-minute
+        interval UAS-V and UAS-VFE counters.  A value of zero indicates
+        that the default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetVTThresholdEntry 4 }
+
+sonetVTDayCVThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 1-day CV-V
+        and CV-VFE counters.  A value of zero indicates that the default
+        threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetVTThresholdEntry 5 }
+
+sonetVTDayESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 1-day ES-V
+        and ES-VFE counters.  A value of zero indicates that the default
+        threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetVTThresholdEntry 6 }
+
+sonetVTDaySESThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 1-day
+        SES-V and SES-VFE counters.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetVTThresholdEntry 7 }
+
+sonetVTDayUASThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The trap threshold value for the interface's current 1-day
+        UAS-V and UAS-VFE counters.  A value of zero indicates that the
+        default threshold value is to be used."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { 0 }
+    ::= { sonetVTThresholdEntry 8 }
+
+
+-- *******************************************************************
+--  The SONET VT Day Table.
+-- *******************************************************************
+
+sonetVTDayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetVTDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SONET Path Day table.  Contains performance statistics
+        collected by each SONET Path over multiple 1-day
+        intervals of operation."
+    ::= { sonetSupVT 17 }
+
+sonetVTDayEntry OBJECT-TYPE
+    SYNTAX      SonetVTDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the SONET Path Day table."
+    INDEX       { ifIndex, sonetVTDayNumber }
+    ::= { sonetVTDayTable 1 }
+
+SonetVTDayEntry ::=
+    SEQUENCE {
+        sonetVTDayNumber      INTEGER,
+        sonetVTDayStartTime   DateAndTime,
+        sonetVTDayValidData   TruthValue,
+        sonetVTDayFCs         PerfTotalCount,
+        sonetVTDayCVs         PerfTotalCount,
+        sonetVTDayESs         PerfTotalCount,
+        sonetVTDaySESs        PerfTotalCount,
+        sonetVTDayUASs        PerfTotalCount,
+        sonetVTDayEBs         PerfTotalCount,
+        sonetVTDayTcaFlag     TruthValue,
+        sonetVTDayReset       INTEGER
+    }
+
+sonetVTDayNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..33)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A number which identifies the 1-day interval for which the set
+        of near-end path related statistics is available.  The number is
+        between 1 and n, where n is the number of 1-day intervals
+        supported by the agent.  The interval identified by 1 is the
+        current 1-day interval, 2 is the previous (most recently
+        completed) 1-day interval and n is the least recently completed
+        1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetVTDayEntry 1 }
+
+sonetVTDayStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the date and time at which the 1-day
+        interval of measurements began on this interface."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetVTDayEntry 2 }
+
+sonetVTDayValidData OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This variable assumes the value true(1) if the data stored for
+        this interval is both valid and complete.  It is set to false(2)
+        if the data stored for this interval is incomplete or otherwise
+        invalid because (a) the data stored for this interval is for a
+        period greater or less than 24 hours, or (b) some data is
+        missing."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.2."
+    ::= { sonetVTDayEntry 3 }
+
+sonetVTDayFCs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The near-end path failure count (FC-V) is the number of
+        occurences of near-end path failure events encountered by the
+        SONET path layer interface in a previous 1-day interval.  A
+        near-end path failure event begins when the first of any of
+        LOP-V, AIS-V or UNEQ-V failures is declared; a near-end
+        path failure event ends when all LOP-V, AIS-V and UNEQ-V
+        failures have cleared."
+    REFERENCE   "ANSI T1.231-1997 clause 8.3.8.1."
+    ::= { sonetVTDayEntry 4 }
+
+sonetVTDayCVs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path code violation (CV-V) count is the number of BIP-2
+        errors which were detected at the VT-path layer interface in a
+        previous 1-day interval.  CVs for the path layer are collected
+        using the BIP-2 in the V5 byte located in the VT-path
+        overhead."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.1.1."
+    ::= { sonetVTDayEntry 5 }
+
+sonetVTDayESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path errored second (ES-V) count is the number of 1-second
+        intervals containing one or more EDC error (V5 byte), or one or
+        more AIS-V, LOP-V or UNEQ-V defects which were
+        encountered by the SONET path layer interface in a previous
+        1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.2."
+    ::= { sonetVTDayEntry 6 }
+
+sonetVTDaySESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path severely errored second (SES-V) is a count of 1-second
+        intervals containing sonetSevereErrorThreshold or more EDC error
+        (V5 byte), or one or more AIS-V, LOP-V or UNEQ-V defects
+        which were encountered by the SONET path layer interface in a
+        previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.5."
+    ::= { sonetVTDayEntry 7 }
+
+sonetVTDayUASs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The path unavailable second (UAS-V) is a count of 1-second
+        intervals for which the SONET VT-path was unavailable during a
+        previous 1-day interval.  The SONET VT-path becomes unavailable
+        at the onset of 10 contiguous SES-Vs.  The 10 SES-Vs are
+        included in unavailable time.  Once unavailable, the SONET
+        VT-path becomes available at the onset of 10 contiguous seconds
+        with no SES-Vs.  The 10 seconds with no SES-Vs are excluded from
+        unavailable time."
+
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.6."
+    ::= { sonetVTDayEntry 8 }
+
+sonetVTDayEBs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number VT path blocks in which one or more bits are in error counted during a day."
+    REFERENCE   "ITU-G.826"
+    ::= { sonetVTDayEntry 9 }
+
+sonetVTDayTcaFlag OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "TRUE if one of the counters crossed the
+       threshold during the day."
+    ::= { sonetVTDayEntry 10 }
+
+sonetVTDayReset OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Writing this object reset the PM counters of this interval."
+    ::= { sonetVTDayEntry 11 }
+
+
+-- *******************************************************************
+-- The SONET Far End VT Day Table.
+-- *******************************************************************
+
+sonetFarEndVTDayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonetFarEndVTDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SONET Far End Path Day table.  Contains various
+        statistics collected by each SONET Far End Path over
+        multiple 1-day intervals of operation."
+    ::= { sonetSupFarEndVT 3 }
+
+sonetFarEndVTDayEntry OBJECT-TYPE
+    SYNTAX      SonetFarEndVTDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An entry in the SONET Far End Path Day table."
+    INDEX       { ifIndex, sonetFarEndVTDayNumber }
+    ::= { sonetFarEndVTDayTable 1 }
+
+SonetFarEndVTDayEntry ::=
+    SEQUENCE {
+        sonetFarEndVTDayNumber      INTEGER,
+        sonetFarEndVTDayStartTime   DateAndTime,
+        sonetFarEndVTDayValidData   TruthValue,
+        sonetFarEndVTDayFCs         PerfTotalCount,
+        sonetFarEndVTDayCVs         PerfTotalCount,
+        sonetFarEndVTDayESs         PerfTotalCount,
+        sonetFarEndVTDaySESs        PerfTotalCount,
+        sonetFarEndVTDayUASs        PerfTotalCount,
+        sonetFarEndVTDayEBs         PerfTotalCount,
+        sonetFarEndVTDayTcaFlag     TruthValue,
+        sonetFarEndVTDayReset       INTEGER
+    }
+
+sonetFarEndVTDayNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..4)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A number which identifies the 1-day interval for which the set
+        of far-end VT-path related statistics is available.  The number is
+        between 1 and n, where n is the number of 1-day intervals
+        supported by the agent.  The interval identified by 1 is the
+        current 1-day interval, 2 is the previous (most recently
+        completed) 1-day interval and n is the least recently completed
+        1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetFarEndVTDayEntry 1 }
+
+sonetFarEndVTDayStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the date and time at which the current
+        interval of measurements began."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.1."
+    ::= { sonetFarEndVTDayEntry 2 }
+
+sonetFarEndVTDayValidData OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This variable assumes the value true(1) if the data stored for
+        this interval is both valid and complete.  It is set to false(2)
+        if the data stored for this interval is incomplete or otherwise
+        invalid because (a) the data stored for this interval is for a
+        period greater or less than 24 hours, or (b) some data is
+        missing (e.g., when a near-end defect prevents some far-end data
+        from being collected)."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.2.2."
+    ::= { sonetFarEndVTDayEntry 3 }
+
+sonetFarEndVTDayFCs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end path failure count (FC-VFE) is the number of
+        occurences of far-end path failure events detected by the SONET
+        VT-path layer interface in a previous 1-day interval.  A
+        far-end path failure event begins when the first of any remote
+        failure indication (RFI-V, RFI-V server, or RFI-V connectivity)
+        failure is declared; a far-end path failure event ends when all
+        RFI-V, RFI-V server, or RFI-V connectivity failures are
+        cleared."
+    REFERENCE   "ANSI T1.231-1997 clause 8.3.8.2."
+    ::= { sonetFarEndVTDayEntry 4 }
+
+sonetFarEndVTDayCVs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end path code violation (CV-VFE) count is the number
+        of REI-Vs (bit 1-4 in G1 byte) which were detected at the
+        SONET VT-path layer interface in a previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.6."
+    ::= { sonetFarEndVTDayEntry 5 }
+
+sonetFarEndVTDayESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end path errored second (ES-VFE) count is the number of
+        1-second intervals containing one or more REDC-V, or one or more
+        RDI-V, ERDI-V server or ERDI-V connectivity defects which were
+        encountered by the SONET VT-path layer interface in a previous
+        1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.6."
+    ::= { sonetFarEndVTDayEntry 6 }
+
+sonetFarEndVTDaySESs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end path severely errored second (SES-VFE) is a count
+        of 1-second intervals containing sonetSevereErrorThreshold or
+        more REDC-Vs or one or more RDI-V, ERDI-V server or ERDI-V
+        connectivity defects which were detected by the SONET VT-path
+        layer interface in a previous 1-day interval."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5."
+   ::= { sonetFarEndVTDayEntry 7 }
+
+sonetFarEndVTDayUASs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The far-end path unavailable second (UAS-VFE) is a count of
+        1-second intervals for which the SONET VT-path was unavailable
+        during a previous 1-day interval.  The SONET VT-path becomes
+        unavailable at the onset of 10 contiguous SES-VFEs.  The 10
+        SES-VFEs are included in unavailable time.  Once unavailable,
+        the SONET VT-path becomes available at the onset of 10
+        contiguous seconds with no SES-VFEs.  The 10 seconds with no
+        SES-VFEs are excluded from unavailable time."
+    REFERENCE   "ANSI T1.231-1997 clause 8.4.5.1."
+    ::= { sonetFarEndVTDayEntry 8 }
+
+sonetFarEndVTDayEBs OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number VT path blocks in which one or more bits are in error counted during a day
+        detected by the Far End."
+    REFERENCE   "ITU-G.826"
+    ::= { sonetFarEndVTDayEntry 9 }
+
+sonetFarEndVTDayTcaFlag OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "TRUE if one of the counters crossed the
+       threshold during the day."
+    ::= { sonetFarEndVTDayEntry 10 }
+
+sonetFarEndVTDayReset OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Writing this object reset the PM counters of this interval."
+    ::= { sonetFarEndVTDayEntry 11 }
+
+
+-- *********************************************************************
+--  SONET notification and notification information definitions.
+-- *********************************************************************
+
+sonetTrap               OBJECT IDENTIFIER ::= { sonetSupObjects 6 }
+
+sonetCounterId OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The OBJECT IDENTIFIER of the instance of the SONET counter
+        that has crossed its threshold."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.3."
+    ::= { sonetTrap 1 }
+
+sonetCounterValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The current value of the SONET counter that has crossed its
+        threshold."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.3."
+    ::= { sonetTrap 2 }
+
+sonetThresholdCrossing NOTIFICATION-TYPE
+    OBJECTS     { sonetCounterId, sonetCounterValue }
+    STATUS      current
+    DESCRIPTION
+        "This notification signifies that a counter has crossed its
+        designated threshold.  The term 'threshold crossing' means
+        that a threshold has been reached or exceeded.  A threshold
+        crossing alert message (trap) signifies a performance
+        degredation at or above the preset threshold value."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.3."
+    ::= { sonetTrap 3 }
+
+
+END

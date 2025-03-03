@@ -1,0 +1,1083 @@
+
+-- *****************************************************************************
+-- Juniper-ROUTER-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   The Router MIB.
+--
+-- Copyright (c) 2000, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-ROUTER-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpEngineID
+        FROM SNMP-FRAMEWORK-MIB
+    JuniName
+        FROM Juniper-TC
+    JuniIpPolicyName, JuniIpPolicyExtendedCommunity
+        FROM Juniper-IP-POLICY-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniRouterMIB  MODULE-IDENTITY
+    LAST-UPDATED "200405062030Z"  -- 06-May-04 04:30 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Router MIB is used to manage the creation and deletion as well as
+        the administrative states of the protocols and functions that run within
+        a designated router."
+    -- Revision History
+    REVISION    "200405062030Z"  -- 06-May-04 04:30 PM EDT  - JUNOSe 6.1
+    DESCRIPTION
+         "Added RLI-870 Virtual Router and Vrf count support."
+    REVISION    "200309241731Z"  -- 24-Sep-03 01:31 PM EDT  - JUNOSe 6.0
+    DESCRIPTION
+         "Added RADIUS Proxy protocol support."
+    REVISION    "200305221552Z"  -- 22-May-03 11:52 AM EDT  - JUNOSe 5.2
+    DESCRIPTION
+        "Added support for global export map and export map filter."
+    REVISION    "200305102054Z"  -- 10-May-03 04:54 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added DHCPv6 protocol support."
+    REVISION    "200304241325Z"  -- 24-Apr-03 09:25 AM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added TACACS+ and RADIUS Disconnect protocol support.
+         Added SNMPv3 context engine ID to the virtual router table."
+    REVISION    "200205101816Z"  -- 10-May-02 02:16 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added support for router context name string."
+    REVISION    "200101241825Z"  -- 24-Jan-01 01:25 PM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Added support for VRF - virtual router forwarder.  Support is defined
+         by these objects/table:
+             juniRouterVrf
+             juniRouterVrfTable
+             juniRouterVrfRouteTargetTable"
+    REVISION    "200001210000Z"  -- 21-Jan-00               - JUNOSe 1.3
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 32 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniNextRouterIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Coordinates routerIndex value allocation for entries in an associated
+        router table.  Clients must first read the routerIndex value from this
+        object, then create an entry having the routerIndex value in the
+        associated router table.
+
+        The DESCRIPTION clause for an object of this type must identify the
+        associated router table.
+
+        A GET of this object returns the next available routerIndex value to be
+        used to create an entry in the associated router table; or zero, if no
+        valid routerIndex value is available.  This object also returns a value
+        of zero when it is the lexicographic successor of a varbind presented in
+        an SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that routerIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously.
+
+        Unless specified otherwise by its MAX-ACCESS and DESCRIPTION clauses, an
+        object of this type is read-only, and a SET of such an object returns a
+        notWritable error."
+    SYNTAX      Unsigned32
+
+JuniRouterProtocolIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Identifies the router protocol."
+    SYNTAX      INTEGER {
+                    ip(1),
+                    osi(2),
+                    icmp(3),
+                    igmp(4),
+                    tcp(5),
+                    udp(6),
+                    bgp(7),
+                    ospf(8),
+                    isis(9),
+                    rip(10),
+                    snmp(11),
+                    ntp(12),
+                    generator(13),
+                    localAddressServer(14),
+                    dhcpProxy(15),
+                    dhcpRelay(16),
+                    nameResolver(17),
+                    policyManager(18),
+                    sscClient(19),
+                    cops(20),
+                    mgtm(21),
+                    dvmrp(22),
+                    pim(23),
+                    msdp(24),
+                    mpls(25),
+                    radius(26),
+                    mplsMgr(27),
+                    dhcpLocalServer(28),
+                    tacacsPlus(29),
+                    radiusDisconnect(30),
+                    dhcpv6LocalServer(31),
+                    radiusProxy(32)}
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRouterObjects   OBJECT IDENTIFIER ::= { juniRouterMIB 1 }
+juniRouterSummaryCounts   OBJECT IDENTIFIER ::= { juniRouterObjects 6 }
+
+--- 
+--- Summary Count Objects
+---
+juniRouterSummaryScalars OBJECT IDENTIFIER
+    ::= {juniRouterSummaryCounts 1}
+
+juniRouterSummaryNonParentVRsConfigured  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of VRs without VRFs configured."
+    ::= { juniRouterSummaryScalars 1 }
+
+juniRouterSummaryParentVRsConfigured  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of VRs with VRFs configured."
+    ::= { juniRouterSummaryScalars 2 }
+
+juniRouterSummaryVRFsConfigured  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of VRFs configured."
+    ::= { juniRouterSummaryScalars 3 }
+
+juniRouterSummaryTotalConfigured  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of Virtual Routers and VRFs configured."
+    ::= { juniRouterSummaryScalars 4}
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- Routers
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- Router ID selection for creating "virtual" routers.
+--
+juniRouterNextRouterIndex  OBJECT-TYPE
+    SYNTAX      JuniNextRouterIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinates routerIndex and juniRouterVrfIndex value allocation for
+        entries in the juniRouterTable and juniRouterVrfTable, respectively.
+
+        A GET of this object returns the next available routerIndex value to be
+        used to create an entry in the associated router table; or zero, if no
+        valid routerIndex value is available.  This object also returns a value
+        of zero when it is the lexicographic successor of a varbind presented in
+        an SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that routerIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniRouterObjects 1 }
+
+--
+-- The Router Table
+--
+juniRouterTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRouterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for routers present in the system."
+    ::= { juniRouterObjects 2 }
+
+juniRouterEntry  OBJECT-TYPE
+    SYNTAX      JuniRouterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents a single router.  Creating and/or
+        deleting entries in this table causes corresponding entries to be
+        created or deleted in the juniRouterProtocolTable.  Note that VRFs also
+        appear as entries in this table and can be differentiated by the
+        juniRouterVrf object.  The juniRouterVrfTable shows the parent / child
+        relationship between routers and VRFs present in the system."
+    INDEX     { juniRouterIndex }
+    ::= { juniRouterTable 1 }
+
+JuniRouterEntry ::= SEQUENCE {
+    juniRouterIndex             Unsigned32,
+    juniRouterName              JuniName,
+    juniRouterRowStatus         RowStatus,
+    juniRouterVrf               TruthValue,
+    juniRouterContextName       OCTET STRING,
+    juniRouterContextEngineID   SnmpEngineID,
+    juniRouterSummaryVRFCount   Counter32}
+
+juniRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The routerIndex of this router.  When creating entries in this table,
+        suitable values for this object are determined by reading
+        juniRouterNextRouterIndex."
+    ::= { juniRouterEntry 1 }
+
+juniRouterName  OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned name given to this router.  The name must
+        be unique within the context of this table and cannot be changed after
+        the router instance is created."
+    ::= { juniRouterEntry 2 }
+
+juniRouterRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniRouterRowStatus
+            juniRouterName
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniRouterIndex must have been determined previously by
+            reading juniRouterNextRouterIndex.
+
+        A corresponding entries in juniRouterProtocolTable are created/destroyed
+        as a result of creating/destroying an entry in this table."
+    ::= { juniRouterEntry 3 }
+
+juniRouterVrf  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies whether this router is a VRF or not.  A value of true(1)
+        indicates that this is a VRF; a value of false(2) indicates that it is
+        not."
+    ::= { juniRouterEntry 4 }
+
+juniRouterContextName  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(7..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An internally derived/assigned name given to this router with a
+        specific format:
+                routerN
+
+        where N is a decimal number (with no leading zeroes) in the range
+        1..16777215 corresponding to the value of the least significant 24 bits
+        of the juniRouterIndex (the router UID).  The name is unique within the
+        context of this table."
+    ::= { juniRouterEntry 5 }
+
+juniRouterContextEngineID  OBJECT-TYPE
+    SYNTAX      SnmpEngineID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The virtual router SNMP engine's administratively-unique identifier.
+        This is used as the contextEngineId to reach the virtual router's
+        SNMP context via the system-wide SNMP engine using SNMPv3."
+    REFERENCE
+        "An Architecture for Describing Simple Network Management Protocol
+        (SNMP) Management Frameworks (RFC3411) clause 3.3.2."
+    ::= { juniRouterEntry 6 }
+
+juniRouterSummaryVRFCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of VRFs contained in the VR." 
+    ::= { juniRouterEntry 7 }
+
+
+--
+-- The Router Protocol Table
+--
+juniRouterProtocolTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRouterProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for each protocol supported by the router
+        entry created in the juniRouterTable."
+    ::= { juniRouterObjects 3 }
+
+juniRouterProtocolEntry  OBJECT-TYPE
+    SYNTAX      JuniRouterProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry provides administrative control on a router protocol for the
+        router designated by the first indice to this table.  The second indice
+        identifies the router protocol.
+
+        Entries in this table are created as a side-effect of row creation in
+        the juniRouterTable or juniRouterVrfTable."
+    INDEX     { juniRouterProtocolRouterIndex,
+                juniRouterProtocolProtocolIndex }
+    ::= { juniRouterProtocolTable 1 }
+
+JuniRouterProtocolEntry ::= SEQUENCE {
+    juniRouterProtocolRouterIndex    Unsigned32,
+    juniRouterProtocolProtocolIndex  JuniRouterProtocolIndex,
+    juniRouterProtocolRowStatus      RowStatus }
+
+juniRouterProtocolRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The routerIndex of this router.  This object is the same as the
+        juniRouterIndex object defined in the juniRouterTable."
+    ::= { juniRouterProtocolEntry 1 }
+
+juniRouterProtocolProtocolIndex  OBJECT-TYPE
+    SYNTAX      JuniRouterProtocolIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identities the router protocol."
+    ::= { juniRouterProtocolEntry 2 }
+
+juniRouterProtocolRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Administrative control and status of a protocol on a router.
+
+        The following values can be read from this object:
+          active(1)   - Indicates that the protocol on the designated router
+                        is created, configured, and running.
+          notReady(3) - Indicates that the protocol requires additional
+                        configuration in a protocol specific MIB module.
+                        Examples include the BGP and OSPF protocols, which
+                        require additional configuration of protocol specific
+                        parameters such as: Autonomous System (AS) for BGP,
+                        and Process Id for OSPF.
+          destroy(6)  - The destroy(3) operation can fail if there are
+                        executing applications dependent on the protocol.
+                        If an attempt is made to destroy(6) an active(1)
+                        protocol that other applications are dependent on,
+                        the rowStatus will read destroy(6).  Normally, when
+                        a row is destroyed, the agent will cleaup and remove
+                        the entry.
+
+        The following values can be written to this object:
+          active(1)      - Activate protocol on the designated router.
+          createAndGo(4) - Create protocol on designated router.  The router
+                           indicated by juniRouterProtocolRouterIndex must
+                           already exist in the juniRouterTable.  The value of
+                           the juniRouterProtocolProtocolIndex must be from the
+                           set of protocol values defined by the
+                           JuniRouterProtocolIndex type.
+          destroy(6)     - Destroy protocol on designated router.  If the
+                           operation is successful, the agent will remove the
+                           entry.  If the operation failed, the row will remain
+                           in the table with a rowStatus value of destroy(6).
+
+            Conditions on destroy(6):
+             1) The default router can not be deleted.
+             2) The local router can not be deleted.  A local router is defined
+                as the router that sourced the SNMP request.
+
+        Upon creation of a router in the juniRouterTable, some protocol entries
+        will appear in this table by default, which indicates that these
+        protocols are created by the action of creating a router.  It is
+        important to note, that this behavior may change over time by protocol
+        type."
+    ::= { juniRouterProtocolEntry 3 }
+
+--
+-- The Router VRF Table
+--
+juniRouterVrfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRouterVrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for each VRF on each router entry created
+        in the juniRouterTable."
+    ::= { juniRouterObjects 4 }
+
+juniRouterVrfEntry  OBJECT-TYPE
+    SYNTAX      JuniRouterVrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry provides administrative control on a router VRF for the
+        router designated by the first indice of this table.  The second indice
+        identifies the router VRF.
+
+        The parent router must exist in the juniRouterTable before performing
+        VRF row creation in this table"
+    INDEX     { juniRouterVrfRouterIndex,
+                juniRouterVrfRouterVrfIndex }
+    ::= { juniRouterVrfTable 1 }
+
+JuniRouterVrfEntry ::= SEQUENCE {
+    juniRouterVrfRouterIndex                      Unsigned32,
+    juniRouterVrfRouterVrfIndex                   Unsigned32,
+    juniRouterVrfIpv4UnicastImportRouteMap        JuniIpPolicyName,
+    juniRouterVrfIpv4UnicastExportRouteMap        JuniIpPolicyName,
+    juniRouterVrfRouteDistinguisher               JuniIpPolicyExtendedCommunity,
+    juniRouterVrfRowStatus                        RowStatus,
+    juniRouterVrfRouterName                       JuniName,
+    juniRouterVrfRouterDescription                DisplayString,
+    juniRouterVrfIpv4UnicastGlobalExportRouteMap  JuniIpPolicyName,
+    juniRouterVrfIpv4UnicastExportRouteMapFilter  TruthValue,
+    juniRouterVrfIpv6UnicastImportRouteMap        JuniIpPolicyName,
+    juniRouterVrfIpv6UnicastExportRouteMap        JuniIpPolicyName,
+    juniRouterVrfIpv6UnicastGlobalExportRouteMap  JuniIpPolicyName,
+    juniRouterVrfIpv6UnicastExportRouteMapFilter  TruthValue,
+    juniRouterVrfIpv4UnicastGlobalImportRouteMap  JuniIpPolicyName,
+    juniRouterVrfIpv4UnicastGlobalImportMaxRoutes Unsigned32,
+    juniRouterVrfIpv6UnicastGlobalImportRouteMap  JuniIpPolicyName,
+    juniRouterVrfIpv6UnicastGlobalImportMaxRoutes Unsigned32}
+
+juniRouterVrfRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The router index of this router, also referred to as the parent of the
+        VRF.  This object is the same as the juniRouterIndex object defined in
+        the juniRouterTable."
+    ::= { juniRouterVrfEntry 1 }
+
+juniRouterVrfRouterVrfIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VRF router index for this entry, also referred as the child of the
+        parent router, which is identified by the first indice to this table."
+    ::= { juniRouterVrfEntry 2 }
+
+juniRouterVrfIpv4UnicastImportRouteMap  OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VRF router import route map for IPv4 unicast routes."
+    DEFVAL    { "" }
+    ::= { juniRouterVrfEntry 3 }
+
+juniRouterVrfIpv4UnicastExportRouteMap  OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VRF router export route map for IPv4 unicast routes."
+    DEFVAL    { "" }
+    ::= { juniRouterVrfEntry 4 }
+
+juniRouterVrfRouteDistinguisher  OBJECT-TYPE
+    SYNTAX      JuniIpPolicyExtendedCommunity
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VRF router route distinguisher."
+    DEFVAL    { "" }
+    ::= { juniRouterVrfEntry 5 }
+
+juniRouterVrfRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        *** LIMITED CONFIGURATION LEVEL ***
+        RowStatus createAndGo/destroy operations have the following
+        special-purpose semantics:
+            createAndGo     Create an entry having the specified configuration
+                            and append it to the target list, i.e. create an
+                            juniRouterVrfEntry table entry with the associated
+                            characteristics.
+            destroy         Destroy the specified element.
+
+        Entries in this table can be modified once the row has been created.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            A value for juniRouterVrfRouterIndex must have been determined
+            previously by reading juniRouterNextRouterIndex.
+
+            A parent router must exist in the juniRouterTable."
+    ::= { juniRouterVrfEntry 7 }
+
+juniRouterVrfRouterName  OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned name given to this VRF router.  The name
+        must be unique within the context of this table and cannot be changed
+        after the router instance is created."
+    ::= { juniRouterVrfEntry 8 }
+
+juniRouterVrfRouterDescription  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned description given to this VRF router."
+    ::= { juniRouterVrfEntry 9 }
+
+juniRouterVrfIpv4UnicastGlobalExportRouteMap  OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VRF router global export route map for IPv4 unicast routes."
+    DEFVAL    { "" }
+    ::= { juniRouterVrfEntry 10 }
+
+juniRouterVrfIpv4UnicastExportRouteMapFilter  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Is the VRF export map for IPv4 unicast routes allowed to 
+        filter routes?"
+    DEFVAL    { false }
+    ::= { juniRouterVrfEntry 11 }
+
+juniRouterVrfIpv6UnicastImportRouteMap  OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VRF router import route map for IPv6 unicast routes."
+    DEFVAL    { "" }
+    ::= { juniRouterVrfEntry 12 }
+
+juniRouterVrfIpv6UnicastExportRouteMap  OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VRF router export route map for IPv6 unicast routes."
+    DEFVAL    { "" }
+    ::= { juniRouterVrfEntry 13 }
+
+juniRouterVrfIpv6UnicastGlobalExportRouteMap  OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VRF router global export route map for IPv6 unicast routes."
+    DEFVAL    { "" }
+    ::= { juniRouterVrfEntry 14 }
+
+juniRouterVrfIpv6UnicastExportRouteMapFilter  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Is the VRF export map for IPv6 unicast routes allowed to 
+        filter routes?"
+    DEFVAL    { false }
+    ::= { juniRouterVrfEntry 15 }
+
+juniRouterVrfIpv4UnicastGlobalImportRouteMap  OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VRF router global import route map for IPv4 unicast routes."
+    DEFVAL    { "" }
+    ::= { juniRouterVrfEntry 16 }
+
+juniRouterVrfIpv4UnicastGlobalImportMaxRoutes  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of IPv4 unicast routes which can be
+        globaly imported."
+    DEFVAL    { 100 }
+    ::= { juniRouterVrfEntry 17 }
+
+juniRouterVrfIpv6UnicastGlobalImportRouteMap  OBJECT-TYPE
+    SYNTAX      JuniIpPolicyName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VRF router global import route map for IPv6 unicast routes."
+    DEFVAL    { "" }
+    ::= { juniRouterVrfEntry 18 }
+
+juniRouterVrfIpv6UnicastGlobalImportMaxRoutes  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of IPv6 unicast routes which can be
+        globaly imported."
+    DEFVAL    { 100 }
+    ::= { juniRouterVrfEntry 19 }
+
+--
+-- The Router VRF Route Target Table
+--
+juniRouterVrfRouteTargetTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRouterVrfRouteTargetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for each route target for the router/VRF
+        entry created in the juniRouterTable and juniRouterVrfTable."
+    ::= { juniRouterObjects 5 }
+
+juniRouterVrfRouteTargetEntry  OBJECT-TYPE
+    SYNTAX      JuniRouterVrfRouteTargetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry provides administrative control on VRF route targets for the
+        router/VRF pair designated by the first and second indice of this table.
+        The third indice identifies the route target.
+
+        The parent router must exist in the juniRouterTable and the VRF router
+        must exist in the juniRouterVrfTable before performing creation of the
+        route target in this table."
+    INDEX     { juniRouterVrfRouteTargetRouterIndex,
+                juniRouterVrfRouteTargetRouterVrfIndex,
+                juniRouterVrfRouteTargetAddrFormat,
+                juniRouterVrfRouteTargetRouteTarget }
+    ::= { juniRouterVrfRouteTargetTable 1 }
+
+JuniRouterVrfRouteTargetEntry ::= SEQUENCE {
+    juniRouterVrfRouteTargetRouterIndex      Unsigned32,
+    juniRouterVrfRouteTargetRouterVrfIndex   Unsigned32,
+    juniRouterVrfRouteTargetAddrFormat       INTEGER,
+    juniRouterVrfRouteTargetRouteTarget      JuniIpPolicyExtendedCommunity,
+    juniRouterVrfRouteTargetType             INTEGER,
+    juniRouterVrfRouteTargetRowStatus        RowStatus }
+
+juniRouterVrfRouteTargetRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The routerIndex of this router, also referred to as the parent of the
+        VRF.  This object is the same as the juniRouterIndex object defined in
+        the juniRouterTable."
+    ::= { juniRouterVrfRouteTargetEntry 1 }
+
+juniRouterVrfRouteTargetRouterVrfIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VRF router index for this entry, also referred as the child of the
+        parent router, which is identified by the first indice to this table."
+    ::= { juniRouterVrfRouteTargetEntry 2 }
+
+juniRouterVrfRouteTargetAddrFormat  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    routeTargetFormatAsn(0),
+                    routeTargetFormateIp(1) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The address format of the route target."
+    ::= { juniRouterVrfRouteTargetEntry 3 }
+
+juniRouterVrfRouteTargetRouteTarget  OBJECT-TYPE
+    SYNTAX      JuniIpPolicyExtendedCommunity
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VRF router route target."
+    ::= { juniRouterVrfRouteTargetEntry 4 }
+
+juniRouterVrfRouteTargetType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     routeTargetInvalid(0),
+                     routeTargetImport(1),
+                     routeTargetExport(2),
+                     routeTargetBoth(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VRF router route target type."
+    ::= { juniRouterVrfRouteTargetEntry 5 }
+
+juniRouterVrfRouteTargetRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        *** LIMITED CONFIGURATION LEVEL ***
+        RowStatus createAndGo/destroy operations have the following
+        special-purpose semantics:
+            createAndGo     Create an entry having the specified configuration
+                            and append it to the target list, i.e., create an
+                            juniRouterVrfRouteTargetEntry table entry with the
+                            associated characteristics.
+            destroy         Destroy the specified element.
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            A parent router must exist in the juniRouterTable.
+
+            A VRF router must exist in the juniRouterVrfTable."
+    ::= { juniRouterVrfRouteTargetEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniRouterTrapControl      OBJECT IDENTIFIER ::= { juniRouterMIB 2 }
+-- juniRouterTraps            OBJECT IDENTIFIER ::= { juniRouterMIB 3 }
+-- juniRouterTrapPrefix       OBJECT IDENTIFIER ::= { juniRouterTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRouterConformance OBJECT IDENTIFIER ::= { juniRouterMIB 4 }
+juniRouterCompliances OBJECT IDENTIFIER ::= { juniRouterConformance 1 }
+juniRouterGroups      OBJECT IDENTIFIER ::= { juniRouterConformance 2 }
+
+--
+-- compliance statements
+--
+juniRouterCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete compliance statement for entities which implement the
+        Juniper Router MIB.  This statement became obsolete when support was
+        added for VRFs within routers."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRouterGroup }
+    ::= { juniRouterCompliances 1 }                                -- JUNOSe 1.3
+
+juniRouterCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete compliance statement for entities which implement the
+        Juniper Router MIB.  This statement became obsolete when support was
+        added for the router context name."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRouterGroup2 }
+        GROUP       juniRouterVrfGroup
+            DESCRIPTION
+                "The VRF group is only required for entities which implement VRF
+                routers."
+    ::= { juniRouterCompliances 2 }                                -- JUNOSe 3.0
+
+juniRouterCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        Router MIB.  This statement became obsolete when support was added for
+        the router context engine ID."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRouterGroup3 }
+        GROUP       juniRouterVrfGroup2
+            DESCRIPTION
+                "The VRF group is only required for entities which implement VRF
+                routers."
+    ::= { juniRouterCompliances 3 }                                -- JUNOSe 4.0
+
+juniRouterCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        Router MIB.  This statement became obsolete when the global export map
+        and the export map filter option were added to the VRF group."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRouterGroup4 }
+        GROUP       juniRouterVrfGroup2
+            DESCRIPTION
+                "The VRF group is only required for entities which implement VRF
+                routers."
+    ::= { juniRouterCompliances 4 }                                -- JUNOSe 5.0
+
+juniRouterCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        Router MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRouterGroup4 }
+        GROUP       juniRouterVrfGroup3
+            DESCRIPTION
+                "The VRF group is only required for entities which implement VRF
+                routers."
+    ::= { juniRouterCompliances 5 }                                -- JUNOSe 5.2
+
+juniRouterCompliance6  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        Router MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRouterGroup5,
+            juniRouterSummaryScalarsGroup}
+        GROUP       juniRouterVrfGroup3
+            DESCRIPTION
+                "The VRF group is only required for entities which implement VRF
+                routers."
+    ::= { juniRouterCompliances 7 }                                -- JUNOSe 6.1
+
+juniRouterCompliance7  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        Router MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRouterGroup5,
+            juniRouterSummaryScalarsGroup}
+        GROUP       juniRouterVrfGroup4
+            DESCRIPTION
+                "The VRF group is only required for entities which implement VRF
+                routers."
+    ::= { juniRouterCompliances 8 }                                -- JUNOSe 7.1
+
+--
+-- units of conformance
+--
+juniRouterGroup  OBJECT-GROUP
+    OBJECTS {
+        juniRouterNextRouterIndex,
+        juniRouterName,
+        juniRouterRowStatus,
+        juniRouterProtocolRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects providing management of routers and
+        routing protocols in a Juniper product.  This group became obsolete when
+        support was added for VRFs within routers."
+    ::= { juniRouterGroups 1 }                                     -- JUNOSe 1.3
+
+juniRouterGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniRouterNextRouterIndex,
+        juniRouterName,
+        juniRouterRowStatus,
+        juniRouterVrf,
+        juniRouterProtocolRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects providing management of routers and
+        routing protocols in a Juniper product.  This group became obsolete when
+        support was added for the router context name."
+    ::= { juniRouterGroups 2 }                                     -- JUNOSe 3.0
+
+juniRouterVrfGroup  OBJECT-GROUP
+    OBJECTS {
+        juniRouterVrfIpv4UnicastImportRouteMap,
+        juniRouterVrfIpv4UnicastExportRouteMap,
+        juniRouterVrfRouteDistinguisher,
+        juniRouterVrfRowStatus,
+        juniRouterVrfRouterName,
+        juniRouterVrfRouteTargetType,
+        juniRouterVrfRouteTargetRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of VRFs within
+        routers in a Juniper product.  This group became obsolete when the VRF
+        router description object was added."
+    ::= { juniRouterGroups 3 }                                     -- JUNOSe 3.0
+
+juniRouterGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniRouterNextRouterIndex,
+        juniRouterName,
+        juniRouterRowStatus,
+        juniRouterVrf,
+        juniRouterProtocolRowStatus,
+        juniRouterContextName }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of routers and
+        routing protocols in a Juniper product.  This group became obsolete when
+        the contect engine ID object was added."
+    ::= { juniRouterGroups 4 }                                     -- JUNOSe 4.0
+
+juniRouterVrfGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniRouterVrfIpv4UnicastImportRouteMap,
+        juniRouterVrfIpv4UnicastExportRouteMap,
+        juniRouterVrfRouteDistinguisher,
+        juniRouterVrfRowStatus,
+        juniRouterVrfRouterName,
+        juniRouterVrfRouterDescription,
+        juniRouterVrfRouteTargetType,
+        juniRouterVrfRouteTargetRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of VRFs within
+        routers in a Juniper product.  This group became obsolete when the
+        global export map and the export map filter option were added."
+    ::= { juniRouterGroups 5 }                                     -- JUNOSe 4.0
+
+juniRouterGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniRouterNextRouterIndex,
+        juniRouterName,
+        juniRouterRowStatus,
+        juniRouterVrf,
+        juniRouterProtocolRowStatus,
+        juniRouterContextName,
+        juniRouterContextEngineID }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of routers and
+        routing protocols in a Juniper product.  This group became obsolete when
+        the summaryVRfCount object was added."
+    ::= { juniRouterGroups 6 }                                     -- JUNOSe 5.0
+
+
+juniRouterVrfGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniRouterVrfIpv4UnicastImportRouteMap,
+        juniRouterVrfIpv4UnicastExportRouteMap,
+        juniRouterVrfRouteDistinguisher,
+        juniRouterVrfRowStatus,
+        juniRouterVrfRouterName,
+        juniRouterVrfRouterDescription,
+        juniRouterVrfIpv4UnicastGlobalExportRouteMap,
+        juniRouterVrfIpv4UnicastExportRouteMapFilter,
+        juniRouterVrfRouteTargetType,
+        juniRouterVrfRouteTargetRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of VRFs within
+        routers in a Juniper product.  This group became obsolete when the
+        global import map was added and when support for separate ipv4 and
+        ipv6 route maps was added."
+    ::= { juniRouterGroups 7 }                                     -- JUNOSe 5.2
+
+juniRouterGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniRouterNextRouterIndex,
+        juniRouterName,
+        juniRouterRowStatus,
+        juniRouterVrf,
+        juniRouterProtocolRowStatus,
+        juniRouterContextName,
+        juniRouterContextEngineID,
+        juniRouterSummaryVRFCount}
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of routers and routing
+        protocols in a Juniper product."
+    ::= { juniRouterGroups 8 }                                     -- JUNOSe 6.1
+
+juniRouterSummaryScalarsGroup  OBJECT-GROUP
+    OBJECTS {
+        juniRouterSummaryNonParentVRsConfigured,
+        juniRouterSummaryParentVRsConfigured,
+        juniRouterSummaryVRFsConfigured,
+        juniRouterSummaryTotalConfigured}
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing summary counts for number of virtual routers
+        and virtual router forwarding instances (VRFs) in a Juniper product."
+    ::= { juniRouterGroups 9 }                                     -- JUNOSe 6.1
+
+juniRouterVrfGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniRouterVrfIpv4UnicastImportRouteMap,
+        juniRouterVrfIpv4UnicastExportRouteMap,
+        juniRouterVrfRouteDistinguisher,
+        juniRouterVrfRowStatus,
+        juniRouterVrfRouterName,
+        juniRouterVrfRouterDescription,
+        juniRouterVrfIpv4UnicastGlobalExportRouteMap,
+        juniRouterVrfIpv4UnicastExportRouteMapFilter,
+        juniRouterVrfIpv6UnicastImportRouteMap,
+        juniRouterVrfIpv6UnicastExportRouteMap,
+        juniRouterVrfIpv6UnicastGlobalExportRouteMap,
+        juniRouterVrfIpv6UnicastExportRouteMapFilter,
+        juniRouterVrfIpv4UnicastGlobalImportRouteMap,
+        juniRouterVrfIpv4UnicastGlobalImportMaxRoutes,
+        juniRouterVrfIpv6UnicastGlobalImportRouteMap,
+        juniRouterVrfIpv6UnicastGlobalImportMaxRoutes,
+        juniRouterVrfRouteTargetType,
+        juniRouterVrfRouteTargetRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of VRFs within routers in
+        a Juniper product."
+    ::= { juniRouterGroups 10 }                                    -- JUNOSe 7.1
+
+END

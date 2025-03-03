@@ -1,0 +1,1700 @@
+-- ****************************************************************
+-- ciscoVismDsx0MIB
+--   The MIB for DS0 interface configuration and
+--   Alarm Configuration for VISM(Voice Interface Module)
+--   in MGX products.
+--
+-- March 2004, Rashmi Purandare
+--
+-- Copyright (c) 2003,2004 by Cisco Systems, Inc.
+-- All rights reserved.
+-- ****************************************************************
+
+CISCO-VISM-DSX0-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32
+                               FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP               FROM SNMPv2-CONF
+    DisplayString,
+    TruthValue                 FROM SNMPv2-TC
+    dsx0Vism,
+    cardSpecific               FROM BASIS-MIB
+    ciscoWan                   FROM CISCOWAN-SMI;
+
+ciscoVismDsx0MIB MODULE-IDENTITY
+    LAST-UPDATED    "200403110000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "       Cisco Systems
+                        Customer Service
+
+                Postal: 170 W Tasman Drive
+                        San Jose, CA  95134
+                        USA
+
+                        Tel: +1 800 553-NETS
+
+                E-mail: cs-wanatm@cisco.com"
+    DESCRIPTION
+        "This MIB module contains ds0 configuration,
+        Status and DS0 related information on a 
+        DS1 interface supported in VISM module.
+
+       VISM is a Voice Interworking Service Module supported
+       in MGX8250 and MGX8850 and other MGX products.
+
+       Terminologies used:
+         line : Same as the Physical Interface.
+               DS1 line signifies DS1 interface."
+
+    REVISION    "200403110000Z"
+    DESCRIPTION
+        "Added
+          - ds0Companding
+          - ds0RxCasTransTblName
+          - ds0TxCasTransTblName
+          - ds0TxRxCasConfig
+          - ciscoVismDsx0Compliance2
+          - ciscoVismDsx0ConfGroup2
+         Deprecated 
+          - ciscoVismDsx0Compliance
+          - ciscoVismDsx0ConfGroup
+        "   
+    REVISION    "200308030000Z"
+    DESCRIPTION
+        "Added following tables:
+           dsx0VismCnfTable 
+           dsx0VismChanMapTable
+
+        These tables were defined in CISCO-WAN-AXIPOP-MIB
+        (an unrelated mib) earlier. The relevant contents 
+        from CISCO-WAN-AXIPOP-MIB are moved and converted 
+        to SMIv2 and defined here."
+
+    REVISION    "200306170000Z"
+    DESCRIPTION
+        "Initial version of the MIB.
+
+        The content of this MIB was originally available
+        in SMIv1 version. The MIB has been converted to
+        SMIv2 version and descriptions of some of the objects
+        have been modified."
+    ::= { ciscoWan 81 }
+
+vismDs0CardStats   OBJECT IDENTIFIER ::= { cardSpecific 24 }
+
+-- -----------------------------------------------------------------
+--
+-- dsx0Vism group:
+--
+-- This group contains the tables/objects necessary to configure 
+-- the DS0s on DS1/E1 interfaces of VISM.
+-- -----------------------------------------------------------------
+
+dsx0VismCnfTable        OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Dsx0VismCnfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The entries in this table are created and deleted 
+        implicitly at the time of adding and deleting the line.
+        For every DS0 on a line, one row will be created."
+    ::= { dsx0Vism 1 }
+ 
+dsx0VismCnfEntry	OBJECT-TYPE
+    SYNTAX     Dsx0VismCnfEntry	
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This ds0 table contains both cas related
+        and non cas related parameters.
+   
+        The non cas related parameters are applicable
+        accross all line signaling types, while the
+        following cas related parameters
+        are applicable only if the signaling type
+        of the line(DS1/E1 Interface) to which this ds0 belongs
+        is cas.
+
+                ds0IdleCode
+                ds0SeizedCode
+                ds0ReceivedCode
+                ds0CasVariantName
+                ds0CasCadenceOnTime
+                ds0CasCadenceOffTime
+                ds0InsertLocalCas
+                ds0LocalCasPattern
+                ds0CasParameterSource
+                ds0CasOnHookMinMakeTime
+                ds0CasOffHookMinMakeTime
+                ds0CasWinkMinMakeTime
+                ds0CasWinkMaxMakeTime
+                ds0CasWinkBreakTime
+                ds0CasGlareTime
+                ds0CasGaurdTime
+                ds0CasDelayImmedStart
+                ds0CasMinDelayDialTime
+                ds0CasMinStartDialTime
+                ds0CasFlashMinMakeTime
+                ds0CasFlashMaxMakeTime
+                ds0CasDirectionality
+                ds0CasGlarePolicy
+                ds0CasIncomingMgcpPackage
+                ds0CasOutgoingMgcpPackage
+
+        When the line signaling type changes from cas to non-cas
+        and vice versa, then the user will be forced to delete
+        endpoint/ccs channels  associated with any ds0 on that line
+        When an endpoint is deleted the ds0CasVariantName associated
+        with that endpoint will also be implicitly deleted.
+        Other than that none of the above cas related parameters are 
+        modified across line signaling type changes."
+    INDEX { ds0IfIndex }
+    ::= { dsx0VismCnfTable 1 }
+
+Dsx0VismCnfEntry ::=
+    SEQUENCE {
+		ds0IfIndex 			Integer32,
+		ds0RobbedBitSignalling 		TruthValue,
+		ds0IdleCode			Integer32,
+		ds0SeizedCode		        Integer32,
+		ds0ReceivedCode		        Integer32,
+		ds0TransmitCodesEnable		TruthValue,
+		ds0BundleMapped		        Integer32,
+		ds0IfType			INTEGER,
+		ds0CasVariantName	        DisplayString,
+                ds0CasCadenceOnTime             Integer32,
+                ds0CasCadenceOffTime            Integer32,
+                ds0InsertLocalCas               TruthValue,
+                ds0LocalCasPattern              Integer32,
+                ds0LoopbackCommand              INTEGER,
+                ds0CasParameterSource           INTEGER,
+                ds0CasOnHookMinMakeTime         Integer32,
+                ds0CasOffHookMinMakeTime        Integer32,
+                ds0CasWinkMinMakeTime           Integer32,
+                ds0CasWinkMaxMakeTime           Integer32,
+                ds0CasWinkBreakTime             Integer32,
+                ds0CasGlareTime                 Integer32,
+                ds0CasGaurdTime                 Integer32,
+                ds0CasDelayImmedStart           Integer32,
+                ds0SignalingType                INTEGER,
+                ds0CasMinDelayDialTime          Integer32,
+                ds0CasMinStartDialTime          Integer32, 
+                ds0CasFlashMinMakeTime          Integer32,
+                ds0CasFlashMaxMakeTime          Integer32,
+                ds0CasDirectionality            INTEGER,
+                ds0CasGlarePolicy               INTEGER,
+                ds0CasIncomingMgcpPackage       DisplayString,
+                ds0CasOutgoingMgcpPackage       DisplayString,
+                ds0InputGain                    Integer32,
+                ds0OutputAttenuation            Integer32,
+                ds0MusicThreshold               Integer32,
+		ds0SidPacket                    TruthValue,
+                ds0ExecDiag                     TruthValue,
+                ds0Companding                   INTEGER,
+                ds0RxCasTransTblName            DisplayString,
+                ds0TxCasTransTblName            DisplayString,
+                ds0TxRxCasConfig                INTEGER
+}
+
+ds0IfIndex 	OBJECT-TYPE
+    SYNTAX     Integer32 (1..248)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This attribute defines the index for this table.
+        This is derived from the following formula:
+	  index = 31 * (Ds1# - 1) + ds0#
+           
+         where : Ds1# - The T1/E1 line number in the range 1 - 8.
+                 ds0# - The ds0 channel number ranging from
+                        1 to 24 for T1
+                    and 1 to 31 for E1."
+    ::= {dsx0VismCnfEntry  1}
+
+ds0RobbedBitSignalling OBJECT-TYPE
+       SYNTAX     TruthValue
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "This object indicates if Robbed Bit Signalling is
+               turned on or off for a given ds0.  This only
+               applies to DS0s on a DS1 link.  For E1 links the
+               value is always off (false). For T1 links, the default 
+               value is true if the line is configured for CAS signaling,
+               the default value is false if the line is configured for
+               CCS signaling or no signaling."
+       ::= { dsx0VismCnfEntry 2 }
+
+ds0IdleCode OBJECT-TYPE
+    SYNTAX     Integer32(0..15)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object contains the code transmitted in the
+         ABCD bits when the ds0 is not connected and
+         ds0TransmitCodesEnable is enabled.  The object is
+         a bitmap and the various bit positions are:
+              Bit 0 (value 1)     D bit
+              Bit 1 (value 2)     C bit
+              Bit 2 (value 4)     B bit
+              Bit 3 (value 8)     A bit
+	 This object is useful for ds0 conditioning to be
+	 done if an alarm condition is detected from the
+	 network side. DS0 conditioning is implemented in
+	 the trunking application only.
+
+	 This object is not applicable in the CAS backhaul 
+         application.
+
+         From vism 2.0.3 release onwards this object can
+         be configured in any mode, but will be applicable
+         only in trunking application and will be ignored
+         in other applications."
+       DEFVAL { 0 }
+       ::= { dsx0VismCnfEntry 3 }
+
+ds0SeizedCode OBJECT-TYPE
+    SYNTAX     Integer32(0..15)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object contains the code transmitted in the
+        ABCD bits when the ds0 is connected and
+        ds0TransmitCodesEnable is enabled.  The object is
+        a bitmap and the various bit positions are:
+           Bit 0 (value 1)     D bit
+           Bit 1 (value 2)     C bit
+           Bit 2 (value 4)     B bit
+           Bit 3 (value 8)     A bit
+	This object is useful for ds0 conditioning to be
+	done if an alarm condition is detected from the
+	network side. DS0 conditioning is implemented in
+        the trunking application only.
+
+        This object is not applicable in the CAS backhaul
+	application.
+
+        From vism 2.0.3 release onwards this object can
+        be configured in any mode, but will be applicable
+        only in trunking application and will be ignored
+        in other applications."
+       DEFVAL { 15 }
+       ::= { dsx0VismCnfEntry 4 }
+
+ds0ReceivedCode OBJECT-TYPE
+        SYNTAX  Integer32(0..15)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+               "This object contains the code being received in
+               the ABCD bits.  The object is a bitmap and the
+               various bit positions are:
+                     Bit 0 (value 1)    D bit
+                     Bit 1 (value 2)    C bit
+                     Bit 2 (value 4)    B bit
+                     Bit 3 (value 8)    A bit"
+       ::= { dsx0VismCnfEntry 5 }
+
+ds0TransmitCodesEnable OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     deprecated
+        DESCRIPTION
+               "This object determines if the idle and seized
+               codes are transmitted. If the value of this object
+               is true then the codes are transmitted.
+               This object is not applicable in the CAS backhaul
+               application."
+       DEFVAL { true }
+       ::= { dsx0VismCnfEntry 6 }
+
+ds0BundleMapped OBJECT-TYPE
+        SYNTAX     Integer32(-1..2147483647)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object indicates endpoint number as specified
+	    by mgEndpointNumber of endpoint table.
+	    If it is not associated with any endpoint, then it 
+            is set to -1.
+	    It should be noted that the endpoint is associated
+	    with bearer DS0s only. For signaling channel or DS0
+	    as in the case of CCS channel, there is no endpoint
+            number associated with it and the value is set to -1."
+       ::= { dsx0VismCnfEntry 7 }
+
+ds0IfType OBJECT-TYPE
+        SYNTAX INTEGER {
+		bearer        (81),
+		ccs-signaling (63),
+		unknown       (1)
+		}
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the interface type associated
+	    with the ds0. 
+            bearer(81) : ds0 ifType is considered as bearer if
+                         the DS0 is used for carrying voice traffic.
+            ccs-signaling(63): ds0 ifType is considered as ccs-signaling,
+                               if the DS0 is configured as the D-channel."
+       ::= { dsx0VismCnfEntry 8 }
+
+ds0CasVariantName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE(0..255))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the index to the CAS variant 
+	    table. This parameter can be configured after configuring
+            this ds0 as an endpoint. This object cannot be modified
+            while connections exist on this endpoint. The CAS variant 
+            table is used for configuring the system parameters associated
+            with various types of CAS signaling methods supported."
+       ::= { dsx0VismCnfEntry 9 }
+
+ds0CasCadenceOnTime     OBJECT-TYPE
+     SYNTAX     Integer32(2..9999)
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This attribute describes the duration during which the digit 
+         tone is generated.
+         This object is applicable only for CAS backhaul applications.
+         For trunking application it is not applicable.
+         The value is expresssed in units of milliseconds.
+         From vism2.0.3 release onwards this object can
+         configured in any application, but will be applicable
+         only in non-trunking applications and will be ignored
+         in other applications."
+     DEFVAL {75}
+    ::= {dsx0VismCnfEntry 10 }
+
+ds0CasCadenceOffTime  OBJECT-TYPE
+     SYNTAX     Integer32(0..9999)
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This attribute corresponds to the silence between the
+         digit tones. 
+         This object is applicable only for CAS backhaul applications.
+         For trunking application it is not applicable.
+         The value is expresssed in units of milliseconds.
+
+         From vism2.0.3 release onwards this object can
+         configured in any application, but will be applicable
+         only in non-trunking applications and will be ignored
+         in other applications."
+     DEFVAL {75}
+    ::= {dsx0VismCnfEntry 11}
+
+ds0InsertLocalCas    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object tells the framer whether to force the cas bits
+        to a value defined by ds0LocalCasPattern or not.
+            
+        If this is enabled the framer will force the cas (ABCD) bits
+        to a value defined in ds0LocalCasPattern by ignorning the
+        cas bits sent by DSP. Else the framer will transmit the cas 
+        bits sent by DSP. 
+
+        Setting of this object is not allowed when the signaling type
+        of this line is cas.
+
+        Also setting of this object is not allowed when the 
+        ds0LoopbackCommand is set to RemoteLoop, because in this 
+        situation we are suppose to loopback whatever comes from
+        the TDM side and not force the cas bits to something else.
+
+        This object can be set only if the line type is T1."
+      DEFVAL {false} 
+       ::= {dsx0VismCnfEntry 12}
+
+ds0LocalCasPattern    OBJECT-TYPE
+   SYNTAX      Integer32(0..15)
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION
+        "This object contains the pattern that the cas (ABCD) bits will have
+        when ds0InsertLocalCas is enabled."
+   DEFVAL{0}
+   ::={dsx0VismCnfEntry 13}
+
+ds0LoopbackCommand    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          noLoop (1),
+                          remoteLoop (2),
+                          localLoop (3)
+                        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "This object represents the loopback type at the ds0 level.The
+         ds0 configuration overrides the line level configuration.
+          
+	  NoLoop
+                     There is no loopback on this ds0.
+
+          LocalLoop
+                     The data received from the ATM side is loopedback
+                     to the ATM side.
+
+          RemoteLoop 
+                     The data from the TDM side is looped back to the
+                     TDM side.                       
+          
+          Setting of this object to RemoteLoop will not be allowed when
+          insert local cas for this ds0 (ds0InsertLocalCas object) is 
+          enabled as we are suppose to force the cas bits to the pattern
+          configured in ds0LocalCasPattern, and not do loopback on the
+          TDM side."
+        DEFVAL{noLoop}
+        ::= {dsx0VismCnfEntry 14}
+
+ds0CasParameterSource  OBJECT-TYPE
+       SYNTAX  INTEGER
+                 {
+                   casAppl (1),
+                   mibValue (2)
+                 } 
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+        "This object indicates VISM whether to read the cas related 
+         timer parameters from the casAppl file downloaded for that 
+         endpoint or to read from this mib. 
+
+         This gives the flexibility of configuring
+         different cas related timer values for different 
+         endpoints associated with the same cas variant.
+
+         This object cannot be configured if the signaling
+         type for the line to which this ds0 belongs is non cas.
+         For a cas line this object CAN only be configured
+         only after associating this ds0 with an endpoint."
+        DEFVAL{casAppl}
+       ::= { dsx0VismCnfEntry 15 }
+
+ds0CasOnHookMinMakeTime OBJECT-TYPE
+       SYNTAX     Integer32 (0..65535)
+       UNITS      "milliseconds"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+        "This indicates the the minimum time in msecs 
+         for which the on hook pattern should be present in order for it 
+         to be recognised else the signal will be considered to be a 
+         spurious signal and will be ignored.
+
+         This object cannot be configured if the signaling
+         type for the line to which this ds0 belongs is non cas.
+         For a cas line this object CAN only be configured
+         only after associating this ds0 with an endpoint.
+
+         This object will be applicable if ds0CasParameterSource
+         has a value of mibValue (2).
+         The allowed range for this object is 10..1000"
+       DEFVAL {300}
+       ::= { dsx0VismCnfEntry 16 }
+
+ds0CasOffHookMinMakeTime OBJECT-TYPE
+       SYNTAX     Integer32 (0..65535)
+       UNITS      "milliseconds"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+        "This indicates the minimum time in msecs for 
+          which the off hook pattern should be present in order for it to be 
+          recognised else the signal will be considered to be a spurious signal
+          and will be ignored.
+    
+          This object cannot be configured if the signaling
+          type for the line to which this ds0 belongs is non cas.
+
+          For a cas line this object CAN only be configured
+          only after associating this ds0 with an endpoint
+          This object will be applicable if ds0CasParameterSource
+          has a value of mibValue (2).
+          The allowed range for this object is 10..1000"
+       DEFVAL {20}
+       ::= { dsx0VismCnfEntry 17 }
+
+ds0CasWinkMinMakeTime  OBJECT-TYPE
+       SYNTAX     Integer32 (0..65535)
+       UNITS      "milliseconds"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+        "The wink consists of off-hook A-B bit pattern, followed
+        by on-hook A-B bit pattern in timed sequence.
+        This object indicates the minimum duration for which
+        the off-hook part of wink signal should persist.
+
+        This object cannot be configured if the signaling
+        type for the line to which this ds0 belongs is non cas. 
+        For a cas line this object CAN only be configured
+        only after associating this ds0 with an endpoint
+        
+        This object will be applicable if ds0CasParameterSource         
+        has a value of mibValue (2).
+        The allowed range for this object is 10..1000."
+       DEFVAL {100}
+       ::= { dsx0VismCnfEntry 18 }
+
+ds0CasWinkMaxMakeTime  OBJECT-TYPE
+       SYNTAX     Integer32 (0..65535)
+       UNITS      "millisesconds"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+       "The wink consists of off-hook A-B bit pattern, followed
+        by on-hook A-B bit pattern in timed sequence.
+        This object indicates the maximum duration for which the 
+        off-hook part of the wink signal should persist, if it 
+        exceeds this time limit the signal will be considered to 
+        be spurious and will be ignored. 
+       
+        This object cannot be configured if the signaling
+        type for the line to which this ds0 belongs is non cas.
+        For a cas line this object CAN only be configured
+        only after associating this ds0 with an endpoint
+        
+        This object will be applicable if ds0CasParameterSource         
+        has a value of mibValue (2).
+
+        The allowed range for this object is 10..3000.
+
+        The value for this object should be greater than or equal to 
+        ds0CasWinkMinMakeTime"
+       DEFVAL {350}
+       ::= { dsx0VismCnfEntry 19 }
+
+ds0CasWinkBreakTime    OBJECT-TYPE 
+       SYNTAX     Integer32 (0..65535)
+       UNITS      "milliseconds"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+           "The wink consists of off-hook A-B bit pattern,
+           followed by on-hook A-B bit pattern in timed sequence.
+           This object indicates the minimum duration for which 
+           the on-hook part of wink signal should persist.
+
+           This object cannot be configured if the signaling
+           type for the line to which this ds0 belongs is non cas.
+           For a cas line this object CAN only be configured
+           only after associating this ds0 with an endpoint
+       
+           This object will be applicable if ds0CasParameterSource         
+           has a value of mibValue (2).
+           The allowed range for this object is 10..1000."
+       DEFVAL {70}
+       ::= { dsx0VismCnfEntry 20 }
+
+ds0CasGlareTime OBJECT-TYPE         
+       SYNTAX     Integer32 (0..65535)
+       UNITS      "milliseconds"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+       "When the terminating gateway receives off Hook event
+        from the Call Agent it starts the timer specified in
+        this object to see if the terminating side is also 
+        trying to originate a call. If this is true, we have
+        a 'glare' condition. The way glare is resolved is 
+        thru this user programmable timer, we will not honor
+        any off hook events from the originating PBX during 
+        this time.
+ 
+        This object cannot be configured if the signaling
+        type for the line to which this ds0 belongs is non CAS.
+        For a CAS line this object can only be configured
+        only after associating this ds0 with an endpoint
+        
+        This object will be applicable if ds0CasParameterSource         
+        has a value of mibValue (2).
+
+        The allowed range for this object is 10..10000."
+       DEFVAL {100}
+       ::= { dsx0VismCnfEntry 21 }
+
+ds0CasGaurdTime OBJECT-TYPE        
+       SYNTAX     Integer32 (0..65535)
+       UNITS      "milliseconds"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+           "The gaurd time is the duration between the end of one call
+           and the start of next call. This object specifies what should
+           be such a duration. All state changes from the PBX are ignored 
+           for this duration. After receiving DLCX, this timer will be
+           started for a period as configured in this object, and will
+           not honor any off-hook events before the expiration of this timer.
+          
+           This object cannot be configured if the signaling
+           type for the line to which this ds0 belongs is non cas.
+
+           For a cas line this object CAN only be configured
+           only after associating this ds0 with an endpoint
+           This object will be applicable if ds0CasParameterSource         
+           has a value of mibValue (2).
+
+           The allowed range for this object is 10..1000."
+       DEFVAL {800}
+       ::= { dsx0VismCnfEntry 22 }
+
+ds0CasDelayImmedStart  OBJECT-TYPE       
+       SYNTAX     Integer32 (0..65535)
+       UNITS      "milliseconds"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+           "This timer indicates the time that VISM should wait before 
+            outpulsing digits to the PBX after sending an off hook event. 
+            This applies only to immediate start protocol.
+
+            This object cannot be configured if the signaling
+            type for the line to which this ds0 belongs is non cas.
+            For a cas line this object CAN only be configured
+            only after associating this ds0 with an endpoint.
+        
+            This object will be applicable if ds0CasParameterSource         
+            has a value of mibValue (2).
+
+            The allowed range for this object is 10..1000."
+       DEFVAL {500}
+       ::= { dsx0VismCnfEntry 23 }
+
+ds0SignalingType     OBJECT-TYPE
+    SYNTAX  INTEGER {
+            cas (1),
+            ccs  (2),
+            none (3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This attribute indicates the type of signaling on the line
+        to which this ds0 belongs.
+
+          CAS - Channel Associated Signaling
+          CCS - Common Channel Signaling
+          none - no signaling used.
+
+        This object will be implicitly set to line signaling
+         type every time it changes."
+    DEFVAL { none }
+      ::= {dsx0VismCnfEntry 24}
+
+ds0CasMinDelayDialTime     OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "milliseconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This is an object for an E & M signaling protocol like 
+        wink-start for this ds0.  The difference is that the 
+        address-control signal is different from wink.
+        The originating VISM, on receiving a seize (AB=11) from the 
+        PBX, responds by sending the delay-dial (AB=11) signal back 
+        to the PBX.  When the originating VISM is ready to collect 
+        the digits, it sends a start-dial (AB=00) signal.
+        This operation is symmetric.  So the terminating VISM, on
+        seizing a trunk, should receive AB=11 
+        (as an ack that the trunk is operational). Subsequently, 
+        when it receives the start signal (AB=00) from the connected PBX,
+        it should outpulse the digits.  The rest of the operation
+        is similiar to wink-start.
+
+        The allowed range for this object is 100..1000 with 
+        units in milliseconds.
+
+        In delay-dial operation, the outgoing interface (this interface), 
+        after sending a seize signal (AB = 11), waits for the delay-dial 
+        signal (AB = 11). The delay-dial signal, apart from 
+        acknowledging the seize signal, tells this interface that 
+        the connected equipment is not ready for the digits yet.
+        This object specifies the time in milliseconds, after which 
+        incoming AB=11 will be interpreted by this interface as the
+        delay-dial signal."
+    REFERENCE
+       "1. Generic Requirements, GR-506-CORE, Issue 1, June 1996,  
+           Revision 1, November 1996,
+        2. LSSGR: Signaling for Analog Interfaces
+           Section 11.2.3 is about 'Delay-Dial Operation' (in general) 
+           In particular, section 11.2.3.1 ([R11-21] is about these
+           timing requirements."
+    DEFVAL {100}
+      ::= {dsx0VismCnfEntry 25}
+
+ds0CasMinStartDialTime     OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "milliseconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This is an object for an E & M signaling protocol like 
+        wink-start for this ds0.  The difference is that the 
+        address-control signal is different from wink. The originating 
+        VISM, on receiving a seize (AB=11) from the PBX,
+        responds by sending the delay-dial (AB=11) signal back 
+        to the PBX.  When the originating VISM is ready to collect 
+        the digits, it sends a start-dial (AB=00) signal.  
+        This operation is symmetric.  So the terminating VISM, on
+        seizing a trunk, should receive AB=11 
+        (as an ack that the trunk is operational). Subsequently, 
+        when it receives the start signal (AB=00) from
+        the connected PBX, it should outpulse the digits.  
+        The rest of the operation is similiar to wink-start.
+
+        The allowed range for this object is 70..1000.
+
+        In delay-dial operation, the outgoing interface (this interface),
+        after receiving a delay-dial signal (AB=11) from the connected 
+        equipment, waits for the start-dial signal (AB = 00) before 
+        sending the digits to the connected equipment. 
+        The start-dial signal tells this interface that the
+        connected equipment is ready for the digits. 
+        This object specifies the time in milliseconds, after which 
+        incoming AB=00 will be interpreted by this interface as the 
+        start dial signal."
+    REFERENCE
+        "1. Generic Requirements, GR-506-CORE, Issue 1, June 1996,  
+            Revision 1, November 1996,
+         2. LSSGR: Signaling for Analog Interfaces
+            Section 11.2.3 is about 'Delay-Dial Operation' (in general) 
+           In particular, section 11.2.3.1 ([R11-22] and [R11-23]) is
+           about these timing requirements."
+    DEFVAL {70}
+      ::= {dsx0VismCnfEntry 26}
+
+ds0CasFlashMinMakeTime     OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "milliseconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Flash is a CAS signal generated by users to request 
+        special services. The interpretation of the flash 
+        depends on the protocol in use. The signal itself 
+        is an on-hook followed by an off-hook. This object 
+        specifies the minimum duration for the signal to be
+        recognized as a flash by VISM. This duration, 
+        expressed in milliseconds, is defined as the elapsed 
+        time between the off-to-on-hook transition followed by 
+        the on-to-off-hook transition. 
+        If the on-hook duration is shorter than the value of 
+        this object, the signal will be ignored.
+
+        This object cannot be configured if the signaling type 
+        for the line to which this ds0 belongs is non-CAS.
+        For a CAS line, this object can only be configured 
+        after associating this ds0 with an endpoint. 
+        If no endpoint was added for this Ds0, any configuration 
+        attempt will be rejected.
+
+        This object will be applicable if ds0CasParameterSource         
+        has a value of mibvalue (2).
+
+        The allowed range for this object is 50..1550."
+    DEFVAL {300}
+      ::= {dsx0VismCnfEntry 27}
+
+ds0CasFlashMaxMakeTime     OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "milliseconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Flash is a CAS signal generated by users to request 
+        special services. The interpretation of the flash 
+        depends on the protocol in use. The signal itself is 
+        an on-hook followed by an off-hook. This object specifies 
+        the maximum duration for the signal to be recognized as a
+        flash by VISM. This duration, expressed in milliseconds, 
+        is defined as the elapsed time between the off-to-on-hook 
+        transition followed by the on-to-off-hook transition. 
+        If the on-hook duration is longer than the value of this object,
+        the signal will be ignored.
+
+        This object cannot be configured if the signaling type 
+        for the line to which this ds0 belongs is non-CAS.
+
+        For a CAS line, this object can only be configured after 
+        associating this ds0 with an endpoint.  This means that 
+        if no endpoint was added for this Ds0, any configuration
+        set attempt will be rejected, but any get will be allowed.
+
+        This object will be applicable if ds0CasParameterSource         
+        has a value of 'mibvalue'(2).
+
+        The allowed range for this object is 50..1550.
+        The value of this object should be greater than 
+        or equal to ds0CasFlashMinMakeTime."
+    DEFVAL {1400}
+      ::= {dsx0VismCnfEntry 28}
+
+ds0CasDirectionality       OBJECT-TYPE
+    SYNTAX  INTEGER {
+            bidirectional (1),
+            incoming      (2),
+            outgoing      (3)
+            }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object specifies the direction in which CAS calls 
+        will be accepted on this endpoint. If this object is set to 
+    
+        bidirectional(1): VISM can send and receive calls on this 
+                          endpoint 
+        incoming(2)     : calls from the connected PBX will be 
+                          accepted by VISM on this endpoint. 
+        outgoing(3)     : VISM will send calls towards the connected PBX and 
+                          not accept calls from the PBX.
+
+        The main difference between bidirectional and one-way trunks 
+        is the occurrence of glare. On bidirectional trunks, since both 
+        VISM and the connected PBX can seize the endpoint at 
+        approximately the same time, glare (dual seizure) is likely to occur. 
+        The protocol assigned to a bidirectional endpoint should be
+        capable of detecting and resolving glare.
+        Wink-start and delay-dial are examples of protocols capable of 
+        glare handling and immediate-start, ground-start and loop-start, 
+        of those that cannot.
+
+        This object cannot be configured if the signaling type for 
+        the DS1 line to which this ds0 belongs is non-CAS.
+
+        For a CAS line, this object can only be configured after
+        associating this ds0 with an endpoint.  This means that if 
+        no endpoint was added for this Ds0, any configuration set 
+        attempt will be rejected, but any get will be allowed."
+    DEFVAL {bidirectional}
+      ::= {dsx0VismCnfEntry  29}
+
+ds0CasGlarePolicy OBJECT-TYPE
+    SYNTAX  INTEGER {
+            controlling  (1),
+            releasing    (2)
+            }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object specifies how a bidirectional endpoint should
+        resolve glare. This object will be used only if 
+        dsx0VismDirectionality of the endpoint is 'bidirectional'.
+        When glare is detected, if this object is set to controlling, 
+        VISM will wait for the connected PBX to assert on-hook.
+        When the connected PBX goes on-hook, VISM proceeds to dial 
+        the numbers out waits for answer. 
+
+        If this object is set to releasing(2), VISM indicates the 
+        glare situation to the Call Agent 
+        (as specified by the control protocol), prepares to collect 
+        digits from the PBX and asserts on hook. The incoming call 
+        should go through. 
+        If the CAS protocol assigned to the endpoint cannot detect 
+        glare or if it cannot resolve glare according to the policy 
+        provisioned via this object, this object will not be used.
+
+        This object cannot be configured if the signaling type 
+        for the DS1 line to which this ds0 belongs is non-CAS.
+
+        For a CAS line, this object can only be configured after 
+        associating this ds0 with an endpoint.  This means that if no 
+        endpoint was added for this Ds0, any configuration set 
+        attempt will be rejected, but any get will be allowed."
+    DEFVAL {controlling}
+      ::= {dsx0VismCnfEntry 30}
+
+ds0CasIncomingMgcpPackage  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object, in conjunction with the card level  
+        persistentXgcpEventsTable, controls how persistent 
+        CAS events (like seize, disconnect, etc) related 
+        to an incoming call observed on this DS0 are notified to 
+        the Media Gateway Controller (MGC). 
+
+        At the card level, the persistentXgcpEventsTable allows 
+        MGCP package-event combinations to be configured as persistent.
+        For example, when L/hd is added to the persistentXgcpEventsTable, 
+        the hook-down event in line package will be notified to the MGC 
+        every time it is observed without the MGC requesting for that event.
+
+        Since the same CAS event can map to different MGCP events under 
+        different packages (eg. the CAS event 'seize' can be 'sup' in 
+        'MS' package and 'hd' in 'BL' package) and different lines could 
+        be running different packages at a given time, there needs to be 
+        a per-DS0 object indicating what package should be used while 
+        notifying CAS events observed on that DS0. This object, 
+        ds0CasIncomingMgcpPackage specifies the package that will be 
+        used while notifying CAS events observed on an incoming call 
+        on this DS0.
+
+        This object can be set to a package name from 
+        xgcpCapabilityPackageTable whose 
+        xgcpCapabilityPackageEnable is true or the string 'basic'
+        indicating that one of the basic packages in that table 
+        (G, T, L, H, R, D or M) to which the observed event belongs 
+        can be used.
+
+        This object is used only if the protocol is MGCP.
+        If the notification is in response to an RQNT, VISM 
+        uses the package (and event name) that the MGC used 
+        to request the event regardless what this object is set to. 
+
+        In the absence of an RQNT, the observed CAS event is 
+        encoded according to the package that this object specifies. 
+        A 'seize' observed on the CAS signaling channel on this DS0,
+        for example is encoded as 'ms/sup' if this object is 
+        set to 'ms', 'bl/hd' if this object is set to 'bl' or
+        as 'L/hd' if this object is set to 'basic'. 
+        If this package/event is present in persistentXgcpEventsTable, 
+        a notification is generated, otherwise this event is discarded.
+
+        An attempt to set this object to a package name whose
+        xgcpCapabilityPackageEnable is false in 
+        xgcpCapabilityPackageTable will fail.
+
+        This object is used only if the ds0CasDirectionality is set
+        to 'bidirectional' or 'incoming'."
+      ::= {dsx0VismCnfEntry 31}
+
+ds0CasOutgoingMgcpPackage OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object, in conjunction with the card level  
+        persistentXgcpEventsTable, controls how persistent 
+        CAS events (like answer, disconnect, etc) related 
+        to an outgoing call observed on this DS0 are notified to the
+        Media Gateway Controller (MGC). 
+
+        At the card level, the persistentXgcpEventsTable allows 
+        MGCP package-event combinations to be configured as persistent.
+        For example, when L/hd is added to the persistentXgcpEventsTable, 
+        the hook-down event in line package will be notified to the MGC
+        every time it is observed without the MGC requesting for that event.
+
+        Since the same CAS event can map to different MGCP events 
+        under different packages (eg. the CAS event 'answer' can be
+        'ans' in 'MS' package and 'hd' in 'BL' package) and different 
+        lines could be running different packages at a given time,
+        there needs to be a per-DS0 object indicating what package 
+        should be used while notifying CAS events observed on that DS0.
+        This object, ds0CasOutgoingMgcpPackage specifies the package 
+        that will be used while notifying CAS events observed on an 
+        outgoing call on this DS0.
+
+        This object can be set to a package name from 
+        xgcpCapabilityPackageTable whose xgcpCapabilityPackageEnable 
+        is true or the string 'basic' indicating that one 
+        of the basic packages in that table (G, T, L, H, R, D or M)
+        to which the observed event belongs can be used.
+
+        This object is used only if the protocol is MGCP.
+        If the notification is in response to an RQNT,
+        VISM uses the package (and event name) that the MGC used 
+        to request the event regardless what this object is set to. 
+
+        In the absence of an RQNT, the observed CAS event is encoded 
+        according to the package that this object specifies. 
+        An answer observed on the CAS signaling channel on this DS0,
+        for example is encoded as 'ms/ans' if this object is set to 'ms', 
+        'bl/hd' if this object is set to 'bl' or as 'L/hd' if this object is 
+        set to 'basic'. If this package/event is present in 
+        persistentXgcpEventsTable, a notification is generated, 
+        otherwise this event is discarded.
+
+        An attempt to set this object to a package name whose
+        xgcpCapabilityPackageEnable is false in 
+        xgcpCapabilityPackageTable will fail.
+
+        This object is used only if the ds0CasDirectionality is set
+        to 'bidirectional' or 'outgoing'."
+      ::= {dsx0VismCnfEntry 32}
+
+ds0InputGain     OBJECT-TYPE
+    SYNTAX     Integer32 (-6..14)
+    UNITS      "dB - decibel"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object indicates the amount of gain inserted at the 
+        receiver side of a ds0 channel, in dB (decibel) units.
+        The default value of this object is 0 dB.
+
+        The input gain settings only define a gain/loss relative 
+        to the 0 dB setting. The absolute loss at the 0 dB setting 
+        could be implementation dependent based on the desired network 
+        loss plan.
+
+        This object can be set when there are active call going on,
+        and in this case the new gain will take effective immediately. 
+        It can also be set at both unbound endpoints and bound but 
+        non-active endpoints."
+    DEFVAL { 0 }
+      ::= {dsx0VismCnfEntry 33}
+
+ds0OutputAttenuation     OBJECT-TYPE
+    SYNTAX     Integer32 (0..14)
+    UNITS      "dB - decibel"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object contains the amount of attenuation inserted 
+         at the transmit side of a ds0 channel, in dB (decibel) units. 
+
+         The output attenuation settings only define a loss relative to
+         0 dB setting. The absolute loss at the 0 dB setting could be
+         implementation dependent based on the desired network loss plan.
+
+         This object can be set when there are active call going on, 
+         and in this case the new gain will take effective immediately. 
+         It can also be set at both unbound endpoints and bound but 
+         non-active endpoints. 
+        "
+    DEFVAL { 0 }
+      ::= {dsx0VismCnfEntry 34}
+
+ds0MusicThreshold     OBJECT-TYPE
+    SYNTAX     Integer32 (-70..-30)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The indicates Music On Hold Threshold in dBm. Based on this
+         value, VISM DSP will interprete the incoming signal from TDM side 
+         as either silence or voice, and consequently turn on or off VAD. 
+
+         This object can be set when there is active call going on at the
+         ds0 channel, and at both unbound endpoints and bound non-active 
+         endpoints. 
+        "
+    DEFVAL { -38 }
+      ::= {dsx0VismCnfEntry 35}
+
+ds0SidPacket     OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object specifies whether the Silence Indication 
+        Detection (SID) packet should be generated when silence 
+        suppression is in active mode. The SID packet indicates 
+        the noise level during silence, which is used as a reference
+        to generate comfort noise on the other side of the gateway.  
+        This object is used for VoIP only."
+      DEFVAL {true} 
+      ::= {dsx0VismCnfEntry 36}
+
+ds0ExecDiag OBJECT-TYPE
+       SYNTAX     TruthValue
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+           "This object indicates the status of DSP channel level
+           RAS on the VISM. When it is enable VISM will configure
+           the DSP through HOST-DSP message on the individual channel."
+        DEFVAL{true}
+       ::= { dsx0VismCnfEntry 37 }
+
+ds0Companding  OBJECT-TYPE
+    SYNTAX  INTEGER
+                 {
+                   uLaw (1),
+                   aLaw (2)
+                 }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object indicates whether input from / output
+         to the TDM side of DS0 is u-law or a-law stream.
+         The setting of this object will not take effect 
+         unless the corresponding DSP channel is closed and 
+         re-opened."
+    ::= { dsx0VismCnfEntry 38 }
+
+ds0RxCasTransTblName  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+        "This object identifies the template name 'cvcmCasTemplateName'
+         in the CISCO-VOICE-CAS-MODULE-MIB associated with the receive
+         signaling channel on a DS0."
+    ::= { dsx0VismCnfEntry 39 }
+
+ds0TxCasTransTblName  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current 
+    DESCRIPTION
+        "This object identifies the template name 
+         'cvcmCasTemplateName' in the CISCO-VOICE-CAS-MODULE-MIB
+         associated with the transmit signaling channel 
+         on a DS0."
+    ::= { dsx0VismCnfEntry 40 }
+
+ds0TxRxCasConfig  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   transmit (1),
+                   receive (2),
+                   bidirectional (3),
+                   none (4)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object indicates configuration on a DS0.
+         'transmit'-      Configure transmit signaling channel
+                          on the DSP with user defined CAS 
+                          pattern to translate incoming ABCD
+                          CAS bits from the TDM
+         'receive'-       Configure receive signaling channel
+                          on the DSP with user defined CAS 
+                          pattern to translate the outgoing
+                          ABCD CAS bits on the TDM
+         'bidirectional'- Configure transmit and receive 
+                          signaling channel on the DSP with 
+                          user defined CAS pattern to translate
+                          incoming and outgoing ABCD CAS bits
+                          on the TDM
+         'none'-          Signaling channel is using default 
+                          ABCD CAS pattern specified by the DSP."
+    ::= { dsx0VismCnfEntry 41 }
+-------------------------------------------------------------------
+--
+--  dsx0VismChanMapTable
+-- This table defines the mapping between the Ds0 and the ifIndex
+-- used to index the table dsx0VismCnfTable.
+------------------------------------------------------------------- 
+
+dsx0VismChanMapTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Dsx0VismChanMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table is created implicitly at the time of 
+        creating and deleting the endpoints.
+        This table provides the mapping information from a line
+        and channel to obtain an index for that channel."
+    ::= { dsx0Vism 2 }
+ 
+dsx0VismChanMapEntry    OBJECT-TYPE
+    SYNTAX     Dsx0VismChanMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each entry represents the mapping from dsx1Line number
+        to ds0 channel Number and provides the ifIndex mapping."
+    INDEX { dsx1LineNum, ds0ChanNum }
+    ::= { dsx0VismChanMapTable 1 }
+ 
+Dsx0VismChanMapEntry	::=
+    SEQUENCE {
+        dsx1LineNum        Integer32,
+        ds0ChanNum         Integer32,
+        ds0ChanMapIfIndex  Integer32
+}
+
+dsx1LineNum OBJECT-TYPE
+    SYNTAX     Integer32 (1..8)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object describes the physical line number on
+        VISM card."
+   ::= { dsx0VismChanMapEntry 1 }
+
+ds0ChanNum OBJECT-TYPE
+    SYNTAX     Integer32 (1..31)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object describes the ds0 number or channel number
+	within a T1 or E1 line. 
+	The valid channel numbers are 1 to 24 for T1 line
+        and 1 - 31 for E1 line."
+   ::= { dsx0VismChanMapEntry 2 }
+
+ds0ChanMapIfIndex OBJECT-TYPE
+    SYNTAX     Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object describes the ifIndex derived based on the
+	line number and the channel number within the line according
+        to the formula:
+        IfIndex = 31 * (Ds1# - 1) + ds0#
+			
+        where : Ds1# - The T1/E1 line number in the range 1 - 8.
+                ds0# - The ds0 channel number ranging from
+	                1 to 24 for T1
+		    and 1 to 31 for E1."
+   ::= { dsx0VismChanMapEntry 3 }
+
+
+vismTotalDs0Count OBJECT-TYPE
+    SYNTAX     Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This is the total number of ds0s configured the card." 
+    DEFVAL { 0 }
+    ::= { vismDs0CardStats 1 }
+
+vismFreeDs0Count OBJECT-TYPE
+    SYNTAX     Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This is the number of free ds0s on the card."
+    DEFVAL { 0 }
+    ::= { vismDs0CardStats 2 }
+
+vismActiveDs0Count OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "This is the number of active ds0s on the card."
+    ::= { vismDs0CardStats 3 }
+
+vismBlockDs0Count OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This is the number of blocked ds0s on the card."
+    DEFVAL { 0 }
+    ::= { vismDs0CardStats 4 }
+
+vismActiveHighWaterMark OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This is the high water mark number of ds0s that were 
+         active simultaneously on the card."
+    DEFVAL { 0 }
+    ::= { vismDs0CardStats 5 }
+
+vismDs0CardStatsClrButton OBJECT-TYPE
+    SYNTAX  INTEGER {
+                noaction (1),
+                clear (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This variable is used to clear all the vism Ds0
+        card stats. 1 = No action, 2 = Clear alarm"
+    ::= { vismDs0CardStats 6 }
+
+--
+-- VISM DS0 Line Stats table
+--
+
+vismDs0LineStatsTable 	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF VismDs0LineStatsEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+        "This table contains information on DS0s configured
+        on DS1 interface."
+    ::= { dsx0Vism 3 }
+
+vismDs0LineStatsEntry OBJECT-TYPE
+    SYNTAX	VismDs0LineStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the vismDs0LineStatsTable.
+        Each entry contains following information 
+        applicable for each DS1 interface:
+          Total   DS0s
+          Free    DS0s
+          Active  DS0s
+          Blocked DS0s."
+    INDEX	{ ds0LineNum }
+    ::= { vismDs0LineStatsTable 1 }
+
+VismDs0LineStatsEntry ::=
+    SEQUENCE {
+        ds0LineNum     	            Integer32,
+        lineTotalDs0Count           Integer32,
+        lineFreeDs0Count	    Integer32,
+        lineActiveDs0Count	    Integer32,
+        lineBlockDs0Count           Integer32,
+        lineActiveHighWaterMark     Integer32,
+        lineStatsClrButton	    INTEGER
+    }
+
+ds0LineNum OBJECT-TYPE
+    SYNTAX     Integer32 (1..8)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object is the identifier of a DS1/E1 Interface on
+        a managed device. The number of entries is 8 in a VISM
+        and VISM-PR card."
+    ::= { vismDs0LineStatsEntry 1 }
+
+lineTotalDs0Count OBJECT-TYPE
+    SYNTAX     Integer32(0..31)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This is the total number of ds0s configured on this 
+         DS1 line."
+    DEFVAL { 0 }
+    ::= { vismDs0LineStatsEntry 2 }
+
+lineFreeDs0Count OBJECT-TYPE
+    SYNTAX     Integer32(0..31)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This is the total number of free ds0s on this 
+         DS1 line."
+    DEFVAL { 0 }
+    ::= { vismDs0LineStatsEntry 3 }
+
+lineActiveDs0Count OBJECT-TYPE
+    SYNTAX     Integer32(0..31)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "This is the number of active ds0s on this line."
+    DEFVAL { 0 }
+    ::= { vismDs0LineStatsEntry 4 }
+
+lineBlockDs0Count OBJECT-TYPE
+    SYNTAX     Integer32(0..31)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "This is the number of blocked ds0s on this line."
+    DEFVAL { 0 }
+    ::= { vismDs0LineStatsEntry 5 }
+
+lineActiveHighWaterMark OBJECT-TYPE
+    SYNTAX     Integer32(0..31)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This is the high water mark number of ds0s that
+         were active simultaneously on the line."
+    DEFVAL { 0 }
+    ::= { vismDs0LineStatsEntry 6 }
+
+lineStatsClrButton OBJECT-TYPE
+    SYNTAX  INTEGER {
+                noaction (1),
+                clear (2)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This variable is used to clear the vism Ds0 line
+        status entry. 1 = No action, 2 = Clear alarm."
+    ::= { vismDs0LineStatsEntry 7 }
+
+--
+-- VISM DS0 Status table
+--
+
+vismDs0StatusTable 	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF VismDs0StatusEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+        "This table contains ds0 status information on a
+        DS1 interface."
+    ::= { dsx0Vism 4 }
+
+    vismDs0StatusEntry OBJECT-TYPE
+    SYNTAX     VismDs0StatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry in the Ds0 Status Table."
+    INDEX	{ ds0LineNumber, ds0Number }
+    ::= { vismDs0StatusTable 1 }
+
+VismDs0StatusEntry ::=
+        SEQUENCE {
+            ds0LineNumber 	    Integer32,
+            ds0Number	            Integer32,
+            ds0Status		    INTEGER,
+            ds0StatusClrButton	    INTEGER
+    }
+
+ds0LineNumber OBJECT-TYPE
+    SYNTAX	Integer32 (1..8)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+        "This object is the identifier of a DS1/E1 Interface
+        on a managed device. The number of entries is 8 in a
+        VISM and VISM-PR card."
+    ::= { vismDs0StatusEntry 1 }
+
+ds0Number OBJECT-TYPE
+    SYNTAX     Integer32 (1..31)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+        "This object identifies the ds0 number on a
+        DS1 interface."
+    ::= { vismDs0StatusEntry 2 }
+
+ds0Status OBJECT-TYPE
+    SYNTAX  INTEGER {
+            idle  (1),
+            busy  (2),
+            fault (3),
+	    block (4),
+            unknown (5)
+            }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "This object is the status of the ds0. idle - This ds0
+         is in idle state. busy - This ds0 is in busy state. 
+         Ds0 enters this state when it is in the process of
+         being setup for a call. fault - This ds0 is in fault(alarm) 
+         state. block - This ds0 is in block state.
+         Ds0 can enter this state when the line or 
+         gateway is commissioned out of service."
+    DEFVAL { unknown }
+    ::= { vismDs0StatusEntry 3 }
+
+ds0StatusClrButton OBJECT-TYPE
+	SYNTAX  INTEGER {
+	            noaction (1),
+                    clear (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+	    "This variable is used to clear the vism Ds0
+            status. 1 = No action, 2 = Clear alarm"
+	::= { vismDs0StatusEntry 4 }
+
+-- conformance information
+
+ciscoVismDsx0MIBConformance  OBJECT IDENTIFIER ::= { ciscoVismDsx0MIB 2 }
+
+ciscoVismDsx0MIBGroups       OBJECT IDENTIFIER ::= 
+                              { ciscoVismDsx0MIBConformance 1 }
+
+ciscoVismDsx0MIBCompliances  OBJECT IDENTIFIER ::= 
+                              { ciscoVismDsx0MIBConformance 2 }
+
+-- compliance statements
+
+ciscoVismDsx0Compliance MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "The compliance statement for objects related
+        to DS0 mib objects."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            ciscoVismDsx0LineStatsGroup,
+            ciscoVismDsx0StatusGroup,
+            ciscoVismDsx0ConfGroup,
+            ciscoVismDsx0ChanMapGroup,
+            ciscoVismCardStatsGroup
+        }
+    ::= { ciscoVismDsx0MIBCompliances 1 }
+
+ciscoVismDsx0Compliance2 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for objects related
+        to DS0 mib objects."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            ciscoVismDsx0LineStatsGroup,
+            ciscoVismDsx0StatusGroup,
+            ciscoVismDsx0ConfGroup2,
+            ciscoVismDsx0ChanMapGroup,
+            ciscoVismCardStatsGroup
+        }
+    ::= { ciscoVismDsx0MIBCompliances 2 }
+
+ciscoVismCardStatsGroup OBJECT-GROUP
+    OBJECTS {
+        vismTotalDs0Count,
+        vismFreeDs0Count,
+        vismActiveDs0Count,
+        vismBlockDs0Count,
+        vismActiveHighWaterMark,
+        vismDs0CardStatsClrButton
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used for
+         DS0 Statistics applicable to VISM Module."
+      ::= { ciscoVismDsx0MIBGroups 1 }
+
+ciscoVismDsx0LineStatsGroup OBJECT-GROUP
+    OBJECTS {
+            ds0LineNum,
+            lineTotalDs0Count,
+            lineFreeDs0Count,
+            lineActiveDs0Count,
+            lineBlockDs0Count, 
+            lineActiveHighWaterMark,
+            lineStatsClrButton
+      }
+      STATUS current
+      DESCRIPTION
+          "The collection of objects used for
+          DS0 Line statistics."
+      ::= { ciscoVismDsx0MIBGroups 2 }
+
+ciscoVismDsx0StatusGroup OBJECT-GROUP
+    OBJECTS {
+        ds0LineNumber,
+        ds0Number,
+        ds0Status,
+        ds0StatusClrButton
+      }
+      STATUS current
+      DESCRIPTION
+          "The collection of objects used for
+          DS0 status."
+      ::= { ciscoVismDsx0MIBGroups 3 }
+  
+ciscoVismDsx0ConfGroup OBJECT-GROUP
+    OBJECTS {
+        ds0IfIndex,
+        ds0RobbedBitSignalling,
+        ds0IdleCode,
+        ds0SeizedCode,
+        ds0ReceivedCode,
+        ds0BundleMapped,
+        ds0IfType,
+        ds0CasVariantName,
+        ds0CasCadenceOnTime ,
+        ds0CasCadenceOffTime,
+        ds0InsertLocalCas,
+        ds0LocalCasPattern,
+        ds0LoopbackCommand,
+        ds0CasParameterSource,
+        ds0CasOnHookMinMakeTime,
+        ds0CasOffHookMinMakeTime,
+        ds0CasWinkMinMakeTime,
+        ds0CasWinkMaxMakeTime,
+        ds0CasWinkBreakTime,
+        ds0CasGlareTime,
+        ds0CasGaurdTime,
+        ds0CasDelayImmedStart,
+        ds0SignalingType,
+        ds0CasMinDelayDialTime,
+        ds0CasMinStartDialTime  ,
+        ds0CasFlashMinMakeTime,
+        ds0CasFlashMaxMakeTime,
+        ds0CasDirectionality,
+        ds0CasGlarePolicy,
+        ds0CasIncomingMgcpPackage,
+        ds0CasOutgoingMgcpPackage,
+        ds0InputGain,
+        ds0OutputAttenuation,
+        ds0MusicThreshold,
+        ds0SidPacket,
+        ds0ExecDiag              
+        }
+    STATUS deprecated
+    DESCRIPTION
+        "The collection of objects used for
+         DS0 configuration in VISM module."
+      ::= { ciscoVismDsx0MIBGroups 4 }
+
+ciscoVismDsx0ConfGroup2 OBJECT-GROUP
+    OBJECTS {
+        ds0IfIndex,
+        ds0RobbedBitSignalling,
+        ds0IdleCode,
+        ds0SeizedCode,
+        ds0ReceivedCode,
+        ds0BundleMapped,
+        ds0IfType,
+        ds0CasVariantName,
+        ds0CasCadenceOnTime ,
+        ds0CasCadenceOffTime,
+        ds0InsertLocalCas,
+        ds0LocalCasPattern,
+        ds0LoopbackCommand,
+        ds0CasParameterSource,
+        ds0CasOnHookMinMakeTime,
+        ds0CasOffHookMinMakeTime,
+        ds0CasWinkMinMakeTime,
+        ds0CasWinkMaxMakeTime,
+        ds0CasWinkBreakTime,
+        ds0CasGlareTime,
+        ds0CasGaurdTime,
+        ds0CasDelayImmedStart,
+        ds0SignalingType,
+        ds0CasMinDelayDialTime,
+        ds0CasMinStartDialTime  ,
+        ds0CasFlashMinMakeTime,
+        ds0CasFlashMaxMakeTime,
+        ds0CasDirectionality,
+        ds0CasGlarePolicy,
+        ds0CasIncomingMgcpPackage,
+        ds0CasOutgoingMgcpPackage,
+        ds0InputGain,
+        ds0OutputAttenuation,
+        ds0MusicThreshold,
+        ds0SidPacket,
+        ds0ExecDiag,
+        ds0Companding,
+        ds0RxCasTransTblName,
+        ds0TxCasTransTblName,
+        ds0TxRxCasConfig
+        }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used for
+         DS0 configuration in VISM module."
+      ::= { ciscoVismDsx0MIBGroups 7 }
+
+ciscoVismDsx0ChanMapGroup OBJECT-GROUP
+    OBJECTS {
+        dsx1LineNum,
+        ds0ChanNum ,
+        ds0ChanMapIfIndex
+      }
+      STATUS current
+      DESCRIPTION
+          "The collection of objects used for
+          mapping DS0 to ifIndex."
+      ::= { ciscoVismDsx0MIBGroups 5 }
+
+ciscoVismDsx0ConfDeprecatedGroup OBJECT-GROUP
+    OBJECTS {
+        ds0TransmitCodesEnable
+    }
+    STATUS deprecated
+    DESCRIPTION
+          "The collection of objects that were
+          supported earlier but deprecated now."
+      ::= { ciscoVismDsx0MIBGroups 6 }
+
+END
+

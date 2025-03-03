@@ -1,0 +1,748 @@
+-- *****************************************************************
+-- UBIQUOSS-SWITCH-MIB.mib:  
+-- Ubiquoss Enterprise Switch Port Structure of Management Information
+--
+-- July 2006, Jisoo Kim
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+	UBIQUOSS-SWITCH-INTERFACE-MIB	DEFINITIONS ::= BEGIN
+		IMPORTS
+		
+		DisplayString 
+		FROM RFC1213-MIB
+		
+		ubiPortIndex
+		FROM UBIQUOSS-INTERFACE-MIB
+		
+		RowStatus
+		FROM SNMPv2-TC
+		
+		PortList
+        FROM Q-BRIDGE-MIB    
+        
+        BridgeId, Timeout			
+		FROM BRIDGE-MIB	
+        
+        ubiSysIndex
+        FROM UBIQUOSS-SYSINFO-MIB
+        		
+		ubiMgmt
+		FROM UBQS-SMI;     
+
+ubiSwitchInterfaceMIB  MODULE-IDENTITY
+	LAST-UPDATED "0607130000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+        "Chair    :  jisoo Kim
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      jisoo@ubiquoss.com
+         Phone:      +82-2-2190-3100
+
+         Co-editor:  Paul 
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      paul@ubiquoss.com
+         Phone:      +82-2-2190-3100"
+    DESCRIPTION
+        "This MIB module defines switch port information" 
+   	::= { ubiMgmt  200 }
+   				
+	ubiSwitchInterfaceMIBObjects	OBJECT IDENTIFIER ::= { ubiSwitchInterfaceMIB  1 }      
+		 	                 	
+-- ***********************************************************
+-- uniSwitchPortTable
+-- ***********************************************************	
+	ubiSwitchPortTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiSwitchPortEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		::= { ubiSwitchInterfaceMIBObjects 1 }
+
+	ubiSwitchPortEntry OBJECT-TYPE
+		SYNTAX  UbiSwitchPortEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		INDEX  { ubiSysIndex, ubiPortIndex }
+		::= { ubiSwitchPortTable 1 } 
+
+	UbiSwitchPortEntry  ::=
+		SEQUENCE {
+			ubiSwitchPortMediaType			INTEGER,
+			ubiSwitchPortSpeedNego			INTEGER,
+			ubiSwitchPortSpeedConfig		INTEGER,
+			ubiSwitchPortDuplexConfig		INTEGER,
+			ubiSwitchPortSpeedCurrent  		INTEGER,
+			ubiSwitchPortDuplexCurrent		INTEGER,
+			ubiSwitchPortLinkAggIfIndex		INTEGER, 
+			ubiSwitchPortLinkAggIndex		INTEGER, 
+			ubiSwitchPortLinkAggMode		INTEGER
+		}			
+    
+    ubiSwitchPortMediaType	 OBJECT-TYPE  
+		SYNTAX  INTEGER {
+		        other(1),
+				base100TX(2),
+				base100FX(3),
+				gbic(4),
+				base1000T(5)
+		}
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiSwitchPortEntry  1 }	
+	         
+	ubiSwitchPortSpeedNego	 OBJECT-TYPE  
+		SYNTAX  INTEGER {
+				manual(1),
+				auto(2)
+		}
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"administrator state"
+		::= { ubiSwitchPortEntry  2 }
+	         
+	ubiSwitchPortSpeedConfig	 OBJECT-TYPE  
+		SYNTAX  INTEGER {  
+				speed10(1),
+				speed100(2),
+				speed1000(3),
+				auto(4)
+		}
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiSwitchPortEntry  3 }
+	         
+	ubiSwitchPortDuplexConfig	 OBJECT-TYPE  
+		SYNTAX  INTEGER {  
+				half(1),
+				full(2),
+				auto(3)
+		}
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiSwitchPortEntry  4 }
+	         
+	ubiSwitchPortSpeedCurrent	 OBJECT-TYPE  
+		SYNTAX  INTEGER {  
+				speed10(1),
+				speed100(2),
+				speed1000(3)
+		}
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiSwitchPortEntry  5 }
+	         
+	ubiSwitchPortDuplexCurrent	 OBJECT-TYPE  
+		SYNTAX  INTEGER {  
+				half(1),
+				full(2)
+		}
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiSwitchPortEntry  6 }
+		
+	ubiSwitchPortLinkAggIfIndex	 OBJECT-TYPE  
+		SYNTAX  INTEGER 
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"ifindex of port-group"
+		::= { ubiSwitchPortEntry  7 }	
+ 
+ 			
+ 	ubiSwitchPortLinkAggIndex	 OBJECT-TYPE  
+		SYNTAX  INTEGER 
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"ubiLinkAggIndex of port-group"
+		::= { ubiSwitchPortEntry  8 }       
+		
+ 	ubiSwitchPortLinkAggMode	 OBJECT-TYPE  
+		SYNTAX  INTEGER  
+		{
+			noExist(0),
+			dynamicActive(1),
+			dynamicPassive(2),
+			static(3)		
+		}
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Link aggregation mode"
+		::= { ubiSwitchPortEntry  9 }                                       
+
+-- ***********************************************************
+-- ubiLinkAggregation
+-- ***********************************************************
+
+    ubiLinkAggregationTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiLinkAggregationEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          ""
+		::= { ubiSwitchInterfaceMIBObjects 2}
+
+    ubiLinkAggregationEntry  OBJECT-TYPE
+       SYNTAX      UbiLinkAggregationEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "A logical row in the ubiLinkAggregationTable."
+       INDEX       {  ubiSysIndex, ubiLinkAggIndex  }
+       ::= { ubiLinkAggregationTable 1 }
+
+    UbiLinkAggregationEntry ::= SEQUENCE {
+       ubiLinkAggIndex			Integer32,
+       ubiLinkAggRowStatus 		RowStatus,
+       ubiLinkAggPortList		PortList,
+       ubiLinkAggType 			Integer32
+       }
+       
+    ubiLinkAggIndex  OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           ""
+       ::= { ubiLinkAggregationEntry 1 }
+
+    ubiLinkAggPortList  OBJECT-TYPE
+       SYNTAX      PortList
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+          ""
+       ::= { ubiLinkAggregationEntry 2 }
+
+    ubiLinkAggType  OBJECT-TYPE
+       SYNTAX      Integer32
+       {
+       		static(1),
+       		dynamic(2)
+       }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+          ""
+       ::= { ubiLinkAggregationEntry 3 }       				              
+
+    ubiLinkAggRowStatus  OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object is used to create a new row or modify or
+            delete an existing row in this table.
+            A flowRule activated by setting this object to `active'.  
+            When `active' is set, the system will validate the flowRule.
+
+            Before a FlowRule can be deleted or taken out of
+            service, (by setting this object to `destroy' or
+            `outOfService') it must be first unreferenced
+            from all associated lines."
+       ::= { ubiLinkAggregationEntry 4 }
+
+-- ***********************************************************
+-- ubiSwitchPortQosPriorityTable
+-- ***********************************************************
+
+     ubiSwitchPortQosPriorityTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiSwitchPortQosPriorityEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			""
+		::=  {  ubiSwitchInterfaceMIBObjects 3  }
+                                   
+	ubiSwitchPortQosPriorityEntry OBJECT-TYPE
+		SYNTAX     UbiSwitchPortQosPriorityEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			""
+		INDEX   { ubiSysIndex, ubiPortIndex }
+		::= { ubiSwitchPortQosPriorityTable 1 }
+
+    UbiSwitchPortQosPriorityEntry ::= SEQUENCE
+    {
+		ubiSwitchPortQosPriorityEnabled		INTEGER,
+		ubiSwitchPortQosPriority				INTEGER
+	}
+    
+    ubiSwitchPortQosPriorityEnabled OBJECT-TYPE
+		SYNTAX     INTEGER{
+			enable(1), 
+			disable(2)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			""
+		::= { ubiSwitchPortQosPriorityEntry 1 }
+                
+    ubiSwitchPortQosPriority OBJECT-TYPE
+		SYNTAX     INTEGER{
+			cos0(0), 
+			cos1(1),
+			cos2(2),
+			cos3(3),
+			cos4(4),
+			cos5(5),
+			cos6(6),
+			cos7(7),
+		}
+		MAX-ACCESS  read-write
+		STATUS     current
+		DESCRIPTION
+			""
+		::= { ubiSwitchPortQosPriorityEntry 2 }  
+
+-- ***********************************************************
+-- ubiSwitchPortQosQueueTable
+-- ***********************************************************
+
+	ubiSwitchPortQosQueueTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiSwitchPortQosQueueEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			""
+		::=  {  ubiSwitchInterfaceMIBObjects 4  }
+                                   
+	ubiSwitchPortQosQueueEntry OBJECT-TYPE
+		SYNTAX     UbiSwitchPortQosQueueEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			""
+		INDEX   { ubiSysIndex, ubiPortIndex }
+		::= { ubiSwitchPortQosQueueTable 1 }
+
+    UbiSwitchPortQosQueueEntry ::= SEQUENCE
+    {
+    	ubiSwitchPortQosQueueIndex		INTEGER,
+		ubiSwitchPortQosQueueMode		INTEGER,
+		ubiSwitchPortQosQueueProfile		INTEGER
+	}
+	
+    ubiSwitchPortQosQueueIndex OBJECT-TYPE
+		SYNTAX     INTEGER(0..7)
+		MAX-ACCESS  not-accessible
+		STATUS     current
+		DESCRIPTION
+			""
+		::= { ubiSwitchPortQosQueueEntry 1 }
+		                                    
+    ubiSwitchPortQosQueueMode OBJECT-TYPE
+		SYNTAX     INTEGER{
+			strict(1), 
+			wrr1(2),
+			wrr2(3)
+		}
+		MAX-ACCESS  read-write
+		STATUS     current
+		DESCRIPTION
+			""
+		::= { ubiSwitchPortQosQueueEntry 2 } 
+                                    
+    ubiSwitchPortQosQueueProfile OBJECT-TYPE
+		SYNTAX     INTEGER(8..225)
+		MAX-ACCESS  read-write
+		STATUS     current
+		DESCRIPTION
+			""
+		::= { ubiSwitchPortQosQueueEntry 3 }
+
+-- ***********************************************************
+-- ubiVlanInfoTable
+-- ***********************************************************	
+	ubiVlanInfoTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiVlanInfoEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Vlan Information"
+		::= { ubiSwitchInterfaceMIBObjects 5 }
+              
+	ubiVlanInfoEntry OBJECT-TYPE
+		SYNTAX  UbiVlanInfoEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Vlan Information"
+		INDEX   { ubiSysIndex, ubiVlanId }
+		::= { ubiVlanInfoTable 1 }
+
+	UbiVlanInfoEntry  ::=
+		SEQUENCE {
+			 ubiVlanId				INTEGER,
+			 ubiVlanName			DisplayString,
+			 ubiVlanPortList		PortList,
+			 ubiVlanOpState			INTEGER,  
+			 ubiVlanRowStatus		RowStatus,
+			 ubiVlanTagPortList		PortList
+		}
+
+	ubiVlanId	OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			" VlanId "
+		::= { ubiVlanInfoEntry  1 }
+              	
+    ubiVlanName	OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Vlan name"
+		::= { ubiVlanInfoEntry  2 } 
+              
+ 	ubiVlanPortList	OBJECT-TYPE
+        SYNTAX  PortList 
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Vlan port list"
+		::= { ubiVlanInfoEntry  3 }  
+
+ 	ubiVlanOpState	OBJECT-TYPE
+        SYNTAX  INTEGER{
+        	up(1),
+        	down(2)
+        } 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Vlan operational status"
+		::= { ubiVlanInfoEntry  4 }  
+                
+	ubiVlanRowStatus	OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object is used to create a new row or modify or
+            delete an existing row in this table.
+            A ubiVlan activated by setting this object to `active'.  
+            When `active' is set, the system will validate the flowRule.
+
+            Before a FlowRule can be deleted or taken out of
+            service, (by setting this object to `destroy' or
+            `outOfService') it must be first unreferenced
+            from all associated lines."     
+        ::= { ubiVlanInfoEntry  5 }	      
+                                         
+    ubiVlanTagPortList  OBJECT-TYPE
+       SYNTAX      PortList
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+          ""
+       ::= { ubiVlanInfoEntry 6 }
+
+
+-- ***********************************************************
+-- ubiSwitchStormControlTable
+-- ***********************************************************	
+	ubiSwitchPortStormControlTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiSwitchPortStormControlEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of storm-control "
+		::= { ubiSwitchInterfaceMIBObjects 6 }
+
+	ubiSwitchPortStormControlEntry OBJECT-TYPE
+		SYNTAX  UbiSwitchPortStormControlEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of storm-control "
+		INDEX  { ubiSysIndex, ubiPortIndex }
+		::= { ubiSwitchPortStormControlTable 1 } 
+
+	UbiSwitchPortStormControlEntry  ::=
+		SEQUENCE {
+			ubiSwitchPortStormLevel			Counter32,
+			ubiSwitchPortStormBroadcast		INTEGER,
+			ubiSwitchPortStormDLFBroadcast 	INTEGER,
+			ubiSwitchPortStormMulticast		INTEGER
+		}	
+				
+ 		ubiSwitchPortStormLevel OBJECT-TYPE
+			SYNTAX Counter32    
+			UNITS "percent"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiSwitchPortStormControlEntry 1  }                                           
+                                            
+		ubiSwitchPortStormBroadcast OBJECT-TYPE
+			SYNTAX INTEGER  {
+				enable  (1),
+				disable	(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiSwitchPortStormControlEntry 2 }
+		
+		ubiSwitchPortStormDLFBroadcast OBJECT-TYPE
+			SYNTAX INTEGER  {
+				enable  (1),
+				disable	(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiSwitchPortStormControlEntry 3 }
+		
+		ubiSwitchPortStormMulticast OBJECT-TYPE
+			SYNTAX INTEGER  { 
+				enable  (1),
+				disable	(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiSwitchPortStormControlEntry 4 }   
+   
+
+-- ***********************************************************
+-- ubiSwitchPortTrafficMonitorTable
+-- ***********************************************************	
+	ubiSwitchPortTrafficMonitorTable  OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiSwitchPortTrafficMonitorEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of storm-control "
+		::= { ubiSwitchInterfaceMIBObjects 7 }
+
+	ubiSwitchPortTrafficMonitorEntry OBJECT-TYPE
+		SYNTAX  UbiSwitchPortTrafficMonitorEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of storm-control "
+		INDEX  { ubiSysIndex, ubiPortIndex }
+		::= { ubiSwitchPortTrafficMonitorTable 1 } 
+
+	UbiSwitchPortTrafficMonitorEntry  ::=
+		SEQUENCE {
+			ubiSwitchPortInPkts			Counter32,
+			ubiSwitchPortOutPkts		Counter32,
+			ubiSwitchPortInCRCErrors 	Counter32
+		}	
+				
+		ubiSwitchPortInPkts OBJECT-TYPE
+			SYNTAX		Counter32
+			MAX-ACCESS 	read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiSwitchPortTrafficMonitorEntry 1 }  
+                                                      
+		ubiSwitchPortOutPkts OBJECT-TYPE
+			SYNTAX		Counter32
+			MAX-ACCESS 	read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiSwitchPortTrafficMonitorEntry 2 }  
+                                 
+		ubiSwitchPortInCRCErrors OBJECT-TYPE
+			SYNTAX		Counter32
+			MAX-ACCESS 	read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiSwitchPortTrafficMonitorEntry 3 }  
+                                 
+-- ***********************************************************
+-- ubiSwitchPortVlanInfoTable
+-- ***********************************************************	
+	ubiSwitchPortVlanInfoTable  OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiSwitchPortVlanInfoEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"."
+		::= { ubiSwitchInterfaceMIBObjects 8 }
+
+	ubiSwitchPortVlanInfoEntry OBJECT-TYPE
+		SYNTAX  UbiSwitchPortVlanInfoEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"."
+		INDEX  { ubiSysIndex, ubiPortIndex, ubiVlanId }
+		::= { ubiSwitchPortVlanInfoTable 1 } 
+
+	UbiSwitchPortVlanInfoEntry  ::=
+		SEQUENCE {
+     	ubiSwitchPortSwitchIndex		INTEGER,		
+		ubiSwitchPortSwitchMode			INTEGER,
+		ubiSwitchPortSwitchNativeVlan	INTEGER
+		}	  
+		
+    ubiSwitchPortSwitchIndex	 OBJECT-TYPE  
+		SYNTAX  INTEGER 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"switchport index"
+		::= { ubiSwitchPortVlanInfoEntry  1 }
+ 
+    ubiSwitchPortSwitchMode	 OBJECT-TYPE  
+		SYNTAX  INTEGER {
+				none(0),
+				noswitch(1),
+				access(2),
+				trunk(3)
+		} 
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"switchport mode"
+		::= { ubiSwitchPortVlanInfoEntry  2 } 
+ 
+	ubiSwitchPortSwitchNativeVlan	 OBJECT-TYPE  
+		SYNTAX  INTEGER 
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"switchport native vlan"
+		::= { ubiSwitchPortVlanInfoEntry  3 } 
+ 
+-- ***********************************************************
+-- ubiSwitchPortVlanControlTable
+-- ***********************************************************	
+	ubiSwitchPortVlanControlTable  OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiSwitchPortVlanControlEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"."
+		::= { ubiSwitchInterfaceMIBObjects 9 } 
+
+	ubiSwitchPortVlanControlEntry OBJECT-TYPE
+		SYNTAX     UbiSwitchPortVlanControlEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			""
+		INDEX   { ubiPortIndex }
+		::= { ubiSwitchPortVlanControlTable 1 }
+
+    UbiSwitchPortVlanControlEntry ::= SEQUENCE
+    {
+		ubiSwitchPortSwitchAddTaggedVlan	INTEGER,
+		ubiSwitchPortSwitchDelTaggedVlan	INTEGER
+	}
+
+    ubiSwitchPortSwitchAddTaggedVlan OBJECT-TYPE
+		SYNTAX     INTEGER(2..4096)
+		MAX-ACCESS  read-write
+		STATUS     current
+		DESCRIPTION
+			"Add tagged vlan.(Set only)"
+		::= { ubiSwitchPortVlanControlEntry 1 }
+		                                    
+    ubiSwitchPortSwitchDelTaggedVlan OBJECT-TYPE
+		SYNTAX     INTEGER(2..4096)
+		MAX-ACCESS  read-write
+		STATUS     current
+		DESCRIPTION
+			"Delete tagged Vlan.(Set only)"
+		::= { ubiSwitchPortVlanControlEntry 2 }
+
+-- ***********************************************************
+-- 
+-- ***********************************************************	
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ubiSwitchInterfaceMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiSwitchInterfaceMIB 2 }
+ubiSwitchInterfaceMIBNotifications OBJECT IDENTIFIER ::= { ubiSwitchInterfaceMIBNotificationPrefix 0 }
+                         
+-- conformance information
+
+ubiSwitchInterfaceMIBConformance OBJECT IDENTIFIER ::= { ubiSwitchInterfaceMIB 3 }
+ubiSwitchInterfaceMIBCompliances OBJECT IDENTIFIER ::= { ubiSwitchInterfaceMIBConformance 1 }
+ubiSwitchInterfaceMIBGroups      OBJECT IDENTIFIER ::= { ubiSwitchInterfaceMIBConformance 2 }
+
+
+-- compliance statements
+ubiSwitchInterfaceMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss port MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ubiSwitchInterfaceMIBGroup	
+                                  }
+
+        GROUP   ubiSwitchInterfaceMIBGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for port."
+                                 
+        ::= { ubiSwitchInterfaceMIBCompliances 1 }
+
+-- ports of conformance
+ubiSwitchInterfaceMIBGroup OBJECT-GROUP
+        OBJECTS {
+        	   	ubiSwitchPortMediaType,
+				ubiSwitchPortSpeedNego,
+				ubiSwitchPortSpeedConfig,
+				ubiSwitchPortDuplexConfig,
+				ubiSwitchPortSpeedCurrent,
+				ubiSwitchPortDuplexCurrent,
+				ubiSwitchPortLinkAggIfIndex,
+				
+				ubiLinkAggRowStatus,
+				ubiLinkAggPortList,
+				ubiLinkAggType,
+				ubiLinkAggIndex     
+        }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss port."
+        ::= { ubiSwitchInterfaceMIBGroups 1 }
+        
+
+END

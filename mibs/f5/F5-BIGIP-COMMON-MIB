@@ -3,7 +3,7 @@ F5-BIGIP-COMMON-MIB DEFINITIONS ::= BEGIN
 --================================================================
 -- F5-MIB 
 --     A private enterprise MIB for F5 Networks.
---     VERSION: 11.6.1
+--     VERSION: 14.1.2.7
 --================================================================
 
 IMPORTS
@@ -19,7 +19,7 @@ IMPORTS
 
 --================================================================
 f5 MODULE-IDENTITY
-    LAST-UPDATED "201603022024Z" -- Wed Mar  2 20:24:18 UTC 2016
+    LAST-UPDATED "201607271941Z" -- Wed Jul 27 19:41:42 UTC 2016
     ORGANIZATION "F5 Networks, Inc."
     CONTACT-INFO
          "postal: F5 Networks, Inc. 
@@ -1505,16 +1505,450 @@ bigipUpdateError  NOTIFICATION-TYPE
             "There was an error checking for updates."
         ::= { bigipNotifications 155 }
 
+bigipGtmDeletedFromGroup  NOTIFICATION-TYPE
+    OBJECTS {
+                bigipNotifyObjMsg
+    }
+    STATUS      current
+    DESCRIPTION
+        "BIG-IP GTM deleted from sync group."
+    ::= { bigipNotifications 156 }
+
+bigipGtmServerNotAvailNoIP NOTIFICATION-TYPE
+    OBJECTS {
+                bigipNotifyObjMsg
+    }
+    STATUS      current
+    DESCRIPTION
+        "A server is becoming unavailable in global traffic management module."
+    ::= { bigipNotifications 157 }
+
+bigipDDMPowerAlarm  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The Digital Diagnostic Monitoring on a pluggable optical
+		transceiver detected an alarm condition.
+		DDM monitors both transmit and receive optical power
+		to ensure the laser power is between vendor-specified
+		power thresholds for pluggable optical modules  such 
+		as SFP/SFP+/QSFP+/QSFP28.
+		An alarm can occur when a cable is removed from a plugged port,
+		or when the transceiver is not configured or operating properly."
+	::= { bigipNotifications 158 }
+
+bigipDDMPowerWarn  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The Digital Diagnostic Monitoring on a pluggable optical
+		transceiver detected a warning condition.
+		DDM monitors both transmit and receive optical power
+		to ensure the laser power is between vendor-specified
+		power thresholds for pluggable optical modules  such 
+		as SFP/SFP+/QSFP+/QSFP28.
+		A warning can occur when a cable is removed from a plugged port,
+		or when the transceiver is not configured or operating properly."
+	::= { bigipNotifications 159 }
+
+bigipDDMPowerAlarmClear  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The Digital Diagnostic Monitoring on a pluggable optical
+		transceiver no longer detects an alarm condition.
+		DDM monitors both transmit and receive optical power
+		to ensure the laser power is between vendor-specified
+		power thresholds."
+	::= { bigipNotifications 160 }
+
+bigipDDMPowerWarnClear  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"The Digital Diagnostic Monitoring on a pluggable optical
+		transceiver no longer detects a warning condition.
+		DDM monitors both transmit and receive optical power
+		to ensure the laser power is between vendor-specified
+		power thresholds."
+	::= { bigipNotifications 161 }
+
+bigipDDMNonF5Optics  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A non-F5 pluggable optical transceiver
+		is present in an interface.  See support.f5.com SOL8153 for
+		restrictions on third-party hardware components with
+		F5 products."
+	::= { bigipNotifications 162 }
+
+bigipTrafficGroupFailoverCond NOTIFICATION-TYPE
+    OBJECTS {
+                bigipNotifyObjMsg
+    }
+    STATUS      current
+    DESCRIPTION
+        "A traffic group has reported a failover condition and will not be able to go active."
+    ::= { bigipNotifications 163 }
+
+bigipTrafficGroupFailoverCondClear NOTIFICATION-TYPE
+    OBJECTS {
+                bigipNotifyObjMsg
+    }
+    STATUS      current
+    DESCRIPTION
+        "Failover condition for a traffic group has been cleared."
+    ::= { bigipNotifications 164 }
+
+bigipDisableNonF5Optics  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"A non-F5 pluggable optical transceiver
+		has been disabled in an interface.  See support.f5.com SOL8153 for
+		restrictions on third-party hardware components with
+		F5 products."
+	::= { bigipNotifications 165 }
+
 bigipFipsFault  NOTIFICATION-TYPE
         OBJECTS {
                 bigipNotifyObjMsg
         }
         STATUS      current
         DESCRIPTION
-            "The FIPS card is currently in faulty state."
-        ::= { bigipNotifications 156 }
+                "The FIPS card is currently in faulty state."
+        ::= { bigipNotifications 166 }
 
---================================================================
+bigipLibhalAomEventWarning  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a warning event."
+        ::= { bigipNotifications 167 }
+
+bigipLibhalAomEventError  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued an error event."
+        ::= { bigipNotifications 168 }
+
+bigipLibhalAomEventAlert  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued an alert event."
+        ::= { bigipNotifications 169 }
+
+bigipLibhalAomEventCritical  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a critical event."
+        ::= { bigipNotifications 170 }
+
+bigipLibhalAomEventEmergency  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued an emergency event."
+        ::= { bigipNotifications 171 }
+
+bigipLibhalAomEventInfo  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued an information event."
+        ::= { bigipNotifications 172 }
+
+bigipLibhalAomSensorTempWarning  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a temperature sensor warning level event."
+        ::= { bigipNotifications 173 }
+
+bigipLibhalAomSensorTempError  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a temperature sensor error level event."
+        ::= { bigipNotifications 174 }
+
+bigipLibhalAomSensorTempAlert  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a temperature sensor alert level event."
+        ::= { bigipNotifications 175 }
+
+bigipLibhalAomSensorTempCritical  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a temperature sensor critical level event."
+        ::= { bigipNotifications 176 }
+
+bigipLibhalAomSensorTempEmergency  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a temperature sensor emergency level event."
+        ::= { bigipNotifications 177 }
+
+bigipLibhalAomSensorTempInfo  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a temperature sensor information level event."
+        ::= { bigipNotifications 178 }
+
+bigipLibhalAomSensorFanWarning  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a fan sensor warning level event."
+        ::= { bigipNotifications 179 }
+
+bigipLibhalAomSensorFanError  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a fan sensor error level event."
+        ::= { bigipNotifications 180 }
+
+bigipLibhalAomSensorFanAlert  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a fan sensor alert level event."
+        ::= { bigipNotifications 181 }
+
+bigipLibhalAomSensorFanCritical  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a fan sensor critical level event."
+        ::= { bigipNotifications 182 }
+
+bigipLibhalAomSensorFanEmergency  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a fan sensor emergency level event."
+        ::= { bigipNotifications 183 }
+
+bigipLibhalAomSensorFanInfo  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a fan sensor information level event."
+        ::= { bigipNotifications 184 }
+
+bigipLibhalAomSensorPwrWarning  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a power sensor warning level event."
+        ::= { bigipNotifications 185 }
+
+bigipLibhalAomSensorPwrError  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a power sensor error level event."
+        ::= { bigipNotifications 186 }
+
+bigipLibhalAomSensorPwrAlert  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a power sensor alert level event."
+        ::= { bigipNotifications 187 }
+
+bigipLibhalAomSensorPwrCritical  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a power sensor critical level event."
+        ::= { bigipNotifications 188 }
+
+bigipLibhalAomSensorPwrEmergency  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a power sensor emergency level event."
+        ::= { bigipNotifications 189 }
+
+bigipLibhalAomSensorPwrInfo  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "AOM has issued a power sensor information level event."
+        ::= { bigipNotifications 190 }
+
+
+
+bigipAccessGlobalLicenseTHDExceeded  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"Global access license usage exceeds threshold."
+	::= { bigipNotifications 191 }
+
+bigipAccessCCULicenseTHDExceeded  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"Global concurrent connectivity license usage exceeds threshold."
+	::= { bigipNotifications 192 }
+
+bigipAccessURLFLicenseTHDExceeded  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"Global URL filtering license usage exceeds threshold."
+	::= { bigipNotifications 193 }
+
+bigipAccessHATransition  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"APM HA state transitioned."
+	::= { bigipNotifications 194 }
+
+bigipMonDBDaemonHungSQL  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "Hung SQL monitor connection."
+        ::= { bigipNotifications 195 }
+
+bigipMonDBDaemonIdle  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "DBDaemon unresponsive, shut down."
+        ::= { bigipNotifications 196 }
+
+bigipAccessURLFLimitedLicenseTHDExceeded  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"Global URL filtering limited license usage exceeds threshold."
+	::= { bigipNotifications 197 }
+
+bigipChassisInadequatePower  NOTIFICATION-TYPE
+	OBJECTS {
+                bigipNotifyObjMsg
+	}
+	STATUS      current
+	DESCRIPTION
+		"Chassis is inadequately powered."
+	::= { bigipNotifications 198 }
+
+bigipChassisPsUnidentified  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "Power supply unit is unidentified."
+        ::= { bigipNotifications 199 }
+
+bigipIPsecTunnelUp  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "An IPSEC Tunnel has come up."
+        ::= { bigipNotifications 200 }
+
+bigipIPsecTunnelDown  NOTIFICATION-TYPE
+        OBJECTS {
+                bigipNotifyObjMsg
+        }
+        STATUS      current
+        DESCRIPTION
+            "An IPSEC Tunnel has come down."
+        ::= { bigipNotifications 201 }
+
 -- Compliance & Groups  
 --
 bigipNotificationCompliance   MODULE-COMPLIANCE
@@ -1706,15 +2140,59 @@ bigipSystemNotifyGroup NOTIFICATION-GROUP
                 bigipUpdatePriority,
                 bigipUpdateServer,
                 bigipUpdateError,
-                bigipFipsFault
+                bigipGtmDeletedFromGroup,
+                bigipGtmServerNotAvailNoIP,
+                bigipDDMPowerAlarm,
+                bigipDDMPowerWarn,
+                bigipDDMPowerAlarmClear,
+                bigipDDMPowerWarnClear,
+                bigipDDMNonF5Optics,
+                bigipTrafficGroupFailoverCond,
+                bigipTrafficGroupFailoverCondClear,
+                bigipDisableNonF5Optics,
+                bigipFipsFault,
+                bigipLibhalAomEventWarning,
+                bigipLibhalAomEventError,
+                bigipLibhalAomEventAlert,
+                bigipLibhalAomEventCritical,
+                bigipLibhalAomEventEmergency,
+                bigipLibhalAomEventInfo,
+                bigipLibhalAomSensorTempWarning,
+                bigipLibhalAomSensorTempError,
+                bigipLibhalAomSensorTempAlert,
+                bigipLibhalAomSensorTempCritical,
+                bigipLibhalAomSensorTempEmergency,
+                bigipLibhalAomSensorTempInfo,
+                bigipLibhalAomSensorFanWarning,
+                bigipLibhalAomSensorFanError,
+                bigipLibhalAomSensorFanAlert,
+                bigipLibhalAomSensorFanCritical,
+                bigipLibhalAomSensorFanEmergency,
+                bigipLibhalAomSensorFanInfo,
+                bigipLibhalAomSensorPwrWarning,
+                bigipLibhalAomSensorPwrError,
+                bigipLibhalAomSensorPwrAlert,
+                bigipLibhalAomSensorPwrCritical,
+                bigipLibhalAomSensorPwrEmergency,
+                bigipLibhalAomSensorPwrInfo,
+                bigipAccessGlobalLicenseTHDExceeded,
+                bigipAccessCCULicenseTHDExceeded,
+                bigipAccessURLFLicenseTHDExceeded,
+                bigipAccessHATransition,
+                bigipMonDBDaemonHungSQL,
+                bigipMonDBDaemonIdle,
+                bigipAccessURLFLimitedLicenseTHDExceeded,
+                bigipChassisInadequatePower,
+                bigipChassisPsUnidentified,
+                bigipIPsecTunnelUp,
+                bigipIPsecTunnelDown
 	}
 	STATUS      current
 	DESCRIPTION
-		"The notifications relating to the operation of 
+		"The notifications relating to the operation of
 		the BIGIP system."
     ::= { bigipNotificationGroups 3 }
 
---================================================================
 --  
 LongDisplayString ::= TEXTUAL-CONVENTION
 	DISPLAY-HINT "1024a"

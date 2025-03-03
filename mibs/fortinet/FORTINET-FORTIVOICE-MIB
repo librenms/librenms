@@ -1,0 +1,268 @@
+--
+-- MODULE-IDENTITY
+--  OrgName
+--    Fortinet, Inc.
+--  ContactInfo
+--     Technical Support
+--     e-mail: support@fortinet.com
+--     http://www.fortinet.com
+--
+
+FORTINET-FORTIVOICE-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		DisplayString, TEXTUAL-CONVENTION
+			FROM SNMPv2-TC
+		MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Gauge32, 
+		IpAddress
+			FROM SNMPv2-SMI
+		ifIndex
+			FROM IF-MIB
+		FnBoolState, FnIndex, FnSessionProto, fortinet
+			FROM FORTINET-CORE-MIB;
+
+fnFortiVoiceMib MODULE-IDENTITY
+    LAST-UPDATED "201401300000Z"
+    ORGANIZATION 
+        "Fortinet Technologies, Inc."
+    CONTACT-INFO 
+        "Technical Support
+         email: support@fortinet.com
+         http://www.fortinet.com
+        "
+    DESCRIPTION 
+		"Inherit FORTINET-CORE-MIB, combine FortiVoice traps"
+    REVISION    "201401300000Z"
+    DESCRIPTION 
+        "MIB module for FortiVoice devices."
+    ::= { fortinet 115 }
+
+	--
+	-- Textual conventions --
+	--
+
+	FvSysEventCodeVal ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "enumerated type for System component events."
+        SYNTAX      INTEGER {
+			systemHalt (1),
+			systemReboot (2),
+			systemReload (3),
+			systemUpgrade (4),
+			guiUpgrade (5),
+			logDiskFormat (6),
+			storageDiskFormat (7)
+		}
+    
+	FvHAEventIdVal ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "enumerated type for HA events."
+        SYNTAX      INTEGER {
+			masterUnitSwitch (1),
+			slaveUnitSwitch  (2),
+			unitShutdown (3)
+		}
+		
+	FvHAModeVal ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "enumerated type for HA mode."
+		SYNTAX 		INTEGER {
+			off	   (0),
+			master (1),
+			slave  (2)
+		}	
+	
+	
+	--
+	--
+	--
+
+	fvTraps			OBJECT IDENTIFIER ::=  { fnFortiVoiceMib 0 }
+	fvSystem		OBJECT IDENTIFIER ::=  { fnFortiVoiceMib 1 }
+	fvSysHA			OBJECT IDENTIFIER ::=  { fvSystem 200 }
+	fvMIBConformance 	OBJECT IDENTIFIER ::=  { fnFortiVoiceMib 600 }
+
+	
+	--
+	-- fnFortiVoiceMib.fvSystem
+	--
+
+	fvSysModel          OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "System model string"
+		::= { fvSystem    1 }
+
+	fvSysSerial         OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Device serial number"
+		::= { fvSystem    2 }
+
+	fvSysVersion        OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 128 ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Device firmware version"
+		::= { fvSystem    3 }
+
+	fvSysCpuUsage       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous CPU usage"
+		::= { fvSystem    6 }
+
+	fvSysMemUsage       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous memory utilization"
+		::= { fvSystem    7 }
+
+	fvSysLogDiskUsage   OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous log disk usage"
+		::= { fvSystem    8 }
+
+	fvSysStorageDiskUsage  OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous storage disk usage"
+		::= { fvSystem    9 }
+	
+	fvSysEventCode OBJECT-TYPE
+		SYNTAX          FvSysEventCodeVal
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "System component events"
+		::= { fvSystem    11 }
+
+	fvHAEventId OBJECT-TYPE
+		SYNTAX          FvHAEventIdVal
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "HA event type ID"
+		::= { fvSystem    14 }
+
+	fvHAUnitIp OBJECT-TYPE
+		SYNTAX          IpAddress
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "Unit IP address where event occurs "
+		::= { fvSystem    15 }
+
+	fvHAEventReason      OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		MAX-ACCESS      accessible-for-notify
+		STATUS          current
+		DESCRIPTION     "The reason for the HA event"
+		::= { fvSystem    16 }
+
+	fvSysLoad       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous system load"
+		::= { fvSystem    30 }
+
+	--
+	-- fnFortiVoiceMib.fvSystem.fvSysHA
+	--
+
+	fvHAMode OBJECT-TYPE
+		SYNTAX          FvHAModeVal
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Configured HA mode"
+		::= { fvSysHA 1 }
+
+	fvHAEffectiveMode OBJECT-TYPE
+		SYNTAX          FvHAModeVal
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Effective HA mode"
+		::= { fvSysHA  2 }
+
+	--
+	-- fnFortiVoiceMib.fvTraps
+	--
+
+	fvTrapStorageDiskHighThreshold  NOTIFICATION-TYPE
+		OBJECTS       { fvSysSerial}
+		STATUS        current
+		DESCRIPTION   "Trap being sent if the storage disk usage becomes too high"
+		::=  {  fvTraps  104  }		
+		
+	fvTrapSystemEvent	NOTIFICATION-TYPE
+		OBJECTS      { fvSysSerial, fvSysEventCode }
+		STATUS       current
+		DESCRIPTION   "Trap being sent when the system component halt, reboot, upgrade etc.,"
+		::=  {  fvTraps  201  }
+
+	fvTrapHAEvent	NOTIFICATION-TYPE
+		OBJECTS      { fvSysSerial, fvHAEventId, fvHAUnitIp, fvHAEventReason }
+		STATUS       current
+		DESCRIPTION   "Trap being sent when HA event occurs"
+		::=  {  fvTraps  203  }
+
+	--
+	-- fnFortiVoiceMib.fvMIBConformance
+	--
+	
+	fvSystemConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fvSysModel, fvSysSerial, fvSysVersion, fvSysCpuUsage, fvSysMemUsage,
+					  fvSysLogDiskUsage, fvSysStorageDiskUsage, fvSysEventCode, fvSysLoad }
+		STATUS 		current
+		DESCRIPTION
+				"object related to fortivoice system."
+		::= { fvMIBConformance 1 }
+
+	fvHAModeConformanceGroup OBJECT-GROUP
+		OBJECTS 	{ fvHAMode, fvHAEffectiveMode }
+		STATUS		current
+		DESCRIPTION
+				"object related to fortivoice HA mode."
+		::= { fvMIBConformance 6 }
+
+	fvTrapsComplianceGroup NOTIFICATION-GROUP
+		NOTIFICATIONS {
+			fvTrapStorageDiskHighThreshold,
+			fvTrapSystemEvent,
+			fvTrapHAEvent
+		}
+		STATUS current
+		DESCRIPTION "Event notifications"
+		::= { fvMIBConformance 7 }
+		
+	fvMIBCompliance MODULE-COMPLIANCE
+		STATUS 		current
+		DESCRIPTION 
+			"the compliance statement for the application MIB."
+		
+		MODULE		-- this module
+		
+			GROUP	fvSystemConformanceGroup
+			DESCRIPTION 
+				"this group is mandatory for all FortiVoice appliances supporting this MIB."
+			
+			GROUP 	fvHAModeConformanceGroup
+			DESCRIPTION
+				"this group is mandatory for all FortiVoice appliances supporting this MIB."
+
+			GROUP	fvTrapsComplianceGroup
+			DESCRIPTION
+				"this group is mandatory for all FortiVoice appliances supporting this MIB."
+
+			::= { fvMIBConformance 100 }
+
+END

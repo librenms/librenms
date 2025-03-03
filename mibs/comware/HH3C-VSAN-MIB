@@ -1,0 +1,870 @@
+-- =====================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--      This MIB module is for configuring and monitoring VSAN (Virtual
+--      Storage Area Network) and domain management related entities.
+-- Reference:
+-- Version: V1.2
+-- History:
+--   V1.0 Initial version created by qiaoxinghua 2013-02-27
+--   V1.1 Added hh3cVsanDmDomainIdChangeNotify and
+--        hh3cVsanDmDomainIdChangeNotifyEnable by qiaoxinghua 2014-3-4
+--   V1.2 Added hh3cVsanName and hh3cVsanWorkingMode
+--        to hh3cVsanTable by chengzhipeng 2014-05-09
+--        Added hh3cVsanFcIdTable and hh3cVsanFcIdPersistencyTable by wangyuqiang 2014-07-25
+-- =====================================================================
+HH3C-VSAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Counter32,
+    Integer32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    Hh3cFcVsanIndex, Hh3cFcNameIdOrZero, Hh3cFcDomainPriority, Hh3cFcDomainId,
+    Hh3cFcNameId, Hh3cFcAddressId, Hh3cFcDomainIdOrZero, Hh3cFcDmState, Hh3cFcDomainIdList
+        FROM HH3C-FC-TC-MIB
+    ifIndex
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cSan MODULE-IDENTITY
+    LAST-UPDATED   "201407251840Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085
+        "
+    DESCRIPTION
+        "This MIB module is for configuring and monitoring VSAN
+         and domain management related entities."
+    REVISION       "201407251840Z"
+    DESCRIPTION
+        "Added hh3cVsanFcIdTable and hh3cVsanFcIdPersistencyTable."
+    REVISION       "201405091840Z"
+    DESCRIPTION
+        "Added hh3cVsanName and hh3cVsanWorkingMode."
+    REVISION       "201403041550Z"
+    DESCRIPTION
+        "Added hh3cVsanDmDomainIdChangeNotify and
+         hh3cVsanDmDomainIdChangeNotifyEnable."
+    REVISION       "201302280940Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+
+    ::= { hh3cCommon 127 }
+
+--
+-- Node definitions
+--
+hh3cVsan OBJECT IDENTIFIER ::= { hh3cSan 1 }
+
+hh3cVsanMibObjects OBJECT IDENTIFIER ::= { hh3cVsan 1 }
+
+hh3cVsanDmConfiguration OBJECT IDENTIFIER ::= { hh3cVsanMibObjects 1 }
+
+-- VSAN Table
+hh3cVsanTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains all the VSANs configured on the device.  It can
+         be used to manage and monitor the VSANs on local device."
+    ::= { hh3cVsanDmConfiguration 1 }
+
+hh3cVsanEntry OBJECT-TYPE
+    SYNTAX      Hh3cVsanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry that contains information about a VSAN in the hh3cVsanTable."
+    INDEX { hh3cVsanIndex }
+    ::= { hh3cVsanTable 1 }
+
+Hh3cVsanEntry ::=
+    SEQUENCE {
+        hh3cVsanIndex
+            Hh3cFcVsanIndex,
+        hh3cVsanCoreSwitchName
+            Hh3cFcNameIdOrZero,
+        hh3cVsanRowStatus
+            RowStatus,
+        hh3cVsanName
+            SnmpAdminString,
+        hh3cVsanWorkingMode
+            Integer32
+       }
+
+hh3cVsanIndex OBJECT-TYPE
+    SYNTAX      Hh3cFcVsanIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The identifier of the VSAN."
+    ::= { hh3cVsanEntry 1 }
+
+hh3cVsanCoreSwitchName OBJECT-TYPE
+    SYNTAX      Hh3cFcNameIdOrZero (SIZE(8 | 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Core Switch_Name of the VSAN, which is indicated by
+         the switch's WWN(World Wide Name)."
+    ::= { hh3cVsanEntry 2 }
+
+hh3cVsanRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "RowStatus. Now only three states are supported:
+         createAndGo, active, and destroy."
+    ::= { hh3cVsanEntry 3 }
+
+hh3cVsanName OBJECT-TYPE
+    SYNTAX      SnmpAdminString(SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the VSAN.
+         The default value of this object will be the
+         string 'VSANxxxx' where xxxx is value of VSAN index
+         expressed as 4 digits.  For example, if VSAN index is
+         10, the default value of this object is 'VSAN0010'."
+    ::= { hh3cVsanEntry 4 }
+
+hh3cVsanWorkingMode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the working modes the VSAN supports.
+         The object has three available values:
+         1: non-FCoE mode.
+         2: FCF mode.
+         3: NPV mode.
+
+         The working mode of VSAN 4079 is always non-FCoE mode and cannot be
+         converted.
+         If the switch mode is not FCF-NPV mode, then the 'SET' operation
+         on this object results in error.
+         When creating a VSAN, the 'SET' operation including this object
+         results in error.
+         When the switch mode is FCF mode, working modes of all user VSANs
+         are FCF mode.
+         When the switch mode is NPV mode, working modes of all user VSANs
+         are NPV mode.
+         When the switch mode is FCF-NPV mode, the default working mode of
+         a user VSAN is NPV mode.  If a VSAN has been created, the working mode
+         can be converted from NPV mode to FCF mode, or vice versa."
+    ::= { hh3cVsanEntry 5 }
+
+-- DM Configuration
+hh3cVsanDmTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsanDmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains domain management related configurations
+         and information of VSANs.
+         An entry in this table is created when corresponding VSAN
+         is created, as well as deleted when the VSAN is deleted."
+    ::= { hh3cVsanDmConfiguration 2 }
+
+hh3cVsanDmEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVsanDmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of domain management related configurations
+         and information of a specified VSAN."
+    INDEX { hh3cVsanIndex }
+    ::= { hh3cVsanDmTable 1}
+
+Hh3cVsanDmEntry ::=
+    SEQUENCE {
+              hh3cVsanDmDomainConfigureEnable     TruthValue,
+              hh3cVsanDmFabricNameConfigured      Hh3cFcNameIdOrZero,
+              hh3cVsanDmPriorityConfigured        Hh3cFcDomainPriority,
+              hh3cVsanDmAllowedDomainIdList       Hh3cFcDomainIdList,
+              hh3cVsanDmDomainIdConfigured        Hh3cFcDomainIdOrZero,
+              hh3cVsanDmDomainIdTypeConfigured    INTEGER,
+              hh3cVsanDmAutoReconfigureEnable     TruthValue,
+              hh3cVsanDmDomainRestart             INTEGER,
+              hh3cVsanDmState                     Hh3cFcDmState,
+              hh3cVsanDmDomainIdAssigned          Hh3cFcDomainIdOrZero,
+              hh3cVsanDmPrincipalSwitchWWN        Hh3cFcNameId,
+              hh3cVsanDmLocalSwitchWWN            Hh3cFcNameId,
+              hh3cVsanDmPrincipalSwRunPriority    Hh3cFcDomainPriority,
+              hh3cVsanDmLocalSwRunPriority        Hh3cFcDomainPriority,
+              hh3cVsanDmPrincipalSwSlctCnt        Counter32,
+              hh3cVsanDmLocalPrincipalSwSlctCnt   Counter32,
+              hh3cVsanDmBFCnt                     Counter32,
+              hh3cVsanDmRCFCnt                    Counter32
+             }
+
+hh3cVsanDmDomainConfigureEnable  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "To enable or disable the fabric configuration function
+         in this VSAN.
+         true:  enabled, the fabric will be built dynamically.
+         false: disabled, the fabric should be built statically
+                by manual configurations."
+    DEFVAL          { true }
+    ::= { hh3cVsanDmEntry 1 }
+
+hh3cVsanDmFabricNameConfigured    OBJECT-TYPE
+    SYNTAX          Hh3cFcNameIdOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies the fabric name in this VSAN, and will use a
+         zero-length octet string as default value if not configured.
+         The fabric name specified here takes effect only if the
+         value of hh3cVsanDmDomainConfigureEnable is 'false', and the
+         same fabric name should be configured for all switches in
+         this VSAN.
+         If the value of hh3cVsanDmDomainConfigureEnable is 'true',
+         the principal switch WWN is used as fabric name.
+         The value should be set to zero-length when canceling
+         a configured fabric name."
+    ::= { hh3cVsanDmEntry 2 }
+
+hh3cVsanDmPriorityConfigured    OBJECT-TYPE
+    SYNTAX          Hh3cFcDomainPriority
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies the priority of a switch in this VSAN, which
+         is used during principal switch selection to cause one
+         Switch to be favored over another."
+    DEFVAL         { 128 }
+    ::= { hh3cVsanDmEntry 3 }
+
+hh3cVsanDmAllowedDomainIdList    OBJECT-TYPE
+    SYNTAX          Hh3cFcDomainIdList
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies the list of domain IDs that are allowed in the
+         VSAN, and the configuration has different meanings in
+         different scenarios:
+
+         1. Principal switch: Can only assign domains IDs within
+            the allowed domain ID list.  If the allowed domain ID
+            list configured does not include any of the already
+            assigned domain IDs or manually configured domain IDs,
+            the configuration will fail.
+
+         2. Non-principal switch: The manually configured domain
+            ID must be within the allowed domain ID list, or
+            the configuration will fail.  Besides, the domain ID
+            assigned by principal switch must within the allowed
+            domain ID list, or the switch will refuse the assigned
+            domain ID and isolate the upstream interface.  If the
+            runtime domain ID for a switch is beyond the new
+            configured ID list, the configuration will fail.
+         The default value is a zero-length octet string.  If This
+         value is set with zero-length, the configuration will be
+         cancelled in this VSAN."
+    ::= { hh3cVsanDmEntry 4 }
+
+hh3cVsanDmDomainIdConfigured    OBJECT-TYPE
+    SYNTAX          Hh3cFcDomainIdOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Used to configure or cancel a domain ID for a switch in
+         this VSAN.
+
+         When this value is not zero, the domain ID type should
+         be specified together via hh3cVsanDmDomainIdTypeConfigured,
+         or the default value of preferred type will be taken.
+         The zero value is used to cancel the domain ID configured,
+         and then, there is no need to specify its type.
+
+         When statically build a fabric, the configured domain ID
+         is the actual domain ID of the switch.  If this object is
+         not manually configured, the switch will isolate all of
+         its E_ports in this VSAN no matter what domain ID type is
+         configured.
+
+         When dynamically build a fabric, the configured domain ID
+         is desired by the switch, but the domain ID assigned to
+         the switch may not be the desired one.
+         If a non-principal switch fails to obtain any domain ID
+         from the principal switch, the non-principal switch will
+         isolate the upstream link.
+         If a non-principal switch obtains a domain ID from the
+         principal switch other than the desired one, different
+         actions will be taken according to different domain ID
+         type configured:
+          - If configured static type, The non-principal switch
+            will isolate the upstream link and refuse other domain
+            IDs assigned by the principal switch.
+          - If configured preferred type, the non-principal switch
+            will use the domain ID assigned by the principal switch."
+    DEFVAL         { 0 }
+    ::= { hh3cVsanDmEntry 5 }
+
+hh3cVsanDmDomainIdTypeConfigured    OBJECT-TYPE
+    SYNTAX          INTEGER {
+                             static(1),
+                             preferred(2)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+         "Specifies the type of configured domain ID, which can be
+          static type or preferred type."
+    DEFVAL         { preferred }
+    ::= { hh3cVsanDmEntry 6 }
+
+hh3cVsanDmAutoReconfigureEnable    OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Used to specify whether a disruptive reconfiguration will
+         be automatically performed when the domain ID lists overlaps
+         in fabric merging.
+
+         The fabric reconfiguration function takes effect only when
+         the value of hh3cVsanDmDomainConfigureEnable is 'true'."
+    DEFVAL         { false }
+    ::= { hh3cVsanDmEntry 7 }
+
+hh3cVsanDmDomainRestart    OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                              noOperation(1),
+                              nonDisruptive(2),
+                              disruptive(3)
+                             }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Used to manually trigger a disruptive or non-disruptive
+         reconfiguration of the fabric."
+    DEFVAL         { noOperation }
+    ::= { hh3cVsanDmEntry 8 }
+
+hh3cVsanDmState         OBJECT-TYPE
+    SYNTAX          Hh3cFcDmState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the managing state of the domain in this VSAN."
+    ::= { hh3cVsanDmEntry 9 }
+
+hh3cVsanDmDomainIdAssigned    OBJECT-TYPE
+    SYNTAX          Hh3cFcDomainIdOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the Domain ID of the local switch in this
+         VSAN or zero if no Domain ID has been assigned."
+    ::= { hh3cVsanDmEntry 10 }
+
+hh3cVsanDmPrincipalSwitchWWN    OBJECT-TYPE
+    SYNTAX          Hh3cFcNameId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the WWN of the principal switch in this VSAN,
+         or zero-length string if the identity of the principal
+         switch is unknown."
+    ::= { hh3cVsanDmEntry 11 }
+
+hh3cVsanDmLocalSwitchWWN       OBJECT-TYPE
+    SYNTAX          Hh3cFcNameId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the WWN of the local switch in this VSAN."
+    ::= { hh3cVsanDmEntry 12 }
+
+hh3cVsanDmPrincipalSwRunPriority    OBJECT-TYPE
+    SYNTAX          Hh3cFcDomainPriority
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the running priority of the principal switch in
+         this VSAN."
+    ::= { hh3cVsanDmEntry 13 }
+
+hh3cVsanDmLocalSwRunPriority    OBJECT-TYPE
+    SYNTAX          Hh3cFcDomainPriority
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the running priority of the local switch in
+         this VSAN."
+    ::= { hh3cVsanDmEntry 14 }
+
+hh3cVsanDmPrincipalSwSlctCnt    OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The times that local switch has participated in principal
+         switch selection in this VSAN."
+    ::= { hh3cVsanDmEntry 15 }
+
+hh3cVsanDmLocalPrincipalSwSlctCnt    OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The times that local switch was elected as principal switch
+         in this VSAN."
+    ::= { hh3cVsanDmEntry 16 }
+
+hh3cVsanDmBFCnt   OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The times that local switch has participated in a BF(Build
+         Fabric) process in this VSAN."
+    ::= { hh3cVsanDmEntry 17 }
+
+hh3cVsanDmRCFCnt    OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The times that local switch has participated in a RCF
+         (Reconfigure Fabric) process in this VSAN."
+    ::= { hh3cVsanDmEntry 18 }
+
+-- DM If Configuration
+hh3cVsanDmIfConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsanDmIfConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains the FC(Fibre Channel) related interface
+         configurations about domain management of a VSAN."
+    ::= { hh3cVsanDmConfiguration 3 }
+
+hh3cVsanDmIfConfigEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVsanDmIfConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry used for managing the FC related interface
+         configurations about domain management of a VSAN.
+         An entry can be created when any object in this table is
+         set to non-default value, and be deleted when the objects
+         in this table are set to default value."
+    INDEX { ifIndex,
+            hh3cVsanIndex }
+    ::= { hh3cVsanDmIfConfigTable 1}
+
+Hh3cVsanDmIfConfigEntry ::=
+    SEQUENCE {
+              hh3cVsanDmIfConfigRcfReject
+                TruthValue
+             }
+
+hh3cVsanDmIfConfigRcfReject  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Used to specify whether the RCF(Reconfigure Fabric) requests
+         received in this VSAN should be rejected.
+          - true:  the received RCF will be rejected.
+          - false: the received RCF will be accepted."
+    DEFVAL          { false }
+    ::= { hh3cVsanDmIfConfigEntry 1 }
+
+
+-- VSAN FC ID Table
+
+hh3cVsanFcIdTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cVsanFcIdEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains FC ID information for each VSAN."
+    ::= { hh3cVsanDmConfiguration 4 }
+
+hh3cVsanFcIdEntry OBJECT-TYPE
+    SYNTAX          Hh3cVsanFcIdEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry provides FC ID information for a VSAN."
+    INDEX  { hh3cVsanIndex }
+    ::= { hh3cVsanFcIdTable 1 }
+
+Hh3cVsanFcIdEntry ::= SEQUENCE {
+        hh3cVsanFreeFcIds                    Counter32,
+        hh3cVsanAssignedFcIds                Counter32,
+        hh3cVsanFcIdPersistency              TruthValue,
+        hh3cVsanFcIdPurge                    INTEGER
+}
+
+hh3cVsanFreeFcIds OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "The number of FC IDs that are unassigned on this VSAN."
+        ::= { hh3cVsanFcIdEntry 1 }
+
+hh3cVsanAssignedFcIds OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "The number of FC IDs that are assigned on this VSAN."
+        ::= { hh3cVsanFcIdEntry 2 }
+
+hh3cVsanFcIdPersistency OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+           "Enable or disable FC ID persistency on this VSAN.
+
+           If this object is set to 'true', then all the FC ID
+           assigned on this VSAN are made persistent on this VSAN, and
+           all login entries automatically created in the
+           hh3cVsanFcIdPersistencyTable with hh3cVsanFcIdPersistencyWwn
+           equal to either WWN of the logged-in Nx_Port for which the
+           FC ID was assigned and hh3cVsanFcIdPersistencyType equal
+           to 'dynamic'.
+
+           If this object is set to 'false', then all the entries on
+           this VSAN in dmFcIdPersistencyTable are deleted."
+    DEFVAL { true }
+    ::= { hh3cVsanFcIdEntry 3 }
+
+hh3cVsanFcIdPurge OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      noOp (1),
+                      enable (2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This object is used to purge the FC ID
+                persistency database on this VSAN.
+
+               If the value of this object is 'enable', then
+               all entries on this VSAN in the hh3cVsanFcIdPersistencyTable with
+               hh3cVsanFcIdPersistencyType is 'dynamic' and
+               hh3cVsanFcIdPersistencyUsed is 'false' are
+               purged from the persistency database."
+        ::= { hh3cVsanFcIdEntry 4 }
+
+-- FC ID Persistency Table
+
+hh3cVsanFcIdPersistencyTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cVsanFcIdPersistencyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+           "This table contains the FC IDs which are in the FC ID
+           persistency database of each VSAN.
+
+           If the FC ID persistency is enabled, FC devices would get
+           the same FC IDs even if they disappear and appear again.
+
+           The FC ID persistency database contains information
+           about the FC IDs which are assigned to FC devices
+           either statically (configured) or dynamically.
+
+           An entry is automatically created when a FC ID is
+           assigned and hh3cVsanFcIdPersistency is 'true' on this VSAN.
+
+           The entries can also be created and deleted via
+           the hh3cVsanFcIdPersistencyRowStatus object.
+
+           If the object hh3cVsanFcIdPurge is set to 'enable', an entry is
+           deleted if its hh3cVsanFcIdPersistencyType is 'dynamic' and
+           hh3cVsanFcIdPersistencyUsed is 'false'.
+
+           If the hh3cVsanFcIdPersistency is 'false', no
+           entry can be created.
+
+           If the hh3cVsanDmDomainIdAssigned is changed on a VSAN, then all the
+           entries on that VSAN in this table are deleted."
+    ::= { hh3cVsanDmConfiguration 5 }
+
+hh3cVsanFcIdPersistencyEntry OBJECT-TYPE
+    SYNTAX          Hh3cVsanFcIdPersistencyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry provides FC ID persistency information for a VSAN."
+    INDEX  { hh3cVsanIndex, hh3cVsanFcIdPersistencyWwn }
+    ::= { hh3cVsanFcIdPersistencyTable 1 }
+
+Hh3cVsanFcIdPersistencyEntry ::= SEQUENCE {
+       hh3cVsanFcIdPersistencyWwn           Hh3cFcNameId,
+       hh3cVsanFcIdPersistencyFcId          Hh3cFcAddressId,
+       hh3cVsanFcIdPersistencyUsed          TruthValue,
+       hh3cVsanFcIdPersistencyType          INTEGER,
+       hh3cVsanFcIdPersistencyRowStatus     RowStatus
+}
+
+hh3cVsanFcIdPersistencyWwn OBJECT-TYPE
+        SYNTAX      Hh3cFcNameId
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+               "This is either the port WWN of the FC device if the
+               local port is an F_port.  The local port is the port on
+               the local device to which the FC device is attached."
+        ::= { hh3cVsanFcIdPersistencyEntry 1 }
+
+hh3cVsanFcIdPersistencyFcId OBJECT-TYPE
+        SYNTAX      Hh3cFcAddressId
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+               "The FC ID assigned for this WWN on this VSAN.
+
+               This object cannot be changed if either the value of
+               hh3cVsanFcIdPersistencyUsed is 'true' or if the
+               new value being set is already assigned on this VSAN."
+        ::= { hh3cVsanFcIdPersistencyEntry 2 }
+
+hh3cVsanFcIdPersistencyUsed OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+           "This object indicates this FC ID is used or not."
+    ::= { hh3cVsanFcIdPersistencyEntry 3 }
+
+hh3cVsanFcIdPersistencyType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   static (1),
+                   dynamic (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The type of persistency of this FC ID."
+    DEFVAL { static }
+    ::= { hh3cVsanFcIdPersistencyEntry 4 }
+
+hh3cVsanFcIdPersistencyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "An entry cannot be created if hh3cVsanFcIdPersistency is 'false'.
+            An entry cannot be deleted if hh3cVsanFcIdPersistencyUsed is 'true'."
+    ::= { hh3cVsanFcIdPersistencyEntry 5 }
+
+-- DM Information
+hh3cVsanDmInformation  OBJECT IDENTIFIER ::= { hh3cVsanMibObjects 2 }
+
+hh3cVsanDmDatabaseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cVsanDmDatabaseEntry
+    MAX-ACCESS         not-accessible
+    STATUS             current
+    DESCRIPTION
+        "A table specifies the information of the switch
+         about all the Domain IDs which have been assigned
+         in each of the VSANs."
+    ::= { hh3cVsanDmInformation 1 }
+
+hh3cVsanDmDatabaseEntry OBJECT-TYPE
+    SYNTAX      Hh3cVsanDmDatabaseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An object in the hh3cVsanDmDatabaseTable contains one
+         Domain ID and the corresponding WWN of the switch in
+         one VSAN."
+    INDEX { hh3cVsanIndex,
+            hh3cVsanDmDatabaseDomainId }
+    ::= { hh3cVsanDmDatabaseTable 1 }
+
+Hh3cVsanDmDatabaseEntry ::=
+    SEQUENCE {
+        hh3cVsanDmDatabaseDomainId
+          Hh3cFcDomainId,
+        hh3cVsanDmDatabaseSwitchWWN
+          Hh3cFcNameId
+       }
+
+hh3cVsanDmDatabaseDomainId OBJECT-TYPE
+    SYNTAX          Hh3cFcDomainId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Domain ID which has been assigned."
+    ::= { hh3cVsanDmDatabaseEntry 1 }
+
+hh3cVsanDmDatabaseSwitchWWN OBJECT-TYPE
+    SYNTAX          Hh3cFcNameId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The WWN of the switch to which the corresponding
+         Domain ID has been assigned in the particular VSAN."
+    ::= { hh3cVsanDmDatabaseEntry 2 }
+
+hh3cVsanDmIfInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cVsanDmIfInfoEntry
+    MAX-ACCESS         not-accessible
+    STATUS             current
+    DESCRIPTION
+        "A table specifies the information of an interface
+         in each of the VSANs."
+    ::= { hh3cVsanDmInformation 2 }
+
+hh3cVsanDmIfInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cVsanDmIfInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the hh3cVsanDmIfInfoTable indicates the
+         role information of the interface in the particular VSAN."
+    INDEX { ifIndex,
+            hh3cVsanIndex }
+    ::= { hh3cVsanDmIfInfoTable 1 }
+
+Hh3cVsanDmIfInfoEntry ::=
+    SEQUENCE {
+          hh3cVsanDmIfInfoRole
+            INTEGER
+          }
+
+hh3cVsanDmIfInfoRole OBJECT-TYPE
+    SYNTAX INTEGER {
+                      nonPrincipal(1),
+                      principalUpstream(2),
+                      principalDownstream(3),
+                      isolated(4),
+                      unknown(5)
+                   }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The role of the interface in the VSAN.  The value specifications
+         are listed as follows:
+
+         nonPrincipal         - The state of the interface is not principal
+                                interface in the VSAN.
+         principalUpstream    - The state of the interface is upstream
+                                principal interface in the VSAN.
+         principalDownstream  - The state of the interface is downstream
+                                principal interface in the VSAN.
+         isolated             - The state of the interface is isolated in
+                                the VSAN.
+         unknown              - The state of the interface is unknown in
+                                the VSAN."
+    ::= { hh3cVsanDmIfInfoEntry 1 }
+
+-- DM Notifications
+hh3cVsanDmNotifications OBJECT IDENTIFIER ::= { hh3cVsanMibObjects 3 }
+hh3cVsanDmNotificationPrefix  OBJECT IDENTIFIER
+    ::= { hh3cVsanDmNotifications 0 }
+
+hh3cVsanDmDomainIdNotAssignedNotify NOTIFICATION-TYPE
+    OBJECTS {hh3cVsanIndex,
+             hh3cVsanDmLocalSwitchWWN}
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered if a Domain ID is not
+         assigned or configured, then the E_ports may be isolated
+         in the VSAN. The conditions are listed as follows:
+
+         1. If the switch has enabled the fabric configuration and
+            a request for a configured static Domain ID is rejected
+            or no other Domain ID is assigned, the E_ports will be
+            isolated in the particular VSAN.
+         2. If the switch does not enable the fabric configuration
+            and a Domain ID is not configured, all of its E_ports
+            will be isolated in the particular VSAN.
+
+         The notification contains the WWN of the Switch and
+         the index of the VSAN in which the event occurred."
+   ::= { hh3cVsanDmNotificationPrefix 1 }
+
+hh3cVsanDmNewPrincipalSwitchNotify NOTIFICATION-TYPE
+    OBJECTS {hh3cVsanIndex,
+             hh3cVsanDmLocalSwitchWWN}
+    STATUS current
+    DESCRIPTION
+        "If a switch becomes the new Principal Switch in a VSAN, this
+         notification is sent immediately after the election.
+
+         The notification contains the WWN of the new Principal Switch
+         and the index of the VSAN in which the transition occurred."
+   ::= { hh3cVsanDmNotificationPrefix 2 }
+
+hh3cVsanDmFabricChangeNotify NOTIFICATION-TYPE
+    OBJECTS         { hh3cVsanIndex }
+    STATUS          current
+    DESCRIPTION
+        "This event will be triggered if a switch sends or receives a
+         Build Fabric (BF) or a Reconfigure Fabric (RCF) message in a
+         VSAN.
+
+         The conditions a switch can receive or send a BF or a RCF are
+         listed as follows:
+         1. Two isolated fabrics in a VSAN merge into one fabric.  If
+            the Domain ID lists do not overlap, the sent or received
+            message is BF, other cases, it is RCF.
+         2. If an upstream principal link which connects to principal
+            switch and other switches become disconnected, the sent or
+            received message is BF.
+         3. A BF or RCF process is triggered manually by configuration.
+         The notification contains the index of the VSAN in which a BF
+         or a RCF was sent or received."
+   ::= { hh3cVsanDmNotificationPrefix 3 }
+
+hh3cVsanDmDomainIdChangeNotify NOTIFICATION-TYPE
+    OBJECTS         { hh3cVsanIndex,
+                      hh3cVsanDmDomainIdAssigned,
+                      hh3cVsanDmLocalSwitchWWN
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This event will be triggered if the Domain ID of the local switch
+         changed in a VSAN."
+    ::= { hh3cVsanDmNotificationPrefix 4 }
+
+hh3cVsanDmNotificationSwitch  OBJECT IDENTIFIER
+   ::= { hh3cVsanDmNotifications 1 }
+
+hh3cVsanDmFabricChangeNotifyEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies whether the hh3cVsanDmFabricChangeNotify can be sent
+         when a BF or RCF message was sent or received by a switch."
+    DEFVAL          { false }
+    ::= { hh3cVsanDmNotificationSwitch 1 }
+
+hh3cVsanDmDomainIdChangeNotifyEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Specifies whether the hh3cVsanDmDomainIdChangeNotify can be sent
+         when the Domain ID of the local switch changed in a VSAN."
+    DEFVAL          { false }
+    ::= { hh3cVsanDmNotificationSwitch 2 }
+END

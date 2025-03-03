@@ -1,0 +1,550 @@
+--  *****************************************************************
+--  DLINKSW-PORT-SECURITY-MIB.mib : Port Security MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-PORT-SECURITY-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Unsigned32,
+        Integer32,
+        Counter64
+            FROM SNMPv2-SMI    
+        TruthValue,        
+        MacAddress,
+        RowStatus
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, 
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+        ifIndex, InterfaceIndex
+            FROM IF-MIB
+        VlanId,
+        VlanIdOrNone
+            FROM Q-BRIDGE-MIB                
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwPortSecurityMIB MODULE-IDENTITY
+        LAST-UPDATED "201307300000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for port security."
+               
+        REVISION "201307300000Z"
+        DESCRIPTION 
+            " This is the first version of the MIB file for 'port
+            security' functionality.
+            "
+        ::= { dlinkIndustrialCommon 8 }
+
+-- -----------------------------------------------------------------------------
+    dPortSecNotifications    OBJECT IDENTIFIER ::= { dlinkSwPortSecurityMIB 0 }
+    dPortSecObjects          OBJECT IDENTIFIER ::= { dlinkSwPortSecurityMIB 1 }
+    dPortSecConformance      OBJECT IDENTIFIER ::= { dlinkSwPortSecurityMIB 2 }
+
+-- -----------------------------------------------------------------------------
+-- dPortSecObjects
+-- -----------------------------------------------------------------------------   
+    dPortSecGlobalNotifControl  OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION   
+            "Set to 'true' to enable global SNMP Notification
+            for port security feature.  Setting the object to
+            'false' will disable SNMP notifications."
+        DEFVAL      { false }              
+        ::= { dPortSecObjects 1}
+        
+    dPortSecGlobalNotifRate OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..1000)
+        UNITS           "notifications per second"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION   
+            "Expressed in the number of notifications can be generated 
+            per second.
+            The global control configures the rate-limit of
+            SNMP Notification for port security feature. This object 
+            specifies the rate at which SNMP Notification is generated 
+            when dPortSecIfViolationCount increases. When the rate is over
+            the configured rate, the SNMP Notification is suppressed but it 
+            does not affect dPortSecIfViolationCount.
+            A value of 0 indicates that an SNMP Notification is generated
+            for every security violation."        
+        DEFVAL      { 0 }              
+        ::= { dPortSecObjects 2 }
+    
+    dPortSecNotifyInfo  OBJECT IDENTIFIER ::= { dPortSecObjects 3 }
+
+    dPortSecIfViolationMacAddress OBJECT-TYPE
+        SYNTAX        MacAddress
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION   
+            "This object is also used as a variable in the dPortSecMacAddrViolation 
+             notification to contain the value of the MAC address which caused the violation."
+        ::= { dPortSecNotifyInfo 1 } 
+
+    dPortSecGlobalMaximumNum OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Indicates the system maximum addresses number (users) allowed. 
+             A value of -1 means no-limit. The max entry range is (1..N). 
+            The value N means the max number and  is determined by the project itself."   
+        DEFVAL      { -1 }
+        ::= { dPortSecObjects 4}
+
+    dPortSecVlanTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DPortSecVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION 
+            "The table is used to configure and display port security settings 
+            and status for a particular VLAN."
+        ::= { dPortSecObjects 5}
+
+    dPortSecVlanEntry OBJECT-TYPE
+        SYNTAX          DPortSecVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION 
+            "An entry contains port security information for a particular 
+            VLAN."
+         INDEX   { dPortSecVlanID }
+        ::= { dPortSecVlanTable 1}
+
+    DPortSecVlanEntry ::= SEQUENCE { 
+        dPortSecVlanID             VlanId,
+        dPortSecVlanMaximumNum         Integer32,
+        dPortSecVlanCurrentNum     Unsigned32                
+    }
+
+    dPortSecVlanID OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION 
+            "This object specifies the VLAN ID for address learning."
+        ::= { dPortSecVlanEntry 1}
+
+    dPortSecVlanMaximumNum OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Indicates the VLAN maximum addresses number (users) allowed. 
+            A value of -1 means no-limit. The range is (1..N). 
+            The value N means the upper limit and is determined by the project
+            itself."   
+        DEFVAL      { -1 }
+        ::= { dPortSecVlanEntry 2}
+
+    dPortSecVlanCurrentNum OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+            "Indicates the current number of secure MAC addresses on this VLAN."
+        ::= { dPortSecVlanEntry 3}
+         
+    dPortSecIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DPortSecIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table is used to configure and display port security settings 
+            and status for a particular interface."
+        ::= { dPortSecObjects 6 }
+
+    dPortSecIfEntry OBJECT-TYPE
+        SYNTAX      DPortSecIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION            
+            "Entry containing port security information for a particular 
+            interface."
+        INDEX   { ifIndex }
+        ::= { dPortSecIfTable 1 }
+
+    DPortSecIfEntry ::= SEQUENCE {       
+        dPortSecIfEnable            TruthValue,
+        dPortSecIfCurrentStatus     INTEGER,
+        dPortSecIfMaximumNum         Unsigned32,
+        dPortSecIfViolationAction   INTEGER,
+        dPortSecIfSecureMode        INTEGER,
+        dPortSecIfAgingTime         INTEGER,
+        dPortSecIfAgingType         INTEGER,
+        dPortSecIfClearDynamicAddr  INTEGER,
+        dPortSecIfCurrentNum         Unsigned32,
+        dPortSecIfViolationCount    Counter64           
+    }
+   
+    dPortSecIfEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Uses the object to enable or disable port security."
+        DEFVAL      { false }
+        ::= { dPortSecIfEntry 1 }
+
+    dPortSecIfCurrentStatus OBJECT-TYPE
+        SYNTAX          INTEGER { notEnabled(1), forwarding(2), errDisabled(3) }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "This object represents the operational status
+            of the port security feature on an interface.
+
+            notEnabled(1) - This indicates port security
+                            is not enabled.
+            forwarding(2) - This indicates port security is
+                            operational. 
+            errDisabled(3) - This indicates that the port is
+                             shutdown due to port security
+                             violation when the object
+                             dPortSecIfViolationAction is of type
+                             'shutdown'."                                      
+        ::= { dPortSecIfEntry 2 }
+        
+    dPortSecIfMaximumNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "This object sets the maximum number of secure MAC addresses
+            (users) allowed."
+        DEFVAL      { 32 }
+        ::= { dPortSecIfEntry 3 }
+    
+    dPortSecIfViolationAction OBJECT-TYPE
+        SYNTAX      INTEGER { protect(1), restrict(2), shutdown(3) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object sets the action to be taken when a security violation is detected.
+
+            protect(1) -  Drops all the packets from the insecure hosts at the 
+                          port-security process level but does not increment 
+                          the security-violation count.
+            restrict(2) - Drops all packets from the insecure hosts at the 
+                          port-security process level and increments the 
+                          security-violation count.
+            shutdown(3) - Shuts down the port if there is a security violation."
+        DEFVAL      { shutdown }
+        ::= { dPortSecIfEntry 4 }
+
+    dPortSecIfSecureMode OBJECT-TYPE
+        SYNTAX      INTEGER { 
+            permanent(1), 
+            deleteOnTimeout(2) 
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Use the object to set the port security mode.             
+
+             permanent(1) - Under this mode all learned MAC addresses won't be
+                            purged unless a user deletes these entries manually.
+             deleteOnTimeout(2) - Under this mode all learned MAC addresses 
+                            will be purged when an entry ages out or a user deletes
+                            these entries manually."
+        DEFVAL      { deleteOnTimeout }
+        ::= { dPortSecIfEntry 5 }
+
+    dPortSecIfAgingTime OBJECT-TYPE
+        SYNTAX      INTEGER(0..1440)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Use the object to set aging time for auto-learned dynamic secured address.             
+             When 0 is set on the specified interface, it means the port security aging 
+             has been disabled."
+        DEFVAL      { 0 }
+        ::= { dPortSecIfEntry 6 }
+        
+    dPortSecIfAgingType OBJECT-TYPE
+        SYNTAX      INTEGER { 
+            absolute(1), 
+            inactivity(2) 
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Use the object to set aging type for auto-learned dynamic secured address.             
+
+             absolute(1) - Under this aging type, all the secured address on this interface will
+                            age out exactly after the time specified.
+             inactivity(2) - Under this aging type, all learned MAC addresses on this interface 
+                             will age out only if there is no data traffic from the secure source 
+                             address for the specified time period."
+        DEFVAL      { absolute }
+        ::= { dPortSecIfEntry 7 }
+        
+    dPortSecIfClearDynamicAddr OBJECT-TYPE
+        SYNTAX      INTEGER {   
+            clear(1),
+            noOp(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS current
+        DESCRIPTION
+           "Setting this object to 'clear' to clear the addresses which will be 
+            purged out when an entry is aged out on the corresponding 
+            interface.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        DEFVAL      { noOp }
+        ::= { dPortSecIfEntry 8 }
+
+    dPortSecIfCurrentNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the current number of secure MAC addresses
+            on this interface."
+        ::= { dPortSecIfEntry 9 }
+
+    dPortSecIfViolationCount OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the number of address violations
+            occurred on a secure interface. The counter will
+            be initialized to zero when the port security
+            feature is enabled on an interface." 
+        ::= { dPortSecIfEntry 10 }  
+-- -----------------------------------------------------------------------------
+    dPortSecAddrTableCurrentNum  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the number of entries present in the dPortSecAddrTable."
+        ::= { dPortSecObjects 7 }
+
+    dPortSecAddrTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DPortSecAddrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of port security entries containing the secure MAC address 
+            information."            
+        ::= { dPortSecObjects 8 }
+
+    dPortSecAddrEntry OBJECT-TYPE
+        SYNTAX      DPortSecAddrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION             
+              "An entry contains secure MAC address information for a particular 
+              interface. A secure MAC address can be added by the user
+              and can be added when the device learns a new secure MAC address."
+        INDEX   { dPortSecAddrIfIndex, dPortSecAddrVlanID, dPortSecAddrMacAddress }
+        ::= { dPortSecAddrTable 1 }
+
+    DPortSecAddrEntry ::= SEQUENCE {
+        dPortSecAddrIfIndex      InterfaceIndex,
+        dPortSecAddrVlanID       VlanIdOrNone,
+        dPortSecAddrMacAddress   MacAddress,
+        dPortSecAddrSecureMode   INTEGER,
+        dPortSecAddrRemainTime   INTEGER,
+        dPortSecAddrRowStatus    RowStatus
+    }
+
+    dPortSecAddrIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The ifIndex value of the interface."
+        ::= { dPortSecAddrEntry 1 }
+
+    dPortSecAddrVlanID OBJECT-TYPE
+        SYNTAX      VlanIdOrNone
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object specifies the VLAN ID where the user-defined secure
+            MAC address is located. If this object is set to 0 at row creation
+            time, the PVID (default port VLAN ID) will be used for the MAC
+            address."           
+        ::= { dPortSecAddrEntry 2 }
+
+    dPortSecAddrMacAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the secure MAC address to gain port access
+            rights."
+        ::= { dPortSecAddrEntry 3 }
+
+    dPortSecAddrSecureMode OBJECT-TYPE
+        SYNTAX      INTEGER { 
+            permanent(1), 
+            deleteOnTimeout(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the secure mode.
+            For manually configured secure MAC addresses, the dPortSecAddrSecureMode is
+            permanent."
+        ::= { dPortSecAddrEntry 4 }
+    
+    dPortSecAddrRemainTime OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the remaining aging time for the auto-learned dynamic secured address."
+        ::= { dPortSecAddrEntry 5 }
+
+    dPortSecAddrRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The status of this conceptual row.
+            This object is used to create and delete instances 
+            of this table. In other words, besides 'permanent' secure MAC
+            address, a 'deleteOnTimeout' address can be cleared by 
+            this object."
+        ::= { dPortSecAddrEntry 99 }
+
+--  ***************************************************************************
+--  Notifications
+--  ***************************************************************************
+    
+    dPortSecMacAddrViolation NOTIFICATION-TYPE
+        OBJECTS  { 
+            ifIndex, 
+            dPortSecIfCurrentStatus, 
+            dPortSecIfViolationMacAddress 
+        }
+        STATUS  current
+        DESCRIPTION
+            "The address violation notification is generated when port security
+            address violation is detected (dPortSecIfViolationCount increases)."
+        ::= { dPortSecNotifications 1 }
+                 
+--  ***************************************************************************
+--  Conformance
+--  ***************************************************************************
+    dPortSecMIBCompliances 
+        OBJECT IDENTIFIER ::= { dPortSecConformance 1 }
+    dPortSecMIBGroups
+        OBJECT IDENTIFIER ::= { dPortSecConformance 2 }
+
+    dPortSecMIBCompliance MODULE-COMPLIANCE
+        STATUS  current   
+        DESCRIPTION
+                "The compliance statement for the Port Security MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS { 
+            dPortSecIfCfgGroup,
+            dPortSecIfStatusGroup,   
+            dPortSecAddrGroup         
+        }
+        ::= { dPortSecMIBCompliances 1 }
+        
+    dPortSecIfCfgGroup OBJECT-GROUP
+        OBJECTS {   
+            dPortSecIfEnable, 
+            dPortSecIfMaximumNum, 
+            dPortSecIfViolationAction, 
+            dPortSecIfSecureMode, 
+            dPortSecIfAgingTime,
+            dPortSecIfAgingType,
+            dPortSecIfClearDynamicAddr
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects for configuring port
+            security feature."
+        ::= { dPortSecMIBGroups 1 }
+
+    dPortSecIfStatusGroup OBJECT-GROUP
+        OBJECTS { 
+            dPortSecIfCurrentNum, 
+            dPortSecIfCurrentStatus,
+            dPortSecIfViolationCount
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing the counter
+            information for the port security feature."
+        ::= { dPortSecMIBGroups 2 }
+
+    dPortSecAddrGroup OBJECT-GROUP
+        OBJECTS {   
+            dPortSecAddrRowStatus, 
+            dPortSecAddrSecureMode, 
+            dPortSecAddrRemainTime,
+            dPortSecAddrTableCurrentNum            
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing the address
+            information for the port security feature."
+        ::= { dPortSecMIBGroups 3 }
+    
+    dPortSecAddrNumCtrlGroup OBJECT-GROUP
+		OBJECTS {   
+		    dPortSecGlobalMaximumNum, 
+		    dPortSecVlanMaximumNum, 
+		    dPortSecVlanCurrentNum 
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides the configuration of
+            the maximum secure MAC address number on system or VLAN specific."
+			::= { dPortSecMIBGroups 4 }
+
+    dPortSecNotifEnableGroup OBJECT-GROUP        
+        OBJECTS {   
+            dPortSecGlobalNotifControl,
+            dPortSecGlobalNotifRate
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of object(s) that provides control over
+            port security related notification(s)."
+        ::= { dPortSecMIBGroups 5}
+    
+    dPortSecNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS   { 
+            dPortSecMacAddrViolation
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of notifications providing information 
+            about address violation."
+        ::= { dPortSecMIBGroups 6}
+       
+
+ 
+END
+
+
+

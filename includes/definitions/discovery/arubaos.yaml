@@ -1,0 +1,28 @@
+mib: ARUBA-MIB:WLSX-SYSTEMEXT-MIB
+modules:
+    os:
+        sysDescr_regex: '/(\(MODEL: (?<hardware>.+)\),)? Version (?<version>\S+)/'
+    mempools:
+        data:
+            -
+                total: WLSX-SWITCH-MIB::sysXMemorySize
+                used: WLSX-SWITCH-MIB::sysXMemoryUsed
+                free: WLSX-SWITCH-MIB::sysXMemoryFree
+                precision: 1024
+                type: arubaos
+                index: 0
+    processors:
+        data:
+            -
+                oid: WLSX-SYSTEMEXT-MIB::wlsxSysExtProcessorTable
+                value: WLSX-SYSTEMEXT-MIB::sysExtProcessorLoad
+                num_oid: '.1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.{{ $index }}'
+                descr: WLSX-SYSTEMEXT-MIB::sysExtProcessorDescr
+    sensors:
+        count:
+            data:
+                -
+                    oid: WLSX-USER-MIB::wlsxNumOfUsersVPN
+                    num_oid: '.1.3.6.1.4.1.14823.2.2.1.4.1.4.2.{{ $index }}'
+                    descr: 'Active VPN sessions'
+                    index: 'vpnsessions{{ $index }}'

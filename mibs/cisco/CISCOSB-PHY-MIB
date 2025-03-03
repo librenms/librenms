@@ -12,7 +12,7 @@ IMPORTS
     TEXTUAL-CONVENTION                          FROM SNMPv2-TC;
 
    rlPhy MODULE-IDENTITY
-      LAST-UPDATED "200209300024Z"  -- September 30, 2002
+      LAST-UPDATED "200409100000Z"  -- September 30, 2002
       ORGANIZATION "Cisco Systems, Inc."
 
       CONTACT-INFO
@@ -63,7 +63,8 @@ RlPhyTestType ::= TEXTUAL-CONVENTION
         rlPhyTestTableCablePairSkew1(21),
         rlPhyTestTableCablePairSkew2(22),
         rlPhyTestTableCablePairSkew3(23),
-        rlPhyTestTableCablePairSkew4(24)
+        rlPhyTestTableCablePairSkew4(24),
+        rlPhyTestTableSFPEepromQualified(25)
     }
 
 rlPhyTest OBJECT IDENTIFIER ::= { rlPhy 1 }
@@ -195,10 +196,10 @@ rlPhyTestGetUnits   OBJECT-TYPE
          that are designed for special test.
 
          The alaskaPhyLength unit is design for the VCT diagnostic and its values are:
-         less_than_50M(1), 50-80M(2), 80-110M(3), 110-140M(4), more_than_140M(5).
+         less-than-50M(1), 50-80M(2), 80-110M(3), 110-140M(4), more-than-140M(5).
 
          The alaskaPhyStatus unit is design for the VCT diagnostic and its values are:
-         4_pair_cable(1), 2_pair_cable(2), no_cable(3), open_cable(4), short_cable(5), bad_cable(6), impedance_mismatch(7)."
+         4-pair-cable(1), 2-pair-cable(2), no-cable(3), open-cable(4), short-cable(5), bad-cable(6), impedance-mismatch(7)."
    ::= { rlPhyTestGetEntry 4 }
 
 rlPhyTestGetAlarm   OBJECT-TYPE

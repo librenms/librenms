@@ -1,0 +1,940 @@
+CADANT-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, MODULE-IDENTITY, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    cadant
+        FROM CADANT-PRODUCTS-MIB;
+
+cadTextualConventions MODULE-IDENTITY
+    LAST-UPDATED "200910150000Z" -- Oct 15, 2009
+    ORGANIZATION 
+        "Arris International Inc"
+    CONTACT-INFO 
+        "Arris Technical Support
+         Phone: +1 630 281 3000
+         Email: support@arrisi.com"
+
+    DESCRIPTION
+        "This MIB module contains the textual conventions that are shared
+         among multiple ARRIS MIBs."
+    REVISION "200910150000Z" -- Oct 15, 2009
+    DESCRIPTION
+        "Add CadCpeDeviceTypes."
+    REVISION "200909140000Z" -- Sep 14, 2009
+    DESCRIPTION
+        "Add ipv6-access-list(5) to CadAclType."
+    REVISION "200908280000Z" -- Aug 28, 2009
+    DESCRIPTION
+        "Add CadCpeDeviceTypes."
+    REVISION "200810230000Z" -- Oct 23, 2008
+    DESCRIPTION
+        "Remove superGreedy(4) from FlowActivityState."
+    REVISION "200808060000Z" -- August 6, 2008
+    DESCRIPTION
+        "Add support for 16D CAM PIC types."
+    REVISION "200711050000Z" -- Nov 5, 2007
+    DESCRIPTION
+        "Add support for port flow control."
+    REVISION "200706250000Z" -- June 25, 2007
+    DESCRIPTION
+        "Add support for EUI IPv6 addresses."
+    REVISION "200610160000Z" -- October 16, 2006
+    DESCRIPTION
+        "Add new card subtype rcardhcp to represent the HCP on the RCM."
+    REVISION "200608230000Z" -- Aug 23, 2006
+    DESCRIPTION
+        "Add new card type dmm(15) and new card subtype dcard0d12u(35), dmm16m16p4iu(36) and dmm16m(37)."
+    REVISION "200607270000Z" -- July 27, 2006
+    DESCRIPTION
+      "This MIB modules contains textual conventions that are
+       shared among two or more Cadant MIBs."
+    REVISION "200607270000Z" -- July 27, 2006
+    DESCRIPTION
+      "This MIB modules contains textual conventions that are
+       shared among two or more Cadant MIBs."
+    REVISION "200512020000Z"
+    DESCRIPTION 
+        "Add support from scheduling types from DISMAN-SCHEDULE-MIB."
+    REVISION "200508300000Z"
+    DESCRIPTION 
+        "Added support for RCM ports."
+    REVISION "200509230000Z"
+    DESCRIPTION 
+        "Remove SshSession and SshConnectionState. Add SshService, 
+         SshAuthMethod, SshMacAlg, SshCipherType, and SshMacAlg."
+    REVISION "200508310000Z"
+    DESCRIPTION 
+        "Added another ACL type to support embedded remarks."
+    REVISION "200411120000Z"
+    DESCRIPTION 
+        "Added OUIAddress"
+    REVISION "200409150000Z"
+    DESCRIPTION 
+        "Add support for CAR feature."
+    REVISION "200403090000Z"
+    DESCRIPTION 
+        "Add cadIfDirection"
+    REVISION "200312180000Z"
+    DESCRIPTION 
+        "Add port type to support logical uchannels."
+    REVISION "200308200000Z"
+    DESCRIPTION 
+        "Add type to support start-stop and stop-only accounting."
+    REVISION "200306080000Z"
+    DESCRIPTION 
+        "Add additional port types to support gbic detection."
+    REVISION "200305080000Z"
+    DESCRIPTION 
+        "Add serverType for INET service support."
+    REVISION "200304210000Z"
+    DESCRIPTION 
+        "Add cadExtAclCondition for IPSec/IKE support."
+    REVISION "200304040000Z"
+    DESCRIPTION 
+        "Fixed comment for FlowActivityState"
+    REVISION "200304010000Z"
+    DESCRIPTION 
+        "Rename AuthenticationMethod as AAAmethod."
+    REVISION "200303310000Z"
+    DESCRIPTION 
+        "Add premilinary pic support and card reset action"
+    REVISION "200303170000Z"
+    DESCRIPTION 
+        "Add card detail support."
+    REVISION "200211010000Z"
+    DESCRIPTION 
+        "Add diskVolume support."
+    REVISION "200210250000Z"
+    DESCRIPTION 
+        "Remove enable authentication method type."
+    REVISION "200210160000Z"
+    DESCRIPTION 
+        "Change SshCipher to bitmask."
+    REVISION "200209250000Z" -- 2002, Sept 25th, midnight
+    DESCRIPTION 
+        "Align card subtypes and types."
+    REVISION "200102030000Z" -- 2001, Feb 3rd, midnight
+    DESCRIPTION 
+        "Created."
+    ::= { cadant 0 }
+
+--=============================Begin Definitions===================--
+
+ShelfId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "Uniquely identifies the shelf. Number of 99 indicate an invalid ShelfId."
+    SYNTAX Integer32 (1..99)
+
+CardId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "Uniquely identifies the individual Circuit Pack. 
+         Number of 99 indicates an invalid CardId."
+    SYNTAX Integer32 (1..99)
+
+CardSubId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "Uniquely identifies an entity on the circuit pack."
+    SYNTAX Integer32 (0..1)
+
+PortId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "Uniquely identifies the port. Number of 99 indicates an invalid PortId. "
+    SYNTAX Integer32 (1..99)
+
+CardType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "Enumeration of generic Card Type."
+    SYNTAX INTEGER {
+        dcard(1),
+        ecard(2),
+        fcard(3),
+        mcard(4),
+        rcard(6),
+        fanA(7),
+        fanB(8),
+        fanC(9),
+        fanD(10),
+        powerA(11),
+        powerB(12),
+        discdriveA(13),
+        discdriveB(14),
+        dmm(15),
+        unknown(98),
+        invalid(99)
+    }
+
+CardSubType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "Enumeration of more specific current Card Type.
+         For cards with only one subtype, the type and subtype
+         should be identical."
+    SYNTAX INTEGER {
+        dcardiu1d8u(1),
+
+        ecard4e(2),
+
+        fcard(3),
+        mcard(4),
+        rcard(6),
+        fanA(7),
+        fanB(8),
+        fanC(9),
+        fanD(10),
+        powerA(11),
+        powerB(12),
+        discdriveA(13),
+        discdriveB(14),
+
+        dcard1d8u(20),
+        dcard2d8u(21),
+        dcardiu2d8u(22),
+        dcardiu2d12u(23),
+
+        ecard8e(30),
+        ecard4oc3(31),
+        ecard7oc3(32),
+        ecard1oc12(33),
+        ecard1gig(34),
+
+        dcard0d12u(35),
+        dmm16m16p4iu(36),
+        dmm16m(37),
+
+        rcardhcp(40),
+
+        unknown(98),
+        invalid(99)
+    }
+
+PortType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+	"Enumeration of current Port Type."
+    SYNTAX INTEGER {
+        dport(1),
+        uport(2),
+        eport10BaseT(3),
+        eport100BaseT(4),
+        macport(5),
+        mport(6),
+        eport1000BaseT(7),
+        uchannel(8),
+        eport10000BaseT(9),
+        dportMac(10),
+        invalid(99)
+    }
+                        
+MacChlPortType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+	"Enumeration of current Port Type."
+    SYNTAX INTEGER {
+	dport(1),
+	uchannel(8),
+        invalid(99)
+    }                        
+
+PortMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+	"mode settings for a network port."
+    SYNTAX INTEGER {
+	autoNegotiate (1),
+	fullDuplex100Mpbs (2),
+	halfDuplex100Mpbs (3),
+	fullDuplex10Mpbs (4),
+	halfDuplex10Mpbs (5),
+	fullDuplex1000Mpbs (6),
+	halfDuplex1000Mpbs (7),
+	fullDuplex10000Mpbs (8),
+	invalid (99)
+    }
+
+PortDetectedMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+	"detected mode settings for a network port."
+    SYNTAX INTEGER {
+	fullDuplex100Mpbs (2),
+	halfDuplex100Mpbs (3),
+	fullDuplex10Mpbs (4),
+	halfDuplex10Mpbs (5),
+
+	sfpFullDuplex1000BaseT (9),
+	sfpHalfDuplex1000BaseT (10),
+	sfpFullDuplex100BaseT (11),
+	sfpHalfDuplex100BaseT (12),
+	sfpFullDuplex10BaseT (13),
+	sfpHalfDuplex10BaseT (14),
+	sfpFullDuplex1000BaseSX (15),
+	sfpFullDuplex1000BaseLX (16),
+	sfpFullDuplex1000BaseLH (17),
+	sfpFullDuplex1000BaseLXLH (18),
+	sfpFullDuplex1000BaseZX (19),
+	sfpFullDuplex1000BaseCWDM (20),
+	sfpFullDuplex1000BaseDWDM (21),
+
+	xfpFullDuplex10GBaseSR (22),
+	xfpFullDuplex10GBaseLRM (23),
+	xfpFullDuplex10GBaseLR (24),
+	xfpFullDuplex10GBaseER (25),
+	xfpFullDuplex10GBaseZR (26),
+	xfpFullDuplex10GBaseLX4 (27),
+
+        unknown (98),
+	invalid (99)
+    }
+
+FlowControlMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "flow control settings for a network port."
+    SYNTAX INTEGER {
+        on(1),
+        off(2),
+        desired(3),
+        unknown(98),
+        invalid(99)
+    }
+
+AdminState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"The administrative or the desired states of the element and are set by the EMS."
+    SYNTAX INTEGER {
+	up(1),
+	down(2)
+    }
+                
+PrimaryState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"The operational state
+	 IS(1): The element is operable and available for use
+	 OOS(2): The element/resource is inoperable and unable to provide service
+	 UNEQ(3): The element/resource is unequiped."
+    SYNTAX INTEGER {
+        is(1),
+        oos(2)
+    }
+
+SecondaryState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"For each PrimaryState, there might be an associated secondary state"
+    SYNTAX INTEGER {
+	notapplicable(0),
+	manual(1),
+	fault(2),
+	diagnostic(3),
+	overload(4),
+	normal(5),
+	degrade(6),
+	initializing(7),
+	swdownload(8),
+	firmwarepump(9) 
+    }
+
+UnknownState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Similar to TMN representation of the Unknown Status. "
+    SYNTAX INTEGER {
+	known(0),
+	unknown(1)
+    }
+
+DuplexStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"not applicable to all components "
+    SYNTAX INTEGER {
+	notapplicable(0),
+	active(1),
+	standby(2),
+	simplex(3),
+	protected(4)
+    }
+
+MacPortId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "A valid unique identifier for a MAC port in a C4 CMTS system."
+    SYNTAX Integer32 (1..448) 
+
+MacPortIdWithInvalid ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Identifier for a MAC port in a C4 CMTS system."
+    SYNTAX Integer32 (1..449) -- 449 is invalid
+
+EqActionType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"not applicable to all components "
+    SYNTAX INTEGER {
+	notapplicable(0),
+	initialize(1),
+	switch(2),
+	remove(3),
+	restorecond(4),
+	restoreuncd(5),
+	systemreset(6),
+	cardreset(7)
+    }
+
+OverloadStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Three levels indicating how much work the card is doing."
+    SYNTAX INTEGER {
+	normal(1),
+	yellow(2),
+	red(3)
+    }
+
+DiskVolumeUsageLevel ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Describe the disk volume usage level"
+    SYNTAX INTEGER {
+	normal(1),
+	minor(2),
+	major(3),
+	critical(4)
+    }
+
+CadBridgeGroupId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+	"Uniquely identifies the bridge group."
+    SYNTAX Integer32 (33..255)
+
+CadBridgePortType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Type of traffic allowed on a bridge port.  
+	 Ethernet ports allow any type of traffic.
+	 RF ports can be sub divided for CM traffic,
+	 authorized CPE traffic, and unauthorized CPE
+	 traffic."
+    SYNTAX INTEGER {
+	cm(1),
+	cpeauth(2),
+	cpeunauth(3),
+	any(4),
+	none(5)
+    }
+
+VlanId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"The unique identifier for a Virtual LAN. A value of 1000000 indicates unknown VLAN."
+    SYNTAX Integer32 (1..1000000)
+
+FlowActivityState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Flow Activity State describes the recent bandwidth utilization history 
+	 of a service flow relative to its Service Level Agreement. A flow that is 
+	 operating below its Tmin is said to be 'needy'. A flow that is operating
+	 above Tmin but below Tmid is said to be 'normal'. A flow that is operating
+	 above Tmid but below Tmax is said to be 'greedy'."
+    SYNTAX INTEGER {
+	needy(1),
+	normal(2),
+	greedy(3)
+    }
+
+InetAddressIPv4or6 ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+         "This TEXTUAL-CONVENTION is similar to InetAddress as defined
+          in the INET-ADDRESS-MIB. However, InetAddressIPv4or6 does not
+          allow DNS addresses and its address type, either IPv4 or IPv6,
+          can be readily determined from its length alone. If the
+          address is an IPv4 address, then the length will be exactly
+          4 bytes. If the address is an IPv6 address, then the length
+          will be either 16 or 20 bytes.
+
+          If the length if 0, then the address is empty or null.
+
+          If the length is 4:
+            octets   contents         encoding
+             1-4     IP address       network-byte order
+
+          If the length is 8:
+            octets   contents         encoding
+             1-8     EUI IPv6 address network-byte order
+
+          If the length is 16:
+            octets   contents         encoding
+             1-16    IPv6 address     network-byte order
+
+          If the length is 20:
+            octets   contents         encoding
+             1-16    IPv6 address     network-byte order
+            17-20    scope identifier network-byte order
+
+          The scope identifier (bytes 17-20) MUST NOT be present
+          for global IPv6 addresses. For non-global IPv6 addresses
+          (e.g. link-local or site-local addresses), the scope
+          identifier MUST always be present. It contains a link
+          identifier for link-local and a site identifier for
+          site-local IPv6 addresses.
+
+          The scope identifier MUST disambiguate identical address
+          values. For link-local addresses, the scope identifier will
+          typically be the interface index (ifIndex as defined in the
+          IF-MIB, RFC 2233) of the interface on which the address is
+          configured.
+
+          The scope identifier may contain the special value 0
+          which refers to the default scope. The default scope
+          may be used in cases where the valid scope identifier
+          is not known (e.g., a management application needs to
+          write a site-local InetAddressIPv6 address without
+          knowing the site identifier value). The default scope
+          SHOULD NOT be used as an easy way out in cases where
+          the scope identifier for a non-global IPv6 is known."
+    REFERENCE  
+	"InetAddress from INET-ADDRESS-MIB, RFC2851"
+    SYNTAX     OCTET STRING (SIZE (0|4|8|16|20))
+
+LineType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the type line connections
+         available on the C4."
+    SYNTAX INTEGER {
+	console(1),
+	vty(2)
+    }
+
+AAAmethod ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the type of AAA
+         methods available on the C4."
+    SYNTAX INTEGER {
+        none(1),
+        line(2),
+        local(4),
+        group(5)
+    }
+
+SshService ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the SSH service types
+         available in SSH on the C4."
+    SYNTAX INTEGER {
+	terminal(1),
+	sftp(2)
+    }
+
+SshAuthMethod ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the authentication method available in SSH
+         on the C4."
+    SYNTAX INTEGER {
+	password(1),
+	public-key(2)
+    }
+
+SshCipher ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the ciphers available in SSH
+         on the C4."
+    SYNTAX BITS {
+        other(0),      -- 0x80
+        threedes(1),   -- 0x40
+        arcfour(2),    -- 0x20
+        blowfish(3),   -- 0x10
+        cast(4),       -- 0x08
+	aes(5)         -- 0x04
+    }
+
+SshCipherType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the specific cipher type
+         on the C4."
+    SYNTAX INTEGER {
+        other(1),
+        threedes(2),
+        arcfour(3),
+        blowfish(4),
+        cast128(5),
+	aes128(6),
+	aes192(7),
+	aes256(8),
+	des(9),
+	rc4(10)	
+    }
+
+SshMacAlg ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the MAC algorithm available in SSH
+         on the C4."
+    SYNTAX INTEGER {
+	none(1),
+        hmac-sha1(2)
+    }
+
+SshProtocol ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the SSH protocol versions 
+         available in SSH on the C4."
+    SYNTAX INTEGER {
+        ssh1(1),
+        ssh2(2),
+        ssh1ssh2(3)
+    }
+
+CadDouble ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-10"
+    STATUS current
+    DESCRIPTION
+        "This type is used to express and display 64-bit, double-precision 
+         floating-point values."
+    SYNTAX Counter64
+
+FirmwareSource ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This type describes the initial source of the firmware running on
+	 a card.  Committed and transient indicate the card flash device and
+	 the downloaded image, respectively.  Boot1 and Boot2 indicate which
+	 of the resident boot images was used to boot the card."
+    SYNTAX INTEGER {
+        committed(1),
+        transient(2),
+        boot1(3),
+        boot2(4),
+        unknown(5)
+    }
+
+PicType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This type describes the PIC attached to the backplane behind a a card."
+    SYNTAX INTEGER {
+        cameven(1),
+        camevensp1to1(2),
+        camevensp2to1(3),
+        camevensp4to1(4),
+        camevensp8to1(5),
+        camodd(6),
+        camoddsp1to1(7),
+        camoddsp2to1(8),
+        camoddsp4to1(9),
+        camoddsp8to1(10),
+        camspare(11),
+        nam(12),
+        scm(13),
+        cam16d(14),
+        cam16dspare(15),
+        unknown(98),
+        invalid(99)
+    }
+
+CadExtAclCondition ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the condition of Extended ACLs."
+    SYNTAX INTEGER {
+	na(0), -- not applicable
+	eq(1),
+	ne(2),
+	lt(3),
+	le(4),
+	gt(5),
+	ge(6),
+	range(7)
+    }
+
+ServerType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the INET services available on the SCM."
+    SYNTAX INTEGER {
+	telnet(1),
+	ftp(2),
+	snmp(3),
+	syslog(4),
+	radius(5),
+	tacacs(6),
+	other(7)
+    }
+
+AccountingType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This TEXTUAL-CONVENTION describes the different types of accounting services."
+    SYNTAX INTEGER {
+	start-stop(1), -- Sends an accounting record both when session is initiated and when session terminates
+	stop-only(2) -- Sends an accounting record only when a session terminates
+    }
+
+CadIfDirection ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A direction of flow on an interface."
+    SYNTAX INTEGER {
+        in(1), -- upstream for cable interfaces, downstream for network interfaces
+        out(2) -- downstream for cable interfaces, upstream for network interfaces
+    }
+
+CadIpPort ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The port of an IP packet.
+	 The value -1 indicates that this field is not used."
+    SYNTAX INTEGER (0..65535|-1)
+
+CadIpTos ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The type-of-service of an IP packet.
+         The value 0 indicates that this field is not used."
+    SYNTAX INTEGER (0..254)
+
+CadIpTosMask ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The allowed type-of-service mask of an IP packet. 30 is used
+         when the 4 bit TOS is specified.  224 is used when the 3 bit
+         precedence is specified, and 254 is used when the entire 7
+         bit TOS is specified.  A value of 0 indicates that the TOS field 
+         is not used."
+    SYNTAX INTEGER (0|30|224|254)
+
+CadProtocolType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The protocol type an IP packet (8 bits). 0 is IP, 1 is ICMP, 
+         2 is IGMP, 6 is TCP 17 is UDP.  See RFC-1700 for complete list.
+         The value -1 indicates an invalid/unused protocol type."
+    SYNTAX INTEGER (0..255|-1)
+
+CadTcpFlags ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The values available in the flags portion of the TCP header."
+    SYNTAX BITS {
+	urg(0),
+	ack(1),
+	push(2),
+	rst(3),
+	syn(4),
+	fin(5) 
+    }
+
+CadAclType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The type of ACL this ACE is part of."
+    SYNTAX INTEGER {
+        none(0),
+        std-access-list(1),
+        ext-access-list(2),
+        rate-limit-access-list(3),
+        remark(4),
+        ipv6-access-list(5)
+    }
+
+CadAclString ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The name of the ACL this ACE is part of."
+    SYNTAX OCTET STRING (SIZE(0..32))
+
+OUIAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS       current
+    DESCRIPTION
+	"Represents the first three(3), most significant bytes of
+	 an 802 MAC address represented in the `canonical' order
+	 defined by IEEE 802.1a, i.e., as if it were transmitted
+	 least significant bit first, even though 802.5 (in contrast
+	 to other 802.x protocols) requires MAC addresses to be
+	 transmitted most significant bit first."
+    SYNTAX       OCTET STRING (SIZE (3))
+
+--
+-- Scheduling types borrowed from DISMAN-SCHEDULE-MIB that allow
+-- recurring scheduling with wildcards.
+--
+SchedWeekDay ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of weekdays on which the scheduled action should
+         take place.  Setting multiple bits will include several
+         weekdays in the set of possible weekdays for this schedule.
+         Setting all bits will cause the scheduler to ignore the
+         weekday."
+    SYNTAX      BITS {
+                    sunday(0),
+                    monday(1),
+                    tuesday(2),
+                    wednesday(3),
+                    thursday(4),
+                    friday(5),
+                    saturday(6)
+                }
+
+SchedMonth  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of months during which the scheduled action should
+         take place.  Setting multiple bits will include several
+         months in the set of possible months for this schedule.
+
+         Setting all bits will cause the scheduler to ignore the
+         month."
+    SYNTAX      BITS {
+                    january(0),
+                    february(1),
+                    march(2),
+                    april(3),
+                    may(4),
+                    june(5),
+                    july(6),
+                    august(7),
+                    september(8),
+                    october(9),
+                    november(10),
+                    december(11)
+                }
+
+SchedDay  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of days in a month on which a scheduled action
+         should take place.  There are two sets of bits one can
+         use to define the day within a month:
+
+         Enumerations starting with the letter 'd' indicate a
+         day in a month relative to the first day of a month.
+         The first day of the month can therefore be specified
+         by setting the bit d1(0) and d31(30) means the last
+         day of a month with 31 days.
+
+         Enumerations starting with the letter 'r' indicate a
+         day in a month in reverse order, relative to the last
+         day of a month.  The last day in the month can therefore
+         be specified by setting the bit r1(31) and r31(61) means
+         the first day of a month with 31 days.
+
+         Setting multiple bits will include several days in the set
+         of possible days for this schedule.  Setting all bits will
+         cause the scheduler to ignore the day within a month.
+
+         Setting all bits starting with the letter 'd' or the
+         letter 'r' will also cause the scheduler to ignore the
+         day within a month."
+    SYNTAX      BITS {
+                    d1(0),   d2(1),   d3(2),   d4(3),   d5(4),
+                    d6(5),   d7(6),   d8(7),   d9(8),   d10(9),
+                    d11(10), d12(11), d13(12), d14(13), d15(14),
+                    d16(15), d17(16), d18(17), d19(18), d20(19),
+                    d21(20), d22(21), d23(22), d24(23), d25(24),
+                    d26(25), d27(26), d28(27), d29(28), d30(29),
+                    d31(30),
+                    r1(31),  r2(32),  r3(33),  r4(34),  r5(35),
+                    r6(36),  r7(37),  r8(38),  r9(39),  r10(40),
+                    r11(41), r12(42), r13(43), r14(44), r15(45),
+                    r16(46), r17(47), r18(48), r19(49), r20(50),
+                    r21(51), r22(52), r23(53), r24(54), r25(55),
+                    r26(56), r27(57), r28(58), r29(59), r30(60),
+                    r31(61)
+                }
+
+SchedHour  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of hours within a day during which the scheduled
+         action should take place."
+    SYNTAX      BITS {
+                    h0(0),   h1(1),   h2(2),   h3(3),   h4(4),
+                    h5(5),   h6(6),   h7(7),   h8(8),   h9(9),
+                    h10(10), h11(11), h12(12), h13(13), h14(14),
+                    h15(15), h16(16), h17(17), h18(18), h19(19),
+                    h20(20), h21(21), h22(22), h23(23)
+                }
+
+SchedMinute ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of minutes within an hour when the scheduled action
+         should take place."
+    SYNTAX      BITS {
+                    m0(0),   m1(1),   m2(2),   m3(3),   m4(4),
+                    m5(5),   m6(6),   m7(7),   m8(8),   m9(9),
+                    m10(10), m11(11), m12(12), m13(13), m14(14),
+                    m15(15), m16(16), m17(17), m18(18), m19(19),
+                    m20(20), m21(21), m22(22), m23(23), m24(24),
+                    m25(25), m26(26), m27(27), m28(28), m29(29),
+                    m30(30), m31(31), m32(32), m33(33), m34(34),
+                    m35(35), m36(36), m37(37), m38(38), m39(39),
+                    m40(40), m41(41), m42(42), m43(43), m44(44),
+                    m45(45), m46(46), m47(47), m48(48), m49(49),
+                    m50(50), m51(51), m52(52), m53(53), m54(54),
+                    m55(55), m56(56), m57(57), m58(58), m59(59)
+                }
+
+CadCpeDeviceTypes ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "CPE Device types."
+    SYNTAX      BITS {
+           cable-modem(0),
+           cpe(1),
+           ps(2),
+           mta(3),
+           stb(4),
+           tea(5),
+           erouter(6),
+           dva(7),
+           sg(8),
+           reserved9(9),
+           reserved10(10),
+           reserved11(11),
+           reserved12(12),
+           reserved13(13),
+           reserved14(14),
+           reserved15(15),
+           reserved16(16),
+           reserved17(17),
+           reserved18(18),
+           reserved19(19),
+           reserved20(20),
+           reserved21(21),
+           reserved22(22),
+           reserved23(23),
+           reserved24(24),
+           reserved25(25),
+           reserved26(26),
+           reserved27(27),
+           reserved28(28),
+           reserved29(29),
+           reserved30(30),
+           reserved31(31)
+   } 
+--=============================End of Definitions===================--
+
+END

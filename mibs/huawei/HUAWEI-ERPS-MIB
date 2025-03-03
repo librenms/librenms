@@ -1,0 +1,1079 @@
+-- =================================================================
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: ITU-T G.8032 huawei mib define
+-- Reference: ITU-T G.8032/Y.1344
+-- Version: V2.15
+-- History:
+--    <fenghaisheng 61958>,<2011.07.05>,<create>
+-- =================================================================
+         
+HUAWEI-ERPS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm            
+            FROM HUAWEI-MIB            
+        EnabledStatus            
+            FROM P-BRIDGE-MIB            
+        VlanId            
+            FROM Q-BRIDGE-MIB            
+        OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE            
+            FROM SNMPv2-CONF            
+        InterfaceIndex, ifName
+            FROM IF-MIB  
+        Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY,
+        NOTIFICATION-TYPE,TimeTicks,Counter32     
+            FROM SNMPv2-SMI                
+        RowStatus,DisplayString            
+            FROM SNMPv2-TC;
+
+    -- 1.3.6.1.4.1.2011.5.25.256
+    hwErpsMIB MODULE-IDENTITY 
+        LAST-UPDATED "201711060001Z"
+        ORGANIZATION 
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
+        DESCRIPTION 
+            "The private mib file includes the general extent 
+            information of the device.hwDatacomm(25).hwErpsMIB.
+            "
+        REVISION "201711060001Z"
+            DESCRIPTION
+               "delete constrictions of table"
+        REVISION "201711010001Z"
+            DESCRIPTION
+              "change English description of nodes"
+        REVISION "201610280000Z"
+            DESCRIPTION
+            	"fix the errors points of hwErpsNotifications."
+        REVISION "201308310000Z"
+            DESCRIPTION
+            	"fix the errors checked by a tool."
+        REVISION "201306280001Z"
+            DESCRIPTION
+            	"Add new node hwErpsNotifications"     	
+        ::= { hwDatacomm 256 }
+
+    
+--  Node definitions
+-- 
+    -- 1.3.6.1.4.1.2011.5.25.256.1
+    hwErpsObjects OBJECT IDENTIFIER ::= { hwErpsMIB 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.1
+    hwErpsGlobalResetRapsPktCnt OBJECT-TYPE
+        SYNTAX INTEGER {
+                        clear(1),
+                        unused(65535)
+                       }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset the RAPS packets counter of all running ERPS ports.
+            The value is unused(65535) when it is read. And it must be clear(1) when it is set."
+        ::= { hwErpsObjects 1 }
+
+    -- ring config table
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2
+    hwErpsRingConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwErpsRingConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes the ERPS ring configurations."
+        ::= { hwErpsObjects 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1
+    hwErpsRingConfigEntry OBJECT-TYPE
+        SYNTAX HwErpsRingConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table includes the configurtion of ERPS rings.
+            The index of the table is ERPS ring id."
+        INDEX { hwConfigRingId }
+        ::= { hwErpsRingConfigTable 1 }
+
+    
+    HwErpsRingConfigEntry ::=
+        SEQUENCE { 
+            hwConfigRingId
+                Integer32, 
+            hwConfigRingRowStatus
+                RowStatus,     
+            hwConfigDescription
+                DisplayString,                
+            hwConfigControlVlanId
+                Integer32,
+            hwConfigProtectedInstanceList
+                OCTET STRING,           
+            hwConfigWtrTimerSettingValue
+                Integer32, 
+            hwConfigGuardTimerSettingValue
+                Integer32,
+            hwConfigHoldoffTimerSettingValue
+                Integer32,
+            hwConfigResetRapsPktCnt 
+                INTEGER,
+            hwConfigRapsMel
+                Integer32,
+            hwConfigVersion
+                INTEGER,
+            hwConfigRevertiveMode
+                INTEGER,
+            hwConfigRingRole
+                INTEGER,
+            hwConfigRapsChannelMode
+                INTEGER,
+            hwConfigTcNotifyErpsRing
+                OCTET STRING,
+            hwConfigTcProtectionInterval
+                Integer32,
+            hwConfigTcProtectionThreshold
+                Integer32,
+            hwConfigProtectionSwitch
+                INTEGER
+               }
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.1
+    hwConfigRingId OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the ring ID."
+        ::= { hwErpsRingConfigEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.2
+    hwConfigRingRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Operation of CreateAndGo can be used to create a new ERPS ring, 
+            and operation of Destroy be used to destroy an existent ERPS ring."
+        ::= { hwErpsRingConfigEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.3
+    hwConfigDescription OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..80))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the ring description. The description can contain a maximum of 80 ASCII characters."
+        ::= { hwErpsRingConfigEntry 3 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.4
+    hwConfigControlVlanId OBJECT-TYPE
+        SYNTAX Integer32 (0 | 1..4094)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the control VLAN information of the ring. If the value of this object is set to 0, the configuration is deleted."
+        DEFVAL { 0 }
+        ::= { hwErpsRingConfigEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.5
+    hwConfigProtectedInstanceList OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..512))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the protection instance ID of the ring."
+        ::= { hwErpsRingConfigEntry 5 }          
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.6
+    hwConfigWtrTimerSettingValue OBJECT-TYPE
+        SYNTAX Integer32 (1..12)
+        UNITS "minutes"
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the ring switchover protection time."
+        DEFVAL { 5 }
+        ::= { hwErpsRingConfigEntry 6 } 
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.7
+    hwConfigGuardTimerSettingValue OBJECT-TYPE
+        SYNTAX Integer32 (1..200)
+        UNITS "centiseconds"
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the interval for discarding RAPS packets." 
+        ::= { hwErpsRingConfigEntry 7 }  
+         
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.8
+    hwConfigHoldoffTimerSettingValue OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        UNITS "deciseconds"
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the interval for keeping the interface status."
+        DEFVAL { 0 }
+        ::= { hwErpsRingConfigEntry 8 } 
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.9
+    hwConfigResetRapsPktCnt OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                clear(1),
+                unused(65535)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "This object indicates resetting packet statistics on an interface. When the read operation is performed, the system returns 65535 (not used). When the set operation is performed, the value of this object must be set to 1 (cleared)."
+            ::= { hwErpsRingConfigEntry 9 }
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.10
+    hwConfigRapsMel OBJECT-TYPE
+        SYNTAX Integer32 (0..7)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the maintenance entity level of the ring, providing a channel to read the ring RAPS information."
+        DEFVAL { 7 }
+        ::= { hwErpsRingConfigEntry 10 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.11
+    hwConfigVersion OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+	        v1(1),
+	        v2(2)
+                }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the version information of the ring. The default version is V1."
+        DEFVAL { 1 }
+        ::= { hwErpsRingConfigEntry 11 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.12
+    hwConfigRevertiveMode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        revertive(1),
+        nonRevertive(2)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the ring's switchback mode. The default mode is revertive switching."
+        DEFVAL { 1 }
+        ::= { hwErpsRingConfigEntry 12 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.13
+    hwConfigRingRole OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        majorRing(1),
+        subRing(2)
+        }	
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates that the ring is configured as a sub-ring."
+        DEFVAL { 1 }    
+        ::= { hwErpsRingConfigEntry 13 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.14
+    hwConfigRapsChannelMode OBJECT-TYPE
+        SYNTAX INTEGER 	
+        {
+        virtualChannel(1),
+        nonVirtualChannel(2),
+        unused(65535)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the sub-ring channel mode. By default, a non-virtual channel is used. If the ring is the primary ring, the system returns 65535 (not used) after the read operation is performed."
+        ::= { hwErpsRingConfigEntry 14 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.15
+    hwConfigTcNotifyErpsRing OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the list of rings to be informed when the topology changes."
+        ::= { hwErpsRingConfigEntry 15 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.16
+    hwConfigTcProtectionInterval OBJECT-TYPE
+        SYNTAX Integer32 (1..600)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the notification interval when the ring topology changes. The default value is 2s."
+        DEFVAL { 2 }    
+        ::= { hwErpsRingConfigEntry 16 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.17
+    hwConfigTcProtectionThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the notification threshold when the ring topology changes. The default value is 3."
+        DEFVAL { 3 }
+        ::= { hwErpsRingConfigEntry 17 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.18
+    hwConfigProtectionSwitch OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        clear(1),
+        idle(65535)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates canceling the ring configuration. The value is 65535 by default. When the ring configuration is canceled, the value is 1 (cleared)."
+        ::= { hwErpsRingConfigEntry 18 }
+        
+        
+                  
+    --ring status table 
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3
+    hwErpsRingStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwErpsRingStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes the ERPS ring status."
+        ::= { hwErpsObjects 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1
+    hwErpsRingStatusEntry OBJECT-TYPE
+        SYNTAX HwErpsRingStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table includes the status of ERPS rings.
+            The index of the table is ERPS ring id."
+        INDEX { hwConfigRingId }
+        ::= { hwErpsRingStatusTable 1 }
+
+    
+    HwErpsRingStatusEntry ::=
+        SEQUENCE { 
+            hwStatusWtrTimerRunningValue
+                Integer32,
+               hwStatusGuardTimerRunningValue
+                Integer32,
+               hwStatusHoldoffTimerRunningValue
+                Integer32,
+               hwStatusMachineState
+                   INTEGER, 
+               hwStatusTopoLastChangeTime
+                   TimeTicks,
+               hwStatusWtbTimerRunningValue
+                   Integer32
+                   }
+
+       
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.1
+    hwStatusWtrTimerRunningValue OBJECT-TYPE
+        SYNTAX Integer32 (0..720)
+        UNITS "seconds"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the time that the ring WTR timer is running."
+        ::= { hwErpsRingStatusEntry 1 }
+     
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.2
+    hwStatusGuardTimerRunningValue OBJECT-TYPE
+        SYNTAX Integer32 (0..200)
+        UNITS "centiseconds"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the time that the ring protection timer is running."
+        ::= { hwErpsRingStatusEntry 2 }
+              
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.3
+    hwStatusHoldoffTimerRunningValue OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        UNITS "deciseconds"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the time that the ring delay timer is running."
+        ::= { hwErpsRingStatusEntry 3 }
+     
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.4
+    hwStatusMachineState OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                idle(1),
+                protection(2),
+                manualSwitch(3),
+                forcedSwitch(4),
+                pending(5)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "This object indicates the ring state machine status.
+                 1: default state.
+                 2: protection state.
+                 3: manual switching state.
+                 4: forced switching state.
+                 5: waiting state."
+            ::= { hwErpsRingStatusEntry 4 }
+     
+     
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.5
+    hwStatusTopoLastChangeTime OBJECT-TYPE
+        SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "This object indicates the time when the ring topology changed for the last time."
+            ::= { hwErpsRingStatusEntry 5 }
+    
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.2.1.6
+    hwStatusWtbTimerRunningValue OBJECT-TYPE
+        SYNTAX Integer32 (0..700)
+        UNITS "centiseconds"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the running time after which the ring is blocked."
+        ::= { hwErpsRingStatusEntry 6 }       
+           
+    --port config table     
+    --1.3.6.1.4.1.2011.5.25.256.1.3
+    hwErpsPortConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwErpsPortConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes interface configurations on an ERPS ring."
+        ::= { hwErpsObjects 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.4.1
+    hwErpsPortConfigEntry OBJECT-TYPE
+        SYNTAX HwErpsPortConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table includes the configuration of ERPS ports.
+            The index of the table is ERPS ring identifier, port type, port identifier1, port identifier2, port identifier3, port identifier4.
+            If it is an ethernet port including fast ethernet/gigabit ethernet/eth-trunk, the port type is 1, the port identifier1 is the IfIndex of the ethernet port.
+            the other port identifier is for extension and not used currently, should be set 0."
+        INDEX { hwConfigRingId, hwConfigPortType, hwConfigPortId1, hwConfigPortId2, hwConfigPortId3, 
+            hwConfigPortId4 }
+        ::= { hwErpsPortConfigTable 1 }
+
+    
+    HwErpsPortConfigEntry ::=
+        SEQUENCE {    
+            hwConfigPortType
+                Unsigned32,
+            hwConfigPortId1
+                Unsigned32,
+            hwConfigPortId2
+                Unsigned32,
+            hwConfigPortId3
+                Unsigned32,
+            hwConfigPortId4
+                Unsigned32,
+            hwConfigPortRowStatus
+                RowStatus,
+            hwConfigPortConfigRole
+                Integer32,
+            hwConfigPortProtectionSwitch
+                INTEGER
+                  }
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.4.1.1
+    hwConfigPortType OBJECT-TYPE
+        SYNTAX Unsigned32 (1)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the interface type on the ring. Currently, ERPS supports only Ethernet interfaces. The value is fixed at 1."
+        ::= { hwErpsPortConfigEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.4.1.2
+    hwConfigPortId1 OBJECT-TYPE
+        SYNTAX Unsigned32 (0..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the interface identified by Id1 on the ring. When the hwConfigPortType value is 1, this object indicates the interface index on the ring."
+        ::= { hwErpsPortConfigEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.4.1.3
+    hwConfigPortId2 OBJECT-TYPE
+        SYNTAX Unsigned32 (0..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the interface identified by Id2. This field is used for extension and is not used currently. The value should be set to 0."
+        ::= { hwErpsPortConfigEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.4.1.4
+    hwConfigPortId3 OBJECT-TYPE
+        SYNTAX Unsigned32 (0..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the interface identified by Id3. This field is used for extension and is not used currently. The value should be set to 0."
+        ::= { hwErpsPortConfigEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.4.1.5
+    hwConfigPortId4 OBJECT-TYPE
+        SYNTAX Unsigned32 (0..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the interface identified by Id4 on the ring. This field is used for extension and is not used currently. The value should be set to 0."
+        ::= { hwErpsPortConfigEntry 5 } 
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.4.1.6
+    hwConfigPortRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Operation of CreateAndGo can be used to have a port join the ERPS ring.
+            and operation of Destroy be used to have a port leave the ERPS ring."
+        ::= { hwErpsPortConfigEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.4.1.7
+    hwConfigPortConfigRole OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the configured role of the ring interface.
+                0x10: common interface.
+                0x21: rplOwner interface.
+                0x22: rplNeighbour interface."
+        ::= { hwErpsPortConfigEntry 7 }
+       
+    -- 1.3.6.1.4.1.2011.5.25.256.1.4.1.8
+    hwConfigPortProtectionSwitch OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+       	forcedSwitch(1),
+        manualSwitch(2),
+        idle(65535)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object indicates the protection switching mode, including forced switching and manual switching. If the mode is not set, the default value 65535 is returned."
+        ::= { hwErpsPortConfigEntry 8 }
+       
+    --port status table     
+    --1.3.6.1.4.1.2011.5.25.256.1.5
+    hwErpsPortStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwErpsPortStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes the ERPS ring interface status."
+        ::= { hwErpsObjects 5 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.5.1
+    hwErpsPortStatusEntry OBJECT-TYPE
+        SYNTAX HwErpsPortStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table includes the status of ERPS ports.
+            The index of the table is ERPS ring identifier, port type, port identifier1, port identifier2, port identifier3, port identifier4.
+            If it is an ethernet port including fast ethernet/gigabit ethernet/eth-trunk, the port type is 1, the port identifier1 is the IfIndex of the ethernet port.
+            the other port identifier is for extension and not used currently, should be set 0."
+        INDEX { hwConfigRingId, hwConfigPortType, hwConfigPortId1, hwConfigPortId2, hwConfigPortId3, 
+        hwConfigPortId4 }
+        ::= { hwErpsPortStatusTable 1 }
+
+    
+    HwErpsPortStatusEntry ::=
+        SEQUENCE { 
+            hwPortStatusActiveRole
+                Integer32,
+            hwPortStatusSignalStatus
+                INTEGER,
+            hwPortStatusFwdStatus
+                INTEGER
+                }
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.5.1.1
+    hwPortStatusActiveRole OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the member role of the ring interface.
+              0x10: common interface.
+              0x21: rplOwner interface.
+              0x22: rplNeighbour interface."
+        ::= { hwErpsPortStatusEntry 1 }     
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.5.1.7
+    hwPortStatusSignalStatus OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                failed(1),
+                nonFailed(2)
+                }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the signal status of the ring interface.
+                 1: failed.
+                 2: successful."
+            ::= { hwErpsPortStatusEntry 2 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.5.1.8
+    hwPortStatusFwdStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                discarding(1),
+                forwarding(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the forwarding status of the ring interface.
+                  1: blocked.
+                  2: forwarding."
+            ::= { hwErpsPortStatusEntry 3 }
+
+    
+    --port Statistics table     
+    --1.3.6.1.4.1.2011.5.25.256.1.6
+    hwErpsPortStatisticsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwErpsPortStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes the ERPS ring interface statistics."
+        ::= { hwErpsObjects 6 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.6.1
+    hwErpsPortStatisticsEntry OBJECT-TYPE
+        SYNTAX HwErpsPortStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table includes the Statistics of ERPS ports.
+            The index of the table is ERPS ring identifier, port type, port identifier1, port identifier2, port identifier3, port identifier4.
+            If it is an ethernet port including fast ethernet/gigabit ethernet/eth-trunk, the port type is 1, the port identifier1 is the IfIndex of the ethernet port.
+            the other port identifier is for extension and not used currently, should be set 0."
+        INDEX { hwConfigRingId, hwConfigPortType, hwConfigPortId1, hwConfigPortId2, hwConfigPortId3, hwConfigPortId4}
+        ::= { hwErpsPortStatisticsTable 1 }
+
+    
+    HwErpsPortStatisticsEntry ::=
+        SEQUENCE { 
+            hwRxRapsSfPktCnt
+                Counter32,
+            hwTxRapsSfPktCnt
+                Counter32,
+            hwRxRapsNrPktCnt
+                Counter32,
+            hwTxRapsNrPktCnt
+                Counter32,
+            hwRxRapsNrRbPktCnt
+                Counter32,
+            hwTxRapsNrRbPktCnt
+                Counter32,  
+            hwRxRapsFsPktCnt
+                Counter32,
+            hwTxRapsFsPktCnt
+                Counter32,
+            hwRxRapsMsPktCnt
+                Counter32,
+            hwTxRapsMsPktCnt
+                Counter32,
+            hwRxRapsEventPktCnt
+                Counter32,
+            hwTxRapsEventPktCnt
+                Counter32            
+             }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.6.1.1
+    hwRxRapsSfPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of received RAPS SF packets."
+        ::= { hwErpsPortStatisticsEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.2
+    hwTxRapsSfPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of sent RAPS SF packets."
+        ::= { hwErpsPortStatisticsEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.3
+    hwRxRapsNrPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the number of received RAPS NR packets."
+        ::= { hwErpsPortStatisticsEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.4
+    hwTxRapsNrPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the number of sent RAPS NR packets."
+        ::= { hwErpsPortStatisticsEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.5
+    hwRxRapsNrRbPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the number of received RAPS NRRB packets."
+        ::= { hwErpsPortStatisticsEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.6
+    hwTxRapsNrRbPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the number of sent RAPS NRRB packets."
+        ::= { hwErpsPortStatisticsEntry 6 }
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.7
+    hwRxRapsFsPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the number of received RAPS FS packets."
+        ::= { hwErpsPortStatisticsEntry 7 }  
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.8
+    hwTxRapsFsPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the number of sent RAPS FS packets."
+        ::= { hwErpsPortStatisticsEntry 8 }    
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.9
+    hwRxRapsMsPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the number of received RAPS MS packets."
+        ::= { hwErpsPortStatisticsEntry 9 }
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.10
+    hwTxRapsMsPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the number of sent RAPS MS packets."
+        ::= { hwErpsPortStatisticsEntry 10 }
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.11
+    hwRxRapsEventPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the number of received RAPS Event packets."
+        ::= { hwErpsPortStatisticsEntry 11 }
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.3.1.12
+    hwTxRapsEventPktCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object indicates the number of sent RAPS Event packets."
+        ::= { hwErpsPortStatisticsEntry 12 }
+        
+        
+    --ERPS port tracking information table     
+    --1.3.6.1.4.1.2011.5.25.256.1.7
+    hwErpsPortTrackTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwErpsPortTrackEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table includes the information of ERPS ports track."
+        ::= { hwErpsObjects 7 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.7.1
+    hwErpsPortTrackEntry OBJECT-TYPE
+        SYNTAX HwErpsPortTrackEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table includes the information of ERPS ports track.
+            The index of the table is ERPS ring identifier, port type, port identifier1, port identifier2, port identifier3, port identifier4, protocol type.
+            If it is an ethernet port including fast ethernet/gigabit ethernet/eth-trunk, the port type is 1, the port identifier1 is the IfIndex of the ethernet port.
+            the other port identifier is for extension and not used currently, should be set 0."
+        INDEX { hwConfigRingId, hwConfigPortType, hwConfigPortId1, hwConfigPortId2, hwConfigPortId3, hwConfigPortId4, hwErpsPortTrackProtocolType}
+        ::= { hwErpsPortTrackTable 1 }
+
+
+    HwErpsPortTrackEntry ::=
+        SEQUENCE { 
+            hwErpsPortTrackProtocolType
+                INTEGER,
+            hwErpsPortTrackRowStatus
+                RowStatus,    
+            hwErpsPortTrackCfmMdName
+                OCTET STRING,
+            hwErpsPortTrackCfmMaName
+                OCTET STRING,
+            hwErpsPortTrackCfmMepId
+                Integer32,
+            hwErpsPortTrackCfmRmepId
+                Integer32        
+             }
+    
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.7.1.1
+    hwErpsPortTrackProtocolType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        cfm(1)   
+        }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The protocol type that ERPS port tracks. Currently ERPS port just supports tracking CFM."
+        ::= { hwErpsPortTrackEntry 1 }             
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.7.1.2
+    hwErpsPortTrackRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The CreateAndGo operation enables an ERPS port to track the protocol. The Destroy operation disables an ERPS port from tracking the protocol." 
+        ::= { hwErpsPortTrackEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.1.7.1.3
+    hwErpsPortTrackCfmMdName OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (1..43))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION	
+            "The name of maintenance domain."
+        ::= { hwErpsPortTrackEntry 3 }
+        
+
+    -- 1.3.6.1.4.1.2011.5.25.256.1.7.1.4
+    hwErpsPortTrackCfmMaName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..43))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The name of maintenance association."
+        ::= { hwErpsPortTrackEntry 4 }
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.1.7.1.5
+    hwErpsPortTrackCfmMepId OBJECT-TYPE
+        SYNTAX Integer32 (1..8191)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "MEP ID."
+        ::= { hwErpsPortTrackEntry 5 }
+        
+          
+    -- 1.3.6.1.4.1.2011.5.25.256.1.7.1.6
+    hwErpsPortTrackCfmRmepId OBJECT-TYPE
+        SYNTAX Integer32 (1..8191)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Remote MEP ID."
+        ::= { hwErpsPortTrackEntry 6 }
+  
+    
+              
+    -- 1.3.6.1.4.1.2011.5.25.256.4
+    hwErpsNotifications OBJECT IDENTIFIER ::= { hwErpsMIB 4 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.256.4.1
+    hwErpsFwStateForwarding NOTIFICATION-TYPE
+        OBJECTS { hwConfigRingId , ifName }
+        STATUS current
+        DESCRIPTION 
+            "This object indicates that an alarm is generated when an interface added to the ERPS ring enters the Forwarding state."
+        ::= { hwErpsNotifications 1 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.256.4.2
+    hwErpsFwStateDiscarding NOTIFICATION-TYPE
+        OBJECTS { hwConfigRingId , ifName }
+        STATUS current
+        DESCRIPTION 
+            "This object indicates that an alarm is generated when an interface added to the ERPS ring enters the Discarding state."
+        ::= { hwErpsNotifications 2 }
+
+ 
+                    
+    -- 1.3.6.1.4.1.2011.5.25.256.2
+    hwErpsGroups OBJECT IDENTIFIER ::= { hwErpsMIB 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.2.1
+    hwErpsGlobalInfoGroup OBJECT-GROUP
+        OBJECTS { hwErpsGlobalResetRapsPktCnt }
+        STATUS current
+        DESCRIPTION 
+            "The group of global information."
+        ::= { hwErpsGroups 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.2.2
+    hwErpsRingConfigInfoGroup OBJECT-GROUP
+        OBJECTS { hwConfigRingRowStatus, hwConfigDescription, hwConfigControlVlanId, hwConfigProtectedInstanceList,  
+            hwConfigWtrTimerSettingValue, hwConfigGuardTimerSettingValue, hwConfigHoldoffTimerSettingValue,
+            hwConfigResetRapsPktCnt, hwConfigRapsMel, hwConfigVersion, hwConfigRevertiveMode, hwConfigRingRole, hwConfigRapsChannelMode, hwConfigTcNotifyErpsRing, 
+            hwConfigTcProtectionInterval, hwConfigTcProtectionThreshold, hwConfigProtectionSwitch }
+        STATUS current
+        DESCRIPTION 
+            "The group of ring configuration."
+        ::= { hwErpsGroups 2 } 
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.2.3
+    hwErpsRingStatusInfoGroup OBJECT-GROUP
+        OBJECTS { hwStatusWtrTimerRunningValue, hwStatusGuardTimerRunningValue, hwStatusHoldoffTimerRunningValue,
+            hwStatusMachineState, hwStatusTopoLastChangeTime, hwStatusWtbTimerRunningValue }
+        STATUS current
+        DESCRIPTION 
+            "The group of ring status."
+        ::= { hwErpsGroups 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.2.4
+    hwErpsPortConfigInfoGroup OBJECT-GROUP
+        OBJECTS { hwConfigPortRowStatus, hwConfigPortConfigRole, hwConfigPortProtectionSwitch }
+        STATUS current
+        DESCRIPTION 
+            "The group of port configuration."
+        ::= { hwErpsGroups 4 }
+    
+    
+    -- 1.3.6.1.4.1.2011.5.25.256.2.5
+    hwErpsPortStatusInfoGroup OBJECT-GROUP
+        OBJECTS { hwPortStatusActiveRole, hwPortStatusSignalStatus, hwPortStatusFwdStatus }
+        STATUS current
+        DESCRIPTION 
+            "The group of port status."
+        ::= { hwErpsGroups 5 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.256.2.6
+    hwErpsPortStatisticsInfoGroup OBJECT-GROUP
+        OBJECTS { hwRxRapsSfPktCnt, hwTxRapsSfPktCnt, hwRxRapsNrPktCnt, hwTxRapsNrPktCnt,
+            hwRxRapsNrRbPktCnt, hwTxRapsNrRbPktCnt, hwRxRapsFsPktCnt, hwTxRapsFsPktCnt, hwRxRapsMsPktCnt, hwTxRapsMsPktCnt, hwRxRapsEventPktCnt, hwTxRapsEventPktCnt }
+        STATUS current
+        DESCRIPTION 
+            "The group of port information."
+        ::= { hwErpsGroups 6 }
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.256.2.7
+    hwErpsPortTrackInfoGroup OBJECT-GROUP
+        OBJECTS { hwErpsPortTrackProtocolType, hwErpsPortTrackRowStatus, hwErpsPortTrackCfmMdName, hwErpsPortTrackCfmMaName, hwErpsPortTrackCfmMepId, hwErpsPortTrackCfmRmepId }
+        STATUS current
+        DESCRIPTION 
+            "The group of ERPS port tracking information."
+        ::= { hwErpsGroups 7 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.256.2.8
+    hwErpsNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwErpsFwStateForwarding, hwErpsFwStateDiscarding }
+        STATUS current
+        DESCRIPTION 
+            "The notification group."
+        ::= { hwErpsGroups 8 }
+
+-- compliance statements
+    hwErpsConformance  OBJECT IDENTIFIER ::= { hwErpsMIB 3 }   
+                        
+    hwErpsCompliances  OBJECT IDENTIFIER ::= { hwErpsConformance 1 }
+                
+    hwErpsCompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION
+            "The core compliance statement for all implementations."
+	MODULE -- this module
+	MANDATORY-GROUPS  {
+		hwErpsGlobalInfoGroup,
+		hwErpsRingConfigInfoGroup,
+		hwErpsRingStatusInfoGroup,
+		hwErpsPortConfigInfoGroup, 
+		hwErpsPortStatusInfoGroup,
+		hwErpsPortStatisticsInfoGroup,
+                                        hwErpsNotificationGroup  		            		            		            
+	    }
+	    ::= { hwErpsCompliances 1 } 
+	    
+    END
+
+--
+-- HUAWEI-ERPS-MIBv2.my
+--

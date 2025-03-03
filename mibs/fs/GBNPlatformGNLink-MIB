@@ -1,0 +1,1359 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File              : gbnPlatformGNLink-MIB.mi2
+--  Description   : Sample gbn GGMP configuration MIB
+--  Version        : 1.0
+--  Date            : Dec 12, 2002
+--  Author         : ouyangchunbo
+--  Copyright (C) New admin Co., Ltd. All Rights Reserved.
+--
+------------------------------------------------------------------------------
+
+    GBNPlatformGNLink-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDEntry, OBJECT-TYPE,
+        Integer32, IpAddress,
+        Counter32, Counter64,
+        Unsigned32,
+        NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+
+        DisplayString                           FROM RFC1213-MIB
+        PortList                                FROM Q-BRIDGE-MIB
+        MacAddress,
+        RowStatus, TruthValue                   FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+
+        gbnPlatform                             FROM ADMIN-MASTER-MIB
+        ;
+
+
+        gnlinkMib MODULE-IDENTITY
+        LAST-UPDATED    "0406030000Z"  -- June 3, 2004
+        ORGANIZATION    "New admin Co., Ltd."
+        CONTACT-INFO    "New admin Co., Ltd.
+                         E-mail: support@admin.com"
+
+        DESCRIPTION     "ADMIN ZY.Link Enterprise MIB definition."
+
+        REVISION        "0406030000Z"  -- June 3, 2004
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnPlatform 2 }
+
+
+------------------------------------------------------------------------------
+--  Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+    --
+    --  "DURABLE":
+    --    Objects that are saved across a system reset and/or power cycle
+    --    are noted as "DURABLE" for convenience in the DESCRIPTION
+    --    section of the object definition.  Code must be explicitly
+    --    written to implement these DURABLE objects.
+    --
+
+------------------------------------------------------------------------------
+--  define groups in GBN-GGMP-MIB
+------------------------------------------------------------------------------
+gbnGgmpSvrProperty            OBJECT IDENTIFIER ::= { gnlinkMib 7 }
+
+gbnGgmpClientProperty         OBJECT IDENTIFIER ::= { gnlinkMib 14 }
+
+gbnGgmpTrap                   OBJECT IDENTIFIER ::= { gnlinkMib 9 }
+-------------------------------------------------------------------
+--Add GGMPMIB      2002/12/12     ouyangchunbo
+-------------------------------------------------------------------
+
+        ggmpStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+             enable(1),
+             disablepacketdiscard(2),
+             disablepacketforwardnolocation(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "ggmp status"
+        ::= { gnlinkMib 1 }
+
+        ggmpRole OBJECT-TYPE
+        SYNTAX INTEGER {
+             client(1),
+             server(2),
+             null(255)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "ggmp lanswitch role"
+        ::= { gnlinkMib 2 }
+
+        ----------------------------------------------------------------------------------
+        --LANSWITCH属性数据MIB表--
+        ----------------------------------------------------------------------------------
+        gbnGgmpLsProTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GbnGgmpLsProEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of Lanswitch property table"
+        ::= { gnlinkMib 3 }
+
+        gbnGgmpLsProEntry OBJECT-TYPE
+        SYNTAX GbnGgmpLsProEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of Lanswitch property parameters."
+        INDEX { ggmplanMAC }
+        ::= { gbnGgmpLsProTable 1 }
+
+        GbnGgmpLsProEntry ::= SEQUENCE {
+            ggmplanMAC             MacAddress,
+            ggmplanswitchName      DisplayString (SIZE(1..255)),
+            ggmplanDeviceId        Integer32,
+            ggmplanInServerPort    Integer32,
+            ggmplanPortNumber      Integer32,
+            ggmplanStatus          Integer32,
+            ggmplanupportsep       Integer32,
+            ggmppvidrangestart     Integer32,
+            ggmplanlocation        Integer32,
+            ggmplanBSF             Integer32,
+            ggmpclientver          Integer32,
+            ggmplanManageVlanId    Integer32,
+            ggmplanGrnStp          Integer32,
+            ggmplanHostVer         DisplayString (SIZE(1..25)),
+            ggmplanOnlineTime      Integer32,
+            ggmplanVlanMode        Integer32,
+            ggmplanMacLearningMode Integer32,
+            ggmplanHardwareVersion Integer32,
+            ggmplanBootVer         DisplayString (SIZE(1..25)),
+            ggmplanDeviceName      DisplayString (SIZE(1..32))
+
+        }
+
+        ggmplanMAC OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " MAC address of the regist lanswtich"
+        ::= { gbnGgmpLsProEntry 1 }
+
+        ggmplanswitchName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..255))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " name of the registered lanswtich ."
+        ::= { gbnGgmpLsProEntry 2 }
+
+
+        ggmplanDeviceId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Device ID of the regist lanswtich , the highest byte of device id means device type , 2 means TiNet s2008,
+             3 means TiNet s2016, 4 means TiNet s3024."
+        ::= { gbnGgmpLsProEntry 3 }
+
+        ggmplanInServerPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             "The port which the lanswith regist in server "
+        ::= { gbnGgmpLsProEntry 4 }
+
+        ggmplanPortNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             "The ports number of regist lanswitch "
+        ::= { gbnGgmpLsProEntry 5 }
+
+        ggmplanStatus OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            lsError(0),
+            lsNormal(1),
+            lsRegister(2),
+            lsNull(255)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             "The status of regist lanswitch "
+        ::= { gbnGgmpLsProEntry 6 }
+
+        ggmplanupportsep OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "The status of regist lanswitch.
+             If lanswitch is in error status, the return value will be -1."
+        ::= { gbnGgmpLsProEntry 7 }
+
+        ggmppvidrangestart OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " The start of pvid range of TiNet S2016E/S2024E.
+             If lanswitch is in error status, the return value will be -1. "
+        ::= { gbnGgmpLsProEntry 8 }
+
+        ggmplanlocation OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " The location of the lanswitch "
+        ::= { gbnGgmpLsProEntry 9 }
+
+        ggmplanBSF OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " Broadcast storm filter value of the lanswitch.
+             If lanswitch is in error status, the return value will be -1. "
+        ::= { gbnGgmpLsProEntry 10 }
+
+        ggmpclientver OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " ggmp client software version "
+        ::= { gbnGgmpLsProEntry 11 }
+
+        ggmplanManageVlanId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " ggmp client Manage Vlan "
+        ::= { gbnGgmpLsProEntry 12 }
+
+        ggmplanGrnStp OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            grnStpEnable(1),
+            grnStpDisable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " ggmp client STP switch.
+             If lanswitch is in error status, the return value will be -1. "
+        ::= { gbnGgmpLsProEntry 13 }
+
+        ggmplanHostVer OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..25))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Host Software Version of the Lanswitch"
+        ::= { gbnGgmpLsProEntry 14 }
+
+        ggmplanOnlineTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " Client Lanswitch Online Time. Unit is second. "
+        ::= { gbnGgmpLsProEntry 15 }
+
+        ggmplanVlanMode OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            vlanModePortBased(1),
+            vlanMode802dot1q(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " ggmp client vlan mode.
+             port-based vlan means ingress does not check packets' vlan header,
+             802.1q means ingress checks packets' vlan header. "
+             --vlan模式分为基于端口的vlan和802.1qvlan，基于端口的vlan表示入端口不检查报文
+             --的vlan首部，802.1qvlan表示入端口检查报文的vlan首部
+        ::= { gbnGgmpLsProEntry 16 }
+
+        ggmplanMacLearningMode OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            macLearningModeIvl(0),
+            macLearningModeSvl(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " ggmp client mac-learning mode.
+             ivl means independent vlan learning,svl means share vlan learning."
+             --ivl代表独立vlan学习，svl代表共享vlan学习
+        ::= { gbnGgmpLsProEntry 17 }
+
+        ggmplanHardwareVersion OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            CDVersion(0),
+            CGVersion(1)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " client's hardware version,0 means CD version and 1 means CG version."
+             --客户端的硬件版本，0代表CD版本，1代表CG坂本
+        ::= { gbnGgmpLsProEntry 18 }
+
+        ggmplanBootVer OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..25))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " BootRom Version of the Lanswitch"
+        ::= { gbnGgmpLsProEntry 19 }
+
+        ggmplanDeviceName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32)) 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Device name of the registered lanswtich ."
+        ::= { gbnGgmpLsProEntry 20 }
+
+        ----------------------------------------------------------------------------------
+        --LANSWITCH端口属性数据MIB表--
+        ----------------------------------------------------------------------------------
+        gbnGgmpPortPropertyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GbnGgmpPortPropertyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of Lanswitch port property table"
+        ::= { gnlinkMib 4 }
+
+        gbnGgmpPortPropertyEntry OBJECT-TYPE
+        SYNTAX GbnGgmpPortPropertyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of Lanswitch port property parameters."
+        INDEX { ggmpportmac, ggmpportportnumber }
+        ::= { gbnGgmpPortPropertyTable 1 }
+
+        GbnGgmpPortPropertyEntry ::= SEQUENCE {
+            ggmpportmac              MacAddress,
+            ggmpportportnumber       Integer32,
+            ggmpportportclosed       Integer32,
+            ggmpportportlink         Integer32,
+            ggmpportportvlanid       Integer32,
+            ggmpportporttagged       Integer32,
+            ggmpportportduplex       Integer32,
+            ggmpportportactualduplex Integer32,
+            ggmpportportlockmac      Integer32,
+            ggmpportportgrnstp       Integer32
+        }
+
+        ggmpportmac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " mac address of the regist lanswtich ."
+        ::= { gbnGgmpPortPropertyEntry 1 }
+
+        ggmpportportnumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " port number of lanswitch "
+        ::= { gbnGgmpPortPropertyEntry 2 }
+
+        ggmpportportclosed OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            interfaceEnable(1),
+            interfaceDisable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " port state of closed or open ."
+        ::= { gbnGgmpPortPropertyEntry 3 }
+
+        ggmpportportlink OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            portlinkup(1),
+            portlinkdown(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " the port link status  "
+        ::= { gbnGgmpPortPropertyEntry 4 }
+
+        ggmpportportvlanid OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " The ports default vlan id "
+        ::= { gbnGgmpPortPropertyEntry 5 }
+
+        ggmpportporttagged OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            porttrunk(1),
+            portaccess(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " The ports tagged or untagged status "
+        ::= { gbnGgmpPortPropertyEntry 6 }
+
+        ggmpportportduplex OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            auto(1),
+            half10(2),
+            full10(3),
+            half100(4),
+            full100(5),
+            half1000(6),
+            full1000(7)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " The ports duplex "
+        ::= { gbnGgmpPortPropertyEntry 7 }
+
+        ggmpportportactualduplex OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            unknown(1),
+            half10(2),
+            full10(3),
+            half100(4),
+            full100(5),
+            half1000(6),
+            full1000(7)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " The ports actual duplex "
+        ::= { gbnGgmpPortPropertyEntry 8 }
+
+        ggmpportportlockmac OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " The ports locked mac-address number "
+        ::= { gbnGgmpPortPropertyEntry 9 }
+
+        ggmpportportgrnstp OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            stpdisable(0),
+            stpblocking(1),
+            stplearning(2),
+            stpforwarding(3),
+            stpunknown(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " The ports grn stp status "
+        ::= { gbnGgmpPortPropertyEntry 10 }
+
+        gbnGgmpVlanPropertyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GbnGgmpVlanPropertyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of Lanswitch vlan property table"
+        ::= { gnlinkMib 5 }
+
+        gbnGgmpVlanPropertyEntry OBJECT-TYPE
+        SYNTAX GbnGgmpVlanPropertyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of Lanswitch Vlan property parameters."
+        INDEX { ggmpvlanmac, ggmpvlanvlanid }
+        ::= { gbnGgmpVlanPropertyTable 1 }
+
+        GbnGgmpVlanPropertyEntry ::= SEQUENCE {
+            ggmpvlanmac                MacAddress,
+            ggmpvlanvlanid             Integer32,
+            ggmpvlanname               DisplayString (SIZE(1..32)),
+            ggmpvlanstatic             Integer32,
+            ggmpvlanmembermap          PortList,
+            ggmpvlanuntaggedmap        PortList,
+            ggmpvlanaddportmap         PortList,
+            ggmpvlandelportmap         PortList,
+            ggmpvlanrowstatus          RowStatus,
+            ggmpvlanaddtagportmap     PortList,
+            ggmpvlanadduntagportmap   PortList
+        }
+
+        ggmpvlanmac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " mac address of the regist lanswtich ."
+        ::= { gbnGgmpVlanPropertyEntry 1 }
+
+        ggmpvlanvlanid OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " the id of vlan "
+        ::= { gbnGgmpVlanPropertyEntry 2 }
+
+        ggmpvlanname OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " An administratively assigned string, which may be used
+              to identify the VLAN., but TiNet s2008 should not config vlan name"
+        ::= { gbnGgmpVlanPropertyEntry 3 }
+
+        ggmpvlanstatic OBJECT-TYPE
+        SYNTAX Integer32
+        {
+           other(1),
+           permanent(2),
+           dynamicgvrp(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " This object indicates the status of this entry.
+              other(1) - this entry is currently in use but the
+                conditions under which it will remain so differ
+                from the following values.
+              permanent(2) - this entry, corresponding to an entry
+                in dot1qVlanStaticTable, is currently in use and
+                will remain so after the next reset of the
+                device.  The port lists for this entry include
+                ports from the equivalent dot1qVlanStaticTable
+                entry and ports learnt dynamically.
+              dynamicGvrp(3) - this entry is currently in use
+                and will remain so until removed by GVRP.  There
+                is no static entry for this VLAN and it will be
+                removed when the last port leaves the VLAN. "
+        ::= { gbnGgmpVlanPropertyEntry 4 }
+
+        ggmpvlanmembermap OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        " The set of ports which are transmitting traffic for
+          this VLAN as either tagged or untagged frames. "
+        ::= { gbnGgmpVlanPropertyEntry 5 }
+
+        ggmpvlanuntaggedmap OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " The set of ports which are transmitting traffic for
+               this VLAN as untagged frames."
+        ::= { gbnGgmpVlanPropertyEntry 6 }
+
+        ggmpvlanaddportmap OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " The set of ports which are transmitting traffic for
+               this VLAN as adding ports."
+        ::= { gbnGgmpVlanPropertyEntry 7 }
+
+        ggmpvlandelportmap OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " The set of ports which are transmitting traffic for
+               this VLAN as adding ports."
+        ::= { gbnGgmpVlanPropertyEntry 8 }
+
+        ggmpvlanrowstatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " This object indicates the status of this entry."
+        ::= { gbnGgmpVlanPropertyEntry 9 }
+
+        ggmpvlanaddtagportmap OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Modify member port of this vlan type to tagged. "
+        ::= { gbnGgmpVlanPropertyEntry 10 }
+
+        ggmpvlanadduntagportmap OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Modify member port of this vlan type to untagged. "
+        ::= { gbnGgmpVlanPropertyEntry 11 }
+
+        gbnGgmpLsSaveTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GbnGgmpLsSaveEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table that save lanswitch"
+        ::= { gnlinkMib 6 }
+
+        gbnGgmpLsSaveEntry OBJECT-TYPE
+        SYNTAX GbnGgmpLsSaveEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table that save lanswitch"
+        INDEX { ggmpsaveMAC }
+        ::= { gbnGgmpLsSaveTable 1 }
+
+        GbnGgmpLsSaveEntry ::= SEQUENCE {
+            ggmpsaveMAC             MacAddress,
+            ggmpsaveStatus          Integer32,
+            ggmprebootStatus        Integer32,
+            ggmpresetStatus         Integer32,
+            ggmpSyncLswProperty     Integer32,
+            ggmpSyncPortTable       Integer32,
+            ggmpSyncVlanTable       Integer32,
+            ggmpAllPortTag          PortList,
+            ggmpAllPortUntag        PortList
+        }
+
+        ggmpsaveMAC OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " MAC address of the regist lanswtich"
+        ::= { gbnGgmpLsSaveEntry 1 }
+
+        ggmpsaveStatus OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            noop(1),
+            savelanswitch(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " if ggmpsaveStatus is 2, then save the lanswitch whose macaddress is MacAddress."
+        ::= { gbnGgmpLsSaveEntry 2 }
+
+        ggmprebootStatus OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            noop(1),
+            rebootlanswitch(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " if ggmprebootStatus is 2, then reboot the lanswitch whose macaddress is MacAddress."
+        ::= { gbnGgmpLsSaveEntry 3 }
+
+        ggmpresetStatus OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            noop(1),
+            resetlanswitch(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " if ggmpresetStatus is 2, then reset the lanswitch whose macaddress is MacAddress to default setting."
+        ::= { gbnGgmpLsSaveEntry 4 }
+
+        ggmpSyncLswProperty OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            noop(1),
+            synchronizelswproperty(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Synchronize Lanswitch Property "
+        ::= { gbnGgmpLsSaveEntry 5 }
+
+        ggmpSyncPortTable OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            noop(1),
+            synchronizeporttable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Synchronize Lanswitch Port Table "
+        ::= { gbnGgmpLsSaveEntry 6 }
+
+        ggmpSyncVlanTable OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            noop(1),
+            synchronizevlantable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Synchronize Lanswitch Vlan Table "
+        ::= { gbnGgmpLsSaveEntry 7 }
+
+        ggmpAllPortTag OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " Set all port tag property. tagged[bit=1],do not change[bit=0]"
+        ::= { gbnGgmpLsSaveEntry 8 }
+
+        ggmpAllPortUntag OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " Set all port untag property. untagged[bit=1],do not change[bit=0]"
+        ::= { gbnGgmpLsSaveEntry 9 }
+
+
+        ggmpRefusedPort OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Refused PortList of Server .enable[bit=1],disable[bit=0]."
+        ::= { gbnGgmpSvrProperty 1 }
+
+        ggmpServerMngVlan OBJECT-TYPE
+        SYNTAX Integer32 (2..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Gnlink vlan in server."
+        ::= { gbnGgmpSvrProperty 2 }
+
+        ggmpSvrLanMngVlan OBJECT-TYPE
+        SYNTAX Integer32 (2..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Gnlink vlan in server for all clients. Command node."
+        ::= { gbnGgmpSvrProperty 3 }
+
+        ggmpTrapSwitch OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            ggmpTrapEnable(1),
+            ggmpTrapDisable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " ggmp trap sending switch "
+        ::= { gbnGgmpSvrProperty 4 }
+
+        ggmpSvrRequestTimeout OBJECT-TYPE
+        SYNTAX Integer32 (1..10)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Maximum time that command waiting for its reply "
+            --命令的超时时间
+        ::= { gbnGgmpSvrProperty 5 }
+
+        ggmpSvrClientErrTimeout OBJECT-TYPE
+        SYNTAX Integer32 (90..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Time that server must wait to delete a lanswith in error state "
+            --server删除处于错误状态的client前需要等待的时间
+        ::= { gbnGgmpSvrProperty 6 }
+
+        ggmpSvrClientErrMaxHellos OBJECT-TYPE
+        SYNTAX Integer32 (3..10)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Times which lanswitch hasn't shankhands with server before being setted to error "
+            --设置server在握手超时多少次后将client置为error
+        ::= { gbnGgmpSvrProperty 7 }
+
+        ggmpSvrRequestMaxRetries OBJECT-TYPE
+        SYNTAX Integer32 (3..10)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " Retransmit times for server before sending a command successfully "
+            --命令发送失败允许的重试次数
+        ::= { gbnGgmpSvrProperty 8 }
+
+        ggmpserverMacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " ZY.Link protocol packets' destination MAC address"
+            --ZY.Link协议报文的目的MAC地址
+        ::= { gbnGgmpSvrProperty 9 }
+
+        ggmpClientAppGetMode OBJECT-TYPE
+        SYNTAX INTEGER {
+               ftp(1),
+               tftp(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " config mode by which to get application from server,ftp or tftp"
+            --选择通过哪种方式由服务器下载客户端应用程序,分为ftp模式和tftp模式
+        ::= { gbnGgmpSvrProperty 10 }
+
+        ggmpClientAppSvrIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " ggmp client application ftp server ipaddress"
+            --集群管理客户端应用程序ftp服务器的ip地址
+        ::= { gbnGgmpSvrProperty 11 }
+
+        ggmpClientAppFtpSvrUserName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "ggmp client application ftp server userName"
+            --集群管理客户端ftp服务器用户名
+        ::= { gbnGgmpSvrProperty 12 }
+
+        ggmpClientAppFtpSvrPassword OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "ggmp client application ftp server password"
+            --集群管理客户端ftp服务器密码
+        ::= { gbnGgmpSvrProperty 13 }
+
+        ggmpClientRemoteReboot OBJECT-TYPE
+        SYNTAX INTEGER {
+               permit(1),
+               deny(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " config ZY.Link server allow client remote reboot"
+            --配置ZY.Link服务器端是否允许支持触发重启的客户端设备在远程升级完毕后触发重启
+        ::= { gbnGgmpSvrProperty 14 }
+
+        ----------------------------------------------------------------------------------
+        --LANSWITCH ARL表查询MIB表--
+        ----------------------------------------------------------------------------------
+        gbnGgmpLsARLTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GbnGgmpLsARLEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table that is used to search lanswitch ARL table"
+        ::= { gnlinkMib 8 }
+
+        gbnGgmpLsARLEntry OBJECT-TYPE
+        SYNTAX GbnGgmpLsARLEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table that is used to search lanswitch ARL table"
+        INDEX { ggmparllanMAC, ggmparllanarlMAC }
+        ::= { gbnGgmpLsARLTable 1 }
+
+
+        GbnGgmpLsARLEntry ::= SEQUENCE {
+            ggmparllanMAC          MacAddress,
+            ggmparllanarlMAC       MacAddress,
+            ggmpmac2port            Integer32
+        }
+
+        ggmparllanMAC OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " MAC address of the registered lanswtich"
+        ::= { gbnGgmpLsARLEntry 1 }
+
+        ggmparllanarlMAC OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " MAC address of the registered lanswtich"
+        ::= { gbnGgmpLsARLEntry 2 }
+
+        ggmpmac2port OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Port id corresponding to the mac address in the last 6 bytes of the index."
+        ::= { gbnGgmpLsARLEntry 3 }
+
+        ----------------------------------------------------------------------------------
+        --GGMP TRAP MIB--
+        ----------------------------------------------------------------------------------
+
+        ggmpClientPortLoop NOTIFICATION-TYPE
+        OBJECTS { ggmpportportgrnstp }
+        STATUS  current
+        DESCRIPTION
+               "Client port loop"
+        ::= { gbnGgmpTrap 1 }
+
+        ggmpClientPortLoopFree NOTIFICATION-TYPE
+        OBJECTS { ggmpportportgrnstp }
+        STATUS  current
+        DESCRIPTION
+               "Client port loop free"
+        ::= { gbnGgmpTrap 2 }
+
+        ggmpClientPortLinkUp NOTIFICATION-TYPE
+        OBJECTS { ggmpportportlink }
+        STATUS  current
+        DESCRIPTION
+               "Client port link up"
+        ::= { gbnGgmpTrap 3 }
+
+        ggmpClientPortLinkDown NOTIFICATION-TYPE
+        OBJECTS { ggmpportportlink }
+        STATUS  current
+        DESCRIPTION
+               "Client port link down"
+        ::= { gbnGgmpTrap 4 }
+
+        ggmpClientTurnErr NOTIFICATION-TYPE
+        OBJECTS { ggmplanMAC }
+        STATUS  current
+        DESCRIPTION
+               "Client turn to error status"
+        ::= { gbnGgmpTrap 5 }
+
+        ggmpClientTurnNormal NOTIFICATION-TYPE
+        OBJECTS { ggmplanMAC }
+        STATUS  current
+        DESCRIPTION
+               "Client turn to normal status from error status"
+        ::= { gbnGgmpTrap 6 }
+
+        ggmpClientDeleteErr NOTIFICATION-TYPE
+        OBJECTS { ggmplanMAC }
+        STATUS  current
+        DESCRIPTION
+               "Delete error status lanswitch information"
+        ::= { gbnGgmpTrap 7 }
+
+        ggmpClientNewReg NOTIFICATION-TYPE
+        OBJECTS { ggmplanMAC }
+        STATUS  current
+        DESCRIPTION
+               "New register lanswitch"
+        ::= { gbnGgmpTrap 8 }
+        
+        -----------------------------------------------------------------------
+        --GGMP 远程升级客户端应用程序名的配置 MIB--
+        -----------------------------------------------------------------------
+        ggmpDevClientAppTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GgmpDevClientAppEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table used to config Lanswitch application table"
+            --该表用来配置下挂交换机的应用程序
+        ::= { gnlinkMib 10 }
+
+        ggmpDevClientAppEntry OBJECT-TYPE
+        SYNTAX GgmpDevClientAppEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+               "Table entry for configging clients' application list."
+               --用于配置客户端的应用程序列表
+        INDEX {
+           ggmpDevTypeNum ,
+           ggmpRmtLoadAppType
+        }
+        ::= { ggmpDevClientAppTable 1 }
+
+        GgmpDevClientAppEntry ::= SEQUENCE {
+            ggmpDevTypeNum         INTEGER,
+            ggmpRmtLoadAppType      INTEGER,
+            ggmpDevAppName             DisplayString(SIZE(1..64))
+        }
+
+        ggmpDevTypeNum OBJECT-TYPE
+        SYNTAX INTEGER (1..24)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+               "This value actually is the same as the index of device id table,
+                please refer to device id table for more details about which
+                value each device corresponds to"
+               --此节点的值和device id表的索引值相同,可以参考device id表来查看每种
+               --设备对应的索引值
+        ::= { ggmpDevClientAppEntry 1 }
+
+        ggmpRmtLoadAppType OBJECT-TYPE
+        SYNTAX INTEGER {
+               bootrom(1),
+               host(2)
+        }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+             "config file type to be loaded :bootrom or host"
+             --配置待加载的文件类型，bootrom文件或主机文件
+        ::= { ggmpDevClientAppEntry 2 }
+
+        ggmpDevAppName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(1..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+               "ggmp client application filename"
+               --集群管理客户端应用程序名
+        ::= { ggmpDevClientAppEntry 3 }
+
+        ----------------------------------------------------------------------
+        --GGMP 远程升级客户端以及加载时间的配置mib--
+        ----------------------------------------------------------------------
+        ggmpDevRmtLoadTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GgmpDevRmtLoadEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of Lanswitch application table"
+        ::= { gnlinkMib 11 }
+
+        ggmpDevRmtLoadEntry OBJECT-TYPE
+        SYNTAX GgmpDevRmtLoadEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+               "Table entry for configging/showing clients remote load information."
+               --用于配置显示客户端的加载信息
+        INDEX { ggmpRmtLoadDevMac }
+        ::= { ggmpDevRmtLoadTable 1 }
+
+        GgmpDevRmtLoadEntry ::= SEQUENCE {
+            ggmpRmtLoadDevMac          MacAddress,
+            ggmpRmtLoadQueIn           INTEGER,
+            ggmplanRmtLoadPercent      INTEGER,
+            ggmplanRmtLoadTime         INTEGER,
+            ggmplanRmtLoadAppType      INTEGER,
+            ggmplanRmtLoadRowStatus    RowStatus
+        }
+
+        ggmpRmtLoadDevMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " MAC address of the regist lanswtich"
+            --集群管理客户端的设备MAC地址
+        ::= { ggmpDevRmtLoadEntry 1 }
+
+        ggmpRmtLoadQueIn OBJECT-TYPE
+        SYNTAX INTEGER {
+              WaitingList(1),
+              ReadyList(2),
+              CmpltList(3),
+              FailedList(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " current queue in which lanswitch resides"
+             --指示设备处于哪个队列
+        ::= { ggmpDevRmtLoadEntry 2 }
+
+        ggmplanRmtLoadPercent OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             " Show the process of loading"
+             --显示加载的进度
+        ::= { ggmpDevRmtLoadEntry 3 }
+
+        ggmplanRmtLoadAppType OBJECT-TYPE
+        SYNTAX INTEGER{
+               bootrom(1),
+               host(2),
+               bootromAndHost(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "config file type to be loaded :bootrom or host or both"
+             --配置待加载的文件类型，bootrom文件或主机文件或者全部文件
+        ::= { ggmpDevRmtLoadEntry 4 }
+
+        ggmplanRmtLoadTime OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " Time at which lanswitch to be loaded"
+             --下挂交换机的加载时间
+        ::= { ggmpDevRmtLoadEntry 5 }
+
+        ggmplanRmtLoadRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+             "Status of this entry."
+            --表项的状态
+        ::= { ggmpDevRmtLoadEntry 6 }
+
+        -----------------------------------------------------------------------
+        --GGMP 远程升级模式的配置 MIB--
+        -----------------------------------------------------------------------
+        ggmpRmtLoadModeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GgmpRmtLoadModeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of Lanswitch application table"
+        ::= { gnlinkMib 12 }
+
+        ggmpRmtLoadModeEntry OBJECT-TYPE
+        SYNTAX GgmpRmtLoadModeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+               "Table entry for configging/showing remote load mode."
+               --用于配置显示客户端的加载模式
+        INDEX { ggmpRmtLoadDevType }
+        ::= { ggmpRmtLoadModeTable 1 }
+
+        GgmpRmtLoadModeEntry ::= SEQUENCE {
+            ggmpRmtLoadDevType      INTEGER,
+            ggmpRmtLoadmode         INTEGER,
+            ggmpRmtLoadModeTime     INTEGER,
+            ggmpRmtLoadNewRegAuto   INTEGER,
+            ggmpRmtLoadModeRowStatus   RowStatus
+        }
+
+        ggmpRmtLoadDevType OBJECT-TYPE
+        SYNTAX INTEGER (0..24)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+             "value '0'means all device,the others actually are the same as the
+              index of device id table,please refer to device id table for more
+              details about which value each device corresponds to"
+             --此节点值为'0'代表配置所有设备,其他值的意义和device id表的索引值相同,
+             --可以参考device id表来查看每种设备对应的索引值
+        ::= { ggmpRmtLoadModeEntry 1 }
+
+        ggmpRmtLoadmode OBJECT-TYPE
+        SYNTAX INTEGER {
+            hostOnce(1),
+            bootromOnce(2),
+            hostAndBootromOnce(3),
+            hostPeriodic(4),
+            bootromPeriodic(5),
+            hostAndBootromPeriodic(6),
+            loadNone(7)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " Config loading mode:1.load all lanswitchs'host file ,or bootrom
+               file, or both ,at specified time; 2.load all lanswitchs'host file,
+               or bootrom file ,or both, periodically at specified time"
+             --配置加载的模式,分为：
+             --1.在给定时间一次性升级所有设备的主机文件或bootrom文件或所有文件;
+             --2.在给定时间周期性加载所有设备的主机文件或bootrom文件或所有文件。
+        ::= { ggmpRmtLoadModeEntry 2 }
+
+        ggmpRmtLoadModeTime OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " Config when to load lanswitch.loading time is total number
+               of seconds relative to start point which is '1970/01/01 00:00:00'
+               if remote-load-mode is 'loadAllOnce',or 'sunday 00:00:00'if
+               remote-load-time is 'loadAllPeriodic' "
+             --配置加载的时间,当加载模式为"loadAllOnce"时，加载时间为相对于
+             --1970/01/01 00:00:00的总秒数，当加载模式为'loadAllPeriodic'时，
+             --加载时间为相对于星期天00:00:00的总秒数
+        ::= { ggmpRmtLoadModeEntry 3 }
+
+        ggmpRmtLoadNewRegAuto OBJECT-TYPE
+        SYNTAX   INTEGER {
+                 hostFile(1),
+                 bootromFile(2),
+                 hostAndBootrom(3),
+                 none(4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Config if all lanswitchs newly registered are loaded automatically.
+             File to be loaded :host file, bootrom file, or both"
+            --配置是否自动加载所有新注册设备,待升级的文件分为主机文件，bootrom文件
+            --或者是两种文件都升级
+        ::= { ggmpRmtLoadModeEntry 4 }
+
+        ggmpRmtLoadModeRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this entry."
+            --表项的状态
+        ::= { ggmpRmtLoadModeEntry 5 }
+        ----------------------------------------------------------------------
+        --此表用来配置客户端的设备id列表--
+        ----------------------------------------------------------------------
+        ggmpGbnDeviceIdTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GgmpGbnDeviceIdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of Lanswitch id Entry"
+        ::= { gnlinkMib 13 }
+
+        ggmpGbnDeviceIdEntry  OBJECT-TYPE
+        SYNTAX GgmpGbnDeviceIdEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+               "Table entry for configging lanswitch deviceId information."
+               --用于配置客户端的设备id信息
+        INDEX { ggmpGbnDevIdIndex }
+        ::= { ggmpGbnDeviceIdTable 1 }
+
+        GgmpGbnDeviceIdEntry ::= SEQUENCE {
+            ggmpGbnDevIdIndex INTEGER,
+            ggmpGbnDeviceId   INTEGER,
+            ggmpGbnDeviceDesc DisplayString(SIZE(1..32)),
+            ggmpGbnDeviceIDRowStatus   RowStatus,
+           ggmpGbnDevLowMidHighType INTEGER
+        }
+
+        ggmpGbnDevIdIndex OBJECT-TYPE
+        SYNTAX INTEGER(1..48)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+             " index of deviceId table,the first 20 entries of id table
+               have been occupied,so index should not less than 21"
+             --设备id表的索引,由于前20条表项已经被占用，所以用户配置
+             --输入的索引不应小于21
+        ::= { ggmpGbnDeviceIdEntry 1 }
+
+        ggmpGbnDeviceId  OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " lanswitch's device-id which is the identifier of device-type,
+               first 20 entries of device-id table have been occupied by
+               existing device-types,following details ：
+               S3042V->0x01000000,S2008E->0x02000000,S2016E->0x03000000,
+               S2016EF->0x03010000,S2024E->0x04000000,S2024EF->0x04010000,
+               S2208->0x05000000,S2024M->0x06010000,S2024M->0x06010000,
+               S2024M->0x06010000,S2024M->0x06010000,S2016M->0x07010000,
+               S2008M->0x08010000,S2024EI->0x09010000,S2016EI->0x0a010000,
+               S2008EI->0x0b010000,S2008EI-S->0x13010000,S2008EI-SF->0x14010000,
+               S2024C->0x0c010000,S2016C->0x0d010000,S2008C->0x0e010000,
+               S2008C-F->0x0f010000,S2008B->0x11010000,these entries are protected
+               by software.unknown device-type-number needs configging manually"
+        ::= { ggmpGbnDeviceIdEntry 2 }
+
+        ggmpGbnDeviceDesc OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " lanswitch's device-type name，such as ‘TiNet S2008E’"
+        ::= { ggmpGbnDeviceIdEntry 3 }
+
+        ggmpGbnDeviceIDRowStatus   OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "Status of this entry."
+        ::= { ggmpGbnDeviceIdEntry 4 }
+
+        ggmpGbnDevLowMidHighType  OBJECT-TYPE
+        SYNTAX INTEGER {
+             lowswitch(1),
+             mid-highswitch(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             " define whether device is low switch or mid-high switch"
+        ::= { ggmpGbnDeviceIdEntry 5 }
+
+
+        ggmpClientmac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " ZY.Link protocol packets' destination MAC address"
+        ::= { gbnGgmpClientProperty 1 }
+
+        ggmpClientManageVlan OBJECT-TYPE
+        SYNTAX Integer32 (2..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Gnlink vlan for client."
+        ::= { gbnGgmpClientProperty 2 }
+--
+-- END of GBN-GGMP-MIB
+--
+
+END
+
+

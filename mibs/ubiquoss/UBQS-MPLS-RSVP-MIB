@@ -1,0 +1,316 @@
+-- *****************************************************************
+-- UBQS-MPLS-RSVP-MIB : Ubiquoss RSVP MIB
+--   
+-- Jun 2011,  Park Hyung Eun
+--
+-- Copyright (c) 2011 by Ubiquoss, Corp.
+--   
+-- All rights reserved.
+-- ***************************************************************
+
+UBQS-MPLS-RSVP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,            
+    Unsigned32,
+    Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF         
+    IpAddress,
+    RowStatus,
+    TimeStamp,
+    DisplayString,    
+    TruthValue,    
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC     
+    InetAddress, 
+    InetAddressType,
+    InetAddressPrefixLength,    
+    InetAddressPrefixLength
+    	FROM INET-ADDRESS-MIB      
+    InterfaceIndex                     
+    	FROM IF-MIB    
+   mplsStdMIB, MplsBitRate, MplsBurstSize, MplsLSPID,
+   MplsTunnelIndex, MplsTunnelInstanceIndex,
+   MplsTunnelAffinity, MplsExtendedTunnelId, MplsPathIndex,
+   MplsPathIndexOrZero, MplsOwner, TeHopAddressType,
+   TeHopAddress, TeHopAddressAS, TeHopAddressUnnum
+      FROM MPLS-TC-STD-MIB                               -- [RFC3811]    	
+    ubiMplsGroupMIB
+        FROM UBQS-SMI;
+
+
+ubiRsvpMIB MODULE-IDENTITY
+        LAST-UPDATED    "201106210000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        ""
+     ::= { ubiMplsGroupMIB 4 }
+
+
+
+-- ***********************************************************
+-- Textual Conventions
+-- ***********************************************************          
+                              
+                              
+-- ***************************************************************
+--   ubiRsvpMIB
+-- ***************************************************************
+ubiRsvpMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiRsvpMIB 0 } 
+ubiRsvpMIBObjects  				OBJECT IDENTIFIER		::= { ubiRsvpMIB 1 }     
+ubiRsvpMIBConformance  			OBJECT IDENTIFIER		::= { ubiRsvpMIB 2 }
+        
+            
+ubiRsvpGlobal				 	OBJECT IDENTIFIER		::= { ubiRsvpMIBObjects 1 } 
+                         
+                         
+ -- ***************************************************************
+--   ubiRsvpMIBNotificationPrefix
+-- ***************************************************************
+                                           
+-- ***********************************************************
+-- ubiRsvpGlobal
+-- ***********************************************************
+ 	ubiRsvpEnable OBJECT-TYPE
+    	SYNTAX         TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"
+			Enable/Disable Ubiquoss RSVP.
+			%If you disable it all entry of 
+			mplsTunnelTable, mplsTunnelHopTable,
+			ubiRSVPTunnelTable and ubiRSVPNeighboTable will disappear.
+			"       
+       	DEFVAL		{ false }
+	   	::= { ubiRsvpGlobal 1 }   
+
+ 	ubiRsvpCspfEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"(Not)Use CSPF as LSP Path determination method for RSVP"              
+       	DEFVAL		{ false }
+	   	::= { ubiRsvpGlobal 2 }   
+
+ 	ubiRsvpLocalProtectionEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"Enable/Disable local protection"   
+       	DEFVAL		{ false }
+	   	::= { ubiRsvpGlobal 3 }   
+
+ 	ubiRsvpPhpEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"Enable/Disable local penultimate-hop-popping"            
+       	DEFVAL		{ true }
+	   	::= { ubiRsvpGlobal 4 }   
+ 
+ 	ubiRsvpRefreshReductionEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"Enable/Disable refresh message reduction"        
+       	DEFVAL		{ false }
+	   	::= { ubiRsvpGlobal 5 }   
+                                           
+                                      
+-- ***********************************************************
+-- ubiRsvpTunnelTable
+-- ***********************************************************   
+	ubiRsvpTunnelTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiRsvpTunnelEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Contains Ubiquoss RSVP Tunnel configuration"
+    	::= { ubiRsvpMIBObjects 2 }
+
+	ubiRsvpTunnelEntry OBJECT-TYPE
+    	SYNTAX          UbiRsvpTunnelEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"
+			RSVP Trunk configuration Table.
+			IT extends standard 'mplsTunnelTable' MIB
+			to describe configurations that the standard MIB does not handle.
+			"
+    	INDEX  { mplsTunnelIndex , mplsTunnelInstance ,
+    			 mplsTunnelIngressLSRId , mplsTunnelEgressLSRId 
+    			} 
+    	::= { ubiRsvpTunnelTable 1 }
+
+	UbiRsvpTunnelEntry ::= SEQUENCE {         
+    	ubiRsvpTunnelRetryTimer					Gauge32,
+    	ubiRsvpTunnelCspfEnable					TruthValue,
+    	ubiRsvpTunnelAlternativeHopTableIndex	Gauge32
+	}
+  
+ 	ubiRsvpTunnelRetryTimer OBJECT-TYPE
+    	SYNTAX          Gauge32
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"Config RSVP session retry time"
+	   	::= { ubiRsvpTunnelEntry 1 }   
+    
+ 	ubiRsvpTunnelCspfEnable OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"Enable/Disable CSPF Query"      
+	   	::= { ubiRsvpTunnelEntry 2 } 
+
+ 	ubiRsvpTunnelAlternativeHopTableIndex OBJECT-TYPE
+    	SYNTAX          Gauge32
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"Config alternative path for RSVP session"
+	   	::= { ubiRsvpTunnelEntry 3 } 
+      
+      
+                                      
+-- ***********************************************************
+-- ubiRsvpInterfaceTable
+-- ***********************************************************   
+	ubiRsvpInterfaceTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiRsvpInterfaceEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Contains RSVP configuration per interface."
+    	::= { ubiRsvpMIBObjects 3 }
+
+	ubiRsvpInterfaceEntry OBJECT-TYPE
+    	SYNTAX          UbiRsvpInterfaceEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ifIndex } 
+    	::= { ubiRsvpInterfaceTable 1 }
+
+	UbiRsvpInterfaceEntry ::= SEQUENCE {         
+            ubiRsvpIfEnable			TruthValue
+	}
+  
+  	ubiRsvpIfEnable OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+   		DESCRIPTION
+        	"Enable/Disable RSVP on interface"      
+       	::= { ubiRsvpInterfaceEntry 1 }              	
+                           
+
+-- ***********************************************************
+-- ubiRsvpNeighborTable
+-- ***********************************************************   
+	ubiRsvpNeighborTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiRsvpNeighborEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Config RSVP Neighbor manually"
+    	::= { ubiRsvpMIBObjects 4 }
+
+	ubiRsvpNeighborEntry OBJECT-TYPE
+    	SYNTAX          UbiRsvpNeighborEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiRsvpNeighborAddrType, ubiRsvpNeighborAddr } 
+    	::= { ubiRsvpNeighborTable 1 }
+
+	UbiRsvpNeighborEntry ::= SEQUENCE {         
+            ubiRsvpNeighborAddrType			InetAddressType,
+            ubiRsvpNeighborAddr				InetAddress,
+            ubiRsvpNEighborRowStatus		RowStatus
+	}
+  
+  	ubiRsvpNeighborAddrType OBJECT-TYPE
+    	SYNTAX          InetAddressType
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"Address type of RSVP Neighbor"
+       	::= { ubiRsvpNeighborEntry 1 }              	
+                           
+  	ubiRsvpNeighborAddr OBJECT-TYPE
+    	SYNTAX          InetAddress
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"Address of RSVP Neighbor"
+       	::= { ubiRsvpNeighborEntry 2 }    
+       	
+  	ubiRsvpNEighborRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	"Create/Delecte RSVP Neighbor manually"
+       	::= { ubiRsvpNeighborEntry 3 }    
+
+                          
+-- ***********************************************************
+-- ubiRsvpMIBConformance
+-- ***********************************************************
+ubiRsvpMIBCompliances  	OBJECT IDENTIFIER		::= { ubiRsvpMIBConformance 1 }
+ubiRsvpMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiRsvpMIBConformance 2 }
+-- Compliance
+
+	ubiRsvpMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for entities which
+        	implement the UBQS-MPLS-RSVP-MIB"
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {  
+    			ubiRsvpMIBGroup
+        }  
+        GROUP    ubiRsvpMIBGroup
+        DESCRIPTION 
+        	"The ubiRsvpMIBGroup is applicable for implementations which
+ 			need to get the RSVP information."    
+     	::= { ubiRsvpMIBCompliances 1 }
+
+
+	ubiRsvpMIBGroup OBJECT-GROUP
+    	OBJECTS         {     
+    	}   
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about the RSVP information."
+    	::= { ubiRsvpMIBGroups 1 }
+    	                               
+    	                               
+END

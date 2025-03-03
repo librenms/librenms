@@ -1,0 +1,258 @@
+--  =============================================================================
+--  Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+--  Description: This MIB module contains managed object definitions for
+--               Border Gateway Protocol (BGP) Virtual Private Networks (VPNs).
+--  Reference:
+--  Version: V1.0
+--  History:
+--    V1.0 2021-02-04 Initial version Created by Yueyongxia
+--  =============================================================================
+HH3C-BGP-VPN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY,
+        Unsigned32, Counter32
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        hh3cCommon
+            FROM HH3C-OID-MIB;
+
+--  =============================================================================
+--  module identity part
+--  =============================================================================
+hh3cBgpVpn MODULE-IDENTITY
+    LAST-UPDATED "202102040000Z"        -- Feb 04, 2021 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "The MIB module for management of Border Gateway Protocol (BGP)
+         Virtual Private Networks (VPNs)."
+    REVISION "202102040000Z"            -- Feb 04, 2021 at 00:00 GMT
+    DESCRIPTION
+        "Update"
+    ::= { hh3cCommon 202 }
+
+-- Textual Conventions.
+
+Hh3cBgpAFI ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The Address Family Identifier(AFI) of BGP peer."
+    SYNTAX INTEGER
+                {
+                ipv4(1),
+                ipv6(2),
+                l2vpn(25),
+                l2vpnDraft(196)
+                }
+
+Hh3cBgpSAFI ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The Subsequent Address Family Identifier(SAFI) of BGP peer."
+    SYNTAX INTEGER
+                {
+                unicast(1),
+                multicast(2),
+                mpls(4),
+                mcastVpn(5),
+                l2vpn(65),
+                mdt(66),
+                evpn(70),
+                vpn(128),
+                routeTarget(132)
+                }
+
+Hh3cBgpVpnId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "31a"
+    STATUS       current
+    DESCRIPTION
+        "An identifier that is assigned to each MPLS/BGP VPN and
+         is used to uniquely identify it.  This is assigned by the
+         system operator or NMS and SHOULD be unique throughout
+         the MPLS domain.  If this is the case, then this identifier
+         can then be used at any LSR within a specific MPLS domain
+         to identify this MPLS/BGP VPN.  It may also be possible to
+         preserve the uniqueness of this identifier across MPLS
+         domain boundaries, in which case this identifier can then
+         be used to uniquely identify MPLS/BGP VPNs on a more global
+         basis."
+    REFERENCE
+        "RFC 2685 [VPN-RFC2685] Fox B., et al, 'Virtual Private
+         Networks Identifier', September 1999."
+    SYNTAX OCTET STRING(SIZE (0..31))
+
+--  =============================================================================
+--  hh3cBgpVpnObjects definition begin
+--  =============================================================================
+hh3cBgpVpnObjects OBJECT IDENTIFIER ::= { hh3cBgpVpn 1 }
+hh3cBgpPeers   OBJECT IDENTIFIER ::= { hh3cBgpVpnObjects 1 }
+-- =============================================================================
+-- hh3cBgpPeerAddrFamilyTable Definition
+-- =============================================================================
+hh3cBgpPeerAddrFamilyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cBgpPeerAddrFamilyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is BGP peer address family table,
+         it contains the address family information of BGP peers."
+    ::= { hh3cBgpPeers 1 }
+
+hh3cBgpPeerAddrFamilyEntry OBJECT-TYPE
+    SYNTAX Hh3cBgpPeerAddrFamilyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in this table contains the information address family
+         information of BGP peers."
+    INDEX {
+            hh3cBgpPeerInstanceId,
+            hh3cBgpPeerVpnIndex,
+            hh3cBgpPeerAddrFamilyId,
+            hh3cBgpPeerSubAddrFamilyId,
+            hh3cBgpPeerType,
+            hh3cBgpPeerIPAddr
+          }
+    ::= { hh3cBgpPeerAddrFamilyTable 1 }
+
+Hh3cBgpPeerAddrFamilyEntry ::= SEQUENCE {
+    hh3cBgpPeerInstanceId                Unsigned32,
+    hh3cBgpPeerVpnIndex                  Unsigned32,
+    hh3cBgpPeerAddrFamilyId              Hh3cBgpAFI,
+    hh3cBgpPeerSubAddrFamilyId           Hh3cBgpSAFI,
+    hh3cBgpPeerType                      InetAddressType,
+    hh3cBgpPeerIPAddr                    InetAddress,
+    hh3cBgpPeerVpnName                   Hh3cBgpVpnId
+}
+
+hh3cBgpPeerInstanceId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Denotes the identifier of the BGP peer instance."
+    ::= { hh3cBgpPeerAddrFamilyEntry 1 }
+
+hh3cBgpPeerVpnIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Denotes the identifier of the BGP peer instance."
+    ::= { hh3cBgpPeerAddrFamilyEntry 2 }
+
+hh3cBgpPeerAddrFamilyId OBJECT-TYPE
+    SYNTAX      Hh3cBgpAFI
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Denotes the identifier of the BGP peer address family."
+    ::= { hh3cBgpPeerAddrFamilyEntry 3 }
+
+hh3cBgpPeerSubAddrFamilyId OBJECT-TYPE
+    SYNTAX      Hh3cBgpSAFI
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Denotes the identifier of the BGP peer sub-address family."
+    ::= { hh3cBgpPeerAddrFamilyEntry 4 }
+
+hh3cBgpPeerType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Denotes the type of the BGP peer address family."
+    ::= { hh3cBgpPeerAddrFamilyEntry 5 }
+
+hh3cBgpPeerIPAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Denotes the IP address of the BGP peer."
+    ::= { hh3cBgpPeerAddrFamilyEntry 6 }
+
+hh3cBgpPeerVpnName OBJECT-TYPE
+    SYNTAX      Hh3cBgpVpnId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The human-readable name of this VPN.  This MAY
+         be equivalent to the RFC2685 VPN-ID."
+    ::= { hh3cBgpPeerAddrFamilyEntry 7 }
+
+-- =============================================================================
+-- hh3cBgpPeerRouteTable Definition
+-- =============================================================================
+hh3cBgpPeerRouteTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cBgpPeerRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is BGP peer route table, it contains routing
+         information of BGP peers."
+    ::= { hh3cBgpPeers 3 }
+
+hh3cBgpPeerRouteEntry OBJECT-TYPE
+    SYNTAX Hh3cBgpPeerRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Denotes the routing information of BGP peers."
+    INDEX {
+            hh3cBgpPeerInstanceId,
+            hh3cBgpPeerVpnIndex,
+            hh3cBgpPeerAddrFamilyId,
+            hh3cBgpPeerSubAddrFamilyId,
+            hh3cBgpPeerType,
+            hh3cBgpPeerIPAddr
+          }
+    ::= { hh3cBgpPeerRouteTable 1 }
+
+Hh3cBgpPeerRouteEntry ::= SEQUENCE {
+    hh3cBgpPeerRouteRcvCount        Counter32,
+    hh3cBgpPeerRouteActiveCount     Counter32,
+    hh3cBgpPeerRouteAdvCount        Counter32
+}
+
+hh3cBgpPeerRouteRcvCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Denotes the number of routes received from the BGP peer."
+    ::= { hh3cBgpPeerRouteEntry 1 }
+
+hh3cBgpPeerRouteActiveCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Denotes the number of active routes received from the BGP peer."
+    ::= { hh3cBgpPeerRouteEntry 2 }
+
+hh3cBgpPeerRouteAdvCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Denotes the number of routes sent to the BGP peer."
+    ::= { hh3cBgpPeerRouteEntry 3 }
+
+--  ============================================================================
+--  End of hh3cBgpVpnObjects Definition
+--  ============================================================================
+
+--  End of HH3C-BGP-VPN-MIB
+END

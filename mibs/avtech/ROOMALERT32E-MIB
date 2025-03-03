@@ -1,0 +1,2278 @@
+--
+--defines ROOMALERT32E-MIB for SNMP agent extension of Room Alert 32E
+--Contents:	Global Registration Module
+--		Room Alert OIDs - Enterprise 20916
+--Version:	3.1.0
+--Date:		13 September 2017
+--Developed By: AVTECH Software, Inc.
+
+--
+--Copyright (c) 2017 AVTECH Software, Inc.
+--
+
+ROOMALERT32E-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises, IpAddress, Counter, TimeTicks
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE
+		FROM RFC-1215;
+
+
+avtech	OBJECT IDENTIFIER ::= { enterprises 20916 }
+products	OBJECT IDENTIFIER ::= { avtech 1 }
+roomalert32E	OBJECT IDENTIFIER ::= { products 8 }
+sensors	OBJECT IDENTIFIER ::= { roomalert32E 1 }
+internal	OBJECT IDENTIFIER ::= { sensors 1 }
+temperature	OBJECT IDENTIFIER ::= { internal 1 }
+humidity	OBJECT IDENTIFIER ::= { internal 2 }
+power		OBJECT IDENTIFIER ::= { internal 3 }
+heat-index	OBJECT IDENTIFIER ::= { internal 4 }
+analog	OBJECT IDENTIFIER ::= { internal 5 }
+relay       OBJECT IDENTIFIER ::= { internal 6 }
+digital	OBJECT IDENTIFIER ::= { sensors 2 }
+digital-sen1	OBJECT IDENTIFIER ::= { digital 1 }
+digital-sen2	OBJECT IDENTIFIER ::= { digital 2 }
+digital-sen3	OBJECT IDENTIFIER ::= { digital 3 }
+digital-sen4	OBJECT IDENTIFIER ::= { digital 4 }
+digital-sen5	OBJECT IDENTIFIER ::= { digital 5 }
+digital-sen6	OBJECT IDENTIFIER ::= { digital 6 }
+digital-sen7	OBJECT IDENTIFIER ::= { digital 7 }
+digital-sen8	OBJECT IDENTIFIER ::= { digital 8 }
+switch	OBJECT IDENTIFIER ::= { sensors 3 }
+wireless	OBJECT IDENTIFIER ::= { sensors 4 }
+wish-1	OBJECT IDENTIFIER ::= { wireless 1 }
+wish-1-sensors	OBJECT IDENTIFIER ::= { wish-1 4 }
+wish-1-internal	OBJECT IDENTIFIER ::= { wish-1-sensors 1 }
+wish-1-external	OBJECT IDENTIFIER ::= { wish-1-sensors 2 }
+wish-1-external-1	OBJECT IDENTIFIER ::= { wish-1-external 1 }
+wish-1-external-2	OBJECT IDENTIFIER ::= { wish-1-external 2 }
+wish-2	OBJECT IDENTIFIER ::= { wireless 2 }
+wish-2-sensors	OBJECT IDENTIFIER ::= { wish-2 4 }
+wish-2-internal	OBJECT IDENTIFIER ::= { wish-2-sensors 1 }
+wish-2-external	OBJECT IDENTIFIER ::= { wish-2-sensors 2 }
+wish-2-external-1	OBJECT IDENTIFIER ::= { wish-2-external 1 }
+wish-2-external-2	OBJECT IDENTIFIER ::= { wish-2-external 2 }
+wish-3	OBJECT IDENTIFIER ::= { wireless 3 }
+wish-3-sensors	OBJECT IDENTIFIER ::= { wish-3 4 }
+wish-3-internal	OBJECT IDENTIFIER ::= { wish-3-sensors 1 }
+wish-3-external	OBJECT IDENTIFIER ::= { wish-3-sensors 2 }
+wish-3-external-1	OBJECT IDENTIFIER ::= { wish-3-external 1 }
+wish-3-external-2	OBJECT IDENTIFIER ::= { wish-3-external 2 }
+wish-4	OBJECT IDENTIFIER ::= { wireless 4 }
+wish-4-sensors	OBJECT IDENTIFIER ::= { wish-4 4 }
+wish-4-internal	OBJECT IDENTIFIER ::= { wish-4-sensors 1 }
+wish-4-external	OBJECT IDENTIFIER ::= { wish-4-sensors 2 }
+wish-4-external-1	OBJECT IDENTIFIER ::= { wish-4-external 1 }
+wish-4-external-2	OBJECT IDENTIFIER ::= { wish-4-external 2 }
+wish-5	OBJECT IDENTIFIER ::= { wireless 5 }
+wish-5-sensors	OBJECT IDENTIFIER ::= { wish-5 4 }
+wish-5-internal	OBJECT IDENTIFIER ::= { wish-5-sensors 1 }
+wish-5-external	OBJECT IDENTIFIER ::= { wish-5-sensors 2 }
+wish-5-external-1	OBJECT IDENTIFIER ::= { wish-5-external 1 }
+wish-5-external-2	OBJECT IDENTIFIER ::= { wish-5-external 2 }
+wish-6	OBJECT IDENTIFIER ::= { wireless 6 }
+wish-6-sensors	OBJECT IDENTIFIER ::= { wish-6 4 }
+wish-6-internal	OBJECT IDENTIFIER ::= { wish-6-sensors 1 }
+wish-6-external	OBJECT IDENTIFIER ::= { wish-6-sensors 2 }
+wish-6-external-1	OBJECT IDENTIFIER ::= { wish-6-external 1 }
+wish-6-external-2	OBJECT IDENTIFIER ::= { wish-6-external 2 }
+wish-7	OBJECT IDENTIFIER ::= { wireless 7 }
+wish-7-sensors	OBJECT IDENTIFIER ::= { wish-7 4 }
+wish-7-internal	OBJECT IDENTIFIER ::= { wish-7-sensors 1 }
+wish-7-external	OBJECT IDENTIFIER ::= { wish-7-sensors 2 }
+wish-7-external-1	OBJECT IDENTIFIER ::= { wish-7-external 1 }
+wish-7-external-2	OBJECT IDENTIFIER ::= { wish-7-external 2 }
+wish-8	OBJECT IDENTIFIER ::= { wireless 8 }
+wish-8-sensors	OBJECT IDENTIFIER ::= { wish-8 4 }
+wish-8-internal	OBJECT IDENTIFIER ::= { wish-8-sensors 1 }
+wish-8-external	OBJECT IDENTIFIER ::= { wish-8-sensors 2 }
+wish-8-external-1	OBJECT IDENTIFIER ::= { wish-8-external 1 }
+wish-8-external-2	OBJECT IDENTIFIER ::= { wish-8-external 2 }
+wish-9	OBJECT IDENTIFIER ::= { wireless 9 }
+wish-9-sensors	OBJECT IDENTIFIER ::= { wish-9 4 }
+wish-9-internal	OBJECT IDENTIFIER ::= { wish-9-sensors 1 }
+wish-9-external	OBJECT IDENTIFIER ::= { wish-9-sensors 2 }
+wish-9-external-1	OBJECT IDENTIFIER ::= { wish-9-external 1 }
+wish-9-external-2	OBJECT IDENTIFIER ::= { wish-9-external 2 }
+wish-10	OBJECT IDENTIFIER ::= { wireless 10 }
+wish-10-sensors	OBJECT IDENTIFIER ::= { wish-10 4 }
+wish-10-internal	OBJECT IDENTIFIER ::= { wish-10-sensors 1 }
+wish-10-external	OBJECT IDENTIFIER ::= { wish-10-sensors 2 }
+wish-10-external-1	OBJECT IDENTIFIER ::= { wish-10-external 1 }
+wish-10-external-2	OBJECT IDENTIFIER ::= { wish-10-external 2 }
+wish-11	OBJECT IDENTIFIER ::= { wireless 11 }
+wish-11-sensors	OBJECT IDENTIFIER ::= { wish-11 4 }
+wish-11-internal	OBJECT IDENTIFIER ::= { wish-11-sensors 1 }
+wish-11-external	OBJECT IDENTIFIER ::= { wish-11-sensors 2 }
+wish-11-external-1	OBJECT IDENTIFIER ::= { wish-11-external 1 }
+wish-11-external-2	OBJECT IDENTIFIER ::= { wish-11-external 2 }
+wish-12	OBJECT IDENTIFIER ::= { wireless 12 }
+wish-12-sensors	OBJECT IDENTIFIER ::= { wish-12 4 }
+wish-12-internal	OBJECT IDENTIFIER ::= { wish-12-sensors 1 }
+wish-12-external	OBJECT IDENTIFIER ::= { wish-12-sensors 2 }
+wish-12-external-1	OBJECT IDENTIFIER ::= { wish-12-external 1 }
+wish-12-external-2	OBJECT IDENTIFIER ::= { wish-12-external 2 }
+wish-13	OBJECT IDENTIFIER ::= { wireless 13 }
+wish-13-sensors	OBJECT IDENTIFIER ::= { wish-13 4 }
+wish-13-internal	OBJECT IDENTIFIER ::= { wish-13-sensors 1 }
+wish-13-external	OBJECT IDENTIFIER ::= { wish-13-sensors 2 }
+wish-13-external-1	OBJECT IDENTIFIER ::= { wish-13-external 1 }
+wish-13-external-2	OBJECT IDENTIFIER ::= { wish-13-external 2 }
+wish-14	OBJECT IDENTIFIER ::= { wireless 14 }
+wish-14-sensors	OBJECT IDENTIFIER ::= { wish-14 4 }
+wish-14-internal	OBJECT IDENTIFIER ::= { wish-14-sensors 1 }
+wish-14-external	OBJECT IDENTIFIER ::= { wish-14-sensors 2 }
+wish-14-external-1	OBJECT IDENTIFIER ::= { wish-14-external 1 }
+wish-14-external-2	OBJECT IDENTIFIER ::= { wish-14-external 2 }
+wish-15	OBJECT IDENTIFIER ::= { wireless 15 }
+wish-15-sensors	OBJECT IDENTIFIER ::= { wish-15 4 }
+wish-15-internal	OBJECT IDENTIFIER ::= { wish-15-sensors 1 }
+wish-15-external	OBJECT IDENTIFIER ::= { wish-15-sensors 2 }
+wish-15-external-1	OBJECT IDENTIFIER ::= { wish-15-external 1 }
+wish-15-external-2	OBJECT IDENTIFIER ::= { wish-15-external 2 }
+traps	OBJECT IDENTIFIER ::= { roomalert32E 2 }
+lighttowers OBJECT IDENTIFIER ::= { roomalert32E 3 }
+lighttower1 OBJECT IDENTIFIER ::= { lighttowers 1 }
+lighttower2 OBJECT IDENTIFIER ::= { lighttowers 2 }
+
+-- Room Alert 32E MIB
+-- Parameters
+
+
+internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal temperature reading in Fahrenheit."
+::= { temperature 1 }
+
+internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal temperature reading in Celsius."
+::= { temperature 2 }
+
+internal-humidity OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The internal relative humidity reading in %RH."
+::= { humidity 1 }
+
+internal-heat-index OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		optional
+	DESCRIPTION	"The internal heat index reading in Fahrenheit."
+::= { heat-index 1 }
+
+internal-heat-indexC OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		optional
+	DESCRIPTION	"The internal heat index reading in Celsius."
+::= { heat-index 2 }
+
+internal-power OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current status of the Room Alert 32E power supply. A '1' indicates the unit is running on AC/Utility power. A '0' indicates the unit is running on battery backup power."
+::= { power 1 }
+
+internal-analog1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current status of the Room Alert 32E analog input (0-5VDC)."
+::= { analog 1 }
+
+internal-analog2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current status of the Room Alert 32E analog input (0-5VDC)."
+::= { analog 2 }
+
+internal-relay1 OBJECT-TYPE
+	SYNTAX		INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the on-board relay output"
+::= { relay 1 }
+
+internal-relay2 OBJECT-TYPE
+	SYNTAX		INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the on-board relay output"
+::= { relay 2 }
+
+digital-sen1-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Celsius."
+::= { digital-sen1 1 }
+
+digital-sen1-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Fahrenheit."
+::= { digital-sen1 2 }
+
+digital-sen1-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog sensor, this value represents the current Voltage reading. If this is a Temp/Active Power sensor, this value represents the current power state (1=Power Detected, 0=No Power Detected)."
+::= { digital-sen1 3 }
+
+digital-sen1-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current custom reading."
+::= { digital-sen1 4 }
+
+digital-sen1-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen1 5 }
+
+digital-sen2-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Celsius."
+::= { digital-sen2 1 }
+
+digital-sen2-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Fahrenheit."
+::= { digital-sen2 2 }
+
+digital-sen2-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog sensor, this value represents the current Voltage reading. If this is a Temp/Active Power sensor, this value represents the current power state (1=Power Detected, 0=No Power Detected)."
+::= { digital-sen2 3 }
+
+digital-sen2-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current custom reading."
+::= { digital-sen2 4 }
+
+digital-sen2-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen2 5 }
+
+digital-sen3-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Celsius."
+::= { digital-sen3 1 }
+
+digital-sen3-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Fahrenheit."
+::= { digital-sen3 2 }
+
+digital-sen3-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog sensor, this value represents the current Voltage reading. If this is a Temp/Active Power sensor, this value represents the current power state (1=Power Detected, 0=No Power Detected)."
+::= { digital-sen3 3 }
+
+digital-sen3-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current custom reading."
+::= { digital-sen3 4 }
+
+digital-sen3-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen3 5 }
+
+digital-sen4-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Celsius."
+::= { digital-sen4 1 }
+
+digital-sen4-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Fahrenheit."
+::= { digital-sen4 2 }
+
+digital-sen4-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog sensor, this value represents the current Voltage reading. If this is a Temp/Active Power sensor, this value represents the current power state (1=Power Detected, 0=No Power Detected)."
+::= { digital-sen4 3 }
+
+digital-sen4-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current custom reading."
+::= { digital-sen4 4 }
+
+digital-sen4-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen4 5 }
+
+digital-sen5-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Celsius."
+::= { digital-sen5 1 }
+
+digital-sen5-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Fahrenheit."
+::= { digital-sen5 2 }
+
+digital-sen5-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog sensor, this value represents the current Voltage reading. If this is a Temp/Active Power sensor, this value represents the current power state (1=Power Detected, 0=No Power Detected)."
+::= { digital-sen5 3 }
+
+digital-sen5-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current custom reading."
+::= { digital-sen5 4 }
+
+digital-sen5-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen5 5 }
+
+digital-sen6-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Celsius."
+::= { digital-sen6 1 }
+
+digital-sen6-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Fahrenheit."
+::= { digital-sen6 2 }
+
+digital-sen6-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog sensor, this value represents the current Voltage reading. If this is a Temp/Active Power sensor, this value represents the current power state (1=Power Detected, 0=No Power Detected)."
+::= { digital-sen6 3 }
+
+digital-sen6-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current custom reading."
+::= { digital-sen6 4 }
+
+digital-sen6-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen6 5 }
+
+digital-sen7-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Celsius."
+::= { digital-sen7 1 }
+
+digital-sen7-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Fahrenheit."
+::= { digital-sen7 2 }
+
+digital-sen7-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog sensor, this value represents the current Voltage reading. If this is a Temp/Active Power sensor, this value represents the current power state (1=Power Detected, 0=No Power Detected)."
+::= { digital-sen7 3 }
+
+digital-sen7-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current custom reading."
+::= { digital-sen7 4 }
+
+digital-sen7-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen7 5 }
+
+digital-sen8-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Celsius."
+::= { digital-sen8 1 }
+
+digital-sen8-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temperature, Temp/Humidity, Temp/Analog, or Temp/Active Power sensor, this value represents the current temperature in Fahrenheit."
+::= { digital-sen8 2 }
+
+digital-sen8-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog sensor, this value represents the current Voltage reading. If this is a Temp/Active Power sensor, this value represents the current power state (1=Power Detected, 0=No Power Detected)."
+::= { digital-sen8 3 }
+
+digital-sen8-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current custom reading."
+::= { digital-sen8 4 }
+
+digital-sen8-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { digital-sen8 5 }
+
+switch-sen1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 1 (0 = OPEN, 1 = CLOSED)."
+::= { switch 1 }
+
+switch-sen2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 2 (0 = OPEN, 1 = CLOSED)."
+::= { switch 2 }
+
+switch-sen3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 3 (0 = OPEN, 1 = CLOSED)."
+::= { switch 3 }
+
+switch-sen4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 4 (0 = OPEN, 1 = CLOSED)."
+::= { switch 4 }
+
+switch-sen5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 5 (0 = OPEN, 1 = CLOSED)."
+::= { switch 5 }
+
+switch-sen6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 6 (0 = OPEN, 1 = CLOSED)."
+::= { switch 6 }
+
+switch-sen7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 7 (0 = OPEN, 1 = CLOSED)."
+::= { switch 7 }
+
+switch-sen8 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 8 (0 = OPEN, 1 = CLOSED)."
+::= { switch 8 }
+
+switch-sen9 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 9 (0 = OPEN, 1 = CLOSED)."
+::= { switch 9 }
+
+switch-sen10 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 10 (0 = OPEN, 1 = CLOSED)."
+::= { switch 10 }
+
+switch-sen11 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 11 (0 = OPEN, 1 = CLOSED)."
+::= { switch 11 }
+
+switch-sen12 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 12 (0 = OPEN, 1 = CLOSED)."
+::= { switch 12 }
+
+switch-sen13 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 13 (0 = OPEN, 1 = CLOSED)."
+::= { switch 13 }
+
+switch-sen14 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 14 (0 = OPEN, 1 = CLOSED)."
+::= { switch 14 }
+
+switch-sen15 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 15 (0 = OPEN, 1 = CLOSED)."
+::= { switch 15 }
+
+switch-sen16 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor 16 (0 = OPEN, 1 = CLOSED)."
+::= { switch 16 }
+
+wish-1-enabled OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current 'enabled' status for this WiSH/WiSPR Sensor. A '0' indicates the WiSH/WiSPR is disabled. A '1' indicates the WiSH/WiSPR is enabled."
+::= { wish-1 1 }
+
+wish-1-serial-num OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The unique serial number for this WiSH/WiSPR Sensor."
+::= { wish-1 2 }
+
+wish-1-updates OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current update interval for this WiSH/WiSPR Sensor."
+::= { wish-1 3 }
+
+wish-1-battery-voltage OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current voltage reading of the internal battery for this WiSH/WiSPR Sensor."
+::= { wish-1-internal 1 }
+
+wish-1-internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Celsius (C) for this WiSH/WiSPR Sensor."
+::= { wish-1-internal 2 }
+
+wish-1-internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Fahrenheit (F) for this WiSH/WiSPR Sensor."
+::= { wish-1-internal 3 }
+
+wish-1-external-1-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-1-external-1 1 }
+
+wish-1-external-1-val1 OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-1-external-1 2 }
+
+wish-1-external-1-val2 OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-1-external-1 3 }
+
+wish-1-external-1-val3 OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-1-external-1 4 }
+
+wish-1-external-1-val4 OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-1-external-1 5 }
+
+wish-1-external-1-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-1-external-1 6 }
+
+wish-1-external-2-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-1-external-2 1 }
+
+wish-1-external-2-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-1-external-2 2 }
+
+wish-1-external-2-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-1-external-2 3 }
+
+wish-1-external-2-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-1-external-2 4 }
+
+wish-1-external-2-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-1-external-2 5 }
+
+wish-1-external-2-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-1-external-2 6 }
+
+wish-1-external-switch OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor contacts of this WiSH/WiSPR Sensor (0 = OPEN, 1 = CLOSED)."
+::= { wish-1-external 3 }
+
+wish-2-enabled OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current 'enabled' status for this WiSH/WiSPR Sensor. A '0' indicates the WiSH/WiSPR is disabled. A '1' indicates the WiSH/WiSPR is enabled."
+::= { wish-2 1 }
+
+wish-2-serial-num OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The unique serial number for this WiSH/WiSPR Sensor."
+::= { wish-2 2 }
+
+wish-2-updates OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current update interval for this WiSH/WiSPR Sensor."
+::= { wish-2 3 }
+
+wish-2-battery-voltage OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current voltage reading of the internal battery for this WiSH/WiSPR Sensor."
+::= { wish-2-internal 1 }
+
+wish-2-internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Celsius (C) for this WiSH/WiSPR Sensor."
+::= { wish-2-internal 2 }
+
+wish-2-internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Fahrenheit (F) for this WiSH/WiSPR Sensor."
+::= { wish-2-internal 3 }
+
+wish-2-external-1-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-2-external-1 1 }
+
+wish-2-external-1-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-2-external-1 2 }
+
+wish-2-external-1-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-2-external-1 3 }
+
+wish-2-external-1-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-2-external-1 4 }
+
+wish-2-external-1-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-2-external-1 5 }
+
+wish-2-external-1-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-2-external-1 6 }
+
+wish-2-external-2-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-2-external-2 1 }
+
+wish-2-external-2-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-2-external-2 2 }
+
+wish-2-external-2-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-2-external-2 3 }
+
+wish-2-external-2-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-2-external-2 4 }
+
+wish-2-external-2-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-2-external-2 5 }
+
+wish-2-external-2-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-2-external-2 6 }
+
+wish-2-external-switch OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor contacts of this WiSH/WiSPR Sensor (0 = OPEN, 1 = CLOSED)."
+::= { wish-2-external 3 }
+
+wish-3-enabled OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current 'enabled' status for this WiSH/WiSPR Sensor. A '0' indicates the WiSH/WiSPR is disabled. A '1' indicates the WiSH/WiSPR is enabled."
+::= { wish-3 1 }
+
+wish-3-serial-num OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The unique serial number for this WiSH/WiSPR Sensor."
+::= { wish-3 2 }
+
+wish-3-updates OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current update interval for this WiSH/WiSPR Sensor."
+::= { wish-3 3 }
+
+wish-3-battery-voltage OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current voltage reading of the internal battery for this WiSH/WiSPR Sensor."
+::= { wish-3-internal 1 }
+
+wish-3-internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Celsius (C) for this WiSH/WiSPR Sensor."
+::= { wish-3-internal 2 }
+
+wish-3-internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Fahrenheit (F) for this WiSH/WiSPR Sensor."
+::= { wish-3-internal 3 }
+
+wish-3-external-1-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-3-external-1 1 }
+
+wish-3-external-1-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-3-external-1 2 }
+
+wish-3-external-1-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-3-external-1 3 }
+
+wish-3-external-1-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-3-external-1 4 }
+
+wish-3-external-1-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-3-external-1 5 }
+
+wish-3-external-1-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-3-external-1 6 }
+
+wish-3-external-2-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-3-external-2 1 }
+
+wish-3-external-2-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-3-external-2 2 }
+
+wish-3-external-2-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-3-external-2 3 }
+
+wish-3-external-2-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-3-external-2 4 }
+
+wish-3-external-2-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-3-external-2 5 }
+
+wish-3-external-2-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-3-external-2 6 }
+
+wish-3-external-switch OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor contacts of this WiSH/WiSPR Sensor (0 = OPEN, 1 = CLOSED)."
+::= { wish-3-external 3 }
+
+wish-4-enabled OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current 'enabled' status for this WiSH/WiSPR Sensor. A '0' indicates the WiSH/WiSPR is disabled. A '1' indicates the WiSH/WiSPR is enabled."
+::= { wish-4 1 }
+
+wish-4-serial-num OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The unique serial number for this WiSH/WiSPR Sensor."
+::= { wish-4 2 }
+
+wish-4-updates OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current update interval for this WiSH/WiSPR Sensor."
+::= { wish-4 3 }
+
+wish-4-battery-voltage OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current voltage reading of the internal battery for this WiSH/WiSPR Sensor."
+::= { wish-4-internal 1 }
+
+wish-4-internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Celsius (C) for this WiSH/WiSPR Sensor."
+::= { wish-4-internal 2 }
+
+wish-4-internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Fahrenheit (F) for this WiSH/WiSPR Sensor."
+::= { wish-4-internal 3 }
+
+wish-4-external-1-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-4-external-1 1 }
+
+wish-4-external-1-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-4-external-1 2 }
+
+wish-4-external-1-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-4-external-1 3 }
+
+wish-4-external-1-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-4-external-1 4 }
+
+wish-4-external-1-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-4-external-1 5 }
+
+wish-4-external-1-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-4-external-1 6 }
+
+wish-4-external-2-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-4-external-2 1 }
+
+wish-4-external-2-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-4-external-2 2 }
+
+wish-4-external-2-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-4-external-2 3 }
+
+wish-4-external-2-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-4-external-2 4 }
+
+wish-4-external-2-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-4-external-2 5 }
+
+wish-4-external-2-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-4-external-2 6 }
+
+wish-4-external-switch OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor contacts of this WiSH/WiSPR Sensor (0 = OPEN, 1 = CLOSED)."
+::= { wish-4-external 3 }
+
+wish-5-enabled OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current 'enabled' status for this WiSH/WiSPR Sensor. A '0' indicates the WiSH/WiSPR is disabled. A '1' indicates the WiSH/WiSPR is enabled."
+::= { wish-5 1 }
+
+wish-5-serial-num OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The unique serial number for this WiSH/WiSPR Sensor."
+::= { wish-5 2 }
+
+wish-5-updates OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current update interval for this WiSH/WiSPR Sensor."
+::= { wish-5 3 }
+
+wish-5-battery-voltage OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current voltage reading of the internal battery for this WiSH/WiSPR Sensor."
+::= { wish-5-internal 1 }
+
+wish-5-internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Celsius (C) for this WiSH/WiSPR Sensor."
+::= { wish-5-internal 2 }
+
+wish-5-internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Fahrenheit (F) for this WiSH/WiSPR Sensor."
+::= { wish-5-internal 3 }
+
+wish-5-external-1-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-5-external-1 1 }
+
+wish-5-external-1-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-5-external-1 2 }
+
+wish-5-external-1-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-5-external-1 3 }
+
+wish-5-external-1-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-5-external-1 4 }
+
+wish-5-external-1-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-5-external-1 5 }
+
+wish-5-external-1-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-5-external-1 6 }
+
+wish-5-external-2-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-5-external-2 1 }
+
+wish-5-external-2-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-5-external-2 2 }
+
+wish-5-external-2-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-5-external-2 3 }
+
+wish-5-external-2-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-5-external-2 4 }
+
+wish-5-external-2-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-5-external-2 5 }
+
+wish-5-external-2-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-5-external-2 6 }
+
+wish-5-external-switch OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor contacts of this WiSH/WiSPR Sensor (0 = OPEN, 1 = CLOSED)."
+::= { wish-5-external 3 }
+
+wish-6-enabled OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current 'enabled' status for this WiSH/WiSPR Sensor. A '0' indicates the WiSH/WiSPR is disabled. A '1' indicates the WiSH/WiSPR is enabled."
+::= { wish-6 1 }
+
+wish-6-serial-num OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The unique serial number for this WiSH/WiSPR Sensor."
+::= { wish-6 2 }
+
+wish-6-updates OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current update interval for this WiSH/WiSPR Sensor."
+::= { wish-6 3 }
+
+wish-6-battery-voltage OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current voltage reading of the internal battery for this WiSH/WiSPR Sensor."
+::= { wish-6-internal 1 }
+
+wish-6-internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Celsius (C) for this WiSH/WiSPR Sensor."
+::= { wish-6-internal 2 }
+
+wish-6-internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Fahrenheit (F) for this WiSH/WiSPR Sensor."
+::= { wish-6-internal 3 }
+
+wish-6-external-1-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-6-external-1 1 }
+
+wish-6-external-1-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-6-external-1 2 }
+
+wish-6-external-1-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-6-external-1 3 }
+
+wish-6-external-1-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-6-external-1 4 }
+
+wish-6-external-1-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-6-external-1 5 }
+
+wish-6-external-1-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-6-external-1 6 }
+
+wish-6-external-2-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-6-external-2 1 }
+
+wish-6-external-2-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-6-external-2 2 }
+
+wish-6-external-2-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-6-external-2 3 }
+
+wish-6-external-2-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-6-external-2 4 }
+
+wish-6-external-2-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-6-external-2 5 }
+
+wish-6-external-2-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-6-external-2 6 }
+
+wish-6-external-switch OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor contacts of this WiSH/WiSPR Sensor (0 = OPEN, 1 = CLOSED)."
+::= { wish-6-external 3 }
+
+wish-7-enabled OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current 'enabled' status for this WiSH/WiSPR Sensor. A '0' indicates the WiSH/WiSPR is disabled. A '1' indicates the WiSH/WiSPR is enabled."
+::= { wish-7 1 }
+
+wish-7-serial-num OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The unique serial number for this WiSH/WiSPR Sensor."
+::= { wish-7 2 }
+
+wish-7-updates OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current update interval for this WiSH/WiSPR Sensor."
+::= { wish-7 3 }
+
+wish-7-battery-voltage OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current voltage reading of the internal battery for this WiSH/WiSPR Sensor."
+::= { wish-7-internal 1 }
+
+wish-7-internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Celsius (C) for this WiSH/WiSPR Sensor."
+::= { wish-7-internal 2 }
+
+wish-7-internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Fahrenheit (F) for this WiSH/WiSPR Sensor."
+::= { wish-7-internal 3 }
+
+wish-7-external-1-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-7-external-1 1 }
+
+wish-7-external-1-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-7-external-1 2 }
+
+wish-7-external-1-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-7-external-1 3 }
+
+wish-7-external-1-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-7-external-1 4 }
+
+wish-7-external-1-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-7-external-1 5 }
+
+wish-7-external-1-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-7-external-1 6 }
+
+wish-7-external-2-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-7-external-2 1 }
+
+wish-7-external-2-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-7-external-2 2 }
+
+wish-7-external-2-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-7-external-2 3 }
+
+wish-7-external-2-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-7-external-2 4 }
+
+wish-7-external-2-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-7-external-2 5 }
+
+wish-7-external-2-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-7-external-2 6 }
+
+wish-7-external-switch OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor contacts of this WiSH/WiSPR Sensor (0 = OPEN, 1 = CLOSED)."
+::= { wish-7-external 3 }
+
+wish-8-enabled OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current 'enabled' status for this WiSH/WiSPR Sensor. A '0' indicates the WiSH/WiSPR is disabled. A '1' indicates the WiSH/WiSPR is enabled."
+::= { wish-8 1 }
+
+wish-8-serial-num OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The unique serial number for this WiSH/WiSPR Sensor."
+::= { wish-8 2 }
+
+wish-8-updates OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current update interval for this WiSH/WiSPR Sensor."
+::= { wish-8 3 }
+
+wish-8-battery-voltage OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current voltage reading of the internal battery for this WiSH/WiSPR Sensor."
+::= { wish-8-internal 1 }
+
+wish-8-internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Celsius (C) for this WiSH/WiSPR Sensor."
+::= { wish-8-internal 2 }
+
+wish-8-internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Fahrenheit (F) for this WiSH/WiSPR Sensor."
+::= { wish-8-internal 3 }
+
+wish-8-external-1-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-8-external-1 1 }
+
+wish-8-external-1-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-8-external-1 2 }
+
+wish-8-external-1-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-8-external-1 3 }
+
+wish-8-external-1-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-8-external-1 4 }
+
+wish-8-external-1-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-8-external-1 5 }
+
+wish-8-external-1-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-8-external-1 6 }
+
+wish-8-external-2-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-8-external-2 1 }
+
+wish-8-external-2-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-8-external-2 2 }
+
+wish-8-external-2-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-8-external-2 3 }
+
+wish-8-external-2-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-8-external-2 4 }
+
+wish-8-external-2-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-8-external-2 5 }
+
+wish-8-external-2-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-8-external-2 6 }
+
+wish-8-external-switch OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor contacts of this WiSH/WiSPR Sensor (0 = OPEN, 1 = CLOSED)."
+::= { wish-8-external 3 }
+
+wish-9-enabled OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current 'enabled' status for this WiSH/WiSPR Sensor. A '0' indicates the WiSH/WiSPR is disabled. A '1' indicates the WiSH/WiSPR is enabled."
+::= { wish-9 1 }
+
+wish-9-serial-num OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The unique serial number for this WiSH/WiSPR Sensor."
+::= { wish-9 2 }
+
+wish-9-updates OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current update interval for this WiSH/WiSPR Sensor."
+::= { wish-9 3 }
+
+wish-9-battery-voltage OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current voltage reading of the internal battery for this WiSH/WiSPR Sensor."
+::= { wish-9-internal 1 }
+
+wish-9-internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Celsius (C) for this WiSH/WiSPR Sensor."
+::= { wish-9-internal 2 }
+
+wish-9-internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Fahrenheit (F) for this WiSH/WiSPR Sensor."
+::= { wish-9-internal 3 }
+
+wish-9-external-1-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-9-external-1 1 }
+
+wish-9-external-1-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-9-external-1 2 }
+
+wish-9-external-1-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-9-external-1 3 }
+
+wish-9-external-1-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-9-external-1 4 }
+
+wish-9-external-1-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-9-external-1 5 }
+
+wish-9-external-1-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-9-external-1 6 }
+
+wish-9-external-2-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-9-external-2 1 }
+
+wish-9-external-2-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-9-external-2 2 }
+
+wish-9-external-2-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-9-external-2 3 }
+
+wish-9-external-2-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-9-external-2 4 }
+
+wish-9-external-2-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-9-external-2 5 }
+
+wish-9-external-2-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-9-external-2 6 }
+
+wish-9-external-switch OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor contacts of this WiSH/WiSPR Sensor (0 = OPEN, 1 = CLOSED)."
+::= { wish-9-external 3 }
+
+wish-10-enabled OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current 'enabled' status for this WiSH/WiSPR Sensor. A '0' indicates the WiSH/WiSPR is disabled. A '1' indicates the WiSH/WiSPR is enabled."
+::= { wish-10 1 }
+
+wish-10-serial-num OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The unique serial number for this WiSH/WiSPR Sensor."
+::= { wish-10 2 }
+
+wish-10-updates OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current update interval for this WiSH/WiSPR Sensor."
+::= { wish-10 3 }
+
+wish-10-battery-voltage OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current voltage reading of the internal battery for this WiSH/WiSPR Sensor."
+::= { wish-10-internal 1 }
+
+wish-10-internal-tempc OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Celsius (C) for this WiSH/WiSPR Sensor."
+::= { wish-10-internal 2 }
+
+wish-10-internal-tempf OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The current temperature of the internal sensor in Fahrenheit (F) for this WiSH/WiSPR Sensor."
+::= { wish-10-internal 3 }
+
+wish-10-external-1-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-10-external-1 1 }
+
+wish-10-external-1-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-10-external-1 2 }
+
+wish-10-external-1-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-10-external-1 3 }
+
+wish-10-external-1-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-10-external-1 4 }
+
+wish-10-external-1-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-10-external-1 5 }
+
+wish-10-external-1-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-10-external-1 6 }
+
+wish-10-external-2-type OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The sensor type of the digital sensor attached to this digital sensor port on the WiSH/WiSPR Sensor."
+::= { wish-10-external-2 1 }
+
+wish-10-external-2-val1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Celsius."
+::= { wish-10-external-2 2 }
+
+wish-10-external-2-val2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temperature, Temp/Humidity or Temp/Analog sensor, this value represents the current temperature in Fahrenheit."
+::= { wish-10-external-2 3 }
+
+wish-10-external-2-val3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current relative humidity in % Relative Humidity. If this sensor is a Temp/Analog Sensor, this value represents the Voltage reading in Volts."
+::= { wish-10-external-2 4 }
+
+wish-10-external-2-val4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Fahrenheit. If this sensor is a Temp/Analog sensor, this value represents the current Custom Value."
+::= { wish-10-external-2 5 }
+
+wish-10-external-2-val5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"If this sensor is a Temp/Humidity sensor, this value represents the current heat index in Celsius."
+::= { wish-10-external-2 6 }
+
+wish-10-external-switch OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for switch sensor contacts of this WiSH/WiSPR Sensor (0 = OPEN, 1 = CLOSED)."
+::= { wish-10-external 3 }
+
+alarmmessage OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Last Alarm Message"
+::= { traps 1 }
+
+
+-- Lighttower1
+
+lighttower1-RE OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the red LED on the Light Tower."
+::= { lighttower1 1 }
+
+lighttower1-OR OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the orange LED on the Light Tower."
+::= { lighttower1 2 }
+
+lighttower1-GR OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the green LED on the Light Tower."
+::= { lighttower1 3 }
+
+lighttower1-WH OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the white LED on the Light Tower."
+::= { lighttower1 4 }
+
+lighttower1-BL OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the blue LED on the Light Tower."
+::= { lighttower1 5 }
+
+lighttower1-A1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the 1st audio alarm on the Light Tower."
+::= { lighttower1 6 }
+
+lighttower1-A2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the 2nd audio alarm on the Light Tower."
+::= { lighttower1 7 }
+
+lighttower1-RL OBJECT-TYPE
+	SYNTAX		INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the LTA's on-board relay output"
+::= { lighttower1 8 }
+
+
+-- Lighttower2
+
+lighttower2-RE OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the red LED on the Light Tower."
+::= { lighttower2 1 }
+
+lighttower2-OR OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the orange LED on the Light Tower."
+::= { lighttower2 2 }
+
+lighttower2-GR OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the green LED on the Light Tower."
+::= { lighttower2 3 }
+
+lighttower2-WH OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the white LED on the Light Tower."
+::= { lighttower2 4 }
+
+lighttower2-BL OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the blue LED on the Light Tower."
+::= { lighttower2 5 }
+
+lighttower2-A1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the 1st audio alarm on the Light Tower."
+::= { lighttower2 6 }
+
+lighttower2-A2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the 2nd audio alarm on the Light Tower."
+::= { lighttower2 7 }
+
+lighttower2-RL OBJECT-TYPE
+	SYNTAX		INTEGER(0..1)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"The status of the LTA's on-board relay output"
+::= { lighttower2 8 }
+
+
+-- ROOMALERT32E TRAPS
+
+tempalarm1-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A tempalarm1 trap signifies that the current
+			temperature on external sensor 1 is outside the
+			defined high or low threshold."
+::= 1
+
+room-alert-32E-snmp-trap TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A room-alert-32E-snmp-trap indicates that an alarm
+			condition has occurred on the sensor inidcated
+			by the alarmMessage variable."
+::= 2
+
+tempalarm2-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A tempalarm2 trap signifies that the current
+			temperature on external sensor 2 is outside the
+			defined high or low threshold."
+::= 3
+
+tempclear2-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A tempclear2 trap signifies that the current
+			temperature on external sensor 2 has returned to
+			a normal condition and is within the defined
+			high or low threshold."
+::= 4
+
+tempalarm3-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A tempalarm3 trap signifies that the current
+			temperature on external sensor 3 is outside the
+			defined high or low threshold."
+::= 5
+
+tempclear3-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A tempclear3 trap signifies that the current
+			temperature on external sensor 3 has returned to
+			a normal condition and is within the defined
+			high or low threshold."
+::= 6
+
+humidityalarm1-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityalarm1 trap signifies that the current
+			humidity on external sensor 1 is outside the
+			defined high or low threshold."
+::= 7
+
+humidityclear1-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityclear1 trap signifies that the current
+			humidity on external sensor 1 has returned to
+			a normal condition and is within the defined
+			high or low threshold."
+::= 8
+
+humidityalarm2-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityalarm2 trap signifies that the current
+			humidity on external sensor 2 is outside the
+			defined high or low threshold."
+::= 9
+
+humidityclear2-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityclear2 trap signifies that the current
+			humidity on external sensor 2 has returned to
+			a normal condition and is within the defined
+			high or low threshold."
+::= 10
+
+humidityalarm3-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityalarm3 trap signifies that the current
+			humidity on external sensor 3 is outside the
+			defined high or low threshold."
+::= 11
+
+humidityclear3-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A humidityclear3 trap signifies that the current
+			humidity on external sensor 3 has returned to
+			a normal condition and is within the defined
+			high or low threshold."
+::= 12
+
+switchalarm1-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm1 trap signifies that switch sensor 1
+			is in an alarm state."
+::= 13
+
+switchclear1-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear1 trap signifies that the switch sensor 1
+			has returned to a normal state."
+::= 14
+
+switchalarm2-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm2 trap signifies that switch sensor 2
+			is in an alarm state."
+::= 15
+
+switchclear2-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear2 trap signifies that the switch sensor 2
+			has returned to a normal state."
+::= 16
+
+switchalarm3-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm3 trap signifies that switch sensor 3
+			is in an alarm state."
+::= 17
+
+switchclear3-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear3 trap signifies that the switch sensor 3
+			has returned to a normal state."
+::= 18
+
+switchalarm4-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm4 trap signifies that switch sensor 4
+			is in an alarm state."
+::= 19
+
+switchclear4-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear4 trap signifies that the switch sensor 4
+			has returned to a normal state."
+::= 20
+
+switchalarm5-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm5 trap signifies that switch sensor 5
+			is in an alarm state."
+::= 21
+
+switchclear5-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear5 trap signifies that the switch sensor 5
+			has returned to a normal state."
+::= 22
+
+switchalarm6-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm6 trap signifies that switch sensor 6
+			is in an alarm state."
+::= 23
+
+switchclear6-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear6 trap signifies that the switch sensor 6
+			has returned to a normal state."
+::= 24
+
+switchalarm7-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm7 trap signifies that switch sensor 7
+			is in an alarm state."
+::= 25
+
+switchclear7-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear7 trap signifies that the switch sensor 7
+			has returned to a normal state."
+::= 26
+
+switchalarm8-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchalarm8 trap signifies that switch sensor 8
+			is in an alarm state."
+::= 27
+
+switchclear8-32E TRAP-TYPE
+	ENTERPRISE	roomalert32E
+	VARIABLES	{ alarmmessage }
+	DESCRIPTION	"A switchclear8 trap signifies that the switch sensor 8
+			has returned to a normal state."
+::= 28
+END

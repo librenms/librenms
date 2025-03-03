@@ -1,0 +1,9 @@
+os: fusionhub
+text: FusionHub
+type: appliance
+icon: peplink
+group: unix
+mib_dir: peplink
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.23695

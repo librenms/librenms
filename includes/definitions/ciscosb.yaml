@@ -1,9 +1,9 @@
 os: ciscosb
-group: cisco
 text: 'Cisco Small Business'
-ifname: 1
+ifname: true
 type: network
 icon: cisco
+mib_dir: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -17,27 +17,33 @@ bad_ifXEntry:
     - SG300-20
     - SG300-28
     - SG300-28MP
+    - SG350-10
 poller_modules:
-    bgp-peers: 0
-    hr-mib: 0
-    ntp: 0
-    ospf: 0
-    ucd-diskio: 0
-    ucd-mib: 0
+    bgp-peers: false
+    hr-mib: false
+    ntp: false
+    ospf: false
+    ucd-diskio: false
+    ucd-mib: false
 discovery_modules:
-    bgp-peers: 0
-    cisco-vrf-lite: 0
-    ntp: 0
-    ucd-diskio: 0
+    bgp-peers: false
+    cisco-vrf-lite: false
+    ntp: false
+    ucd-diskio: false
 discovery:
-    - sysObjectId:
-        - .1.3.6.1.4.1.9.6.1.23.3.13
-        - .1.3.6.1.4.1.9.6.1.80
-        - .1.3.6.1.4.1.9.6.1.81
-        - .1.3.6.1.4.1.9.6.1.82
-        - .1.3.6.1.4.1.9.6.1.83
-        - .1.3.6.1.4.1.9.6.1.85
-        - .1.3.6.1.4.1.9.6.1.88
-        - .1.3.6.1.4.1.9.6.1.89
-        - .1.3.6.1.4.1.9.6.1.95
-        - .1.3.6.1.4.1.3955.6.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9.6.1.
+            - .1.3.6.1.4.1.3955.6.
+        sysObjectID_except:
+            - .1.3.6.1.4.1.9.6.1.23.1.1.1 # ciscospa
+            - .1.3.6.1.4.1.9.6.1.31. # ciscowap
+            - .1.3.6.1.4.1.9.6.1.32. # ciscowap
+            - .1.3.6.1.4.1.9.6.1.34. # ciscowap
+            - .1.3.6.1.4.1.9.6.1.37. # ciscowlc
+    -
+        sysDescr_regex:
+            - '/^Linksys SLM/'
+    -
+        sysObjectID_regex:
+            - '/^.1.3.6.1.4.1.9.1.(1058|1059|1060|1061|1062|1063|1064|1176|1177)/'

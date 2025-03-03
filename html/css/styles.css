@@ -3,11 +3,12 @@ body {
   margin: 0px;
   padding: 0px;
   padding-bottom: 50px;
-  padding-top: 50px;
+  padding-top: 0px;
   background: rgb(255,255,255); /* Old browsers */
   color: #555;
   font-size: 10pt;
   line-height: 20px;
+  overflow-y: scroll;
 }
 
 ul { margin: 0px; padding: 0px; list-style: disc outside; }
@@ -348,6 +349,16 @@ A.purple:visited, a.purple, .purple { color: #740074; }
   color: #555;
 }
 
+.graph-all-common {
+  display: block;
+  padding: 1px;
+  margin: 2px;
+  min-height:180px;
+  max-height:180px;
+  text-align: center;
+  float: left;
+}
+
 .tablehead {
   font-weight: bold;
   font-size: 13px;
@@ -396,13 +407,14 @@ A.purple:visited, a.purple, .purple { color: #740074; }
   color: #cc0000;
 }
 
-tr.device-overview:nth-child(odd) {
-  background: #ffffff;
-}
+.device-overview>.panel-body { padding-top: 0; padding-bottom: 0; }
+.device-overview>.panel-body>.row:nth-child(odd) { background-color: #f9f9f9; }
+.device-overview>.panel-body>.row:hover { background-color: #f5f5f5; }
+.device-overview>.panel-body>.row>div { padding: 3px 5px; }
+.device-overview>.panel-body>.row>div:first-child { font-weight: 500; }
 
-tr.device-overview:nth-child(even) {
-  background: #eeeeee;
-}
+#coordinates-row { cursor: pointer; }
+#location-map { padding: 15px; height: 400px; }
 
 a.list-device, a.list-device-ignored, a.list-device-down, a.list-device-ignored-up, a.list-device-disabled {
   font-weight: bold;
@@ -780,7 +792,7 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
 }
 
 .graphcell, .ifcell, .devicecell, .datacell { margin: 0px 0px 7px 0px; padding: 7px; border: 0px; background: #e8e8e8; float: left; }
-.ifcell { float: left; clear:right; background:none; }
+.iftable td { padding: 0 15px; line-height: 1.42857143; }
 
 .datacell { clear: both; }
 .devicecell { margin: 2px auto; }
@@ -808,6 +820,22 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 
 .interface-admindown, a.list-device-ignored, a.interface-admindown, a.interface-admindown:visited {
   color: #999999;
+}
+
+.sensor-low, a.sensor-low, a.sensor-low:visited {
+  color: #c11;
+}
+
+.sensor-high, a.sensor-high, a.sensor-high:visited {
+  color: #c11;
+}
+
+.sensor-ok, a.sensor-ok, a.sensor-ok:visited {
+  color: #11a;
+}
+
+a.sensor-ok:hover, a.sensor-low:hover, a.sensor-high:hover {
+  color: #990099;
 }
 
 #top {
@@ -1533,8 +1561,28 @@ tr.search:nth-child(odd) {
   font-weight: bold;
 }
 
+.overlib-contents {
+    background-color: #fff;
+}
+
 .minigraph-image {
+  display: inline;
   margin: 2px;
+}
+
+.minigraph-div {
+  display: flex;
+  justify-content: center;
+  padding: 3px;
+  margin: 3px;
+  min-width: 183px;
+  max-width: 183px;
+  min-height: 90px;
+  max-height: 90px;
+  text-align: center;
+  float: left;
+  border: solid 1px;
+  border-color: #b2b6af;
 }
 
 .example-sports .league-name {
@@ -1559,7 +1607,7 @@ tr.search:nth-child(odd) {
 
 .scrollable-menu {
     height: auto;
-    max-height: 200px;
+    max-height: 600px;
     overflow-x: hidden;
 }
 
@@ -1585,9 +1633,26 @@ tr.search:nth-child(odd) {
   min-height: 25px;
 }
 
+nav.navbar-sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom-width: 2px;
+  border-left-width: 0;
+  border-top-width: 0;
+  border-right-width: 0;
+  border-radius: 0;
+}
+
 .navbar-brand {
   padding: 8px 15px 8px 15px !important;
   line-height: 32px;
+}
+
+@media (min-width: 992px) and (max-width: 1280px) {
+  .navbar-brand {
+    display: none !important;
+  }
 }
 
 .navbar-brand img {
@@ -1623,7 +1688,11 @@ tr.search:nth-child(odd) {
      -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
           box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
-
+@media (min-width: 768px)  {
+    .tt-open {
+        left: -400px !important;
+    }
+}
 .tt-open {
   position: absolute;
   top: 95%;
@@ -1631,7 +1700,6 @@ tr.search:nth-child(odd) {
   z-index: 100;
   display: none;
   min-width: 400px;
-  left: -400px !important;
   margin-bottom: 20px;
   overflow: hidden;
   padding: 8px;
@@ -1668,6 +1736,7 @@ tr.search:nth-child(odd) {
 
 .gridster * {
   margin:0;
+  text-align: left;
 }
 
 .grid ul {
@@ -1679,6 +1748,9 @@ tr.search:nth-child(odd) {
     line-height: 100%;
 }
 
+.gridster .awesome-marker {
+  text-align: center;
+}
 
 .gridster {
     margin: 0 auto;
@@ -1718,14 +1790,8 @@ tr.search:nth-child(odd) {
     background-color: #000000;
     color: #ffffff;
     text-align: center;
-    -webkit-border-top-left-radius: 4px;
-     -moz-border-top-right-radius: 4px;
-          border-top-left-radius: 4px;
-          border-top-right-radius: 4px;
-}
-
-.widget_body {
-    padding: 0.8em;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
 }
 
 .mapTooltip {
@@ -1784,10 +1850,11 @@ label {
 .badge-navbar-user {
    border-radius: 40%;
    font-size: 65%;
-   padding: 5px;
+   padding: 4px;
    position: relative;
    top: -10px;
-   left: -5px;
+   left: -11px;
+   margin-right: -14px;
 }
 .badge-default {
   background-color: #777;
@@ -1878,6 +1945,16 @@ label {
     color: white;
 }
 
+.blueCluster {
+    background-color: rgba(23,162,184, 0);
+    background-color: rgba(23,162,184,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: white;
+}
+
 .greenCluster {
     background-color: rgba(0,255,0, 0);
     background-color: rgba(110, 204, 57, 0.6);
@@ -1900,9 +1977,15 @@ label {
 
 .edit-widget, .close-widget { cursor: pointer; }
 .widget_body {
+    padding: 0.8em;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
     overflow-y: auto;
+    overflow-x: hidden;
     width: 100%;
-    height: calc(100% - 38px);
+    height: calc(100% - 2.6em);
+    cursor: auto;
+    text-align: center;
 }
 
 .device-availability, .service-availability {
@@ -1937,6 +2020,7 @@ label {
 }
 
 .availability-label {
+  border-radius: 0 .25em 0 .25em;
   float:right;
   margin:-8px;
 }
@@ -1944,6 +2028,20 @@ label {
 .service-name-label {
   float:left;
   margin:-8px;
+}
+
+.widget_body:has(> .worldmap_widget) {
+    padding: 0;
+}
+.worldmap_widget {
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+.worldmap_widget a:hover {
+    text-decoration: none;
 }
 
 .report-up {
@@ -1992,10 +2090,10 @@ label {
 .widget-availability {
   float:left;
   margin:2px;
-  curosr: pointer;
 }
 
-.widget-availability-fixed {
+.widget-availability:empty {
+  display: inline;
   min-width: 2.4em;
   min-height: 1.3em;
   max-height: 1.6em;
@@ -2004,6 +2102,10 @@ label {
 .widget-availability-host {
   float:left;
   margin-bottom: 10px;
+}
+
+.widget-availability-host a:hover {
+  text-decoration: none;
 }
 
 .widget-availability-service {
@@ -2041,8 +2143,30 @@ label {
   background-color: #D9534F;
 }
 
+.availability-map-oldview-box-ignored {
+  height:12px;
+  width:12px;
+  float:left;
+  background-color: #36393D;
+}
+
 .availability-map-widget-header {
   line-height:34px;
+}
+
+.dashboard-widget-settings label {
+  line-height:34px;
+}
+
+.dashboard-graph, .dashboard-graph img {
+  height: 100%;
+  width: 100%;
+}
+
+.dashboard-image {
+  padding: 2px;
+  height: 100%;
+  width: auto;
 }
 
 .nav > li > a {
@@ -2064,11 +2188,7 @@ label {
 }
 
 .devices-search-header {
-    margin: 5px;
-}
-
-.devices-input-small {
-    line-height: 14px;
+    margin: 0 5px;
 }
 
 .devices-status-box-detail {
@@ -2090,9 +2210,9 @@ label {
     text-align: center;
 }
 
-.devices-headers-table-menu {
-    padding: 0;
+.devices-headers-table-menu > .actions {
     float: right;
+    margin-bottom: 5px;
 }
 
 .devices-overlib-box {
@@ -2103,7 +2223,6 @@ label {
     max-height: 170px;
     text-align: center;
     float: left;
-    background-color: #f5f5f5;
 }
 
 .device-table-metrics span {
@@ -2122,15 +2241,15 @@ label {
 }
 
 .device-table-icon {
-    text-align: center;
-    display: block;
-    width: 70px;
+    display: flex;
+    align-items: center;
+    width: 32px;
     height: 32px;
-    line-height: 32px;
 }
 
 .device-table-icon img {
-    width: 32px;
+  width: 32px;
+  max-height: 32px;
 }
 
 .device-icon img {
@@ -2150,26 +2269,172 @@ label {
   margin-right: 15px;
 }
 
-.severity-ok {
-  color: green;
+.alert-status {
+  display: inline-block;
+  width: 7px;
+  min-height: 27px;
+  height: 32px;
 }
 
-.severity-info {
-  color: royalblue;
+.alert-status-small {
+  display: inline-block;
+  width: 7px;
+  min-height: 16px;
+  height: 20px
 }
 
-.severity-notice {
-  color: gold;
+.device-services-page {
+  font-weight: bold;
+  margin-left: 20px;
+  vertical-align: middle;
 }
 
-.severity-warning {
-  color: darkorange;
+.device-services-page-no-service {
+  font-weight: bold;
+  vertical-align: middle;
+  padding: 15px;
 }
 
-.severity-critical {
-  color: red;
+.validation:invalid {
+    border-color: red;
 }
 
-.severity-unknown {
-  color: darkgrey;
+.eventlog-status {
+  display: inline-block;
+  margin-right: 8px;
+  float: left;
+}
+
+/* Workaround for https://github.com/select2/select2/issues/291 */
+.select2-selection--multiple .select2-search--inline .select2-search__field {
+  width: auto !important;
+}
+
+.tooltip {
+    display: block !important;
+    z-index: 10000;
+}
+
+.tooltip .tooltip-inner {
+    background: black;
+    color: white;
+    border-radius: 16px;
+    padding: 5px 10px 4px;
+}
+
+.tooltip .tooltip-arrow {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    position: absolute;
+    margin: 5px;
+    border-color: black;
+    z-index: 1;
+}
+
+.tooltip[x-placement^="top"] {
+    margin-bottom: 5px;
+}
+
+.tooltip[x-placement^="top"] .tooltip-arrow {
+    border-width: 5px 5px 0 5px;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
+    bottom: -5px;
+    left: calc(50% - 5px);
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.tooltip[x-placement^="bottom"] {
+    margin-top: 5px;
+}
+
+.tooltip[x-placement^="bottom"] .tooltip-arrow {
+    border-width: 0 5px 5px 5px;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-top-color: transparent !important;
+    top: -5px;
+    left: calc(50% - 5px);
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.tooltip[x-placement^="right"] {
+    margin-left: 5px;
+}
+
+.tooltip[x-placement^="right"] .tooltip-arrow {
+    border-width: 5px 5px 5px 0;
+    border-left-color: transparent !important;
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+    left: -5px;
+    top: calc(50% - 5px);
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.tooltip[x-placement^="left"] {
+    margin-right: 5px;
+}
+
+.tooltip[x-placement^="left"] .tooltip-arrow {
+    border-width: 5px 0 5px 5px;
+    border-top-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
+    right: -5px;
+    top: calc(50% - 5px);
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.tooltip.popover .popover-inner {
+    background: #f9f9f9;
+    color: black;
+    padding: 24px;
+    border-radius: 5px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, .1);
+}
+
+.tooltip.popover .popover-arrow {
+    border-color: #f9f9f9;
+}
+
+.tooltip[aria-hidden='true'] {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .15s, visibility .15s;
+}
+
+.tooltip[aria-hidden='false'] {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .15s;
+}
+
+#manage-device-groups-table > thead > tr > th:last-child {
+    min-width: 7%;
+}
+
+.logon-message {
+    white-space: pre-wrap;
+}
+
+.expandable {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.expandable:hover {
+    overflow: visible;
+}
+.expandable:hover span {
+    position: relative;
+    background-color: white;
+    padding: 2px 3px 2px 0;
+    z-index: 5;
 }

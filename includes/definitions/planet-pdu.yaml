@@ -1,0 +1,15 @@
+os: planet-pdu
+text: PLANET
+type: power
+icon: planet
+mib_dir: planet
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_power, text: Power }
+    - { graph: device_state, text: State }
+    - { graph: device_temperature, text: Temperature }
+
+discovery:
+    - sysObjectID_regex:
+        - '/^\.1\.3\.6\.1\.4\.1\.10456$/'

@@ -1,0 +1,52 @@
+CIENA-WS-PLATFORM-TYPEDEFS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsPlatformConfig
+        FROM CIENA-WS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaWsPlatformTypedefsMIB MODULE-IDENTITY
+    LAST-UPDATED "201808010000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "Waveserver Ai Release 1.2"
+    REVISION "201808010000Z"
+    DESCRIPTION "Added String types."
+    REVISION "201804270000Z"
+    DESCRIPTION "Created the TypeDefs MIB."
+    ::= { cienaWsPlatformConfig 13 }
+
+EnabledDisabledEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Enabled and Disabled enum toggle used in Ciena defined modules."
+    SYNTAX INTEGER { disabled(0), enabled(1) }
+
+StringMaxl16 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "16a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 16 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..16))
+
+StringMaxl32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 32 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..32))
+
+StringMaxl44 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "44a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 44 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..44))
+
+END -- End module

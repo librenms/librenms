@@ -1,0 +1,309 @@
+-- =================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: subnet vlan mib
+-- Reference:
+-- Version: V1.1
+-- History:
+--  V1.0 Initial version 2005-08-02
+--  V1.1 2013-04-23 updated by yangxiaoren
+--       Add hh3cSubnetVlanPortStatus object to support the subnet vlan status
+--       of port applied.
+-- =================================================================
+HH3C-SUBNET-VLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    RowStatus
+        FROM SNMPv2-TC;
+
+
+hh3cSubnetVlan MODULE-IDENTITY
+    LAST-UPDATED "200508021353Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB contains the objects for managing the subnet-based VLAN
+        configurations."
+    REVISION "200508021353Z"        -- August 02, 2005 at 13:53 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 61 }
+
+--
+-- Textual Conventions
+--
+
+--
+-- Node definitions
+--
+
+hh3cSubnetVlanObjects OBJECT IDENTIFIER ::= { hh3cSubnetVlan 1 }
+
+hh3cSubnetVlanScalarObjects OBJECT IDENTIFIER ::= { hh3cSubnetVlanObjects 1 }
+
+hh3cSubnetNumAllVlan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of subnets that can be configured on all VLANs."
+    ::= { hh3cSubnetVlanScalarObjects 1 }
+
+hh3cSubnetNumPerVlan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of subnets that can be configured on each VLAN."
+    ::= { hh3cSubnetVlanScalarObjects 2 }
+
+hh3cSubnetNumAllPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of subnets that can be applied to all ports."
+    ::= { hh3cSubnetVlanScalarObjects 3 }
+
+hh3cSubnetNumPerPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of subnets that can be applied to each port."
+    ::= { hh3cSubnetVlanScalarObjects 4 }
+
+hh3cSubnetVlanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSubnetVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Subnet-based VLAN configuration table."
+    ::= { hh3cSubnetVlanObjects 2 }
+
+hh3cSubnetVlanEntry OBJECT-TYPE
+    SYNTAX Hh3cSubnetVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Subnet-based VLAN configuration entry."
+    INDEX { hh3cSubnetVlanVlanId, hh3cSubnetVlanSubnetIndex }
+    ::= { hh3cSubnetVlanTable 1 }
+
+Hh3cSubnetVlanEntry ::=
+    SEQUENCE {
+        hh3cSubnetVlanVlanId
+            Integer32,
+        hh3cSubnetVlanSubnetIndex
+            Integer32,
+        hh3cSubnetVlanVlanIpAddressType
+            InetAddressType,
+        hh3cSubnetVlanIpAddressValue
+            InetAddress,
+        hh3cSubnetVlanNetMaskValue
+            InetAddress,
+        hh3cSubnetVlanRowStatus
+            RowStatus
+         }
+
+hh3cSubnetVlanVlanId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Vlan id."
+    ::= { hh3cSubnetVlanEntry 1 }
+
+hh3cSubnetVlanSubnetIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The subnet index value of a row in this table is from zero to
+         the value of hh3cSubnetNumPerVlan subtracting one."
+    ::= { hh3cSubnetVlanEntry 2 }
+
+hh3cSubnetVlanVlanIpAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "There are two kinds of ip address supported by VLAN.
+         One is IPv4, which is 32 bits.
+         The other is IPv6, which is 128 bits."
+    ::= { hh3cSubnetVlanEntry 3 }
+
+hh3cSubnetVlanIpAddressValue OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The ip address of the configured subnet on VLAN, which can be an IPv4
+        or IPv6."
+    ::= { hh3cSubnetVlanEntry 4 }
+
+hh3cSubnetVlanNetMaskValue OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The net mask of the configured subnet on VLAN, which can be an IPv4 or
+        IPv6."
+    ::= { hh3cSubnetVlanEntry 5 }
+
+hh3cSubnetVlanRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The row status of this table."
+    ::= { hh3cSubnetVlanEntry 6 }
+
+
+hh3cSubnetVlanPortCreateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSubnetVlanPortCreateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Subnet-based VLAN port table."
+    ::= { hh3cSubnetVlanObjects 3 }
+
+hh3cSubnetVlanPortCreateEntry OBJECT-TYPE
+    SYNTAX Hh3cSubnetVlanPortCreateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Subnet-based VLAN port creation entry."
+    INDEX { hh3cSubnetVlanPortCreateIndex, hh3cSubnetVlanPortCreateVlanId }
+    ::= { hh3cSubnetVlanPortCreateTable 1 }
+
+Hh3cSubnetVlanPortCreateEntry ::=
+    SEQUENCE {
+        hh3cSubnetVlanPortCreateIndex
+            Integer32,
+        hh3cSubnetVlanPortCreateVlanId
+            Integer32,
+        hh3cSubnetVlanPortInfoVlanId
+            Integer32,
+        hh3cSubnetVlanPortRowStatus
+            RowStatus,
+        hh3cSubnetVlanPortStatus
+            INTEGER
+         }
+
+hh3cSubnetVlanPortCreateIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port index."
+    ::= { hh3cSubnetVlanPortCreateEntry  1 }
+
+hh3cSubnetVlanPortCreateVlanId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The subnet-based VLAN id."
+    ::= { hh3cSubnetVlanPortCreateEntry  2 }
+
+hh3cSubnetVlanPortInfoVlanId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value is the same as the value of hh3cSubnetVlanPortCreateVlanId index.
+         All of the subnet information in this port,
+         is described on vlan, whose VLAN id is the value of hh3cSubnetVlanPortInfoVlanId.
+         The VLAN id of vlan including subnet information can be obtained here.
+         The subnet information can be obtained in the hh3cSubnetVlanTable above."
+    ::= { hh3cSubnetVlanPortCreateEntry  3 }
+
+hh3cSubnetVlanPortRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The row status of this table."
+    ::= { hh3cSubnetVlanPortCreateEntry  4 }
+
+hh3cSubnetVlanPortStatus OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+        active   (1),
+        inactive (2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The subnet VLAN status on the port.  The value is active only
+        when hh3cSubnetVlanPortCreateVlanId has the corresponding entry in
+        hh3cSubnetVlanTable, the port link type is hybrid, and the VLAN is
+        allowed by the port.
+
+        active:   subnet VLAN has been applied on the port.
+        inactive: subnet VLAN is not applied on the port."
+    ::= { hh3cSubnetVlanPortCreateEntry  5 }
+hh3cSubnetVlanConformance OBJECT IDENTIFIER ::= { hh3cSubnetVlan 2 }
+
+
+hh3cSubnetVlanCompliances OBJECT IDENTIFIER ::= { hh3cSubnetVlanConformance 1 }
+
+
+hh3cSubnetVlanCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for subnet VLAN MIB."
+    MODULE -- this module
+        MANDATORY-GROUPS {
+                   hh3cSubnetVlanScalarObjectGroup,
+                   hh3cSubnetVlanSubnetGroup,
+                   hh3cSubnetVlanPortCreateGroup }
+    ::= { hh3cSubnetVlanCompliances 1 }
+
+
+hh3cSubnetVlanGroups OBJECT IDENTIFIER ::= { hh3cSubnetVlanConformance 2 }
+
+hh3cSubnetVlanScalarObjectGroup OBJECT-GROUP
+    OBJECTS { hh3cSubnetNumAllVlan,
+          hh3cSubnetNumPerVlan,
+          hh3cSubnetNumAllPort,
+          hh3cSubnetNumPerPort }
+    STATUS current
+    DESCRIPTION
+        "A group of scalar objects describing the maximum number."
+    ::= { hh3cSubnetVlanGroups 1 }
+
+hh3cSubnetVlanSubnetGroup OBJECT-GROUP
+    OBJECTS { hh3cSubnetVlanVlanIpAddressType,
+          hh3cSubnetVlanIpAddressValue,
+          hh3cSubnetVlanNetMaskValue,
+          hh3cSubnetVlanRowStatus }
+    STATUS current
+    DESCRIPTION
+        "A group of subnet VLAN subnets."
+    ::= { hh3cSubnetVlanGroups 2 }
+
+hh3cSubnetVlanPortCreateGroup OBJECT-GROUP
+    OBJECTS { hh3cSubnetVlanPortInfoVlanId,
+          hh3cSubnetVlanPortRowStatus }
+    STATUS current
+    DESCRIPTION
+        "A group of subnet VLAN port creation table."
+    ::= { hh3cSubnetVlanGroups 3 }
+
+END

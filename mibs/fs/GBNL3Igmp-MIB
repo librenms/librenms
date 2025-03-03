@@ -1,0 +1,527 @@
+    GBNL3Igmp-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter64,IpAddress         FROM SNMPv2-SMI
+        
+        DisplayString, TruthValue,MacAddress,RowStatus    FROM SNMPv2-TC  
+
+        PortList                                FROM Q-BRIDGE-MIB
+              
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL3                                   FROM ADMIN-MASTER-MIB
+        
+        mib-2                                   FROM RFC1213-MIB;
+    
+        
+    gbnL3IgmpMib MODULE-IDENTITY
+        LAST-UPDATED    "0411190001Z"  -- November 19,2004  
+        ORGANIZATION    "Admin Co. Ltd, Inc."
+        CONTACT-INFO    "Admin Co. Ltd, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "GBN Enterprise MIB definition."
+
+        REVISION        "0411190001Z"  -- November 19,2004  
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL3 7 }
+        
+PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING                
+
+   gbnL3IgmpProxyGroup        OBJECT IDENTIFIER ::= { gbnL3IgmpMib 1 }   
+    
+   
+    igmpProxyEnable OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The enabled status of igmp proxy on this switch."
+           --在交换机上打开igmp代理的使能状态          
+      ::= { gbnL3IgmpProxyGroup 1 }      
+      
+    igmpProxyIfIndex OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The interface from which all IP multicast datagrams are received, 
+            or 0 if the upstream interface is not configged."   
+            --上行接口索引，IGMP打开代理功能后，作为一个主机向此
+            --接口发送报告和离开报文。
+      ::= { gbnL3IgmpProxyGroup 2 }        
+      
+    igmpGrpNum OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The summation of group which is learned from IGMP and 
+            configged statically."   
+            --通过IGMP学习和静态配置的多播组数
+      ::= { gbnL3IgmpProxyGroup 3 }  
+      
+    igmpGrpMembNum OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The summation of group member which is learned from IGMP
+            and configged statically."   
+            --通过IGMP学习和静态配置的多播成员数
+      ::= { gbnL3IgmpProxyGroup 4 } 
+
+--  IGMP interface extend MIB 
+
+    igmpIfExTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF IgmpIfExEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "IGMP interface extend information including the configured  access control 
+           list and querier timeout."    
+           --IGMP的访问控制列表定义和查询者生存时间等
+       ::= { gbnL3IgmpMib 2 }
+
+    igmpIfExEntry OBJECT-TYPE
+        SYNTAX   IgmpIfExEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing the configured ACL and querier timeout ." 
+           --访问控制列表信息
+       INDEX { igmpifIndex }
+       ::= { igmpIfExTable 1 }
+
+    IgmpIfExEntry ::=
+	    SEQUENCE {
+		        igmpifIndex     	Integer32,
+		        igmpIfPortList  	PortList,
+		        igmpifAccessNum		Integer32,
+		        igmpifQuerierExpire  	Integer32,
+		        igmpifV2QuerierTimer	TimeTicks,
+		        igmpifLimiGroupNum	Integer32,
+		        igmpifSSMMappingEnable 	TruthValue
+	              }
+
+    igmpifIndex OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "the index of the interface receiving IGMP packets."       
+           --接收IGMP报文的接口索引
+      ::= { igmpIfExEntry 1 }     
+      
+    igmpIfPortList OBJECT-TYPE
+        SYNTAX   PortList
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "the ports filter IGMP packets in this interface."   
+           --过滤IGMP报文的端口列表
+      ::= { igmpIfExEntry 2 }
+      
+    igmpifAccessNum OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "the number of the access control list used to filter IGMP packet"  
+           --用于过滤IGMP报文的访问控制列表号
+      ::= { igmpIfExEntry 3 }  
+      
+     igmpifQuerierExpire OBJECT-TYPE    
+        SYNTAX   Integer32 
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The amount of time elapsed before the Other Querier
+            Present Timer expires"  
+           --查询者超时时间，当其他查询者存在时必须要等一段时间，在这段时间内
+           --没有收到其他查询者的查询报文后，本地才能成为查询者。
+      ::= { igmpIfExEntry 4 }
+
+    igmpifV2QuerierTimer OBJECT-TYPE    
+        SYNTAX   TimeTicks 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "The time remaining until the host assumes that there are no
+            IGMPv2 routers present on the interface.  While this is non-
+            zero and igmpInterfaceV1QuerierTimer is zero, the host will 
+            reply to all queries with version 2 membership reports." 
+           --v2版本查询者超时定时器。当该值不为0，且v1版本查询者超时定时
+           --器为0时，将定时发送v2的查询报文。
+      ::= { igmpIfExEntry 5 } 
+
+    igmpifLimiGroupNum OBJECT-TYPE    
+        SYNTAX   Integer32 
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "the limit count of group for the interface" 
+           --限制接口加入的多播组个数。默认值为产品所支持的最大多播组个数，如S3526为255，S3750为1024          
+      ::= { igmpIfExEntry 6 }
+      
+    igmpifSSMMappingEnable OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The enabled status of igmp ssm-mapping on this interface."
+           --在接口上打开igmp ssm映射的使能状态          
+	::= { igmpIfExEntry 7 }   
+      
+
+    igmpGroupVlanTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF IgmpGroupVlanEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           " the list information of static group and ingress vlan."    
+           --静态多播组和入vlan信息表
+       	::= { gbnL3IgmpMib 3 }
+  	
+    igmpGroupVlanEntry OBJECT-TYPE
+	SYNTAX IgmpGroupVlanEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		" entry of information about static group and ingress vlan"
+		--静态多播组和入vlan表项
+	INDEX { igmpGroupIP, igmpVlanID }
+	::= { igmpGroupVlanTable 1 }
+				
+    IgmpGroupVlanEntry ::= SEQUENCE {
+    			igmpGroupIP          IpAddress,
+			igmpVlanID 	     Integer32,
+			igmpGroupVlanStatus  RowStatus
+		}
+						  	      	        	    
+    igmpGroupIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+			" the static multicast group ip "
+			--静态多播组
+	::= { igmpGroupVlanEntry 1 }      
+    igmpVlanID OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+			"the specific ingress vlan"
+			--指定入vlan
+	::= { igmpGroupVlanEntry 2 }
+    igmpGroupVlanStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+			"The status of this entry."
+			--表项状态
+	::= { igmpGroupVlanEntry 3 }	
+              
+      
+--  igmpCacheExTable extend MIB
+--  igmp多播组表扩展.added by xzy (2006-8-2 for igmpv3)
+
+    FilterMode ::= INTEGER {
+    	include(1),
+    	exclude(2)
+    }
+
+    igmpCacheExTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF IgmpCacheExEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "IGMP cache extend information including the configured filter mode and source list."    
+           --IGMP的组过滤模式和源地址列表等
+       ::= { gbnL3IgmpMib 4 }
+
+       
+    igmpCacheExEntry OBJECT-TYPE
+        SYNTAX   IgmpCacheExEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing the configured filter mode and source list." 
+           --组过滤模式和源地址列表信息
+       INDEX      { igmpCacheAddressEx, igmpCacheIfIdxEx }
+       ::= { igmpCacheExTable 1 } 
+       
+    IgmpCacheExEntry ::= SEQUENCE {
+        igmpCacheAddressEx          IpAddress,
+        igmpCacheIfIdxEx            Integer32,
+    	igmpCacheVersion2HostTimer  TimeTicks,
+    	igmpCacheFilterMode         FilterMode,
+    	igmpCacheStatic             TruthValue     
+    }
+      
+
+         
+    igmpCacheAddressEx OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+	        "The IP multicast group address for which this entry
+	        contains information."
+	        --多播组地址
+	::= { igmpCacheExEntry 1 }
+	 
+    igmpCacheIfIdxEx OBJECT-TYPE
+	    	SYNTAX     Integer32
+	    	MAX-ACCESS not-accessible
+	    	STATUS     current
+	    	DESCRIPTION
+            	"The interface for which this entry contains information for
+            	an IP multicast group address."
+            	--接口索引
+	::= { igmpCacheExEntry 2 }
+
+    igmpCacheVersion2HostTimer OBJECT-TYPE
+    	SYNTAX     TimeTicks
+    	MAX-ACCESS read-only
+    	STATUS     current
+    	DESCRIPTION
+	    	"The time remaining until the local router will assume that
+	    	there are no longer any IGMP version 2 members on the IP
+	    	subnet attached to this interface.  Upon hearing any IGMPv2
+	    	Membership Report, this value is reset to the group
+	    	membership timer."
+	    	--v2主机存在时间定时器
+	::= { igmpCacheExEntry 3 }
+
+    igmpCacheFilterMode OBJECT-TYPE
+    	SYNTAX     FilterMode
+    	MAX-ACCESS read-only
+    	STATUS     current
+    	DESCRIPTION
+            "The Filter Mode for the IP multicast group address."
+            --组的过滤模式
+	::= { igmpCacheExEntry 4 }
+	
+    igmpCacheStatic OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "An indication of whether the cache is a static member of
+            this group address on this interface."
+        DEFVAL     { true }
+        ::= { igmpCacheExEntry 5 }	
+	
+
+    igmpSrcInfoTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF IgmpSrcInfoEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           " the list information of specific source ip addres."    
+           --源地址列表信息
+       	::= { gbnL3IgmpMib 5 }
+  	
+    igmpSrcInfoEntry OBJECT-TYPE
+	SYNTAX IgmpSrcInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+			" entry of information about specific source"
+			--指定源地址表项
+	INDEX { igmpCacheAddressEx, igmpCacheIfIdxEx, igmpSrcAddress }
+	::= { igmpSrcInfoTable 1 }
+				
+    IgmpSrcInfoEntry ::= SEQUENCE {
+			igmpSrcAddress 	            IpAddress,
+			igmpSrcTimer                TimeTicks,
+			igmpSrcInfoStatus           RowStatus
+		}				  	      	        	    
+    
+    igmpSrcAddress OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+			"the specific source address"
+			--指定源地址
+	::= { igmpSrcInfoEntry 1 }
+	
+    igmpSrcTimer OBJECT-TYPE
+	SYNTAX TimeTicks
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+			" the timer of the specific source address"
+			--指定源定时器
+	::= { igmpSrcInfoEntry 2 } 
+
+    igmpSrcInfoStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+			"The status of this entry."
+			--表项状态
+	::= { igmpSrcInfoEntry 3 } 	
+	
+
+--- IGMP MFIB extend MIB. added by x0084(2007-11-27)
+    IgmpProxyState ::= INTEGER {
+    	nonMember(0),
+    	delayingMember(1),
+    	idleMember(2)
+    }
+    	
+    igmpMFIBTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF IgmpMFIBEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           " the Multicast Forward Information Base."    
+       	::= { gbnL3IgmpMib 6 }
+  	
+    igmpMFIBEntry OBJECT-TYPE
+	SYNTAX IgmpMFIBEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+			" entry of information about MFIB"
+			--指定源地址表项
+	INDEX { igmpGrpAddress }
+	::= { igmpMFIBTable 1 }
+
+			
+    IgmpMFIBEntry ::= SEQUENCE {
+			igmpGrpAddress 	            IpAddress,
+			igmpGrpMembIdx              Integer32,
+			igmpProxyState              IgmpProxyState,
+			igmpGrpMembCount            Integer32
+		}				  	      	        	    
+    
+    igmpGrpAddress OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+			"the IP address of multicast group"
+			--组地址
+	::= { igmpMFIBEntry 1 }
+	
+    igmpGrpMembIdx OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+			"the first group member's index "
+			--用户侧第一个多播接口成员索引
+	::= { igmpMFIBEntry 2 } 
+
+    igmpProxyState OBJECT-TYPE
+	SYNTAX IgmpProxyState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+			"The status of Igmp-proxy."
+			--多播组proxy状态
+	::= { igmpMFIBEntry 3 }
+		  
+    igmpGrpMembCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+			"The count of this multicast group's member."
+			--加入此多播组的端口数
+	::= { igmpMFIBEntry 4 }	      
+	
+--  IGMP SSM-Mapping information
+    igmpSSMMappingTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF IgmpSSMMappingEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           " Group Range information of SSM-Mapping "
+       	::= { gbnL3IgmpMib 7 }
+
+    igmpSSMMappingEntry OBJECT-TYPE
+        SYNTAX   IgmpSSMMappingEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           " An entry (conceptual row) in the igmpSSMMappingTable. "
+       	INDEX { igmpSSMMappingGrp, igmpSSMMappingGrpPrefixLen, igmpSSMMappingACL, igmpSSMMappingSrc }
+       	::= { igmpSSMMappingTable 1 }
+
+    IgmpSSMMappingEntry ::= SEQUENCE {
+	        	igmpSSMMappingGrp        		Integer32,
+	        	igmpSSMMappingGrpPrefixLen   		Integer32, 
+			igmpSSMMappingACL             		Integer32,
+            		igmpSSMMappingSrc              		Integer32,
+			igmpSSMMappingStatus            	RowStatus
+	              }
+
+    igmpSSMMappingGrp OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Group Address of the SSM-Mapping Entry"   
+           --SSM-Mapping表项的组IP地址
+	::= { igmpSSMMappingEntry 1 }
+
+    igmpSSMMappingGrpPrefixLen OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Group Address Prefix Length of the SSM-Mapping Entry"   
+           --SSM-Mapping表项的组IP地址前缀长度
+	::= { igmpSSMMappingEntry 2 }
+
+    igmpSSMMappingACL OBJECT-TYPE
+       SYNTAX     Integer32(1..99)
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "ACL of SSM-Mapping Entry"
+		--SSM-Mapping的访问控制列表号。标准访问控制列表1~99
+	::= { igmpSSMMappingEntry 3}
+	
+    igmpSSMMappingSrc OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Source Address of the SSM-Mapping Entry"   
+           --SSM-Mapping表项的源IP地址
+	::= { igmpSSMMappingEntry 4 }	
+
+    igmpSSMMappingStatus  OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+			"The status of this entry."
+			--表项状态
+	::= { igmpSSMMappingEntry 5 }
+
+  END

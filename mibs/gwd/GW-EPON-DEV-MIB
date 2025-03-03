@@ -1,0 +1,601 @@
+GW-EPON-DEV-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		devices
+			FROM GWTT-SMI
+		TruthValue, DateAndTime, RowStatus, DisplayString
+			FROM SNMPv2-TC
+		DisplayString
+			FROM RFC1213-MIB	
+		gwDevTrapGroup, deviceIndex,EponDeviceType
+			FROM GW-EPON-MIB 		
+		MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, NOTIFICATION-TYPE 
+			FROM SNMPv2-SMI;
+          		
+	eponDevManMIB	MODULE-IDENTITY
+		LAST-UPDATED	"200804090000Z"
+		ORGANIZATION	"Organization"
+		CONTACT-INFO	"Contact-info"
+		DESCRIPTION		"Description"
+		REVISION		"200602141321Z"
+		DESCRIPTION		""
+		::=  {  devices  15  }
+
+	eponDevManMIBObjects	OBJECT IDENTIFIER
+		::=  {  eponDevManMIB  1  }	
+		
+	updateONUGroup	OBJECT IDENTIFIER
+		::=  {  eponDevManMIBObjects  1  }
+
+--	cfgdataSaveGroup	OBJECT IDENTIFIER
+--		::=  {  eponDevManMIBObjects  2  }
+
+	logEventGroup	OBJECT IDENTIFIER
+		::=  {  eponDevManMIBObjects  3  }
+	
+	fanAlarmInfoGroup	OBJECT IDENTIFIER
+		::=  {  eponDevManMIBObjects  4  }
+			
+	powerInfoGroup	OBJECT IDENTIFIER 
+		::= { eponDevManMIBObjects 5 }	
+
+	temperatureInfoGroup  OBJECT IDENTIFIER
+		::= { eponDevManMIBObjects 6 }
+	onuAlarmMaskGroup  OBJECT IDENTIFIER
+		::= { eponDevManMIBObjects 7 }		
+		
+--  update ONU  mib definitions
+
+	onuUpdateTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  OnuUpdateEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table of information about updating onu."
+		::=  { updateONUGroup  1 }
+		
+	onuUpdateEntry	OBJECT-TYPE
+		SYNTAX		OnuUpdateEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table, containing onu update configure information ."
+		INDEX		{  deviceIndex  }
+		::=  { onuUpdateTable 1 }
+		
+	OnuUpdateEntry  ::=  SEQUENCE {
+		updateONUEnable  INTEGER,
+		updateCtrlFlag  INTEGER
+		}	
+					
+	updateONUEnable	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This value of the object  indicates whether enable update ONU's software or firmware"
+		::=  {  onuUpdateEntry  1  }
+
+	updateCtrlFlag	OBJECT-TYPE	
+		SYNTAX			INTEGER  { noop ( 1 ) , update ( 2 ) , inProcess ( 3 ) , forbidden ( 4 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The value is a representation of progress for updating."
+		::=  {  onuUpdateEntry  2  }	
+
+-- log event -------------------------------------------------
+
+	logEventTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  LogEventEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table of logged events"
+		::=  { logEventGroup  1 }
+
+	logEventEntry	OBJECT-TYPE
+		SYNTAX		LogEventEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the table, containing logged event ."
+		INDEX		{  logEventIndex  }
+		::=  { logEventTable 1 }
+
+	LogEventEntry  ::=  SEQUENCE {
+		logEventIndex  Integer32,
+		logEventTime  DateAndTime,
+		logEventDesc  DisplayString
+		}
+
+	logEventIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32	--Integer32  ( 1 .. 65536  ) 
+		MAX-ACCESS	read-only
+		STATUS			current
+		DESCRIPTION		"The vlaue of index of logged event ."
+		::=  {  logEventEntry  1  }
+
+	logEventTime	OBJECT-TYPE	
+		SYNTAX			DateAndTime
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"date and time when log event occure."
+		::=  {  logEventEntry  2  }
+
+
+	logEventDesc	OBJECT-TYPE	
+		SYNTAX			DisplayString( SIZE(1..64) )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Description of the event."
+		::=  {  logEventEntry  3  }
+		
+    alarmSynTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AlarmSynEntry
+        ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The Table of Alarm Synchronization info."
+        ::= { logEventGroup 2 }
+
+    alarmSynEntry  OBJECT-TYPE
+        SYNTAX  AlarmSynEntry
+        ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Table Entry"
+        INDEX { alarmSynIndex }
+        ::= { alarmSynTable 1 }
+
+    AlarmSynEntry ::= SEQUENCE {
+        alarmSynIndex  	INTEGER,
+        alarmSynTime   	DateAndTime,
+        alarmSynData   	OCTET STRING,
+        alarmSynFlag		INTEGER,
+        alarmSynClearTime	DateAndTime
+    }
+
+    alarmSynIndex  OBJECT-TYPE
+        SYNTAX  INTEGER (1..500) 
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Alarm Synchronization Information Index."
+        ::= { alarmSynEntry 1 }
+
+    alarmSynTime  OBJECT-TYPE
+        SYNTAX  DateAndTime
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The time when an alarm occured."
+        ::= { alarmSynEntry 2 }
+
+   alarmSynData  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (255))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Alarm Trap PDU."
+        ::= { alarmSynEntry 3 }
+
+   alarmSynFlag  OBJECT-TYPE
+        SYNTAX  INTEGER { alarm(1), clear(2) }
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The value of this object indicates whether the alarm
+             has been cleared or not."
+        ::= { alarmSynEntry 4 }
+
+    alarmSynClearTime  OBJECT-TYPE
+        SYNTAX  DateAndTime
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The time when an alarm is cleared."
+        ::= { alarmSynEntry 5 }
+		
+    alarmSynEnable  OBJECT-TYPE
+        SYNTAX  INTEGER { enable(1), disable(2) }
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Alarm Synchronization Enable. If the value of this
+             object is 'disable(2)', all the history alarm will
+             be clear."
+        DEFVAL { enable }
+        ::= { logEventGroup 3 }				
+		
+	logEventEnable	OBJECT-TYPE	
+		SYNTAX			INTEGER   { enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The value of this object indicates whether enable log event."
+		::=  {  logEventGroup  4  }
+
+	lastLogEventIndex	OBJECT-TYPE	
+		SYNTAX			Unsigned32	--Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The vlaue of this object indicates the index of event logged last time."
+		::=  {  logEventGroup  5 }		
+		
+		
+-- fanAlarmInfoGroup-------------------------
+
+	devFanAlarmTable		OBJECT-TYPE 
+		SYNTAX 		SEQUENCE OF DevFanAlarmEntry
+		MAX-ACCESS 	not-accessible 
+		STATUS 		current 
+		DESCRIPTION 	"table of fans alarm information"	         	         
+		::=	{ fanAlarmInfoGroup 1 }
+		
+	devFanAlarmEntry	OBJECT-TYPE 
+		SYNTAX 		DevFanAlarmEntry
+		MAX-ACCESS 	not-accessible 
+		STATUS 		current 
+		DESCRIPTION 	"An entry in the table, containing status information"	         	         
+		INDEX 		{ devFanDeviceIndex , devFanIndex }
+		::=	{ devFanAlarmTable 1 }
+		
+	DevFanAlarmEntry ::= SEQUENCE {
+		devFanDeviceIndex    INTEGER,
+		devFanIndex 		INTEGER ,
+		devFanAlarmStatus	INTEGER ,
+		devFanSpyEnable     INTEGER,
+		devFanRev		INTEGER
+	}
+
+	devFanDeviceIndex   OBJECT-TYPE 
+		SYNTAX 	INTEGER
+		MAX-ACCESS            read-only 
+	        STATUS                       current 	
+		DESCRIPTION           "index of device"
+	       ::={  devFanAlarmEntry  1  }	
+		
+	devFanIndex	OBJECT-TYPE 
+		SYNTAX 	INTEGER
+		MAX-ACCESS            read-only 
+	        STATUS                       current 	
+		DESCRIPTION           "index of the fan that the 'devFanDeviceIndex' indicated"
+	       ::={  devFanAlarmEntry  2  }	
+	       
+	devFanAlarmStatus        OBJECT-TYPE 
+	       SYNTAX                   TruthValue {  ALARM(1), CLEAR(5)  }         
+	       MAX-ACCESS            read-only 
+	       STATUS                       current 
+	       DESCRIPTION           "alarm status for fan"
+	       ::={  devFanAlarmEntry  3  }
+
+	devFanSpyEnable   OBJECT-TYPE 
+		SYNTAX   INTEGER {enable(1),disable(2),notSupport(3)}
+		MAX-ACCESS   read-write
+		STATUS  current
+		DESCRIPTION   "fan spy enable"
+		::={  devFanAlarmEntry  4  }
+
+	devFanRev		OBJECT-TYPE 
+		SYNTAX   INTEGER 
+		MAX-ACCESS   read-only
+		STATUS  current
+		DESCRIPTION   "the fan speed"
+		::={  devFanAlarmEntry  5  }
+
+
+
+	devFanNumber	OBJECT-TYPE 
+		SYNTAX 	Integer32
+		MAX-ACCESS   read-only
+	    STATUS       current 	
+		DESCRIPTION  ""
+	       ::={  fanAlarmInfoGroup  2  }	
+	devFanAutoTurnOnThresholds	OBJECT-TYPE 
+		SYNTAX 	Integer32
+		MAX-ACCESS   read-write
+	    STATUS       current 	
+		DESCRIPTION  ""
+	       ::={  fanAlarmInfoGroup  3  }	
+	devFanAutoTurnOffThresholds	OBJECT-TYPE 
+		SYNTAX 	Integer32
+		MAX-ACCESS   read-write
+	    STATUS       current 	
+		DESCRIPTION  ""
+	       ::={  fanAlarmInfoGroup  4  }	
+	devFanRevThresholds  OBJECT-TYPE 
+		SYNTAX		Integer32
+		MAX-ACCESS	read-write
+		STATUS 	current
+		DESCRIPTION	"the speed of fan,default value 1000/minute"
+		::={	fanAlarmInfoGroup 5}
+
+
+--  power information--------------------------
+	powerInfoTable		OBJECT-TYPE 
+		SYNTAX 			SEQUENCE OF PowerInfoEntry
+		MAX-ACCESS 		not-accessible 
+		STATUS 			current 
+		DESCRIPTION 	"table of power information"	       	           	              	       
+		::={ powerInfoGroup 1 }
+		
+	powerInfoEntry		OBJECT-TYPE 
+		SYNTAX 			PowerInfoEntry
+		MAX-ACCESS 		not-accessible 
+		STATUS 			current 
+		DESCRIPTION 	"An entry in the table,containing status about power information"	       	           	              	       
+		INDEX			{ powerIndex }
+		::={ powerInfoTable 1 }
+		
+	PowerInfoEntry ::= SEQUENCE {
+		powerIndex			INTEGER ,
+		powerRunStatus		INTEGER  ,
+		powerTemperature	INTEGER,
+		powerLastChangeTime	TimeTicks,
+		powerTMPRisingThreshold	Integer32 ,
+		powerTMPFallingThreshold	Integer32,
+		powerModuleType     INTEGER,
+		powerVoltage        INTEGER,
+		powerCurrent        INTEGER,
+		PowerVOLTHighThreshold    INTEGER,
+		PowerVOLTLowThreshold     INTEGER, 
+		PowerAlarmInfo       INTEGER,
+		PowerAlarmID        INTEGER,
+		PowerClearAlarmID    INTEGER
+	}
+	
+	powerIndex     OBJECT-TYPE 
+		SYNTAX          INTEGER
+	    MAX-ACCESS      read-only  
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates the index of power"
+	    ::={  powerInfoEntry   1  }	
+	
+	powerRunStatus     OBJECT-TYPE 
+	       SYNTAX            INTEGER { empty(1),powerOff(2), powerOn(3) }
+	       MAX-ACCESS        read-only  
+	       STATUS            current 
+	       DESCRIPTION       "The value of this object indicates power status"
+	       ::={powerInfoEntry 2 }
+	       
+	powerTemperature     OBJECT-TYPE 
+		SYNTAX          INTEGER( 1..100 )
+	    MAX-ACCESS      read-only  
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates the temperature of power"
+	    ::={  powerInfoEntry   3  }		    
+	    
+	powerLastChangeTime     OBJECT-TYPE 
+		SYNTAX          TimeTicks
+	    MAX-ACCESS      read-only  
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates time at which powers's satus changed"
+	    ::={  powerInfoEntry   4  }		
+	    
+	powerTMPRisingThreshold     OBJECT-TYPE 
+		SYNTAX          Integer32 
+	    MAX-ACCESS      read-write  
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates rising threashold of the temperatur of a power"
+	    ::={  powerInfoEntry   5  }	
+	    
+	powerTMPFallingThreshold     OBJECT-TYPE 
+		SYNTAX          Integer32 
+	    MAX-ACCESS      read-write   
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates falling threashold of the temperatur of a power"
+	    ::={  powerInfoEntry   6  }	
+
+	powerModuleType     OBJECT-TYPE 
+		SYNTAX          INTEGER  { AC220V(1), DC48V(2)} 
+	    MAX-ACCESS      read-only   
+	    STATUS          current 
+	    DESCRIPTION     "The value of the object indicates power module type"
+	    ::={  powerInfoEntry   7  }	
+
+	powerVoltage     OBJECT-TYPE 
+		SYNTAX          INTEGER 
+	    MAX-ACCESS      read-only   
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates the voltage of a power"
+	    ::={  powerInfoEntry   8  }	
+
+
+	powerCurrent     OBJECT-TYPE 
+		SYNTAX          INTEGER 
+	    MAX-ACCESS      read-only   
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates the current of a power"
+	    ::={  powerInfoEntry   9  }	
+
+
+	powerVOLTHighThreshold     OBJECT-TYPE 
+		SYNTAX          INTEGER 
+	    MAX-ACCESS      read-only   
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates high threashold of the voltage of a power"
+	    ::={  powerInfoEntry   10  }	
+
+	powerVOLTLowThreshold     OBJECT-TYPE 
+		SYNTAX          INTEGER 
+	    MAX-ACCESS      read-only   
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates low threashold of the voltage of a power"
+	    ::={  powerInfoEntry   11  }
+	    
+	powerAlarmInfo     OBJECT-TYPE 
+		SYNTAX          INTEGER 
+	    MAX-ACCESS      read-only   
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates the alarminfo of a power
+		
+						 AlarmID                AlarmInfo
+						 
+						0x00000000				null
+						0x00000001			input_volt_abnoarmal
+						0x00000002			pwu_stat_abnoarmal
+						0x00000004			pwu_fan_abnoarmal
+						0x00000008			cur_limit_abnoarmal
+						0x00000010			ac_volt_abnoarmal
+						0x00000020			high_volt_abnoarmal
+						0x00000040			out_cur_abnoarmal
+						0x00000080			low_line_abnoarmal
+						0x00000100			pwu_reg_abnoarmal
+						0x00000200			dc_volt_abnoarmal
+						0x00000400			power_off_abnoarmal
+						0x00000800			temp_high_abnoarmal
+						
+						"
+	    ::={  powerInfoEntry   12  }
+	
+		
+	powerAlarmID     OBJECT-TYPE 
+		SYNTAX          INTEGER 
+	    MAX-ACCESS      read-only   
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates the alarmid of a power	"
+	    ::={  powerInfoEntry   13  }
+
+	powerClearAlarmID     OBJECT-TYPE 
+		SYNTAX          INTEGER 
+	    MAX-ACCESS      read-only   
+	    STATUS          current 
+	    DESCRIPTION     "The value indicates the clearalarmid of a power"
+	    ::={  powerInfoEntry   14  }		
+		
+
+--------------------------          trap       ---------------------------------------------
+
+	devFanAlarm	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, devFanIndex }
+		STATUS			current
+		DESCRIPTION		"fan alarm"
+		::=  {  gwDevTrapGroup 28  }
+
+	devFanAlarmClear	NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex, devFanIndex }
+		STATUS			current
+		DESCRIPTION		"fan alarm clear"
+		::=  {  gwDevTrapGroup  29  }
+
+	deviceTemperatureHigh  NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"device temperature high alarm"
+		::=  {  gwDevTrapGroup  124  }
+
+	deviceTemperatureHighClear  NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"device temperature high alarm clear"
+		::=  {  gwDevTrapGroup  125  }
+
+	deviceTemperatureLow   NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"device temperature low alarm"
+		::=  {  gwDevTrapGroup  126  }
+
+	deviceTemperatureLowClear NOTIFICATION-TYPE
+		OBJECTS			{ deviceIndex }
+		STATUS			current
+		DESCRIPTION		"device temperature low alarm clear"
+		::=  {  gwDevTrapGroup  127  }
+
+
+-------temperature information--------------------------------------------------------------
+	temperatureInfoTable  OBJECT-TYPE 
+		SYNTAX 		SEQUENCE OF TemperatureInfoEntry
+		MAX-ACCESS 	not-accessible 
+		STATUS 		current 
+		DESCRIPTION 	"table of temperature information"	         	         
+		::=	{ temperatureInfoGroup 1 }
+
+	temperatureInfoEntry		OBJECT-TYPE 
+		SYNTAX 			TemperatureInfoEntry
+		MAX-ACCESS 		not-accessible 
+		STATUS 			current 
+		DESCRIPTION 	"An entry in the table,containing status about temperature information"	       	           	              	       
+		INDEX			{temperatureDeviceIndex}
+		::={ temperatureInfoTable 1 }
+
+	TemperatureInfoEntry ::= SEQUENCE {
+		temperatureDeviceIndex	INTEGER,
+		devTemperature		INTEGER  ,
+		devTemperatureHighThresholds 	Integer32 ,
+		devTemperatureLowThreshold		Integer32,
+		devTemperatureSpyEnable           INTEGER
+	}
+
+
+	temperatureDeviceIndex OBJECT-TYPE
+		SYNTAX    INTEGER
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION  "The value indicates the device temperature"
+		::={temperatureInfoEntry  1}
+	
+	devTemperature  OBJECT-TYPE
+		SYNTAX    INTEGER
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION  "The value indicates the device temperature"
+		::={temperatureInfoEntry  2}
+
+	devTemperatureHighThresholes  OBJECT-TYPE
+		SYNTAX    Integer32 
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION  "The value indicates the device temperature high "
+		::={temperatureInfoEntry  3}
+
+	devTemperatureLowThresholes  OBJECT-TYPE
+		SYNTAX   Integer32
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION  "The value indicates the device temperature low "
+		::={temperatureInfoEntry  4}
+
+	devTemperatureSpyEnable   OBJECT-TYPE
+		SYNTAX    INTEGER  { enable(1), disable(2), notSupport(3)}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION  "The value indicates the device temperature spy enable"
+		::={temperatureInfoEntry  5}
+	------------- onuAlarmMaskGroup  ---------------------------------------------------
+	onuAlarmMaskTable  OBJECT-TYPE 
+		SYNTAX 		SEQUENCE OF OnuAlarmMaskEntry
+		MAX-ACCESS 	not-accessible 
+		STATUS 		current 
+		DESCRIPTION 	"table of onu alarm mask information"	         	         
+		::=	{ onuAlarmMaskGroup  1 }
+
+	onuAlarmMaskEntry		OBJECT-TYPE 
+		SYNTAX 			OnuAlarmMaskEntry
+		MAX-ACCESS 		not-accessible 
+		STATUS 			current 
+		DESCRIPTION 	"An entry in the table,containing status about onu alarm mask information"	       	           	              	       
+		INDEX			{onutypeIndex}
+		::={ onuAlarmMaskTable  1 }
+
+	OnuAlarmMaskEntry::= SEQUENCE {
+		onutypeIndex	EponDeviceType,
+		onualarmMask	BITS  ,
+		onualarmMaskrowstatus 	RowStatus 
+		}
+
+	onutypeIndex OBJECT-TYPE
+		SYNTAX    EponDeviceType
+		MAX-ACCESS   read-only
+		STATUS   current
+		DESCRIPTION  "onu type vlaue"
+		::={onuAlarmMaskEntry  1}
+
+	onualarmMask OBJECT-TYPE
+		SYNTAX    BITS{power(0),fan(1),cpu(2),temperature(3),register(4),present(5),ethlink(6),ethfer(7),ethflr(8),ethti(9),ethloop(10),ponber(11),ponfer(12),ponabnormal(13),ponaps(14),ponlink(15),onuLaserAlwayOn(16),onuOpticalPowerLow(17),onuOpticalPowerHigh(18)}
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION  "onu alarm mask type"
+		::={onuAlarmMaskEntry  2}
+	
+	onualarmMaskrowstatus  OBJECT-TYPE
+		SYNTAX    RowStatus 
+		MAX-ACCESS   read-write
+		STATUS   current
+		DESCRIPTION  "onu alarm mask table  row status"
+		::={onuAlarmMaskEntry  3}		           	       	   
+		           	       	   
+END

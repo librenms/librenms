@@ -1,0 +1,52 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-TREE-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+    siaeMicroelettronicaSpa MODULE-IDENTITY
+        LAST-UPDATED "201406230000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "SIAE MIB tree root
+            "
+        REVISION "201406230000Z"
+        DESCRIPTION 
+            "Changed the module name from smTreeMib to siaeMicroelettronicaSpa
+             Renoved the definition of siaeMicroelettronicaSpa object identifier
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { enterprises 3373 }
+
+--------------------------------------------------------------------------------
+--  object identifiers inside the module
+--------------------------------------------------------------------------------
+
+siaeMib  OBJECT IDENTIFIER ::= { siaeMicroelettronicaSpa  1103 }
+
+END
+

@@ -1,0 +1,135 @@
+-- ============================================================================
+-- AT-G8032v2-MIB, Allied Telesis enterprise MIB: Ethernet Ring Protection Switching
+--
+-- Copyright (c) 2017 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-G8032v2-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules, DisplayStringUnsized
+                FROM AT-SMI-MIB
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION, TruthValue
+                FROM SNMPv2-TC;
+
+
+        atG8032v2 MODULE-IDENTITY
+            LAST-UPDATED "201702060000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "G.8032v2 Ethernet Ring Protection Switching."
+            REVISION "201702060000Z"
+            DESCRIPTION
+                "Defined system alarm trap."
+            REVISION "201701170000Z"
+            DESCRIPTION
+                "Initial Revision of this MIB module."
+            ::= { modules 604 }
+
+-- The Allied Telesis G8032 module.
+
+
+-------------------------------------------------------- --
+-- G8032 Textual Conventions
+-------------------------------------------------------- --
+
+        AtG8032v2InstanceState ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Defines the EPRS Instance states that are sent
+                in G8032 State Notification Traps."
+            SYNTAX INTEGER
+                {
+                unknown(1),
+                init(2),
+                idle(3),
+                protection(4),
+                manualSwitch(5),
+                forcedSwitch(6),
+                pending(7)
+                }
+
+
+-------------------------------------------------------- --
+-- G8032 Notifications
+-------------------------------------------------------- --
+
+        atG8032v2Notifications OBJECT IDENTIFIER ::= { atG8032v2 0 }
+
+
+        atG8032v2InstanceNotify NOTIFICATION-TYPE
+            OBJECTS { atG8032v2NotificationInstanceName,
+                      atG8032v2NotificationInstanceFromState,
+                      atG8032v2NotificationInstanceCurrentState
+                    }
+            STATUS current
+            DESCRIPTION
+                "G8032 ERP Instance state transition notification."
+            ::= { atG8032v2Notifications 1 }
+
+        atG8032v2SystemAlarmNotify NOTIFICATION-TYPE
+            OBJECTS { atG8032v2NotificationSystemAlarmState
+                    }
+            STATUS current
+            DESCRIPTION
+                "G8032 ERP system alarm transition notification.
+                 Indicates whether any ERP instance is in a
+                 state that is considered to be an alarm condition."
+            ::= { atG8032v2Notifications 2 }
+
+
+-- ---------------------------------------------------------- --
+-- G8032 Notification Variables
+-- ---------------------------------------------------------- --
+
+        atG8032v2NotificationVariable OBJECT IDENTIFIER ::= { atG8032v2 1 }
+
+
+        atG8032v2NotificationInstanceName OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Assigned name of the G8032 ERP Instance."
+            ::= { atG8032v2NotificationVariable 1 }
+
+
+        atG8032v2NotificationInstanceFromState OBJECT-TYPE
+            SYNTAX AtG8032v2InstanceState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Defined state that a G8032 ERP instance is transitioning from."
+            ::= { atG8032v2NotificationVariable 2 }
+
+
+        atG8032v2NotificationInstanceCurrentState OBJECT-TYPE
+            SYNTAX AtG8032v2InstanceState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Defined current state that a G8032 ERP instance is transitioning to."
+            ::= { atG8032v2NotificationVariable 3 }
+
+        atG8032v2NotificationSystemAlarmState OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Has value of 1 (true) if one or more G8032 ERP instance(s) are
+                 in alarm state, else has value of 2 (false)."
+            ::= { atG8032v2NotificationVariable 4 }
+
+
+    END
+
+--
+-- at-G8032v2.mib
+--

@@ -2,7 +2,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
+ * Copyright (c) 2018 Søren Friis Rosiak <sorenrosiak@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -10,133 +10,227 @@
  * the source code distribution for details.
  */
 
-$tables = array(
-    array('ciscoEnvMonVoltageStatusTable','.1.3.6.1.4.1.9.9.13.1.2.1.7.','ciscoEnvMonVoltageState','ciscoEnvMonVoltageStatusDescr', 'CISCO-ENVMON-MIB') ,
-    array('ciscoEnvMonTemperatureStatusTable','.1.3.6.1.4.1.9.9.13.1.3.1.6.','ciscoEnvMonTemperatureState','ciscoEnvMonTemperatureStatusDescr', 'CISCO-ENVMON-MIB') ,
-    array('ciscoEnvMonFanStatusTable','.1.3.6.1.4.1.9.9.13.1.4.1.3.','ciscoEnvMonFanState','ciscoEnvMonFanStatusDescr', 'CISCO-ENVMON-MIB') ,
-    array('ciscoEnvMonSupplyStatusTable','.1.3.6.1.4.1.9.9.13.1.5.1.3.','ciscoEnvMonSupplyState','ciscoEnvMonSupplyStatusDescr', 'CISCO-ENVMON-MIB') ,
-    array('cswGlobals','.1.3.6.1.4.1.9.9.500.1.1.3.','cswRingRedundant','Stack Ring - Redundant', 'CISCO-STACKWISE-MIB') ,
-    array('cswSwitchRole','.1.3.6.1.4.1.9.9.500.1.2.1.1.3.','cswSwitchRole','Stack Role - Switch#', 'CISCO-STACKWISE-MIB') ,
-    array('cswSwitchState','.1.3.6.1.4.1.9.9.500.1.2.1.1.6.','cswSwitchState','Stack State - Switch#', 'CISCO-STACKWISE-MIB') ,
-    array('cswStackPortOperStatus','.1.3.6.1.4.1.9.9.500.1.2.2.1.1.','cswStackPortOperStatus','Stack Port Status - ', 'CISCO-STACKWISE-MIB') ,
-    array('cRFCfgRedundancyOperMode','.1.3.6.1.4.1.9.9.176.1.2.14.','cRFCfgRedundancyOperMode','VSS Mode', 'CISCO-RF-MIB') ,
-    array('cRFStatusUnitState','.1.3.6.1.4.1.9.9.176.1.1.2.','cRFStatusUnitState','VSS Device State', 'CISCO-RF-MIB') ,
-    array('cRFStatusPeerUnitState','.1.3.6.1.4.1.9.9.176.1.1.4.','cRFStatusPeerUnitState','VSS Peer State', 'CISCO-RF-MIB')
-);
+use Illuminate\Support\Facades\Log;
+
+$role_data = SnmpQuery::walk('CISCO-STACKWISE-MIB::cswSwitchRole')->values();
+$redundant_data = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value();
+$entPhysName = SnmpQuery::get('ENTITY-MIB::entPhysicalName.1')->value();
+
+$tables = [
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.6.',    'oid' => 'CISCO-WAN-3G-MIB::c3gModemStatus',                            'state_name' => 'c3gModemStatus',                  'descr' => 'Modem status'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.3.',  'oid' => 'CISCO-WAN-3G-MIB::c3gGsmCurrentBand',                         'state_name' => 'c3gGsmCurrentBand',               'descr' => 'Current band'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.2.1.5.',    'oid' => 'CISCO-WAN-3G-MIB::c3gGsmPacketService',                       'state_name' => 'c3gGsmPacketService',             'descr' => 'Packet service'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.2.1.6.',    'oid' => 'CISCO-WAN-3G-MIB::c3gGsmCurrentRoamingStatus',                'state_name' => 'c3gGsmCurrentRoamingStatus',      'descr' => 'Roaming status'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.5.1.1.2.',  'oid' => 'CISCO-WAN-3G-MIB::c3gGsmSimStatus',                           'state_name' => 'c3gGsmSimStatus',                 'descr' => 'SIM status'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.2.1.7.',       'oid' => 'CISCO-ENVMON-MIB::ciscoEnvMonVoltageStatusTable',             'state_name' => 'ciscoEnvMonVoltageState',         'descr' => 'ciscoEnvMonVoltageStatusDescr'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.3.1.6.',       'oid' => 'CISCO-ENVMON-MIB::ciscoEnvMonTemperatureStatusTable',         'state_name' => 'ciscoEnvMonTemperatureState',     'descr' => 'ciscoEnvMonTemperatureStatusDescr'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.4.1.3.',       'oid' => 'CISCO-ENVMON-MIB::ciscoEnvMonFanStatusTable',                 'state_name' => 'ciscoEnvMonFanState',             'descr' => 'ciscoEnvMonFanStatusDescr'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.5.1.3.',       'oid' => 'CISCO-ENVMON-MIB::ciscoEnvMonSupplyStatusTable',              'state_name' => 'ciscoEnvMonSupplyState',          'descr' => 'ciscoEnvMonSupplyStatusDescr'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.117.1.1.2.1.2.',    'oid' => 'CISCO-ENTITY-FRU-CONTROL-MIB::cefcFRUPowerStatusTable',       'state_name' => 'cefcFRUPowerOperStatus',          'descr' => 'Sensor Name'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.1.2.',        'oid' => 'CISCO-RF-MIB::cRFStatusUnitState',                            'state_name' => 'cRFStatusUnitState',              'descr' => 'VSS Device State'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.1.4.',        'oid' => 'CISCO-RF-MIB::cRFStatusPeerUnitState',                        'state_name' => 'cRFStatusPeerUnitState',          'descr' => 'VSS Peer State'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.2.14.',       'oid' => 'CISCO-RF-MIB::cRFCfgRedundancyOperMode',                      'state_name' => 'cRFCfgRedundancyOperMode',        'descr' => 'VSS Mode'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.1.3.',        'oid' => 'CISCO-STACKWISE-MIB::cswGlobals',                             'state_name' => 'cswRingRedundant',                'descr' => 'Stack Ring - Redundant'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.1.1.3.',    'oid' => 'CISCO-STACKWISE-MIB::cswSwitchRole',                          'state_name' => 'cswSwitchRole',                   'descr' => 'Stack Role - Switch#'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.1.1.6.',    'oid' => 'CISCO-STACKWISE-MIB::cswSwitchState',                         'state_name' => 'cswSwitchState',                  'descr' => 'Stack State - Switch#'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.2.1.1.',    'oid' => 'CISCO-STACKWISE-MIB::cswStackPortOperStatus',                 'state_name' => 'cswStackPortOperStatus',          'descr' => 'Stack Port Status - '],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.601.1.3.1.1.4.',    'oid' => 'CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB::crepSegmentComplete',  'state_name' => 'crepSegmentComplete',             'descr' => 'REP State - Segment '],
+];
+
+$swrolenumber = 0;
+$swstatenumber = 0;
+$repsegmentnumber = 0;
 
 foreach ($tables as $tablevalue) {
-    $temp = snmpwalk_cache_multi_oid($device, $tablevalue[0], array(), $tablevalue[4]);
-    $cur_oid = $tablevalue[1];
+    //Some switches on 15.x expose this information regardless if they are stacked or not, we try to mitigate that by doing the following.
+    if (in_array($tablevalue['oid'], ['CISCO-STACKWISE-MIB::cswGlobals', 'CISCO-STACKWISE-MIB::cswSwitchRole', 'CISCO-STACKWISE-MIB::cswSwitchState', 'CISCO-STACKWISE-MIB::cswStackPortOperStatus']) && $redundant_data == 'false' && count($role_data) <= 1) {
+        continue;
+    }
 
-    if (is_array($temp)) {
-        if ($temp[0][$tablevalue[2]] == 'nonRedundant' || $temp[0]['cswMaxSwitchNum'] == '1') {
+    $temp = SnmpQuery::hideMib()->walk($tablevalue['oid'])->valuesByIndex();
+    $cur_oid = $tablevalue['num_oid'];
+
+    if (! empty($temp)) {
+        $state_name = $tablevalue['state_name'];
+
+        if ((isset($temp[0][$state_name]) && $temp[0][$state_name] == 'nonRedundant') || (isset($temp[0]['cswMaxSwitchNum']) && $temp[0]['cswMaxSwitchNum'] == '1')) {
             break;
+        }
+        // Cisco StackWise Virtual always reports FALSE (2) for cswRingRedundant OID
+        // This OID has no meaning in the context of StackWise Virtual
+        // Skip the creation of the "Stack Ring - Redundant" state sensor if the device operates in StackWise Virtual mode
+        // This can be identified by "Virtual Stack" in entPhysicalName OID
+        if (isset($temp[0]['cswRingRedundant']) && $temp[0]['cswRingRedundant'] == 2 && $entPhysName == 'Virtual Stack') {
+            continue;
         }
 
         //Create State Index
-        $state_name = $tablevalue[2];
-        $state_index_id = create_state_index($state_name);
-
         //Create State Translation
-        if ($state_index_id !== null) {
-            if ($state_name == 'cRFStatusUnitState' || $state_name == 'cRFStatusPeerUnitState') {
-                $states = array(
-                    array($state_index_id,'notKnown',0,1,1) ,
-                    array($state_index_id,'disabled',0,2,0) ,
-                    array($state_index_id,'initialization',0,3,1) ,
-                    array($state_index_id,'negotiation',0,4,1) ,
-                    array($state_index_id,'standbyCold',0,5,1) ,
-                    array($state_index_id,'standbyColdConfig',0,6,1) ,
-                    array($state_index_id,'standbyColdFileSys',0,7,1) ,
-                    array($state_index_id,'standbyColdBulk',0,8,1) ,
-                    array($state_index_id,'standbyHot',0,9,0) ,
-                    array($state_index_id,'activeFast',0,10,1) ,
-                    array($state_index_id,'activeDrain',0,11,1) ,
-                    array($state_index_id,'activePreconfig',0,12,1) ,
-                    array($state_index_id,'activePostconfig',0,13,1) ,
-                    array($state_index_id,'active',0,14,0) ,
-                    array($state_index_id,'activeExtraload',0,15,1) ,
-                    array($state_index_id,'activeHandback',0,16,1)
-                );
-            } elseif ($state_name == 'cRFCfgRedundancyOperMode') {
-                $states = array(
-                    array($state_index_id,'nonRedundant',0,1,0) ,
-                    array($state_index_id,'staticLoadShareNonRedundant',0,2,0) ,
-                    array($state_index_id,'dynamicLoadShareNonRedundant',0,3,0) ,
-                    array($state_index_id,'staticLoadShareRedundant',0,4,0) ,
-                    array($state_index_id,'dynamicLoadShareRedundant',0,5,0) ,
-                    array($state_index_id,'coldStandbyRedundant',0,6,0) ,
-                    array($state_index_id,'warmStandbyRedundant',0,7,0) ,
-                    array($state_index_id,'hotStandbyRedundant',0,8,0)
-                );
-            } elseif ($state_name == 'cswRingRedundant') {
-                $states = array(
-                    array($state_index_id,'true',0,1,0) ,
-                    array($state_index_id,'false',0,2,2)
-                );
-            } elseif ($state_name == 'cswSwitchRole') {
-                $states = array(
-                    array($state_index_id,'master',0,1,0) ,
-                    array($state_index_id,'member',0,2,0) ,
-                    array($state_index_id,'notMember',0,3,0) ,
-                    array($state_index_id,'standby',0,4,0)
-                );
-            } elseif ($state_name == 'cswSwitchState') {
-                $states = array(
-                    array($state_index_id,'waiting',0,1,1) ,
-                    array($state_index_id,'progressing',0,2,1) ,
-                    array($state_index_id,'added',0,3,1) ,
-                    array($state_index_id,'ready',0,4,0) ,
-                    array($state_index_id,'sdmMismatch',0,5,2) ,
-                    array($state_index_id,'verMismatch',0,6,2) ,
-                    array($state_index_id,'featureMismatch',0,7,2) ,
-                    array($state_index_id,'newMasterInit',0,8,2) ,
-                    array($state_index_id,'provisioned',0,9,1) ,
-                    array($state_index_id,'invalid',0,10,2) ,
-                    array($state_index_id,'removed',0,11,1)
-                );
-            } else {
-                $states = array(
-                    array($state_index_id,'normal',0,1,0) ,
-                    array($state_index_id,'warning',0,2,1) ,
-                    array($state_index_id,'critical',0,3,2) ,
-                    array($state_index_id,'shutdown',0,4,3) ,
-                    array($state_index_id,'notPresent',0,5,3) ,
-                    array($state_index_id,'notFunctioning',0,6,2)
-                );
-            }
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = match ($state_name) {
+            'cRFStatusUnitState','cRFStatusPeerUnitState' => [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'notKnown'],
+                ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'disabled'],
+                ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'initialization'],
+                ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'negotiation'],
+                ['value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'standbyCold'],
+                ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'standbyColdConfig'],
+                ['value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'standbyColdFileSys'],
+                ['value' => 8, 'generic' => 1, 'graph' => 0, 'descr' => 'standbyColdBulk'],
+                ['value' => 9, 'generic' => 0, 'graph' => 0, 'descr' => 'standbyHot'],
+                ['value' => 10, 'generic' => 1, 'graph' => 0, 'descr' => 'activeFast'],
+                ['value' => 11, 'generic' => 1, 'graph' => 0, 'descr' => 'activeDrain'],
+                ['value' => 12, 'generic' => 1, 'graph' => 0, 'descr' => 'activePreconfig'],
+                ['value' => 13, 'generic' => 1, 'graph' => 0, 'descr' => 'activePostconfig'],
+                ['value' => 14, 'generic' => 0, 'graph' => 0, 'descr' => 'active'],
+                ['value' => 15, 'generic' => 1, 'graph' => 0, 'descr' => 'activeExtraload'],
+                ['value' => 16, 'generic' => 1, 'graph' => 0, 'descr' => 'activeHandback'],
+            ],
+            'cRFCfgRedundancyOperMode' => [
+                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'nonRedundant'],
+                ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'staticLoadShareNonRedundant'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'dynamicLoadShareNonRedundant'],
+                ['value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'staticLoadShareRedundant'],
+                ['value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'dynamicLoadShareRedundant'],
+                ['value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'coldStandbyRedundant'],
+                ['value' => 7, 'generic' => 0, 'graph' => 0, 'descr' => 'warmStandbyRedundant'],
+                ['value' => 8, 'generic' => 0, 'graph' => 0, 'descr' => 'hotStandbyRedundant'],
+            ],
+            'cswRingRedundant' => [
+                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'true'],
+                ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'false'],
+            ],
+            'cswSwitchRole' => [
+                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'master'],
+                ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'member'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'notMember'],
+                ['value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'standby'],
+            ],
+            'cswSwitchState' => [
+                ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'waiting'],
+                ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'progressing'],
+                ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'added'],
+                ['value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'],
+                ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'sdmMismatch'],
+                ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'verMismatch'],
+                ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'featureMismatch'],
+                ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'newMasterInit'],
+                ['value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'provisioned'],
+                ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'invalid'],
+                ['value' => 11, 'generic' => 1, 'graph' => 0, 'descr' => 'removed'],
+            ],
+            'cefcFRUPowerOperStatus' => [
+                ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'off (other)'],
+                ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'on'],
+                ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'off (admin)'],
+                ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'off (denied)'],
+                ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'off (environmental)'],
+                ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'off (temperature)'],
+                ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'off (fan)'],
+                ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
+                ['value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'on (fan failed)'],
+                ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'off (cooling)'],
+                ['value' => 11, 'generic' => 2, 'graph' => 0, 'descr' => 'off (connector rating)'],
+                ['value' => 12, 'generic' => 1, 'graph' => 0, 'descr' => 'on (no inline power)'],
+            ],
+            'c3gModemStatus' => [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'offline'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'online'],
+                ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'low power mode'],
+            ],
+            'c3gGsmCurrentBand' => [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'invalid'],
+                ['value' => 3, 'generic' => 3, 'graph' => 0, 'descr' => 'none'],
+                ['value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'gsm850'],
+                ['value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'gsm900'],
+                ['value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'gsm1800'],
+                ['value' => 7, 'generic' => 0, 'graph' => 0, 'descr' => 'gsm1900'],
+                ['value' => 8, 'generic' => 0, 'graph' => 0, 'descr' => 'wcdma800'],
+                ['value' => 9, 'generic' => 0, 'graph' => 0, 'descr' => 'wcdma850'],
+                ['value' => 10, 'generic' => 0, 'graph' => 0, 'descr' => 'wcdma1900'],
+                ['value' => 11, 'generic' => 0, 'graph' => 0, 'descr' => 'wcdma2100'],
+                ['value' => 12, 'generic' => 0, 'graph' => 0, 'descr' => 'lte band'],
+            ],
+            'c3gGsmPacketService' => [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'none'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'gprs'],
+                ['value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'edge'],
+                ['value' => 5, 'generic' => 0, 'graph' => 0, 'descr' => 'umts wcdma'],
+                ['value' => 6, 'generic' => 0, 'graph' => 0, 'descr' => 'hsdpa'],
+                ['value' => 7, 'generic' => 0, 'graph' => 0, 'descr' => 'hsupa'],
+                ['value' => 8, 'generic' => 0, 'graph' => 0, 'descr' => 'hspa'],
+                ['value' => 9, 'generic' => 0, 'graph' => 0, 'descr' => 'hspa plus'],
+                ['value' => 10, 'generic' => 0, 'graph' => 0, 'descr' => 'lte'],
+            ],
+            'c3gGsmCurrentRoamingStatus' => [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'roaming'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'home'],
+            ],
+            'c3gGsmSimStatus' => [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'not inserted'],
+                ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'removed'],
+                ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'initFailure'],
+                ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'generalFailure'],
+                ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'locked'],
+                ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'chv1Blocked'],
+                ['value' => 9, 'generic' => 2, 'graph' => 0, 'descr' => 'chv2Blocked'],
+                ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'chv1Rejected'],
+                ['value' => 11, 'generic' => 2, 'graph' => 0, 'descr' => 'wcchv2Rejecteddma2100'],
+                ['value' => 12, 'generic' => 2, 'graph' => 0, 'descr' => 'mepLocked'],
+                ['value' => 13, 'generic' => 2, 'graph' => 0, 'descr' => 'networkRejected'],
+            ],
+            'crepSegmentComplete' => [
+                ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'complete'],
+                ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'incomplete'],
+            ],
+            default => [
+                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
+                ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'],
+                ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'],
+                ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'shutdown'],
+                ['value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+                ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'notFunctioning'],
+            ],
+        };
+        create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
-            //Discover Sensors
-            $descr = ucwords($temp[$index][$tablevalue[3]]);
-            if ($state_name == 'cRFStatusUnitState' || $state_name == 'cRFStatusPeerUnitState' || $state_name == 'cRFCfgRedundancyOperMode' || $state_name == 'cswRingRedundant') {
-                $descr = $tablevalue[3];
-            } elseif ($state_name == 'cswSwitchRole') {
-                $swrolenumber++;
-                $descr = $tablevalue[3] . $swrolenumber;
-            } elseif ($state_name == 'cswSwitchState') {
-                $swstatenumber++;
-                $descr = $tablevalue[3] . $swstatenumber;
-            } elseif ($state_name == 'cswStackPortOperStatus') {
-                $stack_port_descr = get_port_by_index_cache($device, $index);
-                $descr = $tablevalue[3] . $stack_port_descr['ifDescr'];
+            $state_group = null;
+            if ($state_name == 'ciscoEnvMonTemperatureState' && (empty($entry[$tablevalue['descr']]))) {
+                Log::debug('Invalid sensor, skipping..');
+            } else {
+                //Discover Sensors
+                $descr = ucwords($entry[$tablevalue['descr']] ?? 'State');
+                if ($state_name == 'cRFStatusUnitState' || $state_name == 'cRFStatusPeerUnitState' || $state_name == 'cRFCfgRedundancyOperMode' || $state_name == 'cswRingRedundant') {
+                    $descr = $tablevalue['descr'];
+                } elseif ($state_name == 'cswSwitchRole') {
+                    $swrolenumber++;
+                    $descr = $tablevalue['descr'] . $swrolenumber;
+                } elseif ($state_name == 'cswSwitchState') {
+                    $swstatenumber++;
+                    $descr = $tablevalue['descr'] . $swstatenumber;
+                } elseif ($state_name == 'cswStackPortOperStatus') {
+                    $stack_port_descr = get_port_by_index_cache($device['device_id'], $index);
+                    $descr = $tablevalue['descr'] . $stack_port_descr['ifDescr'];
+                } elseif ($state_name == 'cefcFRUPowerOperStatus') {
+                    $descr = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
+                } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
+                    $descr = $tablevalue['descr'];
+                    $state_group = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
+                } elseif ($state_name == 'crepSegmentComplete') {
+                    $repsegmentnumber++;
+                    $descr = $tablevalue['descr'] . $repsegmentnumber;
+                }
+                discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim($descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
             }
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index][$tablevalue[2]], 'snmp', $index);
-
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
         }
     }
 }
+
+unset($role_data, $redundant_data, $temp);

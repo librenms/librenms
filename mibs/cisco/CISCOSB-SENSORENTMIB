@@ -20,25 +20,23 @@ IMPORTS
                 FROM ENTITY-SENSOR-MIB;
 
 rlSensor MODULE-IDENTITY
-        LAST-UPDATED "200309210000Z"
-		ORGANIZATION "Cisco Small Business"
+    LAST-UPDATED "200309210000Z"
+    ORGANIZATION "Cisco Systems, Inc."
 
-		CONTACT-INFO
-		"Postal: 170 West Tasman Drive
-		San Jose , CA 95134-1706
-		USA
+    CONTACT-INFO
+    "Postal: 170 West Tasman Drive
+    San Jose , CA 95134-1706
+    USA
 
-		Website: Cisco Small Business Home http://www.cisco.com/smb>;,
-		Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+    
+    Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
-        DESCRIPTION
-                "The private MIB module definition for sensors in Cisco devices."
-        REVISION "200309210000Z"
-        DESCRIPTION
-                "ADDED this MODULE-IDENTITY clause."
-        ::= { rlEnv 4 }
-
-
+    DESCRIPTION
+            "The private MIB module definition for sensors in CISCOSB devices."
+    REVISION "200309210000Z"
+    DESCRIPTION
+            "ADDED this MODULE-IDENTITY clause."
+    ::= { rlEnv 4 }
 
 rlEntPhySensorTable OBJECT-TYPE
         SYNTAX     SEQUENCE OF RlEntPhySensorEntry
@@ -63,7 +61,8 @@ RlEntPhySensorEntry ::=
         SEQUENCE {
                 rlEnvPhySensorMinValue       EntitySensorValue,
                 rlEnvPhySensorMaxValue       EntitySensorValue,
-                rlEnvPhySensorTestValue      EntitySensorValue
+                rlEnvPhySensorTestValue      EntitySensorValue,
+                rlEnvPhySensorLocation       SnmpAdminString
         }
 
 rlEnvPhySensorMinValue OBJECT-TYPE
@@ -90,5 +89,12 @@ rlEnvPhySensorTestValue OBJECT-TYPE
                 "Test/reference value for the Sensor being instrumented."
         ::= { rlEntPhySensorEntry 3 }
 
+rlEnvPhySensorLocation OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "A textual description for the Location where the Sensor being instrumented."
+        ::= { rlEntPhySensorEntry 4 }
 END
 

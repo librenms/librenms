@@ -1,0 +1,468 @@
+ARRIS-C3-FPD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    cmtsC3
+        FROM ARRIS-MIB
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF;
+
+    cmtsC3FPDMIB  MODULE-IDENTITY
+        LAST-UPDATED "200308200000Z" -- 20th August 2003
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the Front Panel Display (FPD)
+            software on the Arris CMTS C3"
+        ::= { cmtsC3 3 }
+
+    
+    dcxFPDObjects OBJECT IDENTIFIER ::= { cmtsC3FPDMIB 1 }
+
+    dcxFPDMsgTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DcxFPDMsgEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Table of Front Panel LCD Messages."
+        ::= { dcxFPDObjects 1 }
+
+    dcxFPDMsgEntry OBJECT-TYPE
+        SYNTAX DcxFPDMsgEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION 
+            "."
+        INDEX {dcxFPDMsgIndex}
+        ::= { dcxFPDMsgTable 1 }
+
+    DcxFPDMsgEntry ::= SEQUENCE {
+        dcxFPDMsgIndex  Unsigned32,
+        dcxFPDMsgString OCTET STRING
+    }
+
+    dcxFPDMsgIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION
+            "Index used to order the FPD Messages."
+        ::= { dcxFPDMsgEntry 1 }
+
+    dcxFPDMsgString OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..12))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specifies a string that can be displayed
+            on the front panel."
+        ::= { dcxFPDMsgEntry 2 }
+
+    dcxFPDControlGroup OBJECT IDENTIFIER ::= { dcxFPDObjects 2 }
+
+    dcxFPDAttachedStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            attached (1),
+            detached (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Displays if the front panel display is 
+            attached to the Cmts or not."
+        ::= { dcxFPDControlGroup 1 }
+
+    dcxFPDPowerStatus1 OBJECT-TYPE
+        SYNTAX      INTEGER {
+            on (1),
+            off (2)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Specifies if the primary power supply is
+            working.  This is the rightmost power supply.
+            The following values are possible:
+            on(1) and off(2)"
+        ::= { dcxFPDControlGroup 2 }
+
+    dcxFPDPowerStatus2 OBJECT-TYPE
+        SYNTAX      INTEGER {
+            on (1),
+            off (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies if the secondary power supply is 
+            working.  This is the leftmost power supply(nearest the fan tray).
+            The following values are possible:
+            on(1) and off(2)"
+        ::= { dcxFPDControlGroup 3 }
+
+    dcxFPDTemp1Status OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the temperature reading for the
+            sensor on the CPU card closest to the CPU."
+        ::= { dcxFPDControlGroup 4 }
+
+    dcxFPDTemp2Status OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the temperature reading for the
+            sensor on the CPU card, on the right hand side."
+        ::= { dcxFPDControlGroup 5 }
+
+    dcxFPDTemp3Status OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the temperature reading for the
+            sensor on the Kanga card under the Roo cards
+            between RX4 and RX5."
+        ::= { dcxFPDControlGroup 6 }
+
+    dcxFPDTemp4Status OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the temperature reading for the
+            sensor on the Kanga card under the Roo cards
+            between RX2 and RX3."
+        ::= { dcxFPDControlGroup 7 }
+
+    dcxFPDFan1Status OBJECT-TYPE
+        SYNTAX      INTEGER {
+            rotating (1),
+            badRotating (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the fan status for the fan nearest the front of the box.
+            The following values are possible: 
+            Rotating(1) and BadRotating(2).
+            BadRotating is set when the fan is operating outside of dcxFPDFanUpperLimit and dcxFPDFanLowerLimit."
+        ::= { dcxFPDControlGroup 8 }
+
+    dcxFPDFan2Status OBJECT-TYPE
+        SYNTAX      INTEGER {
+            rotating (1),
+            badRotating (2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Specifies the fan status for the fan 2nd from the front.
+            The following values are possible:
+            Rotating(1) and BadRotating(2).
+            BadRotating is set when the fan is operating outside of dcxFPDFanUpperLimit and dcxFPDFanLowerLimit."
+    ::= { dcxFPDControlGroup 9 }
+
+    dcxFPDFan3Status OBJECT-TYPE
+        SYNTAX      INTEGER {
+            rotating (1),
+            badRotating (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the fan status for the fan 3rd from the front.
+            The following values are possible: 
+            Rotating(1) and BadRotating(2).
+            BadRotating is set when the fan is operating outside of dcxFPDFanUpperLimit and dcxFPDFanLowerLimit."
+        ::= { dcxFPDControlGroup 10 }
+
+    dcxFPDFan4Status OBJECT-TYPE
+        SYNTAX      INTEGER {
+            rotating (1),
+            badRotating (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the fan status for the fan 4th from the front.
+            The following values are possible:
+            Rotating(1) and BadRotating(2).
+            BadRotating is set when the fan is operating outside of dcxFPDFanUpperLimit and dcxFPDFanLowerLimit."
+        ::= { dcxFPDControlGroup 11 }
+
+    dcxFPDFan5Status OBJECT-TYPE
+        SYNTAX      INTEGER {
+            rotating (1),
+            badRotating (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the fan status for the fan 5th from the front.
+            The following values are possible:
+            Rotating(1) and BadRotating(2).
+            BadRotating is set when the fan is operating outside of dcxFPDFanUpperLimit and dcxFPDFanLowerLimit."
+        ::= { dcxFPDControlGroup 12 }
+
+    dcxFPDFan6Status OBJECT-TYPE
+        SYNTAX      INTEGER {
+            rotating (1),
+            badRotating (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the fan status for the fan nearest the back of the box
+            The following values are possible:
+            Rotating(1) and BadRotating(2).
+            BadRotating is set when the fan is operating outside of dcxFPDFanUpperLimit and dcxFPDFanLowerLimit."
+        ::= { dcxFPDControlGroup 13 }
+
+    dcxFPDFanUpperLimit OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specifies the upper fan limit(Upper threshold of expected current draw)"
+        ::= { dcxFPDControlGroup 14 }
+
+    dcxFPDFanLowerLimit OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specifies the lower fan limit(Lower threshold of expected current draw)"
+        ::= { dcxFPDControlGroup 15 }
+
+    dcxFPDLCDContrast OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specifies the contrast level for the LCD"
+        ::= { dcxFPDControlGroup 16 }
+
+    dcxFPDLedSetStatus OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Used to turn on or off a Led on the front panel"
+        ::= { dcxFPDControlGroup 17 }
+
+    dcxFPDHwRevision OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the front panel h/w revision"
+        ::= { dcxFPDControlGroup 18 }
+
+    dcxFPDSwRevision OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+	STATUS 	    current
+        DESCRIPTION
+            "Specifies the front panel s/w revision"
+        ::= { dcxFPDControlGroup 19 }
+
+    dcxFPDTrapGroup OBJECT IDENTIFIER ::= { dcxFPDObjects 3 }
+			dcxFPDAttached NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Front Panel Display has been attached."
+	        ::= { dcxFPDTrapGroup 1 }
+
+			dcxFPDDetached NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Front Panel Display has been detached."
+	        ::= { dcxFPDTrapGroup 2 }
+
+			dcxFPDFan1Fail NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan nearest the front of the box failed"
+	        ::= { dcxFPDTrapGroup 3 }
+
+			dcxFPDFan1FailClr NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan nearest the front of the box is working"
+	        ::= { dcxFPDTrapGroup 4 }
+
+			dcxFPDFan2Fail NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan 2nd from the front failed"
+	        ::= { dcxFPDTrapGroup 5 }
+
+			dcxFPDFan2FailClr NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan 2nd from the front is working"
+	        ::= { dcxFPDTrapGroup 6 }
+
+			dcxFPDFan3Fail NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan 3rd from the front failed"
+	        ::= { dcxFPDTrapGroup 7 }
+
+			dcxFPDFan3FailClr NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan 3rd from the front is working"
+	        ::= { dcxFPDTrapGroup 8 }
+
+			dcxFPDFan4Fail NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan 4th from the front failed"
+	        ::= { dcxFPDTrapGroup 9 }
+
+			dcxFPDFan4FailClr NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan 4th from the front is working"
+	        ::= { dcxFPDTrapGroup 10 }
+
+			dcxFPDFan5Fail NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan 5th from the front failed"
+	        ::= { dcxFPDTrapGroup 11 }
+
+			dcxFPDFan5FailClr NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan 5th from the front is working"
+	        ::= { dcxFPDTrapGroup 12 }
+
+			dcxFPDFan6Fail NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan nearest the back of the box failed"
+	        ::= { dcxFPDTrapGroup 13 }
+
+			dcxFPDFan6FailClr NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Fan nearest the back of the box is working"
+	        ::= { dcxFPDTrapGroup 14 }
+
+			dcxFPDPwr1Fail NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Rightmost power supply failed"
+	        ::= { dcxFPDTrapGroup 15 }
+
+			dcxFPDPwr1FailClr NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Rightmost power supply is working"
+	        ::= { dcxFPDTrapGroup 16 }
+
+			dcxFPDPwr2Fail NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Leftmost power supply failed"
+	        ::= { dcxFPDTrapGroup 17 }
+
+			dcxFPDPwr2FailClr NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "Leftmost power supply is working"
+	        ::= { dcxFPDTrapGroup 18 }
+
+			dcxFPDTempOkay NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "System temperature is OK"
+	        ::= { dcxFPDTrapGroup 19 }
+
+			dcxFPDTempBad NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "System temperature is too hot!"
+	        ::= { dcxFPDTrapGroup 20 }
+
+			dcxFPDTempCritical NOTIFICATION-TYPE
+    		    STATUS current
+        		DESCRIPTION 
+	    		    "System temperature is critical!!!, CMTS will shut itself down!!!!"
+	        ::= { dcxFPDTrapGroup 21 }
+        
+--
+-- Conformance Statement
+--
+
+dcxFPDConformance OBJECT IDENTIFIER ::=
+                        { dcxFPDObjects 4 }
+dcxFPDCompliances OBJECT IDENTIFIER ::=
+                        { dcxFPDConformance 1 }
+dcxFPDGroups      OBJECT IDENTIFIER ::=
+                        { dcxFPDConformance 2 }
+
+-- compliance statements        
+dcxFPDCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION 
+        "The compliance statement for devices that implement Arris C3
+        compliant FPD features"
+    MODULE          -- FPD
+    MANDATORY-GROUPS {
+        dcxFPDMsgGroup,
+        dcxFPDControlConfGroup
+    }
+
+    ::= { dcxFPDCompliances 1 }
+
+-- units of conformance
+
+    dcxFPDMsgGroup OBJECT-GROUP
+        OBJECTS {   dcxFPDMsgString }
+        STATUS  current
+        DESCRIPTION
+                "Arris C3 FPD message group"
+        ::= { dcxFPDGroups 1 }       
+        
+    dcxFPDControlConfGroup OBJECT-GROUP
+        OBJECTS {   dcxFPDAttachedStatus,
+                    dcxFPDPowerStatus1,
+                    dcxFPDPowerStatus2,
+                    dcxFPDTemp1Status,
+                    dcxFPDTemp2Status,
+                    dcxFPDTemp3Status,
+                    dcxFPDTemp4Status,
+                    dcxFPDFan1Status,
+                    dcxFPDFan2Status,
+                    dcxFPDFan3Status,
+                    dcxFPDFan4Status,
+                    dcxFPDFan5Status,
+                    dcxFPDFan6Status,
+                    dcxFPDFanUpperLimit,
+                    dcxFPDFanLowerLimit,
+                    dcxFPDLCDContrast,
+                    dcxFPDLedSetStatus,
+                    dcxFPDHwRevision,
+                    dcxFPDSwRevision }
+        STATUS  current
+        DESCRIPTION
+                "Arris C3 FPD Control group"
+        ::= { dcxFPDGroups 2 }
+
+END

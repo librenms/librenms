@@ -1,0 +1,610 @@
+--
+--   
+-- ARBOR NETWORKS
+-- 
+--
+--
+--   File:		ARBORNET-PDOS.txt
+--   Created:		May, 2001
+--   Purpose:		Peakflow DoS MIB
+--		describe any data which we provide
+--		describe any traps which we send
+--
+--
+
+PEAKFLOW-DOS-MIB	DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	TimeTicks,
+        Integer32,
+	Unsigned32,
+	IpAddress
+                FROM SNMPv2-SMI
+        DisplayString
+                FROM SNMPv2-TC
+	arbornetworksProducts
+		FROM ARBOR-SMI;
+
+
+-- =================================================================================
+
+peakflowDosMIB MODULE-IDENTITY
+	LAST-UPDATED "201406240000Z" -- June 24, 2014
+	ORGANIZATION "Arbor Networks, Inc."
+	CONTACT-INFO
+		"	Arbor Networks, Inc.
+			Arbor Technical Assistance Center
+
+			Postal: 76 Blanchard Road
+				Burlington, MA 01803
+				USA
+
+			Tel: +1 866 212 7267 (toll free)
+			     +1 781 362 4300
+			Email: support@arbor.net "
+
+	DESCRIPTION
+		"Peakflow DoS MIB"
+
+	-- Revision log, reverse chrono
+	REVISION    "201511170000Z" -- November 17, 2015
+	DESCRIPTION "Add pdosAnomalyIpVersion to Anomaly notifications"
+
+	REVISION    "201406240000Z" -- June 24, 2014
+	DESCRIPTION "Add pdosAnomalyIpVersion"
+
+	REVISION    "201308190000Z" -- August 19, 2013
+	DESCRIPTION "Updated contact information"
+
+	REVISION    "201005200000Z" -- May 20, 2010
+	DESCRIPTION "Correct values of max-access for objets."
+
+	REVISION    "200903300000Z" -- March 30, 2009
+	DESCRIPTION "Update contact group name."
+
+	REVISION    "200811130000Z" -- November 13, 2008
+	DESCRIPTION "Update company address."
+
+	REVISION    "200805080000Z" -- May 8, 2008
+	DESCRIPTION "Updated SIZE of pdosAnomalyTcpFlags to be (0..8)."
+
+	REVISION    "200804240000Z" -- April 24, 2008
+	DESCRIPTION "Add pdosAnomalyProto to dnsMisuseAnomaly trap"
+
+	REVISION    "200801080000Z" -- January 8, 2008
+	DESCRIPTION "Clean up use of pdosAnomalyProto and pdosTcpFlags"
+
+	REVISION    "200712140000Z" -- December 14, 2007
+	DESCRIPTION "Add udpMisuseAnomaly."
+
+	REVISION    "200511230000Z" -- November 23, 2005
+	DESCRIPTION "Update status of obsolete OIDs."
+
+	REVISION    "200509120000Z" -- September 12, 2005
+	DESCRIPTION "Apply fixes from validation."
+
+	REVISION    "200508260000Z" -- August 26, 2005
+	DESCRIPTION "Adjust trap variable order to match what is sent."
+
+	REVISION    "200505090000Z" -- May 9, 2005
+	DESCRIPTION "Add pdosAnomalyClassification to add DoS alert
+		     classification."
+
+	REVISION    "200502110000Z" -- February 11, 2005
+	DESCRIPTION "Increase size of interfaces entry from 512 to 1024
+		     characters"
+
+	REVISION    "200411100000Z" -- November 10, 2004
+	DESCRIPTION "Add pdosAnomalyRouterInterfacesChange to add input/output
+		     interfaces."
+
+	REVISION    "200410260000Z" -- October 26, 2004
+	DESCRIPTION "Change pdosAnomalyLinkPercent to an Unsigned32 with no
+		     range support."
+
+	REVISION    "200105010000Z" -- May 1, 2001
+	DESCRIPTION "Initial writing and import."
+
+	::= { arbornetworksProducts 1 }
+
+
+peakflowDosCMI OBJECT IDENTIFIER ::= { peakflowDosMIB 1 }
+peakflowDosMgr OBJECT IDENTIFIER ::= { peakflowDosMIB 2 }
+peakflowDosTraps OBJECT IDENTIFIER ::= { peakflowDosMIB 3 }
+
+
+-- =================================================================================
+
+
+-- =================================================================================
+--
+-- decorated data
+--
+
+
+pdosUrl	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"This URL is a back reference to the Peakflow SP leader
+		that has details about the anomaly."
+	::= { peakflowDosCMI 1 }
+
+pdosAnomalyId	OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION 
+		"Identifies the Peakflow anomaly"
+	::= { peakflowDosCMI 2 }
+
+pdosAnomalyDirection	OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Description of anomaly direction"
+	::= { peakflowDosCMI 3 }
+
+pdosAnomalyResource	OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Description of anomaly resource"
+	::= { peakflowDosCMI 4 }
+
+pdosHeartbeatSource	OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  obsolete
+	DESCRIPTION
+		"Describes the collection which lost heartbeat"
+	::= { peakflowDosCMI 5 }
+
+internalErrorLocation	OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  obsolete
+	DESCRIPTION
+		"Describes the location of the internal error"
+	::= { peakflowDosCMI 6 }
+		
+internalErrorReason	OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  obsolete
+	DESCRIPTION
+		"Describes the location of the internal error"
+	::= { peakflowDosCMI 7 }
+		
+pdosAnomalyProto	OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..256))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"IP protocols associated with the anomaly"
+	::= { peakflowDosCMI 8 }
+
+pdosAnomalyLinkPercent	OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Percent of link usage by an anomaly"
+	::= { peakflowDosCMI 9 }
+
+pdosAnomalyAlertCnt	OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  obsolete -- OBSOLETE
+	DESCRIPTION
+		"Number of times a notification has been issued
+		for this anomaly"
+	::= { peakflowDosCMI 10 }
+
+pdosAnomalyStart	OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Textual description of the time the anomaly started"
+	::= { peakflowDosCMI 11 }
+
+pdosAnomalyDuration	OBJECT-TYPE
+	SYNTAX 	TimeTicks
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Duration (in centiseconds) since the start of the
+		anomaly"
+	::= { peakflowDosCMI 12 }
+
+pdosAnomalyTcpFlags	OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..8))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"TCP flags associated with the anomaly signature"
+	::= { peakflowDosCMI 13 }
+
+pdosAnomalyRouter	OBJECT-TYPE
+	SYNTAX  	IpAddress
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The router which is either not sending NetFlow
+		or has resumed sending NetFlow"
+	::= { peakflowDosCMI 14 }
+	
+pdosAnomalyRouterInterfaces	OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..1024))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Router interfaces involved in the anomaly"
+	::= { peakflowDosCMI 15 }
+
+pdosAnomalyClassification	OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..8))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Classification of the anomaly -- high, medium, or low."
+	::= { peakflowDosCMI 16 }
+
+pdosAnomalyIpVersion	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"IP version of the anomaly"
+	::= { peakflowDosCMI 17 }
+
+-- =================================================================================
+--  Notifications:
+--
+
+peakflowDosTrapsEnumerate OBJECT IDENTIFIER ::= { peakflowDosTraps 0 }
+
+bandwidthAnomaly NOTIFICATION-TYPE
+        OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl
+	}
+        STATUS  current
+        DESCRIPTION
+		"Bandwidth anomaly detected by Peakflow"
+        ::= { peakflowDosTrapsEnumerate 1 }
+
+tcpflagsAnomaly NOTIFICATION-TYPE
+        OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl,
+		pdosAnomalyTcpFlags
+	}
+        STATUS  obsolete
+        DESCRIPTION
+		"TCP flags anomaly detected by Peakflow"
+        ::= { peakflowDosTrapsEnumerate 2 }
+
+protocolAnomaly NOTIFICATION-TYPE
+        OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl,
+		pdosAnomalyProto
+	}
+        STATUS  current
+        DESCRIPTION
+		"Protocol anomaly detected by Peakflow"
+        ::= { peakflowDosTrapsEnumerate 3 }
+
+heartbeatLoss NOTIFICATION-TYPE
+        OBJECTS {
+		pdosHeartbeatSource
+	}
+        STATUS  obsolete
+        DESCRIPTION
+		"Missing heartbeat from SP device to leader"
+        ::= { peakflowDosTrapsEnumerate 4 }
+
+internalError	NOTIFICATION-TYPE
+	OBJECTS {
+		internalErrorLocation,
+		internalErrorReason
+	}
+	STATUS  obsolete
+	DESCRIPTION
+		"Internal inconsistency or error"
+	::= { peakflowDosTrapsEnumerate 5 }
+
+-- Not all anomaly types have proto or flags.
+anomalyDone	NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl
+	}
+	STATUS	current
+	DESCRIPTION
+		"Some previously detected anomaly is no longer active"
+	::= { peakflowDosTrapsEnumerate 6 }
+
+netflowMissing NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyRouter
+	}
+	STATUS  obsolete
+	DESCRIPTION
+		"NetFlow has not been received from a NetFlow
+		transmitting router"
+	::= { peakflowDosTrapsEnumerate 7 }
+
+netflowMissingDone NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyRouter
+	}
+	STATUS  obsolete
+	DESCRIPTION
+		"NetFlow has resumed from a router which previously
+		was not forwarding NetFlow data"
+	::= { peakflowDosTrapsEnumerate 8 }
+		
+icmpMisuseAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl,
+		pdosAnomalyProto
+	}
+	STATUS  current
+	DESCRIPTION
+		"ICMP misuse anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 9 }
+
+tcpNullMisuseAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl,
+		pdosAnomalyProto,
+		pdosAnomalyTcpFlags
+	}
+	STATUS  current
+	DESCRIPTION
+		"TCP Null misuse anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 10 }
+
+tcpSynMisuseAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl,
+		pdosAnomalyProto,
+		pdosAnomalyTcpFlags
+	}
+	STATUS  current
+	DESCRIPTION
+		"TCP SYN misuse anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 11 }
+
+ipNullMisuseAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl
+	}
+	STATUS  current
+	DESCRIPTION
+		"IP Null misuse anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 12 }
+
+ipFragMisuseAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl,
+		pdosAnomalyProto
+	}
+	STATUS  current
+	DESCRIPTION
+		"IP Fragment misuse anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 13 }
+
+ipPrivateMisuseAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl
+	}
+	STATUS  current
+	DESCRIPTION
+		"IP Private misuse anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 14 }
+
+heartbeatLossDone NOTIFICATION-TYPE
+        OBJECTS {
+		pdosHeartbeatSource
+	}
+	STATUS  obsolete
+	DESCRIPTION
+		"Heartbeat from SP device to leader now works"
+	::= { peakflowDosTrapsEnumerate 15 }
+
+tcpRstMisuseAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl,
+		pdosAnomalyProto,
+		pdosAnomalyTcpFlags
+	}
+	STATUS  current
+	DESCRIPTION
+		"TCP RST misuse anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 16 }
+
+totalTrafficMisuseAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl
+	}
+	STATUS  current
+	DESCRIPTION
+		"Total Traffic misuse anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 17 }
+
+fingerprintAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl
+	}
+	STATUS  current
+	DESCRIPTION
+		"Fingerprint anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 18 }
+
+dnsMisuseAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl,
+		pdosAnomalyProto
+	}
+	STATUS  current
+	DESCRIPTION
+		"DNS misuse anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 19 } 
+
+udpMisuseAnomaly NOTIFICATION-TYPE
+	OBJECTS {
+		pdosAnomalyId,
+		pdosAnomalyDirection,
+		pdosAnomalyIpVersion,
+		pdosAnomalyResource,
+		pdosAnomalyLinkPercent,
+		pdosAnomalyClassification,
+		pdosAnomalyStart,
+		pdosAnomalyDuration,
+		pdosAnomalyRouterInterfaces,
+		pdosUrl,
+		pdosAnomalyProto
+	}
+	STATUS  current
+	DESCRIPTION
+		"UDP misuse anomaly detected by Peakflow"
+	::= { peakflowDosTrapsEnumerate 20 } 
+
+
+-- =================================================================================
+
+END
+

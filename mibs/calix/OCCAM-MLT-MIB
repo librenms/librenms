@@ -1,0 +1,1681 @@
+
+OCCAM-MLT-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericMonitorModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION
+			FROM SNMPv2-TC
+		MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, 
+                Integer32, NOTIFICATION-TYPE
+			FROM SNMPv2-SMI;
+		
+	occamMltMib	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION
+				"This mib module describes objects used 
+				to perform Metallic Line Testing on customer	
+				access lines and to provide results."
+		
+		REVISION	"200104271051Z"
+		DESCRIPTION	"Reformatted certain text"
+	 
+		REVISION	"200704170000Z"
+		DESCRIPTION	"replace kOhm with Ohm in DC resistance 
+                                UNITS"
+                
+		REVISION	"200702220000Z"
+		DESCRIPTION	"remove DISPLAY-HINT"
+			 
+		REVISION	"200609261000Z"
+		DESCRIPTION	"Removed Gr909 from fuse test result names"
+			
+		REVISION	"200602220135Z"
+		DESCRIPTION     "Initial version."
+		::=  {  occamGenericMonitorModules  3  }
+
+-- TEXTUAL-CONVENTIONS --
+
+	MltTestType ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+                        "A selection value for requesting or forcing
+                        a test. A requested test will only run if the
+                        port is not in use. A forced test will 
+                        immediately shut the port and run the test."
+		SYNTAX 	                INTEGER  { request ( 1 ) , 
+                                        force ( 2 ) } 
+
+	MltTestStatus ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An indication of test status:
+                        none = no test has been requested.
+                        mltbusy = another port is currently being tested. 
+                        complete = the last requested test has completed.
+                        portInUse = the last requested port is in use, 
+                        the test was not run. Rerunning the test as 
+                        'forced' will shut the port and run the test.
+			inProgress = the last requested test is still 
+                        running. mltError = the mlt program reported an 
+                        error and aborted the test.Check the mltErrorText
+                        object.
+			mltNotResponding = the mlt program didn't return
+                        a result."
+		SYNTAX 			INTEGER  { 
+                                        none ( 1 ) , 
+                                        mltBusy ( 2 ), 
+                                        complete ( 3 ) ,
+                                        portInUse ( 4 ) , 
+                                        inProgress ( 5 ), 
+                                        mltError ( 6 ), 
+                                        mltNotResponding ( 7 ) }
+
+        MltTestIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An mlt test selection value."
+		SYNTAX 			INTEGER  { 
+                                        statusSuite ( 1 ) , 
+                                        mltSuite ( 2 ) , 
+                                        activeModeVoltages ( 3 ) , 
+                                        highImpedanceModeVoltages ( 4 ) , 
+                                        dcResistance ( 5 ) , 
+                                        capacitance ( 6 ) , 
+                                        loopDetect ( 7 ) , 
+                                        loopLength ( 8 ) } 
+
+	MltTestHookState ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An mlt test hook state value."
+		SYNTAX 			INTEGER  { 
+                                        onhook ( 1 ) , 
+                                        offhook ( 2 ), 
+                                        notAvailable ( 3 ) } 
+
+	MltTestPassFail ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An mlt test pass/fail value."
+		SYNTAX 			INTEGER  { 
+                                        pass ( 1 ) , 
+                                        fail ( 2 ), 
+                                        notAvailable ( 3 ) } 
+		
+	MltTestRingerResult ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An mlt ringer test result value."
+		SYNTAX 			INTEGER  { 
+                                        pass ( 1 ) , 
+                                        fail ( 2 ), 
+                                        notAvailable ( 3 ), 
+                                        low ( 4 )  }
+
+        MltTestYesNo ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An mlt test pass/fail value."
+		SYNTAX 			INTEGER  { 
+                                        yes ( 1 ) , 
+                                        no ( 2 ), 
+                                        notAvailable ( 3 ) } 
+
+-- The Metallic Loop Test Configuration group
+
+	mltTestConfig	OBJECT IDENTIFIER
+		::=  {  occamMltMib  1  }
+
+
+-- The Metallic Loop Test Status group
+
+	mltTestStatus	OBJECT IDENTIFIER
+		::=  {  occamMltMib  2  }
+
+
+-- The Metallic Loop Test Results group
+
+	mltTestResults	OBJECT IDENTIFIER
+		::=  {  occamMltMib  3  }
+		
+-- The Metallic Loop Test Notifications group
+		
+	mltTestNotifications	OBJECT IDENTIFIER
+		::=  {  occamMltMib  4  }
+
+
+-- Objects of the MLT Configuration group
+
+	mltTestIdentifier	OBJECT-TYPE	
+		SYNTAX			MltTestIdentifier
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Selects the mlt test to be run.
+			Setting this value starts a test.
+			 
+			This is a required parameter.
+			 
+                        Approximate expected test durations are as 
+                        follows:
+			 
+			 statusSuite 			1 second
+			 mltSuite 			1 minute
+			 activeModeVoltages		3 seconds
+			 highImpedanceModeVoltages	9 seconds
+			 dcResistance			18 seconds
+			 capacitance			18 seconds
+			 loopDetect			9 seconds
+			 loopLength			9 seconds."
+		::=  {  mltTestConfig  1  }
+
+	mltTestType	OBJECT-TYPE	
+		SYNTAX			MltTestType
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Selects if a test is requested (only run if port
+                        is not in use) or forced.
+			This is an optional parameter. If not specified, 
+                        the request option is used."
+		::=  {  mltTestConfig  2  }
+
+	mltTestPort	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 48  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Selects voice channel on which test will be run.
+			 This is a required parameter."
+		::=  {  mltTestConfig  3  }
+
+	mltDcResistanceRange	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 0 .. 3  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Selects DC Resistance range value.
+                        This is an optional paramater. Default is 0
+                        (auto mode)."
+		::=  {  mltTestConfig  4  }
+
+	mltLoopLengthMultiplier	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 10 .. 200  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Selects loop length multiplier in nf. This is an
+                        optional parameter. If not specified an internal
+                        default value of 83nF/mile is used."
+		::=  {  mltTestConfig  5  }
+
+     mltLoopDetectThreshold	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 5 .. 200  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Selects the detection threshold in nF. 
+			 This is an optional parameter. If not supplied,
+                         a loop detection threshold of 10nF is used."
+		::=  {  mltTestConfig  6  }
+
+
+-- Objects of the MLT Test Status group
+
+	mltLastTestStatus	OBJECT-TYPE	
+		SYNTAX			MltTestStatus
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates the status of the last run mlt test.
+                        Given that the various mlt tests take several
+                        seconds to 1 1/2 minutes to run, it is suggested
+                        that status polls be spaced 10-20 seconds apart. 
+                        Additionally, a monitoring application could 
+                        wait for the testComplete notification."
+		::=  {  mltTestStatus  1  }
+		
+	mltErrorText		OBJECT-TYPE
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates the textual error in the case of an
+                        aborted test."
+		::= { mltTestStatus 2 }
+
+
+-- Objects of the MLT Test Results group
+
+-- mlt status results table
+	mltStatusResultsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MltStatusResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table provides result of the status test
+                        suite."
+		::=  { mltTestResults  1 }
+
+	mltStatusResultsEntry	OBJECT-TYPE
+		SYNTAX		MltStatusResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Entry holding information about results
+			of status suite tests.
+
+                        Note that a numerical result value of -999 means 
+                        that there was an error of some sort and the 
+                        value could not be measured."
+		INDEX		{  mltTestPort  }
+		::=  { mltStatusResultsTable 1 }
+
+	MltStatusResultsEntry  ::=  SEQUENCE {
+		mltStatusAlarm  OCTET STRING,
+		mltStatusHookState  MltTestHookState,
+		mltStatusTransversalCurrent  Integer32,
+		mltStatusLongitudinalCurrent  Integer32,
+		mltStatusTipVoltage  Integer32,
+		mltStatusRingVoltage  Integer32,
+		mltStatusTipRingVoltage  Integer32,
+		mltStatusVdd  Integer32
+		}
+
+
+	mltStatusAlarm	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates GNK and/or OTEMP alarms active when
+                        status test was run."
+		::=  {  mltStatusResultsEntry  1  }
+
+
+	mltStatusHookState	OBJECT-TYPE	
+		SYNTAX			MltTestHookState
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates line hook state when status test was 
+                        run."
+		::=  {  mltStatusResultsEntry  2  }
+
+
+	mltStatusTransversalCurrent	OBJECT-TYPE	
+		SYNTAX			Integer32
+		UNITS			"0.1 mA"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates transversal current when status test
+                        was run."
+		::=  {  mltStatusResultsEntry  3  }
+
+
+	mltStatusLongitudinalCurrent	OBJECT-TYPE	
+		SYNTAX			Integer32
+		UNITS			"0.1 mA"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates Longitudinal current when status test
+                        was run."
+		::=  {  mltStatusResultsEntry  4  }
+
+
+	mltStatusTipVoltage	OBJECT-TYPE	
+		SYNTAX			Integer32
+		UNITS			"0.1 V"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates tip voltage when status test was run."
+		::=  {  mltStatusResultsEntry  5  }
+
+
+	mltStatusRingVoltage	OBJECT-TYPE	
+		SYNTAX			Integer32
+		UNITS			"0.1 V"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates ring voltage when status test was run."
+		::=  {  mltStatusResultsEntry  6  }
+		
+	mltStatusTipRingVoltage	OBJECT-TYPE	
+		SYNTAX			Integer32
+		UNITS			"0.1 V"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates tip-ring voltage when status test was
+                        run."
+		::=  {  mltStatusResultsEntry  7  }
+
+
+	mltStatusVdd	OBJECT-TYPE	
+		SYNTAX			Integer32
+		UNITS			"0.1 V"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates Vdd when status test was run."
+		::=  {  mltStatusResultsEntry  8  }
+	
+-- mlt test results table	
+	mltTestResultsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MltTestResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table provides result of the mlt test suite.
+			Note that a numerical result value of -999 means 
+                        that there was an error of some sort and the 
+                        value could not be measured.
+			Also, a resistance value of 9999 means that the 
+                        result was greater than 1000 kOhms, but the exact
+                        value could not be measured."
+		::=  { mltTestResults  2 }
+
+	mltTestResultsEntry	OBJECT-TYPE
+		SYNTAX		MltTestResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Entry holding information about results
+			of mlt suite tests."
+		INDEX		{  mltTestPort  }
+		::=  { mltTestResultsTable 1 }
+
+	MltTestResultsEntry  ::=  SEQUENCE {
+		mltTestAlarm  OCTET STRING,
+		mltTestHookState  MltTestHookState,
+		mltTestVdd  Integer32,
+		mltTestActiveModeVoltagesVdctr  Integer32,
+		mltTestActiveModeVoltagesVdctg  Integer32,
+		mltTestActiveModeVoltagesVdcrg  Integer32,
+		mltTestActiveModeVoltagesVactr  Integer32,
+		mltTestActiveModeVoltagesVactg  Integer32,
+		mltTestActiveModeVoltagesVacrg  Integer32,
+		mltTestHighImpedanceModeVoltagesVdctr  Integer32,
+		mltTestHighImpedanceModeVoltagesVdctg  Integer32,
+		mltTestHighImpedanceModeVoltagesVdcrg  Integer32,
+		mltTestHighImpedanceModeVoltagesVactr  Integer32,
+		mltTestHighImpedanceModeVoltagesVactg  Integer32,
+		mltTestHighImpedanceModeVoltagesVacrg  Integer32,
+		mltTestDcCurrentsItransversal  Integer32,
+		mltTestDcCurrentsIlongitudinal  Integer32,
+		mltTestDcCurrentsItip  Integer32,
+		mltTestDcCurrentsIring  Integer32,
+		mltTestCapacitanceCeqtr  Integer32,
+		mltTestCapacitanceCeqtg  Integer32,
+		mltTestCapacitanceCeqrg  Integer32,
+		mltTestResistanceRtr  Integer32,
+		mltTestResistanceRtg  Integer32,
+		mltTestResistanceRrg  Integer32,
+		mltTestGr909HazardousPotentialTestResult MltTestPassFail,
+		mltTestGr909ForeignEmfTestResult  MltTestPassFail,
+		mltTestGr909FuseTestTipFuse  MltTestPassFail,
+		mltTestGr909FuseTestRingFuse  MltTestPassFail,
+		mltTestFuseTestTipFuse  MltTestPassFail,
+		mltTestFuseTestRingFuse  MltTestPassFail,
+		mltTestGr909ResistiveFaultTestResult  MltTestPassFail,
+		mltTestGr909ReceiverOffhookTestResult  MltTestPassFail,
+		mltTestGr909ReceiverOffhookTestResistance1  Integer32,
+		mltTestGr909ReceiverOffhookTestResistance2  Integer32,
+		mltTestGr909ReceiverOffhookTestDifference  Integer32,
+		mltTestGr909RingerTestResult  MltTestRingerResult,
+		mltTestGr909RingerTestRen  Integer32,
+		mltTestErrors  OCTET STRING
+		}
+
+
+	mltTestAlarm	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"GNK and OTEMP bits set by the DuSLIC will be 
+                        reported as alarms. GNK is typically cause by 
+                        ground fault or foreign voltage condition.
+                        OTEMP is set when the DuSLIC is experiencing
+                        thermal overload. This parameter is 
+                        non-intrusive."
+		::=  {  mltTestResultsEntry  1  }
+		
+        mltTestHookState  OBJECT-TYPE
+		SYNTAX			MltTestHookState
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Hook state reflects the DuSLIC hook bit 
+                        (offhook/onhook). This parameter is 
+                        non-intrusive."
+		::=  {  mltTestResultsEntry  2  }
+		
+	mltTestVdd  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 V"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"On HDPOTS, internal Voltage VDD will be 
+                        reported and compared to statistically derived
+                        thresholds. 
+                        This parameter is intrusive during offhook but 
+                        will be available during onhook."
+		::=  {  mltTestResultsEntry  3  }
+		
+	mltTestActiveModeVoltagesVdctr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+                        In active mode, the DuSLIC drives the tip/ring 
+                        in a normal no shutdown state. AC voltages for 
+                        T-R, T-G and R-G will be reported. 
+                        Active mode measurements will not be available
+                        when alarm is detected. This parameter is 
+                        intrusive and will be available in shutdown 
+                        state only."
+		::=  {  mltTestResultsEntry  4  }
+		
+	mltTestActiveModeVoltagesVdctg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+                        In active mode, the DuSLIC drives the tip/ring
+                        in a normal no shutdown state. AC voltages for 
+                        T-R, T-G and R-G will be reported. 
+                        Active mode measurements will not be available 
+                        when alarm is detected. This parameter is 
+                        intrusive and will be available in shutdown 
+                        state only."
+		::=  {  mltTestResultsEntry  5  }
+		
+	mltTestActiveModeVoltagesVdcrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+                        In active mode, the DuSLIC drives the tip/ring
+                        in a normal no shutdown state. AC voltages for 
+                        T-R, T-G and R-G will be reported. 
+                        Active mode measurements will not be available
+                        when alarm is detected. This parameter is 
+                        intrusive and will be available in shutdown 
+                        state only."
+		::=  {  mltTestResultsEntry  6  }
+		
+	mltTestActiveModeVoltagesVactr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+                        In active mode, the DuSLIC drives the tip/ring
+                        in a normal no shutdown state. Thus, VT and VR
+                        measurements should be 0 volt. 
+                        AC voltages for T-R, T-G and R-G will be 
+                        reported. Active mode measurements will not be
+                        available when alarm is detected. This parameter
+                        is intrusive and will be available in shutdown 
+                        state only."
+		::=  {  mltTestResultsEntry  7  }
+		
+	mltTestActiveModeVoltagesVactg  OBJECT-TYPE
+		SYNTAX		Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+                        "Active Mode Tip/Ring AC Voltages:
+                        In active mode, the DuSLIC drives the tip/ring
+                        in a normal no shutdown state. Thus, VT and VR		
+			measurements should be 0 volt. AC voltages for T-R, T-G	
+			and R-G will be reported. Active mode measurements will	
+			not be available when alarm is detected. This parameter	
+			is intrusive and will be available in shutdown state	
+			only."
+		::=  {  mltTestResultsEntry  8  }
+		
+	mltTestActiveModeVoltagesVacrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+			In active mode, the DuSLIC drives the tip/ring in a	
+			normal no shutdown state. Thus, VT and VR measurements	
+			should be 0 volt. AC voltages for T-R, T-G and R-G will	
+			be reported.  Active mode measurements will not be	
+			available when alarm is detected. This parameter is	
+			intrusive and will be available in shutdown state only."
+
+		::=  {  mltTestResultsEntry  9  }
+		
+	mltTestHighImpedanceModeVoltagesVdctr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring DC Voltages (Foreign	
+			Voltages):
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance. The measured voltages represent foreign	
+			voltages. DC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltTestResultsEntry  10  }
+		
+	mltTestHighImpedanceModeVoltagesVdctg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring DC Voltages (Foreign	
+			Voltages):
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance. The measured voltages represent foreign	
+			voltages. DC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltTestResultsEntry  11  }
+		
+	mltTestHighImpedanceModeVoltagesVdcrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring DC Voltages (Foreign	
+			Voltages):
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance. The measured voltages represent foreign	
+			voltages. DC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltTestResultsEntry  12  }
+		
+	mltTestHighImpedanceModeVoltagesVactr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring AC Voltages (Foreign	
+			Voltages): In this mode, the DuSLIC tip and ring are in	
+			high impedance. The measured voltages represent foreign	
+			voltages. AC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltTestResultsEntry  13  }
+		
+	mltTestHighImpedanceModeVoltagesVactg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring AC Voltages (Foreign	
+			Voltages):
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance. The measured voltages represent foreign	
+			voltages. AC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltTestResultsEntry  14  }
+		
+	mltTestHighImpedanceModeVoltagesVacrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring AC Voltages (Foreign	
+			Voltages):
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance. The measured voltages represent foreign	
+			voltages. AC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltTestResultsEntry  15  }
+		
+	mltTestDcCurrentsItransversal  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 mA"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Four DC currents will be reported: IT, IL, It and Ir. 
+			In normal condition, currents will be measured in	
+			active mode. These measurements will not be available if	
+			alarm is present."
+		::=  {  mltTestResultsEntry  16  }
+		
+	mltTestDcCurrentsIlongitudinal  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 mA"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Four DC currents will be reported: IT, IL, It and Ir. 
+			In normal condition, currents will be measured in active	
+			mode. These measurements will not be available if alarm	
+			is present."
+		::=  {  mltTestResultsEntry  17  }
+		
+	mltTestDcCurrentsItip  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 mA"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Four DC currents will be reported: IT, IL, It and Ir. 
+			In normal condition, currents will be measured in active	
+			mode. These measurements will not be available if alarm	
+			is present."
+		::=  {  mltTestResultsEntry  18  }
+		
+	mltTestDcCurrentsIring  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 mA"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Four DC currents will be reported: IT, IL, It and Ir. 
+			In normal condition, currents will be measured in active	
+			mode. These measurements will not be available if alarm	
+			is present."
+		::=  {  mltTestResultsEntry  19  }
+		
+	mltTestCapacitanceCeqtr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Capacitance measurements will support only single	
+			element (2 terminal) circuit. In the presence of a	
+			network of capacitance (figure 3), the individual	
+			capacitance will not be resolved. The equivalent	
+			capacitances CEQtr, CEQtg and CEQrg will be reported.	
+			They represent the following:
+
+	                       CEQtr = Ctr + Ctg/4 + Crg/4
+	                       CEQtg = Ctg + (Ctr*Crg)/(Ctr+Crg)
+	                       CEQrg = Crg + (Ctr*Ctg)/Ctr+Ctg)
+
+			Capacitance measurements will not be available if fuse	
+			test fails or alarm is present. This test is intrusive	
+			and will be available in shutdown state only."
+		::=  {  mltTestResultsEntry  20  }
+		
+	mltTestCapacitanceCeqtg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Capacitance measurements will support only single	
+			element (2 terminal) 
+			circuit. In the presence of a network of capacitance	
+			(figure 3), the 
+			individual capacitance will not be resolved. The	
+			equivalent capacitances CEQtr, CEQtg and CEQrg will be	
+			reported. They represent the following:
+
+	                       CEQtr = Ctr + Ctg/4 + Crg/4
+	                       CEQtg = Ctg + (Ctr*Crg)/(Ctr+Crg)
+	                       CEQrg = Crg + (Ctr*Ctg)/Ctr+Ctg)
+
+			Capacitance measurements will not be available if fuse	
+			test fails or alarm is present. This test is intrusive	
+			and will be available in shutdown state only."
+		::=  {  mltTestResultsEntry  21  }
+		
+	mltTestCapacitanceCeqrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Capacitance measurements will support only single	
+			element (2 terminal) circuit. In the presence of a	
+			network of capacitance (figure 3), the individual	
+			capacitance will not be resolved. The equivalent	
+			capacitances CEQtr, CEQtg and CEQrg will be reported.	
+			They represent the following:
+
+	                       CEQtr = Ctr + Ctg/4 + Crg/4
+	                       CEQtg = Ctg + (Ctr*Crg)/(Ctr+Crg)
+	                       CEQrg = Crg + (Ctr*Ctg)/Ctr+Ctg)
+
+			Capacitance measurements will not be available if fuse	
+			test fails or alarm is present. This test is intrusive	
+			and will be available in shutdown state only."
+		::=  {  mltTestResultsEntry  22  }
+		
+	mltTestResistanceRtr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"Ohm"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"DC resistance measurements will be based on a 3	
+			terminal circuit model. Rtr, Rtg and Rrg will be	
+			provided. User will have the option of specifying 3	
+			resistance ranges: (1) low, (2) medium, (3) high. If not	
+			specified, auto mode will be used. Resistance		
+			measurements will not be available if fuse test fails or	
+			alarm is present. This parameter is intrusive. This test	
+			is intrusive and will be available in shutdown state `	
+			only."
+		::=  {  mltTestResultsEntry  23  }
+		
+	mltTestResistanceRtg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"Ohm"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"DC resistance measurements will be based on a 3	
+			terminal circuit model. Rtr, Rtg and Rrg will be	
+			provided. User will have the option of specifying 
+			3 resistance ranges: (1) low, (2) medium, (3) high. If	
+			not specified, auto mode will be used. Resistance	
+			measurements will not be available if fuse test fails or	
+			alarm is present. This parameter is intrusive. This test	
+			is intrusive and will be available in shutdown state	
+			only."
+		::=  {  mltTestResultsEntry  24  }
+		
+	mltTestResistanceRrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"Ohm"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"DC resistance measurements will be based on a 3	
+			terminal circuit model. Rtr, Rtg and Rrg will be	
+			provided. User will have the option of specifying 
+			3 resistance ranges: (1) low, (2) medium, (3) high. If	
+			not specified, auto mode will be used. Resistance	
+			measurements will not be available if fuse test fails or	
+			alarm is present. This parameter is intrusive. This test	
+			is intrusive and will be available in shutdown state	
+			only."
+		::=  {  mltTestResultsEntry  25  }
+		
+	mltTestGr909HazardousPotentialTestResult  OBJECT-TYPE
+		SYNTAX			MltTestPassFail
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test fails if the T-G or R-G ac voltage is greater	
+			than 50 volts rms or the T-G or R-G dc voltage is	
+			greater than 135 volts. This test will report pass/fail.	
+			This test is intrusive and will be available in shutdown	
+			state only."
+		::=  {  mltTestResultsEntry  26  }
+		
+	mltTestGr909ForeignEmfTestResult  OBJECT-TYPE
+		SYNTAX			MltTestPassFail
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test fails if the T-G or R-G ac voltage is greater	
+			than 50 volts rms or the T-G or R-G dc voltage is	
+			greater than 135 volts. This test will report pass/fail.	
+			This test is intrusive and will be available in shutdown	
+			state only."
+		::=  {  mltTestResultsEntry  27  }
+		
+	mltTestGr909FuseTestTipFuse  OBJECT-TYPE
+		SYNTAX			MltTestPassFail
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION
+			"This test determines if these fuses are blown. This	
+			test will return pass/fail for tip and ring. This test	
+			will not be performed if alarm is present. This		
+			parameter is intrusive. This test is intrusive and will	
+			be available in shutdown state only.
+
+			This object is obsolete. Object name was changed."
+		::=  {  mltTestResultsEntry  28  }
+		
+	mltTestGr909FuseTestRingFuse  OBJECT-TYPE
+		SYNTAX			MltTestPassFail
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION
+			"This test determines if these fuses are blown. This	
+			test will return pass/fail for tip and ring. This test	
+			will not be performed if alarm is present. This		
+			parameter is intrusive. This test is intrusive and will	
+			be available in shutdown state only.
+
+			This object is obsolete. Object name was changed."
+		::=  {  mltTestResultsEntry  29  }
+		
+        mltTestFuseTestTipFuse  OBJECT-TYPE
+		SYNTAX			MltTestPassFail
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test determines if these fuses are blown. This	
+			test will return pass/fail for tip and ring. This test	
+			will not be performed if alarm is present. This		
+			parameter is intrusive. This test is intrusive and will	
+			be available in shutdown state only."
+		::=  {  mltTestResultsEntry  38  }
+		
+	mltTestFuseTestRingFuse  OBJECT-TYPE
+		SYNTAX			MltTestPassFail
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test determines if these fuses are blown. This	
+			test will return pass/fail for tip and ring. This test	
+			will not be performed if alarm is present. This		
+			parameter is intrusive. This test is intrusive and will	
+			be available in shutdown state only."
+		::=  {  mltTestResultsEntry  39  }
+		
+	mltTestGr909ResistiveFaultTestResult  OBJECT-TYPE
+		SYNTAX			MltTestPassFail
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test fails if the T-R, T-G or R-G dc resistance is	
+			less than 150k ohm. This test will not be performed if	
+			fuse test fails or alarm is present. This test will	
+			return pass/fail. This test is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltTestResultsEntry  30  }
+		
+	mltTestGr909ReceiverOffhookTestResult  OBJECT-TYPE
+		SYNTAX			MltTestPassFail
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test fails if a non-linearity in the T-R dc	
+			resistance of greater than 15% when measured at two	
+			different voltage levels exists. This test will not be	
+			performed if fuse test fails or alarm is present. This	
+			test will return the DC resistances at two different	
+			operating points and the percent difference between the	
+			two DC resistances. This test is intrusive and will be	
+			available in shutdown state only. "
+		::=  {  mltTestResultsEntry  31  }
+		
+	mltTestGr909ReceiverOffhookTestResistance1  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"Ohm"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test fails if a non-linearity in the T-R dc	
+			resistance of greater than 15% when measured at two	
+			different voltage levels exists. This test will not be	
+			performed if fuse test fails or alarm is present. This	
+			test will return the DC resistances at two different	
+			operating points and the percent difference between the	
+			two DC resistances. This test is intrusive and will be	
+			available in shutdown state only. "
+		::=  {  mltTestResultsEntry  32  }
+		
+	mltTestGr909ReceiverOffhookTestResistance2  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"Ohm"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test fails if a non-linearity in the T-R dc	
+			resistance of greater than 15% when measured at two	
+			different voltage levels exists. This test will not be	
+			performed if fuse test fails or alarm is present. This	
+			test will return the DC resistances at two different	
+			operating points and the percent difference between the	
+			two DC resistances. This test is intrusive and will be	
+			available in shutdown state only. "
+		::=  {  mltTestResultsEntry  33  }
+		
+	mltTestGr909ReceiverOffhookTestDifference  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"%"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test fails if a non-linearity in the T-R dc	
+			resistance of greater than 15% when measured at two	
+			different voltage levels exists. This test will not be	
+			performed if fuse test fails or alarm is present. This	
+			test will return the DC resistances at two different	
+			operating points and the percent difference between the	
+			two DC resistances. This test is intrusive and will be	
+			available in shutdown state only. "
+		::=  {  mltTestResultsEntry  34  }
+		
+	mltTestGr909RingerTestResult  OBJECT-TYPE
+		SYNTAX			MltTestRingerResult
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test fails when the equivalent ringer count across	
+			tip and ring is less than 0.175 REN or greater than 5	
+			REN. This test will not run if fuse test fails or alarm	
+			is present. This test will report passed/fail and the	
+			REN number. This parameter is intrusive and will be	
+			available in shutdown state shutdown only."
+		::=  {  mltTestResultsEntry  35  }
+		
+	mltTestGr909RingerTestRen  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 REN"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This test fails when the equivalent ringer count across	
+			tip and ring is less than 0.175 REN or greater than 5	
+			REN. This test will not run if fuse test fails or alarm	
+			is present. This test will report passed/fail and the	
+			REN number. This parameter is intrusive and will be	
+			available in shutdown state shutdown only."
+		::=  {  mltTestResultsEntry  36  }
+		
+	mltTestErrors  OBJECT-TYPE
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates GNK and/or OTEMP alarms active when test was	
+			run."
+		::=  {  mltTestResultsEntry  37  }
+
+-- mlt active mode voltages results table	
+	mltActiveModeVoltagesResultsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MltActiveModeVoltagesResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table provides results of the mlt active mode	
+			voltages test.
+			Note that a numerical result value of -999 means that	
+			there was an error of some sort and the value could not	
+			be measured."
+		::=  { mltTestResults  3 }
+
+	mltActiveModeVoltagesResultsEntry	OBJECT-TYPE
+		SYNTAX		MltActiveModeVoltagesResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Entry holding information about results
+			of mlt active mode voltages test."
+		INDEX		{  mltTestPort  }
+		::=  { mltActiveModeVoltagesResultsTable 1 }
+
+	MltActiveModeVoltagesResultsEntry  ::=  SEQUENCE {
+		mltActiveModeVoltagesVdctr  Integer32,
+		mltActiveModeVoltagesVdctg  Integer32,
+		mltActiveModeVoltagesVdcrg  Integer32,
+		mltActiveModeVoltagesVactr  Integer32,
+		mltActiveModeVoltagesVactg  Integer32,
+		mltActiveModeVoltagesVacrg  Integer32,
+		mltActiveModeVoltagesErrors  OCTET STRING
+		}
+		
+	mltActiveModeVoltagesVdctr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+			In active mode, the DuSLIC drives the tip/ring in a	
+			normal no shutdown state. AC voltages for T-R, T-G and	
+			R-G will be reported. 
+			Active mode measurements will not be available when	
+			alarm is detected. This parameter is intrusive and will	
+			be available in shutdown state only."
+		::=  {  mltActiveModeVoltagesResultsEntry  1  }
+		
+	mltActiveModeVoltagesVdctg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+			In active mode, the DuSLIC drives the tip/ring in a	
+			normal no shutdown state. AC voltages for T-R, T-G and	
+			R-G will be reported.  Active mode measurements will not	
+			be available when alarm is detected. This parameter is	
+			intrusive and will be available in shutdown state only."
+		::=  {  mltActiveModeVoltagesResultsEntry  2  }
+		
+	mltActiveModeVoltagesVdcrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+			In active mode, the DuSLIC drives the tip/ring in a	
+			normal no shutdown state. AC voltages for T-R, T-G and	
+			R-G will be reported. Active mode measurements will not	
+			be available when alarm is detected. This parameter is	
+			intrusive and will be available in shutdown state only."
+		::=  {  mltActiveModeVoltagesResultsEntry  3  }
+		
+	mltActiveModeVoltagesVactr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+			In active mode, the DuSLIC drives the tip/ring in a	
+			normal no shutdown state. Thus, VT and VR measurements	
+			should be 0 volt. AC voltages for T-R, T-G and R-G will	
+			be reported. Active mode measurements will not be	
+			available when alarm is detected. This parameter is	
+			intrusive and will be available in shutdown state only."
+		::=  {  mltActiveModeVoltagesResultsEntry  4  }
+		
+	mltActiveModeVoltagesVactg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+                         In active mode, the DuSLIC drives the tip/ring in a	
+			normal no shutdown state. Thus, VT and VR measurements	
+			should be 0 volt. AC voltages for T-R, T-G and R-G will	
+			be reported. Active mode measurements will not be	
+			available when alarm is detected. This parameter is	
+			intrusive and will be available in shutdown state only."
+		::=  {  mltActiveModeVoltagesResultsEntry  5  }
+		
+	mltActiveModeVoltagesVacrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Active Mode Tip/Ring AC Voltages:
+			In active mode, the DuSLIC drives the tip/ring in a	
+			normal no shutdown state. Thus, VT and VR measurements	
+			should be 0 volt. AC voltages for T-R, T-G and R-G will	
+			be reported. 
+			Active mode measurements will not be available when	
+			alarm is detected. This parameter is intrusive and will	
+			be available in shutdown state only."
+
+		::=  {  mltActiveModeVoltagesResultsEntry  6  }
+		
+	 mltActiveModeVoltagesErrors  OBJECT-TYPE
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates GNK and/or OTEMP alarms active when test was	
+			run."
+		::=  {  mltActiveModeVoltagesResultsEntry  7  }
+
+-- mlt high impedance mode voltages results table	
+	mltHighImpedanceModeVoltagesResultsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  
+MltHighImpedanceModeVoltagesResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table provides result of the mlt test suite.
+			Note that a numerical result value of -999 means that	
+			there was an error of some sort and the value could not	
+			be measured."
+		::=  { mltTestResults  4 }
+
+	mltHighImpedanceModeVoltagesResultsEntry	OBJECT-TYPE
+		SYNTAX		MltHighImpedanceModeVoltagesResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Entry holding information about results
+			of mlt high impedance mode voltages test."
+		INDEX		{  mltTestPort  }
+		::=  { mltHighImpedanceModeVoltagesResultsTable 1 }
+
+	MltHighImpedanceModeVoltagesResultsEntry  ::=  SEQUENCE {
+		mltHighImpedanceModeVoltagesVdctr  Integer32,
+		mltHighImpedanceModeVoltagesVdctg  Integer32,
+		mltHighImpedanceModeVoltagesVdcrg  Integer32,
+		mltHighImpedanceModeVoltagesVactr  Integer32,
+		mltHighImpedanceModeVoltagesVactg  Integer32,
+		mltHighImpedanceModeVoltagesVacrg  Integer32,
+		mltHighImpedanceModeVoltagesErrors  OCTET STRING
+		}
+		
+	mltHighImpedanceModeVoltagesVdctr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring DC Voltages (Foreign	
+			Voltages):
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance. The measured voltages represent foreign	
+			voltages. DC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltHighImpedanceModeVoltagesResultsEntry  1  }
+		
+	mltHighImpedanceModeVoltagesVdctg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring DC Voltages (Foreign	
+			Voltages):
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance. The measured voltages represent foreign	
+			voltages. DC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltHighImpedanceModeVoltagesResultsEntry  2  }
+		
+	mltHighImpedanceModeVoltagesVdcrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vdc"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring DC Voltages (Foreign	
+			Voltages): 
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance. The measured voltages represent foreign	
+			voltages. DC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltHighImpedanceModeVoltagesResultsEntry  3  }
+		
+	mltHighImpedanceModeVoltagesVactr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring AC Voltages (Foreign	
+			Voltages):
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance. The measured voltages represent foreign	
+			voltages. AC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltHighImpedanceModeVoltagesResultsEntry  4  }
+		
+	mltHighImpedanceModeVoltagesVactg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring AC Voltages (Foreign	
+			Voltages):
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance.  The measured voltages represent foreign	
+			voltages. AC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltHighImpedanceModeVoltagesResultsEntry  5  }
+		
+	mltHighImpedanceModeVoltagesVacrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"0.1 Vrms"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"High Impedance Mode Tip/Ring AC Voltages (Foreign	
+			Voltages):
+			In this mode, the DuSLIC tip and ring are in high	
+			impedance. The measured voltages represent foreign	
+			voltages. AC voltages for T-R, T-G and R-G will be	
+			reported. This parameter is intrusive and will be	
+			available in shutdown state only."
+		::=  {  mltHighImpedanceModeVoltagesResultsEntry  6  }
+				
+	mltHighImpedanceModeVoltagesErrors  OBJECT-TYPE
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates GNK and/or OTEMP alarms active when test was	
+			run."
+		::=  {  mltHighImpedanceModeVoltagesResultsEntry  7  }
+		
+-- mlt DC resistance results table	
+	mltDcResistanceResultsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MltDcResistanceResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table provides result of the DC resistance test.
+			Note that a numerical result value of -999 means that	
+			there was an error of some sort and the value could not	
+			be measured.  Also, a resistance value of 9999 means	
+			that the result was greater than 1000 kOhms, but the	
+			exact value could not be measured."
+		::=  { mltTestResults  5 }
+
+	mltDcResistanceResultsEntry	OBJECT-TYPE
+		SYNTAX		MltDcResistanceResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Entry holding information about results
+			of mlt DC resistance test."
+		INDEX		{  mltTestPort  }
+		::=  { mltDcResistanceResultsTable 1 }
+
+	MltDcResistanceResultsEntry  ::=  SEQUENCE {
+		mltDcResistanceRtr  Integer32,
+		mltDcResistanceRtg  Integer32,
+		mltDcResistanceRrg  Integer32,
+		mltDcResistanceErrors  OCTET STRING
+		}
+
+		
+	mltDcResistanceRtr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"Ohm"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"DC resistance measurements will be based on a 3	
+			terminal circuit model.  Rtr, Rtg and Rrg will be	
+			provided. User will have the option of specifying 
+			3 resistance ranges: (1) low, (2) medium, (3) high. If	
+			not specified, auto mode will be used. Resistance	
+			measurements will not be available if fuse test fails or	
+			alarm is present. This parameter is intrusive. This test	
+			is intrusive and will be available in shutdown state	
+			only."
+		::=  {  mltDcResistanceResultsEntry  1  }
+		
+	mltDcResistanceRtg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"Ohm"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"DC resistance measurements will be based on a 3	
+			terminal circuit model. Rtr, Rtg and Rrg will be	
+			provided. User will have the option of specifying 
+			3 resistance ranges: (1) low, (2) medium, (3) high. If	
+			not specified, auto mode will be used. Resistance	
+			measurements will not be available if fuse test fails or	
+			alarm is present. This parameter is intrusive. This test	
+			is intrusive and will be available in shutdown state	
+			only."
+		::=  {  mltDcResistanceResultsEntry  2  }
+		
+	mltDcResistanceRrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"Ohm"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"DC resistance measurements will be based on a 3	
+			terminal circuit model. Rtr, Rtg and Rrg will be	
+			provided. User will have the option of specifying 
+			3 resistance ranges: (1) low, (2) medium, (3) high. If	
+			not specified, auto mode will be used. Resistance	
+			measurements will not be available if fuse test fails or	
+			alarm is present. This parameter is intrusive. This test	
+			is intrusive and will be available in shutdown state	
+			only."
+		::=  {  mltDcResistanceResultsEntry  3  }
+				
+	mltDcResistanceErrors  OBJECT-TYPE
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates GNK and/or OTEMP alarms active when test was	
+			run."
+		::=  {  mltDcResistanceResultsEntry  4  }
+		
+-- mlt capacitance results table	
+	mltCapacitanceResultsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MltCapacitanceResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table provides result of the mlt test suite.
+			Note that a numerical result value of -999 means that 
+			there was an error of some sort and the value could not	
+			be measured."
+		::=  { mltTestResults  6 }
+
+	mltCapacitanceResultsEntry	OBJECT-TYPE
+		SYNTAX		MltCapacitanceResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Entry holding information about results
+			of mlt capacitance test."
+		INDEX		{  mltTestPort  }
+		::=  { mltCapacitanceResultsTable 1 }
+
+	MltCapacitanceResultsEntry  ::=  SEQUENCE {
+		mltCapacitanceCeqtr  Integer32,
+		mltCapacitanceCeqtg  Integer32,
+		mltCapacitanceCeqrg  Integer32,
+		mltCapacitanceErrors  OCTET STRING
+		}
+		
+	mltCapacitanceCeqtr  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Capacitance measurements will support only single	
+			element (2 terminal) circuit. In the presence of a	
+			network of capacitance (figure 3), the individual	
+			capacitance will not be resolved. The equivalent	
+			capacitances CEQtr, CEQtg and CEQrg will be reported.	
+			They represent the following:
+
+	                       CEQtr = Ctr + Ctg/4 + Crg/4
+	                       CEQtg = Ctg + (Ctr*Crg)/(Ctr+Crg)
+	                       CEQrg = Crg + (Ctr*Ctg)/Ctr+Ctg)
+
+                         Capacitance measurements will not be available if fuse	
+			test fails or alarm is present. This test is intrusive	
+			and will be available in shutdown state only."
+		::=  {  mltCapacitanceResultsEntry  1  }
+		
+	mltCapacitanceCeqtg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Capacitance measurements will support only single	
+			element (2 terminal) circuit. In the presence of a	
+			network of capacitance (figure 3), the individual	
+			capacitance will not be resolved. The equivalent	
+			capacitances CEQtr, CEQtg and CEQrg will be reported.	
+			They represent the following:
+
+	                       CEQtr = Ctr + Ctg/4 + Crg/4
+	                       CEQtg = Ctg + (Ctr*Crg)/(Ctr+Crg)
+	                       CEQrg = Crg + (Ctr*Ctg)/Ctr+Ctg)
+
+			Capacitance measurements will not be available if fuse	
+			test fails or alarm is present. This test is intrusive	
+			and will be available in shutdown state only."
+		::=  {  mltCapacitanceResultsEntry  2  }
+		
+	mltCapacitanceCeqrg  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Capacitance measurements will support only single	
+			element (2 terminal) circuit. In the presence of a	
+			network of capacitance (figure 3), the individual	
+			capacitance will not be resolved. The equivalent	
+			capacitances CEQtr, CEQtg and CEQrg will be reported.	
+			They represent the following:
+
+	                       CEQtr = Ctr + Ctg/4 + Crg/4
+	                       CEQtg = Ctg + (Ctr*Crg)/(Ctr+Crg)
+	                       CEQrg = Crg + (Ctr*Ctg)/Ctr+Ctg)
+
+			Capacitance measurements will not be available if fuse	
+			test fails or alarm is present. This test is intrusive	
+			and will be available in shutdown state only."
+		::=  {  mltCapacitanceResultsEntry  3  }
+				
+	mltCapacitanceErrors  OBJECT-TYPE
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates GNK and/or OTEMP alarms active when test was	
+			run."
+		::=  {  mltCapacitanceResultsEntry  4  }
+
+-- mlt loop detect results table	
+	mltLoopDetectResultsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MltLoopDetectResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table provides result of the mlt loop detect test.
+			Note that a numerical result value of -999 means that	
+			there was an error of some sort and the value could not	
+			be measured."
+		::=  { mltTestResults  7 }
+
+	mltLoopDetectResultsEntry	OBJECT-TYPE
+		SYNTAX		MltLoopDetectResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Entry holding information about results
+			of mlt loop detect test."
+		INDEX		{  mltTestPort  }
+		::=  { mltLoopDetectResultsTable 1 }
+
+	MltLoopDetectResultsEntry  ::=  SEQUENCE {
+		mltLoopDetectLoopCapacitance  Integer32,
+		mltLoopDetectDetectionThreshold  Integer32,
+		mltLoopDetectLoopDetected  MltTestYesNo,
+		mltLoopDetectErrors  OCTET STRING
+		}
+		
+	mltLoopDetectLoopCapacitance  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+                        "Loop detection will be based on tip-ring capacitance
+                        measurement. User will be able to specify the detection
+                        threshold. If not supplied,loop detection threshold of
+                        10 nF will be used. This test will not be available if
+                        fuse test fails or alarm is present. This test is
+                        intrusive and will be available in shutdown state only."
+		::=  {  mltLoopDetectResultsEntry  1  }
+		
+	mltLoopDetectDetectionThreshold  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Loop detection will be based on tip-ring capacitance
+                        measurement. User will be able to specify the detection
+                        threshold. If not supplied, loop detection threshold of
+                        10 nF will be used. This test will not be available if
+                        fuse test fails or alarm is present. This test is
+                        intrusive and will be available in shutdown state only."
+		::=  {  mltLoopDetectResultsEntry  2  }
+		
+	mltLoopDetectLoopDetected  OBJECT-TYPE
+		SYNTAX			MltTestYesNo
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Loop detection will be based on tip-ring capacitance
+                        measurement. User will be able to specify the detection
+                        threshold. If not supplied, loop detection threshold
+                        of 10 nF will be used. This test will not be available
+                        if fuse test fails or alarm is present. This test is
+                        intrusive and will be available in shutdown state only."
+		::=  {  mltLoopDetectResultsEntry  3  }
+				
+	mltLoopDetectErrors  OBJECT-TYPE
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates GNK and/or OTEMP alarms active when test
+                        was run."
+		::=  {  mltLoopDetectResultsEntry  4  }
+
+-- mlt loop length results table	
+	mltLoopLengthResultsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MltLoopLengthResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table provides result of the mlt loop length test.
+			Note that a numerical result value of -999 means that 
+                        there was an error of some sort and the value could
+                        not be measured."
+		::=  { mltTestResults  8 }
+
+	mltLoopLengthResultsEntry	OBJECT-TYPE
+		SYNTAX		MltLoopLengthResultsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Entry holding information about results
+			of mlt loop length test."
+		INDEX		{  mltTestPort  }
+		::=  { mltLoopLengthResultsTable 1 }
+
+	MltLoopLengthResultsEntry  ::=  SEQUENCE {
+		mltLoopLengthCapacitanceFactor  Integer32,
+		mltLoopLengthLoopCapacitance  Integer32,
+		mltLoopLengthLoopLength  Integer32,
+		mltLoopLengthUncompensatedLoopCapacitance Integer32,
+		mltLoopLengthUncompensatedLoopLength Integer32,
+		mltLoopLengthErrors  OCTET STRING
+		}
+		
+	mltLoopLengthCapacitanceFactor  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF/mile"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Loop length estimate will be based on tip-ring
+                        capacitance measurement. User will be able to 
+                        specify the loop length multiplier. If not supplied, 
+                        loop length multiplier of 83 nF/ mile will be used.
+                        This test will not be available if fuse test fails
+                        or alarm is present. This test is intrusive and will
+                        be available in shutdown state only."
+		::=  {  mltLoopLengthResultsEntry  1  }
+		
+	mltLoopLengthLoopCapacitance  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Loop length estimate will be based on tip-ring		
+			capacitance measurement. User will be able to specify	
+			the loop length multiplier. If not supplied, loop length	
+			multiplier of 83 nF/ mile will be used. This test will	
+			not be available if fuse test fails or alarm is present.	
+			This test is intrusive and will be available in shutdown	
+			state only. "
+		::=  {  mltLoopLengthResultsEntry  2  }
+		
+	mltLoopLengthLoopLength  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"ft"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Loop length estimate will be based on tip-ring		
+			capacitance measurement. User will be able to specify	
+			the loop length multiplier. If not supplied, loop length	
+			multiplier of 83 nF/ mile will be used. This test will	
+			not be available if fuse test fails or alarm is present.	
+			This test is intrusive and will be available in shutdown 
+			state only. "
+		::=  {  mltLoopLengthResultsEntry  3  }
+		
+	mltLoopLengthUncompensatedLoopCapacitance  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"nF"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Loop length estimate will be based on tip-ring		
+			capacitance measurement. User will be able to specify	
+			the loop length multiplier. If not supplied, loop length	
+			multiplier of 83 nF/ mile will be used. This test will	
+			not be available if fuse test fails or alarm is present.	
+			This test is intrusive and will be available in shutdown	
+			state only. This value has no DSL correction."
+		::=  {  mltLoopLengthResultsEntry  4  }
+		
+	mltLoopLengthUncompensatedLoopLength  OBJECT-TYPE
+		SYNTAX			Integer32
+		UNITS			"ft"
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Loop length estimate will be based on tip-ring		
+			capacitance measurement. User will be able to specify	
+			the loop length multiplier. If not supplied, loop length	
+			multiplier of 83 nF/ mile will be used. This test will	
+			not be available if fuse test fails or alarm is present.	
+			This test is intrusive and will be available in shutdown	
+			state only. This value has no DSL correction."
+		::=  {  mltLoopLengthResultsEntry  5  }
+
+				
+	mltLoopLengthErrors  OBJECT-TYPE
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates GNK and/or OTEMP alarms active when test was	
+			run."
+		::=  {  mltLoopLengthResultsEntry  6  }
+		
+-- notifications
+
+	mltTestCompletedNotification	NOTIFICATION-TYPE
+		OBJECTS			{ mltTestIdentifier, mltTestPort, 
+					mltLastTestStatus, mltErrorText }
+		STATUS			current
+		DESCRIPTION		
+			"This notification is sent to the 
+			requesting host when the requested mlt 
+			test has completed."
+		::=  {  mltTestNotifications  1  }
+
+
+
+END

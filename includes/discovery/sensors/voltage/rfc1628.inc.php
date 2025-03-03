@@ -1,86 +1,132 @@
 <?php
 
+use LibreNMS\Util\Number;
+
 echo 'RFC1628 ';
 
-$oids = snmp_walk($device, '.1.3.6.1.2.1.33.1.2.5', '-Osqn', 'UPS-MIB');
-d_echo($oids."\n");
+$battery_volts = snmp_get($device, 'upsBatteryVoltage.0', '-OqvU', 'UPS-MIB');
+if (is_numeric($battery_volts)) {
+    $volt_oid = '.1.3.6.1.2.1.33.1.2.5.0';
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'voltage', $volt_oid);
 
-$oids = trim($oids);
-foreach (explode("\n", $oids) as $data) {
-    $data = trim($data);
-    if ($data) {
-        list($oid,$descr) = explode(' ', $data, 2);
-        $split_oid        = explode('.', $oid);
-        $volt_id          = $split_oid[(count($split_oid) - 1)];
-        $volt_oid         = ".1.3.6.1.2.1.33.1.2.5.$volt_id";
-        $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltage', $volt_oid);
-
-        $volt  = (snmp_get($device, $volt_oid, '-O vq') / $divisor);
-        $descr = 'Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($volt_id + 1));
-        $type  = 'rfc1628';
-        $index = '1.2.5.'.$volt_id;
-
-        discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
-    }
+    discover_sensor(
+        null,
+        'voltage',
+        $device,
+        $volt_oid,
+        '1.2.5.0',
+        'rfc1628',
+        'Battery',
+        $divisor,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $battery_volts / $divisor
+    );
 }
 
-$oids = trim(snmp_walk($device, '.1.3.6.1.2.1.33.1.4.3.0', '-OsqnU'));
-d_echo($oids."\n");
-
-list($unused,$numPhase) = explode(' ', $oids);
-for ($i = 1; $i <= $numPhase; $i++) {
-    $volt_oid = ".1.3.6.1.2.1.33.1.4.4.1.2.$i";
-    $descr    = 'Output';
-    if ($numPhase > 1) {
-        $descr .= " Phase $i";
+$output_volts = snmpwalk_group($device, 'upsOutputVoltage', 'UPS-MIB');
+foreach ($output_volts as $index => $data) {
+    $volt_oid = ".1.3.6.1.2.1.33.1.4.4.1.2.$index";
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'voltage', $volt_oid);
+    $descr = 'Output';
+    if (count($output_volts) > 1) {
+        $descr .= " Phase $index";
     }
 
-    $type    = 'rfc1628';
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltage', $volt_oid);
+    $upsOutputVoltage_value = $data['upsOutputVoltage'];
 
-    $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
-    $index   = $i;
+    if (is_array($data['upsOutputVoltage'])) {
+        $upsOutputVoltage_value = $data['upsOutputVoltage'][0];
+        $volt_oid .= '.0';
+    }
+    $upsOutputVoltage_value = Number::cast($upsOutputVoltage_value);
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(
+        null,
+        'voltage',
+        $device,
+        $volt_oid,
+        $index,
+        'rfc1628',
+        $descr,
+        $divisor,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $upsOutputVoltage_value / $divisor
+    );
 }
 
-$oids = trim(snmp_walk($device, '.1.3.6.1.2.1.33.1.3.2.0', '-OsqnU'));
-d_echo($oids."\n");
-
-list($unused,$numPhase) = explode(' ', $oids);
-for ($i = 1; $i <= $numPhase; $i++) {
-    $volt_oid = ".1.3.6.1.2.1.33.1.3.3.1.3.$i";
-    $descr    = 'Input';
-    if ($numPhase > 1) {
-        $descr .= " Phase $i";
+$input_volts = snmpwalk_group($device, 'upsInputVoltage', 'UPS-MIB');
+foreach ($input_volts as $index => $data) {
+    $volt_oid = ".1.3.6.1.2.1.33.1.3.3.1.3.$index";
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'voltage', $volt_oid);
+    $descr = 'Input';
+    if (count($input_volts) > 1) {
+        $descr .= " Phase $index";
     }
 
-    $type    = 'rfc1628';
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltage', $volt_oid);
+    $upsInputVoltage_value = $data['upsInputVoltage'];
 
-    $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
-
-    $index   = (100 + $i);
-
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
-}
-
-$oids = trim(snmp_walk($device, '.1.3.6.1.2.1.33.1.5.2.0', '-OsqnU'));
-d_echo($oids."\n");
-
-list($unused,$numPhase) = explode(' ', $oids);
-for ($i = 1; $i <= $numPhase; $i++) {
-    $volt_oid = ".1.3.6.1.2.1.33.1.5.3.1.2.$i";
-    $descr    = 'Bypass';
-    if ($numPhase > 1) {
-        $descr .= " Phase $i";
+    if (is_array($data['upsInputVoltage'])) {
+        $upsInputVoltage_value = $data['upsInputVoltage'][0];
+        $volt_oid .= '.0';
     }
+    $upsInputVoltage_value = Number::cast($upsInputVoltage_value);
 
-    $type    = 'rfc1628';
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'voltage', $volt_oid);
-
-    $current = (snmp_get($device, $volt_oid, '-Oqv') / $divisor);
-    $index   = (200 + $i);
-
-    discover_sensor($valid['sensor'], 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(
+        null,
+        'voltage',
+        $device,
+        $volt_oid,
+        100 + $index,
+        'rfc1628',
+        $descr,
+        $divisor,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $upsInputVoltage_value / $divisor
+    );
 }
+
+$bypass_volts = snmpwalk_group($device, 'upsBypassVoltage', 'UPS-MIB');
+foreach ($bypass_volts as $index => $data) {
+    $volt_oid = ".1.3.6.1.2.1.33.1.5.3.1.2.$index";
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'voltage', $volt_oid);
+    $descr = 'Bypass';
+    if (count($bypass_volts) > 1) {
+        $descr .= " Phase $index";
+    }
+    if (is_array($data['upsBypassVoltage'])) {
+        $data['upsBypassVoltage'] = $data['upsBypassVoltage'][0];
+        $volt_oid .= '.0';
+    }
+    $data['upsBypassVoltage'] = Number::cast($data['upsBypassVoltage']);
+
+    discover_sensor(
+        null,
+        'voltage',
+        $device,
+        $volt_oid,
+        200 + $index,
+        'rfc1628',
+        $descr,
+        $divisor,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $data['upsBypassVoltage'] / $divisor
+    );
+}
+
+unset($input_volts, $output_volts, $battery_volts, $bypass_volts);

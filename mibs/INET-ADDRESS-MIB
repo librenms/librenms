@@ -1,16 +1,3 @@
--- *****************************************************************
--- INET-ADDRESS-MIB.my:  Textual Conventions for Internet Network 
---                       Address.
--- 
--- July 2005, Subra Hegde
---
--- Copyright (c) 2005 by cisco Systems, Inc.
--- All rights reserved.
---
--- *****************************************************************
-
--- This MIB is extracted from RFC 4001
-
 INET-ADDRESS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -57,8 +44,6 @@ inetAddressMIB MODULE-IDENTITY
          InetAutonomousSystemNumber, InetAddressIPv4z,
          and InetAddressIPv6z."
     REVISION     "200006080000Z"
-
-
     DESCRIPTION
         "Initial version, published as RFC 2851."
     ::= { mib-2 76 }
@@ -108,7 +93,6 @@ InetAddressType ::= TEXTUAL-CONVENTION
          if an attempt to change an InetAddressType object would,
          for example, lead to an undefined InetAddress value.  In
 
-
          particular, InetAddressType/InetAddress pairs must be
          changed together if the address type changes (e.g., from
          ipv6(2) to ipv4(1))."
@@ -156,7 +140,6 @@ InetAddressIPv4 ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
         "Represents an IPv4 network address:
-
 
            Octets   Contents         Encoding
             1-4     IPv4 address     network-byte order
@@ -207,7 +190,6 @@ InetAddressIPv4z ::= TEXTUAL-CONVENTION
 
          This textual convention SHOULD NOT be used directly in object
 
-
          definitions, as it restricts addresses to a specific format.
          However, if it is used, it MAY be used either on its own or in
          conjunction with InetAddressType, as a pair."
@@ -256,7 +238,6 @@ InetAddressDNS ::= TEXTUAL-CONVENTION
          IPv6).  The order of the resolution process and which DNS
          record takes precedence depends on the configuration of the
          resolver.
-
 
          This textual convention SHOULD NOT be used directly in object
          definitions, as it restricts addresses to a specific format.
@@ -307,7 +288,6 @@ InetPortNumber ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "Represents a 16 bit port number of an Internet transport
 
-
          layer protocol.  Port numbers are assigned by IANA.  A
          current list of all assignments is available from
          <http://www.iana.org/>.
@@ -356,8 +336,6 @@ InetScopeType ::= TEXTUAL-CONVENTION
     REFERENCE   "RFC 3513"
     SYNTAX       INTEGER {
                      -- reserved(0),
-
-
                      interfaceLocal(1),
                      linkLocal(2),
                      subnetLocal(3),
@@ -406,7 +384,6 @@ InetVersion ::= TEXTUAL-CONVENTION
 
          unknown(0)  An unknown or unspecified version of the IP
                      protocol.
-
 
          ipv4(1)     The IPv4 protocol as defined in RFC 791 (STD 5).
 

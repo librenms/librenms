@@ -1,0 +1,9 @@
+modules:
+    mempools:
+        data:
+            -
+                total: FROGFOOT-RESOURCES-MIB::memTotal
+                free: FROGFOOT-RESOURCES-MIB::memFree
+                precision: 1024
+    os:
+        sysDescr_regex: '/(?<hardware>NFT \S+)( (?<version>.*))?/'

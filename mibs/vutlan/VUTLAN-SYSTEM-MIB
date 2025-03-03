@@ -1,0 +1,3525 @@
+
+VUTLAN-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY,
+	enterprises, Integer32
+		FROM SNMPv2-SMI;
+
+vutlan MODULE-IDENTITY
+	LAST-UPDATED "202102100000Z"
+	ORGANIZATION
+		"Vutlan s.r.o."
+	CONTACT-INFO
+		"info@vutlan.com"
+	DESCRIPTION
+		"Vutlan monitoring units"
+::= { enterprises 39052 }
+
+ctlUnit              OBJECT IDENTIFIER ::= { vutlan 1 }
+ctlNotifiers         OBJECT IDENTIFIER ::= { vutlan 2 }
+ctlVirtualDevices    OBJECT IDENTIFIER ::= { vutlan 3 }
+ctlHardwareDevices   OBJECT IDENTIFIER ::= { vutlan 4 }
+ctIInternalSensors   OBJECT IDENTIFIER ::= { vutlan 5 }
+ctlCANSensors        OBJECT IDENTIFIER ::= { vutlan 6 }
+ctlRsSensors         OBJECT IDENTIFIER ::= { vutlan 7 }
+
+ctlUnitModulesTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlUnitModulesEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlUnit 1 }
+
+ctlUnitModulesEntry  OBJECT-TYPE
+	SYNTAX 	CtlUnitModulesEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of module"
+	INDEX { ctlUnitModuleId }
+	::= { ctlUnitModulesTable 1 }
+
+CtlUnitModulesEntry ::= SEQUENCE {
+	ctlUnitModuleId
+		Integer32,
+	ctlUnitModulePcode
+		Integer32,
+	ctlUnitModuleSN
+		Integer32,
+	ctlUnitModuleClass
+		OCTET STRING,
+	ctlUnitModuleType
+		OCTET STRING,
+	ctlUnitModuleName
+		OCTET STRING,
+	ctlUnitModuleState
+		OCTET STRING
+}
+
+ctlUnitModuleId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of module"
+	::= { ctlUnitModulesEntry 1 }
+
+ctlUnitModulePcode  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Product code of module"
+	::= { ctlUnitModulesEntry 2 }
+
+ctlUnitModuleSN  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Serial number of module"
+	::= { ctlUnitModulesEntry 3 }
+
+ctlUnitModuleClass  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Class of module"
+	::= { ctlUnitModulesEntry 4 }
+
+ctlUnitModuleType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of module"
+	::= { ctlUnitModulesEntry 5 }
+
+ctlUnitModuleName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..64))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of module"
+	::= { ctlUnitModulesEntry 6 }
+
+ctlUnitModuleState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of module"
+	::= { ctlUnitModulesEntry 7 }
+
+ctlUnitGroupsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlUnitGroupsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlUnit 2 }
+
+ctlUnitGroupsEntry  OBJECT-TYPE
+	SYNTAX 	CtlUnitGroupsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	INDEX { ctlUnitGroupId }
+	::= { ctlUnitGroupsTable 1 }
+
+CtlUnitGroupsEntry ::= SEQUENCE {
+	ctlUnitGroupId
+		Integer32,
+	ctlUnitGroupName
+		OCTET STRING,
+	ctlUnitGroupDesc
+		OCTET STRING
+}
+
+ctlUnitGroupId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of group"
+	::= { ctlUnitGroupsEntry 1 }
+
+ctlUnitGroupName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..64))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of group"
+	::= { ctlUnitGroupsEntry 2 }
+
+ctlUnitGroupDesc  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(0..256))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Description of group"
+	::= { ctlUnitGroupsEntry 3 }
+
+ctlUnitElementsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlUnitElementsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlUnit 3 }
+
+ctlUnitElementsEntry  OBJECT-TYPE
+	SYNTAX 	CtlUnitElementsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	INDEX { ctlUnitElementId }
+	::= { ctlUnitElementsTable 1 }
+
+CtlUnitElementsEntry ::= SEQUENCE {
+	ctlUnitElementId
+		Integer32,
+	ctlUnitElementGroup
+		Integer32,
+	ctlUnitElementModule
+		Integer32,
+	ctlUnitElementNum
+		Integer32,
+	ctlUnitElementClass
+		OCTET STRING,
+	ctlUnitElementType
+		OCTET STRING,
+	ctlUnitElementName
+		OCTET STRING,
+	ctlUnitElementState
+		OCTET STRING,
+	ctlUnitElementValue
+		OCTET STRING,
+	ctlUnitElementSpec
+		OCTET STRING
+}
+
+ctlUnitElementId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of element"
+	::= { ctlUnitElementsEntry 1 }
+
+ctlUnitElementGroup  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Group of element"
+	::= { ctlUnitElementsEntry 2 }
+
+ctlUnitElementModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of element"
+	::= { ctlUnitElementsEntry 3 }
+
+ctlUnitElementNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Number of elemnt's in module"
+	::= { ctlUnitElementsEntry 4 }
+
+ctlUnitElementClass  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Class of element"
+	::= { ctlUnitElementsEntry 5 }
+
+ctlUnitElementType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of element"
+	::= { ctlUnitElementsEntry 6 }
+
+ctlUnitElementName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of element"
+	::= { ctlUnitElementsEntry 7 }
+
+ctlUnitElementState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of element"
+	::= { ctlUnitElementsEntry 8 }
+
+ctlUnitElementValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Value of element"
+	::= { ctlUnitElementsEntry 9 }
+
+ctlUnitElementSpec  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Special parameters for element"
+	::= { ctlUnitElementsEntry 10 }
+
+ctlUnitLogicsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlUnitLogicsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlUnit 4 }
+
+ctlUnitLogicsEntry  OBJECT-TYPE
+	SYNTAX 	CtlUnitLogicsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of logic"
+	INDEX { ctlUnitLogicId }
+	::= { ctlUnitLogicsTable 1 }
+
+CtlUnitLogicsEntry ::= SEQUENCE {
+	ctlUnitLogicId
+		Integer32,
+	ctlUnitLogicName
+		OCTET STRING,
+	ctlUnitLogicDesc
+		OCTET STRING,
+	ctlUnitLogicDisable
+		Integer32,
+	ctlUnitLogicRowStatus
+		Integer32
+}
+
+-- Id of logic's
+
+ctlUnitLogicId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of logic scheme"
+	::= { ctlUnitLogicsEntry 1 }
+
+ctlUnitLogicName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..64))
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION
+		"Name of logic scheme"
+	::= { ctlUnitLogicsEntry 2 }
+
+ctlUnitLogicDesc  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..256))
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION
+		"Description of logic scheme"
+	::= { ctlUnitLogicsEntry 3 }
+
+ctlUnitLogicDisable  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION
+		"Disable of logic's in secs, 0 for enable "
+	::= { ctlUnitLogicsEntry 4 }
+
+ctlUnitLogicRowStatus  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlUnitLogicsEntry 5 }
+
+
+ctlUnitTrapNotification  NOTIFICATION-TYPE
+	OBJECTS { macroLogicDefinition, macroStateOfSensors, macroDateAndTime,
+	macroLogicName, macroSensorName, macroSensorState, macroSensorValue,
+	macroLastModifiedSensorID, trapID, trapName }
+	STATUS     current
+	DESCRIPTION
+		"SNMP trap notification."
+	::= { ctlUnit 5 }
+
+-- The trap description objects
+
+macroLogicDefinition OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Description of the logic scheme that has triggered."
+   ::= { ctlUnitTrapNotification 1 }
+
+macroStateOfSensors OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Readings of sensors in the logic scheme."
+   ::= { ctlUnitTrapNotification 2 }
+
+macroDateAndTime OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Logic scheme response time."
+   ::= { ctlUnitTrapNotification 3 }
+
+macroLogicName OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Name of logic scheme."
+   ::= { ctlUnitTrapNotification 4 }
+
+macroSensorName OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Name of the sensor which triggered the logic scheme."
+   ::= { ctlUnitTrapNotification 5 }
+
+macroSensorState OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "State of the sensor in the logic scheme that has triggered.
+       Maybe one of these: normal, warning, low warning, high warning,
+       alarm, low alarm, high alarm, on, off, not connected"
+   ::= { ctlUnitTrapNotification 6 }
+
+macroSensorValue OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The value measured by the sensor or logic level."
+   ::= { ctlUnitTrapNotification 7 }
+
+macroLastModifiedSensorID OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Sensor ID that triggered the operation of the logic circuit."
+   ::= { ctlUnitTrapNotification 8 }
+
+trapID OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "ID of SNMP trap."
+   ::= { ctlUnitTrapNotification 20 }
+
+trapName OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Name of SNMP trap."
+   ::= { ctlUnitTrapNotification 21 }
+
+
+ctlUnitSaveToFlash  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Save current setting to flash memory"
+	::= { ctlUnit 6 }
+
+
+-- System information entry
+
+ctlUnitSystem              OBJECT IDENTIFIER ::= { ctlUnit 7 }
+
+systemDevType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Device type"
+	::= { ctlUnitSystem 1 }
+
+systemFirmware  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Firmware version"
+	::= { ctlUnitSystem 2 }
+
+systemKernel  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"System kernel version"
+	::= { ctlUnitSystem 3 }
+
+systemOpTime  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Total operating time"
+	::= { ctlUnitSystem 4 }
+
+systemUpTime  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Session time"
+	::= { ctlUnitSystem 5 }
+
+systemCpuUsage  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"CPU usage (%)"
+	::= { ctlUnitSystem 6 }
+
+systemMemUsage  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Memory usage (%)"
+	::= { ctlUnitSystem 7 }
+
+systemState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"System state"
+	::= { ctlUnitSystem 8 }
+
+systemHostname  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(0..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Network Hostname"
+	::= { ctlUnitSystem 9 }
+
+systemDescSN  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(0..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Serial Number"
+	::= { ctlUnitSystem 10 }
+
+systemDescContacts  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(0..1024))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Contacts"
+	::= { ctlUnitSystem 11 }
+
+systemDescLocation  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(0..1024))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Location description"
+	::= { ctlUnitSystem 12 }
+
+systemDescComment  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(0..1024))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Comment"
+	::= { ctlUnitSystem 13 }
+
+systemMAC  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ethernet MAC address of the unit"
+	::= { ctlUnitSystem 14 }
+
+
+ctlUnitReboot  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Reboot the unit"
+	::= { ctlUnit 8 }
+
+
+ctlNotifiersMailersTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlNotifiersMailersEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlNotifiers 1 }
+
+ctlNotifiersMailersEntry  OBJECT-TYPE
+	SYNTAX 	CtlNotifiersMailersEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of email notify"
+	INDEX { ctlNotifiersMailerId }
+	::= { ctlNotifiersMailersTable 1 }
+
+CtlNotifiersMailersEntry ::= SEQUENCE {
+	ctlNotifiersMailerId
+		Integer32,
+	ctlNotifiersMailerModule
+		Integer32,
+	ctlNotifiersMailerNum
+		Integer32,
+	ctlNotifiersMailerType
+		OCTET STRING,
+	ctlNotifiersMailerName
+		OCTET STRING,
+	ctlNotifiersMailerState
+		OCTET STRING,
+	ctlNotifiersMailerValue
+		OCTET STRING,
+	ctlNotifiersMailerServer
+		OCTET STRING,
+	ctlNotifiersMailerPort
+		Integer32,
+	ctlNotifiersMailerLogin
+		OCTET STRING,
+	ctlNotifiersMailerPassword
+		Integer32,
+	ctlNotifiersMailersTo
+		OCTET STRING,
+	ctlNotifiersMailersFrom
+		OCTET STRING,
+	ctlNotifiersMailerMessage
+		Integer32
+}
+
+ctlNotifiersMailerId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of mailer"
+	::= { ctlNotifiersMailersEntry 1 }
+
+ctlNotifiersMailerModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of mailer"
+	::= { ctlNotifiersMailersEntry 2 }
+
+ctlNotifiersMailerNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for mailer"
+	::= { ctlNotifiersMailersEntry 3 }
+
+ctlNotifiersMailerType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of element"
+	::= { ctlNotifiersMailersEntry 4 }
+
+ctlNotifiersMailerName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of mailer"
+	::= { ctlNotifiersMailersEntry 5 }
+
+ctlNotifiersMailerState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of mailer"
+	::= { ctlNotifiersMailersEntry 6 }
+
+ctlNotifiersMailerValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Value of mailer"
+	::= { ctlNotifiersMailersEntry 7 }
+
+ctlNotifiersMailerServer  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..256))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Mailserver adress"
+	::= { ctlNotifiersMailersEntry 8 }
+
+ctlNotifiersMailerPort  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Port of mailserver"
+	::= { ctlNotifiersMailersEntry 9 }
+
+ctlNotifiersMailerLogin  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Login on mailserver"
+	::= { ctlNotifiersMailersEntry 10 }
+
+ctlNotifiersMailerPassword  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Password for mailserver"
+	::= { ctlNotifiersMailersEntry 11 }
+
+ctlNotifiersMailersTo  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"To"
+	::= { ctlNotifiersMailersEntry 12 }
+
+ctlNotifiersMailersFrom  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..512))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"From"
+	::= { ctlNotifiersMailersEntry 13 }
+
+ctlNotifiersMailerMessage  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Message"
+	::= { ctlNotifiersMailersEntry 14 }
+
+ctlNotifiersTrapsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlNotifiersTrapsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlNotifiers 2 }
+
+ctlNotifiersTrapsEntry  OBJECT-TYPE
+	SYNTAX 	CtlNotifiersTrapsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of trap notify"
+	INDEX { ctlNotifiersTrapId }
+	::= { ctlNotifiersTrapsTable 1 }
+
+CtlNotifiersTrapsEntry ::= SEQUENCE {
+	ctlNotifiersTrapId
+		Integer32,
+	ctlNotifiersTrapModule
+		Integer32,
+	ctlNotifiersTrapNum
+		Integer32,
+	ctlNotifiersTrapType
+		OCTET STRING,
+	ctlNotifiersTrapName
+		OCTET STRING,
+	ctlNotifiersTrapState
+		OCTET STRING,
+	ctlNotifiersTrapValue
+		OCTET STRING,
+	ctlNotifiersTrapServer
+		OCTET STRING,
+	ctlNotifiersTrapPort
+		Integer32,
+	ctlNotifiersTrapVersion
+		OCTET STRING,
+	ctlNotifiersTrapCommunity
+		OCTET STRING
+}
+
+ctlNotifiersTrapId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of trap"
+	::= { ctlNotifiersTrapsEntry 1 }
+
+ctlNotifiersTrapModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of trap"
+	::= { ctlNotifiersTrapsEntry 2 }
+
+ctlNotifiersTrapNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for trap"
+	::= { ctlNotifiersTrapsEntry 3 }
+
+ctlNotifiersTrapType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of element"
+	::= { ctlNotifiersTrapsEntry 4 }
+
+ctlNotifiersTrapName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of trap"
+	::= { ctlNotifiersTrapsEntry 5 }
+
+ctlNotifiersTrapState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of trap"
+	::= { ctlNotifiersTrapsEntry 6 }
+
+ctlNotifiersTrapValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Value of trap"
+	::= { ctlNotifiersTrapsEntry 7 }
+
+ctlNotifiersTrapServer  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Receiver address for trap"
+	::= { ctlNotifiersTrapsEntry 8 }
+
+ctlNotifiersTrapPort  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Port of trap receiver"
+	::= { ctlNotifiersTrapsEntry 9 }
+
+ctlNotifiersTrapVersion  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..4))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Version of trap"
+	::= { ctlNotifiersTrapsEntry 10 }
+
+ctlNotifiersTrapCommunity  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Password for mailserver"
+	::= { ctlNotifiersTrapsEntry 11 }
+
+ctlNotifiersSMSsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlNotifiersSMSsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlNotifiers 3 }
+
+ctlNotifiersSMSsEntry  OBJECT-TYPE
+	SYNTAX 	CtlNotifiersSMSsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of SMS notify"
+	INDEX { ctlNotifiersSMSId }
+	::= { ctlNotifiersSMSsTable 1 }
+
+CtlNotifiersSMSsEntry ::= SEQUENCE {
+	ctlNotifiersSMSId
+		Integer32,
+	ctlNotifiersSMSModule
+		Integer32,
+	ctlNotifiersSMSNum
+		Integer32,
+	ctlNotifiersSMSType
+		OCTET STRING,
+	ctlNotifiersSMSName
+		OCTET STRING,
+	ctlNotifiersSMSState
+		OCTET STRING,
+	ctlNotifiersSMSValue
+		Integer32,
+	ctlNotifiersSMSTo
+		OCTET STRING,
+	ctlNotifiersSMSMessage
+		OCTET STRING
+}
+
+ctlNotifiersSMSId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of SMS"
+	::= { ctlNotifiersSMSsEntry 1 }
+
+ctlNotifiersSMSModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of SMS"
+	::= { ctlNotifiersSMSsEntry 2 }
+
+ctlNotifiersSMSNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for SMS"
+	::= { ctlNotifiersSMSsEntry 3 }
+
+ctlNotifiersSMSType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of SMS"
+	::= { ctlNotifiersSMSsEntry 4 }
+
+ctlNotifiersSMSName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of SMS"
+	::= { ctlNotifiersSMSsEntry 5 }
+
+ctlNotifiersSMSState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of SMS"
+	::= { ctlNotifiersSMSsEntry 6 }
+
+ctlNotifiersSMSValue  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Set '1' to send SMS"
+	::= { ctlNotifiersSMSsEntry 7 }
+
+ctlNotifiersSMSTo  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(3..256))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Phone number"
+	::= { ctlNotifiersSMSsEntry 8 }
+
+ctlNotifiersSMSMessage  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..512))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Text of SMS message"
+	::= { ctlNotifiersSMSsEntry 9 }
+
+ctlVirtualDevicesTimersTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlVirtualDevicesTimersEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlVirtualDevices 1 }
+
+ctlVirtualDevicesTimersEntry  OBJECT-TYPE
+	SYNTAX 	CtlVirtualDevicesTimersEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of timer"
+	INDEX { ctlVirtualDevicesTimerId }
+	::= { ctlVirtualDevicesTimersTable 1 }
+
+CtlVirtualDevicesTimersEntry ::= SEQUENCE {
+	ctlVirtualDevicesTimerId
+		Integer32,
+	ctlVirtualDevicesTimerModule
+		Integer32,
+	ctlVirtualDevicesTimerNum
+		Integer32,
+	ctlVirtualDevicesTimerType
+		OCTET STRING,
+	ctlVirtualDevicesTimerName
+		OCTET STRING,
+	ctlVirtualDevicesTimerState
+		OCTET STRING,
+	ctlVirtualDevicesTimerValue
+		OCTET STRING,
+	ctlVirtualDevicesTimerBegin
+		OCTET STRING,
+	ctlVirtualDevicesTimerEnd
+		OCTET STRING,
+	ctlVirtualDevicesTimerDays
+		OCTET STRING,
+	ctlVirtualDevicesTimerMode
+		OCTET STRING,
+	ctlVirtualDevicesTimerDayPattern
+		OCTET STRING
+}
+
+ctlVirtualDevicesTimerId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of timer"
+	::= { ctlVirtualDevicesTimersEntry 1 }
+
+ctlVirtualDevicesTimerModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of tiimer"
+	::= { ctlVirtualDevicesTimersEntry 2 }
+
+ctlVirtualDevicesTimerNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for timer"
+	::= { ctlVirtualDevicesTimersEntry 3 }
+
+ctlVirtualDevicesTimerType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of timer"
+	::= { ctlVirtualDevicesTimersEntry 4 }
+
+ctlVirtualDevicesTimerName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of timer"
+	::= { ctlVirtualDevicesTimersEntry 5 }
+
+ctlVirtualDevicesTimerState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of timer"
+	::= { ctlVirtualDevicesTimersEntry 6 }
+
+ctlVirtualDevicesTimerValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Value of timer"
+	::= { ctlVirtualDevicesTimersEntry 7 }
+
+ctlVirtualDevicesTimerBegin  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Begin time for timer (Unix timestamp)"
+	::= { ctlVirtualDevicesTimersEntry 8 }
+
+ctlVirtualDevicesTimerEnd  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"End time for timer (Unix timestamp)"
+	::= { ctlVirtualDevicesTimersEntry 9 }
+
+ctlVirtualDevicesTimerDays  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Days for timer"
+	::= { ctlVirtualDevicesTimersEntry 10 }
+
+ctlVirtualDevicesTimerMode  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Mode of timer"
+	::= { ctlVirtualDevicesTimersEntry 11 }
+
+ctlVirtualDevicesTimerDayPattern  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Timer pattern for every day of week"
+	::= { ctlVirtualDevicesTimersEntry 12 }
+
+
+ctlVirtualDevicesPingsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlVirtualDevicesPingsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlVirtualDevices 2 }
+
+ctlVirtualDevicesPingsEntry  OBJECT-TYPE
+	SYNTAX 	CtlVirtualDevicesPingsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of ping"
+	INDEX { ctlVirtualDevicesPingId }
+	::= { ctlVirtualDevicesPingsTable 1 }
+
+CtlVirtualDevicesPingsEntry ::= SEQUENCE {
+	ctlVirtualDevicesPingId
+		Integer32,
+	ctlVirtualDevicesPingModule
+		Integer32,
+	ctlVirtualDevicesPingNum
+		Integer32,
+	ctlVirtualDevicesPingType
+		OCTET STRING,
+	ctlVirtualDevicesPingName
+		OCTET STRING,
+	ctlVirtualDevicesPingState
+		OCTET STRING,
+	ctlVirtualDevicesPingValue
+		OCTET STRING,
+	ctlVirtualDevicesPingPeriod
+		Integer32,
+	ctlVirtualDevicesPingRTT
+		Integer32,
+	ctlVirtualDevicesPingServer
+		OCTET STRING,
+	ctlVirtualDevicesPingIP
+		OCTET STRING,
+	ctlVirtualDevicesPingSent
+		Integer32,
+	ctlVirtualDevicesPingReceived
+		Integer32,
+	ctlVirtualDevicesPingStatus
+		OCTET STRING
+}
+
+ctlVirtualDevicesPingId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of ping"
+	::= { ctlVirtualDevicesPingsEntry 1 }
+
+ctlVirtualDevicesPingModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of ping"
+	::= { ctlVirtualDevicesPingsEntry 2 }
+
+ctlVirtualDevicesPingNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for ping"
+	::= { ctlVirtualDevicesPingsEntry 3 }
+
+ctlVirtualDevicesPingType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of element"
+	::= { ctlVirtualDevicesPingsEntry 4 }
+
+ctlVirtualDevicesPingName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..64))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of ping"
+	::= { ctlVirtualDevicesPingsEntry 5 }
+
+ctlVirtualDevicesPingState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of ping"
+	::= { ctlVirtualDevicesPingsEntry 6 }
+
+ctlVirtualDevicesPingValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Value of timer"
+	::= { ctlVirtualDevicesPingsEntry 7 }
+
+ctlVirtualDevicesPingPeriod  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Period for ping"
+	::= { ctlVirtualDevicesPingsEntry 8 }
+
+ctlVirtualDevicesPingRTT  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Round Trip Time of ping"
+	::= { ctlVirtualDevicesPingsEntry 9 }
+
+ctlVirtualDevicesPingServer  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..256))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Server for ping"
+	::= { ctlVirtualDevicesPingsEntry 10 }
+
+ctlVirtualDevicesPingIP  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Resolved IP for ping"
+	::= { ctlVirtualDevicesPingsEntry 11 }
+
+ctlVirtualDevicesPingSent  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Number of sent pings"
+	::= { ctlVirtualDevicesPingsEntry 12 }
+
+ctlVirtualDevicesPingReceived  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Number of received pings"
+	::= { ctlVirtualDevicesPingsEntry 13 }
+
+ctlVirtualDevicesPingStatus  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Status of ping"
+	::= { ctlVirtualDevicesPingsEntry 14 }
+
+ctlVirtualDevicesTriggersTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlVirtualDevicesTriggersEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlVirtualDevices 3 }
+
+ctlVirtualDevicesTriggersEntry  OBJECT-TYPE
+	SYNTAX 	CtlVirtualDevicesTriggersEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	INDEX { ctlVirtualDevicesTriggerId }
+	::= { ctlVirtualDevicesTriggersTable 1 }
+
+CtlVirtualDevicesTriggersEntry ::= SEQUENCE {
+	ctlVirtualDevicesTriggerId
+		Integer32,
+	ctlVirtualDevicesTriggerModule
+		Integer32,
+	ctlVirtualDevicesTriggerNum
+		Integer32,
+	ctlVirtualDevicesTriggerType
+		OCTET STRING,
+	ctlVirtualDevicesTriggerName
+		OCTET STRING,
+	ctlVirtualDevicesTriggerState
+		OCTET STRING,
+	ctlVirtualDevicesTriggerValue
+		OCTET STRING,
+	ctlVirtualDevicesTriggerReverse
+		Integer32
+}
+
+ctlVirtualDevicesTriggerId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of trigger"
+	::= { ctlVirtualDevicesTriggersEntry 1 }
+
+ctlVirtualDevicesTriggerModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of trigger"
+	::= { ctlVirtualDevicesTriggersEntry 2 }
+
+ctlVirtualDevicesTriggerNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Number of trigger in module"
+	::= { ctlVirtualDevicesTriggersEntry 3 }
+
+ctlVirtualDevicesTriggerType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of trigger"
+	::= { ctlVirtualDevicesTriggersEntry 4 }
+
+ctlVirtualDevicesTriggerName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..64))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of trigger"
+	::= { ctlVirtualDevicesTriggersEntry 5 }
+
+ctlVirtualDevicesTriggerState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of trigger"
+	::= { ctlVirtualDevicesTriggersEntry 6 }
+
+ctlVirtualDevicesTriggerValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Value of timer"
+	::= { ctlVirtualDevicesTriggersEntry 7 }
+
+ctlVirtualDevicesTriggerReverse  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Reverse of trigger"
+	::= { ctlVirtualDevicesTriggersEntry 8 }
+
+ctlVirtualDevicesSnmpgetsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlVirtualDevicesSnmpgetsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlVirtualDevices 4 }
+
+ctlVirtualDevicesSnmpgetsEntry  OBJECT-TYPE
+	SYNTAX 	CtlVirtualDevicesSnmpgetsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	INDEX { ctlVirtualDevicesSnmpgetId }
+	::= { ctlVirtualDevicesSnmpgetsTable 1 }
+
+
+ctlVirtualDevicesAnalogsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlVirtualDevicesAnalogsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlVirtualDevices 5 }
+
+ctlVirtualDevicesAnalogsEntry  OBJECT-TYPE
+	SYNTAX 	CtlVirtualDevicesAnalogsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of analog"
+	INDEX { ctlVirtualDevicesAnalogId }
+	::= { ctlVirtualDevicesAnalogsTable 1 }
+
+CtlVirtualDevicesAnalogsEntry ::= SEQUENCE {
+	ctlVirtualDevicesAnalogId
+		Integer32,
+	ctlVirtualDevicesAnalogModule
+		Integer32,
+	ctlVirtualDevicesAnalogNum
+		Integer32,
+	ctlVirtualDevicesAnalogType
+		OCTET STRING,
+	ctlVirtualDevicesAnalogName
+		OCTET STRING,
+	ctlVirtualDevicesAnalogState
+		OCTET STRING,
+	ctlVirtualDevicesAnalogValue
+		OCTET STRING,
+	ctlVirtualDevicesAnalogMin
+		OCTET STRING,
+	ctlVirtualDevicesAnalogMax
+		OCTET STRING,
+	ctlVirtualDevicesAnalogLowAlarm
+		OCTET STRING,
+	ctlVirtualDevicesAnalogLowWarning
+		OCTET STRING,
+	ctlVirtualDevicesAnalogHighWarning
+		OCTET STRING,
+	ctlVirtualDevicesAnalogHighAlarm
+		OCTET STRING,
+	ctlVirtualDevicesAnalogAt0
+		OCTET STRING,
+	ctlVirtualDevicesAnalogAt75
+		OCTET STRING,
+	ctlVirtualDevicesAnalogExpression
+		OCTET STRING,
+	ctlVirtualDevicesAnalogSpecific
+		OCTET STRING,
+	ctlVirtualDevicesAnalogHystType
+		OCTET STRING,
+	ctlVirtualDevicesAnalogHystValue
+		OCTET STRING,
+	ctlVirtualDevicesAnalogHystLowAlarm
+		Integer32,
+	ctlVirtualDevicesAnalogHystLowWarning
+		Integer32,
+	ctlVirtualDevicesAnalogHystNormal
+		Integer32,
+	ctlVirtualDevicesAnalogHystHighWarning
+		Integer32,
+	ctlVirtualDevicesAnalogHystHighAlarm
+		Integer32,
+	ctlVirtualDevicesAnalogValueInt
+		Integer32
+}
+
+ctlVirtualDevicesAnalogId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of sensor"
+	::= { ctlVirtualDevicesAnalogsEntry 1 }
+
+ctlVirtualDevicesAnalogModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of sensor"
+	::= { ctlVirtualDevicesAnalogsEntry 2 }
+
+ctlVirtualDevicesAnalogNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for sensor"
+	::= { ctlVirtualDevicesAnalogsEntry 3 }
+
+ctlVirtualDevicesAnalogType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of sensor"
+	::= { ctlVirtualDevicesAnalogsEntry 4 }
+
+ctlVirtualDevicesAnalogName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of sensor"
+	::= { ctlVirtualDevicesAnalogsEntry 5 }
+
+ctlVirtualDevicesAnalogState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of sensor"
+	::= { ctlVirtualDevicesAnalogsEntry 6 }
+
+ctlVirtualDevicesAnalogValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Value of sensor"
+	::= { ctlVirtualDevicesAnalogsEntry 7 }
+
+ctlVirtualDevicesAnalogMin  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Minimum of sensor value range"
+	::= { ctlVirtualDevicesAnalogsEntry 8 }
+
+ctlVirtualDevicesAnalogMax  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Maximum of sensor value range"
+	::= { ctlVirtualDevicesAnalogsEntry 9 }
+
+ctlVirtualDevicesAnalogLowAlarm  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Low alarm level for sensor value"
+	::= { ctlVirtualDevicesAnalogsEntry 10 }
+
+ctlVirtualDevicesAnalogLowWarning  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Low warning level for sensor value"
+	::= { ctlVirtualDevicesAnalogsEntry 11 }
+
+ctlVirtualDevicesAnalogHighWarning  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"High warning level for sensor value"
+	::= { ctlVirtualDevicesAnalogsEntry 12 }
+
+ctlVirtualDevicesAnalogHighAlarm  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"High alarm level for sensor value"
+	::= { ctlVirtualDevicesAnalogsEntry 13 }
+
+ctlVirtualDevicesAnalogAt0  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"At0 for sensor value"
+	::= { ctlVirtualDevicesAnalogsEntry 14 }
+
+ctlVirtualDevicesAnalogAt75  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"At75 for sensor value"
+	::= { ctlVirtualDevicesAnalogsEntry 15 }
+
+ctlVirtualDevicesAnalogExpression  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..80))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Expression for sensor value"
+	::= { ctlVirtualDevicesAnalogsEntry 16 }
+
+ctlVirtualDevicesAnalogSpecific  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Specific parameters for sensor"
+	::= { ctlVirtualDevicesAnalogsEntry 17 }
+
+
+ctlVirtualDevicesAnalogHystType  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis type"
+	::= { ctlVirtualDevicesAnalogsEntry 18 }
+
+ctlVirtualDevicesAnalogHystValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis value"
+	::= { ctlVirtualDevicesAnalogsEntry 19 }
+
+ctlVirtualDevicesAnalogHystLowAlarm  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis Low Alarm time"
+	::= { ctlVirtualDevicesAnalogsEntry 20 }
+
+ctlVirtualDevicesAnalogHystLowWarning  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis Low Warning time"
+	::= { ctlVirtualDevicesAnalogsEntry 21 }
+
+ctlVirtualDevicesAnalogHystNormal  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis Normal time"
+	::= { ctlVirtualDevicesAnalogsEntry 22 }
+
+ctlVirtualDevicesAnalogHystHighWarning  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis High Warning time"
+	::= { ctlVirtualDevicesAnalogsEntry 23 }
+
+ctlVirtualDevicesAnalogHystHighAlarm  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis High Alarm time"
+	::= { ctlVirtualDevicesAnalogsEntry 24 }
+
+ctlVirtualDevicesAnalogValueInt  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The integer value of the sensor with a multiplier of 100"
+	::= { ctlVirtualDevicesAnalogsEntry 25 }
+
+
+CtlVirtualDevicesSnmpgetsEntry ::= SEQUENCE {
+	ctlVirtualDevicesSnmpgetId
+		Integer32,
+	ctlVirtualDevicesSnmpgetModule
+		Integer32,
+	ctlVirtualDevicesSnmpgetNum
+		Integer32,
+	ctlVirtualDevicesSnmpgetType
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetName
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetState
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetValue
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetStatus
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetPeriod
+		Integer32,
+	ctlVirtualDevicesSnmpgetServer
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetPort
+		Integer32,
+	ctlVirtualDevicesSnmpgetCommunity
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetOid
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetVartype
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetLowAlarm
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetLowWarning
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetHighWarning
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetHighAlarm
+		OCTET STRING,
+	ctlVirtualDevicesSnmpgetExpression
+		OCTET STRING
+}
+
+ctlVirtualDevicesSnmpgetId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 1 }
+
+ctlVirtualDevicesSnmpgetModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 2 }
+
+ctlVirtualDevicesSnmpgetNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Number of snmpget in module"
+	::= { ctlVirtualDevicesSnmpgetsEntry 3 }
+
+ctlVirtualDevicesSnmpgetType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 4 }
+
+ctlVirtualDevicesSnmpgetName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..64))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 5 }
+
+ctlVirtualDevicesSnmpgetState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 6 }
+
+ctlVirtualDevicesSnmpgetValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Value of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 7 }
+
+ctlVirtualDevicesSnmpgetStatus  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Status of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 8 }
+
+ctlVirtualDevicesSnmpgetPeriod  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Period of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 9 }
+
+ctlVirtualDevicesSnmpgetServer  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Server of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 10 }
+
+ctlVirtualDevicesSnmpgetPort  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Server port of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 11 }
+
+ctlVirtualDevicesSnmpgetCommunity  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Community of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 12 }
+
+ctlVirtualDevicesSnmpgetOid  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Oid of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 13 }
+
+ctlVirtualDevicesSnmpgetVartype  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Vartype of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 14 }
+
+ctlVirtualDevicesSnmpgetLowAlarm  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Low alarm level of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 15 }
+
+ctlVirtualDevicesSnmpgetLowWarning  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Low warning level of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 16 }
+
+ctlVirtualDevicesSnmpgetHighWarning  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"High warning level of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 17 }
+
+ctlVirtualDevicesSnmpgetHighAlarm  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"High alarm level of Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 18 }
+
+ctlVirtualDevicesSnmpgetExpression  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Expression for Snmpget"
+	::= { ctlVirtualDevicesSnmpgetsEntry 19 }
+
+ctlHardwareDevicesCamerasTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlHardwareDevicesCamerasEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlHardwareDevices 1 }
+
+ctlHardwareDevicesCamerasEntry  OBJECT-TYPE
+	SYNTAX 	CtlHardwareDevicesCamerasEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of camera"
+	INDEX { ctlHardwareDevicesCameraId }
+	::= { ctlHardwareDevicesCamerasTable 1 }
+
+CtlHardwareDevicesCamerasEntry ::= SEQUENCE {
+	ctlHardwareDevicesCameraId
+		Integer32,
+	ctlHardwareDevicesCameraModule
+		Integer32,
+	ctlHardwareDevicesCameraNum
+		Integer32,
+	ctlHardwareDevicesCameraType
+		OCTET STRING,
+	ctlHardwareDevicesCameraName
+		OCTET STRING,
+	ctlHardwareDevicesCameraState
+		OCTET STRING,
+	ctlHardwareDevicesCameraValue
+		OCTET STRING,
+	ctlHardwareDevicesCameraURL
+		OCTET STRING,
+	ctlHardwareDevicesCameraFPS
+		OCTET STRING,
+	ctlHardwareDevicesCameraResolution
+		OCTET STRING
+}
+
+ctlHardwareDevicesCameraId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of camera"
+	::= { ctlHardwareDevicesCamerasEntry 1 }
+
+ctlHardwareDevicesCameraModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of camera"
+	::= { ctlHardwareDevicesCamerasEntry 2 }
+
+ctlHardwareDevicesCameraNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for camera"
+	::= { ctlHardwareDevicesCamerasEntry 3 }
+
+ctlHardwareDevicesCameraType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of element"
+	::= { ctlHardwareDevicesCamerasEntry 4 }
+
+ctlHardwareDevicesCameraName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..64))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of camera"
+	::= { ctlHardwareDevicesCamerasEntry 5 }
+
+ctlHardwareDevicesCameraState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of camera"
+	::= { ctlHardwareDevicesCamerasEntry 6 }
+
+ctlHardwareDevicesCameraValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Set '1' for start clip"
+	::= { ctlHardwareDevicesCamerasEntry 7 }
+
+ctlHardwareDevicesCameraURL  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..256))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"IP camera URL (or device path for USB)"
+	::= { ctlHardwareDevicesCamerasEntry 8 }
+
+ctlHardwareDevicesCameraFPS  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"FPS of camera"
+	::= { ctlHardwareDevicesCamerasEntry 9 }
+
+ctlHardwareDevicesCameraResolution  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Resolution of camera"
+	::= { ctlHardwareDevicesCamerasEntry 10 }
+
+
+ctlHardwareDevicesModemsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlHardwareDevicesModemsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlHardwareDevices 2 }
+
+ctlHardwareDevicesModemsEntry  OBJECT-TYPE
+	SYNTAX 	CtlHardwareDevicesModemsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of system modem"
+	INDEX { ctlHardwareDevicesModemState }
+	::= { ctlHardwareDevicesModemsTable 1 }
+
+CtlHardwareDevicesModemsEntry ::= SEQUENCE {
+	ctlHardwareDevicesModemState
+		OCTET STRING,
+	ctlHardwareDevicesModemStatus
+		OCTET STRING,
+	ctlHardwareDevicesModemSignal
+		Integer32,
+	ctlHardwareDevicesModemOperator
+		OCTET STRING,
+	ctlHardwareDevicesModemPosition
+		OCTET STRING
+}
+
+ctlHardwareDevicesModemState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Modem state"
+	::= { ctlHardwareDevicesModemsEntry 1 }
+
+ctlHardwareDevicesModemStatus  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Modem network registration status"
+	::= { ctlHardwareDevicesModemsEntry 2 }
+
+ctlHardwareDevicesModemSignal  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Modem signal level in percent"
+	::= { ctlHardwareDevicesModemsEntry 3 }
+
+ctlHardwareDevicesModemOperator  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Network operator name"
+	::= { ctlHardwareDevicesModemsEntry 4 }
+
+ctlHardwareDevicesModemPosition  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"GPS coordinates in degrees"
+	::= { ctlHardwareDevicesModemsEntry 5 }
+
+
+ctlInternalSensorsDiscretsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlInternalSensorsDiscretsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctIInternalSensors 1 }
+
+ctlInternalSensorsDiscretsEntry  OBJECT-TYPE
+	SYNTAX 	CtlInternalSensorsDiscretsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of discret"
+	INDEX { ctlInternalSensorsDiscretId }
+	::= { ctlInternalSensorsDiscretsTable 1 }
+
+CtlInternalSensorsDiscretsEntry ::= SEQUENCE {
+	ctlInternalSensorsDiscretId
+		Integer32,
+	ctlInternalSensorsDiscretModule
+		Integer32,
+	ctlInternalSensorsDiscretNum
+		Integer32,
+	ctlInternalSensorsDiscretType
+		OCTET STRING,
+	ctlInternalSensorsDiscretName
+		OCTET STRING,
+	ctlInternalSensorsDiscretState
+		OCTET STRING,
+	ctlInternalSensorsDiscretValue
+		Integer32,
+	ctlInternalSensorsDiscretReset
+		Integer32,
+	ctlInternalSensorsDiscretLevel
+		Integer32,
+	ctlInternalSensorsDiscretReverse
+		Integer32,
+	ctlInternalSensorsDiscretSpecific
+		OCTET STRING
+}
+
+ctlInternalSensorsDiscretId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of sensor"
+	::= { ctlInternalSensorsDiscretsEntry 1 }
+
+ctlInternalSensorsDiscretModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of sensor"
+	::= { ctlInternalSensorsDiscretsEntry 2 }
+
+ctlInternalSensorsDiscretNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for sensor"
+	::= { ctlInternalSensorsDiscretsEntry 3 }
+
+ctlInternalSensorsDiscretType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of sensor"
+	::= { ctlInternalSensorsDiscretsEntry 4 }
+
+ctlInternalSensorsDiscretName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of sensor"
+	::= { ctlInternalSensorsDiscretsEntry 5 }
+
+ctlInternalSensorsDiscretState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of sensor"
+	::= { ctlInternalSensorsDiscretsEntry 6 }
+
+ctlInternalSensorsDiscretValue  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Value of sensor"
+	::= { ctlInternalSensorsDiscretsEntry 7 }
+
+ctlInternalSensorsDiscretReset  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Reset of sensor"
+	::= { ctlInternalSensorsDiscretsEntry 8 }
+
+ctlInternalSensorsDiscretLevel  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Level of sensor"
+	::= { ctlInternalSensorsDiscretsEntry 9 }
+
+ctlInternalSensorsDiscretReverse  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Reverse of sensor"
+	::= { ctlInternalSensorsDiscretsEntry 10 }
+
+ctlInternalSensorsDiscretSpecific  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Specific parameters for sensor"
+	::= { ctlInternalSensorsDiscretsEntry 11 }
+
+ctlInternalSensorsAnalogsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlInternalSensorsAnalogsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctIInternalSensors 2 }
+
+ctlInternalSensorsAnalogsEntry  OBJECT-TYPE
+	SYNTAX 	CtlInternalSensorsAnalogsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of analog"
+	INDEX { ctlInternalSensorsAnalogId }
+	::= { ctlInternalSensorsAnalogsTable 1 }
+
+CtlInternalSensorsAnalogsEntry ::= SEQUENCE {
+	ctlInternalSensorsAnalogId
+		Integer32,
+	ctlInternalSensorsAnalogModule
+		Integer32,
+	ctlInternalSensorsAnalogNum
+		Integer32,
+	ctlInternalSensorsAnalogType
+		OCTET STRING,
+	ctlInternalSensorsAnalogName
+		OCTET STRING,
+	ctlInternalSensorsAnalogState
+		OCTET STRING,
+	ctlInternalSensorsAnalogValue
+		OCTET STRING,
+	ctlInternalSensorsAnalogMin
+		OCTET STRING,
+	ctlInternalSensorsAnalogMax
+		OCTET STRING,
+	ctlInternalSensorsAnalogLowAlarm
+		OCTET STRING,
+	ctlInternalSensorsAnalogLowWarning
+		OCTET STRING,
+	ctlInternalSensorsAnalogHighWarning
+		OCTET STRING,
+	ctlInternalSensorsAnalogHighAlarm
+		OCTET STRING,
+	ctlInternalSensorsAnalogAt0
+		OCTET STRING,
+	ctlInternalSensorsAnalogAt75
+		OCTET STRING,
+	ctlInternalSensorsAnalogExpression
+		OCTET STRING,
+	ctlInternalSensorsAnalogSpecific
+		OCTET STRING,
+	ctlInternalSensorsAnalogHystType
+		OCTET STRING,
+	ctlInternalSensorsAnalogHystValue
+		OCTET STRING,
+	ctlInternalSensorsAnalogHystLowAlarm
+		Integer32,
+	ctlInternalSensorsAnalogHystLowWarning
+		Integer32,
+	ctlInternalSensorsAnalogHystNormal
+		Integer32,
+	ctlInternalSensorsAnalogHystHighWarning
+		Integer32,
+	ctlInternalSensorsAnalogHystHighAlarm
+		Integer32,
+	ctlInternalSensorsAnalogValueInt
+		Integer32
+}
+
+ctlInternalSensorsAnalogId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of sensor"
+	::= { ctlInternalSensorsAnalogsEntry 1 }
+
+ctlInternalSensorsAnalogModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of sensor"
+	::= { ctlInternalSensorsAnalogsEntry 2 }
+
+-- Num in modules for mailer
+
+ctlInternalSensorsAnalogNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for sensor"
+	::= { ctlInternalSensorsAnalogsEntry 3 }
+
+ctlInternalSensorsAnalogType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of sensor"
+	::= { ctlInternalSensorsAnalogsEntry 4 }
+
+ctlInternalSensorsAnalogName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of sensor"
+	::= { ctlInternalSensorsAnalogsEntry 5 }
+
+ctlInternalSensorsAnalogState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of sensor"
+	::= { ctlInternalSensorsAnalogsEntry 6 }
+
+ctlInternalSensorsAnalogValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Value of sensor"
+	::= { ctlInternalSensorsAnalogsEntry 7 }
+
+ctlInternalSensorsAnalogMin  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Minimum of sensor value range"
+	::= { ctlInternalSensorsAnalogsEntry 8 }
+
+ctlInternalSensorsAnalogMax  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Maximum of sensor value range"
+	::= { ctlInternalSensorsAnalogsEntry 9 }
+
+ctlInternalSensorsAnalogLowAlarm  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Low alarm level for sensor value"
+	::= { ctlInternalSensorsAnalogsEntry 10 }
+
+ctlInternalSensorsAnalogLowWarning  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Low warning level for sensor value"
+	::= { ctlInternalSensorsAnalogsEntry 11 }
+
+ctlInternalSensorsAnalogHighWarning  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"High warning level for sensor value"
+	::= { ctlInternalSensorsAnalogsEntry 12 }
+
+ctlInternalSensorsAnalogHighAlarm  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"High alarm level for sensor value"
+	::= { ctlInternalSensorsAnalogsEntry 13 }
+
+ctlInternalSensorsAnalogAt0  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"At0 for sensor value"
+	::= { ctlInternalSensorsAnalogsEntry 14 }
+
+ctlInternalSensorsAnalogAt75  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"At75 for sensor value"
+	::= { ctlInternalSensorsAnalogsEntry 15 }
+
+ctlInternalSensorsAnalogExpression  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..80))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Expression for sensor value"
+	::= { ctlInternalSensorsAnalogsEntry 16 }
+
+ctlInternalSensorsAnalogSpecific  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Specific parameters for sensor"
+	::= { ctlInternalSensorsAnalogsEntry 17 }
+
+ctlInternalSensorsAnalogHystType  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis type"
+	::= { ctlInternalSensorsAnalogsEntry 18 }
+
+ctlInternalSensorsAnalogHystValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis value"
+	::= { ctlInternalSensorsAnalogsEntry 19 }
+
+ctlInternalSensorsAnalogHystLowAlarm  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis Low Alarm time"
+	::= { ctlInternalSensorsAnalogsEntry 20 }
+
+ctlInternalSensorsAnalogHystLowWarning  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis Low Warning time"
+	::= { ctlInternalSensorsAnalogsEntry 21 }
+
+ctlInternalSensorsAnalogHystNormal  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis Normal time"
+	::= { ctlInternalSensorsAnalogsEntry 22 }
+
+ctlInternalSensorsAnalogHystHighWarning  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis High Warning time"
+	::= { ctlInternalSensorsAnalogsEntry 23 }
+
+ctlInternalSensorsAnalogHystHighAlarm  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis High Alarm time"
+	::= { ctlInternalSensorsAnalogsEntry 24 }
+
+ctlInternalSensorsAnalogValueInt  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The integer value of the sensor with a multiplier of 100"
+	::= { ctlInternalSensorsAnalogsEntry 25 }
+
+
+ctlInternalSensorsOutletsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlInternalSensorsOutletsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctIInternalSensors 3 }
+
+ctlInternalSensorsOutletsEntry  OBJECT-TYPE
+	SYNTAX 	CtlInternalSensorsOutletsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of outlet"
+	INDEX { ctlInternalSensorsOutletId }
+	::= { ctlInternalSensorsOutletsTable 1 }
+
+CtlInternalSensorsOutletsEntry ::= SEQUENCE {
+	ctlInternalSensorsOutletId
+		Integer32,
+	ctlInternalSensorsOutletModule
+		Integer32,
+	ctlInternalSensorsOutletNum
+		Integer32,
+	ctlInternalSensorsOutletType
+		OCTET STRING,
+	ctlInternalSensorsOutletName
+		OCTET STRING,
+	ctlInternalSensorsOutletState
+		OCTET STRING,
+	ctlInternalSensorsOutletValue
+		OCTET STRING,
+	ctlInternalSensorsOutletInitial
+		OCTET STRING,
+	ctlInternalSensorsDiscretPulse
+		Integer32
+}
+
+ctlInternalSensorsOutletId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of outlet"
+	::= { ctlInternalSensorsOutletsEntry 1 }
+
+ctlInternalSensorsOutletModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of outlet"
+	::= { ctlInternalSensorsOutletsEntry 2 }
+
+ctlInternalSensorsOutletNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for outlet"
+	::= { ctlInternalSensorsOutletsEntry 3 }
+
+ctlInternalSensorsOutletType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of outlet"
+	::= { ctlInternalSensorsOutletsEntry 4 }
+
+ctlInternalSensorsOutletName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of outlet"
+	::= { ctlInternalSensorsOutletsEntry 5 }
+
+ctlInternalSensorsOutletState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of outlet"
+	::= { ctlInternalSensorsOutletsEntry 6 }
+
+ctlInternalSensorsOutletValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Value of outlet"
+	::= { ctlInternalSensorsOutletsEntry 7 }
+
+ctlInternalSensorsOutletInitial  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Initial state for outlet"
+	::= { ctlInternalSensorsOutletsEntry 8 }
+
+ctlInternalSensorsDiscretPulse  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Pulse duration for outlet"
+	::= { ctlInternalSensorsOutletsEntry 9 }
+
+ctlCANSensorsDiscretsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlCANSensorsDiscretsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlCANSensors 1 }
+
+ctlCANSensorsDiscretsEntry  OBJECT-TYPE
+	SYNTAX 	CtlCANSensorsDiscretsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of discret sensor"
+	INDEX { ctlCANSensorsDiscretId }
+	::= { ctlCANSensorsDiscretsTable 1 }
+
+CtlCANSensorsDiscretsEntry ::= SEQUENCE {
+	ctlCANSensorsDiscretId
+		Integer32,
+	ctlCANSensorsDiscretModule
+		Integer32,
+	ctlCANSensorsDiscretNum
+		Integer32,
+	ctlCANSensorsDiscretType
+		OCTET STRING,
+	ctlCANSensorsDiscretName
+		OCTET STRING,
+	ctlCANSensorsDiscretState
+		OCTET STRING,
+	ctlCANSensorsDiscretValue
+		OCTET STRING,
+	ctlCANSensorsDiscretReset
+		Integer32,
+	ctlCANSensorsDiscretLevel
+		Integer32,
+	ctlCANSensorsDiscretReverse
+		Integer32,
+	ctlCANSensorsDiscretSpecific
+		OCTET STRING
+}
+
+ctlCANSensorsDiscretId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of sensor"
+	::= { ctlCANSensorsDiscretsEntry 1 }
+
+ctlCANSensorsDiscretModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of sensor"
+	::= { ctlCANSensorsDiscretsEntry 2 }
+
+ctlCANSensorsDiscretNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for sensor"
+	::= { ctlCANSensorsDiscretsEntry 3 }
+
+ctlCANSensorsDiscretType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of sensor's"
+	::= { ctlCANSensorsDiscretsEntry 4 }
+
+ctlCANSensorsDiscretName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of sensor"
+	::= { ctlCANSensorsDiscretsEntry 5 }
+
+ctlCANSensorsDiscretState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of sensor"
+	::= { ctlCANSensorsDiscretsEntry 6 }
+
+ctlCANSensorsDiscretValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Value of sensor"
+	::= { ctlCANSensorsDiscretsEntry 7 }
+
+ctlCANSensorsDiscretReset  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Reset of sensor"
+	::= { ctlCANSensorsDiscretsEntry 8 }
+
+ctlCANSensorsDiscretLevel  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Level of sensor"
+	::= { ctlCANSensorsDiscretsEntry 9 }
+
+ctlCANSensorsDiscretReverse  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Reverse of sensor"
+	::= { ctlCANSensorsDiscretsEntry 10 }
+
+ctlCANSensorsDiscretSpecific  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Set 'reset smoke' for reset smoke detectors"
+	::= { ctlCANSensorsDiscretsEntry 11 }
+
+ctlCANSensorsAnalogsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlCANSensorsAnalogsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlCANSensors 2 }
+
+ctlCANSensorsAnalogsEntry  OBJECT-TYPE
+	SYNTAX 	CtlCANSensorsAnalogsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of analog sensor"
+	INDEX { ctlCANSensorsAnalogId }
+	::= { ctlCANSensorsAnalogsTable 1 }
+
+CtlCANSensorsAnalogsEntry ::= SEQUENCE {
+	ctlCANSensorsAnalogId
+		Integer32,
+	ctlCANSensorsAnalogModule
+		Integer32,
+	ctlCANSensorsAnalogNum
+		Integer32,
+	ctlCANSensorsAnalogType
+		OCTET STRING,
+	ctlCANSensorsAnalogName
+		OCTET STRING,
+	ctlCANSensorsAnalogState
+		OCTET STRING,
+	ctlCANSensorsAnalogValue
+		OCTET STRING,
+	ctlCANSensorsAnalogMin
+		OCTET STRING,
+	ctlCANSensorsAnalogMax
+		OCTET STRING,
+	ctlCANSensorsAnalogLowAlarm
+		OCTET STRING,
+	ctlCANSensorsAnalogLowWarning
+		OCTET STRING,
+	ctlCANSensorsAnalogHighWarning
+		OCTET STRING,
+	ctlCANSensorsAnalogHighAlarm
+		OCTET STRING,
+	ctlCANSensorsAnalogAt0
+		OCTET STRING,
+	ctlCANSensorsAnalogAt75
+		OCTET STRING,
+	ctlCANSensorsAnalogExpression
+		OCTET STRING,
+	ctlCANSensorsAnalogSpecific
+		OCTET STRING,
+	ctlCANSensorsAnalogHystType
+		OCTET STRING,
+	ctlCANSensorsAnalogHystValue
+		OCTET STRING,
+	ctlCANSensorsAnalogHystLowAlarm
+		Integer32,
+	ctlCANSensorsAnalogHystLowWarning
+		Integer32,
+	ctlCANSensorsAnalogHystNormal
+		Integer32,
+	ctlCANSensorsAnalogHystHighWarning
+		Integer32,
+	ctlCANSensorsAnalogHystHighAlarm
+		Integer32,
+	ctlCANSensorsAnalogValueInt
+		Integer32
+}
+
+ctlCANSensorsAnalogId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of sensor"
+	::= { ctlCANSensorsAnalogsEntry 1 }
+
+ctlCANSensorsAnalogModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of sensor"
+	::= { ctlCANSensorsAnalogsEntry 2 }
+
+-- Num in modules for mailer
+
+ctlCANSensorsAnalogNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for sensor"
+	::= { ctlCANSensorsAnalogsEntry 3 }
+
+ctlCANSensorsAnalogType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of sensor"
+	::= { ctlCANSensorsAnalogsEntry 4 }
+
+ctlCANSensorsAnalogName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of sensor"
+	::= { ctlCANSensorsAnalogsEntry 5 }
+
+ctlCANSensorsAnalogState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of sensor"
+	::= { ctlCANSensorsAnalogsEntry 6 }
+
+ctlCANSensorsAnalogValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Value of sensor"
+	::= { ctlCANSensorsAnalogsEntry 7 }
+
+ctlCANSensorsAnalogMin  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Minimum of sensor value range"
+	::= { ctlCANSensorsAnalogsEntry 8 }
+
+ctlCANSensorsAnalogMax  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Maximum of sensor value range"
+	::= { ctlCANSensorsAnalogsEntry 9 }
+
+ctlCANSensorsAnalogLowAlarm  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Low alarm level for sensor value"
+	::= { ctlCANSensorsAnalogsEntry 10 }
+
+ctlCANSensorsAnalogLowWarning  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Low warning level for sensor value"
+	::= { ctlCANSensorsAnalogsEntry 11 }
+
+ctlCANSensorsAnalogHighWarning  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"High warning level for sensor value"
+	::= { ctlCANSensorsAnalogsEntry 12 }
+
+ctlCANSensorsAnalogHighAlarm  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"High alarm level for sensor value"
+	::= { ctlCANSensorsAnalogsEntry 13 }
+
+ctlCANSensorsAnalogAt0  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"At0 for sensor value"
+	::= { ctlCANSensorsAnalogsEntry 14 }
+
+ctlCANSensorsAnalogAt75  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"At75 for sensor value"
+	::= { ctlCANSensorsAnalogsEntry 15 }
+
+ctlCANSensorsAnalogExpression  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..80))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Expression for sensor value"
+	::= { ctlCANSensorsAnalogsEntry 16 }
+
+ctlCANSensorsAnalogSpecific  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Specific parameters for sensor"
+	::= { ctlCANSensorsAnalogsEntry 17 }
+
+ctlCANSensorsAnalogHystType  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis type"
+	::= { ctlCANSensorsAnalogsEntry 18 }
+
+ctlCANSensorsAnalogHystValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis value"
+	::= { ctlCANSensorsAnalogsEntry 19 }
+
+ctlCANSensorsAnalogHystLowAlarm  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis Low Alarm time"
+	::= { ctlCANSensorsAnalogsEntry 20 }
+
+ctlCANSensorsAnalogHystLowWarning  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis Low Warning time"
+	::= { ctlCANSensorsAnalogsEntry 21 }
+
+ctlCANSensorsAnalogHystNormal  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis Normal time"
+	::= { ctlCANSensorsAnalogsEntry 22 }
+
+ctlCANSensorsAnalogHystHighWarning  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis High Warning time"
+	::= { ctlCANSensorsAnalogsEntry 23 }
+
+ctlCANSensorsAnalogHystHighAlarm  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Hysteresis High Alarm time"
+	::= { ctlCANSensorsAnalogsEntry 24 }
+
+ctlCANSensorsAnalogValueInt  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The integer value of the sensor with a multiplier of 100"
+	::= { ctlCANSensorsAnalogsEntry 25 }
+
+
+ctlCANSensorsOutletsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlCANSensorsOutletsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlCANSensors 3 }
+
+ctlCANSensorsOutletsEntry  OBJECT-TYPE
+	SYNTAX 	CtlCANSensorsOutletsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of outlet"
+	INDEX { ctlCANSensorsOutletId }
+	::= { ctlCANSensorsOutletsTable 1 }
+
+CtlCANSensorsOutletsEntry ::= SEQUENCE {
+	ctlCANSensorsOutletId
+		Integer32,
+	ctlCANSensorsOutletModule
+		Integer32,
+	ctlCANSensorsOutletNum
+		Integer32,
+	ctlCANSensorsOutletType
+		OCTET STRING,
+	ctlCANSensorsOutletName
+		OCTET STRING,
+	ctlCANSensorsOutletState
+		OCTET STRING,
+	ctlCANSensorsOutletValue
+		OCTET STRING,
+	ctlCANSensorsOutletInitial
+		OCTET STRING,
+	ctlCANSensorsDiscretPulse
+		Integer32
+}
+
+ctlCANSensorsOutletId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of outlet"
+	::= { ctlCANSensorsOutletsEntry 1 }
+
+ctlCANSensorsOutletModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of outlet"
+	::= { ctlCANSensorsOutletsEntry 2 }
+
+ctlCANSensorsOutletNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for outlet"
+	::= { ctlCANSensorsOutletsEntry 3 }
+
+ctlCANSensorsOutletType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of outlet"
+	::= { ctlCANSensorsOutletsEntry 4 }
+
+ctlCANSensorsOutletName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of outlet"
+	::= { ctlCANSensorsOutletsEntry 5 }
+
+ctlCANSensorsOutletState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of outlet"
+	::= { ctlCANSensorsOutletsEntry 6 }
+
+ctlCANSensorsOutletValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Value of outlet"
+	::= { ctlCANSensorsOutletsEntry 7 }
+
+ctlCANSensorsOutletInitial  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Initial state for outlet"
+	::= { ctlCANSensorsOutletsEntry 8 }
+
+ctlCANSensorsDiscretPulse  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Pulse duration for outlet"
+	::= { ctlCANSensorsOutletsEntry 9 }
+
+ctlRsSensorsDiscretsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlRsSensorsDiscretsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlRsSensors 1 }
+
+ctlRsSensorsDiscretsEntry  OBJECT-TYPE
+	SYNTAX 	CtlRsSensorsDiscretsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of discret sensor"
+	INDEX { ctlRsSensorsDiscretId }
+	::= { ctlRsSensorsDiscretsTable 1 }
+
+CtlRsSensorsDiscretsEntry ::= SEQUENCE {
+	ctlRsSensorsDiscretId
+		Integer32,
+	ctlRsSensorsDiscretModule
+		Integer32,
+	ctlRsSensorsDiscretNum
+		Integer32,
+	ctlRsSensorsDiscretType
+		OCTET STRING,
+	ctlRsSensorsDiscretName
+		OCTET STRING,
+	ctlRsSensorsDiscretState
+		OCTET STRING,
+	ctlRsSensorsDiscretValue
+		OCTET STRING,
+	ctlRsSensorsDiscretReset
+		Integer32,
+	ctlRsSensorsDiscretLevel
+		Integer32,
+	ctlRsSensorsDiscretReverse
+		Integer32,
+	ctlRsSensorsDiscretSpecific
+		OCTET STRING
+}
+
+ctlRsSensorsDiscretId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of sensor"
+	::= { ctlRsSensorsDiscretsEntry 1 }
+
+ctlRsSensorsDiscretModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of sensor"
+	::= { ctlRsSensorsDiscretsEntry 2 }
+
+ctlRsSensorsDiscretNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for sensor"
+	::= { ctlRsSensorsDiscretsEntry 3 }
+
+ctlRsSensorsDiscretType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of sensor's"
+	::= { ctlRsSensorsDiscretsEntry 4 }
+
+ctlRsSensorsDiscretName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of sensor"
+	::= { ctlRsSensorsDiscretsEntry 5 }
+
+ctlRsSensorsDiscretState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of sensor"
+	::= { ctlRsSensorsDiscretsEntry 6 }
+
+ctlRsSensorsDiscretValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Value of sensor"
+	::= { ctlRsSensorsDiscretsEntry 7 }
+
+ctlRsSensorsDiscretReset  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Reset of sensor"
+	::= { ctlRsSensorsDiscretsEntry 8 }
+
+ctlRsSensorsDiscretLevel  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Level of sensor"
+	::= { ctlRsSensorsDiscretsEntry 9 }
+
+ctlRsSensorsDiscretReverse  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Reverse of sensor"
+	::= { ctlRsSensorsDiscretsEntry 10 }
+
+ctlRsSensorsDiscretSpecific  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Specific parameters for sensor"
+	::= { ctlRsSensorsDiscretsEntry 11 }
+
+ctlRsSensorsAnalogsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlRsSensorsAnalogsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlRsSensors 2 }
+
+ctlRsSensorsAnalogsEntry  OBJECT-TYPE
+	SYNTAX 	CtlRsSensorsAnalogsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of analog sensor"
+	INDEX { ctlRsSensorsAnalogId }
+	::= { ctlRsSensorsAnalogsTable 1 }
+
+CtlRsSensorsAnalogsEntry ::= SEQUENCE {
+	ctlRsSensorsAnalogId
+		Integer32,
+	ctlRsSensorsAnalogModule
+		Integer32,
+	ctlRsSensorsAnalogNum
+		Integer32,
+	ctlRsSensorsAnalogType
+		OCTET STRING,
+	ctlRsSensorsAnalogName
+		OCTET STRING,
+	ctlRsSensorsAnalogState
+		OCTET STRING,
+	ctlRsSensorsAnalogValue
+		OCTET STRING,
+	ctlRsSensorsAnalogMin
+		OCTET STRING,
+	ctlRsSensorsAnalogMax
+		OCTET STRING,
+	ctlRsSensorsAnalogLowAlarm
+		OCTET STRING,
+	ctlRsSensorsAnalogLowWarning
+		OCTET STRING,
+	ctlRsSensorsAnalogHighWarning
+		OCTET STRING,
+	ctlRsSensorsAnalogHighAlarm
+		OCTET STRING,
+	ctlRsSensorsAnalogAt0
+		OCTET STRING,
+	ctlRsSensorsAnalogAt75
+		OCTET STRING,
+	ctlRsSensorsAnalogExpression
+		OCTET STRING,
+	ctlRsSensorsAnalogSpecific
+		OCTET STRING
+}
+
+ctlRsSensorsAnalogId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of sensor"
+	::= { ctlRsSensorsAnalogsEntry 1 }
+
+ctlRsSensorsAnalogModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of sensor"
+	::= { ctlRsSensorsAnalogsEntry 2 }
+
+-- Num in modules for mailer
+
+ctlRsSensorsAnalogNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for sensor"
+	::= { ctlRsSensorsAnalogsEntry 3 }
+
+ctlRsSensorsAnalogType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of sensor"
+	::= { ctlRsSensorsAnalogsEntry 4 }
+
+ctlRsSensorsAnalogName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of sensor"
+	::= { ctlRsSensorsAnalogsEntry 5 }
+
+ctlRsSensorsAnalogState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of sensor"
+	::= { ctlRsSensorsAnalogsEntry 6 }
+
+ctlRsSensorsAnalogValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Value of sensor"
+	::= { ctlRsSensorsAnalogsEntry 7 }
+
+ctlRsSensorsAnalogMin  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Minimum of sensor value range"
+	::= { ctlRsSensorsAnalogsEntry 8 }
+
+ctlRsSensorsAnalogMax  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Maximum of sensor value range"
+	::= { ctlRsSensorsAnalogsEntry 9 }
+
+ctlRsSensorsAnalogLowAlarm  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Low alarm level for sensor value"
+	::= { ctlRsSensorsAnalogsEntry 10 }
+
+ctlRsSensorsAnalogLowWarning  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Low warning level for sensor value"
+	::= { ctlRsSensorsAnalogsEntry 11 }
+
+ctlRsSensorsAnalogHighWarning  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"High warning level for sensor value"
+	::= { ctlRsSensorsAnalogsEntry 12 }
+
+ctlRsSensorsAnalogHighAlarm  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"High alarm level for sensor value"
+	::= { ctlRsSensorsAnalogsEntry 13 }
+
+ctlRsSensorsAnalogAt0  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"At0 for sensor value"
+	::= { ctlRsSensorsAnalogsEntry 14 }
+
+ctlRsSensorsAnalogAt75  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"At75 for sensor value"
+	::= { ctlRsSensorsAnalogsEntry 15 }
+
+ctlRsSensorsAnalogExpression  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..80))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Expression for sensor value"
+	::= { ctlRsSensorsAnalogsEntry 16 }
+
+ctlRsSensorsAnalogSpecific  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Specific parameters for sensor"
+	::= { ctlRsSensorsAnalogsEntry 17 }
+
+ctlRsSensorsOutletsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CtlRsSensorsOutletsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		""
+	::= { ctlRsSensors 3 }
+
+ctlRsSensorsOutletsEntry  OBJECT-TYPE
+	SYNTAX 	CtlRsSensorsOutletsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Entry of outlet"
+	INDEX { ctlRsSensorsOutletId }
+	::= { ctlRsSensorsOutletsTable 1 }
+
+CtlRsSensorsOutletsEntry ::= SEQUENCE {
+	ctlRsSensorsOutletId
+		Integer32,
+	ctlRsSensorsOutletModule
+		Integer32,
+	ctlRsSensorsOutletNum
+		Integer32,
+	ctlRsSensorsOutletType
+		OCTET STRING,
+	ctlRsSensorsOutletName
+		OCTET STRING,
+	ctlRsSensorsOutletState
+		OCTET STRING,
+	ctlRsSensorsOutletValue
+		OCTET STRING,
+	ctlRsSensorsOutletInitial
+		OCTET STRING,
+	ctlRsSensorsDiscretPulse
+		Integer32
+}
+
+ctlRsSensorsOutletId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Id of outlet"
+	::= { ctlRsSensorsOutletsEntry 1 }
+
+ctlRsSensorsOutletModule  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Module of outlet"
+	::= { ctlRsSensorsOutletsEntry 2 }
+
+ctlRsSensorsOutletNum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Logical number in module for outlet"
+	::= { ctlRsSensorsOutletsEntry 3 }
+
+ctlRsSensorsOutletType  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Type of outlet"
+	::= { ctlRsSensorsOutletsEntry 4 }
+
+ctlRsSensorsOutletName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(2..128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Name of outlet"
+	::= { ctlRsSensorsOutletsEntry 5 }
+
+ctlRsSensorsOutletState  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"State of outlet"
+	::= { ctlRsSensorsOutletsEntry 6 }
+
+ctlRsSensorsOutletValue  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Value of outlet"
+	::= { ctlRsSensorsOutletsEntry 7 }
+
+ctlRsSensorsOutletInitial  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Initial state for outlet"
+	::= { ctlRsSensorsOutletsEntry 8 }
+
+ctlRsSensorsDiscretPulse  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Pulse duration for outlet"
+	::= { ctlRsSensorsOutletsEntry 9 }
+
+END
+
+

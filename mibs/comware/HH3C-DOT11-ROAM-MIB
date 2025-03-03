@@ -1,0 +1,714 @@
+-- =====================================================================
+-- Copyright (c) 2004-2016 by New H3C Technologies. All rights reserved.
+--
+-- Description: The file defines a MIB to provide WLAN roaming configuration.
+-- Reference:
+-- Version: V1.3
+-- History:
+-- V1.0 2008-7-23 created by heziqi
+-- V1.1 2009-05-07 modified by Li Yugang
+--      Add hh3cDot11RoamStatisGroup to hh3cDot11ROAM.
+-- V1.2 2009-12-24 modified for Guangdong Mobile
+--      Add hh3cDot11InterACRoamOutSuccCnt to hh3cDot11RoamStatisGroup.
+--      2010-08-04 modefied by l07769 for Guangdong CMCC
+--      Add hh3cDot11IntraACRoamingSuccCnt2, hh3cDot11InterACRoamingSuccCnt2
+--      and hh3cDot11InterACRoamOutSuccCnt2 to hh3cDot11RoamStatis2Group.
+-- V1.3 2016-3-11 modified by yubo 04460
+--      Add hh3cDot11InterACRoamInSuccCnt to hh3cDot11RoamStatusGroup
+--      Add hh3cDot11InterACRoamInSuccCnt2 to hh3cDot11RoamStatis2Group
+-- =====================================================================
+HH3C-DOT11-ROAM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TruthValue,
+        MacAddress,
+        RowStatus,
+        TEXTUAL-CONVENTION
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Counter32
+    FROM SNMPv2-SMI
+        InetAddressType,
+        InetAddress
+    FROM INET-ADDRESS-MIB
+        hh3cDot11
+    FROM HH3C-DOT11-REF-MIB;
+
+hh3cDot11ROAM MODULE-IDENTITY
+    LAST-UPDATED "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R.China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB provides information about WLAN roaming configuration.
+
+        GLOSSARY
+
+        IEEE 802.11
+        Standard to encourage interoperability among
+        wireless networking equipment.
+
+        Access point (AP)
+        Transmitter/receiver (transceiver) device
+        that commonly connects and transports data
+        between a wireless network and a wired network.
+
+        Access control (AC)
+        To control and manage multi-APs, it will bridge
+        wireless and wired network.
+
+        BSS
+        IEEE 802.11 Basic Service Set (Radio Cell).  The
+        BSS of an AP comprises of the stations directly
+        associating with the AP.
+
+        Radio
+        The chip set to receive and send wireless signal.
+
+        HA
+        The AC to which a wireless station is connected by
+        associating with an AP for the first time is the
+        HA of the station.
+
+        FA
+        An AC that is other than the HA and to which a
+        station is currently connected is an FA of the
+        station.
+
+        Fast-roam capable station
+        A wireless station which directly associates to
+        a fast-roam service (rsn+dot1X) with one AC for
+        the first time.
+
+        Roam-out station
+        A wireless station which has associated with an
+        AC other than the HA in the mobility-group is
+        referred to as a roam-out station at its HA.
+
+        Roam-in station
+        A wireless station which has associated with an
+        AC other than the HA in the mobility-group is
+        referred to as a roam-in station at the FA.
+
+        Intra-AC roaming
+        A procedure where a wireless station roams from
+        one AP to another AP, which are connected to the
+        same AC.
+
+        Inter-AC roaming
+        A procedure where a wireless station roams from
+        one AP to another AP, which are connected to
+        different ACs.
+
+        Inter-AC fast roaming capability
+        If a station uses 802.1x (RSN) authentication
+        through negotiation, this station has inter-AC
+        fast roaming capability.
+
+        WLAN-tunnel
+        One type of layer 2 interface which is bound with
+        an IACTP data tunnel and used to tunnel
+        unicast/broadcast frames between ACs."
+    REVISION "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    DESCRIPTION
+            "add new nodes."
+    REVISION "201008041800Z"        -- Aug 04, 2010 at 18:00 GMT
+    DESCRIPTION
+            "Modified to add new hh3cDot11RoamStatis2Group."
+    REVISION "200905072000Z"
+    DESCRIPTION
+            "Modified to add new hh3cDot11RoamStatisGroup."
+    REVISION "200807231200Z"
+    DESCRIPTION
+            "The initial revision of this MIB module."
+    ::= { hh3cDot11 10 }
+
+-- ==================================================================
+-- Textual Conventions
+-- ==================================================================
+Hh3cDot11RoamMobileTunnelType ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The protocol type of the mobility-tunnel.
+        This object has two defined values:
+        - 'ipv4', which indicates that the protocol type of the mobility-tunnel
+          is IPv4.
+        - 'ipv6', which indicates that the protocol type of the mobility-tunnel
+          is IPv6.
+        "
+    SYNTAX      INTEGER
+        {
+            ipv4(1),
+            ipv6(2)
+        }
+
+Hh3cDot11RoamAuthMode ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The authentication mode of the mobility-tunnel.
+        This object has two defined values:
+        - 'none', which indicates that the authentication mode of the
+          mobility-tunnel is None.
+        - 'md5', which indicates that the authentication mode of the
+          mobility-tunnel is MD5.
+        "
+    SYNTAX      INTEGER
+        {
+            none(1),
+            md5(2)
+        }
+
+Hh3cDot11RoamIACTPStatus ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The status of IACTP state machine."
+    SYNTAX      INTEGER
+        {
+            init(1),
+            idle(2),
+            joinRequestWait(3),
+            joinResponseWait(4),
+            joinConfirmWait(5),
+            joinError(6),
+            run(7)
+        }
+
+-- ==================================================================
+-- Major sections
+-- ==================================================================
+hh3cDot11RoamCfgGroup OBJECT IDENTIFIER  ::= { hh3cDot11ROAM 1 }
+--  Roaming Configuration Group has the following children:
+--  hh3cDot11MobGrpTable            ::= { hh3cDot11RoamCfgGroup 1 }
+--  hh3cDot11MobGrpMemberTable      ::= { hh3cDot11RoamCfgGroup 2 }
+
+hh3cDot11RoamStatusGroup OBJECT IDENTIFIER  ::= { hh3cDot11ROAM 2 }
+--  Roaming Status Group has the following children:
+--  hh3cDot11RoamInInfoTable             ::= { hh3cDot11RoamStatusGroup 1 }
+--  hh3cDot11RoamOutInfoTable            ::= { hh3cDot11RoamStatusGroup 2 }
+--  hh3cDot11RoamTrackTable              ::= { hh3cDot11RoamStatusGroup 3 }
+
+hh3cDot11RoamStatisGroup OBJECT IDENTIFIER  ::= { hh3cDot11ROAM 3 }
+--  Roaming Statis Group has the following children:
+--  hh3cDot11IntraACRoamingSuccCnt       ::= { hh3cDot11RoamStatusGroup 1 }
+--  hh3cDot11InterACRoamingSuccCnt       ::= { hh3cDot11RoamStatusGroup 2 }
+--  hh3cDot11InterACRoamOutSuccCnt       ::= { hh3cDot11RoamStatusGroup 3 }
+--  hh3cDot11InterACRoamInSuccCnt        ::= { hh3cDot11RoamStatusGroup 4 }
+
+hh3cDot11RoamStatis2Group OBJECT IDENTIFIER  ::= { hh3cDot11ROAM 4 }
+--  Roaming Statis Group has the following children:
+--  hh3cDot11IntraACRoamingSuccCnt2     ::= { hh3cDot11RoamStatus2Group 1 }
+--  hh3cDot11InterACRoamingSuccCnt2     ::= { hh3cDot11RoamStatus2Group 2 }
+--  hh3cDot11InterACRoamOutSuccCnt2     ::= { hh3cDot11RoamStatus2Group 3 }
+--  hh3cDot11InterACRoamInSuccCnt2      ::= { hh3cDot11RoamStatus2Group 4 }
+
+-- ==================================================================
+-- hh3cDot11RoamCfgGroup Definition
+-- ==================================================================
+-- ==================================================================
+-- hh3cDot11MobGrpTable Definition
+-- ==================================================================
+hh3cDot11MobGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11MobGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table defines the parameters for roaming group configuration."
+    ::= { hh3cDot11RoamCfgGroup 1 }
+
+hh3cDot11MobGrpEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11MobGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains information of mobile group."
+    INDEX
+        {
+            hh3cDot11MobGrpName
+        }
+    ::= { hh3cDot11MobGrpTable 1 }
+
+Hh3cDot11MobGrpEntry ::= SEQUENCE
+    {
+        hh3cDot11MobGrpName        OCTET STRING,
+        hh3cdot11MobGrpTunnelType  Hh3cDot11RoamMobileTunnelType,
+        hh3cDot11MobGrpSrcIPAddr   InetAddress,
+        hh3cDot11MobGrpAuthMode    Hh3cDot11RoamAuthMode,
+        hh3cDot11MobGrpAuthKey     OCTET STRING,
+        hh3cDot11MobGrpEnable      TruthValue,
+        hh3cDot11MobGrpRowStatus   RowStatus
+    }
+
+hh3cDot11MobGrpName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..15))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the name of roam group."
+    ::= { hh3cDot11MobGrpEntry 1 }
+
+hh3cdot11MobGrpTunnelType OBJECT-TYPE
+    SYNTAX      Hh3cDot11RoamMobileTunnelType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the protocol type of mobility-tunnel."
+    DEFVAL      { ipv4 }
+    ::= { hh3cDot11MobGrpEntry 2 }
+
+hh3cDot11MobGrpSrcIPAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of tunnel source.  The IP address
+         type must be the same as hh3cdot11MobGrpTunnelType.
+         The default value is zero."
+    ::= { hh3cDot11MobGrpEntry 3 }
+
+hh3cDot11MobGrpAuthMode OBJECT-TYPE
+    SYNTAX      Hh3cDot11RoamAuthMode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the authentication mode of IACTP tunnel.
+         This object can be used to enable IACTP control message
+         integrity authentication."
+    DEFVAL      { none }
+    ::= { hh3cDot11MobGrpEntry 4 }
+
+hh3cDot11MobGrpAuthKey OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the authentication key of IACTP tunnel.
+         Authentication key to be used with the given
+         authentication method.
+         This object can not be modified when the value of
+         hh3cDot11MobGrpAuthMode is 'none'."
+    ::= { hh3cDot11MobGrpEntry 5 }
+
+hh3cDot11MobGrpEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "State of a mobile group.
+         'true'  : The WLAN mobility group will be enabled.
+         'false' : The inter-AC tunnel communication for the
+                   mobility group will be disabled.
+         A mobility group can be enabled only when the source
+         IP address is configured.  The other objects in this entry
+         can become effective only when mobility group is enabled.
+         The other objects in this entry can not be modified
+         after enabling mobility group."
+    DEFVAL      { false }
+    ::= { hh3cDot11MobGrpEntry 6 }
+
+hh3cDot11MobGrpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11MobGrpEntry 7 }
+
+-- ==================================================================
+-- hh3cDot11MobGrpMemberTable Definition
+-- ==================================================================
+
+hh3cDot11MobGrpMemberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11MobGrpMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table defines the parameters for roaming member configuration."
+    ::= { hh3cDot11RoamCfgGroup 2 }
+
+hh3cDot11MobGrpMemberEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11MobGrpMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains information of mobile group member."
+    INDEX
+        {
+            hh3cDot11MobGrpName,
+            hh3cDot11MobGrpMemberIpAddr
+        }
+    ::= { hh3cDot11MobGrpMemberTable 1 }
+
+Hh3cDot11MobGrpMemberEntry ::= SEQUENCE
+    {
+        hh3cDot11MobGrpMemberIpAddr      InetAddress,
+        hh3cDot11MobGrpMemberStatus      Hh3cDot11RoamIACTPStatus,
+        hh3cDot11MobGrpMemberIf          OCTET STRING,
+        hh3cDot11MobGrpMemberUpTime      Integer32,
+        hh3cDot11MobGrpMemberRowStatus   RowStatus
+    }
+
+hh3cDot11MobGrpMemberIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of group member.  It can not be
+         the same as the source IP address of the mobile group.
+         The address type must be the same as the hh3cdot11MobGrpTunnelType."
+    ::= { hh3cDot11MobGrpMemberEntry 1 }
+
+hh3cDot11MobGrpMemberStatus OBJECT-TYPE
+    SYNTAX      Hh3cDot11RoamIACTPStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the status of group member."
+    ::= { hh3cDot11MobGrpMemberEntry 2 }
+
+hh3cDot11MobGrpMemberIf OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the tunnel interface name of group member."
+    ::= { hh3cDot11MobGrpMemberEntry 3 }
+
+hh3cDot11MobGrpMemberUpTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the sustaining time from tunnel up.  If tunnel
+         is down, MemberUpTime is zero."
+    ::= { hh3cDot11MobGrpMemberEntry 4 }
+
+hh3cDot11MobGrpMemberRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11MobGrpMemberEntry 5 }
+
+-- ==================================================================
+-- hh3cDot11RoamStatusGroup Definition
+-- ==================================================================
+-- ==================================================================
+-- hh3cDot11RoamInInfoTable Definition
+-- ==================================================================
+hh3cDot11RoamInInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11RoamInInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table can used to display the information of roaming in client."
+    ::= { hh3cDot11RoamStatusGroup 1 }
+
+hh3cDot11RoamInInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11RoamInInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains information of roaming in client."
+    INDEX
+        {
+            hh3cDot11RoamClientMAC
+        }
+    ::= { hh3cDot11RoamInInfoTable 1 }
+
+Hh3cDot11RoamInInfoEntry ::= SEQUENCE
+    {
+        hh3cDot11RoamClientMAC         MacAddress,
+        hh3cDot11RoamInClientBSSID     MacAddress,
+        hh3cDot11RoamInClientVlanID    Integer32,
+        hh3cDot11RoamInHomeACIPType    InetAddressType,
+        hh3cDot11RoamInHomeACIPAddr    InetAddress
+    }
+
+hh3cDot11RoamClientMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of roaming in client."
+    ::= { hh3cDot11RoamInInfoEntry 1 }
+
+hh3cDot11RoamInClientBSSID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents BSSID of the AP to which the Roam-In client is associated."
+    ::= { hh3cDot11RoamInInfoEntry 2 }
+
+hh3cDot11RoamInClientVlanID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the VLAN ID of Roam-In client."
+    ::= { hh3cDot11RoamInInfoEntry 3 }
+
+hh3cDot11RoamInHomeACIPType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the protocol type of home AC address."
+    ::= { hh3cDot11RoamInInfoEntry 4 }
+
+hh3cDot11RoamInHomeACIPAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the address of home AC."
+    ::= { hh3cDot11RoamInInfoEntry 5 }
+
+-- ==================================================================
+-- hh3cDot11RoamOutInfoTable Definition
+-- ==================================================================
+
+hh3cDot11RoamOutInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11RoamOutInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table can used to display the information of roaming out client."
+    ::= { hh3cDot11RoamStatusGroup 2 }
+
+hh3cDot11RoamOutInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11RoamOutInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains information of roaming out client."
+    INDEX
+        {
+            hh3cDot11RoamClientMAC
+        }
+    ::= { hh3cDot11RoamOutInfoTable 1 }
+
+Hh3cDot11RoamOutInfoEntry ::= SEQUENCE
+    {
+        hh3cDot11RoamOutClientBSSID       MacAddress,
+        hh3cDot11RoamOutClientVlanID      Integer32,
+        hh3cDot11RoamOutForeignACIPType   InetAddressType,
+        hh3cDot11RoamOutForeignACIPAddr   InetAddress,
+        hh3cDot11RoamOutClientUpTime      Integer32
+    }
+
+hh3cDot11RoamOutClientBSSID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the BSSID of the AP to which the Roam-Out client is
+         associated."
+    ::= { hh3cDot11RoamOutInfoEntry 1 }
+
+hh3cDot11RoamOutClientVlanID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the VLAN ID of Roam-Out client."
+    ::= { hh3cDot11RoamOutInfoEntry 2 }
+
+hh3cDot11RoamOutForeignACIPType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the protocol type of foreign AC address."
+    ::= { hh3cDot11RoamOutInfoEntry 3 }
+
+hh3cDot11RoamOutForeignACIPAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the address of foreign AC."
+    ::= { hh3cDot11RoamOutInfoEntry 4 }
+
+hh3cDot11RoamOutClientUpTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how long the Roam-Out client is associated with the foreign
+         AC."
+    ::= { hh3cDot11RoamOutInfoEntry 5 }
+
+-- ==================================================================
+-- hh3cDot11RoamTrackTable Definition
+-- ==================================================================
+hh3cDot11RoamTrackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11RoamTrackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table contains the roam-track information of a
+         specified client on the client's HA."
+    ::= { hh3cDot11RoamStatusGroup 3 }
+
+hh3cDot11RoamTrackEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11RoamTrackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains information of a specified client on the
+         client's HA."
+    INDEX
+        {
+            hh3cDot11RoamTrackIndex
+        }
+    ::= { hh3cDot11RoamTrackTable 1 }
+
+Hh3cDot11RoamTrackEntry ::= SEQUENCE
+    {
+        hh3cDot11RoamTrackIndex        Integer32,
+        hh3cDot11RoamTrackClientMAC    MacAddress,
+        hh3cDot11RoamTrackBSSID        MacAddress,
+        hh3cDot11RoamTrackUpTime       Integer32,
+        hh3cDot11RoamTrackACIPType     InetAddressType,
+        hh3cDot11RoamTrackACIPAddr     InetAddress
+    }
+
+hh3cDot11RoamTrackIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the index of this entry."
+    ::= { hh3cDot11RoamTrackEntry 1 }
+
+hh3cDot11RoamTrackClientMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of the roamed client."
+    ::= { hh3cDot11RoamTrackEntry 2 }
+
+hh3cDot11RoamTrackBSSID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the BSSID of the AP with which the client is associated."
+    ::= { hh3cDot11RoamTrackEntry 3 }
+
+hh3cDot11RoamTrackUpTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how long the client is associated with the BSSID."
+    ::= { hh3cDot11RoamTrackEntry 4 }
+
+hh3cDot11RoamTrackACIPType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the protocol type of the IP address of the access
+         controller with which the client is connected."
+    ::= { hh3cDot11RoamTrackEntry 5 }
+
+hh3cDot11RoamTrackACIPAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of the access controller with which
+         the client is connected."
+    ::= { hh3cDot11RoamTrackEntry 6 }
+
+-- ==================================================================
+-- hh3cDot11RoamStatisGroup Definition
+-- ==================================================================
+hh3cDot11IntraACRoamingSuccCnt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of client successfully roam Intra-AC."
+    ::= { hh3cDot11RoamStatisGroup 1 }
+
+hh3cDot11InterACRoamingSuccCnt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of client successfully roam in Inter-AC."
+    ::= { hh3cDot11RoamStatisGroup 2 }
+
+hh3cDot11InterACRoamOutSuccCnt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of client successfully roam out Inter-AC."
+    ::= { hh3cDot11RoamStatisGroup 3 }
+
+hh3cDot11InterACRoamInSuccCnt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of clients successfully roamed in inter-AC roaming."
+    ::= { hh3cDot11RoamStatisGroup 4 }
+
+-- ==================================================================
+-- End of hh3cDot11RoamStatisGroup Definition
+-- ==================================================================
+
+-- ==================================================================
+-- hh3cDot11RoamStatis2Group Definition
+-- ==================================================================
+hh3cDot11IntraACRoamingSuccCnt2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of client successfully roam Intra-AC in Counter32."
+    ::= { hh3cDot11RoamStatis2Group 1 }
+
+hh3cDot11InterACRoamingSuccCnt2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of client successfully roam in Inter-AC in Counter32."
+    ::= { hh3cDot11RoamStatis2Group 2 }
+
+hh3cDot11InterACRoamOutSuccCnt2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of client successfully roam out Inter-AC in Counter32."
+    ::= { hh3cDot11RoamStatis2Group 3 }
+
+hh3cDot11InterACRoamInSuccCnt2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of clients successfully roamed in inter-AC roaming in Counter32."
+    ::= { hh3cDot11RoamStatis2Group 4 }
+
+-- ==================================================================
+-- End of hh3cDot11RoamStatis2Group Definition
+-- ==================================================================
+END

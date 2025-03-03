@@ -13,7 +13,7 @@ IMPORTS
     VlanList1, VlanList2, VlanList3, VlanList4              FROM CISCOSB-BRIDGEMIBOBJECTS-MIB;
 
 rsTunning  MODULE-IDENTITY
-           LAST-UPDATED "200602120000Z"
+           LAST-UPDATED "202105170000Z"
            ORGANIZATION "Cisco Systems, Inc."
 
            CONTACT-INFO
@@ -870,6 +870,22 @@ rsMaxVlansEntriesAfterReset OBJECT-TYPE
     DESCRIPTION
         "Future maximal number of entries in the VLANs table."
     ::= { rsMaxVlansTuning  2 }
+	
+rsMaxVlanMapping OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of VLAN mapping entries in the TCAM."
+    ::= { rsMaxVlansTuning  3 }
+
+rsMaxVlanMappingAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Future maximal number of VLAN mapping entries in the TCAM."
+    ::= { rsMaxVlansTuning  4 }
 
 rsMaxPolicyTuning OBJECT IDENTIFIER ::= { rsMaxEntriesTuning 16 }
 
@@ -1351,6 +1367,42 @@ rsMaxIpmv6RoutesAfterReset OBJECT-TYPE
       "Future Maximal number of IPv6 routers ((*,G) and (S,G))
        supported by the IPv6 Multicast Hardware Forwarding Table."
     ::=  { rsMaxIpRoutesTuning 8 }
+
+rsMaxIpv4PbrRoutes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The maximum number of IPv4 policy routes supported by
+       the IPv4 Unicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 9 }
+
+rsMaxIpv4PbrRoutesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future Maximal number of IPv4 policy routes supported by
+       the IPv4 Unicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 10 }
+
+rsMaxIpv6PbrRoutes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The maximum number of IPv6 policy routes supported by
+       the IPv4 Unicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 11 }
+
+rsMaxIpv6PbrRoutesAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Future Maximal number of IPv6 policy routes supported by
+       the IPv4 Unicast Hardware Forwarding Table."
+    ::=  { rsMaxIpRoutesTuning 12 }
 
 -- Obsolete
 -- rsFftAgingTuning OBJECT IDENTIFIER ::= { rsTunning 9 }

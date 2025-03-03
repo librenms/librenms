@@ -1,0 +1,255 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-TE-PARAM-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-TE-PARAM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    mpls
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+prvtTeParamMIB MODULE-IDENTITY
+    LAST-UPDATED "201004280000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The MIB module for management of TE-params entities."
+    REVISION    "201004280000Z"
+    DESCRIPTION 
+        "initial version"
+    ::= { mpls 9 }
+
+
+PrvtTeLinkBandwidthSpeed ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Used in combination with PrvtTeLinkBandwidthUnits to specify a link's bandwidth."
+    SYNTAX      Unsigned32
+
+PrvtTeLinkBandwidthUnits ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Used in combination with PrvtTeLinkBandwidthSpeed to specify a link's bandwidth."
+    SYNTAX      INTEGER { bps(0), kbps(1), mbps(2), gbps(3) }
+
+prvtTeParamMIBObjects OBJECT IDENTIFIER
+    ::= { prvtTeParamMIB 1 }
+
+prvtTeParamLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtTeParamLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table specifying the parameters of TE links."
+    ::= { prvtTeParamMIBObjects 2 }
+
+prvtTeParamLinkEntry OBJECT-TYPE
+    SYNTAX      PrvtTeParamLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtTeParamLinkTable."
+    INDEX       { ifIndex }
+    ::= { prvtTeParamLinkTable 1 }
+
+PrvtTeParamLinkEntry ::= SEQUENCE {
+    prvtTeParamLinkRowStatus            RowStatus,
+    prvtTeParamLinkMetric               Unsigned32,
+    prvtTeParamLinkPhyBandwidthSpeed    PrvtTeLinkBandwidthSpeed,
+    prvtTeParamLinkPhyBandwidthUnits    PrvtTeLinkBandwidthUnits,
+    prvtTeParamLinkMaxRsvBwSpeed        PrvtTeLinkBandwidthSpeed,
+    prvtTeParamLinkMaxRsvBwUnits        PrvtTeLinkBandwidthUnits
+}
+
+prvtTeParamLinkRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for theprvtTeParamLinkTable."
+    ::= { prvtTeParamLinkEntry 1 }
+
+prvtTeParamLinkMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Traffic engineering metric (TEM) for the TE link.
+         The TEM is derived from its component links.
+         All component links within the TE link must have the same TEM."
+    REFERENCE   
+        "Link Bundling in MPLS Traffic Engineering (TE), RFC 4201"
+    ::= { prvtTeParamLinkEntry 2 }
+
+prvtTeParamLinkPhyBandwidthSpeed OBJECT-TYPE
+    SYNTAX      PrvtTeLinkBandwidthSpeed
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Used together with the prvtTeParamLinkPhyBandwidthUnits
+         object to specify the physical bandwidth for the TE link."
+    ::= { prvtTeParamLinkEntry 3 }
+
+prvtTeParamLinkPhyBandwidthUnits OBJECT-TYPE
+    SYNTAX      PrvtTeLinkBandwidthUnits
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Used together with the prvtTeParamLinkPhyBandwidthSpeed
+         object to specify the physical bandwidth for the TE link."
+    ::= { prvtTeParamLinkEntry 4 }
+
+prvtTeParamLinkMaxRsvBwSpeed OBJECT-TYPE
+    SYNTAX      PrvtTeLinkBandwidthSpeed
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Used together with the prvtTeParamLinkMaxRsvBwUnits
+         object to specify the maximum bandwidth for the TE link."
+    ::= { prvtTeParamLinkEntry 5 }
+
+prvtTeParamLinkMaxRsvBwUnits OBJECT-TYPE
+    SYNTAX      PrvtTeLinkBandwidthUnits
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Used together with the prvtTeParamLinkMaxRsvBwSpeed
+         object to specify the maximum bandwidth that can be reserved for the TE link."
+    ::= { prvtTeParamLinkEntry 6 }
+
+prvtTeParamLinkAdminGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtTeParamLinkAdminGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table specifying the administrative groups to which a TE link belongs."
+    ::= { prvtTeParamMIBObjects 3 }
+
+prvtTeParamLinkAdminGrpEntry OBJECT-TYPE
+    SYNTAX      PrvtTeParamLinkAdminGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtTeParamLinkAdminGrpTable."
+    INDEX       { ifIndex, prvtTeParamLinkAdminGrpId }
+    ::= { prvtTeParamLinkAdminGrpTable 1 }
+
+PrvtTeParamLinkAdminGrpEntry ::= SEQUENCE {
+    prvtTeParamLinkAdminGrpId           Integer32,
+    prvtTeParamLinkAdminGrpRowStatus    RowStatus
+}
+
+prvtTeParamLinkAdminGrpId OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "ID of the administrative group to which the TE link belongs."
+    ::= { prvtTeParamLinkAdminGrpEntry 1 }
+
+prvtTeParamLinkAdminGrpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for the prvtTeParamLinkAdminGrpTable."
+    ::= { prvtTeParamLinkAdminGrpEntry 2 }
+
+prvtTeParamAdminGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtTeParamAdminGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table storing the identifiers for an administrative group."
+    ::= { prvtTeParamMIBObjects 5 }
+
+prvtTeParamAdminGroupEntry OBJECT-TYPE
+    SYNTAX      PrvtTeParamAdminGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "prvtTeParamAdminGroupTable allows the specifying of a group-name to
+         each administrative group. Each group is uniquely identified by its
+         prvtTeParamAdminGroupId."
+    INDEX       { prvtTeParamAdminGroupId }
+    ::= { prvtTeParamAdminGroupTable 1 }
+
+PrvtTeParamAdminGroupEntry ::= SEQUENCE {
+    prvtTeParamAdminGroupId         Integer32,
+    prvtTeParamAdminGroupRowStatus  RowStatus,
+    prvtTeParamAdminGroupName       OCTET STRING
+}
+
+prvtTeParamAdminGroupId OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "ID uniquely identifying an administrative group."
+    ::= { prvtTeParamAdminGroupEntry 1 }
+
+prvtTeParamAdminGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for theprvtTeParamAdminGroupTable."
+    ::= { prvtTeParamAdminGroupEntry 2 }
+
+prvtTeParamAdminGroupName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..15))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The name of the administrative group."
+    ::= { prvtTeParamAdminGroupEntry 3 }
+
+END -- end of module PRVT-TE-PARAM-MIB.

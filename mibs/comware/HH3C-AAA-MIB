@@ -1,0 +1,155 @@
+-- ==================================================================
+-- Copyright (C) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: AAA MIB
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 2019.03.11 The initial version, created by Yuhua
+-- V1.1 2020.01.13 updated by liubo
+--      Added hh3cAAATables, hh3cAAASlotStatTable, hh3cAAAChassisId,
+--      hh3cAAASlotId, and hh3cAAASlotSessionResourceNum
+-- ==================================================================
+HH3C-AAA-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Integer32, Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+hh3cAAA MODULE-IDENTITY
+    LAST-UPDATED "202001130000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The MIB module is used for managing AAA."
+
+--  Revision history
+REVISION     "202001130000Z"          -- January 13, 2020 at 00:00 GMT
+    DESCRIPTION  "Added hh3cAAATables, hh3cAAASlotStatTable, hh3cAAAChassisId,
+             hh3cAAASlotId, and hh3cAAASlotSessionResourceNum"
+
+REVISION     "201903110000Z"
+    DESCRIPTION  "The initial version."
+
+::= { hh3cCommon 181 }
+
+-- ----------------------------------------------------------------------
+-- hh3cAAAMibTrapOid Table
+-- ----------------------------------------------------------------------
+hh3cAAAMibTrap OBJECT IDENTIFIER ::= { hh3cAAA 1 }
+
+hh3cAAAMibTrapOid OBJECT IDENTIFIER ::= { hh3cAAAMibTrap 1 }
+hh3cAAATrapOidDefine OBJECT IDENTIFIER ::= { hh3cAAAMibTrapOid 1 }
+
+hh3cAAAUserChassis OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Chassis that online users access."
+    ::= { hh3cAAATrapOidDefine 1 }
+
+hh3cAAAUserSlot OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Slot that online users access."
+    ::= { hh3cAAATrapOidDefine 2 }
+
+hh3cAAAUserSlotMaxNumThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Threshold about the maximum number of online users on this slot."
+    ::= { hh3cAAATrapOidDefine 3 }
+
+-- ----------------------------------------------------------------------
+-- hh3cAAATraps Table
+-- ----------------------------------------------------------------------
+hh3cAAATraps      OBJECT IDENTIFIER ::= { hh3cAAAMibTrap 2 }
+hh3cAAATrapsDefine      OBJECT IDENTIFIER ::= { hh3cAAATraps 0 }
+
+hh3cAAAUserSlotMaxNum NOTIFICATION-TYPE
+    OBJECTS { hh3cAAAUserChassis,
+              hh3cAAAUserSlot,
+              hh3cAAAUserSlotMaxNumThreshold }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the number of online users on the slot
+         reaches the maximum user threshold.  Subsequent users are recommended
+         to access the device through another slot."
+    ::= { hh3cAAATrapsDefine 1 }
+
+hh3cAAAUserSlotMaxNumResume NOTIFICATION-TYPE
+    OBJECTS { hh3cAAAUserChassis,
+              hh3cAAAUserSlot,
+              hh3cAAAUserSlotMaxNumThreshold }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the number of online users on the slot
+         falls below 90% of the maximum user threshold."
+    ::= { hh3cAAATrapsDefine 2 }
+
+-- ----------------------------------------------------------------------
+-- hh3cAAATables Definition
+-- ----------------------------------------------------------------------
+hh3cAAATables OBJECT IDENTIFIER ::= { hh3cAAA 2 }
+
+-- ----------------------------------------------------------------------
+-- hh3cAAASlotStatTable Table
+-- ----------------------------------------------------------------------
+hh3cAAASlotStatTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Hh3cAAASlotStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Slot-based AAA statistics."
+    ::= { hh3cAAATables 1 }
+
+hh3cAAASlotStatEntry OBJECT-TYPE
+    SYNTAX  Hh3cAAASlotStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An entry (conceptual row) represents AAA statistics for a slot."
+        INDEX { hh3cAAAChassisId, hh3cAAASlotId }
+    ::= { hh3cAAASlotStatTable 1 }
+
+Hh3cAAASlotStatEntry ::= SEQUENCE {
+    hh3cAAAChassisId           Unsigned32,
+    hh3cAAASlotId              Unsigned32,
+    hh3cAAASlotSessionResourceNum      Unsigned32}
+
+hh3cAAAChassisId   OBJECT-TYPE
+    SYNTAX   Unsigned32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+        "ID of the member device where the statistics are collected."
+    ::= { hh3cAAASlotStatEntry 1 }
+
+hh3cAAASlotId   OBJECT-TYPE
+    SYNTAX   Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS   current
+    DESCRIPTION
+        "Slot ID of the statistics."
+    ::= { hh3cAAASlotStatEntry 2 }
+
+hh3cAAASlotSessionResourceNum   OBJECT-TYPE
+    SYNTAX   Unsigned32
+    MAX-ACCESS  read-only
+    STATUS   current
+    DESCRIPTION
+        "Number of used session resource on this slot."
+    ::= { hh3cAAASlotStatEntry 3 }
+END

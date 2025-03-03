@@ -1,0 +1,194 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+--
+-- Copyright (c) 2019-2020, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-LSYSSP-SECUREWIRE-MIB DEFINITIONS ::= BEGIN
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+      Unsigned32
+        FROM SNMPv2-SMI
+      DisplayString
+        FROM SNMPv2-TC
+      jnxLsysSpSecurewire
+        FROM JUNIPER-LSYS-SECURITYPROFILE-MIB
+    ;
+
+    jnxLsysSpSecurewireMIB MODULE-IDENTITY
+        LAST-UPDATED  "201903291644Z" -- March 29, 2019
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1133 Innovation Way
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the secure-wire-specific MIB for Juniper Enterprise
+             Logical-System (LSYS) security profiles.  Juniper documentation
+             is recommended as the reference.
+
+             The LSYS security profile provides various static and dynamic
+             resource management by observing resource quota limits.
+             Security secure-wire resource is the focus in this MIB.
+            "
+        ::= { jnxLsysSpSecurewire 1 }
+
+    jnxLsysSpSecurewireObjects        OBJECT IDENTIFIER ::= { jnxLsysSpSecurewireMIB 1 }
+    jnxLsysSpSecurewireSummary        OBJECT IDENTIFIER ::= { jnxLsysSpSecurewireMIB 2 }
+
+
+-- **********************************************************************
+-- Tabular secure-wire resource information objects per LSYS:
+--   Below are secure-wire resource table indexed by LSYS name.
+-- **********************************************************************
+
+-- Securewire resource table per LSYS
+
+    jnxLsysSpSecurewireTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF JnxLsysSpSecurewireEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "LSYSPROFILE secure-wire objects for secure-wire resource consumption per LSYS."
+    ::= { jnxLsysSpSecurewireObjects 1 }
+
+    jnxLsysSpSecurewireEntry OBJECT-TYPE
+        SYNTAX              JnxLsysSpSecurewireEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "An entry in secure-wire resource table."
+    INDEX { IMPLIED jnxLsysSpSecurewireLsysName }
+    ::= { jnxLsysSpSecurewireTable 1 }
+
+    JnxLsysSpSecurewireEntry ::=
+       SEQUENCE {
+          jnxLsysSpSecurewireLsysName    DisplayString,
+          jnxLsysSpSecurewireProfileName DisplayString,
+          jnxLsysSpSecurewireUsage       Unsigned32,
+          jnxLsysSpSecurewireReserved    Unsigned32,
+          jnxLsysSpSecurewireMaximum     Unsigned32
+    }
+
+-- Entry definitions for the secure-wire resource table
+
+    jnxLsysSpSecurewireLsysName       OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..64))
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "The name of the logical system for which secure-wire resource information is retrieved. "
+        ::= { jnxLsysSpSecurewireEntry 1 }
+
+    jnxLsysSpSecurewireProfileName    OBJECT-TYPE
+        SYNTAX              DisplayString (SIZE(1..32))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The security profile name string for the LSYS."
+    ::= { jnxLsysSpSecurewireEntry 2 }
+
+    jnxLsysSpSecurewireUsage          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The current resource usage count for the LSYS."
+    ::= { jnxLsysSpSecurewireEntry 3 }
+
+    jnxLsysSpSecurewireReserved       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The reserved resource count for the LSYS."
+    ::= { jnxLsysSpSecurewireEntry 4 }
+
+    jnxLsysSpSecurewireMaximum        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The maximum allowed resource usage count for the LSYS."
+    ::= { jnxLsysSpSecurewireEntry 5 }
+
+
+-- **********************************************************************
+-- Securewire resource information summary:
+-- **********************************************************************
+
+    jnxLsysSpSecurewireUsedAmount         OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The secure-wire resource consumption over all LSYS."
+    ::= { jnxLsysSpSecurewireSummary 1 }
+
+    jnxLsysSpSecurewireMaxQuota           OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The secure-wire resource maximum quota for the whole device for all LSYS."
+    ::= { jnxLsysSpSecurewireSummary 2 }
+
+    jnxLsysSpSecurewireAvailableAmount    OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The secure-wire resource available in the whole device."
+    ::= { jnxLsysSpSecurewireSummary 3 }
+
+    jnxLsysSpSecurewireHeaviestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The most amount of secure-wire resource consumed of a LSYS."
+    ::= { jnxLsysSpSecurewireSummary 4 }
+
+    jnxLsysSpSecurewireHeaviestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The LSYS name that consume the most secure-wire resource."
+    ::= { jnxLsysSpSecurewireSummary 5 }
+
+    jnxLsysSpSecurewireLightestUsage      OBJECT-TYPE
+        SYNTAX                  Unsigned32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The least amount of secure-wire resource consumed of a LSYS."
+    ::= { jnxLsysSpSecurewireSummary 6 }
+
+    jnxLsysSpSecurewireLightestUser       OBJECT-TYPE
+        SYNTAX                  DisplayString (SIZE(1..64))
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+           "The LSYS name that consume the least secure-wire resource."
+    ::= { jnxLsysSpSecurewireSummary 7 }
+
+
+
+ -- ***************************************************************
+ -- definition of secure-wire resource related traps. (TBD)
+ -- ***************************************************************
+
+--
+-- End of File
+--
+
+END

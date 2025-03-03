@@ -15,23 +15,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 echo 'pduUnitStatusTable ';
-$pre_cache['enlogic_pdu_status'] = snmpwalk_cache_oid($device, 'pduUnitStatusTable', array(), 'ENLOGIC-PDU-MIB');
+$pre_cache['enlogic_pdu_status'] = snmpwalk_cache_oid($device, 'pduUnitStatusTable', [], 'ENLOGIC-PDU-MIB');
 
 echo 'pduInputPhaseConfigTable ';
-$pre_cache['enlogic_pdu_input'] = snmpwalk_cache_oid($device, 'pduInputPhaseConfigTable', array(), 'ENLOGIC-PDU-MIB');
+$pre_cache['enlogic_pdu_input'] = snmpwalk_cache_oid($device, 'pduInputPhaseConfigTable', [], 'ENLOGIC-PDU-MIB');
 echo 'pduInputPhaseStatusTable ';
 $pre_cache['enlogic_pdu_input'] = snmpwalk_cache_oid($device, 'pduInputPhaseStatusTable', $pre_cache['enlogic_pdu_input'], 'ENLOGIC-PDU-MIB');
 
 echo 'pduCircuitBreakerConfigTable ';
-$pre_cache['enlogic_pdu_circuit'] = snmpwalk_cache_oid($device, 'pduCircuitBreakerConfigTable', array(), 'ENLOGIC-PDU-MIB');
+$pre_cache['enlogic_pdu_circuit'] = snmpwalk_cache_oid($device, 'pduCircuitBreakerConfigTable', [], 'ENLOGIC-PDU-MIB');
 echo 'pduCircuitBreakerStatusTable ';
 $pre_cache['enlogic_pdu_circuit'] = snmpwalk_cache_oid($device, 'pduCircuitBreakerStatusTable', $pre_cache['enlogic_pdu_circuit'], 'ENLOGIC-PDU-MIB');

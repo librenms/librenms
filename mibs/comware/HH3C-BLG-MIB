@@ -1,0 +1,142 @@
+-- ==================================================================
+-- Copyright (c) 2004-2009 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This MIB file is used for management of Balance Group
+--              information.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2009-09-15 Created by xupengfei02152
+-- ==================================================================
+HH3C-BLG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+hh3cBlg MODULE-IDENTITY
+    LAST-UPDATED "200909151111Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        Http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB module defines a set of basic objects for
+        configuring switches and routers to set/get balance
+        group information."
+    REVISION
+        "200909151111Z"
+    DESCRIPTION
+        "The initial version of this MIB."
+
+   ::= { hh3cCommon 108 }
+
+CounterClear ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Cleared: reset the value of the group's counter.
+         Nouse: 'nouse' will be returned when getting."
+    SYNTAX INTEGER
+    {
+        cleared(1),
+        nouse(2)
+    }
+
+hh3cBlgObjects OBJECT IDENTIFIER  ::= { hh3cBlg 1 }
+
+hh3cBlgStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cBlgStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains the statistics information
+        about balance groups."
+    ::= { hh3cBlgObjects 1 }
+
+hh3cBlgStatsEntry OBJECT-TYPE
+    SYNTAX Hh3cBlgStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This list contains statistics information."
+    INDEX { hh3cBlgIndex }
+    ::= { hh3cBlgStatsTable 1 }
+
+Hh3cBlgStatsEntry ::=
+   SEQUENCE
+   {
+       hh3cBlgIndex
+           Integer32,
+       hh3cBlgGroupTxPacketCount
+           Counter64,
+       hh3cBlgGroupRxPacketCount
+           Counter64,
+       hh3cBlgGroupTxByteCount
+           Counter64,
+       hh3cBlgGroupRxByteCount
+           Counter64,
+       hh3cBlgGroupCountClear
+           CounterClear
+   }
+
+hh3cBlgIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the balance group."
+    ::= { hh3cBlgStatsEntry 1 }
+
+hh3cBlgGroupTxPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When retrieved, this object returns the count of
+        packets the balance group has sent."
+    ::= { hh3cBlgStatsEntry 2 }
+
+hh3cBlgGroupRxPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When retrieved, this object returns the count of
+        packets the balance group has received."
+    ::= { hh3cBlgStatsEntry 3 }
+
+hh3cBlgGroupTxByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When retrieved, this object returns the count of
+        bytes the balance group has sent."
+    ::= { hh3cBlgStatsEntry 4 }
+
+hh3cBlgGroupRxByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When retrieved, this object returns the count of
+        bytes the balance group has received."
+    ::= { hh3cBlgStatsEntry 5 }
+
+hh3cBlgGroupCountClear OBJECT-TYPE
+    SYNTAX CounterClear
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is used to reset the counter of the balance group.
+        Read operation is meaningless."
+    ::= { hh3cBlgStatsEntry 6 }
+
+END

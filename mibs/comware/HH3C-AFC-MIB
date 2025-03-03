@@ -1,0 +1,174 @@
+-- =================================================================
+-- Copyright (C) 2008 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This MIB is to provide the definition of
+--              Abnormal Flow Clean system.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2008-07-23, Created by luohaijun
+-- =================================================================
+HH3C-AFC-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hh3cCommon FROM HH3C-OID-MIB
+        OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, Integer32, IpAddress
+            FROM SNMPv2-SMI
+        ;
+
+hh3cAFC  MODULE-IDENTITY
+    LAST-UPDATED "200807230000Z"
+    ORGANIZATION "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "PLAT Team New H3C Technologies Co.,Ltd.
+        Shang-Di Information Industry Base,
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB is to provide the definition of Abnormal Flow Clean system."
+    REVISION "200807230000Z"
+    DESCRIPTION
+        "The Initial Version of this MIB module."
+    ::= { hh3cCommon 85 }
+
+
+hh3cAFCLeaf OBJECT IDENTIFIER ::= {hh3cAFC  1}
+
+--
+-- DDOS ATTACK 'Target IP' OBJECT
+--
+
+hh3cDDosAttackTargetIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This shows the victim of a DDos attack.  The IP Address is in the list
+        of protected IP address."
+    ::= {hh3cAFCLeaf 1}
+
+--
+-- DDOS ATTACK 'Attack type' OBJECT
+--
+
+hh3cDDosAttackType OBJECT-TYPE
+    SYNTAX      INTEGER{
+                land(1),
+                smurf(2),
+                fraggle(3),
+                winnuke(4),
+                synflood(5),
+                icmpflood(6),
+                udpflood(7),
+                icmpredirect(8),
+                icmpunreachable(9),
+                tracert(11),
+                tcpflag(12),
+                pingofdeath(13),
+                teardrop(14),
+                ipfragment(15),
+                largeicmp(18),
+                sourceroute(19),
+                routerecord(20),
+                fragflood(24),
+                scan(27),
+                appstreamalarm(29),
+                sessionstreamalarm(30),
+                tcpabnormal(32),
+                ipfragabnormal(33),
+                tftpabnormal(34),
+                dnsabnormal(35),
+                httpabnormal(36),
+                telnetabnormal(37),
+                ftpabnormal(38),
+                smtpabnormal(39),
+                pop3abnormal(40),
+                snmpabnormal(41),
+                ackabnormal(42),
+                cc(43),
+                otherabnormal(1024)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This shows the attack type which the victim is sufferd."
+    ::= {hh3cAFCLeaf 2}
+
+--
+-- DDOS ATTACK 'Attack policy' OBJECT
+--
+
+hh3cDDosAttackPolicy OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..80))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This shows the policy name which detects the DDos Attack."
+    ::= {hh3cAFCLeaf 3}
+    
+--
+-- DDOS ATTACK 'Attack threshold' OBJECT
+--
+
+hh3cDDosAttackThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This shows the policy threshold in the DDos Attack."
+    ::= {hh3cAFCLeaf 4}
+
+--
+-- DDOS ATTACK 'Attack speed' OBJECT
+--
+
+hh3cDDosAttackSpeed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This shows the rate of policy in the DDos Attack."
+    ::= {hh3cAFCLeaf 5}
+
+
+
+-- **********************************************************************
+-- Define enterprise repeater traps. Rules for traps are that any
+-- varbind must be from a table in which the first qualifier on the
+-- object id is the service identifier of the 'thing' causing the trap.
+-- **********************************************************************
+hh3cAFCNotify OBJECT IDENTIFIER ::= {hh3cAFC  2}
+
+hh3cAFCNotifyPrefix OBJECT IDENTIFIER ::= { hh3cAFCNotify 0 }
+
+hh3cDDosAttackStart NOTIFICATION-TYPE
+    OBJECTS {
+        hh3cDDosAttackTargetIP,
+        hh3cDDosAttackType,
+        hh3cDDosAttackPolicy,
+        hh3cDDosAttackThreshold,
+        hh3cDDosAttackSpeed
+        }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when a DDos attack on specific IP is detected.
+         The IP address of the victim is the first object.
+         The exact type of the attack is the second object.
+         The policy name which detects the attack is the third object.
+         The threshold of the attack is the 4th object.
+         The speed of the attack is the 5th object."
+    ::= {hh3cAFCNotifyPrefix 1}
+
+
+hh3cDDosAttackEnd NOTIFICATION-TYPE
+    OBJECTS {
+        hh3cDDosAttackTargetIP
+        }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when a DDos Attack end.  The IP address of the
+        victim is the very object."
+    ::= {hh3cAFCNotifyPrefix 2}
+
+END

@@ -1,0 +1,68 @@
+ARRIS-C3-RANGING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+    MODULE-IDENTITY, 
+    OBJECT-TYPE,
+    Unsigned32,
+    Integer32,
+    IpAddress,
+    NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+    DateAndTime,
+    MacAddress,
+    RowStatus,
+    TruthValue
+        FROM SNMPv2-TC
+    cmtsC3
+        FROM ARRIS-MIB
+    docsIfCmtsCmStatusEntry, TenthdBmV
+        FROM DOCS-IF-MIB  -- RFC2670
+    ifIndex, InterfaceIndexOrZero
+        FROM IF-MIB;      -- RFC2233
+
+cmtsC3RngMIB MODULE-IDENTITY
+        LAST-UPDATED "200308200000Z" -- 20th August 2003
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the FFT software on the Arris CMTS C3"
+    ::= { cmtsC3 10 }
+
+
+    phoenixRangingGroup OBJECT IDENTIFIER ::= { cmtsC3RngMIB 1 }
+    
+    phxRangingPowerOverride OBJECT-TYPE
+        SYNTAX	    INTEGER {
+                    enabled (1),
+                    disabled (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS 	    current
+        DESCRIPTION
+                    "Allows the CMTS to be configured to make only 0 dBmV
+                     power adjustments in RNG-RSP messages."
+        ::= { phoenixRangingGroup 1 }
+    
+    phxRangingForceContinue OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    disabled (0),
+                    enabled (1)
+        }
+        MAX-ACCESS	read-write
+        STATUS		current
+        DESCRIPTION
+                    "Enable the CMTS to force all RNG-RSP messages to issue a
+                     Continue status indefinitely regardless of timing, power,
+                     etc. accuracy of previous incoming RNG-REQ"
+        ::= { phoenixRangingGroup 2 }
+        
+END

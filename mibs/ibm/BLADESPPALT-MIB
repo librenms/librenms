@@ -1,0 +1,2249 @@
+-- **************************************************************************
+-- **************************************************************************
+--
+-- File         : mmalert.mib
+-- Description  : IBM Management Module traps
+--                MIB for traps(Alerts)
+-- Version      : 6.0
+-- Date         : August 2014
+--
+--
+-- Copyright (c) 2002 - 2014 IBM  All Rights Reserved.
+--
+--
+-- Contains trap descriptions for:
+--  (1) Bladecenter Management Module
+--
+-- This MIB is used by the Management Module to describe
+-- traps for alert conditions detected by the MM/Blades on Bladecenter hardware.
+--
+-- The CMM alert MIB (mmalert.mib) is written in SNMPv1 SMI format,
+-- which does not include a SYNTAX definition for an unsigned data type.
+-- This data type, however, is important and is used for event identifiers
+-- in this MIB.
+--
+-- Some management tools, MIB browsers, and MIB compiler tools will raise
+-- errors when encountering this Unsigned32 SYNTAX. To alleviate these
+-- errors, the mmalert.mib file may be updated using one of these methods:
+--
+-- 1) Define the Unsigned32 TEXTUAL-CONVENTION
+--
+--          Unsigned32 ::= TEXTUAL-CONVENTION
+--                         STATUS       current
+--                         DESCRIPTION
+--                         Unsigned integer data type
+--                         SYNTAX       INTEGER (0..4294967295)
+--
+-- 2) Define an Unsigned32 integer range
+--
+--          Unsigned32 ::=  INTEGER (0..4294967295)
+--
+-- 3) Define an alias for Unsigned32 integer range and then update the
+--    usage of it in the mmalert.mib file:
+--
+--          AliasUnsigned32 ::=  INTEGER (0..4294967295)
+--
+--          SYNTAX  AliasUnsigned32   // For example
+--
+-- 4) Add the Unsigned32 line to the IMPORTS list:
+--
+--     IMPORTS                                                                  
+--        OBJECT-TYPE        FROM RFC-1212                                
+--        enterprises        FROM RFC1155-SMI                              
+--        DisplayString      FROM RFC1213-MIB                              
+--        Unsigned32         FROM SNMPv2-SMI
+--        TRAP-TYPE          FROM RFC-1215;
+-- 
+-- **************************************************************************
+-- **************************************************************************
+
+        BLADESPPALT-MIB DEFINITIONS ::= BEGIN
+
+
+        IMPORTS
+            OBJECT-TYPE                          FROM RFC-1212
+            enterprises                          FROM RFC1155-SMI
+            DisplayString                        FROM RFC1213-MIB
+            TRAP-TYPE                            FROM RFC-1215;
+
+
+        ibm            OBJECT IDENTIFIER ::=   { enterprises 2 }
+
+        -- IBM products group
+
+        ibmProd        OBJECT IDENTIFIER ::=   { ibm 6 }
+
+        -- IBM Netfinity SP
+
+        supportProcessor OBJECT IDENTIFIER ::= { ibmProd 158 }
+
+        -- IBM Netfinity SP Alert
+
+        mmRemoteSupTrapMIB     OBJECT IDENTIFIER ::= { supportProcessor 3 }
+
+-- **************************************************************************
+-- Start: Management Module Adapter SP Alerts
+-- **************************************************************************
+
+        -- the rsspalt generic trap generator group
+
+        remoteSupTrapMibObjects OBJECT IDENTIFIER ::= { mmRemoteSupTrapMIB 1 }
+
+
+        spTrapInfo OBJECT IDENTIFIER ::= { remoteSupTrapMibObjects 1 }
+
+        spTrapDateTime  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Timestamp of Local Date and Time when alert was generated
+                        NOTE: the format is changeable by a setting on the Management Module (Flex System only)"
+                       ::= { spTrapInfo 1 }
+
+        spTrapAppId    OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Platform ID, either 'IBM Flex Chassis Management Module' (Flex System)
+                                     or 'BladeCenter Management Module' (BladeCenter)"
+                       ::= { spTrapInfo 2 }
+
+        spTrapSpTxtId  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "SP System Identification - Text Identification"
+                       ::= { spTrapInfo 3 }
+
+        spTrapSysUuid  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host System UUID(Universal Unique ID)"
+                       ::= { spTrapInfo 4 }
+
+        spTrapSysSern  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "'Chassis Serial Number'(Flex System) or 'AMM Serial Number' (BladeCenter)" 
+                       ::= { spTrapInfo 5 }
+
+        spTrapAppType  OBJECT-TYPE
+                       SYNTAX  INTEGER (1..65535)
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Application Alert Type - Trap Type ID"
+                       ::= { spTrapInfo 6 }
+
+        spTrapPriority  OBJECT-TYPE
+                       SYNTAX  INTEGER (1..65535)
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Alert Severity Value
+                          - Critical Alert(0)
+                          - Major(1)
+                          - Non-Critical Alert(2)
+                          - System Alert(4)
+                          - Recovery Alert(8)
+                          - Informational Only Alert(255)"
+                       ::= { spTrapInfo 7 }
+
+        spTrapMsgText  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Alert Message Text"
+                       ::= { spTrapInfo 8 }
+
+        spTrapHostContact  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host Contact"
+                       ::= { spTrapInfo 9 }
+
+        spTrapHostLocation  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host Location"
+                       ::= { spTrapInfo 10 }
+
+        spTrapBladeName  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Server Name
+                        NOTE: This will only be populated if a server event triggered this trap."
+                       ::= { spTrapInfo 11 }
+
+        spTrapBladeSern  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Server Serial Number
+                        NOTE: This will only be populated if a server event triggered this trap."
+                       ::= { spTrapInfo 12 }
+
+        spTrapBladeUuid  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Server UUID(Universal Unique ID)
+                        NOTE: This will only be populated if a server event triggered this trap."
+                       ::= { spTrapInfo 13 }
+
+        spTrapEvtName  OBJECT-TYPE
+                       SYNTAX Unsigned32 (1..4294967295)
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "The event ID in decimal (hexidecimal format may be cross referenced in InfoCenter)."
+                       ::= { spTrapInfo 14 }                       
+
+        spTrapSourceId  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "The source identifier associated with the event that caused the trap
+                        - SERVPROC : event associated with the service processor
+                        - Audit    : audit event (in audit log)
+                        - Stor_X   : event associated with storage element X
+                        - IOMod_X  : event associated with switch X
+                        - Cool_X   : event associated with fan X
+                        - Power_X  : event associated with power supply X
+                        - Blade_X  : event associated with server X"
+                       ::= { spTrapInfo 15 }
+
+        spTrapCallHomeFlag  OBJECT-TYPE
+                       SYNTAX  Unsigned32 (1..4294967295)
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "The call home flag associated with the event that caused the trap
+                         - No Call Home generated with this event (0)
+                         - Call Home generated with this event if call home is enabled (1)"
+                       ::= { spTrapInfo 16 }
+
+        spTrapSysIPAddress  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "The chassis Management Module IP Address.
+                       
+                        NOTE: In some very rare cases, the IP address will indicate 0.0.0.0 
+                              instead of the proper configured IP address. This can happen
+                              on the initial trap that leaves the chassis Management Module
+                              if the associated event happens extremely early in the boot up cycle."
+                       ::= { spTrapInfo 17 }
+
+        spTrapSysMachineModel  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Chassis Machine Type/Model"
+                       ::= { spTrapInfo 18 }
+
+        spTrapBladeMachineModel  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Server Machine Type/Model
+                        NOTE: This will only be populated if a server event triggered this trap."
+                       ::= { spTrapInfo 19 }
+
+        spTrapBladeFRUSerialNumber  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Server Field Replaceable Unit (FRU) Serial Number
+                        NOTE: This will only be populated if a server event triggered this trap.
+                              spTrapBladeFRUSerialNumber is only available on Flex System."
+                       ::= { spTrapInfo 20 }
+
+        spTrapBladeEvtName  OBJECT-TYPE
+                       SYNTAX  DisplayString 
+		       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "The server event ID. This ID can be cross referenced in the InfoCenter.
+                        NOTE: This will only be populated if a server event triggered this trap.
+                              spTrapBladeEvtName is only available on Flex System."
+                       ::= { spTrapInfo 21 }
+
+        spBladeEventDataSource  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "The 5 bytes are values from the IPMI standard SEL (System Event Log) entry received for from server.
+                        Byte 1 (SEL Byte 11) - IPMI Standard Sensor Type
+                        Byte 2 (SEL Byte 13) - IPMI Standard Event/Reading Type Code
+                        Byte 3 (SEL Byte 14) - Event Data 1
+                        Byte 4 (SEL Byte 15) - Event Data 2
+                        Byte 5 (SEL Byte 16) - Event Data 3
+                        NOTE: This will only be populated if a server event triggered this trap.
+                              spBladeEventDataSource is only available on Flex System"
+                       ::= { spTrapInfo 22 }
+
+        spTrapAuxData  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Auxiliary data associated with the event. Truncated if more than 127 characters.
+                        NOTE: spTrapAuxData is only available on Flex System."
+                       ::= { spTrapInfo 23 }
+
+        spTrapComponentID  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Component ID to associate the trap with the location in the chassis and, if applicable, the node enclosure.
+                        NOTE: spTrapComponentID is only available on Flex System."
+                       ::= { spTrapInfo 24 }
+
+        spTrapComponentFRUInfo  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Field Replaceable Unit (FRU) of the component that caused the trap.
+                        NOTE: spTrapComponentFRUInfo is only available on Flex System."
+                       ::= { spTrapInfo 25 }
+
+        spTrapChassisName  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Chassis Name
+                        NOTE: This will only populate if the Chassis Name has been set.
+                              spTrapChassisName is only available on Flex System."
+                       ::= { spTrapInfo 26 }
+
+        spTrapSysRoomId  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Chassis Room ID
+                        NOTE: This will only populate if the Chassis Room ID has been set.
+                              spTrapSysRoomId is only available on Flex System."
+                       ::= { spTrapInfo 27 }
+
+        spTrapSysRackId  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Chassis Rack ID
+                        NOTE: This will only populate if the Chassis Rack ID has been set.
+                              spTrapSysRackId is only available on Flex System."
+                       ::= { spTrapInfo 28 }
+
+        spTrapSysRackU  OBJECT-TYPE
+                       SYNTAX  Unsigned32 (1..4294967295) 
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Chassis anchor (lowest) Rack U location
+                        NOTE: This will only populate if the Chassis lowest Rack U has been set (otherwise it will be '0').
+                              spTrapSysRackU is only available on Flex System."
+                       ::= { spTrapInfo 29 }
+
+        spTrapServiceableEventFlag  OBJECT-TYPE
+                       SYNTAX  Unsigned32 (1..4294967295) 
+		       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "The serviceable event flag associated with the event that caused the trap
+                        - the event requires no user action (0)
+                        - the event is serviceable and requires user attention (1)
+                        NOTE: spTrapServiceableEventFlag is only available on Flex System."
+                       ::= { spTrapInfo 30 }
+
+        spLogSequenceNum  OBJECT-TYPE
+                       SYNTAX  Unsigned32 (1..4294967295)
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Sequence number from the chassis event log or audit log.
+                        NOTE: Audit logs are stored separately internally.
+                              spLogSequenceNum is only available on Flex System."
+                       ::= { spTrapInfo 31 }
+
+        spCimMsgID  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "CIM Indication Message ID
+                        NOTE: spCimMsgID is only available on Flex System."
+                       ::= { spTrapInfo 32 }
+
+        spCimMsgPrefix  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "CIM Indication Message ID name space, one of the following:
+                        - PLAT : DMTF platform registry
+                        - CMM  : CMM message registry
+                        NOTE: spCimMsgPrefix is only available on Flex System."
+                       ::= { spTrapInfo 33 }
+
+        spEventCorrelator  OBJECT-TYPE
+                       SYNTAX  Unsigned32 (0..4294967295)
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "For events originated by the CMM:
+                       If this event is part of a event group, this will be the unique
+                       identifier from 1 - 255 for the event group. Zero means no group.
+                       An alert in the same event group replaces an active alert from the
+                       group.  The recovery event in the group clears the active alert
+                       in the group.
+
+                       For events created by the node system-management processor that are 
+                       logged by CMM:
+                       This field is a correlator from 0 - 254 that is the same for a node alert
+                       and the node recovery event for the alert.  A node recovery event clears 
+                       an existing node alert if all of the following fields from the node alert 
+                       and the node recovery event match: the event correlator (spEventCorrelator) 
+                       value, the Blade UUID (spTrapBladeUuid), and the Blade Event Data Source 
+                       (spBladeEventDataSource).
+                       NOTE: spEventCorrelator is only available on Flex System."
+                       ::= { spTrapInfo 34 }
+
+              
+-- **************************************************************************
+-- Critical Traps
+-- **************************************************************************
+        mmTrapTempC          TRAP-TYPE
+                                ENTERPRISE  mmRemoteSupTrapMIB
+                                VARIABLES
+                                  {
+                                  spTrapDateTime,
+                                  spTrapAppId,
+                                  spTrapSpTxtId,
+                                  spTrapSysUuid,
+                                  spTrapSysSern,
+                                  spTrapAppType,
+                                  spTrapPriority,
+                                  spTrapMsgText,
+                                  spTrapHostContact,
+                                  spTrapHostLocation,
+                                  spTrapBladeName,
+                                  spTrapBladeSern,
+                                  spTrapBladeUuid,
+                                  spTrapEvtName,
+                                  spTrapSourceId,
+                                  spTrapCallHomeFlag,
+                                  spTrapSysIPAddress,
+                                  spTrapSysMachineModel,  
+                                  spTrapBladeMachineModel,
+                                  spEventCorrelator
+                                  }
+                                  DESCRIPTION
+                                    "Critical Alert: Temperature threshold exceeded.
+                                    Note: This mib object will be replaced in a future release."
+                                  ::= 0
+
+        mmTrapVoltC        TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Voltage threshold exceeded.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 1
+
+        mmTrapTampC        TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Physical intrusion of system has occurred.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 2
+
+        mmTrapMffC         TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Multiple fan failure.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 3
+
+        mmTrapPsC          TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel, 
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Power supply failure."
+                                ::= 4
+
+        mTrapHdC          TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Hard disk drive failure.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 5
+
+        mmTrapVrmC         TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Voltage Regulator Module(VRM) failure.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 6
+
+        mmTrapSffC         TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel ,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Single Fan failure.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 11
+
+
+        mmTrapMsC          TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel ,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Multiple switch module failure.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 31
+
+        mmTrapIhcC         TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Incompatible hardware configuration.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 36
+
+        mmTrapBladeC          TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel, 
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Blade."
+                                ::= 128
+
+        mmTrapIOC          TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel, 
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: I/O Module."
+                                ::= 129
+
+        mmTrapStorageC      TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel, 
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Storage Module."
+                                ::= 131
+
+        mmTrapChassisC      TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel, 
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+		                }
+                                DESCRIPTION
+                                  "Critical Alert: Chassis Module."
+                                ::= 130
+
+        mmTrapFanC      TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel, 
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Cooling Devices."
+                                ::= 133
+
+-- **************************************************************************
+-- Non-Critical Traps
+-- **************************************************************************
+
+        mmTrapRdpsN          TRAP-TYPE
+                                ENTERPRISE  mmRemoteSupTrapMIB
+                                VARIABLES
+                                  {
+                                  spTrapDateTime,
+                                  spTrapAppId,
+                                  spTrapSpTxtId,
+                                  spTrapSysUuid,
+                                  spTrapSysSern,
+                                  spTrapAppType,
+                                  spTrapPriority,
+                                  spTrapMsgText,
+                                  spTrapHostContact,
+                                  spTrapHostLocation,
+                                  spTrapBladeName,
+                                  spTrapBladeSern,
+                                  spTrapBladeUuid,
+                                  spTrapEvtName,
+                                  spTrapSourceId,
+                                  spTrapCallHomeFlag,
+                                  spTrapSysIPAddress,
+                                  spTrapSysMachineModel,  
+                                  spTrapBladeMachineModel,
+                                  spEventCorrelator
+                                  }
+                                  DESCRIPTION
+                                    "Non-Critical Alert: Redundant Power Supply failure.
+                                  Note: This mib object will be replaced in a future release."
+                                  ::= 10
+
+        mmTrapTempN        TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Temperature threshold exceeded.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 12
+
+        mmTrapVoltN        TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel 
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Voltage threshold exceeded.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 13
+
+        mmTrapRmN          TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Redundant module.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 32
+                                
+       mmTrapBladeN          TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel, 
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Blade "
+                                ::= 160
+
+       mmTrapION          TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel, 
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: I/O Module"
+                                ::= 161
+
+
+        mmTrapLogFullN          TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Event Log 100% Full."
+                                ::= 7
+
+        mmTrapStorageN       TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel, 
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Storage Module"
+                                ::= 163
+
+        mmTrapPowerN      TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Power Module."
+                                ::= 164
+
+        mmTrapChassisN      TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Chassis Module."
+                                ::= 162
+
+        mmTrapFanN      TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Cooling Devices."
+                                ::= 165
+
+-- **************************************************************************
+-- System Traps
+-- **************************************************************************
+
+        mmTrapSecDvS       TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Secondary Device warning.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 15
+
+        mmTrapPostToS      TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Post Timeout value exceeded.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 20
+
+        mmTrapOsToS        TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: OS Timeout value exceeded.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 21
+
+        mmTrapAppS         TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+				spTrapBladeFRUSerialNumber,
+				spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+				spTrapComponentID,
+				spTrapComponentFRUInfo,
+                                spTrapChassisName,
+				spTrapSysRoomId,
+				spTrapSysRackId,
+				spTrapSysRackU,
+				spTrapServiceableEventFlag,
+				spLogSequenceNum,
+				spCimMsgID,
+				spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Application Alert."
+                                ::= 22
+                                
+        mmTrapPoffS        TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Power Off.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 23
+
+        mmTrapPonS         TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Power On.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 24
+
+        mmTrapBootS        TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: System Boot Failure.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 25
+
+        mmTrapLdrToS       TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: OS Loader Timeout.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 26
+
+        mmTrapPFAS         TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Predictive Failure Analysis(PFA) information.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 27
+
+        mmTrapRemoteLoginS    TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Remote Login"
+                                ::= 30
+
+
+        mmTrapKVMSwitchS   TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Keyboard/Video/Mouse(KVM) or Medial Tray(MT) switching failure.  
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 33
+
+        mmTrapSysInvS      TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Inventory."
+                                ::= 34
+
+        mmTrapSysLogS      TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: System Log 75% full."
+                                ::= 35
+
+        mmTrapNwChangeS    TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Network change notification."
+                                ::= 37
+
+        mmTrapBlThrS          TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Blade Throttle.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 39
+
+        mmTrapPwrMgntS          TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Power Management.
+                                  Note: This mib object will be replaced in a future release."
+                                ::= 40
+
+        mmTrapBladeS        TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Blade"
+                                ::= 176
+
+        mmTrapIOS        TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: I/O Module"
+                                ::= 177
+
+        mmTrapStorageS      TRAP-TYPE
+                              ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Storage Module"
+                                ::= 179
+
+        mmTrapPowerS      TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Power Module."
+                                ::= 180
+
+        mmTrapChassisS      TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Chassis Module."
+                                ::= 178
+
+        mmTrapFanS      TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Cooling Devices."
+                                ::= 181
+
+        mmTrapPwrDOS      TRAP-TYPE 
+                             ENTERPRISE  mmRemoteSupTrapMIB
+                              VARIABLES
+                                {
+                                spTrapDateTime,
+                                spTrapAppId,
+                                spTrapSpTxtId,
+                                spTrapSysUuid,
+                                spTrapSysSern,
+                                spTrapAppType,
+                                spTrapPriority,
+                                spTrapMsgText,
+                                spTrapHostContact,
+                                spTrapHostLocation,
+                                spTrapBladeName,
+                                spTrapBladeSern,
+                                spTrapBladeUuid,
+                                spTrapEvtName,
+                                spTrapSourceId,
+                                spTrapCallHomeFlag,
+                                spTrapSysIPAddress,
+                                spTrapSysMachineModel,  
+                                spTrapBladeMachineModel,
+                                spTrapBladeFRUSerialNumber,
+                                spTrapBladeEvtName,
+                                spBladeEventDataSource,
+                                spTrapAuxData,
+                                spTrapComponentID,
+                                spTrapComponentFRUInfo,
+                                spTrapChassisName,
+                                spTrapSysRoomId,
+                                spTrapSysRackId,
+                                spTrapSysRackU,
+                                spTrapServiceableEventFlag,
+                                spLogSequenceNum,
+                                spCimMsgID,
+                                spCimMsgPrefix,
+                                spEventCorrelator
+                                }
+                                DESCRIPTION
+                                  "System Alert: Power down or on."
+                                ::= 182
+
+END
+

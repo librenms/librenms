@@ -1,0 +1,153 @@
+
+LAG-ARCH-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      enterprises, IpAddress, TimeTicks    FROM RFC1155-SMI
+      OBJECT-TYPE                          FROM RFC-1212
+      TRAP-TYPE                            FROM RFC-1215
+      DisplayString                        FROM RFC1213-MIB;
+
+
+   admin         OBJECT IDENTIFIER ::= { enterprises 13464 }
+   lag         OBJECT IDENTIFIER ::= { admin 1556 }
+
+   lagArchTrunkGroup              OBJECT IDENTIFIER ::= { lag 1 }
+
+-- -------------------------------------------------------------
+-- The Link Aggregator Trunk Group Table
+-- -------------------------------------------------------------
+
+	lagTrunkGroupTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF lagTrunkGroupEntry
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table that contains the Trunk Group Table Entry rule
+			that defines the distribution algorithm for every Link Aggregator
+			that is associated with this System."
+	::= { lagArchTrunkGroup 1 }
+
+	lagTrunkGroupTableEntry OBJECT-TYPE
+		SYNTAX lagTrunkGroupEntry
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A list of the rules applied to the entries of the Trunk Group 
+			Table parameters. This is indexed by the ifIndex of the 
+			Aggregator, which is also the dot3adAggIndex."
+		INDEX { lagTrunkGroupTableAggIndex }
+	::= { lagTrunkGroupTable 1 }
+
+	lagTrunkGroupEntry ::=
+		SEQUENCE {
+			lagTrunkGroupTableAggIndex	INTEGER,
+			lagTrunkGroupTableRule INTEGER
+		}
+
+	lagTrunkGroupTableAggIndex OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"The unique identifier allocated to this Aggregator by the 
+			local System. This attribute identifies an Aggregator instance 
+			among the subordinate managed objects of the containing object.
+			This value is read-only. This is the same value as the 
+			dot3adAggIndex in the dot3adAggTable."
+		REFERENCE
+			"IEEE 802.3 Section 30.7.1.1.1"
+	::= { lagTrunkGroupTableEntry 1 }
+
+	lagTrunkGroupTableRule OBJECT-TYPE
+		SYNTAX INTEGER {
+			srcMAC(1),
+			destMAC(2),
+			srcXORDestMAC(3),
+			srcIP(4),
+			destIP(5),
+			srcXORDestIP(6)
+		}
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			" The Rule to be applied to this Link Aggregator's Trunk Group
+			Table. The rules are based on the following selections SrcMAC (1),
+			means that the last three bits of the Source MAC Address are used to
+			index the Trunk Group to get the destination port. DestMAC (2), means
+			the last three bits of the Destination MAC Address are used to index 
+			into the Trunk Group to get the destination port. SrcXORDestMAC (3),
+			means that the last three bits of the Source MAC Address are logically
+			XORed with the last three bits of the Destination MAC Address and used
+			to index into the Trunk Group to get the destination port. SrcIP (4),
+			means the last three bits of the Source IP Address are used to index
+			into the Trunk Group to get the destination port. DestIP (5), means
+			the last three bits of the Destination IP Address are used to index
+			into the Trunk Group to get the destination port. SrcXORDestIP (6),
+			means the last three bits of the Source IP Address are logically XORed
+			with the last three bits of the Destination IP Address and used to 
+			index into the Trunk Group to get the destination port. This rule
+			defines the distribution algorithm applied to the aggregated link."
+	::= { lagTrunkGroupTableEntry 2 }
+
+	lagLinkStateTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF lagLinkStateTableEntry
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A table that contains the Link State Table Entry
+			that defines the state of each ports link."
+	::= { lagArchTrunkGroup 2 }
+
+	lagLinkStateTableEntry OBJECT-TYPE
+		SYNTAX lagLinkStateTableEntry
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"A list of the link states. This is indexed by the ifIndex of the 
+			Aggregator, which is also the dot3adAggIndex."
+		INDEX { lagLinkStateAggIndex }
+	::= { lagLinkStateTable 1 }
+
+	lagLinkStateTableEntry ::=
+		SEQUENCE {
+			lagLinkStateAggIndex	INTEGER,
+			lagLinkState INTEGER,
+			lagAggregateOrIndividual INTEGER
+		}
+
+	lagLinkStateAggIndex OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS not-accessible
+		STATUS mandatory
+		DESCRIPTION
+			"The unique identifier allocated to this Aggregator by the 
+			local System. This attribute identifies an Aggregator instance 
+			among the subordinate managed objects of the containing object."
+	::= { lagLinkStateTableEntry 1 }
+
+	lagLinkState OBJECT-TYPE
+		SYNTAX INTEGER {
+			up(1),
+			down(2)
+		}
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			" The state of this Link Aggregator port."
+	::= { lagLinkStateTableEntry 2 }
+
+	lagAggregateOrIndividual OBJECT-TYPE
+		SYNTAX INTEGER {
+			true(1),
+			false(2)
+		}
+		ACCESS read-write
+		STATUS mandatory
+		DESCRIPTION
+			" The state of this Link Aggregator port. Indicating whether
+			 the Aggregation Port is able to Aggregate ('TRUE') or is
+			 only able to operate as an Individual link ('FALSE')."
+	::= { lagLinkStateTableEntry 3 }
+
+
+END

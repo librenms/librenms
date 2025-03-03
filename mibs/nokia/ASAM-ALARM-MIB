@@ -1,0 +1,3135 @@
+ASAM-ALARM-MIB DEFINITIONS ::= BEGIN
+
+-- ===========================================================================
+--  This specification is published by Alcatel-Lucent under Non-Disclosure
+--  Agreement(s) (NDA) with specific parties and has to be considered as
+--  Confidential Information as defined in such NDA.
+--  Alcatel-Lucent reserves the right to revise this document for any reason,
+--  including but not limited to conformity with standards promulgated by
+--  various agencies, utilisation of advances in the state of the technical
+--  areas, or the reflection of changes in the design of any equipment,
+--  techniques, or procedures described or referred to herein.
+--  The product specifications and other technical or performance information
+--  contained herein are subject to change without notice.
+--  Updates of this document will be issued under the above NDA's.
+--  Alcatel-Lucent makes no representation or warranty, expressed or implied,
+--  with respect to the sufficiency, accuracy, or utility of any information
+--  or opinion contained herein. Alcatel-Lucent expressly advises that any use
+--  of for any purpose or reliance upon this technical reference is at the
+--  risk of the user and that Alcatel-Lucent shall not be liable for any
+--  damage or injury incurred by any person arising out of the sufficiency,
+--  accuracy, or utility of any information or opinion contained herein.
+--  This document is not to be construed as a suggestion to any manufacturer
+--  to modify or change any of its products, nor does this document represent
+--  any commitment by Alcatel-Lucent to sell or purchase any product.
+--  Nothing contained herein shall be construed as conferring by implication,
+--  estoppel, or otherwise any license or right under any patent, whether or
+--  not the use of any information herein necessarily employs an invention of
+--  any existing or later issued patent.
+--  Alcatel-Lucent reserves the right not to offer any or all of these
+--  products and to withdraw any or all of them at any future time.
+--  Copyright (C) 2004 Alcatel-Lucent. All Rights Reserved.
+-- ===========================================================================
+
+--  MODULE IDENTITY
+--  LAST-UPDATED "201304241200Z"
+--  ORGANIZATION "Alcatel-Lucent"
+--  CONTACT-INFO "email:asam.mibsupport@alcatel-lucent.com"
+--  DESCRIPTION
+--     "The ASAM Alarm MIB allows to manage the Alarm Management application
+--      in the ASAM.  This is a centralized application for alarm reporting
+--      and alarm logging."
+--
+--  REVISION "201304241200Z"
+--  DESCRIPTION
+--     "Version: 3EC15363AAAA_V4.6.0.1.1
+--      Editor: Karel Meijfroidt
+--      Changes:
+--      * Remove Object 'asamAlarmProcMode' from 'asamAlarmEntry'
+--      * Add new value 'ignore' to AsamAlarmSeverityType. This new value is
+--        only to be used in the asamAlarmTable.
+--
+--  REVISION "201303081200Z"
+--  DESCRIPTION
+--     "Version: 3EC15363AAAA_V4.6.0.1.0
+--      Editor: Yao Liqiang
+--      Changes:
+--      *Object 'asamAlarmProcMode' is added to 'asamAlarmEntry'.
+--
+--  REVISION "200121021200Z"
+--  DESCRIPTION
+--     "Version: 3EC15363AAAA_V4.4.0.1.1
+--      Editor: Sridevi Dwaraganath	
+--      Changes:
+--      * New scalar objects asamAlarmReportId, asamAlarmReportAlarmState,
+--      asamAlarmReportSeverity, asamAlarmReportIndex1, asamAlarmReportIndex2, 
+--      asamAlarmReportTime, asamAlarmReportAddInfo are added aspart of 
+--      FR ALU01823984.
+--  REVISION "201102170000Z"
+--  DESCRIPTION            
+--    "Version: 3EC15363EAAA_V3.3.0.2.3
+--     Editor: Karel Meijfroidt
+--     Changes:                       
+--      * Updated description of the delta alarm log buf sizes to note
+--        that although the MIB objects are read-write, the values can
+--        not be updated. 
+--
+--  REVISION "200704031200Z"
+--  DESCRIPTION
+--    "Version: 3EC15363EAAA_V3.3.0.2.0
+--     Editor: Apeksha Kawri
+--     Changes:
+--      * object 'asamAlarmLogBasicAlarmId' is added to 'asamAlarmLogEntry'.
+--      * object 'asamAlarmSeverityDeltaLogBasicAlarmId' is added to 
+--        'asamAlarmSeverityDeltaLogEntry'.
+--
+--
+--  REVISION "200611131200Z"
+--  DESCRIPTION 
+--     "Version: 3EC15363EAAA_V3.3.0.1.0
+--     Editor: Katrien SCHARRE
+--     Changes:
+--     * Add new object in AsamAlarmEntry object definition. "
+--
+--  REVISION "200601231200Z"
+--  DESCRIPTION
+--     "Version: 3FE21961EAAA_E2.4.0.6
+--      Editor: Bart Bogaert
+--      Changes:
+--      * Implemented BDFhw70643: strict syntax checks (smilint)"
+--  
+--  REVISION "200512191200Z"
+--  DESCRIPTION
+--     "Version: 3EC15363EAAA_E2.0.0.0.0
+--      Editor: Pradeep Hosaritthi
+--      Changes:
+--      * Added Alarm Filters MIB objects to support temporal and spatial
+--        alarm filtering"
+--  
+--  REVISION "200401291200Z"
+--  DESCRIPTION
+--     "Version: 3EC15363EAAA_E1.0.0.0
+--      Editor: Rafael Van Driessche
+--      Changes:
+--      * type AsamAlarmType is no longer enumerated to avoid that the
+--        MIB must change each time a new alarm type must be introduced."
+--  
+--  REVISION "200304281200Z"
+--  DESCRIPTION
+--     "Version: 3EC15363AAAA_E5.0.1.1
+--      Editor: Koen Van de Weyer
+--      Changes:
+--      * attribute 'alarmType' extended with infraStructure (36) (BDFaa50353)."
+--
+--  REVISION "200302121200Z"
+--  DESCRIPTION
+--     "Version 3EC15363AAAA_E5.0.1.0
+--      Editor: Gert Steutelings
+--      Changes:
+--      * support of the uas(37) alarm type; this alarm type contains a generic
+--        set of server alarms defined for servers based on the UAS concept."
+--
+--  REVISION "200208141200Z"
+--  DESCRIPTION
+--     "Version: 3EC15363AAAA_E5.0.0.1
+--      Editor: Gert Steutelings
+--      Changes:
+--      * attribute 'asamAlarmChangeOccurredTrapEnable' made obsolete
+--        (BDFaa44804)."
+--
+--  REVISION "200112191200Z"
+--  DESCRIPTION
+--     "Version: 3EC15363AAAA_E5.0.0.0
+--      Editor: Gert Steutelings
+--      First version produced for ASAM R5.0 based on ALARM_MIB of ASAM R4.3.
+--      Changes:
+--      * attributes 'asamAlarmOnThreshold', 'asamAlarmOffThreshold',
+--        'asamAlarmOnTimebase', and 'asamAlarmOffTimebase' have been made
+--        obsolete;  
+--      * attributes 'asamCurrentAlarmPtr', 'asamAlarmLogPtr',
+--        'asamAlarmSnapshotPtr', and 'asamAlarm<severity>DeltaLogPtr' have
+--        been made obsolete;
+--      * introduction of new attributes 'asamCurrentAlarmAddInfo',
+--        'asamAlarmLogAddInfo', 'asamAlarmSnapshot AddInfo', and
+--        'asamAlarm<severity>DeltaLogAddInfo'."
+--
+--  REVISION "201504201200Z"
+--  DESCRIPTION
+--      "Version: 3EC15363AAAA_E5.3.0.0
+--       Editor:  Cheng Liangming
+--       Changes:
+--       * introduction of new table 'asamAlarmQueryTable'
+-- =========================================================================
+
+   IMPORTS OBJECT-TYPE               FROM RFC-1212
+           Counter, Gauge, TimeTicks FROM RFC1155-SMI
+           DisplayString             FROM SNMPv2-TC
+           asam                      FROM SYSTEM-MIB
+           NetworkTimeInSeconds      FROM ASAM-TC-MIB;
+
+
+   AsamAlarmCategoryType ::= INTEGER {
+         communications(1),
+         qualityofService(2), 
+         processingError(3),
+         equipment(4),
+         environmental(5)
+      }
+   
+   AsamAlarmSeverityType ::= INTEGER {
+	 alllevel(0),            -- all levels defined in asamAlarmQueryTable
+         indeterminate(1),       -- not a definite known severity level 
+         warning(2),             -- just to inform as a warning
+         minor(3),               -- not service affecting
+         major(4),               -- service affecting      
+         critical(5),            -- service breaking 
+         ignore(6)               -- ignore alarm completely
+      }
+   
+   AsamAlarmServAffType ::= INTEGER {
+	 allAffecting(0),        -- all affecting defined in asamAlarmQueryTable
+         serviceAffecting(1),    -- Service Affecting
+         notServiceAffecting(2)  -- Not Service Affecting 
+      }
+   
+   AsamAlarmModeType ::= INTEGER {
+         enabled(1), 
+         disabled(2)
+      }
+   
+   AsamAlarmStateType ::= INTEGER {
+         active(1),              -- alarm is activated
+         nonActive(2)            -- alarm is not active
+      }
+   
+   AsamAlarmType ::= INTEGER (1..65535)
+   
+    
+   AsamAlarmLocation ::= INTEGER {
+        nearend(0),
+	farend(1),
+        middleend(2),
+        line(3),
+	nullend(4)
+     }
+
+   AsamAlarmDirection ::= INTEGER {
+       received(0),
+       transmit(1),
+       null(2)
+     }
+   --  The allowed values for AsamAlarmType are documented in the Alarm
+   --  Definition document.  Which version of this document is applicable
+   --  for a given release can be found in the documentation plan.
+   
+   AsamAlarmLogResetType ::= INTEGER {
+         resetCompleted(1),      -- the log was reset
+         reset(2)                -- value to set to reset the log
+      }
+   
+   AsamAlarmLogFullActionType ::= INTEGER {
+         wrap(1),                -- wrap around when log is full
+         halt(2)                 -- halt logging when log is full
+      }
+   
+   AsamAlarmLogOverflowType ::= INTEGER {
+         notoverflowed(1),       -- log is not overflowed
+         overflowed(2)           -- log is overflowed
+      }
+
+   RowConfigState ::= INTEGER {
+         staticAllInitialValues(1), -- static row with all initial values
+         staticOperatorModified(2), -- static row but operator modified
+         operatorCreated(3) }       -- row created by the operator
+
+   -- This textual convention is introduced to indicate whether a row is
+   -- system created or not and if system created whether all columns in
+   -- the row contain values which are equal to the initial values.
+
+   asamAlarmMIB OBJECT IDENTIFIER ::= {asam 3}
+
+   --
+   --  asamAlarmTable
+   --
+   
+   asamAlarmTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamAlarmEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table defines all the possible alarms at the agent.
+          For each alarm, there is an entry. Each entry consists of an index
+          for the table, alarm id, alarm category, alarm On/Off thresholds
+          and timebases and an alarm logging mode. The severity, reporting
+          and logging are manageable objects for the SNMP Manager.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::= {asamAlarmMIB 1}
+   
+   asamAlarmEntry OBJECT-TYPE
+      SYNTAX AsamAlarmEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Entry for alarm table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { asamAlarmId }
+      ::= {asamAlarmTable 1}
+   
+   AsamAlarmEntry ::= SEQUENCE {
+      asamAlarmId             INTEGER (0..4294967295),
+      asamAlarmCategory       AsamAlarmCategoryType,
+      asamAlarmSeverity       AsamAlarmSeverityType,
+      asamAlarmServAffect     AsamAlarmServAffType, 
+      asamAlarmOnThreshold    INTEGER (0..4294967295), 
+      asamAlarmOffThreshold   INTEGER (0..4294967295), 
+      asamAlarmOnTimebase     TimeTicks, 
+      asamAlarmOffTimebase    TimeTicks, 
+      asamAlarmRepMode        AsamAlarmModeType,
+      asamAlarmLogMode        AsamAlarmModeType,
+      asamAlarmEntryConfigState RowConfigState
+   }
+   
+   asamAlarmId OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This is the unique id for an alarm. It is a combination of 2
+          distinct parts of information : the alarm type and the alarm number.
+          The first half represents the type and the second (most right) part
+          the alarm number. This alarm number represents the bit position of
+          an alarm in a bitmap of an active alarm entry.  Thus the value of
+          asamAlarmId can be found using a simple formula: (AlarmType x 2^16)
+          + AlarmNumber.  E.g. an alarm with alarm type 5 and alarm number 3
+          is represented as 0x00050003.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmEntry 1}
+   
+   asamAlarmCategory OBJECT-TYPE
+      SYNTAX AsamAlarmCategoryType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the category of an alarm. Alarm categories
+          are defined in X.733 as Communications, QualityOfService,
+          Processing Error, Equipment and Environmental.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmEntry 2}
+   
+   asamAlarmSeverity OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object is defined to assign a severity level to an alarm. 
+          This object may be indeterminate, warning, minor, major, critical
+          and ignore. In case of severity ignore, the alarm is ignored by
+          the system and all internal resources occupied by these alarms are
+          being freed.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: 1-6 
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmEntry 3}
+   
+   asamAlarmServAffect OBJECT-TYPE
+      SYNTAX AsamAlarmServAffType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines whether an alarm is service affecting or not.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmEntry 4}
+   
+   asamAlarmOnThreshold OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object defines the threshold value for an alarm to be ON."
+      ::= {asamAlarmEntry 5}
+   
+   asamAlarmOffThreshold OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object defines the threshold value for an alarm to be OFF." 
+      ::= {asamAlarmEntry 6}
+   
+   asamAlarmOnTimebase OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object defines the number of miliseconds that the alarm
+          should be persistant ON before it is reported ON." 
+      ::= {asamAlarmEntry 7}
+   
+   asamAlarmOffTimebase OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object defines the number of miliseconds that the alarm
+          should be persistant OFF before it is reported OFF." 
+      ::= {asamAlarmEntry 8}
+   
+   asamAlarmRepMode OBJECT-TYPE
+      SYNTAX AsamAlarmModeType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object is defined to manage the reporting of the alarm.
+          If it is disabled, the alarm is not reported to the SNMP Manager.
+          If it is enabled, reporting to the manager is possible (provided
+          it has a high enough severity).
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmEntry 9}
+   
+   asamAlarmLogMode OBJECT-TYPE
+      SYNTAX AsamAlarmModeType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object is to manage the logging of the alarm. If this object
+          is disabled, the alarm is not logged. If it is enabled, an alarm is
+          logged in the AlarmLoggingTable if it has a high enough severity.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmEntry 10}
+
+   asamAlarmEntryConfigState OBJECT-TYPE
+      SYNTAX RowConfigState
+      ACCESS read-only
+      STATUS mandatory 
+      DESCRIPTION
+         "This object represents the status of configured values of the entry.
+          It indicates whether a system created row contains all system init 
+          values (staticAllInitialValues(1)) or 
+          whether the values are already modified by an 
+          operator (staticOperatorModified(2)).
+          
+          This object can be used to decide to suppress the row when its value
+          equals staticAllInitialValues(1).
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA    RANGE: NA
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmEntry 11}
+
+   asamAlarmChangeOccurredTrapEnable OBJECT-TYPE
+      SYNTAX AsamAlarmModeType
+      ACCESS read-write
+      STATUS obsolete
+      DESCRIPTION
+         "This object defines whether an internal trap should be sent to the
+          Trap MIB when a alarm changed that has a severity equal or higher
+          than the configured trap severity."
+      ::= {asamAlarmMIB 2}
+
+   --
+   --  CurrentAlarmTable and related objects.
+   --
+   
+   asamNumberofAlarmChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the number of changes that have occurred at
+          the CurrentAlarmtable since startup. It is a wrap around counter
+          between 0 and MAX.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 3}
+   
+   asamNumberofAlarmEntries OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the number of entries in the Current Alarm Table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 4}
+   
+   asamCurrentAlarmSeverityStatus OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object indicating all active severities in the current alarm
+          table (equal or higher than the configured severity level). They are
+          represented as a bitmap with the following bitpositions:
+                 1      NoDefect
+                 2      Indeterminate
+                 4      Warning
+                 8      Minor
+                16      Major
+                32      Critical
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+       ::= {asamAlarmMIB 5}
+   
+   --
+   --  Object 'asamCurrentAlarmSeverityLevel' removed.
+   --
+
+   asamCurrentAlarmTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamCurrentAlarmEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table contains the currently active alarms, ordered by severity
+          (highest first). Each entry contains information on the alarm type,
+          alarm status, two indexes and the last time that the entry was
+          changed. Only alarms with a reporting mode set to ON and a severity
+          equal or higher than the configured current table severity are
+          entered in this table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::= {asamAlarmMIB 7}
+   
+   asamCurrentAlarmEntry OBJECT-TYPE
+      SYNTAX AsamCurrentAlarmEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Entry for CurrentAlarmTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { asamCurrentAlarmIndex }
+      ::= {asamCurrentAlarmTable 1}
+   
+   AsamCurrentAlarmEntry ::= SEQUENCE {
+      asamCurrentAlarmIndex      INTEGER (0..4294967295),
+      asamCurrentAlarmType       AsamAlarmType,
+      asamCurrentAlarmStatus     INTEGER (0..4294967295),
+      asamCurrentAlarmIndex1     INTEGER (0..4294967295),
+      asamCurrentAlarmIndex2     INTEGER (0..4294967295),
+      asamCurrentAlarmPtr        OBJECT IDENTIFIER,
+      asamCurrentAlarmTime       NetworkTimeInSeconds,
+      asamCurrentAlarmAddInfo    DisplayString
+   }
+   
+   asamCurrentAlarmIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Index for a Current Alarm Entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamCurrentAlarmEntry 1}
+   
+   asamCurrentAlarmType OBJECT-TYPE
+      SYNTAX AsamAlarmType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the type of the alarms that are active
+          in this entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamCurrentAlarmEntry 2}
+   
+   asamCurrentAlarmStatus OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the current status of all alarms within one
+          alarm type and one index1-index2 combination at that time. The
+          alarms are represented in a bitmap with the following bitpositions:
+                1       NoDefect
+                2       AlarmNumber  1
+                4       AlarmNumber  2
+                8       AlarmNumber  3
+               16       AlarmNumber  4
+               ..       ..............
+   
+          For a definition of the bitmap, see the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamCurrentAlarmEntry 3}
+   
+   asamCurrentAlarmIndex1 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index2. Together they
+          identify where the alarm occurred. For more information regarding
+          the index definition, refer to the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamCurrentAlarmEntry 4}
+   
+   asamCurrentAlarmIndex2 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index1. See description of
+          Index1 for further info.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamCurrentAlarmEntry 5}
+   
+   asamCurrentAlarmPtr OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object is currently not used.  In future releases this
+          object will be used to point to additional information."
+      ::= {asamCurrentAlarmEntry 6}
+   
+   asamCurrentAlarmTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the time in seconds when the entry was updated,
+          respectively added.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamCurrentAlarmEntry 7}
+   
+   asamCurrentAlarmAddInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to keep some additional information about
+          the considered table entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamCurrentAlarmEntry 8}
+
+   --
+   --  asamAlarmLogTable and related objects.
+   --
+   
+   asamAlarmLogLastEntry OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the index of the last entry that was added to the
+          log table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 8}
+   
+   asamAlarmLogReset OBJECT-TYPE
+      SYNTAX INTEGER {
+                resetCompleted(1),
+                reset(2)
+             }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object is a button-like object to reset the alarm logging
+          table.  When it is set to the Reset value, the log table is cleared,
+          and logging starts from index 1.  When the reset action is completed,
+          this object is set to ResetCompleted.  Setting this object to
+          resetCompleted, does not invoke any action.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 9}
+   
+   asamAlarmLogResetTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Time value in seconds when the alarm log was last reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmMIB 10}
+   
+   asamAlarmLogSeverityLevel OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the lowest severity level an alarm must have in
+          order to be logged.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES             RANGE: 1-5
+             PERSIST: YES   DEFVALUE: indeterminate   UNITS: -"
+      ::= {asamAlarmMIB 11}
+   
+   asamAlarmLogBufferSize OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the size of the internal log buffer. This is
+          useful information when an overflow of the log buffer occurs.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 12}
+   
+   asamAlarmLogFullAction OBJECT-TYPE
+      SYNTAX INTEGER {
+                wrap(1), 
+                halt(2)
+             }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the action to be taken when the alarm log buffer
+          is completely full.  If set to Wrap, then older log records are
+          overwritten by recent ones.  If it is set to Halt, then logging is
+          stopped until the log buffer is reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES    RANGE: See above
+             PERSIST: YES   DEFVALUE: wrap   UNITS: -"
+      ::= {asamAlarmMIB 13}
+   
+   asamAlarmLogOverflowed OBJECT-TYPE
+      SYNTAX INTEGER {
+                notoverflowed(1), 
+                overflowed(2)
+             }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object indicates whether the log table is overflowed or not.
+          When the log buffer is reset, this object is set to Notoverflowed.
+          This object is not useful when FullAction is set to Wrap around.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 14}
+   
+   asamAlarmLogTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamAlarmLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table is used to log all alarm changes of alarms with a log
+          status set to active and a severity level equal or higher than the
+          configured logging severity. The entries are ordered by time. The
+          latest alarm change is logged as the last entry of this table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::= {asamAlarmMIB 15}
+   
+   asamAlarmLogEntry OBJECT-TYPE
+      SYNTAX AsamAlarmLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Entry for Alarm Log Table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { asamAlarmLogIndex }
+      ::= {asamAlarmLogTable 1}
+   
+   AsamAlarmLogEntry ::= SEQUENCE {
+      asamAlarmLogIndex               INTEGER (0..4294967295),
+      asamAlarmLogAlarmType           AsamAlarmType,
+      asamAlarmLogAlarmStatus         INTEGER (0..4294967295),
+      asamAlarmLogStatusChange        INTEGER (0..4294967295),
+      asamAlarmLogIndex1              INTEGER (0..4294967295),
+      asamAlarmLogIndex2              INTEGER (0..4294967295),
+      asamAlarmLogPtr                 OBJECT IDENTIFIER,
+      asamAlarmLogTime                NetworkTimeInSeconds,
+      asamAlarmLogAddInfo             DisplayString,
+      asamAlarmLogBasicAlarmId        INTEGER (0..4294967295)
+      }
+   
+   asamAlarmLogIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Index for the entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmLogEntry 1}
+   
+   asamAlarmLogAlarmType OBJECT-TYPE
+      SYNTAX AsamAlarmType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the type of the alarms in this entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmLogEntry 2}
+   
+   asamAlarmLogAlarmStatus OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the status of all alarms within one alarm type
+          and one index1-index2 combination for this logged entry. The alarms
+          are represented in a bitmap with the following bitpositions :
+                1       NoDefect
+                2       AlarmNumber  1
+                4       AlarmNumber  2
+                8       AlarmNumber  3
+               16       AlarmNumber  4
+               ..       ..............
+   
+          For a definition of the bitmap see the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmLogEntry 3}
+   
+   asamAlarmLogStatusChange OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the difference in the status bitmap with its
+          previous logged value. The bitpositions are conforming to the ones
+          in the asamAlarmLogAlarmStatus object.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmLogEntry 4}
+   
+   asamAlarmLogIndex1 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index2. Together they
+          identify where the alarm occurred. For more information regarding
+          the index definition refer to the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmLogEntry 5}
+   
+   asamAlarmLogIndex2 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index1. See description of
+          Index1 for further info.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmLogEntry 6}
+   
+   asamAlarmLogPtr OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object is currently not used. In future releases this object
+          will be used to point to additional information."
+      ::= {asamAlarmLogEntry 7}
+   
+   asamAlarmLogTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the time in seconds when the alarm was logged.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmLogEntry 8}
+   
+   asamAlarmLogAddInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to keep some additional information about the
+          considered table entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmLogEntry 9}
+
+      asamAlarmLogBasicAlarmId  OBJECT-TYPE
+      SYNTAX       INTEGER (0..4294967295)
+      ACCESS       read-only
+      STATUS       mandatory
+      DESCRIPTION  
+         "The meaning of this object depends on the value of asamAlarmLogAlarmType. 
+          The following situations are possible:
+
+                   1. The value of the asamAlarmLogAlarmType object corresponds to
+                      'temporalFilter' or 'spatialFilter'. The table entry is related
+                       to the state change of exact one derived alarm. The asamAlarm-
+                       LogBasicAlarmId object identifies the basic alarm related to
+                       the considered derived alarm.
+
+                   2. The value of the asamAlarmLogAlarmType object does not 
+                      correspond to 'temporalFilter' or 'spatialFilter'. The table
+                      entry is related to the state change of one or more basic
+                      alarms. The asamAlarmLogBasicAlarmId object identifies one of
+                      these basic alarms.
+
+            ALCATEL NOTE:
+               SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+               PERSIST: NO    DEFVALUE: NA   UNITS: -"
+
+      ::= {asamAlarmLogEntry 10}
+
+   --
+   --  asamAlarmSnapshotTable and related objects
+   --
+   
+   asamAlarmSnapshotTableStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                notInUse(1),
+                inUse(2)
+             }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Before reading the snapshot table, one must try to set this object
+          to inUse first. When it is already in this state, the set will fail;
+          when in the notInUse state, the set will succeed. The inUse state is
+          only kept for a limited time, which is defined by the
+          asamAlarmSnapshotTimeout object. When the timeout expires, this
+          object is automatically reset to the notInUse state and the snapshot
+          table is emptied. 
+   
+          Scenario for taking a snapshot :
+          ================================   
+             * Try to set the asamAlarmSnapshotTableStatus to inUse.  Proceed
+               only if successfull;
+   
+             * optionally set the owner string to enable other managers to
+               identify the current snapshot table user;
+   
+             * set the snapshot table severity level;
+   
+             * read the number of entries in the snapshot table;
+   
+             * optionally read the severity status bitmap to identify the
+               active severity levels in the snapshot table;
+   
+             * read out the snapshot table using GET or GETNEXT SNMP commands;
+   
+             * free the snapshot table for other managers by setting the
+               status to notInUse.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES        RANGE: See above
+             PERSIST: NO    DEFVALUE: notInUse   UNITS: -"
+      ::= {asamAlarmMIB 16}
+   
+   asamAlarmSnapshotOwner OBJECT-TYPE
+      SYNTAX OCTET STRING
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This string can contain an identification of the owner who took the
+          snapshot. When a manager wants to use the snapshot table, he can set
+          this string with a meaningful value. When the snapshot table is not
+          in use, the owner string cannot be set.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 17}
+   
+   asamAlarmSnapshotTimeout OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the timeout in msec on the snapshot table.
+          The timer is started from the moment the snapshot table status is
+          set to inUse. It will be set to a default value and cannot be
+          changed by the manager.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA       RANGE: See above
+             PERSIST: NO    DEFVALUE: 120000   UNITS: milliseconds"
+      ::= {asamAlarmMIB 18}
+   
+   asamAlarmSnapshotSeverityLevel OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object indicates the lowest severity level of alarms that
+          should be visible in the snapshot table. When the snapshot table
+          status is in the notInUse state, the severity cannot be read or set.
+          When the snapshot table status is in the InUse state, the severity
+          level can only be set once to prevent confusion as to the lowest
+          severity in the snapshot table. After successfully setting the
+          severity level, the snapshot table and its related objects will
+          contain valid data as long as the snapshot table is in the inUse
+          state.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: 1-5
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 19}
+   
+   asamNumberOfAlarmSnapshotEntries OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "When the snapshot table status is in the inUse state, this object
+          reflects the number of entries in the snapshot table. If the snapshot
+          table status is set to notInUse, this object can not be read.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 20}
+   
+   asamAlarmSnapshotSeverityStatus OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "If the snapshot table status is set to notInUse, this object
+          can not be read. If the snapshot table status is inUse, this object
+          indicates all the active severity levels of the alarms in the
+          snapshot table (higher than the configured snapshot severity level).
+          They are represented as a bitmap with the following bitpositions :
+                          1      NoDefect,
+                          2      Indeterminate,
+                          4      Warning,
+                          8      Minor,
+                         16      Major,
+                         32      Critical.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 21}
+   
+   asamAlarmSnapshotTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamAlarmSnapshotEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table is empty when the snapshot table status is set to
+          notInUse. When a snapshot is taken (see the description of the
+          snapshot table status object for a complete scenario), this table
+          will contain all active alarms, at the time the snapshot was taken,
+          ordered by severity.  The lowest viewable severity is set with the
+          snapshot severity object.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::= {asamAlarmMIB 22}
+   
+   asamAlarmSnapshotEntry OBJECT-TYPE
+      SYNTAX AsamAlarmSnapshotEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Entry for asamAlarmSnapshotTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX  { asamAlarmSnapshotIndex }
+      ::= {asamAlarmSnapshotTable 1}
+   
+   AsamAlarmSnapshotEntry ::= SEQUENCE {
+      asamAlarmSnapshotIndex          INTEGER (0..4294967295),
+      asamAlarmSnapshotType           AsamAlarmType,
+      asamAlarmSnapshotStatus         INTEGER (0..4294967295),
+      asamAlarmSnapshotIndex1         INTEGER (0..4294967295),
+      asamAlarmSnapshotIndex2         INTEGER (0..4294967295),
+      asamAlarmSnapshotPtr            OBJECT IDENTIFIER,
+      asamAlarmSnapshotTime           NetworkTimeInSeconds,
+      asamAlarmSnapshotAddInfo        DisplayString
+   }
+   
+   asamAlarmSnapshotIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Index for an Alarm Snapshot Entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmSnapshotEntry 1}
+   
+   asamAlarmSnapshotType OBJECT-TYPE
+      SYNTAX AsamAlarmType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the type of the alarms in this entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmSnapshotEntry 2}
+   
+   asamAlarmSnapshotStatus OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the status of alarms in an alarm type at the
+          time the snapshot was taken. The alarms are represented in a bitmap
+          with the following bitpositions : 
+              1       NoDefect
+              2       AlarmNumber  1
+              4       AlarmNumber  2
+              8       AlarmNumber  3
+             16       AlarmNumber  4
+             ..       ..............
+   
+          For a definition of the bitmap see the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmSnapshotEntry 3}
+   
+   asamAlarmSnapshotIndex1 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index2. Together they
+          identify where the alarm occurred. For more information regarding
+          the index definition refer to the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmSnapshotEntry 4}
+   
+   asamAlarmSnapshotIndex2 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index1. See description of
+          Index1 for further info.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmSnapshotEntry 5}
+   
+   asamAlarmSnapshotPtr OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object is currently not used. In future releases this
+          object will be used to point to additional information."
+      ::= {asamAlarmSnapshotEntry 6}
+   
+   asamAlarmSnapshotTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the time information in seconds when the entry was
+          updated, respectively added.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmSnapshotEntry 7}
+   
+   asamAlarmSnapshotAddInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to keep some additional information about
+          the considered table entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmSnapshotEntry 8}
+
+   --
+   --  asamAlarm<severity>DeltaLogTables and related objects
+   --
+   
+   asamNumberOfTotalChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This counter represents the total number of changes of all alarms
+          since startup. It is independent of the alarm severity level.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 23}
+   
+   asamNumberOfIndeterminateChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This counter represents the total number of changes of all alarms
+          with a severity level Indeterminate since startup.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 24}
+   
+   asamNumberOfWarningChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This counter represents the total number of changes of all alarms
+          with a severity level Warning since startup.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 25}
+   
+   asamNumberOfMinorChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This counter represents the total number of changes of all alarms
+          with a severity level Minor since startup.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 26}
+   
+   asamNumberOfMajorChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This counter represents the total number of changes of all alarms
+          with a severity level Major since startup.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 27}
+   
+   asamNumberOfCriticalChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This counter represents the total number of changes of all alarms
+          with a severity level Critical since startup.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 28}
+
+   --
+   --  One deprecated object removed.
+   --
+   
+   asamAlarmTrapNumberOfAlarmChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS deprecated
+      DESCRIPTION
+         "This counter represents the number of alarm changes (of alarms with
+          a severity equal or higher than the configured trap severity) since
+          startup. It is a wraparound counter between 0 and MAX."
+      ::= {asamAlarmMIB 30}
+
+   --
+   --  Eight deprecated objects removed.
+   --
+   
+   asamAlarmTotalDeltaLogBufferSize OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This value indicates the maximum of distributed severity-specific
+          delta log entries. This means that :
+               asamAlarmIndeterminateDeltaLogBufferSize
+             + asamAlarmWarningDeltaLogBufferSize
+             + asamAlarmMinorDeltaLogBufferSize
+             + asamAlarmMajorDeltaLogBufferSize
+             + asamAlarmCriticalDeltaLogBufferSize
+          must be equal or smaller than the value of this object.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 39}
+
+   --
+   --  asamAlarmIndeterminateDeltaLogTable and related objects
+   --
+   
+   asamAlarmIndeterminateDeltaLogLastEntry OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the index of the last entry that was added to the
+          Indeterminate delta log table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 40}
+   
+   asamAlarmIndeterminateDeltaLogReset OBJECT-TYPE
+      SYNTAX AsamAlarmLogResetType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object is a button-like object to reset the Indeterminate
+          delta logging table. When it is set to the reset value, the table
+          is cleared, and logging starts from index 1.  When the reset action
+          is completed, this object is set to resetCompleted. Setting this
+          object to resetCompleted, does not invoke any action.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 41}
+   
+   asamAlarmIndeterminateDeltaLogResetTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Network time in seconds indicating when the Indeterminate Delta
+          Log Table was last reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmMIB 42}
+   
+   asamAlarmIndeterminateDeltaLogBufferSize OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the size of the internal Indeterminate Delta
+          Log buffer. It can be set to a new (positive, non-zero) value,
+          but when the sum of all severity-specific Delta Log Table
+          buffersizes would exceed the asamAlarmTotalDeltaLogBufferSize
+          setting with this new value, a smaller value will be set. This
+          value will be chosen so that the sum of buffersizes is equal to
+          the asamAlarmTotalDeltaLogBufferSize. When the size is set to a
+          value smaller than the current number of used entries in the delta
+          log table, a value equal to that number of entries will be set.
+          Setting this object is not supported yet.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO    RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 43}
+   
+   asamAlarmIndeterminateDeltaLogFullAction OBJECT-TYPE
+      SYNTAX AsamAlarmLogFullActionType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the action to be taken when the Indeterminate
+          delta log buffer is completely full. If set to Wrap, older log
+          records will be overwritten by recent ones. If it is set to Halt,
+          logging is stopped until the buffer is reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES    RANGE: See above
+             PERSIST: YES   DEFVALUE: wrap   UNITS: -"
+      ::= {asamAlarmMIB 44}
+   
+   asamAlarmIndeterminateDeltaLogOverflowed OBJECT-TYPE
+      SYNTAX AsamAlarmLogOverflowType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object indicates whether the Indeterminate delta log table is
+          overflowed or not. When the delta log buffer is reset, this object
+          is set to notoverflowed. This object is not meaningful when
+          asamAlarmIndeterminateDeltaLogFullAction is set to Wrap around.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 45}
+   
+   asamAlarmIndeterminateDeltaLogTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamAlarmIndeterminateDeltaLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table is to log all reported alarms with a severity equal to
+          Indeterminate. The Logged records are ordered by time.
+          The latest Indeterminate reported alarm change is logged as the last
+          entry of this table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::= {asamAlarmMIB 46}
+   
+   asamAlarmIndeterminateDeltaLogEntry OBJECT-TYPE
+      SYNTAX AsamAlarmIndeterminateDeltaLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Entry for the Indeterminate Delta Log Table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { asamAlarmIndeterminateDeltaLogIndex }
+      ::= {asamAlarmIndeterminateDeltaLogTable 1}
+   
+   AsamAlarmIndeterminateDeltaLogEntry ::= SEQUENCE {
+      asamAlarmIndeterminateDeltaLogIndex               INTEGER (0..4294967295),
+      asamAlarmIndeterminateDeltaLogAlarmId             INTEGER (0..4294967295),
+      asamAlarmIndeterminateDeltaLogAlarmState          AsamAlarmStateType,
+      asamAlarmIndeterminateDeltaLogIndex1              INTEGER (0..4294967295),
+      asamAlarmIndeterminateDeltaLogIndex2              INTEGER (0..4294967295),
+      asamAlarmIndeterminateDeltaLogPtr                 OBJECT IDENTIFIER,
+      asamAlarmIndeterminateDeltaLogTime                NetworkTimeInSeconds,
+      asamAlarmIndeterminateDeltaLogAddInfo             DisplayString,
+      asamAlarmIndeterminateDeltaLogBasicAlarmId        INTEGER (0..4294967295)
+   }
+   
+   asamAlarmIndeterminateDeltaLogIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Index for an Indeterminate Delta Log Table Entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmIndeterminateDeltaLogEntry 1}
+   
+   asamAlarmIndeterminateDeltaLogAlarmId OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This is the unique id for an alarm. It is a combination of two
+          distinct parts of information: the alarm type and the alarm number.
+          The first half represents the type and the second (rightmost) part
+          the alarm number.  This alarm number represents the bit position of
+          an alarm in a bitmap of an active alarm entry.
+          The value of asamAlarmId can be found using a simple formula:
+          (AlarmType x 2^16) + AlarmNumber.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmIndeterminateDeltaLogEntry 2}
+   
+   asamAlarmIndeterminateDeltaLogAlarmState OBJECT-TYPE
+      SYNTAX AsamAlarmStateType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This reflects the alarm state. When an alarm becomes active, the
+          state will be active. If it dissappears, it will be nonActive.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmIndeterminateDeltaLogEntry 3}
+   
+   asamAlarmIndeterminateDeltaLogIndex1 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index2. Together they
+          identify where the alarm occurred.  For more information regarding
+          the index definition refer to the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmIndeterminateDeltaLogEntry 4}
+   
+   asamAlarmIndeterminateDeltaLogIndex2 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index1. See the description
+          of Index1 for further info.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmIndeterminateDeltaLogEntry 5}
+   
+   asamAlarmIndeterminateDeltaLogPtr OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object is currently not used."
+      ::= {asamAlarmIndeterminateDeltaLogEntry 6}
+   
+   asamAlarmIndeterminateDeltaLogTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the network time in seconds when the alarm
+          was logged.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmIndeterminateDeltaLogEntry 7}
+   
+   asamAlarmIndeterminateDeltaLogAddInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to keep some additional information about
+          the considered table entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmIndeterminateDeltaLogEntry 8}
+
+   asamAlarmIndeterminateDeltaLogBasicAlarmId  OBJECT-TYPE
+      SYNTAX       INTEGER (0..4294967295)
+      ACCESS       read-only
+      STATUS       mandatory
+      DESCRIPTION  
+         "The meaning and use of this object depends on the value of the asamAlarmIndeterminateDeltaLogAlarmId. 
+          The following situations are possible:
+
+                   1. asamAlarmIndeterminateDeltaLogAlarmId points to a basic 
+                      alarm. The value of asamAlarmIndeterminateDeltaLogBasicAlamId 
+                      is identical to the value of the asamAlarmInderminateDelta
+                      LogAlarmId (no added value).
+ 
+                   2. asamAlarmIndeterminateDeltaLogAlarmId points to a derived
+                      alarm of a temporal/spatial alarm filter. The value of
+                      asamAlarmIndeterminateDeltaLogBasicAlarmId identifies the basic
+                      alarm that is related to the considered derived alarm.
+                 
+           ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+                  
+
+     ::= {asamAlarmIndeterminateDeltaLogEntry 9}
+
+   
+   --
+   --  asamAlarmWarningDeltaLogTable and related objects
+   --
+   
+   asamAlarmWarningDeltaLogLastEntry OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the index of the last entry that was added to the
+          Warning delta log table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 47}
+   
+   asamAlarmWarningDeltaLogReset OBJECT-TYPE
+      SYNTAX AsamAlarmLogResetType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object is a button-like object to reset the Warning
+          delta logging table. When it is set to the reset value, the table
+          is cleared, and logging starts from index 1.  When the reset action
+          is completed, this object is set to resetCompleted. Setting this
+          object to resetCompleted, does not invoke any action.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 48}
+   
+   asamAlarmWarningDeltaLogResetTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Network time in seconds indicating when the Warning Delta Log
+          Table was last reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmMIB 49}
+   
+   asamAlarmWarningDeltaLogBufferSize OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the size of the internal Warning Delta
+          Log buffer. It can be set to a new (positive, non-zero) value,
+          but when the sum of all severity-specific Delta Log Table
+          buffersizes would exceed the asamAlarmTotalDeltaLogBufferSize
+          setting with this new value, a smaller value will be set. This
+          value will be chosen so that the sum of buffersizes is equal to
+          the asamAlarmTotalDeltaLogBufferSize. When the size is set to a
+          value smaller than the current number of used entries in the delta
+          log table, a value equal to that number of entries will be set.
+          Setting this object is not supported yet.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO    RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 50}
+   
+   asamAlarmWarningDeltaLogFullAction OBJECT-TYPE
+      SYNTAX AsamAlarmLogFullActionType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the action to be taken when the Warning
+          delta log buffer is completely full. If set to Wrap, older log
+          records will be overwritten by recent ones. If it is set to Halt,
+          logging is stopped until the buffer is reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES    RANGE: See above
+             PERSIST: YES   DEFVALUE: wrap   UNITS: -"
+      ::= {asamAlarmMIB 51}
+   
+   asamAlarmWarningDeltaLogOverflowed OBJECT-TYPE
+      SYNTAX AsamAlarmLogOverflowType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object indicates whether the Warning delta log table is
+          overflowed or not. When the delta log buffer is reset, this object
+          is set to notoverflowed. This object is not meaningful when
+          asamAlarmWarningDeltaLogFullAction is set to Wrap around.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 52}
+   
+   asamAlarmWarningDeltaLogTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamAlarmWarningDeltaLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table is to log all reported alarms with a severity equal to
+          Warning. The Logged records are ordered by time.
+          The latest Warning reported alarm change is logged as the last
+          entry of this table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::= {asamAlarmMIB 53}
+   
+   asamAlarmWarningDeltaLogEntry OBJECT-TYPE
+      SYNTAX AsamAlarmWarningDeltaLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Entry for the Warning Delta Log Table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { asamAlarmWarningDeltaLogIndex }
+      ::= {asamAlarmWarningDeltaLogTable 1}
+   
+   AsamAlarmWarningDeltaLogEntry ::= SEQUENCE {
+      asamAlarmWarningDeltaLogIndex                     INTEGER (0..4294967295),
+      asamAlarmWarningDeltaLogAlarmId                   INTEGER (0..4294967295),
+      asamAlarmWarningDeltaLogAlarmState                AsamAlarmStateType,
+      asamAlarmWarningDeltaLogIndex1                    INTEGER (0..4294967295),
+      asamAlarmWarningDeltaLogIndex2                    INTEGER (0..4294967295),
+      asamAlarmWarningDeltaLogPtr                       OBJECT IDENTIFIER,
+      asamAlarmWarningDeltaLogTime                      NetworkTimeInSeconds,
+      asamAlarmWarningDeltaLogAddInfo                   DisplayString,
+      asamAlarmWarningDeltaLogBasicAlarmId              INTEGER (0..4294967295)
+   }
+   
+   asamAlarmWarningDeltaLogIndex OBJECT-TYPE
+      SYNTAX INTEGER (0.. 4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Index for a Warning Delta Log Table Entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmWarningDeltaLogEntry 1}
+   
+   asamAlarmWarningDeltaLogAlarmId OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This is the unique id for an alarm. It is a combination of two
+          distinct parts of information: the alarm type and the alarm number.
+          The first half represents the type and the second (rightmost) part
+          the alarm number. This alarm number represents the bit position of
+          an alarm in a bitmap of an active alarm entry.
+          The value of asamAlarmId can be found using a simple formula:
+          (AlarmType x 2^16) + AlarmNumber.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmWarningDeltaLogEntry 2}
+   
+   asamAlarmWarningDeltaLogAlarmState OBJECT-TYPE
+      SYNTAX AsamAlarmStateType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This reflects the alarm state. When an alarm becomes active,
+          the state will be active. If it dissappears, it will be nonActive.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmWarningDeltaLogEntry 3}
+   
+   asamAlarmWarningDeltaLogIndex1 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index2. Together they
+          identify where the alarm occurred. For more information regarding
+          the index definition refer to the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmWarningDeltaLogEntry 4}
+   
+   asamAlarmWarningDeltaLogIndex2 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index1. See the description
+          of Index1 for further info.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmWarningDeltaLogEntry 5}
+   
+   asamAlarmWarningDeltaLogPtr OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object is currently not used."
+      ::= {asamAlarmWarningDeltaLogEntry 6}
+   
+   asamAlarmWarningDeltaLogTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the network time in seconds when the alarm
+          was logged.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmWarningDeltaLogEntry 7}
+   
+   asamAlarmWarningDeltaLogAddInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to keep some additional information about
+          the considered table entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmWarningDeltaLogEntry 8}
+
+   asamAlarmWarningDeltaLogBasicAlarmId  OBJECT-TYPE
+      SYNTAX       INTEGER (0..4294967295)
+      ACCESS       read-only
+      STATUS       mandatory
+      DESCRIPTION
+         "The meaning and use of this object depends on the value of the asamAlarmWarningDeltaLogAlarmId. 
+          The following situations are possible:
+
+                   1. asamAlarmWarningDeltaLogAlarmId points to a basic
+                      alarm. The value of asamAlarmWarningDeltaLogBasicAlarmId
+                      is identical to the value of the asamAlarmWarningDeltaLog-
+                      AlarmId (no added value).
+
+                   2. asamAlarmWarningDeltaLogAlarmId points to a derived
+                      alarm of temporal/spatial alarm filter. The value of asamAlarm-
+                      WarningDeltaLogBasicAlarmId identifies the basic alarm that
+                      is related to the considered derived alarm.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+            
+
+      ::= {asamAlarmWarningDeltaLogEntry 9}
+
+
+   
+   --
+   --  asamAlarmMinorDeltaLogTable and related objects
+   --
+   
+   asamAlarmMinorDeltaLogLastEntry OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the index of the last entry that was added
+          to the Minor delta log table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 54}
+   
+   asamAlarmMinorDeltaLogReset OBJECT-TYPE
+      SYNTAX AsamAlarmLogResetType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object is a button-like object to reset the Minor
+          delta logging table. When it is set to the reset value, the table
+          is cleared, and logging starts from index 1.  When the reset action
+          is completed, this object is set to resetCompleted. Setting this
+          object to resetCompleted, does not invoke any action.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 55}
+   
+   asamAlarmMinorDeltaLogResetTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Network time in seconds indicating when the Minor Delta Log
+          Table was last reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmMIB 56}
+   
+   asamAlarmMinorDeltaLogBufferSize OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the size of the internal Minor Delta
+          Log buffer. It can be set to a new (positive, non-zero) value,
+          but when the sum of all severity-specific Delta Log Table
+          buffersizes would exceed the asamAlarmTotalDeltaLogBufferSize
+          setting with this new value, a smaller value will be set. This
+          value will be chosen so that the sum of buffersizes is equal to
+          the asamAlarmTotalDeltaLogBufferSize. When the size is set to a
+          value smaller than the current number of used entries in the delta
+          log table, a value equal to that number of entries will be set.
+          Setting this object is not supported yet.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO    RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 57}
+   
+   asamAlarmMinorDeltaLogFullAction OBJECT-TYPE
+      SYNTAX AsamAlarmLogFullActionType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the action to be taken when the Minor
+          delta log buffer is completely full. If set to Wrap, older log
+          records will be overwritten by recent ones. If it is set to Halt,
+          logging is stopped until the buffer is reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES    RANGE: See above
+             PERSIST: YES   DEFVALUE: wrap   UNITS: -"
+      ::= {asamAlarmMIB 58}
+   
+   asamAlarmMinorDeltaLogOverflowed OBJECT-TYPE
+      SYNTAX AsamAlarmLogOverflowType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object indicates whether the Minor delta log table is
+          overflowed or not. When the delta log buffer is reset, this object
+          is set to notoverflowed. This object is not meaningful when
+          asamAlarmMinorDeltaLogFullAction is set to Wrap around.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 59}
+
+   asamAlarmMinorDeltaLogTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamAlarmMinorDeltaLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table is to log all reported alarms with a severity equal to
+          Minor. The Logged records are ordered by time.
+          The latest Minor reported alarm change is logged as the last
+          entry of this table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::= {asamAlarmMIB 60}
+   
+   asamAlarmMinorDeltaLogEntry OBJECT-TYPE
+      SYNTAX AsamAlarmMinorDeltaLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Entry for the Minor Delta Log Table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { asamAlarmMinorDeltaLogIndex }
+      ::= {asamAlarmMinorDeltaLogTable 1}
+   
+   AsamAlarmMinorDeltaLogEntry ::= SEQUENCE {
+      asamAlarmMinorDeltaLogIndex                       INTEGER (0..4294967295),
+      asamAlarmMinorDeltaLogAlarmId                     INTEGER (0..4294967295),
+      asamAlarmMinorDeltaLogAlarmState                  AsamAlarmStateType,
+      asamAlarmMinorDeltaLogIndex1                      INTEGER (0..4294967295),
+      asamAlarmMinorDeltaLogIndex2                      INTEGER (0..4294967295),
+      asamAlarmMinorDeltaLogPtr                         OBJECT IDENTIFIER,
+      asamAlarmMinorDeltaLogTime                        NetworkTimeInSeconds,
+      asamAlarmMinorDeltaLogAddInfo                     DisplayString,
+      asamAlarmMinorDeltaLogBasicAlarmId                INTEGER (0..4294967295)
+   }
+   
+   asamAlarmMinorDeltaLogIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Index for a Minor Delta Log Table Entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMinorDeltaLogEntry 1}
+   
+   asamAlarmMinorDeltaLogAlarmId OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This is the unique id for an alarm. It is a combination of two
+          distinct parts of information: the alarm type and the alarm number.
+          The first half represents the type and the second (rightmost) part
+          the alarm number. This alarm number represents the bit position of
+          an alarm in a bitmap of an active alarm entry.
+          The value of asamAlarmId can be found using a simple formula:
+          (AlarmType x 2^16) + AlarmNumber.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMinorDeltaLogEntry 2}
+   
+   asamAlarmMinorDeltaLogAlarmState OBJECT-TYPE
+      SYNTAX AsamAlarmStateType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This reflects the alarm state. When an alarm becomes active,
+          the state will be active. If it dissappears, it will be nonActive.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMinorDeltaLogEntry 3}
+   
+   asamAlarmMinorDeltaLogIndex1 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index2. Together they
+          identify where the alarm occurred. For more information regarding
+          the index definition refer to the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMinorDeltaLogEntry 4}
+   
+   asamAlarmMinorDeltaLogIndex2 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index1. See the description
+          of Index1 for further info.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMinorDeltaLogEntry 5}
+   
+   asamAlarmMinorDeltaLogPtr OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object is currently not used."
+      ::= {asamAlarmMinorDeltaLogEntry 6}
+   
+   asamAlarmMinorDeltaLogTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the network time in seconds when the alarm
+          was logged.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmMinorDeltaLogEntry 7}
+   
+   asamAlarmMinorDeltaLogAddInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to keep some additional information about
+          the considered table entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMinorDeltaLogEntry 8}
+  
+  
+    asamAlarmMinorDeltaLogBasicAlarmId  OBJECT-TYPE
+     SYNTAX       INTEGER (0..4294967295)
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION  
+        "The meaning and use of this object depends on the value of the asamAlarmMinorDeltaLogAlarmId. 
+         The following situations are possible:
+                 
+                  1. asamAlarmMinorDeltaLogAlarmId points to a basic alarm. The 
+                     value of asamAlarmMinorDeltaLogBasicAlarmId is identical to 
+                     the value of the asamAlarmMinorDeltaLogAlarmId (no added 
+                     value).
+
+                 2. asamAlarmMinorDeltaLogAlarmId points to a derived alarm of 
+                    a temporal/spatial alarm filter. The value of asamAlarmMinor-
+                    DeltaLogBasicAlarmId identifies the basic alarm that is related 
+                    to the considered derived alarm.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+          
+
+    ::= {asamAlarmMinorDeltaLogEntry 9}
+
+ 
+   --
+   --  asamAlarmMajorDeltaLogTable and related objects
+   --
+   
+   asamAlarmMajorDeltaLogLastEntry OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the index of the last entry that was added
+          to the Major delta log table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 61}
+   
+   asamAlarmMajorDeltaLogReset OBJECT-TYPE
+      SYNTAX AsamAlarmLogResetType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object is a button-like object to reset the Major
+          delta logging table. When it is set to the reset value, the table
+          is cleared, and logging starts from index 1.  When the reset action
+          is completed, this object is set to resetCompleted. Setting this
+          object to resetCompleted, does not invoke any action.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 62}
+   
+   asamAlarmMajorDeltaLogResetTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Network time in seconds indicating when the Major Delta Log
+          Table was last reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmMIB 63}
+   
+   asamAlarmMajorDeltaLogBufferSize OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the size of the internal Major Delta
+          Log buffer. It can be set to a new (positive, non-zero) value,
+          but when the sum of all severity-specific Delta Log Table
+          buffersizes would exceed the asamAlarmTotalDeltaLogBufferSize
+          setting with this new value, a smaller value will be set. This
+          value will be chosen so that the sum of buffersizes is equal to
+          the asamAlarmTotalDeltaLogBufferSize. When the size is set to a
+          value smaller than the current number of used entries in the delta
+          log table, a value equal to that number of entries will be set.
+          Setting this object is not supported yet.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO    RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 64}
+   
+   asamAlarmMajorDeltaLogFullAction OBJECT-TYPE
+      SYNTAX AsamAlarmLogFullActionType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the action to be taken when the Major
+          delta log buffer is completely full. If set to Wrap, older log
+          records will be overwritten by recent ones. If it is set to Halt,
+          logging is stopped until the buffer is reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES    RANGE: See above
+             PERSIST: YES   DEFVALUE: wrap   UNITS: -"
+      ::= {asamAlarmMIB 65}
+   
+   asamAlarmMajorDeltaLogOverflowed OBJECT-TYPE
+      SYNTAX AsamAlarmLogOverflowType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object indicates whether the Major delta log table is
+          overflowed or not. When the delta log buffer is reset, this object
+          is set to notoverflowed. This object is not meaningful when
+          asamAlarmMajorDeltaLogFullAction is set to Wrap around.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 66}
+   
+   asamAlarmMajorDeltaLogTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamAlarmMajorDeltaLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table is to log all reported alarms with a severity equal to
+          Major. The Logged records are ordered by time.
+          The latest Major reported alarm change is logged as the last
+          entry of this table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::= {asamAlarmMIB 67}
+   
+   asamAlarmMajorDeltaLogEntry OBJECT-TYPE
+      SYNTAX AsamAlarmMajorDeltaLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Entry for the Major Delta Log Table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { asamAlarmMajorDeltaLogIndex }
+      ::= {asamAlarmMajorDeltaLogTable 1}
+   
+   AsamAlarmMajorDeltaLogEntry ::= SEQUENCE {
+      asamAlarmMajorDeltaLogIndex                       INTEGER (0..4294967295),
+      asamAlarmMajorDeltaLogAlarmId                     INTEGER (0..4294967295),
+      asamAlarmMajorDeltaLogAlarmState                  AsamAlarmStateType,
+      asamAlarmMajorDeltaLogIndex1                      INTEGER (0..4294967295),
+      asamAlarmMajorDeltaLogIndex2                      INTEGER (0..4294967295),
+      asamAlarmMajorDeltaLogPtr                         OBJECT IDENTIFIER,
+      asamAlarmMajorDeltaLogTime                        NetworkTimeInSeconds,
+      asamAlarmMajorDeltaLogAddInfo                     DisplayString,
+      asamAlarmMajorDeltaLogBasicAlarmId                INTEGER (0..4294967295)
+   }
+   
+   asamAlarmMajorDeltaLogIndex OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Index for a Major Delta Log Table Entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMajorDeltaLogEntry 1}
+   
+   asamAlarmMajorDeltaLogAlarmId OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This is the unique id for an alarm. It is a combination of two
+          distinct parts of information: the alarm type and the alarm number.
+          The first half represents the type and the second (rightmost) part
+          the alarm number. This alarm number represents the bit position of
+          an alarm in a bitmap of an active alarm entry.
+          The value of asamAlarmId can be found using a simple formula:
+          (AlarmType x 2^16) + AlarmNumber.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMajorDeltaLogEntry 2}
+   
+   asamAlarmMajorDeltaLogAlarmState OBJECT-TYPE
+      SYNTAX AsamAlarmStateType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This reflects the alarm state. When an alarm becomes active,
+          the state will be active. If it dissappears, it will be nonActive.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMajorDeltaLogEntry 3}
+   
+   asamAlarmMajorDeltaLogIndex1 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index2. Together they
+          identify where the alarm occurred. For more information regarding
+          the index definition refer to the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMajorDeltaLogEntry 4}
+   
+   asamAlarmMajorDeltaLogIndex2 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index1. See the description
+          of Index1 for further info.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMajorDeltaLogEntry 5}
+   
+   asamAlarmMajorDeltaLogPtr OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object is currently not used."
+      ::= {asamAlarmMajorDeltaLogEntry 6}
+   
+   asamAlarmMajorDeltaLogTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the network time in seconds when the alarm
+          was logged.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmMajorDeltaLogEntry 7}
+   
+   asamAlarmMajorDeltaLogAddInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to keep some additional information about
+          the considered table entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMajorDeltaLogEntry 8}
+
+     asamAlarmMajorDeltaLogBasicAlarmId  OBJECT-TYPE
+       SYNTAX       INTEGER (0..4294967295)
+       ACCESS       read-only
+       STATUS       mandatory
+       DESCRIPTION  
+          "The meaning and use of this object depends on the value of the asamAlarmMajorDeltaLogAlarmId. 
+           The following situations are possible:
+
+                    1. asamAlarmMajorDeltaLogAlarmId points to a basic alarm.
+                       The value of asamAlarmMajorDeltaLogBasicAlarmId is identical
+                       to the value of the asamAlarmMajorDeltaLogAlarmId (no added
+                       value).
+
+                    2. asamAlarmMajorDeltaLogAlarmId points to a derived alarm of
+                       a temporal/spatial alarm filter. The value of asamAlarmMajor- 
+                       DeltaLogBasicAlarmId identifies the basic alarm that is related 
+                       to the considered derived alarm.
+
+           ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+            
+
+::= {asamAlarmMajorDeltaLogEntry 9}
+
+
+   
+   --
+   --  asamAlarmCriticalDeltaLogTable and related objects
+   --
+   
+   asamAlarmCriticalDeltaLogLastEntry OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the index of the last entry that was added
+          to the Critical delta log table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 68}
+   
+   asamAlarmCriticalDeltaLogReset OBJECT-TYPE
+      SYNTAX AsamAlarmLogResetType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object is a button-like object to reset the Critical
+          delta logging table. When it is set to the reset value, the table
+          is cleared, and logging starts from index 1.  When the reset action
+          is completed, this object is set to resetCompleted. Setting this
+          object to resetCompleted, does not invoke any action.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 69}
+   
+   asamAlarmCriticalDeltaLogResetTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Network time in seconds indicating when the Critical Delta Log
+          Table was last reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmMIB 70}
+   
+   asamAlarmCriticalDeltaLogBufferSize OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the size of the internal Critical Delta
+          Log buffer. It can be set to a new (positive, non-zero) value,
+          but when the sum of all severity-specific Delta Log Table
+          buffersizes would exceed the asamAlarmTotalDeltaLogBufferSize
+          setting with this new value, a smaller value will be set. This
+          value will be chosen so that the sum of buffersizes is equal to
+          the asamAlarmTotalDeltaLogBufferSize. When the size is set to a
+          value smaller than the current number of used entries in the delta
+          log table, a value equal to that number of entries will be set.
+          Setting this object is not supported yet.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO    RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= {asamAlarmMIB 71}
+   
+   asamAlarmCriticalDeltaLogFullAction OBJECT-TYPE
+      SYNTAX AsamAlarmLogFullActionType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the action to be taken when the Critical
+          delta log buffer is completely full. If set to Wrap, older log
+          records will be overwritten by recent ones. If it is set to Halt,
+          logging is stopped until the buffer is reset.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES    RANGE: See above
+             PERSIST: YES   DEFVALUE: wrap   UNITS: -"
+      ::= {asamAlarmMIB 72}
+   
+   asamAlarmCriticalDeltaLogOverflowed OBJECT-TYPE
+      SYNTAX AsamAlarmLogOverflowType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object indicates whether the Critical delta log table is
+          overflowed or not. When the delta log buffer is reset, this object
+          is set to notoverflowed. This object is not meaningful when
+          asamAlarmCriticalDeltaLogFullAction is set to Wrap around.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmMIB 73}
+   
+   asamAlarmCriticalDeltaLogTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamAlarmCriticalDeltaLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table is to log all reported alarms with a severity equal to
+          Critical. The Logged records are ordered by time.
+          The latest Critical reported alarm change is logged as the last
+          entry of this table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::= {asamAlarmMIB 74}
+   
+   asamAlarmCriticalDeltaLogEntry OBJECT-TYPE
+      SYNTAX AsamAlarmCriticalDeltaLogEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Entry for the Critical Delta Log Table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { asamAlarmCriticalDeltaLogIndex }
+      ::= {asamAlarmCriticalDeltaLogTable 1}
+   
+   AsamAlarmCriticalDeltaLogEntry ::= SEQUENCE {
+      asamAlarmCriticalDeltaLogIndex                    INTEGER (0..4294967295),
+      asamAlarmCriticalDeltaLogAlarmId                  INTEGER (0..4294967295),
+      asamAlarmCriticalDeltaLogAlarmState               AsamAlarmStateType,
+      asamAlarmCriticalDeltaLogIndex1                   INTEGER (0..4294967295),
+      asamAlarmCriticalDeltaLogIndex2                   INTEGER (0..4294967295),
+      asamAlarmCriticalDeltaLogPtr                      OBJECT IDENTIFIER,
+      asamAlarmCriticalDeltaLogTime                     NetworkTimeInSeconds,
+      asamAlarmCriticalDeltaLogAddInfo                  DisplayString,
+      asamAlarmCriticalDeltaLogBasicAlarmId             INTEGER (0..4294967295)
+   }
+   
+   asamAlarmCriticalDeltaLogIndex OBJECT-TYPE
+      SYNTAX INTEGER (0.. 4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Index for a Critical Delta Log Table Entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmCriticalDeltaLogEntry 1}
+   
+   asamAlarmCriticalDeltaLogAlarmId OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This is the unique id for an alarm. It is a combination of two
+          distinct parts of information: the alarm type and the alarm number.
+          The first half represents the type and the second (rightmost) part
+          the alarm number. This alarm number represents the bit position of
+          an alarm in a bitmap of an active alarm entry.
+          The value of asamAlarmId can be found using a simple formula:
+          (AlarmType x 2^16) + AlarmNumber.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmCriticalDeltaLogEntry 2}
+   
+   asamAlarmCriticalDeltaLogAlarmState OBJECT-TYPE
+      SYNTAX AsamAlarmStateType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This reflects the alarm state. When an alarm becomes active,
+          the state will be active. If it dissappears, it will be nonActive.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmCriticalDeltaLogEntry 3}
+   
+   asamAlarmCriticalDeltaLogIndex1 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index2. Together they
+          identify where the alarm occurred. For more information regarding
+          the index definition refer to the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmCriticalDeltaLogEntry 4}
+   
+   asamAlarmCriticalDeltaLogIndex2 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index1. See the description
+          of Index1 for further info.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmCriticalDeltaLogEntry 5}
+   
+   asamAlarmCriticalDeltaLogPtr OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      ACCESS read-only
+      STATUS obsolete
+      DESCRIPTION
+         "This object is currently not used."
+      ::= {asamAlarmCriticalDeltaLogEntry 6}
+   
+   asamAlarmCriticalDeltaLogTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the network time in seconds when the alarm
+          was logged.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmCriticalDeltaLogEntry 7}
+   
+   asamAlarmCriticalDeltaLogAddInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to keep some additional information about
+          the considered table entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmCriticalDeltaLogEntry 8}
+
+
+    asamAlarmCriticalDeltaLogBasicAlarmId  OBJECT-TYPE
+       SYNTAX       INTEGER (0..4294967295)
+       ACCESS       read-only
+       STATUS       mandatory
+       DESCRIPTION  
+          "The meaning and use of this object depends on the value of the asamAlarmCriticalDeltaLogAlarmId. 
+           The following situations are possible:
+
+                    1. asamAlarmCriticalDeltaLogAlarmId points to a basic alarm.
+                       The value of asamAlarmCriticalDeltaLogBasicAlarmId is identical
+                       to the value of the asamAlarmCriticalDeltaLogAlarmId (no added
+                       value).
+
+                    2. asamAlarmCriticalDeltaLogAlarmId points to a derived alarm of
+                       a temporal/spatial alarm filter. The value of asamAlarm- 
+                       CriticalDeltaLogBasicAlarmId identifies the basic alarm that is
+                       related to the considered derived alarm.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+             
+
+      ::= {asamAlarmCriticalDeltaLogEntry 9}
+
+
+
+   --
+   --  Object to set mininal severity for reporting of
+   --  non-interface-related alarms.
+   --
+   
+   asamAlarmNonItfReportingSeverity OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This objects specifies for all non interface related alarms
+          the minimal severity for the alarm to be reported.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA     RANGE: 1-5
+             PERSIST: NO    DEFVALUE: major  UNITS: -"
+      ::= {asamAlarmMIB 75}
+
+   asamAlarmFilterTable  OBJECT-TYPE
+   SYNTAX       SEQUENCE OF AsamAlarmFilterEntry
+   ACCESS       not-accessible 
+   STATUS       mandatory
+   DESCRIPTION  "Static table, representing the alarm filters inside the ASAM.
+
+ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above "
+   ::= {asamAlarmMIB 76}
+asamAlarmFilterEntry  OBJECT-TYPE
+   SYNTAX       AsamAlarmFilterEntry
+   ACCESS       not-accessible
+   STATUS       mandatory
+   DESCRIPTION  "Entry of the asamAlarmFilterTable.
+                 Each row in the table contains management infornation applicable
+                 to a specific alarm filter inside the ASAM. 
+ALCATEL NOTE:
+             SUPPORT: YES "
+   INDEX        { asamAlarmFilterType, asamAlarmFilterNumber }
+   ::= {asamAlarmFilterTable 1}
+
+AsamAlarmFilterEntry ::= SEQUENCE {
+   asamAlarmFilterType              INTEGER,
+   asamAlarmFilterNumber            INTEGER (1..31),
+   
+   asamAlarmFilterBasicAlarmId      INTEGER (0..4294967295),
+   asamAlarmFilterStatus            INTEGER,
+   asamAlarmFilterThreshold         INTEGER (2.. 65535),
+   asamAlarmFilterWindow            INTEGER (1.. 65535)
+   }
+
+asamAlarmFilterType  OBJECT-TYPE
+   SYNTAX       INTEGER {
+                temporal(1),
+                spatial(2)
+                }
+   ACCESS       read-write
+   STATUS       mandatory
+   DESCRIPTION  "Index in the asamAlarmFilterTable. This object is used to define
+                 the type of the considered alarm filter.
+
+ALCATEL NOTE:
+        	     SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+        	     PERSIST: YES   DEFVALUE: NA   UNITS: -"
+
+   ::= {asamAlarmFilterEntry 1}
+
+asamAlarmFilterNumber  OBJECT-TYPE
+   SYNTAX       INTEGER (1..31)
+   ACCESS       read-only
+   STATUS       mandatory
+   DESCRIPTION  "Index in the asamAlarmFilterTable. This index, together with
+                 asamAlarmFilterType, uniquely identifies the considered alarm
+                 filter within the asamAlarmFilterTable.
+
+ALCATEL NOTE:
+        	     SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+        	     PERSIST: YES   DEFVALUE: NA   UNITS: -"
+
+   ::= {asamAlarmFilterEntry 2}
+
+
+asamAlarmFilterBasicAlarmId  OBJECT-TYPE
+   SYNTAX       INTEGER (0..4294967295)
+   ACCESS       read-write
+   STATUS       mandatory
+   DESCRIPTION  "The value of this object corresponds to the unique identifica-
+                 tion of the basic alarm related to the considered alarm filter.
+                 Each alarm filter in the ASAM is related to exact one basic alarm.
+                 The interpretation of this ID is identical to the interpretation 
+                 of asamAlarmId in the entries of the asamAlarmTable.
+                 An overview of the different basic alarms supported by the ASAM in
+                 R4.5 can be found in the Alarm Definition document.
+
+ALCATEL NOTE:
+        	     SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+        	     PERSIST: YES   DEFVALUE: NA   UNITS: -"
+
+   ::= {asamAlarmFilterEntry 3}
+
+asamAlarmFilterStatus  OBJECT-TYPE
+   SYNTAX       INTEGER {
+                notInUse(1),
+                inUse(2)
+                }
+   ACCESS       read-write
+   STATUS       mandatory
+   DESCRIPTION  "This object is used by the operator to activate/deactivate a
+                 configured alarm filter.
+
+ALCATEL NOTE:
+        	     SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+        	     PERSIST: YES   DEFVALUE: NA   UNITS: -"
+
+   ::= {asamAlarmFilterEntry 4}
+
+asamAlarmFilterThreshold  OBJECT-TYPE
+   SYNTAX       INTEGER (2..65535)
+   ACCESS       read-write
+   STATUS       mandatory
+   DESCRIPTION  "This object is used by the operator to specify the threshold
+                 value of the considered alarm filter. This value must be greater
+                 than 1 in order to make sense.
+          
+                 The meaning of this object depends on the alarm filter type.
+                 
+                 temporal: the number of off_to_on transitions of the considered
+                           basic alarm that have to be detected on a specific
+                           object during an on-going filtering filter, before the
+                           related derived alarm is raised.
+                 spatial:  the number of objects within the ASAM for which the 
+                           considered basic alarm must be raised before the related 
+                           derived alarm is raised.
+ALCATEL NOTE:
+        	     SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+        	     PERSIST: YES   DEFVALUE: NA   UNITS: -"
+
+   ::= {asamAlarmFilterEntry 5}
+
+asamAlarmFilterWindow  OBJECT-TYPE
+   SYNTAX       INTEGER (1..65535)
+   ACCESS       read-write
+   STATUS       mandatory
+   DESCRIPTION  "This object is used by the operator to specify the duration 
+                 (number of seconds) of the filtering window. This object only
+                 makes sense when the considered alarm filter is a temporal filter
+                 (not relevant in case of a spatial alarm filter).
+ALCATEL NOTE:
+        	     SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+        	     PERSIST: YES   DEFVALUE: NA   UNITS: -"
+  
+   ::= {asamAlarmFilterEntry 6} 
+asamAlarmReport OBJECT IDENTIFIER ::= {asamAlarmMIB 77}
+
+  asamAlarmReportId OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This is the unique id for the alarm that was last raised or cleared.
+          It is a combination of 2 distinct parts of information : the alarm
+          type and the alarm number.
+          The first half represents the type and the second (most right) part
+          the alarm number. This alarm number represents the bit position of
+          an alarm in a bitmap of an active alarm entry.  Thus the value of
+          asamAlarmId can be found using a simple formula: (AlarmType x 2^16)
+          + AlarmNumber.  E.g. an alarm with alarm type 5 and alarm number 3
+          is represented as 0x00050003.
+          A value of zero means no alarm was raised or cleared yet.
+  
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmReport 1}
+
+   asamAlarmReportAlarmState OBJECT-TYPE
+      SYNTAX AsamAlarmStateType             
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This reflects the alarm state of the last raised or cleared alarm.
+          When an alarm becomes active, the state will be active.
+          If it dissappears, it will be nonActive.
+   
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmReport 2}
+   
+   asamAlarmReportSeverity OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This reflects the severity level of the last raised or cleared alarm.
+          This severity may be indeterminate, warning, minor, major and critical.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1-5
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmReport 3}
+
+   asamAlarmReportIndex1 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index2. Together they
+          identify where the last raised or cleared alarm occurred.
+          For more information regarding the index definition,
+          refer to the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmReport 4}
+   
+   asamAlarmReportIndex2 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index1. Together they
+          identify where the last raised or cleared alarm occurred.
+          For more information regarding the index definition,
+          refer to the Alarm Definition document.
+                                                                       
+          ALCATEL NOTE:                                                                       
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above                       
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"                                                           
+      ::= {asamAlarmReport 5}
+   
+   asamAlarmReportTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the time in seconds when the last alarm has
+          changed state (either raised or cleared).
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmReport 6}
+
+   asamAlarmReportAddInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to keep some additional information about
+          the last raised or cleared alarm.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmReport 7}
+
+  asamAlarmQueryTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamAlarmQueryEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table is used to retrieve all the reported alarms by filters.
+          For each alarm, there is an entry. Each entry includes the detailed informations for this alarm.
+ 
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+        ::= {asamAlarmMIB 78}
+
+   asamAlarmQueryEntry OBJECT-TYPE
+      SYNTAX AsamAlarmQueryEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Entry for the alarm query table. Each row in the table contains the detailed 
+          information and status for each alarm.
+
+          ALCATEL NOTE:
+                  SUPPORT: YES"
+      INDEX  { asamAlarmQueryAlarmId,
+               asamAlarmQuerySeverity,
+               asamAlarmQueryServAff,
+               asamAlarmQueryAid }
+      ::= {asamAlarmQueryTable 1}
+
+   AsamAlarmQueryEntry ::= SEQUENCE {
+        asamAlarmQueryAlarmId           INTEGER (0..4294967295),
+        asamAlarmQueryAid               INTEGER (0..4294967295),
+        asamAlarmQuerySeverity          AsamAlarmSeverityType,
+        asamAlarmQueryServAff           AsamAlarmServAffType,
+        asamAlarmQueryType              AsamAlarmType,
+        asamAlarmQueryLocation          AsamAlarmLocation,
+        asamAlarmQueryDirection         AsamAlarmDirection,
+        asamAlarmQueryTime              NetworkTimeInSeconds,
+        asamAlarmQueryAidInfo           DisplayString,
+        asamAlarmQueryInfo              DisplayString,
+        asamAlarmQueryIndex1            INTEGER (0..4294967295),
+        asamAlarmQueryIndex2            INTEGER (0..4294967295)
+    }
+
+  asamAlarmQueryAlarmId OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This is the alarm identification. It's a 32bit integer and the scheme is described as following: 
+         ====================================
+         | bit31 ~ bit16 |   | bit15 ~ bit0 |
+         |  alarm type   | + | alarm number |
+         ====================================
+          If alarm number is put as 0, all the alarms belong to this alarm type will be retrieved.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 1}
+
+  asamAlarmQueryAid OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This reflects the alarm index. If the operator wants to show the specific alarm,
+          it stands for the alarm index1 defined in alarm table.
+          If the operator wants to show all the alarms, it is 0. 
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 2}
+
+   asamAlarmQuerySeverity OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This reflects the severity level of the last raised or cleared alarm.
+          This severity may be indeterminate, warning, minor, major critical and all.
+            0-all level, 1-indeterminate, 2-warning, 
+            3-minor,  4-major,  5-critical
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 0-5
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 3}
+
+   asamAlarmQueryServAff OBJECT-TYPE
+      SYNTAX AsamAlarmServAffType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This reflects the sevice affecting or not in query alarm filter.
+           0-all affecting, 1-service-affecting, 2-not service affecting
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 0-2
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 4}
+
+   asamAlarmQueryType OBJECT-TYPE
+      SYNTAX  AsamAlarmType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This defined the alarm type.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 5}
+
+   asamAlarmQueryLocation OBJECT-TYPE
+      SYNTAX AsamAlarmLocation
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in alarm location. It is only suitable for various DSL alarms
+           1-near-end, 2-far-end, 3-middle-end, 4-line, 5-null
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 6}
+
+   asamAlarmQueryDirection OBJECT-TYPE
+      SYNTAX AsamAlarmDirection
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in alarm direction. It is only suitable for various DSL alarms.
+          1-received, 2-transmit, 3-null
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 7}
+
+   asamAlarmQueryTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object gives the time in seconds when the last alarm has
+          changed state (either raised or cleared).
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: seconds"
+      ::= {asamAlarmQueryEntry 8}
+
+   asamAlarmQueryAidInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to show AID parameter in string
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 9}
+
+   asamAlarmQueryInfo OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used to keep some additional information about
+          the queried alarm.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 10}
+
+   asamAlarmQueryIndex1 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index2. Together they
+          identify where the alarm occurred. For more information regarding
+          the index definition, refer to the Alarm Definition document.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 11}
+
+    asamAlarmQueryIndex2 OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is used in conjunction with Index1. See description of
+          Index1 for further info.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= {asamAlarmQueryEntry 12} 
+
+END
+

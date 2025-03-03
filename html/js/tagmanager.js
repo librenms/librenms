@@ -10,8 +10,8 @@ var TagManager = (function () {
                 8
             ],
             delimiterChars: [
-                13, 
-                44, 
+                13,
+                44,
                 188
             ],
             createHandler: function (tagManager, tag, isImport) {
@@ -158,7 +158,7 @@ var Tag = (function () {
         var tagRemover = $('<a />').addClass('tagmanagerRemoveTag').attr('title', 'Remove').attr('href', '#').text('x').appendTo(tagHtml);
         var id = this.id;
         var manager = this.manager;
-        $(tagRemover).click(function (e) {
+        $(tagRemover).on("click", function (e) {
             manager.remove(id);
             return false;
         });

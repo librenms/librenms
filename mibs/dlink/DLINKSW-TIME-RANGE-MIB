@@ -1,0 +1,225 @@
+--  *****************************************************************
+--  DLINKSW-TIME-RANGE-MIB.mib : DLINK Time Range MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-TIME-RANGE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32     
+            FROM SNMPv2-SMI        
+        RowStatus, DisplayString
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+		    FROM SNMPv2-CONF
+        dlinkIndustrialCommon            
+            FROM DLINK-ID-REC-MIB;
+
+     dlinkSwTimeRangeMIB MODULE-IDENTITY
+         LAST-UPDATED "201303220000Z"
+         ORGANIZATION "D-Link Corp."
+         CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB defines time range profiles to activate features."
+         
+        REVISION "201303220000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file."
+         ::= { dlinkIndustrialCommon 50 }
+
+
+-- -----------------------------------------------------------------------------
+    dTimeRangeMIBNotifications   OBJECT IDENTIFIER ::= { dlinkSwTimeRangeMIB 0 }
+    dTimeRangeMIBObjects         OBJECT IDENTIFIER ::= { dlinkSwTimeRangeMIB 1 }
+    dTimeRangeMIBConformance     OBJECT IDENTIFIER ::= { dlinkSwTimeRangeMIB 2 }
+
+-- -----------------------------------------------------------------------------  
+    dTimeRangeProfileTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DTimeRangeProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table consists of a list of time range profiles."
+        ::= { dTimeRangeMIBObjects 1 }
+
+    dTimeRangeProfileEntry OBJECT-TYPE
+        SYNTAX          DTimeRangeProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains information of a time range profile."
+        INDEX { 
+            dTimeRangeProfileName,
+            dTimeRangeProfilePeriodType,             
+            dTimeRangeProfileStartDayOfWeek,
+            dTimeRangeProfileStartHour,
+            dTimeRangeProfileStartMinute,
+            dTimeRangeProfileEndDayOfWeek,
+            dTimeRangeProfileEndHour,
+            dTimeRangeProfileEndMinute      
+        }
+        ::= { dTimeRangeProfileTable 1 }
+
+    DTimeRangeProfileEntry ::=           SEQUENCE {
+        dTimeRangeProfileName               DisplayString,      
+	    dTimeRangeProfilePeriodType 	    INTEGER,
+        dTimeRangeProfileStartDayOfWeek     INTEGER,
+        dTimeRangeProfileStartHour          Unsigned32,
+        dTimeRangeProfileStartMinute        Unsigned32,
+        dTimeRangeProfileEndDayOfWeek       INTEGER,
+        dTimeRangeProfileEndHour            Unsigned32,
+        dTimeRangeProfileEndMinute          Unsigned32,      
+        dTimeRangeProfileRowStatus          RowStatus
+    }
+
+    dTimeRangeProfileName           OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The time range name of the entry."
+        ::= { dTimeRangeProfileEntry 1 }         
+           
+	dTimeRangeProfilePeriodType OBJECT-TYPE
+		SYNTAX	INTEGER {
+			daily(1),
+			weekly(2)
+		}
+		MAX-ACCESS	    not-accessible
+		STATUS	        current
+	    DESCRIPTION
+			"This object indicates the type of this entry.
+            'daily' - Using the time of day to specify the time range.
+            'weekly' - Using the day of the week and time of day to specify 
+                      the time range.
+            "
+		::= { dTimeRangeProfileEntry 2 }
+
+    dTimeRangeProfileStartDayOfWeek          OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            sunday(1),
+            monday(2),
+            tuesday(3),
+            wednesday(4),
+            thursday(5),
+            friday(6),
+            saturday(7),
+            notApplicable(8)
+        }       
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the start day of week of the entry.
+            This object is meaningful when dTimeRangeProfilePeriodType is 'weekly'.
+            If dTimeRangeProfilePeriodType is not 'weekly', this object is set
+            to 'notApplicable'.        
+            "
+        ::= { dTimeRangeProfileEntry 3 }
+       
+    dTimeRangeProfileStartHour OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..23)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the hours component of time (24 hour format)
+            at which the daily/weekly periodic start time for this entry.
+            "
+        ::= { dTimeRangeProfileEntry 4 }
+
+    dTimeRangeProfileStartMinute OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..59)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This object specifies the minutes component of time at which
+           the daily/weekly periodic start time for this entry.
+           "
+        ::= { dTimeRangeProfileEntry 5 }
+ 
+   dTimeRangeProfileEndDayOfWeek          OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            sunday(1),
+            monday(2),
+            tuesday(3),
+            wednesday(4),
+            thursday(5),
+            friday(6),
+            saturday(7),
+            notApplicable(8)
+        }       
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the end day of week of the entry.
+            This object is meaningful when dTimeRangeProfilePeriodType is 'weekly'.
+            If dTimeRangeProfilePeriodType is not 'weekly', this object is set
+            to 'notApplicable'.
+            "
+        ::= { dTimeRangeProfileEntry 6 }
+       
+    dTimeRangeProfileEndHour OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..23)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the hours component of time (24 hour format)
+            at which the daily/weekly periodic start time for this entry.
+            "
+        ::= { dTimeRangeProfileEntry 7 }
+
+    dTimeRangeProfileEndMinute OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..59)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the minutes component of time at which
+            the daily/weekly periodic end time for this entry.
+            "
+        ::= { dTimeRangeProfileEntry 8 }
+
+    dTimeRangeProfileRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the RowStatus of this entry."
+        ::= { dTimeRangeProfileEntry  9 }
+
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************			   		
+	dTimeRangeCompliances OBJECT IDENTIFIER ::= { dTimeRangeMIBConformance 1 }
+		
+	dTimeRangeCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-TIME-RANGE-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+            dTimeRangeProfileCfgGroup         
+        }	
+		
+		::= { dTimeRangeCompliances 1 }
+		
+	dTimeRangeGroups OBJECT IDENTIFIER ::= { dTimeRangeMIBConformance 2 }
+	
+	dTimeRangeProfileCfgGroup OBJECT-GROUP
+		OBJECTS { 
+			dTimeRangeProfileRowStatus 
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing configuration for time range profiles."
+		::= { dTimeRangeGroups 1 }
+	   
+          
+END

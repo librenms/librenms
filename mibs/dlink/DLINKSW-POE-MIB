@@ -1,0 +1,700 @@
+-- *****************************************************************
+-- DLINKSW-POE-MIB.mib : D-Link extensions to POWER-ETHERNET-MIB (PoE)
+--
+-- Copyright (c) 2017 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+DLINKSW-POE-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP		
+            FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Unsigned32 
+            FROM SNMPv2-SMI
+        DisplayString,TruthValue
+            FROM SNMPv2-TC
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        PortList 
+            FROM Q-BRIDGE-MIB
+		pethMainPseGroupIndex, pethPsePortIndex, pethPsePortShortCounter, 
+        pethPsePortOverLoadCounter, pethPsePortPowerDeniedCounter
+			FROM POWER-ETHERNET-MIB
+        dlinkIndustrialCommon
+	        FROM DLINK-ID-REC-MIB;
+	    		  
+
+    dlinkSwPoeExtMIB MODULE-IDENTITY
+        LAST-UPDATED "201703150000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+                "        D-Link Corporation
+                 Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                         Taipei City 114, Taiwan, R.O.C
+                 Tel:     +886-2-66000123
+                 E-mail: tsd@dlink.com.tw
+                "
+        DESCRIPTION
+                "A MIB module for extending POWER-ETHERNET-MIB specified in 
+                RFC 3621.
+                "      
+        REVISION "201305290000Z"
+        DESCRIPTION
+                 "Initial version of this MIB module."
+        REVISION "201309240000Z"
+        DESCRIPTION
+                 "Add dPoeGroupIfLedMode node."
+        REVISION "201703150000Z"
+        DESCRIPTION
+                 "Add dPoeIfPdAliveCfgTable table to support PD alive check feature."
+        ::= { dlinkIndustrialCommon 24 }
+
+-- -----------------------------------------------------------------------------
+    dPoeMIBNotifications OBJECT IDENTIFIER ::= { dlinkSwPoeExtMIB 0 }		
+    dPoeMIBObjects       OBJECT IDENTIFIER ::= { dlinkSwPoeExtMIB 1 }
+    dPoeMIBConformance   OBJECT IDENTIFIER ::= { dlinkSwPoeExtMIB 2 }
+
+--------------------------------------------------------------------------------
+    dPoeGroupCfgTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DPoeGroupCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of group configurations for PoE.
+            Group means box in the stack or module in a rack. 
+            For non-modular devices, the pethMainPseGroupIndex is 1.
+            "
+        ::= { dPoeMIBObjects 1 }
+        
+    dPoeGroupCfgEntry OBJECT-TYPE
+        SYNTAX          DPoeGroupCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains the system configuration of the PoE on a group."
+        INDEX { pethMainPseGroupIndex }
+        ::= { dPoeGroupCfgTable 1 }
+    
+    DPoeGroupCfgEntry ::=      	  SEQUENCE {
+             dPoeGroupPolicyPreempt        TruthValue,
+             dPoeGroupClearIfStatistic     PortList,
+             dPoeGroupIfLedMode            INTEGER    
+        } 
+
+    dPoeGroupPolicyPreempt OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object configures whether to disconnect the PD which is powered 
+			with lower priority in order to release the power to the new connected 
+			PD with higher priority under power shortage condition. 
+			If this object is 'false', then the policy is first in first serviced. 
+			Thus the new PD will not be serviced if the power budget is running out. 
+			If this object is 'true', then the power provisioned to PD 
+			with lower priority can be preempted to release the power to the new 
+			connected PD with higher priority. "
+        DEFVAL { false }
+        ::= { dPoeGroupCfgEntry 1 }
+        
+    dPoeGroupClearIfStatistic OBJECT-TYPE
+        SYNTAX          PortList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to clear the PoE statistics of pethPsePortEntry
+             for specified ports.             
+            "
+        ::= { dPoeGroupCfgEntry 2 }
+
+    dPoeGroupIfLedMode OBJECT-TYPE
+        SYNTAX   INTEGER    {
+           poeMode(1),          
+           linkMode(2),
+           invalid(3)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "For some devices,port LED can indicate either poe status or link status.
+             This object is used to configure or display port LED mode.
+             poeMode(1) - indicates poe status.  
+             linkMode(2) - indicates link status.
+
+             For other devices have LEDs to indicate poe status and link status separately,
+             this object only can get value of invalid(3) to mean this node is meaningless.          
+            "
+        ::= { dPoeGroupCfgEntry 3 }		
+------------------------------------------------------------------------------- 
+    dPoeGroupInfoTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DPoEGroupInfoEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+             "This table consists of a list of PoE information for groups."
+        ::= { dPoeMIBObjects 2 } 
+        
+    dPoeGroupInfoEntry OBJECT-TYPE
+        SYNTAX        DPoEGroupInfoEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+             "An entry contains the system information of the PoE on a group."
+        INDEX { pethMainPseGroupIndex }
+        ::= { dPoeGroupInfoTable 1 }      
+        
+    DPoEGroupInfoEntry ::=      	  SEQUENCE {
+        dPoeGroupMaxPorts  Integer32,
+        dPoeGroupHWVersion DisplayString,
+        dPoeGroupSWVersion DisplayString
+    }  
+
+    dPoeGroupMaxPorts OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "This object indicates the maximum number of ports that the group can support."
+        ::= { dPoeGroupInfoEntry 1 } 
+        
+    dPoeGroupHWVersion OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "This object indicates H/W version of PoE chip."
+        ::= { dPoeGroupInfoEntry 2 }  
+        
+    dPoeGroupSWVersion OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "This object indicates firmware version of PoE chip."
+        ::= { dPoeGroupInfoEntry 3 }  
+
+------------------------------------------------------------------------------------------------------
+    dPoeIfObjects  OBJECT IDENTIFIER ::= { dPoeMIBObjects 3 }  
+                
+    dPoeIfCfgTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DPoeIfCfgEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+             "This table consists of a list of PoE configuration 
+             information for ports."
+        ::= { dPoeIfObjects 1 }   
+       
+    dPoeIfCfgEntry OBJECT-TYPE
+        SYNTAX        DPoeIfCfgEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+             "An entry contains PoE configuration on a port."
+        INDEX { 
+            pethMainPseGroupIndex,
+            pethPsePortIndex
+        }
+        ::= { dPoeIfCfgTable 1 }    
+        
+    DPoeIfCfgEntry ::=      	  SEQUENCE {
+        dPoeIfState             INTEGER,
+        dPoeIfMaxPower          Integer32,
+        dPoeIfTimeRange         DisplayString,
+        dPoeIfLegacyPdEnabled   TruthValue
+    }      
+        
+    dPoeIfState OBJECT-TYPE
+        SYNTAX      INTEGER    {
+           auto(1),          
+           never(2),
+           static(3)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the PoE state of the entry.
+            auto(1) -  the port will automatically detect the PD and provision
+                power to the PD. The max wattage value which can be provisioned
+                to the port is determined by dPoeIfMaxPower. If dPoeIfMaxPower
+                is unspecified, then the class of the PD auto determines the
+                maximum wattage which can be provisioned. The PD will not be
+                provisioned if it requests more wattage than the max wattage
+                which is determined.               
+            never(2) - indicates the port will not supply power to connected PD;
+            static(3) - indicates manager pre-allocate power budget to the port
+                by configuring the dPoeIfMaxPower object. The power budget is allocated
+                to the port even though there is no PD connected to the port. 
+                If dPoeIfMaxPower is not configured, default value is 15400mW for 802.3af 
+                and 30000mW for 802.3at."
+        DEFVAL {auto}
+        ::= { dPoeIfCfgEntry 1 }         
+
+    dPoeIfMaxPower OBJECT-TYPE
+        SYNTAX          Integer32( 0 | 1000..30000)
+        UNITS           "milliwatts"
+        MAX-ACCESS      read-write
+        STATUS           current
+        DESCRIPTION
+              "This object indicates the max wattage value which can 
+               be provisioned to the port.
+               Note: This object is valid only while the dPoeIfState 
+               object is configured as auto or static."
+        ::= { dPoeIfCfgEntry 2 }         
+        
+    dPoeIfTimeRange OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+              "This object indicates the name of time-range profile to delineate
+               the activation period.
+               A zero length string indicates the time-range is not specified.
+               Note: This object is valid only while the dPoeIfState is 'auto'."		
+        ::= { dPoeIfCfgEntry 3 }
+        
+    dPoeIfLegacyPdEnabled OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "This object indicates the state of legacy PD support."
+        DEFVAL { false }
+        ::= { dPoeIfCfgEntry 4 }          
+
+------------------------------------------------------------------------------------------------------
+    dPoeIfInfoObjects  OBJECT IDENTIFIER ::= { dPoeIfObjects 2 }
+
+    dPoeIfStatusTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DPoeIfStatusEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+             "This table consists of a list of PoE status for ports."
+        ::= { dPoeIfInfoObjects 1 } 
+                         
+    dPoeIfStatusEntry  OBJECT-TYPE
+        SYNTAX          DPoeIfStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "An entry consists of PoE status for a port."
+        INDEX { pethMainPseGroupIndex,pethPsePortIndex }
+        ::= { dPoeIfStatusTable 1 }  
+        
+    DPoeIfStatusEntry ::=      	  SEQUENCE {
+        dPoeIfDetectStatus     INTEGER,
+        dPoeIfFaultyType       INTEGER
+    } 
+
+    dPoeIfDetectStatus OBJECT-TYPE
+        SYNTAX          INTEGER             {
+            disabled(1),
+            searching(2),
+            requesting(3),
+            delivering(4),
+            faulty(5)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This object indicates the operational status of the port PD detection.
+             disabled(1) - PSE function is disabled.
+             searching(2) - Remote PD is not connected.
+             requesting(3) - Remote PD is inserted, but the PSE doesn't provide power yet.
+             delivering(4) - Remote PD is now powering by PoE system.
+             faulty(5) - Device detection or a powered device is in a faulty state.
+             "
+        ::= { dPoeIfStatusEntry 1 }  
+            
+    dPoeIfFaultyType OBJECT-TYPE
+        SYNTAX        INTEGER {     
+            notApplicable(0),
+            mpsAbsent(1),
+            pdShort(2),
+            overload(3),
+            powerDenied(4),
+            thermalShutdown(5),
+            startupFailure(6),
+            classificationFailure(7)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This object indicates the specific faulty type. It is meaningful
+            only when dPoeIfDetectStatus object is 'faulty'.
+            notApplicable(0) - indicates this object is meaningless, e.g. the 
+                dPoeIfDetectStatus is not 'faulty'.
+            mpsAbsent(1) - indicates MPS(Maintain Power Signature) Absent
+            pdShort(2) - indicates PD Short
+            overload(3) - indicates Overload
+            powerDenied(4) - indicates Power Denied
+            thermalShutdown(5)- indicates Thermal Shutdown
+            startupFailure(6) -  indicates Startup Failure
+            classificationFailure(7) - indicates Classification Failure(IEEE 802.3at)
+            "
+        ::= { dPoeIfStatusEntry 2 }          
+        
+------------------------------------------------------------------------------------------------------     
+    dPoeIfMeasurementTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DPoEIfMeasurementEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of POE measurement 
+            information for ports."
+        ::= { dPoeIfInfoObjects 2 } 
+                         
+    dPoeIfMeasurementEntry  OBJECT-TYPE
+        SYNTAX          DPoEIfMeasurementEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "An entry consists of PoE measurement information of a port."
+        INDEX { 
+            pethMainPseGroupIndex,
+            pethPsePortIndex 
+        }
+        ::= { dPoeIfMeasurementTable 1 }  
+        
+    DPoEIfMeasurementEntry ::=     	  SEQUENCE {
+        dPoeIfVoltage           Integer32,
+        dPoeIfCurrent           Integer32,
+        dPoeIfTemperature       Integer32,
+        dPoeIfPower             Integer32
+    } 
+
+    dPoeIfVoltage OBJECT-TYPE
+        SYNTAX        Integer32
+        UNITS         "millivolts"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This object indicates the voltage of the port in millivolts."
+        ::= { dPoeIfMeasurementEntry 1 }  
+ 
+     dPoeIfCurrent OBJECT-TYPE
+        SYNTAX        Integer32
+        UNITS         "milliamperes"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "This object indicates the current of port in milliamperes."
+        ::= { dPoeIfMeasurementEntry 2 }  
+ 
+     dPoeIfTemperature OBJECT-TYPE
+        SYNTAX        Integer32
+        UNITS         "Degree Centigrade"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "This object indicates the temperature of port in degrees centigrade."
+        ::= { dPoeIfMeasurementEntry 3 }  
+ 
+     dPoeIfPower OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "This object indicates consumption power of port in milliwatts."
+        ::= { dPoeIfMeasurementEntry 4 }  
+
+---------------------------------------------------------------------------------
+-- Add a new table for SNR-20170223-001(ASV2.1)(PD alive check)
+---------------------------------------------------------------------------------
+   dPoeIfPdAliveCfgTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF DPoeIfPdAliveCfgEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+             "This table consists of a list of configuration for the PD
+             alive check function for ports.
+             The PD alive check feature provides the solution for 
+             PD device that has the stop working or no response 
+             problem via Ping mechanism.
+             Detailed Process:
+             The detailed processes are described as follows:
+             1. The system  needs to  periodically monitor the 
+              specific PD by using Ping function. If there is no 
+              response, system takes one of the following actions:
+              (1) Reset: Switch resets (disable then enable) PoE 
+                  power on the port which connects to a PD under monitoring.
+              (2) Notify: Switch sends logs and traps to notify the administrator.
+              (3) Both: Switch sends logs and traps, and resets the PoE port power.
+             2. The system should implement the retry  mechanism to check 
+              PD aliveness, hence the system will reset the PoE port power 
+              feeding after the retry by using Ping without any response from a PD.
+             3. If the action is Reset or  Both, the system needs 
+              to wait for PD recovery from rebooting and then executes 
+              the Ping function again. Besides, the waiting time can 
+              be configured by users.
+             4. If PoE schedule (time range) function is configured 
+              on the port which enables the PD Alive Check  function, 
+              the time range function has the top priority, and 
+              therefore PD Alive Check function will not work 
+              while PoE time range function is still active.
+             5. This function only takes effect on PoE enabled 
+              port with power feeding.
+             
+             Note: It is required to setup IP settings properly that 
+              the PD can be reachable for Ping, otherwise this function 
+              cannot work as expected.
+             
+              Limitation
+             1. Support Ping Function: If the PD does not support ICMP, 
+              this function cannot work normally.
+             2. Direct-Connected PD: The Reset Action can only work on 
+              the direct-connected PD. If the PD is not connected directly, 
+              the Reset Action may not work as expected.
+             3. PD Also Acts as PSE: If the direct-connected PD is also a PSE, 
+              all the next level PDs connect to this PSE will be power cycling 
+              whenever PD Alive Check function takes effect on 'Reset' or 'Both' Action." 
+        ::= { dPoeIfObjects 3 }   
+       
+    dPoeIfPdAliveCfgEntry OBJECT-TYPE
+        SYNTAX        DPoeIfPdAliveCfgEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+             "An entry contains configuration for PD alive check on a port."
+        INDEX { 
+            pethMainPseGroupIndex,
+            pethPsePortIndex
+        }
+        ::= { dPoeIfPdAliveCfgTable 1 }    
+        
+    DPoeIfPdAliveCfgEntry ::=      	  SEQUENCE {
+        dPoeIfPdAliveCfgState                 INTEGER,
+        dPoeIfPdAliveCfgPdIpType          InetAddressType,
+        dPoeIfPdAliveCfgPdIpAddr              InetAddress,
+        dPoeIfPdAliveCfgInterval              Unsigned32,
+        dPoeIfPdAliveCfgRetry            Unsigned32,
+        dPoeIfPdAliveCfgWaitTime           Unsigned32,
+        dPoeIfPdAliveCfgAction                INTEGER
+    }      
+        
+    dPoeIfPdAliveCfgState OBJECT-TYPE
+        SYNTAX      INTEGER    {
+           enabled(1),          
+           disabled(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the the PD alive function sate.
+             enabled - Enable the PD alive check function
+             disabled - Disable the PD alive check function.
+
+"          
+        DEFVAL { disabled }
+        ::= { dPoeIfPdAliveCfgEntry 1 }         
+
+    dPoeIfPdAliveCfgPdIpType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP address type of the target PD."
+        ::= { dPoeIfPdAliveCfgEntry 2 }
+    
+    dPoeIfPdAliveCfgPdIpAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP address of the target PD."
+        ::= { dPoeIfPdAliveCfgEntry 3 }
+
+    dPoeIfPdAliveCfgInterval OBJECT-TYPE
+        SYNTAX          Unsigned32 (10..300)
+        UNITS           "seconds"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+              "This object indicates the time interval for system 
+               issues ping request to detect the target PD.
+               The valid range for interval time is 10s to 300s."
+        DEFVAL { 30 }
+        ::= { dPoeIfPdAliveCfgEntry 4 }         
+        
+    dPoeIfPdAliveCfgRetry OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..5)
+        UNITS           "times"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+              "This object indicates the retry count of ping 
+               request when PD has no response.
+               The valid range for retry count is 0 to 5 times."
+        DEFVAL { 2}
+        ::= { dPoeIfPdAliveCfgEntry 5 }    
+
+
+    dPoeIfPdAliveCfgWaitTime OBJECT-TYPE
+        SYNTAX          Unsigned32 (30..300)
+        UNITS           "seconds"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+              "This object indicates the waiting time for PD reboot.
+              The valid range for waiting time is 30s to 300s."
+        DEFVAL { 90 }
+        ::= { dPoeIfPdAliveCfgEntry 6 }    
+
+    dPoeIfPdAliveCfgAction OBJECT-TYPE
+        SYNTAX          INTEGER {
+           reset(1),          
+           notify(2),
+           both(3)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+              "This object indicates the action when PD doesn't reply the ping request.
+               reset- System will reset the PoE port state .
+               notify- System will send log and trap to notify the administrator.
+               both- System will send log and trap first and reset the PoE port state."
+        DEFVAL { both }
+        ::= { dPoeIfPdAliveCfgEntry 7 }    
+ 
+-- *****************************************************************************
+-- MIB Notifications 
+-- *****************************************************************************
+    dPoeIfPowerDeniedNotification  NOTIFICATION-TYPE
+         OBJECTS    { pethPsePortPowerDeniedCounter }
+         STATUS      current
+         DESCRIPTION
+             " This Notification indicates if PSE state diagram enters
+               the state POWER_DENIED.
+               At least 500 msec must elapse between notifications
+               being emitted by the same object instance."
+          ::= { dPoeMIBNotifications 1 }  
+
+    dPoeIfPowerOverLoadNotification  NOTIFICATION-TYPE
+         OBJECTS     { pethPsePortOverLoadCounter }
+         STATUS      current
+         DESCRIPTION
+             " This Notification indicates if PSE state diagram enters
+               the state ERROR_DELAY_OVER.
+               At least 500 msec must elapse between notifications
+               being emitted by the same object instance."
+          ::= { dPoeMIBNotifications 2 } 
+     
+    dPoeIfPowerShortCircuitNotification  NOTIFICATION-TYPE
+         OBJECTS     { pethPsePortShortCounter }
+         STATUS      current
+         DESCRIPTION
+             " This Notification indicates if PSE state diagram enters
+               the state ERROR_DELAY_SHORT.
+               At least 500 msec must elapse between notifications
+               being emitted by the same object instance."
+          ::= { dPoeMIBNotifications 3 }
+
+    dPoeIfPdAliveFailOccurNotification  NOTIFICATION-TYPE
+         OBJECTS  { pethMainPseGroupIndex,
+                    pethPsePortIndex,
+                    dPoeIfPdAliveCfgPdIpType,
+                    dPoeIfPdAliveCfgPdIpAddr
+                  }
+         STATUS      current
+         DESCRIPTION
+             " This Notification indicates if the PD device has 
+               the stop working or no response problem."
+          ::= { dPoeMIBNotifications 4 }
+  
+-- *****************************************************************************
+-- MIB Conformance statements
+-- *****************************************************************************
+    dPoeMIBCompliances  OBJECT IDENTIFIER  ::= { dPoeMIBConformance 1 }
+
+    dPoeMIBGroups  OBJECT IDENTIFIER  ::= { dPoeMIBConformance 2 }   
+    dPoeMIBCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the
+             DLINKSW-POE-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS { 
+            dPoeGroupCfgGroup,
+            dPoeIfCfgGroup,
+            dPoeGroupInfoGroup,
+            dPoeIfInfoGroup,
+            dPoeIfErrorStateNotificationGroup,
+            dPoeIfPdAliveCfgGroup
+        } 
+                        
+        ::= { dPoeMIBCompliances 1 }    
+  
+    dPoeGroupCfgGroup OBJECT-GROUP
+        OBJECTS {
+             dPoeGroupPolicyPreempt,
+             dPoeGroupIfLedMode 
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to configure or display the group-specific PoE information."
+        ::= { dPoeMIBGroups 1 }   
+
+    dPoeIfCfgGroup OBJECT-GROUP
+        OBJECTS {
+             dPoeGroupClearIfStatistic,
+             dPoeIfState,
+             dPoeIfMaxPower,
+             dPoeIfTimeRange,
+             dPoeIfLegacyPdEnabled
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects configure or display the ports information."
+        ::= { dPoeMIBGroups 2 } 	 
+	    
+    dPoeGroupInfoGroup OBJECT-GROUP
+        OBJECTS {
+             dPoeGroupMaxPorts,
+             dPoeGroupHWVersion,
+             dPoeGroupSWVersion 
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects display the groups information."
+        ::= { dPoeMIBGroups 3 } 	
+
+    dPoeIfInfoGroup OBJECT-GROUP
+        OBJECTS {
+             dPoeIfDetectStatus,
+             dPoeIfFaultyType,
+             dPoeIfVoltage,
+             dPoeIfCurrent,
+             dPoeIfTemperature,
+             dPoeIfPower
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects display the ports information."
+        ::= { dPoeMIBGroups 4 } 
+
+    dPoeIfErrorStateNotificationGroup NOTIFICATION-GROUP
+     NOTIFICATIONS { dPoeIfPowerDeniedNotification,  
+                      dPoeIfPowerOverLoadNotification,
+                      dPoeIfPowerShortCircuitNotification
+		    }
+    STATUS           current
+    DESCRIPTION  "A collection of objects provides ports error state notifications."
+      ::= { dPoeMIBGroups 5 }	 
+
+    dPoeIfPdAliveCfgGroup OBJECT-GROUP
+        OBJECTS {
+                 dPoeIfPdAliveCfgState,
+                 dPoeIfPdAliveCfgPdIpType,
+                 dPoeIfPdAliveCfgPdIpAddr,
+                 dPoeIfPdAliveCfgInterval,
+                 dPoeIfPdAliveCfgRetry,
+                 dPoeIfPdAliveCfgWaitTime,
+                 dPoeIfPdAliveCfgAction
+         }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects display the PD alive check configuration."
+        ::= { dPoeMIBGroups 6 }
+  
+END          

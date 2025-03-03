@@ -1,0 +1,3 @@
+modules:
+  os:
+    sysDescr_regex: '/(Samsung )+(?<hardware>.*?)( Series)?; ?V?(?<version>[\d.]+).*S\/N (?<serial>\S+)/'

@@ -1,0 +1,86 @@
+-- ============================================================================
+
+-- Support dropped in 6.0
+
+--
+-- Extreme Virtual Chassis objects
+--
+
+EXTREME-VC-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY FROM SNMPv2-SMI
+		OBJECT-TYPE     FROM SNMPv2-SMI
+                TruthValue      FROM SNMPv2-TC
+		ifIndex         FROM RFC1213-MIB
+                extremeAgent    FROM EXTREME-BASE-MIB;
+
+        extremeVC MODULE-IDENTITY
+                LAST-UPDATED "9801090000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme Virtual Chassis objects"
+        ::= { extremeAgent 5 }
+
+--
+-- Virtual Chassis Link Table
+-- 
+
+        extremeVCLinkTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeVCLinkEntry
+		MAX-ACCESS  not-accessible
+		STATUS deprecated
+		DESCRIPTION
+                      "A table of information about any neighbouring
+                       Extreme Virtual Chassis device. Only contains 
+                       valid data for ports that are configured to 
+                       have extremePortSummitlinkAdminMode set to
+                       summitlinkOnly have an active link or 
+		       have had an active link since the last time 
+		       they were configured in Summitlink mode."
+	::= { extremeVC 1 }
+
+	extremeVCLinkEntry OBJECT-TYPE
+		SYNTAX  ExtremeVCLinkEntry
+		MAX-ACCESS  not-accessible
+		STATUS deprecated
+		DESCRIPTION
+                      "Neighbour information for a single Summitlink
+                       Port."
+                INDEX { ifIndex }
+	::= { extremeVCLinkTable 1 }
+
+        ExtremeVCLinkEntry ::=  SEQUENCE {
+		extremeVCLinkValid     TruthValue,
+                extremeVCLinkDeviceId  INTEGER,
+                extremeVCLinkPortIndex INTEGER
+        } 
+
+        extremeVCLinkValid OBJECT-TYPE 
+                SYNTAX TruthValue
+                MAX-ACCESS  read-only
+                STATUS deprecated
+                DESCRIPTION
+                      "Flag indicating whether other columns of this
+                      table contain data."
+	::= { extremeVCLinkEntry 1 }
+
+        extremeVCLinkDeviceId OBJECT-TYPE 
+                SYNTAX INTEGER
+                MAX-ACCESS  read-only
+                STATUS deprecated
+                DESCRIPTION
+                      "ID of the current SummitVC device
+                        connected to this Summitlink port."
+	::= { extremeVCLinkEntry 2 }
+
+        extremeVCLinkPortIndex OBJECT-TYPE
+                SYNTAX INTEGER
+                MAX-ACCESS  read-only
+                STATUS deprecated
+                DESCRIPTION
+                      "The Summitlink subchannel number that the Summit 
+                        device on the other side of the neighbouring 
+                        SummitVC will use to reach this device."
+	::= { extremeVCLinkEntry 3 }
+END

@@ -1,0 +1,89 @@
+-- file: SNMPv2-TC.my
+-- Changes:
+--      Converted to SMICng format.
+--      Removed unused imports of ObjectSyntax.
+--      Changed starting column of description text for
+--      DateAndTime and RowStatus.
+-- dperkins@scruznet.com    
+
+
+SWITCH-TC DEFINITIONS ::= BEGIN 
+IMPORTS    
+	TEXTUAL-CONVENTION FROM SNMPv2-TC;
+PortList ::= TEXTUAL-CONVENTION
+    	STATUS      current
+    	DESCRIPTION
+        	"Each octet within this value specifies a set of eight
+        	ports, with the first octet specifying ports 1 through
+        	8, the second octet specifying ports 9 through 16, etc.
+        	Within each octet, the most significant bit represents
+        	the lowest numbered port, and the least significant bit
+        	represents the highest numbered port.  Thus, each port
+        	of the bridge is represented by a single bit within the
+        	value of this object.  If that bit has a value of '1'
+        	then that port is included in the set of ports; the port
+        	is not included if its bit has a value of '0'."
+    	SYNTAX      OCTET STRING (SIZE (32))
+
+Vlanset ::= TEXTUAL-CONVENTION
+    	STATUS      current
+    	DESCRIPTION
+        	"Each octet within this value specifies a set of eight
+        	vlans, with the first octet specifying vlan 1 through
+        	8, the second octet specifying vlan 9 through 16, etc.
+        	Within each octet, the most significant bit represents
+        	the lowest numbered vlan, and the least significant bit
+        	represents the highest numbered vlan.  Thus, each vlan
+        	is represented by a single bit within the value of this 
+        	object.  If that bit has a value of '1' then that vlan 
+        	is included in the set of vlans; the vlan is not included 
+        	if its bit has a value of '0'."
+    	SYNTAX    OCTET STRING (SIZE (512))  
+    	
+EnableVar ::= TEXTUAL-CONVENTION
+    	STATUS      current
+    	DESCRIPTION
+        	"enable or disable a function."
+    	SYNTAX    INTEGER {enable(1),disable(2)}  
+
+ClearVar ::= TEXTUAL-CONVENTION
+    	STATUS      current
+    	DESCRIPTION
+        	"clear the statistic."
+    	SYNTAX    INTEGER {clear(1)}  
+	
+DateAndTime ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2d-1d-1d,1d:1d:1d.1d,1a1d:1d"
+    STATUS       current     
+    DESCRIPTION
+            "A date-time specification.
+
+            field  octets  contents                  range
+            -----  ------  --------                  -----
+              1      1-2   year                      0..65536
+              2       3    month                     1..12
+              3       4    day                       1..31
+              4       5    hour                      0..23
+              5       6    minutes                   0..59
+              6       7    seconds                   0..60
+                           (use 60 for leap-second)
+              7       8    deci-seconds              0..9
+              8       9    direction from UTC        '+' / '-'
+              9      10    hours from UTC            0..11
+             10      11    minutes from UTC          0..59
+
+            For example, Tuesday May 26, 1992 at 1:30:15 PM EDT would be
+            displayed as:
+
+                             1992-5-26,13:30:15.0,-4:0
+
+            Note that if only local time is known, then timezone
+            information (fields 8-10) is not present."
+    SYNTAX       OCTET STRING (SIZE (11))
+ 
+ObjName ::= TEXTUAL-CONVENTION
+   	STATUS      current
+   	DESCRIPTION
+       	"the object name."
+    SYNTAX    OCTET STRING (SIZE (16))      
+END

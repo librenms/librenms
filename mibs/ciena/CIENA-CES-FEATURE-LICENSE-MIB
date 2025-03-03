@@ -1,0 +1,513 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+                       
+ --
+ -- CIENA-CES-FEATURE-LICENSE-MIB.my
+ --
+ --
+
+ CIENA-CES-FEATURE-LICENSE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+     	
+   Unsigned32, NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY			
+	    FROM SNMPv2-SMI			
+    DisplayString
+        FROM SNMPv2-TC	
+   cienaGlobalSeverity, cienaGlobalMacAddress
+   		FROM CIENA-GLOBAL-MIB    
+   cienaCesNotifications, cienaCesConfig
+        FROM CIENA-SMI
+   cienaCesModuleChassisIndx, cienaCesModuleShelfIndx,cienaCesModuleSlotIndx 
+    	FROM CIENA-CES-MODULE-MIB;                                                        
+	
+	
+ cienaCesFeatureLicenseMIB MODULE-IDENTITY
+          LAST-UPDATED "201706070000Z"
+          ORGANIZATION "Ciena Corp."
+          CONTACT-INFO
+          "   Mib Meister
+              7035 Ridge Road
+              Hanover, Maryland 21076
+              USA
+              Phone:  +1 800 921 1144
+              Email:  support@ciena.com"
+
+	      DESCRIPTION
+		       "This module defines the software license configuration objects and also the objects required for
+		       software license related notifications."
+
+          REVISION "201706070000Z"
+          DESCRIPTION 
+          		"Updated contact info."
+
+          REVISION "201311040000Z"
+          DESCRIPTION
+          		"Added cienaCesPremiumFeatureLicenseDomainName to cienaCesPremiumFeatureLicenseNotInstalledNotification.
+          		 Added cienaCesPremiumFeatureLicenseDomainName to cienaCesPremiumFeatureLicensePartialStatusNotification.
+          		 Added cienaCesPremiumFeatureLicenseDomainName to cienaCesPremiumFeatureLicenseInstalledNotification.
+          		 Added cienaCesPremiumFeatureLicenseDomainName to cienaCesPremiumFeatureLicenseUsageViolationNotification."
+
+          REVISION "201102100000Z"
+          DESCRIPTION 
+          		"Added Software License cienaCesPremiumFeatureLicenseStatusTable, cienaCesPremiumFeatureLicenseSystemTable and 
+          		 cienaCesPremiumFeatureLicensePoolTable.
+          		 Added cienaCesPremiumFeatureLicenseInstalledNotification and cienaCesPremiumFeatureLicenseUsageViolationNotification"
+
+          ::= { cienaCesConfig 11 }
+            
+
+ --
+ -- Node definitions
+ --
+	
+ cienaCesFeatureLicenseMIBObjects OBJECT IDENTIFIER ::= { cienaCesFeatureLicenseMIB 1 }
+ 
+ 
+ --
+ -- Premium Feature License Node
+ --
+ cienaCesPremiumFeatureLicense OBJECT IDENTIFIER ::= { cienaCesFeatureLicenseMIBObjects 1 }
+ cienaCesPremiumFeatureLicenseNotifAttrs        OBJECT IDENTIFIER ::= { cienaCesFeatureLicenseMIBObjects 2 }
+ 
+ -- Notifications 
+  
+ cienaCesFeatureLicenseMIBNotificationPrefix OBJECT IDENTIFIER ::= { cienaCesNotifications 11 }
+ 
+ cienaCesFeatureLicenseMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { cienaCesFeatureLicenseMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ cienaCesFeatureLicenseMIBConformance OBJECT IDENTIFIER ::= { cienaCesFeatureLicenseMIB 3 }
+ cienaCesFeatureLicenseMIBCompliances OBJECT IDENTIFIER ::= { cienaCesFeatureLicenseMIBConformance 1 } 		
+ cienaCesFeatureLicenseMIBGroups      OBJECT IDENTIFIER ::= { cienaCesFeatureLicenseMIBConformance 2 }
+
+ --
+ -- Scalar Attributes
+ --             
+ cienaCesPremiumFeatureStatusTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesPremiumFeatureStatusEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of premium features and the operational status of each."
+     ::= { cienaCesPremiumFeatureLicense 1 }
+		
+ cienaCesPremiumFeatureStatusEntry OBJECT-TYPE
+     SYNTAX     CienaCesPremiumFeatureStatusEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "Each entry represents a premium feature."
+     INDEX { cienaCesPremiumFeatureId }
+           ::= { cienaCesPremiumFeatureStatusTable 1 }
+ 
+ CienaCesPremiumFeatureStatusEntry ::=  SEQUENCE { 
+      cienaCesPremiumFeatureId                   INTEGER,
+      cienaCesPremiumFeatureName                 DisplayString,
+      cienaCesPremiumFeatureOperStatus           INTEGER
+ } 
+ cienaCesPremiumFeatureId OBJECT-TYPE
+     SYNTAX       INTEGER            
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the unique ID assigned to each premium feature requiring
+             a license. It is the index into the table."
+     ::= { cienaCesPremiumFeatureStatusEntry 1 }
+
+ cienaCesPremiumFeatureName OBJECT-TYPE
+     SYNTAX       DisplayString 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the name of a premium feature."
+     ::= { cienaCesPremiumFeatureStatusEntry 2 }
+
+ cienaCesPremiumFeatureOperStatus OBJECT-TYPE
+     SYNTAX        INTEGER {
+					     unknown(0),
+                         disabled(1),
+                    	 restrictedUse(2),
+                         fullyActive(3),
+                         someLicenseKeyMissing(4),
+                         licenseViolation(5)
+                      	}
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the operational status of the premium feature."
+  
+     ::= { cienaCesPremiumFeatureStatusEntry 3 } 
+  
+ --
+ -- Premium feature licenses operational status
+ --             
+ cienaCesPremiumFeatureLicenseStatusTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesPremiumFeatureLicenseStatusEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "Table of premium features and the operational status of each."
+     ::= {cienaCesPremiumFeatureLicense 2  }
+      
+ cienaCesPremiumFeatureLicenseStatusEntry OBJECT-TYPE
+     SYNTAX     CienaCesPremiumFeatureLicenseStatusEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "Each entry represents a premium feature license."
+     INDEX { cienaCesPremiumFeatureLicenseIndex}
+           ::= { cienaCesPremiumFeatureLicenseStatusTable 1 }
+ 
+ CienaCesPremiumFeatureLicenseStatusEntry ::=  SEQUENCE { 
+     cienaCesPremiumFeatureLicenseIndex          Unsigned32,
+     cienaCesPremiumFeatureLicenseName           DisplayString,
+     cienaCesPremiumFeatureLicenseDomainName     DisplayString,
+     cienaCesPremiumFeatureLicenseOperStatus     INTEGER
+ }
+
+ cienaCesPremiumFeatureLicenseIndex OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+            "Unique ID assigned to each premium feature requiring
+             a license. It is part of index to the table."
+     ::= { cienaCesPremiumFeatureLicenseStatusEntry 1 } 
+  
+
+ cienaCesPremiumFeatureLicenseName OBJECT-TYPE
+     SYNTAX       DisplayString 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The name of a premium feature."
+     ::= { cienaCesPremiumFeatureLicenseStatusEntry 2 }  
+ 
+  cienaCesPremiumFeatureLicenseDomainName OBJECT-TYPE
+     SYNTAX       DisplayString 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The domain name of a premium feature."
+     ::= { cienaCesPremiumFeatureLicenseStatusEntry 3 }  
+    
+
+ cienaCesPremiumFeatureLicenseOperStatus OBJECT-TYPE
+     SYNTAX       INTEGER {
+     				    infoNotAvailable(1),
+                        notInstalled(2),
+                        installed(3),
+                        partial(4),
+                        noBaseLic(5)
+ 	 }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "Premium feature license operational status:
+            infoNotAvailable: Licensing information is not applicable or does
+               not apply to the platform.
+            notInstalled: referred to as an invalid license. This means that
+               none of the operationally enabled modules has a key installed
+               for this license.
+            installed: referred to as a valid license. This means that all 
+               of the operationally enabled modules have a key installed for 
+               this license and all conditional requirements for such license
+               installation have been satisfied.
+            partial: referred to as a partial License. This means that one 
+               or more, but not all, operationally enabled modules have a key
+               installed for this license.
+            noBasicLic: Requires Basic or Carrier License. This means the 
+               feature has its key installed into all operationally enabled
+               modules however such feature is not considered installed, or 
+               valid, because the Basic Edition or Carrier Edition license
+               is not installed, or valid. "
+  ::= { cienaCesPremiumFeatureLicenseStatusEntry 4 }  
+    
+
+ --
+ -- Installed Premium feature licenses in the system
+ --             
+ cienaCesPremiumFeatureLicenseSystemTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesPremiumFeatureLicenseSystemEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "Table of installed premium features and the operational status of each."
+     ::= { cienaCesPremiumFeatureLicense 3}
+      
+ cienaCesPremiumFeatureLicenseSystemEntry OBJECT-TYPE
+     SYNTAX     CienaCesPremiumFeatureLicenseSystemEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "Each entry represents an installed premium feature license."
+     INDEX {cienaCesPremiumFeatureLicenseSystemIndex}
+            ::= { cienaCesPremiumFeatureLicenseSystemTable 1 }
+ 
+ CienaCesPremiumFeatureLicenseSystemEntry ::=  SEQUENCE {
+ 	 cienaCesPremiumFeatureLicenseSystemIndex			Unsigned32,
+ 	 cienaCesPremiumFeatureLicenseSystemLicenseName     DisplayString,
+     cienaCesPremiumFeatureLicenseSystemDomainName     	DisplayString,
+     cienaCesPremiumFeatureLicenseSystemAdminId        	INTEGER,
+     cienaCesPremiumFeatureLicenseSystemSequenceNumber 	Unsigned32,
+     cienaCesPremiumFeatureLicenseSystemDaysRemaining  	INTEGER,
+     cienaCesPremiumFeatureLicenseSystemLicenseKey      DisplayString
+    }     
+  
+ cienaCesPremiumFeatureLicenseSystemIndex	OBJECT-TYPE
+ 	SYNTAX	Unsigned32
+ 	MAX-ACCESS not-accessible
+ 	STATUS	current
+ 	DESCRIPTION
+ 		"Unique value, also used as index in the table."
+ 	::= { cienaCesPremiumFeatureLicenseSystemEntry 1 }
+ 
+ cienaCesPremiumFeatureLicenseSystemLicenseName OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The name of this installed premium feature license."
+     ::= { cienaCesPremiumFeatureLicenseSystemEntry 2 } 
+
+ cienaCesPremiumFeatureLicenseSystemDomainName OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The name of the license domain of which this installed premium feature is a member."
+     ::= { cienaCesPremiumFeatureLicenseSystemEntry 3 }
+    
+ cienaCesPremiumFeatureLicenseSystemAdminId OBJECT-TYPE
+     SYNTAX       INTEGER 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The installed premium feature license administrator unique ID."
+     ::= { cienaCesPremiumFeatureLicenseSystemEntry 4 }    
+     
+ cienaCesPremiumFeatureLicenseSystemSequenceNumber OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Premium feature license sequence number."
+     ::= { cienaCesPremiumFeatureLicenseSystemEntry 5 }   
+ 
+
+ cienaCesPremiumFeatureLicenseSystemDaysRemaining OBJECT-TYPE
+     SYNTAX       INTEGER 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Days remaining for this installed premium feature license."
+     ::= { cienaCesPremiumFeatureLicenseSystemEntry 6 }
+     
+   cienaCesPremiumFeatureLicenseSystemLicenseKey OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the installed license key string for this installed premium feature.
+              This object returns zero length if this feature is not installed."
+     ::= { cienaCesPremiumFeatureLicenseSystemEntry 7 }
+     
+  
+ -- Premium feature licenses in the POOL 
+ 
+  cienaCesPremiumFeatureLicensePoolTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesPremiumFeatureLicensePoolEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "Table of installed premium features and the operational status of each."
+     ::= { cienaCesPremiumFeatureLicense 4}
+      
+ cienaCesPremiumFeatureLicensePoolEntry OBJECT-TYPE
+     SYNTAX     CienaCesPremiumFeatureLicensePoolEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "Each entry represents an installed premium feature license."
+     INDEX {cienaCesPremiumFeatureLicensePoolIndex }
+     ::= { cienaCesPremiumFeatureLicensePoolTable 1 }
+ 
+ CienaCesPremiumFeatureLicensePoolEntry ::=  SEQUENCE {
+ 	 cienaCesPremiumFeatureLicensePoolIndex 					INTEGER,
+ 	 cienaCesPremiumFeatureLicensePoolLicenseName          		DisplayString,
+ 	 cienaCesPremiumFeatureLicensePoolDomainName     			DisplayString,
+     cienaCesPremiumFeatureLicensePoolAdminId     		   		INTEGER,
+     cienaCesPremiumFeatureLicensePoolSequenceNumber  			Unsigned32,
+     cienaCesPremiumFeatureLicensePoolDaysRemaining  			INTEGER,
+     cienaCesPremiumFeatureLicensePoolLicenseKey       			DisplayString
+  }
+ 
+ cienaCesPremiumFeatureLicensePoolIndex	OBJECT-TYPE
+ 	SYNTAX	INTEGER
+ 	MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+             "Index in the system license table."
+     ::= { cienaCesPremiumFeatureLicensePoolEntry 1 }
+     
+ cienaCesPremiumFeatureLicensePoolLicenseName OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The name of this installed premium feature license."
+     ::= { cienaCesPremiumFeatureLicensePoolEntry 2 } 
+ 
+  cienaCesPremiumFeatureLicensePoolDomainName OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The name of the license domain of which this installed premium feature is a member."
+     ::= { cienaCesPremiumFeatureLicensePoolEntry 3 }
+
+ cienaCesPremiumFeatureLicensePoolAdminId OBJECT-TYPE
+     SYNTAX       INTEGER 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The installed premium feature license administrator unique ID."
+     ::= { cienaCesPremiumFeatureLicensePoolEntry 4 }    
+ 
+ cienaCesPremiumFeatureLicensePoolSequenceNumber OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Premium feature license sequence number."
+     ::= { cienaCesPremiumFeatureLicensePoolEntry 5 } 
+ 
+ cienaCesPremiumFeatureLicensePoolDaysRemaining OBJECT-TYPE
+     SYNTAX       INTEGER 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Days remaining for this installed premium feature license."
+     ::= { cienaCesPremiumFeatureLicensePoolEntry 6 }
+     
+ cienaCesPremiumFeatureLicensePoolLicenseKey OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Specifies the installed license key string for this installed premium feature.
+              This object returns zero length if this feature is not installed."
+     ::= { cienaCesPremiumFeatureLicensePoolEntry 7 }
+     
+ 
+ --
+ -- Notifications
+ --      
+ 
+ cienaCesPremiumFeatureLicenseInstallUnsuccessfulReason OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+           "This object represents the status of an install operation.
+            This object is included in the cienaCesPremiumFeatureLicenseInstallErrorNotification
+            upon an unsuccessful installation."
+        ::= { cienaCesPremiumFeatureLicenseNotifAttrs 1 } 
+
+ cienaCesPremiumFeatureLicenseNotInstalledNotification NOTIFICATION-TYPE
+     OBJECTS      { 
+		          cienaGlobalSeverity,
+        		  cienaGlobalMacAddress,
+                  cienaCesPremiumFeatureLicenseName,
+                  cienaCesPremiumFeatureLicenseOperStatus,
+                  cienaCesPremiumFeatureLicenseDomainName
+                  }
+     STATUS    current
+     DESCRIPTION
+        "This notification is sent when a premium feature license is uninstalled from the system.
+         To enable the device to send this trap, cienaCesFeatureLicenseStatusTrapState needs to 
+         be set to enabled. The cienaCesFeatureLicenseStatusTrapState is enabled by default. 
+         Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+         cienaCesPremiumFeatureLicenseName, cienaCesPremiumFeatureLicenseOperStatus,
+         and cienaCesPremiumFeatureLicenseDomainName."
+     ::= { cienaCesFeatureLicenseMIBNotifications 1 }
+
+ cienaCesPremiumFeatureLicensePartialStatusNotification NOTIFICATION-TYPE
+     OBJECTS      { 
+		          cienaGlobalSeverity,
+        		  cienaGlobalMacAddress,
+                  cienaCesPremiumFeatureLicenseName,
+                  cienaCesPremiumFeatureLicenseOperStatus,
+                  cienaCesPremiumFeatureLicenseDomainName
+                  }
+     STATUS    current
+     DESCRIPTION
+        "This notification is sent when there are fewer licenses available in the pool. 
+         To enable the device to send this trap, cienaCesFeatureLicenseStatusTrapState 
+         needs to be set to enabled. The cienaCesFeatureLicenseStatusTrapState is enabled
+         by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress,
+         cienaCesPremiumFeatureLicenseName, cienaCesPremiumFeatureLicenseOperStatus,
+         and cienaCesPremiumFeatureLicenseDomainName."
+::= { cienaCesFeatureLicenseMIBNotifications 2 }
+
+
+ cienaCesPremiumFeatureLicenseInstallErrorNotification NOTIFICATION-TYPE
+       OBJECTS      { 
+		        	cienaGlobalSeverity,
+        		  	cienaGlobalMacAddress,
+                    cienaCesModuleChassisIndx,
+                    cienaCesModuleShelfIndx,
+                    cienaCesModuleSlotIndx,
+                    cienaCesPremiumFeatureLicenseInstallUnsuccessfulReason
+                    }
+        STATUS    current
+        DESCRIPTION
+             "This notification is sent when there was an unsuccessful installation
+              of a premium feature license on the slot. To enable the device to send 
+              this trap, cienaCesFeatureLicenseInstallErrorTrapState needs to be set
+              to enabled. The cienaCesFeatureLicenseInstallErrorTrapState is enabled 
+              by default. Variable bindings include: cienaGlobalSeverity, 
+              cienaGlobalMacAddress,cienaCesModuleChassisIndx, cienaCesModuleShelfIndx,
+              cienaCesModuleSlotIndx, and cienaCesPremiumFeatureLicenseInstallUnsuccessfulReason."
+        ::= { cienaCesFeatureLicenseMIBNotifications 3 } 
+ 
+ cienaCesPremiumFeatureLicenseInstalledNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+ 			cienaGlobalSeverity,
+ 			cienaGlobalMacAddress, 
+ 			cienaCesPremiumFeatureLicenseName,
+ 			cienaCesPremiumFeatureLicenseOperStatus,
+ 			cienaCesPremiumFeatureLicenseDomainName
+ 		}
+ 	STATUS    current
+    DESCRIPTION
+    	"This notification is sent when a premium feature license is installed on the system.
+    	 To enable the device to send this trap, cienaCesFeatureLicenseStatusTrapState needs to 
+         be set to enabled. The cienaCesFeatureLicenseStatusTrapState is enabled by default.  
+    	 Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+    	 cienaCesPremiumFeatureLicenseName, cienaCesPremiumFeatureLicenseOperStatus,
+    	 and cienaCesPremiumFeatureLicenseDomainName."
+    ::= { cienaCesFeatureLicenseMIBNotifications 4 }   
+ 
+ cienaCesPremiumFeatureLicenseUsageViolationNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+ 			cienaGlobalSeverity,
+ 			cienaGlobalMacAddress, 
+ 			cienaCesPremiumFeatureLicenseName,
+ 			cienaCesPremiumFeatureLicenseOperStatus,
+ 			cienaCesPremiumFeatureLicenseDomainName
+ 		}
+ 	STATUS    current
+    DESCRIPTION
+    	"This notification is sent whenever there is license usage violation.
+    	To enable the device to send this trap, cienaCesFeatureLicenseStatusTrapState 
+    	needs to be set to enabled. The cienaCesFeatureLicenseStatusTrapState is enabled
+    	by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress,
+    	cienaCesPremiumFeatureLicenseName, cienaCesPremiumFeatureLicenseOperStatus,
+    	and cienaCesPremiumFeatureLicenseDomainName."
+    ::= { cienaCesFeatureLicenseMIBNotifications 5 }   
+ 
+ 
+ END

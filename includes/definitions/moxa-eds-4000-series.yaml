@@ -1,0 +1,11 @@
+os: moxa-eds-4000-series
+icon: moxa
+text: Moxa-EDS-4000-Series
+type: network
+over:
+    - { graph: device_power, text: 'Power Consumption' }
+mib_dir: moxa
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8691.600.

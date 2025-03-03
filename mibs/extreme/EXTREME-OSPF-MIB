@@ -1,0 +1,78 @@
+-- ################################################################################
+
+
+EXTREME-OSPF-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY         FROM SNMPv2-SMI
+        OBJECT-TYPE             FROM SNMPv2-SMI
+        TruthValue              FROM SNMPv2-TC
+        RowStatus               FROM SNMPv2-TC
+        extremeAgent            FROM EXTREME-BASE-MIB
+        extremeVlanIfIndex      FROM EXTREME-VLAN-MIB
+        IpAddress               FROM SNMPv2-SMI;
+
+
+    extremeOspf MODULE-IDENTITY
+        LAST-UPDATED "200502140000Z"
+        ORGANIZATION "Extreme Networks, Inc."
+        CONTACT-INFO "www.extremenetworks.com"
+        DESCRIPTION "Extreme specific OSPF information"
+    ::= { extremeAgent 15 }
+
+
+    extremeOspfInterfaceTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeOspfInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains Extreme Networks specific information 
+            about OSPF interfaces."
+        ::= { extremeOspf 1 }
+
+    extremeOspfInterfaceEntry   OBJECT-TYPE
+        SYNTAX  ExtremeOspfInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry in the table containing Extreme Networks specific 
+            OSPF interface information."
+        INDEX {extremeVlanIfIndex}
+        ::= {extremeOspfInterfaceTable 1}
+
+    ExtremeOspfInterfaceEntry ::= SEQUENCE {
+                extremeOspfAreaId               IpAddress,
+        extremeOspfInterfacePassive TruthValue,
+                extremeOspfInterfaceStatus      RowStatus
+    }
+
+        extremeOspfAreaId OBJECT-TYPE
+            SYNTAX   IpAddress
+            MAX-ACCESS   read-write
+            STATUS   current
+            DESCRIPTION
+               "A 32-bit integer uniquely identifying an area.
+               Area ID 0.0.0.0 is used for the OSPF backbone."
+          ::= { extremeOspfInterfaceEntry 1 }
+
+
+
+    extremeOspfInterfacePassive OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates whether the OSPF interface on this Vlan is
+            Passive or not. Passive interfaces do not send routing
+            updates. A true value indicates that the interface is passive."
+        ::= { extremeOspfInterfaceEntry 2 }
+
+    extremeOspfInterfaceStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The row status variable, used according to
+                        row installation and removal conventions."
+        ::= { extremeOspfInterfaceEntry 3 }
+
+END

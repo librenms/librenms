@@ -1,0 +1,136 @@
+-- *****************************************************************
+-- TN-DEV-AGGREGATION-MIB
+--
+-- Copyright (c) 2012, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+TN-DEV-AGGREGATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, Unsigned32 FROM SNMPv2-SMI
+    RowStatus FROM SNMPv2-TC
+    entPhysicalIndex FROM ENTITY-MIB
+    PortList FROM Q-BRIDGE-MIB
+    tnDevMgmt FROM TN-MGMT-MIB;
+
+tnDevAggregation        OBJECT IDENTIFIER ::= { tnDevMgmt 38 }
+
+--
+-- MIB variables
+--
+
+--
+-- tnDevAggrModeCfgTable
+--
+tnDevAggrModeCfgTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnDevAggrModeCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "Aggregation Mode Configuration"
+    ::= { tnDevAggregation 1 }
+
+tnDevAggrModeCfgEntry OBJECT-TYPE
+    SYNTAX        TnDevAggrModeCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    ""
+    INDEX { entPhysicalIndex }
+    ::= { tnDevAggrModeCfgTable 1 }
+
+TnDevAggrModeCfgEntry ::= SEQUENCE {
+    tnDevAggrModeSmac             INTEGER,
+    tnDevAggrModeDmac             INTEGER,
+    tnDevAggrModeSipDip           INTEGER,
+    tnDevAggrModeSportDport       INTEGER,
+    }
+
+tnDevAggrModeSmac  OBJECT-TYPE
+    SYNTAX       INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Source MAC address can be used to calculate the destination port for the frame."
+    ::= { tnDevAggrModeCfgEntry 1 }
+
+tnDevAggrModeDmac  OBJECT-TYPE
+    SYNTAX       INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Destination MAC Address can be used to calculate the destination port for the frame."
+    ::= { tnDevAggrModeCfgEntry 2 }
+
+tnDevAggrModeSipDip  OBJECT-TYPE
+    SYNTAX       INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The IP address can be used to calculate the destination port for the frame."
+    ::= { tnDevAggrModeCfgEntry 3 }
+
+tnDevAggrModeSportDport  OBJECT-TYPE
+    SYNTAX       INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The TCP/UDP port number can be used to calculate the destination port for the frame."
+    ::= { tnDevAggrModeCfgEntry 4 }
+
+--
+-- tnDevAggrGroupCfgTable
+--
+tnDevAggrGroupCfgTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnDevAggrGroupCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "Aggregation Group Configuration"
+    ::= { tnDevAggregation 2 }
+
+tnDevAggrGroupCfgEntry OBJECT-TYPE
+    SYNTAX        TnDevAggrGroupCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    ""
+    INDEX { tnDevAggrGroupId }
+    ::= { tnDevAggrGroupCfgTable 1 }
+
+TnDevAggrGroupCfgEntry ::= SEQUENCE {
+    tnDevAggrGroupId                Unsigned32,
+    tnDevAggrGroupPortMember        PortList,
+    tnDevAggrGroupRowStatus         RowStatus
+    }
+
+tnDevAggrGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates the group ID for the settings contained in the entry."
+    ::= { tnDevAggrGroupCfgEntry 1 }
+
+tnDevAggrGroupPortMember OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the port member of the entry."
+    ::= { tnDevAggrGroupCfgEntry 2 }
+
+tnDevAggrGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of the entry, and is used to create and delete entries in this table."
+    ::= { tnDevAggrGroupCfgEntry 3 }
+
+--
+-- Notifications
+--
+
+END

@@ -1,0 +1,621 @@
+AE-ALARM-TABLE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MacAddress
+        FROM SNMPv2-TC
+
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    MODULE-IDENTITY,
+    Unsigned32,
+    Integer32,
+    IpAddress
+        FROM SNMPv2-SMI
+
+    calixNetworks,
+    calixRegistrations,
+    calixProducts,
+    calixModules
+        FROM CALIX-SMI
+
+    AeEquipmentType,
+    AeEquipmentInstance,
+    AeAlarmType,
+    AeCondStatus,
+    AeCondSeverityLevel,
+    AeCondServiceAffecting,
+    AeTime,
+    AeBriefText,
+    AeText,
+    AeFsanSerialNumber,
+    AeMfgSerialNumber,
+    AeSnmpVersion,
+    AeOntModelNum,
+    AeOntFirmwareVersion,
+    AeOntRegistrationPeriod,
+    AeOntState,
+    AeRegistrationID,
+    AeDeviceClass,
+    AeConfigMethod,
+    AeConfigFilename,
+    AeConfigFileMarker,
+    AeConfigMIC,
+    AeDeviceStatus,
+    AeConfigStatus
+        FROM AE-TC
+    ;
+
+-- ******************************************************************************
+--
+--        GX OID Sstructure
+--
+-- ******************************************************************************
+
+    pSeries OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The definitive identifier of the Calix Networks Active Ethernet ONT"
+    ::= { calixProducts 5 }
+
+    aeModules OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Sub-tree to register the values assigned to the GX ONT modules with the
+        MODULE-IDENTITY construct."
+    ::= { pSeries 1 }
+
+    aeNotificationModule MODULE-IDENTITY
+        LAST-UPDATED "200808270000Z"
+        ORGANIZATION "Calix"
+        CONTACT-INFO
+            "Calix"
+    DESCRIPTION
+        "Describes all the notifications related to Calix Active Ethernet ONT product."
+    ::= { aeModules 1 }
+
+    aeNotification OBJECT IDENTIFIER ::= { pSeries 2 }
+    aeNotificationObjects OBJECT IDENTIFIER ::= { aeNotification 1 }
+
+    aeNotifications       OBJECT IDENTIFIER ::= { aeNotification 2 }
+
+    aeAlarms              OBJECT IDENTIFIER ::= { pSeries 3 }
+
+    aeOnt                 OBJECT IDENTIFIER ::= { pSeries 4 }
+
+--    aePmModule            OBJECT IDENTIFIER ::= { pSeries 5 }
+
+-- *******************************************************************************
+--
+--        GX ONT
+--
+-- *******************************************************************************
+
+-------------------------------------------------------------------------------
+
+aeOntMIBVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the current MIB version.
+         History log:
+         Version 1: Initial version.
+         Version 2: AE release 2.0
+                    T1 and PWE3 alarms added.
+                    T1 and PWE3 PM MIBs added."
+    ::= { aeOnt 1 }
+
+aeOntModelNum OBJECT-TYPE
+    SYNTAX      AeOntModelNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object identifies the ONT Model Number."
+    ::= { aeOnt 2 }
+
+aeOntFsanSerNum OBJECT-TYPE
+    SYNTAX      AeFsanSerialNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object identifies the FSAN serial number."
+    ::= { aeOnt 3 }
+
+aeOntFirmwareVersion OBJECT-TYPE
+    SYNTAX      AeOntFirmwareVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the firmware version
+         currently running on the ONT."
+    ::= { aeOnt 4 }
+
+aeOntRegistrationPeriod OBJECT-TYPE
+    SYNTAX      AeOntRegistrationPeriod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the time period (in seconds) between
+         the sending of recurring ONT registraion SNMP traps."
+    ::= { aeOnt 5 }
+
+aeOntReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Write to this object would reinitialize the ONT"
+    ::= { aeOnt 6 }
+
+aeOntRegistrationID OBJECT-TYPE
+    SYNTAX      AeRegistrationID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This object identifies the Registration ID."
+    ::= { aeOnt 7 }
+
+aeOntRegisterState OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Write to this object would transition the ONT to registered state"
+    ::= { aeOnt 8 }
+
+aeOntLabel OBJECT-TYPE
+    SYNTAX      AeBriefText
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The descriptive label assigned to the ONT."
+    ::= { aeOnt 9 }
+
+aeOntConfigMethod OBJECT-TYPE
+    SYNTAX      AeConfigMethod
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT configuration method, i.e. config file, TR69, SNMP, etc"
+    ::= { aeOnt 10 }
+
+aeOntConfigFilename OBJECT-TYPE
+    SYNTAX      AeConfigFilename
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT configuration filename in used"
+    ::= { aeOnt 11 }
+
+aeOntConfigFileMarker OBJECT-TYPE
+    SYNTAX      AeConfigFileMarker
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT configuration filename marker"
+    ::= { aeOnt 12 }
+
+aeOntConfigFileMIC OBJECT-TYPE
+    SYNTAX      AeConfigMIC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT configuration filename message integrity code"
+    ::= { aeOnt 13 }
+
+aeOntPrimaryManagementServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Primary management server IP address"
+    ::= { aeOnt 14 }
+
+aeOntDeviceStatus OBJECT-TYPE
+    SYNTAX      AeDeviceStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device status, i.e., acquired IP address, configured with ONT specific
+                 file, generic file, cached file, etc"
+    ::= { aeOnt 15 }
+
+aeOntConfigStatus OBJECT-TYPE
+    SYNTAX      AeConfigStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Configuration status, i.e., no errors, configured with errors, not configured"
+    ::= { aeOnt 16 }
+
+aeOntManagementVlanId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Management VLAN ID"
+    ::= { aeOnt 17 }
+
+aeOntMfgSerNum OBJECT-TYPE
+    SYNTAX      AeMfgSerialNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object identifies the MFG serial number."
+    ::= { aeOnt 18 }
+
+-- *******************************************************************************
+--
+--        Notification Objects
+--
+-- *******************************************************************************
+
+-- Notification objects for ONT Alarm Traps
+
+aeTrapSequenceNo OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Uniquely identifies each alarm trap that is transmitted by the ONT.
+         The value Increment for each alarm trap that is transmitted.
+         The first trap has a sequence number of one (1)."
+    ::= { aeNotificationObjects 1 }
+
+aeTrapEquipmentType OBJECT-TYPE
+    SYNTAX      AeEquipmentType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The type of physical equipment the ONT Alarm is associated with."
+    ::= { aeNotificationObjects 2 }
+
+aeTrapEquipmentInstance OBJECT-TYPE
+    SYNTAX      AeEquipmentInstance
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The instance of the physical equipment the ONT Alarm is assocaited with."
+    ::= { aeNotificationObjects 3 }
+
+aeTrapAlarmType OBJECT-TYPE
+    SYNTAX      AeAlarmType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The type of the ONT Alarm."
+    ::= { aeNotificationObjects 4 }
+
+aeTrapAlarmStatus OBJECT-TYPE
+    SYNTAX      AeCondStatus
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The status of the ONT alarm - on/off."
+    ::= { aeNotificationObjects 5 }
+
+aeTrapAlarmSeverityLevel OBJECT-TYPE
+    SYNTAX      AeCondSeverityLevel
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The severity level of the ONT Alarm."
+    ::= { aeNotificationObjects 6 }
+
+aeTrapServiceAffecting OBJECT-TYPE
+    SYNTAX      AeCondServiceAffecting
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "This value indicated whether the ONT Alarm is service affecting or not."
+    ::= { aeNotificationObjects 7 }
+
+aeTrapText OBJECT-TYPE
+    SYNTAX      AeText
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "This object contains the brief description about the ONT Alarm."
+    ::= { aeNotificationObjects 8 }
+
+aeTrapTimeStamp OBJECT-TYPE
+    SYNTAX      AeBriefText
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Local time string for the ONT Alarm."
+    ::= { aeNotificationObjects 9 }
+
+aeTrapTime OBJECT-TYPE
+    SYNTAX      AeTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "UTC time integer of the ONT Alarm."
+    ::= { aeNotificationObjects 10 }
+
+-- Notificaiton objects for ONT Registration Traps
+
+aeTrapFsanSerialNumber OBJECT-TYPE
+    SYNTAX      AeFsanSerialNumber
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The FSAN Serial Number of the ONT expressed as 4 charaters and 8 hex digits."
+    ::= { aeNotificationObjects 12 }
+
+aeTrapIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The IP Address assigned to the ONT."
+    ::= { aeNotificationObjects 13 }
+
+aeTrapMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "External MAC Address of the ONT."
+    ::= { aeNotificationObjects 14 }
+
+aeTrapOntState OBJECT-TYPE
+    SYNTAX      AeOntState
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "ONT SNMP provisioning state."
+    ::= { aeNotificationObjects 15 }
+
+aeTrapOntLabel OBJECT-TYPE
+    SYNTAX      AeText
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The descriptive label assigned to the ONT."
+    ::= { aeNotificationObjects 16 }
+
+aeTrapRegistrationID OBJECT-TYPE
+    SYNTAX      AeRegistrationID
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The Registration ID of the ONT expressed as max 10 char numerical string."
+    ::= { aeNotificationObjects 17 }
+
+aeTrapDeviceClass OBJECT-TYPE
+    SYNTAX      AeDeviceClass
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Device class (ONT)"
+    ::= { aeNotificationObjects 18 }
+
+aeTrapDeviceModel OBJECT-TYPE
+    SYNTAX      AeOntModelNum
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Device model, i.e. ONT model number 710GX, etc"
+    ::= { aeNotificationObjects 19 }
+
+aeTrapFirmwareRevision OBJECT-TYPE
+    SYNTAX      AeOntFirmwareVersion
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the firmware version
+         currently running on the ONT."
+    ::= { aeNotificationObjects 20 }
+
+aeTrapConfigMethod OBJECT-TYPE
+    SYNTAX      AeConfigMethod
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "ONT configuration method, i.e. config file, TR69, SNMP, etc"
+    ::= { aeNotificationObjects 21 }
+
+aeTrapConfigFilename OBJECT-TYPE
+    SYNTAX      AeConfigFilename
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "ONT configuration filename in used"
+    ::= { aeNotificationObjects 22 }
+
+aeTrapConfigFileMarker OBJECT-TYPE
+    SYNTAX      AeConfigFileMarker
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "ONT configuration filename marker"
+    ::= { aeNotificationObjects 23 }
+
+aeTrapConfigFileMIC OBJECT-TYPE
+    SYNTAX      AeConfigMIC
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "ONT configuration filename message integrity code"
+    ::= { aeNotificationObjects 24 }
+
+aeTrapPrimaryManagementServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Primary management server IP address"
+    ::= { aeNotificationObjects 25 }
+
+aeTrapDeviceStatus OBJECT-TYPE
+    SYNTAX      AeDeviceStatus
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Device status, i.e., acquired IP address, configured with ONT specific
+                 file, generic file, cached file, etc"
+    ::= { aeNotificationObjects 26 }
+
+aeTrapConfigStatus OBJECT-TYPE
+    SYNTAX      AeConfigStatus
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Configuration status, i.e., no errors, configured with errors, not configured"
+    ::= { aeNotificationObjects 27 }
+
+aeTrapManagementVlanId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Management VLAN ID"
+    ::= { aeNotificationObjects 28 }
+
+aeTrapMfgSerialNumber OBJECT-TYPE
+    SYNTAX      AeMfgSerialNumber
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The MFG Serial Number of the ONT expressed as decimal digits."
+    ::= { aeNotificationObjects 29 }
+
+-- *******************************************************************************
+--
+--        Traps
+--
+-- *******************************************************************************
+aeTrapRegistration NOTIFICATION-TYPE
+    OBJECTS {
+        aeTrapFsanSerialNumber,
+        aeTrapIpAddr,
+        aeTrapMacAddress,
+        aeTrapOntState,
+        aeTrapOntLabel,
+        aeTrapRegistrationID,
+        aeTrapDeviceClass,
+        aeTrapDeviceModel,
+        aeTrapFirmwareRevision,
+        aeTrapConfigMethod,
+        aeTrapConfigFilename,
+        aeTrapConfigFileMarker,
+        aeTrapConfigFileMIC,
+        aeTrapPrimaryManagementServer,
+        aeTrapDeviceStatus,
+        aeTrapConfigStatus,
+        aeTrapManagementVlanId,
+        aeTrapSequenceNo,
+        aeTrapMfgSerialNumber,
+        }
+    STATUS        current
+    DESCRIPTION "aeTrapRegistration is generated periodically after the ONT boots.
+                 It is sent more frequently before it is pinged and slows down afterwards."
+    ::= { aeNotifications 1 }
+
+aeTrapAlarm NOTIFICATION-TYPE
+    OBJECTS {
+        aeTrapSequenceNo,
+        aeTrapEquipmentType,
+        aeTrapEquipmentInstance,
+        aeTrapAlarmType,
+        aeTrapAlarmStatus,
+        aeTrapAlarmSeverityLevel,
+        aeTrapServiceAffecting,
+        aeTrapText,
+        aeTrapTimeStamp,
+        aeTrapTime,
+        aeTrapFsanSerialNumber,
+        aeTrapRegistrationID
+        }
+    STATUS      current
+    DESCRIPTION "aeTrapAlarm is generated whenever an alarm is raised or cleared."
+    ::= { aeNotifications 2 }
+
+-- *******************************************************************************
+--
+--        Alarm Table
+--
+-- *******************************************************************************
+aeAlarmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AeAlarmEntrySeq
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The Current Alarm Table."
+    ::= { aeAlarms 1 }
+
+aeAlarmEntry OBJECT-TYPE
+    SYNTAX      AeAlarmEntrySeq
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Each entry corresponds to one active Alarm."
+    INDEX       { aeAlarmIndex }
+    ::= { aeAlarmTable 1 }
+
+AeAlarmEntrySeq ::=
+    SEQUENCE {
+        aeAlarmIndex
+            INTEGER,
+        aeAlarmSequence
+            Integer32,
+        aeAlarmEquipmentType
+            AeEquipmentType,
+        aeAlarmEquipmentInstance
+            AeEquipmentInstance,
+        aeAlarmAlarmType
+            AeAlarmType,
+        aeAlarmStatus
+            AeCondStatus,
+        aeAlarmSeverityLevel
+            AeCondSeverityLevel,
+        aeAlarmServiceAffecting
+            AeCondServiceAffecting,
+        aeAlarmTimeStamp
+            AeBriefText,
+        aeAlarmTime
+            AeTime,
+        aeAlarmText
+            AeBriefText
+    }
+
+aeAlarmIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The ONT's Alarm Identifier index number"
+    ::= { aeAlarmEntry 1 }
+
+aeAlarmSequence OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Sequence number the Alarm Trap was sent with."
+    ::= { aeAlarmEntry 2 }
+
+aeAlarmEquipmentType OBJECT-TYPE
+    SYNTAX      AeEquipmentType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The type of physical equipment the ONT Alarm is associated with."
+    ::= { aeAlarmEntry 3 }
+
+aeAlarmEquipmentInstance OBJECT-TYPE
+    SYNTAX      AeEquipmentInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The instance of the physical equipment the ONT Alarm is assocaited with."
+    ::= { aeAlarmEntry 4 }
+
+aeAlarmAlarmType OBJECT-TYPE
+    SYNTAX      AeAlarmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The type of the ONT Alarm."
+    ::= { aeAlarmEntry 5 }
+
+aeAlarmStatus OBJECT-TYPE
+    SYNTAX      AeCondStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The status of the ONT alarm - on/off."
+    ::= { aeAlarmEntry 6 }
+
+aeAlarmSeverityLevel OBJECT-TYPE
+    SYNTAX      AeCondSeverityLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The severity level of the ONT Alarm."
+    ::= { aeAlarmEntry 7 }
+
+aeAlarmServiceAffecting OBJECT-TYPE
+    SYNTAX      AeCondServiceAffecting
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This value indicated wether this alarm is service affecting or not."
+    ::= { aeAlarmEntry 8 }
+
+aeAlarmTimeStamp OBJECT-TYPE
+    SYNTAX      AeBriefText
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local time string for the ONT Alarm."
+    ::= { aeAlarmEntry 9 }
+
+aeAlarmTime OBJECT-TYPE
+    SYNTAX      AeTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "UTC time integer of the ONT Alarm"
+    ::= { aeAlarmEntry 10 }
+
+aeAlarmText OBJECT-TYPE
+    SYNTAX      AeText
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object contains the brief description about the ONT Alarm."
+    ::= { aeAlarmEntry 11 }
+
+END

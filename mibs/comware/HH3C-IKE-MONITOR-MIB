@@ -1,0 +1,1905 @@
+-- ====================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The MIB is designed to get IKE tunnels' statistic information.
+--
+-- Reference:
+-- Version: 1.5
+-- History:
+--     V1.0: The initial version created by Caixiansen, Renweichun and Maoyu.
+--     V1.1: modified by liguanmin.2005.1.19
+--           In order to describe DPD work parameters if a tunnel enable
+--           DPD function, two nodes have added in Hh3cIKETunnelEntry .those nodes are
+--           hh3cIKETunDpdIntervalTime and hh3cIKETunDpdTimeOut.
+--     V1.2: Modified by Caixiansen Mar.3 2005
+--           Two values 'modp1536(5)' and 'modp2048(14)'are added for data type
+--           'Hh3cDiffHellmanGrp' .
+--     V1.3: Modified by Liukan Dec.8 2008
+--           Three values 'aesCbc128(8)', 'aesCbc192(9)' and 'aesCbc256(10)' are added
+--           to data type 'Hh3cEncryptAlgo'.
+--           Value description of data type 'Hh3cIKENegoMode' is changed from 'aggressive(4)' to
+--           'aggressiveMode(4)'.
+--     V1.4: Modified by Weiyanheng Jun.28 2012
+--           1) 'dsaSignatures(2)' is added to data type 'Hh3cIKEAuthMethod'.
+--           2) 'none(0)' 'invalidGroup(2147483647)' and 'dhGroup24(24)' are added
+--               to data type 'Hh3cDiffHellmanGrp'.
+--           3) Value description of data type 'Hh3cDiffHellmanGrp' is changed
+--              from 'modp768(1)' 'modp1024(2)' 'modp1536(5)' 'modp2048(14)'
+--              to 'dhGroup1(1)' 'dhGroup2(2)' 'dhGroup5(5)' 'dhGroup14(14)'.
+--           4) 'aesCtr(11)', 'aesCamelliaCbc(12)', 'rc4(13)' and 'invalidAlg(2147483647)'
+--               are added to data type 'Hh3cEncryptAlgo'.
+--           5) Value description of data type 'Hh3cAuthAlgo' is changed from
+--              'sha(2)' to 'sha1(2)'.
+--           6) 'sha256(3)', 'sha384(4)', 'sha512(5)' and 'invalidAlg(2147483647)'
+--              are added to data type 'Hh3cAuthAlgo'.
+--           7) In order to describe the IPV4 and IPV6 address of a tunnel, four
+--              nodes have added in Hh3cIKETunnelEntry.
+--              These nodes are hh3cIKETunLocalInetAddrType, hh3cIKETunLocalInetAddr,
+--              hh3cIKETunRemoteInetAddrType and hh3cIKETunRemoteInetAddr.
+--           8) 'hh3cIKETunLocalAddr' and 'hh3cIKETunRemoteAddr' are deprecated.
+--     V1.5: Modified by Yangbaotao and Zhaoming Apr.25 2021
+--           1) One value 'gmMainMode(128)' is added to data type 'Hh3cIKENegoMode'.
+--           2) Two values 'rsaDigitalEnvelope(5)' and 'sm2DigitalEnvelope(6)' are added
+--              to data type 'Hh3cIKEAuthMethod'.
+--           3) Four values 'sm1Cbc128(128)','sm1Cbc192(129)','sm1Cbc256(130)' and 'sm4Cbc(131)'
+--              are added to data type 'Hh3cEncryptAlgo'.
+--           4) One value 'sm3(128)' is added to data type 'Hh3cAuthAlgo'.
+--              Deprecated hh3cIKETunLocalValue1 and hh3cIKETunRemoteValue1,
+--              added hh3cIKETunLocalValue3 and hh3cIKETunRemoteValue3.
+-- =====================================================================
+HH3C-IKE-MONITOR-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        DisplayString,TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        IpAddress, Integer32, Counter32, Counter64, OBJECT-TYPE, MODULE-IDENTITY,
+        Gauge32, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        hh3cCommon
+            FROM HH3C-OID-MIB;
+
+    hh3cIKEMonitor MODULE-IDENTITY
+        LAST-UPDATED "202104241858Z"            -- Apr. 25, 2021  GMT
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085"
+        DESCRIPTION
+            "The MIB is designed to get statistic information of
+            IKE tunnels. With this MIB, we can get information of a certain IKE tunnel
+            or all IKE tunnels"
+        REVISION "202104241858Z"
+         DESCRIPTION
+            "Data type Hh3cIKENegoMode,Hh3cIKEAuthMethod,Hh3cEncryptAlgo and Hh3cAuthAlgo are added.
+             Deprecate hh3cIKETunLocalValue1 and hh3cIKETunRemoteValue1,
+             add hh3cIKETunLocalValue3 and hh3cIKETunRemoteValue3."
+        ::= { hh3cCommon 30 }
+
+        Hh3cIKENegoMode   ::= TEXTUAL-CONVENTION
+                   STATUS     current
+                   DESCRIPTION
+                       "The IKE negotiation mode."
+                   SYNTAX INTEGER {
+                             mainMode(2),
+                             aggressiveMode(4),
+                             quickMode(32),
+                             gmMainMode(128)
+
+                          }
+
+    Hh3cIKEAuthMethod   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+        "The authentication method used in IKE negotiations."
+        SYNTAX INTEGER {
+            preSharedKey(1),
+            dsaSignatures(2),
+            rsaSignatures(3),
+            rsaDigitalEnvelope(5),
+            sm2DigitalEnvelope(6)
+        }
+
+    Hh3cDiffHellmanGrp   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+           "The Diffie Hellman Group used in IKE and IPsec negotiations."
+        SYNTAX INTEGER {
+            none(0),
+            dhGroup1(1),
+            dhGroup2(2),
+            dhGroup5(5),
+            dhGroup14(14),
+            dhGroup24(24),
+            invalidGroup(2147483647)
+        }
+
+    Hh3cEncryptAlgo   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The encryption algorithm used in IKE and IPsec negotiations."
+        SYNTAX INTEGER {
+            none(0),
+            desCbc(1),
+            ideaCbc(2),
+            blowfishCbc(3),
+            rc5R16B64Cbc(4),
+            tripleDesCbc(5),
+            castCbc(6),
+            aesCbc(7),
+            aesCbc128(8),
+            aesCbc192(9),
+            aesCbc256(10),
+            aesCtr(11),
+            aesCamelliaCbc(12),
+            rc4(13),
+            sm1Cbc128(128),
+            sm1Cbc192(129),
+            sm1Cbc256(130),
+            sm4Cbc(131),
+            invalidAlg(2147483647)
+        }
+
+    Hh3cAuthAlgo   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The authentication algorithm used in IKE negotiations."
+        SYNTAX INTEGER {
+            none(0),
+            md5(1),
+            sha1(2),
+            sha256(3),
+            sha384(4),
+            sha512(5),
+            sm3(128),
+            invalidAlg(2147483647)
+        }
+
+        Hh3cTrapStatus   ::= TEXTUAL-CONVENTION
+                   STATUS     current
+                   DESCRIPTION
+                       "The switch which determines whether send a trap or not."
+                   SYNTAX INTEGER {
+                             enabled(1),
+                             disabled(2)
+                          }
+
+        Hh3cIKEIDType   ::= TEXTUAL-CONVENTION
+                   STATUS     current
+                   DESCRIPTION
+                       "The type of IKE Identity."
+                   SYNTAX INTEGER {
+                             reserved(0),
+                             ipv4Addr(1),
+                             fqdn(2),             -- fully-qualified domain name
+                             userFqdn(3),         -- fully-qualified username
+                             ipv4AddrSubnet(4),
+                             ipv6Addr(5),
+                             ipv6AddrSubnet(6),
+                             ipv4AddrRange(7),
+                             ipv6AddrRange(8),
+                             derAsn1Dn(9),        -- the binary DER encoding of an ASN.1 X.500 Distinguished Name
+                                                  -- [X.501] of the principal whose certificates are being exchanged
+                                                  -- to establish the SA.
+
+                             derAsn1Gn(10),       -- the binary DER encoding of an ASN.1 X.500 GeneralName [X.509]
+                                                  -- of the principal whose certificates are being exchanged to
+                                                  -- establish the SA.
+
+                             keyId(11)            -- specifies an opaque byte stream which may be used to pass
+                                                  -- vendor-specific information necessary to identify which
+                                                  -- pre-shared key should be used to authenticate Aggressive
+                                                  -- mode negotiations.
+                          }
+
+        Hh3cIKETunnelState   ::= TEXTUAL-CONVENTION
+                   STATUS     current
+                   DESCRIPTION
+                       "The state of the IKE tunnel."
+                   SYNTAX INTEGER {
+                             active(1),
+                             timeout(2)
+                          }
+
+
+-- ========================================================================
+-- Node definitions
+-- ========================================================================
+--Begin the node of hh3cIKEObjects.
+
+        hh3cIKEObjects OBJECT IDENTIFIER ::= { hh3cIKEMonitor 1 }
+-- ================================================
+-- Begin the table of hh3cIKETunnelTable.
+-- ================================================
+
+        hh3cIKETunnelTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIKETunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The IPsec Phase-1 Internet Key Exchange Tunnel Table.
+                 There is one entry in this table for each active IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKEObjects 1 }
+
+        hh3cIKETunnelEntry OBJECT-TYPE
+            SYNTAX Hh3cIKETunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry contains the information about hh3cIKETunnelTable, such as negotiate mode,
+                 encryption algorithm and authentication algorithm, etc."
+            INDEX { hh3cIKETunIndex }
+            ::= { hh3cIKETunnelTable 1 }
+
+    Hh3cIKETunnelEntry ::=
+        SEQUENCE {
+            hh3cIKETunIndex
+                Integer32,
+            hh3cIKETunLocalType
+                Hh3cIKEIDType,
+            hh3cIKETunLocalValue1
+                DisplayString,
+            hh3cIKETunLocalValue2
+                DisplayString,
+            hh3cIKETunLocalAddr
+                IpAddress,
+            hh3cIKETunRemoteType
+                Hh3cIKEIDType,
+            hh3cIKETunRemoteValue1
+                DisplayString,
+            hh3cIKETunRemoteValue2
+                DisplayString,
+            hh3cIKETunRemoteAddr
+                IpAddress,
+            hh3cIKETunInitiator
+                INTEGER,
+            hh3cIKETunNegoMode
+                Hh3cIKENegoMode,
+            hh3cIKETunDiffHellmanGrp
+                Hh3cDiffHellmanGrp,
+            hh3cIKETunEncryptAlgo
+                Hh3cEncryptAlgo,
+            hh3cIKETunHashAlgo
+                Hh3cAuthAlgo,
+            hh3cIKETunAuthMethod
+                Hh3cIKEAuthMethod,
+            hh3cIKETunLifeTime
+                Integer32,
+            hh3cIKETunActiveTime
+                Integer32,
+            hh3cIKETunRemainTime
+                Integer32,
+            hh3cIKETunTotalRefreshes
+                Counter32,
+            hh3cIKETunState
+                Hh3cIKETunnelState,
+            hh3cIKETunDpdIntervalTime
+                Integer32,
+            hh3cIKETunDpdTimeOut
+                Integer32,
+            hh3cIKETunLocalInetAddrType
+                InetAddressType,
+            hh3cIKETunLocalInetAddr
+                InetAddress,
+            hh3cIKETunRemoteInetAddrType
+                InetAddressType,
+            hh3cIKETunRemoteInetAddr
+                InetAddress,
+            hh3cIKETunLocalValue3
+                OCTET STRING,
+            hh3cIKETunRemoteValue3
+                OCTET STRING
+        }
+
+        hh3cIKETunIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The index of the IPsec Phase-1 IKE Tunnel Table.
+                 The value of the index is a number which begins
+                 at one and is incremented with each tunnel that
+                 is created. The value of this object will wrap
+                 at 2147483647."
+            ::= { hh3cIKETunnelEntry 1 }
+
+        hh3cIKETunLocalType OBJECT-TYPE
+            SYNTAX Hh3cIKEIDType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of local peer identity."
+            ::= { hh3cIKETunnelEntry 2 }
+
+        hh3cIKETunLocalValue1 OBJECT-TYPE
+            SYNTAX DisplayString(SIZE(0..255))
+            MAX-ACCESS read-only
+            STATUS deprecated
+            DESCRIPTION
+                "The value of the local peer identity.
+
+                If the local peer type is ipv4Addr/ipv6Addr, this is the IP address
+                used to identify the local peer.
+
+                If the local peer type is ipv4AddrSubnet/ipv6AddrSubnet, this is
+                the subnet address.
+
+                If the local peer type is ipv4AddrRange/ipv6AddrRange, this is
+                the beginning IP address of the range.
+
+                If the local peer type is fqdn/userFqdn, this is the host name
+                used to identify the local peer.
+
+                If the local peer type is derAsn1Dn, this is the binary DER
+                encoding of an ASN.1 X.500 Distinguished Name [X.501] of the
+                principal whose certificates are being exchanged to establish
+                the SA.
+
+                If the local peer type is derAsn1Gn, this is the binary DER
+                encoding of an ASN.1 X.500 GeneralName [X.509] of the principal
+                whose certificates are being exchanged to establish the SA.
+
+                If the local peer type is keyId, this is an opaque byte
+                stream which may be used to pass vendor-specific information
+                necessary to identify which pre-shared key should be used to
+                authenticate Aggressive mode negotiations.
+
+                The local peer identity may not exceed 255 characters in length.
+                The complete value will be displayed by hh3cIKETunLocalValue3"
+            ::= { hh3cIKETunnelEntry 3 }
+
+        hh3cIKETunLocalValue2 OBJECT-TYPE
+            SYNTAX DisplayString(SIZE(0..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The second specification of the local peer's IP address.
+
+                 If the local peer type is ipv4AddrSubnet/ipv6AddrSubnet, this
+                 is the subnet mask.
+
+                 If the local peer type is ipv4AddrRange/ipv6AddrRange, this is
+                 the ending IP address of the range.
+
+                 If the local peer type are others, this is a zero-length string."
+            ::= { hh3cIKETunnelEntry 4 }
+
+        hh3cIKETunLocalAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS deprecated
+            DESCRIPTION
+                "The IP address of the local endpoint for the IPsec
+                 Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelEntry 5 }
+
+        hh3cIKETunRemoteType OBJECT-TYPE
+            SYNTAX Hh3cIKEIDType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of remote peer identity."
+            ::= { hh3cIKETunnelEntry 6 }
+
+        hh3cIKETunRemoteValue1 OBJECT-TYPE
+            SYNTAX DisplayString(SIZE(0..255))
+            MAX-ACCESS read-only
+            STATUS deprecated
+            DESCRIPTION
+                "The value of the remote peer identity.
+
+                If the remote peer type is ipv4Addr/ipv6Addr, this is the IP address
+                used to identify the remote peer.
+
+                If the remote peer type is ipv4AddrSubnet/ipv6AddrSubnet, this is
+                the subnet address.
+
+                If the remote peer type is ipv4AddrRange/ipv6AddrRange, this is
+                the beginning IP address of the range.
+
+                If the remote peer type is fqdn/userFqdn, this is the host name
+                used to identify the remote peer.
+
+                If the remote peer type is derAsn1Dn, this is the binary DER
+                encoding of an ASN.1 X.500 Distinguished Name [X.501] of the
+                principal whose certificates are being exchanged to establish
+                the SA.
+
+                If the remote peer type is derAsn1Gn, this is the binary DER
+                encoding of an ASN.1 X.500 GeneralName [X.509] of the principal
+                whose certificates are being exchanged to establish the SA.
+
+                If the remote peer type is keyId, this is an opaque byte
+                stream which may be used to pass vendor-specific information
+                necessary to identify which pre-shared key should be used to
+                authenticate Aggressive mode negotiations.
+
+                The remote peer identity may not exceed 255 characters in length.
+                The complete value will be displayed by hh3cIKETunRemoteValue3"
+            ::= { hh3cIKETunnelEntry 7 }
+
+        hh3cIKETunRemoteValue2 OBJECT-TYPE
+            SYNTAX DisplayString(SIZE(0..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The second specification of the remote peer's IP address.
+
+                 If the remote peer type is ipv4AddrSubnet/ipv6AddrSubnet, this
+                 is the subnet mask.
+
+                 If the remote peer type is ipv4AddrRange/ipv6AddrRange, this is
+                 the ending IP address of the range.
+
+                 If the remote peer type are others, this is a zero-length string."
+            ::= { hh3cIKETunnelEntry 8 }
+
+        hh3cIKETunRemoteAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS deprecated
+            DESCRIPTION
+                "The IP address of the remote peer for the IPsec
+                Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelEntry 9 }
+
+        hh3cIKETunInitiator OBJECT-TYPE
+            SYNTAX INTEGER  {
+                                local(1),
+                                remote(2)
+                            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The initiator of this tunnel."
+            ::= { hh3cIKETunnelEntry 10 }
+
+        hh3cIKETunNegoMode OBJECT-TYPE
+            SYNTAX Hh3cIKENegoMode
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The negotiation mode of the IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelEntry 11 }
+
+        hh3cIKETunDiffHellmanGrp OBJECT-TYPE
+            SYNTAX Hh3cDiffHellmanGrp
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Diffie Hellman Group used in the IPsec Phase-1 IKE
+                 negotiations."
+            ::= { hh3cIKETunnelEntry 12 }
+
+        hh3cIKETunEncryptAlgo OBJECT-TYPE
+            SYNTAX Hh3cEncryptAlgo
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The encryption algorithm used in the IPsec Phase-1 IKE
+                 negotiations."
+            ::= { hh3cIKETunnelEntry 13 }
+
+        hh3cIKETunHashAlgo OBJECT-TYPE
+            SYNTAX Hh3cAuthAlgo
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The hash algorithm used in the IPsec Phase-1 IKE
+                 negotiations."
+            ::= { hh3cIKETunnelEntry 14 }
+
+        hh3cIKETunAuthMethod OBJECT-TYPE
+            SYNTAX Hh3cIKEAuthMethod
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The authentication method used in the IPsec Phase-1
+                 IKE negotiations."
+            ::= { hh3cIKETunnelEntry 15 }
+
+        hh3cIKETunLifeTime OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The negotiated LifeTime of the IPsec Phase-1
+                 IKE Tunnel in seconds."
+            ::= { hh3cIKETunnelEntry 16 }
+
+        hh3cIKETunActiveTime OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The duration the IPsec Phase-1 IKE tunnel
+                 has been active in seconds."
+            ::= { hh3cIKETunnelEntry 17 }
+
+        hh3cIKETunRemainTime OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The security association remaining time in
+                 seconds."
+            ::= { hh3cIKETunnelEntry 18 }
+
+        hh3cIKETunTotalRefreshes OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of security association
+                 refreshing performed."
+            ::= { hh3cIKETunnelEntry 19 }
+
+        hh3cIKETunState OBJECT-TYPE
+            SYNTAX Hh3cIKETunnelState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The State of IKE Tunnel."
+            ::= { hh3cIKETunnelEntry 20 }
+
+        hh3cIKETunDpdIntervalTime OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time that trigger DPD request.
+                If ipsec message is expected to be sent out
+                and the interval time between current time
+                and the last time receiving peer's IPsec
+                message is bigger than this time, DPD request
+                would be triggered."
+            DEFVAL { 10 }
+            ::= { hh3cIKETunnelEntry 21 }
+
+        hh3cIKETunDpdTimeOut OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The overtime of single DPD request.
+                If DPD requests are refused three times, all
+                security associations related would be deleted."
+            DEFVAL { 5 }
+            ::= { hh3cIKETunnelEntry 22 }
+
+    hh3cIKETunLocalInetAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the local peer's IP address."
+        ::= { hh3cIKETunnelEntry 23 }
+
+    hh3cIKETunLocalInetAddr OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The IP address of the local peer for the IPsec Phase-1 IKE Tunnel."
+        ::= { hh3cIKETunnelEntry 24 }
+
+    hh3cIKETunRemoteInetAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the remote peer's IP address."
+        ::= { hh3cIKETunnelEntry 25 }
+
+    hh3cIKETunRemoteInetAddr OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The IP address of the remote peer for the IPsec Phase-1 IKE Tunnel."
+        ::= { hh3cIKETunnelEntry 26 }
+
+     hh3cIKETunLocalValue3 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..2047))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of the local peer identity.
+
+            If the local peer type is ipv4Addr/ipv6Addr, this is the IP address
+            used to identify the local peer.
+
+            If the local peer type is ipv4AddrSubnet/ipv6AddrSubnet, this is
+            the subnet address.
+
+            If the local peer type is ipv4AddrRange/ipv6AddrRange, this is
+            the beginning IP address of the range.
+
+            If the local peer type is fqdn/userFqdn, this is the host name
+            used to identify the local peer.
+
+            If the local peer type is derAsn1Dn, this is the binary DER
+            encoding of an ASN.1 X.500 Distinguished Name [X.501] of the
+            principal whose certificates are being exchanged to establish
+            the SA.
+
+            If the local peer type is derAsn1Gn, this is the binary DER
+            encoding of an ASN.1 X.500 GeneralName [X.509] of the principal
+            whose certificates are being exchanged to establish the SA.
+
+            If the local peer type is keyId, this is an opaque byte
+            stream which may be used to pass vendor-specific information
+            necessary to identify which pre-shared key should be used to
+            authenticate Aggressive mode negotiations."
+        ::= { hh3cIKETunnelEntry 27 }
+
+    hh3cIKETunRemoteValue3 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..2047))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of the remote peer identity.
+
+            If the remote peer type is ipv4Addr/ipv6Addr, this is the IP address
+            used to identify the remote peer.
+
+            If the remote peer type is ipv4AddrSubnet/ipv6AddrSubnet, this is
+            the subnet address.
+
+            If the remote peer type is ipv4AddrRange/ipv6AddrRange, this is
+            the beginning IP address of the range.
+
+            If the remote peer type is fqdn/userFqdn, this is the host name
+            used to identify the remote peer.
+
+            If the remote peer type is derAsn1Dn, this is the binary DER
+            encoding of an ASN.1 X.500 Distinguished Name [X.501] of the
+            principal whose certificates are being exchanged to establish
+            the SA.
+
+            If the remote peer type is derAsn1Gn, this is the binary DER
+            encoding of an ASN.1 X.500 GeneralName [X.509] of the principal
+            whose certificates are being exchanged to establish the SA.
+
+            If the remote peer type is keyId, this is an opaque byte
+            stream which may be used to pass vendor-specific information
+            necessary to identify which pre-shared key should be used to
+            authenticate Aggressive mode negotiations."
+        ::= { hh3cIKETunnelEntry 28 }
+-- =======================================
+-- begin the table of hh3cIKETunnelStatTable.
+-- =======================================
+
+        hh3cIKETunnelStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cIKETunnelStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The IPsec Phase-1 IKE Tunnel Statistic Table."
+            ::= { hh3cIKEObjects 2 }
+
+
+        hh3cIKETunnelStatEntry OBJECT-TYPE
+            SYNTAX Hh3cIKETunnelStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry contains the information of hh3cIKETunnelStatTable,
+                 such as the number of packets sent and received by the
+                 IKE tunnel, etc."
+            INDEX { hh3cIKETunIndex }
+            ::= { hh3cIKETunnelStatTable 1 }
+
+        Hh3cIKETunnelStatEntry ::=
+            SEQUENCE {
+                                hh3cIKETunInOctets
+                                    Counter64,
+                                hh3cIKETunInPkts
+                                    Counter64,
+                                hh3cIKETunInDropPkts
+                                    Counter64,
+                                hh3cIKETunInP2Exchgs
+                                    Counter64,
+                                hh3cIKETunInP2ExchgRejets
+                                    Counter64,
+                                hh3cIKETunInP2SaDelRequests
+                                    Counter64,
+                                hh3cIKETunInP1SaDelRequests
+                                    Counter64,
+                                hh3cIKETunInNotifys
+                                    Counter32,
+                                hh3cIKETunOutOctets
+                                    Counter64,
+                                hh3cIKETunOutPkts
+                                    Counter64,
+                                hh3cIKETunOutDropPkts
+                                    Counter64,
+                                hh3cIKETunOutP2Exchgs
+                                    Counter64,
+                                hh3cIKETunOutP2ExchgRejects
+                                    Counter64,
+                                hh3cIKETunOutP2SaDelRequests
+                                    Counter64,
+                                hh3cIKETunOutP1SaDelRequests
+                                    Counter64,
+                                hh3cIKETunOutNotifys
+                                    Counter32
+             }
+
+        hh3cIKETunInOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets received by
+                 this IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 1 }
+
+        hh3cIKETunInPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets received by
+                 this IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 2 }
+
+        hh3cIKETunInDropPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets dropped  by this
+                 IPsec Phase-1 IKE Tunnel during receiving process."
+            ::= { hh3cIKETunnelStatEntry 3 }
+
+        hh3cIKETunInP2Exchgs OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 exchanges
+                 received by this IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 4 }
+
+        hh3cIKETunInP2ExchgRejets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 exchanges
+                 received and rejected by this IPsec Phase-1 Tunnel."
+            ::= { hh3cIKETunnelStatEntry 5 }
+
+        hh3cIKETunInP2SaDelRequests OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 security association
+                 deleting requests received by this IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 6 }
+
+        hh3cIKETunInP1SaDelRequests OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-1
+                 security association deleting requests."
+            ::= { hh3cIKETunnelStatEntry 7 }
+
+        hh3cIKETunInNotifys OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of notifications received by this
+                 IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 8 }
+
+        hh3cIKETunOutOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets sent by this IPsec
+                 Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 9 }
+
+        hh3cIKETunOutPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets sent by this IPsec
+                 Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 10 }
+
+        hh3cIKETunOutDropPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets dropped by this
+                 IPsec Phase-1 IKE Tunnel during sending process."
+            ::= { hh3cIKETunnelStatEntry 11 }
+
+        hh3cIKETunOutP2Exchgs OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 exchanges sent
+                 by this IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 12 }
+
+        hh3cIKETunOutP2ExchgRejects OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 exchanges sent
+                 and rejected by this IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 13 }
+
+        hh3cIKETunOutP2SaDelRequests OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 security
+                 association deleting requests sent by this
+                 IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 14 }
+
+        hh3cIKETunOutP1SaDelRequests OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-1 security
+                 association deleting requests sent by this
+                 IPsec Phase-1 IKE Tunnel."
+            ::= { hh3cIKETunnelStatEntry 15 }
+
+        hh3cIKETunOutNotifys OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of notifications sent by this IPsec
+                 Phase-1 Tunnel."
+            ::= { hh3cIKETunnelStatEntry 16 }
+
+-- =======================================
+-- Begin the hh3cIKEGlobalStats.
+-- =======================================
+
+        hh3cIKEGlobalStats OBJECT IDENTIFIER ::= { hh3cIKEObjects 3 }
+
+        hh3cIKEGlobalActiveTunnels OBJECT-TYPE
+            SYNTAX Gauge32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of currently active IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 1 }
+
+        hh3cIKEGlobalInOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets received by all currently and
+                 previously active IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 2 }
+
+        hh3cIKEGlobalInPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets received by all
+                 currently and previously active IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 3 }
+
+        hh3cIKEGlobalInDropPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets which were dropped during receiving
+                 process by all currently and previously active IPsec Phase-1
+                 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 4 }
+
+        hh3cIKEGlobalInP2Exchgs OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 exchanges received by all
+                 currently and previously active IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 5 }
+
+        hh3cIKEGlobalInP2ExchgRejects OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 exchanges which were
+                 received and rejected by all currently and previously
+                 active IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 6 }
+
+        hh3cIKEGlobalInP2SaDelRequests OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 security association
+                 deleting requests received by all currently and previously
+                 active IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 7 }
+
+        hh3cIKEGlobalInNotifys OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of notifications received by all IPsec
+                 Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 8 }
+
+        hh3cIKEGlobalOutOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets sent by all currently
+                 and previously active and IPsec Phase-1 IKE Tunnels. "
+            ::= { hh3cIKEGlobalStats 9 }
+
+        hh3cIKEGlobalOutPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets sent by all currently
+                 and previously active and IPsec Phase-1 Tunnels."
+            ::= { hh3cIKEGlobalStats 10 }
+
+        hh3cIKEGlobalOutDropPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets which were dropped during
+                 sending process by all currently and previously active
+                 IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 11 }
+
+        hh3cIKEGlobalOutP2Exchgs OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 exchanges which were
+                 sent by all currently and previously active IPsec
+                 Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 12 }
+
+        hh3cIKEGlobalOutP2ExchgRejects OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 exchanges which
+                 were sent and rejected by all currently and previously
+                 active IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 13 }
+
+        hh3cIKEGlobalOutP2SaDelRequests OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-2 SA deleting requests sent
+                 by all currently and previously active IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 14 }
+
+        hh3cIKEGlobalOutNotifys OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of notifications sent by all active IPsec
+                 Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 15 }
+
+        hh3cIKEGlobalInitTunnels OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-1 IKE Tunnels which
+                 were locally initiated."
+            ::= { hh3cIKEGlobalStats 16 }
+
+        hh3cIKEGlobalInitTunnelFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-1 IKE Tunnels which
+                 were locally initiated and failed to activate."
+            ::= { hh3cIKEGlobalStats 17 }
+
+        hh3cIKEGlobalRespTunnels OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-1 IKE Tunnels which
+                 were remotely initiated."
+            ::= { hh3cIKEGlobalStats 18 }
+
+        hh3cIKEGlobalRespTunnelFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPsec Phase-1 IKE Tunnels which
+                 were remotely initiated and failed to activate."
+            ::= { hh3cIKEGlobalStats 19 }
+
+        hh3cIKEGlobalAuthFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of authentications which ended in
+                 failure by all current and previous IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 20 }
+
+        hh3cIKEGlobalNoSaFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of non-existent Security Association
+                 in failures which occurred during processing of all
+                 current and previous IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 21 }
+
+        hh3cIKEGlobalInvalidCookieFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of invalid cookie in failures which
+                 occurred during processing of all current and previous
+                 IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 22 }
+
+        hh3cIKEGlobalAttrNotSuppFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of attributes not supported in failures
+                 which occurred during processing of all current and previous
+                 IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 23 }
+
+        hh3cIKEGlobalNoProposalChosenFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of no proposal chosen in failures which
+                 occurred during processing of all current and previous
+                 IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 24 }
+
+        hh3cIKEGlobalUnsportExchTypeFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unsupported exchange type in failures
+                 which occurred during processing of all current and
+                 previous IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 25 }
+
+        hh3cIKEGlobalInvalidIdFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of invalid id Information in failures
+                 which occurred during processing of all current and
+                 previous IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 26 }
+
+            hh3cIKEGlobalInvalidProFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of invalid protocol id in failures which
+                 occurred during processing of all current and previous
+                 IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 27 }
+
+            hh3cIKEGlobalCertTypeUnsuppFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of certificate type unsupported in failures
+                 which occurred during processing of all current and
+                 previous IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 28 }
+
+        hh3cIKEGlobalInvalidCertAuthFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                   "The total number of failures because of invalid certificate authority
+                 which occurred during processing of all current and
+                 previous IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 29 }
+
+        hh3cIKEGlobalInvalidSignFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of failures because of the invalid signature which
+                 occurred during processing of all current and previous
+                 IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 30 }
+
+        hh3cIKEGlobalCertUnavailableFails OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of certificate unavailable in failures
+                 which occurred during processing of all current and
+                 previous IPsec Phase-1 IKE Tunnels."
+            ::= { hh3cIKEGlobalStats 31 }
+
+-- =======================================
+-- Begin the hh3cIKETrapObject.
+-- =======================================
+
+        hh3cIKETrapObject OBJECT IDENTIFIER ::= { hh3cIKEObjects 4 }
+
+        hh3cIKEProposalNumber OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The IKE proposal's number with a trap."
+            ::= { hh3cIKETrapObject 1 }
+
+        hh3cIKEProposalSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The number of IKE proposals with a trap."
+            ::= { hh3cIKETrapObject 2 }
+
+        hh3cIKEIdInformation OBJECT-TYPE
+            SYNTAX DisplayString(SIZE(0..255))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The id information with a trap."
+            ::= { hh3cIKETrapObject 3 }
+
+        hh3cIKEProtocolNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The protocol number with a trap"
+            ::= { hh3cIKETrapObject 4 }
+
+        hh3cIKECertInformation OBJECT-TYPE
+            SYNTAX DisplayString(SIZE(0..255))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The certificate information with a trap."
+            ::= { hh3cIKETrapObject 5 }
+
+
+-- =======================================
+-- Begin the hh3cIKETrapCntl.
+-- =======================================
+
+        hh3cIKETrapCntl OBJECT IDENTIFIER ::= { hh3cIKEObjects 5 }
+
+        hh3cIKETrapGlobalCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether all IKE traps should be generated."
+            ::= { hh3cIKETrapCntl 1 }
+
+
+        hh3cIKETunnelStartTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKETunnelStart traps should be generated."
+            ::= { hh3cIKETrapCntl 2 }
+
+        hh3cIKETunnelStopTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                        "Indicates whether hh3cIKETunnelStop traps should be generated."
+            ::= { hh3cIKETrapCntl 3 }
+
+        hh3cIKENoSaTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKENoSaFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 4 }
+
+        hh3cIKEEncryFailureTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEEncryFailFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 5 }
+
+        hh3cIKEDecryFailureTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEDecryFailFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 6 }
+
+        hh3cIKEInvalidProposalTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEInvalidProposalFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 7 }
+
+        hh3cIKEAuthFailTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEAuthFailFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 8 }
+
+        hh3cIKEInvalidCookieTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEInvalidCookieFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 9 }
+
+        hh3cIKEInvalidSpiTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEInvalidSpiFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 10 }
+
+        hh3cIKEAttrNotSuppTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEAttrNotSuppFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 11 }
+
+        hh3cIKEUnsportExchTypeTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEUnsportExchTypeFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 12 }
+
+        hh3cIKEInvalidIdTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEInvalidIdFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 13 }
+
+        hh3cIKEInvalidProtocolTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEInvalidProtocolFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 14 }
+
+        hh3cIKECertTypeUnsuppTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKECertTypeUnsuppFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 15 }
+
+        hh3cIKEInvalidCertAuthTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEInvalidCertAuthFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 16 }
+
+        hh3cIKEInvalidSignTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEInvalidSignFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 17 }
+
+        hh3cIKECertUnavailableTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKECertUnavailableFailure traps should be generated."
+            ::= { hh3cIKETrapCntl 18 }
+
+        hh3cIKEProposalAddTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEProposalAdd traps should be generated."
+            ::= { hh3cIKETrapCntl 19 }
+
+        hh3cIKEProposalDelTrapCntl OBJECT-TYPE
+            SYNTAX Hh3cTrapStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether hh3cIKEProposalDel traps should be generated."
+            ::= { hh3cIKETrapCntl 20 }
+
+-- ================================================
+-- definition of traps.
+-- ================================================
+
+        hh3cIKETrap OBJECT IDENTIFIER ::= { hh3cIKEObjects 6 }
+        hh3cIKENotifications OBJECT IDENTIFIER ::= { hh3cIKETrap 1 }
+
+        hh3cIKETunnelStart NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKETunLifeTime,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                 "This notification is generated when an IPsec Phase-1
+                  IKE Tunnel is created."
+                    ::= { hh3cIKENotifications 1 }
+
+        hh3cIKETunnelStop NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKETunActiveTime,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when an IPsec Phase-1
+                IKE Tunnel is deleted."
+                    ::= { hh3cIKENotifications 2 }
+
+        hh3cIKENoSaFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IKE tunnel
+                 has a non-existent SA error."
+        ::= { hh3cIKENotifications 3 }
+
+        hh3cIKEEncryFailFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IKE tunnel
+                 has an encrypting failure."
+                    ::= { hh3cIKENotifications 4 }
+
+        hh3cIKEDecryFailFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+                    DESCRIPTION
+                "This notification is generated when the IKE tunnel
+                has a decrypting failure."
+                    ::= { hh3cIKENotifications 5 }
+
+        hh3cIKEInvalidProposalFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IPsec phase-1
+                invalid proposal occurs."
+                    ::= { hh3cIKENotifications 6 }
+
+        hh3cIKEAuthFailFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IPsec phase-1
+                authentication failure occurs."
+            ::= { hh3cIKENotifications 7 }
+
+        hh3cIKEInvalidCookieFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IPsec phase-1
+                invalid cookie failure occurs."
+            ::= { hh3cIKENotifications 8 }
+
+        hh3cIKEAttrNotSuppFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IPsec phase-1 unsupported
+                attribute failure occurs."
+            ::= { hh3cIKENotifications 9 }
+
+        hh3cIKEUnsportExchTypeFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IPsec phase-1
+                unsupported exchange type failure occurs."
+            ::= { hh3cIKENotifications 10 }
+
+        hh3cIKEInvalidIdFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKEIdInformation,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IPsec phase-1
+                invalid id failure occurs."
+            ::= { hh3cIKENotifications 11 }
+
+        hh3cIKEInvalidProtocolFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKEProtocolNum,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                        }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the processing for
+                an IPsec Phase-1 IKE Tunnel has a protocol related errors."
+            ::= { hh3cIKENotifications 12 }
+
+        hh3cIKECertTypeUnsuppFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKECertInformation,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IPsec phase-1
+                unsupported certificate type failure occurs."
+            ::= { hh3cIKENotifications 13 }
+
+        hh3cIKEInvalidCertAuthFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKECertInformation,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IPsec phase-1
+                invalid certificate authorization failure occurs."
+            ::= { hh3cIKENotifications 14 }
+
+        hh3cIKElInvalidSignFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKECertInformation,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IPsec phase-1
+                invalid signature failure occurs."
+            ::= { hh3cIKENotifications 15 }
+
+        hh3cIKECertUnavailableFailure NOTIFICATION-TYPE
+            OBJECTS {
+                        hh3cIKETunLocalAddr,
+                        hh3cIKETunRemoteAddr,
+                        hh3cIKECertInformation,
+                        hh3cIKETunIndex,
+                        hh3cIKETunLocalInetAddrType,
+                        hh3cIKETunLocalInetAddr,
+                        hh3cIKETunRemoteInetAddrType,
+                        hh3cIKETunRemoteInetAddr
+                    }
+            STATUS     current
+            DESCRIPTION
+                "This notification is generated when the IPsec phase-1
+                certificate unavailable failure occurs."
+            ::= { hh3cIKENotifications 16 }
+
+        hh3cIKEProposalAdd NOTIFICATION-TYPE
+                    OBJECTS { hh3cIKEProposalNumber,
+                              hh3cIKEProposalSize
+                            }
+                    STATUS     current
+                    DESCRIPTION
+                "This notification is generated when an IKE proposal is added."
+                    ::= { hh3cIKENotifications 17 }
+
+        hh3cIKEProposalDel NOTIFICATION-TYPE
+                    OBJECTS { hh3cIKEProposalNumber,
+                              hh3cIKEProposalSize
+                            }
+                    STATUS     current
+                    DESCRIPTION
+                "This notification is generated when an IKE proposal is deleted."
+                    ::= { hh3cIKENotifications 18 }
+
+-- =======================================
+-- Begin the hh3cIKEScalarObjects.
+-- =======================================
+    hh3cIKEScalarObjects OBJECT IDENTIFIER ::= { hh3cIKEObjects 7 }
+
+    hh3cIKEMIBVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Version string of this MIB."
+        ::= { hh3cIKEScalarObjects 1 }
+
+-- =======================================
+-- Conformance Information
+-- =======================================
+        hh3cIKEConformance   OBJECT IDENTIFIER
+                                 ::= { hh3cIKEMonitor 2 }
+        hh3cIKECompliances   OBJECT IDENTIFIER
+                                 ::= { hh3cIKEConformance 1 }
+        hh3cIKEGroups        OBJECT IDENTIFIER
+                                 ::= { hh3cIKEConformance 2 }
+
+-- =======================================
+-- Compliance Statements
+-- =======================================
+        hh3cIKECompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                " "
+            MODULE -- this module
+            MANDATORY-GROUPS
+                {
+                    hh3cIKETunnelTableGroup,
+                    hh3cIKETunnelStatTableGroup,
+                    hh3cIKEGlobalStatsGroup,
+                    hh3cIKETrapObjectGroup,
+                    hh3cIKETrapCntlGroup,
+                    hh3cIKETrapGroup,
+                    hh3cIKEScalarObjectsGroup
+                }
+            ::= { hh3cIKECompliances 1 }
+
+    hh3cIKETunnelTableGroup OBJECT-GROUP
+        OBJECTS {
+            hh3cIKETunLocalType,
+            hh3cIKETunLocalValue1,
+            hh3cIKETunLocalValue2,
+            hh3cIKETunLocalAddr,
+            hh3cIKETunRemoteType,
+            hh3cIKETunRemoteValue1,
+            hh3cIKETunRemoteValue2,
+            hh3cIKETunRemoteAddr,
+            hh3cIKETunInitiator,
+            hh3cIKETunNegoMode,
+            hh3cIKETunDiffHellmanGrp,
+            hh3cIKETunEncryptAlgo,
+            hh3cIKETunHashAlgo,
+            hh3cIKETunAuthMethod,
+            hh3cIKETunLifeTime,
+            hh3cIKETunActiveTime,
+            hh3cIKETunRemainTime,
+            hh3cIKETunTotalRefreshes,
+            hh3cIKETunState,
+            hh3cIKETunDpdIntervalTime,
+            hh3cIKETunDpdTimeOut,
+            hh3cIKETunLocalInetAddrType,
+            hh3cIKETunLocalInetAddr,
+            hh3cIKETunRemoteInetAddrType,
+            hh3cIKETunRemoteInetAddr,
+            hh3cIKETunLocalValue3,
+            hh3cIKETunRemoteValue3
+        }
+        STATUS current
+        DESCRIPTION
+            "The group contains the IKE tunnel's property information."
+        ::= { hh3cIKEGroups 1 }
+
+
+        hh3cIKETunnelStatTableGroup OBJECT-GROUP
+            OBJECTS {
+                                hh3cIKETunInOctets ,
+                                hh3cIKETunInPkts,
+                                hh3cIKETunInDropPkts,
+                                hh3cIKETunInP2Exchgs,
+                                hh3cIKETunInP2ExchgRejets,
+                                hh3cIKETunInP2SaDelRequests,
+                                hh3cIKETunInP1SaDelRequests,
+                                hh3cIKETunInNotifys,
+                                hh3cIKETunOutOctets,
+                                hh3cIKETunOutPkts,
+                                hh3cIKETunOutDropPkts,
+                                hh3cIKETunOutP2Exchgs,
+                                hh3cIKETunOutP2ExchgRejects,
+                                hh3cIKETunOutP2SaDelRequests,
+                                hh3cIKETunOutP1SaDelRequests,
+                                hh3cIKETunOutNotifys
+                                }
+            STATUS current
+            DESCRIPTION
+                "The group contains the IKE tunnel's statistic information."
+            ::= { hh3cIKEGroups 2 }
+
+        hh3cIKEGlobalStatsGroup OBJECT-GROUP
+            OBJECTS {
+                                hh3cIKEGlobalActiveTunnels,
+                                hh3cIKEGlobalInOctets,
+                                hh3cIKEGlobalInPkts,
+                                hh3cIKEGlobalInDropPkts,
+                                hh3cIKEGlobalInP2Exchgs,
+                                hh3cIKEGlobalInP2ExchgRejects,
+                                hh3cIKEGlobalInP2SaDelRequests,
+                                hh3cIKEGlobalInNotifys,
+                                hh3cIKEGlobalOutOctets,
+                                hh3cIKEGlobalOutPkts,
+                                hh3cIKEGlobalOutDropPkts,
+                                hh3cIKEGlobalOutP2Exchgs,
+                                hh3cIKEGlobalOutP2ExchgRejects,
+                                hh3cIKEGlobalOutP2SaDelRequests,
+                                hh3cIKEGlobalOutNotifys,
+                                hh3cIKEGlobalInitTunnels,
+                                hh3cIKEGlobalInitTunnelFails,
+                                hh3cIKEGlobalRespTunnels,
+                                hh3cIKEGlobalRespTunnelFails,
+                                hh3cIKEGlobalAuthFails,
+                                hh3cIKEGlobalNoSaFails,
+                                hh3cIKEGlobalInvalidCookieFails,
+                                hh3cIKEGlobalAttrNotSuppFails,
+                                hh3cIKEGlobalNoProposalChosenFails,
+                                hh3cIKEGlobalUnsportExchTypeFails,
+                                hh3cIKEGlobalInvalidIdFails,
+                                hh3cIKEGlobalInvalidProFails,
+                                hh3cIKEGlobalCertTypeUnsuppFails,
+                                hh3cIKEGlobalInvalidCertAuthFails,
+                                hh3cIKEGlobalInvalidSignFails,
+                                hh3cIKEGlobalCertUnavailableFails
+                                }
+            STATUS current
+            DESCRIPTION
+                "The group contains all of the IKE tunnel's statistic information."
+            ::= { hh3cIKEGroups 3 }
+
+        hh3cIKETrapObjectGroup OBJECT-GROUP
+            OBJECTS {
+                                hh3cIKEProposalNumber,
+                                hh3cIKEProposalSize,
+                                hh3cIKEIdInformation,
+                                hh3cIKEProtocolNum,
+                                hh3cIKECertInformation
+                    }
+            STATUS current
+            DESCRIPTION
+                "The group contains all of trap objects of IKE tunnels."
+            ::= { hh3cIKEGroups 4 }
+
+        hh3cIKETrapCntlGroup OBJECT-GROUP
+            OBJECTS {
+                                hh3cIKETrapGlobalCntl,
+                                hh3cIKETunnelStartTrapCntl,
+                                hh3cIKETunnelStopTrapCntl,
+                                hh3cIKENoSaTrapCntl,
+                                hh3cIKEEncryFailureTrapCntl,
+                                hh3cIKEDecryFailureTrapCntl,
+                                hh3cIKEInvalidProposalTrapCntl,
+                                hh3cIKEAuthFailTrapCntl,
+                                hh3cIKEInvalidCookieTrapCntl,
+                                hh3cIKEInvalidSpiTrapCntl,
+                                hh3cIKEAttrNotSuppTrapCntl,
+                                hh3cIKEUnsportExchTypeTrapCntl,
+                                hh3cIKEInvalidIdTrapCntl,
+                                hh3cIKEInvalidProtocolTrapCntl,
+                                hh3cIKECertTypeUnsuppTrapCntl,
+                                hh3cIKEInvalidCertAuthTrapCntl,
+                                hh3cIKEInvalidSignTrapCntl,
+                                hh3cIKECertUnavailableTrapCntl,
+                                hh3cIKEProposalAddTrapCntl,
+                                hh3cIKEProposalDelTrapCntl
+                                }
+            STATUS current
+            DESCRIPTION
+                "The group contains all of trap switches of IKE tunnels."
+            ::= { hh3cIKEGroups 5 }
+
+        hh3cIKETrapGroup  NOTIFICATION-GROUP
+            NOTIFICATIONS {
+                                hh3cIKETunnelStart,
+                                hh3cIKETunnelStop,
+                                hh3cIKENoSaFailure,
+                                hh3cIKEEncryFailFailure,
+                                hh3cIKEDecryFailFailure,
+                                hh3cIKEInvalidProposalFailure,
+                                hh3cIKEAuthFailFailure,
+                                hh3cIKEInvalidCookieFailure,
+                                hh3cIKEAttrNotSuppFailure,
+                                hh3cIKEUnsportExchTypeFailure,
+                                hh3cIKEInvalidIdFailure,
+                                hh3cIKEInvalidProtocolFailure,
+                                hh3cIKECertTypeUnsuppFailure,
+                                hh3cIKEInvalidCertAuthFailure,
+                                hh3cIKElInvalidSignFailure,
+                                hh3cIKECertUnavailableFailure,
+                                hh3cIKEProposalAdd,
+                                hh3cIKEProposalDel
+                           }
+            STATUS current
+            DESCRIPTION
+                "The group contains all of trap of IKE tunnels."
+            ::= { hh3cIKEGroups 6 }
+
+        hh3cIKEScalarObjectsGroup OBJECT-GROUP
+            OBJECTS {
+                        hh3cIKEMIBVersion
+                    }
+            STATUS current
+            DESCRIPTION
+                "The group contains all of scalar objects of the MIB."
+            ::= { hh3cIKEGroups 7 }
+
+    END

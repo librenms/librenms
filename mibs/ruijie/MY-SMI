@@ -1,0 +1,151 @@
+-- *****************************************************************
+-- MY-SMI.mib: MY-SMI
+--                My Enterprise Structure of Management Information
+--
+-- $Copyright$
+-- 
+-- 
+-- *****************************************************************
+--
+
+MY-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY,
+        enterprises
+                FROM SNMPv2-SMI;
+
+-- My Snmpagent Enterprise Specific Objects
+   my          OBJECT IDENTIFIER ::= { enterprises 4881 }
+
+   products        OBJECT IDENTIFIER ::= { my 1 }
+
+   switch          OBJECT IDENTIFIER ::= { products 1 }
+   
+   router          OBJECT IDENTIFIER ::= { products 2 }
+
+   wireless        OBJECT IDENTIFIER ::= { products 3 }
+   
+switchMib MODULE-IDENTITY
+        LAST-UPDATED "200203190000Z"
+        ORGANIZATION "$Company$"
+        CONTACT-INFO
+                " 
+                Tel: $Telephone$ 
+
+                E-mail: $E-mail$"
+        DESCRIPTION
+                "The Structure of Management Information for the
+                 My enterprise."
+        REVISION      "200203190000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { switch 10 }        
+
+mySwitchProducts OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "mySwitchProducts is the root OBJECT IDENTIFIER from
+                which sysObjectID values are assigned for switch.  Actual
+                values are defined in MY-PRODUCTS-MIB."
+        ::= { switchMib 1 }
+
+myMgmt OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "myMgmt is the main subtree for those functional mib."
+        ::= { switchMib 2 }
+
+myAgentCapability OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "myAgentCapability provides a root object identifier
+                from which AGENT-CAPABILITIES values may be assigned."
+        ::= { switchMib 3 }
+
+myModules OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "myModules provides a root object identifier
+                from which MODULE-IDENTITY values may be assigned."
+        ::= { switchMib 4 }
+        
+myExperiment OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "myExperiment provides a root object identifier
+                from which experimental mibs may be temporarily
+                based.  mibs are typicially based here if they
+                fall in one of two categories
+                1) are IETF work-in-process mibs which have not
+                been assigned a permanent object identifier by
+                the IANA.
+                2) are my work-in-process which has not been
+                assigned a permanent object identifier by the
+                my assigned number authority, typicially because
+                the mib is not ready for deployment.
+
+                NOTE WELL:  support for mibs in the myExperiment
+                subtree will be deleted when a permanent object
+                identifier assignment is made."
+        ::= { switchMib 5 }
+
+
+-- ****************************** router ***********************************
+routerMib MODULE-IDENTITY
+        LAST-UPDATED "200501060000Z"
+        ORGANIZATION "$Company$"
+        CONTACT-INFO
+                " 
+                Tel: $Telephone$ 
+
+                E-mail: $E-mail$"
+        DESCRIPTION
+                "The Structure of Management Information for the
+                 My enterprise."
+        REVISION      "200501060000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { router 1 }        
+
+myRouterProducts OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "myRouterProducts is the root OBJECT IDENTIFIER from
+                which sysObjectID values are assigned for router.  Actual
+                values are defined in MY-PRODUCTS-MIB."
+        ::= { routerMib 1 }
+
+-- ****************************** wireless ***********************************
+wirelessMib MODULE-IDENTITY
+        LAST-UPDATED "200707040000Z"
+        ORGANIZATION "$Company$"
+        CONTACT-INFO
+                " 
+                Tel: $Telephone$ 
+
+                E-mail: $E-mail$"
+        DESCRIPTION
+                "The Structure of Management Information for the
+                 My enterprise."
+        REVISION      "200707040000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { wireless 1 }        
+
+myWirelessProducts OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "myWirelessProducts is the root OBJECT IDENTIFIER from
+                which sysObjectID values are assigned for wireless product.
+                Actual values are defined in MY-PRODUCTS-MIB."
+        ::= { wirelessMib 1 }
+
+myWirelessMgmt OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "myWirelessMgmt is the main subtree for those functional mib."
+        ::= { wirelessMib 2 }
+ 
+END

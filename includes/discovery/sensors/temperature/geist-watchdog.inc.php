@@ -15,38 +15,35 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $value = snmp_get($device, 'climateTempC', '-Oqv', 'GEIST-MIB-V3');
 if ($value) {
     $current_oid = '.1.3.6.1.4.1.21239.2.2.1.5.1';
     $descr = 'Temperature';
-    discover_sensor($valid['sensor'], 'temperature', $device, $current_oid, 'climateTempC', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
+    discover_sensor(null, 'temperature', $device, $current_oid, 'climateTempC', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
 }
 
-$value = snmp_get($device, 'internalTemp.1', '-Oqv', 'GEIST-V4-MIB');
+$value = snmp_get($device, 'climateTempF', '-Oqv', 'GEIST-MIB-V3');
 if ($value) {
-    $current_oid = '.1.3.6.1.4.1.21239.5.1.2.1.5.1';
-    $descr = 'Internal temperature';
-    $divisor = 10;
-    $value = $value / $divisor;
-    discover_sensor($valid['sensor'], 'temperature', $device, $current_oid, 'internalTemp.1', 'geist-watchdog', $descr, $divisor, 1, null, null, null, null, $value);
+    $current_oid = '.1.3.6.1.4.1.21239.2.2.1.6.1';
+    $descr = 'Temperature';
+    discover_sensor(null, 'temperature', $device, $current_oid, 'climateTempF', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value, null, null, null, 'fahrenheit_to_celsius');
 }
 
-$temp_table = snmpwalk_cache_oid($device, 'tempSensorTable', array(), 'GEIST-MIB-V3');
+$temp_table = snmpwalk_cache_oid($device, 'tempSensorTable', [], 'GEIST-MIB-V3');
 
 foreach ($temp_table as $index => $temp_data) {
     if ($temp_data['tempSensorAvail'] == 1) {
         $current_oid = '.1.3.6.1.4.1.21239.2.4.1.5.' . $index;
         $descr = $temp_data['tempSensorName'] . ': #' . $temp_data['tempSensorSerial'];
         $value = $temp_data['tempSensorTempC'];
-        discover_sensor($valid['sensor'], 'temperature', $device, $current_oid, $index, 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
+        discover_sensor(null, 'temperature', $device, $current_oid, $index, 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
     }
 }
 

@@ -1,0 +1,1138 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : gbnL3Mib.mi2
+--  Description  : Sample GBN Layer 3 Enterprise MIB - Hardware Independent 
+--  Version      : 0.14
+--  Date         : April 12, 2001     
+--
+--  Copyright (c) 2000-2001 admin Systems, Inc.  All Rights Reserved.
+--
+--  Reproduction of this document is authorized on condition that this
+--  copyright notice is included.  This sample GBN Layer 3 Enterprise MIB
+--  embodies proprietary intellectual property of admin Systems (ADMIN). 
+--  ADMIN retains all title and ownership in the specification, including any
+--  revisions.
+--
+--  It is the intent of ADMIN to encourage the widespread use of this
+--  specification in connection with the management of GBN-based products.  
+--  ADMIN grants vendors, end-users, and other interested parties a
+--  non-exclusive license to use this specification in connection with the
+--  management of GBN products.
+--
+--  This specification is supplied "AS IS", and ADMIN makes no warranty,
+--  either express or implied, as to the use, operations, condition,
+--  or performance of this specification.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--  Sample ADMIN GBN Generic Layer 3 Enterprise MIB
+--
+--  NOTES:
+--   1. This is a SMIv2 MIB.
+--
+--   2. The Layer 3 (L3) routing groups are defined independent of the
+--      underlying hardware or architecture.
+--
+--   3. This MIB is designed to be used with both "Layer 2 and Layer 3 hybrid
+--      switches" (L2/L3 hybrid) or with "Layer 3 only" (L3 only) switches.
+--
+--  The following groups are supported in the ADMIN GBN L3 Enterprise MIB:
+--   - gbnL3Mib             GBN Generic Layer 3 Routing MIB:
+--      - gbnL3IpMisc       Configure and retrieve global L3 objects   
+--      - gbnL3IpSubnet     Configure and retrieve IP subnet objects   
+--      - gbnL3IpStatic     Configure and retrieve IP static routes   
+--      - gbnL3IpDynamic    Configure and retrieve IP dynamic routes   
+--      - gbnL3IpRoute      Configure and retrieve IP routing info   
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    GBNL3-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Counter32, Gauge32,
+        Unsigned32, Integer32,
+        IpAddress                               FROM SNMPv2-SMI
+        
+        RowStatus, TruthValue, 
+        DisplayString, MacAddress               FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL3If                                 FROM GBNL3If-MIB;       
+
+    gbnL3Mib MODULE-IDENTITY
+        LAST-UPDATED    "0104120000Z"  -- April 12, 200
+        ORGANIZATION    "admin Systems, Inc."
+        CONTACT-INFO    "admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "GBN Generic Layer 3 MIB definition."
+
+        REVISION        "0104120000Z"  -- April 12, 200
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL3If 1 }
+
+------------------------------------------------------------------------------
+-- Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+--
+-- "DURABLE":
+--    Objects that are saved across a system reset and/or power cycle
+--    are noted as "DURABLE" for convenience in the DESCRIPTION
+--    section of the object definition.  Code must be explicitly
+--    written to implement these DURABLE objects.
+--
+
+------------------------------------------------------------------------------
+--  groups in the GBN Layer 3 MIB
+------------------------------------------------------------------------------
+    gbnL3IpMisc             OBJECT IDENTIFIER ::= { gbnL3Mib 1 }
+    gbnL3IpSubnet           OBJECT IDENTIFIER ::= { gbnL3Mib 2 }
+    gbnL3IpStatic           OBJECT IDENTIFIER ::= { gbnL3Mib 3 }
+--  gbnL3IpDynamic          OBJECT IDENTIFIER ::= { gbnL3Mib 4 }
+    gbnL3IpRoute            OBJECT IDENTIFIER ::= { gbnL3Mib 5 }
+    gbnL3MibConformance     OBJECT IDENTIFIER ::= { gbnL3Mib 6 }
+    gbnL3MibGroups          OBJECT IDENTIFIER ::= { gbnL3MibConformance 1 }
+    gbnL3MibCompliances     OBJECT IDENTIFIER ::= { gbnL3MibConformance 2 }
+    gbnL3IpVr               OBJECT IDENTIFIER ::= { gbnL3Mib 7 }
+
+------------------------------------------------------------------------------
+--
+--  gbnL3IpMisc:
+--      This group is used to configure and retrieve miscellaneous global
+--      Layer 3 parameters.
+--
+------------------------------------------------------------------------------
+--
+    gbnL3IpMiscNumLogicalPorts OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The number of logical ports (i.e., L2/L3 hybrid Aggregators or
+             L3 only interfaces).  For GBN, this is normally equal to the
+             number of physical ports."
+        ::= { gbnL3IpMisc 1 }  
+        
+    gbnL3IpMiscRouterId OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS  read-write
+        STATUS  obsolete
+        DESCRIPTION
+            "the title of a router
+            it is used when ospf is enable."
+        ::= { gbnL3IpMisc 2 }        
+
+    gbnL3IpMiscRoutingProtocol OBJECT-TYPE
+        SYNTAX  INTEGER {
+            none(0),        -- no dynamic routing protocols
+            rip(1),         -- RIPv1/v2
+            ospf(2),        -- OSPFv2
+            ripandOspf(3),
+            bgp(4)          --BGPv4
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "DURABLE: { none }
+             The selected dynamic routing protocol.
+
+             Note that static routing is still functional even when this
+             object is set to none(1)."
+        ::= { gbnL3IpMisc 3 }
+        
+        
+    gbnL3IpMiscOspfv2Config OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..4096))
+        MAX-ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+             "This object is used for retrieving the RFC1850
+              Open Shortest Path First version 2 (OSPFv2) nonvolatile
+              (NVM) configuration data in an ASCII character string format."
+             
+        REFERENCE
+              "RFC1583 OSPFv2,
+               RFC1850 OSPFv2 MIB, 
+               WindNet OSPFv2 1.1 Release Notes,
+               WindNet OSPFv2 1.1 User's Guide, Section 6 Configuration" 
+        ::= { gbnL3IpMisc 4 }        
+
+    gbnL3IpMiscRouteECMPSupport OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+             "This object is used for indicating whether ecmp route is supported."
+        ::= { gbnL3IpMisc 5 }
+
+    gbnL3IpMiscRouteECMPCount OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+             "This object is used for indicating the max number of a ecmp route.
+              when value is 1, means no ecmp."
+        ::= { gbnL3IpMisc 6 }
+
+    gbnL3IpMiscRouteWCMPSupport OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+             "This object is used for indicating whether wcmp route is supported."
+        ::= { gbnL3IpMisc 7 }
+
+------------------------------------------------------------------------------
+--
+--  gbnL3IpSubnet:
+--      This group is used to configure and retrieve subnet parameters
+--      required for the basic routing functionality.  Before a "L2/L3 hybrid"
+--      VLAN or a "L3 only" interface is used for routing, it must be assigned
+--      to at least one subnet.  Although GBN supports multiple subnets per
+--      VLAN or L3 interface, GBN recommends using one subnet per interface.
+--
+--      Note that the subnet IP address is added indirectly.  It is calculated
+--      by logically AND'ing the Agent's IP address (gbnL3IpSubnetAgentIpAddr)
+--      for this subnet with its subnet mask (gbnL3IpSubnetMask).  These
+--      subnets are automatically added to the software Routing Table by IP
+--      and can be seen in the gbnL3IpDynamicRouteTable.
+--
+--      For a L2/L3 hybrid switch, a static VLAN must be created for the
+--      specified gbnL3IpSubnetVidIface VLAN ID value before this entry can
+--      be used.
+--
+--      Note that one of the entries for the first interface in this table
+--      (i.e., gbnL3IpSubnetIfIndex for the 'sw0' swEND driver) is directly
+--      mapped to the IP address parameters in the GBN Common MIB
+--      (GBN-COMMON-MIB; i.e., gbnCommonIPIpAddress, gbnCommonIPNetMask).
+--      This allows the initial agent IP address to be set using the serial
+--      console, BOOTP, or DHCP.  The remaining subnet entries can be entered
+--      using SNMP or the Web management interfaces.
+--
+------------------------------------------------------------------------------
+--
+    gbnL3IpSubnetMaxRows  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum possible number of rows in the 'gbnL3IpSubnetTable'."
+        ::= { gbnL3IpSubnet 1 }
+
+    gbnL3IpSubnetCurrentRows  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current number of rows in the 'gbnL3IpSubnetTable'."
+        ::= { gbnL3IpSubnet 2 }
+
+    gbnL3IpSubnetTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GbnL3IpSubnetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of subnet parameters.  There is one entry
+             available for each of the 'gbnL3IpSubnetMaxRows'
+             supported IP subnets."
+        ::= { gbnL3IpSubnet 3 }
+
+    gbnL3IpSubnetEntry OBJECT-TYPE
+        SYNTAX GbnL3IpSubnetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of subnet parameters."
+        INDEX { gbnL3IpSubnetIfIndex, gbnL3IpSubnetAgentIpAddr }
+        ::= { gbnL3IpSubnetTable 1 }
+
+    GbnL3IpSubnetEntry ::= SEQUENCE {
+        gbnL3IpSubnetIfIndex        Integer32,
+        gbnL3IpSubnetAgentIpAddr    IpAddress,
+        gbnL3IpSubnetMask           IpAddress,
+        gbnL3IpSubnetVidIface       Integer32,
+        gbnL3IpSubnetName           DisplayString,
+        gbnL3IpSubnetRowStatus      RowStatus
+    }
+
+    gbnL3IpSubnetIfIndex  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The ifIndex of the swEND driver associated with this subnet."
+        ::= { gbnL3IpSubnetEntry 1 }
+
+    gbnL3IpSubnetAgentIpAddr  OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The network management station uses this IP Address to talk
+             with the Agent on this subnet.  This IP address logically
+             AND'ed with 'gbnL3IpSubnetMask' yields the actual subnet
+             value for this subnet."
+        ::= { gbnL3IpSubnetEntry 2 }
+
+    gbnL3IpSubnetMask  OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The subnet mask for this subnet.  It contains 1's in the
+             bit positions for the net and subnet IDs and 0's in the
+             bit positions for host ID.  The 1's must be contiguous,
+             starting with the left most bit."
+        ::= { gbnL3IpSubnetEntry 3 }
+
+    gbnL3IpSubnetVidIface  OBJECT-TYPE
+        SYNTAX Integer32 (0..4094)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { default=0:all }
+             For a L2/L3 hybrid switch, this object contains the actual
+             VLAN ID (VID) from 1 to 4094 or 0 if the VID is unassigned.
+             For a L3 only switch, this object contains the actual switch
+             interface from 1 to 4094 or 0 if unassigned.
+             
+             Changing this object for this row causes all rows with the same
+             'gbnL3IpSubnetIfIndex' as this row to be changed to this new
+             'gbnL3IpSubnetVidIface' value."
+        ::= { gbnL3IpSubnetEntry 4 }
+
+    gbnL3IpSubnetName  OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..16))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE:  { '':all )
+             A user reference name for this subnet."
+        ::= { gbnL3IpSubnetEntry 5 }
+
+    gbnL3IpSubnetRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "DURABLE:
+             This object indicates the status of this entry.  A row in this
+             table must be created using the createAndWait(5) action state
+             (i.e., createAndGo(4) is not supported).  This object can only
+             be set to active(1) after all objects for this row are valid.
+             The 'gbnL3IpSubnetName' is optional.
+             
+             Note that the notInService(2) state is not supported.  Objects
+             in this table row can be changed when this object is notReady(3)
+             or active(1)."
+        ::= { gbnL3IpSubnetEntry 6 }
+
+   gbnL3IpSubnetPrimaryIpTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GbnL3IpSubnetPrimaryIpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "子网的主ip地址表。"
+        ::= { gbnL3IpSubnet 4 }
+
+    gbnL3IpSubnetPrimaryIpEntry OBJECT-TYPE
+        SYNTAX GbnL3IpSubnetPrimaryIpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "子网的主ip地址表。"
+        INDEX { gbnL3IpSubnetPrimaryIpIfIndex}
+        ::= { gbnL3IpSubnetPrimaryIpTable 1 }
+
+    GbnL3IpSubnetPrimaryIpEntry ::= SEQUENCE {
+        gbnL3IpSubnetPrimaryIpIfIndex        Integer32,
+        gbnL3IpSubnetPrimaryIpIpAddr    IpAddress
+    }
+
+    gbnL3IpSubnetPrimaryIpIfIndex  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "接口的索引。"
+        ::= { gbnL3IpSubnetPrimaryIpEntry 1 }
+
+    gbnL3IpSubnetPrimaryIpIpAddr  OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "接口的主ip地址。"
+        ::= { gbnL3IpSubnetPrimaryIpEntry 2 }
+
+------------------------------------------------------------------------------
+--
+--  gbnL3IpStatic:
+--      This group is used to configure and retrieve static routes for both
+--      host and subnet IP destinations.
+--
+--      This group is independent of the underlying switch hardware and
+--      architecture.  It indicates how many Host IDs and Subnet IDs that
+--      the hardware can directly support, if any.  In general, hardware
+--      entries route much faster than software entries.
+--      
+--      The user can choose to reserve zero, some, or all of the available
+--      hardware entries for use as static routes.  The remaining entries,
+--      if any, are reserved for dynamic routes (e.g., RIP, OSPF, etc.).
+--
+--      Note that the default route entry (0.0.0.0) cannot be placed in this
+--      table.  If the default route was ever placed into the hardware route
+--      table, unknown routes would never be sent to the CPU (i.e., this would
+--      prevent new routes from being learned and/or placed into the hardware
+--      route table).  The default route is reserved for use by the agent.
+--
+------------------------------------------------------------------------------
+--
+    gbnL3IpStaticMaxHwHosts  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum number, if any, of hosts that the hardware
+             can support in its routing table.
+             
+             Note that if the hardware supports both hosts and subnets
+             in the same table, this number represents both and 
+             'gbnL3IpStaticMaxHwSubnets' is zero (0)."
+        ::= { gbnL3IpStatic 1 }
+
+    gbnL3IpStaticNumStaticHwHosts  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The number of 'gbnL3IpStaticMaxHwHosts' hosts that the user
+             would like to reserve for static routes.  A SNMPv1 badValue
+             or SNMPv2 wrongValue is returned if the user attempts to use
+             a value less than zero or greater than 'gbnL3IpStaticMaxHwHosts'.
+             
+             WARNING: This value is only used during system initialization
+             (i.e., after a reset)."
+        ::= { gbnL3IpStatic 2 }
+
+    gbnL3IpStaticMaxHwSubnets  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum number, if any, of subnets that the hardware
+             can support in its routing table.
+
+             Note that if the hardware supports both hosts and subnets
+             in the same table, this value is zero (0)."
+        ::= { gbnL3IpStatic 3 }
+
+    gbnL3IpStaticNumStaticHwSubnets  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The number of 'gbnL3IpStaticMaxHwSubnets' subnets that the user
+             would like to reserve for static routes.  An A SNMPv1 badValue
+             or SNMPv2 wrongValue is returned if the user attempts to use a
+             value less than zero or greater than 'gbnL3IpStaticMaxHwSubnets'.
+             
+             WARNING: This value is only used during system initialization
+             (i.e., after a reset)."
+        ::= { gbnL3IpStatic 4 }
+
+    gbnL3IpStaticRouteMaxRows  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum possible number of rows in the 
+             'gbnL3IpStaticRouteTable'."
+        ::= { gbnL3IpStatic 5 }
+
+    gbnL3IpStaticRouteCurrentRows  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current number of rows in the 'gbnL3IpStaticRouteTable'."
+        ::= { gbnL3IpStatic 6 }
+
+    gbnL3IpStaticRouteTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GbnL3IpStaticRouteEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of static routes."
+        ::= { gbnL3IpStatic 7 }
+
+    gbnL3IpStaticRouteEntry OBJECT-TYPE
+        SYNTAX GbnL3IpStaticRouteEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of static route parameters."
+        INDEX { gbnL3IpStaticDestIpAddr, gbnL3IpStaticVrId, gbnL3IpStaticECMPIndex }
+        ::= { gbnL3IpStaticRouteTable 1 }
+
+    GbnL3IpStaticRouteEntry ::= SEQUENCE {
+        gbnL3IpStaticDestIpAddr     IpAddress,
+        gbnL3IpStaticMask           IpAddress,
+        gbnL3IpStaticNextHop        IpAddress,
+        gbnL3IpStaticName           DisplayString,
+        gbnL3IpStaticUseHw          TruthValue,
+        gbnL3IpStaticInHw           TruthValue,
+        gbnL3IpStaticGateway        TruthValue,
+        gbnL3IpStaticRowStatus      RowStatus,
+        gbnL3IpStaticVrId           Integer32,
+        gbnL3IpStaticECMPIndex      Integer32,
+        gbnL3IpStaticWCMPWeight     Integer32
+    }
+
+    gbnL3IpStaticDestIpAddr  OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The static route host or subnet IP destination address.
+             All IP destination addresses must be non-zero."
+        ::= { gbnL3IpStaticRouteEntry 1 }
+
+    gbnL3IpStaticMask  OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The mask for this IP destination.  It contains 1's in the
+             bit positions for the net and subnet IDs and 0's in the
+             bit positions for host ID.  The 1's must be contiguous,
+             starting with the left most bit.
+             
+             Note that a host route uses a 255.255.255.255 mask."
+        ::= { gbnL3IpStaticRouteEntry 2 }
+
+    gbnL3IpStaticNextHop OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The IP address of the next hop of this route.
+            (In the case of a route bound to an interface
+            which is realized via a broadcast media, the value
+            of this field is the agent's IP address on that
+            interface.)"
+        ::= { gbnL3IpStaticRouteEntry 3 }
+
+    gbnL3IpStaticName  OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..16))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE:  { '':all )
+             A user reference name for this Static Route."
+        ::= { gbnL3IpStaticRouteEntry 4 }
+
+    gbnL3IpStaticUseHw  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { false:all )
+             By setting this object to true(1), the user indicates the
+             desire to use hardware routing for this entry.  To disable
+             hardware routing for this entry, set this object to false(2).
+             If the underlying switch fabric does not support hardware
+             routing, this object is ignored.
+
+             There is usually limited space in the hardware routing table.
+             Consequently, if the user enables hardware routing on 'too'
+             many entries, the agent assigns routes on a first come, first
+             serve basis (i.e., the user may not get the expected results)."
+        DEFVAL  { false }
+        ::= { gbnL3IpStaticRouteEntry 5 }
+
+    gbnL3IpStaticInHw  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "If this object is true(1), this static route is actually in
+             the hardware Route Table.  Otherwise it is false(2)."
+        ::= { gbnL3IpStaticRouteEntry 6 }
+
+    gbnL3IpStaticGateway  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { false:all )
+             By setting this object to true(1), the user indicates that this
+             subnet route is a gateway route (i.e., connected to external
+             router).  By setting it to false(2), the user indicates that this
+             is a direct route.  If 'gbnL3IpStaticMask' is '255.255.255.255'
+             (i.e., a host route) for this entry, this object cannot be set
+             to true(1)."
+        DEFVAL  { false }
+        ::= { gbnL3IpStaticRouteEntry 7 }
+
+    gbnL3IpStaticRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "DURABLE:
+             This object indicates the status of this entry.  A row in this
+             table must be created using the createAndWait(5) action state
+             (i.e., createAndGo(4) is not supported).  This object can only
+             be set to active(1) after all objects for this row are valid.
+             The 'gbnL3IpStaticName' is optional.
+             
+             Note that the notInService(2) state is not supported.  Objects
+             in this table row can be changed when this object is notReady(3)
+             or active(1)."
+        ::= { gbnL3IpStaticRouteEntry 8 }
+
+    gbnL3IpStaticVrId  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             virtual router index this route belongs to.when not support vrf,it value is always 0."
+        ::= { gbnL3IpStaticRouteEntry 9 }
+
+
+    gbnL3IpStaticECMPIndex  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             ECMP route index.when device dose not support ECMP,it's value must be 0."
+        ::= { gbnL3IpStaticRouteEntry 10 }
+
+    gbnL3IpStaticWCMPWeight  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             WCMP route weight.value range 1~(gbnL3IpMiscRouteECMPCount - 1).default value is 1,means ecmp.
+             change this for wcmp,but all wcmp route's sum can not exceed gbnL3IpMiscRouteECMPCount."
+        ::= { gbnL3IpStaticRouteEntry 11 }
+
+------------------------------------------------------------------------------
+--
+--  gbnL3IpRoute:
+--      The MIB II Routing Table (ipRouteTable) does not include the 
+--      information required to support the UNIX style "netstat -nr" command.
+--      This group replicates some of the ipRouteTable objects and adds
+--      additional objects to support the "netstat -nr" functionality.
+--
+--      Note that the "netstat -nr" functionality has not been implemented.
+--
+--      This table also provides 'RowStatus' support for the 'ipRouteTable'
+--      objects contained in this table.
+--
+--      The ipRouteTable objects are not actually duplicated, but use the CCD+
+--      "alternate object" capability to point back to the MIB II ipRouteTable.
+--      Note that the utilized ipRouteTable objects are presented here
+--      in a more logical order (similar to RFC1354).
+--
+------------------------------------------------------------------------------
+--
+    gbnL3IpRouteTableCurrentSwEntries  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of current entries in the software Routing Table."
+        ::= { gbnL3IpRoute 1 }
+
+    gbnL3IpRouteCurrentHwHosts  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of hardware host routing table entries currently
+             in use.  If the hardware does not have routing table support,
+             this value is zero (0).
+             
+             If the hardware supports both hosts and subnets
+             in the same table, this number represents both and
+             'gbnL3IpRouteCurrentHwSubnets' is zero (0)."
+        ::= { gbnL3IpRoute 2 }
+
+    gbnL3IpRouteCurrentHwSubnets  OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of hardware subnet routing table entries currently
+             in use.  If the hardware does not have routing table support,
+             this value is zero (0).
+
+             Note that if the hardware supports both hosts and subnets
+             in the same table, this value is zero (0)."
+        ::= { gbnL3IpRoute 3 }
+
+    gbnL3IpRouteTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF GbnL3IpRouteEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Provides Routing Table access.  This table can be used to
+             modify or add Routing Table entries.  Changes made with this
+             table are not saved to NVM (nonvolatile memory).  To save
+             static routes to NVM, use the gbnL3IpStaticRouteTable."
+        ::= { gbnL3IpRoute 4 }
+
+    gbnL3IpRouteEntry OBJECT-TYPE
+        SYNTAX  GbnL3IpRouteEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Provides enough routing information to support the UNIX style
+             'netstat -nr' command and to support maintenance of the
+             Routing Table."
+        INDEX   { gbnL3IpRouteDest , gbnL3IpRouteMask, gbnL3IpRouteVrId }
+        ::= { gbnL3IpRouteTable 1 }
+
+    GbnL3IpRouteEntry ::=
+        SEQUENCE {
+            gbnL3IpRouteDest        IpAddress,
+            gbnL3IpRouteMask        IpAddress,
+            gbnL3IpRouteNextHopIp   IpAddress,
+            gbnL3IpRouteNextHopMac  MacAddress,
+            gbnL3IpRouteIfIndex     Integer32,
+            gbnL3IpRouteType        INTEGER,
+            gbnL3IpRouteProto       INTEGER,
+            gbnL3IpRouteAge         Unsigned32,
+            gbnL3IpRouteMetric1     Integer32,
+            gbnL3IpRouteUsingHw     TruthValue,
+            gbnL3IpRouteIsStatic    TruthValue,
+            gbnL3IpRouteFlags       Unsigned32,
+            gbnL3IpRouteRef         Gauge32,
+            gbnL3IpRouteUse         Counter32,
+            gbnL3IpRouteRowStatus   RowStatus,
+            gbnL3IpRouteVrId        Integer32
+        }
+
+    gbnL3IpRouteDest OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The destination IP address of this route.  An
+            entry with a value of 0.0.0.0 is considered a
+            default route.  Multiple routes to a single
+            destination can appear in the table, but access to
+            such multiple entries is dependent on the table-
+            access mechanisms defined by the network
+            management protocol in use."
+        ::= { gbnL3IpRouteEntry 1 }
+
+    gbnL3IpRouteMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Indicate the mask to be logical-ANDed with the
+            destination address before being compared to the
+            value in the gbnL3IpRouteDest field.
+
+            If the value of the gbnL3IpRouteDest is 0.0.0.0 (a
+            default route), then the mask value is also
+            0.0.0.0.  It should be noted that all IP routing
+            subsystems implicitly use this mechanism."
+        ::= { gbnL3IpRouteEntry 2 }
+        
+    gbnL3IpRouteNextHopIp OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The IP address of the next hop of this route.
+            (In the case of a route bound to an interface
+            which is realized via a broadcast media, the value
+            of this field is the agent's IP address on that
+            interface.)"
+        ::= { gbnL3IpRouteEntry 3 }
+
+    gbnL3IpRouteNextHopMac OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The six byte MAC address of the next hop of this
+            route.  If the underlying hardware does not support this
+            object, an octet string of zero length is returned."
+        ::= { gbnL3IpRouteEntry 4 }
+
+    gbnL3IpRouteIfIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The index value which uniquely identifies the
+            local interface through which the next hop of this
+            route should be reached.  The interface identified
+            by a particular value of this index is the same
+            interface as identified by the same value of
+            ifIndex."
+        ::= { gbnL3IpRouteEntry 5 }
+
+    gbnL3IpRouteType OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),       -- none of the following
+            invalid(2),     -- an invalidated route
+            direct(3),      -- route to directly connected (sub-)network
+            indirect(4)     -- route to a non-local 
+                            -- host/network/sub-network
+                }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of route.  Note that the values
+            direct(3) and indirect(4) refer to the notion of
+            direct and indirect routing in the IP architecture.
+
+            Setting this object to the value invalid(2) has
+            the effect of invalidating the corresponding entry
+            in the gbnL3IpRouteTable object.  That is, it
+            effectively disassociates the destination
+            identified with said entry from the route
+            identified with said entry.  It is an
+            implementation-specific matter as to whether the
+            agent removes an invalidated entry from the table.
+            Accordingly, management stations must be prepared
+            to receive tabular information from agents that
+            corresponds to entries not currently in use.
+            Proper interpretation of such entries requires
+            examination of the relevant gbnL3IpRouteType object."
+        ::= { gbnL3IpRouteEntry 6 }
+
+    gbnL3IpRouteProto OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),       -- none of the following
+
+                            -- non-protocol information,
+            local(2),       -- e.g., manually configured entries
+
+            netmgmt(3),     -- set via a network management protocol
+
+            icmp(4),        -- obtained via ICMP, e.g., Redirect
+
+                            -- the remaining values are all gateway
+                            -- routing protocols
+            egp(5),
+            ggp(6),
+            hello(7),
+            rip(8),
+            is-is(9),
+            es-is(10),
+            ciscoIgrp(11),
+            bbnSpfIgp(12),
+            ospf(13),
+            bgp(14)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The routing mechanism via which this route was
+            learned.  Inclusion of values for gateway routing
+            protocols is not intended to imply that hosts
+            should support those protocols."
+        ::= { gbnL3IpRouteEntry 7 }
+
+    gbnL3IpRouteAge OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The number of seconds since this route was last
+            updated or otherwise determined to be correct.
+            Note that no semantics of `too old' can be implied
+            except through knowledge of the routing protocol
+            by which the route was learned."
+        ::= { gbnL3IpRouteEntry 8 }
+
+    gbnL3IpRouteMetric1 OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The primary routing metric for this route.  The
+            semantics of this metric are determined by the
+            routing-protocol specified in the route's
+            gbnL3IpRouteProto value.  If this metric is not used,
+            its value should be set to -1."
+        ::= { gbnL3IpRouteEntry 9 }
+
+    gbnL3IpRouteUsingHw OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object is true(1) if this route is contained in
+            the hardware routing table; otherwise, it is false(2)."
+        ::= { gbnL3IpRouteEntry 10 }
+
+    gbnL3IpRouteIsStatic OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object is true(1) if this route is defined in the
+            'gbnL3IpStaticRouteTable'.  This object is false(2) if this
+            route was created dynamically (e.g., with RIP, OSPF) or was
+            manually created using this table ('gbnL3IpRouteTable') or 
+            the RFC1213 'ipRouteTable'."
+        ::= { gbnL3IpRouteEntry 11 }
+
+    gbnL3IpRouteFlags OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Not implemented.  Returns '0'.
+             
+             Contains the information required for a netstat-like
+             'Flags' field.
+             
+             The flags field represents a decimal value of the flags
+             specified for a given route.  The following is a list of
+             currently available flag values:
+                 0x1     | - route is usable (that is, 'up')
+                 0x2     | - destination is a gateway
+                 0x4     | - host specific routing entry
+                 0x8     | - host or net unreachable
+                 0x10    | - created dynamically (by redirect)
+                 0x20    | - modified dynamically (by redirect)
+                 0x40    | - message confirmed
+                 0x80    | - subnet mask present
+                 0x100   | - generate new routes on use
+                 0x200   | - external daemon resolves name
+                 0x400   | - generated by ARP
+                 0x800   | - manually added (static)
+                 0x1000  | - just discard packets (during updates)
+                 0x2000  | - modified by management protocol
+                 0x4000  | - protocol specific routing flag
+                 0x8000  | - protocol specific routing flag
+
+            For example, if the entry in the Routing Table has a flag
+            value of decimal 5, (0x1 OR'ed with 0x4), then this route
+            is 'up' and usable and is host-specific."
+        ::= { gbnL3IpRouteEntry 12 }
+
+    gbnL3IpRouteRef OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Not implemented.  Returns '0'.
+            
+             Contains the information required for the netstat 'Ref'
+             field, which indicates the number active uses for this
+             route."
+        ::= { gbnL3IpRouteEntry 13 }
+
+    gbnL3IpRouteUse OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Not implemented.  Returns '0'.
+            
+             Contains the information required for the netstat 'Use'
+             field, which indicates the number of packets sent with
+             this route."
+        ::= { gbnL3IpRouteEntry 14 }
+
+    gbnL3IpRouteRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the status of this entry.  A row in this
+             table must be created using the createAndWait(5) action state
+             (i.e., createAndGo(4) is not supported).  This object can only
+             be set to active(1) for the specified 'gbnL3IpRouteDest' index
+             value after the 'gbnL3IpRouteMask' and 'gbnL3IpRouteNextHop'
+             objects for this row are valid.  Setting 'gbnL3IpRouteType' is
+             optional.
+             
+             Note that the notInService(2) state is not supported.  Objects
+             in this table row can be changed when this object is notReady(3)
+             or active(1)."
+        ::= { gbnL3IpRouteEntry 15 }
+
+    gbnL3IpRouteVrId  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             virtual router index this route belongs to.when not support vrf,it value is always 0."
+        ::= { gbnL3IpRouteEntry 16 }
+
+------------------------------------------------------------------------------
+--  conformance information
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+--  units of conformance
+------------------------------------------------------------------------------
+
+    gbnL3IpMiscGroup    OBJECT-GROUP
+        OBJECTS {
+            gbnL3IpMiscNumLogicalPorts,
+            gbnL3IpMiscRoutingProtocol,
+            gbnL3IpMiscOspfv2Config
+        }
+        STATUS  current
+        DESCRIPTION
+           "This group configures and retrieves global, miscellaneous
+            L3 objects."
+        ::= { gbnL3MibGroups 1 }
+    
+    gbnL3IpSubnetGroup  OBJECT-GROUP
+        OBJECTS {
+            gbnL3IpSubnetMaxRows,
+            gbnL3IpSubnetCurrentRows,
+            gbnL3IpSubnetMask,
+            gbnL3IpSubnetVidIface,
+            gbnL3IpSubnetName,
+            gbnL3IpSubnetRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+           "This group configures and retrieves IP subnet objects."
+        ::= { gbnL3MibGroups 2 }
+    
+    gbnL3IpStaticGroup  OBJECT-GROUP
+        OBJECTS {
+            gbnL3IpStaticMaxHwHosts,
+            gbnL3IpStaticNumStaticHwHosts,
+            gbnL3IpStaticMaxHwSubnets,
+            gbnL3IpStaticNumStaticHwSubnets,
+            gbnL3IpStaticRouteMaxRows,
+            gbnL3IpStaticRouteCurrentRows,
+            gbnL3IpStaticMask,
+            gbnL3IpStaticNextHop,
+            gbnL3IpStaticName,
+            gbnL3IpStaticUseHw,
+            gbnL3IpStaticInHw,
+            gbnL3IpStaticGateway,
+            gbnL3IpStaticRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+           "This group configures and retrieves IP static routes."
+        ::= { gbnL3MibGroups 3 }
+
+    gbnL3IpRouteGroup   OBJECT-GROUP
+        OBJECTS {
+            gbnL3IpRouteTableCurrentSwEntries,
+            gbnL3IpRouteCurrentHwHosts,
+            gbnL3IpRouteCurrentHwSubnets,
+            gbnL3IpRouteMask,
+            gbnL3IpRouteNextHopIp,
+            gbnL3IpRouteNextHopMac,
+            gbnL3IpRouteIfIndex,
+            gbnL3IpRouteType,
+            gbnL3IpRouteProto,
+            gbnL3IpRouteAge,
+            gbnL3IpRouteMetric1,
+            gbnL3IpRouteUsingHw,
+            gbnL3IpRouteIsStatic,
+            gbnL3IpRouteFlags,
+            gbnL3IpRouteRef,
+            gbnL3IpRouteUse,
+            gbnL3IpRouteRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+           "This group configures and retrieves IP routing info."
+        ::= { gbnL3MibGroups 5 }
+
+------------------------------------------------------------------------------
+--  compliance statements
+------------------------------------------------------------------------------
+
+    gbnL3MibCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+           "The compliance statement."
+        MODULE  -- this module
+        MANDATORY-GROUPS {
+             gbnL3IpMiscGroup,
+             gbnL3IpSubnetGroup,
+             gbnL3IpStaticGroup,
+             gbnL3IpRouteGroup
+        }
+        ::= { gbnL3MibCompliances 1 }
+
+------------------------------------------------------------------------------
+--
+--  gbnL3IpVr:
+--
+------------------------------------------------------------------------------
+--
+    gbnL3IpSubnetVrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GbnL3IpSubnetVrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of subnet vr parameters. "
+        ::= { gbnL3IpVr 1 }
+
+    gbnL3IpSubnetVrEntry OBJECT-TYPE
+        SYNTAX GbnL3IpSubnetVrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of subnet vr parameters."
+        INDEX { gbnL3IpSubnetVrIfIndex }
+        ::= { gbnL3IpSubnetVrTable 1 }
+
+    GbnL3IpSubnetVrEntry ::= SEQUENCE {
+        gbnL3IpSubnetVrIfIndex        Integer32,
+        gbnL3IpSubnetVrId             Integer32
+    }
+
+    gbnL3IpSubnetVrIfIndex  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The ifIndex of the swEND driver associated with this subnet."
+        ::= { gbnL3IpSubnetVrEntry 1 }
+
+    gbnL3IpSubnetVrId  OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+            virtual router index this ip-subnet belongs to.when not support vrf,it value is always 0."
+        ::= { gbnL3IpSubnetVrEntry 2 }
+
+--
+-- END of GBN-L3-MIB
+--
+
+END

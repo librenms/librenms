@@ -1,0 +1,3 @@
+modules:
+    os:
+        hardware: LLDP-MIB::lldpLocSysName.0

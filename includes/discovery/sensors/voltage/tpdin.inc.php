@@ -15,44 +15,43 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
-$tpdin_oids = array(
-    array(
-        'oid'     => '.1.3.6.1.4.1.45621.2.2.5.0',
-        'index'   => 'voltage1',
-        'descr'   => 'Voltage 1',
+$tpdin_oids = [
+    [
+        'oid' => '.1.3.6.1.4.1.45621.2.2.5.0',
+        'index' => 'voltage1',
+        'descr' => 'Voltage 1',
         'current' => $pre_cache['tpdin_monitor'][0]['voltage1'],
-    ),
-    array(
-        'oid'     => '.1.3.6.1.4.1.45621.2.2.6.0',
-        'index'   => 'voltage2',
-        'descr'   => 'Voltage 2',
+    ],
+    [
+        'oid' => '.1.3.6.1.4.1.45621.2.2.6.0',
+        'index' => 'voltage2',
+        'descr' => 'Voltage 2',
         'current' => $pre_cache['tpdin_monitor'][0]['voltage2'],
-    ),
-    array(
-        'oid'     => '.1.3.6.1.4.1.45621.2.2.7.0',
-        'index'   => 'voltage3',
-        'descr'   => 'Voltage 3',
+    ],
+    [
+        'oid' => '.1.3.6.1.4.1.45621.2.2.7.0',
+        'index' => 'voltage3',
+        'descr' => 'Voltage 3',
         'current' => $pre_cache['tpdin_monitor'][0]['voltage3'],
-    ),
-    array(
-        'oid'     => '.1.3.6.1.4.1.45621.2.2.8.0',
-        'index'   => 'voltage4',
-        'descr'   => 'Voltage 4',
+    ],
+    [
+        'oid' => '.1.3.6.1.4.1.45621.2.2.8.0',
+        'index' => 'voltage4',
+        'descr' => 'Voltage 4',
         'current' => $pre_cache['tpdin_monitor'][0]['voltage4'],
-    ),
-);
+    ],
+];
 
 foreach ($tpdin_oids as $data) {
     if ($data['current'] > 0) {
-        discover_sensor($valid['sensor'], 'voltage', $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
+        discover_sensor(null, 'voltage', $device, $data['oid'], $data['index'], $device['os'], $data['descr'], 10, '1', null, null, null, null, $data['current']);
     }
 }
 

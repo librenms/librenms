@@ -7,25 +7,23 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 poller_modules:
-    cisco-cbqos: 1
-    cisco-cef: 1
-    cisco-mac-accounting: 1
-    cisco-voice: 1
-    cisco-remote-access-monitor: 1
-    cisco-sla: 1
-    cisco-ipsec-flow-monitor: 1
-    cipsec-tunnels: 1
-    cisco-otv: 1
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-remote-access-monitor: true
+    slas: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
 discovery_modules:
-    cisco-cef: 1
-    cisco-sla: 1
-    cisco-mac-accounting: 1
-    cisco-otv: 1
-    cisco-pw: 1
-    cisco-vrf: 1
-    cisco-vrf-lite: 1
-mib_dir:
-    - cisco
+    cisco-cef: true
+    slas: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
+mib_dir: cisco
 discovery:
-    - sysDescr_regex:
-        - '/^Cisco Intrusion Prevention System/'
+    -
+        sysDescr_regex:
+            - '/^Cisco Intrusion Prevention System/'

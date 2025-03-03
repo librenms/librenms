@@ -1,0 +1,299 @@
+-- *****************************************************************
+-- UBIQUOSS-SYSINFO-MIB.mib:  
+-- Ubiquoss Enterprise System Configuration Structure of Management Information
+--
+-- July 2006, Jisoo Kim
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+UBIQUOSS-SYSINFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS	
+	DisplayString 
+		FROM RFC1213-MIB  
+	IANAifType                               
+		FROM IANAifType-MIB
+	ubiMgmt
+		FROM UBQS-SMI		
+	RowStatus, PhysAddress
+		FROM SNMPv2-TC;
+		         
+ubiSysInfoMIB  MODULE-IDENTITY
+	LAST-UPDATED "0607130000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+        "Chair    :  jisoo Kim
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      jisoo@ubiquoss.com
+         Phone:      +82-2-2190-3100
+
+         Co-editor:  Paul 
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      paul@ubiquoss.com
+         Phone:      +82-2-2190-3100"
+    DESCRIPTION
+        "This MIB module defines MIB objects which provide
+         mechanisms to remotely configure the parameters
+         used by an SNMP entity for the generation of
+         notifications."
+	::= { ubiMgmt  100 }	
+
+ubiSysInfoMIBObjects  OBJECT IDENTIFIER ::= { ubiSysInfoMIB 1 }	    
+ 
+-- ***********************************************************
+-- sysInfoTable
+-- ***********************************************************
+
+ 	ubiSysInfoTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  UbiSysInfoEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION	
+			"information of configuration"
+		::=  { ubiSysInfoMIBObjects 1 }
+
+	ubiSysInfoEntry	OBJECT-TYPE
+		SYNTAX		UbiSysInfoEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION	
+			"information of configuration"
+		INDEX		{ ubiSysIndex }
+		::=  { ubiSysInfoTable 1 }
+
+	UbiSysInfoEntry  ::=  SEQUENCE {
+		ubiSysIndex			Integer32,
+		ubiSysDescr         DisplayString,
+        ubiSysObjectID		OBJECT IDENTIFIER,
+        ubiSysUpTime        TimeTicks,
+        ubiSysName          DisplayString,
+        ubiSysSerialNumber	DisplayString,
+        ubiSysMacAddress	PhysAddress,
+        ubiSysHwVersion		DisplayString,
+        ubiSysSwVersion		DisplayString,
+        ubiSysFwVersion		DisplayString,
+        ubiSysReset			INTEGER,
+        ubiSystemDateAndTime  DisplayString,  
+		ubiTimeZoneCurrent  DisplayString,
+		ubiSysDayBanner			DisplayString 
+    } 
+		
+	ubiSysIndex	OBJECT-TYPE	
+		SYNTAX			Integer32   
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION		
+				"An index value that uniquely identifies this chassis"
+		::=  {  ubiSysInfoEntry  1  }
+		
+	ubiSysDescr OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+		::=  {  ubiSysInfoEntry  2  }
+
+	ubiSysObjectID OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+		::=  {  ubiSysInfoEntry  3  }
+
+	ubiSysUpTime OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+		::=  {  ubiSysInfoEntry  4  }
+
+	ubiSysName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+		::=  {  ubiSysInfoEntry  5  }
+
+	ubiSysSerialNumber	OBJECT-TYPE	
+		SYNTAX			DisplayString   
+		ACCESS			read-only
+		STATUS			current
+		DESCRIPTION		
+				"SerialNumber"
+		::=  {  ubiSysInfoEntry 6 }
+    
+    ubiSysMacAddress	OBJECT-TYPE	
+		SYNTAX			PhysAddress   
+		ACCESS			read-only
+		STATUS			current
+		DESCRIPTION		
+				"system mac address"
+		::=  {  ubiSysInfoEntry 7 }
+		
+	ubiSysHwVersion	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION		
+				"hardware version"
+		::=  {  ubiSysInfoEntry  8  }
+		
+	ubiSysSwVersion	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION		
+				"software version"
+		::=  {  ubiSysInfoEntry  9  }
+	
+	ubiSysFwVersion	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION		
+				"firmware version"
+		::=  {  ubiSysInfoEntry  10  }
+		
+	ubiSysReset OBJECT-TYPE
+        SYNTAX	INTEGER 
+        {
+			none(0),       -- none of the following
+			reset(1)        -- resetting the system
+		}
+        MAX-ACCESS	read-write
+        STATUS		current
+        DESCRIPTION	"reset of system"  
+		::= { ubiSysInfoEntry 11 }       
+		                                                     
+	ubiSystemDateAndTime OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..20))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"system date and time string"
+		::= { ubiSysInfoEntry 12 }                
+		
+	ubiTimeZoneCurrent OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..255))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { ubiSysInfoEntry 13 }    
+		
+	ubiSysDayBanner OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..255))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Modify the system Day banner"          
+		::= { ubiSysInfoEntry 14 }   	     
+ 	
+-- *****************************************************************
+--	
+-- *****************************************************************		
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ubiSysInfoMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiSysInfoMIB 2 }
+ubiSysInfoMIBNotifications OBJECT IDENTIFIER ::= { ubiSysInfoMIBNotificationPrefix 0 }
+
+ubiSysAlarmNotification NOTIFICATION-TYPE
+        OBJECTS {
+                ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus                
+                }
+        STATUS  current
+        DESCRIPTION
+                "A sysAlarmNotification is sent if system restart."
+        ::= { ubiSysInfoMIBNotifications 1 }              
+        
+        
+-- conformance information
+
+ubiSysInfoMIBConformance OBJECT IDENTIFIER ::= { ubiSysInfoMIB 3 }
+ubiSysInfoMIBCompliances OBJECT IDENTIFIER ::= { ubiSysInfoMIBConformance 1 }
+ubiSysInfoMonMIBGroups      OBJECT IDENTIFIER ::= { ubiSysInfoMIBConformance 2 }
+
+
+-- compliance statements
+ubiSysInfoMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Cisco Environmental Monitor MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ubiSysInfoMIBGroup,
+                                   ubiSysInfoMIBAlarmNotifGroup }
+
+        GROUP   ubiSysInfoMIBGroup
+        DESCRIPTION
+                "The ubiSysInfoMIBGroup is optional. 
+                 This group is applicable for implementations which
+                 need information for system."
+
+        GROUP   ubiSysInfoMIBAlarmNotifGroup
+        DESCRIPTION
+                "The ubiSysInfoMIBAlarmNotifGroup is optional. 
+                 This group is applicable for implementations which
+                 need alarm notifications for system"
+
+        ::= { ubiSysInfoMIBCompliances 1 }          
+        
+-- units of conformance
+ubiSysInfoMIBGroup OBJECT-GROUP
+        OBJECTS {  
+
+                ubiSysDescr,
+                ubiSysObjectID,
+                ubiSysUpTime,
+                ubiSysName,
+                ubiSysSerialNumber,
+                ubiSysMacAddress,
+                ubiSysHwVersion,
+                ubiSysSwVersion,
+                ubiSysFwVersion
+
+        }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss system information."
+        ::= { ubiSysInfoMonMIBGroups 1 }
+
+ubiSysInfoMIBAlarmNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS  {
+                ubiSysAlarmNotification
+        }
+        STATUS current
+        DESCRIPTION
+                "A notification group providing system alarm notification
+                 for system. "
+        ::= { ubiSysInfoMonMIBGroups 2 }             
+        
+
+                             
+ END
+ 

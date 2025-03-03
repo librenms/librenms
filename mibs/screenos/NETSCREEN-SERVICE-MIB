@@ -1,0 +1,323 @@
+-- This module defines enterprise MIBs for Services
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SERVICE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenService
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenServiceMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor
+         service configuration in NetScreen device."
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105140000Z" -- May 14, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenService 0 }
+
+NsServiceEntry ::= SEQUENCE
+{
+    nsServiceIndex       Integer32,
+    nsServiceName        DisplayString,
+    nsServiceCategory    INTEGER,
+    nsServiceTransProto  INTEGER,
+    nsServiceSrcPortLow  Integer32,
+    nsServiceSrcPortHigh Integer32,
+    nsServiceDstPortLow  Integer32,
+    nsServiceDstPortHigh Integer32,
+    nsServiceFlag        INTEGER,
+    nsServiceVsys        Integer32
+}
+
+NsServiceGroupEntry ::= SEQUENCE
+{
+    nsServiceGroupIndex   Integer32,
+    nsServiceGroupName    DisplayString,
+    nsServiceGroupMember  Integer32,
+    nsServiceGroupComment DisplayString,
+    nsServiceGroupVsys    Integer32
+}
+
+NsServiceGrpMemberEntry ::= SEQUENCE
+{
+    nsServiceGrpMemberIndex  Integer32,
+    nsServiceGrpName         DisplayString,
+    nsServiceGroupMemberName DisplayString,
+    nsServiceGroupMemberVsys Integer32
+}
+
+nsServiceTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsServiceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Services are types of IP traffic for which protocol standards
+         exist. This table collects all the service configurations
+         existing in NetScreen device."
+    ::= { netscreenService 1 }
+
+nsServiceEntry OBJECT-TYPE
+    SYNTAX        NsServiceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each enry in the nsServiceTable holds a set of configuration
+         parameters  associated with an instance of service."
+    INDEX
+        { nsServiceIndex }
+    ::= { nsServiceTable 1 }
+
+nsServiceIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each address.  Its value ranges between 0
+         and 65535 and may not be contiguous."
+    ::= { nsServiceEntry 1 }
+
+nsServiceName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Service name."
+    ::= { nsServiceEntry 2 }
+
+nsServiceCategory OBJECT-TYPE
+    SYNTAX        INTEGER {
+        remote(1),
+        email(2),
+        infoseek(3),
+        security(4),
+        other(5)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Category this service belongs to."
+    ::= { nsServiceEntry 3 }
+
+nsServiceTransProto OBJECT-TYPE
+    SYNTAX        INTEGER {
+    	other(0),
+	   	icmp(1),
+		tcp(6),
+        udp(17),
+		egp(8),
+		igp(9),
+		udp(17),
+		rsvp(46),
+		gre(47),
+		ospf(89)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Service trans protocol.
+         6 means tcp
+         17 means udp"
+    ::= { nsServiceEntry 4 }
+
+nsServiceSrcPortLow OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The low source port number associated with service."
+    ::= { nsServiceEntry 5 }
+
+nsServiceSrcPortHigh OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The high source port number associated with service."
+    ::= { nsServiceEntry 6 }
+
+nsServiceDstPortLow OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The low destination port number associated with service."
+    ::= { nsServiceEntry 7 }
+
+nsServiceDstPortHigh OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The high source port number associated with service."
+    ::= { nsServiceEntry 8 }
+
+nsServiceFlag OBJECT-TYPE
+    SYNTAX        INTEGER {
+        pre-define(0),
+        usr-define(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Service flag used to indicate if the service is a pre-defined
+         one or a custom one."
+    ::= { nsServiceEntry 9 }
+
+nsServiceVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual system this configuration belongs to."
+    ::= { nsServiceEntry 10 }
+
+nsServiceGroupTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsServiceGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Services can be organized into service group for convenience.
+         This table collects all service group entries in NetScreen
+         device."
+    ::= { netscreenService 2 }
+
+nsServiceGroupEntry OBJECT-TYPE
+    SYNTAX        NsServiceGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsServiceGroupTable holds a set of
+         information about service group."
+    INDEX
+        { nsServiceGroupIndex }
+    ::= { nsServiceGroupTable 1 }
+
+nsServiceGroupIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each group.  Its value ranges between 0 and
+         65535 and may not be contiguous."
+    ::= { nsServiceGroupEntry 1 }
+
+nsServiceGroupName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Service group name."
+    ::= { nsServiceGroupEntry 2 }
+
+nsServiceGroupMember OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Service member number in service group."
+    ::= { nsServiceGroupEntry 3 }
+
+nsServiceGroupComment OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Comments for service group."
+    ::= { nsServiceGroupEntry 4 }
+
+nsServiceGroupVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual system this group belongs to."
+    ::= { nsServiceGroupEntry 5 }
+
+nsServiceGrpMemberTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsServiceGrpMemberEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Service group membership info table will show detail
+         information of a service group."
+    ::= { netscreenService 3 }
+
+nsServiceGrpMemberEntry OBJECT-TYPE
+    SYNTAX        NsServiceGrpMemberEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing attributes service group's member info"
+    INDEX
+        { nsServiceGrpMemberIndex }
+    ::= { nsServiceGrpMemberTable 1 }
+
+nsServiceGrpMemberIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each group.  Its value ranges between 0 and
+         65535 and may not be contiguous."
+    ::= { nsServiceGrpMemberEntry 1 }
+
+nsServiceGrpName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Specific service group name"
+    ::= { nsServiceGrpMemberEntry 2 }
+
+nsServiceGroupMemberName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Specific service name in the service group."
+    ::= { nsServiceGrpMemberEntry 3 }
+
+nsServiceGroupMemberVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual system this configuration belongs to"
+    ::= { nsServiceGrpMemberEntry 4 }
+
+END
+
+

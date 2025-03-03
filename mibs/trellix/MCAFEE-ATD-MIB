@@ -1,0 +1,296 @@
+-- *****************************************************************
+-- MCAFEE-ATD.mib:  
+-- McAfee Enterprise Structure of Management Information
+-- Nov 2014, Pravin Yarolkar, Pawan Bhandari
+-- Jan 2018, Vibhavari Mandal
+-- Copyright (c) 2014 by McAfee, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+MCAFEE-ATD-MIB DEFINITIONS ::= BEGIN
+--
+-- Top-level infrastructure of the Mcafee-ATD product MIB tree
+--
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32 FROM SNMPv2-SMI
+    matdProducts
+        FROM MCAFEE-INTRUVERT-SMI;
+
+mcAfeeATDMIB MODULE-IDENTITY
+    LAST-UPDATED "201411200000Z"
+    ORGANIZATION "McAfee, Inc."
+    CONTACT-INFO
+         "McAfee Customer Service Department
+         Postal: 5000 Headquarters Drive
+         Plano, TX  75024
+         USA
+         Tel: +1 800 338 8754
+         E-mail: support@mcafee.com"
+    DESCRIPTION
+        "Top-level infrastructure of the MATD product under enterprise.mcafee-intruvert MIB tree."
+    REVISION "201411170000Z"
+    DESCRIPTION
+        "Initial Draft"
+::= { matdProducts 1}
+
+mcAfeeATDMIBObjects OBJECT IDENTIFIER ::= { mcAfeeATDMIB 1 }
+
+atdCPUUtilizationAvg OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides CPU utilization of the system."
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 1 }
+
+atdMemoryUtilization OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides Memory utilization of the system."
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 2 }
+
+atdHDDSystemSpaceUtilization OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides HDD system space utilization of the system."
+    ::= { mcAfeeATDMIBObjects 3 }
+
+atdHDDDataSpaceUtilization OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides HDD data space utilization of the system."
+    ::= { mcAfeeATDMIBObjects 4 }
+
+atdInterfaceCountTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AtdInterfaceCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table to list the received and sent packets over physical interfaces present in the system."
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 5 }
+
+atdInterfaceCountEntry OBJECT-TYPE
+    SYNTAX      AtdInterfaceCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the atdInterfaceCountTable."
+    INDEX { atdInterfaceCountIndex }
+    ::= { atdInterfaceCountTable 1 }
+
+AtdInterfaceCountEntry ::= SEQUENCE
+{
+    atdInterfaceCountIndex INTEGER,
+    atdInterfaceCountRx INTEGER,
+    atdInterfaceCountTx INTEGER
+}
+
+atdInterfaceCountIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The auxiliary variable used for identifying instances of the columnar objects in the atdInterfaceCountTable."
+    ::= { atdInterfaceCountEntry 1 }
+
+atdInterfaceCountRx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received packets on given interface."
+    DEFVAL { 0 }
+    ::= { atdInterfaceCountEntry 2 }
+
+atdInterfaceCountTx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted packets on given interface."
+    DEFVAL { 0 }
+    ::= { atdInterfaceCountEntry 3 }
+
+atdFileWaiting OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides number of sample in waiting in the system."
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 6 }
+
+atdFileAnalyzing OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides number of sample in analyzing in the system."
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 7 }
+
+atdSystemTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides system temperature."
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 8 }
+
+
+atdSystemHealth OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides system health.Value is 
+		1 if SYSTEM health is GOOD
+		0 if SYETM health is BAD"
+    DEFVAL { 0}
+    ::= { mcAfeeATDMIBObjects 9 }
+
+atdBackupSchedulerStatus OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides configured backup scheduler status. Value is 
+		1 if Backup Scheduler Status is OK
+		0 if Backup Scheduler status is Failed"
+    DEFVAL { 0}
+    ::= { mcAfeeATDMIBObjects 10 }
+
+atdLoadBalancerStatus OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides ATD Load Balancer Status. Value is 
+		0 if device is in standalone mode
+		1 if LB status is DOWN
+		2 if LB status is UP and RUNNING
+		3 if Node status is SW VERSION MISMATCH
+		4 if Primary Node LB services are not UP
+	    5 if SCP failed
+	    6 if VM creation failed
+	    7 if Invalid Status"
+		
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 11 }
+
+atdEmailConnectorStatus OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides ATD Email Connector Status.Value is
+		0 if Email Connector status is DISABLED
+		1 if EmailConnector status is Enabled and EmailConnector health is GOOD
+		2 if EmailConnector health is DEGRADED
+		3 if EmailConnector health is OVERLOADED"
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 12 }
+
+atdEmailGatewayWaitTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether system waittime is more than Email Gateway Wait Time threshold waittime. Value is 
+		1 if threshold is reached 
+		0 otherwise"
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 13 }
+
+atdMalwareInterfaceStatus OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides ATD Malware Interface status. Value is 
+		1 if interface status is UP
+		0 if interface status is DOWN"
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 14 }
+
+atdLicenseStatus OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides ATD License Status. Value is 
+		1 if License is VALID
+		2 if License is INVALID
+                3 if License is EXPIRED"
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 15 }
+
+atdDXLChannelStatus OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides DXL status. Value is 
+		1 if DXL is UP
+		0 if DXL is DOWN"
+    DEFVAL {0}
+    ::= { mcAfeeATDMIBObjects 16 }
+
+atdSensorStatus OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides Sensor status. Value is 
+		0 if Sensor status is INACTIVE
+		1 if Sensor status is ACTIVE
+		2 if Sensor status is NOT CONNECTED"
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 17 }
+
+atdTAXIIStatus OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides TAXII Status. Value is 
+		0 if TAXII channel health is DOWN
+		1 if TAXII channel health is UP
+		2 if TAXII channel health is UNKNOWN"
+    DEFVAL { 0 }
+	::= { mcAfeeATDMIBObjects 18 }
+	
+atdHDDVarSpaceUtilization OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides Var disk utilization in %"
+    DEFVAL { 0 }
+	::= { mcAfeeATDMIBObjects 19 }
+
+atdMalwareDNSStatus OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides Malware DNS status. Value is
+                1 if MALWARE DNS status is good
+                0 if MALWARE DNS status is bad"
+    DEFVAL { 0 }
+    ::= { mcAfeeATDMIBObjects 20 }
+END

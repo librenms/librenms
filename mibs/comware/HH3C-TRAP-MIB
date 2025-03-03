@@ -1,0 +1,675 @@
+-- =================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This file describes the enterprise mib implementation
+--              of sending some traps.
+-- Reference:
+-- Version: V1.6
+-- History:
+--   V1.0 created by Huang Yang
+--     Initial version 2005-01-25
+--   V1.1 2005-10-27  added hh3cArpPortDynamicEntryFullTrap by ZhangLin
+--   V1.2 2007-02-06  added hh3cNdTabTrapEnable, hh3cNdTabTrapInterval,
+--                    hh3cNdTabLen and hh3cNdTabFullTrap by lizuxing04859
+--   V1.3 2008-07-18  added hh3cPeriodicalTrapGroup by songhao
+--   V1.4 2009-10-09  modified hh3cPeriodicalTrapInterval by lisong
+--   V1.5 2010-03-06  added hh3cPeriodicalTrapSwitch, hh3cTrapDesInfoTable
+--                    hh3cTrapConfigTable by haoyan
+--        2010-04-29  added hh3cDefaultRtDelTrap by wenchenhua
+--        2010-06-05  added hh3cTrapDesAddrTAddress by jinyi
+--   V1.6 2013-09-13  added hh3cPeriodicalTrapSwitch2 and
+--                    hh3cTrapConfigSwitch2 by duyanbing
+-- =================================================================
+HH3C-TRAP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        IpAddress
+            FROM SNMPv2-SMI
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+        ifIndex, ifDescr, InterfaceIndex
+            FROM IF-MIB
+        RowStatus, TAddress, TruthValue
+            FROM SNMPv2-TC
+        Integer32, OBJECT-TYPE,
+        MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        hh3cCommon
+            FROM HH3C-OID-MIB;
+
+    hh3cTrap MODULE-IDENTITY
+        LAST-UPDATED "201006051050Z"
+        ORGANIZATION
+            "New H3C Technologies Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Technologies Co., Ltd.
+             Hai-Dian District Beijing P.R. China
+             http://www.h3c.com
+             Zip: 100085"
+        DESCRIPTION
+            "This MIB is applicable to routers, switches and other products.
+
+            Some objects in this may be used only for some specific products,
+            so users should refer to the related documents to acquire more
+            detail information.
+            "
+        REVISION "201006051050Z"
+        DESCRIPTION
+            "The initial revision of this MIB module."
+        ::= { hh3cCommon 38 }
+
+
+--
+-- Node definitions
+--
+    hh3cTableGroup OBJECT IDENTIFIER ::= { hh3cTrap 1 }
+
+-- Describe objects for MAC table
+    hh3cMacTabStatGroup OBJECT IDENTIFIER ::= { hh3cTableGroup 1 }
+
+    hh3cMacTabTrapEnable OBJECT-TYPE
+        SYNTAX INTEGER{
+                        enable(1),
+                        disable(2)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cMacTabFullTrap and
+            hh3cMacTabAlmostFullTrap traps should be generated
+            when the MAC table is filled."
+        DEFVAL { enable }
+        ::= { hh3cMacTabStatGroup 1 }
+
+    hh3cMacTabTrapInterval OBJECT-TYPE
+        SYNTAX Integer32 (30..3600)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Definition of the minimum interval between two
+            traps which occur when the MAC table is full or
+            two traps which occur when the MAC table is almost full."
+        DEFVAL { 30 }
+        ::= { hh3cMacTabStatGroup 2 }
+
+    hh3cMacTabTrapInfo OBJECT IDENTIFIER ::= { hh3cMacTabStatGroup 3 }
+
+    hh3cMacTabLen OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The length of the MAC table."
+        ::= { hh3cMacTabTrapInfo 1 }
+
+    hh3cMacTabTrap OBJECT IDENTIFIER ::= { hh3cMacTabStatGroup 4 }
+
+    hh3cMacTabFullTrap NOTIFICATION-TYPE
+            OBJECTS { hh3cMacTabLen }
+            STATUS current
+            DESCRIPTION
+                "Send this trap when the MAC table is filled.  The
+                interval between two traps generated should be longer
+                than hh3cMacTabTrapInterval."
+            ::= { hh3cMacTabTrap 1 }
+
+    hh3cMacTabAlmostFullTrap NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "Send this trap when the MAC table is almost full.  The
+                interval between two traps generated should be longer
+                than hh3cMacTabTrapInterval."
+            ::= { hh3cMacTabTrap 2 }
+
+-- Describe objects for ARP table
+    hh3cArpTabStatGroup OBJECT IDENTIFIER ::= { hh3cTableGroup 2 }
+
+    hh3cArpTabTrapEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cArpTabFullTrap traps
+            should be generated when the ARP table is filled."
+        DEFVAL { enable }
+        ::= { hh3cArpTabStatGroup 1 }
+
+    hh3cArpTabTrapInterval OBJECT-TYPE
+        SYNTAX Integer32 (30..3600)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Definition of the minimum interval between two traps
+            which occur when the ARP table is filled."
+        DEFVAL { 30 }
+        ::= { hh3cArpTabStatGroup 2 }
+
+    hh3cArpTabTrapInfo OBJECT IDENTIFIER ::= { hh3cArpTabStatGroup 3 }
+
+    hh3cArpTabLen OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The length of the ARP table."
+        ::= { hh3cArpTabTrapInfo 1 }
+
+    hh3cArpTabTrap OBJECT IDENTIFIER ::= { hh3cArpTabStatGroup 4 }
+
+    hh3cArpTabFullTrap NOTIFICATION-TYPE
+            OBJECTS { hh3cArpTabLen }
+            STATUS current
+            DESCRIPTION
+                "Send this trap when the ARP table is filled.  The
+                interval between two traps generated should be longer
+                than hh3cArpTabTrapInterval."
+            ::= { hh3cArpTabTrap 1 }
+
+    hh3cArpPortDynamicEntryFullTrap NOTIFICATION-TYPE
+            OBJECTS { hh3cArpTabLen, ifIndex, ifDescr }
+            STATUS current
+            DESCRIPTION
+                 "Send this trap when the dynamic ARP number of the
+                port exceeds the limitation. The object hh3cArpTabLen
+                describes the limitation of the max dynamic ARP number
+                of this port. The interval between two traps should be
+                longer than hh3cArpTabTrapInterval."
+            ::= { hh3cArpTabTrap 2 }
+
+-- Describe objects for routing table
+    hh3cRtTabStatGroup OBJECT IDENTIFIER ::= { hh3cTableGroup 3 }
+
+    hh3cDetailRtTrapTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cDetailRtTrapEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains objects to decide what kind of
+            trap should be sent."
+        ::= { hh3cRtTabStatGroup 1 }
+
+    hh3cDetailRtTrapEntry OBJECT-TYPE
+        SYNTAX Hh3cDetailRtTrapEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry items"
+        INDEX { hh3cDetailRtProType }
+        ::= { hh3cDetailRtTrapTable 1 }
+
+    Hh3cDetailRtTrapEntry ::=
+        SEQUENCE {
+            hh3cDetailRtProType
+                INTEGER,
+            hh3cDetailRtEnable
+                INTEGER
+        }
+
+    hh3cDetailRtProType OBJECT-TYPE
+        SYNTAX INTEGER {
+            other(1),       -- none of the following
+
+                            -- non-protocol information,
+                            -- e.g., manually configured
+            local(2),       -- entries
+            rip(3),
+            isis(4),
+            ospf(5),
+            bgp(6)
+        }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The index value which uniquely identifies an entry
+            in the hh3cDetailRtTrapTable."
+        ::= { hh3cDetailRtTrapEntry 1 }
+
+    hh3cDetailRtEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cDetailRtTabFullTrap traps
+            should be generated when a specific routing table
+            is filled."
+        DEFVAL { enable }
+        ::= { hh3cDetailRtTrapEntry 2 }
+
+    hh3cRtTabTrapEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cRtTabFullTrap traps should
+            be generated when the routing table is filled."
+        DEFVAL { enable }
+        ::= { hh3cRtTabStatGroup 2 }
+
+    hh3cRtTabTrapInterval OBJECT-TYPE
+        SYNTAX Integer32 (30..3600)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Definition of the minimum interval between two
+            traps which occur when the routing table is filled."
+        DEFVAL { 30 }
+        ::= { hh3cRtTabStatGroup 3 }
+
+    hh3cRtTabTrapInfo OBJECT IDENTIFIER ::= { hh3cRtTabStatGroup 4 }
+
+    hh3cRtTabLen OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The length of the routing table.  The detail
+            routing tables also use the same object."
+        ::= { hh3cRtTabTrapInfo 1 }
+
+    hh3cDefaultRtNextHopType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The IP address type of the next hop of the default route.
+            The value must be ipv4 or ipv6"
+        ::= { hh3cRtTabTrapInfo 2 }
+
+    hh3cDefaultRtNextHop OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The IP address of the next hop of the default route."
+        ::= { hh3cRtTabTrapInfo 3 }
+
+    hh3cDefaultRtOutIf OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The index value which uniquely identifies the
+             local interface through which the next hop of this
+             route should be reached.  The interface identified
+             by a particular value of this index is the same
+             interface as identified by the same value of
+             ifIndex."
+        ::= { hh3cRtTabTrapInfo 4 }
+
+    hh3cRtTabTrap OBJECT IDENTIFIER ::= { hh3cRtTabStatGroup 5 }
+
+    hh3cRtTabFullTrap NOTIFICATION-TYPE
+            OBJECTS { hh3cRtTabLen }
+            STATUS current
+            DESCRIPTION
+                "Send this trap when the routing table is filled.  The
+                interval between two traps generated should be longer
+                than hh3cRtTabTrapInterval."
+            ::= { hh3cRtTabTrap 1 }
+
+    hh3cDetailRtTabFullTrap NOTIFICATION-TYPE
+            OBJECTS { hh3cDetailRtProType, hh3cRtTabLen }
+            STATUS current
+            DESCRIPTION
+                "Send this trap when the detail routing table is filled.  The
+                interval between two traps generated should be longer than
+                hh3cRtTabTrapInterval."
+            ::= { hh3cRtTabTrap 2 }
+
+    hh3cDefaultRtDelTrap NOTIFICATION-TYPE
+            OBJECTS { hh3cDetailRtProType, hh3cDefaultRtNextHopType, hh3cDefaultRtNextHop, hh3cDefaultRtOutIf }
+            STATUS current
+            DESCRIPTION
+                "Send this trap when the default route is deleted."
+            ::= { hh3cRtTabTrap 3 }
+
+    hh3cDefaultRtDelTrapEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cDefaultRtDelTrap traps should
+            be generated when the default route is deleted."
+        DEFVAL { false }
+        ::= { hh3cRtTabStatGroup 6 }
+
+-- Describe objects for multicast table
+    hh3cMulticastTabStatGroup OBJECT IDENTIFIER ::= { hh3cTableGroup 4 }
+
+    hh3cMulticastTabTrapEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cMulticastTabFullTrap traps
+            should be generated when the multicast table is filled."
+        DEFVAL { enable }
+        ::= { hh3cMulticastTabStatGroup 1 }
+
+    hh3cMulticastTabTrapInterval OBJECT-TYPE
+        SYNTAX Integer32 (30..3600)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Definition of the minimum interval between two traps
+            which occur when the multicast table is filled."
+        DEFVAL { 30 }
+        ::= { hh3cMulticastTabStatGroup 2 }
+
+    hh3cMulticastTabTrapInfo OBJECT IDENTIFIER ::= { hh3cMulticastTabStatGroup 3 }
+
+    hh3cMulticastTabType OBJECT-TYPE
+        SYNTAX INTEGER {
+                        lay2(1),
+                        lay3(2)
+                        }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Defining the type of the multicast table, layer2 or layer3."
+        ::= { hh3cMulticastTabTrapInfo 1 }
+
+    hh3cMulticastTabLen OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The length of the multicast table."
+        ::= { hh3cMulticastTabTrapInfo 2 }
+
+    hh3cMulticastTabTrap OBJECT IDENTIFIER ::= { hh3cMulticastTabStatGroup 4 }
+
+    hh3cMulticastTabFullTrap NOTIFICATION-TYPE
+            OBJECTS { hh3cMulticastTabType, hh3cMulticastTabLen }
+            STATUS current
+            DESCRIPTION
+                "Send this trap when the multicast table is filled.  The
+                interval between two traps generated should be longer
+                than hh3cMulticastTabTrapInterval."
+            ::= { hh3cMulticastTabTrap 1 }
+
+
+-- Describe objects for Neighbor table
+    hh3cNdTabStatGroup OBJECT IDENTIFIER ::= { hh3cTableGroup 5 }
+
+    hh3cNdTabTrapEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cNdTabFullTrap traps
+            should be generated when the ND table is filled."
+        DEFVAL { enable }
+        ::= { hh3cNdTabStatGroup 1 }
+
+    hh3cNdTabTrapInterval OBJECT-TYPE
+        SYNTAX Integer32 (30..3600)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Definition of the minimum interval between two traps
+            which occur when the ND table is filled."
+        DEFVAL { 30 }
+        ::= { hh3cNdTabStatGroup 2 }
+
+    hh3cNdTabTrapInfo OBJECT IDENTIFIER ::= { hh3cNdTabStatGroup 3 }
+
+    hh3cNdTabLen OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The length of the ND table."
+        ::= { hh3cNdTabTrapInfo 1 }
+
+    hh3cNdTabTrap OBJECT IDENTIFIER ::= { hh3cNdTabStatGroup 4 }
+
+    hh3cNdTabFullTrap NOTIFICATION-TYPE
+            OBJECTS { hh3cNdTabLen }
+            STATUS current
+            DESCRIPTION
+                "Send this trap when the ND table is filled.  The
+                interval between two traps generated should be longer
+                than hh3cNdTabTrapInterval."
+            ::= { hh3cNdTabTrap 1 }
+
+-- Describe SNMP periodical trap group
+    hh3cPeriodicalTrapGroup OBJECT IDENTIFIER ::= { hh3cTableGroup 6 }
+
+-- Describe objects for SNMP periodical trap
+    hh3cPeriodicalTrapObjects OBJECT IDENTIFIER
+        ::= { hh3cPeriodicalTrapGroup 1 }
+
+    hh3cPeriodicalTrapInterval OBJECT-TYPE
+        SYNTAX Integer32 (0|10..3600)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Definition of the periodical interval.
+            If no trap occurs during the certain interval, an hh3cPeriodicalTrap
+            will be generated.
+            If the interval is set to 0, no hh3cPeriodicalTrap will be generated."
+        DEFVAL { 60 }
+        ::= { hh3cPeriodicalTrapObjects 1 }
+
+    hh3cPeriodicalTrapSwitch OBJECT-TYPE
+        SYNTAX INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Definition of the periodical switch.
+            If the value is off,the hh3cPeriodicalTrap will not be generated.
+            the hh3cPeriodicalTrapInterval will be set to 0."
+        DEFVAL { enable }
+        ::= { hh3cPeriodicalTrapObjects 2 }
+
+    hh3cPeriodicalTrapSwitch2 OBJECT-TYPE
+        SYNTAX INTEGER {
+                        off(0),
+                        on(1)
+                        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Periodical heartbeat trap sending switch.
+            If the value is off, the hh3cPeriodicalTrap will not be generated,
+            and the hh3cPeriodicalTrapInterval will be set to 0.  This node
+            differs from hh3cPeriodicalTrapSwitch in value."
+        DEFVAL { on }
+        ::= { hh3cPeriodicalTrapObjects 3 }
+
+-- Describe information for SNMP periodical trap
+    hh3cPeriodicalTrapInfo OBJECT IDENTIFIER
+        ::= { hh3cPeriodicalTrapGroup 2 }
+
+-- Describe SNMP periodical trap
+    hh3cPeriodicalNotification OBJECT IDENTIFIER
+        ::= { hh3cPeriodicalTrapGroup 3 }
+
+    hh3cPeriodicalNotificationPrefix OBJECT IDENTIFIER
+        ::= { hh3cPeriodicalNotification 0 }
+
+    hh3cPeriodicalTrap NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "If no trap occurs during the interval spicified by
+                hh3cPeriodicalTrapInterval, an hh3cPeriodicalTrap
+                will be generated. If the interval is set to 0, no
+                hh3cPeriodicalTrap will be generated."
+            ::= { hh3cPeriodicalNotificationPrefix 1 }
+
+-- Describe SNMP TrapDesInfo group
+    hh3cTrapDesInfo OBJECT IDENTIFIER ::= { hh3cTableGroup 7 }
+
+    hh3cTrapDesInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cTrapDesInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of trap destination host address and port ."
+            ::= { hh3cTrapDesInfo 1 }
+
+    hh3cTrapDesInfoEntry OBJECT-TYPE
+            SYNTAX Hh3cTrapDesInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of trap destination host address and port."
+            INDEX { hh3cTrapDesInfoIndex }
+            ::= { hh3cTrapDesInfoTable 1 }
+
+    Hh3cTrapDesInfoEntry ::=
+            SEQUENCE {
+                hh3cTrapDesInfoIndex Integer32,
+                hh3cTrapDesIPAddress IpAddress,
+                hh3cTrapDesPort Integer32,
+                hh3cTrapDesRowStatus  RowStatus,
+                hh3cTrapDesAddrTAddress TAddress
+            }
+
+    hh3cTrapDesInfoIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..20)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of this table."
+            ::= { hh3cTrapDesInfoEntry 1 }
+
+    hh3cTrapDesIPAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The host IP address of the trap destination."
+            ::= { hh3cTrapDesInfoEntry 2 }
+
+    hh3cTrapDesPort OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The port of the trap destination."
+            ::= { hh3cTrapDesInfoEntry 3 }
+
+    hh3cTrapDesRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this table entry."
+            ::= { hh3cTrapDesInfoEntry 4 }
+
+    hh3cTrapDesAddrTAddress OBJECT-TYPE
+            SYNTAX TAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object contains a transport address."
+            ::= { hh3cTrapDesInfoEntry 5 }
+
+-- Describe SNMP TrapConfig group
+    hh3cTrapConfig OBJECT IDENTIFIER ::= { hh3cTableGroup 8 }
+
+    hh3cTrapConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cTrapConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of trap configuration."
+            ::= { hh3cTrapConfig 1 }
+
+    hh3cTrapConfigEntry OBJECT-TYPE
+            SYNTAX Hh3cTrapConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of trap configuration."
+            INDEX { hh3cTrapConfigIndex }
+            ::= { hh3cTrapConfigTable 1 }
+
+    Hh3cTrapConfigEntry ::=
+            SEQUENCE {
+                    hh3cTrapConfigIndex Integer32,
+                    hh3cTrapConfigName SnmpAdminString,
+                    hh3cTrapConfigDescr SnmpAdminString,
+                    hh3cTrapConfigSwitch INTEGER,
+                    hh3cTrapConfigSwitch2 INTEGER
+            }
+
+    hh3cTrapConfigIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of this table."
+            ::= { hh3cTrapConfigEntry 1 }
+
+    hh3cTrapConfigName OBJECT-TYPE
+            SYNTAX SnmpAdminString (SIZE(0..127))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of the appointed traps."
+            ::= { hh3cTrapConfigEntry 2 }
+
+    hh3cTrapConfigDescr OBJECT-TYPE
+            SYNTAX SnmpAdminString (SIZE(0..127))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The description of the appointed traps."
+            ::= { hh3cTrapConfigEntry 3 }
+
+    hh3cTrapConfigSwitch OBJECT-TYPE
+            SYNTAX INTEGER {
+                            enable(1),
+                            disable(2)
+                            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether the specified traps
+                should be generated."
+            DEFVAL { enable }
+            ::= { hh3cTrapConfigEntry 4 }
+
+    hh3cTrapConfigSwitch2 OBJECT-TYPE
+            SYNTAX INTEGER {
+                            off(0),
+                            on(1)
+                            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether the specified traps should be generated.
+                This node differs from hh3cTrapConfigSwitch in value."
+            DEFVAL { on }
+            ::= { hh3cTrapConfigEntry 5 }
+
+END

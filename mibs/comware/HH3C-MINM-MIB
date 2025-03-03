@@ -1,0 +1,323 @@
+-- =============================================================================
+-- Copyright (c) 2004-2010 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: 802.1ah MAC-in-MAC MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2009-08-08 Initial version Created by Jianyong Song
+--        2010-08-05 Add 'hh3cMinmBmac' by Wei Zhang
+-- =============================================================================
+HH3C-MINM-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        RowStatus,
+        TEXTUAL-CONVENTION,
+        MacAddress
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Unsigned32
+    FROM SNMPv2-SMI
+        ifIndex
+    FROM RFC1213-MIB
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        hh3cVsiIndex
+    FROM HH3C-VSI-MIB;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cMinm MODULE-IDENTITY
+    LAST-UPDATED
+        "200908081000Z"        -- Aug 08, 2009 at 10:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "802.1ah MAC-in-MAC MIB"
+    REVISION
+        "200908081000Z"   -- Aug 08, 2009 at 10:00 GMT
+    DESCRIPTION
+        "The initial version of this MIB."
+    ::= { hh3cCommon 107 }
+
+-- =============================================================================
+-- Textual Conventions
+-- =============================================================================
+Hh3cMinmEnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A enumerated value which indicates the state of object."
+    SYNTAX  INTEGER
+    {
+        enabled(1),
+        disabled(2)
+    }
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+
+hh3cMinmObjects      OBJECT IDENTIFIER ::= { hh3cMinm 1 }
+
+hh3cMinmScalarGroup OBJECT IDENTIFIER ::= { hh3cMinmObjects 1 }
+
+hh3cMinmCapabilities    OBJECT-TYPE
+    SYNTAX      BITS
+    {
+        reEncapsulation(0),
+        uplink(1),
+        vsiShareConnection(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object displays the MAC-in-MAC capabilities with respect to
+         certain fields. The following values may be supported:
+         reEncapsulation:     Support for configuring re-encapsulation (denoted
+                              by hh3cMinmVsiReEncapsulation).
+         uplink:              Support for configuring uplink (denoted
+                              by hh3cMinmUplinkTable).
+         vsiShareConnection:  It indicates that connection entry is shared in
+                              all VSIs. hh3cVsiIndex is meaningless and must
+                              be value 1 in hh3cMinmConnectionTable."
+    ::= { hh3cMinmScalarGroup 1 }
+
+hh3cMinmBmac  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A MAC address used in creating the MAC header of I-tagged frames
+        transmitted across a Provider Backbone Bridged Network. The invalid
+        value FF:FF:FF:FF:FF:FF indicates that this node is not supported by
+        the device."
+    ::= { hh3cMinmScalarGroup 2 }
+
+-- =============================================================================
+-- hh3cMinmVsiTable Definition
+-- =============================================================================
+hh3cMinmVsiTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMinmVsiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring MAC-in-MAC service instance parameter."
+    ::= { hh3cMinmObjects 2 }
+
+hh3cMinmVsiEntry  OBJECT-TYPE
+    SYNTAX      Hh3cMinmVsiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring MAC-in-MAC service instance parameter."
+    INDEX
+    {
+        hh3cVsiIndex
+    }
+    ::= { hh3cMinmVsiTable 1 }
+
+Hh3cMinmVsiEntry ::=
+    SEQUENCE
+    {
+        hh3cMinmVsiBvlan               Integer32,
+        hh3cMinmVsiReEncapsulation     Hh3cMinmEnabledStatus,
+        hh3cMinmVsiNextAvailableLinkId Unsigned32
+    }
+
+hh3cMinmVsiBvlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094 | 65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "BVLAN ID. The value 65535 indicates the BVLAN has not been configured
+        for get operation, and it indicates deleting the BVLAN configration
+        for set operation."
+    ::= { hh3cMinmVsiEntry 1 }
+
+hh3cMinmVsiReEncapsulation    OBJECT-TYPE
+    SYNTAX      Hh3cMinmEnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the re-encapsulation is enabled. The reEncapsulation field of
+        hh3cMinmCapabilities denotes whether this node is supported."
+    ::= { hh3cMinmVsiEntry 2 }
+
+hh3cMinmVsiNextAvailableLinkId    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Next available connection entry index for creating a connection entry.
+        Its value ranges from 0x1 to 0xFFFFFFFF.The invalid value 0xFFFFFFFF
+        indicates that connection entry can not be created. When the
+        vsiShareConnection field of hh3cMinmCapabilities is set, this node
+        returns an invalid value if the value of hh3cVsiIndex is not 1."
+    ::= { hh3cMinmVsiEntry 3 }
+
+-- =============================================================================
+-- End of hh3cMinmVsiTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cMinmUplinkTable Definition
+-- =============================================================================
+hh3cMinmUplinkTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMinmUplinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for uplink ports of the VSI in MAC-in-MAC. The uplink field of
+        hh3cMinmCapabilities denotes whether this table is supported."
+    ::= { hh3cMinmObjects 3 }
+
+hh3cMinmUplinkEntry  OBJECT-TYPE
+    SYNTAX      Hh3cMinmUplinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for uplink ports of the VSI in MAC-in-MAC."
+    INDEX
+    {
+        hh3cVsiIndex,
+        ifIndex
+    }
+    ::= { hh3cMinmUplinkTable 1 }
+
+Hh3cMinmUplinkEntry ::=
+    SEQUENCE
+    {
+        hh3cMinmUplinkRowStatus      RowStatus
+    }
+
+hh3cMinmUplinkRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cMinmUplinkEntry 1 }
+-- =============================================================================
+-- End of hh3cMinmUplinkTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cMinmConnectionTable Definition
+-- =============================================================================
+hh3cMinmConnectionTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMinmConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for the connection information of BMAC."
+    ::= { hh3cMinmObjects 4 }
+
+hh3cMinmConnectionEntry  OBJECT-TYPE
+    SYNTAX      Hh3cMinmConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for the connection information of BMAC.
+        When the vsiShareConnection field of hh3cMinmCapabilities is set,
+        connection entry is shared in all VSIs. hh3cVsiIndex is meaningless
+        and must be value 1 in hh3cMinmConnectionTable."
+    INDEX
+    {
+        hh3cVsiIndex,
+        hh3cMinmConnectionLinkId
+    }
+    ::= { hh3cMinmConnectionTable 1 }
+
+Hh3cMinmConnectionEntry ::=
+    SEQUENCE
+    {
+        hh3cMinmConnectionLinkId       Unsigned32,
+        hh3cMinmConnectionBmac         MacAddress,
+        hh3cMinmConnectionBvlan        Integer32,
+        hh3cMinmConnectionPort         Integer32,
+        hh3cMinmConnectionStatus       INTEGER,
+        hh3cMinmConnectionAgingStatus  INTEGER,
+        hh3cMinmConnectionRowStatus    RowStatus
+    }
+
+hh3cMinmConnectionLinkId    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry index when the vsiShareConnection bit of hh3cMinmCapabilities
+        is set(hh3cVsiIndex is meaningless and must be value 1),
+        else entry index in the VSI of hh3cVsiIndex.Its value ranges
+        from 0x1 to 0xFFFFFFFE. It should be obtained from
+        hh3cMinmVsiNextAvailableLinkId for create operation."
+    ::= { hh3cMinmConnectionEntry 1 }
+
+hh3cMinmConnectionBmac    OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "BMAC of an connection entry."
+    ::= { hh3cMinmConnectionEntry 2 }
+
+hh3cMinmConnectionBvlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "BVLAN of an connection entry."
+    ::= { hh3cMinmConnectionEntry 3 }
+
+hh3cMinmConnectionPort   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port ifindex of an connection entry."
+    ::= { hh3cMinmConnectionEntry 4 }
+
+hh3cMinmConnectionStatus   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        learned(1),
+        configDynamic(2),
+        configStatic(3),
+        blackhole(4)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "State of an connection entry."
+    ::= { hh3cMinmConnectionEntry 5 }
+
+hh3cMinmConnectionAgingStatus   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        aging(1),
+        noAged(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aging time of an connection entry."
+    ::= { hh3cMinmConnectionEntry 6 }
+
+hh3cMinmConnectionRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cMinmConnectionEntry 7 }
+-- =============================================================================
+-- End of hh3cMinmConnectionTable Definition
+-- =============================================================================
+
+END

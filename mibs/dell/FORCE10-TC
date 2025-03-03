@@ -1,0 +1,630 @@
+--
+--  Dell Networking OS MIB Textual Conventions
+--
+--  This module provides authoritative definitions for Dell Networking OS
+--  Textual Convention MIB.
+--
+--  This module will be extended, as needed.
+--
+
+FORCE10-TC	DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, Integer32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString
+		FROM SNMPv2-TC
+	f10Modules
+		FROM FORCE10-SMI;
+
+f10TextualConventions MODULE-IDENTITY
+	LAST-UPDATED "200904071200Z"	-- Apr. 7, 2009 12:00:00 GMT
+ 	ORGANIZATION
+          	  "Dell Inc"
+	CONTACT-INFO
+                  "http://www.force10networks.com/support"
+	DESCRIPTION
+		  "The Textual Convention of Dell Networking OS MIB."
+
+	REVISION     "200904071200Z"
+	DESCRIPTION
+		  "Added new Nemesis card type."
+
+	REVISION     "200809161200Z"
+	DESCRIPTION
+		  "Added ExaScale chassis mode and Nemesis card type."
+
+	REVISION     "200809021200Z"
+	DESCRIPTION
+		  "Added F10CardOperStatus."
+
+	REVISION     "200706281200Z"
+	DESCRIPTION
+		  "Added F10ChassisType and F10HundredthdB."
+	::= { f10Modules 2}
+
+
+	F10ChassisType ::= TEXTUAL-CONVENTION
+	    STATUS       current
+	    DESCRIPTION
+	       "Dell Networking OS chassis type."
+	    SYNTAX	INTEGER {
+                e1200(1),                       -- Dell Networking OS E1200 16-slot switch/router
+                e600(2),                        -- Dell Networking OS E600 9-slot switch/router
+                e300(3),                        -- Dell Networking OS E300 8-slot switch/router
+                e150(4),                        -- Dell Networking OS E150 8-slot switch/router
+                e610(5),                        -- Dell Networking OS E610 9-slot switch/router
+                c150(6),                        -- Dell Networking OS C150 6-slot switch/router
+                c300(7),                        -- Dell Networking OS C300 10-slot switch/router
+                e1200i(8),                      -- Dell Networking OS E1200i 16-slot switch/router
+                s2410cp(9),                     -- Dell Networking OS S2410 10GbE switch
+                s2410p(10),                     -- Dell Networking OS S2410 10GbE switch
+                s50(11),                        -- Dell Networking OS S50 access switch
+                s50e(12),                       -- Dell Networking OS S50e access switch
+                s50v(13),                       -- Dell Networking OS S50v access switch    		    		
+                s50nac(14),                     -- Dell Networking OS S50nac access switch
+                s50ndc(15),                     -- Dell Networking OS S50ndc access switch
+                s25pdc(16),                     -- Dell Networking OS S25pdc access switch
+                s25pac(17),                     -- Dell Networking OS S25pac access switch
+                s25v(18),                       -- Dell Networking OS S25v access switch
+                s25n(19),                       -- Dell Networking OS S25n access switch
+                s60(20),                        -- Dell Networking OS S60 access switch
+                s55(21),                        -- Dell Networking OS S55 access switch
+                s4810(22),                      -- Dell Networking OS S4810 access switch
+                s6410(23),                      -- Dell Networking OS S6410 access switch
+                z9000(24),                      -- Dell Networking OS Z9000 access switch
+                m-MXL(25),                      -- Dell Networking OS MXL 10/40GE switch/router
+                m-IOA(26),                      -- PowerEdge M I/O Aggregator bridge
+                s4820(27),                      -- Dell Networking OS S4820 access switch
+                s6000(28),                      -- Dell Networking OS S6000 access switch
+                s5000(29),                      -- Dell Networking OS S5000 access switch 
+                s-FN410S-IOA(30),               -- Dell PowerEdge FN 410S IOA
+                s-FN410T-IOA(31),               -- Dell PowerEdge FN 410T IOA
+                s-FN2210S-IOA(32),              -- Dell PowerEdge FN 2210S IOA
+                z9500(33),                      -- Dell Networking OS Z9500 switch
+                s4810on(34),                    -- Dell Networking OS S4810 ON access switch
+                s6000on(35),                    -- Dell Networking OS S6000 ON access switch
+                s4000(36),                      -- Dell Networking OS S4000 access switch
+                c9000(37),			-- Dell Networking OS C9000 switch
+                c1048p(38),                      -- Dell Networking OS C1048P switch
+                s3000(39)                      -- Dell Networking OS S3000 access switch
+            }
+
+	F10InterfaceType ::= TEXTUAL-CONVENTION
+	    STATUS       current
+	    DESCRIPTION
+	       "Interface types supported by the Dell Networking OS line cards.
+	       "
+	    SYNTAX	INTEGER {
+    		ethernetManagement(1),  -- Ethernet Mangement port
+    		ethernet100M(2),		-- Ethernet 100Mb
+    		ethernet1GB(3),			-- Ethernet 1 GB interface
+    		ethernet1GBCopper(4),	-- Ethernet Copper 1 GB interface
+    		ethernet10GB(5),		-- Ethernet 10 GB interface
+    		ethernet10GBCopper(6),	-- Ethernet Copper 10 GB interface
+    		sonetOC3OC12(7),		-- SONET or OC3/OC12 interface
+    		sonetOC48OC96(8),		-- SONET or OC48/OC96 interface
+    		sonetOC192(9),			-- SONET or OC192 interface
+	        ethernet40GB(10)                -- Ethernet 40 GB interface
+	    }
+
+	F10SystemPortType ::= TEXTUAL-CONVENTION
+	    STATUS       current
+	    DESCRIPTION
+	       "Port type available in Dell Networking OS series of products."
+	    SYNTAX       INTEGER {
+    		portSerial(1),
+    		portAux(2),
+    		portFastEther(3),
+    		port0210E2TV(4),		-- xena
+    		port0210E2TE(5),		-- zeus 40K
+    		port2401E24S(6),		-- ripley sx eb
+    		port2401E24L(7),		-- ripley lx eb
+    		port12OC12OC3(8),		-- aladdin
+    		port01OC192(9),			-- mulan
+    		port2401E24SEC(10),		-- hercules sx ec
+    		port2401E24LEC(11),		-- hercules lx ec
+    		port0210E2TY(12),		-- zeus 10K
+    		port0210E2TU(13),		-- zeus 100K
+    		port0110EW1YB(14),		-- everest eb
+    		port0110EW1YC(15),		-- everest ec
+    		port02S48YC2(16),		-- cairo ec
+    		port0110EX1YB(17),		-- K2 eb (1-port zeus 10K)
+    		port0110EX1YC(18),		-- K2 ec (1-port zeus 10K)
+     		port1201F12PB(19),		-- morpheus eb
+    		port1201F12PC(20),		-- morpheus ec
+    		port0110EX1EB(21),		-- K2 eb 40K
+    		port0110EX1EC(22),		-- K2 ec 40K
+    		port0110EX1YBL(23),		-- Lisbon
+    		port0210EX2YD(24),		-- Prometheus 10Km
+    		port0210EX2ED(25),		-- Prometheus 40Km
+    		port0210EX2ZD-DEP(26),	-- Prometheus 80Km Deprecated
+    		port0210EW2YD(27),		-- Corsica 10Km
+    		port0110EX1YD(28),		-- Cyclops 10Km
+    		port0110EX1ED(29),		-- Cyclops 40Km
+    		port0110EX1ZD(30),		-- Cyclops 80Km
+    		port0110EW1YD(31),		-- Sicily 10Km WAN ED2
+    		port2401E24PD(32),		-- Cronus GE SFP
+    		port0210EX2YD2(33),		-- Prometheus 10Km ED2
+    		port0210EX2YE(34),		-- Prometheus 10Km EE
+    		port0110EX1YD2(35),		-- Cyclops 10Km ED2
+    		port0110EX1YE(36),		-- Cyclops 10Km EE
+    		port0210EW2YD2(37),		-- Corsica 10Km WAN
+    		port0210EW2YE(38),		-- Corsica 10Km WAN EE
+    		port0110EW1YE(39),		-- Sicily 10Km WAN EE
+    		port01OC192SE(40),		-- Sequoia OC192/STM64
+    		port2401E24TD(41),		-- Castor FE/GE
+    		port2401E24PE(42),		-- Cronus GE SFP EE
+    		port1201F12PC2(43),		-- morpheus EoMPLS
+    		port0210EX2ZD(44),		-- Prometheus 80Km
+    		port0210EW2YD3(45),		-- Prometheus 10Km WAN
+    		port0210EX2ZE(46),		-- Prometheus 80Km EE
+    		port1201F12PE(47),		-- Apollo GE 12ports GE EE
+    		port2401E24PD2(48),		-- Cronus GE SFP ED2
+    		port1201E12TD3(49),		-- Budlite 12 ports FE/GE
+    		port0210EX2YD3(50),		-- Tsunami 40Km ED
+    		port0110EX1YD3(51),		-- Tsunami 1pp 40Km ED
+    		port1201E12PD3(52),		-- Typhoon 12 ports SFP ED3
+    		port02S48YE2(53),       -- CAIRO J port
+    		port0110EX1YE3(54),     -- Tsunami 1pp 40Km EE
+    		port1201E12PE3(55),     -- Typhoon 12 ports EE
+
+    		 -- T2C2 Cards
+    		port4801E48PF(56),      -- Saturn 48 ports 2 pp GE
+    		port2401E24PF3(57),     -- Saturn-s 24 ports 1 pp GE
+    		port4801E48TF3(58),     -- Ketel1 48 ports 1 pp E/FE/GE oversub E300
+    		port4801E48TF(59),      -- Pluto  48 ports 2 pp E/FE/GE
+    		port0410EXW4PF(60),     -- Voltex 4 ports  2 pp LAN/WAN 10 GE
+    		port0210EXW2PF3(61),    -- Voltex-s 2 ports  1 pp LAN/WAN 10 GE
+    		port9001E90MF(62),      -- Absolut 90 ports 2 pp GE
+    		port4801E48T1F(63),     -- Medusa 48 ports 1 pp E/FE/GE oversub E600/1200
+    		port1610EXW16PF(64),    -- Baku 16 ports 2 pp LAN/WAN 10 GE
+    		port0810EXW8PF(65),     -- Baku 8 ports 1 pp LAN/WAN 10 GE
+    		port0410EXW4PG(66),     -- Voltex 4 ports  2 pp LAN/WAN 10 GE (EG)
+    		port4801E48PG(67),      -- Saturn 48 ports 2 pp GE (EG)
+    		port4801E48TG(68),      -- Pluto  48 ports 2 pp E/FE/GE (EG)
+    		port0210EXW2PG3(69),    -- Voltex 2 ports  1 pp LAN/WAN 10 GE (EG3)
+    		port2401E24PG3(70),     -- Saturn 24 ports 1 pp GE (EG3)
+    		port2401E24TG3(71),     -- Pluto  24 ports 1 pp E/FE/GE (EG3)
+    		port04S48P4G(72),       -- Sonoma OC48c/12c/3c 4 Ports (EG)
+    		port04S48P4G3(73),      -- Sonoma OC48c/12c/3c 4 Ports (EG3)
+    		port1610EXW16PG(74),    -- Baku Dual CAM 16 ports 10GE
+    		port0810EXW8PG3(75),    -- Baku Dual CAM 8 ports
+    		
+    		 -- CYCLONE3 Cards
+    		port9001E90MH(76),      -- Athena 90 ports 10M CAM E/FE/GE (EH)
+    		port1010EXW10SH(77),    -- Icarus-SFP+ 10 ports LAN/WAN 10GE SFP+ (EH)
+    		port1010EXW10SJ(78),    -- Icarus-SFP+-Dual CAM 10 ports LAN/WAN 10GE SFP+ (EJ)
+    		port9001E90MJ(79),      -- Athena 90 ports 40M CAM E/FE/GE (EJ)
+    		port5001E50PH(80),      -- Artemis-SFP 50 ports LAN 1GE SFP 10M CAM (EH)
+    		port5001E50PJ(81),      -- Artemis-SFP 50 ports LAN 1GE SFP 40M CAM (EJ)
+    		port1010EXW10PH(82),    -- Erebus 10 ports 10GE XFP 10M CAM (EH)
+    		port1010EXW10PJ(83),    -- Erebus 10 ports 10GE XFP 40M CAM (EJ)
+    		port4010EXW40SH(84),    -- Pegasus 40 ports LAN/WAN SFP + 10M CAM
+    		port4010EXW40SJ(85),    -- Pegasus 40 ports LAN/WAN SFP + 40M CAM
+
+    		portUnknown(99)
+        }
+
+
+	F10SystemCardType ::= TEXTUAL-CONVENTION
+	    STATUS	current
+    	DESCRIPTION
+	    	"The processor card supported by the Dell Networking OS
+		    products ."
+    	SYNTAX	INTEGER {
+
+    		notPresented(0),
+    		lc0210E2TV(1),		-- 2-port 10GE LAN PHY line card with VSR optics
+    		lc0210E2TE(2),		-- 2-port 10GE LAN PHY line card with 40Km optics
+    		lc2401E24S(3),		-- 24-port GE line card with SX optics
+    		lc2401E24L(4),		-- 24-port GE line card with LX optics
+    		lc12OC12OC3(5),		-- 12-port OC12c/3c PoS + EoS line card with IR optics
+    		lc01OC192(6),		-- 1-port OC192c Pos line card with SR optics
+    		lcReserve(7),
+    		lc2401E24SEC(8),	-- 24-port GE line card with SX optics (EC)
+    		lc2401E24lEc(9),	-- 24-port GE line card with SX optics (EC)
+    		lc0210E2TY(10),		-- 2-port 10GE LAN PHY line card with 10Km optics
+    		lc0210E2TU(11),		-- 2-port 10GE LAN PHY line card with 100Km optics
+    		lc0110EW1YB(12),	-- 1-port 10GE WAN PHY line card with 10Km optics
+    		lc0110EW1YC(13),	-- 1-port 10GE WAN PHY line card with 10Km optics
+    		lc02S48YC2(14),		-- 2-port OC48c line card with SR optics (EC)
+    		lc0110EX1YB(15),	-- 1-port 10GE LAN PHY line card with 10Km optics (EB)
+    		lc0110EX1YC(16),	-- 1-port 10GE LAN PHY line card with 10Km optics (EC)
+    		lc1201F12PB(17),	-- 12-port GE Flex line card with SFP optics (EB)
+    		lc1201F12PC(18),	-- 12-port GE Flex line card with SFP optics (EC)
+    		lc0110EX1EB(19),	-- 1-port 10GE LAN PHY line card with 40Km optics (EB)
+    		lc0110EX1EC(20),	-- 1-port 10GE LAN PHY line card with 40Km optics (EC)
+    		lc0110EX1YBL(21),	-- 1-port 10GE LAN PHY line card with 10Km optics (EB)
+    		lc0210EX2YD(22),	-- 2 port 10GE LAN PHY with 10Km (1301nm) optics (ED)
+    		lc0210EX2ED(23),	-- 2 port 10GE LAN PHY with 40Km (1550nm) optics (ED)
+    		lc0210EX2ZDdep(24), -- 2 port 10GE LAN PHY with 80Km (1550nm) optics (ED; DEPRECATED.
+    		lc0210EW2YD(25),	-- 2 port 10GE WAN PHY with 10Km (1310nm) optics (ED)
+    		lc0110EX1YD(26),	-- 1 port 10GE LAN PHY with 10Km (1310nm) optics (ED)
+    		lc0110EX1ED(27),	-- 1 port 10GE LAN PHY with 40Km (1550nm) optics (ED)
+    		lc0110EX1ZD(28),	-- 1 port 10GE LAN PHY with 80Km (1550nm) optics (ED)
+    		lc0110EW1YD(29),	-- 1 port 10GE WAN PHY with 10Km. (1310nm) optics (ED)
+    		lc2401E24PD(30),	-- 24 port 1GE SFP (ED)
+    		lc0210EX2YD2(31),	-- 2 port 10GE LAN PHY with 10Km. (1310nm) optics (ED2)
+    		lc0210EX2YE(32),	-- 2 port 10GE LAN PHY with 10Km. (1310nm) optics (EE)
+    		lc0110EX1YD2(33),	-- 1 port 10 GE LAN PHY with 10Km. (1310nm) optics (ED2)
+    		lc0110EX1YE(34),	-- 1 port 10 GE LAN PHY with 10Km. (1310nm) optics (EE)
+    		lc0210EW2YD2(35),	-- 2 port 10GE WAN PHY with 10Km (1310nm) optics (ED2)
+    		lc0210EW2YE(36),	-- 2 port 10GE WAN PHY with 10Km (1310nm) optics (EE)
+    		lc0110EW1YE(37),	-- 1 port 10GE WAN PHY with 10Km. (1310nm) optics (EE)
+    		lc01OC192SE(38),	-- 1-port OC192c/STM-64c PoS line card with SR optics (EE)
+    		lc2401E24TD(39),	-- 24-port 100/1000Base-T line card with RJ-45 interfaces (ED)
+    		lc2401E24PE(40),	-- 24 port 1GE SFP (EE)
+    		lc1201F12PC2(41),	-- 12-port GE Flex line card with EoMPLS & SFP optics (EC2)
+    		lc0210EX2ZD(42),	-- 2 port 10GE LAN PHY with 80Km (1550nm) optics (ZD)
+    		lc0210EW2YD3(43),	-- 2 port 10GE WAN PHY with 10Km (1550nm) optics (ED3)
+    		lc0210EX2ZE(44),	-- 2 port 10GE LAN PHY with 80Km (1550nm) optics (EE)
+    		lc1201F12PE(45),	-- 12-port GE Flex line card with SFP optics (EE)
+    		lc2401E24PD2(46),	-- 24 port 1GE SFP (ED2)
+    		lc0210EX2ZD2(47),	-- PROMETHEUS 80Km ED2
+    		lc1201E12TD3(48),	-- Moosehaed 12 ports 1 pp FE/GE
+    		lc0210EX2YD3(49),	-- Tsunami 10Km ED      - Tsunami + Gorilla
+    		lc0110EX1YD3(50),	-- Tsunami 1 pp 10Km ED - Tsunami + Gorilla
+    		lc1201E12PD3(51),	-- Typhoon 12 ports SFP ED3
+    		lc02S48YE2(52),     -- Cairo J EE
+    		lc0110EX1YE3(53),   -- Tsunami 1pp 40Km EE
+    		lc1201E12PE3(54),   -- Typhoon 12 ports EE
+
+    		-- T2C2 Cards
+    		lc4801E48PF(55),    -- Saturn 48 ports 2 pp GE
+    		lc2401E24PF3(56),   -- Saturn-s 24 ports 1 pp GE
+    		lc4801E48TF3(57),   -- Ketel1 48 ports 1 pp E/FE/GE oversub E300
+    		lc4801E48TF(58),    -- Pluto  48 ports 2 pp E/FE/GE
+    		lc0410EXW4PF(59),   -- Voltex 4 ports  2 pp LAN/WAN 10 GE
+    		lc0210EXW2PF3(60),  -- Voltex-s 2 ports  1 pp LAN/WAN 10 GE
+    		lc9001E90MF(61),    -- Absolut 90 ports 2 pp GE
+    		lc4801E48T1F(62),   -- Medusa 48 ports 1 pp E/FE/GE oversub E600/1200
+    		lc1610EXW16PF(63),  -- Baku 16 ports 10 GE
+    		lc0810EXW8PF(64),   -- Baku 8 ports 10 GE
+    		lc0410EXW4PG(65),   -- Voltex 4 ports 10 GE (EG)
+    		lc4801E48PG(66),    -- Saturn 48 ports 2 pp GE (EG)
+    		lc4801E48TG(67),    -- Pluto  48 ports 2 pp E/FE/GE (EG)
+    		lc0210EXW2PG3(68),  -- Voltex 2 ports 10 GE (EG3)
+    		lc2401E24PG3(69),   -- Saturn 24 ports 1 pp GE (EG3)
+    		lc2401E24TG3(70),   -- Pluto  24 ports 1 pp E/FE/GE (EG3)
+    		lc04S48P4G(71),     -- Sonoma OC48c/12c/3c 4 Ports (EG)
+    		lc04S48P4G3(72),    -- Sonoma OC48c/12c/3c 4 Ports (EG3)
+    		lc1610EXW16PG(73),  -- Baku Dual CAM 16 ports
+    		lc0810EXW8PG3(74),  -- Baku Dual CAM 8 ports
+    		
+    		 -- CYCLONE3 Cards
+    		lc9001E90MH(75),    -- Athena 90 ports 10M CAM E/FE/GE (EH)
+    		lc1010EXW10SH(76),  -- Icarus-SFP+ 10 ports LAN/WAN 10GE SFP+ (EH)
+    		lc1010EXW10SJ(77),  -- Icarus-SFP+-Dual CAM 10 ports LAN/WAN 10GE SFP+ (EJ)
+    		lc9001E90MJ(78),    -- Athena 90 ports 40M CAM E/FE/GE (EJ)
+    		lc5001E50PH(79),    -- Artemis-SFP 50 ports LAN 1GE SFP 10M CAM (EH)
+    		lc5001E50PJ(80),    -- Artemis-SFP 50 ports LAN 1GE SFP 40M CAM (EJ)
+    		lc1010EXW10PH(81),  -- Erebus 10 ports 10GE XFP 10M CAM (EH)
+    		lc1010EXW10PJ(82),  -- Erebus 10 ports 10GE XFP 40M CAM (EJ)
+    		lc4010EXW40SH(83),  -- Pegasus 40 ports 10GE SFP+ 10M CAM
+    		lc4010EXW40SJ(84),  -- Pegasus 40 ports 10GE SFP+ 40M CAM
+                z9500LC12(85),           
+                z9500LC36(86),
+                z9500LC48(87),
+                c9000LC24X10GCu(88),
+                c9000LC24X10GOptics(89),
+                c9000LC6X40G(90), 
+    		
+    		rpmCard(200),       -- Route Processor Card
+    		rpmCardEB(201),
+    		rpmCardED(202),
+    		rpmCardEE(203),
+    		rpmCardEE3(204),
+    		rpmCardEF(205),
+    		rpmCardEF3(206),
+    		rpmCardEH(207),     -- Bigfoot
+                supCard(208),       -- Supervisor Card
+                sfmCard(250),       -- Switch Fabric Card
+    		
+    		cardUnknown(259)
+        }
+
+	F10CardOperStatus ::= TEXTUAL-CONVENTION
+	    STATUS        current
+	    DESCRIPTION
+	        "The operational status provides further condition of 
+	        the card. If AdminStatus is changed to 'up', then the
+	        valid state is
+	        'ready' - the card is present and ready and operational
+	                  packets can be passed
+	        If AdminStatus is changed to 'down', the states can be 
+	        as followed:
+	        'cardNotmatch'- the card does not matche what is configured
+	        'cardProblem' - the card detects hardware problems
+	        'diagMode'    - the card in the diagnostic mode
+	        'cardAbsent'  - the card is not present
+	        'offline'     - the card is not used."
+	    SYNTAX 		 INTEGER {
+	        ready(1),
+	        cardNotmatch(2),
+	        cardProblem(3),
+	        diagMode(4),
+	        cardAbsent(5),
+	        offline(6)
+	    }
+
+    F10CSeriesPortType ::= TEXTUAL-CONVENTION
+	    STATUS       current
+	    DESCRIPTION
+	       "Port type available in Dell Networking OS C-Series products."
+	    SYNTAX       INTEGER {
+    		portSerial(1),
+    		portAux(2),
+    		portFastEther(3),
+    		portGigEther(4),
+    		port10GigEther(5),
+    		portUnknown(99)
+        }
+
+    F10SSeriesPortType ::= TEXTUAL-CONVENTION
+	    STATUS       current
+	    DESCRIPTION
+	       "Port type available in Dell Networking OS S-Series products."
+	    SYNTAX       INTEGER {
+    		portSerial(1),
+    		portFastEther(2),
+    		portGigEther(3),
+    		port10GigEther(4),
+		    port40GigEther(5),
+            portFibreChannel(6),
+    		portUnknown(99)
+        }
+
+     F10MSeriesPortType ::= TEXTUAL-CONVENTION
+             STATUS       current
+             DESCRIPTION
+                "Port type available in Dell Networking OS M-Series products."
+             SYNTAX       INTEGER {
+                 portSerial(1),
+                 portFastEther(2),
+                 portGigEther(3),
+                 port10GigEther(4),
+                 port40GigEther(5),
+                 portFC(6),
+                 portUnknown(99)
+        }
+
+	F10CSeriesCardType ::= TEXTUAL-CONVENTION
+	    STATUS	current
+    	DESCRIPTION
+	    	"The processor card supported by the Dell Networking OS C-Series system
+		    products ."
+    	SYNTAX	INTEGER {
+    		notPresented(0),
+    		cardUnknown(99),
+    		lc4802E48TB(1024),  -- 48-port GE 100/1000Base-T line card with RJ45 interface (CB)
+    		lc0410EX4PB(1026),  -- 4-port 10GE LAN PHY line card with XFP optics (CB)    		    		
+    		lc4801E48PB(1027),  -- 48-port FE/GE line card with SFP optics (CB)    		   		
+    		lc4610E46TB(1028),  -- 36-port GE 10/100/1000Base-T with RJ45 - 8-port FE/GE with SFP - 2-port 10GE with SFP+
+    		lc4802E48VB(1280),  -- 48-port GE 100/1000Base-T line card with RJ45 interface (CB) with POE    		
+    		lc4610E46VB(1284),  -- 36-port GE 10/100/1000Base-T with RJ45 and PoE - 8-port FE/GE with SFP - 2-port 10GE with SFP+        		
+    		lc0810EX8PB(2049),  -- 8-port 10GE LAN PHY line card with XFP optics (CB)
+    		rpmCard(200)	-- Route Processor Card
+        }
+
+	F10ProcessorModuleType ::= TEXTUAL-CONVENTION
+	    STATUS       current
+	    DESCRIPTION
+	       "The processor modules supported by the Dell Networking OS
+		card."
+	    SYNTAX	INTEGER {
+			controlProcessor(1),   		-- Control Processor
+			routingProcessor1(2),		-- Rotuing Processor type 1
+			routingProcessor2(3),		-- Rotuing Processor type 2
+			linecardProcessor(4),		-- Line Card Processor
+			rpmProcessor(5),		-- Single Control+Routing Processor
+			routingProcessor(6)		-- Rotuing Processor
+	    }
+
+
+	F10SlotState ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+		"A bit string that represents the status of the slot
+		in a E1200 chassis.
+
+                Slot# 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+                      1 1 1 0 1 1 1 0 1  1  1  1  1  1  1  1
+                      |                                    |
+                      |                                    |
+                      |        Least Significant bit <-----+
+                      |
+                      +----->  Most Significant bit
+
+		The slot numbers starts with the most significant bit.
+		The most significant bit represents slot number 1 and
+		the least significant bit is slot 16.
+
+		A bit string that represents the status of the slot
+		in a E600 chassis.
+
+                Slot# 1 2 3 4 5 6 7 8 9
+                      1 1 1 0 1 1 1 0 1
+                      |               |
+                      |               V
+                      |               Least Significant bit
+                      |
+                      +----->  Most Significant bit
+
+		The slot numbers starts with the most significant bit.
+		The most significant bit represents slot number 1 and
+		the least significant bit is slot 9.
+
+		Each slot occupies a bit. The value 1 indicates slot is
+		in used and 0 indicates slot is empty."
+    	SYNTAX	  INTEGER (0..65535)
+
+    F10SlotID ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Dell Networking OS Chassis Slot ID.
+                "
+        SYNTAX  INTEGER
+
+	F10SwDate ::= TEXTUAL-CONVENTION
+         STATUS       current
+         DESCRIPTION
+	     "The date format is MM/DD/YYYY.
+
+		 MM   = Month
+		 DD   = Day
+		 YYYY = Year
+
+             For example, January 24, 2002 would be
+             displayed as:
+                 		01/24/2002
+		"
+    	SYNTAX  DisplayString
+
+	F10MfgDate ::= TEXTUAL-CONVENTION
+         STATUS       current
+         DESCRIPTION
+		"The manufacturing date format is PPWWYYYY
+		 PP   = Plant #(ie, what building made the board;01= Sanmina Bldg 4,02=Sanmina Bldg 2)
+		 WW   = Week number (01 = First full week of the year ie, Sunday through Saturday)
+		 YYYY = Year
+             For example, 01482001 would have been produced at Samina Bldg 4 during the first
+		 week of December, 2001.
+		"
+	    SYNTAX  DisplayString
+
+	PortList ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+        SYNTAX      OCTET STRING
+
+    F10VlanID ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+        "Dell Networking OS VLAN ID.
+        A value used to index per-VLAN tables: values of 0 and
+        4095 are not permitted; if the value is between 1 and
+        4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with
+        global scope within a given bridged domain (see VlanId
+        textual convention).  If the value is greater than 4095
+        then it represents a VLAN with scope local to the
+        particular agent, i.e. one without a global VLAN-ID
+        assigned to it. Such VLANs are outside the scope of
+        IEEE 802.1Q but it is convenient to be able to manage them
+        in the same way using this MIB."
+        SYNTAX      INTEGER
+
+	F10ChassisMode ::= TEXTUAL-CONVENTION
+	    STATUS       current
+	    DESCRIPTION
+	       "The chassis mode in Dell Networking series of products."
+	    SYNTAX       INTEGER {
+			nonJumbo(0), 	    -- 1.0
+			etherScale(1),      -- Jumbo/1.5
+			mixed(2),           -- 1.5 Mix
+			teraScale(3),       -- 2.0
+			cseries1(4),        -- C-Series 1.0
+			sseries1(5),        -- S-Series 1.0
+			exaScale(6)         -- 3.0
+    	}
+
+    F10QueueID ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Dell Networking OS Queue ID.
+                "
+        SYNTAX  INTEGER
+
+    F10PortPipeID ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Dell Networking OS PortPipe ID.
+                "
+        SYNTAX  INTEGER
+
+	F10CycloneVersion ::= TEXTUAL-CONVENTION
+	    STATUS       current
+	    DESCRIPTION
+	       "the Dell Networking OS Cyclone based hardware version"
+	    SYNTAX       INTEGER {
+			onePointFive(1),    -- TjCj
+			twoPointZero(2),    -- T2C2
+			threePointZero(3)   -- X3
+    	}
+
+	F10CamPartitionType ::= TEXTUAL-CONVENTION
+	    STATUS       current
+	    DESCRIPTION
+	       "The CAM partition supported in the Dell Networking OS line card.
+
+                The sequecing used here is
+
+                        Layer 2 Ingress CAM range is 1 - 30
+                        Layer 2 Egress CAM range is  31 - 60
+                        Layer 3 Ingress CAM range is 61 - 90
+                        Layer 3 Egress CAM range is  91 - 120
+                        Layer 3 Host abd LPM CAM (BCM specific) range is 121 - 150
+               "
+	    SYNTAX	INTEGER {
+			layer2AclIngress(1),   		-- L2 Ingress ACL
+			layer2AclPvstIngress(2),   	-- L2 Ingress ACL PVST
+			layer2FibIngress(3),   		-- L2 Ingress FIB
+			layer2FibEgress(31),   		-- L2 Egress FIB
+			layer3AclIngress(61),  		-- L3 Ingress ACL
+			layer3FibIngress(62),  		-- L3 Ingress FIB
+			layer3SysFlowIngress(63),   	-- L3 Ingress System Flow
+			layer3TrcListIngress(64),   	-- L3 Ingress System Flow
+			layer3McastFibIngress(65),   	-- L3 Ingress multicast fib
+			layer3QosIngress(66),   	-- L3 Ingress multicast fib
+			layer3PbrIngress(67),   	-- L3 Ingress multicast fib
+			layer3AclEgress(91),   		-- L3 Egress ACL
+			layer3ExtHost(121),   		-- L3 Host Table(BCM)
+			layer3ExtLPM(122)   		-- L3 Longest Prefix Match(BCM-LPM) 
+
+	    }
+
+    F10HundredthdB ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "d-2"
+        STATUS       current
+        DESCRIPTION
+            "This data type represents power levels
+            that are normally expressed in dB. Units
+            are in hundredths of a dB;
+            for example, -7.23 dB will be represented as -723."
+        SYNTAX       Integer32
+
+    
+    DellNetDeviceType ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+          "The device category running  the Dell Networking OS"
+     SYNTAX     INTEGER {
+                    chassis(1),            -- Chassis
+                    stack(2),              -- Stackable unit
+                    rpm(3),                -- Route Processor Module
+                    supervisor(4),         -- supervisor Module
+                    linecard(5),           -- Line Card
+                    port-extender(6)       -- Port Extender
+    }
+
+
+    DellNetPEOperStatus ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+          "The operational status of the port extender"
+     SYNTAX     INTEGER {
+                    up(1),
+                    down(2)
+    }
+ 
+END

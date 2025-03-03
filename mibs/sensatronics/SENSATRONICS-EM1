@@ -1,0 +1,493 @@
+-- *****************************************************************
+-- SENSATRONICS-ITTM.TXT:  MIB corresponding to ITTM firmware v3.0
+-- 
+-- February 2004  Andrew F. Thompson--
+-- Copyright (c) 2004 by Sensatronics LLC
+-- All rights reserved.-- 
+-- *****************************************************************
+SENSATRONICS-EM1 DEFINITIONS ::= BEGIN
+IMPORTS
+        MODULE-IDENTITY,        
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        IpAddress,
+        TimeTicks        
+        FROM SNMPv2-SMI        
+        DisplayString        
+        FROM SNMPv2-TC        
+        envMonitors      
+        FROM SENSATRONICS-SMI;
+
+productEM1 MODULE-IDENTITY
+        LAST-UPDATED "200409130900Z"
+        ORGANIZATION "Sensatronics LLC"
+        CONTACT-INFO
+         "Sensatronics LLC
+          Postal: 20A Dunklee Road
+                  Bow, NH 03304
+                  USA
+          Tel: +1 603 224 0617
+          E-mail: dthompson@sensatronics.com"
+        DESCRIPTION
+                "Description of EM1 code."
+        REVISION	"200409130900Z"
+        DESCRIPTION
+                "Initial version of this MIB module."        
+::= { envMonitors 3 }
+
+unitInfo OBJECT IDENTIFIER ::= { productEM1 1 } -- Unit info for the Temperature Monitor being accessed.
+configData OBJECT IDENTIFIER ::= { productEM1 2 } -- Config data for the Temperature Monitor being accessed.
+sensorInfo OBJECT IDENTIFIER ::= { productEM1 3 } -- Sensor data for the Temperature Monitor being accessed.
+unitName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (32))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "A user-definable unit name for the module being managed."        
+::= { unitInfo 1 }
+
+unitModel OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The model number of the module being managed."        
+::= { unitInfo 2 }
+
+unitManufacturer OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (12))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Company name of unit producer."        
+::= { unitInfo 3 }
+
+unitWeb OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (28))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Website of manufacturer"        
+::= { unitInfo 4 }
+
+unitFirmware OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                "Firmware revision of unit."        
+::= { unitInfo 5 }
+
+unitFWReleaseDate OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (18))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Release date of unit firmware."        
+::= { unitInfo 6 }
+
+unitSerial OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (32))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Serial number of unit being managed."        
+::= { unitInfo 7 }
+
+unitConfig OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "In-house configuration MIB - do not use."        
+::= { unitInfo 8 }
+
+netInfo OBJECT IDENTIFIER ::= { configData 1 }  -- Network info for unit
+trapConfig OBJECT IDENTIFIER ::= { configData 2 }  -- Trap setup for unit
+measurementSystem OBJECT IDENTIFIER ::= { configData 3 }  -- Configuration of system of units
+
+netMode OBJECT-TYPE
+	SYNTAX
+	INTEGER (0..1)	
+      MAX-ACCESS read-only
+	STATUS	   current
+	DESCRIPTION
+		"1 if the unit is self-configuring via DHCP, 0 if static IP assigned."  	
+::= { netInfo 1 }
+
+netIP OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "IP address of unit being managed."        
+::= { netInfo 2 }
+
+netNM OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Netmask of unit being managed."        
+::= { netInfo 3 }
+
+netGW OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Gateway of unit being managed."        
+::= { netInfo 4 }
+
+netHTTPPort OBJECT-TYPE
+	SYNTAX	   INTEGER (0..65535)
+	MAX-ACCESS read-write
+	STATUS	   current
+	DESCRIPTION
+		"Port the unit webserver listens on"  	
+::= { netInfo 5 }
+
+managerConfig OBJECT IDENTIFIER ::= { trapConfig 1 }  -- Trap manager setup for unit
+
+unitMode OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (2))
+        MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Set to C for Celsius units in probe data, F for Fahrenheit, 
+                 K for Kelvin, R for Rankine, other values disallowed."  	
+::= { measurementSystem 1 }
+
+managerIP OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "IP of trap manager."        
+::= { managerConfig 1 }
+
+group1 OBJECT IDENTIFIER ::= { sensorInfo 1 }  -- 4 groups
+group2 OBJECT IDENTIFIER ::= { sensorInfo 2 }
+group3 OBJECT IDENTIFIER ::= { sensorInfo 3 }
+group4 OBJECT IDENTIFIER ::= { sensorInfo 4 }
+
+group1Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of group 1 - User configurable, 16 characters"        
+::= { group1 1 }
+
+group1TempName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Temperature probe in group 1 - User configurable, 16 characters"        
+::= { group1 2 }
+
+group1TempDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Temperature probe in group 1, string format, to 1 decimal place"        
+::= { group1 3 }
+
+group1TempDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-1000..10000)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Temperature probe in group 1, integer format, no decimal places"        
+::= { group1 4 }
+
+group1HumidName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Humidity probe in group 1 - User configurable, 16 characters"        
+::= { group1 5 }
+
+group1HumidDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Humidity probe in group 1, string format, to 1 decimal place"        
+::= { group1 6 }
+
+group1HumidDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1000)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Humidity probe in group 1, integer format, no decimal places"        
+::= { group1 7 }
+
+group1WetName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Wetness probe in group 1 - User configurable, 16 characters"        
+::= { group1 8 }
+
+group1WetDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Wetness probe in group 1, string format, to 1 decimal place"        
+::= { group1 9 }
+
+group1WetDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-1..110)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Wetness probe in group 1, integer format, no decimal places"        
+::= { group1 10 }
+
+group2Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of group 2 - User configurable, 16 characters"        
+::= { group2 1 }
+
+group2TempName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Temperature probe in group 2 - User configurable, 16 characters"        
+::= { group2 2 }
+
+group2TempDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Temperature probe in group 2, string format, to 1 decimal place"        
+::= { group2 3 }
+
+group2TempDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-1000..10000)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Temperature probe in group 2, integer format, no decimal places"        
+::= { group2 4 }
+
+group2HumidName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Humidity probe in group 2 - User configurable, 16 characters"        
+::= { group2 5 }
+
+group2HumidDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Humidity probe in group 2, string format, to 1 decimal place"        
+::= { group2 6 }
+
+group2HumidDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1000)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Humidity probe in group 2, integer format, no decimal places"        
+::= { group2 7 }
+
+group2WetName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Wetness probe in group 2 - User configurable, 16 characters"        
+::= { group2 8 }
+
+group2WetDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Wetness probe in group 2, string format, to 1 decimal place"        
+::= { group2 9 }
+
+group2WetDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-1..110)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Wetness probe in group 2, integer format, no decimal places"        
+::= { group2 10 }
+
+group3Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of group 3 - User configurable, 16 characters"        
+::= { group3 1 }
+
+group3TempName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Temperature probe in group 3 - User configurable, 16 characters"        
+::= { group3 2 }
+
+group3TempDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Temperature probe in group 3, string format, to 1 decimal place"        
+::= { group3 3 }
+
+group3TempDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-1000..10000)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Temperature probe in group 3, integer format, no decimal places"        
+::= { group3 4 }
+
+group3HumidName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Humidity probe in group 3 - User configurable, 16 characters"        
+::= { group3 5 }
+
+group3HumidDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Humidity probe in group 3, string format, to 1 decimal place"        
+::= { group3 6 }
+
+group3HumidDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1000)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Humidity probe in group 3, integer format, no decimal places"        
+::= { group3 7 }
+
+group3WetName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Wetness probe in group 3 - User configurable, 16 characters"        
+::= { group3 8 }
+
+group3WetDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Wetness probe in group 3, string format, to 1 decimal place"        
+::= { group3 9 }
+
+group3WetDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-1..110)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Wetness probe in group 3, integer format, no decimal places"        
+::= { group3 10 }
+
+group4Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of group 4 - User configurable, 16 characters"        
+::= { group4 1 }
+
+group4TempName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Temperature probe in group 4 - User configurable, 16 characters"        
+::= { group4 2 }
+
+group4TempDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Temperature probe in group 4, string format, to 1 decimal place"        
+::= { group4 3 }
+
+group4TempDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-1000..10000)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Temperature probe in group 4, integer format, no decimal places"        
+::= { group4 4 }
+
+group4HumidName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Humidity probe in group 4 - User configurable, 16 characters"        
+::= { group4 5 }
+
+group4HumidDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Humidity probe in group 4, string format, to 1 decimal place"        
+::= { group4 6 }
+
+group4HumidDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (0..1000)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Humidity probe in group 4, integer format, no decimal places"        
+::= { group4 7 }
+
+group4WetName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of Wetness probe in group 4 - User configurable, 16 characters"        
+::= { group4 8 }
+
+group4WetDataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Wetness probe in group 4, string format, to 1 decimal place"        
+::= { group4 9 }
+
+group4WetDataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-1..110)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from Wetness probe in group 4, integer format, no decimal places"        
+::= { group4 10 }
+
+END

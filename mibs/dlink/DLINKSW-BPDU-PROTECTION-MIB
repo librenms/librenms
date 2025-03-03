@@ -1,0 +1,205 @@
+--  *****************************************************************
+--  DLINKSW-BPDU-PROTECTION-MIB.mib : BPDU Protection MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+
+    DLINKSW-BPDU-PROTECTION-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE               FROM SNMPv2-SMI       
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP              FROM SNMPv2-CONF
+        TruthValue                      FROM SNMPv2-TC
+        ifIndex                         FROM IF-MIB
+        dlinkIndustrialCommon           FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwBpduProtectionMIB MODULE-IDENTITY
+        LAST-UPDATED "201302190000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+             "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for BPDU Protection."
+
+        REVISION "201302190000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file."
+        ::= { dlinkIndustrialCommon 47 }
+
+-- ---------------------------------------------------------------------------------------------
+    dBpduProtectionNotifications    OBJECT IDENTIFIER ::= { dlinkSwBpduProtectionMIB 0 }
+    dBpduProtectionObjects          OBJECT IDENTIFIER ::= { dlinkSwBpduProtectionMIB 1 }
+    dBpduProtectionConformance      OBJECT IDENTIFIER ::= { dlinkSwBpduProtectionMIB 2 }
+
+-- ---------------------------------------------------------------------------------------------
+    dBpduProtectionGlobalEnabled    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the global BPDU Protection state.    
+            'true' - The BPDU Protection is enabled globally.                   
+            'false' - The lBPDU Protection is disabled globally."
+        ::= { dBpduProtectionObjects 1 }
+
+    dBpduProtectionNotifyEnabled    OBJECT-TYPE
+        SYNTAX          TruthValue   
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether sending SNMP notifications for BPDU Protection.                                              
+            "
+        ::= { dBpduProtectionObjects 2 }
+
+-- ---------------------------------------------------------------------------------------------
+    dBpduProtectionIfTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DBpduProtectionIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS              current
+        DESCRIPTION            
+            "This table consists of a list of interface-specific BPDU Protection
+            information entries."            
+        ::= { dBpduProtectionObjects 3 }
+
+    dBpduProtectionIfEntry    OBJECT-TYPE
+        SYNTAX         DBpduProtectionIfEntry
+        MAX-ACCESS     not-accessible       
+        STATUS         current
+        DESCRIPTION            
+            "An entry indicates the state and attack status of BPDU Protection 
+            on an interface."
+        INDEX  { ifIndex }
+        ::= { dBpduProtectionIfTable 1 }
+
+    DBpduProtectionIfEntry ::= SEQUENCE     {
+        dBpduProtectionIfCfgMode            INTEGER,
+        dBpduProtectionIfAttackStatus       INTEGER
+    }
+
+    dBpduProtectionIfCfgMode    OBJECT-TYPE
+        SYNTAX           INTEGER        {
+            disabled(1),
+            drop(2),
+            block(3),
+            shutdown(4)
+        }
+        MAX-ACCESS       read-write
+        STATUS           current
+        DESCRIPTION
+            "This object indicates the operational mode of BPDU Protection on the interface.
+
+            disabled(1) - The BPDU Protection is disabled.
+
+            drop(2) - Drop all received BPDU packets when the interface enters the attacked state.
+
+            block(3) - Drop all packets (include BPDU and normal packets) when the interface
+                       enters the attacked state.
+
+            shutdown(4) - Shut down the interface when the interface enters he attacked state.
+            "             
+        ::= { dBpduProtectionIfEntry 1 }
+
+    dBpduProtectionIfAttackStatus    OBJECT-TYPE
+        SYNTAX               INTEGER        {
+            normal(1),
+            underAttack(2)
+        }
+        MAX-ACCESS           read-only
+        STATUS               current
+        DESCRIPTION
+            "This object indicates the status of BPDU Protection on an interface.
+            normal(1) - The interface is under normal status.
+            underAttack(2) - The inter is under attack status."
+        ::= { dBpduProtectionIfEntry 2 }
+
+-- ---------------------------------------------------------------------------------------------
+-- MIB Notifications statements
+-- ---------------------------------------------------------------------------------------------
+    dBpduProtectionAttackOccur    NOTIFICATION-TYPE
+        OBJECTS         {
+            ifIndex,
+            dBpduProtectionIfCfgMode
+        }
+        STATUS             current
+        DESCRIPTION
+            "This trap is sent when the BPDU attack happened on an interface."
+        ::= { dBpduProtectionNotifications 1 }
+
+    dBpduProtectionAttackRecover    NOTIFICATION-TYPE
+        OBJECTS         {
+            ifIndex
+        }
+        STATUS               current
+        DESCRIPTION
+            "This trap is sent when the BPDU attack recovered on an interface."
+        ::= { dBpduProtectionNotifications 2 }
+
+-- ---------------------------------------------------------------------------------------------
+-- MIB Conformance statements
+-- ---------------------------------------------------------------------------------------------
+    dBpduProtectionMIBCompliances    OBJECT IDENTIFIER
+        ::= { dBpduProtectionConformance 1 }
+
+    dBpduProtectionMIBGroups    OBJECT IDENTIFIER
+        ::= { dBpduProtectionConformance 2 }
+
+-- ---------------------------------------------------------------------------------------------
+    dBpduProtectionMIBCompliance    MODULE-COMPLIANCE
+        STATUS               current
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+            DLINKSW-BPDU-PROTECTION-MIB."
+        MODULE               -- this module
+        MANDATORY-GROUPS
+        {
+            dBpduProtectionCfgGroup,
+            dBpduProtectionIfGroup           
+        }
+        ::= { dBpduProtectionMIBCompliances 1 }
+
+-- ---------------------------------------------------------------------------------------------
+    dBpduProtectionCfgGroup    OBJECT-GROUP
+        OBJECTS         {
+            dBpduProtectionGlobalEnabled,
+            dBpduProtectionNotifyEnabled
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing management of the BPDU 
+            Protection feature."
+        ::= { dBpduProtectionMIBGroups 1 }
+
+    dBpduProtectionIfGroup    OBJECT-GROUP
+        OBJECTS        { 
+            dBpduProtectionIfCfgMode,
+            dBpduProtectionIfAttackStatus
+        }
+        STATUS            current
+        DESCRIPTION
+            "A collection of objects providing management and information for 
+            BPDU Protection a per-interface basis."
+        ::= { dBpduProtectionMIBGroups 2 }
+
+    dBpduProtectionNotifyGroup    NOTIFICATION-GROUP
+        NOTIFICATIONS        {
+            dBpduProtectionAttackOccur,
+            dBpduProtectionAttackRecover
+        }
+        STATUS             current
+        DESCRIPTION
+            "A collection of notifications for BPDU Protection."
+        ::= { dBpduProtectionMIBGroups 3 }
+
+END

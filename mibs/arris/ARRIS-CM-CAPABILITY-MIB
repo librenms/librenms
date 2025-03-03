@@ -1,0 +1,473 @@
+-- [RCOLEY - 06.26.2002 : MIB has been modified to successfully compile in Epilogue/Emissary v9.1]
+ARRIS-CM-CAPABILITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+    arrisProdIdCM
+        FROM ARRIS-MIB;		
+
+modemCapabilities	MODULE-IDENTITY
+LAST-UPDATED  "0206250000Z" -- June 25, 2002
+ORGANIZATION  "Arris Interactive, L.L.C."
+CONTACT-INFO   
+       "Robert Coley
+       Postal: Arris Interactive, L.L.C.
+               3871 Lakefield Drive
+               Suite 300
+               Suwanee, GA 30024-1242
+               U.S.A.
+       Phone:  +1 770 622 8500
+       E-mail: robert.coley@arrisi.com"
+
+DESCRIPTION
+	"This is the MIB Module describing modem capabilities."
+::= { arrisProdIdCM 20 }
+
+-- Next branch connection is vendor proprietary
+modemCapabilitiesObjects  OBJECT IDENTIFIER ::= { modemCapabilities 1 }
+
+-- [RCOLEY - 06.26.2002: AGENT-CAPABILITIES constructs modified to compile in Emissary v9.1]
+-- Capability description 
+modemAgentDocsis10 OBJECT IDENTIFIER --AGENT-CAPABILITIES
+--       PRODUCT-RELEASE      "DOCSIS 1.0 Cable Modem Agent release 2.0."
+--       STATUS               current
+--       DESCRIPTION          "DOCSIS 1.0 Cable Modem agent."
+
+--       SUPPORTS             BRIDGE-MIB
+--           INCLUDES         { dot1dBase, dot1dTp }
+
+--       SUPPORTS             SNMPv2-MIB
+--           INCLUDES         { snmpGroup, snmpSetGroup, systemGroup,
+--                              snmpBasicNotificationsGroup,
+--                              snmpCommunityGroup,
+--                              snmpObsoleteGroup }
+
+--       SUPPORTS             IP-MIB
+--           INCLUDES         { ipGroup, icmpGroup}
+
+--       SUPPORTS             UDP-MIB
+--           INCLUDES         { udpGroup }
+
+--       SUPPORTS             IF-MIB
+--           INCLUDES         { ifGeneralInformationGroup, ifStackGroup2,
+--                              ifCounterDiscontinuityGroup,
+--                              ifVHCPacketGroup,
+--                              ifOldObjectsGroup }
+
+--       SUPPORTS             EtherLike-MIB
+--           INCLUDES         { etherStatsBaseGroup,
+--                              etherStatsLowSpeedGroup,
+--                              etherStatsHighSpeedGroup,
+--                              etherDuplexGroup }
+
+--       SUPPORTS             DOCS-CABLE-DEVICE-MIB
+--           INCLUDES         { docsDevBaseGroup, docsDevNmAccessGroup,
+--                              docsDevSoftwareGroup, docsDevServerGroup,
+--                              docsDevEventGroup, docsDevFilterGroup,
+--                              docsDevCpeGroup }
+
+--           VARIATION        docsDevNmAccessEntry
+--               CREATION-REQUIRES { docsDevNmAccessStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterLLCEntry
+--               CREATION-REQUIRES { docsDevFilterLLCStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterIpEntry
+--               CREATION-REQUIRES { docsDevFilterIpStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterPolicyEntry
+--               CREATION-REQUIRES { docsDevFilterPolicyId, docsDevFilterPolicyStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterTosEntry
+--               CREATION-REQUIRES { docsDevFilterTosStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevCpeEntry
+--               CREATION-REQUIRES { docsDevCpeStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             DOCS-IF-MIB
+--           INCLUDES         { docsIfBasicGroup, docsIfCmGroup }
+
+--       SUPPORTS             DOCS-BPI-MIB
+--           INCLUDES         { docsBpiCmGroup }
+
+--       SUPPORTS             USB-MIB
+--           INCLUDES         { usbMibBasicGroup,
+--                              usbMibCDCGroup,
+--                              usbMibCDCEtherGroup }
+
+-- Fixed place for CM capabilities
+::= { modemCapabilitiesObjects 1 }
+
+
+
+
+modemAgentDocsis11 OBJECT IDENTIFIER --AGENT-CAPABILITIES
+--       PRODUCT-RELEASE      "DOCSIS 1.1 Cable Modem Agent release 2.0."
+--       STATUS               current
+--       DESCRIPTION          "DOCSIS 1.1 Cable Modem agent."
+
+--       SUPPORTS             BRIDGE-MIB
+--           INCLUDES         { dot1dBase, dot1dTp }
+
+--       SUPPORTS             SNMPv2-MIB
+--           INCLUDES         { snmpGroup, snmpSetGroup, systemGroup,
+--                              snmpBasicNotificationsGroup,
+--                              snmpCommunityGroup,
+--                              snmpObsoleteGroup }
+
+--       SUPPORTS             IP-MIB
+--           INCLUDES         { ipGroup, icmpGroup}
+
+--       SUPPORTS             UDP-MIB
+--           INCLUDES         { udpGroup }
+
+--       SUPPORTS             IF-MIB
+--           INCLUDES         { ifGeneralInformationGroup, ifStackGroup2,
+--                              ifCounterDiscontinuityGroup,
+--                              ifVHCPacketGroup,
+--                              ifOldObjectsGroup }
+
+--       SUPPORTS             EtherLike-MIB
+--           INCLUDES         { etherStatsBaseGroup,
+--                              etherStatsLowSpeedGroup,
+--                              etherStatsHighSpeedGroup,
+--                              etherDuplexGroup }
+
+--       SUPPORTS             DOCS-CABLE-DEVICE-MIB
+--           INCLUDES         { docsDevBaseGroup, docsDevNmAccessGroup,
+--                              docsDevSoftwareGroup, docsDevServerGroup,
+--                              docsDevEventGroup, docsDevFilterGroup,
+--                              docsDevCpeGroup }
+
+--           VARIATION        docsDevNmAccessEntry
+--               CREATION-REQUIRES { docsDevNmAccessStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterLLCEntry
+--               CREATION-REQUIRES { docsDevFilterLLCStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterIpEntry
+--               CREATION-REQUIRES { docsDevFilterIpStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterPolicyEntry
+--               CREATION-REQUIRES { docsDevFilterPolicyId, docsDevFilterPolicyStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterTosEntry
+--               CREATION-REQUIRES { docsDevFilterTosStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevCpeEntry
+--               CREATION-REQUIRES { docsDevCpeStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             DOCS-IF-MIB
+--           INCLUDES         { docsIfBasicGroup, docsIfCmGroup }
+
+--       SUPPORTS             DOCS-BPI-MIB
+--           INCLUDES         { docsBpiCmGroup }
+
+--       SUPPORTS             USB-MIB
+--           INCLUDES         { usbMibBasicGroup,
+--                              usbMibCDCGroup,
+--                              usbMibCDCEtherGroup }
+
+
+-- DOCSIS 1.1 additional Capabilities
+
+--       SUPPORTS             SNMP-FRAMEWORK-MIB
+--           INCLUDES         { snmpEngineGroup }
+
+--       SUPPORTS             SNMP-MPD-MIB
+--           INCLUDES         { snmpMPDGroup }
+
+--       SUPPORTS             SNMP-TARGET-MIB
+--           INCLUDES         { snmpTargetBasicGroup,
+--                              snmpTargetResponseGroup,
+--                              snmpTargetCommandResponderGroup }
+
+--           VARIATION        snmpTargetAddrEntry
+--               CREATION-REQUIRES { snmpTargetAddrRowStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        snmpTargetParamsEntry
+--               CREATION-REQUIRES { snmpTargetParamsRowStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             SNMP-NOTIFICATION-MIB
+--           INCLUDES         { snmpNotifyGroup,
+--                              snmpNotifyFilterGroup }
+
+--           VARIATION        snmpNotifyEntry
+--               CREATION-REQUIRES { snmpNotifyRowStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        snmpNotifyFilterProfileEntry
+--               CREATION-REQUIRES { snmpNotifyFilterProfileRowStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        snmpNotifyFilterEntry
+--               CREATION-REQUIRES { snmpNotifyFilterRowStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             SNMP-USER-BASED-SM-MIB
+--           INCLUDES         { usmMIBBasicGroup }
+
+--           VARIATION        usmUserEntry
+--               CREATION-REQUIRES { usmUserStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             SNMP-VIEW-BASED-ACM-MIB
+--           INCLUDES         { vacmBasicGroup }
+
+--           VARIATION        vacmSecurityToGroupEntry
+--               CREATION-REQUIRES { vacmSecurityToGroupStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        vacmAccessEntry
+--               CREATION-REQUIRES { vacmAccessStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             SNMP-COMMUNITY-MIB
+--           INCLUDES         { snmpCommunityGroup }
+
+--           VARIATION        snmpCommunityEntry
+--               CREATION-REQUIRES { snmpCommunityName, snmpCommunitySecurityName,
+--                                   snmpCommunityStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             SNMP-USM-DH-OBJECTS-MIB
+--           INCLUDES         { usmDHKeyMIBBasicGroup,
+--                              usmDHKeyParamGroup,
+--                              usmDHKeyKickstartGroup }
+
+--       SUPPORTS             DOCS-BPI2-MIB
+--           INCLUDES         { docsBpi2CmGroup,
+--                              docsBpi2CodeDownloadGroup }
+
+--       SUPPORTS             DOCS-QOS-MIB
+--           INCLUDES         { docsQosBaseGroup,
+--                              docsQosParamSetGroup,
+--                              docsQosSrvClassPolicyGroup }
+
+--           VARIATION        docsQosServiceClassPolicyEntry
+--               CREATION-REQUIRES { docsQosServiceClassPolicyStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+
+--       SUPPORTS             IGMP-STD-MIB
+--           INCLUDES         { igmpBaseMIBGroup,
+--                              igmpRouterMIBGroup,
+--                              igmpV2HostMIBGroup,
+--                              igmpHostOptMIBGroup,
+--                              igmpV2RouterMIBGroup,
+--                              igmpV2ProxyMIBGroup }
+
+--           VARIATION        igmpCacheEntry
+--               CREATION-REQUIRES { igmpCacheStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             DOCS-IF-EXT-MIB
+--           INCLUDES         { docsIfExtGroup,
+--                              docsIfDocsisVersionGroup }
+
+--       SUPPORTS             DOCS-CABLE-DEVICE-TRAP-MIB
+--           INCLUDES         { docsDevCmTrapControlGroup,
+--                              docsDevCmNotificationGroup }
+
+-- Fixed place for CM capabilities
+::= { modemCapabilitiesObjects 2 }
+
+modemAgentDocsis20 OBJECT IDENTIFIER --AGENT-CAPABILITIES
+--       PRODUCT-RELEASE      "DOCSIS 2.0 Cable Modem Agent release 2.0."
+--       STATUS               current
+--       DESCRIPTION          "DOCSIS 2.0 Cable Modem agent."
+
+--       SUPPORTS             BRIDGE-MIB
+--           INCLUDES         { dot1dBase, dot1dTp }
+
+--       SUPPORTS             SNMPv2-MIB
+--           INCLUDES         { snmpGroup, snmpSetGroup, systemGroup,
+--                              snmpBasicNotificationsGroup,
+--                              snmpCommunityGroup,
+--                              snmpObsoleteGroup }
+
+--       SUPPORTS             IP-MIB
+--           INCLUDES         { ipGroup, icmpGroup}
+
+--       SUPPORTS             UDP-MIB
+--           INCLUDES         { udpGroup }
+
+--       SUPPORTS             IF-MIB
+--           INCLUDES         { ifGeneralInformationGroup, ifStackGroup2,
+--                              ifCounterDiscontinuityGroup,
+--                              ifVHCPacketGroup,
+--                              ifOldObjectsGroup }
+
+--       SUPPORTS             EtherLike-MIB
+--           INCLUDES         { etherStatsBaseGroup,
+--                              etherStatsLowSpeedGroup,
+--                              etherStatsHighSpeedGroup,
+--                              etherDuplexGroup }
+
+--       SUPPORTS             DOCS-CABLE-DEVICE-MIB
+--           INCLUDES         { docsDevBaseGroup, docsDevNmAccessGroup,
+--                              docsDevSoftwareGroup, docsDevServerGroup,
+--                              docsDevEventGroup, docsDevFilterGroup,
+--                              docsDevCpeGroup }
+
+--           VARIATION        docsDevNmAccessEntry
+--               CREATION-REQUIRES { docsDevNmAccessStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterLLCEntry
+--               CREATION-REQUIRES { docsDevFilterLLCStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterIpEntry
+--               CREATION-REQUIRES { docsDevFilterIpStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterPolicyEntry
+--               CREATION-REQUIRES { docsDevFilterPolicyId, docsDevFilterPolicyStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevFilterTosEntry
+--               CREATION-REQUIRES { docsDevFilterTosStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        docsDevCpeEntry
+--               CREATION-REQUIRES { docsDevCpeStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             DOCS-IF-MIB
+--           INCLUDES         { docsIfBasicGroup, docsIfCmGroup }
+
+--       SUPPORTS             DOCS-BPI-MIB
+--           INCLUDES         { docsBpiCmGroup }
+
+--       SUPPORTS             USB-MIB
+--           INCLUDES         { usbMibBasicGroup,
+--                              usbMibCDCGroup,
+--                              usbMibCDCEtherGroup }
+
+
+-- DOCSIS 2.0 additional Capabilities
+
+--       SUPPORTS             SNMP-FRAMEWORK-MIB
+--           INCLUDES         { snmpEngineGroup }
+
+--       SUPPORTS             SNMP-MPD-MIB
+--           INCLUDES         { snmpMPDGroup }
+
+--       SUPPORTS             SNMP-TARGET-MIB
+--           INCLUDES         { snmpTargetBasicGroup,
+--                              snmpTargetResponseGroup,
+--                              snmpTargetCommandResponderGroup }
+
+--           VARIATION        snmpTargetAddrEntry
+--               CREATION-REQUIRES { snmpTargetAddrRowStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        snmpTargetParamsEntry
+--               CREATION-REQUIRES { snmpTargetParamsRowStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             SNMP-NOTIFICATION-MIB
+--           INCLUDES         { snmpNotifyGroup,
+--                              snmpNotifyFilterGroup }
+
+--           VARIATION        snmpNotifyEntry
+--               CREATION-REQUIRES { snmpNotifyRowStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        snmpNotifyFilterProfileEntry
+--               CREATION-REQUIRES { snmpNotifyFilterProfileRowStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        snmpNotifyFilterEntry
+--               CREATION-REQUIRES { snmpNotifyFilterRowStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             SNMP-USER-BASED-SM-MIB
+--           INCLUDES         { usmMIBBasicGroup }
+
+--           VARIATION        usmUserEntry
+--               CREATION-REQUIRES { usmUserStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             SNMP-VIEW-BASED-ACM-MIB
+--           INCLUDES         { vacmBasicGroup }
+
+--           VARIATION        vacmSecurityToGroupEntry
+--               CREATION-REQUIRES { vacmSecurityToGroupStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--           VARIATION        vacmAccessEntry
+--               CREATION-REQUIRES { vacmAccessStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             SNMP-COMMUNITY-MIB
+--           INCLUDES         { snmpCommunityGroup }
+
+--           VARIATION        snmpCommunityEntry
+--               CREATION-REQUIRES { snmpCommunityName, snmpCommunitySecurityName,
+--                                   snmpCommunityStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             SNMP-USM-DH-OBJECTS-MIB
+--           INCLUDES         { usmDHKeyMIBBasicGroup,
+--                              usmDHKeyParamGroup,
+--                              usmDHKeyKickstartGroup }
+
+--       SUPPORTS             DOCS-BPI2-MIB
+--           INCLUDES         { docsBpi2CmGroup,
+--                              docsBpi2CodeDownloadGroup }
+
+--       SUPPORTS             DOCS-QOS-MIB
+--           INCLUDES         { docsQosBaseGroup,
+--                              docsQosParamSetGroup,
+--                              docsQosSrvClassPolicyGroup }
+
+--           VARIATION        docsQosServiceClassPolicyEntry
+--               CREATION-REQUIRES { docsQosServiceClassPolicyStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+
+--       SUPPORTS             IGMP-STD-MIB
+--           INCLUDES         { igmpBaseMIBGroup,
+--                              igmpRouterMIBGroup,
+--                              igmpV2HostMIBGroup,
+--                              igmpHostOptMIBGroup,
+--                              igmpV2RouterMIBGroup,
+--                              igmpV2ProxyMIBGroup }
+
+--           VARIATION        igmpCacheEntry
+--               CREATION-REQUIRES { igmpCacheStatus }
+--               DESCRIPTION  "Conceptual row creation is supported."
+
+--       SUPPORTS             DOCS-IF-EXT-MIB
+--           INCLUDES         { docsIfExtGroup,
+--                              docsIfDocsisVersionGroup }
+
+--       SUPPORTS             DOCS-CABLE-DEVICE-TRAP-MIB
+--           INCLUDES         { docsDevCmTrapControlGroup,
+--                              docsDevCmNotificationGroup }
+
+--      SUPPORTS              DOCS-TEST-MIB
+--          INCLUDES          { docsTestGroup }
+--
+-- Fixed place for CM capabilities
+::= { modemCapabilitiesObjects 3 }
+
+END
+

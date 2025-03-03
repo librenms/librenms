@@ -1,16 +1,15 @@
 os: okilan
 group: printer
 text: 'OKI Printer'
-overgraph:
-    - device_toner
-overtext: Toner
+over:
+    - { graph: device_toner, text: Toner }
 type: printer
 icon: oki
 discovery:
-    - sysDescr:
-        - OKI OkiLAN
+    -
+        sysDescr:
+            - 'OKI OkiLAN'
 discovery_modules:
-    toner: 1
+    printer-supplies:   true
 poller_modules:
-    toner: 1
-
+    printer-supplies:   true

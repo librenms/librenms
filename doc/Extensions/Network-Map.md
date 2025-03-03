@@ -1,56 +1,33 @@
-source: Extensions/Network-Map.md
 # Network Map
 
-## LibreNMS has the ability to show you a network map based on:
+LibreNMS has the ability to show you a dynamic network map based on
+data collected from devices.  These maps are accessed through the
+following menu options:
+
+ - Overview -> Maps -> Network
+ - Overview -> Maps -> Device Group Maps
+ - The Neighbours -> Map tab when viewing a single device
+   (the Neighbours tab will only show if a device has xDP neighbours)
+
+These network maps can be based on:
 
 - xDP Discovery
-- MAC addresses
+- MAC addresses (ARP entries matching interface IP and MAC)
 
-By default, both are are included but you can enable / disable either one using the following config option:
+By default, both are are included but you can enable / disable either
+one using the following config option:
 
-```php
-$config['network_map_items'] = array('mac','xdp');
+```bash
+lnms config:set network_map_items '["mac","xdp"]'
 ```
 
 Either remove mac or xdp depending on which you want.
+XDP is based on FDP, CDP and LLDP support based on the device type.
 
-A global map will be drawn from the information in the database, it is worth noting that this could lead to a large network map.
-Network maps for individual devices are available showing the relationship with other devices.
+It is worth noting that the global map could lead to a large network
+map that is slow to render and interact with. The network map on the
+device neighbour page, or building device groups and using the device
+group maps will be more usable on large networks.
 
-One can also specify the parameters to be used for drawing and updating the network map.
-Please see http://visjs.org/docs/network/ for details on the configuration parameters.
-```php
-$config['network_map_vis_options'] = '{
-  layout:{
-      randomSeed:2
-  },
-  "edges": {
-    "smooth": {
-        enabled: false
-    },
-    font: {
-        size: 12,
-        color: "red",
-        face: "sans",
-        background: "white",
-        strokeWidth:3,
-        align: "middle",
-        strokeWidth: 2
-    }
-  },
-  "physics": {
-    "forceAtlas2Based": {
-      "gravitationalConstant": -800,
-      "centralGravity": 0.03,
-      "springLength": 50,
-      "springConstant": 0,
-      "damping": 1,
-      "avoidOverlap": 1
-    },
-    "maxVelocity": 50,
-    "minVelocity": 0.01,
-    "solver": "forceAtlas2Based",
-    "timestep": 0.30
-  }
-}';
-```
+## Settings
+The map display can be configured by altering the [Vis JS Options](VisJS-Config.md)

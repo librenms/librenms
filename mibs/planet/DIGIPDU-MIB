@@ -1,0 +1,3174 @@
+--
+-- Copyright (C) 2014 All Rights Reserved.
+--
+
+	DIGIPDU-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+      MODULE-IDENTITY, NOTIFICATION-TYPE,
+      OBJECT-TYPE, enterprises                            FROM SNMPv2-SMI
+      DisplayString                                       FROM SNMPv2-TC
+      TRAP-TYPE     																			FROM RFC-1215;
+
+  smart MODULE-IDENTITY
+		LAST-UPDATED "200904161627Z" -- April 16 2009
+		ORGANIZATION ""
+		CONTACT-INFO 
+			""
+
+		DESCRIPTION "This is the MIB module for the All DIGIPDU Device"
+		REVISION "200904161627Z" -- April 16 2009
+		DESCRIPTION "V1.00 for the DIGIPDU Device"
+		::= { digipdu 3 }
+
+  digipdu OBJECT IDENTIFIER ::= { enterprises 10456 }
+			
+--
+-- Product 
+--
+
+	product OBJECT IDENTIFIER 	::= { smart 1 }
+
+	productModel OBJECT-TYPE
+		SYNTAX 			DisplayString(SIZE(0..50))
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Indicate the Model of Device."
+	::= { product 1 }
+
+	productPartNumber OBJECT-TYPE
+		SYNTAX 			DisplayString(SIZE(0..32))
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"The part number of this appliance as shown on the label."
+	::= { product 2 }
+
+	productSerialNumber OBJECT-TYPE
+		SYNTAX 			DisplayString(SIZE(0..32))
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"The serial number of this appliance as shown on the label."
+	::= { product 3 }
+
+	productFirmwareVersion OBJECT-TYPE
+		SYNTAX 			DisplayString(SIZE(0..32))
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"The version of the firmware of this product."
+	::= { product 4 }
+
+	productTemperatureKind OBJECT-TYPE
+		SYNTAX 			INTEGER(0..1)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Temperature Kind(0:CELSIUS, 1:FAHRENHEIT)."
+	::= { product 11 }
+		
+	productResetDetector OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Display the Nearest Operated Time of Reset Buttom."
+	::= { product 21 }
+		
+--
+-- Device Tables
+--
+
+	deviceTable  OBJECT IDENTIFIER 	::= { smart 2 }
+
+	deviceATSKind OBJECT-TYPE
+		SYNTAX 			INTEGER(1..3)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Device ATS Kind."
+	::= { deviceTable 1 }
+	
+	deviceInFeedTotal OBJECT-TYPE
+		SYNTAX 			INTEGER(1..3)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Input Feed Total."
+	::= { deviceTable 2 }
+
+	deviceInFeedKind OBJECT-TYPE
+		SYNTAX 			INTEGER(1..4)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Input Feed Kind."
+	::= { deviceTable 3 }
+
+	deviceInFeedBranch OBJECT-TYPE
+		SYNTAX 			INTEGER(1..2)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Input Feed Kind."
+	::= { deviceTable 4 }
+	
+	deviceOutTotal OBJECT-TYPE
+		SYNTAX 			INTEGER(1..24)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Out Total."
+	::= { deviceTable 5 }
+
+	deviceOutKind OBJECT-TYPE
+		SYNTAX 			INTEGER(1..4)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Out Kind."
+	::= { deviceTable 6 }
+	
+	deviceInbuiltTempTotal OBJECT-TYPE
+		SYNTAX 			INTEGER(0..1)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Inbuilt Temperature Total."
+	::= { deviceTable 7 }
+
+	deviceExtendTemperatureTotal OBJECT-TYPE
+		SYNTAX 			INTEGER(0..6)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Extend ENV Total."
+	::= { deviceTable 8 }
+
+	deviceExtendRHTotal OBJECT-TYPE
+		SYNTAX 			INTEGER(0..4)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Extend ENV Total."
+	::= { deviceTable 9 }
+
+	devicePDUTotal OBJECT-TYPE
+		SYNTAX 			INTEGER(1..8)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"PDU Total."
+	::= { deviceTable 10 }
+
+	deviceInputTotal OBJECT-TYPE
+		SYNTAX 			INTEGER(1..8)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Input Total."
+	::= { deviceTable 11 }
+
+	deviceUPS OBJECT-TYPE
+		SYNTAX 			INTEGER{
+			no(0),
+			yes(1)}
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS."
+	::= { deviceTable 12 }
+
+	deviceDaisyChain OBJECT-TYPE
+		SYNTAX 			INTEGER{
+			no(0),
+			yes(1)}
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Daisy Chain."
+	::= { deviceTable 13 }
+
+	deviceUnitTotal OBJECT-TYPE
+		SYNTAX 			INTEGER(1..16)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Device Unit Total."
+	::= { deviceTable 20 }
+
+--
+-- Device Unit Table
+--
+
+	deviceUnitTable OBJECT-TYPE
+		SYNTAX 			SEQUENCE OF DeviceUnitEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"The table of Device Unit."
+	::= { deviceTable 21 }
+
+	deviceUnitEntry OBJECT-TYPE
+		SYNTAX 			DeviceUnitEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"Row definition for Device Unit table."
+		INDEX { deviceUnitIndex }
+	::= { deviceUnitTable 1 }
+
+	DeviceUnitEntry ::= SEQUENCE {
+		deviceUnitIndex			 							INTEGER,
+		deviceUnitStatus			 						INTEGER,
+		deviceUnitInfeedTotal            	INTEGER, 
+		deviceUnitOutTotal           			INTEGER 
+	}
+	
+	deviceUnitIndex OBJECT-TYPE
+		SYNTAX 			INTEGER(1..16)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Device Unit table index."
+	::= { deviceUnitEntry 1 }
+
+	deviceUnitStatus OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"status in the Device Unit."
+	::= { deviceUnitEntry 2 }
+	
+	deviceUnitInfeedTotal OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Infeed Total of Device Unit."
+	::= { deviceUnitEntry 3 }
+
+	deviceUnitOutTotal OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Out Total of Device Unit."
+	::= { deviceUnitEntry 4 }
+
+--
+-- peripheral Tables
+--
+	
+	peripheralTables  OBJECT IDENTIFIER 	::= { smart 3 }
+
+--
+-- ATS Table
+--
+
+	aTSTable OBJECT-TYPE
+		SYNTAX 			SEQUENCE OF ATSEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"The table of Auto Transfer Switch."
+	::= { peripheralTables 1 }
+
+	aTSEntry OBJECT-TYPE
+		SYNTAX 			ATSEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"Row definition for Input Feed table."
+		INDEX { aTSIndex }
+	::= { aTSTable 1 }
+
+	ATSEntry ::= SEQUENCE {
+		aTSIndex			 							INTEGER,
+		aTSStatus			 							INTEGER,
+		aTSVoltage            			INTEGER, 
+		aTSFrequency           			INTEGER 
+	}
+	
+	aTSIndex OBJECT-TYPE
+		SYNTAX 			INTEGER(1..2)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Auto Transfer Switch table index."
+	::= { aTSEntry 1 }
+
+	aTSStatus OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"status in the Auto Transfer Switch."
+	::= { aTSEntry 2 }
+	
+	aTSVoltage OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Voltage of Auto Transfer Switch."
+	::= { aTSEntry 3 }
+
+	aTSFrequency OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Frequency of Auto Transfer Switch."
+	::= { aTSEntry 4 }
+    
+--
+-- InFeed Table
+--
+
+	inFeedTable OBJECT-TYPE
+		SYNTAX 			SEQUENCE OF InFeedEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"The table of Input Feed."
+	::= { peripheralTables 2 }
+
+	inFeedEntry OBJECT-TYPE
+		SYNTAX 			InFeedEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"Row definition for Input Feed table."
+		INDEX {	inFeedIndex }
+	::= { inFeedTable 1 }
+
+	InFeedEntry ::= SEQUENCE {
+		inFeedIndex			 							  INTEGER,
+		inFeedStatus			 							INTEGER,
+		inFeedVoltage            			  INTEGER, 
+		inFeedFrequency                 INTEGER,
+    inFeedCurrent									  INTEGER,
+		inFeedPowerLoad         				INTEGER, 
+		inFeedPowerFactor        			  INTEGER, 
+		inFeedPowerEnergy         			INTEGER, 
+		inFeedOverLoad								  INTEGER,
+		inFeedHighWarning							  INTEGER,
+		inFeedLowWarning							  INTEGER,
+		inFeedBranch			              INTEGER,
+		inFeedBranch1Current						INTEGER,
+		inFeedBranch1PowerLoad     			INTEGER, 
+		inFeedBranch1PowerFactor  			INTEGER, 
+		inFeedBranch1OverLoad						INTEGER,
+		inFeedBranch1HighWarning				INTEGER,
+		inFeedBranch1LowWarning					INTEGER,
+		inFeedBranch2Current						INTEGER,
+		inFeedBranch2PowerLoad     			INTEGER, 
+		inFeedBranch2PowerFactor  			INTEGER, 
+		inFeedBranch2OverLoad						INTEGER,
+		inFeedBranch2HighWarning				INTEGER,
+		inFeedBranch2LowWarning					INTEGER
+	}
+
+	inFeedIndex OBJECT-TYPE
+		SYNTAX 			INTEGER(1..3)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Input Feed table index."
+	::= { inFeedEntry 1 }
+
+	inFeedStatus OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"status in the Input Feed."
+	::= { inFeedEntry 2 }
+	
+	inFeedVoltage OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Voltage of Input Feed."
+	::= { inFeedEntry 3 }
+
+	inFeedFrequency OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Frequency of Input Feed."
+	::= { inFeedEntry 4 }
+    
+	inFeedCurrent OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Total Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 5 }
+
+	inFeedPowerLoad OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power in the Input Feed."
+	::= { inFeedEntry 6 }
+
+	inFeedPowerFactor OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power factor in the Input Feed."
+	::= { inFeedEntry 7 }
+
+
+	inFeedPowerEnergy OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of energy in the Input Feed."
+	::= { inFeedEntry 8 }
+
+	inFeedOverLoad OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"OverLoad of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 9 }
+
+	inFeedHighWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"High Warning of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 10 }
+
+	inFeedLowWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Low Warning of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 11 }
+
+	inFeedBranch OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 12 }
+
+	inFeedBranch1Current OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 13 }
+
+	inFeedBranch1PowerLoad OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power in the PDU."
+	::= { inFeedEntry 14 }
+
+	inFeedBranch1PowerFactor OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power factor in the PDU."
+	::= { inFeedEntry 15 }
+
+	inFeedBranch1OverLoad OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"OverLoad of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 16 }
+
+	inFeedBranch1HighWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 17 }
+
+	inFeedBranch1LowWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 18 }
+
+	inFeedBranch2Current OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 19 }
+
+	inFeedBranch2PowerLoad OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power in the PDU."
+	::= { inFeedEntry 20 }
+
+	inFeedBranch2PowerFactor OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power factor in the PDU."
+	::= { inFeedEntry 21 }
+
+	inFeedBranch2OverLoad OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"OverLoad of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 22 }
+
+	inFeedBranch2HighWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 23 }
+
+	inFeedBranch2LowWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { inFeedEntry 24 }
+
+--
+-- Outlet Table
+--
+
+	outTable OBJECT-TYPE
+		SYNTAX 			SEQUENCE OF OutletEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"The table of Outlet."
+	::= { peripheralTables 3 }
+
+	outEntry OBJECT-TYPE
+		SYNTAX 			OutletEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"Row definition for Outlet table."
+		INDEX {	outIndex }
+	::= { outTable 1 }
+
+	OutletEntry ::= SEQUENCE {
+		outIndex 											INTEGER,
+		outComputerStatus							INTEGER,
+		outCurrentStatus 							INTEGER,
+		outSwitchStatus								INTEGER,
+		outSwitchCtrl								  INTEGER,
+		outVoltage      							INTEGER, 
+		outCurrent										INTEGER,
+		outPowerFactor  							INTEGER, 
+		outPowerLoad    							INTEGER, 
+		outOverload										INTEGER,
+		outHighWarning								INTEGER,
+		outLowWarning									INTEGER
+	}
+	
+	outIndex OBJECT-TYPE
+		SYNTAX 			INTEGER(1..24)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Out table index."
+	::= { outEntry 1 }
+
+	outComputerStatus OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Out computer status."
+	::= { outEntry 2 }
+	
+	outCurrentStatus OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Out Current status."
+	::= { outEntry 3 }
+
+	outSwitchStatus OBJECT-TYPE
+		SYNTAX 			INTEGER {
+			off(0),
+			on(1),
+			off-act(2),
+			on-act(3)}
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"This OID is provided for Outlet Status information.
+
+		     '0'  if the out is Switch Off.
+		     '1'  if the out is Switch On.
+		     '2'  if the out is Switch Off Acting.
+		     '3'  if the out is Switch On Acting.
+
+			"
+	::= { outEntry 4 }
+
+	outSwitchCtrl OBJECT-TYPE
+		SYNTAX 			INTEGER {
+			none(0),
+      ctrl-on(1),
+			ctrl-off(2),
+			ctrl-reboot(3),
+      ctrl-on-off(4)}
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"This OID is provided for Outlet Status information.
+
+		     '0'  if the out is None.
+		     '1'  Switch Ctrl On.
+		     '2'  Switch Ctrl Off.
+		     '3'  Switch Ctrl Reboot.
+		     '4'  Switch Ctrl On Off.
+
+			"
+	::= { outEntry 5 }
+	
+	outVoltage OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Voltage of Outlet."
+	::= { outEntry 6 }
+	
+	outCurrent OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Current of Outlet(In tenths of amps, divide by 10 for value in amps)."
+	::= { outEntry 7 }
+
+	outPowerFactor OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power factor in the Outlet."
+	::= { outEntry 8 }
+
+	outPowerLoad OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power in the Outlet."
+	::= { outEntry 9 }
+
+	outOverload OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Overload of Outlet(In tenths of amps, divide by 10 for value in amps)."
+	::= { outEntry 10 }
+
+	outHighWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"High Warning of Outlet(In tenths of amps, divide by 10 for value in amps)."
+	::= { outEntry 11 }
+
+	outLowWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Low Warning of Outlet(In tenths of amps, divide by 10 for value in amps)."
+	::= { outEntry 12 }
+
+--
+-- PDU Table
+--
+
+	pduTables OBJECT-TYPE
+		SYNTAX 			SEQUENCE OF PDUEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"The table of PDU."
+	::= { peripheralTables 4 }
+	
+	pduEntry OBJECT-TYPE
+		SYNTAX 			PDUEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"Row definition for PDU table."
+		INDEX {	pduIndex }
+	::= { pduTables 1 }
+
+	PDUEntry ::= SEQUENCE {
+		pduIndex 								    INTEGER,
+		pduModel       				      DisplayString,
+		pduMonitor							    INTEGER,
+		pduStatus       				    INTEGER,
+		pduVoltage      				    INTEGER, 
+		pduFrequency                INTEGER,
+		pduCurrent							    INTEGER,
+		pduPowerLoad     				    INTEGER, 
+		pduPowerFactor  				    INTEGER, 
+		pduPowerEnergy     				  INTEGER, 
+		pduOverload							    INTEGER,
+		pduHighWarning					    INTEGER,
+		pduLowWarning						    INTEGER,
+		pduBranch                   INTEGER,
+		pduBranch1Current						INTEGER,
+		pduBranch1Overload					INTEGER,
+		pduBranch1HighWarning				INTEGER,
+		pduBranch1LowWarning				INTEGER,
+		pduBranch2Current						INTEGER,
+		pduBranch2Overload					INTEGER,
+		pduBranch2HighWarning				INTEGER,
+		pduBranch2LowWarning				INTEGER
+	}
+
+	pduIndex OBJECT-TYPE
+		SYNTAX 			INTEGER(1..8)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"PDU table index."
+	::= { pduEntry 1 }
+
+	pduModel OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Now Power Data Log of PDU(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 2 }
+
+	pduMonitor OBJECT-TYPE
+		SYNTAX 			INTEGER {
+			no(0),
+			yes(1)}
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"PDU Monitor Status."
+	::= { pduEntry 3 }
+
+	pduStatus OBJECT-TYPE
+		SYNTAX 			INTEGER {
+			no(0),
+			yes(1),
+			warning(2)}
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"PDU Connect Status."
+	::= { pduEntry 4 }
+
+	pduVoltage OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Voltage of PDU."
+	::= { pduEntry 5 }
+
+	pduFrequency OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Frequency of PDU."
+	::= { pduEntry 6 }
+	
+	pduCurrent OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Total Current of PDU(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 7 }
+
+	pduPowerLoad OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power in the PDU."
+	::= { pduEntry 8 }
+
+	pduPowerFactor OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power factor in the PDU."
+	::= { pduEntry 9 }
+
+	pduPowerEnergy OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Actual value of power in the PDU."
+	::= { pduEntry 10 }
+
+	pduOverload OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Overload of PDU(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 11 }
+
+	pduHighWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"High Warning of PDU(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 12 }
+
+	pduLowWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"High Warning of PDU(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 13 }
+
+	pduBranch OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 14 }
+
+	pduBranch1Current OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 15 }
+
+	pduBranch1Overload OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Overload of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 16 }
+
+	pduBranch1HighWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 17 }
+
+	pduBranch1LowWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 18 }
+
+	pduBranch2Current OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 19 }
+
+	pduBranch2Overload OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Overload of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 20 }
+
+	pduBranch2HighWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 21 }
+
+	pduBranch2LowWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Average Current of Input Feed(In tenths of amps, divide by 10 for value in amps)."
+	::= { pduEntry 22 }
+
+--
+-- InbuiltTemperature Table
+--
+
+	inbuiltTemperatureTable OBJECT-TYPE
+		SYNTAX 			SEQUENCE OF InbuiltTemperatureEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"The table of Inbuilt Temperature Sensor."
+	::= { peripheralTables 5 }
+
+	inbuiltTemperatureEntry OBJECT-TYPE
+		SYNTAX 			InbuiltTemperatureEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"Row definition for Inbuilt Temperature Sensor table."
+		INDEX {	inbuiltTemperatureIndex }
+	::= { inbuiltTemperatureTable 1 }
+
+	InbuiltTemperatureEntry ::= SEQUENCE {
+		inbuiltTemperatureIndex 			INTEGER,
+		inbuiltTemperatureStatus			INTEGER,
+		inbuiltTemperature						INTEGER,
+		inbuiltTemperatureHighWarning	INTEGER,
+		inbuiltTemperatureLowWarning	INTEGER
+	}
+
+	inbuiltTemperatureIndex OBJECT-TYPE
+		SYNTAX 			INTEGER (0..8)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Index for the Inbuilt Temperature Sensor table."
+	::= { inbuiltTemperatureEntry 1 }
+
+	inbuiltTemperatureStatus OBJECT-TYPE
+		SYNTAX 			INTEGER {
+			no(0),
+			yes(1)}
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Inbuilt Temperature Sensor Connect Status."
+	::= { inbuiltTemperatureEntry 2 }
+
+	inbuiltTemperature OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Detected Temperature from Inbuilt Temperature Sensor."
+	::= { inbuiltTemperatureEntry 3 }
+
+	inbuiltTemperatureHighWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"High Warning Temperature from Inbuilt Temperature Sensor."
+	::= { inbuiltTemperatureEntry 4 }
+
+	inbuiltTemperatureLowWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Low Warning Temperature from Inbuilt Temperature Sensor."
+	::= { inbuiltTemperatureEntry 5 }
+
+--
+-- ExtendTemperature Table
+--
+
+	extendTemperatureTable OBJECT-TYPE
+		SYNTAX 			SEQUENCE OF ExtendTemperatureEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"The table of Extend Temperature Sensor."
+	::= { peripheralTables 6 }
+
+	extendTemperatureEntry OBJECT-TYPE
+		SYNTAX 			ExtendTemperatureEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"Row definition for Extend Temperature Sensor table."
+		INDEX {	extendTemperatureIndex }
+	::= { extendTemperatureTable 1 }
+
+	ExtendTemperatureEntry ::= SEQUENCE {
+		extendTemperatureIndex 				INTEGER,
+		extendTemperatureDeviceId			INTEGER,
+		extendTemperaturePort   			INTEGER,
+		extendTemperatureMonitor			INTEGER,
+		extendTemperatureStatus				INTEGER,
+		extendTemperature							INTEGER,
+		extendTemperatureHighWarning	INTEGER,
+		extendTemperatureLowWarning		INTEGER
+	}
+
+	extendTemperatureIndex OBJECT-TYPE
+		SYNTAX 			INTEGER (0..8)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Index for the Extend Temperature Sensor table."
+	::= { extendTemperatureEntry 1 }
+
+	extendTemperatureDeviceId OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Extend Temperature Monitor Status."
+	::= { extendTemperatureEntry 2 }
+
+	extendTemperaturePort OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Extend Temperature Monitor Status."
+	::= { extendTemperatureEntry 3 }
+
+	extendTemperatureMonitor OBJECT-TYPE
+		SYNTAX 			INTEGER {
+			no(0),
+			yes(1)}
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Extend Temperature Monitor Status."
+	::= { extendTemperatureEntry 4 }
+
+	extendTemperatureStatus OBJECT-TYPE
+		SYNTAX 			INTEGER {
+			no(0),
+			yes(1)}
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Extend Temperature Sensor Connect Status."
+	::= { extendTemperatureEntry 5 }
+
+	extendTemperature OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Detected Temperature from Inbuilt Temperature Sensor."
+	::= { extendTemperatureEntry 6 }
+
+	extendTemperatureHighWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"High Warning Temperature from Extend Temperature Sensor."
+	::= { extendTemperatureEntry 7 }
+
+	extendTemperatureLowWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Low Warning Temperature from Extend Temperature Sensor."
+	::= { extendTemperatureEntry 8 }
+	
+--
+-- extendRH Table
+--
+
+	extendRHTable OBJECT-TYPE
+		SYNTAX 			SEQUENCE OF ExtendRHEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"The table of Extend RH Sensor."
+	::= { peripheralTables 7 }
+
+	extendRHEntry OBJECT-TYPE
+		SYNTAX 			ExtendRHEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"Row definition for Extend RH table."
+		INDEX {	extendRHIndex }
+	::= { extendRHTable 1 }
+
+	ExtendRHEntry ::= SEQUENCE {
+		extendRHIndex 								INTEGER,
+		extendRHDeviceId 							INTEGER,
+		extendRHPort   								INTEGER,
+		extendRHMonitor								INTEGER,
+		extendRHStatus								INTEGER,
+		extendRH										  INTEGER,
+		extendRHHighWarning						INTEGER,
+		extendRHLowWarning 						INTEGER
+	}
+
+	extendRHIndex OBJECT-TYPE
+		SYNTAX 			INTEGER (0..8)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Index for the Extend RH Sensor table."
+	::= { extendRHEntry 1 }
+
+	extendRHDeviceId OBJECT-TYPE
+		SYNTAX 			INTEGER (0..8)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Index for the Extend RH Sensor table."
+	::= { extendRHEntry 2 }
+
+	extendRHPort OBJECT-TYPE
+		SYNTAX 			INTEGER (0..8)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Index for the Extend RH Sensor table."
+	::= { extendRHEntry 3 }
+
+	extendRHMonitor OBJECT-TYPE
+		SYNTAX 			INTEGER {
+			no(0),
+			yes(1)}
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Extend RH Monitor Status."
+	::= { extendRHEntry 4 }
+
+	extendRHStatus OBJECT-TYPE
+		SYNTAX 			INTEGER {
+			no(0),
+			yes(1)}
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Extend RH Sensor Connect Status."
+	::= { extendRHEntry 5 }
+
+	extendRH OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Detected RH from Inbuilt Temperature Sensor."
+	::= { extendRHEntry 6 }
+
+	extendRHHighWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"High Warning RH from Extend Temperature Sensor."
+	::= { extendRHEntry 7 }
+
+	extendRHLowWarning OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"Low Warning RH from Extend Temperature Sensor."
+	::= { extendRHEntry 8 }
+	
+--
+-- Input Table
+--
+
+	inputTable OBJECT-TYPE
+		SYNTAX 			SEQUENCE OF InputEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"The table of Input."
+	::= { peripheralTables 8 }
+
+	inputEntry OBJECT-TYPE
+		SYNTAX 			InputEntry
+    MAX-ACCESS  not-accessible
+		STATUS 			current
+		DESCRIPTION
+			"Row definition for Input table."
+		INDEX {	inputIndex }
+	::= { inputTable 1 }
+
+	InputEntry ::= SEQUENCE {
+		inputIndex   			INTEGER,
+		inputStatus				INTEGER,
+		inputState				INTEGER,
+		inputTimeout			INTEGER,
+		inputDefault			INTEGER,
+		inputDetectTime		DisplayString
+}
+
+	inputIndex OBJECT-TYPE
+		SYNTAX 			INTEGER (1)
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Index for Input table."
+	::= { inputEntry 1 }
+
+	inputStatus OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"This OID is provided for Input Status.
+				'0'  NORMAL.
+				'1'  WARNING.
+				'2'  TIMEOUT.
+			"
+	::= { inputEntry 2 }
+
+	inputState OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"This OID is provided for Input Default.
+				'0'  NORMAL_CLOSE.
+				'1'  NORMAL_OPEN.
+			"
+	::= { inputEntry 3 }
+  
+	inputTimeout OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"TimeOut of Input Status."
+	::= { inputEntry 4 }
+  
+	inputDefault OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-write
+		STATUS 			current
+		DESCRIPTION
+			"This OID is provided for Input Default.
+				'0'  NORMAL_CLOSE.
+				'1'  NORMAL_OPEN.
+			"
+	::= { inputEntry 5 }
+
+	inputDetectTime OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Detect the nearest Changed Time of Input Status."
+	::= { inputEntry 6 }
+
+--
+-- RFID reader
+--
+
+	rfidReader OBJECT IDENTIFIER 	::= { peripheralTables 9 }
+
+	rfidCardNum OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"RFID Card Number."
+	::= { rfidReader 1 }
+
+	rfidDetectTime OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"The Nearest Time to detect RFID Card."
+	::= { rfidReader 2 }
+
+--
+-- UPS
+--
+
+	uPS OBJECT IDENTIFIER 	::= { peripheralTables 10 }
+
+	uPSModel OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Model."
+	::= { uPS 1 }
+
+	uPSConnectStatus OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Connect Status."
+	::= { uPS 2 }
+
+	uPSFirmware OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Firmware."
+	::= { uPS 3 }
+
+	uPSSerial OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Serial."
+	::= { uPS 4 }
+
+	uPSTemperature OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Temperature."
+	::= { uPS 5 }
+
+	uPSInputVoltage OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Input Voltage."
+	::= { uPS 6 }
+
+	uPSOutputOnBattery OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Output On Battery."
+	::= { uPS 7 }
+
+	uPSOutputVoltage OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Output Voltage."
+	::= { uPS 8 }
+
+	uPSOutputFrequency OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Output Voltage."
+	::= { uPS 9 }
+
+	uPSOutputCurrent OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Output Current."
+	::= { uPS 10 }
+
+	uPSOutputLoad OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Output Load."
+	::= { uPS 11 }
+
+	uPSOutputOverload OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Output Overload."
+	::= { uPS 12 }
+
+	uPSBatteryDate OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Battery Date."
+	::= { uPS 13 }
+
+	uPSBatteryVoltage OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Battery Voltage."
+	::= { uPS 14 }
+
+	uPSBatteryLevel OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Battery Level."
+	::= { uPS 15 }
+
+	uPSBatteryRunTime OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Battery RunTime."
+	::= { uPS 16 }
+
+	uPSBatteryLow OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Battery Low."
+	::= { uPS 17 }
+
+	uPSBatteryReplace OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS Battery Need Replace."
+	::= { uPS 18 }
+
+	uPSUARTId OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"UPS UART Id."
+	::= { uPS 19 }
+
+--
+-- MIC Detect
+--
+
+	micDetec OBJECT IDENTIFIER 	::= { peripheralTables 11 }
+
+	micDetectTimes OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"MIC Detect Times."
+	::= { micDetec 1 }
+
+	micDetectPeriod OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"MIC Detect Period."
+	::= { micDetec 2 }
+
+	micLastDetectTime OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"MIC Detect Detect Time."
+	::= { micDetec 3 }
+
+--
+-- Vibration Detect
+--
+
+	vibrationDetec OBJECT IDENTIFIER 	::= { peripheralTables 12 }
+
+	vibrationDetectTimes OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Vibration Detect Times."
+	::= { vibrationDetec 1 }
+
+	vibrationDetectPeriod OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Vibration Detect Period."
+	::= { vibrationDetec 2 }
+
+	vibrationLastDetectTime OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Vibration Detect Detect Time."
+	::= { vibrationDetec 3 }
+
+	dataLogTable  OBJECT IDENTIFIER 	::= { smart 4 }
+
+--
+-- Input Feed Data Table
+--
+
+	inFeedDataList OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Input Feed Data List."
+	::= { dataLogTable 1 }
+		
+--
+-- Outlet Table
+--
+
+	outDataList OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Outlet Data List."
+	::= { dataLogTable 2 }
+
+--
+-- PDU Table
+--
+
+	pduDataList OBJECT-TYPE
+		SYNTAX 			DisplayString
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"PDU Data List."
+	::= { dataLogTable 3 }
+	
+--
+--  Enterprise Traps
+--
+  smartTraps OBJECT IDENTIFIER ::= { smart 100 }
+
+  trap OBJECT IDENTIFIER ::= { smartTraps 1 }
+  -- the 0 is for V1 compatibility
+
+  arg OBJECT IDENTIFIER ::= { smartTraps 2 }
+
+	trapArg1 OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Indicate the Trap Arg1."
+	::= { arg 1 }
+
+	trapArg2 OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Indicate the Trap Arg2."
+	::= { arg 2 }
+
+	trapArg3 OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Indicate the Trap Arg3."
+	::= { arg 3 }
+
+	trapArg4 OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Indicate the Trap Arg4."
+	::= { arg 4 }
+
+	trapArg5 OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Indicate the Trap Arg5."
+	::= { arg 5 }
+
+	trapArg6 OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Indicate the Trap Arg6."
+	::= { arg 6 }
+
+	trapArg7 OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Indicate the Trap Arg7."
+	::= { arg 7 }
+
+	trapArg8 OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Indicate the Trap Arg8."
+	::= { arg 8 }
+
+	trapArg9 OBJECT-TYPE
+		SYNTAX 			INTEGER
+    MAX-ACCESS  read-only
+		STATUS 			current
+		DESCRIPTION
+			"Indicate the Trap Arg9."
+	::= { arg 9 }
+		
+	testTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1
+    }
+    STATUS      current
+		DESCRIPTION
+      "testData"
+	::= { trap 1 }
+		
+  -- Input Feed Traps
+	
+	inFeedOverloadTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			inFeedIndex,
+      inFeedStatus,
+      inFeedCurrent,
+      inFeedOverload
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 101 }
+
+	inFeedHighCurrentTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			inFeedIndex,
+      inFeedStatus,
+      inFeedCurrent,
+      inFeedHighWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 102 }
+
+	inFeedLowCurrentTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			inFeedIndex,
+      inFeedStatus,
+      inFeedCurrent,
+      inFeedHighWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 103 }
+
+	inFeedBranchOverloadTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			inFeedIndex,
+			BranchIndex,
+      inFeedStatus,
+      inFeedCurrent,
+      inFeedOverload
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 104 }
+	
+	inFeedBranchHighCurrentTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			inFeedIndex,
+			BranchIndex,
+      inFeedStatus,
+      inFeedCurrent,
+      inFeedHighWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 105 }
+
+	inFeedBranchLowCurrentTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			inFeedIndex,
+			BranchIndex,
+      inFeedStatus,
+      inFeedCurrent,
+      inFeedHighWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 106 }
+	
+	outWebOperationTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3
+    }
+    STATUS      current
+		DESCRIPTION
+      "Outlet on/off change event.  If enabled, this trap is sent
+       when the outStatus changes from any 'on' state ('on',
+       'onWait', 'onError', or 'onFuse') to any 'off' state ('off',
+       'offWait', 'offError', or 'offFuse'), and vice-versa."
+		--#SUMMARY     "The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 201 }
+
+	outPanelOperationTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3
+    }
+    STATUS      current
+		DESCRIPTION
+      "Outlet on/off change event.  If enabled, this trap is sent
+       when the outStatus changes from any 'on' state ('on',
+       'onWait', 'onError', or 'onFuse') to any 'off' state ('off',
+       'offWait', 'offError', or 'offFuse'), and vice-versa."
+		--#SUMMARY     "The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 202 }
+
+	outAPIOperationTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3
+    }
+    STATUS      current
+		DESCRIPTION
+      "Outlet on/off change event.  If enabled, this trap is sent
+       when the outStatus changes from any 'on' state ('on',
+       'onWait', 'onError', or 'onFuse') to any 'off' state ('off',
+       'offWait', 'offError', or 'offFuse'), and vice-versa."
+		--#SUMMARY     "The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 203 }
+	
+	outScheduleTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+			trapArg5,
+      trapArg6,
+      trapArg7,
+      trapArg8,
+      trapArg9
+    }
+    STATUS      current
+		DESCRIPTION
+      "Outlet on/off change event.  If enabled, this trap is sent
+       when the outStatus changes from any 'on' state ('on',
+       'onWait', 'onError', or 'onFuse') to any 'off' state ('off',
+       'offWait', 'offError', or 'offFuse'), and vice-versa."
+		--#SUMMARY     "The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 211 }
+
+	outScheduleErrorTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+			trapArg5,
+      trapArg6,
+      trapArg7
+    }
+    STATUS      current
+		DESCRIPTION
+      "Outlet on/off change event.  If enabled, this trap is sent
+       when the outStatus changes from any 'on' state ('on',
+       'onWait', 'onError', or 'onFuse') to any 'off' state ('off',
+       'offWait', 'offError', or 'offFuse'), and vice-versa."
+		--#SUMMARY     "The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 212 }
+
+	outPingTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4
+    }
+    STATUS      current
+		DESCRIPTION
+      "Outlet on/off change event.  If enabled, this trap is sent
+       when the outStatus changes from any 'on' state ('on',
+       'onWait', 'onError', or 'onFuse') to any 'off' state ('off',
+       'offWait', 'offError', or 'offFuse'), and vice-versa."
+		--#SUMMARY     "The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 221 }
+
+	outPingRebootTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4
+    }
+    STATUS      current
+		DESCRIPTION
+      "Outlet on/off change event.  If enabled, this trap is sent
+       when the outStatus changes from any 'on' state ('on',
+       'onWait', 'onError', or 'onFuse') to any 'off' state ('off',
+       'offWait', 'offError', or 'offFuse'), and vice-versa."
+		--#SUMMARY     "The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 222 }
+	
+	outOverloadTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+      outIndex,
+      outCurrentStatus,
+      outCurrent,
+      outHighWarning
+			Outlet load event.  If enabled, this trap is sent when the
+       outLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the outLoadStatus
+       remains in an error state.  If the outLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error outLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT 				evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 231 }
+	
+	outHighCurrentTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+      outIndex,
+      outCurrentStatus,
+      outCurrent,
+      outHighWarning
+			Outlet load event.  If enabled, this trap is sent when the
+       outLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the outLoadStatus
+       remains in an error state.  If the outLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error outLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT 				evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 232 }
+
+	outLowCurrentTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+      outIndex,
+      outCurrentStatus,
+      outCurrent,
+      outLowWarning
+			Outlet load event.  If enabled, this trap is sent when the
+       outLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the outLoadStatus
+       remains in an error state.  If the outLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error outLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT 				evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 233 }
+
+	outConditionCtrlTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+      outIndex,
+      outCurrentStatus,
+      outCurrent,
+      outLowWarning
+			Outlet load event.  If enabled, this trap is sent when the
+       outLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the outLoadStatus
+       remains in an error state.  If the outLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error outLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT 				evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 241 }
+
+	outUPSACFaultOffTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+      trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+      value
+			Outlet load event.  If enabled, this trap is sent when the
+       outLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the outLoadStatus
+       remains in an error state.  If the outLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error outLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT 				evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 311 }
+
+	outUPSBatteryLevelOffTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+      trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+      value
+			Outlet load event.  If enabled, this trap is sent when the
+       outLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the outLoadStatus
+       remains in an error state.  If the outLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error outLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT 				evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 312 }
+
+	outUPSBatteryLowOffTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+      trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+      value
+			Outlet load event.  If enabled, this trap is sent when the
+       outLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the outLoadStatus
+       remains in an error state.  If the outLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error outLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT 				evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 313 }
+
+	outUPSACRecoveryOnTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+      trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+      value
+			Outlet load event.  If enabled, this trap is sent when the
+       outLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the outLoadStatus
+       remains in an error state.  If the outLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error outLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT 				evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 314 }
+
+	outUPSBatteryLevelOnTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+      trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+      value
+			Outlet load event.  If enabled, this trap is sent when the
+       outLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the outLoadStatus
+       remains in an error state.  If the outLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error outLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT 				evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 315 }
+
+	outUPSBatteryLowRecoveryOnTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+      trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+      value
+			Outlet load event.  If enabled, this trap is sent when the
+       outLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the outLoadStatus
+       remains in an error state.  If the outLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error outLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT 				evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 316 }
+  
+	pduConnectTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			PDUIndex,
+      PDUConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 401 }
+
+	pduOverloadTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			PDUIndex,
+      PDUStatus,
+      PDUCurrent,
+      PDUOverload
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 402 }
+
+	pduHighCurrentTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			PDUIndex,
+      PDUStatus,
+      PDUCurrent,
+      PDUHighWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 403 }
+
+	pduLowCurrentTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			PDUIndex,
+      PDUStatus,
+      PDUCurrent,
+      PDUHighWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 404 }
+
+	pduBranchOverloadTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			PDUIndex,
+			BranchIndex,
+      PDUStatus,
+      PDUCurrent,
+      PDUOverload
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 405 }
+
+	pduBranchHighCurrentTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			PDUIndex,
+			BranchIndex,
+      PDUStatus,
+      PDUCurrent,
+      PDUHighWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 406 }
+
+	pduBranchLowCurrentTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			PDUIndex,
+			BranchIndex,
+      PDUStatus,
+      PDUCurrent,
+      PDUHighWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 407 }
+
+	inbuiltTemperatureHighTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			InTempId,
+			InTempStatus,
+			InTempTemperature,
+      InTempTemperatureWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 501 }
+
+	inbuiltTemperatureLowTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			InTempId,
+			InTempStatus,
+			InTempTemperature,
+      InTempTemperatureWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 502 }
+
+	envConnectTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			ENVIndex,
+      ENVConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 511 }
+
+	envTemperatureConnectTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			ENVIndex,
+      ENVConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 512 }
+  
+	envTemperatureHighTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5,
+      trapArg6
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			EnvId,
+			EnvStatus,
+			EnvTemperature,
+      EnvTemperatureWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 513 }
+
+	envTemperatureLowTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5,
+      trapArg6
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			EnvId,
+			EnvStatus,
+			EnvTemperature,
+      EnvTemperatureWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 514 }
+
+	envRHConnectTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			EnvId,
+			EnvStatus,
+			EnvRH,
+      EnvRHWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 515 }
+
+	envRHHighTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			EnvId,
+			EnvStatus,
+			EnvRH,
+      EnvRHWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 516 }
+
+	envRHLowTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4,
+      trapArg5
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			EnvId,
+			EnvStatus,
+			EnvRH,
+      EnvRHWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 517 }
+
+	inputTimeOutTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			EnvId,
+			EnvStatus,
+			EnvTemperature,
+      EnvTemperatureWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 601 }
+	
+	inputTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2,
+      trapArg3,
+      trapArg4
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+      deviceIndex,
+			EnvId,
+			EnvStatus,
+			EnvTemperature,
+      EnvTemperatureWarning
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 602 }
+  
+	upsConnectTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			Model,
+      ConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 701 }
+  
+	upsOnBatteryTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			Model,
+      ConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 702 }
+
+	upsOverloadTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			Model,
+      ConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 703 }
+
+	upsBatteryLowTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			Model,
+      ConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 704 }
+  
+	upsBatteryReplace NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			Model,
+      ConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 705 }
+  
+	daisyChainConnectTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			Model,
+      ConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 801 }
+
+	micDetectOccurTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			Model,
+      ConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 901 }
+
+	vibrationDetectOccurTrap NOTIFICATION-TYPE
+		OBJECTS { 
+      trapArg1,
+			trapArg2
+    }
+    STATUS      current
+		DESCRIPTION
+      "
+			Model,
+      ConnectStatus
+			Input feed load event.  If enabled, this trap is sent when
+       the infeedLoadStatus indicates an error state ('loadLow',
+       'loadHigh', 'overLoad', 'readError', or 'noComm').  This
+       trap is repeated periodically while the infeedLoadStatus
+       remains in an error state.  If the infeedLoadStatus returns
+       to a non-error state ('normal' or 'notOn'), this trap is
+       sent once more with the non-error infeedLoadStatus, and then
+       stops being repeated."
+		--#SUMMARY     	"The appliance is rebooting. Command issued by user: %s."
+		--#ARGUMENTS   	{ 0 }
+		--#SEVERITY    	INFORMATIONAL
+		--#CATEGORY    	"Status Events"
+		--NAME      		"Appliance Rebooting"
+		--SHORT     		"appliance rebooting"
+		--EVENT evt_reboot
+		--% TrapTypeEnum=15 
+	::= { trap 902 }
+  
+END

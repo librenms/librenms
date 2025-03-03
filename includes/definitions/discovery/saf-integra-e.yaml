@@ -1,0 +1,66 @@
+mib: SAF-INTEGRAE-MIB
+modules:
+    os:
+        sysDescr_regex: '/Prod: (?<hardware>[A-Za-z-_]+);Vers: (?<version>[0-9.]+);.*;S\/N: (?<serial>[0-9]+)/'
+    processors:
+          data:
+              -
+                  oid: integraEsysCPUidle
+                  num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.9.4.10.{{ $index }}'
+                  precision: -10
+                  type: saf-integra
+    sensors:
+        temperature:
+            options:
+                divisor: 10
+            data:
+                -
+                    oid: integraEsysCPUtemperature
+                    num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.9.4.2.{{ $index }}'
+                    descr: System CPU
+                    index: 'integraEsysCPUtemperature.{{ $index }}'
+                -
+                    oid: integraEsysBoardTemperature
+                    num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.9.4.8.{{ $index }}'
+                    descr: System Board
+                    index: 'integraEsysBoardTemperature.{{ $index }}'
+        voltage:
+            options:
+                divisor: 1000
+            data:
+                -
+                    oid: integraEsysPSUvoltage
+                    num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.9.4.5.{{ $index }}'
+                    descr: PSU Voltage
+                    index: 'integraEsysPSUvoltage.{{ $index }}'
+        current:
+            options:
+                divisor: 1000
+            data:
+                -
+                    oid: integraEsysPSUcurrent
+                    num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.9.4.6.{{ $index }}'
+                    descr: PSU Current
+                    index: 'integraEsysPSUcurrent.{{ $index }}'
+        power:
+            options:
+                divisor: 1000
+            data:
+                -
+                    oid: integraEsysPSUpower
+                    num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.9.4.7.{{ $index }}'
+                    descr: PSU Power
+                    index: 'integraEsysPSUpower.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: integraEsysLicenseGenStatus
+                    num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.9.4.4.{{ $index }}'
+                    descr: License Status
+                    index: 'integraEsysLicenseGenStatus.{{ $index }}'
+                    state_name: integraBsysLicenseGenStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: ok }
+                        - { value: 2, generic: 2, graph: 1, descr: expired }
+                        - { value: 3, generic: 3, graph: 1, descr: unknown }
+                        - { value: 4, generic: 0, graph: 1, descr: unlimitedTime }

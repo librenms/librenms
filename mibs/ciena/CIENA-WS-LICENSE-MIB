@@ -1,0 +1,336 @@
+-- This file was automatically generated from ciena-ws-license.yang. Do not edit.
+
+CIENA-WS-LICENSE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    StringMaxl128, StringMaxl16, StringMaxl32, StringMaxl64
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaWsLicenseMIB MODULE-IDENTITY
+    LAST-UPDATED "201707070000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This module defines licensing information representation for Ciena's Waveserver."
+    REVISION "201707070000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 25 }
+
+LicenseComplianceState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { notCompliant(0), compliant(1) }
+
+LicenseSource ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { preInstall(0), local(1) }
+
+LicenseStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { valid(0), invalid(1), expired(2) }
+
+LicenseType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { trial(0), served(1) }
+
+cwsLicenseClientIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsLicenseClientIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "License client identification information."
+    ::= { cienaWsLicenseMIB 4 }
+
+cwsLicenseClientIdEntry OBJECT-TYPE
+    SYNTAX CwsLicenseClientIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsLicenseClientIdTable."
+    INDEX { cwsLicenseClientIdTableSnmpKey }
+    ::= { cwsLicenseClientIdTable 1 }
+
+CwsLicenseClientIdEntry ::= SEQUENCE { 
+    cwsLicenseClientIdTableSnmpKey Integer32,
+    cwsLicenseClientIdRegistrationId StringMaxl64 
+}
+
+cwsLicenseClientIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsLicenseClientId"
+    ::= { cwsLicenseClientIdEntry 1 }
+
+cwsLicenseClientIdRegistrationId OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "License client registration id"
+    ::= { cwsLicenseClientIdEntry 2 }
+
+cwsLicenseClientStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsLicenseClientStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "License client state information."
+    ::= { cienaWsLicenseMIB 5 }
+
+cwsLicenseClientStateEntry OBJECT-TYPE
+    SYNTAX CwsLicenseClientStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsLicenseClientStateTable."
+    INDEX { cwsLicenseClientStateTableSnmpKey }
+    ::= { cwsLicenseClientStateTable 1 }
+
+CwsLicenseClientStateEntry ::= SEQUENCE { 
+    cwsLicenseClientStateTableSnmpKey Integer32,
+    cwsLicenseClientStateComplianceState LicenseComplianceState 
+}
+
+cwsLicenseClientStateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsLicenseClientState"
+    ::= { cwsLicenseClientStateEntry 1 }
+
+cwsLicenseClientStateComplianceState OBJECT-TYPE
+    SYNTAX LicenseComplianceState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the license client is compliant."
+    ::= { cwsLicenseClientStateEntry 2 }
+
+cwsLicenseLicenseslistTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsLicenseLicenseslistEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "List of waveserver licenses."
+    ::= { cienaWsLicenseMIB 7 }
+
+cwsLicenseLicenseslistEntry OBJECT-TYPE
+    SYNTAX CwsLicenseLicenseslistEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsLicenseLicenseslistTable."
+    INDEX { cwsLicenseLicenseslistLicenseIndex }
+    ::= { cwsLicenseLicenseslistTable 1 }
+
+CwsLicenseLicenseslistEntry ::= SEQUENCE { 
+    cwsLicenseLicenseslistLicenseIndex Integer32,
+    cwsLicenseLicenseslistName StringMaxl128,
+    cwsLicenseLicenseslistDescription StringMaxl128,
+    cwsLicenseLicenseslistVersion StringMaxl16,
+    cwsLicenseLicenseslistStatus LicenseStatus,
+    cwsLicenseLicenseslistSource LicenseSource,
+    cwsLicenseLicenseslistIssuerName StringMaxl128,
+    cwsLicenseLicenseslistIssuedDate StringMaxl128,
+    cwsLicenseLicenseslistType LicenseType,
+    cwsLicenseLicenseslistHostId StringMaxl128,
+    cwsLicenseLicenseslistCount StringMaxl16,
+    cwsLicenseLicenseslistCheckedOutCount StringMaxl16,
+    cwsLicenseLicenseslistExpiryDate StringMaxl32,
+    cwsLicenseLicenseslistNotice StringMaxl128 
+}
+
+cwsLicenseLicenseslistLicenseIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "License index, unique, key value for the License List."
+    ::= { cwsLicenseLicenseslistEntry 1 }
+
+cwsLicenseLicenseslistName OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Name of the License."
+    ::= { cwsLicenseLicenseslistEntry 2 }
+
+cwsLicenseLicenseslistDescription OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Description of the License."
+    ::= { cwsLicenseLicenseslistEntry 3 }
+
+cwsLicenseLicenseslistVersion OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Version of the License."
+    ::= { cwsLicenseLicenseslistEntry 4 }
+
+cwsLicenseLicenseslistStatus OBJECT-TYPE
+    SYNTAX LicenseStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Status of the License."
+    ::= { cwsLicenseLicenseslistEntry 5 }
+
+cwsLicenseLicenseslistSource OBJECT-TYPE
+    SYNTAX LicenseSource
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Source of the License."
+    ::= { cwsLicenseLicenseslistEntry 6 }
+
+cwsLicenseLicenseslistIssuerName OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Name of the Issuer of the License."
+    ::= { cwsLicenseLicenseslistEntry 7 }
+
+cwsLicenseLicenseslistIssuedDate OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Date the License was issued."
+    ::= { cwsLicenseLicenseslistEntry 8 }
+
+cwsLicenseLicenseslistType OBJECT-TYPE
+    SYNTAX LicenseType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Type of the License."
+    ::= { cwsLicenseLicenseslistEntry 9 }
+
+cwsLicenseLicenseslistHostId OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Host Id of the License."
+    ::= { cwsLicenseLicenseslistEntry 10 }
+
+cwsLicenseLicenseslistCount OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of License instances available."
+    ::= { cwsLicenseLicenseslistEntry 11 }
+
+cwsLicenseLicenseslistCheckedOutCount OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of License instances checked out."
+    ::= { cwsLicenseLicenseslistEntry 12 }
+
+cwsLicenseLicenseslistExpiryDate OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Date the License expires."
+    ::= { cwsLicenseLicenseslistEntry 13 }
+
+cwsLicenseLicenseslistNotice OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Notice of the License."
+    ::= { cwsLicenseLicenseslistEntry 14 }
+
+cwsLicenseServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsLicenseServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "License server information."
+    ::= { cienaWsLicenseMIB 8 }
+
+cwsLicenseServerEntry OBJECT-TYPE
+    SYNTAX CwsLicenseServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsLicenseServerTable."
+    INDEX { cwsLicenseServerTableSnmpKey }
+    ::= { cwsLicenseServerTable 1 }
+
+CwsLicenseServerEntry ::= SEQUENCE { 
+    cwsLicenseServerTableSnmpKey Integer32,
+    cwsLicenseServerHostAddress OCTET STRING,
+    cwsLicenseServerNumLicenseServers Unsigned32 
+}
+
+cwsLicenseServerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsLicenseServer"
+    ::= { cwsLicenseServerEntry 1 }
+
+cwsLicenseServerHostAddress OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..256))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The license server host name and port number, separated by a colon."
+    ::= { cwsLicenseServerEntry 2 }
+
+cwsLicenseServerNumLicenseServers OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The number of license servers."
+    ::= { cwsLicenseServerEntry 3 }
+
+
+
+-- Conformance statements
+cienaWsLicenseObjects OBJECT IDENTIFIER
+    ::= { cienaWsLicenseMIB 1 }
+
+cienaWsLicenseConformance OBJECT IDENTIFIER
+    ::= { cienaWsLicenseMIB 2 }
+
+cienaWsLicenseGroups OBJECT IDENTIFIER
+    ::= { cienaWsLicenseConformance 1 }
+
+cienaWsLicenseGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsLicenseClientIdRegistrationId,
+        cwsLicenseClientStateComplianceState,
+        cwsLicenseLicenseslistName,
+        cwsLicenseLicenseslistDescription,
+        cwsLicenseLicenseslistVersion,
+        cwsLicenseLicenseslistStatus,
+        cwsLicenseLicenseslistSource,
+        cwsLicenseLicenseslistIssuerName,
+        cwsLicenseLicenseslistIssuedDate,
+        cwsLicenseLicenseslistType,
+        cwsLicenseLicenseslistHostId,
+        cwsLicenseLicenseslistCount,
+        cwsLicenseLicenseslistCheckedOutCount,
+        cwsLicenseLicenseslistExpiryDate,
+        cwsLicenseLicenseslistNotice,
+        cwsLicenseServerHostAddress,
+        cwsLicenseServerNumLicenseServers
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsLicenseGroups 1 }
+
+cienaWsLicenseCompliances OBJECT IDENTIFIER
+    ::= { cienaWsLicenseConformance 2 }
+
+cienaWsLicenseCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsLicenseGroup }
+    ::= { cienaWsLicenseCompliances 1 }
+
+END -- End module

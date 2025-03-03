@@ -1,0 +1,138 @@
+      DELL-NETWORKING-BMP-MIB DEFINITIONS ::= BEGIN
+      --
+      --  This module provides authoritative definitions for 
+      --  Dell Networking OS Baremetal Provisioning MIB.
+      --
+      --  This module will be extended, as needed.
+      --
+
+      IMPORTS
+          MODULE-IDENTITY, OBJECT-TYPE, 
+          Counter32
+              FROM SNMPv2-SMI
+          dellNetMgmt
+              FROM DELL-NETWORKING-SMI;
+
+      dellNetBmpMib MODULE-IDENTITY
+      
+      LAST-UPDATED "201112071248Z" -- Dec 07,2011 12:48:00 GMT
+      
+      ORGANIZATION "Dell Inc."
+      
+      CONTACT-INFO "http://www.dell.com/support"
+
+      DESCRIPTION  "Dell Networking OS Baremetal Provisioning MIB."
+
+      REVISION     "201407211200Z"
+      DESCRIPTION
+              "Adding relay related objects - bmpRelay and bmpRelayRemoteID."
+
+      REVISION     "201112071248Z"
+      DESCRIPTION  
+              "Initial version of this mib."
+              ::= { dellNetMgmt 23 }
+
+      -- ### Groups ###
+
+      dellNetBmp OBJECT IDENTIFIER ::={ dellNetBmpMib 1 }
+
+         bmpReloadType OBJECT-TYPE
+         SYNTAX        INTEGER {
+                                normalReload (1),
+                                bmpReload (2)
+                       }
+         MAX-ACCESS    read-write
+         STATUS        current
+         DESCRIPTION
+         "Configure reload type to enable/disable BMP.
+         normalReload    - Regular reload type; BMP process is not
+                           initiated.
+         bmpReload - Bmp reload type; BMP process is
+                           initiated and image/config files are upgraded
+                           based on the DHCP/BOOTP offer.
+         Default is bmpReload."
+         DEFVAL        { bmpReload }
+         ::= { dellNetBmp 1 }
+
+         bmpAutoSave OBJECT-TYPE
+         SYNTAX        INTEGER {
+                               bmpActionEnable (1),
+                               bmpActionDisable (2)
+                       }
+         MAX-ACCESS    read-write
+         STATUS        current
+         DESCRIPTION
+         "Configure auto-save option for downloaded config file.
+         bmpActionEnable  - Enable auto-save option.
+         bmpActionDisable - Disable auto-save option.
+         Default is bmpActionDisable."
+         DEFVAL        { bmpActionDisable }
+         ::= { dellNetBmp 2 }
+
+         bmpConfigDownload OBJECT-TYPE
+         SYNTAX        INTEGER {
+                                bmpActionEnable (1),
+                                bmpActionDisable (2)
+                       }
+         MAX-ACCESS    read-write
+         STATUS        current
+         DESCRIPTION
+         "Enable/disable config file download.
+         bmpActionEnable  - Enable config-download option.
+         bmpActionDisable - Disable config-download option.
+         Default is bmpActionEnable."
+         DEFVAL        { bmpActionDisable }
+         ::= { dellNetBmp 3 }
+
+         bmpDhcpTimeout OBJECT-TYPE
+         SYNTAX        INTEGER (0..50)
+         MAX-ACCESS    read-write
+         STATUS        current
+         DESCRIPTION
+         "Configure the DHCP timeout value.
+         Default is infinity which can be set using value 0"
+         DEFVAL        { 0 }
+         ::= { dellNetBmp 4 }
+
+         bmpRetryCount OBJECT-TYPE
+         SYNTAX        INTEGER (0..6)
+         MAX-ACCESS    read-write
+         STATUS        current
+         DESCRIPTION
+         "Configure the number of attempts to download a config file.
+         Default value is 3."
+         DEFVAL        { 0 }
+         ::= { dellNetBmp 5 }
+
+        bmpUserDefinedString  OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..64))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "A textual string containing information about the option 60."
+        ::= { dellNetBmp 6 }
+
+        bmpRelay    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        bmpActionEnable (1),
+                        bmpActionDisable (2)
+        }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+           "Configure relay option in bmp to support option82 information.
+           bmpActionEnable  - Enable option82 - relay information.
+           bmpActionDisable - Disable option82 - relay information.
+           Default is bmpActionDisable."
+        DEFVAL        { bmpActionDisable }
+        ::= { dellNetBmp 7 }
+
+        bmpRelayRemoteId    OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..64))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "A textual string to be appened for the remote-id value."
+        ::= { dellNetBmp 8}
+
+    END

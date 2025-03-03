@@ -1,0 +1,2080 @@
+CM-SECURITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Unsigned32
+             FROM SNMPv2-SMI
+    DateAndTime, DisplayString, TruthValue, RowStatus, StorageType, 
+    TEXTUAL-CONVENTION, VariablePointer
+             FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+             FROM SNMPv2-CONF
+    fsp150cm
+             FROM  ADVA-MIB
+    IpVersion, UserInterfaceType
+             FROM  CM-COMMON-MIB
+    Ipv6Address
+             FROM  IPV6-TC
+    usmUserEntry
+             FROM  SNMP-USER-BASED-SM-MIB
+    SnmpAdminString
+             FROM  SNMP-FRAMEWORK-MIB;
+
+cmSecurityMIB MODULE-IDENTITY
+    LAST-UPDATED    "202101280000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
+    CONTACT-INFO
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
+    DESCRIPTION
+            "This module defines the Security MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.  These are used
+             to manage the user/authentication for CLI/GUI sessions.
+             Copyright (C) ADVA."
+    REVISION        "202101280000Z"
+    DESCRIPTION
+             "Notes from release 202007270000Z:
+              (1) Added new tables: f3CaProfileTable, f3CaTable.
+              (2) Added new textual conventions: CaAction,
+                  SslCertificatePrivateKeyPairAction, CertificateType,
+                  CertificateStatus, AutoEnrollmentStatus, CaRootCertStatus.
+              (3) Added new columns to f3SslCertificatePrivateKeyPairTable:
+                  f3SslCertificatePrivateKeyPairRsaKeyPairName,
+                  f3SslCertificatePrivateKeyPairCertificateType,
+                  f3SslCertificatePrivateKeyPairCertificateStatus,
+                  f3SslCertificatePrivateKeyPairAction.
+              (4) Added new column to f3CertSigningRequestTable:
+                  f3CertSigningRequestAutoEnrollmentStatus.
+              (5) Added new scalar to f3SshCipherStrengthHighControl.
+
+              Notes from release 202006180000Z:
+              (1) Changed MAX-ACCESS for f3HttpsSslKeyPair from read-only to read-write
+              
+              Notes from release 201912010000Z
+              (1) Added f3NasIpAddressType,
+                  f3SslCertificateActionKeyName,
+              
+              Notes from release 201910010000Z
+              (1) Added scalars f3HttpsSslCertExpNotifPeriod,
+                  f3HttpsSslKeyPair,
+                  f3SslCertificateAction,
+                  f3SslCertificateActionPairName,
+                  
+                  Added f3SslCertificatePrivateKeyPairTable with columns:
+                  f3SslCertificatePrivateKeyPairName,
+                  f3SslCertificatePrivateKeyPairSslCertificate,
+                  f3SslCertificatePrivateKeyPairPrivateKeyPresent
+
+              Notes from release 201905280000Z
+              (1) added cmSecurityUserSso2fa to cmSecurityUserTable
+              (2) added scalar f3Sso2faControl
+
+              Notes from release 201706270000Z
+              (1) Added Object Identifier cmIcmpV4Objects with scalar objects:
+                  icmpV4Filter, icmpV4DropEchoRequests
+              (2) Added Object Identifier cmIcmpV6Objects with scalar objects:
+                  icmpV6Filter, icmpV6DropEchoRequests, icmpV6DropNeighborSolicitation,
+                  icmpV6DropRouterAdvertisement, icmpV6DropNeighborAdvertisement,
+                  icmpV6DropRouterSolicitation
+	      
+	      Notes from release 201704030000Z
+              (1) add f3RadiusSendVendorAvpEnabled and f3RadiusRealm to the MIB
+
+              Notes from release 201606140000Z
+              (1) added cmSecurityUserRemoteCryptoUser to cmSecurityUserTable
+
+              Notes from release 201602080000Z
+              (1)Added literal netconf to CmSecurityPrivLevel
+
+              Notes from release 201509180000Z
+              (1)Added cmSecurityCryptoPassword attribute to cmSecurityUserTable
+
+              Note from release  201106270000Z,
+              (1)Added f3TacacsPrivLevelControlEnabled, f3TacacsDefaultPrivLevel
+
+              Note from release 201104140000Z,
+              (1)Added cmSecurityUserAction to support remove-lockout
+
+              Note from release 201101050000Z,
+              (1)Added f3UsmUserTable - an augment to UsmUserTable
+
+              Note from release 201002120000Z,
+              (1)MIBs updated for supported functionality in R4.3CC and R4.1CM 
+                 (a)cmRemoteAuthServerTable has new objects 
+                    cmRemoteAuthServerAccountingPort to support RADIUS accounting
+              
+              Notes from release 200903190000Z,
+             (1)MIB version ready for release FSP150CC GE101, GE206 devices
+               (a)Added Textual convention CmSecurityPolicyStrength
+               (b)Added MIB scalar cmSecurityPolicyStrength
+
+             (2)Following changes are made to the cmSecurityUserTable,
+                (a)cmSecurityUserPassword column to modify security user password
+                (b)cmSecurityUserStorageType and cmSecurityUserRowStatus columns added 
+                   thereby allowing creation/deletion of Security Users
+                (c)cmSecurityUserComment, cmSecurityUserPrivLevel, 
+                   cmSecurityUserLoginTimeout, cmSecurityUserNumFailedLoginAttempts, 
+                   cmSecurityUserCliPagingEnable columns are now read-write
+                   to allow write access. 
+
+            Notes from release 200803030000Z,
+             (1)MIB version ready for release FSP150CM 3.1." 
+    ::= {fsp150cm 10}    
+
+-- 
+-- OID definitions
+-- 
+cmSecurityObjects           OBJECT IDENTIFIER ::= {cmSecurityMIB 1}
+cmSecurityConformance       OBJECT IDENTIFIER ::= {cmSecurityMIB 2}
+cmSecurityNotifications     OBJECT IDENTIFIER ::= {cmSecurityMIB 3}
+
+cmIcmpV4Objects             OBJECT IDENTIFIER ::= { cmSecurityObjects 20 }
+cmIcmpV6Objects             OBJECT IDENTIFIER ::= { cmSecurityObjects 21 }
+
+f3FipsObjects               OBJECT IDENTIFIER ::= { cmSecurityObjects 23 }
+f3SslCertificateObjects     OBJECT IDENTIFIER ::= { cmSecurityObjects 25 }
+
+f3RsaKeyPairObjects          OBJECT IDENTIFIER ::= { cmSecurityObjects 26 }
+f3CertSigningRequestObjects  OBJECT IDENTIFIER ::= { cmSecurityObjects 27 }
+
+--
+-- Textual conventions.
+--
+SecuritySelfTestResult ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Security Self Test Result 
+          fail     - fail to pass the test, 
+          success  - success to pass the test."
+    SYNTAX       INTEGER {
+                   notApplicable (0),
+                   fail (1),
+                   success (2)
+                 }
+
+SecuritySelfTestStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Security Self Test Status 
+          notStarted - test not started.
+          inprogress - test is in progress.
+          complete   - test has completed."
+    SYNTAX       INTEGER {
+                   notApplicable (0),
+                   notStarted (1),
+                   inprogress (2),
+                   complete (3)
+                 }
+
+CmRemoteAuthProtocol ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for remote authentication protocol.
+          none   - No remote authentication protocol, 
+          radius - RADIUS (Remote Authentication Dial-In User Service), 
+          tacacs - TACACS+(Terminal Access Controller Access Control System)."
+    SYNTAX       INTEGER {
+                   none (1),
+                   radius (2),
+                   tacacs (3)
+                 }
+
+CmSecurityAccessOrder ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for order for security access.
+             local  - Local database for user/security validation, 
+             remote - Remote protocol for user/security validation."
+    SYNTAX       INTEGER {
+                   local (1),
+                   remote (2)
+                 }
+
+CmSecurityAuthType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for remote authentication protocol types.
+             pap  - Password Authentication Protocol, 
+             chap - Challenge-Handshake Authentication Protocol."
+    SYNTAX       INTEGER {
+                   pap (1),
+                   chap (2),
+                   ascii (3)
+                 }
+
+CmSecurityPrivLevel ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Security Privilege Level.
+             retrieve         - Retrieve Privilege Level (can only 
+                                VIEW management information), 
+             maintenance      - Maintenance Privilege Level 
+                                (can VIEW management, as well as perform 
+                                maintenance operations such as loopbacks,
+                                etherjack diagnosis etc.)
+             provisioning     - Provisioning Privilege Level
+                                (can perform Provisioning operations) 
+             superuser        - Super User Privilege Level
+                                (can perform all operations)
+             testuser         - Retrieve Privilege Level
+                                and some maintenance, 
+                                provisioning operations.
+             cryptouser       - Crypto User Privilege Level 
+                                (can perform security operations)
+             netconf          - NETCONF Privilege Level"
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   retrieve (1),
+                   maintenance (2),
+                   provisioning (3),
+                   superuser (4),
+                   testuser (5),
+                   cryptouser (6),
+                   netconf (7)
+                 }
+
+CmRemoteAuthOrder ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for order for remote authentication access.
+             first  - first to access the remote authentication, 
+             second - second to access the remote authentication,
+             third  - third to access the remote authentication."
+    SYNTAX       INTEGER {
+                   first (1),
+                   second (2),
+                   third (3)
+                 }
+
+CmSecurityPolicyStrength ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for security policy strength 
+             low  - Low Security Policy, 
+             medium - Medium Security Policy,
+             high  - High Security Policy."
+    SYNTAX       INTEGER {
+                   low (1),
+                   medium (2),
+                   high (3)
+                 }
+
+UsmUserAccessType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for type of USM User 
+             read-only  - Read only, 
+             read-write - Read write ,
+             trap-only  - Trap Only."
+    SYNTAX       INTEGER {
+                   read-only (1),
+                   read-write (2),
+                   trap-only (3)
+                 }
+
+
+SecurityUserAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Provides ability to manage security users."
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   remove-lockout(1) -- removes the locked out condition on security user
+                 }
+
+SnmpSecurityTrapType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Provides ability to manage security traps.
+             all - trap is reported when user logs in, logs out or is locked out
+             loginFailed  - trap is reported only when user failed to log in
+             disabled  - security traps are disabled."
+
+    SYNTAX     INTEGER {
+                 all(1),
+                 loginFailed(2),
+                 disabled(3)
+               }
+
+PrivilegeRequestAction ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Privilege request action." 
+  SYNTAX        INTEGER
+                {
+                  undefined(0),
+                  none(1),
+                  approve(2),
+                  deny(3),
+                  cancel(4)
+                }
+
+PrivilegeRequestState ::= TEXTUAL-CONVENTION
+  STATUS        current
+  DESCRIPTION
+         "Privilege request state." 
+  SYNTAX        INTEGER
+                {
+                  none(1),
+                  requestSent(2),
+                  requestCanceled(3),
+                  requestApproved(4),
+                  requestDenied(5),
+                  requestTimeout(6),
+                  accessExpired(7),
+                  accessCanceled(8)
+                }
+
+RsaKeyLengthType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "RSA key length."
+    SYNTAX       INTEGER {
+                   rsaKeyLength2048 (1),
+                   rsaKeyLength4096 (2)
+                 }
+
+ZeroizeKeysAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Zeroize Keys."
+    SYNTAX       INTEGER {
+                   notApplicable (0),
+                   ZeroizeKeys (1)
+                 }
+
+RunSelfTestAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Run Self-Test."
+    SYNTAX       INTEGER {
+                   notApplicable (0),
+                   RunSelfTest (1)
+                 }
+                 
+SslCertificateAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Provides ability to manage SSL Certificate/Private Key pair.
+         deleteSslKeyPair - delete SSL Certificate/Private Key pair
+         setHttpsSslKeyPair - set SSL Certificate/Private Key pair used for HTTPS
+         addRsaPrivateKey - add RSA Private Key to SSL Certificate/Private Key pair"
+    SYNTAX  INTEGER {
+                   notApplicable (0), 
+                   deleteSslKeyPair (1),
+                   setHttpsSslKeyPair (2),
+                   addRsaPrivateKey (3)
+                 }
+
+RsaKeyPairAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "generate or delete RSA key pair."
+    SYNTAX  INTEGER {
+                   notApplicable (0), 
+                   genRsaKeyPair (1),
+                   delRsaKeyPair (2)
+                 }
+
+CsrAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "generate or delete CSR."
+    SYNTAX  INTEGER {
+                   notApplicable (0), 
+                   genCsr (1),
+                   delCsr (2)
+                 }
+
+NasIpAddressType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Nas Ip Address Type."
+    SYNTAX       INTEGER {
+                   userDefined (1),
+                   packetSourceIp (2)
+                 }
+                 
+CertificateEnrollmentProtocol ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Protocol type used for automatic certificate enrollment."
+    SYNTAX INTEGER {
+             scep (1)
+           }
+
+CaAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Certificate authority action."
+    SYNTAX       INTEGER {
+                   none(1),
+                   updateCACertificates(2),
+                   startAutoEnrollment(3),
+                   getCACertificates(4)
+                 }
+
+SslCertificatePrivateKeyPairAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "SSL certificate/private key pair action."
+    SYNTAX       INTEGER {
+                   none(1),
+                   trustRootCACertificate(2)
+                 }
+
+CertificateType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Certificate type."
+    SYNTAX       INTEGER {
+                   root(1),
+                   intermediate(2),
+                   device(3)
+                 }
+
+CertificateStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Certificate status."
+    SYNTAX       INTEGER {
+                   trusted(1),
+                   untrusted(2),
+                   valid(3),
+                   invalid(4)
+                 }
+
+AutoEnrollmentStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Auto enrollment status."
+    SYNTAX       INTEGER {
+                   none(1),
+                   failure(2),
+                   success(3),
+                   pending(4),
+                   aborted(5),
+                   timedout(6)
+                 }
+
+CaRootCertStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Certificate authority root certificate status."
+    SYNTAX       INTEGER {
+                   pending(1),
+                   active(2),
+                   failed(3),
+                   renewing(4),
+                   renewalFailed(5)
+                 }
+
+
+--
+-- Scalar definitions.
+--
+cmAuthProtocol OBJECT-TYPE
+    SYNTAX     CmRemoteAuthProtocol 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Remote user authentication protocol."
+    ::= { cmSecurityObjects 1 }
+
+
+cmAccessOrder OBJECT-TYPE
+    SYNTAX     CmSecurityAccessOrder 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Order of access for security, i.e. try 'local' first or
+             'remote' first."
+    ::= { cmSecurityObjects 2 }
+
+cmAuthType    OBJECT-TYPE
+    SYNTAX     CmSecurityAuthType 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "In case of remote authentication, the chosen protocol." 
+    ::= { cmSecurityObjects 3 }
+
+cmNASIpAddress    OBJECT-TYPE
+    SYNTAX     IpAddress 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "In case of remote authentication RADIUS, 
+             the Network Access Server's IP Address." 
+    ::= { cmSecurityObjects 4 }
+
+-- cmSecurityUserTable is { cmSecurityObjects 5 } 
+-- cmRemoteAuthServerTable is { cmSecurityObjects 6 } 
+
+cmSecurityPolicyStrength OBJECT-TYPE
+    SYNTAX     CmSecurityPolicyStrength 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object represents the security policy
+             strength of the system.  Based on this value,
+             the system puts additional restrictions on
+             the user id and password rules."
+    ::= { cmSecurityObjects 7 }
+
+cmRemoteAuthServerAccountingEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to enable/disable RADIUS/TACACS+ Accounting 
+          on all authentication servers." 
+     ::= { cmSecurityObjects 8 }
+
+-- f3UsmUserTable is { cmSecurityObjects 9 } 
+
+f3TacacsPrivLevelControlEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to enable/disable the use of ENABLE authorization 
+          control to determine
+          the Privilege Level configured by the remote authentication server.
+          This object is only valid for TACACS+. Default value of this object is
+          TRUE."
+     ::= { cmSecurityObjects 10 }
+
+f3TacacsDefaultPrivLevel OBJECT-TYPE
+    SYNTAX     CmSecurityPrivLevel
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the default privilege level of the
+          TACACS+ user, when the use of  ENABLE authorization control is DISABLED, i.e.
+          f3TacacsPrivLevelControlEnabled is set to FALSE."
+     ::= { cmSecurityObjects 11 }
+
+f3NasIpv6Addr OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describe the ipv6 address."
+     ::= { cmSecurityObjects 12 }
+
+f3SecurityTrapType OBJECT-TYPE
+    SYNTAX      SnmpSecurityTrapType
+    MAX-ACCESS  read-write
+    STATUS       current
+    DESCRIPTION
+         "This object provides ability to manage whether report security trap."
+    ::= { cmSecurityObjects 13 }
+
+f3SecurityTrapInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS       current
+    DESCRIPTION
+         "This object is used to describe the security trap info.
+          This object is used only in trap and GET operation on this object
+          will return empty string."
+    ::= { cmSecurityObjects 14 }
+
+-- f3PrivilegeChangeTable is { CmSecurityObjects 15 }
+
+f3UserPrivMgmtControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to enable/disable User Privilege Management."
+    ::= { cmSecurityObjects 16 }
+
+f3UserPrivRspTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (1..60)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to set response timeout for user privilege
+          upgrade request in minutes."
+    ::= { cmSecurityObjects 17 }
+
+f3RadiusSendVendorAvpEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "If enabled, Vendor-ID AVP is sent in Access-Request Messages."
+    ::= { cmSecurityObjects 18 }
+
+f3RadiusRealm  OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION  "When the value of radiusRealm is not a null string, the system shall append an '@' 
+                 character and the radiusRealm string to the User-Name attribute included in 
+                 Access-Request Messages. "
+ ::= { cmSecurityObjects 19 }
+ 
+ -- cmIcmpV4Objects is { cmSecurityObjects 20 }
+ -- cmIcmpV6Objects is { cmSecurityObjects 21 }
+ 
+cmAnonymizeLogTimeInDays OBJECT-TYPE
+    SYNTAX     Integer32 (0..1096) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object represents the logging anonymization interval in days. 
+            After the configured number of days have passed, the system anonymizes the user names. 
+            At midnight of that day, the system anonymizes all the log entries that precede the configured value.
+            0 means NEVER anonymize."
+    ::= { cmSecurityObjects 22 }
+ 
+-- f3FipsObjects is { cmSecurityObjects 23 }
+
+f3Sso2faControl OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "When enabled, the f3 device will allow the creation of a cmSecurityUserEntry with
+    the cmSecurityUserSso2fa set to enabled."
+    ::= { cmSecurityObjects 24 }
+    
+f3NasIpAddressType OBJECT-TYPE
+    SYNTAX      NasIpAddressType
+    MAX-ACCESS  read-write
+    STATUS       current
+    DESCRIPTION
+         "TThis object describe the ip address type."
+    ::= { cmSecurityObjects 28 }
+
+f3SshCipherStrengthHighControl OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "When enabled, high cipher strength is enforced."
+    ::= { cmSecurityObjects 31 }
+    
+-- 
+-- Fips Objects 
+--
+f3FipsOperationMode  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Fips Operation Mode."
+    ::= { f3FipsObjects 1 }
+    
+f3FipsSecuritySelfTestFailureCount  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fips Security Self Test Failure Count."
+    ::= { f3FipsObjects 2 }
+    
+f3FipsSecuritySelfTestResult  OBJECT-TYPE
+    SYNTAX      SecuritySelfTestResult
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fips Security Self Test Result."
+    ::= { f3FipsObjects 3 }
+    
+f3FipsSecuritySelfTestStatus  OBJECT-TYPE
+    SYNTAX      SecuritySelfTestStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fips Security Self Test Status."
+    ::= { f3FipsObjects 4 }
+
+f3FipsAction  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                 notApplicable(0),
+                 zeroize(1),
+                 startSecSelfTest(2)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Fips Security Self Test Action."
+    ::= { f3FipsObjects 5 }
+
+--
+-- cmIcmpV4Objects
+--
+
+icmpV4Filter OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to enable/disable ICMP Filter. When disabled
+          is set, all IcmpV4 dropping filters are not applied. 
+          Only when enabled is set, IcmpV4 dropping filter can be set."
+    ::= { cmIcmpV4Objects 1 }
+
+icmpV4DropEchoRequests OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to enable/disable Dropping Echo Requests."
+    ::= { cmIcmpV4Objects 2 }
+
+--
+-- cmIcmpV6Objects
+--
+
+icmpV6Filter OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to enable/disable ICMP Filter. When disabled
+          is set, all IcmpV6 dropping filters are not applied. 
+          Only when enabled is set, IcmpV6 dropping filters can be set
+          individually."
+    ::= { cmIcmpV6Objects 1 }
+
+icmpV6DropEchoRequests OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to enable/disable Dropping Echo Requests."
+    ::= { cmIcmpV6Objects 2 }
+
+icmpV6DropNeighborSolicitation OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to enable/disable Dropping Neighbor Solicitation."
+    ::= { cmIcmpV6Objects 3 }
+
+icmpV6DropRouterAdvertisement OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to enable/disable Dropping Router Advertisement."
+    ::= { cmIcmpV6Objects 4 }
+
+icmpV6DropNeighborAdvertisement OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to enable/disable Dropping Neighbor Advertisement."
+    ::= { cmIcmpV6Objects 5 }
+
+icmpV6DropRouterSolicitation OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object is used to enable/disable Dropping Router Solicitation."
+    ::= { cmIcmpV6Objects 6 }
+
+-- 
+-- Ssl Certificate Objects
+--
+f3HttpsSslCertExpNotifPeriod  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..180)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Number of days prior to expiration of the HTTPS SSL Certificate 
+          that the Expiry Notification Alarm will be raised."
+    ::= { f3SslCertificateObjects 1 }
+    
+f3HttpsSslKeyPair  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the SSL certificate/private key pair used for HTTPS."
+    ::= { f3SslCertificateObjects 2 }
+
+f3SslCertificateAction  OBJECT-TYPE
+    SYNTAX      SslCertificateAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the action to take on SSL certificate objects."
+    ::= { f3SslCertificateObjects 3 }
+
+f3SslCertificateActionPairName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the name of the SSL Certificate/Private Key pair to delete or set for HTTPS."
+    ::= { f3SslCertificateObjects 4 }
+
+f3SslCertificateActionKeyName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the name of the Certificate/Private Key pair to add."
+    ::= { f3SslCertificateObjects 6 }
+
+--
+--  SSL Certificate Private Key Pair Table
+--
+f3SslCertificatePrivateKeyPairTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3SslCertificatePrivateKeyPairEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the SSL Certificate/Private Key Pairs."
+    ::= { f3SslCertificateObjects 5 }   
+
+f3SslCertificatePrivateKeyPairEntry  OBJECT-TYPE
+    SYNTAX      F3SslCertificatePrivateKeyPairEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3SslCertificatePrivateKeyPairTable."
+    INDEX { f3SslCertificatePrivateKeyPairName }
+    ::= { f3SslCertificatePrivateKeyPairTable 1 }
+
+F3SslCertificatePrivateKeyPairEntry ::= SEQUENCE {
+    f3SslCertificatePrivateKeyPairName                  DisplayString,
+    f3SslCertificatePrivateKeyPairSslCertificate        DisplayString,
+    f3SslCertificatePrivateKeyPairPrivateKeyPresent     TruthValue,
+    f3SslCertificatePrivateKeyPairRsaKeyPairName        DisplayString,
+    f3SslCertificatePrivateKeyPairCertificateType       CertificateType,
+    f3SslCertificatePrivateKeyPairCertificateStatus     CertificateStatus,
+    f3SslCertificatePrivateKeyPairAction                SslCertificatePrivateKeyPairAction
+}
+
+f3SslCertificatePrivateKeyPairName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "This is a unique name for the key pair."
+    ::= { f3SslCertificatePrivateKeyPairEntry 1 }
+
+f3SslCertificatePrivateKeyPairSslCertificate OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..4096))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the contents of the SSL certificate."
+    ::= { f3SslCertificatePrivateKeyPairEntry 2 }
+
+f3SslCertificatePrivateKeyPairPrivateKeyPresent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This indicates that a private key is present in the key pair."
+    ::= { f3SslCertificatePrivateKeyPairEntry 3 }
+
+f3SslCertificatePrivateKeyPairRsaKeyPairName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the Rsa key of the SSL certificate."
+    ::= { f3SslCertificatePrivateKeyPairEntry 4 }
+
+f3SslCertificatePrivateKeyPairCertificateType OBJECT-TYPE
+    SYNTAX      CertificateType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the SSL certificate type."
+    ::= { f3SslCertificatePrivateKeyPairEntry 5 }
+
+f3SslCertificatePrivateKeyPairCertificateStatus OBJECT-TYPE
+    SYNTAX      CertificateStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the SSL certificate status."
+    ::= { f3SslCertificatePrivateKeyPairEntry 6 }
+
+f3SslCertificatePrivateKeyPairAction OBJECT-TYPE
+    SYNTAX      SslCertificatePrivateKeyPairAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This is the SSL Certificate/Private Key Pair Action."
+    ::= { f3SslCertificatePrivateKeyPairEntry 7 }
+
+-- 
+-- RSA Key Pair Objects
+--
+
+f3RsaKeyPairAction  OBJECT-TYPE
+    SYNTAX      RsaKeyPairAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the action to RSA key pair."
+    ::= { f3RsaKeyPairObjects 1 }
+
+f3RsaKeyPairActionName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the name of RSA key pair action."
+    ::= { f3RsaKeyPairObjects 2 }
+
+f3RsaKeyPairActionLength  OBJECT-TYPE
+    SYNTAX      RsaKeyLengthType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the length of RSA key pair action."
+    ::= { f3RsaKeyPairObjects 3 }
+
+-- 
+-- RSA Key Pair Table
+--
+
+f3RsaKeyPairTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3RsaKeyPairEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of RSA key pairs."
+    ::= { f3RsaKeyPairObjects 4 }
+
+f3RsaKeyPairEntry  OBJECT-TYPE
+    SYNTAX      F3RsaKeyPairEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3RsaKeyPairTable."
+    INDEX { f3RsaKeyPairName }
+    ::= { f3RsaKeyPairTable 1 }
+
+F3RsaKeyPairEntry ::= SEQUENCE {
+    f3RsaKeyPairName                  DisplayString,
+    f3RsaKeyPairPublicKey             DisplayString
+}
+
+f3RsaKeyPairName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "This is a unique name for the key pair."
+    ::= { f3RsaKeyPairEntry 1 }
+
+f3RsaKeyPairPublicKey OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..4096))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is a public key."
+    ::= { f3RsaKeyPairEntry 2 }
+
+-- 
+-- CSR Objects
+--
+
+f3CsrAction  OBJECT-TYPE
+    SYNTAX      CsrAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the action to CSR."
+    ::= { f3CertSigningRequestObjects 1 }
+
+f3CsrActionCsrName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the name of CSR action."
+    ::= { f3CertSigningRequestObjects 2 }
+    
+f3CsrActionRsaKeyName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the RSA key name of CSR action."
+    ::= { f3CertSigningRequestObjects 3 }
+
+f3CsrActionCountry  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the country of CSR action."
+    ::= { f3CertSigningRequestObjects 4 }
+    
+f3CsrActionState  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the state of CSR action."
+    ::= { f3CertSigningRequestObjects 5 }
+    
+f3CsrActionLocality  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the locality of CSR action."
+    ::= { f3CertSigningRequestObjects 6 }
+    
+f3CsrActionOrganization  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the organization of CSR action."
+    ::= { f3CertSigningRequestObjects 7 }
+    
+f3CsrActionOrganizationUnit  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the organization unit of CSR action."
+    ::= { f3CertSigningRequestObjects 8 }
+
+f3CsrActionCommonName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the common name of CSR action."
+    ::= { f3CertSigningRequestObjects 9 }
+    
+f3CsrActionEmail  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the email of CSR action."
+    ::= { f3CertSigningRequestObjects 10 }
+    
+f3CsrActionSerialNumber  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the serial number of CSR action."
+    ::= { f3CertSigningRequestObjects 11 }
+    
+f3CsrActionAlternativeName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This is the alternative name of CSR action."
+    ::= { f3CertSigningRequestObjects 12 }
+
+-- 
+-- CSR Table
+--
+
+f3CertSigningRequestTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3CertSigningRequestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of CSR."
+    ::= { f3CertSigningRequestObjects 13 }
+
+f3CertSigningRequestEntry  OBJECT-TYPE
+    SYNTAX      F3CertSigningRequestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3CertSigningRequestTable."
+    INDEX { f3CertSigningRequestName }
+    ::= { f3CertSigningRequestTable 1 }
+
+F3CertSigningRequestEntry ::= SEQUENCE {
+    f3CertSigningRequestName                  DisplayString,
+    f3CertSigningRequestRsaKeyPairName        DisplayString,
+    f3CertSigningRequestCsrData               DisplayString,
+    f3CertSigningRequestAutoEnrollmentStatus  AutoEnrollmentStatus
+}
+
+f3CertSigningRequestName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "This is a unique name for CSR."
+    ::= { f3CertSigningRequestEntry 1 }
+
+f3CertSigningRequestRsaKeyPairName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the Key pair name."
+    ::= { f3CertSigningRequestEntry 2 }
+
+f3CertSigningRequestCsrData OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..4096))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the CSR data."
+    ::= { f3CertSigningRequestEntry 3 }
+
+f3CertSigningRequestAutoEnrollmentStatus OBJECT-TYPE
+    SYNTAX      AutoEnrollmentStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This is the auto enrollment status."
+    ::= { f3CertSigningRequestEntry 4 }
+
+
+--
+-- Table definitions.
+--
+
+--
+-- Security User Table 
+--
+cmSecurityUserTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmSecurityUserEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the security users. 
+             Entries cannot be created in this table by management
+             application action."
+    ::= { cmSecurityObjects 5 }
+
+
+cmSecurityUserEntry OBJECT-TYPE
+    SYNTAX     CmSecurityUserEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             security user."
+    INDEX { cmSecurityUserName, cmSecurityUserRemoteUser }
+    ::= { cmSecurityUserTable 1 }
+
+
+CmSecurityUserEntry ::= SEQUENCE {
+    cmSecurityUserName                     DisplayString,
+    cmSecurityUserComment                  DisplayString,
+    cmSecurityUserPrivLevel                CmSecurityPrivLevel,
+    cmSecurityUserLoginTimeout             Integer32,
+    cmSecurityUserNumFailedLoginAttempts   Integer32,
+    cmSecurityUserLastLoginTime            DateAndTime,
+    cmSecurityUserLockedout                TruthValue,
+    cmSecurityUserLastLockedoutTime        DateAndTime,
+    cmSecurityUserCliPagingEnable          TruthValue,
+    cmSecurityUserRemoteUser               TruthValue,
+    cmSecurityUserPassword                 DisplayString,
+    cmSecurityUserStorageType              StorageType,   
+    cmSecurityUserRowStatus                RowStatus,
+    cmSecurityUserAction                   SecurityUserAction,
+    cmSecurityCryptoPassword               DisplayString,
+    cmSecurityUserRemoteCryptoUser         TruthValue,
+    cmSecurityUserSso2fa                   TruthValue
+}
+
+cmSecurityUserName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32)) 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Security User Name."
+     ::= { cmSecurityUserEntry 1 }
+
+cmSecurityUserComment OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..128)) 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Notes on Security User."
+     ::= { cmSecurityUserEntry 2 }
+
+cmSecurityUserPrivLevel OBJECT-TYPE
+    SYNTAX     CmSecurityPrivLevel 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Security User Privilege Level."
+     ::= { cmSecurityUserEntry 3 }
+
+cmSecurityUserLoginTimeout OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Security User Login Timeout."
+     ::= { cmSecurityUserEntry 4 }
+
+cmSecurityUserNumFailedLoginAttempts OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Security User Number of Failed Login Attempts."
+     ::= { cmSecurityUserEntry 5 }
+
+cmSecurityUserLastLoginTime OBJECT-TYPE
+    SYNTAX     DateAndTime 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Security User Last Login Time."
+     ::= { cmSecurityUserEntry 6 }
+
+cmSecurityUserLockedout OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Whether the security user has been locked out."
+     ::= { cmSecurityUserEntry 7 }
+
+cmSecurityUserLastLockedoutTime OBJECT-TYPE
+    SYNTAX     DateAndTime 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Security User Last Locked out Time."
+     ::= { cmSecurityUserEntry 8 }
+
+cmSecurityUserCliPagingEnable OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Whether the security user has CLI paging enabled."
+     ::= { cmSecurityUserEntry 9 }
+
+cmSecurityUserRemoteUser OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Whether the security user is a remote user."
+     ::= { cmSecurityUserEntry 10 }
+
+cmSecurityUserPassword OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32)) 
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "Password of the security user. 
+          Note that this attribute is a SET only attribute."
+     ::= { cmSecurityUserEntry 11 }
+
+cmSecurityUserStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { cmSecurityUserEntry 12 }
+
+cmSecurityUserRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of cmSecurityUserRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            cmSecurityUserRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The cmSecurityUserRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { cmSecurityUserEntry 13 }
+
+cmSecurityUserAction OBJECT-TYPE
+    SYNTAX     SecurityUserAction
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object provides ability to perform specific actions on security user.
+                 remove-lockout - this removes the locked out condition on the security user
+            ." 
+    ::= { cmSecurityUserEntry 14 }
+
+cmSecurityCryptoPassword OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32)) 
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "Second level password used in connectguard configurations.
+          This applies only to crypto users.
+          Note that this attribute is a SET only attribute."
+     ::= { cmSecurityUserEntry 15 }
+
+cmSecurityUserRemoteCryptoUser OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Indicates if a security user is a remote crypto user."
+     ::= { cmSecurityUserEntry 16 }
+
+cmSecurityUserSso2fa OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "If enabled, user can be used to bypass remote authentication if
+          cmSso2faControl is enabled. This parameter can only be set on user creation"
+     ::= { cmSecurityUserEntry 17 }
+
+--
+-- Remote Authentication Server Table 
+--
+cmRemoteAuthServerTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmRemoteAuthServerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the remote authentication 
+             servers.
+             Entries cannot be created in this table by management
+             application action."
+    ::= { cmSecurityObjects 6 }
+
+
+cmRemoteAuthServerEntry OBJECT-TYPE
+    SYNTAX     CmRemoteAuthServerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             remote authentication server."
+    INDEX { cmRemoteAuthServerIndex }
+    ::= { cmRemoteAuthServerTable 1 }
+
+
+CmRemoteAuthServerEntry ::= SEQUENCE {
+    cmRemoteAuthServerIndex              Integer32,
+    cmRemoteAuthServerEnabled            TruthValue,
+    cmRemoteAuthServerOrder              CmRemoteAuthOrder,
+    cmRemoteAuthServerIpAddress          IpAddress,
+    cmRemoteAuthServerPort               Integer32,
+    cmRemoteAuthServerNumRetries         Integer32,
+    cmRemoteAuthServerTimeout            Integer32,
+    cmRemoteAuthServerSecret             DisplayString,
+    cmRemoteAuthServerAccountingPort     Integer32,
+    cmRemoteAuthServerIpVersion          IpVersion,
+    cmRemoteAuthServerIpv6Addr           Ipv6Address
+}
+
+cmRemoteAuthServerIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Unique index to address/configure a specific Remote 
+          Authentication Server."
+     ::= { cmRemoteAuthServerEntry 1 }
+
+cmRemoteAuthServerEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows enabling/disabling a Remote Authentication Server."
+     ::= { cmRemoteAuthServerEntry 2 }
+
+cmRemoteAuthServerOrder OBJECT-TYPE
+    SYNTAX     CmRemoteAuthOrder 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object determines the order in which the Remote 
+          Authentication Servers are accessed for security information."
+     ::= { cmRemoteAuthServerEntry 3 }
+
+cmRemoteAuthServerIpAddress OBJECT-TYPE
+    SYNTAX     IpAddress 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify an IP Address for the Remote
+          Authentication Server."
+     ::= { cmRemoteAuthServerEntry 4 }
+
+cmRemoteAuthServerPort OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify a Port for Remote Authentication
+          Server."
+     ::= { cmRemoteAuthServerEntry 5 }
+
+cmRemoteAuthServerNumRetries OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify the number of retries the Remote 
+          Authentication Server must be tried for security access before
+          giving up."
+     ::= { cmRemoteAuthServerEntry 6 }
+
+cmRemoteAuthServerTimeout OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify the timeout period for timing
+          out a security access request to the Remote Authentication Server."
+     ::= { cmRemoteAuthServerEntry 7 }
+
+cmRemoteAuthServerSecret OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..128)) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This allows configuration of secret password for Remote 
+          Authentication Server request."
+     ::= { cmRemoteAuthServerEntry 8 }
+
+cmRemoteAuthServerAccountingPort OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to specify a Port for RADIUS Accounting." 
+     ::= { cmRemoteAuthServerEntry 9 }
+
+cmRemoteAuthServerIpVersion OBJECT-TYPE
+    SYNTAX     IpVersion 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describe the Ip Version." 
+     ::= { cmRemoteAuthServerEntry 10 }
+
+cmRemoteAuthServerIpv6Addr OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describe the Ipv6 Address." 
+     ::= { cmRemoteAuthServerEntry 11 }
+
+--
+-- USM User Extension Table 
+--
+f3UsmUserTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3UsmUserEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "This table is the extension of the F3 USM User Table."
+    ::= { cmSecurityObjects 9 }
+
+f3UsmUserEntry OBJECT-TYPE
+    SYNTAX     F3UsmUserEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in the F3 USM User Table." 
+    AUGMENTS { usmUserEntry }
+    ::= { f3UsmUserTable 1 }
+
+F3UsmUserEntry ::= SEQUENCE {
+    f3UsmUserAccessType       UsmUserAccessType
+}
+
+f3UsmUserAccessType OBJECT-TYPE
+    SYNTAX     UsmUserAccessType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This indicates the type of USM User, read-only, read-write, trap-only."
+     ::= { f3UsmUserEntry 1 }
+
+f3PrivilegeChangeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PrivilegeChangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "This table is used for Restricted User Login via NMS.
+         This is for users with lower privileges to elevate them to higher ones for limited amount of time."
+    ::=  { cmSecurityObjects 15 }
+
+f3PrivilegeChangeEntry OBJECT-TYPE
+    SYNTAX      F3PrivilegeChangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Column for privilegeChangeTable."
+    INDEX       { f3PrivilegeChangeId }
+    ::=  { f3PrivilegeChangeTable 1 }
+
+F3PrivilegeChangeEntry ::= SEQUENCE {
+    f3PrivilegeChangeId                   Unsigned32,
+    f3PrivilegeChangeUserName             SnmpAdminString,
+    f3PrivilegeChangeIpv4Address          IpAddress,
+    f3PrivilegeChangeIpv6Address          Ipv6Address,
+    f3PrivilegeChangeTerminalIpv4Address  IpAddress,
+    f3PrivilegeChangeTerminalIpv6Address  Ipv6Address,
+    f3PrivilegeChangeInterface            UserInterfaceType,
+    f3PrivilegeChangeCurrentPrivilege     CmSecurityPrivLevel,
+    f3PrivilegeChangeRequestedPrivilege   CmSecurityPrivLevel,
+    f3PrivilegeChangeDuration             Unsigned32,
+    f3PrivilegeChangeAction               PrivilegeRequestAction,
+    f3PrivilegeChangeState                PrivilegeRequestState,
+    f3PrivilegeChangeRemainingTime        Unsigned32,
+    f3PrivilegeChangeRemoteName           SnmpAdminString 
+}
+
+f3PrivilegeChangeId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Unique index identifying a request."
+    ::=  { f3PrivilegeChangeEntry 1 }
+
+f3PrivilegeChangeUserName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name string for user authentication purposes" 
+    ::=  { f3PrivilegeChangeEntry 2 }
+
+f3PrivilegeChangeIpv4Address OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv4 address of interface to which user's terminal is connected."
+    ::=  { f3PrivilegeChangeEntry 3 }
+
+f3PrivilegeChangeIpv6Address OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 address of interface to which user's terminal is connected."
+    ::=  { f3PrivilegeChangeEntry 4 }
+
+f3PrivilegeChangeTerminalIpv4Address OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Source IPv4 address of connected terminal."
+    ::=  { f3PrivilegeChangeEntry 5 }
+
+f3PrivilegeChangeTerminalIpv6Address OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Source IPv6 address of connected terminal."
+    ::=  { f3PrivilegeChangeEntry 6 }
+
+f3PrivilegeChangeInterface OBJECT-TYPE
+    SYNTAX      UserInterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface used by the user" 
+    ::=  { f3PrivilegeChangeEntry 7 }
+
+f3PrivilegeChangeCurrentPrivilege OBJECT-TYPE
+    SYNTAX      CmSecurityPrivLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current privilege level of the user, who is requesting role upgrade." 
+    ::=  { f3PrivilegeChangeEntry 8 }
+
+f3PrivilegeChangeRequestedPrivilege OBJECT-TYPE
+    SYNTAX      CmSecurityPrivLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Privilege requested by user for session." 
+    ::=  { f3PrivilegeChangeEntry 9 }
+
+f3PrivilegeChangeDuration OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..480) 
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Requested time period by user (in minutes)."
+    ::=  { f3PrivilegeChangeEntry 10 }
+
+f3PrivilegeChangeAction OBJECT-TYPE
+    SYNTAX      PrivilegeRequestAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Privilege request action." 
+    ::=  { f3PrivilegeChangeEntry 11 }
+
+f3PrivilegeChangeState OBJECT-TYPE
+    SYNTAX      PrivilegeRequestState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Privilege request state." 
+    ::=  { f3PrivilegeChangeEntry 12 }
+
+f3PrivilegeChangeRemainingTime OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time remaining in session with upgrade user privilege (in seconds)." 
+    ::=  { f3PrivilegeChangeEntry 13 }
+
+f3PrivilegeChangeRemoteName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name string for Radius/Tacacs authentication purposes."
+    ::=  { f3PrivilegeChangeEntry 14 }
+
+-- 
+-- CA Profile Table
+--
+
+f3CaProfileTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3CaProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of Certificate Authority Profiles."
+    ::= { cmSecurityObjects 29 }
+
+f3CaProfileEntry  OBJECT-TYPE
+    SYNTAX      F3CaProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3CaProfileTable."
+    INDEX { f3CaProfileIndex }
+    ::= { f3CaProfileTable 1 }
+
+F3CaProfileEntry ::= SEQUENCE {
+    f3CaProfileIndex                       Unsigned32,
+    f3CaProfileName                        DisplayString,
+    f3CaProfileEnrollmentProtocol          CertificateEnrollmentProtocol,
+    f3CaProfileHttpPort                    Unsigned32,
+    f3CaProfileAutoRenewalControl          TruthValue,
+    f3CaProfileRenewalPercentLifetime      Unsigned32,
+    f3CaProfileRenewalNewKeyPairGenControl TruthValue,
+    f3CaProfileStorageType                 StorageType,
+    f3CaProfileRowStatus                   RowStatus
+}
+
+f3CaProfileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "An integer index used to identify this CA Profile."
+    ::= { f3CaProfileEntry 1 }
+
+f3CaProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object provides name for this CA Profile."
+    ::= { f3CaProfileEntry 2 }
+
+f3CaProfileEnrollmentProtocol OBJECT-TYPE
+    SYNTAX      CertificateEnrollmentProtocol
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object allows to specify type of protocol used for
+            automatic certificate enrollment."
+    DEFVAL { scep }
+    ::= { f3CaProfileEntry 3 }
+
+f3CaProfileHttpPort OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This obect allows to specify TCP port number used by 
+            enrollment protocol."
+    DEFVAL { 80 }
+    ::= { f3CaProfileEntry 4 }
+
+f3CaProfileAutoRenewalControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This obect allows to specify whether the client 
+            certificate is automatically renewed or re-enrolled."
+    DEFVAL { true }
+    ::= { f3CaProfileEntry 5 }
+
+f3CaProfileRenewalPercentLifetime OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This obect allows to specify percentage of certificate 
+            lifetime at which point the automatic certificate 
+            renewal process begins."
+    DEFVAL { 75 }
+    ::= { f3CaProfileEntry 6 }
+
+f3CaProfileRenewalNewKeyPairGenControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This obect allows to specify if the RSA key pair is 
+            regenerated prior to each certificate renewal."
+    DEFVAL { false }
+    ::= { f3CaProfileEntry 7 }
+
+f3CaProfileStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The type of storage configured for this entry."
+    ::= { f3CaProfileEntry 8 }
+    
+f3CaProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+        
+            The values of f3CaProfileRowStatus supported are
+            createAndGo(4) and destroy(6). All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3CaProfileRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+        
+            The f3CaProfileRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3CaProfileEntry 9 }
+
+
+f3CaTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3CaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of Certificate Authority object used for certificate 
+         enrollment with CA."
+   ::= { cmSecurityObjects 30 }
+
+f3CaEntry OBJECT-TYPE
+    SYNTAX      F3CaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The conceptual row in f3CaTable."
+    INDEX   { f3CaName }
+
+   ::= { f3CaTable 1 }
+
+F3CaEntry ::= SEQUENCE {
+    f3CaName                    DisplayString,
+    f3CaProfile                 VariablePointer,
+    f3CaUrl                     DisplayString,
+    f3CaCertList                DisplayString,
+    f3CaRootCertStatus          CaRootCertStatus,
+    f3CaLastCsr                 DisplayString,
+    f3CaAction                  CaAction,
+    f3CaActionCsrName           DisplayString,
+    f3CaActionChallengePassword DisplayString,
+    f3CaStorageType             StorageType,
+    f3CaRowStatus               RowStatus
+}
+
+f3CaName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique name used to identify this CA."
+   ::= { f3CaEntry 1 }
+
+f3CaProfile OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object provides a pointer to CA Profile used for this CA."
+   ::= { f3CaEntry 2 }
+
+f3CaUrl OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object provides the URL for certificate enrollment with CA."
+   ::= { f3CaEntry 3 }
+
+f3CaScepQueryMessage OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..512))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object provides the SCEP Query Message for certificate
+         enrollment with CA."
+   ::= { f3CaEntry 4 }
+
+f3CaCertList OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides list of CA certificates sent by the CA as
+         the chain of trust."
+   ::= { f3CaEntry 5 }
+
+f3CaRootCertStatus OBJECT-TYPE
+    SYNTAX      CaRootCertStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides CA root certificate status."
+   ::= { f3CaEntry 6 }
+
+f3CaLastCsr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides last CSR name in an enrollment process."
+   ::= { f3CaEntry 7 }
+
+f3CaAction OBJECT-TYPE
+    SYNTAX      CaAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies a CA Action."
+   ::= { f3CaEntry 8 }
+
+f3CaActionCsrName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies a CSR Name.
+         Applicable to startAutoEnrollment action."
+   ::= { f3CaEntry 9 }
+
+f3CaActionChallengePassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies a challenge password.
+         Applicable to startAutoEnrollment action."
+   ::= { f3CaEntry 10 }
+
+f3CaStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3CaEntry 11 }
+
+f3CaRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3CaRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3CaRowStatus value as createAndGo(4).
+            Upon successful row creation, this variable has a
+            value of active(1).
+
+            The f3CaRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3CaEntry 12 }
+
+
+---
+---Notifications
+---
+f3SecurityTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "This is security trap. Security traps are reported
+             according to value of f3SecurityTrapType object."
+  ::= { cmSecurityNotifications 1 }
+
+f3PrivilegeChangeTrap NOTIFICATION-TYPE 
+    OBJECTS     { f3PrivilegeChangeState,
+                  f3PrivilegeChangeUserName,
+                  f3PrivilegeChangeIpv4Address,
+                  f3PrivilegeChangeIpv6Address,
+                  f3PrivilegeChangeTerminalIpv4Address,
+                  f3PrivilegeChangeTerminalIpv6Address,
+                  f3PrivilegeChangeInterface,
+                  f3PrivilegeChangeCurrentPrivilege,
+                  f3PrivilegeChangeRequestedPrivilege,
+                  f3PrivilegeChangeDuration
+                } 
+    STATUS      current
+    DESCRIPTION   "This trap is sent every time a privilege change request is changed (added, modified, removed)."
+    ::=  { cmSecurityNotifications 2 }
+--
+-- Conformance
+--
+cmSecurityCompliances OBJECT IDENTIFIER ::= {cmSecurityConformance 1}
+cmSecurityGroups      OBJECT IDENTIFIER ::= {cmSecurityConformance 2}
+
+cmSecurityCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the CM Security
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              cmSecurityObjectGroup
+        }
+    ::= { cmSecurityCompliances 1 }
+
+cmSecurityObjectGroup OBJECT-GROUP
+    OBJECTS {
+        cmAuthProtocol, cmAccessOrder, cmAuthType, cmNASIpAddress,
+        cmSecurityPolicyStrength, cmRemoteAuthServerAccountingEnabled,
+        cmAnonymizeLogTimeInDays, f3Sso2faControl, f3NasIpAddressType,
+        f3SshCipherStrengthHighControl,
+
+        f3TacacsPrivLevelControlEnabled, f3TacacsDefaultPrivLevel,
+        f3NasIpv6Addr, f3SecurityTrapType, f3SecurityTrapInfo,
+
+        cmSecurityUserName, cmSecurityUserComment, cmSecurityUserPrivLevel,
+        cmSecurityUserLoginTimeout, cmSecurityUserNumFailedLoginAttempts,
+        cmSecurityUserLastLoginTime, cmSecurityUserLockedout,
+        cmSecurityUserLastLockedoutTime, cmSecurityUserCliPagingEnable,
+        cmSecurityUserRemoteUser, cmSecurityUserPassword,
+        cmSecurityUserStorageType, cmSecurityUserRowStatus, 
+        cmSecurityUserAction, cmSecurityCryptoPassword,
+        cmSecurityUserRemoteCryptoUser, cmSecurityUserSso2fa,
+
+        cmRemoteAuthServerIndex, cmRemoteAuthServerEnabled,
+        cmRemoteAuthServerOrder, cmRemoteAuthServerIpAddress,
+        cmRemoteAuthServerPort, cmRemoteAuthServerNumRetries,
+        cmRemoteAuthServerTimeout, cmRemoteAuthServerSecret,
+        cmRemoteAuthServerAccountingPort, cmRemoteAuthServerIpVersion,
+        cmRemoteAuthServerIpv6Addr,
+
+        f3UsmUserAccessType,
+
+        f3PrivilegeChangeUserName,
+        f3PrivilegeChangeIpv4Address, f3PrivilegeChangeIpv6Address,
+        f3PrivilegeChangeTerminalIpv4Address, f3PrivilegeChangeTerminalIpv6Address,
+        f3PrivilegeChangeInterface, f3PrivilegeChangeCurrentPrivilege,
+        f3PrivilegeChangeRequestedPrivilege, f3PrivilegeChangeDuration,
+        f3PrivilegeChangeAction, f3PrivilegeChangeState, f3PrivilegeChangeRemainingTime,
+        f3PrivilegeChangeRemoteName, f3RadiusSendVendorAvpEnabled, f3RadiusRealm,
+        
+        icmpV4Filter, icmpV4DropEchoRequests,
+        icmpV6Filter, icmpV6DropEchoRequests, icmpV6DropNeighborSolicitation,
+        icmpV6DropRouterAdvertisement, icmpV6DropNeighborAdvertisement, 
+        icmpV6DropRouterSolicitation,        
+        f3FipsOperationMode,
+        f3FipsSecuritySelfTestFailureCount,
+        f3FipsSecuritySelfTestResult,
+        f3FipsSecuritySelfTestStatus,
+        f3FipsAction,
+        
+        f3HttpsSslCertExpNotifPeriod,
+        f3HttpsSslKeyPair,
+        f3SslCertificateAction,
+        f3SslCertificateActionPairName,
+        f3SslCertificatePrivateKeyPairName,
+        f3SslCertificatePrivateKeyPairSslCertificate,
+        f3SslCertificatePrivateKeyPairPrivateKeyPresent,
+        
+        f3RsaKeyPairName, f3RsaKeyPairPublicKey,
+        f3RsaKeyPairAction, f3RsaKeyPairActionName, f3RsaKeyPairActionLength,
+        f3CsrAction, f3CsrActionCsrName, f3CsrActionRsaKeyName,
+        f3CsrActionCountry, f3CsrActionState, f3CsrActionLocality,
+        f3CsrActionOrganization, f3CsrActionOrganizationUnit,
+        f3CsrActionCommonName, f3CsrActionEmail,
+        f3CsrActionSerialNumber, f3CsrActionAlternativeName,
+        f3CertSigningRequestName, f3CertSigningRequestRsaKeyPairName,
+        f3CertSigningRequestCsrData, f3CertSigningRequestAutoEnrollmentStatus,
+        f3SslCertificatePrivateKeyPairRsaKeyPairName,
+        f3SslCertificatePrivateKeyPairCertificateType,
+        f3SslCertificatePrivateKeyPairCertificateStatus,
+        f3SslCertificatePrivateKeyPairAction,
+        f3SslCertificateActionKeyName,
+        
+        f3CaProfileName, f3CaProfileEnrollmentProtocol, f3CaProfileHttpPort,
+        f3CaProfileAutoRenewalControl, f3CaProfileRenewalPercentLifetime,
+        f3CaProfileRenewalNewKeyPairGenControl,
+        f3CaProfileStorageType, f3CaProfileRowStatus,
+        f3CaProfile, f3CaScepQueryMessage, f3CaUrl, f3CaCertList, f3CaRootCertStatus,
+        f3CaLastCsr, f3CaAction, f3CaActionCsrName, f3CaActionChallengePassword,
+        f3CaStorageType, f3CaRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the CM Security
+             group."
+    ::= { cmSecurityGroups 1 }
+
+cmSecurityNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        f3SecurityTrap
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications used in the CM Security
+              group."
+    ::= { cmSecurityGroups 2 }
+
+END

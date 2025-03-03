@@ -1,0 +1,7 @@
+modules:
+    os:
+        hardware: RADWIN-MIB-WINLINK1000::winlink1000OduAdmProductName.0
+        version: RADWIN-MIB-WINLINK1000::winlink1000OduAdmSwRev.0
+        features: RADWIN-MIB-WINLINK1000::winlink1000OduAdmHwRev.0
+        features_template: 'Ver. {{ RADWIN-MIB-WINLINK1000::winlink1000OduAdmHwRev.0 }}'
+        serial: RADWIN-MIB-WINLINK1000::winlink1000OduAdmSN.0

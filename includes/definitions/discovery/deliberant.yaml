@@ -1,0 +1,4 @@
+modules:
+  os:
+    hardware: .1.3.6.1.4.1.32761.3.1.1.1.3.0
+    sysDescr_regex: '/DLB APC (?<hardware>[^,]+), v(?<version>[\d.-]+\d)/'

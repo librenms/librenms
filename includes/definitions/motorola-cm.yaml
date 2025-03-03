@@ -1,0 +1,10 @@
+os: motorola-cm
+text: 'Motorola DOCSIS Cable Modem'
+icon: motorola-cm
+type: network
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.1166.1.450.12.2

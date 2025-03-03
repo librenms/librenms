@@ -1,0 +1,87 @@
+mib: DRAGONWAVE-HORIZON-IDU-MIB
+modules:
+    os:
+        version: DRAGONWAVE-HORIZON-IDU-MIB::hzIduSwInvSystemOmniVersionNo.0
+        serial: DRAGONWAVE-HORIZON-IDU-MIB::hzIduUnitSerialNo.0
+        hardware: DRAGONWAVE-HORIZON-IDU-MIB::hzIduUnitAssemblylNo.0
+    sensors:
+        state:
+            data:
+                -
+                    oid: hzIduModemRxLossOfSignal
+                    index: 'hzIduModemRxLossOfSignal.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.7.4.1.1.1.2.{{ $index }}'
+                    descr: 'Modem{{ $index }} Rx Loss of Signal'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'No' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Yes' }
+                    snmp_flags: ['-ObsQe']
+                -
+                    oid: hzIduEnetPort1EthernetLinkDown
+                    index: 'hzIduEnetPort1EthernetLinkDown.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.7.3.1.9.{{ $index }}'
+                    descr: 'Enet Port1 Link State'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'Up' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Down' }
+                -
+                    oid: hzIduEnetPort2EthernetLinkDown
+                    index: 'hzIduEnetPort2EthernetLinkDown.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.7.3.2.1.{{ $index }}'
+                    descr: 'Enet Port2 Link State'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'Up' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Down' }
+                -
+                    oid: hzIduModemModulationType
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.5.2.2.1.6.{{ $index }}'
+                    index: 'hzIduModemModulationType.{{ $index }}'
+                    descr: 'Modem{{ $index }} Modulation'
+                    states:
+                        - { value: 1, generic: 2, graph: 0, descr: 'qpsk' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'qam' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'qam16' }
+                        - { value: 4, generic: 1, graph: 0, descr: 'qam32' }
+                        - { value: 5, generic: 1, graph: 0, descr: 'qam64' }
+                        - { value: 6, generic: 1, graph: 0, descr: 'qam128' }
+                        - { value: 7, generic: 0, graph: 0, descr: 'qam256' }
+                        - { value: 8, generic: 0, graph: 0, descr: 'x8psk' }
+                    snmp_flags: ['-ObsQ']
+        count:
+            data:
+                -
+                    oid: hzIduModemRxLossOfSignalCounts
+                    index: 'hzIduModemRxLossOfSignalCounts.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.7.4.1.1.1.3.{{ $index }}'
+                    descr: 'Modem{{ $index }} Rx Loss of Signals'
+                    snmp_flags: ['-ObsQ']
+                -
+                    oid: hzIduEnetPort1EthernetLinkDownActivatedCounts
+                    index: 'hzIduEnetPort1EthernetLinkDownActivatedCounts.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.7.3.1.10.{{ $index }}'
+                    descr: 'Enet Port1 Link Downs'
+                -
+                    oid: hzIduEnetPort2EthernetLinkDownActivatedCounts
+                    index: 'hzIduEnetPort2EthernetLinkDownActivatedCounts.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.7.3.2.2.{{ $index }}'
+                    descr: 'Enet Port2 Link Downs'
+                -
+                    oid: hzIduEnetPort1RxFramesInErrors
+                    index: 'hzIduEnetPort1RxFramesInErrors.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.4.1.4.5.{{ $index }}'
+                    descr: 'Enet Port1 Input Error'
+                -
+                    oid: hzIduEnetPort1RxFramesCRCErrors
+                    index: 'hzIduEnetPort1RxFramesCRCErrors.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.4.1.4.6.{{ $index }}'
+                    descr: 'Enet Port1 CRC Error'
+                -
+                    oid: hzIduEnetPort2RxFramesInErrors
+                    index: 'hzIduEnetPort2RxFramesInErrors.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.4.2.4.5.{{ $index }}'
+                    descr: 'Enet Port2 Input Error'
+                -
+                    oid: hzIduEnetPort2RxFramesCrcErrors
+                    index: 'hzIduEnetPort2RxFramesCrcErrors.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.7262.2.3.4.2.4.6.{{ $index }}'
+                    descr: 'Enet Port2 CRC Error'

@@ -1,0 +1,356 @@
+-- =============================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide WLAN license feature.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 created by luoguixing
+--     Initial version 2012-04-25
+-- =============================================================================
+HH3C-DOT11-LIC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32
+    FROM SNMPv2-SMI
+        TruthValue
+    FROM SNMPv2-TC
+        hh3cDot11
+    FROM HH3C-DOT11-REF-MIB;
+
+hh3cDot11LIC MODULE-IDENTITY
+    LAST-UPDATED "201204251800Z"        -- Apr 25, 2012 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB provides information for WLAN license configuration in AC.
+
+        GLOSSARY
+
+        IEEE 802.11
+        Standard to encourage interoperability among
+        wireless networking equipment.
+
+        Access point (AP)
+        Transmitter/receiver (transceiver) device
+        that commonly connects and transports data
+        between a wireless network and a wired network.
+
+        Access control (AC)
+        To control and manage multi-APs, it will bridge
+        wireless and wired network.
+
+        Fit AP
+        Applied in the enterprise environment, it will work
+        under the control and management from AC.
+
+        Control And Provisioning of Wireless Access Points Protocol
+        The short name of protocol is CAPWAP. AC will control
+        and manage AP by CAPWAP tunnel protocol defined by IETF.
+        Also, a data tunnel will be set up between AC and AP.
+
+        Basic Service Set
+        The IEEE 802.11 BSS of an AP comprises of the
+        stations directly associating with the AP. It will
+        be identified by BSSID."
+
+    REVISION "201204251800Z"        -- Apr 25, 2012 at 18:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cDot11 14 }
+
+-- *****************************************************************************
+-- *  Major sections
+-- *****************************************************************************
+
+--  License Configuration Group
+--  DEFINED AS "The group to provide the license configuration information for AC"
+
+hh3cDot11LICConfigGroup OBJECT IDENTIFIER     ::= { hh3cDot11LIC 1 }
+
+--  License ap number Group
+--  DEFINED AS "The group to provide the ap number information for AC."
+hh3cDot11LICApNumGroup OBJECT IDENTIFIER  ::= { hh3cDot11LIC 2 }
+--  AP Number Group has the following children:
+--  hh3cDot11LICApNumAttrTable          ::= { hh3cDot11LICApNumGroup 1 }
+--  hh3cDot11LICApNumLicTable            ::= { hh3cDot11LICApNumGroup 2 }
+
+--  License wlan feature Group
+--  DEFINED AS "The group to provide the wlan feature information for AC."
+hh3cDot11LICFeatureGroup OBJECT IDENTIFIER    ::= { hh3cDot11LIC 3 }
+--  License wlan feature Group has the following children:
+--  hh3cDot11LICFeatureAttrTable          ::= { hh3cDot11LICFeatureGroup 1 }
+--  hh3cDot11LICFeatureLicTable            ::= { hh3cDot11LICFeatureGroup 2 }
+
+-- *****************************************************************************
+-- *  hh3cDot11LICConfigGroup Definition
+-- *****************************************************************************
+hh3cDot11LICSerialNumber OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+        "The device serial number."
+    ::= { hh3cDot11LICConfigGroup 1 }
+
+hh3cDot11LicApNumGroupSupport OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents support hh3cDot11LicApNumGroup
+        'ture': device spport hh3cDot11LicApNumGroup.
+        'false': device not spport hh3cDot11LicApNumGroupp."
+    DEFVAL       { false }
+    ::= { hh3cDot11LICConfigGroup 2 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11LICConfigGroup Definition
+-- *****************************************************************************
+
+
+-- *****************************************************************************
+-- *  hh3cDot11LICApNumTable Definition
+-- *****************************************************************************
+
+hh3cDot11LICApNumAttrTable OBJECT IDENTIFIER     ::= { hh3cDot11LICApNumGroup 1 }
+
+hh3cDot11LICDefautAPNumPermit OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of AP connection permitted
+        for one AC without license."
+    ::= { hh3cDot11LICApNumAttrTable 1 }
+
+hh3cDot11LICCurrentAPNumPermit OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of AP connection permitted
+        for one AC, include default number and the licenses
+        that installed."
+    ::= { hh3cDot11LICApNumAttrTable 2 }
+
+hh3cDot11LICMaxAPNumPermit OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum number of AP to support connection permitted
+        for one AC, include default number and full licenses."
+    ::= { hh3cDot11LICApNumAttrTable 3 }
+
+
+hh3cDot11LICApNumLicTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11LICApNumLicEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains license information of ap number."
+    ::= { hh3cDot11LICApNumGroup 2 }
+
+hh3cDot11LICApNumLicEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11LICApNumLicEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains association information of each station."
+   INDEX
+        { hh3cDot11LICLicenseKeyIndex }
+    ::= { hh3cDot11LICApNumLicTable 1 }
+
+Hh3cDot11LICApNumLicEntry ::= SEQUENCE
+    {
+        hh3cDot11LICLicenseKeyIndex   Integer32,
+        hh3cDot11LICLicenseKey        OCTET STRING,
+        hh3cDot11LICActivationKey     OCTET STRING,
+        hh3cDot11LICApNum          Integer32
+    }
+
+hh3cDot11LICLicenseKeyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Licensed key index value."
+    ::= { hh3cDot11LICApNumLicEntry 1 }
+
+hh3cDot11LICLicenseKey OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies a certain license key."
+    ::= { hh3cDot11LICApNumLicEntry 2 }
+
+hh3cDot11LICActivationKey OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies a certain activation key."
+    ::= { hh3cDot11LICApNumLicEntry 3 }
+
+hh3cDot11LICApNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents support connect ap number of the license."
+    ::= { hh3cDot11LICApNumLicEntry 4 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11LICApNumTable Definition
+-- *****************************************************************************
+
+
+-- *****************************************************************************
+-- *  hh3cDot11LICFeatureTable Definition
+-- *****************************************************************************
+hh3cDot11LICFeatureAttrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11LICFeatureAttrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains attribute information of wlan feature."
+    ::= { hh3cDot11LICFeatureGroup 1 }
+
+hh3cDot11LICFeatureAttrEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11LICFeatureAttrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains feature attribute information of licensetypename."
+   INDEX
+        {
+            hh3cDot11LICAttrIndex
+        }
+    ::= { hh3cDot11LICFeatureAttrTable 1 }
+
+Hh3cDot11LICFeatureAttrEntry ::= SEQUENCE
+    {
+        hh3cDot11LICAttrIndex     Integer32,
+        hh3cDot11LICAttrTypeName  OCTET STRING,
+        hh3cDot11LICAttrDefVal    Integer32,
+        hh3cDot11LICAttrMaxVal    Integer32
+    }
+
+hh3cDot11LICAttrIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Attribute index value."
+    ::= { hh3cDot11LICFeatureAttrEntry 1 }
+
+hh3cDot11LICAttrTypeName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents attribute type name"
+    ::= { hh3cDot11LICFeatureAttrEntry 2 }
+
+hh3cDot11LICAttrDefVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the default value of the license type."
+    ::= { hh3cDot11LICFeatureAttrEntry 3 }
+
+hh3cDot11LICAttrMaxVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum value of the license type."
+    ::= { hh3cDot11LICFeatureAttrEntry 4 }
+
+hh3cDot11LICFeatureLicTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11LICFeatureLicEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains license information of wlan feature."
+    ::= { hh3cDot11LICFeatureGroup 2 }
+
+hh3cDot11LICFeatureLicEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11LICFeatureLicEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains wlan feature information of license."
+   INDEX
+        {
+            hh3cDot11LICKeyIndex
+        }
+    ::= { hh3cDot11LICFeatureLicTable 1 }
+
+Hh3cDot11LICFeatureLicEntry ::= SEQUENCE
+    {
+        hh3cDot11LICKeyIndex   Integer32,
+        hh3cDot11LICTypeName   OCTET STRING,
+        hh3cDot11LICKey        OCTET STRING,
+        hh3cDot11LICTimeLimit  Integer32,
+        hh3cDot11LICValue      Integer32
+    }
+
+hh3cDot11LICKeyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Licensed key index value."
+    ::= { hh3cDot11LICFeatureLicEntry 1 }
+
+hh3cDot11LICTypeName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the type name of the license entry."
+    ::= { hh3cDot11LICFeatureLicEntry 2 }
+
+hh3cDot11LICKey OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies a certain license key."
+    ::= { hh3cDot11LICFeatureLicEntry 3 }
+
+hh3cDot11LICTimeLimit OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents available time left of the license entry."
+    ::= { hh3cDot11LICFeatureLicEntry 4 }
+
+hh3cDot11LICValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the value of the license entry.
+        If hh3cDot11LICFeatureTypeName is 'AP',
+        this meaning of ap number, and so no."
+    ::= { hh3cDot11LICFeatureLicEntry 5 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11LICFeatureTable Definition
+-- *****************************************************************************
+
+END

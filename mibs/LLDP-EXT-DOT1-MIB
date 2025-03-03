@@ -1,18 +1,22 @@
-LLDP-EXT-DOT3-MIB DEFINITIONS ::= BEGIN
+LLDP-EXT-DOT1-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32
         FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, TruthValue
+    TruthValue
         FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
     lldpExtensions, lldpLocPortNum, 
-    lldpRemTimeMark, lldpRemLocalPortNum, lldpRemIndex,
+    lldpRemTimeMark, lldpRemLocalPortNum, lldpRemIndex, 
     lldpPortConfigEntry
-        FROM LLDP-MIB;
+        FROM LLDP-MIB
+   VlanId
+        FROM Q-BRIDGE-MIB;
 
-lldpXdot3MIB MODULE-IDENTITY
+lldpXdot1MIB MODULE-IDENTITY
     LAST-UPDATED "200505060000Z" -- May 06, 2005
     ORGANIZATION "IEEE 802.1 Working Group"
     CONTACT-INFO 
@@ -28,828 +32,790 @@ lldpXdot3MIB MODULE-IDENTITY
                E-mail: paul_congdon@hp.com"
     DESCRIPTION
             "The LLDP Management Information Base extension module for
-            IEEE 802.3 organizationally defined discovery information.
+            IEEE 802.1 organizationally defined discovery information.
 
             In order to assure the uniqueness of the LLDP-MIB,
-            lldpXdot3MIB is branched from lldpExtensions using OUI value
+            lldpXdot1MIB is branched from lldpExtensions using OUI value
             as the node.  An OUI/'company_id' is a 24 bit globally unique
             assigned number referenced by various standards.
 
             Copyright (C) IEEE (2005).  This version of this MIB module
-            is published as Annex G.6.1 of IEEE Std 802.1AB-2005;
+            is published as Annex F.7.1 of IEEE Std 802.1AB-2005;
             see the standard itself for full legal notices."
     REVISION        "200505060000Z" -- May 06, 2005
     DESCRIPTION
             "Published as part of IEEE Std 802.1AB-2005 initial version."
--- OUI for IEEE 802.3 is 4623 (00-12-0F)
-   ::= { lldpExtensions 4623 } 
+-- OUI for IEEE 802.1 is 32962 (00-80-C2) 
+   ::= { lldpExtensions 32962 }
+--   ::= { iso std(0) iso8802(8802) ieee802dot1(1) ieee802dot1mibs(1) lldPMIB(2)  lldpObjects(1)                lldpExtensions(5) 32962}
 
 ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
 --
--- Organizationally Defined Information Extension - IEEE 802.3
+-- Organizationally Defined Information Extension - IEEE 802.1
 --
 ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
 
-lldpXdot3Objects    OBJECT IDENTIFIER ::= { lldpXdot3MIB 1 }
+lldpXdot1Objects    OBJECT IDENTIFIER ::= { lldpXdot1MIB 1 }
 
--- LLDP IEEE 802.3 extension MIB groups
-lldpXdot3Config     OBJECT IDENTIFIER ::= { lldpXdot3Objects 1 }
-lldpXdot3LocalData  OBJECT IDENTIFIER ::= { lldpXdot3Objects 2 }
-lldpXdot3RemoteData OBJECT IDENTIFIER ::= { lldpXdot3Objects 3 }
-
--- textual conventions
-
-LldpPowerPortClass ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION
-            "This TC describes the Power over Ethernet (PoE) port class."
-    SYNTAX  INTEGER {
-            pClassPSE(1),
-            pClassPD(2)
-    }
-
-LldpLinkAggStatusMap ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION
-            "This TC describes the link aggregation status.
-
-            The bit 'aggCapable(0)' indicates the link is capable of being
-            aggregated. 
-
-            The bit 'aggEnabled(1)' indicates the link is currently in
-            aggregation."
-    SYNTAX  BITS {
-            aggCapable(0),
-            aggEnabled(1)
-    }
+-- LLDP IEEE 802.1 extension MIB groups
+lldpXdot1Config     OBJECT IDENTIFIER ::= { lldpXdot1Objects 1 }
+lldpXdot1LocalData  OBJECT IDENTIFIER ::= { lldpXdot1Objects 2 }
+lldpXdot1RemoteData OBJECT IDENTIFIER ::= { lldpXdot1Objects 3 }
 
 ------------------------------------------------------------------------------
--- IEEE 802.3 - Configuration
+-- IEEE 802.1 - Configuration
 ------------------------------------------------------------------------------
+--
+-- lldpXdot1ConfigPortVlanTable : configure the transmission of the 
+--                                Port VLAN-ID TLVs on set of ports.
+--
 
-lldpXdot3PortConfigTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF LldpXdot3PortConfigEntry
+lldpXdot1ConfigPortVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1ConfigPortVlanEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "A table that controls selection of LLDP TLVs to be transmitted 
-            on individual ports."
-    ::= { lldpXdot3Config 1 }
+            "A table that controls selection of LLDP Port VLAN-ID TLVs
+            to be transmitted on individual ports."
+    ::= { lldpXdot1Config 1 }
 
-lldpXdot3PortConfigEntry  OBJECT-TYPE
-    SYNTAX      LldpXdot3PortConfigEntry
+lldpXdot1ConfigPortVlanEntry  OBJECT-TYPE
+    SYNTAX      LldpXdot1ConfigPortVlanEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
             "LLDP configuration information that controls the
-            transmission of IEEE 802.3 organizationally defined TLVs on
-            LLDP transmission capable ports.
+            transmission of IEEE 802.1 organizationally defined Port
+            VLAN-ID TLV on LLDP transmission capable ports.
 
             This configuration object augments the lldpPortConfigEntry of
             the LLDP-MIB, therefore it is only present along with the port
             configuration defined by the associated lldpPortConfigEntry
             entry.
 
-            Each active lldpXdot3PortConfigEntry must be from non-volatile
+            Each active lldpConfigEntry must be restored from non-volatile
             storage (along with the corresponding lldpPortConfigEntry)
             after a re-initialization of the management system."
     AUGMENTS { lldpPortConfigEntry }
-    ::= { lldpXdot3PortConfigTable 1 }
+    ::= { lldpXdot1ConfigPortVlanTable 1 }
 
-LldpXdot3PortConfigEntry ::= SEQUENCE {
-      lldpXdot3PortConfigTLVsTxEnable  BITS
+LldpXdot1ConfigPortVlanEntry ::= SEQUENCE {
+      lldpXdot1ConfigPortVlanTxEnable  TruthValue
 }
 
-lldpXdot3PortConfigTLVsTxEnable  OBJECT-TYPE
-    SYNTAX      BITS {
-            macPhyConfigStatus(0),
-            powerViaMDI(1),
-            linkAggregation(2),
-            maxFrameSize(3)
-    }
+lldpXdot1ConfigPortVlanTxEnable OBJECT-TYPE
+    SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-            "The lldpXdot3PortConfigTLVsTxEnable, defined as a bitmap,
-            includes the IEEE 802.3 organizationally defined set of LLDP
-            TLVs whose transmission is allowed on the local LLDP agent by
-            the network management.  Each bit in the bitmap corresponds
-            to an IEEE 802.3 subtype associated with a specific IEEE
-            802.3 optional TLV.  The bit 0 is not used since there is
-            no corresponding subtype.
-
-            The bit 'macPhyConfigStatus(0)' indicates that LLDP agent
-            should transmit 'MAC/PHY configuration/status TLV'.
-
-            The bit 'powerViaMDI(1)' indicates that LLDP agent should
-            transmit 'Power via MDI TLV'.
-
-            The bit 'linkAggregation(2)' indicates that LLDP agent should
-            transmit 'Link Aggregation TLV'.
-
-            The bit 'maxFrameSize(3)' indicates that LLDP agent should
-            transmit 'Maximum-frame-size TLV'.
-
-            The default value for lldpXdot3PortConfigTLVsTxEnable object
-            is an empty set, which means no enumerated values are set.
+            "The lldpXdot1ConfigPortVlanTxEnable, which is defined as
+            a truth value and configured by the network management,
+            determines whether the IEEE 802.1 organizationally defined
+            port VLAN TLV transmission is allowed on a given LLDP
+            transmission capable port.
 
             The value of this object must be restored from non-volatile
             storage after a re-initialization of the management system."
     REFERENCE 
             "IEEE 802.1AB-2005 10.2.1.1"
-    DEFVAL  { { } }
-    ::= { lldpXdot3PortConfigEntry  1 }
+    DEFVAL  { false }
+    ::= { lldpXdot1ConfigPortVlanEntry 1 }
 
+--
+-- lldpXdot1LocVlanNameTable : VLAN name information about the local system
+--
 
-------------------------------------------------------------------------------
--- IEEE 802.3 - Local Device Information 
-------------------------------------------------------------------------------
----
---- lldpXdot3LocPortTable: Ethernet Port AutoNeg/Speed/Duplex
----                        Information Table
----
----
-lldpXdot3LocPortTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF LldpXdot3LocPortEntry
+lldpXdot1LocVlanNameTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1LocVlanNameEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "This table contains one row per port of Ethernet port
-            information (as a part of the LLDP 802.3 organizational
-            extension) on the local system known to this agent."
-    ::= { lldpXdot3LocalData 1 }
+            "This table contains one or more rows per IEEE 802.1Q VLAN
+            name information on the local system known to this agent."
+    ::= { lldpXdot1LocalData 3 }
 
-lldpXdot3LocPortEntry OBJECT-TYPE
-    SYNTAX      LldpXdot3LocPortEntry
+lldpXdot1LocVlanNameEntry OBJECT-TYPE
+    SYNTAX      LldpXdot1LocVlanNameEntry 
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "Information about a particular port component."
-    INDEX   { lldpLocPortNum }
-    ::= { lldpXdot3LocPortTable 1 }
+            "VLAN name Information about a particular port component.
+            There may be multiple VLANs, identified by a particular
+            lldpXdot1LocVlanId, configured on the given port."
+    INDEX   { lldpLocPortNum,
+              lldpXdot1LocVlanId }
+    ::= { lldpXdot1LocVlanNameTable 1 }
 
-LldpXdot3LocPortEntry ::= SEQUENCE {
-              lldpXdot3LocPortAutoNegSupported     TruthValue,
-              lldpXdot3LocPortAutoNegEnabled       TruthValue,
-              lldpXdot3LocPortAutoNegAdvertisedCap OCTET STRING,
-              lldpXdot3LocPortOperMauType          Integer32
-} 
+LldpXdot1LocVlanNameEntry ::= SEQUENCE {
+      lldpXdot1LocVlanId     VlanId,
+      lldpXdot1LocVlanName   SnmpAdminString
+}
 
-lldpXdot3LocPortAutoNegSupported OBJECT-TYPE
+lldpXdot1LocVlanId  OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The integer value used to identify the IEEE 802.1Q 
+            VLAN IDs with which the given port is compatible."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.4.2"
+    ::= { lldpXdot1LocVlanNameEntry 1 }
+
+lldpXdot1LocVlanName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify VLAN name identified by the
+            Vlan Id associated with the given port on the local system.
+
+            This object should contain the value of the dot1QVLANStaticName
+            object (defined in IETF RFC 2674) identified with the given
+            lldpXdot1LocVlanId."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.4.4"
+    ::= { lldpXdot1LocVlanNameEntry 2 }
+
+--
+-- lldpXdot1ConfigVlanNameTable : configure the transmission of the 
+--                                VLAN name instances on set of ports.
+--
+
+lldpXdot1ConfigVlanNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1ConfigVlanNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table that controls selection of LLDP VLAN name TLV
+            instances to be transmitted on individual ports."
+    ::= { lldpXdot1Config 2 }
+
+lldpXdot1ConfigVlanNameEntry  OBJECT-TYPE
+    SYNTAX      LldpXdot1ConfigVlanNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "LLDP configuration information that specifies the set of
+            ports (represented as a PortList) on which the Local System
+            VLAN name instance will be transmitted.
+
+            This configuration object augments the lldpLocVlanEntry,
+            therefore it is only present along with the VLAN Name instance
+            contained in the associated lldpLocVlanNameEntry entry.
+
+            Each active lldpXdot1ConfigVlanNameEntry must be restored
+            from non-volatile storage (along with the corresponding
+            lldpXdot1LocVlanNameEntry) after a re-initialization of the
+            management system."
+    AUGMENTS { lldpXdot1LocVlanNameEntry }
+    ::= { lldpXdot1ConfigVlanNameTable 1 }
+
+LldpXdot1ConfigVlanNameEntry ::= SEQUENCE {
+      lldpXdot1ConfigVlanNameTxEnable  TruthValue 
+}
+
+lldpXdot1ConfigVlanNameTxEnable  OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "The boolean value that indicates whether the corresponding
+            Local System VLAN name instance will be transmitted on the
+            port defined by the given lldpXdot1LocVlanNameEntry.
+
+            The value of this object must be restored from non-volatile
+            storage after a re-initialization of the management system."
+    REFERENCE 
+            "IEEE 802.1AB-2005 10.2.1.1"
+    DEFVAL  { false }
+    ::= { lldpXdot1ConfigVlanNameEntry 1 }
+
+--
+-- lldpXdot1LocProtoVlanTable: Port and Protocol VLAN information 
+--
+
+lldpXdot1LocProtoVlanTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1LocProtoVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one or more rows per Port and Protocol
+            VLAN information about the local system."
+    ::= { lldpXdot1LocalData 2 }
+
+lldpXdot1LocProtoVlanEntry OBJECT-TYPE
+    SYNTAX      LldpXdot1LocProtoVlanEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Port and protocol VLAN ID Information about a particular
+            port component.  There may be multiple port and protocol VLANs,
+            identified by a particular lldpXdot1LocProtoVlanId, configured
+            on the given port."
+    INDEX   { lldpLocPortNum,
+              lldpXdot1LocProtoVlanId }
+    ::= { lldpXdot1LocProtoVlanTable 1 }
+
+LldpXdot1LocProtoVlanEntry ::= SEQUENCE {
+      lldpXdot1LocProtoVlanId        Integer32,
+      lldpXdot1LocProtoVlanSupported TruthValue,
+      lldpXdot1LocProtoVlanEnabled   TruthValue
+}
+
+lldpXdot1LocProtoVlanId  OBJECT-TYPE
+    SYNTAX      Integer32(0|1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The integer value used to identify the port and protocol
+            VLANs associated with the given port associated with the
+            local system.  A value of zero shall be used if the system
+            either does not know the protocol VLAN ID (PPVID) or does
+            not support port and protocol VLAN operation."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.3.2"
+    ::= { lldpXdot1LocProtoVlanEntry 1 }
+
+lldpXdot1LocProtoVlanSupported  OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
             "The truth value used to indicate whether the given port
-            (associated with the local system) supports Auto-negotiation."
+            (associated with the local system) supports port and protocol
+            VLANs."
     REFERENCE 
-            "IEEE 802.1AB-2005 G.2.1"
-    ::= { lldpXdot3LocPortEntry 1 }
+            "IEEE 802.1AB-2005 F.3.1"
+    ::= { lldpXdot1LocProtoVlanEntry 2 }
 
-lldpXdot3LocPortAutoNegEnabled  OBJECT-TYPE
+lldpXdot1LocProtoVlanEnabled  OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-            "The truth value used to indicate whether port
-            Auto-negotiation is enabled on the given port associated
-            with the local system."
+            "The truth value used to indicate whether the port and
+            protocol VLANs are enabled on the given port associated with
+            the local system."
     REFERENCE 
-            "IEEE 802.1AB-2005 G.2.1"
-    ::= { lldpXdot3LocPortEntry 2 }
+            "IEEE 802.1AB-2005 F.3.1"
+    ::= { lldpXdot1LocProtoVlanEntry 3 }
 
-lldpXdot3LocPortAutoNegAdvertisedCap OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(2))
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "This object contains the value (bitmap) of the
-            ifMauAutoNegCapAdvertisedBits object (defined in IETF RFC
-            3636) which is associated with the given port on the
-            local system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.2.2"
-    ::= { lldpXdot3LocPortEntry 3 }
+--
+-- lldpXdot1ConfigProtoVlanTable : configure the transmission of the 
+--                                 protocol VLAN instances on set
+--                                 of ports.
+--
 
-lldpXdot3LocPortOperMauType  OBJECT-TYPE
-    SYNTAX 	    Integer32(0..2147483647)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "An integer value that indicates the operational MAU type
-            of the given port on the local system.
-
-            This object contains the integer value derived from the
-            list position of the corresponding dot3MauType as listed 
-            in IETF RFC 3636 (or subsequent revisions) and is equal
-            to the last number in the respective dot3MauType OID.
-           
-            For example, if the ifMauType object is dot3MauType1000BaseTHD
-            which corresponds to {dot3MauType 29}, the numerical value of
-            this field will be 29. For MAU types not listed in RFC 3636
-            (or subsequent revisions), the value of this field shall be
-            set to zero."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.2.3"
-    ::= { lldpXdot3LocPortEntry 4 }
-
----
----
---- lldpXdot3LocPowerTable: Power Ethernet Information Table
----
----
-lldpXdot3LocPowerTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF LldpXdot3LocPowerEntry
+lldpXdot1ConfigProtoVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1ConfigProtoVlanEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "This table contains one row per port of power ethernet 
-            information (as a part of the LLDP 802.3 organizational
-            extension) on the local system known to this agent."
-    ::= { lldpXdot3LocalData 2 }
+            "The table that controls selection of LLDP Port and Protocol
+            VLAN ID TLV instances to be transmitted on individual ports."
+    ::= { lldpXdot1Config 3 }
 
-lldpXdot3LocPowerEntry OBJECT-TYPE
-    SYNTAX      LldpXdot3LocPowerEntry
+lldpXdot1ConfigProtoVlanEntry  OBJECT-TYPE
+    SYNTAX      LldpXdot1ConfigProtoVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "LLDP configuration information that specifies the set of
+            ports (represented as a PortList) on which the Local System
+            Protocol VLAN instance will be transmitted.
+
+            This configuration object augments the lldpXdot1LocVlanEntry,
+            therefore it is only present along with the Port and
+            Protocol VLAN ID instance contained in the associated
+            lldpXdot1LocVlanEntry entry.
+
+            Each active lldpXdot1ConfigProtoVlanEntry must be restored
+            from non-volatile storage (along with the corresponding
+            lldpXdot1LocProtoVlanEntry) after a re-initialization of
+            the management system."
+
+    AUGMENTS { lldpXdot1LocProtoVlanEntry }
+    ::= { lldpXdot1ConfigProtoVlanTable 1 }
+
+LldpXdot1ConfigProtoVlanEntry ::= SEQUENCE {
+      lldpXdot1ConfigProtoVlanTxEnable   TruthValue
+}
+
+lldpXdot1ConfigProtoVlanTxEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "The boolean value that indicates whether the corresponding
+            Local System Port and Protocol VLAN instance will
+            be transmitted on the port defined by the given
+            lldpXdot1LocProtoVlanEntry.
+
+            The value of this object must be restored from non-volatile
+            storage after a re-initialization of the management system."
+    REFERENCE 
+            "IEEE 802.1AB-2005 10.2.1.1"
+    DEFVAL  { false }
+    ::= { lldpXdot1ConfigProtoVlanEntry 1 }
+
+--
+-- lldpXdot1LocProtocolTable : Protocol Identity information 
+--
+
+lldpXdot1LocProtocolTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1LocProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one or more rows per protocol identity
+            information on the local system known to this agent."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.5"
+    ::= { lldpXdot1LocalData 4 }
+
+lldpXdot1LocProtocolEntry  OBJECT-TYPE
+    SYNTAX      LldpXdot1LocProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about particular protocols that are accessible
+            through the given port component.
+
+            There may be multiple protocols, identified by particular
+            lldpXdot1ProtocolIndex, and lldpLocPortNum."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.5"
+    INDEX   { lldpLocPortNum,
+              lldpXdot1LocProtocolIndex }
+    ::= { lldpXdot1LocProtocolTable 1 }
+
+LldpXdot1LocProtocolEntry ::= SEQUENCE {
+      lldpXdot1LocProtocolIndex Integer32,
+      lldpXdot1LocProtocolId    OCTET STRING
+}
+
+lldpXdot1LocProtocolIndex  OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object represents an arbitrary local integer value used
+            by this agent to identify a particular protocol identity."
+    ::= { lldpXdot1LocProtocolEntry 1 }
+
+lldpXdot1LocProtocolId  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The octet string value used to identify the protocols
+            associated with the given port of the local system."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.5.3"
+    ::= { lldpXdot1LocProtocolEntry 2 }
+
+--
+-- lldpXdot1ConfigProtocolTable : configure the transmission of the 
+--                                protocol instances on set
+--                                of ports.
+--
+
+lldpXdot1ConfigProtocolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1ConfigProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table that controls selection of LLDP Protocol 
+            TLV instances to be transmitted on individual ports."
+    ::= { lldpXdot1Config 4 }
+
+lldpXdot1ConfigProtocolEntry  OBJECT-TYPE
+    SYNTAX      LldpXdot1ConfigProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "LLDP configuration information that specifies the set of
+            ports (represented as a PortList) on which the Local System
+            Protocol instance will be transmitted.
+
+            This configuration object augments the lldpXdot1LocProtoEntry,
+            therefore it is only present along with the Protocol instance
+            contained in the associated lldpXdot1LocProtoEntry entry.
+
+            Each active lldpXdot1ConfigProtocolEntry must be restored
+            from non-volatile storage (along with the corresponding
+            lldpXdot1LocProtocolEntry) after a re-initialization of the
+            management system."
+    AUGMENTS { lldpXdot1LocProtocolEntry }
+    ::= { lldpXdot1ConfigProtocolTable 1 }
+
+LldpXdot1ConfigProtocolEntry ::= SEQUENCE {
+      lldpXdot1ConfigProtocolTxEnable   TruthValue
+}
+
+lldpXdot1ConfigProtocolTxEnable  OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "The boolean value that indicates whether the corresponding
+            Local System Protocol Identity instance will be transmitted
+            on the port defined by the given lldpXdot1LocProtocolEntry.
+
+            The value of this object must be restored from non-volatile
+            storage after a re-initialization of the management system."
+    REFERENCE 
+            "IEEE 802.1AB-2005 10.2.1.1"
+    DEFVAL  { false }
+    ::= { lldpXdot1ConfigProtocolEntry 1 }
+
+------------------------------------------------------------------------------
+-- IEEE 802.1 - Local System Information
+------------------------------------------------------------------------------
+lldpXdot1LocTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1LocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one row per port for IEEE 802.1
+            organizationally defined LLDP extension on the local system
+            known to this agent."
+    ::= { lldpXdot1LocalData 1 }
+
+lldpXdot1LocEntry  OBJECT-TYPE
+    SYNTAX      LldpXdot1LocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about IEEE 802.1 organizationally defined
+            LLDP extension."
+    INDEX   { lldpLocPortNum }
+    ::= { lldpXdot1LocTable 1 }
+
+LldpXdot1LocEntry ::= SEQUENCE {
+              lldpXdot1LocPortVlanId         Integer32
+} 
+
+lldpXdot1LocPortVlanId OBJECT-TYPE
+    SYNTAX      Integer32(0|1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The integer value used to identify the port's VLAN identifier
+            associated with the local system.   A value of zero shall
+            be used if the system either does not know the PVID or does
+            not support port-based VLAN operation."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.2.1"
+    ::= { lldpXdot1LocEntry 1 }
+
+------------------------------------------------------------------------------
+-- IEEE 802.1 - Remote System Information
+------------------------------------------------------------------------------
+lldpXdot1RemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1RemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one or more rows per physical network
+            connection known to this agent.  The agent may wish to
+            ensure that only one lldpXdot1RemEntry is present for
+            each local port, or it may choose to maintain multiple
+            lldpXdot1RemEntries for the same local port."
+    ::= { lldpXdot1RemoteData 1 }
+
+lldpXdot1RemEntry OBJECT-TYPE
+    SYNTAX      LldpXdot1RemEntry 
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
             "Information about a particular port component."
-    INDEX   { lldpLocPortNum }
-    ::= { lldpXdot3LocPowerTable 1 }
-
-LldpXdot3LocPowerEntry ::= SEQUENCE {
-              lldpXdot3LocPowerPortClass           LldpPowerPortClass,
-              lldpXdot3LocPowerMDISupported        TruthValue,
-              lldpXdot3LocPowerMDIEnabled          TruthValue,
-              lldpXdot3LocPowerPairControlable     TruthValue,
-              lldpXdot3LocPowerPairs               Integer32,
-              lldpXdot3LocPowerClass               Integer32
-} 
-
-lldpXdot3LocPowerPortClass  OBJECT-TYPE
-    SYNTAX      LldpPowerPortClass
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The value that identifies the port Class of the given port
-            associated with the local system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.1"
-    ::= { lldpXdot3LocPowerEntry 1 }
-
-lldpXdot3LocPowerMDISupported  OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The truth value used to indicate whether the MDI power is
-            supported on the given port associated with the local system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.1"
-    ::= { lldpXdot3LocPowerEntry 2 }
-
-lldpXdot3LocPowerMDIEnabled  OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The truth value used to identify whether MDI power is
-            enabled on the given port associated with the local system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.1"
-    ::= { lldpXdot3LocPowerEntry 3 }
-
-lldpXdot3LocPowerPairControlable  OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The truth value is derived from the value of
-            pethPsePortPowerPairsControlAbility object (defined in IETF
-            RFC 3621) and is used to indicate whether the pair selection
-            can be controlled on the given port associated with the
-            local system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.1"
-    ::= { lldpXdot3LocPowerEntry 4 }
-
-lldpXdot3LocPowerPairs  OBJECT-TYPE
-    SYNTAX      Integer32(1|2)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "This object contains the value of the pethPsePortPowerPairs
-            object (defined in IETF RFC 3621) which is associated with
-            the given port on the local system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.2"
-    ::= { lldpXdot3LocPowerEntry 5 }
-
-lldpXdot3LocPowerClass  OBJECT-TYPE
-    SYNTAX      Integer32(1|2|3|4|5)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "This object contains the value of the
-            pethPsePortPowerClassifications object (defined in IETF
-            RFC 3621) which is associated with the given port on the
-            local system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.3"
-    ::= { lldpXdot3LocPowerEntry 6 }
-
----
----
---- lldpXdot3LocLinkAggTable: Link Aggregation Information Table
----
----
-lldpXdot3LocLinkAggTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF LldpXdot3LocLinkAggEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "This table contains one row per port of link aggregation 
-            information (as a part of the LLDP 802.3 organizational
-            extension) on the local system known to this agent."
-    ::= { lldpXdot3LocalData 3 }
-
-lldpXdot3LocLinkAggEntry OBJECT-TYPE
-    SYNTAX      LldpXdot3LocLinkAggEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "Link Aggregation information about a particular port
-            component."
-    INDEX   { lldpLocPortNum }
-    ::= { lldpXdot3LocLinkAggTable 1 }
-
-LldpXdot3LocLinkAggEntry ::= SEQUENCE {
-              lldpXdot3LocLinkAggStatus       LldpLinkAggStatusMap,
-              lldpXdot3LocLinkAggPortId       Integer32
-} 
-
-lldpXdot3LocLinkAggStatus OBJECT-TYPE
-    SYNTAX      LldpLinkAggStatusMap
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The bitmap value contains the link aggregation capabilities
-            and the current aggregation status of the link."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.4.1"
-    ::= { lldpXdot3LocLinkAggEntry 1 }
-
-lldpXdot3LocLinkAggPortId OBJECT-TYPE
-    SYNTAX 	    Integer32(0|1..2147483647)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "This object contains the IEEE 802.3 aggregated port
-            identifier, aAggPortID (IEEE 802.3-2002, 30.7.2.1.1),
-            derived from the ifNumber of the ifIndex for the port
-            component in link aggregation.
-
-            If the port is not in link aggregation state and/or it
-            does not support link aggregation, this value should be set
-            to zero."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.4.2"
-    ::= { lldpXdot3LocLinkAggEntry 2 }
-
----
----
---- lldpXdot3LocMaxFrameSizeTable: Maximum Frame Size information 
----
----
-lldpXdot3LocMaxFrameSizeTable  OBJECT-TYPE
-    SYNTAX      SEQUENCE OF LldpXdot3LocMaxFrameSizeEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "This table contains one row per port of maximum frame 
-            size information (as a part of the LLDP 802.3 organizational
-            extension) on the local system known to this agent."
-    ::= { lldpXdot3LocalData 4 }
-
-lldpXdot3LocMaxFrameSizeEntry OBJECT-TYPE
-    SYNTAX      LldpXdot3LocMaxFrameSizeEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "Maximum Frame Size information about a particular port
-            component."
-    INDEX   { lldpLocPortNum }
-    ::= { lldpXdot3LocMaxFrameSizeTable 1 }
-
-LldpXdot3LocMaxFrameSizeEntry ::= SEQUENCE {
-              lldpXdot3LocMaxFrameSize   Integer32
-} 
-
-lldpXdot3LocMaxFrameSize OBJECT-TYPE
-    SYNTAX      Integer32(0..65535)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "An integer value indicating the maximum supported frame 
-             size in octets on the given port of the local system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.5.1"
-    ::= { lldpXdot3LocMaxFrameSizeEntry 1 }
-
-
-------------------------------------------------------------------------------
--- IEEE 802.3 - Remote Devices Information
-------------------------------------------------------------------------------
----
----
---- lldpXdot3RemPortTable: Ethernet Information Table
----
----
-lldpXdot3RemPortTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF LldpXdot3RemPortEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "This table contains Ethernet port information (as a part
-            of the LLDP 802.3 organizational extension) of the remote
-            system."
-    ::= { lldpXdot3RemoteData 1 }
-
-lldpXdot3RemPortEntry OBJECT-TYPE
-    SYNTAX      LldpXdot3RemPortEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "Information about a particular physical network connection."
     INDEX   { lldpRemTimeMark,
               lldpRemLocalPortNum,
               lldpRemIndex }
-    ::= { lldpXdot3RemPortTable 1 }
+    ::= { lldpXdot1RemTable 1 }
 
-LldpXdot3RemPortEntry ::= SEQUENCE {
-              lldpXdot3RemPortAutoNegSupported     TruthValue,
-              lldpXdot3RemPortAutoNegEnabled       TruthValue,
-              lldpXdot3RemPortAutoNegAdvertisedCap OCTET STRING,
-              lldpXdot3RemPortOperMauType          Integer32
-} 
+LldpXdot1RemEntry ::= SEQUENCE {
+              lldpXdot1RemPortVlanId         Integer32
+}
 
-lldpXdot3RemPortAutoNegSupported OBJECT-TYPE
+lldpXdot1RemPortVlanId OBJECT-TYPE
+    SYNTAX      Integer32(0|1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The integer value used to identify the port's VLAN identifier
+            associated with the remote system.  if the remote system
+            either does not know the PVID or does not support port-based
+            VLAN operation, the value of lldpXdot1RemPortVlanId should
+            be zero."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.2.1"
+    ::= { lldpXdot1RemEntry 1 }
+
+lldpXdot1RemProtoVlanTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1RemProtoVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one or more rows per Port and Protocol
+            VLAN information about the remote system, received on the
+            given port."
+    ::= { lldpXdot1RemoteData 2 }
+
+lldpXdot1RemProtoVlanEntry OBJECT-TYPE
+    SYNTAX      LldpXdot1RemProtoVlanEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Port and protocol VLAN name Information about a particular
+            port component.  There may be multiple protocol VLANs,
+            identified by a particular lldpXdot1RemProtoVlanId, configured
+            on the remote system."
+    INDEX   { lldpRemTimeMark,
+              lldpRemLocalPortNum,
+              lldpRemIndex,
+              lldpXdot1RemProtoVlanId }
+    ::= { lldpXdot1RemProtoVlanTable 1 }
+
+LldpXdot1RemProtoVlanEntry ::= SEQUENCE {
+      lldpXdot1RemProtoVlanId        Integer32,
+      lldpXdot1RemProtoVlanSupported TruthValue,
+      lldpXdot1RemProtoVlanEnabled   TruthValue
+}
+
+lldpXdot1RemProtoVlanId  OBJECT-TYPE
+    SYNTAX      Integer32(0|1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The integer value used to identify the port and protocol
+            VLANs associated with the given port associated with the
+            remote system.
+
+            If port and protocol VLANs are not supported on the given
+            port associated with the remote system, or if the port is
+            not enabled with any port and protocol VLAN, the value of
+            lldpXdot1RemProtoVlanId should be zero."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.3.2"
+    ::= { lldpXdot1RemProtoVlanEntry 1 }
+
+lldpXdot1RemProtoVlanSupported  OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
             "The truth value used to indicate whether the given port
-            (associated with remote system) supports Auto-negotiation."
+            (associated with the remote system) is capable of supporting
+            port and protocol VLANs."
     REFERENCE 
-            "IEEE 802.1AB-2005 G.2.1"
-    ::= { lldpXdot3RemPortEntry 1 }
+            "IEEE 802.1AB-2005 F.3.1"
+    ::= { lldpXdot1RemProtoVlanEntry 2 }
 
-lldpXdot3RemPortAutoNegEnabled  OBJECT-TYPE
+lldpXdot1RemProtoVlanEnabled  OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-            "The truth value used to indicate whether port
-            Auto-negotiation is enabled on the given port associated
-            with the remote system."
+            "The truth value used to indicate whether the port and
+            protocol VLANs are enabled on the given port associated with
+            the remote system."
     REFERENCE 
-            "IEEE 802.1AB-2005 G.2.1"
-    ::= { lldpXdot3RemPortEntry 2 }
+            "IEEE 802.1AB-2005 F.3.1"
+    ::= { lldpXdot1RemProtoVlanEntry 3 }
 
-lldpXdot3RemPortAutoNegAdvertisedCap  OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(2))
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "This object contains the value (bitmap) of the
-            ifMauAutoNegCapAdvertisedBits object (defined in IETF RFC
-            3636) which is associated with the given port on the
-            remote system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.2.2"
-    ::= { lldpXdot3RemPortEntry 3 }
 
-lldpXdot3RemPortOperMauType OBJECT-TYPE
-    SYNTAX 	    Integer32(0..2147483647)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "An integer value that indicates the operational MAU type
-            of the sending device.
+-- 
+-- lldpXdot1RemVlanNameTable : VLAN name information of the remote 
+--                             systems
+--
 
-            This object contains the integer value derived from the
-            list position of the corresponding dot3MauType as listed in
-            in IETF RFC 3636 (or subsequent revisions) and is equal
-            to the last number in the respective dot3MauType OID.
-           
-            For example, if the ifMauType object is dot3MauType1000BaseTHD
-            which corresponds to {dot3MauType 29}, the numerical value of
-            this field will be 29. For MAU types not listed in RFC 3636
-            (or subsequent revisions), the value of this field shall be
-            set to zero."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.2.3"
-    ::= { lldpXdot3RemPortEntry 4 }
-
----
----
---- lldpXdot3RemPowerTable: Power Ethernet Information Table
----
----
-lldpXdot3RemPowerTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF LldpXdot3RemPowerEntry
+lldpXdot1RemVlanNameTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1RemVlanNameEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "This table contains Ethernet power information (as a part
-            of the LLDP 802.3 organizational extension) of the remote
-            system."
-    ::= { lldpXdot3RemoteData 2 }
+            "This table contains one or more rows per IEEE 802.1Q VLAN
+            name information about the remote system, received on the
+            given port."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.4"
+    ::= { lldpXdot1RemoteData 3 }
 
-lldpXdot3RemPowerEntry OBJECT-TYPE
-    SYNTAX      LldpXdot3RemPowerEntry
+lldpXdot1RemVlanNameEntry OBJECT-TYPE
+    SYNTAX      LldpXdot1RemVlanNameEntry 
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "Information about a particular physical network connection."
+            "VLAN name Information about a particular port component.
+            There may be multiple VLANs, identified by a particular
+            lldpXdot1RemVlanId, received on the given port."
     INDEX   { lldpRemTimeMark,
               lldpRemLocalPortNum,
-              lldpRemIndex }
-    ::= { lldpXdot3RemPowerTable 1 }
+              lldpRemIndex,
+              lldpXdot1RemVlanId }
+    ::= { lldpXdot1RemVlanNameTable 1 }
 
-LldpXdot3RemPowerEntry ::= SEQUENCE {
-              lldpXdot3RemPowerPortClass           LldpPowerPortClass,
-              lldpXdot3RemPowerMDISupported        TruthValue,
-              lldpXdot3RemPowerMDIEnabled          TruthValue,
-              lldpXdot3RemPowerPairControlable     TruthValue,
-              lldpXdot3RemPowerPairs               Integer32,
-              lldpXdot3RemPowerClass               Integer32
-} 
+LldpXdot1RemVlanNameEntry ::= SEQUENCE {
+      lldpXdot1RemVlanId     VlanId,
+      lldpXdot1RemVlanName   SnmpAdminString
+}
 
-lldpXdot3RemPowerPortClass  OBJECT-TYPE
-    SYNTAX      LldpPowerPortClass
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The value that identifies the port Class of the given port
-            associated with the remote system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.1"
-    ::= { lldpXdot3RemPowerEntry 1 }
-
-lldpXdot3RemPowerMDISupported  OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The truth value used to indicate whether the MDI power
-            is supported on the given port associated with the remote
-            system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.1"
-    ::= { lldpXdot3RemPowerEntry 2 }
-
-lldpXdot3RemPowerMDIEnabled  OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The truth value used to identify whether MDI power is
-            enabled on the given port associated with the remote system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.1"
-    ::= { lldpXdot3RemPowerEntry 3 }
-
-lldpXdot3RemPowerPairControlable  OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The truth value is derived from the value of
-            pethPsePortPowerPairsControlAbility object (defined in IETF
-            RFC 3621) and is used to indicate whether the pair selection
-            can be controlled on the given port associated with the
-            remote system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.1"
-    ::= { lldpXdot3RemPowerEntry 4 }
-
-lldpXdot3RemPowerPairs  OBJECT-TYPE
-    SYNTAX      Integer32(1|2)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "This object contains the value of the pethPsePortPowerPairs
-            object (defined in IETF RFC 3621) which is associated with
-            the given port on the remote system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.2"
-    ::= { lldpXdot3RemPowerEntry 5 }
-
-lldpXdot3RemPowerClass  OBJECT-TYPE
-    SYNTAX      Integer32(1|2|3|4|5)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "This object contains the value of the
-            pethPsePortPowerClassifications object (defined in IETF
-            RFC 3621) which is associated with the given port on the
-            remote system."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.3.3"
-    ::= { lldpXdot3RemPowerEntry 6 }
-
----
----
---- lldpXdot3RemLinkAggTable: Link Aggregation Information Table
----
----
-lldpXdot3RemLinkAggTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF LldpXdot3RemLinkAggEntry
+lldpXdot1RemVlanId  OBJECT-TYPE
+    SYNTAX      VlanId
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "This table contains port link aggregation information
-            (as a part of the LLDP 802.3 organizational extension)
-            of the remote system."
-    ::= { lldpXdot3RemoteData 3 }
+            "The integer value used to identify the IEEE 802.1Q 
+            VLAN IDs with which the given port of the remote system
+            is compatible."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.4.2"
+    ::= { lldpXdot1RemVlanNameEntry 1 }
 
-lldpXdot3RemLinkAggEntry OBJECT-TYPE
-    SYNTAX      LldpXdot3RemLinkAggEntry
+lldpXdot1RemVlanName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string value used to identify VLAN name identified by the 
+            VLAN Id associated with the remote system."
+    REFERENCE 
+            "IEEE 802.1AB-2005 F.4.4"
+    ::= { lldpXdot1RemVlanNameEntry 2 }
+
+--
+-- lldpXdot1RemProtocolTable : Protocol information of the remote systems
+--
+
+lldpXdot1RemProtocolTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LldpXdot1RemProtocolEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "Link Aggregation information about remote system's port
-            component."
+            "This table contains one or more rows per protocol information
+            about the remote system, received on the given port."
+    ::= { lldpXdot1RemoteData 4 }
+
+lldpXdot1RemProtocolEntry  OBJECT-TYPE
+    SYNTAX      LldpXdot1RemProtocolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Protocol information about a particular port component.
+            There may be multiple protocols, identified by a particular
+            lldpXdot1ProtocolIndex, received on the given port."
     INDEX   { lldpRemTimeMark,
               lldpRemLocalPortNum,
-              lldpRemIndex }
-    ::= { lldpXdot3RemLinkAggTable 1 }
+              lldpRemIndex,
+              lldpXdot1RemProtocolIndex }
+    ::= { lldpXdot1RemProtocolTable 1 }
 
-LldpXdot3RemLinkAggEntry ::= SEQUENCE {
-              lldpXdot3RemLinkAggStatus       LldpLinkAggStatusMap,
-              lldpXdot3RemLinkAggPortId       Integer32
-} 
+LldpXdot1RemProtocolEntry ::= SEQUENCE {
+      lldpXdot1RemProtocolIndex Integer32,
+      lldpXdot1RemProtocolId    OCTET STRING
+}
 
-lldpXdot3RemLinkAggStatus OBJECT-TYPE
-    SYNTAX      LldpLinkAggStatusMap
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The bitmap value contains the link aggregation capabilities
-            and the current aggregation status of the link."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.4.1"
-    ::= { lldpXdot3RemLinkAggEntry 1 }
-
-lldpXdot3RemLinkAggPortId OBJECT-TYPE
-    SYNTAX 	    Integer32(0|1..2147483647)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "This object contains the IEEE 802.3 aggregated port
-            identifier, aAggPortID (IEEE 802.3-2002, 30.7.2.1.1),
-            derived from the ifNumber of the ifIndex for the port
-            component associated with the remote system.
-
-            If the remote port is not in link aggregation state and/or
-            it does not support link aggregation, this value should be
-            zero."
-    REFERENCE 
-            "IEEE 802.1AB-2005 G.4.2"
-    ::= { lldpXdot3RemLinkAggEntry 2 }
-
-
----
----
---- lldpXdot3RemMaxFrameSizeTable: Maximum Frame Size information 
----
----
-lldpXdot3RemMaxFrameSizeTable  OBJECT-TYPE
-    SYNTAX      SEQUENCE OF LldpXdot3RemMaxFrameSizeEntry
+lldpXdot1RemProtocolIndex  OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "This table contains one row per port of maximum frame 
-            size information (as a part of the LLDP 802.3 organizational
-            extension) of the remote system."
-    ::= { lldpXdot3RemoteData 4 }
+            "This object represents an arbitrary local integer value used
+            by this agent to identify a particular protocol identity."
+    ::= { lldpXdot1RemProtocolEntry 1 }
 
-lldpXdot3RemMaxFrameSizeEntry OBJECT-TYPE
-    SYNTAX      LldpXdot3RemMaxFrameSizeEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "Maximum Frame Size information about a particular port
-            component."
-    INDEX   { lldpRemTimeMark,
-              lldpRemLocalPortNum,
-              lldpRemIndex }
-    ::= { lldpXdot3RemMaxFrameSizeTable 1 }
-
-LldpXdot3RemMaxFrameSizeEntry ::= SEQUENCE {
-              lldpXdot3RemMaxFrameSize   Integer32
-} 
-
-lldpXdot3RemMaxFrameSize OBJECT-TYPE
-    SYNTAX      Integer32(0..65535)
+lldpXdot1RemProtocolId  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..255))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-            "An integer value indicating the maximum supported frame 
-             size in octets on the port component associated with the 
-             remote system."
+            "The octet string value used to identify the protocols
+            associated with the given port of remote system."
     REFERENCE 
-            "IEEE 802.1AB-2005 G.5.1"
-    ::= { lldpXdot3RemMaxFrameSizeEntry 1 }
+            "IEEE 802.1AB-2005 F.5.3"
+    ::= { lldpXdot1RemProtocolEntry 2 }
 
 
 ------------------------------------------------------------------------------
 -- Conformance Information
 ------------------------------------------------------------------------------
-lldpXdot3Conformance OBJECT IDENTIFIER ::= { lldpXdot3MIB 2 }
-lldpXdot3Compliances OBJECT IDENTIFIER ::= { lldpXdot3Conformance 1 }
-lldpXdot3Groups      OBJECT IDENTIFIER ::= { lldpXdot3Conformance 2 }
+
+lldpXdot1Conformance OBJECT IDENTIFIER ::= { lldpXdot1MIB 2 }
+lldpXdot1Compliances OBJECT IDENTIFIER ::= { lldpXdot1Conformance 1 }
+lldpXdot1Groups      OBJECT IDENTIFIER ::= { lldpXdot1Conformance 2 }
 
 -- compliance statements
 
-lldpXdot3Compliance MODULE-COMPLIANCE
+lldpXdot1Compliance MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION
             "The compliance statement for SNMP entities which implement
-            the LLDP 802.3 organizational extension MIB."
+            the IEEE 802.1 organizationally defined LLDP extension MIB."
     MODULE  -- this module
-        MANDATORY-GROUPS { lldpXdot3ConfigGroup, 
-                           lldpXdot3LocSysGroup,
-                           lldpXdot3RemSysGroup
+        MANDATORY-GROUPS { lldpXdot1ConfigGroup, 
+                           lldpXdot1LocSysGroup,
+                           lldpXdot1RemSysGroup
         }
-    ::= { lldpXdot3Compliances 1 }
+    ::= { lldpXdot1Compliances 1 }
 
 -- MIB groupings
 
-lldpXdot3ConfigGroup    OBJECT-GROUP
+lldpXdot1ConfigGroup    OBJECT-GROUP
     OBJECTS {
-        lldpXdot3PortConfigTLVsTxEnable
+        lldpXdot1ConfigPortVlanTxEnable,
+        lldpXdot1ConfigVlanNameTxEnable,
+        lldpXdot1ConfigProtoVlanTxEnable,
+        lldpXdot1ConfigProtocolTxEnable
     }
     STATUS  current
     DESCRIPTION
             "The collection of objects which are used to configure the
-            LLDP 802.3 organizational extension implementation behavior.
+            IEEE 802.1 organizationally defined LLDP extension
+            implementation behavior.
 
             This group is mandatory for agents which implement the 
-            LLDP 802.3 organizational extension."
-    ::= { lldpXdot3Groups 1 }
+            IEEE 802.1 organizationally defined LLDP extension."
+    ::= { lldpXdot1Groups 1 }
 
-lldpXdot3LocSysGroup  OBJECT-GROUP
+lldpXdot1LocSysGroup  OBJECT-GROUP
     OBJECTS {
-        lldpXdot3LocPortAutoNegSupported,
-        lldpXdot3LocPortAutoNegEnabled,
-        lldpXdot3LocPortAutoNegAdvertisedCap,
-        lldpXdot3LocPortOperMauType,
-        lldpXdot3LocPowerPortClass,
-        lldpXdot3LocPowerMDISupported,
-        lldpXdot3LocPowerMDIEnabled,
-        lldpXdot3LocPowerPairControlable,
-        lldpXdot3LocPowerPairs,
-        lldpXdot3LocPowerClass,
-        lldpXdot3LocLinkAggStatus,
-        lldpXdot3LocLinkAggPortId,
-        lldpXdot3LocMaxFrameSize
+        lldpXdot1LocPortVlanId,
+        lldpXdot1LocProtoVlanSupported,
+        lldpXdot1LocProtoVlanEnabled,
+        lldpXdot1LocVlanName,
+        lldpXdot1LocProtocolId 
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to represent 
+            IEEE 802.1 organizationally defined LLDP extension associated
+            with the Local Device Information.
+            
+            This group is mandatory for agents which implement the 
+            IEEE 802.1 organizationally defined LLDP extension in the
+            TX mode."
+    ::= { lldpXdot1Groups 2 }
+
+lldpXdot1RemSysGroup  OBJECT-GROUP
+    OBJECTS {
+        lldpXdot1RemPortVlanId,
+        lldpXdot1RemProtoVlanSupported,
+        lldpXdot1RemProtoVlanEnabled,
+        lldpXdot1RemVlanName,
+        lldpXdot1RemProtocolId 
     }
     STATUS  current
     DESCRIPTION
             "The collection of objects which are used to represent LLDP
-            802.3 organizational extension Local Device Information.
+            802.1 organizational extension Local Device Information.
             
             This group is mandatory for agents which implement the 
-            LLDP 802.3 organizational extension in the TX mode."
-    ::= { lldpXdot3Groups 2 }
-
-lldpXdot3RemSysGroup  OBJECT-GROUP
-    OBJECTS {
-        lldpXdot3RemPortAutoNegSupported,
-        lldpXdot3RemPortAutoNegEnabled,
-        lldpXdot3RemPortAutoNegAdvertisedCap,
-        lldpXdot3RemPortOperMauType,
-        lldpXdot3RemPowerPortClass,
-        lldpXdot3RemPowerMDISupported,
-        lldpXdot3RemPowerMDIEnabled,
-        lldpXdot3RemPowerPairControlable,
-        lldpXdot3RemPowerPairs,
-        lldpXdot3RemPowerClass,
-        lldpXdot3RemLinkAggStatus,
-        lldpXdot3RemLinkAggPortId,
-        lldpXdot3RemMaxFrameSize
-    }
-    STATUS  current
-    DESCRIPTION
-            "The collection of objects which are used to represent LLDP
-            802.3 organizational extension Local Device Information.
-            
-            This group is mandatory for agents which implement the 
-            LLDP 802.3 organizational extension in the RX mode."
-    ::= { lldpXdot3Groups 3 }
+            LLDP 802.1 organizational extension in the RX mode."
+    ::= { lldpXdot1Groups 3 }
 
 END

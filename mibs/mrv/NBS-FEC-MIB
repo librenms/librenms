@@ -1,0 +1,138 @@
+NBS-FEC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB;
+
+nbsFecMib  MODULE-IDENTITY
+    LAST-UPDATED "201504290000Z"  -- April 29, 2015
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+    DESCRIPTION
+      "Forward Error Correction"
+    ::= { nbs 232 }
+
+-- *******************************************************************
+-- NBS-FEC-MIB textual conventions
+-- *******************************************************************
+
+NbsFecCode  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Particular FEC Algorithm/Code"
+    SYNTAX      INTEGER {
+        notSupported (0),
+        noFec        (1),
+        zero         (2),
+        gfec         (3),
+        ufec7        (4),
+        ufec10       (5),
+        ufec25       (6),
+        hgfec7       (7),
+        sdfec0       (8),
+        sdfec1       (9),
+        sdfec2       (10),
+        sdfec3       (11),
+        g975i4       (12),
+        g975i7       (13),
+        xfec7        (14),
+        sdfec15      (15)
+    }
+
+-- *******************************************************************
+-- NBS-FEC-MIB groups
+-- *******************************************************************
+
+nbsFecCfgGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "FEC configuration"
+    ::= { nbsFecMib 1 }
+
+
+-- *******************************************************************
+--
+-- the nbsFecCfgGrp
+--
+-- *******************************************************************
+
+
+nbsFecCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsFecCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "FEC settings for all supported ports"
+    ::= { nbsFecCfgGrp  1 }
+
+nbsFecCfgEntry OBJECT-TYPE
+    SYNTAX          NbsFecCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "FEC settings for an individual port"
+    INDEX { nbsFecCfgIfIndex }
+    ::= { nbsFecCfgTable 1 }
+
+NbsFecCfgEntry ::= SEQUENCE {
+    nbsFecCfgIfIndex        InterfaceIndex,
+    nbsFecCfgCodeCaps       OCTET STRING,
+    nbsFecCfgCodeAdmin      NbsFecCode,
+    nbsFecCfgCodeOper       NbsFecCode
+}
+
+nbsFecCfgIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The mib2 ifIndex"
+    ::= { nbsFecCfgEntry 1 }
+
+nbsFecCfgCodeCaps OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(3))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This bitmask indicates which FEC codes this port can
+        support.
+
+        Bit 0 is reserved.
+
+        Subsequent bits refer to the NbsFecCode enumerated list.  Bit 1
+        corresponds to none(1), Bit 2 to zero(2) enumeration,
+        and so on.  A bit is set (1) if that code is appropriate
+        for this module, cleared (0) if unavailable.
+
+        OCTET STRING bitmasks count the leftmost bit (MSB) as 0."
+    ::= { nbsFecCfgEntry 2 }
+
+nbsFecCfgCodeAdmin OBJECT-TYPE
+    SYNTAX          NbsFecCode
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "The administratively desired Forward Error Correction code"
+    ::= { nbsFecCfgEntry 3 }
+
+
+nbsFecCfgCodeOper OBJECT-TYPE
+    SYNTAX          NbsFecCode
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The operationally active Forward Error Correction code"
+    ::= { nbsFecCfgEntry 4}
+
+
+END

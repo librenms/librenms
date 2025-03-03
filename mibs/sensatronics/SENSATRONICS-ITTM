@@ -1,0 +1,568 @@
+-- *****************************************************************
+-- SENSATRONICS-ITTM.TXT:  MIB corresponding to ITTM firmware v3.0
+-- 
+-- February 2004  Andrew F. Thompson--
+-- Copyright (c) 2004 by Sensatronics LLC
+-- All rights reserved.-- 
+-- *****************************************************************
+SENSATRONICS-ITTM DEFINITIONS ::= BEGIN
+IMPORTS
+        MODULE-IDENTITY,        
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        IpAddress,
+        TimeTicks        
+        FROM SNMPv2-SMI        
+        DisplayString        
+        FROM SNMPv2-TC        
+        envMonitors      
+        FROM SENSATRONICS-SMI;
+
+productITTM MODULE-IDENTITY
+        LAST-UPDATED "200402230900Z"
+        ORGANIZATION "Sensatronics LLC"
+        CONTACT-INFO
+         "Sensatronics LLC
+          Postal: 20A Dunklee Road
+                  Bow, NH 03304
+                  USA
+          Tel: +1 603 224 0617
+          E-mail: dthompson@sensatronics.com"
+        DESCRIPTION
+                "Description of ITTM code."
+        REVISION	"200402230900Z"
+        DESCRIPTION
+                "Initial version of this MIB module."        
+::= { envMonitors 1 }
+
+unitInfo OBJECT IDENTIFIER ::= { productITTM 1 } -- Unit info for the IT Temperature Monitor being accessed.
+configData OBJECT IDENTIFIER ::= { productITTM 2 } -- Config data for the IT Temperature Monitor being accessed.
+sensorInfo OBJECT IDENTIFIER ::= { productITTM 3 } -- Sensor data for the IT Temperature Monitor being accessed.
+unitName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (32))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "A user-definable unit name for the module being managed."        
+::= { unitInfo 1 }
+
+unitModel OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The model number of the module being managed."        
+::= { unitInfo 2 }
+
+unitManufacturer OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (12))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Company name of unit producer."        
+::= { unitInfo 3 }
+
+unitWeb OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (28))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Website of manufacturer"        
+::= { unitInfo 4 }
+
+unitFirmware OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION                "Firmware revision of unit."        
+::= { unitInfo 5 }
+
+unitFWReleaseDate OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (18))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Release date of unit firmware."        
+::= { unitInfo 6 }
+
+unitSerial OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (32))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Serial number of unit being managed."        
+::= { unitInfo 7 }
+
+unitConfig OBJECT-TYPE
+        SYNTAX     INTEGER (0..1)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "In-house configuration MIB - do not use."        
+::= { unitInfo 8 }
+
+netInfo OBJECT IDENTIFIER ::= { configData 1 }  -- Network info for unit
+trapConfig OBJECT IDENTIFIER ::= { configData 2 }  -- Trap setup for unit
+measurementSystem OBJECT IDENTIFIER ::= { configData 3 }  -- Configuration of system of units
+
+netMode OBJECT-TYPE
+	SYNTAX
+	INTEGER (0..1)	
+      MAX-ACCESS read-only
+	STATUS	   current
+	DESCRIPTION
+		"1 if the unit is self-configuring via DHCP, 0 if static IP assigned."  	
+::= { netInfo 1 }
+
+netIP OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "IP address of unit being managed."        
+::= { netInfo 2 }
+
+netNM OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Netmask of unit being managed."        
+::= { netInfo 3 }
+
+netGW OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Gateway of unit being managed."        
+::= { netInfo 4 }
+
+netHTTPPort OBJECT-TYPE
+	SYNTAX	   INTEGER (0..65535)
+	MAX-ACCESS read-write
+	STATUS	   current
+	DESCRIPTION
+		"Port the unit webserver listens on"  	
+::= { netInfo 5 }
+
+managerConfig OBJECT IDENTIFIER ::= { trapConfig 1 }  -- Trap manager setup for unit
+
+unitMode OBJECT-TYPE
+	SYNTAX	   INTEGER (0..1)
+	MAX-ACCESS read-write
+	STATUS	   current
+	DESCRIPTION
+		"Set to 0 for Celsius units in probe data, 1 for Fahrenheit, other values disallowed."  	
+::= { measurementSystem 1 }
+
+managerIP OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "IP of trap manager."        
+::= { managerConfig 1 }
+
+sensor1 OBJECT IDENTIFIER ::= { sensorInfo 1 }  -- 16 sensors
+sensor2 OBJECT IDENTIFIER ::= { sensorInfo 2 }
+sensor3 OBJECT IDENTIFIER ::= { sensorInfo 3 }
+sensor4 OBJECT IDENTIFIER ::= { sensorInfo 4 }
+sensor5 OBJECT IDENTIFIER ::= { sensorInfo 5 }
+sensor6 OBJECT IDENTIFIER ::= { sensorInfo 6 }
+sensor7 OBJECT IDENTIFIER ::= { sensorInfo 7 }
+sensor8 OBJECT IDENTIFIER ::= { sensorInfo 8 }
+sensor9 OBJECT IDENTIFIER ::= { sensorInfo 9 }
+sensor10 OBJECT IDENTIFIER ::= { sensorInfo 10 }
+sensor11 OBJECT IDENTIFIER ::= { sensorInfo 11 }
+sensor12 OBJECT IDENTIFIER ::= { sensorInfo 12 }
+sensor13 OBJECT IDENTIFIER ::= { sensorInfo 13 }
+sensor14 OBJECT IDENTIFIER ::= { sensorInfo 14 }
+sensor15 OBJECT IDENTIFIER ::= { sensorInfo 15 }
+sensor16 OBJECT IDENTIFIER ::= { sensorInfo 16 }
+
+sensor1Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 1 - User configurable, 16 characters"        
+::= { sensor1 1 }
+
+sensor1DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 1, string format, to 1 decimal place"        
+::= { sensor1 2 }
+
+sensor1DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 1, integer format, no decimal places"        
+::= { sensor1 3 }
+
+sensor2Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 2 - User configurable, 16 characters"        
+::= { sensor2 1 }
+
+sensor2DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 2, string format, to 1 decimal place"        
+::= { sensor2 2 }
+
+sensor2DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 2, integer format, no decimal places"        
+::= { sensor2 3 }
+
+sensor3Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 3 - User configurable, 16 characters"        
+::= { sensor3 1 }
+
+sensor3DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 3, string format, to 1 decimal place"        
+::= { sensor3 2 }
+
+sensor3DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 3, integer format, no decimal places"        
+::= { sensor3 3 }
+
+sensor4Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 4 - User configurable, 16 characters"        
+::= { sensor4 1 }
+
+sensor4DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION 
+                "Data from sensor 4, string format, to 1 decimal place"        
+::= { sensor4 2 }
+
+sensor4DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 4, integer format, no decimal places"        
+::= { sensor4 3 }
+
+sensor5Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 5 - User configurable, 16 characters"        
+::= { sensor5 1 }
+
+sensor5DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 5, string format, to 1 decimal place"        
+::= { sensor5 2 }
+
+sensor5DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 5, integer format, no decimal places"        
+::= { sensor5 3 }
+
+sensor6Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 6 - User configurable, 16 characters"        
+::= { sensor6 1 }
+
+sensor6DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 6, string format, to 1 decimal place"        
+::= { sensor6 2 }
+
+sensor6DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 6, integer format, no decimal places"        
+::= { sensor6 3 }
+
+sensor7Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 7 - User configurable, 16 characters"        
+::= { sensor7 1 }
+
+sensor7DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 7, string format, to 1 decimal place"        
+::= { sensor7 2 }
+
+sensor7DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 7, integer format, no decimal places"        
+::= { sensor7 3 }
+
+sensor8Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 8 - User configurable, 16 characters"        
+::= { sensor8 1 }
+
+sensor8DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 8, string format, to 1 decimal place"        
+::= { sensor8 2 }
+
+sensor8DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 8, integer format, no decimal places"        
+::= { sensor8 3 }
+
+sensor9Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 9 - User configurable, 16 characters"        
+::= { sensor9 1 }
+
+sensor9DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 9, string format, to 1 decimal place"        
+::= { sensor9 2 }
+
+sensor9DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 9, integer format, no decimal places"        
+::= { sensor9 3 }
+
+sensor10Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 10 - User configurable, 16 characters"        
+::= { sensor10 1 }
+
+sensor10DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write 
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 10, string format, to 1 decimal place"        
+::= { sensor10 2 }
+
+sensor10DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 10, integer format, no decimal places"        
+::= { sensor10 3 }
+
+sensor11Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 11 - User configurable, 16 characters"        
+::= { sensor11 1 }
+
+sensor11DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 11, string format, to 1 decimal place"        
+::= { sensor11 2 }
+
+sensor11DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 11, integer format, no decimal places"        
+::= { sensor11 3 }
+
+sensor12Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 12 - User configurable, 16 characters"        
+::= { sensor12 1 }
+
+sensor12DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 12, string format, to 1 decimal place"        
+::= { sensor12 2 }
+
+sensor12DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 12, integer format, no decimal places"        
+::= { sensor12 3 }
+
+sensor13Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 13 - User configurable, 16 characters"        
+::= { sensor13 1 }
+
+sensor13DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 13, string format, to 1 decimal place"        
+::= { sensor13 2 }
+
+sensor13DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 13, integer format, no decimal places"        
+::= { sensor13 3 }
+
+sensor14Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 14 - User configurable, 16 characters"        
+::= { sensor14 1 }
+
+sensor14DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 14, string format, to 1 decimal place"        
+::= { sensor14 2 }
+
+sensor14DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 14, integer format, no decimal places"        
+::= { sensor14 3 }
+
+sensor15Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 15 - User configurable, 16 characters"        
+::= { sensor15 1 }
+
+sensor15DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 15, string format, to 1 decimal place"        
+::= { sensor15 2 }
+
+sensor15DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 15, integer format, no decimal places"        
+::= { sensor15 3 }
+
+sensor16Name OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (16))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Name of sensor 16 - User configurable, 16 characters"        
+::= { sensor16 1 }
+
+sensor16DataStr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (5))
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 16, string format, to 1 decimal place"        
+::= { sensor16 2 }
+
+sensor16DataInt OBJECT-TYPE
+        SYNTAX     INTEGER (-100..255)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Data from sensor 16, integer format, no decimal places"        
+::= { sensor16 3 }
+
+END

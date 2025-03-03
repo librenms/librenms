@@ -1,0 +1,257 @@
+-- *****************************************************************
+-- Transition Networks ARP Inspection MIB
+--
+-- Copyright (C) 2012  Transition Networks, Inc. All Rights Reserved.
+-- *****************************************************************
+
+TN-ARP-INSPECTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    DisplayString, RowStatus, TruthValue, TimeStamp, DateAndTime,
+        MacAddress FROM SNMPv2-TC
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises FROM SNMPv2-SMI
+    InetAddressType, InetAddress, InetAddressPrefixLength FROM INET-ADDRESS-MIB
+    entPhysicalIndex FROM ENTITY-MIB
+    ifIndex FROM IF-MIB
+    tnDevMgmt FROM TN-MGMT-MIB;
+
+tnARPInspectionMIB OBJECT IDENTIFIER ::= { tnDevMgmt 22 }
+
+--
+-- Mib variables
+--
+
+--
+-- tnARPInspectionConfigTable
+--
+
+tnARPInspectionConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TNARPInspectionConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TN Access Resolution Protocol Inspection Configuration Table"
+    ::= { tnARPInspectionMIB 1 }
+
+tnARPInspectionConfigEntry OBJECT-TYPE
+    SYNTAX TNARPInspectionConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents the ARP Inspection configuration on a device."
+    INDEX { entPhysicalIndex }
+    ::= { tnARPInspectionConfigTable 1 }
+
+TNARPInspectionConfigEntry ::= SEQUENCE {
+    tnARPInspectionMode       INTEGER,
+    tnARPInspectionTranslation      TruthValue
+}
+
+tnARPInspectionMode OBJECT-TYPE
+    SYNTAX INTEGER { enable (1), disable (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "TN ARP Inspection Mode on a device."
+    ::= { tnARPInspectionConfigEntry 1 }
+
+tnARPInspectionTranslation OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Translation from Dynamic to Static for ARP Inspection."
+    ::= { tnARPInspectionConfigEntry 2 }
+
+--
+-- tnARPInspectionPortModeTable
+--
+
+tnARPInspectionPortModeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TNARPInspectionPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TN Access Resolution Protocol Inspection port mode table."
+    ::= { tnARPInspectionMIB 2 }
+
+tnARPInspectionPortModeEntry OBJECT-TYPE
+    SYNTAX TNARPInspectionPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents ARP Inspection port mode for a port."
+    INDEX { ifIndex }
+    ::= { tnARPInspectionPortModeTable 1 }
+
+TNARPInspectionPortModeEntry ::= SEQUENCE {
+    tnARPInspectionPortMode       INTEGER
+}
+
+tnARPInspectionPortMode OBJECT-TYPE
+    SYNTAX INTEGER { enable (1), disable (2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "TN ARP Inspection port mode for every port."
+    ::= { tnARPInspectionPortModeEntry 1 }
+
+--
+-- tnStaticARPInspectionTable
+--
+
+tnStaticARPInspectionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TNStaticARPInspectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TN Static Access Resolution Protocol Inspection Table."
+    ::= { tnARPInspectionMIB 3 }
+
+tnStaticARPInspectionEntry OBJECT-TYPE
+    SYNTAX TNStaticARPInspectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents a static ARP Inspection on a device."
+    INDEX { tnStaticARPInspectionPort,
+            tnStaticARPInspectionVLAN,
+            tnStaticARPInspectionMAC,
+            tnStaticARPInspectionAddrType,
+            tnStaticARPInspectionAddr }
+    ::= { tnStaticARPInspectionTable 1 }
+
+TNStaticARPInspectionEntry ::= SEQUENCE {
+    tnStaticARPInspectionPort       INTEGER,
+    tnStaticARPInspectionVLAN       INTEGER,
+    tnStaticARPInspectionMAC        MacAddress,
+    tnStaticARPInspectionAddrType   InetAddressType,
+    tnStaticARPInspectionAddr       InetAddress,
+    tnStaticARPInspectionRowStatus  RowStatus
+}
+
+tnStaticARPInspectionPort OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port number of a static ARP inspection."
+    ::= { tnStaticARPInspectionEntry 1 }
+
+tnStaticARPInspectionVLAN OBJECT-TYPE
+    SYNTAX INTEGER (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The VLAN of a static ARP inspection."
+    ::= { tnStaticARPInspectionEntry 2 }
+
+tnStaticARPInspectionMAC OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The MAC Address of a static ARP inspection."
+    ::= { tnStaticARPInspectionEntry 3 }
+
+tnStaticARPInspectionAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The IP Address type of a static ARP inspection. ARP only supports IPv4.
+        For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnStaticARPInspectionEntry 4 }
+
+tnStaticARPInspectionAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The IP Address of a static ARP inspection. ARP only supports IPv4.
+        For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnStaticARPInspectionEntry 5 }
+
+
+tnStaticARPInspectionRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Row Status of a static ARP inspection."
+    ::= { tnStaticARPInspectionEntry 6 }
+
+--
+-- tnDynamicARPInspectionTable
+--
+
+tnDynamicARPInspectionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TNDynamicARPInspectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TN Dynamic Access Resolution Protocol Inspection Table."
+    ::= { tnARPInspectionMIB 4 }
+
+tnDynamicARPInspectionEntry OBJECT-TYPE
+    SYNTAX TNDynamicARPInspectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents a dynamic ARP Inspection on a device."
+    INDEX { tnDynamicARPInspectionPort,
+            tnDynamicARPInspectionVLAN,
+            tnDynamicARPInspectionMAC }
+    ::= { tnDynamicARPInspectionTable 1 }
+
+TNDynamicARPInspectionEntry ::= SEQUENCE {
+    tnDynamicARPInspectionPort       INTEGER,
+    tnDynamicARPInspectionVLAN       INTEGER,
+    tnDynamicARPInspectionMAC        MacAddress,
+    tnDynamicARPInspectionAddrType   InetAddressType,
+    tnDynamicARPInspectionAddr       InetAddress,
+}
+
+tnDynamicARPInspectionPort OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port number of a dynamic ARP inspection."
+    ::= { tnDynamicARPInspectionEntry 1 }
+
+tnDynamicARPInspectionVLAN OBJECT-TYPE
+    SYNTAX INTEGER (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The VLAN of a dynamic ARP inspection."
+    ::= { tnDynamicARPInspectionEntry 2 }
+
+tnDynamicARPInspectionMAC OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The MAC Address of a dynamic ARP inspection."
+    ::= { tnDynamicARPInspectionEntry 3 }
+
+tnDynamicARPInspectionAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The IP Address of a dynamic ARP inspection. ARP only supports IPv4.
+        For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnDynamicARPInspectionEntry 4 }
+
+tnDynamicARPInspectionAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The IP Address of a dynamic ARP inspection. ARP only supports IPv4.
+        For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnDynamicARPInspectionEntry 5 }
+
+
+END

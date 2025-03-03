@@ -6,10 +6,10 @@ icon: lexmark
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysDescr:
-        - Lexmark 
+    -
+        sysDescr:
+            - Lexmark
 discovery_modules:
-    toner: 1
+    printer-supplies:   true
 poller_modules:
-    toner: 1
-
+    printer-supplies:   true

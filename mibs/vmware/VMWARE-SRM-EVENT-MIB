@@ -1,0 +1,299 @@
+-- **********************************************************
+-- Copyright 2012 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-SRM-EVENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    vmwSRM
+       FROM VMWARE-ROOT-MIB       
+    DisplayString
+        FROM SNMPv2-TC;
+
+    vmwSRMMIB MODULE-IDENTITY
+    LAST-UPDATED "201202070000Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+    "VMware, Inc
+    3401 Hillview Ave
+    Palo Alto, CA 94304
+    Tel: 1-877-486-9273 or 650-427-5000
+    Fax: 650-427-5001
+    Web: http://communities.vmware.com/community/developer/forums/managementapi
+    "
+DESCRIPTION
+     "This MIB module identifies Site Recovery Maager notifications (traps or inform)."
+
+REVISION      "201202070000Z"
+DESCRIPTION
+    "This is the first revision in SMIv2 format. Prior version was published as SMIv1.
+     Notifications were formerly in the VMWARE-SRM-TRAPS-1-0.MIB."
+::= { vmwSRM 10 }
+
+vmwSrmNotification OBJECT IDENTIFIER ::= { vmwSRM 1 }
+
+vmwSRMevents OBJECT IDENTIFIER ::= {vmwSRM 0 }
+
+vmwSrmVmName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the name of the affected VM generating the trap."
+    ::= { vmwSrmNotification 1 }
+
+vmwSrmRecoveryName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the name of the Recovery Plan generating the trap."
+    ::= { vmwSrmNotification 2 }
+
+vmwSrmPromptString OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the text of the prompt generating the trap."
+    ::= { vmwSrmNotification 3 }
+
+vmwSrmRecoveryType OBJECT-TYPE
+    SYNTAX      INTEGER { test(1), recovery(2), reprotect(3), cleanup(4) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the mode of execution for the the Recovery Plan."
+    ::= { vmwSrmNotification 4 }
+
+vmwSrmRecoveryState OBJECT-TYPE
+    SYNTAX      INTEGER { uninitialized(1), running(2), paused(3), 
+                    cancelled(4), completed(5) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the state of execution for the the Recovery Plan."
+    ::= { vmwSrmNotification 5 }
+
+vmwSrmSiteString OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the name of the DR site that is causing the trap."
+    ::= { vmwSrmNotification 6 }
+
+vmwSrmVmUuid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the UUID of the affected VM generating the trap."
+    ::= { vmwSrmNotification 7 }
+
+vmwSrmResult OBJECT-TYPE
+    SYNTAX      INTEGER { success(1), failure(2), warning(3), 
+                    cancelled(4) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the result of running a Recovery Plan."
+    ::= { vmwSrmNotification 8 }
+
+vmwSrmCommandName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the name of a callout command executed during Recovery Plan execution."
+    ::= { vmwSrmNotification 9 }
+
+vmwareSrmRecoveryPlanExecuteTestBeginTrap NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan starts a test."
+    ::= { vmwSRMevents 1 }
+
+vmwareSrmRecoveryPlanExecuteTestEndEvent NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmResult }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan ends a test."
+    ::= { vmwSRMevents 2 }
+
+vmwareSrmRecoveryPlanExecuteBeginEvent NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan starts a recovery."
+    ::= { vmwSRMevents 3 }
+
+vmwareVmwSrmRecoveryPlanExecuteEndEvent NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmResult }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan ends a recovery."
+    ::= { vmwSRMevents 4 }
+
+vmwareVmwSrmRecoveryVmBeginEvent NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmVmName, vmwSrmVmUuid }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan starts recovering a VM."
+    ::= { vmwSRMevents 5 }
+
+vmwareSrmRecoveryVmEndEvent NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmVmName, vmwSrmVmUuid, vmwSrmResult }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan has finished recovering a VM."
+    ::= { vmwSRMevents 6 }
+
+vmwareSrmRecoveryPlanPromptDisplay NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmPromptString }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan requires user input before continuing."
+    ::= { vmwSRMevents 7 }
+
+vmwareSrmRecoveryPlanPromptResponse NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan no longer requires user input before continuing."
+    ::= { vmwSRMevents 8 }
+
+vmwareVmwSrmRecoveryPlanServerCommandBegin NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmCommandName }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan starts the execution of a command callout on SRM server's machine."
+    ::= { vmwSRMevents 9 }
+
+vmwareSrmRecoveryPlanServerCommandEnd NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmCommandName, vmwSrmResult }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan has finished the execution of a command callout on SRM server's machine."
+    ::= { vmwSRMevents 10 }
+
+vmwareSrmRecoveryPlanVmCommandBegin NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmCommandName, vmwSrmVmName, vmwSrmVmUuid }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan starts the execution of a command callout on a recovered VM."
+    ::= { vmwSRMevents 11 }
+
+vmwareSrmRecoveryPlanVmCommandEnd NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmCommandName, vmwSrmVmName, vmwSrmVmUuid, 
+                  vmwSrmResult }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan has finished the execution of a command callout on a recovered VM."
+    ::= { vmwSRMevents 12 }
+
+vmwareSrmRecoveryPlanExecuteReprotectBegin NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when SRM starts the reprotect workflow for a Recovery Plan."
+    ::= { vmwSRMevents 13 }
+
+vmwareSrmRecoveryPlanExecuteReprotectEnd NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmResult }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when SRM has finished the reprotect workflow for a Recovery Plan."
+    ::= { vmwSRMevents 14 }
+
+vmwareVmwSrmRecoveryPlanExecuteCleanupBegin NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent when a Recovery Plan starts a test cleanup."
+    ::= { vmwSRMevents 15 }
+
+vmwSrmRecoveryPlanExecuteCleanupEnd NOTIFICATION-TYPE
+    OBJECTS     { vmwSrmSiteString, vmwSrmRecoveryName, vmwSrmRecoveryType, 
+                  vmwSrmRecoveryState, vmwSrmResult }
+    STATUS      current
+    DESCRIPTION 
+        "This trap is sent a Recovery Plan ends a test cleanup."
+    ::= { vmwSRMevents 16 }
+
+-- conformance information
+vmwSRMMIBConformance OBJECT IDENTIFIER ::= { vmwSRMMIB 2 }
+vmwSRMMIBCompliances OBJECT IDENTIFIER ::= { vmwSRMMIBConformance 1 }
+vmwSRMMIBGroups OBJECT IDENTIFIER ::= { vmwSRMMIBConformance 2 }
+
+-- compliance statements
+vmwSRMMIBBasicCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement VMWARE-SRM-EVENT-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwSRMNotificationInfoGroup, vmwSRMNotificationGroup }
+    ::= { vmwSRMMIBCompliances 2 }
+
+vmwSRMNotificationInfoGroup OBJECT-GROUP
+    OBJECTS {
+         vmwSrmVmName,
+         vmwSrmRecoveryName,
+         vmwSrmPromptString,
+         vmwSrmRecoveryType,
+         vmwSrmRecoveryState,
+         vmwSrmSiteString,
+         vmwSrmVmUuid,
+         vmwSrmResult,
+         vmwSrmCommandName
+    }
+    STATUS current
+    DESCRIPTION
+	"These objects provide details in SRM notifications."
+    ::= { vmwSRMMIBGroups 1 }
+
+vmwSRMNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+          vmwareSrmRecoveryPlanExecuteTestBeginTrap,
+          vmwareSrmRecoveryPlanExecuteTestEndEvent,
+          vmwareSrmRecoveryPlanExecuteBeginEvent,
+          vmwareVmwSrmRecoveryPlanExecuteEndEvent,
+          vmwareVmwSrmRecoveryVmBeginEvent,
+          vmwareSrmRecoveryVmEndEvent,
+          vmwareSrmRecoveryPlanPromptDisplay,
+          vmwareSrmRecoveryPlanPromptResponse,
+          vmwareVmwSrmRecoveryPlanServerCommandBegin,
+          vmwareSrmRecoveryPlanServerCommandEnd,
+          vmwareSrmRecoveryPlanVmCommandBegin,
+          vmwareSrmRecoveryPlanVmCommandEnd,
+          vmwareSrmRecoveryPlanExecuteReprotectBegin,
+          vmwareSrmRecoveryPlanExecuteReprotectEnd,
+          vmwareVmwSrmRecoveryPlanExecuteCleanupBegin,
+          vmwSrmRecoveryPlanExecuteCleanupEnd
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps)."
+       ::= { vmwSRMMIBGroups 2 }
+
+END

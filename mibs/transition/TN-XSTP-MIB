@@ -1,0 +1,435 @@
+-- *****************************************************************
+-- TN-PROTECTION-MIB.my : TN Ethernet Protection MIB
+--
+-- april 2012, Tony Lei
+--
+-- Copyright (c) 2012 by TN, Inc.
+--
+-- All rights reserved.
+-- *****************************************************************
+
+TN-XSTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    TruthValue,
+    RowStatus,
+    DisplayString
+        FROM SNMPv2-TC
+    IEEE8021PbbComponentIdentifier,
+    IEEE8021BridgePortNumber
+            FROM IEEE8021-TC-MIB
+    ieee8021MstpEntry,
+    ieee8021MstpCistEntry,
+    ieee8021MstpCistPortEntry,
+    ieee8021MstpPortEntry
+        FROM IEEE8021-MSTP-MIB
+    tnProducts
+        FROM TRANSITION-SMI;
+
+tnXSTPMIB MODULE-IDENTITY
+    LAST-UPDATED    "201207061930Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+                  Technical Support
+
+                  10900 Red Circle Drive
+                  Minnetonka, MN 55343 USA
+                  Tel: +1-800-526-9267
+
+                  E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "TBD"
+    REVISION        "201204200000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tnProducts 111 }
+
+tnXSTPMIBNotifications  OBJECT IDENTIFIER ::= { tnXSTPMIB 1 }
+tnXSTPMgmtObjects       OBJECT IDENTIFIER ::= { tnXSTPMIB 2 }
+tnXSTPMIBConformance    OBJECT IDENTIFIER ::= { tnXSTPMIB 3 }
+
+--cist table
+tnExtMstpCistTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF  TnExtMstpCistEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+      "The Common and Internal Spanning Tree (CIST) Table. Each row in
+       the table represents information regarding a Bridge's Bridge
+       Protocol Entity for the CIST."
+   ::= { tnXSTPMgmtObjects 1}
+
+tnExtMstpCistEntry OBJECT-TYPE
+    SYNTAX         TnExtMstpCistEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A extension MSTP Cist Table entry"
+    AUGMENTS       { ieee8021MstpCistEntry }
+    ::= { tnExtMstpCistTable 1 }
+
+TnExtMstpCistEntry ::= SEQUENCE {
+    tnExtMstpCistBpduFiltering    TruthValue,
+    tnExtMstpCistBpduGuard        TruthValue,
+    tnExtMstpCistRecoveryTimeout  Integer32
+}
+
+tnExtMstpCistBpduFiltering OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object control whether a port explicitly configured as Edge
+         will transmit and receive BPDUs"
+    ::= { tnExtMstpCistEntry 1 }
+
+tnExtMstpCistBpduGuard OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object control whether a port explicitly configured as Edge
+         will disable itself upon reception of a BPDU.The port will enter
+         the error-disabled state, and will be removed from the active
+         topology."
+    ::= { tnExtMstpCistEntry 2 }
+
+tnExtMstpCistRecoveryTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time to pass before a port in the error-disabled state can be enabled.
+         Valid values are between 30 and 86400 seconds (24 hours). And 0 means disabled"
+    ::= { tnExtMstpCistEntry 3 }
+
+-- MSTP table
+
+tnExtMstpTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnExtMstpEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "In an MSTP Bridge, the MSTP Table. Each row in the Table
+         represents information regarding a Bridge's Bridge Protocol
+         Entity for the specified Spanning Tree instance."
+    ::= { tnXSTPMgmtObjects 2 }
+
+tnExtMstpEntry OBJECT-TYPE
+    SYNTAX          TnExtMstpEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A extension MSTP Table entry."
+    AUGMENTS        { ieee8021MstpEntry }
+    ::= { tnExtMstpTable 1 }
+
+TnExtMstpEntry ::= SEQUENCE {
+        tnExtMstpVids0          OCTET STRING,
+        tnExtMstpVids1          OCTET STRING,
+        tnExtMstpVids2          OCTET STRING,
+        tnExtMstpVids3          OCTET STRING
+}
+
+tnExtMstpVids0 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object contains the first 1024 bits of the 4096 bit vector
+         indicating which VIDs are assigned to this MSTID.  The high order
+         bit of the first octet corresponds to the first bit of the vector,
+         while the low order bit of the last octet corresponds to the last
+         bit of this portion of the vector.  A bit that is on (equal to 1)
+         indicates that the corresponding VID is assigned to this MSTID."
+    ::= { tnExtMstpEntry 1 }
+
+tnExtMstpVids1 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object contains the second 1024 bits of the 4096 bit vector
+         indicating which VIDs are assigned to this MSTID.  The high order
+         bit of the first octet corresponds to the first bit of this
+         portion of the vector, while the low order bit of the last octet
+         corresponds to the last bit of this portion of the vector.  A bit
+         that is on (equal to 1) indicates that the corresponding VID is
+         assigned to this MSTID."
+    ::= { tnExtMstpEntry 2 }
+
+tnExtMstpVids2 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object contains the third 1024 bits of the 4096 bit vector
+         indicating which VIDs are assigned to this MSTID.  The high order
+         bit of the first octet corresponds to the first bit of this
+         portion of the vector, while the low order bit of the last octet
+         corresponds to the last bit of this portion of the vector.  A bit
+         that is on (equal to 1) indicates that the corresponding VID is
+         assigned to this MSTID."
+    ::= { tnExtMstpEntry 3 }
+
+tnExtMstpVids3 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object contains the fourth 1024 bits of the 4096 bit vector
+         indicating which VIDs are assigned to this MSTID.  The high order
+         bit of the first octet corresponds to the first bit of this
+         portion of the vector, while the low order bit of the last octet
+         corresponds to the last bit of this portion of the vector.  A bit
+         that is on (equal to 1) indicates that the corresponding VID is
+         assigned to this MSTID."
+    ::= { tnExtMstpEntry 4 }
+-- MSTP cist port table
+
+tnExtMstpCistPortTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnExtMstpCistPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The CIST Port Table. Each row in the Table represents information
+         regarding a specific Port within the Bridge's Bridge Protocol
+         Entity, for the CIST."
+    ::= { tnXSTPMgmtObjects 3 }
+
+tnExtMstpCistPortEntry OBJECT-TYPE
+    SYNTAX         TnExtMstpCistPortEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "A extension MSTP Cist Port Table entry."
+    AUGMENTS       { ieee8021MstpCistPortEntry }
+    ::= { tnExtMstpCistPortTable 1 }
+
+TnExtMstpCistPortEntry ::= SEQUENCE {
+    tnExtMstpCistPortBpduGuard    TruthValue,
+    tnExtMstpCistPortAutoEdge     TruthValue,
+}
+
+tnExtMstpCistPortBpduGuard OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "If enabled, causes the port to disable itself upon receiving valid BPDU's.
+         Contrary to the similar bridge setting, the port Edge status does not
+         effect this setting. A port entering error-disabled state due to this
+         setting is subject to the bridge Port Error Recovery setting as well."
+   ::= { tnExtMstpCistPortEntry 1 }
+
+tnExtMstpCistPortAutoEdge OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+         "Controls whether the bridge should enable automatic edge detection on
+          the bridge port. This allows operEdge to be derived from whether BPDU's
+          are received on the port or not."
+   ::= { tnExtMstpCistPortEntry 2 }
+
+-- MSTP port table
+
+tnExtMstpPortTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnExtMstpPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MSTP Port Table. Each row in the Table represents information
+         regarding a specific Port within the Bridge's Bridge Protocol
+         Entity, for a given MSTI.
+         The values of all writable objects in this table MUST be
+         retained across reinitializations of the management system.
+         Note that entries will exist in this table only for bridge
+         components for which the corresponding instance of
+         ieee8021SpanningTreeVersion (from the IEEE8021-SPANNING-TREE-MIB)
+         has a value of mstp(2)"
+    ::= { tnXSTPMgmtObjects 4 }
+
+tnExtMstpPortEntry OBJECT-TYPE
+    SYNTAX          TnExtMstpPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A extension MSTP Port Table entry"
+    AUGMENTS        { ieee8021MstpPortEntry }
+    ::= { tnExtMstpPortTable 1 }
+
+TnExtMstpPortEntry ::= SEQUENCE {
+        tnExtMstpPortAdminPathCost     Integer32
+}
+
+tnExtMstpPortAdminPathCost OBJECT-TYPE
+    SYNTAX      Integer32 (0..200000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned value for the contribution
+         of this port to the path cost of paths toward the spanning
+         tree root.
+         Writing a value of '0' assigns the automatically calculated
+         default Path Cost value to the port.  If the default Path
+         Cost is being used, this object returns '0' when read."
+    ::= { tnExtMstpPortEntry 1 }
+
+-- =============================================================
+-- tnMSTPPortStatsTable:
+-- =============================================================
+
+tnXstpPortStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnXstpPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The STP Port statistics Table."
+    ::= { tnXSTPMgmtObjects 5 }
+
+tnXstpPortStatsEntry OBJECT-TYPE
+    SYNTAX      TnXstpPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A XSTP port statistics Table entry."
+    INDEX { tnXstpPortStatsComponentId , tnXstpPortStatsPort }
+    ::= { tnXstpPortStatsTable 1 }
+
+TnXstpPortStatsEntry ::= SEQUENCE {
+    tnXstpPortStatsComponentId               IEEE8021PbbComponentIdentifier,
+    tnXstpPortStatsPort                      IEEE8021BridgePortNumber,
+    tnXstpPortStatsMstpTx                    Integer32,
+    tnXstpPortStatsRstpTx                    Integer32,
+    tnXstpPortStatsStpTx                     Integer32,
+    tnXstpPortStatsTcnTx                     Integer32,
+    tnXstpPortStatsMstpRx                    Integer32,
+    tnXstpPortStatsRstpRx                    Integer32,
+    tnXstpPortStatsStpRx                     Integer32,
+    tnXstpPortStatsTcnRx                     Integer32,
+    tnXstpPortStatsUnknown                   Integer32,
+    tnXstpPortStatsLllegal                   Integer32,
+    tnXstpPortStatsClear                     TruthValue
+}
+
+tnXstpPortStatsComponentId OBJECT-TYPE
+    SYNTAX      IEEE8021PbbComponentIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The component identifier is used to distinguish between the
+         multiple virtual bridge instances within a PBB.  In simple
+         situations where there is only a single component the default
+         value is 1"
+    ::= { tnXstpPortStatsEntry 1 }
+
+tnXstpPortStatsPort OBJECT-TYPE
+    SYNTAX      IEEE8021BridgePortNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port number of the port for which this entry
+         contains Spanning Tree Protocol management information.
+        "
+    ::= { tnXstpPortStatsEntry 2 }
+
+tnXstpPortStatsMstpTx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of MSTP Configuration BPDU's transmitted on the port."
+    ::= { tnXstpPortStatsEntry 3 }
+
+tnXstpPortStatsRstpTx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RSTP Configuration BPDU's transmitted on the port."
+    ::= { tnXstpPortStatsEntry 4 }
+
+tnXstpPortStatsStpTx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of STP Configuration BPDU's transmitted on the port."
+    ::= { tnXstpPortStatsEntry 5 }
+
+tnXstpPortStatsTcnTx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of TCN Configuration BPDU's transmitted on the port."
+    ::= { tnXstpPortStatsEntry 6 }
+
+tnXstpPortStatsMstpRx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of MSTP Configuration BPDU's received on the port."
+    ::= { tnXstpPortStatsEntry 7 }
+
+tnXstpPortStatsRstpRx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of RSTP Configuration BPDU's received on the port."
+    ::= { tnXstpPortStatsEntry 8 }
+
+tnXstpPortStatsStpRx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of STP Configuration BPDU's received on the port."
+    ::= { tnXstpPortStatsEntry 9 }
+
+tnXstpPortStatsTcnRx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of TCN Configuration BPDU's received on the port."
+    ::= { tnXstpPortStatsEntry 10 }
+
+tnXstpPortStatsUnknown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unkown BPDU's received on the port."
+    ::= { tnXstpPortStatsEntry 11 }
+
+tnXstpPortStatsLllegal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lllegal BPDU's received on the port."
+    ::= { tnXstpPortStatsEntry 12 }
+
+tnXstpPortStatsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear the stats"
+    ::= { tnXstpPortStatsEntry 13 }
+END

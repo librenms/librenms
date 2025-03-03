@@ -1,0 +1,3304 @@
+LUM-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32, IpAddress
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    RowStatus, DisplayString, TestAndIncr, DateAndTime
+        FROM SNMPv2-TC
+    lumModules, lumSystemMIB
+        FROM LUM-REG
+    CommandString, FaultStatus, EnableDisable, OnOff, Platform
+        FROM LUM-TC;
+
+lumSystemMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201903290000Z" -- March 29th 2019
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The system MIB.
+
+        - General
+
+        - Node parameters
+
+        - Date and time
+
+        - License information
+
+        - RADIUS and TACACS+ authentication configuration
+
+        - User information
+
+"
+    REVISION
+        "201903290000Z" -- March 29th 2019
+    DESCRIPTION
+        "Changes made for r32.1:
+        - Added sysLoginBanner table"
+    REVISION
+        "201812210000Z" -- Dec 21th 2018
+    DESCRIPTION
+        "Changes made for r32.0:
+        - Improved the help text for sysSecurityAutoEnableBlockedMgmtPorts
+        - Added sysSecurityInstallCertificates
+        - Added sysSecurityInstallFactoryDefaultCertificates
+        - Added manager table"
+    REVISION
+        "201809280000Z" -- Sept 28th 2018
+    DESCRIPTION
+	"Changes made for r31.1:
+        - Fix inconsistent use of lower case and
+              upper case in long alias in system-security
+              table"
+    REVISION
+        "201712080000Z" -- Dec 8th 2017
+    DESCRIPTION
+        "Changes made for release r30.0:
+         - Added sysSecurityCUFrontICNPortAccess
+                 sysSecurityChangeCUFrontICNPortAccess
+                 sysSecuritySubrackICNPortAccess
+                 sysSecurityChangeSubrackICNPortAccess,
+                 sysSecurityMgmtAccessProofOfConnStatus,
+                 sysSecurityMgmtAccessProofOfConnectivity,
+                 sysSecurityAutoEnableBlockedMgmtPorts,
+                 sysSecurityBlockedMgmtPortsUnblocked"
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+        - Added attribute sysSecurityFileSystemAccessRestrictions
+        - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28.0:
+        - Added extra attributes for sysNode group including
+          CLLI (Common Language Location Identifier),
+          FIC (Facility Interface Code),
+          TID (Target ID),
+          Latitude and Longitude."
+    REVISION
+        "201606140000Z" -- Jun 14th 2016
+    DESCRIPTION
+        "Changes made for release r27:
+        - Added attribute sysSecurityLocalCraftAccess in group Security, to show the access
+          status to the local ETH-Craft port.
+        - Added attribute sysSecurityChangeLocalCraftAccess in group Security to be able to change the access
+          to the local ETH-Craft port on CU-SFP/III boards.
+        - Added attribute sysSecurityAuthenticationOrder in group Security, to show the authentication order
+          currently active in the node.
+        - Remove possibility of setting TACACS and RADIUS configurations via snmp."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Changes made for release r23:
+        - Added attribute sysGeneralWriteTest in group General, to be used when TNM connects
+        - Attribute sysGeneralTest in group General set to deprecated (prev used when TNM connects)"
+    REVISION
+        "201311150000Z" -- November 15th 2013
+    DESCRIPTION
+        "Description for local console access is improved. Help text for user
+        name improved."
+    REVISION
+        "201008030000Z" -- August 3th 2010
+    DESCRIPTION
+        "Change local console access and radius port numbers."
+    REVISION
+        "200808050000Z" -- August 5th 2008
+    DESCRIPTION
+        "Added compliance to indicate web server less vulnerable to hanging."
+    REVISION
+        "200509140000Z" -- September 14th 2005
+    DESCRIPTION
+        "Added minimal compliance groups."
+    REVISION
+        "200410010000Z" -- October 1st 2004
+    DESCRIPTION
+        "Added table size variables."
+    REVISION
+        "200406300000Z" -- June 30th 2004
+    DESCRIPTION
+        "Enabled user group, added wtmp-logging config.."
+    REVISION
+        "200405260000Z" -- May 26th 2004
+    DESCRIPTION
+        "Added TACACS+ configuration."
+    REVISION
+        "200308030000Z" -- September 3rd 2003
+    DESCRIPTION
+        "Added command for changing local time."
+    REVISION
+        "200212130000Z" -- December 13th 2002
+    DESCRIPTION
+        "Added network element type, user name and distinguished name."
+    REVISION
+        "200204180000Z" -- April 18th 2002
+    DESCRIPTION
+        "Added systemGeneralTest."
+    REVISION
+        "200201110000Z" -- January 11th  2002
+    DESCRIPTION
+        "Added sysNodeUptime."
+    REVISION
+        "200108140000Z" -- August 14th 2001
+    DESCRIPTION
+        "Cleaned up some tbd, removed unused definitions.
+        Fixed some defaults.
+        Added sysNodeRunLevel."
+    REVISION
+        "200107260000Z" -- July 26th 2001
+    DESCRIPTION
+        "Added aliases and compliance groups."
+    REVISION
+        "200104260000Z" -- April 26th 2001
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 4 }
+
+
+-- ----------------------------------------------------
+-- Conformance area, containing groups and complicance
+-- specifications.
+-- ----------------------------------------------------
+
+lumSystemConfs OBJECT IDENTIFIER ::= { lumSystemMIB 1 }
+lumSystemGroups OBJECT IDENTIFIER ::= { lumSystemConfs 1 }
+lumSystemCompl OBJECT IDENTIFIER ::= { lumSystemConfs 2 }
+lumSystemMinimalGroups OBJECT IDENTIFIER ::= { lumSystemConfs 3 }
+lumSystemMinimalCompl OBJECT IDENTIFIER ::= { lumSystemConfs 4 }
+
+
+-- ----------------------------------------------------
+-- Root for objects in the system MIB
+-- ----------------------------------------------------
+
+lumSystemMIBObjects OBJECT IDENTIFIER ::= { lumSystemMIB 2 }
+
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+sysGeneral OBJECT IDENTIFIER ::= { lumSystemMIBObjects 1 }
+sysNode OBJECT IDENTIFIER ::= { lumSystemMIBObjects 2 }
+sysHostList OBJECT IDENTIFIER ::= { lumSystemMIBObjects 3 }
+sysTime OBJECT IDENTIFIER ::= { lumSystemMIBObjects 4 }
+sysLogList OBJECT IDENTIFIER ::= { lumSystemMIBObjects 5 }
+sysUserList OBJECT IDENTIFIER ::= { lumSystemMIBObjects 6 }
+sysRadius OBJECT IDENTIFIER ::= { lumSystemMIBObjects 7 }
+sysLicense OBJECT IDENTIFIER ::= { lumSystemMIBObjects 8 }
+sysTacacs OBJECT IDENTIFIER ::= { lumSystemMIBObjects 9 }
+sysAudit OBJECT IDENTIFIER ::= { lumSystemMIBObjects 10 }
+sysSecurity OBJECT IDENTIFIER ::= { lumSystemMIBObjects 11 }
+sysManager OBJECT IDENTIFIER ::= { lumSystemMIBObjects 12 }
+sysLoginBanner OBJECT IDENTIFIER ::= { lumSystemMIBObjects 13 }
+
+
+-- ----------------------------------------------------
+-- Textual Conventions
+-- ----------------------------------------------------
+
+-- n/a
+
+
+-- ----------------------------------------------------
+-- General group
+-- ----------------------------------------------------
+
+sysGeneralTestAndIncr OBJECT-TYPE
+    SYNTAX      TestAndIncr
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Protection against simultaneous access from
+        multiple managers. See SNMPv2-TC.
+
+"
+    ::= { sysGeneral 1 }
+
+sysGeneralMibSpecVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MIB specification version.
+
+"
+    DEFVAL { "" }
+    ::= { sysGeneral 2 }
+
+sysGeneralMibImplVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MIB implementation version.
+
+"
+    DEFVAL { "" }
+    ::= { sysGeneral 3 }
+
+sysGeneralLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time the state of MIB last changed.
+
+"
+    ::= { sysGeneral 4 }
+
+sysGeneralTest OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Object that can be used to verify write access
+        (via SNMP).
+
+        This attribute can be written via SNMP.
+"
+    DEFVAL { 0 }
+    ::= { sysGeneral 5 }
+
+sysGeneralConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time the configuration of the MIB last
+        changed.
+
+"
+    ::= { sysGeneral 6 }
+
+sysGeneralLoginRecords OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off (1),
+                    on (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable login records.
+        The log can be viewed with the 'last'
+        command.
+
+        off - Login records log disabled.
+
+        on - Login records log enable.
+
+"
+    DEFVAL { off }
+    ::= { sysGeneral 7 }
+
+sysGeneralUserTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of rows available in the
+        user table.
+
+"
+    ::= { sysGeneral 8 }
+
+sysGeneralWriteTest OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Object that can be used to verify write access
+        (via SNMP).
+
+        This attribute can be written via SNMP.
+"
+    DEFVAL { "" }
+    ::= { sysGeneral 9 }
+
+
+-- ----------------------------------------------------
+-- Node configuration group
+-- ----------------------------------------------------
+
+sysNodeName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An administratively-assigned name for this
+        managed node.  By convention, this is the nodes
+        fully-qualified domain name.
+
+        The node name may be composed of the following
+        characters:
+        A to Z  ; uppercase characters
+        a to z  ; lower case characters
+        0 to 9  ; numeric characters
+        -       ; dash
+        .       ; dot, is used as a separator
+        _       ; underscore, supported (but might not be supported by all DNS servers)
+
+        A host name (label) can start or end with a letter or a number
+        A host name (label) MUST NOT start or end with a '-' (dash)
+        A host name (label) MUST NOT consist of all numeric values
+        A host name (label) can be up to 63 characters
+
+"
+    DEFVAL { "localhost.localdomain" }
+    ::= { sysNode 1 }
+
+sysNodeContact OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The textual identification of the contact person
+        for this managed node, together with information
+        on how to contact this person. Set to the empty
+        string if not known.
+        Example: 'Joe, e-mail: joe@localhost.localdomain'
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 2 }
+
+sysNodeLocation OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The physical location of this node. Set to the
+        empty string if not known.
+        Example: 'Rack 5, in the system lab, third floor'
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 3 }
+
+sysNodeObjectId OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vendors authoritative identification of the
+        network management subsystem contained in the
+        entity.  This value is allocated within the SMI
+        enterprises subtree (1.3.6.1.4.1) and provides an
+        easy and unambiguous means for determining
+        'what kind of box' is being managed.
+
+"
+    ::= { sysNode 4 }
+
+sysNodePrimaryNameServer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name or IP address of the name server.
+        Set to the empty string if not known.
+        Example: 'dns.localdomain'
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 5 }
+
+sysNodeRunLevel OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    undefined (0),
+                    halt (1),
+                    single (2),
+                    normal (3),
+                    reboot (4) }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Note: This attribute is deprecated!
+
+        Indicates the runlevel of the software.
+
+        halt - Shutdown the entire node.
+
+        single - Stop all applications and enter
+        single user mode.
+
+        normal - Normal operations.
+
+        reboot - Restart the entire node.
+
+        tbd: no network?
+        tbd: restart with default configuration
+"
+    DEFVAL { normal }
+    ::= { sysNode  6 }
+
+sysNodeSecondaryNameServer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name or IP address of the name server.
+        Set to the empty string if not known.
+        Example: 'dns.lumentis.se', '192.168.1.200'
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 7 }
+
+sysNodeUptime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The uptime in string format.
+
+"
+    ::= { sysNode 8 }
+
+sysNodeNeType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable identifier of the type of node.
+        Included in performance measurements reports.
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 9 }
+
+sysNodeNeUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable network element name.
+        Included in performance measurements reports.
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 10 }
+
+sysNodeNeDistinguishedName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable network element distinguished
+        name. Included in performance measurements
+        reports.
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 11 }
+
+sysNodeBootTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Application start time.
+
+"
+    ::= { sysNode 12 }
+
+sysNodeLocale OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determines what rules should be used when formatting
+        and display items that are affected by language and
+        locality.
+
+        The following is currently affected:
+
+        Date and time
+
+        Decimal character
+
+        Unit used for temperatures
+
+        If locale is set to US English temperatures are
+        converted to degrees Fahrenheit.
+
+        Note: Only the default locale, 'C', is supported at
+        the moment.
+
+"
+    DEFVAL { "C" }
+    ::= { sysNode 13 }
+
+sysNodeVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The build version.
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 14 }
+
+sysNodeCLLI OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Common Language Location Identifier of NE.
+         Specifies the location
+         and function of telecommunications equipment or
+         of a relevant location such as international
+         border or the location of a supporting equipment,
+         such as a pole or a manhole.
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 15 }
+
+sysNodeFIC OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Frame Identifier Code or
+         Facility Interface Code for NE.
+         FIC identifies the type of interface that
+         the terminal equipment requires for compatible
+         interconnection with wireline carrier facilities.
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 16 }
+
+sysNodeTID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Target ID of NE. A unique
+         identifier which is a combination of the
+         CLLI and FIC (Location+Frame).
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 17 }
+
+sysNodeLatitude OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Latitude of the NE. A geographic coordinate
+         ranging from -90 to +90 degree specifying
+         the north-south position of a node
+         on the Earth surface.
+         Decimal Degree Representation is used as
+         the latitude format.
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 18 }
+
+sysNodeLongitude OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Longitude of the NE. A geographic
+         coordinate ranging from -180 to +180
+         degree specifying the east-west position
+         of the node on the Earth surface.
+         Decimal Degree Representation is used
+         as the longitude format.
+
+
+"
+    DEFVAL { "" }
+    ::= { sysNode 19 }
+
+-- ----------------------------------------------------
+-- Host names configuration group
+-- ----------------------------------------------------
+
+sysHostTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SysHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The well known host names list.
+
+"
+    ::= { sysHostList 1 }
+
+sysHostEntry OBJECT-TYPE
+    SYNTAX      SysHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in well known host names list.
+
+"
+    INDEX { sysHostIndex }
+    ::= { sysHostTable 1 }
+
+SysHostEntry ::=
+    SEQUENCE {
+        sysHostIndex                    Unsigned32,
+        sysHostIpAddress                DisplayString,
+        sysHostNames                    DisplayString,
+        sysHostRowStatus                RowStatus }
+
+sysHostIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each host
+        entry.
+
+"
+    ::= { sysHostEntry 1 }
+
+sysHostIpAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address of a well known host.
+        Example: '192.168.1.200'
+
+"
+    ::= { sysHostEntry 2 }
+
+sysHostNames OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name(s) of a well known host. Set to the
+        empty string if not known.
+        Example: 'dns.lumentis.se dns'
+
+"
+    ::= { sysHostEntry 3 }
+
+sysHostRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Manages creation and deletion of conceptual rows.
+        See also SNMPv2-TC.
+
+"
+    ::= { sysHostEntry 4 }
+
+
+-- ----------------------------------------------------
+-- Local users configuration group
+-- ----------------------------------------------------
+
+sysUserTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SysUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The local user list."
+    ::= { sysUserList 1 }
+
+sysUserEntry OBJECT-TYPE
+    SYNTAX      SysUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the local user list.
+        Prompts for the following when
+        creating a new user:
+
+        Password for the current user (the user
+        in question or an administrator).
+
+        New password for the user.
+
+        New password again.
+
+        Profile for the new user
+        (default operator).
+
+"
+    INDEX { sysUserIndex }
+    ::= { sysUserTable 1 }
+
+SysUserEntry ::=
+    SEQUENCE {
+        sysUserIndex                    Unsigned32,
+        sysUserName                     DisplayString,
+        sysUserPasswd                   DisplayString,
+        sysUserDescr                    DisplayString,
+        sysUserLastChangeTime           DateAndTime,
+        sysUserExpireTime               DateAndTime,
+        sysUserRowStatus                RowStatus,
+        sysUserProfile                  DisplayString,
+        sysUserUid                      Unsigned32,
+        sysUserChangePassword           CommandString,
+        sysUserClearPassword            CommandString,
+        sysUserDisable                  CommandString,
+        sysUserEnable                   CommandString,
+        sysUserMode                     INTEGER }
+
+sysUserIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each entry.
+
+"
+    ::= { sysUserEntry 1 }
+
+sysUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The username must start with a lowercase alphabetical
+        character. The rest of the username should be lowercase
+        letters (a-z), numbers(0-9) or any of the following
+        characters: -._
+        It is also possible to add $ as the last character.
+
+"
+    ::= { sysUserEntry 2 }
+
+sysUserPasswd OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "tbd description
+        tbd examples
+
+"
+    DEFVAL { "1234567890" }
+    ::= { sysUserEntry 3 }
+
+sysUserDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User description string.
+
+"
+    DEFVAL { "" }
+    ::= { sysUserEntry 4 }
+
+sysUserLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "tbd description
+        tbd examples
+
+"
+    ::= { sysUserEntry 5 }
+
+sysUserExpireTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "tbd description
+        tbd examples
+
+"
+    ::= { sysUserEntry 6 }
+
+sysUserRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "Manages creation and deletion of conceptual rows.
+        See also SNMPv2-TC.
+
+"
+    ::= { sysUserEntry 7 }
+
+sysUserProfile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user authority profile.
+
+        'administrator' - No restrictions.
+
+        'operator' - Restrictions on user operations
+        and some systems management operations.
+        Otherwise read/write access.
+
+        'readonly' - Read only access.
+
+"
+    DEFVAL { "operator" }
+    ::= { sysUserEntry 8 }
+
+sysUserUid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User id.
+
+"
+    ::= { sysUserEntry 9 }
+
+sysUserChangePassword OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Change user password.
+        Permitted for the the user in question
+        and administrators.
+        Asks for the following:
+
+        User database to update, Local or TACACS.
+        The system supports update of either the
+        local password or the TACACS password on
+        a remote server. This choice is seen only
+        when applicable.
+
+        Password for the current user (the user
+        in question or an administrator).
+
+        New password for the user.
+
+        New password again.
+
+        Password can consist of any printable ASCII character
+        except for '&' and whitespace. There are no restrictions
+        on upper or lower case characters.
+
+        Password length:  1 - 40 character(s).
+
+        Default password is set when new user is created.
+
+"
+    DEFVAL { "1234567890" }
+    ::= { sysUserEntry 10 }
+
+sysUserClearPassword OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear the user password.
+        Only permitted for administrators.
+        Asks for the following:
+
+        Password for the current user.
+
+        Note: Only changes the local password.
+        If a RADIUS- or TACACS+-server is in use
+        they may override the local configuration.
+
+"
+    ::= { sysUserEntry 11 }
+
+sysUserDisable OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Disable the user.
+        Clear or set the password to make the user
+        available again.
+        Only permitted for administrators.
+        Asks for the following:
+
+        Password for the current user.
+
+        Note: Only disables the user locally.
+        If a RADIUS- or TACACS+-server is in use
+        they may override the local configuration.
+
+"
+    ::= { sysUserEntry 12 }
+
+sysUserEnable OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable the user.
+        Only permitted for administrators.
+        Asks for the following:
+
+        Password for the current user.
+
+        Note: Only enables the user locally.
+        If a RADIUS- or TACACS+-server is in use
+        they may override the local configuration.
+
+"
+    ::= { sysUserEntry 13 }
+
+sysUserMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Administrative status for the user.
+
+        Note: Only shows the local user configuration.
+        If a RADIUS- or TACACS+-server is in use
+        they may override the local configuration.
+"
+    DEFVAL { enabled }
+    ::= { sysUserEntry 14 }
+
+
+-- ----------------------------------------------------
+-- Date and time group
+-- ----------------------------------------------------
+
+sysTimeLocal OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local date and time.
+
+"
+    ::= { sysTime 1 }
+
+sysTimeZone OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the time zone in which node
+        is located.
+
+        A few examples:
+
+        'CET'
+
+        'EET'
+
+        'Europe/Stockholm'
+
+        'Europe/London'
+
+        'Europe/Copenhagen'
+
+        'Europe/Berlin'
+
+        'America/Chicago'
+
+        'America/Kentucky/Louisville'
+
+        'Asia/Tokyo'
+
+        Note: The notation used for naming the
+        timezones where the offset to Coordinated
+        Universal Time (UTC) is explicitly included,
+        i.e. 'GMT-2', may be confusing.
+        The offset indicates the time value
+        to be added to the local time to get UTC.
+
+        This means that the the offset is positive
+        for timezones west of UTC and and negative
+        east of UTC. This is the opposite of how
+        timezones are often described.
+        For example standard time in Sweden is
+        'GMT-1'. On timezone maps zones east of
+        UTC are often given a positive offset
+        so that the very same zone is called 'GMT+1'.
+
+        This attribute can be written via SNMP.
+"
+    DEFVAL { "CET" }
+    ::= { sysTime 2 }
+
+sysTimePrimaryServer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address of the primary SNTP/NTP server.
+
+        Set to the 0.0.0.0 or empty string if not used.
+
+        Example: '192.36.143.150' (time1.stupi.se)
+
+"
+    ::= { sysTime 3 }
+
+sysTimeSecondaryServer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address of the secondary SNTP/NTP server.
+
+        Set to the 0.0.0.0 or empty string if not used.
+
+        Example: '192.36.143.151' (time2.stupi.se)
+
+"
+    DEFVAL { "" }
+    ::= { sysTime 4 }
+
+sysTimeChangeLocalTime OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Change the local date and time.
+
+        Year - If no century is input the
+        current century is set by default.
+
+        Month - 1 to 12
+
+        Day - 1 to 31
+
+        Hour - 0 to 23
+
+        Minute - 0 to 59
+
+        Second - 0 to 59
+
+        Note: Setting of the local time is disabled if
+        either the primary or secondary time server
+        is set.
+
+"
+    ::= { sysTime 5 }
+
+sysTimePrimaryIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the primary SNTP/NTP server.
+
+        Set to 0.0.0.0 if not used.
+
+        Example: '192.36.143.150' (time1.stupi.se)
+
+        This attribute can be written via SNMP.
+"
+    DEFVAL { "0.0.0.0" }
+    ::= { sysTime 6 }
+
+sysTimeSecondaryIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the primary SNTP/NTP server.
+
+        Set to 0.0.0.0 if not used.
+
+        Example: '192.36.143.150' (time1.stupi.se)
+
+        This attribute can be written via SNMP.
+"
+    DEFVAL { "0.0.0.0" }
+    ::= { sysTime 7 }
+
+-- ----------------------------------------------------
+-- Syslog configuration directives group
+-- ----------------------------------------------------
+
+sysLogTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SysLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The syslog configuration directives list.
+
+"
+    ::= { sysLogList 1 }
+
+sysLogEntry OBJECT-TYPE
+    SYNTAX      SysLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "An entry in the syslog configuration
+        directives list.
+
+"
+    INDEX { sysLogIndex }
+    ::= { sysLogTable 1 }
+
+SysLogEntry ::=
+    SEQUENCE {
+        sysLogIndex                     Unsigned32,
+        sysLogSelection                 DisplayString,
+        sysLogAction                    DisplayString,
+        sysLogRowStatus                 RowStatus
+    }
+
+sysLogIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "An arbitrary index assigned to each syslog
+        configuration directive.
+
+"
+    ::= { sysLogEntry 1 }
+
+sysLogSelection OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "tbd description
+        tbd examples
+
+"
+    ::= { sysLogEntry 2 }
+
+sysLogAction OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "tbd description
+        tbd examples
+
+"
+    ::= { sysLogEntry 3 }
+
+sysLogRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Manages creation and deletion of conceptual rows.
+        See also SNMPv2-TC.
+
+"
+    ::= { sysLogEntry 4 }
+
+
+-- ----------------------------------------------------
+-- Radius group
+-- ----------------------------------------------------
+
+sysRadiusPrimaryServer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address for the primary RADIUS-server.
+        The port number used is 1812 (accounting,
+        port 1813, is not enabled).
+        Time-out is 3 seconds.
+
+        Set to the 0.0.0.0 or empty string if not used.
+
+        If either the server or the secret are not set
+        the primary server is disabled.
+
+"
+    DEFVAL { "" }
+    ::= { sysRadius 1 }
+
+sysRadiusPrimarySecret OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The shared secret for the primary RADIUS-server.
+
+        Set to empty string if not used.
+
+        If either the server or the secret are not set
+        the primary server is disabled.
+
+"
+    DEFVAL { "1234567890" }
+    ::= { sysRadius 2 }
+
+sysRadiusSecondaryServer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address for the secondary RADIUS-server.
+        The port number used is 1812 (accounting,
+        port 1813, is not enabled).
+        Time-out is 3 seconds.
+
+        Set to the 0.0.0.0 or empty string if not used.
+
+        If either the server or the secret are not set
+        the secondary server is disabled.
+
+"
+    DEFVAL { "" }
+    ::= { sysRadius 3 }
+
+sysRadiusSecondarySecret OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The shared secret for the secondary RADIUS-server.
+
+        Set to empty string if not used.
+
+        If either the server or the secret are not set
+        the secondary server is disabled.
+
+"
+    DEFVAL { "1234567890" }
+    ::= { sysRadius 4 }
+
+sysRadiusPrimaryIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address for the primary RADIUS-server.
+        The port number used is 1812 (accounting,
+        port 1813, is not enabled).
+        Time-out is 3 seconds.
+
+        Set to 0.0.0.0 if not used.
+
+        If either the server or the secret are not set
+        the primary server is disabled.
+
+"
+    DEFVAL { "0.0.0.0" }
+    ::= { sysRadius 5 }
+
+sysRadiusSecondaryIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address for the secondary RADIUS-server.
+        The port number used is 1812 (accounting,
+        port 1813, is not enabled).
+        Time-out is 3 seconds.
+
+        Set to 0.0.0.0 if not used.
+
+        If either the server or the secret are not set
+        the primary server is disabled.
+
+"
+    DEFVAL { "0.0.0.0" }
+    ::= { sysRadius 6 }
+
+sysRadiusPrimaryPort OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number for the primary RADIUS server.
+"
+    DEFVAL { 1812 }
+    ::= { sysRadius 7 }
+
+sysRadiusSecondaryPort OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number used for the Secondary RADIUS server.
+"
+    DEFVAL { 1812 }
+    ::= { sysRadius 8 }
+
+sysRadiusDefaultUserProfile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user authority profile.
+
+        'administrator' - No restrictions.
+
+        'operator' - Restrictions on user operations
+        and some systems management operations.
+        Otherwise read/write access.
+
+        'readonly' - Read only access.
+
+	'no radius template' - The user 'radius' is used as template.
+	It should be created if RADIUS server is used.
+	Otherwise both primary and secondary servers are disabled.
+
+"
+    ::= { sysRadius 9 }
+
+
+-- ----------------------------------------------------
+-- License group
+-- ----------------------------------------------------
+
+sysLicenseExpireDate OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the date when the license will expire.
+
+"
+    ::= { sysLicense 1 }
+
+sysLicenseCustomer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the name of the customer that holds the license.
+
+"
+    ::= { sysLicense 2 }
+
+sysLicenseExpiresSoon OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Warns that the license will expire in 7 days,
+        or less.
+
+"
+    ::= { sysLicense 3 }
+
+sysLicenseExpired OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the license has expired, or the
+         license file is missing.
+
+"
+    ::= { sysLicense 4 }
+
+sysLicenseExpiredCause OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (0),
+                    missing (1),
+                    invalid (2),
+                    corrupt (3),
+                    expired (4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes why the license expired alarm is
+         raised.
+
+         none    - file is ok, no alarm.
+
+         missing - the license file is missing.
+
+         invalid - it is not a valid XML file, or
+                   some tags are missing.
+
+         corrupt - the encryption key does not match
+                   the content of the file.
+
+         expired - the license has expired.
+
+"
+    ::= { sysLicense 5 }
+
+sysLicenseFeatureEws OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2),
+                    demo (3),
+                    corrupt (4),
+                    expired (5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "disabled - the feature ENM can not be used.
+
+         enabled - the feature ENM can be used.
+
+         demo    - the feature is only for demo use.
+
+         corrupt - the encryption key does not match.
+
+         expired - the feature has expired.
+
+"
+    ::= { sysLicense 6 }
+
+sysLicenseFeatureOspf OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2),
+                    demo (3),
+                    corrupt (4),
+                    expired (5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "disabled - the feature OSPF can not be used.
+
+         enabled - the feature OSPF can be used.
+
+         demo    - the feature is only for demo use.
+
+         corrupt - the encryption key does not match.
+
+         expired - the feature has expired.
+
+"
+    ::= { sysLicense 7 }
+
+sysLicenseFeatureSnmp OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2),
+                    demo (3),
+                    corrupt (4),
+                    expired (5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "disabled - the feature SNMP can not be used.
+
+         enabled - the feature SNMP can be used.
+
+         demo    - the feature is only for demo use.
+
+         corrupt - the encryption key does not match.
+
+         expired - the feature has expired.
+
+"
+    ::= { sysLicense 8 }
+
+sysLicenseFeatureGmpls OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2),
+                    demo (3),
+                    corrupt (4),
+                    expired (5) }
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "disabled - the feature GMPLS can not be used.
+
+         enabled - the feature GMPLS can be used.
+
+         demo    - the feature is only for demo use.
+
+         corrupt - the encryption key does not match.
+
+         expired - the feature has expired.
+
+"
+    ::= { sysLicense 9 }
+
+sysLicenseFeatureRudb OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2),
+                    demo (3),
+                    corrupt (4),
+                    expired (5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "disabled - the feature RUDB can not be used.
+
+         enabled - the feature RUDB can be used.
+
+         demo    - the feature is only for demo use.
+
+         corrupt - the encryption key does not match.
+
+         expired - the feature has expired.
+
+         RUDB means 'remote used database' and include
+         TACACS and RADIUS.
+
+"
+    ::= { sysLicense 10 }
+
+sysLicenseInstallLicenseFile OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Install a new license file.
+
+         The license file can either be fetched from a
+         remote server or installed from local
+         directory.
+
+         There are 3 cases:
+
+         1. Remote server. Give server addr and full path
+
+            installLicenseFile <ip-addr>/<full path>
+
+            installLicenseFile 192.168.10.27/tftp/license.xml
+
+         2. From a local directory
+
+           installLicenseFile <full path>
+
+           installLicenseFile /root/license.xml
+
+         3. From the local download directory
+            /tftpboot/downloaded
+
+           installLicenseFile <file name>
+
+           installLicenseFile license.xml
+
+         Regardless of the name of the file it will be
+         installed as
+
+              /etc/lumentis/license.xml
+
+"
+    ::= { sysLicense 11 }
+
+
+-- ----------------------------------------------------
+-- Tacacs group
+-- ----------------------------------------------------
+
+sysTacacsPrimaryServer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address for the primary TACACS+-server.
+        The port number used is 49.
+        Time-out is 3 seconds.
+
+        Set to the 0.0.0.0 or empty string if not used.
+
+"
+    DEFVAL { "" }
+    ::= { sysTacacs 1 }
+
+sysTacacsSecondaryServer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address for the secondary TACACS+-server.
+        The port number used is 49.
+        Time-out is 3 seconds.
+
+        Set to the 0.0.0.0 or empty string if not used.
+
+"
+    DEFVAL { "" }
+    ::= { sysTacacs 2 }
+
+sysTacacsSecret OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The shared secret for the primary TACACS+-server.
+
+        Set to empty string if not used.
+
+"
+    DEFVAL { "1234567890" }
+    ::= { sysTacacs 3 }
+
+sysTacacsSecondarySecret OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The shared secret for the secondary TACACS+-server.
+
+        Set to empty string if not used.
+
+"
+    DEFVAL { "1234567890" }
+    ::= { sysTacacs 4 }
+
+sysTacacsPrimaryIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address for the primary TACACS+-server.
+        The port number used is 49.
+        Time-out is 3 seconds.
+
+        Set to 0.0.0.0 if not used.
+
+"
+    DEFVAL { "0.0.0.0" }
+    ::= { sysTacacs 5 }
+
+sysTacacsSecondaryIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address for the secondary TACACS+-server.
+        The port number used is 49.
+        Time-out is 3 seconds.
+
+        Set to 0.0.0.0 if not used.
+
+"
+    DEFVAL { "0.0.0.0" }
+    ::= { sysTacacs 6 }
+
+-- ----------------------------------------------------
+-- Security group
+-- ----------------------------------------------------
+
+sysSecurityLocalConsoleAccess OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2),
+                    bootdisabled (3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When this parameter is 'disabled' there
+         is no way to access the board via RS-232.
+
+         Note, the setting applies to all boards in all chassis.
+
+         enabled -      Access is allowed
+         disabled -     No access is allowed.
+                        The boot monitor and LINUX login are blocked.
+         bootdisabled - The boot monitor is blocked while LINUX login is allowed.
+
+         Only administrator can change the local console access settings.
+
+"
+    DEFVAL { enabled }
+    ::= { sysSecurity 1 }
+
+sysSecurityChangeLocalConsoleAccess OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Procedure to change 'Local Console Access'
+
+"
+    ::= { sysSecurity 2 }
+
+sysSecurityIpTablesStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unavailable (1),
+                    unsecure (2),
+		    secure (3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This parameter shows if a system
+         function is enabled in the node.
+
+         unavailable - package not installed
+         unsecure - package installed but not in use
+	 secure - package installed and in use
+
+"
+    DEFVAL { unavailable }
+    ::= { sysSecurity 3 }
+
+sysSecurityLocalCraftAccess OBJECT-TYPE
+    SYNTAX      EnableDisable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The local craft ETH access is used for
+         connecting a PC which runs DHCP (Dynamic Host Control Protocol)
+         for accessing the web (GUI) interface.
+         Use lc in the address bar of the browser.
+         The IP address of the DCN also works.
+
+         When this parameter is 'disabled' there
+         is no way to access the board via Craft ETH port.
+
+         enabled -      Access is allowed
+         disabled -     No access is allowed.
+
+         Only administrator can change the local craft ETH access settings.
+
+         The Local Craft ETH runs in 1000Base-T mode (1G Eth) or lower speed
+         depending on the auto negotiation.
+
+"
+    DEFVAL { enabled }
+    ::= { sysSecurity 4 }
+
+sysSecurityChangeLocalCraftAccess OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Procedure to change 'Local Craft ETH Access'
+
+"
+    ::= { sysSecurity 5 }
+
+sysSecurityAuthenticationOrder OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    localFirst (1),
+                    remoteFirst (2),
+                    strictRemoteFirst (3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This parameter shows the authentication order which is
+         used by the system.
+
+         localFirst -        First authenticate with respect to local user database. If it fails, try remote server(s).
+                             If no remote servers are configured, the authentication will be Local-Only.
+         remoteFirst -       First authenticate with respect to the remote servers. If all remote servers are unreachable, try the local user database.
+                             If the remote authentication is denied, try the local user database.
+         strictRemoteFirst - First authenticate with respect to the remote servers. If all remote servers are unreachable, try the local user database.
+                             If the remote authentication is denied, stop, access is denied.
+
+        Only administrator can change the authenticate order settings.
+
+"
+    DEFVAL { strictRemoteFirst }
+    ::= { sysSecurity 6 }
+
+sysSecurityFileSystemAccessRestrictions OBJECT-TYPE
+    SYNTAX      EnableDisable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Access rights to the file system of the node element. When 'restricted',
+         restrictions to the file system are activated, these restrictions depends
+         on the user authority profile.
+
+         disabled    - Default access rights:
+                    1. Administrators (including root) and operators can execute
+                       CLI commands bash and telnet.
+                    2. All users have full file system access using SFTP or
+                       FTP (if enabled).
+
+         enabled     - Restricted access rights to the file system. The following
+                       restrictions are applied:
+                    1. Only administrator users (including root) can execute
+                       CLI commands bash and telnet.
+                    2. When using SFTP:
+                       Readonly and operator users can only access /tftpboot/ and
+                       its subdirectories.
+		       Administrator users (including root) have full file system
+                       access.
+                    3. When using FTP (if enabled):
+                       Readonly, operator and all administrator users except root
+                       can only access /tftpboot/ and its subdirectories.
+                       The root user have full file system access.
+
+         When changed, the updated restrictions will be used at following FTP/SFTP
+         sessions.
+         On CU-SFP/III, active FTP sessions will be aborted at the point when file
+         system access is changed.
+
+         Only administrator can change the file system access restriction settings.
+
+"
+    DEFVAL { disabled }
+    ::= { sysSecurity 7 }
+
+sysSecurityCUFrontICNPortAccess OBJECT-TYPE
+    SYNTAX      EnableDisable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The CU front ICN port access is used for
+         internal connection between subracks.
+
+         When this parameter is 'disabled' there
+         is no way to access next node via ICN1 or ICN2.
+
+         enabled -      Access is allowed
+         disabled -     No access is allowed.
+
+         Only administrator can change the CU front ICN port access settings.
+
+"
+    DEFVAL { enabled }
+    ::= { sysSecurity 8 }
+
+sysSecurityChangeCUFrontICNPortAccess OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Procedure to change 'CU front ICN port access'
+
+"
+    ::= { sysSecurity 9 }
+
+sysSecuritySubrackICNPortAccess OBJECT-TYPE
+    SYNTAX      EnableDisable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Subrack ICN port access is used for
+         internal connection between subracks.
+
+         When this parameter is 'disabled' there
+         is no way to access next subrack via ICN3 or ICN4.
+
+         enabled -      Access is allowed
+         disabled -     No access is allowed.
+
+         Only administrator can change the Subrack ICN port access settings.
+
+"
+    DEFVAL { enabled }
+    ::= { sysSecurity 10 }
+
+sysSecurityChangeSubrackICNPortAccess OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Procedure to change 'Subrack ICN port access'
+
+"
+    ::= { sysSecurity 11 }
+
+sysSecurityMgmtAccessProofOfConnStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    undefined (0),
+                    connected (1),
+                    disconnected (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This parameter shows if the NE has lost the signal
+         or not.  The SNMP agent is regularly polling the NE
+         and if the NE is not polled within a certain time period
+         (set in parameter MgmtAccessProofOfConnectivity)
+         we have proof of connectivity loss, and this parameter
+         is set to disconnected.
+
+        undefined -    NE connectivity status not determined
+        disconnected - NE lost connection
+        connected -    NE is connected
+
+"
+    DEFVAL { undefined }
+    ::= { sysSecurity 12 }
+
+sysSecurityMgmtAccessProofOfConnectivity OBJECT-TYPE
+    SYNTAX      Integer32 (1..720)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of minutes that has to pass with no SNMP agent polls
+         before the NE assumes that connectivity is lost.
+
+         Only administrator can change the proof of connectivity settings.
+
+"
+    DEFVAL { 120 }
+    ::= { sysSecurity 13 }
+
+ sysSecurityAutoEnableBlockedMgmtPorts OBJECT-TYPE
+    SYNTAX      OnOff
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A setting to turn off/on auto enabling of blocked management ports.
+        Management ports in this context means DCN and Local craft ETH (Local craft ETH
+        does not exist on all platforms). If the network element has not been polled by the SNMP agent
+        (DNA-M) within the time that is set by the attribute Proof of Connectivity, the
+        blocked management ports are automatically enabled (deblocked/unblocked).
+        If SNMP polling is detected again by the network element (after a discontinuity) the ports will
+        revert to their blocked state.
+
+         on - The function to auto enable blocked ports is turned on.
+
+         off - The function to auto enable blocked ports is turned off.
+
+         Only administrator can change the auto enable blocked management ports settings.
+
+"
+    DEFVAL { on }
+    ::= { sysSecurity 14 }
+
+sysSecurityBlockedMgmtPortsUnblocked OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Blocked management ports (i.e. local craft and DCN ports) are unblocked.
+        The blocking is overridden due to loss of management connectivity (SNMP).
+
+"
+    ::= { sysSecurity 15 }
+
+sysSecurityInstallCertificates OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Procedure to install certificates
+        installCertificates  <private-key-file-path> <public-key-file-path> <cert-chain-file-path>
+        Each <file-path> is absolute (starting with '/').
+        After this command, the files are automatically deleted.
+
+"
+    ::= { sysSecurity 16 }
+
+sysSecurityInstallFactoryDefaultCertificates OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Procedure to install factory default certificates.
+
+"
+    ::= { sysSecurity 17 }
+
+-- ----------------------------------------------------
+-- Manager group
+-- ----------------------------------------------------
+
+sysManagerName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of Centralized Security Manager (DNA-M).
+         This attribute shall NOT be set locally.
+         The DNA-M managing the security features of the NE will set this.
+         Requires administrator privileges to change.
+
+"
+    DEFVAL { "" }
+    ::= { sysManager 1 }
+
+sysManagerIPAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The address of Centralized Security Manager (DNA-M).
+         This attribute shall NOT be set locally.
+         The DNA-M managing the security features of the NE will set this.
+         Requires administrator privileges to change.
+
+"
+    ::= { sysManager 2 }
+
+sysManagerPolicyName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the Security Policy, defined in DNA-M, that is assigned to
+         this NE.
+         This attribute shall NOT be set locally.
+         The DNA-M managing the security features of the NE will set this.
+         Requires administrator privileges to change.
+
+"
+    DEFVAL { "" }
+    ::= { sysManager 3 }
+
+sysManagerPlatform OBJECT-TYPE
+    SYNTAX      Platform
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "NE platform information.
+         Used by Centralized Security Manager (DNA-M).
+
+"
+    DEFVAL { unknown }
+    ::= { sysManager 4 }
+
+sysManagerFcmComplianceVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Feature Capability Matrix Compliance version.
+         Used by Centralized Security Manager (DNA-M).
+
+"
+    DEFVAL { "" }
+    ::= { sysManager 5 }
+
+-- ----------------------------------------------------
+-- loginBanner group
+-- ----------------------------------------------------
+
+sysLoginBannerContent OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The login banner can be used to display pre-login
+         information such as system information or a warning.
+         The login banner requires administrator privileges
+         to change and can be set through CLI, GUI or DNA-M.
+         Characters 0x20 to 0x25 and 0x27 to 0x7E in
+         ISO/IEC 8859-1 are accepted/valid. Ampersand ('&')
+         0x26 is not allowed (this is a general XTM restriction
+         for text fields). New-line shall be encoded as '\\n' if
+         the message is set through CLI.
+
+         Min length: 0 character.
+
+         Max length: 1020 characters.
+
+         Although formal SNMP type is restricted to 128
+         characters, the system can cope with 1020 characters
+         when managed from CLI/GUI or DNA-M.
+
+"
+    DEFVAL { "" }
+    ::= { sysLoginBanner 1 }
+
+-- ----------------------------------------------------
+-- Notifications
+-- ----------------------------------------------------
+
+-- n/a
+
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+sysGeneralGroup OBJECT-GROUP
+    OBJECTS {
+        sysGeneralTestAndIncr,
+        sysGeneralMibSpecVersion,
+        sysGeneralMibImplVersion
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general system MIB objects."
+    ::= { lumSystemGroups 1 }
+
+sysNodeGroup OBJECT-GROUP
+    OBJECTS {
+        sysNodeName,
+        sysNodeContact,
+        sysNodeLocation,
+        sysNodeObjectId,
+        sysNodePrimaryNameServer,
+        sysNodeRunLevel }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node properties objects."
+    ::= { lumSystemGroups 2 }
+
+sysHostListGroup OBJECT-GROUP
+    OBJECTS {
+        sysHostIndex,
+        sysHostIpAddress,
+        sysHostNames,
+        sysHostRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "The host name table."
+    ::= { lumSystemGroups 3 }
+
+sysTimeGroup OBJECT-GROUP
+    OBJECTS {
+        sysTimeLocal,
+        sysTimeZone,
+        sysTimePrimaryServer,
+        sysTimeSecondaryServer }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node time properties."
+    ::= { lumSystemGroups 4 }
+
+sysLogListGroup OBJECT-GROUP
+    OBJECTS {
+        sysLogIndex,
+        sysLogSelection,
+        sysLogAction,
+        sysLogRowStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "Log configuration directives."
+    ::= { lumSystemGroups 5 }
+
+sysGeneralGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysGeneralLastChangeTime
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general system MIB objects v2."
+    ::= { lumSystemGroups 6 }
+
+sysNodeGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysNodeName,
+        sysNodeContact,
+        sysNodeLocation,
+        sysNodeObjectId,
+        sysNodePrimaryNameServer,
+        sysNodeRunLevel,
+        sysNodeSecondaryNameServer }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node properties objects V2."
+    ::= { lumSystemGroups 7 }
+
+sysUserGroup OBJECT-GROUP
+    OBJECTS {
+        sysUserIndex,
+        sysUserName,
+        sysUserPasswd,
+        sysUserDescr,
+        sysUserLastChangeTime,
+        sysUserExpireTime,
+        sysUserRowStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "The user table objects."
+    ::= { lumSystemGroups 8 }
+
+sysNodeGroupV3 OBJECT-GROUP
+    OBJECTS {
+        sysNodeName,
+        sysNodeContact,
+        sysNodeLocation,
+        sysNodeObjectId,
+        sysNodePrimaryNameServer,
+        sysNodeRunLevel,
+        sysNodeSecondaryNameServer,
+        sysNodeUptime }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node properties objects V3."
+    ::= { lumSystemGroups 9 }
+
+sysGeneralGroupV3 OBJECT-GROUP
+    OBJECTS {
+        sysGeneralLastChangeTime,
+        sysGeneralTest
+    }
+    STATUS      current
+    DESCRIPTION
+        "The general system MIB objects v3."
+    ::= { lumSystemGroups 10 }
+
+sysNodeGroupV4 OBJECT-GROUP
+    OBJECTS {
+        sysNodeName,
+        sysNodeContact,
+        sysNodeLocation,
+        sysNodeObjectId,
+        sysNodePrimaryNameServer,
+        sysNodeRunLevel,
+        sysNodeSecondaryNameServer,
+        sysNodeUptime,
+        sysNodeNeDistinguishedName,
+        sysNodeNeUserName,
+        sysNodeNeType }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node properties objects V4."
+    ::= { lumSystemGroups 11 }
+
+sysGeneralGroupV4 OBJECT-GROUP
+    OBJECTS {
+        sysGeneralLastChangeTime,
+        sysGeneralTest,
+        sysGeneralConfigLastChangeTime
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general system MIB objects v4."
+    ::= { lumSystemGroups 12 }
+
+sysNodeGroupV5 OBJECT-GROUP
+    OBJECTS {
+        sysNodeName,
+        sysNodeContact,
+        sysNodeLocation,
+        sysNodeObjectId,
+        sysNodePrimaryNameServer,
+        sysNodeSecondaryNameServer,
+        sysNodeUptime,
+        sysNodeNeDistinguishedName,
+        sysNodeNeUserName,
+        sysNodeNeType,
+        sysNodeBootTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node properties objects V5."
+    ::= { lumSystemGroups 15 }
+
+sysRadiusGroup OBJECT-GROUP
+    OBJECTS {
+        sysRadiusPrimaryServer,
+        sysRadiusPrimarySecret,
+        sysRadiusSecondaryServer,
+        sysRadiusSecondarySecret }
+    STATUS      deprecated
+    DESCRIPTION
+        "The RADIUS MIB objects."
+    ::= { lumSystemGroups 16 }
+
+sysNodeGroupV6 OBJECT-GROUP
+    OBJECTS {
+        sysNodeName,
+        sysNodeContact,
+        sysNodeLocation,
+        sysNodeObjectId,
+        sysNodePrimaryNameServer,
+        sysNodeSecondaryNameServer,
+        sysNodeUptime,
+        sysNodeNeDistinguishedName,
+        sysNodeNeUserName,
+        sysNodeNeType,
+        sysNodeBootTime,
+        sysNodeLocale }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node properties objects V6."
+    ::= { lumSystemGroups 17 }
+
+sysTimeGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysTimeLocal,
+        sysTimeZone,
+        sysTimePrimaryServer,
+        sysTimeSecondaryServer,
+        sysTimeChangeLocalTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node time properties V2."
+    ::= { lumSystemGroups 18 }
+
+sysLicenseGroup OBJECT-GROUP
+    OBJECTS {
+            sysLicenseExpireDate,
+            sysLicenseCustomer,
+            sysLicenseExpiresSoon,
+            sysLicenseExpired,
+            sysLicenseExpiredCause,
+            sysLicenseFeatureEws,
+            sysLicenseFeatureEws,
+            sysLicenseFeatureOspf,
+            sysLicenseFeatureSnmp,
+            sysLicenseFeatureGmpls,
+            sysLicenseFeatureRudb,
+            sysLicenseInstallLicenseFile }
+    STATUS      current
+    DESCRIPTION
+        "The node license properties V1."
+    ::= { lumSystemGroups 19 }
+
+sysTacacsGroup OBJECT-GROUP
+    OBJECTS {
+        sysTacacsPrimaryServer,
+        sysTacacsSecondaryServer,
+        sysTacacsSecret }
+    STATUS      deprecated
+    DESCRIPTION
+        "The TACACS+ MIB objects."
+    ::= { lumSystemGroups 20 }
+
+sysUserGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysUserIndex,
+        sysUserName,
+        sysUserDescr,
+        sysUserProfile,
+        sysUserUid }
+    STATUS      current
+    DESCRIPTION
+        "The user table objects v2."
+    ::= { lumSystemGroups 21 }
+
+sysGeneralGroupV5 OBJECT-GROUP
+    OBJECTS {
+        sysGeneralLastChangeTime,
+        sysGeneralTest,
+        sysGeneralConfigLastChangeTime,
+        sysGeneralLoginRecords
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general system MIB objects v5."
+    ::= { lumSystemGroups 22 }
+
+sysUserGroupV3 OBJECT-GROUP
+    OBJECTS {
+        sysUserIndex,
+        sysUserName,
+        sysUserDescr,
+        sysUserProfile,
+        sysUserUid,
+        sysUserChangePassword,
+        sysUserClearPassword,
+        sysUserDisable }
+    STATUS      deprecated
+    DESCRIPTION
+        "The user table objects v3."
+    ::= { lumSystemGroups 23 }
+
+sysTacacsGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysTacacsPrimaryServer,
+        sysTacacsSecondaryServer,
+        sysTacacsSecret,
+        sysTacacsSecondarySecret }
+    STATUS      deprecated
+    DESCRIPTION
+        "The TACACS+ MIB objects v2."
+    ::= { lumSystemGroups 24 }
+
+sysGeneralGroupV6 OBJECT-GROUP
+    OBJECTS {
+        sysGeneralLastChangeTime,
+        sysGeneralTest,
+        sysGeneralConfigLastChangeTime,
+        sysGeneralLoginRecords,
+        sysGeneralUserTableSize }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general system MIB objects v6."
+    ::= { lumSystemGroups 25 }
+
+sysUserGroupV4 OBJECT-GROUP
+    OBJECTS {
+        sysUserIndex,
+        sysUserName,
+        sysUserDescr,
+        sysUserProfile,
+        sysUserUid,
+        sysUserChangePassword,
+        sysUserClearPassword,
+        sysUserDisable,
+        sysUserMode,
+        sysUserEnable }
+    STATUS      current
+    DESCRIPTION
+        "The user table objects v4."
+    ::= { lumSystemGroups 26 }
+
+sysSecurityGroupV1 OBJECT-GROUP
+    OBJECTS {
+	sysSecurityLocalConsoleAccess,
+	sysSecurityChangeLocalConsoleAccess }
+    STATUS      deprecated
+    DESCRIPTION
+        "The security group objects v1 (7.0)."
+    ::= { lumSystemGroups 27 }
+
+sysNodeGroupV7 OBJECT-GROUP
+    OBJECTS {
+        sysNodeName,
+        sysNodeContact,
+        sysNodeLocation,
+        sysNodeObjectId,
+        sysNodePrimaryNameServer,
+        sysNodeSecondaryNameServer,
+        sysNodeUptime,
+        sysNodeNeDistinguishedName,
+        sysNodeNeUserName,
+        sysNodeNeType,
+        sysNodeBootTime,
+        sysNodeLocale,
+        sysNodeVersion }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node properties objects V7."
+    ::= { lumSystemGroups 28 }
+
+sysTacacsGroupV3 OBJECT-GROUP
+    OBJECTS {
+        sysTacacsSecret,
+        sysTacacsSecondarySecret,
+        sysTacacsPrimaryIpAddress,
+        sysTacacsSecondaryIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "The TACACS+ MIB objects v3."
+    ::= { lumSystemGroups 29 }
+
+sysRadiusGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysRadiusPrimarySecret,
+        sysRadiusSecondarySecret,
+        sysRadiusPrimaryIpAddress,
+        sysRadiusSecondaryIpAddress }
+    STATUS     deprecated
+    DESCRIPTION
+        "The RADIUS MIB objects."
+    ::= { lumSystemGroups 30 }
+
+sysTimeGroupV3 OBJECT-GROUP
+    OBJECTS {
+        sysTimeLocal,
+        sysTimeZone,
+        sysTimeChangeLocalTime,
+        sysTimePrimaryIpAddress,
+        sysTimeSecondaryIpAddress}
+    STATUS      current
+    DESCRIPTION
+        "The node time properties V3."
+    ::= { lumSystemGroups 31 }
+
+sysSecurityGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysSecurityLocalConsoleAccess,
+        sysSecurityChangeLocalConsoleAccess,
+        sysSecurityIpTablesStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "The security group objects v2 (12.0)."
+    ::= { lumSystemGroups 32 }
+
+sysRadiusGroupV3 OBJECT-GROUP
+    OBJECTS {
+        sysRadiusPrimarySecret,
+        sysRadiusSecondarySecret,
+        sysRadiusPrimaryIpAddress,
+        sysRadiusSecondaryIpAddress,
+        sysRadiusPrimaryPort,
+        sysRadiusSecondaryPort }
+    STATUS     deprecated
+    DESCRIPTION
+        "The RADIUS MIB objects V3."
+    ::= { lumSystemGroups 33 }
+
+sysRadiusGroupV4 OBJECT-GROUP
+    OBJECTS {
+        sysRadiusPrimarySecret,
+        sysRadiusSecondarySecret,
+        sysRadiusPrimaryIpAddress,
+        sysRadiusSecondaryIpAddress,
+        sysRadiusPrimaryPort,
+	sysRadiusSecondaryPort,
+	sysRadiusDefaultUserProfile}
+    STATUS     current
+    DESCRIPTION
+        "The RADIUS MIB objects V4."
+    ::= { lumSystemGroups 34 }
+
+sysGeneralGroupV7 OBJECT-GROUP
+    OBJECTS {
+        sysGeneralLastChangeTime,
+        sysGeneralConfigLastChangeTime,
+        sysGeneralLoginRecords,
+        sysGeneralUserTableSize,
+	sysGeneralWriteTest }
+    STATUS      current
+    DESCRIPTION
+        "The general system MIB objects v7."
+    ::= { lumSystemGroups  35 }
+
+sysSecurityGroupV3 OBJECT-GROUP
+    OBJECTS {
+        sysSecurityLocalConsoleAccess,
+        sysSecurityChangeLocalConsoleAccess,
+        sysSecurityLocalCraftAccess,
+        sysSecurityChangeLocalCraftAccess,
+        sysSecurityIpTablesStatus,
+        sysSecurityAuthenticationOrder}
+    STATUS      deprecated
+    DESCRIPTION
+        "The security group objects v3 (27.0)."
+    ::= { lumSystemGroups 36 }
+
+sysNodeGroupV8 OBJECT-GROUP
+    OBJECTS {
+        sysNodeName,
+        sysNodeContact,
+        sysNodeLocation,
+        sysNodeObjectId,
+        sysNodePrimaryNameServer,
+        sysNodeSecondaryNameServer,
+        sysNodeUptime,
+        sysNodeNeDistinguishedName,
+        sysNodeNeUserName,
+        sysNodeNeType,
+        sysNodeBootTime,
+        sysNodeLocale,
+        sysNodeVersion,
+        sysNodeCLLI,
+        sysNodeFIC,
+        sysNodeTID,
+        sysNodeLatitude,
+        sysNodeLongitude}
+    STATUS      current
+    DESCRIPTION
+        "The node properties objects V8 (28.0)."
+    ::= { lumSystemGroups 37 }
+
+sysSecurityGroupV4 OBJECT-GROUP
+    OBJECTS {
+        sysSecurityLocalConsoleAccess,
+        sysSecurityChangeLocalConsoleAccess,
+        sysSecurityLocalCraftAccess,
+        sysSecurityChangeLocalCraftAccess,
+        sysSecurityIpTablesStatus,
+        sysSecurityAuthenticationOrder,
+        sysSecurityFileSystemAccessRestrictions}
+    STATUS      deprecated
+    DESCRIPTION
+        "The security group objects v4 (29.0)."
+    ::= { lumSystemGroups 38 }
+
+sysSecurityGroupV5 OBJECT-GROUP
+    OBJECTS {
+        sysSecurityLocalConsoleAccess,
+        sysSecurityChangeLocalConsoleAccess,
+        sysSecurityLocalCraftAccess,
+        sysSecurityChangeLocalCraftAccess,
+        sysSecurityIpTablesStatus,
+        sysSecurityAuthenticationOrder,
+        sysSecurityFileSystemAccessRestrictions,
+        sysSecurityCUFrontICNPortAccess,
+        sysSecurityChangeCUFrontICNPortAccess,
+        sysSecuritySubrackICNPortAccess,
+        sysSecurityChangeSubrackICNPortAccess,
+        sysSecurityMgmtAccessProofOfConnStatus,
+        sysSecurityMgmtAccessProofOfConnectivity,
+        sysSecurityAutoEnableBlockedMgmtPorts,
+        sysSecurityBlockedMgmtPortsUnblocked }
+    STATUS      deprecated
+    DESCRIPTION
+        "The security group objects v5 (30.0)."
+    ::= { lumSystemGroups 39 }
+
+sysSecurityGroupV6 OBJECT-GROUP
+    OBJECTS {
+        sysSecurityLocalConsoleAccess,
+        sysSecurityChangeLocalConsoleAccess,
+        sysSecurityLocalCraftAccess,
+        sysSecurityChangeLocalCraftAccess,
+        sysSecurityIpTablesStatus,
+        sysSecurityAuthenticationOrder,
+        sysSecurityFileSystemAccessRestrictions,
+        sysSecurityCUFrontICNPortAccess,
+        sysSecurityChangeCUFrontICNPortAccess,
+        sysSecuritySubrackICNPortAccess,
+        sysSecurityChangeSubrackICNPortAccess,
+        sysSecurityMgmtAccessProofOfConnStatus,
+        sysSecurityMgmtAccessProofOfConnectivity,
+        sysSecurityAutoEnableBlockedMgmtPorts,
+        sysSecurityBlockedMgmtPortsUnblocked,
+        sysSecurityInstallCertificates,
+        sysSecurityInstallFactoryDefaultCertificates }
+    STATUS      current
+    DESCRIPTION
+        "The security group objects v6 (32.0)."
+    ::= { lumSystemGroups 40 }
+
+sysManagerGroupV1 OBJECT-GROUP
+    OBJECTS {
+        sysManagerName,
+        sysManagerIPAddress,
+        sysManagerPolicyName,
+        sysManagerPlatform }
+    STATUS      deprecated
+    DESCRIPTION
+        "The manager group objects v1 (32.0)."
+    ::= { lumSystemGroups 41 }
+
+sysLoginBannerGroupV1 OBJECT-GROUP
+    OBJECTS {
+        sysLoginBannerContent }
+    STATUS      current
+    DESCRIPTION
+        "The loginBanner group objects v1 (32.1)."
+    ::= { lumSystemGroups 42 }
+
+sysManagerGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysManagerName,
+        sysManagerIPAddress,
+        sysManagerPolicyName,
+        sysManagerPlatform,
+	sysManagerFcmComplianceVersion}
+    STATUS      current
+    DESCRIPTION
+        "The manager group objects v2 (32.1)."
+    ::= { lumSystemGroups 43 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumSystemBasicComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroup,
+            sysNodeGroup,
+            sysTimeGroup,
+            sysLogListGroup,
+            sysHostListGroup
+        }
+    ::= { lumSystemCompl 1 }
+
+lumSystemBasicComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V2."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV2,
+            sysTimeGroup,
+            sysNodeGroup }
+    ::= { lumSystemCompl 2 }
+
+lumSystemBasicComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V3."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV2,
+            sysTimeGroup,
+            sysNodeGroupV2,
+            sysUserGroup }
+    ::= { lumSystemCompl 3 }
+
+lumSystemBasicComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V4."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV2,
+            sysTimeGroup,
+            sysNodeGroupV3,
+            sysUserGroup }
+    ::= { lumSystemCompl 4 }
+
+lumSystemBasicComplV5 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V5."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV3,
+            sysTimeGroup,
+            sysNodeGroupV3,
+            sysUserGroup }
+    ::= { lumSystemCompl 5 }
+
+lumSystemBasicComplV6 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V6."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV3,
+            sysTimeGroup,
+            sysNodeGroupV4,
+            sysUserGroup }
+    ::= { lumSystemCompl 6 }
+
+lumSystemBasicComplV7 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V7."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV4,
+            sysTimeGroup,
+            sysNodeGroupV5,
+            sysUserGroup }
+    ::= { lumSystemCompl 7 }
+
+lumSystemBasicComplV8 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V8."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV4,
+            sysTimeGroup,
+            sysNodeGroupV5,
+            sysUserGroup,
+            sysRadiusGroup }
+    ::= { lumSystemCompl 8 }
+
+lumSystemBasicComplV9 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V9."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV4,
+            sysTimeGroup,
+            sysNodeGroupV6,
+            sysUserGroup,
+            sysRadiusGroup }
+    ::= { lumSystemCompl 9 }
+
+lumSystemBasicComplV10 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V10 (2.2)."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV4,
+            sysTimeGroupV2,
+            sysNodeGroupV6,
+            sysRadiusGroup,
+            sysLicenseGroup }
+    ::= { lumSystemCompl 10 }
+
+lumSystemBasicComplV11 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V11."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV4,
+            sysTimeGroupV2,
+            sysNodeGroupV6,
+            sysRadiusGroup,
+            sysLicenseGroup,
+            sysTacacsGroup }
+    ::= { lumSystemCompl 11 }
+
+lumSystemBasicComplV12 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V12."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV4,
+            sysTimeGroupV2,
+            sysNodeGroupV6,
+            sysRadiusGroup,
+            sysLicenseGroup,
+            sysTacacsGroup,
+            sysUserGroupV2 }
+    ::= { lumSystemCompl 12 }
+
+lumSystemBasicComplV13 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V13."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV5,
+            sysTimeGroupV2,
+            sysNodeGroupV6,
+            sysRadiusGroup,
+            sysLicenseGroup,
+            sysTacacsGroup,
+            sysUserGroupV2 }
+    ::= { lumSystemCompl 13 }
+
+lumSystemBasicComplV14 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V14."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV6,
+            sysTimeGroupV2,
+            sysNodeGroupV6,
+            sysRadiusGroup,
+            sysLicenseGroup,
+            sysTacacsGroupV2,
+            sysUserGroupV3 }
+    ::= { lumSystemCompl 14 }
+
+lumSystemBasicComplV15 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V15 (4.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV6,
+            sysTimeGroupV2,
+            sysNodeGroupV6,
+            sysRadiusGroup,
+            sysLicenseGroup,
+            sysTacacsGroupV2,
+            sysUserGroupV4 }
+    ::= { lumSystemCompl 15 }
+
+lumSystemBasicComplV16 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V16 (7.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV6,
+            sysTimeGroupV2,
+            sysNodeGroupV6,
+            sysRadiusGroup,
+            sysLicenseGroup,
+            sysTacacsGroupV2,
+            sysUserGroupV4,
+	    sysSecurityGroupV1 }
+    ::= { lumSystemCompl 16 }
+
+lumSystemBasicComplV17 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V17 (10.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV6,
+            sysTimeGroupV2,
+            sysNodeGroupV7,
+            sysRadiusGroup,
+            sysLicenseGroup,
+            sysTacacsGroupV2,
+            sysUserGroupV4,
+	    sysSecurityGroupV1 }
+    ::= { lumSystemCompl 17 }
+
+lumSystemBasicComplV18 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V18 (11.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV6,
+            sysTimeGroupV3,
+            sysNodeGroupV7,
+            sysRadiusGroupV2,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+	    sysSecurityGroupV1 }
+    ::= { lumSystemCompl 18 }
+
+lumSystemBasicComplV19 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V19 (12.0).
+	Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV6,
+            sysTimeGroupV3,
+            sysNodeGroupV7,
+            sysRadiusGroupV2,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+	    sysSecurityGroupV2 }
+    ::= { lumSystemCompl 19 }
+
+lumSystemBasicComplV20 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V20 (13.0).
+	Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV6,
+            sysTimeGroupV3,
+            sysNodeGroupV7,
+            sysRadiusGroupV3,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+	    sysSecurityGroupV2 }
+    ::= { lumSystemCompl 20 }
+
+lumSystemBasicComplV21 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V21 (13.0).
+	Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV6,
+            sysTimeGroupV3,
+            sysNodeGroupV7,
+            sysRadiusGroupV4,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+	    sysSecurityGroupV2 }
+    ::= { lumSystemCompl 21 }
+
+
+lumSystemBasicComplV22 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V22 (23.0).
+	Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV7,
+            sysTimeGroupV3,
+            sysNodeGroupV7,
+            sysRadiusGroupV4,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+	    sysSecurityGroupV2 }
+    ::= { lumSystemCompl 22 }
+
+lumSystemBasicComplV23 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V23 (28.0).
+	Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV7,
+            sysTimeGroupV3,
+            sysNodeGroupV8,
+            sysRadiusGroupV4,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+            sysSecurityGroupV2 }
+    ::= { lumSystemCompl 23 }
+
+lumSystemBasicComplV24 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V24 (29.0).
+	Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV7,
+            sysTimeGroupV3,
+            sysNodeGroupV8,
+            sysRadiusGroupV4,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+            sysSecurityGroupV4 }
+    ::= { lumSystemCompl 24 }
+
+lumSystemBasicComplV25 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V25 (30.0).
+    Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV7,
+            sysTimeGroupV3,
+            sysNodeGroupV8,
+            sysRadiusGroupV4,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+            sysSecurityGroupV5 }
+    ::= { lumSystemCompl 25 }
+
+lumSystemBasicComplV26 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V26 (30.1).
+    Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV7,
+            sysTimeGroupV3,
+            sysNodeGroupV8,
+            sysRadiusGroupV4,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+            sysSecurityGroupV5 }
+    ::= { lumSystemCompl 26 }
+
+lumSystemBasicComplV27 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V27 (32.0).
+        Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV7,
+            sysTimeGroupV3,
+            sysNodeGroupV8,
+            sysRadiusGroupV4,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+            sysSecurityGroupV6 }
+    ::= { lumSystemCompl 27 }
+
+lumSystemBasicComplV28 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V28 (32.0).
+        Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV7,
+            sysTimeGroupV3,
+            sysNodeGroupV8,
+            sysRadiusGroupV4,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+            sysSecurityGroupV6,
+            sysManagerGroupV1 }
+    ::= { lumSystemCompl 28 }
+
+lumSystemBasicComplV29 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the system MIB V29 (32.1).
+        Used to indicate web-server less vulnerable to hanging."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralGroupV7,
+            sysTimeGroupV3,
+            sysNodeGroupV8,
+            sysRadiusGroupV4,
+            sysLicenseGroup,
+            sysTacacsGroupV3,
+            sysUserGroupV4,
+            sysSecurityGroupV6,
+            sysManagerGroupV2,
+            sysLoginBannerGroupV1 }
+    ::= { lumSystemCompl 29 }
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+sysGeneralMinimalGroupV1 OBJECT-GROUP
+    OBJECTS {
+        sysGeneralLastChangeTime,
+        sysGeneralConfigLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "The minimal general system MIB objects v1."
+    ::= { lumSystemMinimalGroups 1 }
+
+sysNodeMinimalGroupV1 OBJECT-GROUP
+    OBJECTS {
+        sysNodeName,
+        sysNodeNeUserName,
+        sysNodeBootTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "The minimal node properties objects v1."
+    ::= { lumSystemMinimalGroups 2 }
+
+sysTimeMinimalGroupV1 OBJECT-GROUP
+    OBJECTS {
+        sysTimeLocal }
+    STATUS      deprecated
+    DESCRIPTION
+        "The minimal node time properties v1."
+    ::= { lumSystemMinimalGroups 3 }
+
+sysNodeMinimalGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysNodeName,
+        sysNodeNeUserName,
+	sysNodeLocation,
+	sysNodeContact,
+        sysNodeBootTime }
+    STATUS      current
+    DESCRIPTION
+        "The minimal node properties objects v2."
+    ::= { lumSystemMinimalGroups 4 }
+
+sysTimeMinimalGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysTimeLocal,
+	sysTimeZone,
+	sysTimePrimaryServer }
+    STATUS      deprecated
+    DESCRIPTION
+        "The minimal node time properties v2."
+    ::= { lumSystemMinimalGroups 5 }
+
+sysRadiusMinimalGroupV1 OBJECT-GROUP
+    OBJECTS {
+        sysRadiusPrimaryServer,
+        sysRadiusPrimarySecret,
+        sysRadiusSecondaryServer,
+        sysRadiusSecondarySecret }
+    STATUS      deprecated
+    DESCRIPTION
+        "The minimal node RADIUS MIB objects v1."
+    ::= { lumSystemMinimalGroups 6 }
+
+
+sysTimeMinimalGroupV3 OBJECT-GROUP
+    OBJECTS {
+        sysTimeLocal,
+	sysTimeZone,
+        sysTimePrimaryIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "The minimal node time properties v3."
+    ::= { lumSystemMinimalGroups 7 }
+
+sysRadiusMinimalGroupV2 OBJECT-GROUP
+    OBJECTS {
+        sysRadiusPrimarySecret,
+        sysRadiusSecondarySecret,
+        sysRadiusPrimaryIpAddress,
+        sysRadiusSecondaryIpAddress }
+    STATUS      deprecated
+    DESCRIPTION
+        "The minimal node RADIUS MIB objects v2."
+    ::= { lumSystemMinimalGroups 8 }
+
+sysRadiusMinimalGroupV3 OBJECT-GROUP
+    OBJECTS {
+        sysRadiusPrimarySecret,
+        sysRadiusSecondarySecret,
+        sysRadiusPrimaryIpAddress,
+        sysRadiusSecondaryIpAddress,
+	sysRadiusPrimaryPort,
+	sysRadiusSecondaryPort }
+    STATUS      deprecated
+    DESCRIPTION
+        "The minimal node RADIUS MIB objects v3."
+    ::= { lumSystemMinimalGroups 9 }
+
+sysRadiusMinimalGroupV4 OBJECT-GROUP
+    OBJECTS {
+        sysRadiusPrimarySecret,
+        sysRadiusSecondarySecret,
+        sysRadiusPrimaryIpAddress,
+        sysRadiusSecondaryIpAddress,
+	sysRadiusPrimaryPort,
+	sysRadiusSecondaryPort,
+	sysRadiusDefaultUserProfile}
+    STATUS      current
+    DESCRIPTION
+        "The minimal node RADIUS MIB objects v4."
+    ::= { lumSystemMinimalGroups 10 }
+
+
+-- ----------------------------------------------------
+-- Minimal Compliance
+-- ----------------------------------------------------
+
+lumSystemMinimalComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the system MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralMinimalGroupV1,
+            sysTimeMinimalGroupV1,
+            sysNodeMinimalGroupV1 }
+    ::= { lumSystemMinimalCompl 1 }
+
+lumSystemMinimalComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the system MIB V2."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralMinimalGroupV1,
+            sysTimeMinimalGroupV1,
+            sysNodeMinimalGroupV2 }
+    ::= { lumSystemMinimalCompl 2 }
+
+lumSystemMinimalComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the system MIB V3."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralMinimalGroupV1,
+            sysTimeMinimalGroupV2,
+            sysNodeMinimalGroupV2,
+	    sysRadiusMinimalGroupV1 }
+    ::= { lumSystemMinimalCompl 3 }
+
+lumSystemMinimalComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the system MIB V4."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralMinimalGroupV1,
+            sysTimeMinimalGroupV3,
+            sysNodeMinimalGroupV2,
+	    sysRadiusMinimalGroupV2 }
+    ::= { lumSystemMinimalCompl 4 }
+
+lumSystemMinimalComplV5 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the system MIB V5."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralMinimalGroupV1,
+            sysTimeMinimalGroupV3,
+            sysNodeMinimalGroupV2,
+	    sysRadiusMinimalGroupV3 }
+    ::= { lumSystemMinimalCompl 5 }
+
+lumSystemMinimalComplV6 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Minimal implementation requirements for the system MIB V6."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralMinimalGroupV1,
+            sysTimeMinimalGroupV3,
+            sysNodeMinimalGroupV2,
+	    sysRadiusMinimalGroupV4 }
+    ::= { lumSystemMinimalCompl 6}
+
+
+lumSystemMinimalComplV7 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Minimal implementation requirements for the system MIB V7 (30.1)."
+    MODULE
+        MANDATORY-GROUPS {
+            sysGeneralMinimalGroupV1,
+            sysTimeMinimalGroupV3,
+            sysNodeMinimalGroupV2,
+	    sysRadiusMinimalGroupV4 }
+    ::= { lumSystemMinimalCompl 7}
+
+END
+

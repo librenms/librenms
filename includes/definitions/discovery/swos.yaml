@@ -1,0 +1,228 @@
+mib: MIKROTIK-MIB
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>.*)\sSwOS\s(?<version>.*)/'        
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - mtxrInterfaceStatsName
+        temperature:
+            data:
+                -
+                    oid: mtxrOpticalTable
+                    value: mtxrOpticalTemperature
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.6.{{ $index }}'
+                    descr: mtxrOpticalName
+                    index: 'mtxrOpticalTemperature.{{ $index }}'
+                    skip_value_gt: 25000
+                    skip_values:
+                    -
+                      oid: mtxrOpticalName
+                      op: '=='
+                      value: ""
+                -
+                    oid: mtxrHlSensorTemperature
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.5.{{ $index }}'
+                    divisor: 10
+                    descr: 'Sensor chip'
+                    index: 'mtxrHlSensorTemperature.{{ $index }}'
+                -
+                    oid: mtxrHlCpuTemperature
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.6.{{ $index }}'
+                    divisor: 10
+                    descr: 'Processor'
+                    index: 'mtxrHlCpuTemperature.{{ $index }}'
+                -
+                    oid: mtxrHlBoardTemperature
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.7.{{ $index }}'
+                    divisor: 10
+                    descr: 'System board'
+                    index: 'mtxrHlBoardTemperature.{{ $index }}'
+                -
+                    oid: mtxrHlTemperature
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.10.{{ $index }}'
+                    index: 0
+                    divisor: 10
+                    descr: 'Temperature {{ $index }}'
+                    low_limit: -40
+                    low_warn_limit: -35
+                    warn_limit: 65
+                    high_limit: 70
+                -
+                    oid: mtxrHlProcessorTemperature
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.11.{{ $index }}'
+                    index: 1
+                    divisor: 10
+                    descr: 'Processor Temperature {{ $index }}'
+        voltage:
+            data:
+                -
+                    oid: mtxrOpticalTable
+                    value: mtxrOpticalSupplyVoltage
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.7.{{ $index }}'
+                    divisor: 1000
+                    descr: mtxrOpticalName
+                    index: 'mtxrOpticalSupplyVoltage.{{ $index }}'
+                    skip_values:
+                    -
+                      oid: mtxrOpticalName
+                      op: '=='
+                      value: ""
+                -
+                    oid: mtxrPOETable
+                    value: mtxrPOEVoltage
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.4.{{ $index }}'
+                    divisor: 10
+                    descr: '{{ $mtxrPOEName }} POE'
+                    index: 'mtxrPOEVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlCoreVoltage
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.1.{{ $index }}'
+                    descr: 'Core'
+                    index: 'mtxrHlCoreVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlThreeDotThreeVoltage
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.2.{{ $index }}'
+                    descr: '3.3V'
+                    index: 'mtxrHlThreeDotThreeVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlFiveVoltage
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.3.{{ $index }}'
+                    descr: '5V'
+                    index: 'mtxrHlFiveVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlTwelveVoltage
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.4.{{ $index }}'
+                    descr: '12V'
+                    index: 'mtxrHlTwelveVoltage.{{ $index }}'
+                -
+                    oid: mtxrHlVoltage
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.8.{{ $index }}'
+                    divisor: 10
+                    descr: 'Voltage {{ $index }}'
+        current:
+            data:
+                -
+                    oid: mtxrOpticalTable
+                    value: mtxrOpticalTxBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.8.{{ $index }}'
+                    divisor: 1000
+                    descr: '{{ $mtxrOpticalName }} Tx'
+                    index: 'mtxrOpticalTxBiasCurrent.{{ $index }}'
+                    skip_values:
+                    -
+                      oid: mtxrOpticalName
+                      op: '=='
+                      value: ""
+                -
+                    oid: mtxrPOETable
+                    value: mtxrPOECurrent
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.5.{{ $index }}'
+                    divisor: 1000
+                    descr: '{{ $mtxrPOEName }} POE'
+                    index: 'mtxrPOECurrent.{{ $index }}'
+                -
+                    oid: mtxrHlCurrent
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.13.{{ $index }}'
+                    divisor: 1000
+                    descr: 'Current'
+                    index: '0'
+        dbm:
+            data:
+                -
+                    oid: mtxrOpticalTable
+                    value: mtxrOpticalTxPower
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.9.{{ $index }}'
+                    divisor: 1000
+                    descr: '{{ $mtxrOpticalName }} Tx'
+                    index: 'mtxrOpticalTxPower.{{ $index }}'
+                -
+                    oid: mtxrOpticalTable
+                    value: mtxrOpticalRxPower
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.10.{{ $index }}'
+                    divisor: 1000
+                    descr: '{{ $mtxrOpticalName }} Rx'
+                    index: 'mtxrOpticalRxPower.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: mtxrOpticalTable
+                    value: mtxrOpticalRxLoss
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.3.{{ $index }}'
+                    descr: '{{ $mtxrOpticalName }} Rx'
+                    index: 'mtxrOpticalRxLoss.{{ $index }}'
+                    state_name: mtxrOpticalRxLoss
+                    states:
+                        - { descr: no, graph: 1, value: 0, generic: 0 }
+                        - { descr: yes, graph: 1, value: 1, generic: 2 }
+                        - { descr: 'null', graph: 1, value: 2, generic: 3 }
+                -
+                    oid: mtxrOpticalTable
+                    value: mtxrOpticalTxFault
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.4.{{ $index }}'
+                    descr: '{{ $mtxrOpticalName }} Tx'
+                    index: 'mtxrOpticalTxFault.{{ $index }}'
+                    state_name: mtxrOpticalTxFault
+                    states:
+                        - { descr: no, graph: 1, value: 0, generic: 0 }
+                        - { descr: yes, graph: 1, value: 1, generic: 2 }
+                        - { descr: 'null', graph: 1, value: 2, generic: 3 }
+                -
+                    oid: mtxrPOETable
+                    value: mtxrPOEStatus
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.3.{{ $index }}'
+                    descr: '{{ $mtxrPOEName }} POE'
+                    index: 'mtxrPOEStatus.{{ $index }}'
+                    state_name: mtxrPOEStatus
+                    states:
+                        - { descr: 'disabled', graph: 1, value: 1, generic: 3 }
+                        - { descr: 'waitingForLoad', graph: 1, value: 2, generic: 3 }
+                        - { descr: 'poweredOn', graph: 1, value: 3, generic: 0 }
+                        - { descr: 'overload', graph: 1, value: 4, generic: 2 }
+                -
+                    oid: mtxrHlPowerSupplyState
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.15.{{ $index }}'
+                    descr: Primary PSU
+                    index: 'mtxrHlPowerSupplyState.{{ $index }}'
+                    state_name: mtxrHlPowerSupplyState
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'false' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'true' }
+                -
+                    oid: mtxrHlBackupPowerSupplyState
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.16.{{ $index }}'
+                    descr: Backup PSU
+                    index: 'mtxrHlBackupPowerSupplyState.{{ $index }}'
+                    state_name: mtxrHlBackupPowerSupplyState
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'false' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'true' }
+        power:
+            data:
+                -
+                    oid: mtxrPOETable
+                    value: mtxrPOEPower
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.6.{{ $index }}'
+                    divisor: 10
+                    descr: '{{ $mtxrPOEName }} POE'
+                    index: 'mtxrPOEPower.{{ $index }}'
+                -
+                    oid: mtxrHlPower
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.12.{{ $index }}'
+                    divisor: 10
+                    descr: 'Power Usage'
+                    index: '1'
+        fanspeed:
+            data:
+                -
+                    oid: mtxrHlFanSpeed1
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.17.{{ $index }}'
+                    descr: 'Fan #1'
+                    index: '0'
+                -
+                    oid: mtxrHlFanSpeed2
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.18.{{ $index }}'
+                    descr: 'Fan #2'
+                    index: '1'

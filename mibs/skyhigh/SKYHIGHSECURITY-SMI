@@ -1,0 +1,41 @@
+
+SKYHIGHSECURITY-SMI DEFINITIONS ::= BEGIN
+
+-- $Header: /cvs/WebShield/wsrc/comp/lib/snmp/Attic/SKYHIGHSECURITY-SMI.txt,v 1.1.2.1 2006/09/21 07:46:36 cbotteri Exp $
+-- Copyright (C) 2022 Skyhigh Security LLC All rights reserved.
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+swg MODULE-IDENTITY
+        LAST-UPDATED    "202301090000Z"
+        ORGANIZATION    "Skyhigh Security LLC"
+        CONTACT-INFO
+                        "Skyhigh Security Customer Service Department
+
+                         Postal: 6000 Headquarters Drive
+                         Suite 600
+                         Plano, TX 75024
+                         USA
+
+                         Tel: +1 888 847 8766
+
+                         E-mail: support@skyhighsecurity.com"
+	DESCRIPTION
+		" The Structure of Management Information for the
+		  Skyhigh Security."
+	REVISION      "202301090000Z"
+	DESCRIPTION
+		"Initial Definition"
+	::= { enterprises 59732 }
+
+swgGATEWAY OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Skyhigh Security Gateway Products"
+	::= { swg 2 }
+
+END

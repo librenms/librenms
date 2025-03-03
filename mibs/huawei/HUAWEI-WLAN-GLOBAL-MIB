@@ -1,0 +1,1379 @@
+-- ============================================================================
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  The mib is used for config the ac in global view.
+-- Reference: 
+-- Version: V1.15
+-- ============================================================================
+-- Module definition
+
+	HUAWEI-WLAN-GLOBAL-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			hwWlan
+				FROM HUAWEI-WLAN-MIB
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+				FROM SNMPv2-CONF
+			IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,
+			MODULE-IDENTITY, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+			MacAddress, RowStatus, DateAndTime
+				FROM SNMPv2-TC;
+		--1.3.6.1.4.1.2011.6.139.12
+		hwWlanGlobalManagement MODULE-IDENTITY
+			LAST-UPDATED "202001181237Z"		-- Aug 10, 2019 at 23:37 GMT  
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+                                  "Huawei Industrial Base
+				   Bantian, Longgang
+				   Shenzhen 518129
+				   People's Republic of China
+				   Website: http://www.huawei.com
+				   Email: support@huawei.com
+
+				  "
+			DESCRIPTION
+                             "V1.15 Modify the node hwWlanUpSpeedHistory."
+                        REVISION "202001181237Z"		-- Aug 10, 2019 at 23:37 GMT  	
+		                   
+                                                         DESCRIPTION
+                             "V1.14, Add the node for global trap."
+                        REVISION "201908192337Z"		-- Aug 10, 2019 at 23:37 GMT  
+			
+			DESCRIPTION
+                             "V1.13, Add the node for global trap."
+                        REVISION "201907162130Z"		-- Jun 16, 2019 at 21:30 GMT  	        
+
+			DESCRIPTION
+                             "V1.12, Add the node for global statistics."
+                        REVISION "201902181830Z"		-- Feb 18, 2019 at 18:30 GMT  	        
+			DESCRIPTION
+                             "V1.11, Add the node for global trap."
+                        REVISION "201901151950Z"		-- Jan 15, 2019 at 19:50 GMT 
+						
+                        DESCRIPTION
+                             "V1.10, Add the node for global trap."
+                        REVISION "201810311440Z"		-- October 31, 2018 at 14:40 GMT                       
+                        DESCRIPTION
+                             "V1.08, Add the node for global statistics."
+                        REVISION "201805091530Z"		-- May 9, 2018 at 15:30 GMT				  
+                        DESCRIPTION
+                             "V1.08, Add the node for global statistics."
+                        REVISION "201803121530Z"		-- March 12, 2018 at 15:30 GMT
+			
+			DESCRIPTION
+                             "V1.07, Modify the node of hwStaGlobalAccessExperience."
+                        REVISION "201705020930Z"		-- May 2, 2017 at 09:30 GMT
+
+                        DESCRIPTION
+                             "V1.06, Add the node for station DFX."
+                        REVISION "201703271415Z"		-- March 27, 2017 at 14:15 GMT
+                        DESCRIPTION
+                             "V1.05, Add the hwWlanCurrentL3RoamStaCnt info node"
+                        REVISION "201602161615Z"		-- Feb 16, 2016 at 16:15 GMT
+			DESCRIPTION 
+				"The MIB module defines the ap update operation."
+			REVISION "201508251550Z"		-- Aug 25, 2015 at 15:50 GMT
+			DESCRIPTION 
+				"V1.04, Add the ApGroup Statistics  info nodes."	
+			REVISION "201506271150Z"		-- June 27, 2015 at 11:50 GMT
+			DESCRIPTION 
+				"V1.03, Add the hwWlanServiceNormalAPCount and hwWlanApCount  info nodes."
+			REVISION "201506211020Z"		-- June 21, 2015 at 10:20 GMT
+			DESCRIPTION 
+				"V1.02, Add the backup license info nodes."
+				
+			REVISION "201502021445Z"		-- May 11, 2015 at 14:40 GMT
+			DESCRIPTION 
+				"V1.01, Add the description of mib nodes."
+	                REVISION "201502021445Z"		-- February 2, 2015 at 14:40 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			::= { hwWlan 12 }
+
+--
+--Node definitions
+--
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1
+		hwWlanGlobalObjects OBJECT IDENTIFIER ::= { hwWlanGlobalManagement 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.1
+		hwWlanGlobalPara OBJECT IDENTIFIER ::= { hwWlanGlobalObjects 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.1.1
+		hwWlanGlobalWorkMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ac(1) ,
+				ap(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanGlobalPara 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.1.2
+		hwWlanAccessMaxApNumber OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the maximum number of APs."
+			::= { hwWlanGlobalPara 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.1.3
+		hwWlanAccessMaxStaNumber OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the maximum number of STAs connected to an AC."
+			::= { hwWlanGlobalPara 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.1.4
+		hwBranchGroupFileLoadFailGroupNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of branch groups that failed to load the certificate."
+			::= { hwWlanGlobalPara 4 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.2
+		hwWlanGlobalAcStatistics OBJECT IDENTIFIER ::= { hwWlanGlobalObjects 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.2.1
+		hwWlanCurJointApNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of APs currently connected to an AC."
+			::= { hwWlanGlobalAcStatistics 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.2.2
+		hwWlanCurAssocStaNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of associated users on an AC."
+			::= { hwWlanGlobalAcStatistics 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.2.3
+		hwWlanCurAuthSuccessStaNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the total number of online STAs on an AC."
+			::= { hwWlanGlobalAcStatistics 3 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.2.4
+		hwWlanReassocSuccessTimes OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of successful roaming times on an AC."
+			::= { hwWlanGlobalAcStatistics 4 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.2.5
+		hwWlanCurAssoc2gStaNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the total number of 2.4G users on an AC."
+			::= { hwWlanGlobalAcStatistics 5 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.2.6
+		hwWlanCurAssoc5gStaNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the total number of 5G users on an AC."
+			::= { hwWlanGlobalAcStatistics 6 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.2.7
+		hwWlanDualBandStaNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of dual-band STAs."
+			::= { hwWlanGlobalAcStatistics 7 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.2.8
+		hwWlanGlobalUpSpeed OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the upstream rate of the system (uplink throughput)."
+			::= { hwWlanGlobalAcStatistics 8 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.2.9
+		hwWlanGlobalDownSpeed OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the downstream rate of the system (downlink throughput)."
+			::= { hwWlanGlobalAcStatistics 9 }
+
+        -- 1.3.6.1.4.1.2011.6.139.12.1.2.10
+		hwWlanCurrentL3RoamStaCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the count of current L3 roam stations."
+			::= { hwWlanGlobalAcStatistics 10 }
+
+        -- 1.3.6.1.4.1.2011.6.139.12.1.2.11
+		hwWlanCurAssoc2gStaType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the numbers of 2.4G users with different rfmodes on an AC."
+			::= { hwWlanGlobalAcStatistics 11 }
+
+        -- 1.3.6.1.4.1.2011.6.139.12.1.2.12
+		hwWlanCurAssoc5gStaType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the numbers of 5G users with different rfmodes on an AC."
+			::= { hwWlanGlobalAcStatistics 12 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3
+		hwWlanGlobalStaStatistics OBJECT IDENTIFIER ::= { hwWlanGlobalObjects 3 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.1
+		hwWlanStaRateComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates compliance ratio of the STA rate.
+Unit: 0.01 Compliance standard: Rate > x (x = proportion of 12 Mbps STAs to the total number of STAs)."
+			::= { hwWlanGlobalStaStatistics 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.2
+		hwWlanStaSnrComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates compliance ratio of STA signal-to-noise ratio (SNR).
+Unit: 0.01 Compliance standard: SNR > x (x = 20 dB)."
+			::= { hwWlanGlobalStaStatistics 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.3
+		hwWlanStaResendRateComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates compliance ratio of the STA retransmission rate (RR).
+Unit: 0.01 Compliance standard: RR < x (x = 50%)."
+			::= { hwWlanGlobalStaStatistics 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.4
+		hwWlanStaDropRateComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates compliance ratio of the STA packet loss rate (PLR).
+Unit: 0.01 Compliance standard: PLR < x (x = 5%)."
+			::= { hwWlanGlobalStaStatistics 4 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.5
+		hwWlanStaComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the total STA compliance ratio."
+			::= { hwWlanGlobalStaStatistics 5 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.6
+		hwStaSnrNoncompliance2gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of STAs whose 2.4G SNR fails to meet the compliance standard.
+Compliance standard: SNR > x (x = 20 dB)."
+			::= { hwWlanGlobalStaStatistics 6 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.7
+		hwStaRateNoncompliance2gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of STAs whose 2.4G rate fails to meet the compliance standard.
+Compliance standard: Rate > x (x = 12 Mbps)."
+			::= { hwWlanGlobalStaStatistics 7 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.8
+		hwStaResendRateNoncompliance2gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of STAs whose 2.4G retransmission rate (RR) fails to meet the compliance standard.
+Compliance standard: RR < x (x = 50%)."
+			::= { hwWlanGlobalStaStatistics 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.9
+		hwStaDropRateNoncompliance2gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of STAs whose 2.4G packet loss rate (PLR) fails to meet the compliance standard.
+Compliance standard: PLR < x (x = 5%)."
+			::= { hwWlanGlobalStaStatistics 9 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.10
+		hwStaThruputNoncompliance2gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of STAs whose 2.4G throughput fails to meet the compliance standard. (Here the throughput refers to a sum of the uplink and the downlink throughput.)
+Compliance standard: Throughput > x (x = 12 Mbps)."
+			::= { hwWlanGlobalStaStatistics 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.11
+		hwStaSnrNoncompliance5gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of STAs whose 5G SNR fails to meet the compliance standard.
+Compliance standard: SNR > x (x = 20 dB)."
+			::= { hwWlanGlobalStaStatistics 11 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.12
+		hwStaRateNoncompliance5gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of STAs whose 5G rate fails to meet the compliance standard.
+Compliance standard: Rate > x (x = 12 Mbps)."
+			::= { hwWlanGlobalStaStatistics 12 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.13
+		hwStaResendRateNoncompliance5gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of STAs whose 5G retransmission rate (RR) fails to meet the compliance standard.
+Compliance standard: RR < x (x = 50%)."
+			::= { hwWlanGlobalStaStatistics 13 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.14
+		hwStaDropRateNoncompliance5gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of STAs whose 5G packet loss rate (PLR) fails to meet the compliance standard.
+Compliance standard: PLR < x (x = 5%)."
+			::= { hwWlanGlobalStaStatistics 14 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.15
+		hwStaThruputNoncompliance5gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of STAs whose 5G throughput fails to meet the compliance standard. (Here the throughput refers to a sum of the uplink and the downlink throughput.)
+Compliance standard: Throughput > x (x = 12 Mbps)."
+			::= { hwWlanGlobalStaStatistics 15 }
+
+
+					
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.16
+		hwStaGlobalWirelessPacketDelay OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the average packet delay of the stations."
+			::= { hwWlanGlobalStaStatistics 16 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.17
+		hwStaGlobalWirelessPacketDropRate OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the average packet drop rate of the stations."
+			::= { hwWlanGlobalStaStatistics 17 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.18
+		hwStaGlobalTotalAccessTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the average online time of the stations."
+			::= { hwWlanGlobalStaStatistics 18 }
+			
+	
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.19
+		hwStaGlobalAccessExperience OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the access experience of the stations."
+			::= { hwWlanGlobalStaStatistics 19 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.20
+		hwStaGlobalAssocRate OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the associate rate of station."
+			::= { hwWlanGlobalStaStatistics 20 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.21
+		hwStaGlobalAuthRateDot1x OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Dot1x authentication rate of station."
+			::= { hwWlanGlobalStaStatistics 21 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.22
+		hwStaGlobalAuthRatePortal OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Portal authentication rate of station."
+			::= { hwWlanGlobalStaStatistics 22 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.3.23
+		hwStaGlobalAuthRateMac OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the Mac authentication rate of station."
+			::= { hwWlanGlobalStaStatistics 23 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4
+		hwWlanGlobalRfStatistics OBJECT IDENTIFIER ::= { hwWlanGlobalObjects 4 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.1
+		hwWlanRfChannelUtilRateComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates compliance ratio of the RF channel utilization.
+Unit: 0.01 Compliance standard: Channel utilization < x (x = 70%)."
+			::= { hwWlanGlobalRfStatistics 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.2
+		hwWlanRfNoiseComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates compliance ratio of the RF noise intensity.
+Unit: 0.01 Compliance standard: Noise intensity < x (x = -80 dBm)."
+			::= { hwWlanGlobalRfStatistics 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.3
+		hwWlanRfChannelJamRateComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This objects indicates compliance ratio of the RF interference ratio.
+Unit: 0.01 Compliance standard: Interference ratio < x (x = 40%)."
+			::= { hwWlanGlobalRfStatistics 3 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.4
+		hwWlanRfResendRateComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This objects indicate compliance ratio of the RF retransmission rate (RR).
+Unit: 0.01 Compliance standard: RR < x (x = 50%)."
+			::= { hwWlanGlobalRfStatistics 4 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.5
+		hwWlanRfDropRateComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This objects indicates compliance ratio of the RF packet loss rate (PLR).
+Unit: 0.01 Compliance standard: PLR < x (x = 5%)."
+			::= { hwWlanGlobalRfStatistics 5 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.6
+		hwWlanRfComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the total RF compliance ratio."
+			::= { hwWlanGlobalRfStatistics 6 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.7
+		hwWlanRfNoiseNoncompliance2gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of radios on which the 2.4G noise intensity fails to meet the compliance standard.
+Compliance standard: Noise intensity < x (x = -80 dBm)."
+			::= { hwWlanGlobalRfStatistics 7 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.8
+		hwWlanRfChannelUtilRateNoncompliance2gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of radios on which the 2.4G channel utilization fails to meet the compliance standard.
+Compliance standard: Channel utilization < x (x = 70%)."
+			::= { hwWlanGlobalRfStatistics 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.9
+		hwWlanRfLoadNoncompliance2gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of radios on which the 2.4G load fails to meet the compliance standard.
+Compliance standard: Number of online users < x (x = 40)."
+			::= { hwWlanGlobalRfStatistics 9 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.10
+		hwWlanRfChannelJamRateNoncompliance2gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of radios on which the 2.4G interference ratio fails to meet the compliance standard.
+Compliance standard: Interference ratio < x (x = 40%)."
+			::= { hwWlanGlobalRfStatistics 10 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.11
+		hwWlanRfNoiseNoncompliance5gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of radios on which the 5G noise intensity fails to meet the compliance standard.
+Compliance standard: Noise intensity < x (x = -80 dBm)."
+			::= { hwWlanGlobalRfStatistics 11 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.12
+		hwWlanRfChannelUtilRateNoncompliance5gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of radios on which the 5G channel utilization fails to meet the compliance standard.
+Compliance standard: Channel utilization < x (x = 70%)."
+			::= { hwWlanGlobalRfStatistics 12 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.13
+		hwWlanRfLoadNoncompliance5gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of radios on which the 5G load fails to meet the compliance standard.
+Compliance standard: Number of online users < x (x = 40)."
+			::= { hwWlanGlobalRfStatistics 13 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.4.14
+		hwWlanRfChannelJamRateNoncompliance5gCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of radios on which the 5G interference ratio fails to meet the compliance standard.
+Compliance standard: Interference ratio < x (x = 40%)."
+			::= { hwWlanGlobalRfStatistics 14 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.5
+		hwWlanGlobalApStatistics OBJECT IDENTIFIER ::= { hwWlanGlobalObjects 5 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.5.1
+		hwWlanApNormalRatio OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the proportion of APs in normal and commit states to all APs.
+Unit: 0.01."
+			::= { hwWlanGlobalApStatistics 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.5.2
+		hwWlanApStaOnlineFailRateComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates compliance ratio of the AP's STA access failure rate.
+Unit: 0.01 Compliance standard: STA access failure rate < x (x = 20%) Access failure rate = (hwStaAccessRequestFailedCount+hwStaAuthenRequestFailedCount)/(hwStaAssocAndReAssocRequestCount+hwStaAuthenRequestCount)."
+			::= { hwWlanGlobalApStatistics 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.5.3
+		hwWlanApStaOfflineRateComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates compliance ratio of the AP's STA offline rate.
+Unit: 0.01 Compliance standard: STA offline rate x (x = 20%) Offline rate = hwStaExceptionalOfflineCnt/hwStaAuthenRequestSuccessCount. Abnormal APs are those in fault, version mismatch, and type mismatch."
+			::= { hwWlanGlobalApStatistics 3 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.5.4
+		hwWlanApStaOnlineCntComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates compliance ratio of the number of access STAs on an AP.
+Unit: 0.01 Compliance standard: Access STAs < x (x = 40). Access STAs refer to online STAs. Abnormal APs are those in fault, version mismatch, and type mismatch."
+			::= { hwWlanGlobalApStatistics 4 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.5.5
+		hwWlanApComplianceRate OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the total AP compliance ratio."
+			::= { hwWlanGlobalApStatistics 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.5.6
+		hwWlanServiceNormalAPCount OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the total of AP in service normal states."
+			::= { hwWlanGlobalApStatistics 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.5.7
+		hwWlanApCount OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the total of AP."
+			::= { hwWlanGlobalApStatistics 7 }
+
+		
+--  1.3.6.1.4.1.2011.6.139.12.1.6
+		-- 1.3.6.1.4.1.2011.6.139.12.1.6
+		hwWlanOnlineStaCntHistoryTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanOnlineStaCntHistoryEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table describes historical number of access users, which is counted every 1 min. The AC stores data in the latest 15 min."
+			::= { hwWlanGlobalObjects 6 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.6.1
+		hwWlanOnlineStaCntHistoryEntry OBJECT-TYPE
+			SYNTAX HwWlanOnlineStaCntHistoryEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The index of this table is hwWlanOnlineStaCntTime."
+			INDEX { hwWlanOnlineStaCntTime }
+			::= { hwWlanOnlineStaCntHistoryTable 1 }
+
+
+		HwWlanOnlineStaCntHistoryEntry ::=
+			SEQUENCE {				
+				hwWlanOnlineStaCntTime
+					Unsigned32,
+				hwWlanOnlineStaCnt
+					Integer32,
+				hwWlan2gOnlineStaCnt
+					Integer32,
+				hwWlan5gOnlineStaCnt
+					Integer32 
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.6.1.1
+		hwWlanOnlineStaCntTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the count time. It is the index of the table."
+			::= { hwWlanOnlineStaCntHistoryEntry 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.6.1.2
+		hwWlanOnlineStaCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of access users."
+			::= { hwWlanOnlineStaCntHistoryEntry 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.6.1.3
+		hwWlan2gOnlineStaCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of users connected to the 2.4G radio."
+			::= { hwWlanOnlineStaCntHistoryEntry 3 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.6.1.4
+		hwWlan5gOnlineStaCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of users connected to the 5G radio."
+			::= { hwWlanOnlineStaCntHistoryEntry 4 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.7
+		hwWlanSpeedHistoryTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanSpeedHistoryEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table describes the historical effective throughput statistics, which is collected every 1 min. The AC stores data in the latest 15 min."
+			::= { hwWlanGlobalObjects 7 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.7.1
+		hwWlanSpeedHistoryEntry OBJECT-TYPE
+			SYNTAX HwWlanSpeedHistoryEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The index of this table is hwWlanSpeedHistoryTime."
+			INDEX { hwWlanSpeedHistoryTime }
+			::= { hwWlanSpeedHistoryTable 1 }
+
+
+		HwWlanSpeedHistoryEntry ::=
+			SEQUENCE {				
+				hwWlanSpeedHistoryTime
+					Unsigned32,
+				hwWlanUpSpeedHistory
+					Integer32,
+				hwWlanDownSpeedHistory
+					Integer32 
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.7.1.1
+		hwWlanSpeedHistoryTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the statistics collection time. It is the index of the table."
+			::= { hwWlanSpeedHistoryEntry 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.7.1.2
+		hwWlanUpSpeedHistory OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates uplink effective throughput of the AC. Unit: Kbps."
+			::= { hwWlanSpeedHistoryEntry 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.7.1.3
+		hwWlanDownSpeedHistory OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates downlink effective throughput of the AC.Unit: Kbps."
+			::= { hwWlanSpeedHistoryEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.8
+		hwWlanBackupLicenseTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanBackupLicenseEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanGlobalObjects 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.8.1
+		hwWlanBackupLicenseEntry OBJECT-TYPE
+			SYNTAX HwWlanBackupLicenseEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwWlanMainAcMac }
+			::= { hwWlanBackupLicenseTable 1 }
+
+		
+		HwWlanBackupLicenseEntry ::=
+			SEQUENCE { 
+				hwWlanMainAcMac
+					MacAddress,
+				hwWlanBackupLicense
+					Integer32,
+				hwWlanLicenseOrigin
+					Integer32,
+				hwWlanLicenseBackupTime
+					OCTET STRING,
+				hwWlanLicenseBackType
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.8.1.1
+		hwWlanMainAcMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBackupLicenseEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.8.1.2
+		hwWlanBackupLicense OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBackupLicenseEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.8.1.3
+		hwWlanLicenseOrigin OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBackupLicenseEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.8.1.4
+		hwWlanLicenseBackupTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBackupLicenseEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.8.1.5
+		hwWlanLicenseBackType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Backup license source type."
+			::= { hwWlanBackupLicenseEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.9
+		hwWlanApGroupStatisticsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanApGroupStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table  collects statistics about 2G and 5G users in AP groups."
+			::= { hwWlanGlobalObjects 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.9.1
+		hwWlanApGroupStatisticsEntry OBJECT-TYPE
+			SYNTAX HwWlanApGroupStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of this table is hwWlanApGpStatAPGroupName."
+			INDEX { hwWlanApGpStatAPGroupName }
+			::= { hwWlanApGroupStatisticsTable 1 }
+
+		
+		HwWlanApGroupStatisticsEntry ::=
+			SEQUENCE { 
+				hwWlanApGpStatAPGroupName
+					OCTET STRING,
+				hwWlanApGpStatCurAssoc2gStaNum
+					Unsigned32,
+				hwWlanApGpStatCurAssoc5gStaNum
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.1.9.1.1
+		hwWlanApGpStatAPGroupName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of an AP group. It is the index of the table."
+			::= { hwWlanApGroupStatisticsEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.9.1.2
+		hwWlanApGpStatCurAssoc2gStaNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of 2G users in an AP group."
+			::= { hwWlanApGroupStatisticsEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.1.9.1.3
+		hwWlanApGpStatCurAssoc5gStaNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of 5G users in an AP group."
+			::= { hwWlanApGroupStatisticsEntry 3 }
+
+		
+--    1.3.6.1.4.1.2011.6.139.12.2
+-- 1.3.6.1.4.1.2011.6.139.12.2
+		-- 1.3.6.1.4.1.2011.6.139.12.2
+		hwWlanGlobalManagementConformance OBJECT IDENTIFIER ::= { hwWlanGlobalManagement 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.2.1
+		hwWlanGlobalManagementCompliances OBJECT IDENTIFIER ::= { hwWlanGlobalManagementConformance 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.2.1.1
+		hwWlanGlobalManagementCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE
+					MANDATORY-GROUPS { hwWlanGlobalParaGroup, hwWlanGlobalStatisticsGroup, hwWlanGlobalStaStatisticsGroup, hwWlanGlobalRfStatisticsGroup, hwWlanGlobalApStatisticsGroup, 
+			hwWlanOnlineStaCntHistoryGroup, hwWlanSpeedHistoryGroup }
+			::= { hwWlanGlobalManagementCompliances 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.2.2
+		hwWlanGlobalManagementObjectGroups OBJECT IDENTIFIER ::= { hwWlanGlobalManagementConformance 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.2.2.1
+		hwWlanGlobalParaGroup OBJECT-GROUP
+			OBJECTS { hwWlanGlobalWorkMode, hwWlanAccessMaxApNumber, hwWlanAccessMaxStaNumber, hwBranchGroupFileLoadFailGroupNum }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanGlobalManagementObjectGroups 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.2.2.2
+		hwWlanGlobalStatisticsGroup OBJECT-GROUP
+			OBJECTS { hwWlanCurJointApNum, hwWlanCurAssocStaNum, hwWlanCurAuthSuccessStaNum, hwWlanReassocSuccessTimes, hwWlanCurAssoc2gStaNum, 
+			hwWlanCurAssoc5gStaNum, hwWlanDualBandStaNum, hwWlanGlobalUpSpeed, hwWlanGlobalDownSpeed }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanGlobalManagementObjectGroups 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.2.2.3
+		hwWlanGlobalStaStatisticsGroup OBJECT-GROUP
+			OBJECTS { hwWlanStaRateComplianceRate, hwWlanStaSnrComplianceRate, hwWlanStaResendRateComplianceRate, hwWlanStaDropRateComplianceRate, hwWlanStaComplianceRate, 
+			hwStaSnrNoncompliance2gCnt, hwStaRateNoncompliance2gCnt, hwStaResendRateNoncompliance2gCnt, hwStaDropRateNoncompliance2gCnt, hwStaThruputNoncompliance2gCnt, 
+			hwStaSnrNoncompliance5gCnt, hwStaRateNoncompliance5gCnt, hwStaResendRateNoncompliance5gCnt, hwStaDropRateNoncompliance5gCnt, hwStaThruputNoncompliance5gCnt,
+			hwStaGlobalWirelessPacketDelay, hwStaGlobalWirelessPacketDropRate, hwStaGlobalTotalAccessTime, hwStaGlobalAccessExperience, hwStaGlobalAssocRate, hwStaGlobalAuthRateDot1x, 
+			hwStaGlobalAuthRatePortal, hwStaGlobalAuthRateMac}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanGlobalManagementObjectGroups 3 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.2.2.4
+		hwWlanGlobalRfStatisticsGroup OBJECT-GROUP
+			OBJECTS { hwWlanRfChannelUtilRateComplianceRate, hwWlanRfNoiseComplianceRate, hwWlanRfChannelJamRateComplianceRate, hwWlanRfResendRateComplianceRate, hwWlanRfDropRateComplianceRate, 
+			hwWlanRfComplianceRate, hwWlanRfNoiseNoncompliance2gCnt, hwWlanRfChannelUtilRateNoncompliance2gCnt, hwWlanRfLoadNoncompliance2gCnt, hwWlanRfChannelJamRateNoncompliance2gCnt, 
+			hwWlanRfNoiseNoncompliance5gCnt, hwWlanRfChannelUtilRateNoncompliance5gCnt, hwWlanRfLoadNoncompliance5gCnt, hwWlanRfChannelJamRateNoncompliance5gCnt }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanGlobalManagementObjectGroups 4 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.2.2.5
+		hwWlanGlobalApStatisticsGroup OBJECT-GROUP
+			OBJECTS { hwWlanApNormalRatio, hwWlanApStaOnlineFailRateComplianceRate, hwWlanApStaOfflineRateComplianceRate, hwWlanApStaOnlineCntComplianceRate, hwWlanApComplianceRate, 
+			hwWlanServiceNormalAPCount, hwWlanApCount }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanGlobalManagementObjectGroups 5 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.2.2.6
+		hwWlanOnlineStaCntHistoryGroup OBJECT-GROUP
+			OBJECTS { hwWlanOnlineStaCnt, hwWlan2gOnlineStaCnt, hwWlan5gOnlineStaCnt }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanGlobalManagementObjectGroups 6 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.12.2.2.7
+		hwWlanSpeedHistoryGroup OBJECT-GROUP
+			OBJECTS { hwWlanUpSpeedHistory, hwWlanDownSpeedHistory }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanGlobalManagementObjectGroups 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.2.2.8
+		hwWlanBackupLicenseGroup OBJECT-GROUP
+			OBJECTS { hwWlanMainAcMac, hwWlanBackupLicense, hwWlanLicenseOrigin, hwWlanLicenseBackupTime }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanGlobalManagementObjectGroups 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.2.2.9
+		hwWlanApGroupStatisticsGroup OBJECT-GROUP
+			OBJECTS { hwWlanApGpStatCurAssoc2gStaNum, hwWlanApGpStatCurAssoc5gStaNum }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanGlobalManagementObjectGroups 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3
+		hwWlanGlobalTrapInfo OBJECT IDENTIFIER ::= { hwWlanGlobalManagement 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1
+		hwWlanGlobalTrap OBJECT IDENTIFIER ::= { hwWlanGlobalTrapInfo 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.1
+		hwWlanBackLicAgeTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanMainAcMac, hwWlanBackupLicense, hwWlanLicenseBackType, hwWlanLicenseBackupTime }
+			STATUS current
+			DESCRIPTION 
+				"Backup license aging alarm."
+			::= { hwWlanGlobalTrap 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.2
+		hwWlanBackLicAgeRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanMainAcMac, hwWlanBackupLicense, hwWlanLicenseBackType, hwWlanLicenseBackupTime }
+			STATUS current
+			DESCRIPTION 
+				"The backup license stops aging."
+			::= { hwWlanGlobalTrap 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.3
+		hwWlanShareLicAgeTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanShareLicAcMac, hwWlanShareLicNum }
+			STATUS current
+			DESCRIPTION 
+				"Shared license aging."
+			::= { hwWlanGlobalTrap 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.4
+		hwWlanShareLicAgeRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanShareLicAcMac, hwWlanShareLicNum }
+			STATUS current
+			DESCRIPTION 
+				"Shared license aging restore."
+			::= { hwWlanGlobalTrap 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.5
+		hwWlanPoolLicAgeTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanPoolTotalLicNum, hwWlanPoolSelfShareLicNum }
+			STATUS current
+			DESCRIPTION 
+				"License resource pool aging."
+			::= { hwWlanGlobalTrap 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.6
+		hwWlanPoolLicAgeRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanPoolTotalLicNum, hwWlanPoolSelfShareLicNum }
+			STATUS current
+			DESCRIPTION 
+				"License resource pool aging restore."
+			::= { hwWlanGlobalTrap 6 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.7
+		hwWlanStaNumReachWarningTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanStaMaxNum, hwWlanStaCurNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of stations reaches 80% of the maximum specifications."
+			::= { hwWlanGlobalTrap 7 }
+            
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.8
+		hwWlanStaNumReachWarningRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanStaMaxNum, hwWlanStaCurNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of stations is less than 80% of the maximum specifications."
+			::= { hwWlanGlobalTrap 8 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.9
+		hwWlanStaNumReachMaxTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanStaMaxNum, hwWlanStaCurNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of stations reaches the maximum specifications."
+			::= { hwWlanGlobalTrap 9 }
+            
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.10
+		hwWlanStaNumReachMaxRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanStaMaxNum, hwWlanStaCurNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of stations is less than the maximum specifications."
+			::= { hwWlanGlobalTrap 10 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.11
+		hwWlanWapiCertificateNearlyExpiredTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWapiSecurityProfileName, hwWlanWapiCertType, hwWlanWapiCertFileName, hwWlanWapiCertStartTime, hwWlanWapiCertEndTime }
+			STATUS current
+			DESCRIPTION 
+				"The WAPI certificate is nearly expired."
+			::= { hwWlanGlobalTrap 11 }            
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.1.12            
+		hwWlanWapiCertificateNearlyExpiredTrapRestore NOTIFICATION-TYPE
+			OBJECTS { hwWlanWapiSecurityProfileName, hwWlanWapiCertType }
+			STATUS current
+			DESCRIPTION 
+				"The alarm of the WAPI certificate reaching expiration is cleared."
+			::= { hwWlanGlobalTrap 12 }    
+            
+ 		-- 1.3.6.1.4.1.2011.6.139.12.3.1.13
+		hwWlanWapiCertificateInvalidTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWapiSecurityProfileName, hwWlanWapiCertType, hwWlanWapiCertFileName, hwWlanWapiCertStartTime, hwWlanWapiCertEndTime }
+			STATUS current
+			DESCRIPTION 
+				"The WAPI certificate is invalid."
+			::= { hwWlanGlobalTrap 13 }       
+
+ 		-- 1.3.6.1.4.1.2011.6.139.12.3.1.14
+		hwWlanWapiCertificateInvalidTrapRestore NOTIFICATION-TYPE
+			OBJECTS { hwWlanWapiSecurityProfileName, hwWlanWapiCertType }
+			STATUS current
+			DESCRIPTION 
+				"The alarm of the WAPI certificate out of the invalidity period is cleared."
+			::= { hwWlanGlobalTrap 14 }  
+            
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2
+		hwWlanGlobalTrapObjects OBJECT IDENTIFIER ::= { hwWlanGlobalTrapInfo 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.1
+		hwWlanShareLicAcMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The mac address of the shared AC"
+			::= { hwWlanGlobalTrapObjects 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.2
+		hwWlanShareLicNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of shared license."
+			::= { hwWlanGlobalTrapObjects 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.3
+		hwWlanPoolTotalLicNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number in license pool."
+			::= { hwWlanGlobalTrapObjects 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.4
+		hwWlanPoolSelfShareLicNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The total number of self shared in license pool ."
+			::= { hwWlanGlobalTrapObjects 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.5
+		hwWlanStaMaxNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the maximum specifications of stations."
+			::= { hwWlanGlobalTrapObjects 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.6
+		hwWlanStaCurNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of associated stations."
+			::= { hwWlanGlobalTrapObjects 6 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.7
+		hwWlanWapiSecurityProfileName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of security profile."
+			::= { hwWlanGlobalTrapObjects 7 }	
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.8
+		hwWlanWapiCertType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the type of WAPI certificate."
+			::= { hwWlanGlobalTrapObjects 8 }	
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.9
+		hwWlanWapiCertFileName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the file name of WAPI certificate."
+			::= { hwWlanGlobalTrapObjects 9 }
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.10
+		hwWlanWapiCertStartTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the start time of WAPI certificate validity."
+			::= { hwWlanGlobalTrapObjects 10 }     
+
+		-- 1.3.6.1.4.1.2011.6.139.12.3.2.11
+		hwWlanWapiCertEndTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the end time of WAPI certificate validity."
+			::= { hwWlanGlobalTrapObjects 11 }              
+	END
+--
+-- HUAWEI-WLAN-GLOBAL-MIB.mib
+--
+
+
+
+
+
+
+
+
+
+
+
+

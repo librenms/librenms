@@ -1,0 +1,448 @@
+--
+-- ALPINE-GEN-CARD-EDFA-MIB.mib
+--
+
+	ALPINE-GEN-CARD-EDFA-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			alpineGeneric			
+				FROM ALPINE-ROOT			
+			Integer32, OBJECT-TYPE, NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI;
+	
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.52326.1.1
+		alpineGenCardEdfa OBJECT IDENTIFIER ::= { alpineGeneric 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1
+		alpineGenCardEdfaInfosTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AlpineGenCardEdfaInfosEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { alpineGenCardEdfa 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1.1
+		alpineGenCardEdfaInfosEntry OBJECT-TYPE
+			SYNTAX AlpineGenCardEdfaInfosEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gceSlotNum, gceEdfaNum }
+			::= { alpineGenCardEdfaInfosTable 1 }
+
+		
+		AlpineGenCardEdfaInfosEntry ::=
+			SEQUENCE { 
+				gceSlotNum
+					Integer32,
+				gceEdfaNum
+					Integer32,
+				gceMode
+					Integer32,
+				gceOutputPowerTarget
+					OCTET STRING,
+				gceGainTarget
+					OCTET STRING,
+				gceOutputPower
+					OCTET STRING,
+				gceGain
+					OCTET STRING,
+				gceTemperature
+					OCTET STRING,
+				gceSaveConfig
+					Integer32,
+				gceInputPower
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.52326.1.1.1.1.1
+		gceSlotNum OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Slot number."
+			::= { alpineGenCardEdfaInfosEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1.1.2
+		gceEdfaNum OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"EDFA Number in the line card.
+				Up to 2 EDFA modules are supported in one line card."
+			::= { alpineGenCardEdfaInfosEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1.1.3
+		gceMode OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Work mode of EDFA.
+				1. AGC
+				2. APC
+				Please note, when you want to change work mode, make sure the relative target value be set first.
+				For example, if you want to set work mode to APC and the output power is 5dBm, you need set 'gceOutputPowerTarget' to 5 first."
+			::= { alpineGenCardEdfaInfosEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1.1.4
+		gceOutputPowerTarget OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "dBm"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Output power target of EDFA.
+				If current work mode is APC, then output power will be applied immediately. 
+				If current work mode is AGC, then output power will be applied after 'gceMode' is set to APC."
+			::= { alpineGenCardEdfaInfosEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1.1.5
+		gceGainTarget OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "dB"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Gain target of EDFA.
+				If current work mode is AGC, then output power will be applied immediately. 
+				If current work mode is APC, then output power will be applied after 'gceMode' is set to AGC."
+			::= { alpineGenCardEdfaInfosEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1.1.6
+		gceOutputPower OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "dBm"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Current output power of EDFA."
+			::= { alpineGenCardEdfaInfosEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1.1.7
+		gceGain OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "dB"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Current gain of EDFA."
+			::= { alpineGenCardEdfaInfosEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1.1.8
+		gceTemperature OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Current temperature of EDFA."
+			::= { alpineGenCardEdfaInfosEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1.1.9
+		gceSaveConfig OBJECT-TYPE
+			SYNTAX Integer32 (0..2)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Save current configuration into flash for non-valatile setting.
+				0: Idle/Save Done.
+				1: Issue save command.
+				2: Saving.
+				Only value 1 can be accepted in snmp set."
+			::= { alpineGenCardEdfaInfosEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.1.1.10
+		gceInputPower OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "dBm"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Current input power of EDFA."
+			::= { alpineGenCardEdfaInfosEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2
+		alpineGenCardEdfaAlarm OBJECT IDENTIFIER ::= { alpineGenCardEdfa 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.1
+		alpineGenCardEdfaAlarmThldTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AlpineGenCardEdfaAlarmThldEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { alpineGenCardEdfaAlarm 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.1.1
+		alpineGenCardEdfaAlarmThldEntry OBJECT-TYPE
+			SYNTAX AlpineGenCardEdfaAlarmThldEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gceaSlotNum, gceaEdfaNum }
+			::= { alpineGenCardEdfaAlarmThldTable 1 }
+
+		
+		AlpineGenCardEdfaAlarmThldEntry ::=
+			SEQUENCE { 
+				gceaSlotNum
+					Integer32,
+				gceaEdfaNum
+					Integer32,
+				gceaInputPowerThld
+					OCTET STRING,
+				gceaOutputPowerThld
+					OCTET STRING,
+				gceaTemperatureThld
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.52326.1.1.2.1.1.1
+		gceaSlotNum OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Slot number."
+			::= { alpineGenCardEdfaAlarmThldEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.1.1.2
+		gceaEdfaNum OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"EDFA Number in the line card.
+				Up to 2 EDFA modules are supported in one line card."
+			::= { alpineGenCardEdfaAlarmThldEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.1.1.3
+		gceaInputPowerThld OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "dBm"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Low threshold of input power."
+			::= { alpineGenCardEdfaAlarmThldEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.1.1.4
+		gceaOutputPowerThld OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "dBm"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Low threshold of output power."
+			::= { alpineGenCardEdfaAlarmThldEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.1.1.5
+		gceaTemperatureThld OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "degreeC"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"High threshold of temperature."
+			::= { alpineGenCardEdfaAlarmThldEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.2
+		alpineGenEdfaAlarmInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AlpineGenEdfaAlarmInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { alpineGenCardEdfaAlarm 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.2.1
+		alpineGenEdfaAlarmInfoEntry OBJECT-TYPE
+			SYNTAX AlpineGenEdfaAlarmInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { geaiSlotNum, geaiEdfaNum }
+			::= { alpineGenEdfaAlarmInfoTable 1 }
+
+		
+		AlpineGenEdfaAlarmInfoEntry ::=
+			SEQUENCE { 
+				geaiSlotNum
+					Integer32,
+				geaiEdfaNum
+					Integer32,
+				geaiCommonAlarm
+					Integer32,
+				geaiCaseTemperatureAlarm
+					Integer32,
+				geaiPumpTemperatureAlarm
+					Integer32,
+				geaiPumpBiasAlarm
+					Integer32,
+				geaiLossInputAlarm
+					Integer32,
+				geaiLossOutputAlarm
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.52326.1.1.2.2.1.1
+		geaiSlotNum OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { alpineGenEdfaAlarmInfoEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.2.1.2
+		geaiEdfaNum OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"EDFA Number in the line card.
+				Up to 2 EDFA modules are supported in one line card."
+			::= { alpineGenEdfaAlarmInfoEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.2.1.3
+		geaiCommonAlarm OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"If any alarm occurs, this field will set to 1.
+				0. Normal
+				1. One or some alarm occur."
+			::= { alpineGenEdfaAlarmInfoEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.2.1.4
+		geaiCaseTemperatureAlarm OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"0. Clear
+				1. Case temperature alarm occurs."
+			::= { alpineGenEdfaAlarmInfoEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.2.1.5
+		geaiPumpTemperatureAlarm OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"0. Clear
+				1. Pump temperature alarm occurs."
+			::= { alpineGenEdfaAlarmInfoEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.2.1.6
+		geaiPumpBiasAlarm OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"0. Clear
+				1. Pump bias alarm occurs."
+			::= { alpineGenEdfaAlarmInfoEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.2.1.7
+		geaiLossInputAlarm OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"0. Clear
+				1. Loss of input alarm occurs."
+			::= { alpineGenEdfaAlarmInfoEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.2.1.8
+		geaiLossOutputAlarm OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"0. Clear
+				1. Loss of output alarm occurs."
+			::= { alpineGenEdfaAlarmInfoEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.3
+		alpineGenEdfaPowerAlarm NOTIFICATION-TYPE
+			OBJECTS { gceOutputPower, geaiLossOutputAlarm }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { alpineGenCardEdfaAlarm 3 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.4
+		alpineGenEdfaTemperatureAlarm NOTIFICATION-TYPE
+			OBJECTS { gceTemperature, geaiPumpTemperatureAlarm, geaiCaseTemperatureAlarm }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { alpineGenCardEdfaAlarm 4 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.5
+		alpineGenEdfaBiasAlarm NOTIFICATION-TYPE
+			OBJECTS { geaiPumpBiasAlarm }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { alpineGenCardEdfaAlarm 5 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.1.2.6
+		alpineGenEdfaLossAlarm NOTIFICATION-TYPE
+			OBJECTS { geaiLossInputAlarm }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { alpineGenCardEdfaAlarm 6 }
+
+		
+	
+	END
+
+--
+-- ALPINE-GEN-CARD-EDFA-MIB.mib
+--

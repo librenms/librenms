@@ -1,81 +1,127 @@
 <?php
 
+use LibreNMS\Util\Number;
+
 echo 'RFC1628 ';
 
-$oids = snmp_walk($device, '.1.3.6.1.2.1.33.1.2.6', '-Osqn', 'UPS-MIB');
-d_echo($oids."\n");
+$battery_current = snmp_get($device, 'upsBatteryCurrent.0', '-OqvU', 'UPS-MIB');
 
-$oids = trim($oids);
-foreach (explode("\n", $oids) as $data) {
-    $data = trim($data);
-    if ($data) {
-        list($oid,$descr) = explode(' ', $data, 2);
-        $split_oid        = explode('.', $oid);
-        $current_id       = $split_oid[(count($split_oid) - 1)];
-        $current_oid      = ".1.3.6.1.2.1.33.1.2.6.$current_id";
-        $divisor          = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $current_oid);
-        $current          = (snmp_get($device, $current_oid, '-O vq') / $divisor);
-        $descr            = 'Battery'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($current_id + 1));
-        $type             = 'rfc1628';
-        $index            = (500 + $current_id);
+if (is_numeric($battery_current)) {
+    $oid = '.1.3.6.1.2.1.33.1.2.6.0';
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
 
-        discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
-    }
+    discover_sensor(
+        null,
+        'current',
+        $device,
+        $oid,
+        500,
+        'rfc1628',
+        'Battery',
+        $divisor,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $battery_current / $divisor
+    );
 }
 
-$oids = trim(snmp_walk($device, '.1.3.6.1.2.1.33.1.4.3.0', '-OsqnU'));
-d_echo($oids."\n");
-
-list($unused,$numPhase) = explode(' ', $oids);
-for ($i = 1; $i <= $numPhase; $i++) {
-    $current_oid = ".1.3.6.1.2.1.33.1.4.4.1.3.$i";
-    $descr       = 'Output';
-    if ($numPhase > 1) {
-        $descr .= " Phase $i";
+$output_current = snmpwalk_group($device, 'upsOutputCurrent', 'UPS-MIB');
+foreach ($output_current as $index => $data) {
+    $oid = ".1.3.6.1.2.1.33.1.4.4.1.3.$index";
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
+    $descr = 'Output';
+    if (count($output_current) > 1) {
+        $descr .= " Phase $index";
     }
+    if (is_array($data['upsOutputCurrent'])) {
+        $data['upsOutputCurrent'] = $data['upsOutputCurrent'][0];
+        $oid .= '.0';
+    }
+    $data['upsOutputCurrent'] = Number::cast($data['upsOutputCurrent']);
 
-    $divisor   = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $current_oid);
-    $current   = (snmp_get($device, $current_oid, '-Oqv') / $divisor);
-    $type      = 'rfc1628';
-    $index     = $i;
-
-    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(
+        null,
+        'current',
+        $device,
+        $oid,
+        $index,
+        'rfc1628',
+        $descr,
+        $divisor,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $data['upsOutputCurrent'] / $divisor
+    );
 }
 
-$oids = trim(snmp_walk($device, '.1.3.6.1.2.1.33.1.3.2.0', '-OsqnU'));
-d_echo($oids."\n");
-
-list($unused,$numPhase) = explode(' ', $oids);
-for ($i = 1; $i <= $numPhase; $i++) {
-    $current_oid = ".1.3.6.1.2.1.33.1.3.3.1.4.$i";
-    $descr       = 'Input';
-    if ($numPhase > 1) {
-        $descr .= " Phase $i";
+$input_current = snmpwalk_group($device, 'upsInputCurrent', 'UPS-MIB');
+foreach ($input_current as $index => $data) {
+    $oid = ".1.3.6.1.2.1.33.1.3.3.1.4.$index";
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
+    $descr = 'Input';
+    if (count($input_current) > 1) {
+        $descr .= " Phase $index";
     }
+    if (is_array($data['upsInputCurrent'])) {
+        $data['upsInputCurrent'] = $data['upsInputCurrent'][0];
+        $oid .= '.0';
+    }
+    $data['upsInputCurrent'] = Number::cast($data['upsInputCurrent']);
 
-    $divisor   = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $current_oid);
-    $current   = (snmp_get($device, $current_oid, '-Oqv') / $divisor);
-    $type      = 'rfc1628';
-    $index     = (100 + $i);
-
-    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(
+        null,
+        'current',
+        $device,
+        $oid,
+        100 + $index,
+        'rfc1628',
+        $descr,
+        $divisor,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $data['upsInputCurrent'] / $divisor
+    );
 }
 
-$oids = trim(snmp_walk($device, '.1.3.6.1.2.1.33.1.5.2.0', '-OsqnU'));
-d_echo($oids."\n");
-
-list($unused,$numPhase) = explode(' ', $oids);
-for ($i = 1; $i <= $numPhase; $i++) {
-    $current_oid = ".1.3.6.1.2.1.33.1.5.3.1.3.$i";
-    $descr       = 'Bypass';
-    if ($numPhase > 1) {
-        $descr .= " Phase $i";
+$bypass_current = snmpwalk_group($device, 'upsBypassCurrent', 'UPS-MIB');
+foreach ($bypass_current as $index => $data) {
+    $oid = ".1.3.6.1.2.1.33.1.5.3.1.3.$index";
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
+    $descr = 'Bypass';
+    if (count($bypass_current) > 1) {
+        $descr .= " Phase $index";
     }
+    if (is_array($data['upsBypassCurrent'])) {
+        $data['upsBypassCurrent'] = $data['upsBypassCurrent'][0];
+        $oid .= '.0';
+    }
+    $data['upsBypassCurrent'] = Number::cast($data['upsBypassCurrent']);
 
-    $divisor   = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $current_oid);
-    $current   = (snmp_get($device, $current_oid, '-Oqv') / $divisor);
-    $type      = 'rfc1628';
-    $index     = (200 + $i);
-
-    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor(
+        null,
+        'current',
+        $device,
+        $oid,
+        200 + $index,
+        'rfc1628',
+        $descr,
+        $divisor,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $data['upsBypassCurrent'] / $divisor
+    );
 }
+
+unset($battery_current, $output_current, $input_current, $bypass_current);

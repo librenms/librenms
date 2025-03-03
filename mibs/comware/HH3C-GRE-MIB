@@ -1,0 +1,108 @@
+-- =================================================================
+-- Copyright (C) 2005 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Generic Routing Encapsulation configuration MIB
+-- Reference: IF-MIB
+-- Version: V1.0
+-- History:
+-- V1.0 created by Sun Ludong
+--   2005-06-04 Initial version
+-- =================================================================
+HH3C-GRE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    ifIndex
+        FROM IF-MIB; 
+
+hh3cGre MODULE-IDENTITY
+    LAST-UPDATED
+        "200506040000Z"                        -- June 4, 2005 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB contains objects to Manage configuration and 
+        Monitor running state for GRE.
+        "                        
+    REVISION
+        "200506040000Z"                        -- June 4, 2005 at 00:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module.
+        "
+    ::= { hh3cCommon 54 }
+
+    hh3cGreObjects OBJECT IDENTIFIER ::= { hh3cGre 1 }
+
+    hh3cGreTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cGreEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of Generic Routing Encapsulation(GRE) configuration. 
+        It contains configuration of GRE Key, and enable flags of Key
+        and Checksum. The detail of Key and Checksum is described in
+        RFC2784 and RFC2890.
+        "
+    ::= { hh3cGreObjects 1 }
+                        
+    hh3cGreEntry OBJECT-TYPE
+    SYNTAX Hh3cGreEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of hh3cGreTable
+        "
+    INDEX { ifIndex }
+    ::= { hh3cGreTable 1 }
+
+    Hh3cGreEntry ::= SEQUENCE {
+        hh3cGreKeyValue
+            Unsigned32, 
+        hh3cGreKey
+            INTEGER, 
+        hh3cGreChecksum
+            INTEGER
+    }
+    hh3cGreKeyValue OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value of GRE key
+        "
+    ::= { hh3cGreEntry 1 }
+                     
+    hh3cGreKey OBJECT-TYPE
+        SYNTAX INTEGER{
+            enable(1), 
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The enable flag of GRE key
+        "
+    ::= { hh3cGreEntry 2 }
+                        
+    hh3cGreChecksum OBJECT-TYPE
+        SYNTAX INTEGER{
+            enable(1), 
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The enable flag of GRE Checksum
+            "
+        ::= { hh3cGreEntry 3 }
+
+END

@@ -1,0 +1,4683 @@
+-- *****************************************************************
+-- ROSMGMT-OSPFv2-MIB.mib
+--
+-- May 2010, zhangyan
+--
+-- Copyright(c) 2020 by RAISECOM TECH, Ltd. 
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+--MibName=rosMgmtOspf
+ROSMGMT-OSPFV2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,Counter32, Gauge32,
+    Integer32, Unsigned32, IpAddress
+                 FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus
+                 FROM SNMPv2-TC 
+    EnableVar	 FROM SWITCH-TC   
+    InterfaceIndexOrZero
+                 FROM IF-MIB                
+    rosMgmt	            	         
+                 FROM RAISECOM-BASE-MIB;       
+
+    rosMgmtOspf MODULE-IDENTITY
+        LAST-UPDATED    "202005070000Z"  -- May 07, 2020
+        ORGANIZATION    "Raisecom Technology CO.,Ltd."
+        CONTACT-INFO    
+                "       Raise Systems        
+                        Postal: Beijing, China
+                        Tel: 86-010-82884499
+                        E-mail: support@raisecom.com"
+
+        DESCRIPTION     "This MIB module defines objects to Ospf."
+
+        REVISION        "202005070000Z"  -- May 07, 2020
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { rosMgmt 47} 
+
+ProcessID ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "The OSPF process id."
+       SYNTAX       Unsigned32          
+        
+AreaID ::= TEXTUAL-CONVENTION 
+       DISPLAY-HINT "1d.1d.1d.1d" 
+       STATUS       current
+       DESCRIPTION
+          "An OSPF Area Identifier.
+           Note that the Area ID, in OSPF, has the same format
+           as an IP address, but has the function of defining
+           a summarization point for link state advertisements."
+       SYNTAX       IpAddress
+
+RouterID ::= TEXTUAL-CONVENTION  
+       DISPLAY-HINT "1d.1d.1d.1d"
+       STATUS       current
+       DESCRIPTION
+          "A OSPF Router Identifier.
+           Note that the Router ID, in OSPF, has the same format
+           as an IP address, but identifies the router independent
+           of its IP address."
+       SYNTAX       IpAddress
+
+Metric ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "The OSPF internal metric.
+           Note that the OSPF metric is defined as an unsigned value
+           in the range."
+       SYNTAX       Integer32 (0..'FFFF'h)
+
+BigMetric ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "The OSPF external metric."
+       SYNTAX       Integer32 (0..'FFFFFF'h)
+
+Status ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "An indication of the operability of an OSPF
+          function or feature.  For example, the status
+          of an interface: 'enabled' indicates that
+          it is willing to communicate with other OSPF routers,
+          and 'disabled' indicates that it is not."
+       SYNTAX       INTEGER { enabled (1), disabled (2) }
+
+PositiveInteger ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "A positive integer.  Values in excess are precluded as
+          unnecessary and prone to interoperability issues."
+       SYNTAX       Integer32 (0..'7FFFFFFF'h)
+
+HelloRange ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "The range of intervals in seconds on which Hello messages
+          are exchanged."
+       SYNTAX       Integer32 (1..'FFFF'h)
+
+UpToMaxAge ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+
+       DESCRIPTION
+          "The values in seconds that one might find or configure
+          for variables bounded by the maximum age of an LSA."
+       SYNTAX       Integer32 (0..3600)
+
+DesignatedRouterPriority ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-0"
+       STATUS       current
+       DESCRIPTION
+          "The range of values defined for the priority of a system
+          for becoming the designated router."
+       SYNTAX       Integer32 (0..'FF'h)
+
+OspfAuthenticationType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "The authentication type."
+       SYNTAX       INTEGER {
+                       none (0),
+                       simplePassword (1),
+                       md5 (2)
+                       -- reserved for specification by IANA (> 2)
+                    }
+
+
+--  Define groups in ROSMGMT-OSPFv2-MIB
+    rosMgmtOspfNotifications        OBJECT IDENTIFIER ::= { rosMgmtOspf 1 } 
+    rosMgmtOspfObjects              OBJECT IDENTIFIER ::= { rosMgmtOspf 2 } 
+    rosMgmtOspfConformance          OBJECT IDENTIFIER ::= { rosMgmtOspf 3 } 
+ 
+--   rosMgmtOspfNotifications 
+--   
+--   This group defines the traps related to Ospf.
+
+--
+--  Define groups in rosMgmtOspfNotifications
+--
+--    rosMgmtOspfTrapControl    OBJECT IDENTIFIER ::= { rosMgmtOspfNotifications 1 }
+
+   
+--
+--  rosMgmtOspfTrapControl 
+--
+--  This Table defines the control infomation of Ospf Traps.
+--
+   rosMgmtOspfTrapControlTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfTrapControlEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The table enable or disable ospf traps"
+       ::= { rosMgmtOspfNotifications 1 }
+
+  rosMgmtOspfTrapControlEntry OBJECT-TYPE
+       SYNTAX   RosMgmtOspfTrapControlEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "Define an entry in the rosMgmtOspfTrapControl.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       INDEX { rosMgmtOspfProcessId }
+       ::= { rosMgmtOspfTrapControlTable 1 }
+
+  RosMgmtOspfTrapControlEntry ::=
+       SEQUENCE {
+          rosMgmtOspfSetTrap
+             EnableVar,
+          rosMgmtOspfConfigErrorType
+             INTEGER,
+          rosMgmtOspfPacketType
+             INTEGER,
+          rosMgmtOspfPacketSrc
+             IpAddress
+             }
+             
+    rosMgmtOspfSetTrap OBJECT-TYPE
+        SYNTAX   EnableVar
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Whether the Device shoule send traps."    
+       DEFVAL {disable}
+       ::= { rosMgmtOspfTrapControlEntry 1 }
+
+
+    rosMgmtOspfConfigErrorType OBJECT-TYPE
+        SYNTAX   INTEGER    {
+                    badVersion (1),
+                    areaMismatch (2),
+                    unknownNbmaNbr (3), -- Router is Dr eligible
+                    unknownVirtualNbr (4),
+                    authTypeMismatch(5),
+                    authFailure (6),
+                    netMaskMismatch (7),
+                    helloIntervalMismatch (8),
+                    deadIntervalMismatch (9),
+                    optionMismatch (10) }
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "Potential types  of  configuration  conflicts.
+           Used  by the ospfConfigError and ospfConfigVir-
+           tError traps."
+   ::= { rosMgmtOspfTrapControlEntry 2 }
+
+
+    rosMgmtOspfPacketType OBJECT-TYPE
+        SYNTAX   INTEGER    {
+                    hello (1),
+                    dbDescript (2),
+                    lsReq (3),
+                    lsUpdate (4),
+                    lsAck (5) }
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "OSPF packet types."
+   ::= { rosMgmtOspfTrapControlEntry 3 }
+
+
+    rosMgmtOspfPacketSrc OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The IP address of an inbound packet that  can-
+           not be identified by a neighbor instance."
+       ::= { rosMgmtOspfTrapControlEntry 4 }  
+
+
+--
+--  rosMgmtOspfTraps 
+--
+--  This Table defines the Ospf Traps.
+--
+--  Define groups in rosMgmtOspfNotifications
+--
+    rosMgmtOspfTraps          OBJECT IDENTIFIER ::= { rosMgmtOspfNotifications 0 }
+      
+   rosMgmtOspfIfStateChange NOTIFICATION-TYPE
+        OBJECTS { 
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfIfIpAddress,
+                    rosMgmtOspfAddressLessIf,
+                    rosMgmtOspfIfState   -- The new state
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An rosMgmtOspfIfStateChange trap signifies that there
+           has been a change in the state of a non-virtual
+           OSPF interface. This trap should  be  generated
+           when  the interface state regresses (e.g., goes
+           from Dr to Down) or progresses  to  a  terminal
+           state  (i.e.,  Point-to-Point, DR Other, Dr, or
+           Backup)."
+   ::= { rosMgmtOspfTraps 1 }
+
+
+    rosMgmtOspfVirtIfStateChange NOTIFICATION-TYPE
+        OBJECTS {   
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfVirtIfAreaId,
+                    rosMgmtOspfVirtIfNeighbor,
+                    rosMgmtOspfVirtIfState  -- The new state
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An rosMgmtOspfIfStateChange trap signifies that there
+           has  been a change in the state of an OSPF vir-
+           tual interface.
+           This trap should be generated when  the  inter-
+           face  state  regresses  (e.g., goes from Point-
+           to-Point to Down) or progresses to  a  terminal
+           state (i.e., Point-to-Point)."
+   ::= { rosMgmtOspfTraps 2 }  
+    
+       rosMgmtOspfNbrStateChange NOTIFICATION-TYPE
+        OBJECTS {   
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfNbrIpAddr,
+                    rosMgmtOspfNbrAddressLessIndex,
+                    rosMgmtOspfNbrRtrId,
+                    rosMgmtOspfNbrState  -- The new state
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An  rosMgmtOspfNbrStateChange  trap  signifies   that
+           there  has been a change in the state of a non-
+           virtual OSPF neighbor.   This  trap  should  be
+           generated  when  the  neighbor  state regresses
+           (e.g., goes from Attempt or Full  to  1-Way  or
+           Down)  or progresses to a terminal state (e.g.,
+           2-Way or Full).  When an  neighbor  transitions
+           from  or  to Full on non-broadcast multi-access
+           and broadcast networks, the trap should be gen-
+           erated  by the designated router.  A designated
+           router transitioning to Down will be  noted  by
+           rosMgmtOspfIfStateChange."
+   ::= { rosMgmtOspfTraps 3 }
+
+    rosMgmtOspfVirtNbrStateChange NOTIFICATION-TYPE
+        OBJECTS {   
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfVirtNbrArea,
+                    rosMgmtOspfVirtNbrRtrId,
+                    rosMgmtOspfVirtNbrState  -- The new state
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An rosMgmtOspfIfStateChange trap signifies that there
+           has  been a change in the state of an OSPF vir-
+           tual neighbor.  This trap should  be  generated
+           when  the  neighbor state regresses (e.g., goes
+           from Attempt or  Full  to  1-Way  or  Down)  or
+           progresses to a terminal state (e.g., Full)."
+   ::= { rosMgmtOspfTraps 4 }
+
+    rosMgmtOspfIfConfigError NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfIfIpAddress,
+                    rosMgmtOspfAddressLessIf,
+                    rosMgmtOspfPacketSrc,  -- The source IP address
+                    rosMgmtOspfConfigErrorType, -- Type of error
+                    rosMgmtOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An rosMgmtOspfIfConfigError  trap  signifies  that  a
+           packet  has  been received on a non-virtual in-
+           terface  from  a  router  whose   configuration
+           parameters  conflict  with this router's confi-
+           guration parameters.  Note that the  event  op-
+           tionMismatch  should  cause  a  trap only if it
+           prevents an adjacency from forming."
+   ::= { rosMgmtOspfTraps 5 }
+
+    rosMgmtOspfVirtIfConfigError NOTIFICATION-TYPE
+        OBJECTS {   
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfVirtIfAreaId,
+                    rosMgmtOspfVirtIfNeighbor,
+                    rosMgmtOspfConfigErrorType, -- Type of error
+                    rosMgmtOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfConfigError trap signifies that a pack-
+           et  has  been  received  on a virtual interface
+           from a router  whose  configuration  parameters
+           conflict   with   this  router's  configuration
+           parameters.  Note that the event optionMismatch
+           should  cause a trap only if it prevents an ad-
+           jacency from forming."
+   ::= { rosMgmtOspfTraps 6 }
+
+
+    rosMgmtOspfIfAuthFailure NOTIFICATION-TYPE
+        OBJECTS {   
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfIfIpAddress,
+                    rosMgmtOspfAddressLessIf,
+                    rosMgmtOspfPacketSrc,  -- The source IP address
+                    rosMgmtOspfConfigErrorType, -- authTypeMismatch or
+                                         -- authFailure
+                    rosMgmtOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An rosMgmtOspfIfAuthFailure  trap  signifies  that  a
+           packet  has  been received on a non-virtual in-
+           terface from a router whose authentication  key
+           or  authentication  type  conflicts  with  this
+           router's authentication key  or  authentication
+           type."
+   ::= { rosMgmtOspfTraps 7 }
+
+
+    rosMgmtOspfVirtIfAuthFailure NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfVirtIfAreaId,
+                    rosMgmtOspfVirtIfNeighbor,
+                    rosMgmtOspfConfigErrorType, -- authTypeMismatch or
+                                         -- authFailure
+                    rosMgmtOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An rosMgmtOspfVirtIfAuthFailure trap signifies that a
+           packet has been received on a virtual interface
+           from a router whose authentication key  or  au-
+           thentication  type conflicts with this router's
+           authentication key or authentication type."
+   ::= { rosMgmtOspfTraps 8 }
+
+    rosMgmtOspfIfRxBadPacket NOTIFICATION-TYPE
+        OBJECTS {     
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfIfIpAddress,
+                    rosMgmtOspfAddressLessIf,
+                    rosMgmtOspfPacketSrc,  -- The source IP address
+                    rosMgmtOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An rosMgmtOspfIfRxBadPacket trap  signifies  that  an
+           OSPF  packet has been received on a non-virtual
+           interface that cannot be parsed."
+   ::= { rosMgmtOspfTraps 9 }
+
+    rosMgmtOspfVirtIfRxBadPacket NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfVirtIfAreaId,
+                    rosMgmtOspfVirtIfNeighbor,
+                    rosMgmtOspfPacketType
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfRxBadPacket trap signifies that an OSPF
+           packet has been received on a virtual interface
+           that cannot be parsed."
+   ::= { rosMgmtOspfTraps 10 }
+
+
+    rosMgmtOspfTxRetransmit NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfIfIpAddress,
+                    rosMgmtOspfAddressLessIf,
+                    rosMgmtOspfNbrRtrId, -- Destination
+                    rosMgmtOspfPacketType,
+                    rosMgmtOspfLsdbType,
+                    rosMgmtOspfLsdbLsId,
+                    rosMgmtOspfLsdbRouterId
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfTxRetransmit  trap  signifies  than  an
+           OSPF  packet  has  been retransmitted on a non-
+           virtual interface.  All packets that may be re-
+           transmitted  are associated with an LSDB entry.
+           The LS type, LS ID, and Router ID are  used  to
+           identify the LSDB entry."
+   ::= { rosMgmtOspfTraps 11 }
+
+
+    rosMgmtOspfVirtIfTxRetransmit NOTIFICATION-TYPE
+        OBJECTS {      
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfVirtIfAreaId,
+                    rosMgmtOspfVirtIfNeighbor,
+                    rosMgmtOspfPacketType,
+                    rosMgmtOspfLsdbType,
+                    rosMgmtOspfLsdbLsId,
+                    rosMgmtOspfLsdbRouterId
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfTxRetransmit  trap  signifies  than  an
+           OSPF packet has been retransmitted on a virtual
+           interface.  All packets that may be retransmit-
+           ted  are  associated with an LSDB entry. The LS
+           type, LS ID, and Router ID are used to identify
+           the LSDB entry."
+   ::= { rosMgmtOspfTraps 12 }
+
+    rosMgmtOspfOriginateLsa NOTIFICATION-TYPE
+        OBJECTS {   
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfLsdbAreaId,  -- 0.0.0.0 for AS Externals
+                    rosMgmtOspfLsdbType,
+                    rosMgmtOspfLsdbLsId,
+                    rosMgmtOspfLsdbRouterId
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfOriginateLsa trap signifies that a  new
+           LSA  has  been originated by this router.  This
+           trap should not be invoked for simple refreshes
+           of  LSAs  (which happesn every 30 minutes), but
+           instead will only be invoked  when  an  LSA  is
+           (re)originated due to a topology change.  Addi-
+           tionally, this trap does not include LSAs  that
+           are  being  flushed  because  they have reached
+           MaxAge."
+   ::= { rosMgmtOspfTraps 13 }
+
+    rosMgmtOspfMaxAgeLsa NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfLsdbAreaId,  -- 0.0.0.0 for AS Externals
+                    rosMgmtOspfLsdbType,
+                    rosMgmtOspfLsdbLsId,
+                    rosMgmtOspfLsdbRouterId
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An ospfMaxAgeLsa trap signifies  that  one  of
+           the LSA in the router's link-state database has
+           aged to MaxAge."
+   ::= { rosMgmtOspfTraps 14 }
+
+    rosMgmtOspfLsdbOverflow NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfExtLsdbLimit
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An rosMgmtOspfLsdbOverflow trap  signifies  that  the
+           number of LSAs in the router's link-state data-
+           base has exceeded rosMgmtOspfExtLsdbLimit."
+   ::= { rosMgmtOspfTraps 15 }
+
+
+    rosMgmtOspfLsdbApproachingOverflow NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfExtLsdbLimit
+                  }
+        STATUS             current
+        DESCRIPTION
+           "An rosMgmtOspfLsdbApproachingOverflow trap  signifies
+           that  the  number of LSAs in the router's link-
+           state database has exceeded ninety  percent  of
+           rosMgmtOspfExtLsdbLimit."
+   ::= { rosMgmtOspfTraps 16 }     
+   
+    rosMgmtOspfIfKeyValid NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfIfIpAddress,
+                    rosMgmtOspfAddressLessIf,
+                    rosMgmtOspfIfAuthKeyChain
+                  }
+        STATUS             current
+        DESCRIPTION
+           "This trap will notify the network manager that some key 
+           associated with an interface recovers valid."
+   ::= { rosMgmtOspfTraps 17 }
+
+
+    rosMgmtOspfIfLastKeyExpiration NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfIfIpAddress,
+                    rosMgmtOspfAddressLessIf, 
+                    rosMgmtOspfIfAuthKeyChain
+                  }
+        STATUS             current
+        DESCRIPTION
+           "This trap will notify the network manager that the last 
+ 	       key associated with an interface expires."
+   ::= { rosMgmtOspfTraps 18 }      
+   
+    rosMgmtOspfVirtIfKeyValid NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfVirtIfAreaId,
+                    rosMgmtOspfVirtIfNeighbor, 
+                    rosMgmtOspfVirtIfAuthKeyChain
+                  }
+        STATUS             current
+        DESCRIPTION
+           "This trap will notify the network manager that some key 
+           associated with an virtual link recovers valid."
+   ::= { rosMgmtOspfTraps 19 }
+
+
+    rosMgmtOspfVirtIfLastKeyExpiration NOTIFICATION-TYPE
+        OBJECTS {    
+                    rosMgmtOspfProcessId,
+                    rosMgmtOspfRouterId, -- The originator of the trap
+                    rosMgmtOspfVirtIfAreaId,
+                    rosMgmtOspfVirtIfNeighbor,
+                    rosMgmtOspfVirtIfAuthKeyChain
+                  }
+        STATUS             current
+        DESCRIPTION
+           "This trap will notify the network manager that the last 
+ 	       key associated with an virtual link expires."
+   ::= { rosMgmtOspfTraps 20 } 
+   
+     rosMgmtOspfRedistributeOverflow NOTIFICATION-TYPE
+        OBJECTS {    
+                   rosMgmtOspfProcessId,
+                   rosMgmtOspfRedistributeProtocol, -- The originator of the trap
+                   rosMgmtOspfRedistributeProcessId,
+                   rosMgmtOspfRedistributeRouteLimit
+                  }
+        STATUS             current
+        DESCRIPTION
+           "This trap should  be  generated when  the number of 
+            redistribute routes exceeds limit."
+   ::= { rosMgmtOspfTraps 21 }
+ 
+      rosMgmtOspfRedistributeNotOverflow NOTIFICATION-TYPE
+        OBJECTS {    
+                   rosMgmtOspfProcessId,
+                   rosMgmtOspfRedistributeProtocol, -- The originator of the trap
+                   rosMgmtOspfRedistributeProcessId,
+                   rosMgmtOspfRedistributeRouteLimit
+                  }
+        STATUS             current
+        DESCRIPTION
+           "This trap should  be  generated when  the number of 
+            redistribute routes  drop to limit."
+   ::= { rosMgmtOspfTraps 22 }
+
+--
+--   rosMgmtOspfObjects 
+--   
+--   This group defines all the objects related to Ospf.
+
+--  Define groups in rosMgmtOspfObjects
+--    rosMgmtOspfGlobalTable             OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 1 }
+--    rosMgmtOspfAreaTable               OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 2 } 
+--    rosMgmtOspfNetWorkTable            OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 3 }
+--    rosMgmtOspfStubAreaTable           OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 4 }
+--    rosMgmtOspfNssaAreaTable           OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 5 }         
+--    rosMgmtOspfIfTable                 OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 6 }
+--    rosMgmtOspfVirtIfTable             OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 7 }
+--    rosMgmtOspfNbrTable                OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 8 }
+--    rosMgmtOspfNbmaCfgNbrTable         OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 9 }
+--    rosMgmtOspfVirtNbrTable            OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 10}
+--    rosMgmtOspfAreaAggregateTable      OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 11}
+--    rosMgmtOspfExternalAggregateTable  OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 12}  
+--    rosMgmtOspfLsdbTable               OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 13}
+--    rosMgmtOspfAsLsdbTable             OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 14}
+--    rosMgmtOspfAreaLsaCountTable       OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 15}
+--    rosMgmtOspfRedistributeTable       OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 16}
+--    rosMgmtOspfDefaultInfoTable        OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 17} 
+--    rosMgmtOspfPacketIoStatisTable     OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 18}
+--    rosMgmtOspfRouteTable              OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 19}
+--    rosMgmtOspfBdrRouteTable           OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 20}    
+--    rosMgmtOspfDistributeListGroup     OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 21}  
+--    rosMgmtOspfDNBitOperationTable     OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 22}
+--
+--
+--  rosMgmtOspfGlobalTable 
+--
+--  This Table defines the Global Vars.
+--
+ rosMgmtOspfGlobalTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfGlobalEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "OSPF global Vars for every ospf process."
+       ::= { rosMgmtOspfObjects 1 }
+
+  rosMgmtOspfGlobalEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfGlobalEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "OSPF global Vars for every ospf process."
+       INDEX { rosMgmtOspfProcessId }
+       ::= { rosMgmtOspfGlobalTable 1 }
+
+  RosMgmtOspfGlobalEntry ::=
+        SEQUENCE {
+           rosMgmtOspfProcessId
+              ProcessID,
+           rosMgmtOspfRouterId
+              RouterID,
+           rosMgmtOspfAdminStat
+              EnableVar,
+           rosMgmtOspfVersionNumber
+              INTEGER,
+           rosMgmtOspfAreaBdrRtrStatus
+              TruthValue,
+           rosMgmtOspfASBdrRtrStatus
+              TruthValue,
+           rosMgmtOspfExternLsaCount
+              Gauge32,
+           rosMgmtOspfExternLsaCksumSum
+              Integer32,
+           rosMgmtOspfOriginateNewLsas
+              Counter32,
+           rosMgmtOspfRxNewLsas
+              Counter32,
+           rosMgmtOspfExtLsdbLimit
+              Integer32,
+           rosMgmtOspfExitOverflowInterval
+              PositiveInteger,
+           rosMgmtOspfReferenceBandwidth
+              Unsigned32,   
+           rosMgmtOspfAsLsaCount  
+              Gauge32,
+           rosMgmtOspfAsLsaCksumSum   
+              Unsigned32,
+           rosMgmtOspfStubRouterSupport   
+              TruthValue,
+           rosMgmtOspfStubRouterAdvertisement   
+              INTEGER,
+           rosMgmtOspfAdminDistance 
+              Integer32, 
+           rosMgmtOspfSpfInterval   
+              Integer32,   
+           rosMgmtOspfReset   
+              INTEGER,
+           rosMgmtOspfExportMetric   
+              Integer32,
+           rosMgmtOspfExportTag   
+              Integer32,
+           rosMgmtOspfExportType   
+              INTEGER,
+           rosMgmtOspfNetCounts   
+              Integer32,
+           rosMgmtOspfAreaCounts   
+              Integer32,
+           rosMgmtOspfNssaAreaCounts
+              Integer32,           
+           rosMgmtOspfSpfCounts
+              Integer32, 
+           rosMgmtOspfGlobalStatus   
+              RowStatus,
+           rosMgmtOspfRedistributeRouteLimit 
+              Integer32, 
+           rosMgmtOspfDistanceIntra
+              Integer32,
+           rosMgmtOspfDistanceInter
+              Integer32, 
+           rosMgmtOspfDistanceExtern
+              Integer32, 
+           rosMgmtOspfRfc1583Compatible
+              TruthValue,  
+           rosMgmtOspfSpfHode 
+              Integer32,
+	       rosMgmtOspfBfdAllItfs
+		       TruthValue,
+           rosMgmtOspfOpaqueCapability
+              TruthValue,
+           rosMgmtOspfTECapability
+              TruthValue,  
+           rosMgmtOspfTEAreaID
+              IpAddress,
+           rosMgmtOspfTERouterId
+              RouterID, 
+           rosMgmtOspfGRCapability
+              INTEGER,
+           rosMgmtOspfGRPeriod  
+              Integer32,
+           rosMgmtOspfGRHelper
+              INTEGER,  
+           rosMgmtOspfGRHelperMaxPeriod 
+              Integer32,     
+           rosMgmtOspfMaximumLoadBalancing 
+              Integer32,  
+           rosMgmtOspfMaxMetric   
+              Integer32,   
+           rosMgmtOspfMaxMetricType   
+              Integer32, 
+           rosMgmtOspfMaxMetricTime
+              Integer32, 
+     	   rosMgmtOspfMaxMetricTypeStartup
+              Integer32,
+           rosMgmtOspfLsdbOverflowLimit     
+              Integer32,   
+           rosMgmtOspfTrafficAdjustType
+              INTEGER, 
+           rosMgmtOspfRouteTagValue
+              Unsigned32,
+           rosMgmtOspfRouteTagCheckDisable
+              TruthValue,
+           rosMgmtOspfDNBitSetDisableSummary    
+              TruthValue,
+           rosMgmtOspfDNBitSetDisableAse
+              TruthValue,
+           rosMgmtOspfDNBitSetDisableNssa
+              TruthValue,
+           rosMgmtOspfDNBitCheckDisableSummary
+              TruthValue,  
+           rosMgmtOspfDNBitCheckDisableAse
+              TruthValue,
+           rosMgmtOspfDNBitCheckDisableNssa
+              TruthValue,
+           rosMgmtOspfSpfMilliInterval   
+              Integer32,  
+           rosMgmtOspfSpfMilliHode 
+              Integer32,
+           rosMgmtOspfLoopFreeAlt
+              TruthValue
+         }    
+
+  rosMgmtOspfProcessId OBJECT-TYPE
+       SYNTAX       ProcessID
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A 32-bit unsigned integer uniquely identifying the
+          ospf process."
+       ::= { rosMgmtOspfGlobalEntry 1 }
+         
+  
+  rosMgmtOspfRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "A 32-bit integer uniquely identifying the
+          router in the Autonomous System.
+          By convention, to ensure uniqueness, this
+          should default to the value of one of the
+          router's IP interface addresses.
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile storage."
+       REFERENCE
+          "OSPF Version 2, C.1 Global parameters"
+       ::= { rosMgmtOspfGlobalEntry 2 }
+
+  rosMgmtOspfAdminStat OBJECT-TYPE
+       SYNTAX       EnableVar
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The administrative status of OSPF in the
+          router.  The value 'enabled' denotes that the
+          OSPF Process is active on at least one interface;
+          'disabled' disables it on all interfaces.
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile storage."  
+       DEFVAL { disable }
+       ::= { rosMgmtOspfGlobalEntry 3 }
+
+  rosMgmtOspfVersionNumber OBJECT-TYPE
+       SYNTAX       INTEGER { version2 (2) }
+       MAX-ACCESS   read-only
+       STATUS       current
+
+       DESCRIPTION
+          "The current version number of the OSPF protocol is 2."
+       REFERENCE
+          "OSPF Version 2, Title"
+       ::= { rosMgmtOspfGlobalEntry 4 }
+
+  rosMgmtOspfAreaBdrRtrStatus OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A flag to note whether this router is an Area
+          Border Router."
+       REFERENCE
+          "OSPF Version 2, Section 3 Splitting the AS into
+          Areas"
+       ::= { rosMgmtOspfGlobalEntry 5 }
+
+  rosMgmtOspfASBdrRtrStatus OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A flag to note whether this router is configured as
+           an Autonomous System Border Router.
+
+           This object is persistent and when written the
+           entity SHOULD save the change to non-volatile storage."
+       REFERENCE
+          "OSPF Version 2, Section 3.3 Classification of
+          routers"
+       ::= { rosMgmtOspfGlobalEntry 6 }
+
+  rosMgmtOspfExternLsaCount OBJECT-TYPE
+        SYNTAX       Gauge32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+           "The number of external (LS type-5) link state
+           advertisements in the link state database."
+        REFERENCE
+           "OSPF Version 2, Appendix A.4.5 AS external link
+           advertisements"
+        ::= { rosMgmtOspfGlobalEntry 7 }
+
+  rosMgmtOspfExternLsaCksumSum OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+
+        STATUS       current
+        DESCRIPTION
+           "The 32-bit sum of the LS checksums of
+           the external link state advertisements
+           contained in the link state database.  This sum
+           can be used to determine if there has been a
+           change in a router's link state database and
+           to compare the link state database of two
+           routers.  The value should be treated as unsigned
+           when comparing two sums of checksums."
+        ::= { rosMgmtOspfGlobalEntry 8 }
+
+   rosMgmtOspfOriginateNewLsas OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of new link state advertisements
+          that have been originated.  This number is
+          incremented each time the router originates a new
+          LSA.
+
+          Discontinuities in the value of this counter can
+          occur at re-initialization of the management system,
+          and at other times as indicated by the value of
+          ospfDiscontinuityTime."
+        ::= { rosMgmtOspfGlobalEntry 9 }
+
+  rosMgmtOspfRxNewLsas OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+
+          "The number of link state advertisements received
+          that are determined to be new instantiations.
+          This number does not include newer instantiations
+          of self-originated link state advertisements.
+
+          Discontinuities in the value of this counter can
+          occur at re-initialization of the management system,
+          and at other times as indicated by the value of
+          ospfDiscontinuityTime."
+       ::= { rosMgmtOspfGlobalEntry 10 }
+
+  rosMgmtOspfExtLsdbLimit OBJECT-TYPE
+       SYNTAX       Integer32 (-1..'7FFFFFFF'h)
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The maximum number of non-default
+          AS-external LSAs entries that can be stored in the
+          link state database.  If the value is -1, then
+          there is no limit.
+
+          When the number of non-default AS-external LSAs
+          in a router's link state database reaches
+          rosMgmtOspfExtLsdbLimit, the router enters
+          overflow state.  The router never holds more than
+          rosMgmtOspfExtLsdbLimit non-default AS-external LSAs
+          in its database.  rosMgmtOspfExtLsdbLimit MUST be set
+          identically in all routers attached to the OSPF
+          backbone and/or any regular OSPF area (i.e.,
+          OSPF stub areas and NSSAs are excluded).
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile
+          storage."
+        DEFVAL { -1 }
+        ::= { rosMgmtOspfGlobalEntry 11 }
+
+  rosMgmtOspfExitOverflowInterval OBJECT-TYPE
+       SYNTAX       PositiveInteger
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds that, after entering
+          OverflowState, a router will attempt to leave
+          OverflowState.  This allows the router to again
+          originate non-default AS-external LSAs.  When
+          set to 0, the router will not leave
+          overflow state until restarted.
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile
+          storage."
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 12 }
+
+  rosMgmtOspfReferenceBandwidth OBJECT-TYPE
+       SYNTAX       Unsigned32(1..4296967)
+       UNITS        "millionbits per second"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Reference bandwidth in millionbits/second for
+          calculating default interface metrics.  The
+          default value is 100 MBPS.
+
+          This object is persistent and when written
+          the entity SHOULD save the change to non-volatile
+          storage."
+       ::= { rosMgmtOspfGlobalEntry 13 }
+
+  rosMgmtOspfAsLsaCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+
+       DESCRIPTION
+           "The number of AS-scope link state
+           advertisements in the AS-scope link state database."
+       ::= { rosMgmtOspfGlobalEntry 14 }
+
+  rosMgmtOspfAsLsaCksumSum OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "The 32-bit unsigned sum of the LS checksums of
+           the AS link state advertisements contained in the AS-scope
+           link state database.  This sum can be used to determine
+           if there has been a change in a router's AS-scope link
+           state database, and to compare the AS-scope link state
+           database of two routers."
+       ::= { rosMgmtOspfGlobalEntry 15 }
+
+  rosMgmtOspfStubRouterSupport OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "The router's support for stub router functionality."
+       REFERENCE
+           "OSPF Stub Router Advertisement"
+       ::= { rosMgmtOspfGlobalEntry 16 }
+
+  rosMgmtOspfStubRouterAdvertisement OBJECT-TYPE
+       SYNTAX       INTEGER {
+                          doNotAdvertise (1),
+                          advertise(2)
+                          }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "This object controls the advertisement of
+           stub router LSAs by the router.  The value
+           doNotAdvertise will result in the advertisement
+           of a standard router LSA and is the default value.
+
+           This object is persistent and when written
+           the entity SHOULD save the change to non-volatile
+           storage."
+       ::= { rosMgmtOspfGlobalEntry 17 }   
+       
+  rosMgmtOspfAdminDistance OBJECT-TYPE
+       SYNTAX       Integer32 (0..255)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "The administrative distance of ospf process. 0 represents
+           administration distance of ospf is not set."     
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 18 }  
+        
+  rosMgmtOspfSpfInterval OBJECT-TYPE
+       SYNTAX       Integer32 (1..600)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Delay(s) between receiving a change to SPF calculation."     
+       DEFVAL { 2 }
+       ::= { rosMgmtOspfGlobalEntry 19 }  
+ 
+  rosMgmtOspfReset OBJECT-TYPE
+       SYNTAX       INTEGER {
+                               none (0),
+                               general(1),
+                               gr(2)
+                            }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Reset ospf process by process ID."     
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 20 }   
+
+  rosMgmtOspfExportMetric OBJECT-TYPE
+       SYNTAX       Integer32 (0.. 16777215)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "The default metric of imporing route into ospf process."     
+       DEFVAL { 20 }
+       ::= { rosMgmtOspfGlobalEntry 21 }
+
+  rosMgmtOspfExportTag OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-create
+       STATUS       current      
+       DESCRIPTION
+           "The default tag of importing route into ospf process."
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 22 }
+
+  rosMgmtOspfExportType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                      type1 (1),
+                      type2 (2)
+                      }                             
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "The default type of importing route into ospf process."     
+       DEFVAL { type2 }
+       ::= { rosMgmtOspfGlobalEntry 23 }
+
+  rosMgmtOspfNetCounts OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "It bas been used to describe the total number of networks in OSPF process."     
+       ::= { rosMgmtOspfGlobalEntry 24 }
+
+  rosMgmtOspfAreaCounts OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "It bas been used to describe the number of areas in OSPF process."     
+       ::= { rosMgmtOspfGlobalEntry 25 }
+
+  rosMgmtOspfNssaAreaCounts OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "It bas been used to describe the number of NSSA areas in OSPF process."     
+       ::= { rosMgmtOspfGlobalEntry 26 }
+
+  rosMgmtOspfSpfCounts OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "It bas been used to describe the total number of SPF calculation in OSPF process. "     
+       ::= { rosMgmtOspfGlobalEntry 27 }
+
+  rosMgmtOspfGlobalStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfGlobalEntry 28 }   
+       
+  rosMgmtOspfRedistributeRouteLimit OBJECT-TYPE
+       SYNTAX       Integer32(-1|1..65535) 
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Specify the max number in importing route.-1 represents 
+		  the max number in importing route are not set." 
+       ::= { rosMgmtOspfGlobalEntry 29 }      
+
+  rosMgmtOspfDistanceIntra OBJECT-TYPE
+       SYNTAX       Integer32 (0..255)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "The administrative distance of ospf Intra-area routes. 0 represents 
+           administration distance of ospf Intra-area routes are not set."     
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 30 }  
+
+  rosMgmtOspfDistanceInter OBJECT-TYPE
+       SYNTAX       Integer32 (0..255)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "The administrative distance of ospf Inter-area routes. 0 represents
+           administration distance of ospf Inter-area routes are not set."     
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 31 }  
+
+  rosMgmtOspfDistanceExtern OBJECT-TYPE
+       SYNTAX       Integer32 (0..255)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "The administrative distance of ospf external routes. 0 represents
+           administration distance of ospf external routes are not set."     
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 32 }  
+
+  rosMgmtOspfRfc1583Compatible OBJECT-TYPE
+       SYNTAX       TruthValue  
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "ospf process compatible with RFC 1583."     
+       DEFVAL { true }
+       ::= { rosMgmtOspfGlobalEntry 33 }  
+
+  rosMgmtOspfSpfHode OBJECT-TYPE
+       SYNTAX       Integer32 (1..600)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Hold time (s) between consecutive SPF calculations."     
+       DEFVAL { 3 }
+       ::= { rosMgmtOspfGlobalEntry 34 }  
+
+  rosMgmtOspfBfdAllItfs OBJECT-TYPE
+       SYNTAX       TruthValue  
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Ospf process indicate global BFD."     
+       DEFVAL { false }
+       ::= { rosMgmtOspfGlobalEntry 35 }  
+
+  rosMgmtOspfOpaqueCapability OBJECT-TYPE
+       SYNTAX       TruthValue  
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Ospf process indicate opaque capability."     
+       DEFVAL { false }
+       ::= { rosMgmtOspfGlobalEntry 36 }  
+
+  rosMgmtOspfTECapability OBJECT-TYPE
+       SYNTAX       TruthValue  
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Ospf process indicate TE capability."     
+       DEFVAL { false }
+       ::= { rosMgmtOspfGlobalEntry 37 }   
+       
+   rosMgmtOspfTEAreaID OBJECT-TYPE
+      SYNTAX       IpAddress
+      MAX-ACCESS   read-only
+      
+      STATUS       deprecated
+      DESCRIPTION
+         "A 32-bit integer uniquely identifying an area.
+         Area ID 0.0.0.0 is used for the OSPF backbone."
+      REFERENCE
+         "OSPF Version 2, Appendix C.2 Area parameters"
+      ::= { rosMgmtOspfGlobalEntry 38 }
+      
+   rosMgmtOspfTERouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "A 32-bit integer uniquely identifying the 
+	    TE router in the area.By convention,
+	    to ensure uniqueness,this should default to 
+	    the value of the router-id of ospf precess."
+       REFERENCE
+          "OSPF Version 2, C.1 Global parameters"
+       ::= { rosMgmtOspfGlobalEntry 39 }  
+       
+   rosMgmtOspfGRCapability OBJECT-TYPE
+       SYNTAX       INTEGER {
+                               graceful (1),
+                               signaling (2),
+                               never(3)
+                          }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Use this command to enable OSPF graceful restart 
+           or restart signaling. If a router is not restart-enabled, 
+           it cannot enter graceful restart mode and act as a helper."
+       ::= { rosMgmtOspfGlobalEntry 40 }            
+     
+   rosMgmtOspfGRPeriod OBJECT-TYPE
+       SYNTAX       Integer32 (1..1800)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           " The grace period for the restarting  router."     
+       DEFVAL { 120 }
+       ::= { rosMgmtOspfGlobalEntry 41 }  
+       
+   rosMgmtOspfGRHelper OBJECT-TYPE
+       SYNTAX       INTEGER {
+                               general (0),
+                               never (1),
+                               plannedonly (2)
+                          }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "the helper behavior for graceful restart."
+       ::= { rosMgmtOspfGlobalEntry 42 }     
+    
+
+   rosMgmtOspfGRHelperMaxPeriod OBJECT-TYPE
+       SYNTAX       Integer32 (1..1800)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Help only if received grace-period is less than this value."     
+       DEFVAL { 1800 }
+       ::= { rosMgmtOspfGlobalEntry 43 }     
+       
+   rosMgmtOspfMaximumLoadBalancing OBJECT-TYPE
+       SYNTAX       Integer32 (1..8)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Maximum load-balancing paths for OSPF."     
+       DEFVAL { 1 }
+       ::= { rosMgmtOspfGlobalEntry 44 }     
+                                              
+    rosMgmtOspfMaxMetric OBJECT-TYPE
+       SYNTAX       Integer32 (1..2)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "The router announces itself as a stub router."     
+       DEFVAL { 2 }
+       ::= { rosMgmtOspfGlobalEntry 45 }        
+       
+    rosMgmtOspfMaxMetricType OBJECT-TYPE
+       SYNTAX       Integer32 (0..1)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "The stub router will change the cost include stub link."     
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 46 }  
+       
+        
+   rosMgmtOspfMaxMetricTime OBJECT-TYPE
+       SYNTAX       Integer32 (0 | 90..86400)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Time, in seconds, router-LSAs are originated with max-metric."     
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 47 }   
+       
+   rosMgmtOspfMaxMetricTypeStartup  OBJECT-TYPE
+       SYNTAX       Integer32 (0..1)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Set maximum metric for stub links in router-LSAs on start up."     
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 48 }     
+       
+   rosMgmtOspfLsdbOverflowLimit OBJECT-TYPE
+       SYNTAX       Integer32 (0..1000000)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Set the OSPF link-state database overflow limit."     
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 49 }       
+       
+   rosMgmtOspfTrafficAdjustType OBJECT-TYPE
+       SYNTAX   INTEGER {  
+                          none (0),
+                          shortcut (1),
+                          fa (2)
+                        }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Set the OSPF traffic adjust feature."     
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 50 }     
+       
+   rosMgmtOspfRouteTagValue OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Set tag of the import route whcih belongs to the vpn process."
+       ::= { rosMgmtOspfGlobalEntry 51 }  
+       
+   rosMgmtOspfRouteTagCheckDisable OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Block the inclusion of Tag whcih belongs to the vpn process."
+       ::= { rosMgmtOspfGlobalEntry 52 }  
+       
+             
+   rosMgmtOspfDNBitSetDisableSummary OBJECT-TYPE
+       SYNTAX   TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Configure the DN bit in an Summary LSA. The DN bit is set in an Summary LSA by default."     
+       ::= { rosMgmtOspfGlobalEntry 53 } 
+       
+       
+   rosMgmtOspfDNBitSetDisableAse OBJECT-TYPE
+       SYNTAX   TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Configure the DN bit in an as-external-LSA. The DN bit is set in an as-external-LSA by default."     
+       ::= { rosMgmtOspfGlobalEntry 54 }
+       
+       
+   rosMgmtOspfDNBitSetDisableNssa OBJECT-TYPE
+       SYNTAX   TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Configure the DN bit in an Nssa LSA. The DN bit is set in an Nssa LSA by default."     
+       ::= { rosMgmtOspfGlobalEntry 55 }
+                 
+   rosMgmtOspfDNBitCheckDisableSummary OBJECT-TYPE
+       SYNTAX   TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Check the DN bit in an Summary LSA. The DN bit check is enabled in an Summary LSA by default."     
+       ::= { rosMgmtOspfGlobalEntry 56 }  
+       
+   rosMgmtOspfDNBitCheckDisableAse OBJECT-TYPE
+       SYNTAX   TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Check the DN bit in an an as-external-LSA. The DN bit check is enabled in an an as-external-LSA by default."     
+       ::= { rosMgmtOspfGlobalEntry 57 } 
+       
+              
+   rosMgmtOspfDNBitCheckDisableNssa OBJECT-TYPE
+       SYNTAX   TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Check the DN bit in an Nssa LSA. The DN bit check is enabled in an Nssa LSA by default."     
+       ::= { rosMgmtOspfGlobalEntry 58 }       
+       
+       
+  rosMgmtOspfSpfMilliInterval OBJECT-TYPE
+       SYNTAX       Integer32 (0..600000)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Delay(ms) between receiving a change to SPF calculation." 
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 59 } 
+       
+       
+  rosMgmtOspfSpfMilliHode OBJECT-TYPE
+       SYNTAX       Integer32 (0..600000)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Hold time (ms) between consecutive SPF calculations."   
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfGlobalEntry 60 }        
+       
+  rosMgmtOspfLoopFreeAlt  OBJECT-TYPE
+       SYNTAX   TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+           "Enable OSPF Loop-Free Alternate(LFA)."     
+       ::= { rosMgmtOspfGlobalEntry 61 }  
+
+     
+--  rosMgmtOspfAreaTable
+--     The OSPF Area Table contains information
+--     regarding the various areas.
+  rosMgmtOspfAreaTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfAreaEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Information describing the configured parameters and
+          cumulative statistics of the router's attached areas.
+          The interfaces and virtual links are configured
+          as part of these areas.  Area 0.0.0.0, by definition,
+          is the backbone area."
+       REFERENCE
+          "OSPF Version 2, Section 6 The Area Data Structure"
+       ::= { rosMgmtOspfObjects 2 }
+
+  rosMgmtOspfAreaEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfAreaEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Information describing the configured parameters and
+          cumulative statistics of one of the router's attached areas.
+          The interfaces and virtual links are configured as part of
+          these areas.  Area 0.0.0.0, by definition, is the backbone
+          area.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfAreaId }
+       ::= { rosMgmtOspfAreaTable 1 }
+
+  RosMgmtOspfAreaEntry ::=
+        SEQUENCE {
+           rosMgmtOspfAreaId
+              AreaID,
+           rosMgmtOspfAuthType
+              OspfAuthenticationType,
+           rosMgmtOspfImportAsExtern
+              INTEGER,
+           rosMgmtOspfSpfRuns
+              Counter32,
+           rosMgmtOspfAreaBdrRtrCount
+              Gauge32,
+           rosMgmtOspfAsBdrRtrCount
+              Gauge32,
+           rosMgmtOspfAreaLsaCount
+              Gauge32,
+           rosMgmtOspfAreaLsaCksumSum
+              Integer32,
+           rosMgmtOspfAreaSummary
+              INTEGER,
+           rosMgmtOspfAreaNssaTranslatorRole
+              INTEGER,
+           rosMgmtOspfAreaNssaTranslatorState
+              INTEGER,
+           rosMgmtOspfAreaNssaTranslatorStabilityInterval
+              PositiveInteger,
+           rosMgmtOspfAreaNssaTranslatorEvents
+              Counter32,     
+           rosMgmtOspfAreaDefaultCost
+              BigMetric,
+           rosMgmtOspfAreaType
+              INTEGER,
+           rosMgmtOspfAreaStatus
+              RowStatus,
+           rosMgmtOspfAreaFilterInIpPrefixListName 
+              OCTET STRING,  
+           rosMgmtOspfAreaFilterOutIpPrefixListName
+              OCTET STRING,
+           rosMgmtOspfAreaTeCapability
+              TruthValue
+           }
+
+  rosMgmtOspfAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "A 32-bit integer uniquely identifying an area.
+          Area ID 0.0.0.0 is used for the OSPF backbone."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { rosMgmtOspfAreaEntry 1 }
+
+  rosMgmtOspfAuthType OBJECT-TYPE
+       SYNTAX       OspfAuthenticationType
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The authentication type specified for an area."
+       REFERENCE
+          "OSPF Version 2, Appendix D Authentication"
+       DEFVAL { none } -- no authentication, by default
+       ::= { rosMgmtOspfAreaEntry 2 }
+
+  rosMgmtOspfImportAsExtern OBJECT-TYPE
+       SYNTAX       INTEGER {
+                      importExternal (1),
+                      importNoExternal (2),
+                      importNssa (3)
+                      }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Indicates if an area is a stub area, NSSA, or standard
+          area.  Type-5 AS-external LSAs and type-11 Opaque LSAs are
+          not imported into stub areas or NSSAs.  NSSAs import
+          AS-external data as type-7 LSAs"
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       DEFVAL { importExternal }
+       ::= { rosMgmtOspfAreaEntry 3 }
+
+  rosMgmtOspfSpfRuns OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of times that the intra-area route
+          table has been calculated using this area's
+          link state database.  This is typically done
+          using Dijkstra's algorithm.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of ospfDiscontinuityTime."
+       ::= { rosMgmtOspfAreaEntry 4 }
+
+  rosMgmtOspfAreaBdrRtrCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The total number of Area Border Routers reachable
+          within this area.  This is initially zero and is
+          calculated in each Shortest Path First (SPF) pass."
+
+       ::= { rosMgmtOspfAreaEntry 5 }
+
+  rosMgmtOspfAsBdrRtrCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The total number of Autonomous System Border
+          Routers reachable within this area.  This is
+          initially zero and is calculated in each SPF
+          pass."
+       ::= { rosMgmtOspfAreaEntry 6 }
+
+  rosMgmtOspfAreaLsaCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The total number of link state advertisements
+          in this area's link state database, excluding
+          AS-external LSAs."
+       ::= { rosMgmtOspfAreaEntry 7 }
+
+  rosMgmtOspfAreaLsaCksumSum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit sum of the link state
+          advertisements' LS checksums contained in this
+          area's link state database.  This sum excludes
+          external (LS type-5) link state advertisements.
+          The sum can be used to determine if there has
+          been a change in a router's link state
+          database, and to compare the link state database of
+          two routers.  The value should be treated as unsigned
+          when comparing two sums of checksums."
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfAreaEntry 8 }
+
+  rosMgmtOspfAreaSummary OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       noAreaSummary (1),
+                       sendAreaSummary (2)
+                       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+
+          "The variable ospfAreaSummary controls the
+          import of summary LSAs into stub and NSSA areas.
+          It has no effect on other areas.
+
+          If it is noAreaSummary, the router will not
+          originate summary LSAs into the stub or NSSA area.
+          It will rely entirely on its default route.
+
+          If it is sendAreaSummary, the router will both
+          summarize and propagate summary LSAs."
+       DEFVAL { sendAreaSummary }
+       ::= { rosMgmtOspfAreaEntry 9 }
+
+
+  rosMgmtOspfAreaNssaTranslatorRole OBJECT-TYPE
+       SYNTAX       INTEGER { always (1), candidate (2) }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Indicates an NSSA border router's ability to
+          perform NSSA translation of type-7 LSAs into
+          type-5 LSAs."
+       DEFVAL { candidate }
+       ::= { rosMgmtOspfAreaEntry 10 }
+
+  rosMgmtOspfAreaNssaTranslatorState OBJECT-TYPE
+       SYNTAX       INTEGER { enabled (1),
+                       elected (2),
+                       disabled (3)
+                       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Indicates if and how an NSSA border router is
+          performing NSSA translation of type-7 LSAs into type-5
+
+          LSAs.  When this object is set to enabled, the NSSA Border
+          router's OspfAreaNssaExtTranslatorRole has been set to
+          always.  When this object is set to elected, a candidate
+          NSSA Border router is Translating type-7 LSAs into type-5.
+          When this object is set to disabled, a candidate NSSA
+          border router is NOT translating type-7 LSAs into type-5."
+       ::= { rosMgmtOspfAreaEntry 11 }
+
+  rosMgmtOspfAreaNssaTranslatorStabilityInterval OBJECT-TYPE
+       SYNTAX       PositiveInteger
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds after an elected translator
+          determines its services are no longer required, that
+          it should continue to perform its translation duties."
+       DEFVAL { 40 }
+       ::= { rosMgmtOspfAreaEntry 12 }
+
+  rosMgmtOspfAreaNssaTranslatorEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Indicates the number of translator state changes
+          that have occurred since the last boot-up.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of ospfDiscontinuityTime."
+       ::= { rosMgmtOspfAreaEntry 13 }   
+       
+  rosMgmtOspfAreaDefaultCost OBJECT-TYPE
+       SYNTAX       BigMetric
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "It indicates the cost of default route of NSSA area or 
+          stub area."
+       DEFVAL { 1 }
+       ::= { rosMgmtOspfAreaEntry 14 }
+ 
+  rosMgmtOspfAreaType OBJECT-TYPE
+       SYNTAX       INTEGER {  
+                      backbone (1),
+                      normal (2),
+                      stub (3),
+                      nssa (4),
+                      transmit (5)
+                      }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the type of 
+          area,area 0 indicates backbone, area that has virtual-links is 
+          transmit area. When area is configured as stub,it's a stub area, and 
+          same as nssa area.other areas are called normal areas."
+       ::= { rosMgmtOspfAreaEntry 15 }
+  
+  rosMgmtOspfAreaStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfAreaEntry 16 }   
+  rosMgmtOspfAreaFilterInIpPrefixListName OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Filter incoming summary lsa,the value of this object 
+           indicates the name of an ip-prefix-list."
+       ::= { rosMgmtOspfAreaEntry 17 }   
+
+  rosMgmtOspfAreaFilterOutIpPrefixListName OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Filter outgoing summary lsa,the value of this object 
+           indicates the name of an ip-prefix-list."
+       ::= { rosMgmtOspfAreaEntry 18 }   
+       
+   rosMgmtOspfAreaTeCapability OBJECT-TYPE
+      SYNTAX       TruthValue
+      MAX-ACCESS   read-create 
+      STATUS       current
+      DESCRIPTION
+         "Indicate Area TE enable state."
+      REFERENCE
+         "OSPF Version 2, Appendix C.2 Area parameters"
+      ::= { rosMgmtOspfAreaEntry 19 }    
+          
+   
+--  rosMgmtOspfNetWorkTable
+--     The OSPF netwrok Table contains information
+--     regarding the various areas.
+rosMgmtOspfNetWorkTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfNetWorkEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The list of directly-connected networks which enable 
+          the OSPF function."
+       ::= { rosMgmtOspfObjects 3 }
+
+  rosMgmtOspfNetWorkEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfNetWorkEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Defines an entry in the rosMgmtOspfNetWorkTable.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfAreaId,
+               rosMgmtOspfNet, 
+               rosMgmtOspfMask }
+       ::= { rosMgmtOspfNetWorkTable 1 }
+
+  RosMgmtOspfNetWorkEntry ::=
+       SEQUENCE {
+          rosMgmtOspfNet
+             IpAddress,
+          rosMgmtOspfMask
+             IpAddress,
+          rosMgmtOspfNetWorkStatus
+             RowStatus
+          }
+
+  rosMgmtOspfNet OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The IP address of the net or subnet indicated
+          by the range."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { rosMgmtOspfNetWorkEntry 1 }
+
+  rosMgmtOspfMask OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The subnet mask that pertains to the net or
+          subnet."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { rosMgmtOspfNetWorkEntry 2 }
+
+  rosMgmtOspfNetWorkStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfNetWorkEntry 3 }
+       
+--rosMgmtOspfStubAreaTable    
+--
+--The table define ospf stub area
+  rosMgmtOspfStubAreaTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfStubAreaEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The set of metrics that will be advertised
+          by a default Area Border Router into a stub area."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2, Area Parameters"
+       ::= { rosMgmtOspfObjects 4 }
+
+  rosMgmtOspfStubAreaEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfStubAreaEntry
+       MAX-ACCESS   not-accessible
+       STATUS      current
+       DESCRIPTION
+          "The metric for a given Type of Service that
+          will be advertised by a default Area Border
+          Router into a stub area.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2, Area Parameters"
+       INDEX { rosMgmtOspfProcessId, 
+               rosMgmtOspfStubAreaId }
+       ::= { rosMgmtOspfStubAreaTable 1 }
+
+  RosMgmtOspfStubAreaEntry ::=
+       SEQUENCE {
+          rosMgmtOspfStubAreaId
+             AreaID,
+          rosMgmtOspfStubAreaOption
+             TruthValue,
+          rosMgmtOspfStubAreaStatus
+             RowStatus
+          }
+
+  rosMgmtOspfStubAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   not-accessible -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit identifier for the stub area.  On
+          creation, this can be derived from the
+          instance."
+       ::= { rosMgmtOspfStubAreaEntry 1 }
+
+  rosMgmtOspfStubAreaOption OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The option of STUB area.True means that ABR cann't send summary lsa to
+          stub area."
+       ::= { rosMgmtOspfStubAreaEntry 2 }
+
+  rosMgmtOspfStubAreaStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfStubAreaEntry 3 }
+  
+--rosMgmtOspfNssaAreaTable    
+--
+--The table define ospf nssa area
+  rosMgmtOspfNssaAreaTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfNssaAreaEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The set of metrics that will be advertised
+          by a default Area Border Router into a Nssa area."
+       REFERENCE
+          "Rfc 1587"
+       ::= { rosMgmtOspfObjects 5 }
+
+  rosMgmtOspfNssaAreaEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfNssaAreaEntry
+       MAX-ACCESS   not-accessible
+       STATUS      current
+       DESCRIPTION
+          "The metric for a given Type of Service that
+          will be advertised by a default Area Border
+          Router into a Nssa area.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       REFERENCE
+          "Rfc 1587"
+       INDEX { rosMgmtOspfProcessId, 
+               rosMgmtOspfNssaAreaId }
+       ::= { rosMgmtOspfNssaAreaTable 1 }
+
+  RosMgmtOspfNssaAreaEntry ::=
+       SEQUENCE {
+          rosMgmtOspfNssaAreaId
+             AreaID,
+          rosMgmtOspfNssaAreaOption
+             INTEGER,
+          rosMgmtOspfNssaAreaStatus
+             RowStatus
+          }
+
+  rosMgmtOspfNssaAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   not-accessible -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit identifier for the nssa area.  On
+          creation, this can be derived from the
+          instance."
+       ::= { rosMgmtOspfNssaAreaEntry 1 }
+
+  rosMgmtOspfNssaAreaOption OBJECT-TYPE       
+       SYNTAX       INTEGER {  
+                      summarysend (0),
+                      nosummary (4)
+                      }	   
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The option of Nssa area. If first bit is set, Router should generate
+          default type-7 lsa; if second bit is set, nssa area cann't import ex-
+          ternal route; if third bit is set, ABR cann't send summary lsas to the
+          nssa area."
+       ::= { rosMgmtOspfNssaAreaEntry 2 }
+
+  rosMgmtOspfNssaAreaStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfNssaAreaEntry 3 }       
+       
+     
+--  rosMgmtOspfIfTable
+--  OSPF Interface Table
+-- 
+  rosMgmtOspfIfTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The OSPF Interface Table describes the interfaces
+          from the viewpoint of OSPF.
+          It augments the ipAddrTable with OSPF specific information."
+       REFERENCE
+          "OSPF Version 2, Appendix C.3  Router interface
+          parameters"
+       ::= { rosMgmtOspfObjects 6 }
+
+  rosMgmtOspfIfEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The OSPF interface entry describes one interface
+          from the viewpoint of OSPF.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfAddressLessIf }
+       ::= { rosMgmtOspfIfTable 1 }
+
+  RosMgmtOspfIfEntry ::=
+       SEQUENCE {
+          rosMgmtOspfAddressLessIf
+             InterfaceIndexOrZero,
+          rosMgmtOspfIfIpAddress
+             IpAddress,
+          rosMgmtOspfIfAreaId
+             AreaID,
+          rosMgmtOspfIfType
+             INTEGER,
+          rosMgmtOspfIfAdminStat
+             Status,
+          rosMgmtOspfIfRtrPriority
+             DesignatedRouterPriority,
+          rosMgmtOspfIfTransitDelay
+             Integer32,
+          rosMgmtOspfIfRetransInterval
+             Integer32,
+          rosMgmtOspfIfHelloInterval
+             Integer32,
+          rosMgmtOspfIfRtrDeadInterval
+             Integer32,
+          rosMgmtOspfIfPollInterval
+             Integer32,
+          rosMgmtOspfIfState
+             INTEGER,
+          rosMgmtOspfIfDesignatedRouter
+             IpAddress,
+          rosMgmtOspfIfBackupDesignatedRouter
+             IpAddress,
+          rosMgmtOspfIfEvents
+             Counter32,
+          rosMgmtOspfIfAuthKeyId
+             Integer32,  
+          rosMgmtOspfIfAuthSimpleKeyType 
+             INTEGER,
+          rosMgmtOspfIfAuthMd5KeyType 
+             INTEGER,
+          rosMgmtOspfIfAuthSimpleKey  
+             OCTET STRING,     
+          rosMgmtOspfIfAuthMd5Key  
+             OCTET STRING,     
+          rosMgmtOspfIfAuthKeyChain
+             OCTET STRING,
+          rosMgmtOspfIfAuthType
+             OspfAuthenticationType,
+          rosMgmtOspfIfLsaCount
+             Gauge32,
+          rosMgmtOspfIfLsaCksumSum
+             Unsigned32,
+          rosMgmtOspfIfDesignatedRouterId
+             RouterID,
+          rosMgmtOspfIfBackupDesignatedRouterId
+             RouterID, 
+          rosMgmtOspfIfPassive   
+             EnableVar,
+          rosMgmtOspfIfMtu   
+             EnableVar, 
+          rosMgmtOspfIfMetric
+             Metric,
+          rosMgmtOspfIfBfd   
+             EnableVar,   
+          rosMgmtOspfIfGRResync
+             Integer32
+             }
+  
+  rosMgmtOspfAddressLessIf OBJECT-TYPE
+       SYNTAX       InterfaceIndexOrZero
+       MAX-ACCESS    read-only
+       STATUS       current
+       DESCRIPTION
+          "For the purpose of easing the instancing of
+          addressed and addressless interfaces; this
+          variable takes the value 0 on interfaces with
+          IP addresses and the corresponding value of
+          ifIndex for interfaces having no IP address."
+       ::= { rosMgmtOspfIfEntry 1 }
+  
+  rosMgmtOspfIfIpAddress OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only 
+       STATUS       current
+       DESCRIPTION
+          "The IP address of this OSPF interface."
+
+       ::= { rosMgmtOspfIfEntry 2 }
+
+  rosMgmtOspfIfAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A 32-bit integer uniquely identifying the area
+          to which the interface connects.  Area ID
+          0.0.0.0 is used for the OSPF backbone."
+       DEFVAL { '00000000'H }  -- 0.0.0.0
+       ::= { rosMgmtOspfIfEntry 3 }
+
+  rosMgmtOspfIfType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       none (0),
+                       pointToPoint (1),
+                       broadcast (2),
+                       nbma (3),
+                       pointToMultipoint (4),
+                       virtuallink (5),
+                       loopback (6)
+                       }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The OSPF interface type.
+          By way of a default, this field may be intuited
+          from the corresponding value of ifType.
+          Broadcast LANs, such as Ethernet and IEEE 802.5,
+          take the value 'broadcast', X.25 and similar
+          technologies take the value 'nbma', and links
+          that are definitively point to point take the
+          value 'pointToPoint'."  
+       DEFVAL {broadcast}
+        ::= { rosMgmtOspfIfEntry 4 }
+
+  rosMgmtOspfIfAdminStat OBJECT-TYPE
+       SYNTAX       Status
+
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The OSPF interface's administrative status.
+          The value formed on the interface, and the interface
+          will be advertised as an internal route to some area.
+          The value 'disabled' denotes that the interface is
+          external to OSPF."
+       DEFVAL { enabled }
+       ::= { rosMgmtOspfIfEntry 5 }
+
+  rosMgmtOspfIfRtrPriority OBJECT-TYPE
+       SYNTAX       DesignatedRouterPriority
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The priority of this interface.  Used in
+          multi-access networks, this field is used in
+          the designated router election algorithm.  The
+          value 0 signifies that the router is not eligible
+          to become the designated router on this particular
+          network.  In the event of a tie in this value,
+          routers will use their Router ID as a tie breaker."
+        DEFVAL { 1 }
+        ::= { rosMgmtOspfIfEntry 6 }
+
+  rosMgmtOspfIfTransitDelay OBJECT-TYPE
+        SYNTAX       Integer32 (1..65535)
+        UNITS        "seconds"
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+           "The estimated number of seconds it takes to
+           transmit a link state update packet over this
+           interface.  Note that the minimal value SHOULD be
+           1 second."
+        DEFVAL { 1 }
+        ::= { rosMgmtOspfIfEntry 7 }
+
+  rosMgmtOspfIfRetransInterval OBJECT-TYPE
+       SYNTAX       Integer32 (1..65535)
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds between link state advertisement
+          retransmissions, for adjacencies belonging to this
+          interface.  This value is also used when retransmitting
+
+          database description and Link State request packets.
+          Note that minimal value SHOULD be 1 second."
+       DEFVAL { 5 }
+       ::= { rosMgmtOspfIfEntry 8 }
+
+  rosMgmtOspfIfHelloInterval OBJECT-TYPE
+       SYNTAX       Integer32 (1..65535)
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The length of time, in seconds, between the Hello packets
+          that the router sends on the interface.  This value must be
+          the same for all routers attached to a common network."
+       DEFVAL { 10 }
+       ::= { rosMgmtOspfIfEntry 9 }
+
+  rosMgmtOspfIfRtrDeadInterval OBJECT-TYPE
+       SYNTAX       Integer32 (1..65535)
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds that a router's Hello packets have
+          not been seen before its neighbors declare the router down.
+          This should be some multiple of the Hello interval.  This
+          value must be the same for all routers attached to a common
+          network."
+        DEFVAL { 40 }
+        ::= { rosMgmtOspfIfEntry 10 }
+
+  rosMgmtOspfIfPollInterval OBJECT-TYPE
+       SYNTAX       Integer32 (1..65535)
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The larger time interval, in seconds, between the Hello
+          packets sent to an inactive non-broadcast multi-access
+          neighbor."
+       DEFVAL { 120 }
+       ::= { rosMgmtOspfIfEntry 11 }
+
+  rosMgmtOspfIfState OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       down (1),
+                       loopback (2),
+                       waiting (3),
+                       pointToPoint (4),
+                       designatedRouter (5),
+                       backupDesignatedRouter (6),
+                       otherDesignatedRouter (7)
+                       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The OSPF Interface State."
+       DEFVAL { down }
+       ::= { rosMgmtOspfIfEntry 12 }
+
+  rosMgmtOspfIfDesignatedRouter OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The IP address of the designated router."
+       DEFVAL { '00000000'H } -- 0.0.0.0
+       ::= { rosMgmtOspfIfEntry 13 }
+
+  rosMgmtOspfIfBackupDesignatedRouter OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The IP address of the backup designated
+          router."
+       DEFVAL { '00000000'H }  -- 0.0.0.0
+       ::= { rosMgmtOspfIfEntry 14 }
+
+  rosMgmtOspfIfEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of times this OSPF interface has
+          changed its state or an error has occurred.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of ospfDiscontinuityTime."
+       ::= { rosMgmtOspfIfEntry 15 }
+ 
+  rosMgmtOspfIfAuthKeyId OBJECT-TYPE
+       SYNTAX       Integer32 (0..255)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION  
+          "The key id of md5 authentication."   
+       DEFVAL { 0 }   
+       ::= { rosMgmtOspfIfEntry 16 } 
+         
+  rosMgmtOspfIfAuthSimpleKeyType OBJECT-TYPE
+       SYNTAX       INTEGER {plain(0), cipher(7)}
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION  
+          "The type of password for simple authentication."   
+       DEFVAL { 0 }   
+       ::= { rosMgmtOspfIfEntry 17 }
+  
+  rosMgmtOspfIfAuthMd5KeyType OBJECT-TYPE
+       SYNTAX       INTEGER {plain(0), cipher(7)}
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION  
+          "The type of password for md5 authentication."   
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfIfEntry 18 }
+
+  rosMgmtOspfIfAuthSimpleKey OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The password used as an OSPF
+          authentication key when simple password security
+          is enabled."
+       DEFVAL {''h}    
+       ::= { rosMgmtOspfIfEntry 19 } 
+       
+  rosMgmtOspfIfAuthMd5Key OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The password used as an OSPF
+          authentication key when md5 security
+          is enabled."  
+       DEFVAL {''h}   
+       ::= { rosMgmtOspfIfEntry 20 }
+  
+  rosMgmtOspfIfAuthKeyChain OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The name of key chain."
+       DEFVAL {''h}
+       ::= { rosMgmtOspfIfEntry 21 }
+
+  rosMgmtOspfIfAuthType OBJECT-TYPE
+       SYNTAX       OspfAuthenticationType
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The authentication type specified for an interface.
+
+          Note that this object can be used to engage
+          in significant attacks against an OSPF router."
+       REFERENCE
+          "OSPF Version 2, Appendix D Authentication"
+       DEFVAL { none } -- no authentication, by default
+       ::= { rosMgmtOspfIfEntry 22 }
+
+  rosMgmtOspfIfLsaCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The total number of link-local link state advertisements
+          in this interface's link-local link state database."
+       ::= { rosMgmtOspfIfEntry 23 }
+
+  rosMgmtOspfIfLsaCksumSum OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit unsigned sum of the Link State
+          Advertisements' LS checksums contained in this
+          interface's link-local link state database.
+          The sum can be used to determine if there has
+          been a change in the interface's link state
+          database and to compare the interface link state
+          database of routers attached to the same subnet."
+       ::= { rosMgmtOspfIfEntry 24 }
+
+  rosMgmtOspfIfDesignatedRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The Router ID of the designated router."
+       ::= { rosMgmtOspfIfEntry 25 }
+
+  rosMgmtOspfIfBackupDesignatedRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The Router ID of the backup designated router."
+       ::= { rosMgmtOspfIfEntry 26 } 
+       
+  rosMgmtOspfIfPassive OBJECT-TYPE
+       SYNTAX       EnableVar
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Indicate the interface is a passive interface." 
+       DEFVAL {disable}  
+       ::= { rosMgmtOspfIfEntry 27 }
+    
+  rosMgmtOspfIfMtu OBJECT-TYPE
+       SYNTAX       EnableVar
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Indicate ignore the interface's mtu." 
+       DEFVAL {disable}  
+       ::= { rosMgmtOspfIfEntry 28 }     
+
+  rosMgmtOspfIfMetric OBJECT-TYPE
+       SYNTAX       Metric
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The metric of using this Type of Service on
+          this interface.  The default value of the TOS 0
+          metric is 10^8 / ifSpeed."
+       ::= { rosMgmtOspfIfEntry 29 }
+
+  rosMgmtOspfIfBfd OBJECT-TYPE
+       SYNTAX       EnableVar
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Indicate the interface enables BFD function." 
+       DEFVAL {disable}  
+       ::= { rosMgmtOspfIfEntry 30 }      
+       
+ rosMgmtOspfIfGRResync OBJECT-TYPE
+       SYNTAX       Integer32 (1..65535)
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The interval period starts from the time a 
+          restart signal is received from a neighbor."
+       DEFVAL { 40 }
+       ::= { rosMgmtOspfIfEntry 31 }   
+       
+--rosMgmtOspfVirtIfTable    
+--
+--OSPF Virtual Interface Table
+  rosMgmtOspfVirtIfTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfVirtIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Information about this router's virtual interfaces
+          that the OSPF Process is configured to carry on."
+       REFERENCE
+          "OSPF Version 2, Appendix C.4  Virtual link
+          parameters"
+       ::= { rosMgmtOspfObjects 7 }
+
+  rosMgmtOspfVirtIfEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfVirtIfEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Information about a single virtual interface.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfVirtIfAreaId, 
+               rosMgmtOspfVirtIfNeighbor }
+       ::= { rosMgmtOspfVirtIfTable 1 }
+
+  RosMgmtOspfVirtIfEntry ::=
+       SEQUENCE {
+          rosMgmtOspfVirtIfAreaId
+             AreaID,
+          rosMgmtOspfVirtIfNeighbor
+             RouterID,
+          rosMgmtOspfVirtIfTransitDelay
+             UpToMaxAge,
+          rosMgmtOspfVirtIfRetransInterval
+             UpToMaxAge,
+          rosMgmtOspfVirtIfHelloInterval
+             HelloRange,
+          rosMgmtOspfVirtIfRtrDeadInterval
+             PositiveInteger,
+          rosMgmtOspfVirtIfState
+             INTEGER,
+          rosMgmtOspfVirtIfEvents
+             Counter32,    
+          rosMgmtOspfVirtIfAuthKeyId
+             Integer32,  
+          rosMgmtOspfVirtIfAuthSimpleKeyType 
+             INTEGER,
+          rosMgmtOspfVirtIfAuthMd5KeyType 
+             INTEGER,
+          rosMgmtOspfVirtIfAuthSimpleKey  
+             OCTET STRING,     
+          rosMgmtOspfVirtIfAuthMd5Key  
+             OCTET STRING,     
+          rosMgmtOspfVirtIfAuthKeyChain
+             OCTET STRING,
+          rosMgmtOspfVirtIfAuthType
+             OspfAuthenticationType,
+          rosMgmtOspfVirtIfLsaCount
+             Gauge32,
+          rosMgmtOspfVirtIfLsaCksumSum
+             Unsigned32,
+          rosMgmtOspfVirtIfCost
+             Integer32,
+          rosMgmtOspfVirtIfStatus
+             RowStatus
+          }
+
+  rosMgmtOspfVirtIfAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS    read-only
+       STATUS       current
+       DESCRIPTION
+          "The transit area that the virtual link
+          traverses.  By definition, this is not 0.0.0.0."
+       ::= { rosMgmtOspfVirtIfEntry 1 }
+
+  rosMgmtOspfVirtIfNeighbor OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS    read-only
+       STATUS       current
+       DESCRIPTION
+          "The Router ID of the virtual neighbor."
+       ::= { rosMgmtOspfVirtIfEntry 2 }
+
+  rosMgmtOspfVirtIfTransitDelay OBJECT-TYPE
+       SYNTAX       UpToMaxAge
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The estimated number of seconds it takes to
+          transmit a Link State update packet over this
+          interface.  Note that the minimal value SHOULD be
+          1 second."
+       DEFVAL { 1 }
+       ::= { rosMgmtOspfVirtIfEntry 3 }
+
+  rosMgmtOspfVirtIfRetransInterval OBJECT-TYPE
+       SYNTAX       UpToMaxAge
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds between link state
+          avertisement retransmissions, for adjacencies
+          belonging to this interface.  This value is
+          also used when retransmitting database
+          description and Link State request packets.  This
+          value should be well over the expected
+          round-trip time.  Note that the minimal value SHOULD be
+          1 second."
+       DEFVAL { 5 }
+       ::= { rosMgmtOspfVirtIfEntry 4 }
+
+  rosMgmtOspfVirtIfHelloInterval OBJECT-TYPE
+       SYNTAX       HelloRange
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The length of time, in seconds, between the
+          Hello packets that the router sends on the
+          interface.  This value must be the same for the
+          virtual neighbor."
+       DEFVAL { 10 }
+       ::= { rosMgmtOspfVirtIfEntry 5 }
+
+  rosMgmtOspfVirtIfRtrDeadInterval OBJECT-TYPE
+
+       SYNTAX       PositiveInteger
+       UNITS        "seconds"
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The number of seconds that a router's Hello
+          packets have not been seen before its
+          neighbors declare the router down.  This should be
+          some multiple of the Hello interval.  This
+          value must be the same for the virtual neighbor."
+       DEFVAL { 60 }
+       ::= { rosMgmtOspfVirtIfEntry 6 }
+
+  rosMgmtOspfVirtIfState OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       down (1), -- these use the same encoding
+                       pointToPoint (4) -- as the rosMgmtOspfIfTable
+                       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "OSPF virtual interface states."
+       DEFVAL { down }
+       ::= { rosMgmtOspfVirtIfEntry 7 }
+
+  rosMgmtOspfVirtIfEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of state changes or error events on
+          this virtual link.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of ospfDiscontinuityTime."
+       ::= { rosMgmtOspfVirtIfEntry 8 } 
+       
+   rosMgmtOspfVirtIfAuthKeyId OBJECT-TYPE
+       SYNTAX       Integer32 (0..255)
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION  
+          "The key id of md5 authentication."   
+       DEFVAL { 0 }   
+       ::= { rosMgmtOspfVirtIfEntry 9 } 
+         
+  rosMgmtOspfVirtIfAuthSimpleKeyType OBJECT-TYPE
+       SYNTAX       INTEGER {plain(0), cipher(7)}
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION  
+          "The type of password for simple authentication."   
+       DEFVAL { 0 }   
+       ::= { rosMgmtOspfVirtIfEntry 10 }
+  
+  rosMgmtOspfVirtIfAuthMd5KeyType OBJECT-TYPE
+       SYNTAX       INTEGER {plain(0), cipher(7)}
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION  
+          "The type of password for md5 authentication."   
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfVirtIfEntry 11 }
+
+  rosMgmtOspfVirtIfAuthSimpleKey OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-create
+       STATUS       current
+
+       DESCRIPTION
+          "The password used as an OSPF
+          authentication key when simple password security
+          is enabled."  
+       DEFVAL {''h}   
+       ::= { rosMgmtOspfVirtIfEntry 12 } 
+       
+  rosMgmtOspfVirtIfAuthMd5Key OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The password used as an OSPF
+          authentication key when md5 security
+          is enabled."
+       DEFVAL {''h} 
+       ::= { rosMgmtOspfVirtIfEntry 13 }
+  
+  rosMgmtOspfVirtIfAuthKeyChain OBJECT-TYPE
+       SYNTAX       OCTET STRING 
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The name of key chain."
+       DEFVAL {''h}
+       ::= { rosMgmtOspfVirtIfEntry 14 }
+
+  rosMgmtOspfVirtIfAuthType OBJECT-TYPE
+       SYNTAX       OspfAuthenticationType
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The authentication type specified for a virtual interface.
+
+          Note that this object can be used to engage
+          in significant attacks against an OSPF router."
+       REFERENCE
+          "OSPF Version 2, Appendix E Authentication"
+       DEFVAL { none } -- no authentication, by default
+
+       ::= { rosMgmtOspfVirtIfEntry 15 }
+
+  rosMgmtOspfVirtIfLsaCount OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The total number of link-local link state advertisements
+          in this virtual interface's link-local link state database."
+       ::= { rosMgmtOspfVirtIfEntry 16 }
+
+  rosMgmtOspfVirtIfLsaCksumSum OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit unsigned sum of the link state
+          advertisements' LS checksums contained in this
+          virtual interface's link-local link state database.
+          The sum can be used to determine if there has
+          been a change in the virtual interface's link state
+          database, and to compare the virtual interface
+          link state database of the virtual neighbors."
+       ::= { rosMgmtOspfVirtIfEntry 17 }  
+
+  rosMgmtOspfVirtIfCost OBJECT-TYPE
+       SYNTAX       Integer32 (1.. 65535)
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the cost of 
+          virtual interface."
+       DEFVAL { 1 }
+       ::= { rosMgmtOspfVirtIfEntry 18 } 
+       
+  rosMgmtOspfVirtIfStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+        ::= { rosMgmtOspfVirtIfEntry 19 }   
+        
+--rosMgmtOspfNbrTable    
+--
+--OSPF Neighbor Table
+  rosMgmtOspfNbrTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfNbrEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "A table describing all non-virtual neighbors
+          in the locality of the OSPF router."
+       REFERENCE
+          "OSPF Version 2, Section 10 The Neighbor Data
+          Structure"
+       ::= { rosMgmtOspfObjects 8 }
+
+  rosMgmtOspfNbrEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfNbrEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The information regarding a single neighbor.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       REFERENCE
+          "OSPF Version 2, Section 10 The Neighbor Data
+          Structure"
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfNbrIpAddr,
+               rosMgmtOspfNbrAddressLessIndex }
+       ::= { rosMgmtOspfNbrTable 1 }
+
+  RosMgmtOspfNbrEntry ::=
+       SEQUENCE {
+          rosMgmtOspfNbrIpAddr
+             IpAddress,
+          rosMgmtOspfNbrAddressLessIndex
+             InterfaceIndexOrZero,
+          rosMgmtOspfNbrRtrId
+             RouterID,
+          rosMgmtOspfNbrOptions
+             Integer32,
+          rosMgmtOspfNbrPriority
+             DesignatedRouterPriority,
+          rosMgmtOspfNbrState
+             INTEGER,
+          rosMgmtOspfNbrEvents
+             Counter32,
+          rosMgmtOspfNbrLsRetransQLen
+             Gauge32,
+          rosMgmtOspfNbrMode
+             INTEGER   
+          }
+
+  rosMgmtOspfNbrIpAddr OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The IP address this neighbor is using in its
+          IP source address.  Note that, on addressless
+          links, this will not be 0.0.0.0 but the
+
+          address of another of the neighbor's interfaces."
+       ::= { rosMgmtOspfNbrEntry 1 }
+
+   rosMgmtOspfNbrAddressLessIndex OBJECT-TYPE
+       SYNTAX       InterfaceIndexOrZero
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "On an interface having an IP address, zero.
+          On addressless interfaces, the corresponding
+          value of ifIndex in the Internet Standard MIB.
+          On row creation, this can be derived from the
+          instance."
+        ::= { rosMgmtOspfNbrEntry 2 }
+
+  rosMgmtOspfNbrRtrId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A 32-bit integer (represented as a type
+          IpAddress) uniquely identifying the neighboring
+          router in the Autonomous System."
+       DEFVAL { '00000000'H } -- 0.0.0.0
+       ::= { rosMgmtOspfNbrEntry 3 }
+
+  rosMgmtOspfNbrOptions OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A bit mask corresponding to the neighbor's
+          options field.
+
+          Bit 0, if set, indicates that the system will
+          operate on Type of Service metrics other than
+          TOS 0.  If zero, the neighbor will ignore all
+          metrics except the TOS 0 metric.
+
+          Bit 1, if set, indicates that the associated
+          area accepts and operates on external
+          information; if zero, it is a stub area.
+
+          Bit 2, if set, indicates that the system is
+          capable of routing IP multicast datagrams, that is
+          that it implements the multicast extensions to
+          OSPF.
+
+          Bit 3, if set, indicates that the associated
+          area is an NSSA.  These areas are capable of
+          carrying type-7 external advertisements, which
+          are translated into type-5 external advertisements
+          at NSSA borders."
+       REFERENCE
+           "OSPF Version 2, Section 12.1.2 Options"
+       DEFVAL { 0 }
+       ::= { rosMgmtOspfNbrEntry 4 }
+
+   rosMgmtOspfNbrPriority OBJECT-TYPE
+       SYNTAX       DesignatedRouterPriority
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The priority of this neighbor in the designated
+          router election algorithm.  The value 0 signifies
+          that the neighbor is not eligible to become
+          the designated router on this particular network."
+       DEFVAL { 1 }
+       ::= { rosMgmtOspfNbrEntry 5 }
+
+   rosMgmtOspfNbrState OBJECT-TYPE
+        SYNTAX       INTEGER {
+                         down (1),
+                         attempt (2),
+                         init (3),
+                         twoWay (4),
+                         exchangeStart (5),
+                         exchange (6),
+                         loading (7),
+                         full (8)
+                         }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "The state of the relationship with this neighbor."
+         REFERENCE
+            "OSPF Version 2, Section 10.1 Neighbor States"
+         DEFVAL { down }
+         ::= { rosMgmtOspfNbrEntry 6 }
+
+  rosMgmtOspfNbrEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of times this neighbor relationship
+          has changed state or an error has occurred.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of ospfDiscontinuityTime."
+       ::= { rosMgmtOspfNbrEntry 7 }
+
+  rosMgmtOspfNbrLsRetransQLen OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The current length of the retransmission
+          queue."
+       ::= { rosMgmtOspfNbrEntry 8 } 
+  
+  rosMgmtOspfNbrMode OBJECT-TYPE
+       SYNTAX       INTEGER {  
+                      slave (1),
+                      master (2)
+                      }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the master-slave mode of 
+          neighbor. "
+       DEFVAL { slave }
+       ::= { rosMgmtOspfNbrEntry 9 }           
+       
+--rosMgmtOspfNbmaCfgNbrTable    
+--
+--OSPF Nbma Network Configed Neighbor Table
+  rosMgmtOspfNbmaCfgNbrTable   OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfNbmaCfgNbrEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "A table describing all configured neigbors on nbma network."
+       ::= { rosMgmtOspfObjects 9 }
+
+  rosMgmtOspfNbmaCfgNbrEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfNbmaCfgNbrEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The information regarding a Configured neighbor.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       REFERENCE
+          "OSPF Version 2, Section 10 The Neighbor Data
+          Structure"
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfNbmaCfgNbrIpAddr }
+       ::= { rosMgmtOspfNbmaCfgNbrTable 1 }
+
+  RosMgmtOspfNbmaCfgNbrEntry ::=
+       SEQUENCE {
+          rosMgmtOspfNbmaCfgNbrIpAddr
+             IpAddress,
+          rosMgmtOspfNbmaCfgNbrPriority 
+             DesignatedRouterPriority, 
+          rosMgmtOspfNbmaCfgNbrStatus
+             RowStatus       
+          }
+
+  rosMgmtOspfNbmaCfgNbrIpAddr OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The IP address this neighbor is using in its
+          IP source address.  Note that, on addressless
+          links, this will not be 0.0.0.0 but the
+          address of another of the neighbor's interfaces."
+       ::= { rosMgmtOspfNbmaCfgNbrEntry 1 }    
+              
+  rosMgmtOspfNbmaCfgNbrPriority OBJECT-TYPE
+       SYNTAX       DesignatedRouterPriority
+       MAX-ACCESS   read-create 
+       STATUS       current
+       DESCRIPTION
+          "The priority of this neighbor in the designated
+          router election algorithm.  The value 0 signifies
+          that the neighbor is not eligible to become
+          the designated router on this particular network." 
+       DEFVAL { 1 }
+       ::= { rosMgmtOspfNbmaCfgNbrEntry 2 }           
+
+  rosMgmtOspfNbmaCfgNbrStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfNbmaCfgNbrEntry 3 }
+ 
+--rosMgmtOspfVirtNbrTable    
+--
+--OSPF Virtual Neighbor Table
+  rosMgmtOspfVirtNbrTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfVirtNbrEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "This table describes all virtual neighbors.
+          Since virtual links are configured
+          in the Virtual Interface Table, this table is read-only."
+       REFERENCE
+          "OSPF Version 2, Section 15 Virtual Links"
+       ::= { rosMgmtOspfObjects 10 }
+
+  rosMgmtOspfVirtNbrEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfVirtNbrEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Virtual neighbor information."
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfVirtNbrArea, 
+               rosMgmtOspfVirtNbrRtrId }
+       ::= { rosMgmtOspfVirtNbrTable 1 }
+
+  RosMgmtOspfVirtNbrEntry ::=
+       SEQUENCE {
+          rosMgmtOspfVirtNbrArea
+             AreaID,
+          rosMgmtOspfVirtNbrRtrId
+             RouterID,
+          rosMgmtOspfVirtNbrIpAddr
+             IpAddress,
+          rosMgmtOspfVirtNbrOptions
+             Integer32,
+          rosMgmtOspfVirtNbrState
+             INTEGER,
+          rosMgmtOspfVirtNbrEvents
+             Counter32,
+          rosMgmtOspfVirtNbrLsRetransQLen
+             Gauge32,
+          rosMgmtOspfVirtNbrLessIf
+             Integer32,
+          rosMgmtOspfVirtNbrMode
+             INTEGER
+          }
+
+  rosMgmtOspfVirtNbrArea OBJECT-TYPE
+
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS       current
+       DESCRIPTION
+          "The Transit Area Identifier."
+       ::= { rosMgmtOspfVirtNbrEntry 1 }
+
+  rosMgmtOspfVirtNbrRtrId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only -- read-only since originally an
+                              -- SMIv1 index
+       STATUS      current
+       DESCRIPTION
+          "A 32-bit integer uniquely identifying the
+          neighboring router in the Autonomous System."
+       ::= { rosMgmtOspfVirtNbrEntry 2 }
+
+  rosMgmtOspfVirtNbrIpAddr OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The IP address this virtual neighbor is using."
+       ::= { rosMgmtOspfVirtNbrEntry 3 }
+
+  rosMgmtOspfVirtNbrOptions OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "A bit mask corresponding to the neighbor's
+          options field.
+
+          Bit 1, if set, indicates that the system will
+          operate on Type of Service metrics other than
+          TOS 0.  If zero, the neighbor will ignore all
+          metrics except the TOS 0 metric.
+
+          Bit 2, if set, indicates that the system is
+          network multicast capable, i.e., that it
+          implements OSPF multicast routing."
+       ::= { rosMgmtOspfVirtNbrEntry 4 }
+
+   rosMgmtOspfVirtNbrState OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       down (1),
+                       attempt (2),
+                       init (3),
+                       twoWay (4),
+                       exchangeStart (5),
+                       exchange (6),
+                       loading (7),
+                       full (8)
+                       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The state of the virtual neighbor relationship."
+       ::= { rosMgmtOspfVirtNbrEntry 5 }
+
+  rosMgmtOspfVirtNbrEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number of times this virtual link has
+          changed its state or an error has occurred.
+
+          Discontinuities in the value of this counter can occur
+          at re-initialization of the management system, and at other
+          times as indicated by the value of ospfDiscontinuityTime."
+       ::= { rosMgmtOspfVirtNbrEntry 6 }
+
+  rosMgmtOspfVirtNbrLsRetransQLen OBJECT-TYPE
+       SYNTAX       Gauge32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The current length of the retransmission
+          queue."
+       ::= { rosMgmtOspfVirtNbrEntry 7 }
+       
+  rosMgmtOspfVirtNbrLessIf OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the out interface index of 
+          this virtual neighbor."
+       ::= { rosMgmtOspfVirtNbrEntry 8 }
+
+  rosMgmtOspfVirtNbrMode OBJECT-TYPE
+       SYNTAX       INTEGER {  
+                      slave (1),
+                      master (2)
+                      }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the master-slave mode of 
+          virtual neighbor. "
+       DEFVAL { slave }
+       ::= { rosMgmtOspfVirtNbrEntry 9 }
+
+--  The OSPF Area Aggregate Table
+--
+--     This table replaces the OSPF Area Summary Table, being an
+--     extension of that for CIDR routers.
+   rosMgmtOspfAreaAggregateTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfAreaAggregateEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+
+       DESCRIPTION
+          "The Area Aggregate Table acts as an adjunct
+           to the Area Table.  It describes those address aggregates
+           that are configured to be propagated from an area.
+           Its purpose is to reduce the amount of information
+           that is known beyond an Area's borders.
+
+           It contains a set of IP address ranges
+           specified by an IP address/IP network mask pair.
+           For example, a class B address range of X.X.X.X
+           with a network mask of 255.255.0.0 includes all IP
+           addresses from X.X.0.0 to X.X.255.255.
+
+           Note that if ranges are configured such that one range
+           subsumes another range (e.g., 10.0.0.0 mask 255.0.0.0
+           and 10.1.0.0 mask 255.255.0.0),
+           the most specific match is the preferred one."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2  Area parameters"
+       ::= { rosMgmtOspfObjects 11 }
+
+  rosMgmtOspfAreaAggregateEntry OBJECT-TYPE
+       SYNTAX   RosMgmtOspfAreaAggregateEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "A single area aggregate entry.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2  Area parameters"
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfAreaAggregateAreaID, 
+               rosMgmtOspfAreaAggregateLsdbType,
+               rosMgmtOspfAreaAggregateNet, 
+               rosMgmtOspfAreaAggregateMask }
+       ::= { rosMgmtOspfAreaAggregateTable 1 }
+
+  RosMgmtOspfAreaAggregateEntry ::=
+       SEQUENCE {
+          rosMgmtOspfAreaAggregateAreaID
+             AreaID,
+          rosMgmtOspfAreaAggregateLsdbType
+             INTEGER,
+          rosMgmtOspfAreaAggregateNet
+             IpAddress,
+          rosMgmtOspfAreaAggregateMask
+             IpAddress, 
+          rosMgmtOspfAreaAggregateEffect
+             INTEGER,
+          rosMgmtOspfAreaAggregateStatus
+             RowStatus
+          }
+
+  rosMgmtOspfAreaAggregateAreaID OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The area within which the address aggregate is to be
+          found."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { rosMgmtOspfAreaAggregateEntry 1 }
+
+  rosMgmtOspfAreaAggregateLsdbType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       summaryLink (3),
+                       nssaExternalLink (7)
+                       }
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The type of the address aggregate.  This field
+          specifies the Lsdb type that this address
+          aggregate applies to."
+       REFERENCE
+          "OSPF Version 2, Appendix A.4.1 The Link State
+          Advertisement header"
+       ::= { rosMgmtOspfAreaAggregateEntry 2 }
+
+  rosMgmtOspfAreaAggregateNet OBJECT-TYPE
+       SYNTAX   IpAddress
+       MAX-ACCESS    not-accessible
+       STATUS   current
+       DESCRIPTION
+          "The IP address of the net or subnet indicated
+          by the range."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { rosMgmtOspfAreaAggregateEntry 3 }
+
+  rosMgmtOspfAreaAggregateMask OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS    not-accessible
+       STATUS      current
+       DESCRIPTION
+          "The subnet mask that pertains to the net or
+          subnet."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+       ::= { rosMgmtOspfAreaAggregateEntry 4 } 
+       
+  rosMgmtOspfAreaAggregateEffect OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       advertiseMatching (1),
+                       doNotAdvertiseMatching (2)
+                       }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Subnets subsumed by ranges either trigger the
+          advertisement of the indicated aggregate
+         (advertiseMatching) or result in the subnet's not
+          being advertised at all outside the area."
+       DEFVAL { advertiseMatching }
+       ::= { rosMgmtOspfAreaAggregateEntry 5 }
+
+  rosMgmtOspfAreaAggregateStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfAreaAggregateEntry 6 }    
+       
+--  The OSPF External Aggregate Table
+--
+   rosMgmtOspfExternalAggregateTable   OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfExternalAggregateEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+
+       DESCRIPTION
+          "It contains a set of IP address ranges
+           specified by an IP address/IP network mask pair.
+           For example, a class B address range of X.X.X.X
+           with a network mask of 255.255.0.0 includes all IP
+           addresses from X.X.0.0 to X.X.255.255.
+
+           Note that if ranges are configured such that one range
+           subsumes another range (e.g., 10.0.0.0 mask 255.0.0.0
+           and 10.1.0.0 mask 255.255.0.0),
+           the most specific match is the preferred one."
+       ::= { rosMgmtOspfObjects 12 }
+
+  rosMgmtOspfExternalAggregateEntry OBJECT-TYPE
+       SYNTAX   RosMgmtOspfExternalAggregateEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "A single external aggregate entry.
+
+          Information in this table is persistent and when this object
+          is written the entity SHOULD save the change to non-volatile
+          storage."
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfExternalAggregateNet, 
+               rosMgmtOspfExternalAggregateMask }
+       ::= { rosMgmtOspfExternalAggregateTable 1 }
+
+  RosMgmtOspfExternalAggregateEntry ::=
+       SEQUENCE {
+          rosMgmtOspfExternalAggregateNet
+             IpAddress,   
+          rosMgmtOspfExternalAggregateMask
+             IpAddress, 
+          rosMgmtOspfExternalAggregateEffect
+             INTEGER,
+          rosMgmtOspfExternalAggregateCost
+             BigMetric,
+          rosMgmtOspfExternalAggregateStatus
+             RowStatus
+          }
+
+  rosMgmtOspfExternalAggregateNet OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS  not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The IP address of the net or subnet indicated
+          by the range."
+       ::= { rosMgmtOspfExternalAggregateEntry 1 } 
+       
+  rosMgmtOspfExternalAggregateMask OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   not-accessible
+       STATUS      current
+       DESCRIPTION
+          "The subnet mask that pertains to the net or
+          subnet."
+       ::= { rosMgmtOspfExternalAggregateEntry 2 } 
+
+  rosMgmtOspfExternalAggregateEffect OBJECT-TYPE
+       SYNTAX       INTEGER {
+                             doNotAdvertise (1),
+                             advertise(2)
+                             }
+       MAX-ACCESS   read-create       
+       STATUS       current
+       DESCRIPTION
+          "This object controls the advertisement of external route summary."  
+       DEFVAL { advertise }
+       ::= { rosMgmtOspfExternalAggregateEntry 3 }
+
+  rosMgmtOspfExternalAggregateCost OBJECT-TYPE
+       SYNTAX   BigMetric
+       MAX-ACCESS   read-create
+       STATUS   current
+       DESCRIPTION
+          "It indicates the cost of aggregated external route, 16777215 
+          represents the cost is not set, the metric of route while decided
+          by ospf itself according to the route type." 
+       DEFVAL { 1 }
+       ::= { rosMgmtOspfExternalAggregateEntry 4 }
+
+  rosMgmtOspfExternalAggregateStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfExternalAggregateEntry 5 } 
+
+--rosMgmtOspfLsdbTable    
+--
+--The table define link state database
+  rosMgmtOspfLsdbTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+
+       DESCRIPTION
+          "The OSPF Process's link state database (LSDB).
+           The LSDB contains the link state advertisements
+           from throughout the areas that the device is attached to."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State Advertisements"
+       ::= { rosMgmtOspfObjects 13 }
+
+  rosMgmtOspfLsdbEntry OBJECT-TYPE
+       SYNTAX   RosMgmtOspfLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS   current
+       DESCRIPTION
+          "A single link state advertisement."
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfLsdbAreaId, 
+               rosMgmtOspfLsdbType,
+               rosMgmtOspfLsdbLsId, 
+               rosMgmtOspfLsdbRouterId }
+       ::= { rosMgmtOspfLsdbTable 1 }
+
+  RosMgmtOspfLsdbEntry ::=
+       SEQUENCE {
+          rosMgmtOspfLsdbAreaId
+             AreaID,
+          rosMgmtOspfLsdbType
+             INTEGER,
+          rosMgmtOspfLsdbLsId
+             IpAddress,
+          rosMgmtOspfLsdbRouterId
+             RouterID,
+          rosMgmtOspfLsdbSequence
+             Integer32,
+          rosMgmtOspfLsdbAge
+             Integer32,
+          rosMgmtOspfLsdbChecksum
+             Integer32,
+          rosMgmtOspfLsdbAdvertisement
+             OCTET STRING
+          }
+
+  rosMgmtOspfLsdbAreaId OBJECT-TYPE
+       SYNTAX       AreaID
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit identifier of the area from which
+          the LSA was received."
+       REFERENCE
+          "OSPF Version 2, Appendix C.2 Area parameters"
+
+       ::= { rosMgmtOspfLsdbEntry 1 }
+
+  rosMgmtOspfLsdbType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                       routerLink (1),
+                       networkLink (2),
+                       summaryLink (3),
+                       asSummaryLink (4),
+                       asExternalLink (5), -- but see rosMgmtOspfAsLsdbTable
+                       multicastLink (6),
+                       nssaExternalLink (7), 
+                       linkOpaqueLink (9),
+                       areaOpaqueLink (10),
+                       asOpaqueLink (11)
+                       }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The type of the link state advertisement.
+          Each link state type has a separate advertisement
+          format.
+
+          Note: External link state advertisements are permitted
+          for backward compatibility, but should be displayed
+          in the rosMgmtOspfAsLsdbTable rather than here."
+       REFERENCE
+          "OSPF Version 2, Appendix A.4.1 The Link State
+          Advertisement header"
+       ::= { rosMgmtOspfLsdbEntry 2 }
+
+  rosMgmtOspfLsdbLsId OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The Link State ID is an LS Type Specific field
+          containing either a Router ID or an IP address;
+          it identifies the piece of the routing domain
+          that is being described by the advertisement."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.4 Link State ID"
+       ::= { rosMgmtOspfLsdbEntry 3 }
+
+  rosMgmtOspfLsdbRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   read-only
+       STATUS       current
+
+       DESCRIPTION
+          "The 32-bit number that uniquely identifies the
+          originating router in the Autonomous System."
+       REFERENCE
+          "OSPF Version 2, Appendix C.1 Global parameters"
+       ::= { rosMgmtOspfLsdbEntry 4 }
+
+  rosMgmtOspfLsdbSequence OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The sequence number field is a signed 32-bit
+          integer.  It starts with the value '80000001'h,
+          or -'7FFFFFFF'h, and increments until '7FFFFFFF'h.
+          Thus, a typical sequence number will be very negative.
+          It is used to detect old and duplicate Link State
+          Advertisements.  The space of sequence numbers is linearly
+          ordered.  The larger the sequence number, the more recent
+          the advertisement."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.6 LS sequence
+          number"
+       ::= { rosMgmtOspfLsdbEntry 5 }
+
+  rosMgmtOspfLsdbAge OBJECT-TYPE
+       SYNTAX       Integer32 -- Should be 0..MaxAge, except when
+                              -- doNotAge bit is set
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the age of the link state advertisement
+          in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+       ::= { rosMgmtOspfLsdbEntry 6 }
+
+  rosMgmtOspfLsdbChecksum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the checksum of the complete contents of
+          the advertisement, excepting the age field.  The age field
+          is excepted so that an advertisement's age can be
+          incremented without updating the checksum.  The checksum
+          used is the same that is used for ISO connectionless
+
+          datagrams; it is commonly referred to as the
+          Fletcher checksum."
+        REFERENCE
+           "OSPF Version 2, Section 12.1.7 LS checksum"
+        ::= { rosMgmtOspfLsdbEntry 7 }
+
+  rosMgmtOspfLsdbAdvertisement OBJECT-TYPE
+       SYNTAX       OCTET STRING 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The entire link state advertisement, including
+          its header.
+
+          Note that for variable length LSAs, SNMP agents
+          may not be able to return the largest string size."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State Advertisements"
+       ::= { rosMgmtOspfLsdbEntry 8 } 
+         
+--rosMgmtOspfAsLsdbTable    
+--
+--OSPF Link State Database, External
+  rosMgmtOspfAsLsdbTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfAsLsdbEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The OSPF Process's AS-scope LSA link state database.
+           The database contains the AS-scope Link State
+           Advertisements from throughout the areas that
+           the device is attached to.
+
+           This table is identical to the OSPF LSDB Table
+           in format, but contains only AS-scope Link State
+           Advertisements.  The purpose is to allow AS-scope
+           LSAs to be displayed once for the router rather
+           than once in each non-stub area."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State
+          Advertisements"
+       ::= { rosMgmtOspfObjects 14 }
+
+  rosMgmtOspfAsLsdbEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfAsLsdbEntry
+
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "A single link state advertisement."
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfAsLsdbType, 
+               rosMgmtOspfAsLsdbLsId, 
+               rosMgmtOspfAsLsdbRouterId }
+       ::= { rosMgmtOspfAsLsdbTable 1 }
+
+  RosMgmtOspfAsLsdbEntry ::=
+       SEQUENCE {
+          rosMgmtOspfAsLsdbType
+             INTEGER,
+          rosMgmtOspfAsLsdbLsId
+             IpAddress,
+          rosMgmtOspfAsLsdbRouterId
+             RouterID,
+          rosMgmtOspfAsLsdbSequence
+             Integer32,
+          rosMgmtOspfAsLsdbAge
+             Integer32,
+          rosMgmtOspfAsLsdbChecksum
+             Integer32,
+          rosMgmtOspfAsLsdbAdvertisement
+             OCTET STRING
+          }
+
+  rosMgmtOspfAsLsdbType OBJECT-TYPE
+       SYNTAX      INTEGER { asExternalLink (5) }
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The type of the link state advertisement.
+          Each link state type has a separate
+          advertisement format."
+       REFERENCE
+          "OSPF Version 2, Appendix A.4.1 The Link State
+          Advertisement header"
+       ::= { rosMgmtOspfAsLsdbEntry 1 }
+
+  rosMgmtOspfAsLsdbLsId OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The Link State ID is an LS Type Specific field
+          containing either a Router ID or an IP address;
+
+          it identifies the piece of the routing domain
+          that is being described by the advertisement."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.4 Link State ID"
+       ::= { rosMgmtOspfAsLsdbEntry 2 }
+
+  rosMgmtOspfAsLsdbRouterId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The 32-bit number that uniquely identifies the
+          originating router in the Autonomous System."
+       REFERENCE
+          "OSPF Version 2, Appendix C.1 Global parameters"
+       ::= { rosMgmtOspfAsLsdbEntry 3 }
+
+  rosMgmtOspfAsLsdbSequence OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The sequence number field is a signed 32-bit
+          integer.  It starts with the value '80000001'h,
+          or -'7FFFFFFF'h, and increments until '7FFFFFFF'h.
+          Thus, a typical sequence number will be very negative.
+          It is used to detect old and duplicate link state
+          advertisements.  The space of sequence numbers is linearly
+          ordered.  The larger the sequence number, the more recent
+          the advertisement."
+       REFERENCE
+          "OSPF Version  2,  Section  12.1.6  LS  sequence
+          number"
+       ::= { rosMgmtOspfAsLsdbEntry 4 }
+
+  rosMgmtOspfAsLsdbAge OBJECT-TYPE
+       SYNTAX       Integer32 -- Should be 0..MaxAge, except when
+                              -- doNotAge bit is set
+       UNITS        "seconds"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the age of the link state
+          advertisement in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+       ::= { rosMgmtOspfAsLsdbEntry 5 }
+
+  rosMgmtOspfAsLsdbChecksum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "This field is the checksum of the complete
+          contents of the advertisement, excepting the
+          age field.  The age field is excepted so that
+          an advertisement's age can be incremented
+          without updating the checksum.  The checksum
+          used is the same that is used for ISO
+          connectionless datagrams; it is commonly referred
+          to as the Fletcher checksum."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.7 LS checksum"
+       ::= { rosMgmtOspfAsLsdbEntry 6 }
+
+  rosMgmtOspfAsLsdbAdvertisement OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The entire link state advertisement, including
+          its header."
+       REFERENCE
+          "OSPF Version 2, Section 12 Link State
+          Advertisements.
+
+          Note that for variable length LSAs, SNMP agents
+          may not be able to return the largest string size."
+       ::= { rosMgmtOspfAsLsdbEntry 7 }   
+       
+--rosMgmtOspfAreaLsaCountTable    
+--
+--OSPF Area LSA Counter Table
+  rosMgmtOspfAreaLsaCountTable OBJECT-TYPE
+          SYNTAX       SEQUENCE OF RosMgmtOspfAreaLsaCountEntry
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+             "This table maintains per-area, per-LSA-type counters"
+          ::= { rosMgmtOspfObjects 15 }
+
+      rosMgmtOspfAreaLsaCountEntry OBJECT-TYPE
+          SYNTAX       RosMgmtOspfAreaLsaCountEntry
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION
+             "An entry with a number of link advertisements
+              of a given type for a given area."
+          INDEX { rosMgmtOspfProcessId,
+                  rosMgmtOspfAreaLsaCountAreaId, 
+                  rosMgmtOspfAreaLsaCountLsaType }
+          ::= { rosMgmtOspfAreaLsaCountTable 1 }
+
+      RosMgmtOspfAreaLsaCountEntry ::=
+           SEQUENCE {
+              rosMgmtOspfAreaLsaCountAreaId
+                 AreaID,
+              rosMgmtOspfAreaLsaCountLsaType
+                 INTEGER,
+              rosMgmtOspfAreaLsaCountNumber
+                 Gauge32
+           }
+
+      rosMgmtOspfAreaLsaCountAreaId OBJECT-TYPE
+          SYNTAX       AreaID
+          MAX-ACCESS    not-accessible
+          STATUS       current
+          DESCRIPTION
+             "This entry Area ID."
+         ::= { rosMgmtOspfAreaLsaCountEntry 1 }
+		 	 		
+      rosMgmtOspfAreaLsaCountLsaType OBJECT-TYPE
+          SYNTAX       INTEGER {
+                          routerLink (1),
+                          networkLink (2),
+                          summaryLink (3),
+                          asSummaryLink (4),                         
+                          nssaExternalLink (7),
+			  linkOpaqueLink (9),
+                          areaOpaqueLink (10)
+                       }
+          MAX-ACCESS    not-accessible
+          STATUS       current
+          DESCRIPTION
+             "This entry LSA type."
+         ::= { rosMgmtOspfAreaLsaCountEntry 2 }
+
+      rosMgmtOspfAreaLsaCountNumber OBJECT-TYPE
+          SYNTAX       Gauge32
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION
+             "Number of LSAs of a given type for a given area."
+         ::= { rosMgmtOspfAreaLsaCountEntry 3 }
+    
+-- rosMgmtOspfRedistributeTable  
+--
+  rosMgmtOspfRedistributeTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfRedistributeEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Import external route to ospf protocol."
+       ::= { rosMgmtOspfObjects 16 }
+
+  rosMgmtOspfRedistributeEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfRedistributeEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Define an entry in the rosMgmtOspfRedistributeTable"
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfRedistributeProtocol, 
+               rosMgmtOspfRedistributeProcessId }
+       ::= { rosMgmtOspfRedistributeTable 1 }
+
+  RosMgmtOspfRedistributeEntry ::=
+       SEQUENCE {
+          rosMgmtOspfRedistributeProtocol
+             INTEGER,
+          rosMgmtOspfRedistributeProcessId
+             ProcessID,
+          rosMgmtOspfRedistributeCost
+             BigMetric,
+          rosMgmtOspfRedistributeType
+             INTEGER,
+          rosMgmtOspfRedistributeStatus
+             RowStatus,
+          rosMgmtOspfRedistributeRouteMapName
+             OCTET STRING,
+          rosMgmtOspfRedistributeTag
+             Unsigned32
+          }
+
+  rosMgmtOspfRedistributeProtocol OBJECT-TYPE
+       SYNTAX  INTEGER {                  -- RFC1213  route proto define
+                          other(1),       -- none of the following
+
+                                          -- non-protocol information,
+                                          -- e.g., manually configured
+                          local(2),       -- entries
+
+                                          -- set via a network
+                          netmgmt(3),     -- management protocol
+
+                                          -- obtained via ICMP,
+                          icmp(4),        -- e.g., Redirect
+
+                                          -- the remaining values are
+                                          -- all gateway routing
+                                          -- protocols
+                          egp(5),
+                          ggp(6),
+                          hello(7),
+                          rip(8),
+                          isis(9),
+                          esis(10),
+                          ciscoIgrp(11),
+                          bbnSpfIgp(12),
+                          ospf(13),
+                          bgp(14)
+                      }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Route protocol to be redistributed."
+       ::= { rosMgmtOspfRedistributeEntry 1 }
+
+  rosMgmtOspfRedistributeProcessId OBJECT-TYPE
+       SYNTAX       ProcessID
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "Process id of redistributed route protocol, only support ospf."
+       ::= { rosMgmtOspfRedistributeEntry 2 }
+
+  rosMgmtOspfRedistributeCost OBJECT-TYPE
+       SYNTAX       BigMetric
+       MAX-ACCESS   read-create 
+       STATUS       current
+       DESCRIPTION
+          "It indicates the cost of redistributed route, 16777215 represents
+         the cost is not set, the metric of route while decided by
+         ospf itself according to the route type."  
+       DEFVAL { 1 }
+       ::= { rosMgmtOspfRedistributeEntry 3 }
+
+  rosMgmtOspfRedistributeType OBJECT-TYPE
+       SYNTAX       INTEGER { e1(1),e2(2) }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The type of external route."   
+       DEFVAL { e2 }
+       ::= { rosMgmtOspfRedistributeEntry 4 }
+
+  rosMgmtOspfRedistributeStatus OBJECT-TYPE
+       SYNTAX       RowStatus 
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfRedistributeEntry 5 }
+   rosMgmtOspfRedistributeRouteMapName OBJECT-TYPE
+       SYNTAX       OCTET STRING 
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Specify a route-map."
+       ::= { rosMgmtOspfRedistributeEntry 6 }
+
+   rosMgmtOspfRedistributeTag OBJECT-TYPE
+       SYNTAX       Unsigned32
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Set tag of route."
+       ::= { rosMgmtOspfRedistributeEntry 7 }
+
+--rosMgmtOspfDefaultInfoTable    
+--
+  rosMgmtOspfDefaultInfoTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfDefaultInfoEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The table generate or delete the default route."
+       ::= { rosMgmtOspfObjects 17 }
+
+  rosMgmtOspfDefaultInfoEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfDefaultInfoEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Define an entry in the rosMgmtOspfDefaultInfoTable"
+       INDEX { rosMgmtOspfProcessId }
+       ::= { rosMgmtOspfDefaultInfoTable 1 }
+
+  RosMgmtOspfDefaultInfoEntry ::=
+       SEQUENCE {
+          rosMgmtOspfDefaultInfoAlways
+             TruthValue,
+          rosMgmtOspfDefaultInfoCost
+             BigMetric,
+          rosMgmtOspfDefaultInfoType
+             INTEGER,
+          rosMgmtOspfDefaultInfoStatus
+             RowStatus
+                }
+
+  rosMgmtOspfDefaultInfoAlways OBJECT-TYPE
+       SYNTAX       TruthValue
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Whether always inform default route."    
+       DEFVAL { false }
+       ::= { rosMgmtOspfDefaultInfoEntry 1 }
+
+  rosMgmtOspfDefaultInfoCost OBJECT-TYPE
+       SYNTAX       BigMetric
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "It indicates the default cost of route, 16777215 represents
+         the default cost is not set, the metric of route while decided by
+         ospf itself according to the route type."     
+       DEFVAL { 1 }
+       ::= { rosMgmtOspfDefaultInfoEntry 2 }
+
+  rosMgmtOspfDefaultInfoType OBJECT-TYPE
+       SYNTAX       INTEGER  { e1(1),e2(2) }
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "It indicates the type of default route."    
+       DEFVAL { e2 }
+       ::= { rosMgmtOspfDefaultInfoEntry 3 }
+
+  rosMgmtOspfDefaultInfoStatus OBJECT-TYPE
+       SYNTAX       RowStatus 
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfDefaultInfoEntry 4 }   
+
+-- rosMgmtOspfPacketIoStatisTable  
+--
+  rosMgmtOspfPacketIoStatisTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfPacketIoStatisEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The table is used to storage all kinds of 
+          input and output packet statistical information of 
+          OSPF process."
+       ::= { rosMgmtOspfObjects 18 }
+
+  rosMgmtOspfPacketIoStatisEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfPacketIoStatisEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Define an entry in the rosMgmtOspfPacketIoStatisTable"
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfPacketIoStatisIoType,
+               rosMgmtOspfPacketIoStatisPktType }
+       ::= { rosMgmtOspfPacketIoStatisTable 1 }                
+
+  RosMgmtOspfPacketIoStatisEntry ::=
+       SEQUENCE {
+          rosMgmtOspfPacketIoStatisIoType
+             INTEGER,
+          rosMgmtOspfPacketIoStatisPktType
+             INTEGER,
+          rosMgmtOspfPacketIoStatisNumber
+             Integer32
+                }
+
+  rosMgmtOspfPacketIoStatisIoType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                      input (1),
+                      output (2)
+                      }
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the IO direction of 
+          packet."    
+       ::= { rosMgmtOspfPacketIoStatisEntry 1 }       
+
+  rosMgmtOspfPacketIoStatisPktType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                      hello (1),
+                      dbDescript (2),
+                      lsReq (3),
+                      lsUpdate (4),
+                      lsAck (5)
+                      }
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the type of 
+          OSPF packet."    
+       ::= { rosMgmtOspfPacketIoStatisEntry 2 } 
+       
+  rosMgmtOspfPacketIoStatisNumber OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "The number indicates the number of specified type of 
+          packets on input or output direction."    
+       ::= { rosMgmtOspfPacketIoStatisEntry 3 }        
+
+-- rosMgmtOspfRouteTable  
+--
+  rosMgmtOspfRouteTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfRouteEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The table is used to storage OSPF calculation of routing table."
+       ::= { rosMgmtOspfObjects 19 }
+
+  rosMgmtOspfRouteEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfRouteEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Define an entry in the rosMgmtOspfRouteTable"
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfRouteDest,
+               rosMgmtOspfRouteMask,
+               rosMgmtOspfRouteType }
+       ::= { rosMgmtOspfRouteTable 1 }                
+
+  RosMgmtOspfRouteEntry ::=
+       SEQUENCE {
+          rosMgmtOspfRouteDest
+             IpAddress,
+          rosMgmtOspfRouteMask
+             IpAddress,
+          rosMgmtOspfRouteType
+             Integer32,
+          rosMgmtOspfRouteLsType   
+             INTEGER,
+          rosMgmtOspfRouteMetric   
+             Integer32,
+          rosMgmtOspfRouteNextHop
+             IpAddress, 
+          rosMgmtOspfRouteAdvRtr
+             IpAddress, 
+          rosMgmtOspfRouteArea
+             Integer32
+                }
+
+  rosMgmtOspfRouteDest OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the destination address of 
+          an ospf route."    
+       ::= { rosMgmtOspfRouteEntry 1 }       
+
+  rosMgmtOspfRouteMask OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the mask of 
+          an ospf route."    
+       ::= { rosMgmtOspfRouteEntry 2 }
+  
+  rosMgmtOspfRouteType OBJECT-TYPE
+       SYNTAX       Integer32 (1..'37'h)
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "It indicates the type of an ospf route.            
+          The hige 8 bits represents the ospf route type. 
+          Value 1, represents the route is a ROUTER route, 
+          whith is to a destined router.   
+          Value 2, is for a NETWORK route, most caculated 
+          ospf route is NETWORK route.     
+          Value 3, represents the route is to be DISCARDed resently.
+               
+          The low 8 bits represents the ospf route path type. 
+          Value 1, represents the route path is a intra area path, 
+          Value 2, represents the route path is a inter area path,     
+          Value 3, represents the route path is a type1 external path,   
+          Value 4, represents the route path is a type2 external path"    
+       ::= { rosMgmtOspfRouteEntry 3 } 
+  
+  rosMgmtOspfRouteLsType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                      stub (0),
+                      routerLink (1),
+                      networkLink (2),
+                      summaryLink (3),
+                      asSummaryLink (4),
+                      asExternalLink (5), 
+                      multicastLink (6),
+                      nssaExternalLink (7),
+                      areaOpaqueLink (10)
+                      }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the LSA type of 
+          a router."  
+       ::= { rosMgmtOspfRouteEntry 4 } 
+
+  rosMgmtOspfRouteMetric OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the metric of 
+          an ospf route. "    
+       ::= { rosMgmtOspfRouteEntry 5 } 
+  
+  rosMgmtOspfRouteNextHop OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the nexthop address of 
+          an ospf route."    
+       ::= { rosMgmtOspfRouteEntry 6 } 
+  
+  rosMgmtOspfRouteAdvRtr OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the advertising router of 
+          an ospf route."    
+       ::= { rosMgmtOspfRouteEntry 7 } 
+  
+  rosMgmtOspfRouteArea OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the ccmputing area of 
+          an ospf route."    
+       ::= { rosMgmtOspfRouteEntry 8 } 
+                                                         
+-- rosMgmtOspfBdrRouteTable 
+--
+  rosMgmtOspfBdrRouteTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfBdrRouteEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The table is used to storage the imformation of boder router."
+       ::= { rosMgmtOspfObjects 20 }
+
+  rosMgmtOspfBdrRouteEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfBdrRouteEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Define an entry in the rosMgmtOspfBdrRouteTable"
+       INDEX { rosMgmtOspfProcessId,
+               rosMgmtOspfBdrRouteRtrType,
+               rosMgmtOspfBdrRouteArea,
+               rosMgmtOspfBdrRouteDest,
+               rosMgmtOspfBdrRouteNextHop }
+       ::= { rosMgmtOspfBdrRouteTable 1 }                
+
+  RosMgmtOspfBdrRouteEntry ::=
+       SEQUENCE {
+          rosMgmtOspfBdrRouteRtrType
+             Integer32,
+          rosMgmtOspfBdrRouteArea
+             IpAddress,
+          rosMgmtOspfBdrRouteDest
+             IpAddress,
+          rosMgmtOspfBdrRouteNextHop   
+             IpAddress, 
+          rosMgmtOspfBdrRouteLsType   
+             INTEGER,
+          rosMgmtOspfBdrRouteMetric
+             Integer32
+             }
+
+  rosMgmtOspfBdrRouteRtrType OBJECT-TYPE
+       SYNTAX       Integer32  (1..'77'h)
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "It indicates the type of an ospf router.            
+          The hige 8 bits is a bit mask corresponding to 
+          the ospf router type. 
+          Bit 1, if set, indicates that the router is an ABR.
+          Bit 2, if set, indicates that the router is an ASBR.. 
+          Bit 3, if set, indicates that the router has a VLINK in this area.     
+          Bit 4, if set, indicates that the routers always translates Type-7.   
+          Bit 5, if set, indicates that it is a shortcut-ABR specific flag.
+               
+          The low 8 bits represents the route path type to this router. 
+          Value 1, represents the route path is a intra area path, 
+          Value 2, represents the route path is a inter area path,     
+          Value 3, represents the route path is a type1 external path,   
+          Value 4, represents the route path is a type2 external path" 
+       ::= { rosMgmtOspfBdrRouteEntry 1 }       
+     
+  rosMgmtOspfBdrRouteArea OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the area of 
+          a boder router."    
+       ::= { rosMgmtOspfBdrRouteEntry 2 }       
+  
+  rosMgmtOspfBdrRouteDest OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the boder router by 
+          it's router id."    
+       ::= { rosMgmtOspfBdrRouteEntry 3 }       
+  
+  rosMgmtOspfBdrRouteNextHop OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS    not-accessible
+       STATUS       current
+       DESCRIPTION
+          "IIt has been used to describe the nexthop router to 
+          reach a boder router."    
+       ::= { rosMgmtOspfBdrRouteEntry 4 }       
+  
+  rosMgmtOspfBdrRouteLsType OBJECT-TYPE
+       SYNTAX       INTEGER {
+                      routerLink (1),
+                      networkLink (2),
+                      summaryLink (3),
+                      asSummaryLink (4),
+                      asExternalLink (5), 
+                      multicastLink (6),
+                      nssaExternalLink (7),
+                      areaOpaqueLink (10)
+                      }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the LSA type of 
+          a boder router."    
+       ::= { rosMgmtOspfBdrRouteEntry 5 }       
+  
+  rosMgmtOspfBdrRouteMetric OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "It has been used to describe the metric to 
+          a boder router."    
+       ::= { rosMgmtOspfBdrRouteEntry 6 }       
+       
+  rosMgmtOspfDistributeListGroup     OBJECT IDENTIFIER ::= { rosMgmtOspfObjects 21}  
+  
+-- rosMgmtOspfDistributeListInTable 
+--
+  rosMgmtOspfDistributeListInTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfDistributeListInEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The table is used to config and check distribute-in policy."
+       ::= { rosMgmtOspfDistributeListGroup 1 }
+
+  rosMgmtOspfDistributeListInEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfDistributeListInEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Define an entry in the rosMgmtOspfDistributeListInTable"
+       INDEX { rosMgmtOspfProcessId }
+       ::= { rosMgmtOspfDistributeListInTable 1 }                
+
+  RosMgmtOspfDistributeListInEntry ::=
+       SEQUENCE {
+          rosMgmtOspfDistrInIpPrefixListName
+             OCTET STRING,
+          rosMgmtOspfDistrInAclNum
+             Integer32,
+          rosMgmtOspfDistrInRowStatus
+             RowStatus
+             }
+
+  rosMgmtOspfDistrInIpPrefixListName OBJECT-TYPE
+       SYNTAX       OCTET STRING
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Filter incoming routing updates,the value of this 
+           object indicates the name of an ip-prefix-list."    
+       ::= { rosMgmtOspfDistributeListInEntry 1 }       
+         
+   rosMgmtOspfDistrInAclNum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Filter incoming routing updates by the IP ACL number of OSPF distribute-in policy,
+          -1 is a value to inditace no setting of acl."    
+       ::= { rosMgmtOspfDistributeListInEntry 2 }  
+
+   rosMgmtOspfDistrInRowStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+           facilitating actions such as row creation,construction, 
+           and destruction.The value of this object has no effect
+           on whether other objects in this conceptual row can be 
+           modified."    
+       ::= { rosMgmtOspfDistributeListInEntry 3 }  
+       
+-- rosMgmtOspfDistributeListOutTable  
+--
+  rosMgmtOspfDistributeListOutTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfDistributeListOutEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The table is used to config and check distribute-out policy."
+       ::= { rosMgmtOspfDistributeListGroup 2 }
+
+  rosMgmtOspfDistributeListOutEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfDistributeListOutEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Define an entry in the rosMgmtOspfDistributeListOutTable"
+       INDEX { rosMgmtOspfProcessId }
+       ::= { rosMgmtOspfDistributeListOutTable 1 }                
+
+  RosMgmtOspfDistributeListOutEntry ::=
+       SEQUENCE {
+          rosMgmtOspfDistrOutIpPrefixListName
+             OCTET STRING,
+          rosMgmtOspfDistrOutAclNum
+             Integer32,
+          rosMgmtOspfDistrOutRowStatus
+             RowStatus
+             }
+
+  rosMgmtOspfDistrOutIpPrefixListName OBJECT-TYPE
+       SYNTAX       OCTET STRING 
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Filter outgoing routing updates,the value of this object
+           indicates the name of an ip-prefix-list."    
+       ::= { rosMgmtOspfDistributeListOutEntry 1 }       
+         
+   rosMgmtOspfDistrOutAclNum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Filter incoming outgoing updates by the IP ACL number of OSPF distribute-out policy,
+          -1 is a value to inditace no setting of acl."    
+       ::= { rosMgmtOspfDistributeListOutEntry 2 }  
+
+   rosMgmtOspfDistrOutRowStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+           facilitating actions such as row creation,construction, 
+           and destruction. The value of this object has no effect 
+           on whether other objects in this conceptual row can be 
+           modified."    
+       ::= { rosMgmtOspfDistributeListOutEntry 3 }     
+
+-- rosMgmtOspfDistributeListOutProtocolTable   
+--
+  rosMgmtOspfDistributeListOutProtocolTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfDistributeListOutProtocolEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The table is used to config and check distribute-out policy based on protocol."
+       ::= { rosMgmtOspfDistributeListGroup 3 }
+
+  rosMgmtOspfDistributeListOutProtocolEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfDistributeListOutProtocolEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Define an entry in the rosMgmtOspfDistributeListOutProtocolTable"
+       INDEX { 
+               rosMgmtOspfProcessId, 
+               rosMgmtOspfDistrOutProtocol,
+               rosMgmtOspfDistrOutProcessId
+                }
+       ::= { rosMgmtOspfDistributeListOutProtocolTable 1 }                
+
+  RosMgmtOspfDistributeListOutProtocolEntry ::=
+       SEQUENCE {
+          rosMgmtOspfDistrOutProtocol
+             INTEGER,
+          rosMgmtOspfDistrOutProcessId
+             ProcessID,
+          rosMgmtOspfDistrOutProIpPrefixListName
+             OCTET STRING,
+          rosMgmtOspfDistrOutProAclNum
+             Integer32,
+          rosMgmtOspfDistrOutProRowStatus
+             RowStatus    
+             }
+
+  rosMgmtOspfDistrOutProtocol OBJECT-TYPE
+       SYNTAX  INTEGER {                  -- RFC1213  route proto define
+                          other(1),       -- none of the following
+
+                                          -- non-protocol information,
+                                          -- e.g., manually configured
+                          local(2),       -- entries
+
+                                          -- set via a network
+                          netmgmt(3),     -- management protocol
+
+                                          -- obtained via ICMP,
+                          icmp(4),        -- e.g., Redirect
+
+                                          -- the remaining values are
+                                          -- all gateway routing
+                                          -- protocols
+                          egp(5),
+                          ggp(6),
+                          hello(7),
+                          rip(8),
+                          isis(9),
+                          esis(10),
+                          ciscoIgrp(11),
+                          bbnSpfIgp(12),
+                          ospf(13),
+                          bgp(14)
+                      }
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Redistributed route protocol."    
+       ::= { rosMgmtOspfDistributeListOutProtocolEntry 1 }       
+         
+   rosMgmtOspfDistrOutProcessId OBJECT-TYPE
+       SYNTAX       ProcessID
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Process id of redistributed route protocol, only support ospf."    
+       ::= { rosMgmtOspfDistributeListOutProtocolEntry 2 }  
+
+   rosMgmtOspfDistrOutProIpPrefixListName OBJECT-TYPE
+       SYNTAX       OCTET STRING 
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Filtering outgoing updates based on imported protocol, the value 
+           of this object indicates the name of an ip-prefix-list."    
+       ::= { rosMgmtOspfDistributeListOutProtocolEntry 3 } 
+       
+    rosMgmtOspfDistrOutProAclNum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "Filtering outgoing updates based on imported protocol, the value of this object 
+          indicates the IP ACL number, -1 is a value to inditace no setting of acl."    
+       ::= { rosMgmtOspfDistributeListOutProtocolEntry 4 }  
+       
+     rosMgmtOspfDistrOutProRowStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+           facilitating actions such as row creation,construction, 
+           and destruction.The value of this object has no effect 
+           on whether other objects in this conceptual row can be 
+           modified."    
+       ::= { rosMgmtOspfDistributeListOutProtocolEntry 5 }   
+       
+       
+--rosMgmtOspfDNBitCheckDisableSummaryTable    
+--
+  rosMgmtOspfDNBitCheckDisableSummaryTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF RosMgmtOspfDNBitCheckDisableSummaryEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "The table check or set the operation  of ND bit."
+       ::= { rosMgmtOspfObjects 22 }
+
+  rosMgmtOspfDNBitCheckDisableSummaryEntry OBJECT-TYPE
+       SYNTAX       RosMgmtOspfDNBitCheckDisableSummaryEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "Define an entry in the RosMgmtOspfDNBitCheckDisableSummaryEntry"
+       INDEX { 
+                rosMgmtOspfProcessId,
+                rosMgmtOspfDNBitCheckDisableSummaryRtrId
+             }
+       ::= { rosMgmtOspfDNBitCheckDisableSummaryTable 1 }
+
+  RosMgmtOspfDNBitCheckDisableSummaryEntry ::=
+       SEQUENCE {
+          rosMgmtOspfDNBitCheckDisableSummaryRtrId
+             RouterID,
+          rosMgmtOspfDNBitCheckDisableSummaryStatus
+             RowStatus
+                }
+
+  rosMgmtOspfDNBitCheckDisableSummaryRtrId OBJECT-TYPE
+       SYNTAX       RouterID
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+          "It indicates the router-id of summary-lsa,which can be operated the DN bit separately.This node can only
+          be used for check operation"    
+       ::= { rosMgmtOspfDNBitCheckDisableSummaryEntry 1 }
+
+  rosMgmtOspfDNBitCheckDisableSummaryStatus OBJECT-TYPE
+       SYNTAX       RowStatus 
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "This object permits management of the table by
+          facilitating actions such as row creation,
+          construction, and destruction.
+
+          The value of this object has no effect on
+          whether other objects in this conceptual row can be
+          modified."
+       ::= { rosMgmtOspfDNBitCheckDisableSummaryEntry 2 }   
+
+                                                 
+END

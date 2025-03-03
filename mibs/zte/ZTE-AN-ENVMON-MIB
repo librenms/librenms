@@ -1,0 +1,2439 @@
+
+ZTE-AN-ENVMON-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS     
+        RowStatus              FROM SNMPv2-TC
+        DisplayString          FROM SNMPv2-TC
+        TruthValue             FROM SNMPv2-TC
+        DateAndTime            FROM SNMPv2-TC
+        MODULE-IDENTITY        FROM SNMPv2-SMI
+        OBJECT-TYPE            FROM SNMPv2-SMI
+        Integer32              FROM SNMPv2-SMI
+        IpAddress              FROM SNMPv2-SMI
+        Counter64              FROM SNMPv2-SMI
+        Unsigned32             FROM SNMPv2-SMI
+        NOTIFICATION-TYPE      FROM SNMPv2-SMI
+        zxAccessNode           FROM ZTE-AN-SMI
+        zxAnEquipment          FROM ZTE-AN-SMI
+        MODULE-COMPLIANCE      FROM SNMPv2-CONF
+        OBJECT-GROUP           FROM SNMPv2-CONF
+        NOTIFICATION-GROUP     FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION     FROM SNMPv2-TC
+        HCPerfCurrentCount     FROM HC-PerfHist-TC-MIB;
+
+    zxAnEnvMonMib    MODULE-IDENTITY
+        LAST-UPDATED    "201412230000Z"
+        ORGANIZATION    "ZTE Corporation"
+        CONTACT-INFO    "Mei YuLing     ZTE Corporation
+                         Mail: mei.yuLing@zte.com.cn
+                         Tel : +86-21-68897315"
+        DESCRIPTION     "This MIB defines zte Access Node managed environment 
+                        monitor."
+        REVISION        "201412230000Z"
+        DESCRIPTION
+        "modify the range of fan tray speed percentage." 
+        REVISION        "201312310000Z"
+        DESCRIPTION
+        "add fan tray SN configuration."                
+        REVISION        "201204270000Z"
+        DESCRIPTION
+        "add fan unified configuration."     
+        REVISION        "201204180000Z"
+        DESCRIPTION
+        "add overheat protection."          
+        REVISION        "201110170000Z"
+        DESCRIPTION
+        "add details of fan speed level."       
+        REVISION        "201105260000Z"
+        DESCRIPTION
+        "Initial version of this MIB module."
+        ::=  {  zxAnEquipment  10  }
+        
+    ZxAnEnvShutdownServiceType ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "A set of service type defined in environment monitor module 
+            that may be shut down in protection action, 
+            each bit refers to a type:
+            Bit 00 : xPON service.
+            Bit 01 : xDSL service.
+            Bit 02 : P2P service.
+            Bit 03 : narrowband service."
+        SYNTAX      BITS {
+            xpon(0),
+            xdsl(1),
+            p2p(2),
+            narrowband(3)
+        }          
+    
+-------------------------------------------------------------------------------
+-- Following management objects are defined.
+-- 1. Environment Management Capability Table
+-- 2. Environment Temperature Table
+-- 3. Card Environment Performance Table
+--- 3.1. zxAnCardEnvParamTable
+--- 3.2. zxAnCardEnvHis15MinPerfTable
+--- 3.3. zxAnCardEnvHis1DayPerfTable
+--- 3.4. zxAnCardEnvAlmProfileConfTable
+--- 3.5. zxAnCardEnvAlmProfileApplyTable
+--- 3.6. zxAnCardEnvAlmProfileTable
+--- 3.7. zxAnEnvOverheatProtectTable
+--- 3.8. zxAnEnvCardOverheatProtectTable
+-- 4. Environment Interface Connection Management Table
+-- 5. Power Supply Management Table
+-- 6. Fan Management Objects
+-- 6.1 Fan Tray Control table
+-- 6.2 Fans Control And Operational Status table
+-- 6.3 Fan Tray Reset Objects
+-- 8. Environment Device Objects
+-- 9. Environment Device Switch Objects
+
+-- Following notification objects are defined.
+-- 21. zxAnEnvMonNotifications
+
+-- Following conformance information is defined.
+-- 31. zxAnEnvMonConformance
+
+-------------------------------------------------------------------------------
+
+    zxAnEnvMonGlobalObjects    OBJECT IDENTIFIER::={zxAnEnvMonMib            1}
+    zxAnEnvMonObjects          OBJECT IDENTIFIER::={zxAnEnvMonMib            2}
+    zxAnEnvMonNotifications    OBJECT IDENTIFIER::={zxAnEnvMonMib            3}    
+                                                                             
+    zxAnEnvParamObjects        OBJECT IDENTIFIER::={zxAnEnvMonObjects        1}    
+    zxAnEnvMonInterfaceObjects OBJECT IDENTIFIER::={zxAnEnvMonObjects        2}
+    zxAnEnvPowerSupplyObjects  OBJECT IDENTIFIER::={zxAnEnvMonObjects        3}
+    zxAnEnvFanObjects          OBJECT IDENTIFIER::={zxAnEnvMonObjects        4}
+    zxAnEnvDeviceObjects       OBJECT IDENTIFIER::={zxAnEnvMonObjects        5}
+    
+    zxAnEnvFanTrayResetObjects OBJECT IDENTIFIER::={zxAnEnvFanObjects        12}
+    
+    zxAnEnvParamGlobalObjects  OBJECT IDENTIFIER::={zxAnEnvParamObjects      1}
+    
+    zxAnPowerSupplyGlobalObjects 
+                          OBJECT IDENTIFIER ::= { zxAnEnvPowerSupplyObjects  1}
+    
+    zxAnEnvMonTempTraps        OBJECT IDENTIFIER::={zxAnEnvMonNotifications  1}
+    zxAnEnvMonInterfaceTraps   OBJECT IDENTIFIER::={zxAnEnvMonNotifications  2}
+    zxAnEnvMonPowerSupplyTraps OBJECT IDENTIFIER::={zxAnEnvMonNotifications  3}
+    zxAnEnvMonFanTraps         OBJECT IDENTIFIER::={zxAnEnvMonNotifications  4}
+    zxAnEnvDeviceTraps         OBJECT IDENTIFIER::={zxAnEnvMonNotifications  5}
+    
+
+-------------------------------------------------------------------------------
+-- 1. Environment Management Capability Table
+-------------------------------------------------------------------------------
+    zxAnEnvMonCapabilities OBJECT-TYPE
+        SYNTAX     BITS
+        {
+            envTemperature(0),
+            fanAlarmBeep(1),
+            fanAutoSwitchByCardInstall(2),
+            fanSpeedCtrlBasedTemperature(3),
+            fanFixSpeed(4),
+            singleFanShutdown(5),
+            mpTemperature(6),
+            powerSupply(7),
+            cardTemperature(8),
+            fanSpeedPercentage(9),
+            backplaneInterface(10),
+            envMonitorInterfaceTrapEnable(11),
+            slaveShelfFanConfig(12)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The environment management capabilities of this equipment.The bit
+            value 1 means the function represented by this bit is supported by 
+            this equipment.
+            
+            NOTE:
+               Not recommended to display it in NMS.
+            "
+        ::= { zxAnEnvMonGlobalObjects 1 }
+    
+    zxAnEnvCardShutdownReason OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            envHighTemperature(1),
+            cardHighTemperature(2),
+            chipHighTemperature(3),
+            emergencyPowerSaving(4)
+        }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The alarm reason of zxAnEnvCardShutdownAlm.
+            envHighTemperature(1): Environment temperature is too high.
+            cardHighTemperature(2):Card self temperature is too high.
+            chipHighTemperature(3):Card's chip temperature is too high.
+            emergencyPowerSaving(4):Emergency power saving action has been 
+            taken caused by AC power failure.
+            "
+        ::= { zxAnEnvParamGlobalObjects 1 } 
+-------------------------------------------------------------------------------
+-- 2. Environment Temperature Table
+-------------------------------------------------------------------------------
+    zxAnEnvParamTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ZxAnEnvParamEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This table includes environment temperature information."
+        ::= { zxAnEnvParamObjects 5 }
+
+   zxAnEnvParamEntry  OBJECT-TYPE
+        SYNTAX     ZxAnEnvParamEntry 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The entry of zxAnEnvParamTable. "
+        INDEX  { zxAnEnvRack, zxAnEnvShelf }
+        ::= { zxAnEnvParamTable 1 }
+
+    ZxAnEnvParamEntry ::= SEQUENCE {
+            zxAnEnvRack                       Integer32,
+            zxAnEnvShelf                      Integer32,
+            zxAnEnvTemp                       Integer32,
+            zxAnEnvTempHighAlmThreshold       Integer32,
+            zxAnEnvTempCriticalAlmThreshold   Integer32,
+            zxAnEnvTempLowAlmThreshold        Integer32,
+            zxAnEnvShelfPowerConsumption      Integer32,
+            zxAnEnvShelfVoltage               Integer32,
+            zxAnEnvShelfCurrent               Integer32
+        }
+
+    zxAnEnvRack         OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "The index of rack."
+        ::=  {  zxAnEnvParamEntry  1  }
+        
+    zxAnEnvShelf        OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "The index of shelf."
+        ::=  {  zxAnEnvParamEntry  2  } 
+    
+    zxAnEnvTemp         OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Centigrade"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The temperature of the environment."
+        ::= { zxAnEnvParamEntry 3 }
+        
+    zxAnEnvTempHighAlmThreshold  OBJECT-TYPE
+        SYNTAX          Integer32(45..95)
+        UNITS           "Centigrade"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The temperature high alarm threshold of the environment."
+        DEFVAL { 75 }
+        ::= { zxAnEnvParamEntry 4 }
+
+    zxAnEnvTempCriticalAlmThreshold  OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Centigrade"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The temperature critical alarm threshold of the environment."
+        DEFVAL { 100 }
+        ::= { zxAnEnvParamEntry 5 }
+
+    zxAnEnvTempLowAlmThreshold  OBJECT-TYPE
+        SYNTAX          Integer32(-40..0)
+        UNITS           "Centigrade"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The temperature low alarm threshold of the environment."
+        ::= { zxAnEnvParamEntry 6 }
+        
+    zxAnEnvShelfPowerConsumption  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001W"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Power consumption of the shelf.
+             Value 0 means not available."
+       ::= { zxAnEnvParamEntry 7 }
+       
+    zxAnEnvShelfVoltage  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Voltage of the shelf.
+             Value 0 means not available."
+       ::= { zxAnEnvParamEntry 8 }
+       
+    zxAnEnvShelfCurrent  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current of the shelf.
+             Value 0 means not available."
+       ::= { zxAnEnvParamEntry 9 }
+
+
+-------------------------------------------------------------------------------
+-- 3. Card Environment Performance Table
+-- 3.1. zxAnCardEnvParamTable
+-------------------------------------------------------------------------------
+
+  zxAnCardEnvParamTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ZxAnCardEnvParamEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This table includes card temperature information."
+        ::= { zxAnEnvParamObjects 6 }
+
+   zxAnCardEnvParamEntry  OBJECT-TYPE
+        SYNTAX     ZxAnCardEnvParamEntry 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The entry of zxAnCardEnvParamTable. "
+        INDEX  { zxAnEnvRack, zxAnEnvShelf, zxAnEnvSlot }
+        ::= { zxAnCardEnvParamTable 1 }
+
+    ZxAnCardEnvParamEntry ::= SEQUENCE {
+            zxAnEnvSlot                      Integer32,
+            zxAnCardTemp                     Integer32,
+            zxAnCardPowerConsumption         Integer32,
+            zxAnCardVoltage                  Integer32,
+            zxAnCardCurrent                  Integer32,
+            zxAnCardCriticalTempAlmThreshold Integer32,
+            zxAnCardOptHighestTemp           Integer32,
+            zxAnCardOptCriticalTempAlmThresh Integer32,
+            zxAnCardOptHighestTempPortNo     Integer32,
+            zxAnCardHeatRadiationAlmThresh   Integer32
+        }
+
+    zxAnEnvSlot  OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The index of slot, the range is [0,20] of 19-inch
+                         shelf and [0,22] of 21-inch shelf."
+        ::=  {  zxAnCardEnvParamEntry  1  }
+
+    zxAnCardTemp OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The current temperature of the card environment.                 
+                
+                 NOTE: 
+                 1. In current system, only certain cards support 
+                    temperature-reading, such as SCXL, GTGOD cards.
+                 2. If the card is not configured, we cannot get its 
+                    temperature.
+                 3. For the configured but not support temperature-reading 
+                    cards, we use -1000 as an invalid temperature value to note
+                    its temperature.
+                 "
+       ::= { zxAnCardEnvParamEntry 2 }
+       
+    zxAnCardPowerConsumption OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001W"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Power consumption of the card.
+             Value 0 means not available."
+       ::= { zxAnCardEnvParamEntry 3 }
+       
+    zxAnCardVoltage OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Voltage of the card.
+             Value 0 means not available."
+       ::= { zxAnCardEnvParamEntry 4 }
+       
+    zxAnCardCurrent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current of the card.
+             Value 0 means not available."
+       ::= { zxAnCardEnvParamEntry 5 }
+
+    zxAnCardCriticalTempAlmThreshold  OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "Centigrade"
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "The critical temperature alarm threshold of the card."
+        ::= { zxAnCardEnvParamEntry 6 }
+    
+    zxAnCardOptHighestTemp OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.001Degrees"
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The highest temperature of the optical modules in the card."
+       ::= { zxAnCardEnvParamEntry 7 }
+           
+    zxAnCardOptCriticalTempAlmThresh  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Centigrade"
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The critical optical temperature alarm threshold."
+        ::= { zxAnCardEnvParamEntry 8 }
+    
+    zxAnCardOptHighestTempPortNo  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The port No. which the optical module is located at, and the 
+             optical module has the highest temperature."
+        ::= { zxAnCardEnvParamEntry 9 }
+                
+    zxAnCardHeatRadiationAlmThresh OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Centigrade"
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The heat radiation abnormal alarm threshold of the card."
+       ::= { zxAnCardEnvParamEntry 10 }
+        
+-------------------------------------------------------------------------------
+-- 3.2. zxAnCardEnvHis15MinPerfTable
+-------------------------------------------------------------------------------
+
+    zxAnCardEnvHis15MinPerfTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnCardEnvHis15MinPerfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+             "The 15 minutes interval performance data table of card 
+             temperature."
+        ::= { zxAnEnvParamObjects 7 }
+
+    zxAnCardEnvHis15MinPerfEntry    OBJECT-TYPE
+        SYNTAX      ZxAnCardEnvHis15MinPerfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "The 15 minutes interval performance data entry of card 
+            temperature."
+        INDEX   {  zxAnEnvRack, zxAnEnvShelf, zxAnEnvSlot, 
+                   zxAnCardEnvHis15MinIntervalNo }
+        ::= { zxAnCardEnvHis15MinPerfTable 1 }
+
+    ZxAnCardEnvHis15MinPerfEntry ::= SEQUENCE {
+        zxAnCardEnvHis15MinIntervalNo    Integer32,
+        zxAnCardEnvHis15MinDateTime      DateAndTime,
+        zxAnCardEnvHis15MinTemp          Counter64
+        }   
+      
+    zxAnCardEnvHis15MinIntervalNo    OBJECT-TYPE 
+        SYNTAX      Integer32(1..96)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION     
+             "Performance data interval number 1 is the the most recent 
+              previous interval; interval 96 is 24 hours ago.  
+              Intervals 2..96 are optional."       
+        ::= { zxAnCardEnvHis15MinPerfEntry 1 }
+        
+    zxAnCardEnvHis15MinDateTime    OBJECT-TYPE   
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+             "The 15 minutes interval performance data generation time."       
+        ::= { zxAnCardEnvHis15MinPerfEntry 2 }
+        
+    zxAnCardEnvHis15MinTemp    OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+            "The 15 minutes interval average temperature of card."
+        ::= { zxAnCardEnvHis15MinPerfEntry 3 }
+        
+-------------------------------------------------------------------------------
+-- 3.3. zxAnCardEnvHis1DayPerfTable
+-------------------------------------------------------------------------------
+
+    zxAnCardEnvHis1DayPerfTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnCardEnvHis1DayPerfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+             "The 1 day interval performance data table of card temperature."             
+        ::= { zxAnEnvParamObjects 8 }
+
+    zxAnCardEnvHis1DayPerfEntry    OBJECT-TYPE
+        SYNTAX      ZxAnCardEnvHis1DayPerfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "The 1 day interval performance data entry of card temperature."
+        INDEX   { zxAnEnvRack, zxAnEnvShelf, zxAnEnvSlot, 
+                  zxAnCardEnvHis1DayIntervalNo }
+        ::= { zxAnCardEnvHis1DayPerfTable 1 }
+
+    ZxAnCardEnvHis1DayPerfEntry ::= SEQUENCE {
+        zxAnCardEnvHis1DayIntervalNo Integer32,
+        zxAnCardEnvHis1DayDateTime   DateAndTime,
+        zxAnCardEnvHis1DayTemp       Counter64
+        }
+      
+    zxAnCardEnvHis1DayIntervalNo  OBJECT-TYPE 
+        SYNTAX      Integer32(1..7)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION     
+             "Performance data interval number 1 is the the most recent 
+              previous interval; interval 7 is 1 week ago.  
+              Intervals 2..7 are optional."       
+        ::= { zxAnCardEnvHis1DayPerfEntry 1 }        
+        
+    zxAnCardEnvHis1DayDateTime    OBJECT-TYPE   
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+             "The 1 day interval performance data generation time."       
+        ::= { zxAnCardEnvHis1DayPerfEntry 2 }
+    
+    zxAnCardEnvHis1DayTemp    OBJECT-TYPE 
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+            "The 1 day interval average temperature of card."
+        ::= { zxAnCardEnvHis1DayPerfEntry 3 }
+
+-------------------------------------------------------------------------------
+-- 3.4. zxAnCardEnvAlmProfileConfTable
+-------------------------------------------------------------------------------
+
+    zxAnCardEnvAlmProfileConfTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnCardEnvAlmProfileConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+             "The performance alarm threshold profile items configuration table
+             of card temperature."
+        ::= { zxAnEnvParamObjects 9 }
+
+    zxAnCardEnvAlmProfileConfEntry   OBJECT-TYPE
+        SYNTAX      ZxAnCardEnvAlmProfileConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+           "The performance alarm threshold profile items configuration entry 
+           of card temperature."
+        INDEX   { zxAnCardEnvAlmProfileName, zxAnCardEnvPerfVariable }
+        ::= { zxAnCardEnvAlmProfileConfTable 1 }
+
+    ZxAnCardEnvAlmProfileConfEntry ::= SEQUENCE {
+        zxAnCardEnvAlmProfileName        DisplayString,
+        zxAnCardEnvPerfVariable          OBJECT IDENTIFIER,
+        zxAnCardEnvRiseAlmThresh         HCPerfCurrentCount,
+        zxAnCardEnvClrRiseAlmThresh      HCPerfCurrentCount,
+        zxAnCardEnvRiseWarnThresh        HCPerfCurrentCount,
+        zxAnCardEnvClrRiseWarnThresh     HCPerfCurrentCount,
+        zxAnCardEnvFallWarnThresh        HCPerfCurrentCount,
+        zxAnCardEnvClrFallWarnThresh     HCPerfCurrentCount,
+        zxAnCardEnvFallAlmThresh         HCPerfCurrentCount,
+        zxAnCardEnvClrFallAlmThresh      HCPerfCurrentCount,
+        zxAnCardEnvAlmPrfConfRowStatus   RowStatus
+        }
+
+    zxAnCardEnvAlmProfileName  OBJECT-TYPE 
+        SYNTAX      DisplayString(SIZE(1..32))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION     
+            "The performance alarm threshold profile name."
+        ::= { zxAnCardEnvAlmProfileConfEntry 1 }
+        
+    zxAnCardEnvPerfVariable  OBJECT-TYPE 
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION     
+            "The object identifier of performance variables."
+        ::= { zxAnCardEnvAlmProfileConfEntry 2 }
+        
+    zxAnCardEnvRiseAlmThresh  OBJECT-TYPE 
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The threshold for rising alarm."
+        ::= { zxAnCardEnvAlmProfileConfEntry 3 }
+
+    zxAnCardEnvClrRiseAlmThresh  OBJECT-TYPE 
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The threshold for rising alarm restore."
+        ::= { zxAnCardEnvAlmProfileConfEntry 4 }
+
+    zxAnCardEnvRiseWarnThresh  OBJECT-TYPE 
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The threshold for rising warning."
+        ::= { zxAnCardEnvAlmProfileConfEntry 5 }
+
+    zxAnCardEnvClrRiseWarnThresh  OBJECT-TYPE 
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The threshold for rising warning restore."
+        ::= { zxAnCardEnvAlmProfileConfEntry 6 }
+        
+    zxAnCardEnvFallWarnThresh  OBJECT-TYPE 
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The threshold for falling warning."
+        ::= { zxAnCardEnvAlmProfileConfEntry 7 }
+
+    zxAnCardEnvClrFallWarnThresh  OBJECT-TYPE 
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The threshold for falling warning restore."
+        ::= { zxAnCardEnvAlmProfileConfEntry 8 }
+        
+    zxAnCardEnvFallAlmThresh  OBJECT-TYPE 
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The threshold for falling alarm."
+        ::= { zxAnCardEnvAlmProfileConfEntry 9 }
+
+    zxAnCardEnvClrFallAlmThresh  OBJECT-TYPE 
+        SYNTAX      HCPerfCurrentCount
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The threshold for falling alarm restore."
+        ::= { zxAnCardEnvAlmProfileConfEntry 10 }
+
+    zxAnCardEnvAlmPrfConfRowStatus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The status of this conceptual row.
+
+             To create a row in this table, a manager must
+             set this object to createAndGo(4).
+             
+             To delete a row in this table, a manager must
+             set this object to destroy(6). "
+        ::= { zxAnCardEnvAlmProfileConfEntry 50 }
+        
+-------------------------------------------------------------------------------
+-- 3.5. zxAnCardEnvAlmProfileApplyTable
+-------------------------------------------------------------------------------
+
+    zxAnCardEnvAlmProfileApplyTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnCardEnvAlmProfileApplyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+             "The performance alarm threshold profile application table of
+              card temperature."
+        ::= { zxAnEnvParamObjects 10 }
+
+    zxAnCardEnvAlmProfileApplyEntry   OBJECT-TYPE
+        SYNTAX      ZxAnCardEnvAlmProfileApplyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "The performance alarm threshold profile application entry of
+             card temperature."
+        INDEX   { zxAnEnvRack, zxAnEnvShelf, zxAnEnvSlot }
+        ::= { zxAnCardEnvAlmProfileApplyTable 1 }
+
+    ZxAnCardEnvAlmProfileApplyEntry ::= SEQUENCE {
+        zxAnCardEnvAlmPrf                 DisplayString,
+        zxAnCardEnvAlmPrfApplyRowStatus   RowStatus
+        }
+        
+    zxAnCardEnvAlmPrf  OBJECT-TYPE 
+        SYNTAX      DisplayString(SIZE(1..32))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The performance alarm threshold profile."
+        ::= { zxAnCardEnvAlmProfileApplyEntry 1 }
+               
+    zxAnCardEnvAlmPrfApplyRowStatus  OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The status of this conceptual row.
+
+             To create a row in this table, a manager must
+             set this object to createAndGo(4).
+            
+             To delete a row in this table, a manager must
+             set this object to destroy(6). "
+        ::= { zxAnCardEnvAlmProfileApplyEntry 50 }
+        
+
+-------------------------------------------------------------------------------
+-- 3.6. zxAnCardEnvAlmProfileTable
+-------------------------------------------------------------------------------
+
+    zxAnCardEnvAlmProfileTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnCardEnvAlmProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+             "The performance alarm threshold profile table of card
+             temperature."
+        ::= { zxAnEnvParamObjects 11 }
+
+    zxAnCardEnvAlmProfileEntry   OBJECT-TYPE
+        SYNTAX      ZxAnCardEnvAlmProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "The performance alarm threshold profile entry of
+             card temperature."
+        INDEX   { zxAnCardEnvAlmProfileName }
+        ::= { zxAnCardEnvAlmProfileTable 1 }
+
+    ZxAnCardEnvAlmProfileEntry ::= SEQUENCE {
+        zxAnCardEnvAlmPrfRowStatus       RowStatus
+        }
+               
+    zxAnCardEnvAlmPrfRowStatus  OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The status of this conceptual row.
+
+             To create a row in this table, a manager must
+             set this object to createAndGo(4).
+            
+             To delete a row in this table, a manager must
+             set this object to destroy(6). "
+        ::= { zxAnCardEnvAlmProfileEntry 50 }
+
+-------------------------------------------------------------------------------
+--- 3.7. zxAnEnvOverheatProtectTable
+-------------------------------------------------------------------------------
+    zxAnEnvOverheatProtectTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ZxAnEnvOverheatProtectEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Environment overheat protection table."
+        ::= { zxAnEnvParamObjects 13 }
+
+    zxAnEnvOverheatProtectEntry  OBJECT-TYPE
+        SYNTAX     ZxAnEnvOverheatProtectEntry 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Environment overheat protection entry.
+
+            To modify zxAnEnvOverheatProtectEnable from disabled to enabled,   
+            zxAnEnvOverheatProtectEnable is mandatory,
+            zxAnEnvOverheatProtectDelay is optional.
+
+            To  modify zxAnEnvOverheatProtectEnable from enabled to disabled, 
+            only zxAnEnvOverheatProtectEnable is mandatory."
+        INDEX  { zxAnEnvRack, zxAnEnvShelf }
+        ::= { zxAnEnvOverheatProtectTable 1 }
+
+    ZxAnEnvOverheatProtectEntry ::= SEQUENCE {
+            zxAnEnvOverheatProtectEnable        INTEGER,
+            zxAnEnvOverheatProtectDelay         Integer32,
+            zxAnEnvOverheatProtectFirstStep     ZxAnEnvShutdownServiceType,
+            zxAnEnvOverheatProtectSecondStep    ZxAnEnvShutdownServiceType
+        }
+
+    zxAnEnvOverheatProtectEnable OBJECT-TYPE
+        SYNTAX      INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables or disables the environment overheat protection function."
+        DEFVAL { disabled }
+        ::=  {  zxAnEnvOverheatProtectEntry  1  }
+
+    zxAnEnvOverheatProtectDelay OBJECT-TYPE
+        SYNTAX          Integer32(1..60)
+        UNITS           "minutes"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The delaying time between two steps.
+            For example, when temperature is higher than the threshold, takes an 
+            action as the step 1, and delays the value of 
+            zxAnEnvOverheatProtectDelay, if the temperature is still higher than
+            the threshold, takes an action as step 2."
+        DEFVAL { 10 }
+        ::=  {  zxAnEnvOverheatProtectEntry  2  }
+
+    zxAnEnvOverheatProtectFirstStep OBJECT-TYPE
+        SYNTAX      ZxAnEnvShutdownServiceType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The first step when the environment temperature exceeds 
+            zxAnEnvTempHighAlmThreshold."
+        DEFVAL { {xpon,xdsl,p2p} }
+        ::=  {  zxAnEnvOverheatProtectEntry  3  }
+
+    zxAnEnvOverheatProtectSecondStep OBJECT-TYPE
+        SYNTAX      ZxAnEnvShutdownServiceType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The second step when the environment temperature still exceeds 
+            zxAnEnvTempHighAlmThreshold after first step has been done."
+        DEFVAL { {narrowband} }
+        ::=  {  zxAnEnvOverheatProtectEntry  4  }
+
+-------------------------------------------------------------------------------
+--- 3.8. zxAnEnvCardOverheatProtectTable
+-------------------------------------------------------------------------------
+    zxAnEnvCardOverheatProtectTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ZxAnEnvCardOverheatProtectEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Card overheat protection table."
+        ::= { zxAnEnvParamObjects 14 }
+
+    zxAnEnvCardOverheatProtectEntry  OBJECT-TYPE
+        SYNTAX     ZxAnEnvCardOverheatProtectEntry 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Card overheat protection entry."
+        INDEX  { zxAnEnvRack, zxAnEnvShelf }
+        ::= { zxAnEnvCardOverheatProtectTable 1 }
+
+    ZxAnEnvCardOverheatProtectEntry ::= SEQUENCE {
+            zxAnEnvCardCriticalTempProtectEn        INTEGER
+        }
+
+    zxAnEnvCardCriticalTempProtectEn OBJECT-TYPE
+        SYNTAX      INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION      
+            "Enables or disables the card critical temperature protection 
+            function. If it is enabled, the card will be stopped when the card 
+            temperature is higher than the card critical temperature."
+        DEFVAL { enabled }
+        ::=  {  zxAnEnvCardOverheatProtectEntry  1  }
+
+-------------------------------------------------------------------------------
+-- 4. Environment Interface Connection Management Table
+-------------------------------------------------------------------------------
+    zxAnEnvMonInterfaceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ZxAnEnvMonInterfaceEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This table includes the environment interface information."
+        ::= { zxAnEnvMonInterfaceObjects 5 }
+
+   zxAnEnvMonInterfaceEntry  OBJECT-TYPE
+        SYNTAX     ZxAnEnvMonInterfaceEntry 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The entry of zxAnEnvMonInterfaceTable. "
+        INDEX  { zxAnEnvRack, zxAnEnvShelf }
+        ::= { zxAnEnvMonInterfaceTable 1 }
+
+    ZxAnEnvMonInterfaceEntry ::= SEQUENCE {
+            zxAnEnvMonInterfaceUsage        INTEGER,
+            zxAnEnvEpmConnectPort           INTEGER,
+            zxAnEnvBackplaneInterfaceUsage  INTEGER
+        }    
+    
+    zxAnEnvMonInterfaceUsage OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            epm(1),
+            fanTray(2),
+            noUse(3),
+            noSupport(4),
+            etmWithTestSubcard(5),
+            etmWithoutTestSubcard(6)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The equipment type connected to the environment monitor interface.
+            "
+        DEFVAL { fanTray }        
+        ::= { zxAnEnvMonInterfaceEntry 1 }  
+
+    zxAnEnvEpmConnectPort  OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            port0(1),
+            port1(2),
+            notconfigured(255)    
+        }        
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The port no which epm connect"
+        ::= { zxAnEnvMonInterfaceEntry 2 }
+
+    zxAnEnvBackplaneInterfaceUsage  OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            fan(1),
+            noUse(3),
+            noSupport(255)    
+        }        
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The equipment type connected to the Backplane Interface.
+            fan(1): the fan connect to the Backplane Interface;
+            noUse(3): not used;
+            noSupport(255):not support.
+            "
+        ::= { zxAnEnvMonInterfaceEntry 3 }
+        
+-------------------------------------------------------------------------------
+-- 5. Power Supply Management Table
+-------------------------------------------------------------------------------    
+    zxAnEnvEmergencyPowerSaveEnable OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION      
+            "Enables or disables the emergency power saving."
+        DEFVAL { disabled }
+        ::=  {  zxAnPowerSupplyGlobalObjects  1  }
+        
+    zxAnEnvEmergencyPowerSaveDelay OBJECT-TYPE
+        SYNTAX          Integer32(0..1440)
+        UNITS           "Minutes"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "If AC power failure lasts more than zxAnEnvEmergencyPowerSaveDelay,
+            emergency power saving action will be taken."
+        DEFVAL { 60 }
+        ::=  {  zxAnPowerSupplyGlobalObjects  2  }
+        
+    zxAnEnvEmergencyPowerSaveRecover OBJECT-TYPE
+        SYNTAX          Integer32(0..1440)
+        UNITS           "Minutes"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "If AC power recovered, after this delay, the emergency power save
+            action will be cancelled."
+        DEFVAL { 0 }
+        ::=  {  zxAnPowerSupplyGlobalObjects  3  }        
+
+    zxAnEnvEmergencyPowerSaveSvcType OBJECT-TYPE
+        SYNTAX          ZxAnEnvShutdownServiceType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The service types will be shut down in emergency power saving 
+            action."
+        DEFVAL { {xpon, xdsl, p2p} }
+        ::=  {  zxAnPowerSupplyGlobalObjects  4  }
+
+    zxAnEnvPowerMode OBJECT-TYPE
+        SYNTAX          INTEGER
+        {
+            normal(1),
+            battery(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The current power supply mode of the equipment, emergency power 
+            saving action is on the basis of the power mode zxAnEnvPowerMode.
+            normal(1) means using AC power as power supply.
+            battery(2) means using storage battery as power supply. 
+            "
+        DEFVAL { normal }
+        ::=  {  zxAnPowerSupplyGlobalObjects  5  }
+
+    zxAnEnvEmergencyBatteryVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.001Volts"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The current voltage of the battery."
+        ::=  {  zxAnPowerSupplyGlobalObjects  6  }
+        
+    zxAnEnvEmergencyBatteryThreshold OBJECT-TYPE
+        SYNTAX          Integer32(45000..53000)
+        UNITS           "0.001Volts"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The threshold of the battery voltage.
+            If the battery voltage is less than 
+            zxAnEnvEmergencyBatteryThreshold, the emergency power saving action 
+            will be taken."
+        DEFVAL { 48000 }
+        ::=  {  zxAnPowerSupplyGlobalObjects  7  }
+    
+    zxAnPowerSupplyCapabilityTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ZxAnPowerSupplyCapabilityEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+           "This table includes power supply capability table."
+       ::= { zxAnEnvPowerSupplyObjects 10 }
+
+    zxAnPowerSupplyCapabilityEntry OBJECT-TYPE
+        SYNTAX  ZxAnPowerSupplyCapabilityEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+           "The entry of zxAnPowerSupplyCapabilityTable."
+        INDEX       {  zxAnEnvRack, zxAnEnvShelf  }
+       ::= { zxAnPowerSupplyCapabilityTable 1 }
+
+    ZxAnPowerSupplyCapabilityEntry ::= SEQUENCE 
+        {
+            zxAnPowerSupplyMaxPowerNum    Integer32
+        }
+
+    zxAnPowerSupplyMaxPowerNum OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+           "The max number of power supply in the equipment."
+       ::= { zxAnPowerSupplyCapabilityEntry 1 }
+ 
+--- Power supply table
+
+    zxAnPowerSupplyTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ZxAnPowerSupplyEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+           "This table includes power supply table."
+       ::= { zxAnEnvPowerSupplyObjects 11 }
+
+    zxAnPowerSupplyEntry OBJECT-TYPE
+        SYNTAX  ZxAnPowerSupplyEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+           "An entry in zxAnPowerSupplyTable."
+        INDEX       {  zxAnEnvRack, zxAnEnvShelf, zxAnEnvSlot  }
+       ::= { zxAnPowerSupplyTable 1 }
+
+    ZxAnPowerSupplyEntry ::= SEQUENCE 
+        {
+            zxAnPowerSupplyOperStatus       INTEGER,
+            zxAnPowerSupplyInVoltage        Integer32,
+            zxAnPowerSupplyInVoltageStatus  INTEGER,
+            zxAnPowerInVoltageUpperThresh   Integer32,
+            zxAnPowerInVoltageLowerThresh   Integer32,            
+            zxAnPowerSupplyInCurrent        Integer32,
+            zxAnPowerInCurrentThresh        Integer32
+        }    
+
+   zxAnPowerSupplyOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER 
+        {
+            inService(1),
+            hwOffline(2),
+            powerFaulty(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The operational status of the power supply module."
+      ::= { zxAnPowerSupplyEntry 1 }
+
+    zxAnPowerSupplyInVoltage OBJECT-TYPE
+        SYNTAX      Integer32 
+        UNITS       "Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The actual input volts of the power supply module."
+      ::= { zxAnPowerSupplyEntry 2 }
+      
+    zxAnPowerSupplyInVoltageStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                    normal(1),
+                    overVoltage(2),
+                    underVoltage(3),
+                    off(4)    
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The volt status of the power supply.
+                
+                normal(1)       -- The input power is normal.
+                overVoltage(2)  -- The input power is over voltage.
+                underVoltage(3) -- The input power is under voltage.
+                off(4))         -- No power input.
+                "
+       ::= { zxAnPowerSupplyEntry 3 }
+
+    zxAnPowerInVoltageUpperThresh OBJECT-TYPE
+        SYNTAX      Integer32 
+        UNITS       "Volts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The upper threshold of input volts.The alarm should be generated
+        when zxAnPowerSupplyInVoltage exceeds this threshold.
+            If it is 0, no alarm reported to manager."
+        DEFVAL  { 0 }
+      ::= { zxAnPowerSupplyEntry 4 }
+
+
+    zxAnPowerInVoltageLowerThresh OBJECT-TYPE
+        SYNTAX      Integer32 
+        UNITS       "Volts"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The lower threshold of input volts.The alarm should be generated
+        when zxAnPowerSupplyInVoltage is lower than this threshold.
+            If it is 0, no alarm reported to manager."
+        DEFVAL  { 0 }
+      ::= { zxAnPowerSupplyEntry 5 }
+      
+
+    zxAnPowerSupplyInCurrent OBJECT-TYPE
+        SYNTAX      Integer32 
+        UNITS       "Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The actual current of the power supply module."
+      ::= { zxAnPowerSupplyEntry 6 }
+
+
+    zxAnPowerInCurrentThresh OBJECT-TYPE
+        SYNTAX      Integer32 
+        UNITS       "Amp"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+           "The upper threshold of input current.The alarm should be generated
+        when zxAnPowerSupplyInCurrent exceeds this threshold.
+            If it is 0, no alarm reported to manager."
+        DEFVAL  { 0 }
+      ::= { zxAnPowerSupplyEntry 7 }     
+
+-------------------------------------------------------------------------------
+-- 6. Fan Management Objects
+-- 6.1 Fan Tray Control table
+-------------------------------------------------------------------------------
+      
+   zxAnEnvFanTrayTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ZxAnEnvFanTrayEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+           "The Fan Tray Control table, with rack and shelf information."
+        ::= { zxAnEnvFanObjects 10 }
+        
+    zxAnEnvFanTrayEntry OBJECT-TYPE
+        SYNTAX  ZxAnEnvFanTrayEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+           "An entry in the zxAnEnvFanTrayTable."
+        INDEX       {  zxAnEnvRack, zxAnEnvShelf  }
+        ::= { zxAnEnvFanTrayTable 1 }
+        
+    ZxAnEnvFanTrayEntry ::= SEQUENCE 
+        {   zxAnFanTrayAlarmBeepEnable     INTEGER,
+            zxAnFanTrayAutoSwitchByCardUp  INTEGER,
+            zxAnFanTrayHardwareVersion     DisplayString,
+            zxAnFanTraySoftwareVersion     DisplayString,
+            zxAnFanTraySpeedCtrlMode       INTEGER,
+            zxAnFanTrayLowSpeed            Integer32,
+            zxAnFanTrayStdSpeed            Integer32,
+            zxAnFanTrayHighSpeed           Integer32,
+            zxAnFanTraySuperSpeed          Integer32,
+            zxAnFanTrayLowSpeedShiftTemp   Integer32,
+            zxAnFanTrayStdSpeedShiftTemp   Integer32,
+            zxAnFanTrayHighSpeedShiftTemp  Integer32,
+            zxAnFanTraySuperSpeedShiftTemp Integer32,
+            zxAnFanTrayLowSpeedPercent     INTEGER,
+            zxAnFanTrayStdSpeedPercent     INTEGER,
+            zxAnFanTrayHighSpeedPercent    INTEGER,
+            zxAnFanTraySuperSpeedPercent   INTEGER,
+            zxAnFanTrayAdminStatus         INTEGER,
+            zxAnFanTrayConfSpeedLevel      INTEGER,
+            zxAnFanTrayPowerConsumption    Integer32,
+            zxAnFanTraySn                  DisplayString,
+            zxAnFanTrayVoltage             Integer32,
+            zxAnFanTrayCurrent             Integer32,
+            zxAnFanTrayTemp                Integer32
+        }
+        
+    zxAnFanTrayAlarmBeepEnable OBJECT-TYPE
+        SYNTAX     INTEGER{
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The control status of the fan alarm beep."
+        DEFVAL { enable }        
+        ::= { zxAnEnvFanTrayEntry 1 } 
+       
+    zxAnFanTrayAutoSwitchByCardUp OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/disable fan auto switch with card installation. If it is
+            enabled, the fan under the card should be switched to running 
+            status when the card is installed. Otherwise, the fan should be 
+            shutdown.
+            "
+        DEFVAL { disable }        
+        ::= { zxAnEnvFanTrayEntry 2 }
+
+    zxAnFanTrayHardwareVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION   "The hardware version of the fan tray"
+        ::= { zxAnEnvFanTrayEntry 3 }
+
+    zxAnFanTraySoftwareVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION   "The software version of the fan tray"
+        ::= { zxAnEnvFanTrayEntry 4 }
+        
+   zxAnFanTraySpeedCtrlMode OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            temperatureBasedAutoCtrl(1),
+            fixSpeed(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The speed control mode of the fan.
+            When this value is fixSpeed,zxAnFanTrayAdminStatus,
+            zxAnFanTrayConfSpeedLevel,zxAnEnvFanAdminStatus and 
+            zxAnEnvFanConfSpeedLevel can be configured."
+        DEFVAL { temperatureBasedAutoCtrl }
+        ::= { zxAnEnvFanTrayEntry 5 }  
+        
+    zxAnFanTrayLowSpeed   OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "RPM"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The speed value of the fan's low speed level.
+            The values for ZXDSL9800,9210 are 1500,2400,2700,3000,3400,3700,
+            4000,4400.
+            NOTE:
+               Different equipment maybe has different default value.
+            "
+        ::=  {  zxAnEnvFanTrayEntry  6  }
+
+    zxAnFanTrayStdSpeed OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "RPM"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The speed value of the fan's standard speed level.
+            The values for ZXDSL9800,9210 are 1500,2400,2700,3000,3400,3700,
+            4000,4400.
+            NOTE:
+               Different equipment maybe has different default value.
+            "
+        ::=  {  zxAnEnvFanTrayEntry  7  }
+        
+    zxAnFanTrayHighSpeed OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "RPM"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The speed value of the fan's high speed level.
+            The values for ZXDSL9800,9210 are 1500,2400,2700,3000,3400,3700,
+            4000,4400.
+            NOTE:
+               Different equipment maybe has different default value.
+            "
+        ::=  {  zxAnEnvFanTrayEntry  8  }
+        
+    zxAnFanTraySuperSpeed OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "RPM"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The speed value of the fan's super speed level.
+            The values for ZXDSL9800,9210 are 1500,2400,2700,3000,3400,3700,
+            4000,4400.
+            NOTE:
+               Different equipment maybe has different default value.
+            "
+        ::=  {  zxAnEnvFanTrayEntry  9  }
+
+    zxAnFanTrayLowSpeedShiftTemp OBJECT-TYPE
+        SYNTAX          Integer32(0..55)
+        UNITS           "centigrade"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The temperature to activate the fan tray to shift to
+            the low speed level.
+            "
+        ::=  {  zxAnEnvFanTrayEntry  10  }
+        
+    zxAnFanTrayStdSpeedShiftTemp OBJECT-TYPE
+        SYNTAX          Integer32(5..60)
+        UNITS           "centigrade"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The temperature to activate the fan tray to shift to
+            the standard speed level.
+            "
+        ::=  {  zxAnEnvFanTrayEntry  11  }
+
+    zxAnFanTrayHighSpeedShiftTemp OBJECT-TYPE
+        SYNTAX          Integer32(10..65)
+        UNITS           "centigrade"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The temperature to activate the fan tray to shift to
+            the high speed level.
+            "
+        ::=  {  zxAnEnvFanTrayEntry  12  }
+
+    zxAnFanTraySuperSpeedShiftTemp OBJECT-TYPE
+        SYNTAX          Integer32(15..70)
+        UNITS           "centigrade"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The temperature to activate the fan tray to shift to
+            the super speed level.
+            "
+        ::=  {  zxAnEnvFanTrayEntry  13  } 
+    
+    zxAnFanTrayLowSpeedPercent OBJECT-TYPE
+        SYNTAX          INTEGER(10..97)
+        UNITS           "percent"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The percentage of speed of the low speed level."
+        DEFVAL{30}
+        ::=  {  zxAnEnvFanTrayEntry  14  }       
+        
+    zxAnFanTrayStdSpeedPercent OBJECT-TYPE
+        SYNTAX          INTEGER(11..98)
+        UNITS           "percent"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The percentage of speed of the standard speed level."
+        DEFVAL{50}
+        ::=  {  zxAnEnvFanTrayEntry  15  } 
+            
+
+    zxAnFanTrayHighSpeedPercent OBJECT-TYPE
+        SYNTAX          INTEGER(12..99)
+        UNITS           "percent"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The percentage of speed of the high speed level."
+        DEFVAL{70}
+        ::=  {  zxAnEnvFanTrayEntry  16  }
+        
+    zxAnFanTraySuperSpeedPercent OBJECT-TYPE
+        SYNTAX          INTEGER(13..100)
+        UNITS           "percent"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The percentage of speed of the super speed level."
+        DEFVAL{90}
+        ::=  {  zxAnEnvFanTrayEntry  17  }       
+            
+    zxAnFanTrayAdminStatus OBJECT-TYPE 
+        SYNTAX      INTEGER 
+        {
+            up(1),
+            down(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The administrative status of the fan tray.                    
+                    When zxAnFanTrayAdminStatus is configured, all the 
+                    zxAnEnvFanAdminStatus values are consistent with 
+                    zxAnFanTrayAdminStatus."
+        DEFVAL { up }
+        ::=  {  zxAnEnvFanTrayEntry  18  }
+        
+   zxAnFanTrayConfSpeedLevel OBJECT-TYPE 
+        SYNTAX      INTEGER
+        {
+            lowSpeed     (1),
+            standardSpeed(2),
+            highSpeed    (3),
+            superSpeed   (4)       
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The configured speed level of the fan tray.      
+            When zxAnFanTrayConfSpeedLevel is configured, all the 
+            zxAnEnvFanConfSpeedLevel values are consistent with 
+            zxAnFanTrayConfSpeedLevel.
+            This variable is valid if zxAnFanTrayAdminStatus is up."
+        DEFVAL { standardSpeed }
+        ::=  {  zxAnEnvFanTrayEntry  19  }
+        
+    zxAnFanTrayPowerConsumption OBJECT-TYPE 
+        SYNTAX      Integer32
+        UNITS       "0.001W"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Power consumption of the fan tray.
+             Value 0 means not available."
+        ::=  {  zxAnEnvFanTrayEntry  20  }      
+        
+    zxAnFanTraySn               OBJECT-TYPE 
+        SYNTAX      DisplayString (SIZE (0..12))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The serial number of fan tray."
+        DEFVAL { "" }    
+        ::=  {  zxAnEnvFanTrayEntry  21  }
+        
+    zxAnFanTrayVoltage OBJECT-TYPE 
+        SYNTAX      Integer32
+        UNITS       "0.001Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Voltage of the fan tray.
+             Value 0 means not available."
+        ::=  {  zxAnEnvFanTrayEntry  22  }
+        
+    zxAnFanTrayCurrent OBJECT-TYPE 
+        SYNTAX      Integer32
+        UNITS       "0.001Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current of the fan tray.
+             Value 0 means not available."
+        ::=  {  zxAnEnvFanTrayEntry  23  }        
+
+    zxAnFanTrayTemp  OBJECT-TYPE
+        SYNTAX       Integer32
+        UNITS        "Centigrade"
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The temperature of the fan tray."
+        ::= { zxAnEnvFanTrayEntry 24 }
+-------------------------------------------------------------------------------
+-- 6.2 Fans Control And Operational Status table
+-------------------------------------------------------------------------------
+   
+   zxAnEnvFanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ZxAnEnvFanEntry 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This table includes speed information and operational status of 
+             the fan units."
+        ::= { zxAnEnvFanObjects 11 }
+
+   zxAnEnvFanEntry  OBJECT-TYPE
+        SYNTAX     ZxAnEnvFanEntry 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The entry of zxAnEnvFanTable. "
+        INDEX  { zxAnEnvRack, zxAnEnvShelf, zxAnEnvFanIndex  }
+        ::= { zxAnEnvFanTable 1 }
+
+    ZxAnEnvFanEntry ::= SEQUENCE {
+        zxAnEnvFanIndex               Integer32,
+        zxAnEnvFanConfSpeedLevel      INTEGER,
+        zxAnEnvFanActualSpeedLevel    INTEGER,
+        zxAnEnvFanAdminStatus         INTEGER, 
+        zxAnEnvFanOperStatus          INTEGER,
+        zxAnEnvFanOnlineStatus        INTEGER,
+        zxAnEnvFanActualSpeed         Integer32
+    }
+    zxAnEnvFanIndex OBJECT-TYPE
+        SYNTAX     Integer32 
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The index of this fan unit.
+            
+            For 19-inch shelf, there are 3 fans in each fan tray.
+            The fan index should be integer in [1,3].
+            
+            For 21-inch shelf, there are 4 fans. The fan index should
+            be integer in [1,4]."
+            
+        ::= { zxAnEnvFanEntry 1 }    
+       
+    zxAnEnvFanConfSpeedLevel    OBJECT-TYPE 
+        SYNTAX      INTEGER
+        {
+            lowSpeed     (1),
+            standardSpeed(2),
+            highSpeed    (3),
+            superSpeed   (4)       
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+                    "The configured speed level of the fan unit singly."
+        DEFVAL { standardSpeed }
+        ::=  {  zxAnEnvFanEntry  2  }
+
+    zxAnEnvFanActualSpeedLevel  OBJECT-TYPE 
+        SYNTAX      INTEGER
+        {
+            lowSpeed     (1),
+            standardSpeed(2),
+            highSpeed    (3),
+            superSpeed   (4),
+            other        (10)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The actual speed level of the fan unit."
+        ::=  {  zxAnEnvFanEntry  3  }
+    
+    zxAnEnvFanAdminStatus   OBJECT-TYPE 
+        SYNTAX      INTEGER 
+        {
+            up(1),
+            down(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+                    "The administrative status of the fan unit singly."
+        DEFVAL { up }
+        ::=  {  zxAnEnvFanEntry  4  }   
+    
+    zxAnEnvFanOperStatus    OBJECT-TYPE
+        SYNTAX      INTEGER 
+        {
+            up(1),
+            down(2),
+            unknown(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The operational status of the fan unit."
+        ::=  {  zxAnEnvFanEntry  5  }   
+
+    zxAnEnvFanOnlineStatus      OBJECT-TYPE 
+        SYNTAX      INTEGER
+        {
+            online(1),
+            offline(2),
+            unknown(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The actual online status of the fan unit."
+        ::=  {  zxAnEnvFanEntry  6  }
+    
+    zxAnEnvFanActualSpeed  OBJECT-TYPE 
+        SYNTAX      Integer32        
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The actual speed of the fan unit.
+            NOTE:
+               If not supported, NMS should use the speed value of 
+               zxAnEnvFanActualSpeedLevel."
+        ::=  {  zxAnEnvFanEntry  7  }
+
+-------------------------------------------------------------------------------
+-- 6.3 Fan Tray Reset Objects
+-------------------------------------------------------------------------------
+    zxAnEnvFanTrayResetRack           OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+            "The rack number of the fan tray."
+        ::=  {  zxAnEnvFanTrayResetObjects  1  }
+        
+    zxAnEnvFanTrayResetShelfList      OBJECT-TYPE 
+        SYNTAX          DisplayString ( SIZE ( 0 .. 16 ) ) 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+            "The shelf number list of the fan tray. 
+             They can be reset in batch, for example: 1,2,3.
+             Setting this object to empty means all the fan trays 
+             connected with zxAnEnvFanTrayRack will be reset."
+        ::=  {  zxAnEnvFanTrayResetObjects  2  } 
+        
+    zxAnEnvFanTrayResetAction OBJECT-TYPE     
+        SYNTAX      INTEGER
+        {
+            reset(1)
+        } 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "Reset the fan trays. 
+             To query this object, always return 1."
+        ::=  {  zxAnEnvFanTrayResetObjects  3  }
+
+-------------------------------------------------------------------------------
+-- 8. Environment Device Objects
+-------------------------------------------------------------------------------
+    zxAnEnvDeviceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnEnvDeviceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table of environment device."
+        ::= { zxAnEnvDeviceObjects 2 }
+
+    zxAnEnvDeviceEntry OBJECT-TYPE
+        SYNTAX      ZxAnEnvDeviceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The entry of the zxAnEnvDeviceTable."
+        INDEX       { zxAnEnvDeviceId }
+        ::= { zxAnEnvDeviceTable 1 }
+
+    ZxAnEnvDeviceEntry ::= SEQUENCE {
+        zxAnEnvDeviceId        Integer32,
+        zxAnEnvDeviceName      DisplayString,
+        zxAnEnvDeviceRowStatus RowStatus
+    }
+     
+    zxAnEnvDeviceId OBJECT-TYPE
+        SYNTAX     Integer32(1..100)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The ID of this environment device.
+            Value 1-50 is default value which can not be modified or deleted.
+            If add a new device, the ID will be starting from 51."
+        ::= { zxAnEnvDeviceEntry 1 }
+       
+    zxAnEnvDeviceName OBJECT-TYPE 
+        SYNTAX      DisplayString(SIZE(1..32))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION     
+            "The name of the environment device."
+        ::= { zxAnEnvDeviceEntry 2 }
+
+    zxAnEnvDeviceRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION   
+            "The status of this conceptual row.
+            
+            The supported actions of this conceptual row only include:
+            'createAndGo' and 'destroy'.
+
+            To create a row in this table, a manager must set this object to
+            createAndGo(4).
+    
+            To delete a row in this table, a manager must set this object to
+            destroy(6).
+             
+            To get this object, the agent always returns active(1).
+            "
+        ::=  { zxAnEnvDeviceEntry 50 }
+
+-------------------------------------------------------------------------------
+-- 9. Environment Device Switch Objects
+-------------------------------------------------------------------------------
+    zxAnEnvDevMonSwitchTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ZxAnEnvDevMonSwitchEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The table of the switch which monitors environment device."
+        ::= { zxAnEnvDeviceObjects 3 }
+
+    zxAnEnvDevMonSwitchEntry OBJECT-TYPE
+        SYNTAX     ZxAnEnvDevMonSwitchEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The entry of the zxAnEnvDevMonSwitchTable."
+        INDEX      { zxAnEnvDevMonSwitchId }
+        ::= { zxAnEnvDevMonSwitchTable 1 }
+
+    ZxAnEnvDevMonSwitchEntry ::= SEQUENCE {
+        zxAnEnvDevMonSwitchId           Integer32,
+        zxAnEnvDevMonSwitchDeviceId     Integer32,
+        zxAnEnvDevMonSwitchTrapEnable   INTEGER,
+        zxAnEnvDevMonSwitchNormalStatus INTEGER,
+        zxAnEnvDevMonSwitchCurrStatus   INTEGER
+    }
+        
+    zxAnEnvDevMonSwitchId OBJECT-TYPE
+        SYNTAX     Integer32(1..8)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The ID of the switch."
+        ::= { zxAnEnvDevMonSwitchEntry 1 }
+       
+    zxAnEnvDevMonSwitchDeviceId OBJECT-TYPE
+        SYNTAX       Integer32(0..100)
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION     
+            "The ID of the device which monitored by the switch. 
+             Value 0 means this switch does not monitor any device."
+        DEFVAL { 0 }
+        ::= { zxAnEnvDevMonSwitchEntry 2 }
+   
+    zxAnEnvDevMonSwitchTrapEnable OBJECT-TYPE
+        SYNTAX      INTEGER  
+        { 
+            enabled(1),
+            disabled(2)
+        } 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION   
+            "Enables or disables the environment device abnormal trap."
+        DEFVAL { disabled }
+        ::= { zxAnEnvDevMonSwitchEntry 3 }
+     
+    zxAnEnvDevMonSwitchNormalStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+        { 
+            lowLevel(1),
+            highLevel(2)
+        } 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION   
+            "The normal status of the environment device."
+        DEFVAL { lowLevel }
+        ::= { zxAnEnvDevMonSwitchEntry 4 }
+        
+    zxAnEnvDevMonSwitchCurrStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+        { 
+            lowLevel(1),
+            highLevel(2),
+            unknown(255)
+        } 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION   
+            "The current status of the environment device. "
+        ::= { zxAnEnvDevMonSwitchEntry 5 }
+
+-------------------------------------------------------------------------------
+-- 21. zxAnEnvMonNotifications  
+-------------------------------------------------------------------------------
+    
+---envTempHigh  alarm
+    
+    zxAnEnvHighTempAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnEnvTemp,  zxAnEnvTempHighAlmThreshold }
+        STATUS             current
+        DESCRIPTION
+           "The environment temperature has exceeded high temperature 
+            threshold zxAnEnvTempHighAlmThreshold. 
+            The zxAnEnvTemp object identifies the current temperature."
+       ::= { zxAnEnvMonTempTraps 1 }          
+
+    zxAnEnvHighTempClr NOTIFICATION-TYPE
+        OBJECTS { zxAnEnvTemp,  zxAnEnvTempHighAlmThreshold }
+        STATUS             current
+        DESCRIPTION
+           "The environment temperature has returned to normal operating 
+            temperature from zxAnEnvTempHighAlmThreshold. 
+            The zxAnEnvTemp object identifies the current temperature."
+       ::= { zxAnEnvMonTempTraps 2 }
+      
+     zxAnEnvTempSensorFailure NOTIFICATION-TYPE
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the temperature sensor is in fault."
+      ::= { zxAnEnvMonTempTraps 5 }    
+
+    zxAnEnvCriticalTempAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnEnvTemp,  zxAnEnvTempCriticalAlmThreshold }
+        STATUS             current
+        DESCRIPTION
+           "The environment temperature has exceeded critical temperature 
+            threshold zxAnEnvTempCriticalAlmThreshold. 
+            The zxAnEnvTemp object identifies the current temperature."
+       ::= { zxAnEnvMonTempTraps 6 }
+
+    zxAnEnvCriticalTempClr NOTIFICATION-TYPE
+        OBJECTS { zxAnEnvTemp,  zxAnEnvTempCriticalAlmThreshold }
+        STATUS             current
+        DESCRIPTION
+           "The environment temperature has returned to normal operating 
+            temperature from zxAnEnvTempCriticalAlmThreshold. 
+            The zxAnEnvTemp object identifies the current temperature."
+       ::= { zxAnEnvMonTempTraps 7 }
+
+    zxAnEnvLowTempAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnEnvTemp,  zxAnEnvTempLowAlmThreshold }
+        STATUS             current
+        DESCRIPTION
+           "The environment temperature is below low temperature 
+            threshold zxAnEnvTempLowAlmThreshold. 
+            The zxAnEnvTemp object identifies the current temperature."
+       ::= { zxAnEnvMonTempTraps 8 }
+
+    zxAnEnvLowTempClr NOTIFICATION-TYPE
+        OBJECTS { zxAnEnvTemp,  zxAnEnvTempLowAlmThreshold }
+        STATUS             current
+        DESCRIPTION
+           "The environment temperature has returned to normal operating 
+            temperature from zxAnEnvTempLowAlmThreshold. 
+            The zxAnEnvTemp object identifies the current temperature."
+       ::= { zxAnEnvMonTempTraps 9 }
+       
+    zxAnEnvCardShutdownAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnEnvCardShutdownReason,
+                  zxAnCardTemp,
+                  zxAnEnvTemp,
+                  zxAnEnvEmergencyBatteryVoltage,
+                  zxAnEnvEmergencyBatteryThreshold }
+        STATUS             current
+        DESCRIPTION
+            "A zxAnEnvCardShutdownAlm trap is sent when the card has 
+            been shut down because agent has detected that the temperature 
+            is too high or the AC power is failure and the battery voltage 
+            is lower than zxAnEnvEmergencyBatteryThreshold.
+            
+            zxAnEnvCardShutdownReason indicates the real reason.
+            
+            When zxAnEnvCardShutdownReason is envHighTemperature ( 1 ),
+            it means the environment temperature is too high,
+            zxAnEnvTemp is the value of current environment temperature, 
+            zxAnCardTemp is invalid and should be zero.
+            zxAnEnvEmergencyBatteryVoltage and zxAnEnvEmergencyBatteryThreshold 
+            are invalid and should be zero.
+            
+            When zxAnEnvCardShutdownReason is cardHighTemperature ( 2 ),
+            it means the card temperature is too high,
+            zxAnCardTemp is the value of current card temperature, 
+            zxAnEnvTemp is invalid and should be zero.
+            zxAnEnvEmergencyBatteryVoltage and zxAnEnvEmergencyBatteryThreshold 
+            are invalid and should be zero.
+            
+            When zxAnEnvCardShutdownReason is chipHighTemperature ( 3 ),
+            it means the temperature of the chip on the card is too high,
+            zxAnCardTemp and zxAnEnvTemp are invalid and should be zero.
+            zxAnEnvEmergencyBatteryVoltage and zxAnEnvEmergencyBatteryThreshold 
+            are invalid and should be zero.
+            
+            When zxAnEnvCardShutdownReason is emergencyPowerSaving ( 4 ),
+            it means the AC power is failure, the emergency power saving action
+            has been taken, zxAnCardTemp and zxAnEnvTemp are invalid 
+            and should be zero.
+            zxAnEnvEmergencyBatteryVoltage is the value of the current battery 
+            voltage, zxAnEnvEmergencyBatteryThreshold is the threshold of the 
+            battery voltage.
+            "
+       ::= { zxAnEnvMonTempTraps 30 }
+       
+    zxAnEnvCardShutdownClr NOTIFICATION-TYPE
+        OBJECTS { zxAnEnvCardShutdownReason,
+                  zxAnCardTemp,
+                  zxAnEnvTemp,
+                  zxAnEnvEmergencyBatteryVoltage,
+                  zxAnEnvEmergencyBatteryThreshold }
+       STATUS  current
+       DESCRIPTION
+            "A zxAnEnvCardShutdownClr trap is sent when the card 
+            temperature becomes normal,
+            or the environment temperature becomes normal,
+            or the chip temperature becomes normal,
+            or the battery voltage is higher than 
+            zxAnEnvEmergencyBatteryThreshold or AC power becomes normal."
+      ::= { zxAnEnvMonTempTraps 31 }
+      
+    zxAnEnvTemperatureAbnormalAlm  NOTIFICATION-TYPE
+       STATUS  current
+       DESCRIPTION
+           "In temperature control mode, a zxAnEnvTemperatureAbnormalAlm trap 
+           is sent when the environment temperature can't be read."
+      ::= { zxAnEnvMonTempTraps 32 }
+
+    zxAnEnvTemperatureAbnormalClr NOTIFICATION-TYPE
+       STATUS  current
+       DESCRIPTION
+           "A zxAnEnvTemperatureAbnormalClr trap is sent when 
+           the zxAnEnvTemperatureAbnormalAlm is cleared."
+      ::= { zxAnEnvMonTempTraps 33 }
+      
+    zxAnEnvNearCriticalTempAlm   NOTIFICATION-TYPE
+       OBJECTS {
+           zxAnEnvTemp, 
+           zxAnEnvTempCriticalAlmThreshold 
+       }
+       STATUS  current
+       DESCRIPTION
+           "A zxAnEnvNearCriticalTempAlm trap is sent when the environment 
+           temperature is close to the environment critical temperature alarm 
+           threshold."
+      ::= { zxAnEnvMonTempTraps 34 } 
+
+    zxAnEnvNearCriticalTempClr   NOTIFICATION-TYPE
+       OBJECTS {
+           zxAnEnvTemp, 
+           zxAnEnvTempCriticalAlmThreshold 
+       }
+       STATUS  current
+       DESCRIPTION
+           "A zxAnEnvNearCriticalTempClr trap is sent when 
+           the zxAnEnvNearCriticalTempAlm is cleared."
+      ::= { zxAnEnvMonTempTraps 35 } 
+
+    zxAnEnvCardNearCriticalTempAlm   NOTIFICATION-TYPE
+       OBJECTS {
+           zxAnCardTemp, 
+           zxAnCardCriticalTempAlmThreshold 
+       }
+       STATUS  current
+       DESCRIPTION
+           "A zxAnEnvCardNearCriticalTempAlm trap is sent when the card 
+           temperature is close to the card critical temperature alarm 
+           threshold."
+      ::= { zxAnEnvMonTempTraps 36 } 
+
+    zxAnEnvCardNearCriticalTempClr   NOTIFICATION-TYPE
+       OBJECTS {
+           zxAnCardTemp, 
+           zxAnCardCriticalTempAlmThreshold 
+       }
+       STATUS  current
+       DESCRIPTION
+           "A zxAnEnvCardNearCriticalTempClr trap is sent when 
+           the zxAnEnvCardNearCriticalTempAlm is cleared."
+      ::= { zxAnEnvMonTempTraps 37 } 
+                
+    zxAnEnvOptNearCriticalTempAlm   NOTIFICATION-TYPE
+       OBJECTS {
+           zxAnCardOptHighestTemp, 
+           zxAnCardOptCriticalTempAlmThresh,
+           zxAnCardOptHighestTempPortNo
+       }
+       STATUS  current
+       DESCRIPTION
+           "A zxAnEnvOptNearCriticalTempAlm trap is sent when the optical 
+            module temperature is close to the optical module critical 
+            temperature alarm threshold."
+      ::= { zxAnEnvMonTempTraps 38 }
+
+    zxAnEnvOptNearCriticalTempClr   NOTIFICATION-TYPE
+       OBJECTS {
+           zxAnCardOptHighestTemp, 
+           zxAnCardOptCriticalTempAlmThresh,
+           zxAnCardOptHighestTempPortNo
+       }
+       STATUS  current
+       DESCRIPTION
+           "A zxAnEnvOptNearCriticalTempClr trap is sent when 
+           the zxAnEnvOptNearCriticalTempAlm is cleared."
+      ::= { zxAnEnvMonTempTraps 39 } 
+                  
+    zxAnEnvHeatRadiationAbnormalAlm   NOTIFICATION-TYPE
+       OBJECTS {
+           zxAnEnvTemp,
+           zxAnCardTemp, 
+           zxAnCardHeatRadiationAlmThresh
+       }
+       STATUS  current
+       DESCRIPTION
+           "A zxAnEnvHeatRadiationAbnormalAlm trap is sent when the 
+            temperature difference between the card and the environment 
+            exceeds the zxAnCardHeatRadiationAlmThresh."
+      ::= { zxAnEnvMonTempTraps 40 } 
+          
+    zxAnEnvHeatRadiationAbnormalClr   NOTIFICATION-TYPE
+       OBJECTS {
+           zxAnEnvTemp,
+           zxAnCardTemp,
+           zxAnCardHeatRadiationAlmThresh
+       }
+       STATUS  current
+       DESCRIPTION
+           "A zxAnEnvHeatRadiationAbnormalClr trap is sent when 
+           the zxAnEnvHeatRadiationAbnormalAlm is cleared."
+      ::= { zxAnEnvMonTempTraps 41 } 
+      
+---interface link down alarm
+ 
+    zxAnEnvMonitorInterfaceLinkDown NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "It indicates that the agent has detected that the
+             link at the environment monitoring interface has been down."
+       ::= { zxAnEnvMonInterfaceTraps 1 }    
+       
+    zxAnEnvMonitorInterfaceLinkUp NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "It indicates that the agent has detected that the
+             link at the environment monitoring interface has been up."
+       ::= { zxAnEnvMonInterfaceTraps 2 }
+
+--- Power Supply Alarm
+   
+    zxAnEnvPowerSupplyModuleDown NOTIFICATION-TYPE
+       OBJECTS      { zxAnPowerSupplyOperStatus }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the power supply module is down."
+      ::= { zxAnEnvMonPowerSupplyTraps 1 }   
+
+    zxAnEnvPowerSupplyModuleUp NOTIFICATION-TYPE
+       OBJECTS      { zxAnPowerSupplyOperStatus }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the power supply module is up."
+      ::= { zxAnEnvMonPowerSupplyTraps 2 }
+
+    zxAnEnvPowerOverVoltageAlm  NOTIFICATION-TYPE
+       OBJECTS      { zxAnPowerSupplyInVoltage, zxAnPowerInVoltageUpperThresh }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the input voltage of power supply is 
+           over-voltage."
+      ::= { zxAnEnvMonPowerSupplyTraps 3 }   
+
+
+    zxAnEnvPowerOverVoltageClr  NOTIFICATION-TYPE
+       OBJECTS      { zxAnPowerSupplyInVoltage,zxAnPowerInVoltageUpperThresh }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the over-voltage fault is cleared."
+      ::= { zxAnEnvMonPowerSupplyTraps 4 }
+
+
+    zxAnEnvPowerUnderVoltageAlm  NOTIFICATION-TYPE
+       OBJECTS      { zxAnPowerSupplyInVoltage,zxAnPowerInVoltageLowerThresh }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the input voltage of power supply is 
+           under-voltage."
+      ::= { zxAnEnvMonPowerSupplyTraps 5 }  
+
+
+    zxAnEnvPowerUnderVoltageClr   NOTIFICATION-TYPE
+       OBJECTS      { zxAnPowerSupplyInVoltage,zxAnPowerInVoltageLowerThresh }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the under-voltage fault is cleared."
+      ::= { zxAnEnvMonPowerSupplyTraps 6 }   
+      
+    zxAnEnvPowerOff  NOTIFICATION-TYPE
+       OBJECTS      { zxAnPowerSupplyInVoltageStatus }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the  power supply is off."
+      ::= { zxAnEnvMonPowerSupplyTraps 7 }  
+      
+    zxAnEnvPowerOn   NOTIFICATION-TYPE
+       OBJECTS      { zxAnPowerSupplyInVoltageStatus }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the power supply off fault is cleared."
+      ::= { zxAnEnvMonPowerSupplyTraps 8 }
+      
+    zxAnEnvEmergencyPowerSaveAlm   NOTIFICATION-TYPE
+       STATUS  current
+       DESCRIPTION
+           "The current power supply switches to storage battery, 
+           the emergency power saving action has been taken."
+      ::= { zxAnEnvMonPowerSupplyTraps 9 }
+
+    zxAnEnvEmergencyPowerSaveClr   NOTIFICATION-TYPE
+       STATUS  current
+       DESCRIPTION
+           "The current power supply switches to normal AC power."
+      ::= { zxAnEnvMonPowerSupplyTraps 10 }
+    
+    zxAnEnvACPowerDownAlm NOTIFICATION-TYPE
+       STATUS             current
+       DESCRIPTION
+           "A zxAnEnvACPowerDownAlm trap is sent when the agent detects no AC
+           power input."
+       ::= { zxAnEnvMonPowerSupplyTraps 11 } 
+    
+    zxAnEnvACPowerDownClr NOTIFICATION-TYPE
+       STATUS             current
+       DESCRIPTION
+           "A zxAnEnvACPowerDownClr trap is sent when the agent detects AC
+           power input."
+       ::= { zxAnEnvMonPowerSupplyTraps 12 } 
+    
+    zxAnEnvNoBatteryAlm  NOTIFICATION-TYPE
+       STATUS             current
+       DESCRIPTION
+           "A zxAnEnvNoBatteryAlm trap is sent when no battery found by
+           the agent."
+       ::= { zxAnEnvMonPowerSupplyTraps 13 }
+    
+    zxAnEnvNoBatteryClr  NOTIFICATION-TYPE
+       STATUS             current
+       DESCRIPTION
+           "A zxAnEnvNoBatteryClr trap is sent when the battery has been found
+           by the agent."
+       ::= { zxAnEnvMonPowerSupplyTraps 14 }
+ 
+    zxAnEnvBatteryUnderVoltageAlm  NOTIFICATION-TYPE
+       STATUS             current
+       DESCRIPTION
+           "A zxAnEnvBatteryUnderVoltageAlm trap is sent when the battery 
+           voltage is under-voltage."
+       ::= { zxAnEnvMonPowerSupplyTraps 15 }
+    
+    zxAnEnvBatteryUnderVoltageClr  NOTIFICATION-TYPE
+       STATUS             current
+       DESCRIPTION
+           "A zxAnEnvBatteryUnderVoltageClr trap is sent when the battery 
+           voltage becomes normal."
+       ::= { zxAnEnvMonPowerSupplyTraps 16 }
+ 
+    
+--- Fan Alarm
+
+   zxAnEnvFanLinkDown NOTIFICATION-TYPE
+       OBJECTS { zxAnEnvFanOnlineStatus }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the agent has detected that fan is offline."
+      ::= { zxAnEnvMonFanTraps 1 }
+    
+   zxAnEnvFanLinkUp NOTIFICATION-TYPE
+       OBJECTS { zxAnEnvFanOnlineStatus }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the agent has detected that fan is online."
+      ::= { zxAnEnvMonFanTraps 2 }
+      
+          
+    zxAnEnvFanTrayLinkDown NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "It indicates that the agent has detected that the
+             link at the fan card interface has been down."
+       ::= { zxAnEnvMonFanTraps 3 }
+    
+       
+    zxAnEnvFanTrayLinkUp NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "It indicates that the agent has detected that the
+             link at the fan card interface has been up."
+       ::= { zxAnEnvMonFanTraps 4 }  
+    
+    zxAnEnvFanFailureAlm NOTIFICATION-TYPE
+       OBJECTS { zxAnEnvFanOperStatus }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the fan is in fault."
+      ::= { zxAnEnvMonFanTraps 5 }                            
+
+    zxAnEnvFanFailureClr NOTIFICATION-TYPE
+       OBJECTS { zxAnEnvFanOperStatus }
+       STATUS  current
+       DESCRIPTION
+           "It indicates that the fan's fault is cleared."
+      ::= { zxAnEnvMonFanTraps 6 }           
+
+    zxAnEnvDeviceAbnormalAlm NOTIFICATION-TYPE
+        OBJECTS {
+            zxAnEnvDevMonSwitchDeviceId,
+            zxAnEnvDevMonSwitchNormalStatus,
+            zxAnEnvDevMonSwitchCurrStatus,
+            zxAnEnvDeviceName
+        }   
+        STATUS      current
+        DESCRIPTION
+           "A zxAnEnvDeviceAbnormalAlm trap is sent when the current status 
+           of environment device is inconsistent with normal status."
+        ::= { zxAnEnvDeviceTraps 1 }
+
+    zxAnEnvDeviceAbnormalClr NOTIFICATION-TYPE
+        OBJECTS {
+            zxAnEnvDevMonSwitchDeviceId,
+            zxAnEnvDevMonSwitchNormalStatus,
+            zxAnEnvDevMonSwitchCurrStatus,
+            zxAnEnvDeviceName
+        }    
+        STATUS      current
+        DESCRIPTION
+           "A zxAnEnvDeviceAbnormalClr trap is sent when current status 
+           of environment device is consistent with normal status."
+        ::= { zxAnEnvDeviceTraps 2 }
+-------------------------------------------------------------------------------
+-- 31. zxAnEnvMonConformance
+-------------------------------------------------------------------------------
+    zxAnEnvMonConformance  OBJECT IDENTIFIER   ::=  { zxAnEnvMonMib         4 }
+                           
+    zxAnEnvMonCompliances  OBJECT IDENTIFIER   ::=  { zxAnEnvMonConformance 1 } 
+    zxAnEnvMonGroups       OBJECT IDENTIFIER   ::=  { zxAnEnvMonConformance 2 }
+
+    zxAnEnvMonCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for SNMP entities which implement the
+            ZTE-AN-ENVMON-MIB."
+        MODULE -- this module
+        
+            MANDATORY-GROUPS { 
+                  zxAnEnvMonCapabilitiesGroup, 
+                  zxAnEnvTempGroup,
+                  zxAnEnvCardTempGroup,
+                  zxAnEnvInterfaceGroup,
+                  zxAnEnvPowerSupplyGroup,
+                  zxAnEnvFanTrayTableGroup,
+                  zxAnEnvFanTableGroup,  
+                  zxAnEnvMonNotificationsGroup
+                }
+        ::= { zxAnEnvMonCompliances 1 }
+
+    zxAnEnvMonCapabilitiesGroup OBJECT-GROUP
+        OBJECTS { zxAnEnvMonCapabilities
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent environment
+            management capabilities of this equipment. The bit value 1 means
+            the function represented by this bit is supported by this 
+            equipment."
+        ::= { zxAnEnvMonGroups 1 }   
+        
+    zxAnEnvTempGroup OBJECT-GROUP
+        OBJECTS { zxAnEnvTemp, 
+                  zxAnEnvTempHighAlmThreshold,
+                  zxAnEnvTempCriticalAlmThreshold,
+                  zxAnEnvTempLowAlmThreshold
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent the 
+            temperature information of this equipment/card and to set the
+            temperature alarm threshold of the environment/card."
+        ::= { zxAnEnvMonGroups 2 }
+        
+    zxAnEnvCardTempGroup OBJECT-GROUP
+        OBJECTS { zxAnCardTemp,
+                  zxAnCardEnvHis15MinTemp,
+                  zxAnCardEnvHis1DayTemp,
+                  zxAnCardEnvRiseAlmThresh,
+                  zxAnCardEnvClrRiseAlmThresh,
+                  zxAnCardEnvRiseWarnThresh,
+                  zxAnCardEnvClrRiseWarnThresh,
+                  zxAnCardEnvFallWarnThresh,
+                  zxAnCardEnvClrFallWarnThresh,
+                  zxAnCardEnvFallAlmThresh,
+                  zxAnCardEnvClrFallAlmThresh,
+                  zxAnCardEnvAlmPrfConfRowStatus,
+                  zxAnCardEnvAlmPrf,
+                  zxAnCardEnvAlmPrfApplyRowStatus,
+                  zxAnCardEnvAlmPrfRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "The collection of objects which are used to represent temperature
+            performance of the card environment."
+        ::= { zxAnEnvMonGroups 3 }
+                
+    zxAnEnvInterfaceGroup OBJECT-GROUP
+        OBJECTS { zxAnEnvMonInterfaceUsage,
+                  zxAnEnvEpmConnectPort,
+                  zxAnEnvBackplaneInterfaceUsage
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent the 
+            interface connection of the equipment."
+        ::= { zxAnEnvMonGroups 4 } 
+
+    zxAnEnvPowerSupplyGroup OBJECT-GROUP
+        OBJECTS { zxAnPowerSupplyMaxPowerNum, 
+                  zxAnPowerSupplyOperStatus,
+                  zxAnPowerSupplyInVoltage,
+                  zxAnPowerSupplyInVoltageStatus, 
+                  zxAnPowerInVoltageUpperThresh, 
+                  zxAnPowerInVoltageLowerThresh,
+                  zxAnPowerSupplyInCurrent, 
+                  zxAnPowerInCurrentThresh
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to provide power
+            management functions, include power count and the voltage status
+            of the power supply."
+        ::= { zxAnEnvMonGroups 5 } 
+        
+    zxAnEnvFanTrayTableGroup OBJECT-GROUP
+        OBJECTS { zxAnFanTrayAlarmBeepEnable, 
+                  zxAnFanTrayAutoSwitchByCardUp, 
+                  zxAnFanTrayHardwareVersion,
+                  zxAnFanTraySoftwareVersion,
+                  zxAnFanTraySpeedCtrlMode,
+                  zxAnFanTrayLowSpeed,
+                  zxAnFanTrayStdSpeed, 
+                  zxAnFanTrayHighSpeed, 
+                  zxAnFanTraySuperSpeed, 
+                  zxAnFanTrayLowSpeedShiftTemp, 
+                  zxAnFanTrayStdSpeedShiftTemp,
+                  zxAnFanTrayHighSpeedShiftTemp, 
+                  zxAnFanTraySuperSpeedShiftTemp,                  
+                  zxAnFanTrayLowSpeedPercent,
+                  zxAnFanTrayStdSpeedPercent, 
+                  zxAnFanTrayHighSpeedPercent,
+                  zxAnFanTraySuperSpeedPercent,
+                  zxAnFanTraySn
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to provide fan management
+            functions, include setting the speed control mode and the
+            percentage of speed of the different speed level of the fan."
+        ::= { zxAnEnvMonGroups 6 }
+        
+    zxAnEnvFanTableGroup OBJECT-GROUP
+        OBJECTS { zxAnEnvFanConfSpeedLevel, 
+                  zxAnEnvFanActualSpeedLevel, 
+                  zxAnEnvFanAdminStatus, 
+                  zxAnEnvFanOperStatus, 
+                  zxAnEnvFanOnlineStatus, 
+                  zxAnEnvFanActualSpeed             
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to provide the speed
+            information and operational status of the fan."            
+        ::= { zxAnEnvMonGroups 7 }
+    
+    zxAnEnvMonNotificationsGroup  OBJECT-GROUP
+        OBJECTS { zxAnEnvHighTempAlm,
+                  zxAnEnvHighTempClr,
+                  zxAnEnvMonitorInterfaceLinkDown,
+                  zxAnEnvMonitorInterfaceLinkUp,
+                  zxAnEnvFanLinkDown,
+                  zxAnEnvFanLinkUp,
+                  zxAnEnvTempSensorFailure,
+                  zxAnEnvFanFailureAlm,
+                  zxAnEnvFanFailureClr,                  
+                  zxAnEnvPowerSupplyModuleDown,
+                  zxAnEnvPowerSupplyModuleUp,                  
+                  zxAnEnvFanTrayLinkDown,
+                  zxAnEnvFanTrayLinkUp,
+                  zxAnEnvPowerOverVoltageAlm,
+                  zxAnEnvPowerOverVoltageClr,
+                  zxAnEnvPowerUnderVoltageAlm,
+                  zxAnEnvPowerUnderVoltageClr,
+                  zxAnEnvPowerOff,
+                  zxAnEnvPowerOn,                   
+                  zxAnEnvACPowerDownAlm,    
+                  zxAnEnvACPowerDownClr,     
+                  zxAnEnvNoBatteryAlm,
+                  zxAnEnvNoBatteryClr,
+                  zxAnEnvBatteryUnderVoltageAlm,
+                  zxAnEnvBatteryUnderVoltageClr,
+                  zxAnEnvCardShutdownAlm,
+                  zxAnEnvCardShutdownClr,
+                  zxAnEnvCriticalTempAlm,
+                  zxAnEnvCriticalTempClr,
+                  zxAnEnvLowTempAlm,
+                  zxAnEnvLowTempClr,
+                  zxAnEnvOptNearCriticalTempAlm,
+                  zxAnEnvOptNearCriticalTempClr,
+                  zxAnEnvHeatRadiationAbnormalAlm,
+                  zxAnEnvHeatRadiationAbnormalClr
+        }
+        STATUS current
+        DESCRIPTION 
+            "The notifications which indicate specific changes, include
+            temperature,  fan status, power status and gpon card status."
+        ::= { zxAnEnvMonGroups 8 } 
+        
+END

@@ -1,0 +1,781 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64",
+                    "sysContact": "<private>",
+                    "version": "3.10.0-693.5.2.el7.x86_64",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "systemd",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "systemd",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "active_activating",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "active_active",
+                    "value": 160,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "active_deactivating",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "active_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "active_inactive",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "active_maintenance",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "active_reloading",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "active_total",
+                    "value": 160,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "load_bad-setting",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "load_error",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "load_loaded",
+                    "value": 160,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "load_masked",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "load_merged",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "load_not-found",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "load_stub",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "load_total",
+                    "value": 160,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_automount_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_automount_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_automount_running",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_automount_total",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_automount_waiting",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_device_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_device_plugged",
+                    "value": 24,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_device_tentative",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_device_total",
+                    "value": 24,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_freezer_freezing",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_freezer_freezing-by-parent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_freezer_frozen",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_freezer_frozen-by-parent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_freezer_running",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_freezer_thawing",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_freezer_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_cleaning",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_mounted",
+                    "value": 19,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_mounting",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_mounting-done",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_remounting",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_remounting-sigkill",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_remounting-sigterm",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_total",
+                    "value": 19,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_unmounting",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_unmounting-sigkill",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_mount_unmounting-sigterm",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_path_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_path_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_path_running",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_path_total",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_path_waiting",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_scope_abandoned",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_scope_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_scope_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_scope_running",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_scope_start-chown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_scope_stop-sigkill",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_scope_stop-sigterm",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_scope_total",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_auto-restart",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_auto-restart-queued",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_cleaning",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_condition",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_dead-before-auto-restart",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_dead-resources-pinned",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_exited",
+                    "value": 21,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_failed-before-auto-restart",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_final-sigkill",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_final-sigterm",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_final-watchdog",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_reload",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_reload-notify",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_reload-signal",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_running",
+                    "value": 35,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_start",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_start-post",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_start-pre",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_stop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_stop-post",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_stop-sigkill",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_stop-sigterm",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_stop-watchdog",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_total",
+                    "value": 56,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_slice_active",
+                    "value": 11,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_slice_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_slice_total",
+                    "value": 11,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_cleaning",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_final-sigkill",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_final-sigterm",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_listening",
+                    "value": 7,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_running",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_start-chown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_start-post",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_start-pre",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_stop-post",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_stop-pre",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_stop-pre-sigkill",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_stop-pre-sigterm",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_socket_total",
+                    "value": 13,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_swap_activating",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_swap_activating-done",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_swap_active",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_swap_cleaning",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_swap_deactivating",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_swap_deactivating-sigkill",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_swap_deactivating-sigterm",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_swap_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_swap_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_swap_total",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_target_active",
+                    "value": 25,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_target_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_target_total",
+                    "value": 25,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_timer_dead",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_timer_elapsed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_timer_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_timer_running",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_timer_total",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_timer_waiting",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                }
+            ]
+        }
+    }
+}

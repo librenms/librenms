@@ -1,0 +1,3 @@
+modules:
+    os:
+        sysDescr_regex: '/ radio;(?<hardware>.*) v(?<version>[0-9.]*);.*;SN: (?<serial>[0-9]+);/'

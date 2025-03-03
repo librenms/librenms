@@ -12,17 +12,25 @@
  * the source code distribution for details.
  */
 
-$init_modules = array('web', 'auth', 'alerts');
-require realpath(__DIR__ . '/..') . '/includes/init.php';
+use LibreNMS\Util\Debug;
 
-if (!$_SESSION['authenticated']) {
-    echo "Unauthenticated\n";
-    exit;
+session_start();
+session_write_close();
+if (isset($_SESSION['stage']) && $_SESSION['stage'] == 2) {
+    $init_modules = ['web', 'nodb'];
+    require realpath(__DIR__ . '/..') . '/includes/init.php';
+} else {
+    $init_modules = ['web', 'auth', 'alerts'];
+    require realpath(__DIR__ . '/..') . '/includes/init.php';
+
+    if (! Auth::check()) {
+        exit('Unauthorized');
+    }
 }
 
-set_debug($_REQUEST['debug']);
-$id = mres($_REQUEST['id']);
+Debug::set($_REQUEST['debug']);
+$id = basename($_REQUEST['id']);
 
-if (isset($id)) {
-    require $config['install_dir'] . "/html/includes/output/$id.inc.php";
+if ($id && is_file(\LibreNMS\Config::get('install_dir') . "/includes/html/output/$id.inc.php")) {
+    require \LibreNMS\Config::get('install_dir') . "/includes/html/output/$id.inc.php";
 }

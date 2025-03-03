@@ -1,0 +1,67 @@
+-- *****************************************************************
+-- CISCOWAN-SMI.my:  Cisco Enterprise Structure of Management Information
+--                   for WAN Products(MGX Series)
+--
+-- May 2002, Subra.Hegde
+-- Copyright (c) 1999-2000, 2002 by Cisco Systems,Inc.
+-- 
+-- *****************************************************************
+
+CISCOWAN-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+-- The appropriate name for MODULE-IDENTITY should have been "ciscoWAN".
+-- However,if we use "ciscoWAN", mib compilers complain about multiple names 
+-- using same OID value and some applications used for testing might fail 
+-- loading MIBs. 
+-- Using "stratacom" to make sure this MIB and MIBs dependent on this
+-- can be compiled and tested.
+
+stratacom MODULE-IDENTITY
+	LAST-UPDATED	"200205240000Z"
+	ORGANIZATION	"Cisco Systems, Inc."
+	CONTACT-INFO
+		"       Cisco Systems
+			Customer Service
+
+		Postal: 170 W Tasman Drive
+			San Jose, CA  95134
+			USA
+
+		   Tel: +1 800 553-NETS
+
+		E-mail: cs-wanatm@cisco.com"
+
+	DESCRIPTION
+		"The Structure of Management Information for the
+		 stratacom enterprise."
+        REVISION      "200205240000Z"
+        DESCRIPTION
+            "Using the 4 digit Year value in LAST-UPDATED and
+             REVISION Clause. Modified description of 'ciscoWan'."
+        REVISION      "200001240000Z"
+        DESCRIPTION
+                "Added ciscoWanAgentCapability Object Identifier
+	         assignment."
+	::={ enterprises 351 }  -- assigned by IANA
+				-- it is for stratacom enterprise
+
+ciscoWan OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "ciscoWan is the main subtree for mibs under 'stratacom'
+        enterprise. This is used by MGX product series."
+    ::= { stratacom 150 }
+
+ciscoWanAgentCapability OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "ciscoWanAgentCapability provides a root object identifier
+        from which AGENT-CAPABILITIES values may be assigned."
+    ::= { stratacom 160 }
+END

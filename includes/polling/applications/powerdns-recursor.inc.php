@@ -16,36 +16,28 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
-global $config;
 $data = '';
 $name = 'powerdns-recursor';
-$app_id = $app['app_id'];
 
-echo ' ' . $name;
-
-if ($agent_data['app'][$name]) {
+if (! empty($agent_data['app'][$name])) {
     $data = $agent_data['app'][$name];
-} elseif (isset($config['apps'][$name]['api-key'])) {
-    if (isset($config['apps'][$name]['port']) && is_numeric($config['apps'][$name]['port'])) {
-        $port = $config['apps'][$name]['port'];
-    } else {
-        $port = '8082';
-    }
-
-    $scheme = (isset($config['apps'][$name]['https']) && $config['apps'][$name]['https']) ? 'https://' : 'http://';
+} elseif (Config::has('apps.powerdns-recursor.api-key')) {
+    $port = Config::get('apps.powerdns-recursor.port', 8082);
+    $scheme = Config::get('apps.powerdns-recursor.https') ? 'https://' : 'http://';
 
     d_echo("\nNo Agent Data. Attempting to connect directly to the powerdns-recursor server $scheme" . $device['hostname'] . ":$port\n");
-    $context = stream_context_create(array('http' => array('header' => 'X-API-Key: ' . $config['apps'][$name]['api-key'])));
+    $context = stream_context_create(['http' => ['header' => 'X-API-Key: ' . Config::get('apps.powerdns-recursor.api-key')]]);
     $data = file_get_contents($scheme . $device['hostname'] . ':' . $port . '/api/v1/servers/localhost/statistics', false, $context);
     if ($data === false) {
         $data = file_get_contents($scheme . $device['hostname'] . ':' . $port . '/servers/localhost/statistics', false, $context);
@@ -53,12 +45,11 @@ if ($agent_data['app'][$name]) {
 } else {
     // nsExtendOutputFull."powerdns-recursor"
     $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.17.112.111.119.101.114.100.110.115.45.114.101.99.117.114.115.111.114';
-    $data = snmp_get($device, $oid, '-Oqv');
+    $data = stripslashes(snmp_get($device, $oid, '-Oqv'));
 }
 
-if (!empty($data)) {
-    update_application($app, $data);
-    $ds_list = array(
+if (! empty($data)) {
+    $ds_list = [
         'all-outqueries' => 'DERIVE',
         'answers-slow' => 'DERIVE',
         'answers0-1' => 'DERIVE',
@@ -117,18 +108,19 @@ if (!empty($data)) {
         'unreachables' => 'DERIVE',
         'uptime' => 'DERIVE',
         'user-msec' => 'DERIVE',
-    );
+    ];
 
     //decode and flatten the data
-    $stats = array();
-    foreach (json_decode($data, true) as $stat) {
+    $stats = [];
+    [$json_data] = explode("\n", $data, 2);
+    foreach (json_decode($json_data, true) as $stat) {
         $stats[$stat['name']] = $stat['value'];
     }
     d_echo($stats);
 
     // only the stats we store in rrd
     $rrd_def = new RrdDefinition();
-    $fields = array();
+    $fields = [];
     foreach ($ds_list as $key => $type) {
         $rrd_def->addDataset($key, $type, 0);
 
@@ -139,9 +131,14 @@ if (!empty($data)) {
         }
     }
 
-    $rrd_name = array('app', 'powerdns', 'recursor', $app_id);
-    $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+    $tags = [
+        'name' => $name,
+        'app_id' => $app->app_id,
+        'rrd_name' => ['app', 'powerdns', 'recursor', $app->app_id],
+        'rrd_def' => $rrd_def,
+    ];
     data_update($device, 'app', $tags, $fields);
+    update_application($app, $data, $fields);
 }
 
-unset($data, $stats, $rrd_def, $rrd_name, $rrd_keys, $tags, $fields);
+unset($data, $stats, $rrd_def, $rrd_keys, $tags, $fields);

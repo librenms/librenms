@@ -1,0 +1,1912 @@
+-- =================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+-- Reference:
+-- Version: V1.7
+-- History:
+-- V1.0 created by liujingya.
+--     Initial version of the MIB
+-- V1.1 2008-1-29 Adjusted the structure of some tables and the value of
+--     some objects by liujingya.
+-- V1.2 2008-5-19 Added hh3cEOCComUniAdminStatus, hh3cEOCComCnuSoftwareVersion,
+--     modified description of hh3cEOCComUniUpLineRate and
+--     hh3cEOCComUniDownLineRate by liujingya.
+-- V1.3 2008-7-30 updated by xujun
+--     add hh3cEOCComCnuRateDropThr, hh3cEOCComCnuTxRate, hh3cEOCComCnuRxRate,
+--     hh3cEOCComCnuTxRateDrop, hh3cEOCComCnuRxRateDrop, hh3cEOCCnuTxRateDropTrap,
+--     hh3cEOCCnuTxRateDropRecoverTrap, hh3cEOCCnuRxRateDropTrap and
+--     hh3cEOCCnuRxRateDropRecoverTrap by xujun
+-- V1.4 2009-2-13 Added hh3cEOCCnuFWDownLoadErrTrap,
+--     hh3cEOCCnuFWDownLoadErrReTrap, hh3cEOCCnuDeviceTypeErrTrap,
+--     hh3cEOCCnuDeviceTypeErrReTrap, hh3cEOCCnuAutoUpdateErrTrap,
+--     hh3cEOCCnuAutoUpdateSuccTrap and
+--     modified MAX-ACCESS of hh3cEOCComCnuDeviceType by liujingya.
+-- V1.5 2010-1-7 Added hh3cEocComCnuTypeIdx, hh3cEOCComCnuDescripton,
+--     hh3cEOCComCltMaxAllowToAccess, hh3cEocComCnuNumber by xujun
+-- V1.6 2011-12-28 updated by gaoguangping
+--     Added hh3cEOCLoopbackDetectTrap, hh3cEOCLoopbackRecoverTrap;
+--     Modified hh3cEOCComCnuLinkState.
+-- V1.7 2013-08-20 Added hh3cEOCComCnuTempIndex by xujun
+-- =================================================================
+HH3C-EOC-COMMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        ifIndex, ifDescr
+    FROM IF-MIB
+        Integer32, Unsigned32, TimeTicks, OBJECT-TYPE, MODULE-IDENTITY,
+        NOTIFICATION-TYPE, Gauge32
+    FROM SNMPv2-SMI
+        IANAifType
+    FROM IANAifType-MIB
+        MacAddress, RowStatus, DisplayString, TruthValue
+    FROM SNMPv2-TC
+        hh3cHPEOCDownLoadCNUFWResult
+    FROM HH3C-HPEOC-MIB;
+
+
+hh3cEOCCommon MODULE-IDENTITY
+    LAST-UPDATED "200709111008Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "SMB EOC Team New H3C Technologies Co., Ltd.
+        Shang-Di Information Industry Base,
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:310053."
+    DESCRIPTION
+        "
+        The objects in this MIB module are used to manage and
+        display common configuration between Ethernet Passive
+        Optical Network (EOC) port which are based on the Ethernet
+        in the First Mile (EFM) Passive Optical Network(PON) as
+        defined in IEEE Draft P802.3ah/D3.0 clause 60, 64, 65..
+        and Ethernet Over Cable (EOC) which is based on HomePlug
+        AV Specification.
+        "
+    ::= { hh3cCommon 83 }
+
+--
+-- hh3cEOCCommonSysMan
+--
+hh3cEOCCommonSysMan OBJECT IDENTIFIER ::= { hh3cEOCCommon 1 }
+
+hh3cEOCCommonSysScalarObjects OBJECT IDENTIFIER ::= { hh3cEOCCommonSysMan 1 }
+
+hh3cEOCCommonSysVersion OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        Eoc version.  If the object length is
+        zero, it means the version is unknown.
+        The length is up to 1024.
+        "
+    ::= { hh3cEOCCommonSysScalarObjects 1 }
+
+hh3cEOCCommonUpLinkMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        EOC CLT's uplink device's mac address.
+        "
+    ::= { hh3cEOCCommonSysScalarObjects 2 }
+
+
+--
+-- hh3cEOCCommonCltMan
+--
+hh3cEOCCommonCltMan OBJECT IDENTIFIER ::= { hh3cEOCCommon 2 }
+
+--
+-- hh3cEOCCommonCltManTable
+--
+hh3cEOCCommonCltManTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cEOCCommonCltManEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        This table defines the primary parameters of the
+        CLT configuration.
+        "
+    ::= { hh3cEOCCommonCltMan 1 }
+
+hh3cEOCCommonCltManEntry OBJECT-TYPE
+    SYNTAX     Hh3cEOCCommonCltManEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        The entry of the table hh3cEOCCommonCltManTable.
+        "
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cEOCCommonCltManTable 1 }
+
+Hh3cEOCCommonCltManEntry ::= SEQUENCE
+    {
+        hh3cEOCCommonCltAutoAuthorize    TruthValue,
+        hh3cEOCCommonCltMaxAllowToAccess Integer32
+    }
+
+hh3cEOCCommonCltAutoAuthorize OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        This value determines whether software performs
+        self-authorization for each Cable Network Unit(CNU)
+        registering to the network.  Setting it to false
+        means for every CNU registering, software requires
+        external authorization, and until it's done the
+        CNU is not authenticated.  True value means software
+        authorizes each CNU registering to the network
+        automatically.
+        "
+    DEFVAL
+        {
+            false
+        }
+    ::= { hh3cEOCCommonCltManEntry 1 }
+
+hh3cEOCCommonCltMaxAllowToAccess OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "
+         This value determines how many CNU can be bound
+         in this CLT. If the number of CNU is more than this
+         value , then the rest of CNU should not be allow to
+         access.
+         "
+    DEFVAL
+        {
+            253
+        }
+    ::= { hh3cEOCCommonCltManEntry 2 }
+
+--
+-- hh3cEOCComCnuMan
+--
+
+hh3cEOCComCnuMan OBJECT IDENTIFIER ::= { hh3cEOCCommon 3 }
+
+hh3cEOCComCnuScalarObjects OBJECT IDENTIFIER ::= { hh3cEOCComCnuMan 1 }
+
+hh3cEOCComCnuMaxDownBWMinVal OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The lower limit of total-bandwidth which is confined to
+        hh3cEOCComCnuMaxDownBW."
+    ::= { hh3cEOCComCnuScalarObjects 1 }
+
+hh3cEOCComCnuMaxDownBWMaxVal OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The upper limit of total-bandwidth which is confined to
+        hh3cEOCComCnuMaxDownBW."
+    ::= { hh3cEOCComCnuScalarObjects 2 }
+
+hh3cEOCComCnuSlaHighPriBWMinVal OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The lower limit of high priority bandwidth which is confined to
+        hh3cEOCComCnuSlaHighPriBW."
+    ::= { hh3cEOCComCnuScalarObjects 3 }
+
+hh3cEOCComCnuSlaHighPriBWMaxVal OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The upper limit of high priority bandwidth which is confined to
+        hh3cEOCComCnuSlaHighPriBW."
+    ::= { hh3cEOCComCnuScalarObjects 4 }
+
+hh3cEOCComCnuMaxUpBWMinVal OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The lower limit of total-bandwidth which is confined to
+        hh3cEOCComCnuMaxUpBW."
+    ::= { hh3cEOCComCnuScalarObjects 5 }
+
+hh3cEOCComCnuMaxUpBWMaxVal OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The upper limit of total-bandwidth which is confined to
+        hh3cEOCComCnuMaxUpBW."
+    ::= { hh3cEOCComCnuScalarObjects 6 }
+
+hh3cEOCComCnuAttenThrA OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        The value of cnu's average attenuation good level thresholds.
+        "
+    ::= { hh3cEOCComCnuScalarObjects 7 }
+
+hh3cEOCComCnuAttenThrB OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        The value of cnu's average attenuation normal level thresholds.
+        "
+    ::= { hh3cEOCComCnuScalarObjects 8 }
+
+hh3cEOCComCnuRateDropThr OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        The value of cnu's Tx/Rx rate drop thresholds.
+        "
+    ::= { hh3cEOCComCnuScalarObjects 9 }
+
+--
+-- hh3cEOCComCnuSysManTable
+--
+
+hh3cEOCComCnuSysManTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cEOCComCnuSysManEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        This table implements the management of CNUs(Coax Network Unit).
+        "
+    ::= { hh3cEOCComCnuMan 2 }
+
+hh3cEOCComCnuSysManEntry OBJECT-TYPE
+    SYNTAX     Hh3cEOCComCnuSysManEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        The entry of the table hh3cEOCComCnuSysManTable.
+        "
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cEOCComCnuSysManTable 1 }
+
+Hh3cEOCComCnuSysManEntry ::= SEQUENCE
+    {
+        hh3cEOCComCnuCableIfindex    Integer32,
+        hh3cEOCComCnuDeviceType      DisplayString,
+        hh3cEOCComCnuDeviceAlias     DisplayString,
+        hh3cEOCComCnuDescr           DisplayString,
+        hh3cEOCComCnuUpTime          TimeTicks,
+        hh3cEOCComCnuVLANType        INTEGER,
+        hh3cEOCComCnuPvid            Integer32,
+        hh3cEOCComCnuVlanTag         INTEGER,
+        hh3cEOCComCnuReset           INTEGER,
+        hh3cEOCComCnuDeregister      INTEGER,
+        hh3cEOCComCnuSave            INTEGER,
+        hh3cEOCComCnuAccess          INTEGER
+    }
+
+hh3cEOCComCnuCableIfindex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The index of cable port which uniquely identifies the cable
+        port of one device.
+        "
+    ::= { hh3cEOCComCnuSysManEntry 1 }
+
+hh3cEOCComCnuDeviceType OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        The type of the EOC CNU(Coax Network Unit).
+        "
+    ::= { hh3cEOCComCnuSysManEntry 2 }
+
+hh3cEOCComCnuDeviceAlias OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        EOC CNU's alias which display as the device's name,
+        it's recommended to set it uniquely and understandably.
+        "
+    ::= { hh3cEOCComCnuSysManEntry 3 }
+
+hh3cEOCComCnuDescr OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        User's description, including user's address,
+        name, telephone number and so on.
+        "
+    ::= { hh3cEOCComCnuSysManEntry 4 }
+
+hh3cEOCComCnuUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The time since the CNU last registered to the network.
+        "
+    ::= { hh3cEOCComCnuSysManEntry 5 }
+
+hh3cEOCComCnuVLANType OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            vLANTrunk(1),
+            access(2),
+            hybrid(3),
+            fabric(4)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "port vlan types.
+        hybrid (3) port can carry multiple VLANs.
+        If fabric function is supported, fabric(4) means the port is
+        a fabric port."
+    ::= { hh3cEOCComCnuSysManEntry 6 }
+
+hh3cEOCComCnuPvid OBJECT-TYPE
+    SYNTAX     Integer32 (1..4094)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        The PVID, the VLAN ID assigned to untagged frames or
+        Priority-Tagged frames received on cable interface.
+        "
+    REFERENCE
+        "
+        IEEE 802.1Q/D11 Section 12.10.1.1
+        "
+    DEFVAL
+        {
+            1
+        }
+    ::= { hh3cEOCComCnuSysManEntry 7 }
+
+hh3cEOCComCnuVlanTag OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            tagged(1),
+            untagged(2)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        VLAN is set tagged or untagged on cable interface.
+        "
+    ::= { hh3cEOCComCnuSysManEntry 8 }
+
+hh3cEOCComCnuReset OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            running(1),
+            reset(2)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        This variable is used to reset the CNU device. The
+        interface may be unavailable while the reset occurs and
+        data may be lost. During reading operation it returns
+        the state of the CNU device. running(1) indicates and
+        operates normal operation, reset(2) indicates and
+        operates reset mode. Writing can be done all the time.
+        "
+    ::= { hh3cEOCComCnuSysManEntry 9 }
+
+hh3cEOCComCnuDeregister OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            deregister(1)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        deregister CNU.
+        "
+    ::= { hh3cEOCComCnuSysManEntry 10 }
+
+hh3cEOCComCnuSave OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            save(1),
+            running(2)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        Save the UNI and CNU related configurations to
+        the CNU.
+        "
+    ::= { hh3cEOCComCnuSysManEntry 11 }
+
+hh3cEOCComCnuAccess OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            access(1),
+            notaccess(2)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        Control whether the user can access to the network.
+        "
+    ::= { hh3cEOCComCnuSysManEntry 12 }
+
+--
+-- hh3cEOCComCnuMacTable
+--
+
+hh3cEOCComCnuMacTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cEOCComCnuMacEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        This table implements the management of CNUs.
+        "
+    ::= { hh3cEOCComCnuMan 3 }
+
+hh3cEOCComCnuMacEntry OBJECT-TYPE
+    SYNTAX     Hh3cEOCComCnuMacEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        The entry of the table hh3cEOCComCnuMacTable.
+        "
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cEOCComCnuMacTable 1 }
+
+Hh3cEOCComCnuMacEntry ::= SEQUENCE
+    {
+        hh3cEOCComCnuMacAddress    MacAddress,
+        hh3cEOCComCnuRowStatus     RowStatus,
+        hh3cEOCComCnuTempIndex     Integer32
+    }
+
+hh3cEOCComCnuMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "
+        EOC CNU's MAC address.
+        "
+    ::= { hh3cEOCComCnuMacEntry 1 }
+
+hh3cEOCComCnuRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "
+        Operation status.
+        "
+    ::= { hh3cEOCComCnuMacEntry 2 }
+    
+hh3cEOCComCnuTempIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        EOC CNU's model index from hh3cHPEOCTemplateIndex,
+        If configure 0, the CNU select no model.
+        "
+    ::= { hh3cEOCComCnuMacEntry 3 }
+    
+--
+-- hh3cEOCComCnuInfoTable
+--
+
+hh3cEOCComCnuInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cEOCComCnuInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        Primary status of the specified CNU.
+        There will be one row in this table for each
+        information in the system.
+        "
+    ::= { hh3cEOCComCnuMan 4 }
+
+hh3cEOCComCnuInfoEntry OBJECT-TYPE
+    SYNTAX     Hh3cEOCComCnuInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        The entry of the hh3cEOCComCnuInfoTable.
+        "
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cEOCComCnuInfoTable 1 }
+
+Hh3cEOCComCnuInfoEntry ::= SEQUENCE
+    {
+        hh3cEOCComCnuHardwareVersion    DisplayString,
+        hh3cEOCComCnuPCBVersion         OCTET STRING,
+        hh3cEOCComCnuLinkState          INTEGER,
+        hh3cEOCComCnuAttenuation        Integer32,
+        hh3cEOCComCnuSoftwareVersion    DisplayString,
+        hh3cEOCComCnuTxRate             Integer32,
+        hh3cEOCComCnuRxRate             Integer32,
+        hh3cEOCComCnuTxRateDrop         Integer32,
+        hh3cEOCComCnuRxRateDrop         Integer32
+    }
+
+hh3cEOCComCnuHardwareVersion OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        EOC CNU's hardware version.  If the object length is
+        zero, it means the version is unknown.
+        "
+    ::= { hh3cEOCComCnuInfoEntry 1 }
+
+hh3cEOCComCnuPCBVersion OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        EOC CNU's PCB version.
+        "
+    ::= { hh3cEOCComCnuInfoEntry 2 }
+
+hh3cEOCComCnuLinkState OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            physicaldown(1),
+            linkdown(2),
+            linkup(3),
+            loopback(4)
+        }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The cable port's link state.  The physicaldown(1) state indicates
+        that the CNU is not powered on.  The linkdown(2) state indicates
+        that the CNU is powered on, but registers fail.  The linkup(3)
+        state indicates that the CNU is powered on, and registers
+        successful.  The loopback(4) state indecates that the CNU is
+        powered on and registers successful, but loopback has detected.
+        "
+    ::= { hh3cEOCComCnuInfoEntry 3 }
+
+hh3cEOCComCnuAttenuation OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The cnu's average attenuation.
+        "
+    ::= { hh3cEOCComCnuInfoEntry 4 }
+
+hh3cEOCComCnuSoftwareVersion OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        EOC CNU's software version.  If the object length is
+        zero, it means the version is unknown.
+        "
+    ::= { hh3cEOCComCnuInfoEntry 5 }
+
+hh3cEOCComCnuTxRate OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The cnu's capability of tx speed in unit of 1Mbps.
+        "
+    ::= { hh3cEOCComCnuInfoEntry 6 }
+
+hh3cEOCComCnuRxRate OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The cnu's capability of rx speed in unit of 1Mbps.
+        "
+    ::= { hh3cEOCComCnuInfoEntry 7 }
+
+hh3cEOCComCnuTxRateDrop OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The cnu's capability droping of tx
+        speed from it's history max value in unit of %.
+        "
+    ::= { hh3cEOCComCnuInfoEntry 8 }
+
+hh3cEOCComCnuRxRateDrop OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The cnu's capability droping of rx
+        speed from it's history max value in unit of %.
+        "
+    ::= { hh3cEOCComCnuInfoEntry 9 }
+
+--
+-- hh3cEOCComCnuBandWidthTable
+--
+
+hh3cEOCComCnuBandWidthTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cEOCComCnuBandWidthEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        Set bandwidth parameters.
+        "
+    ::= { hh3cEOCComCnuMan 5 }
+
+hh3cEOCComCnuBandWidthEntry OBJECT-TYPE
+    SYNTAX     Hh3cEOCComCnuBandWidthEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        The entry of table hh3cEOCComCnuBandWidthTable.
+        It is a pre-configuration.
+        "
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cEOCComCnuBandWidthTable 1 }
+
+Hh3cEOCComCnuBandWidthEntry ::= SEQUENCE
+    {
+        hh3cEOCComCnuMaxDownBW       Integer32,
+        hh3cEOCComCnuSlaHighPriBW    Integer32,
+        hh3cEOCComCnuMaxUpBW         Integer32
+    }
+
+hh3cEOCComCnuMaxDownBW OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        Maximum bandwidth allowed for the CNU,
+        measured in Kbit/s.
+        "
+    ::= { hh3cEOCComCnuBandWidthEntry 1 }
+
+hh3cEOCComCnuSlaHighPriBW OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        High priority bandwidth - measured in Kbit/s.
+        The value of this object should be the multiple of
+        the value of hh3cEOCComCnuMaxUpBW.
+        The high priority bandwidth should not be larger than the maximum
+        bandwidth.
+        "
+    ::= { hh3cEOCComCnuBandWidthEntry 2 }
+
+hh3cEOCComCnuMaxUpBW OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        Total bandwidth - measured in Kbit/s.
+        The value of this object should be the multiple of
+        the value of hh3cEOCComCnuSlaHighPriBW.
+        The total bandwidth should be larger than the high priority bandwidth.
+        "
+    ::= { hh3cEOCComCnuBandWidthEntry 3 }
+
+
+
+
+--
+-- hh3cEOCComUniMan
+--
+
+hh3cEOCComUniMan OBJECT IDENTIFIER ::= { hh3cEOCCommon 4 }
+
+hh3cEOCComUniManTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cEOCComUniManEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        This table defines several user network interface(UNI) system
+        parameters.
+        "
+    ::= { hh3cEOCComUniMan 1 }
+
+hh3cEOCComUniManEntry OBJECT-TYPE
+    SYNTAX     Hh3cEOCComUniManEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        The entry of hh3cEOCComUniManTable.
+        "
+    INDEX
+        {
+            ifIndex,
+            hh3cEOCUniIndex
+        }
+    ::= { hh3cEOCComUniManTable 1 }
+
+Hh3cEOCComUniManEntry ::= SEQUENCE
+    {
+        hh3cEOCUniIndex               Unsigned32,
+        hh3cEOCComUniDescr            DisplayString,
+        hh3cEOCComUniStatus           INTEGER,
+        hh3cEOCComUniSpeed            INTEGER,
+        hh3cEOCComUniDuplex           INTEGER,
+        hh3cEOCComUniCurrentSpeed     Gauge32,
+        hh3cEOCComUniCurrentDuplex    INTEGER,
+        hh3cEOCComUniMdi              INTEGER,
+        hh3cEOCComUniFlowControl      TruthValue,
+        hh3cEOCComUniCountReset       INTEGER,
+        hh3cEOCComUniAlias            DisplayString,
+        hh3cEOCComUniType             IANAifType,
+        hh3cEOCComUniVLANType         INTEGER,
+        hh3cEOCComUniPvid             Integer32,
+        hh3cEOCComUniVlanTag          INTEGER,
+        hh3cEOCComUniPriority         Integer32,
+        hh3cEOCComUniUpLineRate       Unsigned32,
+        hh3cEOCComUniDownLineRate     Unsigned32,
+        hh3cEOCComUniAdminStatus      INTEGER
+    }
+
+hh3cEOCUniIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        The index value which uniquely identifies the FE(Fast Ethernet)
+        interface of the CNU.
+        "
+    ::= { hh3cEOCComUniManEntry 1 }
+
+hh3cEOCComUniDescr OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        A textual string containing information about the interface.  This
+        string should include the name of the manufacturer, the product
+        name and the version of the interface hardware and software.
+        "
+    ::= { hh3cEOCComUniManEntry 2 }
+
+hh3cEOCComUniStatus OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            up(1),
+            down(2),
+            testing(3)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        The desired state of the user network interface. When a managed
+        system initializes, all user network interfaces start with down
+        state. The testing state indicates that no operational packets
+        can be passed. As a result of either explicit management action or
+        per configuration information retained by the managed system,
+        hh3cEOCComUniStatus is then changed to either the up or
+        testing states (or remains in the down state).
+        "
+    ::= { hh3cEOCComUniManEntry 3 }
+
+hh3cEOCComUniSpeed OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            auto(1),
+            s10M(10),
+            s100M(100)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        User network interface speed.
+        "
+    ::= { hh3cEOCComUniManEntry 4 }
+
+hh3cEOCComUniDuplex OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            full(1),
+            half(2),
+            auto(3)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        User network interface mode.
+        "
+    ::= { hh3cEOCComUniManEntry 5 }
+
+hh3cEOCComUniCurrentSpeed OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        An estimate of the interface's current bandwidth in
+        bits per second.  For interfaces which do not vary in
+        bandwidth or for those where no accurate estimation
+        can be made, this object should contain the nominal
+        bandwidth.  If the bandwidth of the interface is
+        greater than the maximum value reportable by this
+        object then this object should report its maximum
+        value (4,294,967,295).  For a sub-layer which
+        has no concept of bandwidth, this object should be
+        zero.
+        "
+    ::= { hh3cEOCComUniManEntry 6 }
+
+hh3cEOCComUniCurrentDuplex OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            full(1),
+            half(2),
+            unknown(3)
+        }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The current mode of operation of the MAC
+        entity.  'unknown' indicates that the current
+        duplex mode could not be determined.
+
+        Management control of the duplex mode is
+        accomplished through the MAU MIB.  When
+        an interface does not support autonegotiation,
+        or when autonegotiation is not enabled, the
+        duplex mode is controlled using
+        ifMauDefaultType.  When autonegotiation is
+        supported and enabled, duplex mode is controlled
+        using ifMauAutoNegAdvertisedBits.  In either
+        case, the currently operating duplex mode is
+        reflected both in this object and in ifMauType.
+
+        Note that this object provides redundant
+        information with ifMauType.  Normally, redundant
+        objects are discouraged.  However, in this
+        instance, it allows a management application to
+        determine the duplex status of an interface
+        without having to know every possible value of
+        ifMauType.  This was felt to be sufficiently
+        valuable to justify the redundancy.
+        "
+    REFERENCE
+        "
+        [IEEE 802.3 Std.], 30.3.1.1.32, aDuplexStatus.
+        "
+    ::= { hh3cEOCComUniManEntry 7 }
+
+hh3cEOCComUniMdi OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            mdi-ii(1),
+            mdi-x(2),
+            mdi-auto(3)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Type of the line connected to UNI interface:
+        mdi-ii(straight-through cable),
+        mdi-x (crossover cable),
+        mdi-auto (auto-sensing)."
+    DEFVAL
+        {
+            mdi-auto
+        }
+    ::= { hh3cEOCComUniManEntry 8 }
+
+hh3cEOCComUniFlowControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Flow control status.
+        true(1)  - Flow control status enable.
+        false(2) - Flow control status disable."
+    DEFVAL
+        {
+            false
+        }
+    ::= { hh3cEOCComUniManEntry 9 }
+
+hh3cEOCComUniCountReset OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            reset(1)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reset the counter which is about packets of the interface,
+        then the counter will change to zero.  There is no sense in
+        reading this object."
+    ::= { hh3cEOCComUniManEntry 10 }
+
+hh3cEOCComUniAlias OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        This object is an 'alias' name for the interface as
+        specified by a network manager, and provides a non-
+        volatile 'handle' for the interface.
+
+        On the first instantiation of an interface, the value
+        of hh3cEOCComUniAlias associated with that interface is the
+        zero-length string.  As and when a value is written
+        into an instance of hh3cEOCComUniAlias through a network
+        management set operation, then the agent must retain
+        the supplied value in the hh3cEOCComUniAlias instance associated
+        with the same interface for as long as that interface
+        remains instantiated, including across all re-
+        initializations/reboots of the network management
+        system, including those which result in a change of
+        the interface's ifIndex and hh3cEOCUniIndex value.
+
+        An example of the value which a network manager might
+        store in this object for a WAN interface is the
+        (Telco's) circuit number/identifier of the interface.
+
+        Some agents may support write-access only for
+        interfaces having particular values of hh3cEOCComUniType.  An
+        agent which supports write access to this object is
+        required to keep the value in non-volatile storage,
+        but it may limit the length of new values depending on
+        how much storage is already occupied by the current
+        values for other interfaces.
+        "
+    ::= { hh3cEOCComUniManEntry 11 }
+
+hh3cEOCComUniType OBJECT-TYPE
+    SYNTAX     IANAifType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The type of interface.  Additional values for hh3cEOCComUniType
+        are assigned by the Internet Assigned Numbers
+        Authority(IANA), through updating the syntax of the
+        IANAifType textual convention.
+        "
+    ::= { hh3cEOCComUniManEntry 12 }
+
+hh3cEOCComUniVLANType OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            vLANTrunk(1),
+            access(2),
+            hybrid(3),
+            fabric(4)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "port vlan types.
+        hybrid (3) port can carry multiple VLANs.
+        If fabric function is supported, fabric(4) means the port is
+        a fabric port."
+    ::= { hh3cEOCComUniManEntry 13 }
+
+hh3cEOCComUniPvid OBJECT-TYPE
+    SYNTAX     Integer32 (1..4094)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        The PVID, the VLAN ID assigned to untagged frames or
+        Priority-Tagged frames received on this port.
+        "
+    REFERENCE
+        "
+        IEEE 802.1Q/D11 Section 12.10.1.1
+        "
+    DEFVAL
+        {
+            1
+        }
+    ::= { hh3cEOCComUniManEntry 14 }
+
+hh3cEOCComUniVlanTag OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            tagged(1),
+            untagged(2)
+        }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        VLAN is set tagged or untagged.
+        "
+    ::= { hh3cEOCComUniManEntry 15 }
+
+hh3cEOCComUniPriority OBJECT-TYPE
+    SYNTAX     Integer32 (0..7)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        The default ingress User Priority for this port.  This
+        only has effect on media, such as Ethernet, that do not
+        support native User Priority.
+        "
+    ::= { hh3cEOCComUniManEntry 16 }
+
+hh3cEOCComUniUpLineRate OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        The max speed upload in units of 1,000 bits per second
+        on this interface.  The value should between 0 and 100Mbps.
+        If the value is 0, it means that the upload speed is only
+        restricted by the physical line.
+        "
+    ::= { hh3cEOCComUniManEntry 17 }
+
+hh3cEOCComUniDownLineRate OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        The max speed download in units of 1,000 bits per second
+        on this interface.  The value should between 0 and 100Mbps.
+        If the value is 0, it means that the download speed is only
+        restricted by the physical line.
+        "
+    ::= { hh3cEOCComUniManEntry 18 }
+
+hh3cEOCComUniAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            up(1),
+            down(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Control if open or close the UNI.  If choose up(1), means the UNI is
+        opened and packets can pass it.  If choose down(2), means the UNI is
+        closed and all packets will be discard.
+        "
+    ::= { hh3cEOCComUniManEntry 19 }
+
+--
+-- hh3cEOCComUniCountTable
+--
+hh3cEOCComUniCountTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cEOCComUniCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of interface counter about frames entries."
+    ::= { hh3cEOCComUniMan 2 }
+
+hh3cEOCComUniCountEntry OBJECT-TYPE
+    SYNTAX      Hh3cEOCComUniCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable
+        to a particular interface."
+    INDEX
+        {
+            ifIndex,
+            hh3cEOCUniIndex
+        }
+    ::= { hh3cEOCComUniCountTable 1 }
+
+Hh3cEOCComUniCountEntry ::= SEQUENCE
+    {
+        hh3cEOCUniInPkts                     Unsigned32,
+        hh3cEOCUniInUPkts                    Unsigned32,
+        hh3cEOCUniInBPkts                    Unsigned32,
+        hh3cEOCUniInMPkts                    Unsigned32,
+        hh3cEOCUniInPausePkts                Unsigned32,
+        hh3cEOCUniInTotalErrors              Unsigned32,
+        hh3cEOCUniInCRCErrs                  Unsigned32,
+        hh3cEOCUniInUndersizePkts            Unsigned32,
+        hh3cEOCUniInOversizePkts             Unsigned32,
+        hh3cEOCUniInErrorbyOther             Unsigned32,
+        hh3cEOCUniInOctets                   Unsigned32,
+        hh3cEOCUniOutPkts                    Unsigned32,
+        hh3cEOCUniOutUPkts                   Unsigned32,
+        hh3cEOCUniOutBPkts                   Unsigned32,
+        hh3cEOCUniOutMPkts                   Unsigned32,
+        hh3cEOCUniOutPausePkts               Unsigned32,
+        hh3cEOCUniOutTotalErrors             Unsigned32,
+        hh3cEOCUniOutCollisions              Unsigned32,
+        hh3cEOCUniOutDelayExceedDsds         Unsigned32,
+        hh3cEOCUniOutErrorbyOther            Unsigned32,
+        hh3cEOCUniOutDroppedFrames           Unsigned32,
+        hh3cEOCUniOutOctets                  Unsigned32
+    }
+
+hh3cEOCUniInPkts OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received."
+    ::= { hh3cEOCComUniCountEntry 1 }
+
+hh3cEOCUniInUPkts  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of good packets received that are
+        directed to the unicast address.  Note that this
+        does not include multicast and broadcast packets."
+    ::= { hh3cEOCComUniCountEntry 2 }
+
+hh3cEOCUniInBPkts  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of good packets received that are
+        directed to the broadcast address.  Note that this
+        does not include multicast packets."
+    ::= { hh3cEOCComUniCountEntry 3 }
+
+hh3cEOCUniInMPkts  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of good packets received that are
+        directed to a multicast address.  Note that this number
+        does not include packets directed to the broadcast address."
+    ::= { hh3cEOCComUniCountEntry 4 }
+
+hh3cEOCUniInPausePkts  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A count of MAC Control packets received on this
+        interface by the pause(flow control) operation.
+        This counter does not increment when the
+        interface is in a half-duplex mode.
+        Discontinuities in the value of this counter can
+        occur at re-initialization of the management
+        system."
+    ::= { hh3cEOCComUniCountEntry 5 }
+
+hh3cEOCUniInTotalErrors  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Total count of the error packets received on this interface."
+    ::= { hh3cEOCComUniCountEntry 6 }
+
+hh3cEOCUniInCRCErrs  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets received that
+        had a length (excluding framing bits, but
+        including FCS octets) of between 64 and 1518
+        octets, inclusive, but had either a bad
+        Frame Check Sequence (FCS) with an integral
+        number of octets (FCS Error) or a bad FCS with
+        a non-integral number of octets (Alignment Error)."
+    ::= { hh3cEOCComUniCountEntry 7 }
+
+hh3cEOCUniInUndersizePkts  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets received that are
+        less than 64 octets long (excluding framing bits,
+        but including FCS octets) and are otherwise well formed."
+    ::= { hh3cEOCComUniCountEntry 8 }
+
+hh3cEOCUniInOversizePkts  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets received that are
+        longer than 1518 octets (excluding framing bits,
+        but including FCS octets) and are otherwise well formed."
+    ::= { hh3cEOCComUniCountEntry 9 }
+
+hh3cEOCUniInErrorbyOther   OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of other error packets received on this interface."
+    ::= { hh3cEOCComUniCountEntry 10 }
+
+hh3cEOCUniInOctets   OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of octets received on this interface."
+    ::= { hh3cEOCComUniCountEntry 11 }
+
+hh3cEOCUniOutPkts OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) sent."
+    ::= { hh3cEOCComUniCountEntry 12 }
+
+hh3cEOCUniOutUPkts OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of good packets sent that are
+        directed to the unicast address.  Note that this
+        does not include multicast and broadcast packets."
+    ::= { hh3cEOCComUniCountEntry 13 }
+
+hh3cEOCUniOutBPkts  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of good packets sent that are
+        directed to the broadcast address.  Note that this
+        does not include multicast packets."
+    ::= { hh3cEOCComUniCountEntry 14 }
+
+hh3cEOCUniOutMPkts  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of good packets sent that are
+        directed to a multicast address.  Note that this number
+        does not include packets directed to the broadcast address."
+    ::= { hh3cEOCComUniCountEntry 15 }
+
+hh3cEOCUniOutPausePkts  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of MAC control packets sent on this
+        interface by the pause operation.  This counter does
+        not increment when the interface is in a half-duplex mode.
+        Discontinuities in the value of this counter can
+        occur at re-initialization of the management system."
+    ::= { hh3cEOCComUniCountEntry 16 }
+
+hh3cEOCUniOutTotalErrors  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of error packets sent on this interface."
+    ::= { hh3cEOCComUniCountEntry 17 }
+
+hh3cEOCUniOutCollisions  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The best estimate of the total number of collisions
+        on this Ethernet segment.
+        The value returned will depend on the location of the
+        RMON probe.  Section 8.2.1.3 (10BASE-5) and section
+        10.3.1.3 (10BASE-2) of IEEE standard 802.3 states that a
+        station must detect a collision, in the receive mode, if
+        three or more stations are transmitting simultaneously.  A
+        repeater port must detect a collision when two or more
+        stations are transmitting simultaneously.  Thus a probe
+        placed on a repeater port could record more collisions
+        than a probe connected to a station on the same segment
+        could.  Probe location plays a much smaller role when considering
+        10BASE-T.  14.2.1.4 (10BASE-T) of IEEE standard 802.3
+        defines a collision as the simultaneous presence of signals
+        on the DO and RD circuits (transmitting and receiving
+        at the same time).  A 10BASE-T station can only detect
+        collisions when it is transmitting.  Thus probes placed on
+        a station and a repeater, should report the same number of
+        collisions.  Note also that an RMON probe inside a repeater should
+        ideally report collisions between the repeater and one or
+        more other hosts (transmit collisions as defined by IEEE
+        802.3k) plus receiver collisions observed on any coax
+        segments to which the repeater is connected."
+    ::= { hh3cEOCComUniCountEntry 18 }
+
+hh3cEOCUniOutDelayExceedDsds  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of packets discarded by this port due
+        to excessive transit delay through the bridge.  It
+        is incremented by both transparent and source route bridges."
+    ::= { hh3cEOCComUniCountEntry 19 }
+
+hh3cEOCUniOutErrorbyOther  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of other error packets sent on this interface.
+        Other error packets means the error packets out of collision packets
+        and excessive delayed packets."
+    ::= { hh3cEOCComUniCountEntry 20 }
+
+hh3cEOCUniOutDroppedFrames OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of frames dropped because of buffer failure."
+    ::= { hh3cEOCComUniCountEntry 21 }
+
+hh3cEOCUniOutOctets   OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of octets transmitted out of the interface."
+    ::= { hh3cEOCComUniCountEntry 22 }
+
+--
+-- hh3cEOCCommon NOTIFICATION
+--
+
+hh3cEOCCommonTrap OBJECT IDENTIFIER ::= { hh3cEOCCommon 5 }
+
+hh3cEOCTrapPrefix OBJECT IDENTIFIER ::= {hh3cEOCCommonTrap 0}
+
+hh3cEOCCnuRegExcessTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuRegExcessTrap notification is sent when the
+        number of registered CNUs exceeds the limit.
+        "
+    ::= { hh3cEOCTrapPrefix 1 }
+
+hh3cEOCCnuRegExcessRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuRegExcessRecoverTrap notification is sent when
+        hh3cEOCCnuRegExcessTrap is detected and then recoverd.
+        "
+    ::= { hh3cEOCTrapPrefix 2 }
+
+hh3cEOCCnuRegSuccTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuRegSuccTrap notification is sent when a
+        CNU registers successful.
+        "
+    ::= { hh3cEOCTrapPrefix 3 }
+
+hh3cEOCCnuOffLineTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuOffLineTrap notification is sent when a
+        CNU offline.
+        "
+    ::= { hh3cEOCTrapPrefix 4 }
+
+hh3cEOCCnuLinkupTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuLinkupTrap notification is sent when a
+        CNU linkup.
+        "
+    ::= { hh3cEOCTrapPrefix 5 }
+
+hh3cEOCOamDisconnectTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCOamDisconnectionTrap notification is sent when
+        LLID's OAM link is disconnected.
+        "
+    ::= { hh3cEOCTrapPrefix 6 }
+
+hh3cEOCOamDisconnectRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCOamDisconnectionRecoverTrap notification is sent when
+        LLID's OAM link is disconnected and then connected.
+        "
+    ::= { hh3cEOCTrapPrefix 7 }
+
+
+hh3cEOCBandwidthNotEnoughTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        Bandwidth is not enough, cnu can not bind now.
+        "
+    ::= { hh3cEOCTrapPrefix 8 }
+
+hh3cEOCCnuAttenuationTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress,
+            hh3cEOCComCnuAttenuation
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cHPEOCCnuAttenuationTrap notification is sent when a
+        CNU's attenuation is changing.
+        "
+    ::= { hh3cEOCTrapPrefix 9 }
+
+hh3cEOCCnuRegFailTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuRegFailTrap notification is sent when a
+        CNU registers fail.
+        "
+    ::= { hh3cEOCTrapPrefix 10 }
+
+hh3cEOCCLTCablePortErrorTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCLTCablePortErrorTrap notification is sent when the
+        hardware of cable port occurs error or CLT's vlan is configged
+        error.
+        "
+    ::= { hh3cEOCTrapPrefix 11 }
+
+hh3cEOCCLTCablePortErrReTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCLTCablePortErrReTrap notification is sent when cable port
+        error and then recovered.
+        "
+    ::= { hh3cEOCTrapPrefix 12 }
+
+hh3cEOCCnuTxRateDropTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress,
+            hh3cEOCComCnuTxRateDrop
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuTxRateDropTrap notification is sent when cable port
+        rate of TX capability drop exceeded threshold.
+        "
+    ::= { hh3cEOCTrapPrefix 13 }
+
+hh3cEOCCnuTxRateDropRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress,
+            hh3cEOCComCnuTxRateDrop
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuTxRateDropRecoverTrap notification is sent when cable port
+        rate of TX capability recover from the recent rate-drop trap.
+        "
+    ::= { hh3cEOCTrapPrefix 14 }
+
+hh3cEOCCnuRxRateDropTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress,
+            hh3cEOCComCnuRxRateDrop
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuRxRateDropTrap notification is sent when cable port
+        rate of RX capability drop exceeded threshold.
+        "
+    ::= { hh3cEOCTrapPrefix 15 }
+
+hh3cEOCCnuRxRateDropRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress,
+            hh3cEOCComCnuRxRateDrop
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuRxRateDropRecoverTrap notification is sent when cable port
+        rate of RX capability recover from the recent rate-drop trap.
+        "
+    ::= { hh3cEOCTrapPrefix 16 }
+
+hh3cEOCCnuFWDownLoadErrTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cHPEOCDownLoadCNUFWResult
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuFWDownLoadErrTrap notification is sent when CLT can't
+        download CNU firmware from the server successfully.
+        "
+    ::= { hh3cEOCTrapPrefix 17 }
+
+hh3cEOCCnuFWDownLoadErrReTrap NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuFWDownLoadErrReTrap notification is sent when CLT recover
+        from the download CNU firmware error.
+        "
+    ::= { hh3cEOCTrapPrefix 18 }
+
+hh3cEOCCnuDeviceTypeErrTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress,
+            hh3cEOCComCnuDeviceType
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuDeviceTypeErrTrap notification is sent when the online CNU
+        doesn't match the type which user defined earlier.
+        "
+    ::= { hh3cEOCTrapPrefix 19 }
+
+hh3cEOCCnuDeviceTypeErrReTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuDeviceTypeErrReTrap notification is sent when the online CNU
+        doesn't match the type which user defined earlier and then recover.
+        "
+    ::= { hh3cEOCTrapPrefix 20 }
+
+hh3cEOCCnuAutoUpdateErrTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuAutoUpdateErrTrap notification is sent when the online CNU
+        doesn't auto update successfully.
+        "
+    ::= { hh3cEOCTrapPrefix 21 }
+
+hh3cEOCCnuAutoUpdateSuccTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCCnuAutoUpdateSuccTrap notification is sent when the online CNU
+        auto update successfully.
+        "
+    ::= { hh3cEOCTrapPrefix 22 }
+
+hh3cEOCLoopbackDetectTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCLoopbackDetectTrap notification is sent when the loopback between
+        the ethernet ports of CNU or CLT is found.
+        "
+    ::= { hh3cEOCTrapPrefix 23 }
+
+hh3cEOCLoopbackRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cEOCComCnuMacAddress
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cEOCLoopbackRecoverTrap notification is sent when the loopback between
+        the ethernet ports of CNU or CLT is recover.
+        "
+    ::= { hh3cEOCTrapPrefix 24 }
+
+--
+-- hh3cEOCComOnLineCnuMan
+--
+
+hh3cEOCComOnLineCnuMan OBJECT IDENTIFIER ::= { hh3cEOCCommon 6 }
+--
+-- hh3cEOCComCnuTypeTable
+--
+hh3cEOCComCnuTypeTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cEOCComCnuTypeEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        This table defines the description of cnu typ.
+        "
+    ::= { hh3cEOCComOnLineCnuMan 1 }
+
+hh3cEOCComCnuTypeEntry OBJECT-TYPE
+    SYNTAX     Hh3cEOCComCnuTypeEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        The entry of the table hh3cEOCComCnuTypeTable.
+        "
+    INDEX
+        {
+            hh3cEOCComCnuTypeIdx
+        }
+    ::= { hh3cEOCComCnuTypeTable 1 }
+
+Hh3cEOCComCnuTypeEntry ::= SEQUENCE
+    {
+        hh3cEOCComCnuTypeIdx    Unsigned32,
+        hh3cEOCComCnuDescripton DisplayString
+    }
+
+hh3cEOCComCnuTypeIdx OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        A unique value for each cnu types.  Its value
+        ranges between 1 and the value of cny typess.
+        "
+    ::= { hh3cEOCComCnuTypeEntry 1 }
+
+hh3cEOCComCnuDescripton OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The description for unique cnu types.
+        "
+    ::= { hh3cEOCComCnuTypeEntry 2 }
+
+--
+-- hh3cEOCComCnuNumTable
+--
+
+hh3cEOCComCnuNumTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cEOCComCnuNumEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        This table defines the number of cnu registered in variable types
+        of the CLT .
+        "
+    ::= { hh3cEOCComOnLineCnuMan 2 }
+
+hh3cEOCComCnuNumEntry OBJECT-TYPE
+    SYNTAX     Hh3cEOCComCnuNumEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "
+        The entry of the table hh3cEOCComCnuNumTable.
+        "
+    INDEX
+        {
+            ifIndex,
+            hh3cEOCComCnuTypeIdx
+        }
+    ::= { hh3cEOCComCnuNumTable 1 }
+
+Hh3cEOCComCnuNumEntry ::= SEQUENCE
+    {
+        hh3cEOCComCnuNumber     Integer32
+    }
+
+hh3cEOCComCnuNumber OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "
+        The number of special type of cnu that has been registerd in clt.
+        "
+    ::= { hh3cEOCComCnuNumEntry 1 }
+
+END

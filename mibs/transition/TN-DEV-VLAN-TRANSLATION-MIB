@@ -1,0 +1,140 @@
+-- *****************************************************************
+-- TN-DEV-VLAN-TRANSLATION-MIB
+--
+-- Copyright (c) 2012, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+TN-DEV-VLAN-TRANSLATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    Unsigned32  FROM SNMPv2-SMI
+    RowStatus  FROM SNMPv2-TC
+    PortList, VlanId  FROM Q-BRIDGE-MIB
+    tnDevMgmt  FROM TN-MGMT-MIB;
+
+tnDevVlanTranslation OBJECT IDENTIFIER ::= { tnDevMgmt 37 }
+
+--
+-- MIB variables
+--
+
+--
+-- tnVlanTransPort2GroupMapTable
+--
+tnVlanTransPort2GroupMapTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnVlanTransPort2GroupMapEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "This table contains a mapping set of Port members to a Group ID for all switch ports."
+    ::= { tnDevVlanTranslation 1 }
+
+tnVlanTransPort2GroupMapEntry OBJECT-TYPE
+    SYNTAX        TnVlanTransPort2GroupMapEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "The entry contains detailed information used to map Port members to a Group."
+
+    INDEX { tnVlanTransPort2GroupMapGroupId }
+    ::= { tnVlanTransPort2GroupMapTable 1 }
+
+TnVlanTransPort2GroupMapEntry ::= SEQUENCE {
+    tnVlanTransPort2GroupMapGroupId         Unsigned32,
+    tnVlanTransPort2GroupMapPortMember      PortList,
+    tnVlanTransPort2GroupMapRowStatus       RowStatus
+    }
+
+tnVlanTransPort2GroupMapGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates the Group ID in the entry."
+    ::= { tnVlanTransPort2GroupMapEntry 1 }
+
+tnVlanTransPort2GroupMapPortMember OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The port member of an entry."
+    ::= { tnVlanTransPort2GroupMapEntry 2 }
+
+tnVlanTransPort2GroupMapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of the entry, and is used to create
+        and delete entries in this table."
+    ::= { tnVlanTransPort2GroupMapEntry 3 }
+
+--
+-- tnVlanTransMapTable
+--
+tnVlanTransMapTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnVlanTransMapEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "This table contains a mapping set of VLAN ID to other VLAN ID for a particular Group ID Globally."
+    ::= { tnDevVlanTranslation 2 }
+
+tnVlanTransMapEntry OBJECT-TYPE
+    SYNTAX        TnVlanTransMapEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "The entry contains detailed information used to map VLAN ID to other VLAN ID for a particular Group ID Globally."
+
+    INDEX { tnVlanTransMapGroupId, tnVlanTransMapVlanId }
+    ::= { tnVlanTransMapTable 1 }
+
+TnVlanTransMapEntry ::= SEQUENCE {
+    tnVlanTransMapGroupId                   Unsigned32,
+    tnVlanTransMapVlanId                    VlanId,
+    tnVlanTransMapTranslatedVlanId          VlanId,
+    tnVlanTransMapRowStatus                 RowStatus
+    }
+
+tnVlanTransMapGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates the Group ID in the entry."
+    ::= { tnVlanTransMapEntry 1 }
+
+tnVlanTransMapVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicates the VLAN ID in the entry."
+    ::= { tnVlanTransMapEntry 2 }
+
+tnVlanTransMapTranslatedVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates the mapping VLAN ID in the entry."
+    ::= { tnVlanTransMapEntry 3 }
+
+tnVlanTransMapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of the entry, and is used to create
+        and delete entries in this table."
+    ::= { tnVlanTransMapEntry 4 }
+
+--
+-- Notifications
+--
+
+END

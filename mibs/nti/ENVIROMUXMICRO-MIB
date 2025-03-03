@@ -1,0 +1,555 @@
+ENVIROMUXMICRO-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, 
+   enterprises,
+   Integer32                                    FROM  SNMPv2-SMI
+   DisplayString                                FROM  SNMPv2-TC;
+      
+enviromuxMicro MODULE-IDENTITY
+     LAST-UPDATED "202103071400Z"
+     ORGANIZATION "Network Technologies Inc."
+     CONTACT-INFO 
+         "Network Technologies Inc.
+         
+          Postal: 1275 Danner Dr,
+                  Aurora, OH 442022
+                  US
+                 
+          Tel: 330-562-7070
+          Fax: 330-562-1999
+             
+          WEB: www.networktechinc.com"
+	 
+     DESCRIPTION 
+         "E-MICRO MIB file." 
+
+    REVISION     "202103071400Z" 
+         DESCRIPTION  "Rev. 1.04 - Added hostSystem variables"
+    REVISION     "201509271400Z" 
+         DESCRIPTION  "Rev. 1.03 - Added Smart Alerts OID's"
+    REVISION     "201502231400Z" 
+         DESCRIPTION  "Rev. 1.02 - Added traps OID's"
+    REVISION     "201411251400Z" 
+         DESCRIPTION  "Rev. 1.01 - Corrected missing elements"
+    REVISION     "201411141400Z" 
+         DESCRIPTION  "Rev. 1.00 - Initial version"
+     ::= { hardware 12 }
+
+-- the root of the subtree for Network Technologies Inc
+nti		        OBJECT IDENTIFIER ::= { enterprises 3699 }
+
+-- subtree for products
+products		        OBJECT IDENTIFIER ::= { nti 1 }
+hardware		        OBJECT IDENTIFIER ::= { products 1 }
+software		        OBJECT IDENTIFIER ::= { products 2 }
+otherProduct            OBJECT IDENTIFIER ::= { hardware 200 }
+
+-- e-micro subtree
+masterUnit	            OBJECT IDENTIFIER ::= { enviromuxMicro 1 }
+intSensors		        OBJECT IDENTIFIER ::= { masterUnit 1 }
+extSensors		        OBJECT IDENTIFIER ::= { masterUnit 2 }
+digInputs               OBJECT IDENTIFIER ::= { masterUnit 3 }
+ipDevices               OBJECT IDENTIFIER ::= { masterUnit 4 }
+eAlerts                 OBJECT IDENTIFIER ::= { masterUnit 5 }
+smAlerts                OBJECT IDENTIFIER ::= { masterUnit 6 }
+hostSystem              OBJECT IDENTIFIER ::= { masterUnit 100 }
+enviromuxMicroTraps     OBJECT IDENTIFIER ::= { enviromuxMicro 100 }
+-- integrated sensors description
+
+intSensorTable			OBJECT-TYPE
+	SYNTAX	            SEQUENCE OF	IntSensorEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "Table of internal Sensors entries"
+	::= { intSensors 1 }
+
+intSensorEntry     		OBJECT-TYPE
+    SYNTAX              IntSensorEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "An internal sensor entry"
+	INDEX               { intSensorIndex }
+	::= { intSensorTable 1 }
+
+IntSensorEntry ::= 
+	SEQUENCE {
+		intSensorIndex
+			Integer32,
+		intSensorType
+			INTEGER,
+		intSensorDescription
+			DisplayString,
+        intSensorValue
+            INTEGER,
+		intSensorUnit
+			Integer32
+	}
+
+intSensorIndex			OBJECT-TYPE
+	SYNTAX				Integer32 (1..3)
+	MAX-ACCESS			not-accessible
+	STATUS				current
+	DESCRIPTION	        "The index of the integrated sensor entry 1..3"
+	::= { intSensorEntry 1 }
+
+intSensorType		    OBJECT-TYPE
+	SYNTAX				INTEGER {  undefined(0), temperature(1), humidity(2), dewPoint(24)  }
+	MAX-ACCESS  		read-only
+	STATUS				current
+	DESCRIPTION	        "Sensor Type"
+	::= { intSensorEntry 2 }
+
+intSensorDescription    OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-only
+	STATUS				current
+	DESCRIPTION	        "Sensor Description"
+	::= { intSensorEntry 3 }
+    
+intSensorValue			OBJECT-TYPE
+	SYNTAX				Integer32 
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The value of the integrated sensor reading. For temperature, voltage, current or low voltage,  it is presented in tenths of degrees/volts"
+	::= { intSensorEntry 4 }
+	
+intSensorUnit			OBJECT-TYPE
+	SYNTAX				Integer32 (0..1)
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The measuremnet unit for this sensor in numeric format. It is important only for temperature"
+	::= { intSensorEntry 5 }
+
+-- external sensors description
+
+extSensorTable			OBJECT-TYPE
+	SYNTAX	            SEQUENCE OF	ExtSensorEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "Table of external Sensors entries"
+	::= { extSensors 1 }
+
+extSensorEntry     		OBJECT-TYPE
+    SYNTAX              ExtSensorEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "An external sensor entry"
+	INDEX               { extSensorIndex }
+	::= { extSensorTable 1 }
+
+ExtSensorEntry ::= 
+	SEQUENCE {
+		extSensorIndex
+			Integer32,
+		extSensorType
+			INTEGER,
+		extSensorDescription
+			DisplayString,
+        extSensorValue
+            INTEGER,
+		extSensorUnit
+			Integer32
+	}
+
+extSensorIndex			OBJECT-TYPE
+	SYNTAX				Integer32 (1..6)
+	MAX-ACCESS			not-accessible
+	STATUS				current
+	DESCRIPTION	        "The index of the external sensor entry 1..6"
+	::= { extSensorEntry 1 }
+
+extSensorType		    OBJECT-TYPE
+	SYNTAX				INTEGER {  undefined(0), temperature(1), humidity(2), dewPoint(24)  }
+	MAX-ACCESS  		read-only
+	STATUS				current
+	DESCRIPTION	        "Sensor Type"
+	::= { extSensorEntry 2 }
+
+extSensorDescription    OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-only
+	STATUS				current
+	DESCRIPTION	        "Sensor Description"
+	::= { extSensorEntry 3 }
+    
+extSensorValue			OBJECT-TYPE
+	SYNTAX				Integer32 
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The value of the external sensor reading. For temperature, voltage, current or low voltage,  it is presented in tenths of degrees/volts"
+	::= { extSensorEntry 4 }
+	
+extSensorUnit			OBJECT-TYPE
+	SYNTAX				Integer32 (0..1)
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The measuremnet unit for this sensor in numeric format. It is important only for temperature"
+	::= { extSensorEntry 5 }
+
+-- digital inputs description
+
+digInputTable			OBJECT-TYPE
+	SYNTAX	            SEQUENCE OF	DigInputEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "Table of digital input entries"
+	::= { digInputs 1 }
+
+digInputEntry     		OBJECT-TYPE
+    SYNTAX              DigInputEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "A digital input entry"
+	INDEX               { digInputIndex }
+	::= { digInputTable 1 }
+
+DigInputEntry ::= 
+	SEQUENCE {
+		digInputIndex
+			Integer32,
+		digInputDescription
+			DisplayString,
+        digInputValue
+            INTEGER
+	}
+
+digInputIndex			OBJECT-TYPE
+	SYNTAX				Integer32 (1..2)
+	MAX-ACCESS			not-accessible
+	STATUS				current
+	DESCRIPTION	        "The index of the digital input entry 1..2"
+	::= { digInputEntry 1 }
+
+digInputDescription    OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-only
+	STATUS				current
+	DESCRIPTION	        "Sensor Description"
+	::= { digInputEntry 2 }
+    
+digInputValue			OBJECT-TYPE
+	SYNTAX				INTEGER { closed(0), open(1) }
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The value of the digital reading"
+	::= { digInputEntry 3 }
+	
+-- ip devices description
+
+ipDeviceTable			OBJECT-TYPE
+	SYNTAX	            SEQUENCE OF	IpDeviceEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "Table of digital input entries"
+	::= { ipDevices 1 }
+
+ipDeviceEntry     		OBJECT-TYPE
+    SYNTAX              IpDeviceEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "A digital input entry"
+	INDEX               { ipDeviceIndex }
+	::= { ipDeviceTable 1 }
+
+IpDeviceEntry ::= 
+	SEQUENCE {
+		ipDeviceIndex
+			Integer32,
+		ipDeviceDescription
+			DisplayString,
+        ipDeviceValue
+            INTEGER
+	}
+
+ipDeviceIndex			OBJECT-TYPE
+	SYNTAX				Integer32 (1..4)
+	MAX-ACCESS			not-accessible
+	STATUS				current
+	DESCRIPTION	        "The index of the ip device entry 1..4"
+	::= { ipDeviceEntry 1 }
+
+ipDeviceDescription     OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-only
+	STATUS				current
+	DESCRIPTION	        "Sensor Description"
+	::= { ipDeviceEntry 2 }
+    
+ipDeviceValue			OBJECT-TYPE
+	SYNTAX				INTEGER { notResponding(0), responding(1) }
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The result of the ip device ping test"
+	::= { ipDeviceEntry 3 }
+	
+-- alerts description
+
+alertTable	    		OBJECT-TYPE
+	SYNTAX	            SEQUENCE OF	AlertEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "Table of alert entries"
+	::= { eAlerts 1 }
+
+alertEntry     		    OBJECT-TYPE
+    SYNTAX              AlertEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "An alert entry"
+	INDEX               { alertIndex }
+	::= { alertTable 1 }
+
+AlertEntry ::= 
+	SEQUENCE {
+		alertIndex
+			Integer32,
+		alertEnabled
+			Integer32,
+		alertSensor
+			DisplayString,
+        alertSensorValue
+            INTEGER,
+        alertThreshold
+            INTEGER,
+        alertThresholdType
+            INTEGER,
+        alertStatus
+            INTEGER
+	}
+
+alertIndex	         	OBJECT-TYPE
+	SYNTAX				Integer32 (1..32)
+	MAX-ACCESS			not-accessible
+	STATUS				current
+	DESCRIPTION	        "The index of the alert entry 1..32"
+	::= { alertEntry 1 }
+
+alertEnabled        	OBJECT-TYPE
+	SYNTAX				INTEGER { false(0), true(1)}
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "Shows if alert is enabled 0..1"
+	::= { alertEntry 2 }
+
+alertSensor             OBJECT-TYPE
+	SYNTAX				DisplayString
+	MAX-ACCESS  		read-only
+	STATUS				current
+	DESCRIPTION	        "Alert Sensor Description"
+	::= { alertEntry 3 }
+    
+alertSensorValue		OBJECT-TYPE
+	SYNTAX				Integer32 
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The value of the sensor for analog sensors or open/closed for digital inputs"
+	::= { alertEntry 4 }
+	
+alertThreshold			OBJECT-TYPE
+	SYNTAX				Integer32 
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The value of the alert threshold for analog sensors, irrelevant for alerts for digital inputs"
+	::= { alertEntry 5 }
+	
+alertThresholdType   	OBJECT-TYPE
+	SYNTAX				INTEGER { lessThan(0), greaterThan(1) }
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The type of the alert threshold for analog sensors, irrelevant for alerts for digital inputs"
+	::= { alertEntry 6 }
+	
+alertStatus     		OBJECT-TYPE
+	SYNTAX				INTEGER { normal(0), enteringCritical(1), critical(2), exitingCritical(3), waitingAckDismiss(4), acknowledged(5), dismissed(6), disconnected(7) }
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The current status of the alert"
+	::= { alertEntry 7 }
+
+-- smart alerts description
+
+smAlertTable    		OBJECT-TYPE
+	SYNTAX	            SEQUENCE OF	SmAlertEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "Table of alert entries"
+	::= { smAlerts 1 }
+
+smAlertEntry   		    OBJECT-TYPE
+    SYNTAX              SmAlertEntry
+	MAX-ACCESS          not-accessible
+	STATUS	            current
+	DESCRIPTION         "A smart alert entry"
+	INDEX               { smAlertIndex }
+	::= { smAlertTable 1 }
+
+SmAlertEntry ::= 
+	SEQUENCE {
+		smAlertIndex
+			Integer32,
+		smAlertEnabled
+			Integer32,
+        smAlertStatus
+            INTEGER
+	}
+
+smAlertIndex	       	OBJECT-TYPE
+	SYNTAX				Integer32 (1..1)
+	MAX-ACCESS			not-accessible
+	STATUS				current
+	DESCRIPTION	        "The index of the alert entry (only one)"
+	::= { smAlertEntry 1 }
+
+smAlertEnabled        	OBJECT-TYPE
+	SYNTAX				INTEGER { false(0), true(1)}
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "Shows if alert is enabled 0..1"
+	::= { smAlertEntry 2 }
+
+smAlertStatus     		OBJECT-TYPE
+	SYNTAX				INTEGER { normal(0), enteringCritical(1), critical(2), exitingCritical(3), waitingAckDismiss(4), acknowledged(5), dismissed(6), disconnected(7) }
+	MAX-ACCESS			read-only
+	STATUS				current
+	DESCRIPTION	        "The current status of the alert"
+	::= { smAlertEntry 3 }
+
+-- hostSystem subtree
+
+unitName		OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS  		read-only
+	STATUS			current
+	DESCRIPTION		"Unit Name"
+	::= { hostSystem 1 }
+
+deviceModel		OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS  		read-only
+	STATUS			current
+	DESCRIPTION		"Device Model"
+	::= { hostSystem 2 }
+
+serialNumber		OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS  		read-only
+	STATUS			current
+	DESCRIPTION		"Serial Number"
+	::= { hostSystem 3 }
+
+firmwareRevision	OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS  		read-only
+	STATUS			current
+	DESCRIPTION		"Firmware Revision"
+	::= { hostSystem 4 }
+
+senderEmailAddress		OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS  		read-only
+	STATUS			current
+	DESCRIPTION		"FROM email address for alerts"
+	::= { hostSystem 5 }
+
+
+
+
+-- Trap Definitions
+
+intSensorsTraps         OBJECT IDENTIFIER ::= { enviromuxMicroTraps 1 }
+extSensorsTraps         OBJECT IDENTIFIER ::= { enviromuxMicroTraps 2 }
+digitalInputsTraps      OBJECT IDENTIFIER ::= { enviromuxMicroTraps 3 }
+ipDevicesTraps          OBJECT IDENTIFIER ::= { enviromuxMicroTraps 4 }
+
+intSensor1Trap          NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, intSensorValue, intSensorUnit }
+    STATUS              current
+    DESCRIPTION         "Trap issued when internal sensor 1 has a notification to send"
+    ::= {intSensorsTraps 1 }
+
+intSensor2Trap          NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, intSensorValue, intSensorUnit }
+    STATUS              current
+    DESCRIPTION         "Trap issued when internal sensor 2 has a notification to send"
+    ::= {intSensorsTraps 2 }
+
+intSensor3Trap          NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, intSensorValue, intSensorUnit }
+    STATUS              current
+    DESCRIPTION         "Trap issued when internal sensor 3 has a notification to send"
+    ::= {intSensorsTraps 3 }
+
+extSensor1Trap          NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, extSensorValue, extSensorUnit }
+    STATUS              current
+    DESCRIPTION         "Trap issued when external sensor 1 has a notification to send"
+    ::= {extSensorsTraps 1 }
+
+extSensor2Trap          NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, extSensorValue, extSensorUnit }
+    STATUS              current
+    DESCRIPTION         "Trap issued when external sensor 2 has a notification to send"
+    ::= {extSensorsTraps 2 }
+
+extSensor3Trap          NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, extSensorValue, extSensorUnit }
+    STATUS              current
+    DESCRIPTION         "Trap issued when external sensor 3 has a notification to send"
+    ::= {extSensorsTraps 3 }
+
+extSensor4Trap          NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, extSensorValue, extSensorUnit }
+    STATUS              current
+    DESCRIPTION         "Trap issued when external sensor 4 has a notification to send"
+    ::= {extSensorsTraps 4 }
+
+extSensor5Trap          NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, extSensorValue, extSensorUnit }
+    STATUS              current
+    DESCRIPTION         "Trap issued when external sensor 5 has a notification to send"
+    ::= {extSensorsTraps 5 }
+
+extSensor6Trap          NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, extSensorValue, extSensorUnit }
+    STATUS              current
+    DESCRIPTION         "Trap issued when external sensor 6 has a notification to send"
+    ::= {extSensorsTraps 6 }
+
+digInput1Trap           NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, digInputValue }
+    STATUS              current
+    DESCRIPTION         "Trap issued when digital input 1 has a notification to send"
+    ::= {digitalInputsTraps 1 }
+
+digInpu21Trap           NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, digInputValue }
+    STATUS              current
+    DESCRIPTION         "Trap issued when digital input 2 has a notification to send"
+    ::= {digitalInputsTraps 2 }
+
+ipDevice1Trap           NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, ipDeviceValue }
+    STATUS              current
+    DESCRIPTION         "Trap issued when IP device 1 has a notification to send"
+    ::= {ipDevicesTraps 1 }
+
+ipDevice2Trap           NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, ipDeviceValue }
+    STATUS              current
+    DESCRIPTION         "Trap issued when IP device 2 has a notification to send"
+    ::= {ipDevicesTraps 2 }
+
+ipDevice3Trap           NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, ipDeviceValue }
+    STATUS              current
+    DESCRIPTION         "Trap issued when IP device 3 has a notification to send"
+    ::= {ipDevicesTraps 3 }
+
+ipDevice4Trap           NOTIFICATION-TYPE
+    OBJECTS             { alertStatus, ipDeviceValue }
+    STATUS              current
+    DESCRIPTION         "Trap issued when IP device 4 has a notification to send"
+    ::= {ipDevicesTraps 4 }
+
+	
+END

@@ -1,0 +1,236 @@
+FAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Unsigned32 
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    hpSwitch
+        FROM HP-ICF-OID;
+
+hpicfFanMIB MODULE-IDENTITY
+    LAST-UPDATED "200808271030Z"   --August  27, 2008 10:30 GMT
+    ORGANIZATION "HP Networking"
+    CONTACT-INFO "Hewlett-Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION  "The MIB module is for representing switch fan entity."
+    REVISION     "200808271030Z"   --August  27, 2008 10:30 GMT
+    DESCRIPTION  "Revision 01."
+    ::= { hpSwitch 54 }
+
+-- ********************************************************************
+--  FAN Textual Conventions
+-- ********************************************************************
+HpicfDcFanIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"   
+    STATUS       current
+    DESCRIPTION  "A unique value that serves as an index to identify the fan." 
+    SYNTAX       Unsigned32
+
+HpicfDcFanType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "An enumerated value that indications the fan types."
+    SYNTAX       INTEGER {
+       unknown(0),
+       mm(1),
+       fm(2),
+       im(3),
+       ps(4),    
+       rollup(5),
+       maxtype(6)
+    }
+
+HpicfDcFanAirflowDirection ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "An enumerated value which provides an indication of the
+                  fan airflow direction. The Physical fan airflow direction
+                  could be either from the port towards the power supply
+                  module i.e. portToPower(1), or from the power supply module
+                  towards the port i.e. powerToPort(2)"
+    SYNTAX        INTEGER {
+       portToPower(1),
+       powerToPort(2)
+    }
+
+HpicfDcFanState ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION   "An enumerated value which provides an indication of the
+                  fan state."
+    SYNTAX        INTEGER  {
+       failed(0),
+       removed(1),
+       off(2),
+       underspeed(3),
+       overspeed(4),    
+       ok(5),
+       maxstate(6)
+    }
+
+-- ********************************************************************
+-- Fan Scalars
+-- ********************************************************************
+
+hpicfFanScalars OBJECT IDENTIFIER ::= { hpicfFanMIB 1 }
+
+      hpicfFanUserPrefAirflowDir OBJECT-TYPE
+      SYNTAX                     INTEGER {
+               portToPower(1),
+               powerToPort(2)
+      }
+      MAX-ACCESS                 read-write
+      STATUS                     current
+      DESCRIPTION  "The user preferred fan airflow direction. The direction could be
+                    powerToPort or portToPower. The actual fan direction has to be 
+                    changed manually, this will be used to indicate to the user when
+                    when the actual fan airflow direction is different from the user
+                    preferred airflow direction."
+      DEFVAL { powerToPort }
+      ::= { hpicfFanScalars 1 }
+
+
+-- ********************************************************************
+-- FAN entry 
+-- ********************************************************************
+
+hpicfEntityFan  OBJECT IDENTIFIER ::= { hpicfFanMIB 2 }
+
+hpicfFanTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HpicfFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table contains one row for every fan in the switch entity."
+    ::= { hpicfEntityFan 1 }
+
+hpicfFanEntry   OBJECT-TYPE
+    SYNTAX      HpicfFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Information about fan entity table."
+    INDEX       { hpicfFanIndex }
+    ::= { hpicfFanTable 1 }
+
+HpicfFanEntry ::= SEQUENCE {
+      hpicfFanIndex             HpicfDcFanIndex,
+      hpicfFanTray              Integer32,
+      hpicfFanType              HpicfDcFanType,
+      hpicfFanState             HpicfDcFanState,
+      hpicfFanRecovering        Integer32,
+      hpicfFanNumFailures       Counter32, 
+      hpicfFanAirflowDirection  HpicfDcFanAirflowDirection 
+}
+
+hpicfFanIndex    OBJECT-TYPE
+    SYNTAX       HpicfDcFanIndex
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "The index that is used to access the switch fan entry table."
+    ::= { hpicfFanEntry 1 }
+
+hpicfFanTray OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  "The tray number in which the fan is docked."
+    ::= { hpicfFanEntry 2 }
+
+hpicfFanType OBJECT-TYPE
+    SYNTAX      HpicfDcFanType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "An indication of the vendor-specific fan."
+    ::= { hpicfFanEntry 3 }
+
+hpicfFanState OBJECT-TYPE
+    SYNTAX      HpicfDcFanState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current state of the fan."
+    ::= { hpicfFanEntry 4 }
+
+hpicfFanRecovering OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "An indication that the switch fan entity is faulty.
+                 Before declaring a fan to be good after a failure is 
+                 detected, the same good indication must happen five (5)
+                 times in a row. A failure indication is always TRUE, while
+                 a good indication could be FALSE, hence this parameter is 
+                 used to count the repeated good indications before 
+                 declaring the fan to be good "
+    ::= { hpicfFanEntry 5 }
+
+hpicfFanNumFailures OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of times the fan has failed."
+    ::= { hpicfFanEntry 6 }
+
+hpicfFanAirflowDirection OBJECT-TYPE
+    SYNTAX        HpicfDcFanAirflowDirection 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Indication of the fan air flow direction, either
+                  from Power supply towards the port or from the port
+                  towards the power supply."
+    ::= { hpicfFanEntry 7 }
+
+
+-- ********************************************************************
+-- FAN Conformance
+--********************************************************************
+
+   hpicfFanConformance OBJECT IDENTIFIER ::= { hpicfFanMIB 3 }
+   hpicfFanCompliance  OBJECT IDENTIFIER ::= { hpicfFanConformance 1 }
+   hpicfFanGroups      OBJECT IDENTIFIER ::= { hpicfFanConformance 2 }
+
+-- ********************************************************************
+-- FAN Complicance
+-- ********************************************************************
+   hpicfDcFanCompliance MODULE-COMPLIANCE
+      STATUS       current
+      DESCRIPTION  "The compliance statement for entries which implement 
+                    the FAN MIB."
+      MODULE        -- This module
+      MANDATORY-GROUPS
+      {
+          hpicfFanScalarsGroup,
+          hpicfFanGroup
+      }
+      GROUP        hpicfFanGroup
+      DESCRIPTION  "Objects associated with switch entity FAN."
+      ::= { hpicfFanCompliance 1 } 
+
+--
+-- FAN Groups
+--
+   hpicfFanScalarsGroup OBJECT-GROUP
+      OBJECTS
+      {
+           hpicfFanUserPrefAirflowDir
+      }
+      STATUS      current
+      DESCRIPTION "Basic Scalars required in FAN MIB implementation."
+      ::= { hpicfFanGroups 1 }
+
+   hpicfFanGroup OBJECT-GROUP
+      OBJECTS
+      {
+          hpicfFanTray,              
+          hpicfFanType,              
+          hpicfFanState,            
+          hpicfFanRecovering,      
+          hpicfFanNumFailures,       
+          hpicfFanAirflowDirection
+      }
+      STATUS      current
+      DESCRIPTION "FAN MIB parameters "
+      ::= { hpicfFanGroups 2 }
+END

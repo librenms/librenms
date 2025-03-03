@@ -1,0 +1,930 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-RAPS-MIB.my
+ --
+ --
+
+ CIENA-CES-RAPS-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS        
+   Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE                    
+
+        FROM SNMPv2-SMI                 
+
+   DisplayString, MacAddress                
+
+        FROM SNMPv2-TC                                                  
+
+    cienaGlobalSeverity, cienaGlobalMacAddress
+
+   		FROM  CIENA-GLOBAL-MIB
+
+   CienaGlobalState
+
+   		FROM CIENA-TC
+
+   cienaCesConfig, cienaCesNotifications         
+
+        FROM CIENA-SMI;
+   
+   cienaCesRapsMIB MODULE-IDENTITY
+        LAST-UPDATED "201706070000Z"
+        ORGANIZATION "Ciena Corp."
+        CONTACT-INFO
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
+            Email:  support@ciena.com"
+        DESCRIPTION
+            "The MIB module for the Ciena RAPS Mib specific information."
+
+        REVISION    "201706070000Z"
+        DESCRIPTION 
+		    "Updated contact info."
+
+        REVISION    "201701230000Z"
+        DESCRIPTION
+		    "Added cienaCesRapsVirtualRingLogicalRingName to CienaCesRapsVirtualRingEntry."
+        REVISION
+             "201407040000Z"            
+        DESCRIPTION
+             "Added cienaCesRapsVirtualRingWestForce and cienaCesRapsVirtualRingEastForce attributes to CienaCesRapsVirtualRingEntry."            
+        REVISION    "201104161700Z"
+        DESCRIPTION
+            "Initial creation."
+        ::= { cienaCesConfig 20 }
+        
+  
+ --
+ -- Node definitions
+ --
+    
+ cienaCesRapsMIBObjects OBJECT IDENTIFIER ::= { cienaCesRapsMIB 1 }
+
+ cienaCesRapsGlobal OBJECT IDENTIFIER ::= { cienaCesRapsMIBObjects 1 }
+ cienaCesRapsLogicalRing OBJECT IDENTIFIER ::= { cienaCesRapsMIBObjects 2 }
+ cienaCesRapsVirtualRing OBJECT IDENTIFIER ::= { cienaCesRapsMIBObjects 3 }
+ cienaCesRapsVirtualRingMember OBJECT IDENTIFIER ::= { cienaCesRapsMIBObjects 4 }
+ 
+ -- Notifications 
+  
+ cienaCesRapsMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 18 } 
+ cienaCesRapsMIBNotifications    OBJECT IDENTIFIER ::=    { cienaCesRapsMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ cienaCesRapsMIBConformance OBJECT IDENTIFIER ::= { cienaCesRapsMIB 2 } 
+ cienaCesRapsMIBCompliances OBJECT IDENTIFIER ::= { cienaCesRapsMIBConformance 1 }      
+ cienaCesRapsMIBGroups      OBJECT IDENTIFIER ::= { cienaCesRapsMIBConformance 2 } 
+ 
+ -- 
+-- ***********************************************************
+-- 
+--                 Global Ring Config    
+-- 
+-- *********************************************************** 
+--
+
+ cienaCesRapsGlobalAttrs  OBJECT IDENTIFIER ::= { cienaCesRapsGlobal 1}
+
+ cienaCesRapsState   OBJECT-TYPE
+     SYNTAX         CienaGlobalState
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the global ring-protection state."
+     DEFVAL     { enabled }
+     ::= { cienaCesRapsGlobalAttrs 1 }
+
+ cienaCesRapsNodeId   OBJECT-TYPE
+     SYNTAX         MacAddress  
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the node ID."
+     ::= { cienaCesRapsGlobalAttrs 2 }
+
+ cienaCesRapsEtherType   OBJECT-TYPE
+     SYNTAX         OCTET STRING (SIZE(1..2))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the Ethertype value that is used in B-Tag section of RAPS encapsulation.."
+     ::= { cienaCesRapsGlobalAttrs 3 }
+
+ cienaCesRapsNumberOfRings   OBJECT-TYPE
+     SYNTAX        Integer32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This object indicates the number of logical rings."
+     ::= { cienaCesRapsGlobalAttrs 4 }
+
+-- 
+-- ***********************************************************
+-- 
+--                 Logical Ring Config    
+-- 
+-- *********************************************************** 
+-- 
+ cienaCesRapsLogicalRingTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesRapsLogicalRingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This object represents the table of logical rings."
+     ::= { cienaCesRapsLogicalRing 1 }
+        
+ cienaCesRapsLogicalRingEntry OBJECT-TYPE
+     SYNTAX       CienaCesRapsLogicalRingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the RAPS logical ring entry in the logical ring table."
+     INDEX { cienaCesRapsLogicalRingIndex }
+     ::= { cienaCesRapsLogicalRingTable 1 } 
+
+
+ CienaCesRapsLogicalRingEntry ::= SEQUENCE { 
+     cienaCesRapsLogicalRingIndex                                Integer32,
+     cienaCesRapsLogicalRingName                                DisplayString,
+     cienaCesRapsLogicalRingId                                     Integer32,
+     cienaCesRapsLogicalRingEastPortId                         Integer32,
+     cienaCesRapsLogicalRingWestPortId                        Integer32,
+     cienaCesRapsLogicalRingGuardTime                        Integer32,
+     cienaCesRapsLogicalRingWtr                                   Integer32,
+     cienaCesRapsLogicalRingWtb                                  Integer32,
+     cienaCesRapsLogicalRingWestHoldOffTime               Integer32,
+     cienaCesRapsLogicalRingWestForce                         INTEGER,
+     cienaCesRapsLogicalRingWestCfmService                DisplayString,
+     cienaCesRapsLogicalRingEastHoldOffTime                Integer32,
+     cienaCesRapsLogicalRingEastForce                          INTEGER,
+     cienaCesRapsLogicalRingEastCfmService                 DisplayString,
+     cienaCesRapsLogicalRingNumberOfVirtualRings        Integer32
+  }
+
+ cienaCesRapsLogicalRingIndex   OBJECT-TYPE
+     SYNTAX         Integer32 (1..60) 
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the logical ring index."
+     ::= { cienaCesRapsLogicalRingEntry 1 }
+ 
+ cienaCesRapsLogicalRingName   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..32))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the name of the logical ring."
+     ::= { cienaCesRapsLogicalRingEntry 2 }
+
+  cienaCesRapsLogicalRingId   OBJECT-TYPE
+     SYNTAX         Integer32 (1..255) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the logical ring ID."
+     ::= { cienaCesRapsLogicalRingEntry 3 }
+
+   cienaCesRapsLogicalRingGuardTime   OBJECT-TYPE
+     SYNTAX         Integer32 (10..2000) 
+     UNITS           "milliseconds"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the logical ring guard time in milliseconds."
+    DEFVAL     { 500 }
+     ::= { cienaCesRapsLogicalRingEntry 4 }
+
+   cienaCesRapsLogicalRingWtr   OBJECT-TYPE
+     SYNTAX         Integer32 (1..12)
+     UNITS           "minutes"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the wait-to-restore time of the logical ring."
+    DEFVAL     { 5 }
+     ::= { cienaCesRapsLogicalRingEntry 5 }
+
+ cienaCesRapsLogicalRingWtb   OBJECT-TYPE
+     SYNTAX         Integer32
+     UNITS           "minutes"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the wait-to-block time configured for this logical ring."
+     ::= { cienaCesRapsLogicalRingEntry 6 }
+
+   cienaCesRapsLogicalRingWestPortId   OBJECT-TYPE
+     SYNTAX         Integer32 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the west link port ID of this logical ring."
+     ::= { cienaCesRapsLogicalRingEntry 7 }
+
+   cienaCesRapsLogicalRingWestHoldOffTime   OBJECT-TYPE
+     SYNTAX         Integer32 (0..10000)
+     UNITS           "milliseconds"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the holdoff time for this logical ring."
+    DEFVAL     { 0 }
+     ::= { cienaCesRapsLogicalRingEntry 8 }
+
+   cienaCesRapsLogicalRingWestForce   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+            off(1),
+            on(2)
+            }
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the force switch state of the logical ring link."
+     DEFVAL     { 1 }
+     ::= { cienaCesRapsLogicalRingEntry 9 }
+
+ cienaCesRapsLogicalRingWestCfmService   OBJECT-TYPE
+     SYNTAX         DisplayString(SIZE (1..32))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the CFM service added to a logical ring link."
+     ::= { cienaCesRapsLogicalRingEntry 10 }
+
+   cienaCesRapsLogicalRingEastPortId   OBJECT-TYPE
+     SYNTAX         Integer32 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the east link port ID of this logical ring."
+     ::= { cienaCesRapsLogicalRingEntry 11 }
+
+   cienaCesRapsLogicalRingEastHoldOffTime   OBJECT-TYPE
+     SYNTAX         Integer32 (0..10000)
+     UNITS           "milliseconds"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the holdoff time for this logical ring."
+    DEFVAL     { 0 }
+     ::= { cienaCesRapsLogicalRingEntry 12 }
+
+   cienaCesRapsLogicalRingEastForce   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+            off(1),
+            on(2)
+            }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the switch state of the logical ring link."
+     DEFVAL     { 1 }
+     ::= { cienaCesRapsLogicalRingEntry 13 }
+
+ cienaCesRapsLogicalRingEastCfmService   OBJECT-TYPE
+     SYNTAX         DisplayString(SIZE (1..32))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the CFM service added to a logical ring link."
+     ::= { cienaCesRapsLogicalRingEntry 14 }
+
+   cienaCesRapsLogicalRingNumberOfVirtualRings   OBJECT-TYPE
+     SYNTAX         Integer32 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         " This object indicates the number of virtual rings in this logical ring."
+    DEFVAL     { 0 }
+     ::= { cienaCesRapsLogicalRingEntry 15 }
+
+-- 
+-- ***********************************************************
+-- 
+--                 Virtual Ring     
+-- 
+-- *********************************************************** 
+--
+  cienaCesRapsVirtualRingTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesRapsVirtualRingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This object identifies the table of virtual rings."
+     ::= { cienaCesRapsVirtualRing 1 }
+        
+ cienaCesRapsVirtualRingEntry OBJECT-TYPE
+     SYNTAX       CienaCesRapsVirtualRingEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the RAPS virtual ring entry in the virtual ring table."
+     INDEX { cienaCesRapsVirtualRingIndex }
+     ::= { cienaCesRapsVirtualRingTable 1 } 
+
+ CienaCesRapsVirtualRingEntry ::= SEQUENCE { 
+	 cienaCesRapsVirtualRingIndex				Integer32,
+	 cienaCesRapsVirtualRingName				DisplayString,
+	 cienaCesRapsVirtualRingVid 				Integer32,
+	 cienaCesRapsVirtualRingLogicalRingId		       Integer32,
+	 cienaCesRapsVirtualRingMel 				Integer32,
+	 cienaCesRapsVirtualRingRevertive			INTEGER,
+	 cienaCesRapsVirtualRingState				INTEGER,
+	 cienaCesRapsVirtualRingStatus				INTEGER,
+	 cienaCesRapsVirtualRingAlarm				INTEGER,
+	 cienaCesRapsVirtualRingNumOfSwitchOvers	Integer32,
+	 cienaCesRapsVirtualRingUptimeFromLastFailure	Integer32,
+	 cienaCesRapsVirtualRingTotalDownTime		Integer32,	
+	 cienaCesRapsVirtualRingWestPortRpl 		       INTEGER,	
+	 cienaCesRapsVirtualRingWestPortState		INTEGER,  
+	 cienaCesRapsVirtualRingWestPortStatus		INTEGER, 
+	 cienaCesRapsVirtualRingWestPortNrRxd		Integer32,  
+	 cienaCesRapsVirtualRingWestPortNrTxd		Integer32,	
+	 cienaCesRapsVirtualRingWestPortSfRxd		Integer32,
+	 cienaCesRapsVirtualRingWestPortSfTxd		Integer32,  
+	 cienaCesRapsVirtualRingWestPortFsRxd		Integer32,
+	 cienaCesRapsVirtualRingWestPortFsTxd		Integer32,  
+	 cienaCesRapsVirtualRingWestPortNrRbRxd 	Integer32,
+	 cienaCesRapsVirtualRingWestPortNrRbTxd 	Integer32,  
+	 cienaCesRapsVirtualRingEastPortRpl 		INTEGER,	
+	 cienaCesRapsVirtualRingEastPortState		INTEGER,  
+	 cienaCesRapsVirtualRingEastPortStatus		INTEGER, 
+	 cienaCesRapsVirtualRingEastPortNrRxd		Integer32,  
+	 cienaCesRapsVirtualRingEastPortNrTxd		Integer32,	
+	 cienaCesRapsVirtualRingEastPortSfRxd		Integer32,
+	 cienaCesRapsVirtualRingEastPortSfTxd		Integer32,  
+	 cienaCesRapsVirtualRingEastPortFsRxd		Integer32,
+	 cienaCesRapsVirtualRingEastPortFsTxd		Integer32,  
+	 cienaCesRapsVirtualRingEastPortNrRbRxd 	Integer32,
+	 cienaCesRapsVirtualRingEastPortNrRbTxd 	Integer32,
+	 cienaCesRapsVirtualRingType			    INTEGER,
+	 cienaCesRapsVirtualRingSubRingPortTerm      INTEGER,
+	 cienaCesRapsVirtualRingNotifIndex		     Integer32,
+	 cienaCesRapsVirtualRingAlarmExtended	     OCTET STRING,
+	 cienaCesRapsVirtualRingWestForce           INTEGER,
+	 cienaCesRapsVirtualRingEastForce           INTEGER,
+	 cienaCesRapsVirtualRingFlushPropagate      INTEGER,
+	 cienaCesRapsVirtualRingLogicalRingName     DisplayString
+  }
+
+ cienaCesRapsVirtualRingIndex   OBJECT-TYPE
+     SYNTAX         Integer32 (1..240) 
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the virtual ring index."
+     ::= { cienaCesRapsVirtualRingEntry 1 }
+ 
+ cienaCesRapsVirtualRingName   OBJECT-TYPE
+     SYNTAX         DisplayString(SIZE (1..32))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the name of the virtual ring."
+     ::= { cienaCesRapsVirtualRingEntry 2 }
+
+ cienaCesRapsVirtualRingVid   OBJECT-TYPE
+     SYNTAX         Integer32 (1..4094) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the virtual ring VID."
+     ::= { cienaCesRapsVirtualRingEntry 3 }
+
+ cienaCesRapsVirtualRingLogicalRingId   OBJECT-TYPE
+     SYNTAX         Integer32 (1..255) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the ID of the logical ring to which this virtual ring belongs."
+     ::= { cienaCesRapsVirtualRingEntry 4 }
+
+ cienaCesRapsVirtualRingMel   OBJECT-TYPE
+     SYNTAX         Integer32 (0..7) 
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the maintenance group level of a virtual ring."
+     ::= { cienaCesRapsVirtualRingEntry 5 }
+
+ cienaCesRapsVirtualRingRevertive   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                    off(1),
+                    on(2)
+                    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates whether a virtual ring is revertive."
+     DEFVAL     { 2 }
+     ::= { cienaCesRapsVirtualRingEntry 6 }
+
+ cienaCesRapsVirtualRingState   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+                adminDisabled(1),
+                ok(2),
+                protecting(3),
+                recovering(4),
+                init(5),
+                none(6)
+                }
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the current state of a virtual ring."
+     ::= { cienaCesRapsVirtualRingEntry 7 }
+
+ cienaCesRapsVirtualRingStatus   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+                 clear(1),
+                 localSignalFail(2),
+                 localForceSwitch(3),
+                 remoteOrOtherPortSignalFail(4),
+                 remoteOrOtherPortForceSwitch(5),
+                 provisioningMismatch(6),
+                 noRapsPduReceived(7),
+                 noRplOwnerDetected(8)
+            }
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the current status of a virtual ring."
+     ::= { cienaCesRapsVirtualRingEntry 8 }
+
+ cienaCesRapsVirtualRingAlarm   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+            clear(1),
+            protectionSwitching(2),
+            provisionMismatch(3),
+            noRapsPduReceived(4),
+            noRplOwnerDetected(5)
+    }
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the current alarm status of a virtual ring. Multiple alarms may occur at
+          the same time. cienaCesRapsVirtualRingAlarmExtended can be used to reterive all existing alarms."
+     ::= { cienaCesRapsVirtualRingEntry 9 }
+
+ cienaCesRapsVirtualRingNumOfSwitchOvers   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of protection switchovers that have occurred for this virtual ring."
+     ::= { cienaCesRapsVirtualRingEntry 10 }
+
+ cienaCesRapsVirtualRingUptimeFromLastFailure   OBJECT-TYPE
+     SYNTAX         Integer32     
+     UNITS           "seconds"
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the up time from the last failure for this virtual ring."
+     ::= { cienaCesRapsVirtualRingEntry 11 }
+
+ cienaCesRapsVirtualRingTotalDownTime   OBJECT-TYPE
+     SYNTAX         Integer32     
+     UNITS           "seconds"
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the total down time for this virtual ring."
+     ::= { cienaCesRapsVirtualRingEntry 12 }
+
+ cienaCesRapsVirtualRingWestPortRpl   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+            none(1),
+            owner(2)
+            }
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the RPL ownership for the virtual ring's west link."
+     DEFVAL     { 1 }
+     ::= { cienaCesRapsVirtualRingEntry 13 }
+
+ cienaCesRapsVirtualRingWestPortState   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+            disabled(1),
+            forwarding(2),
+            blocked(3)
+            }
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the virtual ring's west link state."
+     ::= { cienaCesRapsVirtualRingEntry 14 }
+
+ cienaCesRapsVirtualRingWestPortStatus   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+            oK(1),
+            down(2),
+            ccmFailure(3),
+            localForceSwitch(4),
+            remoteForceSwitch(5),
+            remoteSignalFailure(6)
+            }
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the virtual ring's west link status."
+     ::= { cienaCesRapsVirtualRingEntry 15 }
+
+ cienaCesRapsVirtualRingWestPortNrRxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of requests received on the west link."
+     ::= { cienaCesRapsVirtualRingEntry 16 }
+
+ cienaCesRapsVirtualRingWestPortNrTxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of request transmitted on the west link."
+     ::= { cienaCesRapsVirtualRingEntry 17 }
+
+
+ cienaCesRapsVirtualRingWestPortSfRxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of signal failures received on the west link."
+     ::= { cienaCesRapsVirtualRingEntry 18 }
+
+ cienaCesRapsVirtualRingWestPortSfTxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of signal failures transmitted on the west link."
+     ::= { cienaCesRapsVirtualRingEntry 19 }
+
+ cienaCesRapsVirtualRingWestPortFsRxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of force-switch received on the west link."
+     ::= { cienaCesRapsVirtualRingEntry 20 }
+
+ cienaCesRapsVirtualRingWestPortFsTxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of force-switch transmitted on the west link."
+     ::= { cienaCesRapsVirtualRingEntry 21 }
+
+ cienaCesRapsVirtualRingWestPortNrRbRxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of no-request-RPL-blocked received on the west link."
+     ::= { cienaCesRapsVirtualRingEntry 22 }
+
+ cienaCesRapsVirtualRingWestPortNrRbTxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of no-request-RPL-blocked transmitted on the west link."
+     ::= { cienaCesRapsVirtualRingEntry 23 }
+
+ cienaCesRapsVirtualRingEastPortRpl   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+            none(1),
+            owner(2)
+            }
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the RPL ownership for the virtual ring's east link."
+     DEFVAL     { 1 }
+     ::= { cienaCesRapsVirtualRingEntry 24 }
+
+ cienaCesRapsVirtualRingEastPortState   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+            disabled(1),
+            forwarding(2),
+            blocked(3)
+            }
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the the virtual ring's east link state."
+     ::= { cienaCesRapsVirtualRingEntry 25 }
+
+ cienaCesRapsVirtualRingEastPortStatus   OBJECT-TYPE
+     SYNTAX         INTEGER {   
+            ok(1),
+            down(2),
+            ccmFailure(3),
+            localForceSwitch(4),
+            remoteForceSwitch(5),
+            remoteSignalFailure(6)
+            }
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the virtual ring's east link status."
+     ::= { cienaCesRapsVirtualRingEntry 26 }
+
+ cienaCesRapsVirtualRingEastPortNrRxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of no-request received on the east link."
+     ::= { cienaCesRapsVirtualRingEntry 27  }
+
+ cienaCesRapsVirtualRingEastPortNrTxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of no-request transmitted on the east link."
+     ::= { cienaCesRapsVirtualRingEntry 28  }
+
+
+ cienaCesRapsVirtualRingEastPortSfRxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of signal failures received on the east link."
+     ::= { cienaCesRapsVirtualRingEntry 29  }
+
+ cienaCesRapsVirtualRingEastPortSfTxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of signal failures transmitted on the east link."
+     ::= { cienaCesRapsVirtualRingEntry 30 }
+
+ cienaCesRapsVirtualRingEastPortFsRxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of force-switch received on the east link."
+     ::= { cienaCesRapsVirtualRingEntry 31 }
+
+ cienaCesRapsVirtualRingEastPortFsTxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of force-switch transmitted on the east link."
+     ::= { cienaCesRapsVirtualRingEntry 32 }
+
+ cienaCesRapsVirtualRingEastPortNrRbRxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of no-request-RPL-blocked received on the east link."
+     ::= { cienaCesRapsVirtualRingEntry 33 }
+
+ cienaCesRapsVirtualRingEastPortNrRbTxd   OBJECT-TYPE
+     SYNTAX         Integer32     
+     MAX-ACCESS     read-only
+     STATUS               current
+     DESCRIPTION
+         "This object indicates the number of no-request-RPL-blocked transmitted on the east link."
+     ::= { cienaCesRapsVirtualRingEntry 34 }
+
+ cienaCesRapsVirtualRingType   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        majorRing(1),
+                        subRing(2)
+                    }
+     MAX-ACCESS     read-only  
+     STATUS               current
+     DESCRIPTION
+             "This object indicates the virtual ring type."
+     ::= { cienaCesRapsVirtualRingEntry 35 }
+
+ cienaCesRapsVirtualRingSubRingPortTerm   OBJECT-TYPE
+     SYNTAX         INTEGER {  
+                        noTerminate(1),
+                        westPortTerminate(2),
+                        eastPortTerminate(3)
+                    }
+     MAX-ACCESS     read-only  
+     STATUS               current
+     DESCRIPTION
+             "This object indicates the virtual sub-ring termination port."
+     ::= { cienaCesRapsVirtualRingEntry 36 }
+ 
+ cienaCesRapsVirtualRingNotifIndex OBJECT-TYPE
+     SYNTAX         Integer32 (1..240) 
+     MAX-ACCESS     accessible-for-notify
+     STATUS         current
+     DESCRIPTION
+         "This object indicates the virtual ring index that is accessible to notify objects."
+     ::= { cienaCesRapsVirtualRingEntry 37 }
+
+ cienaCesRapsVirtualRingAlarmExtended   OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(1))		    
+     MAX-ACCESS     read-only
+     STATUS         	  current
+     DESCRIPTION
+	     "This object shows all extsting  virtual ring alarms.
+			Bit 0: configurationMismatch,
+			Bit 1: protectionSwitchActive,
+			Bit 2: noRapsPduReceived,
+			Bit 3; noRplOwnerDetected"
+     ::= { cienaCesRapsVirtualRingEntry 38 }
+     
+ cienaCesRapsVirtualRingWestForce   OBJECT-TYPE
+    SYNTAX         INTEGER {   
+            off(1),
+            on(2)
+            }
+    MAX-ACCESS     read-only
+    STATUS               current
+    DESCRIPTION
+        "This object indicates the force switch state of the virtual ring link."
+    DEFVAL     { 1 }
+    ::= { cienaCesRapsVirtualRingEntry 39 }
+    
+ cienaCesRapsVirtualRingEastForce   OBJECT-TYPE
+    SYNTAX         INTEGER {   
+            off(1),
+            on(2)
+            }
+    MAX-ACCESS     read-only
+    STATUS               current
+    DESCRIPTION
+        "This object indicates the force switch state of the virtual ring link."
+    DEFVAL     { 1 }
+    ::= { cienaCesRapsVirtualRingEntry 40 }
+
+cienaCesRapsVirtualRingFlushPropagate   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                    off(1),
+                    on(2)
+                    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+         "This object indicates whether flush propagation is enabled or disabled."
+     DEFVAL     { 1 }
+     ::= { cienaCesRapsVirtualRingEntry 41 }
+
+  cienaCesRapsVirtualRingLogicalRingName   OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE (1..32))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "Name of the logical ring to which this virtual ring belongs."
+    ::= { cienaCesRapsVirtualRingEntry 42 }
+ 
+ --CienaCesRapsVirtualRingMemberTable
+ 
+  cienaCesRapsVirtualRingMemberTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesRapsVirtualRingMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This object represents the table of virtual ring VLAN members."
+     ::= { cienaCesRapsVirtualRingMember 1 }
+        
+ cienaCesRapsVirtualRingMemberEntry OBJECT-TYPE
+     SYNTAX       CienaCesRapsVirtualRingMemberEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This object represents the RAPS virtual ring member entry in the virtual ring table."
+     INDEX { cienaCesRapsVirtualRingIndex, cienaCesRapsVirtualRingMemberVsId }
+     ::= { cienaCesRapsVirtualRingMemberTable 1 } 
+     
+ CienaCesRapsVirtualRingMemberEntry ::= SEQUENCE { 
+     cienaCesRapsVirtualRingMemberVsId   Integer32
+  }
+
+  cienaCesRapsVirtualRingMemberVsId OBJECT-TYPE
+     SYNTAX       Integer32 (1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "This object indicates the VS ID."
+     ::= { cienaCesRapsVirtualRingMemberEntry 2 } 
+
+
+ --
+ -- Notifications
+ --
+ cienaCesRapsAlarmClearNotification NOTIFICATION-TYPE
+    OBJECTS { 
+             cienaGlobalSeverity,
+             cienaGlobalMacAddress,
+             cienaCesRapsVirtualRingNotifIndex,                
+             cienaCesRapsVirtualRingName,
+             cienaCesRapsVirtualRingAlarm
+        }
+    STATUS  current
+    DESCRIPTION
+        "A alarm notification is sent when an alarm is cleared. The cause field will indicate which alarm
+        is cleared.
+        To enable this notification, cienaCesRapsAlarmTrapState must be enabled. 
+        By default this trap state is enabled. Variable bindings include: 
+        cienaGlobalSeverity, cienaGlobalMacAddress, 
+        cienaCesRapsVirtualRingNotifIndex,cienaCesRapsVirtualRingName, 
+        and cienaCesRapsVirtualRingAlarm."       
+    ::= { cienaCesRapsMIBNotifications 1 }
+ 
+ cienaCesRapsAlarmProtectionSwitchingNotification NOTIFICATION-TYPE
+    OBJECTS { 
+             cienaGlobalSeverity,
+             cienaGlobalMacAddress,
+             cienaCesRapsVirtualRingNotifIndex,                
+             cienaCesRapsVirtualRingName,
+             cienaCesRapsVirtualRingAlarm
+        }
+    STATUS  current
+    DESCRIPTION
+        "A alarm notification is sent when a ring detects a Protection-Switch-Active 
+        condition. To enable this notification, cienaCesRapsAlarmTrapState must be enabled.
+        By default this trap state is enabled. Variable bindings include:
+        cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesRapsVirtualRingNotifIndex, 
+        cienaCesRapsVirtualRingName, and cienaCesRapsVirtualRingAlarm."      
+    ::= { cienaCesRapsMIBNotifications 2 }
+
+cienaCesRapsAlarmProvisionMismatchNotification NOTIFICATION-TYPE
+    OBJECTS { 
+             cienaGlobalSeverity,
+             cienaGlobalMacAddress,
+             cienaCesRapsVirtualRingNotifIndex,                
+             cienaCesRapsVirtualRingName,
+             cienaCesRapsVirtualRingAlarm
+        }
+    STATUS  current
+    DESCRIPTION
+        "A alarm notification is sent when a ring detects a Provisioning-Mismatch 
+        condition. To enable this notification, cienaCesRapsAlarmTrapState must be enabled.
+        By default this trap state is enabled. Variable bindings include: 
+        cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesRapsVirtualRingNotifIndex, 
+        cienaCesRapsVirtualRingName, and cienaCesRapsVirtualRingAlarm."      
+    ::= { cienaCesRapsMIBNotifications 3 }
+
+
+cienaCesRapsAlarmNoRapsPduReceivedNotification NOTIFICATION-TYPE
+    OBJECTS { 
+             cienaGlobalSeverity,
+             cienaGlobalMacAddress,
+             cienaCesRapsVirtualRingNotifIndex,                
+             cienaCesRapsVirtualRingName,
+             cienaCesRapsVirtualRingAlarm
+        }
+    STATUS  current
+    DESCRIPTION
+        "On a major-ring, a node is not receiving any R-APS messages on a ringlet port 
+        for at least 3.5 consecutive long R-APS frame intervals (i.e. 3.5 * 5 = total 17.5 seconds) 
+        while that ring port does not report any link level failures and is not administratively disabled. 
+        On a sub-ring, a node is not receiving R-APS messages on either ringlet port for at least 3.5
+        consecutive long R-APS frame intervals (i.e. 3.5 * 5 = total 17.5 seconds) while that ring port 
+        does not report any link level failures and is not administratively disabled.
+        To enable this notification, cienaCesRapsAlarmTrapState must be enabled.
+        By default this trap state is enabled. Variable bindings include:
+        cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesRapsVirtualRingNotifIndex, 
+        cienaCesRapsVirtualRingName, and cienaCesRapsVirtualRingAlarm."      
+    ::= { cienaCesRapsMIBNotifications 4 }
+
+cienaCesRapsAlarmNoRplOwnerDetectedNotification NOTIFICATION-TYPE
+    OBJECTS { 
+             cienaGlobalSeverity,
+             cienaGlobalMacAddress,
+             cienaCesRapsVirtualRingNotifIndex,                
+             cienaCesRapsVirtualRingName,
+             cienaCesRapsVirtualRingAlarmExtended
+        }
+    STATUS  current
+    DESCRIPTION
+        "A ringlet instance that is not the RPL Owner receives no R-APS OK message while 
+        it is transmitting R-APS RIM messages for 13 or more minutes.
+        To enable this notification, cienaCesRapsAlarmTrapState must be enabled.
+        By default this trap state is enabled. Variable bindings include:
+        cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesRapsVirtualRingNotifIndex, 
+        cienaCesRapsVirtualRingName, and cienaCesRapsVirtualRingAlarm."      
+    ::= { cienaCesRapsMIBNotifications 5 }
+
+
+ END
+
+ --
+ -- CIENA-CES-RAPS-MIB
+ --
+

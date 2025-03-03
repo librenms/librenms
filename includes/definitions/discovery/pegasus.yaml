@@ -1,0 +1,95 @@
+mib: PEGASUS-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: dslCardTable
+                    value: dslCardOperState
+                    num_oid: '.1.3.6.1.4.1.6368.2.1.1.1.6.{{ $index }}'
+                    descr: LTU {{ $index }} Operational State
+                    state_name: dslCardOperState
+                    states:
+                        - { descr: enabled, graph: 0, value: 1, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 2, generic: 2 }
+                -
+                    oid: dslCardTable
+                    value: dslCardCommState
+                    num_oid: '.1.3.6.1.4.1.6368.2.1.1.1.9.{{ $index }}'
+                    descr: LTU {{ $index }} Mgmt Comm State
+                    state_name: dslCardCommState
+                    states:
+                        - { descr: disconnected, graph: 0, value: 1, generic: 0 }
+                        - { descr: init, graph: 0, value: 2, generic: 0 }
+                        - { descr: identification, graph: 0, value: 3, generic: 0 }
+                        - { descr: checkHw, graph: 0, value: 4, generic: 0 }
+                        - { descr: hwAdaption, graph: 0, value: 5, generic: 0 }
+                        - { descr: checkHwVers, graph: 0, value: 6, generic: 0 }
+                        - { descr: wrongProgramm, graph: 0, value: 7, generic: 0 }
+                        - { descr: checkConfig, graph: 0, value: 8, generic: 0 }
+                        - { descr: downloadConfig, graph: 0, value: 9, generic: 0 }
+                        - { descr: uploadConfig, graph: 0, value: 10, generic: 0 }
+                        - { descr: statusSynch, graph: 0, value: 11, generic: 0 }
+                        - { descr: resetting, graph: 0, value: 12, generic: 0 }
+                        - { descr: inactive, graph: 0, value: 13, generic: 0 }
+                        - { descr: active, graph: 0, value: 14, generic: 0 }
+                -
+                    oid: v5CardTable
+                    value: v5CardOperState
+                    num_oid: '.1.3.6.1.4.1.6368.2.2.1.1.7.{{ $index }}'
+                    descr: V5 {{ $index }} Operational State
+                    state_name: v5CardOperState
+                    states:
+                        - { descr: enabled, graph: 0, value: 1, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 2, generic: 2 }
+                -
+                    oid: v5CardTable
+                    value: v5CardCommState
+                    num_oid: '.1.3.6.1.4.1.6368.2.2.1.1.10.{{ $index }}'
+                    descr: V5 {{ $index }} Mgmt Comm State
+                    state_name: v5CardCommState
+                    states:
+                        - { descr: disconnected, graph: 0, value: 1, generic: 0 }
+                        - { descr: init, graph: 0, value: 2, generic: 0 }
+                        - { descr: identification, graph: 0, value: 3, generic: 0 }
+                        - { descr: checkHw, graph: 0, value: 4, generic: 0 }
+                        - { descr: hwAdaption, graph: 0, value: 5, generic: 0 }
+                        - { descr: checkHwVers, graph: 0, value: 6, generic: 0 }
+                        - { descr: wrongProgramm, graph: 0, value: 7, generic: 0 }
+                        - { descr: checkConfig, graph: 0, value: 8, generic: 0 }
+                        - { descr: downloadConfig, graph: 0, value: 9, generic: 0 }
+                        - { descr: uploadConfig, graph: 0, value: 10, generic: 0 }
+                        - { descr: statusSynch, graph: 0, value: 11, generic: 0 }
+                        - { descr: resetting, graph: 0, value: 12, generic: 0 }
+                        - { descr: inactive, graph: 0, value: 13, generic: 0 }
+                        - { descr: active, graph: 0, value: 14, generic: 0 }
+                -
+                    oid: dataCardTable
+                    value: dataCardOperState
+                    num_oid: '.1.3.6.1.4.1.6368.2.3.1.1.6.{{ $index }}'
+                    descr: Data {{ $index }} Operational State
+                    state_name: dataCardOperState
+                    states:
+                        - { descr: enabled, graph: 0, value: 1, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 2, generic: 2 }
+                -
+                    oid: dataCardTable
+                    value: dataCardCommState
+                    num_oid: '.1.3.6.1.4.1.6368.2.3.1.1.9.{{ $index }}'
+                    descr: Data {{ $index }} Mgmt Comm State
+                    state_name: dataCardCommState
+                    states:
+                        - { descr: disconnected, graph: 0, value: 1, generic: 0 }
+                        - { descr: init, graph: 0, value: 2, generic: 0 }
+                        - { descr: identification, graph: 0, value: 3, generic: 0 }
+                        - { descr: checkHw, graph: 0, value: 4, generic: 0 }
+                        - { descr: hwAdaption, graph: 0, value: 5, generic: 0 }
+                        - { descr: checkHwVers, graph: 0, value: 6, generic: 0 }
+                        - { descr: wrongProgramm, graph: 0, value: 7, generic: 0 }
+                        - { descr: checkConfig, graph: 0, value: 8, generic: 0 }
+                        - { descr: downloadConfig, graph: 0, value: 9, generic: 0 }
+                        - { descr: uploadConfig, graph: 0, value: 10, generic: 0 }
+                        - { descr: statusSynch, graph: 0, value: 11, generic: 0 }
+                        - { descr: resetting, graph: 0, value: 12, generic: 0 }
+                        - { descr: inactive, graph: 0, value: 13, generic: 0 }
+                        - { descr: active, graph: 0, value: 14, generic: 0 }

@@ -4,8 +4,9 @@ type: appliance
 icon: avaya
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_storage, text: 'Storage' }
+    - { graph: device_storage, text: Storage }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysObjectId:
-        - .1.3.6.1.4.1.903.31.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.903.31.

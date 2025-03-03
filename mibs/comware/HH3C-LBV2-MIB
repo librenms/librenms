@@ -1,0 +1,1165 @@
+-- =================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: Private MIB File For LB
+-- Reference:
+-- Version: V1.3
+-- History:
+-- V1.0  2013-11 Initial Version created by y04448.
+-- V1.1  2014-04 updated by yuhongqiang.
+--       Change MAX-ACCESS from not-accessible to accessible-for-notify for the
+--       following MIB nodes:
+--         hh3cLBv2RSStatChassis, hh3cLBv2RSStatSlot, hh3cLBv2RSStatCpuid.
+--       Add the following MIB nodes:
+--         hh3cLBv2RSConnectionsLimit, hh3cLBv2RSConnectionsRateLimit,
+--         hh3cLBv2RSStatConnectionsRate.
+--       Add the following trap nodes:
+--         hh3cLBv2RSConnOverloadTrap, hh3cLBv2RSConnRecoveryTrap,
+--         hh3cLBv2RSConnsRateOverloadTrap, hh3cLBv2RSConnsRateRecoveryTrap.
+--       Change the description of hh3cLBv2VSConnsRateRecoveryTrap.
+-- V1.2  2016-11 modified description of hh3cLBv2VSActiveTrap, hh3cLBv2VSInactiveTrap,
+--         hh3cLBv2RSAvailableTrap, hh3cLBv2RSUnavailableTrap, hh3cLBv2SFActiveTrap,
+--         hh3cLBv2SFInactiveTrap, hh3cLBv2ActionInUseSFChangeTrap, hh3cLBv2VSInUseSFChangeTrap  by l08992.
+-- V1.3  2019-05 updated by m16825.
+--         Add the following MIB table:
+--         hh3cLBv2GlobalStatsTable
+--       Add the following MIB nodes:
+--         hh3cLBv2GlobalStatChassis,hh3cLBv2GlobalStatSlot,hh3cLBv2GlobalStatCpuid,
+--         hh3cLBv2GlobalStatTotalConnections, hh3cLBv2GlobalStatActiveConnections,hh3cLBv2GlobalStatConnectionsRate.
+-- =================================================================
+HH3C-LBV2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64, NOTIFICATION-TYPE, Gauge32
+        FROM SNMPv2-SMI         -- [RFC2578]
+    RowStatus, DisplayString
+        FROM SNMPv2-TC;         -- [RFC2578]
+
+hh3cLBv2 MODULE-IDENTITY
+    LAST-UPDATED "201905130000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The private MIB file includes the LB information of
+         the device."
+    REVISION      "201905130000Z"
+    DESCRIPTION
+        "Add MIB table hh3cLBv2GlobalStatsTable."
+    REVISION      "201311010000Z"
+    DESCRIPTION
+        "Initial revision of this MIB module."
+    ::= { hh3cCommon 148 }
+
+hh3cLBv2GlobalObjects OBJECT IDENTIFIER ::= { hh3cLBv2 1 }
+
+hh3cLBv2TrapEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+         enabled     (1),
+         disabled    (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the module of LB will generate
+         traps for events defined in this MIB.  'enabled'
+         results in SNMP traps; 'disabled', no traps are sent."
+    DEFVAL { enabled }
+    ::= { hh3cLBv2GlobalObjects 1 }
+
+hh3cLBv2GlobalStatsTable OBJECT-TYPE
+-- =================================================================
+--    LB Global Statistic Table
+-- =================================================================
+    SYNTAX SEQUENCE OF Hh3cLBv2GlobalStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Global statistic table for LB."
+  ::= { hh3cLBv2GlobalObjects 2 }
+
+hh3cLBv2GlobalStatsEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBv2GlobalStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the statistic information of LB."
+    INDEX {
+            hh3cLBv2GlobalStatChassis,
+            hh3cLBv2GlobalStatSlot,
+            hh3cLBv2GlobalStatCpuid
+          }
+    ::= { hh3cLBv2GlobalStatsTable 1 }
+
+Hh3cLBv2GlobalStatsEntry  ::=
+    SEQUENCE{
+        hh3cLBv2GlobalStatChassis                  Unsigned32,
+        hh3cLBv2GlobalStatSlot                     Unsigned32,
+        hh3cLBv2GlobalStatCpuid                    Unsigned32,
+        hh3cLBv2GlobalStatTotalConnections         Counter64,
+        hh3cLBv2GlobalStatActiveConnections        Gauge32,
+        hh3cLBv2GlobalStatConnectionsRate          Gauge32
+    }
+
+hh3cLBv2GlobalStatChassis OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ID of the device that holds the card."
+    ::= { hh3cLBv2GlobalStatsEntry 1 }
+
+hh3cLBv2GlobalStatSlot OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Member ID of the card on device."
+    ::= { hh3cLBv2GlobalStatsEntry 2 }
+
+hh3cLBv2GlobalStatCpuid OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ID of the CPU on the card."
+    ::= { hh3cLBv2GlobalStatsEntry 3 }
+
+hh3cLBv2GlobalStatTotalConnections OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of connections of LB."
+    ::= { hh3cLBv2GlobalStatsEntry 4 }
+
+hh3cLBv2GlobalStatActiveConnections OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active connections of LB."
+    ::= { hh3cLBv2GlobalStatsEntry 5}
+
+hh3cLBv2GlobalStatConnectionsRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "cps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection rate of LB."
+    ::= { hh3cLBv2GlobalStatsEntry 6 }
+
+hh3cLBv2ActionTables OBJECT IDENTIFIER ::= { hh3cLBv2 2 }
+-- =================================================================
+--    LB Action Table
+-- =================================================================
+hh3cLBv2ActionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cLBv2ActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Action table for LB."
+    ::= { hh3cLBv2ActionTables 1 }
+
+hh3cLBv2ActionEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBv2ActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the information of the action."
+    INDEX {
+            hh3cLBv2ActionName
+          }
+    ::= { hh3cLBv2ActionTable 1 }
+
+Hh3cLBv2ActionEntry  ::=
+    SEQUENCE{
+        hh3cLBv2ActionName                     DisplayString,
+        hh3cLBv2ActionDefaultSF                DisplayString,
+        hh3cLBv2ActionBackupSF                 DisplayString,
+        hh3cLBv2ActionInUseSF                  DisplayString,
+        hh3cLBv2ActionRowStatus                RowStatus
+    }
+
+hh3cLBv2ActionName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of the action."
+    ::= { hh3cLBv2ActionEntry 1 }
+
+hh3cLBv2ActionDefaultSF OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..63))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Default server farm quoted by the action.  A zero length
+         string indicates no default server farm has been assigned."
+    ::= { hh3cLBv2ActionEntry 2 }
+
+hh3cLBv2ActionBackupSF OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..63))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Backup server farm quoted by the action.  A zero length
+         string indicates no backup server farm has been assigned."
+    ::= { hh3cLBv2ActionEntry 3 }
+
+hh3cLBv2ActionInUseSF OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Server farm in use quoted by the action."
+    ::= { hh3cLBv2ActionEntry 4 }
+
+hh3cLBv2ActionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Status of this conceptual row.  When create an action, default
+         server farm and backup server farm are optional."
+    ::= { hh3cLBv2ActionEntry 5 }
+
+hh3cLBv2VSTables OBJECT IDENTIFIER ::= { hh3cLBv2 3 }
+-- =================================================================
+--    LB Virtual Server Table
+-- =================================================================
+hh3cLBv2VSTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cLBv2VSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Virtual server table for LB."
+    ::= { hh3cLBv2VSTables 1 }
+
+hh3cLBv2VSEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBv2VSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the information of the virtual server."
+    INDEX {
+            hh3cLBv2VSName
+          }
+    ::= { hh3cLBv2VSTable 1 }
+
+Hh3cLBv2VSEntry  ::=
+    SEQUENCE{
+        hh3cLBv2VSName                         DisplayString,
+        hh3cLBv2VSConnectionsLimit             Unsigned32,
+        hh3cLBv2VSConnectionsRateLimit         Unsigned32,
+        hh3cLBv2VSDefaultSF                    DisplayString,
+        hh3cLBv2VSBackupSF                     DisplayString,
+        hh3cLBv2VSInUseSF                      DisplayString,
+        hh3cLBv2VSRowStatus                    RowStatus
+    }
+
+hh3cLBv2VSName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of the virtual server."
+    ::= { hh3cLBv2VSEntry 1 }
+
+hh3cLBv2VSConnectionsLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Max connections limit of the virtual server.  0 means there is
+         no limit."
+    DEFVAL { 0 }
+    ::= { hh3cLBv2VSEntry 2 }
+
+hh3cLBv2VSConnectionsRateLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Max connections rate limit of the virtual server.  0 means there is
+         no limit."
+    DEFVAL { 0 }
+    ::= { hh3cLBv2VSEntry 3 }
+
+hh3cLBv2VSDefaultSF OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..63))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Default server farm quoted by the virtual server.  A zero length
+         string indicates no default server farm has been assigned."
+    ::= { hh3cLBv2VSEntry 4 }
+
+hh3cLBv2VSBackupSF OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..63))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Backup server farm quoted by the virtual server.  A zero length
+         string indicates no backup server farm has been assigned."
+    ::= { hh3cLBv2VSEntry 5 }
+
+hh3cLBv2VSInUseSF OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Server farm in use quoted by the virtual server."
+    ::= { hh3cLBv2VSEntry 6 }
+
+hh3cLBv2VSRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Status of this conceptual row.  When create an virtual server,
+         default server farm and backup server farm are optional."
+    ::= { hh3cLBv2VSEntry 7 }
+
+-- =================================================================
+--    LB Virtual Server Statistic Table
+-- =================================================================
+hh3cLBv2VSStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cLBv2VSStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Virtual server statistic table for LB."
+    ::= { hh3cLBv2VSTables 2 }
+
+hh3cLBv2VSStatsEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBv2VSStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the statistic information of the virtual server."
+    INDEX {
+            hh3cLBv2VSName,
+            hh3cLBv2VSStatChassis,
+            hh3cLBv2VSStatSlot,
+            hh3cLBv2VSStatCpuid
+          }
+    ::= { hh3cLBv2VSStatsTable 1 }
+
+Hh3cLBv2VSStatsEntry  ::=
+    SEQUENCE{
+        hh3cLBv2VSStatChassis                  Unsigned32,
+        hh3cLBv2VSStatSlot                     Unsigned32,
+        hh3cLBv2VSStatCpuid                    Unsigned32,
+        hh3cLBv2VSStatTotalConnections         Counter64,
+        hh3cLBv2VSStatActiveConnections        Unsigned32,
+        hh3cLBv2VSStatClientSidePKTsIn         Counter64,
+        hh3cLBv2VSStatClientSidePKTsOut        Counter64,
+        hh3cLBv2VSStatDroppedPackets           Counter64,
+        hh3cLBv2VSStatClientSideBytesIn        Counter64,
+        hh3cLBv2VSStatClientSideBytesOut       Counter64,
+        hh3cLBv2VSStatReceivedRequests         Counter64,
+        hh3cLBv2VSStatSentResponses            Counter64,
+        hh3cLBv2VSStatConnectionsRate          Unsigned32
+    }
+
+hh3cLBv2VSStatChassis OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "ID of the device that holds the card."
+    ::= { hh3cLBv2VSStatsEntry 1 }
+
+hh3cLBv2VSStatSlot OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Member ID of the card on device."
+    ::= { hh3cLBv2VSStatsEntry 2 }
+
+hh3cLBv2VSStatCpuid OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "ID of the CPU on the card."
+    ::= { hh3cLBv2VSStatsEntry 3 }
+
+hh3cLBv2VSStatTotalConnections OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of connections that the virtual server received."
+    ::= { hh3cLBv2VSStatsEntry 4 }
+
+hh3cLBv2VSStatActiveConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active connections that the virtual server received."
+    ::= { hh3cLBv2VSStatsEntry 5 }
+
+hh3cLBv2VSStatClientSidePKTsIn OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that the virtual server received from client."
+    ::= { hh3cLBv2VSStatsEntry 6 }
+
+hh3cLBv2VSStatClientSidePKTsOut OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that the virtual server sent to client."
+    ::= { hh3cLBv2VSStatsEntry 7 }
+
+hh3cLBv2VSStatDroppedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that the virtual server dropped."
+    ::= { hh3cLBv2VSStatsEntry 8 }
+
+hh3cLBv2VSStatClientSideBytesIn OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "byte"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes that the virtual server received from client."
+    ::= { hh3cLBv2VSStatsEntry 9 }
+
+hh3cLBv2VSStatClientSideBytesOut OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "byte"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes that the virtual server sent to client."
+    ::= { hh3cLBv2VSStatsEntry 10 }
+
+hh3cLBv2VSStatReceivedRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of requests that the virtual server received from client."
+    ::= { hh3cLBv2VSStatsEntry 11 }
+
+hh3cLBv2VSStatSentResponses OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of responses that the virtual server sent to client."
+    ::= { hh3cLBv2VSStatsEntry 12 }
+
+hh3cLBv2VSStatConnectionsRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "cps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connections rate of the virtual server."
+    ::= { hh3cLBv2VSStatsEntry 13 }
+
+hh3cLBv2RSTables OBJECT IDENTIFIER ::= { hh3cLBv2 4 }
+-- =================================================================
+--    LB Real Server Table
+-- =================================================================
+hh3cLBv2RSTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cLBv2RSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Real server table for LB."
+    ::= { hh3cLBv2RSTables 1 }
+
+hh3cLBv2RSEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBv2RSEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the information of the real server."
+    INDEX {
+            hh3cLBv2RSName
+          }
+    ::= { hh3cLBv2RSTable 1 }
+
+Hh3cLBv2RSEntry  ::=
+    SEQUENCE{
+        hh3cLBv2RSName                         DisplayString,
+        hh3cLBv2RSRowStatus                    RowStatus,
+        hh3cLBv2RSConnectionsLimit             Unsigned32,
+        hh3cLBv2RSConnectionsRateLimit         Unsigned32
+    }
+
+hh3cLBv2RSName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of the real server."
+    ::= { hh3cLBv2RSEntry 1 }
+
+hh3cLBv2RSRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Status of this conceptual row."
+    ::= { hh3cLBv2RSEntry 2 }
+
+hh3cLBv2RSConnectionsLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Max connections limit of the real server.  0 means there is
+         no limit."
+    DEFVAL { 0 }
+    ::= { hh3cLBv2RSEntry 3 }
+
+hh3cLBv2RSConnectionsRateLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Max connections rate limit of the real server.  0 means there is
+         no limit."
+    DEFVAL { 0 }
+    ::= { hh3cLBv2RSEntry 4 }
+
+-- =================================================================
+--    LB Real Server Statistic Table
+-- =================================================================
+hh3cLBv2RSStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cLBv2RSStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Real server statistic table for LB."
+    ::= { hh3cLBv2RSTables 2 }
+
+hh3cLBv2RSStatsEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBv2RSStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the statistic information of the real server."
+    INDEX {
+            hh3cLBv2RSName,
+            hh3cLBv2RSStatChassis,
+            hh3cLBv2RSStatSlot,
+            hh3cLBv2RSStatCpuid
+          }
+    ::= { hh3cLBv2RSStatsTable 1 }
+
+Hh3cLBv2RSStatsEntry  ::=
+    SEQUENCE{
+        hh3cLBv2RSStatChassis                  Unsigned32,
+        hh3cLBv2RSStatSlot                     Unsigned32,
+        hh3cLBv2RSStatCpuid                    Unsigned32,
+        hh3cLBv2RSStatTotalConnections         Counter64,
+        hh3cLBv2RSStatActiveConnections        Unsigned32,
+        hh3cLBv2RSStatServerSidePKTsIn         Counter64,
+        hh3cLBv2RSStatServerSidePKTsOut        Counter64,
+        hh3cLBv2RSStatDroppedPackets           Counter64,
+        hh3cLBv2RSStatServerSideBytesIn        Counter64,
+        hh3cLBv2RSStatServerSideBytesOut       Counter64,
+        hh3cLBv2RSStatReceivedRequests         Counter64,
+        hh3cLBv2RSStatSentResponses            Counter64,
+        hh3cLBv2RSStatConnectionsRate          Unsigned32
+    }
+
+hh3cLBv2RSStatChassis OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "ID of the device that holds the card."
+    ::= { hh3cLBv2RSStatsEntry 1 }
+
+hh3cLBv2RSStatSlot OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Member ID of the card on device."
+    ::= { hh3cLBv2RSStatsEntry 2 }
+
+hh3cLBv2RSStatCpuid OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "ID of the CPU on the card."
+    ::= { hh3cLBv2RSStatsEntry 3 }
+
+hh3cLBv2RSStatTotalConnections OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of connections that the real server received."
+    ::= { hh3cLBv2RSStatsEntry 4 }
+
+hh3cLBv2RSStatActiveConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active connections that the real server received."
+    ::= { hh3cLBv2RSStatsEntry 5 }
+
+hh3cLBv2RSStatServerSidePKTsIn OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that the real server received from device."
+    ::= { hh3cLBv2RSStatsEntry 6 }
+
+hh3cLBv2RSStatServerSidePKTsOut OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that the real server sent."
+    ::= { hh3cLBv2RSStatsEntry 7 }
+
+hh3cLBv2RSStatDroppedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that the real server dropped."
+    ::= { hh3cLBv2RSStatsEntry 8 }
+
+hh3cLBv2RSStatServerSideBytesIn OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "byte"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes that the real server received from device."
+    ::= { hh3cLBv2RSStatsEntry 9 }
+
+hh3cLBv2RSStatServerSideBytesOut OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "byte"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes that the real server sent."
+    ::= { hh3cLBv2RSStatsEntry 10 }
+
+hh3cLBv2RSStatReceivedRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of requests that the real server received from device."
+    ::= { hh3cLBv2RSStatsEntry 11 }
+
+hh3cLBv2RSStatSentResponses OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of responses that the real server sent to device."
+    ::= { hh3cLBv2RSStatsEntry 12 }
+
+hh3cLBv2RSStatConnectionsRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "cps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connections rate of the real server."
+    ::= { hh3cLBv2RSStatsEntry 13 }
+
+hh3cLBv2SFTables OBJECT IDENTIFIER ::= { hh3cLBv2 5 }
+-- =================================================================
+--    LB Server Farm Table
+-- =================================================================
+hh3cLBv2SFTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cLBv2SFEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Server farm table for LB."
+    ::= { hh3cLBv2SFTables 1 }
+
+hh3cLBv2SFEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBv2SFEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the information of the server farm."
+    INDEX {
+            hh3cLBv2SFName
+          }
+    ::= { hh3cLBv2SFTable 1 }
+
+Hh3cLBv2SFEntry  ::=
+    SEQUENCE{
+        hh3cLBv2SFName                         DisplayString,
+        hh3cLBv2SFRowStatus                    RowStatus
+    }
+
+hh3cLBv2SFName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of the server farm."
+    ::= { hh3cLBv2SFEntry 1 }
+
+hh3cLBv2SFRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Status of this conceptual row."
+    ::= { hh3cLBv2SFEntry 2 }
+
+-- =================================================================
+--    LB Server Farm Statistic Table
+-- =================================================================
+hh3cLBv2SFStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cLBv2SFStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Server farm statistic for LB."
+    ::= { hh3cLBv2SFTables 2 }
+
+hh3cLBv2SFStatsEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBv2SFStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the statistic information of the server farm."
+    INDEX {
+            hh3cLBv2SFName,
+            hh3cLBv2SFStatChassis,
+            hh3cLBv2SFStatSlot,
+            hh3cLBv2SFStatCpuid
+          }
+    ::= { hh3cLBv2SFStatsTable 1 }
+
+Hh3cLBv2SFStatsEntry  ::=
+    SEQUENCE{
+        hh3cLBv2SFStatChassis                  Unsigned32,
+        hh3cLBv2SFStatSlot                     Unsigned32,
+        hh3cLBv2SFStatCpuid                    Unsigned32,
+        hh3cLBv2SFStatTotalConnections         Counter64,
+        hh3cLBv2SFStatActiveConnections        Unsigned32,
+        hh3cLBv2SFStatServerSidePKTsIn         Counter64,
+        hh3cLBv2SFStatServerSidePKTsOut        Counter64,
+        hh3cLBv2SFStatDroppedPackets           Counter64,
+        hh3cLBv2SFStatServerSideBytesIn        Counter64,
+        hh3cLBv2SFStatServerSideBytesOut       Counter64,
+        hh3cLBv2SFStatReceivedRequests         Counter64,
+        hh3cLBv2SFStatSentResponses            Counter64
+    }
+
+hh3cLBv2SFStatChassis OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ID of the device that holds the card."
+    ::= { hh3cLBv2SFStatsEntry 1 }
+
+hh3cLBv2SFStatSlot OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Member ID of the card on device."
+    ::= { hh3cLBv2SFStatsEntry 2 }
+
+hh3cLBv2SFStatCpuid OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ID of the CPU on the card."
+    ::= { hh3cLBv2SFStatsEntry 3 }
+
+hh3cLBv2SFStatTotalConnections OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of connections that the server farm received."
+    ::= { hh3cLBv2SFStatsEntry 4 }
+
+hh3cLBv2SFStatActiveConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active connections that the server farm received."
+    ::= { hh3cLBv2SFStatsEntry 5 }
+
+hh3cLBv2SFStatServerSidePKTsIn OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that the server farm received from device."
+    ::= { hh3cLBv2SFStatsEntry 6 }
+
+hh3cLBv2SFStatServerSidePKTsOut OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that the server farm sent."
+    ::= { hh3cLBv2SFStatsEntry 7 }
+
+hh3cLBv2SFStatDroppedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that the server farm dropped."
+    ::= { hh3cLBv2SFStatsEntry 8 }
+
+hh3cLBv2SFStatServerSideBytesIn OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "byte"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes that the server farm received."
+    ::= { hh3cLBv2SFStatsEntry 9 }
+
+hh3cLBv2SFStatServerSideBytesOut OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "byte"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes that the server farm sent."
+    ::= { hh3cLBv2SFStatsEntry 10 }
+
+hh3cLBv2SFStatReceivedRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of requests that all real servers in the server farm
+         received from device."
+    ::= { hh3cLBv2SFStatsEntry 11 }
+
+hh3cLBv2SFStatSentResponses OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of responses that the server farm sent to device."
+    ::= { hh3cLBv2SFStatsEntry 12 }
+
+-- =================================================================
+--    LB NOTIFICATION
+-- =================================================================
+hh3cLBv2Trap OBJECT IDENTIFIER ::= { hh3cLBv2 6 }
+
+hh3cLBv2TrapPrefix OBJECT IDENTIFIER ::= { hh3cLBv2Trap 0 }
+-- =================================================================
+--    Virtual Server Connections Overload Notification
+-- =================================================================
+hh3cLBv2VSConnOverloadTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2VSName,
+            hh3cLBv2VSConnectionsLimit,
+            hh3cLBv2VSStatChassis,
+            hh3cLBv2VSStatSlot,
+            hh3cLBv2VSStatCpuid,
+            hh3cLBv2VSStatActiveConnections
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2VSConnOverloadTrap notification is sent when
+         the number of active connections of the virtual server
+         has reached the upper limit. "
+    ::= { hh3cLBv2TrapPrefix 1 }
+
+-- =================================================================
+--    Virtual Server Connections Overload Recovery Notification
+-- =================================================================
+hh3cLBv2VSConnRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2VSName,
+            hh3cLBv2VSConnectionsLimit,
+            hh3cLBv2VSStatChassis,
+            hh3cLBv2VSStatSlot,
+            hh3cLBv2VSStatCpuid,
+            hh3cLBv2VSStatActiveConnections
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2VSConnRecoveryTrap notification is sent when
+         the number of active connections of the virtual server
+         is less than the upper limit."
+    ::= { hh3cLBv2TrapPrefix 2 }
+-- =================================================================
+--    Virtual Server Connections Rate Overload Notification
+-- =================================================================
+hh3cLBv2VSConnsRateOverloadTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2VSName,
+            hh3cLBv2VSConnectionsRateLimit,
+            hh3cLBv2VSStatChassis,
+            hh3cLBv2VSStatSlot,
+            hh3cLBv2VSStatCpuid,
+            hh3cLBv2VSStatConnectionsRate
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2VSConnsRateOverloadTrap notification is sent
+         when the connection rate of the virtual server has
+         reached the upper limit."
+    ::= { hh3cLBv2TrapPrefix 3 }
+
+-- =================================================================
+--    Virtual Server Connections Rate Overload Recovery Notification
+-- =================================================================
+hh3cLBv2VSConnsRateRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2VSName,
+            hh3cLBv2VSConnectionsRateLimit,
+            hh3cLBv2VSStatChassis,
+            hh3cLBv2VSStatSlot,
+            hh3cLBv2VSStatCpuid,
+            hh3cLBv2VSStatConnectionsRate
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2VSConnsRateRecoveryTrap notification is sent
+         when the connection rate of the virtual server is smaller than
+         the upper limit."
+    ::= { hh3cLBv2TrapPrefix 4 }
+
+-- =================================================================
+--    Virtual Server Active Notification
+-- =================================================================
+hh3cLBv2VSActiveTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2VSName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2VSActiveTrap notification is sent when virtual
+         server status changes to active."
+    ::= { hh3cLBv2TrapPrefix 5 }
+
+-- =================================================================
+--    Virtual Server Inactive Notification
+-- =================================================================
+hh3cLBv2VSInactiveTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2VSName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2VSInactiveTrap notification is sent when virtual
+         server status changes to inactive."
+    ::= { hh3cLBv2TrapPrefix 6 }
+
+-- =================================================================
+--    Real Server Available Notification
+-- =================================================================
+hh3cLBv2RSAvailableTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2RSName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2RSAvailableTrap notification is sent when the status of
+         the real server changes to available."
+    ::= { hh3cLBv2TrapPrefix 7 }
+
+-- =================================================================
+--    Real Server Unavailable Notification
+-- =================================================================
+hh3cLBv2RSUnavailableTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2RSName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2RSUnavailableTrap notification is sent when the status of
+         the real server changes to unavailable."
+    ::= { hh3cLBv2TrapPrefix 8 }
+
+-- =================================================================
+--    Server Farm Active Notification
+-- =================================================================
+hh3cLBv2SFActiveTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2SFName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2SFActiveTrap notification is sent when the status of
+         the server farm changes to active."
+    ::= { hh3cLBv2TrapPrefix 9 }
+
+-- =================================================================
+--    Server Farm Inactive Notification
+-- =================================================================
+hh3cLBv2SFInactiveTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2SFName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2SFInactiveTrap notification is sent when the status of
+         the server farm changes to inactive."
+    ::= { hh3cLBv2TrapPrefix 10 }
+
+-- =================================================================
+--    Server Farm In Use Of Action Changes Notification
+-- =================================================================
+hh3cLBv2ActionInUseSFChangeTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2ActionName,
+            hh3cLBv2ActionDefaultSF,
+            hh3cLBv2ActionBackupSF,
+            hh3cLBv2ActionInUseSF
+        }
+    STATUS      current
+    DESCRIPTION
+         "A hh3cLBv2ActionInUseSFChangeTrap notification is sent when the
+         server farm which is in use quoted by action changes."
+    ::= { hh3cLBv2TrapPrefix 11 }
+
+-- =================================================================
+--    Server Farm In Use Of Virtual Server Changes Notification
+-- =================================================================
+hh3cLBv2VSInUseSFChangeTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2VSName,
+            hh3cLBv2VSDefaultSF,
+            hh3cLBv2VSBackupSF,
+            hh3cLBv2VSInUseSF
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2VSInUseSFChangeTrap notification is sent when
+         the server farm which is in use quoted by virtual server
+         changes."
+    ::= { hh3cLBv2TrapPrefix 12 }
+
+-- =================================================================
+--    Real Server Connections Overload Notification
+-- =================================================================
+hh3cLBv2RSConnOverloadTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2RSName,
+            hh3cLBv2RSConnectionsLimit,
+            hh3cLBv2RSStatChassis,
+            hh3cLBv2RSStatSlot,
+            hh3cLBv2RSStatCpuid,
+            hh3cLBv2RSStatActiveConnections
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2RSConnOverloadTrap notification is sent when
+         the number of active connections of the real server
+         has reached the upper limit. "
+    ::= { hh3cLBv2TrapPrefix 13 }
+
+-- =================================================================
+--    Real Server Connections Overload Recovery Notification
+-- =================================================================
+hh3cLBv2RSConnRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2RSName,
+            hh3cLBv2RSConnectionsLimit,
+            hh3cLBv2RSStatChassis,
+            hh3cLBv2RSStatSlot,
+            hh3cLBv2RSStatCpuid,
+            hh3cLBv2RSStatActiveConnections
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2RSConnRecoveryTrap notification is sent when
+         the number of active connections of the real server
+         is less than the upper limit."
+    ::= { hh3cLBv2TrapPrefix 14 }
+-- =================================================================
+--    Real Server Connections Rate Overload Notification
+-- =================================================================
+hh3cLBv2RSConnsRateOverloadTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2RSName,
+            hh3cLBv2RSConnectionsRateLimit,
+            hh3cLBv2RSStatChassis,
+            hh3cLBv2RSStatSlot,
+            hh3cLBv2RSStatCpuid,
+            hh3cLBv2RSStatConnectionsRate
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2RSConnsRateOverloadTrap notification is sent
+         when the connection rate of the real server has
+         reached the upper limit."
+    ::= { hh3cLBv2TrapPrefix 15 }
+
+-- =================================================================
+--    Real Server Connections Rate Overload Recovery Notification
+-- =================================================================
+hh3cLBv2RSConnsRateRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2RSName,
+            hh3cLBv2RSConnectionsRateLimit,
+            hh3cLBv2RSStatChassis,
+            hh3cLBv2RSStatSlot,
+            hh3cLBv2RSStatCpuid,
+            hh3cLBv2RSStatConnectionsRate
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2RSConnsRateRecoveryTrap notification is sent
+         when the connection rate of the real server is smaller than
+         the upper limit."
+    ::= { hh3cLBv2TrapPrefix 16 }
+
+END

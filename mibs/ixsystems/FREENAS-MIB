@@ -1,0 +1,560 @@
+FREENAS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises,
+    Integer32, Counter32, Counter64, Gauge32  FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, DisplayString         FROM SNMPv2-TC;
+
+freeNas MODULE-IDENTITY
+    LAST-UPDATED "201710270000Z"
+    ORGANIZATION "www.ixsystems.com"
+    CONTACT-INFO
+        "postal:   2490 Kruse Dr
+                   San Jose, CA 95131
+
+         email:    support@iXsystems.com"
+    DESCRIPTION
+        ""
+    REVISION     "201710270000Z"
+    DESCRIPTION
+        ""
+    ::= { enterprises 50536 }
+
+ZPoolHealthType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+                online(0),
+                degraded(1),
+                faulted(2),
+                offline(3),
+                unavail(4),
+                removed(5)
+                }
+
+AlertLevelType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+                info(20),
+                warning(30),
+                critical(50)
+                }
+
+zfs     OBJECT IDENTIFIER ::= { freeNas 1 }
+
+notifications       OBJECT IDENTIFIER ::= { freeNas 2 }
+notificationPrefix  OBJECT IDENTIFIER ::= { notifications 1 }
+notificationObjects OBJECT IDENTIFIER ::= { notifications 2 }
+
+zpool   OBJECT IDENTIFIER ::= { zfs 1 }
+dataset OBJECT IDENTIFIER ::= { zfs 2 }
+zvol    OBJECT IDENTIFIER ::= { zfs 3 }
+arc     OBJECT IDENTIFIER ::= { zfs 4 }
+l2arc   OBJECT IDENTIFIER ::= { zfs 5 }
+zil     OBJECT IDENTIFIER ::= { zfs 6 }
+
+zpoolTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ZpoolEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zpool 1 }
+
+zpoolEntry OBJECT-TYPE
+    SYNTAX     ZpoolEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        ""
+    INDEX { zpoolIndex }
+    ::= { zpoolTable 1 }
+
+ZpoolEntry ::= SEQUENCE {
+        zpoolIndex                    Integer32,
+        zpoolDescr                    DisplayString,
+        zpoolAllocationUnits          Integer32,
+        zpoolSize                     Integer32,
+        zpoolUsed                     Integer32,
+        zpoolAvailable                Integer32,
+        zpoolHealth                   ZPoolHealthType,
+        zpoolReadOps                  Counter64,
+        zpoolWriteOps                 Counter64,
+        zpoolReadBytes                Counter64,
+        zpoolWriteBytes               Counter64,
+        zpoolReadOps1sec              Counter64,
+        zpoolWriteOps1sec             Counter64,
+        zpoolReadBytes1sec            Counter64,
+        zpoolWriteBytes1sec           Counter64
+    }
+
+zpoolIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zpoolEntry 1 }
+
+zpoolDescr OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zpoolEntry 2 }
+
+zpoolAllocationUnits OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    UNITS      "Bytes"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zpoolEntry 3 }
+
+zpoolSize OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zpoolEntry 4 }
+
+zpoolUsed OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zpoolEntry 5 }
+
+zpoolAvailable OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zpoolEntry 6 }
+
+zpoolHealth OBJECT-TYPE
+    SYNTAX  ZPoolHealthType
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The current health of the containing pool, as reported
+        by zpool status."
+    ::= { zpoolEntry 7 }
+
+zpoolReadOps OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of read I/O operations sent to the pool or device,
+        including metadata requests (averaged since system booted)."
+    ::= { zpoolEntry 8 }
+
+zpoolWriteOps OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of write I/O operations sent to the pool or device
+        (averaged since system booted)."
+    ::= { zpoolEntry 9 }
+
+zpoolReadBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The bandwidth of all read operations (including metadata),
+        expressed as units per second (averaged since system booted)"
+    ::= { zpoolEntry 10 }
+
+zpoolWriteBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The bandwidth of all write operations, expressed as units per
+        second (averaged since system booted)."
+    ::= { zpoolEntry 11 }
+
+zpoolReadOps1sec OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of read I/O operations sent to the pool or device,
+        including metadata requests (over 1 second interval)."
+    ::= { zpoolEntry 12 }
+
+zpoolWriteOps1sec OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of write I/O operations sent to the pool or device
+        (over 1 second interval)."
+    ::= { zpoolEntry 13 }
+
+zpoolReadBytes1sec OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The bandwidth of all read operations (including metadata),
+        expressed as units per second (over 1 second interval)"
+    ::= { zpoolEntry 14 }
+
+zpoolWriteBytes1sec OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The bandwidth of all write operations, expressed as units per
+        second (over 1 second interval)."
+    ::= { zpoolEntry 15 }
+
+datasetTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF DatasetEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { dataset 1 }
+
+datasetEntry OBJECT-TYPE
+    SYNTAX     DatasetEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        ""
+    INDEX { datasetIndex }
+    ::= { datasetTable 1 }
+
+DatasetEntry ::= SEQUENCE {
+        datasetIndex                    Integer32,
+        datasetDescr                    DisplayString,
+        datasetAllocationUnits          Integer32,
+        datasetSize                     Integer32,
+        datasetUsed                     Integer32,
+        datasetAvailable                Integer32
+    }
+
+datasetIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { datasetEntry 1 }
+
+datasetDescr OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { datasetEntry 2 }
+
+datasetAllocationUnits OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    UNITS      "Bytes"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { datasetEntry 3 }
+
+datasetSize OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { datasetEntry 4 }
+
+datasetUsed OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { datasetEntry 5 }
+
+datasetAvailable OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { datasetEntry 6 }
+
+zvolTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ZvolEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zvol 1 }
+
+zvolEntry OBJECT-TYPE
+    SYNTAX     ZvolEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        ""
+    INDEX { zvolIndex }
+    ::= { zvolTable 1 }
+
+ZvolEntry ::= SEQUENCE {
+        zvolIndex                    Integer32,
+        zvolDescr                    DisplayString,
+        zvolAllocationUnits          Integer32,
+        zvolSize                     Integer32,
+        zvolUsed                     Integer32,
+        zvolAvailable                Integer32
+    }
+
+zvolIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zvolEntry 1 }
+
+zvolDescr OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zvolEntry 2 }
+
+zvolAllocationUnits OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    UNITS      "Bytes"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zvolEntry 3 }
+
+zvolSize OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zvolEntry 4 }
+
+zvolUsed OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zvolEntry 5 }
+
+zvolAvailable OBJECT-TYPE
+    SYNTAX     Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { zvolEntry 6 }
+
+zfsArcSize OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { arc 1 }
+
+zfsArcMeta OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { arc 2 }
+
+zfsArcData OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { arc 3 }
+
+zfsArcHits OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { arc 4 }
+
+zfsArcMisses OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { arc 5 }
+
+zfsArcC OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { arc 6 }
+
+zfsArcP OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { arc 7 }
+
+zfsArcMissPercent OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Arc Miss Percentage.
+        (Note: Floating precision sent across SNMP as a String"
+    ::= { arc 8 }
+
+zfsArcCacheHitRatio OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Arc Cache Hit Ration Percentage.
+        (Note: Floating precision sent across SNMP as a String"
+    ::= { arc 9 }
+
+zfsArcCacheMissRatio OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Arc Cache Miss Ration Percentage.
+        (Note: Floating precision sent across SNMP as a String"
+    ::= { arc 10 }
+
+zfsL2ArcHits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { l2arc 1 }
+
+zfsL2ArcMisses OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { l2arc 2 }
+
+zfsL2ArcRead OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { l2arc 3 }
+
+zfsL2ArcWrite OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { l2arc 4 }
+
+zfsL2ArcSize OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { l2arc 5 }
+
+zfsZilstatOps1sec OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The ops column parsed from the command zilstat 1 1"
+    ::= { zil 1 }
+
+zfsZilstatOps5sec OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The ops column parsed from the command zilstat 5 1"
+    ::= { zil 2 }
+
+zfsZilstatOps10sec OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The ops column parsed from the command zilstat 10 1"
+    ::= { zil 3 }
+
+alert NOTIFICATION-TYPE
+    OBJECTS    { alertId, alertLevel, alertMessage }
+    STATUS     current
+    DESCRIPTION
+        "An alert raised"
+    ::= { notificationPrefix 1 }
+
+alertId OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { notificationObjects 1 }
+
+alertLevel OBJECT-TYPE
+    SYNTAX     AlertLevelType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { notificationObjects 2 }
+
+alertMessage OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        ""
+    ::= { notificationObjects 3 }
+
+alertCancellation NOTIFICATION-TYPE
+    OBJECTS    { alertId }
+    STATUS     current
+    DESCRIPTION
+        "An alert cancelled"
+    ::= { notificationPrefix 2 }
+
+END

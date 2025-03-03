@@ -1,0 +1,927 @@
+--*******************************************************************
+--*    SAGEM, IONOS	    											*
+--*******************************************************************
+--*******************************************************************
+
+--  Filename: log
+--
+--  File type: .mib    
+-- 
+--  Description:  SNMP source Mib file.
+--
+--			describes alarmes and event log records and
+--			associated traps
+--             
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--		Version:			Date: 25 10 1999
+--		Version: MIB-P0-301199	Date: 30 11 1999
+--      Version: MIB-P0-05092000 Date: 05 09 2000
+--                passage de performance en perf pour 
+--               diminuer la longueur des traps de l'ADR155
+--		Version:			Date: 14 06 2001
+--				ajout table de defaut courant pour gestionnaire
+--		Version:			Date: 22 08 2001
+--				LogCurrent comments modification  
+--
+--		Version: MIB-P0-301199	Date: 30 11 1999 
+-- 
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+
+
+
+
+--*******************************************************************
+-- MIB: LOG-MIB
+--*******************************************************************
+LOG-MIB DEFINITIONS ::= BEGIN
+
+
+--*******************************************************************
+-- IMPORTS
+--*******************************************************************
+   IMPORTS
+   sagemDr				FROM SAGEM-DR-MIB
+   SagemBoolean,IntDateTime,Severity	FROM EQUIPMENT-MIB
+   		DisplayString		FROM SNMPv2-TC
+   MODULE-IDENTITY,OBJECT-TYPE,
+   NOTIFICATION-TYPE			FROM SNMPv2-SMI;
+--   TRAP-TYPE				FROM RFC-1215;
+
+   
+--*******************************************************************
+-- OBJECTS
+--*******************************************************************
+   log	MODULE-IDENTITY
+      LAST-UPDATED "0211150000Z"
+      ORGANIZATION "SAGEM/DR Tolbiac Centre"
+      CONTACT-INFO
+	" "
+      DESCRIPTION 
+	"	
+	Modification: 
+			Date: 15 11 2002
+			Description: 
+			sagemDr replace sagem-dr
+			NOTIFICATION-TYPE replace TRAP-TYPE
+	
+	Modification: 
+			Date: 20 12 1999
+			Description: Modification of comments
+					 Modification of trap re-notification
+					 quality-threshold-overflow replaced by 
+						performance.
+	New Object: 
+			Date: 30 11 1999
+			Name: lostTrapBool,lostTrapBegin,lostTrapEnd,lostTrap
+			Description: System of re-notification of lost traps,
+			Name: LodEvent
+			Description: Add of qualityThresholdOverflow (20),
+			otherThresholdOverflow (21), maintenance (30) 
+			Name: probableCause
+			Description: SIZE (0..20) replaced by SIZE (0..50)
+			
+	Creation:		 
+ 			This MIB module describes alarmes and event log records. 
+			It also describes associated trap
+	"
+      ::= { sagemDr 105 }
+
+
+-- Warning:
+--		The events (13) and (31) are non cleared 
+-- 
+    
+ LogEvent      ::= INTEGER {	clear (0),	nonAlarmed (1), 
+	minor (2), major (3), critical (4), warning (5),
+	raise (10),  -- some events requires raise/clear
+	event (13),  -- for cold/hot start, re-notification, version switching	
+	switch (14),	
+	perf (20),
+	otherThresholdOverflow (21),
+	maintenance (30) 
+		-- used for login/logout, start/end write session, 
+		-- 		download/upload, operator action
+--	,security (31)	
+     }
+      
+   logClear   OBJECT-TYPE
+      SYNTAX       INTEGER { setToClear(0) }
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When a set command is issued on this variable the entire 
+	log event is cleared.
+
+	This command is optional
+    " 
+      ::= { log 1 } 
+   
+   logCapacity   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The maximum number of event in the log database"  
+      ::= { log 2 } 
+   
+   logLastEvent   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The index of the last event number that have been logged.
+	This is usefull for trap lost detection."  
+      ::= { log 3 } 
+   
+   logNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of current log in equipment."  
+      ::= { log 4 } 
+   
+
+   logTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF LogEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of log trap that come from the equipment."  
+      ::= { log 5 } 
+   
+   logEntry   OBJECT-TYPE
+      SYNTAX       LogEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular log of the equipment." 
+      INDEX        { logIndex } 
+      ::= { logTable 1 } 
+ 
+ 
+   LogEntry ::=
+      SEQUENCE {
+        logIndex           INTEGER,
+        logDate            IntDateTime,
+        logObject          OBJECT IDENTIFIER,
+        logName            DisplayString,
+        logEvent           LogEvent,
+        logPC		   	   DisplayString,
+	    logAI 			   DisplayString,
+	  	logEquipStatusV2  	   Severity
+      }
+         
+   logIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular log entry.
+	The index value cannot exced logCapacity and then returns 
+	to zero when the number of events exceds the capacity of 
+	equipement log table.
+	Its value is :
+	logIndex = <total number of event>%logCapacity.
+	It is mandatory for the equipment to respond to get-next in
+	anti-chronological order (youngest first) no matter to the 
+	index value.
+	Get-next(LogEntry.logEntry) is logEntry.logIndex[logLastEvent]"  
+      ::= { logEntry 1 } 
+   
+   logDate   OBJECT-TYPE
+      SYNTAX       IntDateTime
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"When the event had happened."  
+      ::= { logEntry 2 } 
+   
+   logObject   OBJECT-TYPE
+      SYNTAX       OBJECT IDENTIFIER
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the function/interface who produced the event"  
+      ::= { logEntry 3 }
+       
+ 
+   logName   OBJECT-TYPE
+      SYNTAX       DisplayString (SIZE (0..40))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	log entries. "  
+      ::= { logEntry 4 } 
+   
+   logEvent   OBJECT-TYPE
+      SYNTAX       LogEvent
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"indicates the type of event which had occured"  
+      ::= { logEntry 5 } 
+
+
+	-- The folowing probable cause are the mnemonics of failures
+	-- For all failures, the event indicates both the status and 
+	-- the associed severity.
+	-- The event is non-alarmed, minor, major, critical or warning
+	-- if the failure has raised, and is clear when it has 
+	-- desapeared.The LogObject is the oid of the 
+	-- function/interface which notified the failure
+	-- los, tf, ais, lof, eber, sd, rdi, lop, pam, scm, otm,
+	-- slm, uneq, lom, tim, etc ...
+	-- 
+	-- For user-input associated failure, the probable cause 
+	-- is the string name associated with the input.
+
+      -- For performance threshold exced the event is 
+	-- "performance" and probable cause is "threshold exceded".
+ 
+      -- For Msp switch the event is "switch", probable cause is
+	-- "msp on working" or "msp on protection". oid indicates 
+	-- msp function.
+ 
+	-- Sets source fail failure mnemonique is "source fail" and
+	-- oid is the value of setsInTable[source who failed]
+	-- On T0 switch the event "switch" is issued with probable 
+	-- cause "t0 switch" and oid setsInTable[new-src]
+      -- On T4 failure the event "raise" or clear" is issued with
+	-- probable cause "t4 failure"
+
+      -- Note on standarts trap :
+	-- warmStart	rfc1215
+	-- coldStart	rfc1215
+	-- linkUp
+	-- linkDown
+	-- The equipment sends these standard traps througt 
+	-- rfc1215 mib.
+	-- Then it is no use to send them through this mib but on 
+	-- other hand it may be usefull to store them in the log as 
+	-- an event :
+	-- event "event", probable cause "warm start" or 
+	-- "cold start", oid={0,0}
+	-- event "event", probable cause 
+	-- "link up" or "link down",oid=ifEntry.Index
+   
+   
+   logPC   OBJECT-TYPE
+      SYNTAX       DisplayString (SIZE (0..50))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Probable cause. A short string which identifies the event type.
+	For a failure it is its mnemonique."  
+      ::= { logEntry 6 }   
+
+		
+   logAI   OBJECT-TYPE
+         SYNTAX       DisplayString (SIZE (0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION 
+   	"A short string which gives additional information on 
+	the event"  
+      ::= { logEntry 7 }   
+
+  logEquipStatusV2   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"
+	logEquipStatusV2 is the value of equipStatusV2 
+	stored in logTable each time a trap is sent"  
+      ::= { logEntry 8 } 
+
+
+--*******************************************************************
+-- Description:
+--		"logTrapEnable" 
+   logTrapEnable   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When set to false the equipment stops to send logTraps. 
+	It has no effect on event log recording.
+	It also has no effects on quality traps and on status trap
+	used for the manager IONOS-ANM-V1.
+	The default value is true."
+	
+      ::= { log 6 } 
+
+
+
+--*******************************************************************
+-- Modification:
+-- 		Description: System used for notify again lost's 
+--			traps or current state. 
+--          Warning: the equipment sends these traps only
+--                   to the requester.
+--
+-- 1:Detection of lost traps
+--	To detect lost traps:
+-- 		we have to use two values:
+--			-one in the equipment: logLastEvent
+--			-one in the manager: the number of the last event 
+--				received by the manager
+--		we have to poll regulary logLastEvent and make a 
+--		comparition with the value stored and maintained in the
+--		manager. If the values are different the number of trap 
+--		lost equal to the difference between the two values. 
+--
+-- 2:Resend lost traps	
+--	The manager can use GET request on logTable to acces the values.
+--	The index of the table is logIndex or logTimeIndex 
+--	(logTImeIndex is not implemented in P0)
+--
+-- 3: Resend current state (start...)
+--	The manager can set the boolean values of 
+--	resendTrapBool to get the current state.
+--	Sequence to resent traps (current state):		
+--			For all re-sent traps:
+--			Two special traps (logTap for P0) are sent before 
+--			and after the group of re-sent traps.
+-- 			The logEvent field is: "maintainance" (= 30) for 
+--			the begining and "clear" for the end.
+--			The probableCause field is: "lost trap"
+-- 	The equipment send the following sequence for P0:
+--	-1 logTrap with:
+--			logEvent="maintainance" 
+--			probableCause="resent current trap"
+--	-a set of logTrap that are current trap
+--			In P0 ,you can not make a difference beetwen resent
+--				trap and new alarms sent inside the sequence
+--				(that are current trap too).  
+-- 	-1 logTrap with: 
+--			logEvent="clear" 
+--			probableCause="resent current trap"
+--********************************************************************            
+
+   lostTrap  OBJECT IDENTIFIER ::= { log 7 }  
+   
+   resendTrapBool   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The manager set this variable to receive all the current traps of the 
+	equipment.
+	The equipment must use resentLogTrap and resentNetworkAlarmeTrap 
+	to do it(not in P0)." 
+      ::= { lostTrap 1 }
+
+
+--********************************************************************* 
+-- Warning: logTime* are NOT used in P0 !
+--*********************************************************************      
+--    logTimeTable   OBJECT-TYPE
+--      SYNTAX       SEQUENCE OF LogTimeEntry
+--      MAX-ACCESS   not-accessible
+--      STATUS       current
+--      DESCRIPTION 
+--	"The logDateTable contains data in the same format as the
+--     logTable, and must contain the same set of data, but is
+--     indexed using logTimeDate rather than logIndex.
+--     
+--     If the logTable is managed by the equipment, the 
+--     logTimeTable is optional. Otherwise, the logTimeTable
+--     is mandatory.
+--    "  
+--      ::= { log 20 } 
+--   
+--   logTimeEntry   OBJECT-TYPE
+--      SYNTAX       LogTimeEntry
+--      MAX-ACCESS   not-accessible
+--      STATUS       current
+--      DESCRIPTION 
+--	"Refer to the same object in the logTable." 
+--      INDEX        { logTimeDate } 
+--      ::= { logTimeTable 1 } 
+-- 
+--    LogTimeEntry ::=
+--      SEQUENCE {
+--        logTimeIndex           INTEGER,
+--        logTimeDate            IntDateTime,
+--        logTimeObject          OBJECT IDENTIFIER,
+--        logTimeName            DisplayString,
+--        logTimeEvent           LogEvent,
+--        logTimeProbableCause   DisplayString,
+--	    logTimeAI  DisplayString,
+--	    logTimeEquipmentStatus Severity
+--      }  
+--   
+--   logTimeIndex   OBJECT-TYPE
+--      SYNTAX       INTEGER
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"Refer to the same object in the logTable."  
+--      ::= { logTimeEntry 1 } 
+--   
+--   logTimeDate   OBJECT-TYPE
+--      SYNTAX       IntDateTime
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"Refer to the same object in the logTable."  
+--      ::= { logTimeEntry 2 } 
+--   
+--   logTimeObject   OBJECT-TYPE
+--      SYNTAX       OBJECT IDENTIFIER
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"Refer to the same object in the logTable."  
+--      ::= { logTimeEntry 3 } 
+--   
+--   logTimeName   OBJECT-TYPE
+--      SYNTAX       DisplayString (SIZE (0..40))
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"Refer to the same object in the logTable."  
+--      ::= { logTimeEntry 4 } 
+--   
+--   logTimeEvent   OBJECT-TYPE
+--      SYNTAX       LogEvent
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"Refer to the same object in the logTable."  
+--      ::= { logTimeEntry 5 } 
+--  
+--   logTimeProbableCause   OBJECT-TYPE
+--      SYNTAX       DisplayString (SIZE (0..50))
+--      MAX-ACCESS   read-only
+--      STATUS       current
+--      DESCRIPTION 
+--	"Refer to the same object in the logTable."  
+--      ::= { logTimeEntry 6 }   
+--
+--  logTimeAI   OBJECT-TYPE
+--         SYNTAX       DisplayString (SIZE (0..64))
+--         MAX-ACCESS   read-only
+--         STATUS       current
+--         DESCRIPTION 
+--   	"Refer to the same object in the logTable."  
+--      ::= { logTimeEntry 7 }   
+-- 
+--  logTimeEquipmentStatus   OBJECT-TYPE
+--         SYNTAX       Severity
+--         MAX-ACCESS   read-only
+--         STATUS       current
+--         DESCRIPTION 
+--   	"Refer to the same object in the logTable."  
+--      ::= { logTimeEntry 8 }         
+--
+--*******************************************************************
+
+
+--  logTrap TRAP-TYPE
+--      ENTERPRISE  log
+--      VARIABLES   { logIndex, logDate, logObject,
+--                   logName, logEvent, logPC, 
+--					logAI,logEquipStatusV2}
+--      DESCRIPTION
+--	"A trap of this type indicates a failure or an event in the
+--	corresponding interface/function. It also gives the date and 
+--	time when the trap was sent, and the equipment status. 
+--	
+--      The logTrap is recommended for the equipment layer management.
+--      The networkAlarmeTrap is recommended for the network layer management.	
+--	"
+--      ::= 1
+  
+--  thresholdTrap TRAP-TYPE
+--      ENTERPRISE  log
+--      VARIABLES   { logIndex, logDate, logObject,
+--                    logName, logEvent, logPC, 
+--				logAI,logEquipStatusV2}
+--      DESCRIPTION
+--	"A trap of this type indicates that a threshold has been 
+--	crossed in the corresponding interface/function. 
+--	It also gives the date and time when the trap was sent, 
+--	and the equipment status"
+--      ::= 2 
+
+  logTraps OBJECT IDENTIFIER ::= { log 0 }
+  
+  logTrap NOTIFICATION-TYPE
+          OBJECTS     { logIndex, logDate, logObject,
+                    logName, logEvent, logPC, 
+					logAI,logEquipStatusV2 }
+          STATUS      current
+          DESCRIPTION "A trap of this type indicates that a threshold has been 
+	crossed in the corresponding interface/function. 
+	It also gives the date and time when the trap was sent, 
+	and the equipment status"
+          REFERENCE   ""
+          ::= { logTraps 1 }
+    
+  thresholdTrap NOTIFICATION-TYPE
+          OBJECTS     { logIndex, logDate, logObject,
+                    logName, logEvent, logPC, 
+				logAI,logEquipStatusV2 }
+          STATUS      current
+          DESCRIPTION "A trap of this type indicates that a threshold has been 
+	crossed in the corresponding interface/function. 
+	It also gives the date and time when the trap was sent, 
+	and the equipment status"
+          REFERENCE   ""
+          ::= { logTraps 2 }
+
+-- Warning:
+-- The next traps are NOT used with P0 version
+--
+--   securityTrap TRAP-TYPE
+--      ENTERPRISE  log
+--      VARIABLES   { logIndex, logDate, logObject,
+--                    logName, logEvent, logPC, 
+--				logAI,logEquipStatusV2}
+--      DESCRIPTION
+--	"A trap of this type indicates that a security event has been
+--	 appeared.
+--	"
+--      ::= 3 
+--
+--   networkAlarmeTrap TRAP-TYPE
+--      ENTERPRISE  log
+--      VARIABLES   { logIndex, logDate, logObject,
+--                    logName, logEvent, logPC, 
+--				    logAI,logEquipStatusV2}
+--      DESCRIPTION
+--	"A trap of this type indicates that a network event has been
+--	 appeared. Special network event used by the IONOS-ANM manager
+--	 to have an easily network layer management.
+--	"
+--      ::= 4  
+--      
+--   maintainanceTrap TRAP-TYPE
+--      ENTERPRISE  log
+--      VARIABLES   { logIndex, logDate, logObject,
+--                    logName, logEvent, logPC, 
+--				    logAI,logEquipStatusV2}
+--      DESCRIPTION
+--	"A trap of this type indicates that a maintainance event has been
+--	 appeared.
+--	"
+--      ::= 5 
+--      
+--   resentLogTrap TRAP-TYPE
+--      ENTERPRISE  log
+--      VARIABLES   { logIndex, logDate, logObject,
+--                    logName, logEvent, logPC, 
+--					logAI,logEquipStatusV2}
+--      DESCRIPTION
+--	"This trap is used to re-send logTrap." 	
+--      ::= 6
+--       
+--   resentNetworkAlarmeTrap TRAP-TYPE
+--      ENTERPRISE  log
+--      VARIABLES   { logIndex, logDate, logObject,
+--                    logName, logEvent, logPC, 
+--				    logAI,logEquipStatusV2}
+--      DESCRIPTION
+--	"This trap is used to re-send networkAlarmeTrap." 	
+--      ::= 7      
+--   
+
+
+
+    
+--***************************************************************
+-- Meaning and values of variables of the different kind of trap
+--***************************************************************
+-- Only logTrap and thresholdTrap are used for P0;
+-- So the other traps described are logTrap:
+--	networkAlarmTrap
+--	maintainanceTrap
+--	securityTrap
+--
+-- That means in P0 Version, networkAlarmTrap,maintainanceTrap,
+-- and securityTrap are not implemented and are replaced by
+-- a logTrap with the same format than respectively networkAlarmTrap,
+-- maintainanceTrap and securityTrap 
+--
+--
+-- ===============================
+-- 1:logTrap
+-- ===============================
+--
+-- 1.1:Equipment Alarm traps
+-- *********************  
+--
+-- logObject        : equipment OID or daughter card OID or ...
+-- logName          : "Alarm name", ...
+-- logEvent         : clear, non-alarmed, minor, major, critical, warning ...
+-- logProbableCause : "ProbableCause"
+-- logAI: "", "AI"
+--
+--
+--
+-- ===============================
+-- 2:networkAlarmTrap
+-- ===============================
+--
+-- 2.1:Network Alarm traps
+-- ******************* 
+--
+-- logObject        : interface OID or access OID ...
+-- logName 		  : not yet defined !!!!
+-- logName          : "Slot=0, Card=ADSL, Prot=ATM, VP/VC=12/8", ... 
+-- logEvent         : clear, non-alarmed, minor, major, critical, warning ...
+-- logProbableCause : "ProbableCause"
+-- logAI: "", "AI"
+--
+--
+--
+-- ===============================
+-- 3:maintainanceTrap
+-- ===============================
+--
+-- 3.1:Download/Upload traps
+-- *********************  
+--
+-- logObject        : equipment OID or daughter card OID
+-- logName          : "", "Card name", ...
+-- logEvent         : maintainance or clear
+-- logProbableCause : "download" or "upload"
+-- logAI: transferedItemType value, transferedItemVersion value
+--
+--
+-- 3.2:Switching traps
+-- ***************
+--
+-- logObject        : equipment OID or daughter card OID
+-- logName          : "", "Card name", ...
+-- logEvent         : event
+-- logProbableCause : "software switching" or "data configuration switching"
+-- logAI: transferedItemType value, transferedItemVersion value 
+-- 
+--
+-- 3.3:Software restart traps
+-- **********************  
+-- (Restart none requested by an operator). 
+--
+-- logObject        : equipment OID or daughter card OID
+-- logName          : "", "Card name"
+-- logEvent         : event
+-- logProbableCause : "cold start" or "hot start"
+-- logAI: "" or "additionnal info"
+--
+--
+-- 3.4:Maintainance action traps with end
+-- **********************************  
+--
+-- logObject        : port OID or card OID
+-- logName          : "name of the localisation"
+-- logEvent         : maintainance or clear
+-- logProbableCause : "loop back" or ...
+-- logAI: "loop number = xx" or ...
+--
+--
+-- 3.5:Maintainance action traps without end
+-- *************************************  
+--
+-- logObject        : port OID or card OID
+-- logName          : "name of the localisation"
+-- logEvent         : event
+-- logProbableCause : "clock switching" or ...
+-- logAI: "" or ... 
+--
+--
+-- 3.6:Write-session traps
+-- ******************* 
+-- A "write-session" trap must be sent when a write session starts
+-- or ends. (Refer to the Sagem-dr-session Mib for the different
+-- field values).
+--
+-- logObject        : 
+-- logName          : "writeSession"
+-- logEvent         : maintainance or clear (start or end)
+-- logProbableCause : "writeSession" 
+-- logAI: sessionIp,sessionType
+--
+--	ex: logAI= "135.10.34.24,http,sess2,iONOSANMsupervisor" 
+--
+--
+-- 3.7:Re-notification traps
+-- *********************  
+-- Two special traps (trapLog) are sent before and after 
+-- the group of re-sent traps.
+-- The logEvent field is: "maintainance" for the begining and
+-- "clear" for the end.
+--
+-- logObject        : equipment OID
+-- logName          : ""
+-- logEvent         : maintainance or clear
+-- logProbableCause : "current log"
+-- logAI: "Requester IP@ = x.x.x.x"
+-- 
+-- ===============================
+-- 4:thresholdTrap
+-- ===============================
+--
+-- 4.1:performance (Quality-threshold-overflow) traps
+-- ********************************   
+--
+-- logObject        : cptObject OID
+-- logName          : "port name"
+-- logEvent         : quality-threshold-overflow or clear
+-- logProbableCause : "quality-threshold-overflow cptNearFar value, cptDuration value"
+-- logAI: "max Threshold = xxxx, min Threshold = xxxx"
+--
+-- 4.2:Other-threshold-overflow traps
+-- ******************************   
+--
+-- logObject        : variable OID
+-- logName          : "" or variable name
+-- logEvent         : other-threshold-overflow or clear
+-- logProbableCause : "other threshold overflow"
+-- logAI: "max Threshold = xxxx, min Threshold = xxxx"
+--
+-- ===============================
+-- 5:securityTrap
+-- ===============================
+--
+-- 5.1:Security traps
+-- **************  
+--
+-- logObject        : equipment OID, ...
+-- logName          : ""
+-- logEvent         : security
+-- logProbableCause : "intrusion attempt"
+-- logAI: "Caller IP@ = x.x.x.x, community = xxxxxxx"
+--
+--***************************************************************
+ 
+ 
+--***************************************************************
+-- Log current Alarm
+--***************************************************************
+-- currentLog Table function the same way as log Table
+-- It contains only current alarms
+ 
+   logCurrentClear   OBJECT-TYPE
+      SYNTAX       INTEGER { setToClear(0) }
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When a set command is issued on this variable the entire 
+	log event is cleared.
+
+	This command is optional
+    " 
+      ::= { log 101 } 
+   
+   logCurrentCapacity   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The maximum number of event in the log database
+	This variable is optional"  
+      ::= { log 102 } 
+   
+   logCurrentLastEvent   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The index of the last current alarm number that have been logged.
+	This variable is optional"  
+      ::= { log 103 } 
+   
+   logCurrentNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of current log in equipment."  
+      ::= { log 104 } 
+   
+
+   logCurrentTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF LogCurrentEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of log trap that come from the equipment."  
+      ::= { log 105 } 
+   
+   logCurrentEntry   OBJECT-TYPE
+      SYNTAX       LogCurrentEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular log of the equipment." 
+      INDEX        { logCurrentIndex } 
+      ::= { logCurrentTable 1 } 
+ 
+ 
+   LogCurrentEntry ::=
+      SEQUENCE {
+        logCurrentIndex           INTEGER,
+        logCurrentDate            IntDateTime,
+        logCurrentObject          OBJECT IDENTIFIER,
+        logCurrentName            DisplayString,
+        logCurrentEvent           LogEvent,
+        logCurrentPC			  DisplayString,
+	  	logCurrentAI 				  DisplayString,
+	  	logCurrentStatusV2 	  Severity
+      }
+         
+   logCurrentIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular logCurrent entry.
+	The index value is comprised between 1 and logCurrentNumber.
+	There is no relation between the index Value and the date of the alarm. "  
+      ::= { logCurrentEntry 1 } 
+   
+   logCurrentDate   OBJECT-TYPE
+      SYNTAX       IntDateTime
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"When the event had happened."  
+      ::= { logCurrentEntry 2 } 
+   
+   logCurrentObject   OBJECT-TYPE
+      SYNTAX       OBJECT IDENTIFIER
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the function/interface who produced the event"  
+      ::= { logCurrentEntry 3 }
+       
+ 
+   logCurrentName   OBJECT-TYPE
+      SYNTAX       DisplayString (SIZE (0..40))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	log entries. "  
+      ::= { logCurrentEntry 4 } 
+   
+   logCurrentEvent   OBJECT-TYPE
+      SYNTAX       LogEvent
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"indicates the type of event which had occured"  
+      ::= { logCurrentEntry 5 } 
+
+   
+   logCurrentPC   OBJECT-TYPE
+      SYNTAX       DisplayString (SIZE (0..50))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Probable cause. A short string which identifies the event type.
+	For a failure it is its mnemonique."  
+      ::= { logCurrentEntry 6 }   
+
+		
+    logCurrentAI   OBJECT-TYPE
+         SYNTAX       DisplayString (SIZE (0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION 
+   	"A short string which gives additional information on 
+	the event"  
+      ::= { logCurrentEntry 7 }   
+
+ 	logCurrentStatusV2   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"
+	logEquipStatusV2 is the value of equipStatusV2 
+	stored in logTable each time a trap is sent"  
+      ::= { logCurrentEntry 8 } 
+ 
+ 
+END

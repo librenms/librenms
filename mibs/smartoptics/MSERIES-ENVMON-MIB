@@ -1,0 +1,125 @@
+	-- SmartOptics Enterprise Specific Enviroment Monitor MIB.
+--
+-- Copyright (c) 2014, SmartOptics
+-- All rights reserved
+--
+
+MSERIES-ENVMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+    FROM SNMPv2-SMI
+    DisplayString
+    FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+    FROM SNMPv2-CONF
+    mseries
+    FROM MSERIES-MIB;
+
+smartEnvMon     MODULE-IDENTITY
+                LAST-UPDATED    "201402151034Z"
+                ORGANIZATION    "SmartOptics"
+                CONTACT-INFO    "http://www.smartoptics.com"
+                DESCRIPTION
+                                "This is the enterprise specific Enviroment Monitor MIB for SmartOptics M-Series."
+                REVISION        "201402151034Z"
+                DESCRIPTION
+                                "The initial revision of the MSERIES Enviroment Monitor MIB."
+
+                ::=  { mseries 4 }
+
+        smartEnvMonObjects   OBJECT IDENTIFIER
+                ::=  { smartEnvMon  1}
+
+        smartEnvMonMIBConformance   OBJECT IDENTIFIER
+                ::=  { smartEnvMon  2}
+
+        smartEnvMonGroups   OBJECT IDENTIFIER
+                ::=  { smartEnvMonMIBConformance  1}
+
+        smartEnvMonCompliances   OBJECT IDENTIFIER
+                ::=  { smartEnvMonMIBConformance  2}
+
+
+--
+-- The EnvMon Temperature Table
+--
+
+smartEnvMonTemperatureTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SmartEnvMonTemperatureEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains one row per temperature sensor."
+    ::= { smartEnvMonObjects 1 }
+
+smartEnvMonTemperatureEntry OBJECT-TYPE
+    SYNTAX      SmartEnvMonTemperatureEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular temperature sensor."
+    INDEX { smartEnvMonTemperatureIndex }
+    ::= { smartEnvMonTemperatureTable 1 }
+
+SmartEnvMonTemperatureEntry ::=
+    SEQUENCE {
+        smartEnvMonTemperatureIndex        Unsigned32,
+        smartEnvMonTemperatureDescr        DisplayString,
+        smartEnvMonTemperatureValue        Integer32
+}
+
+smartEnvMonTemperatureIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An unique index for each temperature sensor."
+    ::= { smartEnvMonTemperatureEntry 1 }
+
+smartEnvMonTemperatureDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the temperature sensor."
+    ::= { smartEnvMonTemperatureEntry 2 }
+
+smartEnvMonTemperatureValue OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The temperature in Celsius measured by the sensor."
+    ::= { smartEnvMonTemperatureEntry 3 }
+
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+smartEnvMonTemperatureGroupV1 OBJECT-GROUP
+    OBJECTS {
+        smartEnvMonTemperatureIndex,
+        smartEnvMonTemperatureDescr,
+        smartEnvMonTemperatureValue }
+    STATUS      current
+    DESCRIPTION
+        "The EnvMon Temperatue MIB objects v1."
+    ::= { smartEnvMonGroups 1 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+smartEnvMonBasicComplV1 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the ENVMON MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            smartEnvMonTemperatureGroupV1 }
+    ::= { smartEnvMonCompliances 1 }
+
+END

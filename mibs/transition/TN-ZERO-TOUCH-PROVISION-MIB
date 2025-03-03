@@ -1,0 +1,92 @@
+-- *****************************************************************
+-- TN-ZERO-TOUCH-PROVISION-MIB.my : TN zero touch provision MIB
+--
+-- Copyright (c) 2014 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************************************************
+--
+
+TN-ZERO-TOUCH-PROVISION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    tnProducts 
+        FROM TRANSITION-SMI
+    sysObjectID
+        FROM SNMPv2-MIB
+    ifPhysAddress
+        FROM IF-MIB
+    entPhysicalDescr, entPhysicalSoftwareRev,
+    entPhysicalHardwareRev, entPhysicalSerialNum
+        FROM ENTITY-MIB
+    tnIpAddr, tnIpv6Addr
+        FROM TN-DEV-SYS-IPMGMT-MIB;
+
+--
+-- main body
+--
+tnZeroTouchProvisionMIB MODULE-IDENTITY
+    LAST-UPDATED    "201402080000Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+             Technical Support
+             10900 Red Circle Drive
+             Minnetonka, MN 55343 USA
+             Tel: +1-800-526-9267
+             E-mail: techsupport@transition.com
+            "
+    DESCRIPTION
+        "The mib for device zero touch device provisioning."
+    REVISION        "201402080000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tnProducts 12 }
+
+tnZeroTouchProvisionNotifications  OBJECT IDENTIFIER ::= { tnZeroTouchProvisionMIB 0 }
+tnZeroTouchProvisionMIBObjects OBJECT IDENTIFIER ::= { tnZeroTouchProvisionMIB 1 }
+
+
+tnZTPAutoDiscoveryMode  OBJECT-TYPE
+    SYNTAX      INTEGER  {
+       none(0),
+       dhcp(1)    -- auto discoverty through dhcp
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "To mode of the Zero Touch Provision. The none(0) disable the 
+             ZTP auto discovery. The dhcp(1) enable the ZTP auto discovery
+             through dhcp."
+    DEFVAL         { dhcp }
+    ::= { tnZeroTouchProvisionMIBObjects 1 }
+
+
+-- ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- These notifications will be sent to the management entity
+-- ******************************************************************
+
+tnZTPAutoDiscoveryNotification NOTIFICATION-TYPE
+    OBJECTS     { 
+                  sysObjectID,
+                  entPhysicalDescr,
+                  tnIpAddr,
+                  tnIpv6Addr,
+                  entPhysicalSoftwareRev,
+                  entPhysicalHardwareRev,
+                  entPhysicalSerialNum,
+                  ifPhysAddress
+                }
+    STATUS      current
+    DESCRIPTION
+       "A tnAutoProvDiscoveryNotification trap is sent when the device receives a provisioning server (EMS)
+        address from DHCP server. The objects in the notification correspond to the values in scalar
+        instance in SNMPv2-MIB and row instances in the ifTable, entPhysicalTable, tnIpMgmtTable and
+        tnIpextMgmtTable. At most one of the tnIpAddr or tnIpv6Addr could be zero length, which means
+        the IPv4 or IPv6 address, correspondingly, is not supported at the time this notification is sent."
+    ::= { tnZeroTouchProvisionNotifications 1 }
+
+END

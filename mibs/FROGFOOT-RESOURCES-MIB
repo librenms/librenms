@@ -1,0 +1,368 @@
+FROGFOOT-RESOURCES-MIB
+
+-- -*- mib -*-
+
+DEFINITIONS ::= BEGIN
+
+-- Frogfoot Networks CC Resources MIB
+
+--
+-- The idea behind this is to measure usage of resources.
+-- It does not contain information about the system such as
+-- cpu/disk types, etc.
+--
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32,
+	enterprises
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP
+		FROM SNMPv2-CONF;
+
+resources 	MODULE-IDENTITY
+	LAST-UPDATED "200407170000Z"
+	ORGANIZATION "Frogfoot Networks"
+	CONTACT-INFO
+		"	Abraham van der Merwe
+
+			Postal: Frogfoot Networks CC
+					P.O. Box 23618
+					Claremont
+					Cape Town
+					7735
+					South Africa
+
+			Phone: +27 82 565 4451
+			Email: abz@frogfoot.net"
+	DESCRIPTION
+		"The MIB module to describe system resources."
+	::= { system 1 }
+
+frogfoot		OBJECT IDENTIFIER ::= { enterprises 10002 }
+servers			OBJECT IDENTIFIER ::= { frogfoot 1 }
+system			OBJECT IDENTIFIER ::= { servers 1 }
+
+memory			OBJECT IDENTIFIER ::= { resources 1 }
+swap			OBJECT IDENTIFIER ::= { resources 2 }
+storage			OBJECT IDENTIFIER ::= { resources 3 }
+load			OBJECT IDENTIFIER ::= { resources 4 }
+
+resMIB			OBJECT IDENTIFIER ::= { resources 31 }
+resMIBObjects	OBJECT IDENTIFIER ::= { resMIB 1 }
+resConformance	OBJECT IDENTIFIER ::= { resMIB 2 }
+
+resGroups		OBJECT IDENTIFIER ::= { resConformance 1 }
+resCompliances	OBJECT IDENTIFIER ::= { resConformance 2 }
+
+TableIndex ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS			current
+	DESCRIPTION
+		"A unique value, greater than zero. It is recommended
+		that values are assigned contiguously starting from 1."
+	SYNTAX			Integer32 (1..2147483647)
+
+--
+-- Memory statistics
+--
+
+memTotal		OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Total usable physical memory (in KB)"
+	::= { memory 1 }
+
+memFree			OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Available physical memory (in KB)"
+	::= { memory 2 }
+
+memBuffer		OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Physical memory used by buffers (in KB)"
+	::= { memory 3 }
+
+memCache		OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Physical memory used for caching (in KB)"
+	::= { memory 4 }
+
+--
+-- Swap space statistics
+--
+
+swapTotal		OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Total swap space size (in KB)"
+	::= { swap 1 }
+
+swapFree 		OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Swap space still available (in KB)"
+	::= { swap 2 }
+
+--
+-- Disk space statistics
+--
+
+diskNumber		OBJECT-TYPE
+	SYNTAX			Integer32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"The number of mounted disks present on this system."
+	::= { storage 1 }
+
+diskTable		OBJECT-TYPE
+	SYNTAX			SEQUENCE OF DiskEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"A table of mounted disks on this system."
+	::= { storage 2 }
+
+diskEntry		OBJECT-TYPE
+	SYNTAX			DiskEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"An entry containing management information applicable
+		to a particular mounted disk on the system."
+	INDEX { diskIndex }
+	::= { diskTable 1 }
+
+DiskEntry ::=
+	SEQUENCE {
+		diskIndex		TableIndex,
+		diskDev			DisplayString,
+		diskDir			DisplayString,
+		diskFSType		INTEGER,
+		diskTotal		Gauge32,
+		diskFree		Gauge32
+	}
+
+diskIndex		OBJECT-TYPE
+	SYNTAX			TableIndex
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"A unique value, greater than zero, for each disk on the
+		system. It is recommended that values are assigned contiguously
+		starting from 1."
+	::= { diskEntry 1 }
+
+diskDev			OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"A textual string containing the disk device name."
+	::= { diskEntry 2 }
+
+diskDir			OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"A textual string containing the disk mount point."
+	::= { diskEntry 3 }
+
+diskFSType		OBJECT-TYPE
+	SYNTAX			INTEGER {
+						unknown(0),		-- Unknown File System
+						adfs(1),		-- Acorn Advanced Disc Filing System
+						affs(2),		-- Amiga Fast File System
+						coda(3),		-- CODA File System
+						cramfs(4),		-- cram File System for small storage (ROMs etc)
+						ext2(5),		-- Ext2 File System
+						hpfs(6),		-- OS/2 HPFS File System
+						iso9660(7),		-- ISO 9660 (CDROM) File System
+						jffs2(8),		-- Journalling Flash File System
+						jfs(9),			-- JFS File System
+						minix(10),		-- Minix File System
+						msdos(11),		-- FAT-based File Systems
+						ncpfs(12),		-- Novell Netware(tm) File System
+						nfs(13),		-- Network File Sharing Protocol
+						ntfs(14),		-- NTFS File System (Windows NT)
+						qnx4(15),		-- QNX4 File System
+						reiserfs(16),	-- ReiserFS Journalling File System
+						romfs(17),		-- ROM File System
+						smbfs(18),		-- Server Message Block (SMB) Protocol
+						sysv(19),		-- SystemV/V7/Xenix/Coherent File System
+						tmpfs(20),		-- Virtual Memory File System
+						udf(21),		-- UDF (DVD, CDRW, etc) File System
+						ufs(22),		-- UFS File System (SunOS, FreeBSD, etc)
+						vxfs(23),		-- VERITAS VxFS(TM) File System
+						xfs(24)			-- XFS (SGI) Journalling File System
+					}
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"The type of file system present on the disk. This
+		does not include fake file systems such as the proc file
+		system, devfs, etc. Additional types may be assigned by
+		Frogfoot Networks in the future."
+	::= { diskEntry 4 }
+
+diskTotal		OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Total space on disk (in MB)"
+	::= { diskEntry 5 }
+
+diskFree		OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Disk space still available (in MB)"
+	::= { diskEntry 6 }
+
+--
+-- Load Average statistics
+--
+
+loadNumber		OBJECT-TYPE
+	SYNTAX			Integer32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"The number of load averages stored in the
+		load average table."
+	::= { load 1 }
+
+loadTable		OBJECT-TYPE
+	SYNTAX			SEQUENCE OF LoadEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"Load average information."
+	::= { load 2 }
+
+loadEntry		OBJECT-TYPE
+	SYNTAX			LoadEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"An entry containing load average information."
+	INDEX { loadIndex }
+	::= { loadTable 1 }
+
+LoadEntry ::=
+	SEQUENCE {
+		loadIndex		TableIndex,
+		loadDescr		DisplayString,
+		loadValue		Gauge32
+	}
+
+loadIndex		OBJECT-TYPE
+	SYNTAX			TableIndex
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"A unique value, greater than zero, for each
+		load average stored."
+	::= { loadEntry 1 }
+
+loadDescr		OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"A description of each load average."
+	::= { loadEntry 2 }
+
+loadValue		OBJECT-TYPE
+	SYNTAX			Gauge32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"The 1,5 and 10 minute load averages. These values are
+		stored as a percentage of processor load."
+	::= { loadEntry 3 }
+
+--
+-- Compliance Statements
+--
+
+resCompliance	MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION
+		"The compliance statement for SNMP entities which have
+		system resources such as volatile and non-volatile
+		storage."
+	MODULE
+		MANDATORY-GROUPS { resMemGroup, resSwapGroup, resDiskGroup, resLoadGroup }
+		GROUP resMemGroup
+		DESCRIPTION
+			"This group is mandatory for those systems which have
+			any form of volatile storage."
+		GROUP resSwapGroup
+		DESCRIPTION
+			"This group is mandatory for those systems which have
+			the ability to temporarily swap unused pages to disk."
+		GROUP resDiskGroup
+		DESCRIPTION
+			"This group is mandatory for those systems which have
+			any form of non-volatile storage."
+		GROUP resLoadGroup
+		DESCRIPTION
+			"This group is mandatory for those systems which store
+			any form of processor load average information."
+	::= { resCompliances 1 }
+
+resMemGroup		OBJECT-GROUP
+	OBJECTS { memTotal, memFree, memBuffer, memCache }
+	STATUS			current
+	DESCRIPTION
+		"A collection of objects providing information specific to
+		volatile system storage."
+	::= { resGroups 1 }
+
+resSwapGroup	OBJECT-GROUP
+	OBJECTS { swapTotal, swapFree }
+	STATUS			current
+	DESCRIPTION
+		"A collection of objects providing information specific to
+		storage used for swapping pages to disk."
+	::= { resGroups 2 }
+
+resDiskGroup	OBJECT-GROUP
+	OBJECTS { diskNumber, diskDev, diskDir, diskFSType, diskTotal, diskFree }
+	STATUS			current
+	DESCRIPTION
+		"A collection of objects providing information specific to
+		non-volatile system storage."
+	::= { resGroups 3 }
+
+resLoadGroup	OBJECT-GROUP
+	OBJECTS { loadNumber, loadDescr, loadValue }
+	STATUS			current
+	DESCRIPTION
+		"A collection of objects providing information specific to
+		processor load averages."
+	::= { resGroups 4 }
+
+END
+

@@ -1,0 +1,180 @@
+ESPHOME-ESP8266-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	sysDescr,
+	snmp
+		FROM SNMPv2-MIB
+	hrMemorySize,
+	hrSystemUptime,
+	hrStorageIndex,
+	hrStorageDescr,
+	hrStorageAllocationUnits,
+	hrStorageSize,
+	hrStorageUsed,
+	hrStorageGroup
+		FROM HOST-RESOURCES-MIB
+	DisplayString,
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Integer32
+		FROM SNMPv2-SMI
+	OBJECT-GROUP
+		FROM SNMPv2-CONF;
+
+esphome MODULE-IDENTITY
+	LAST-UPDATED "201704200000Z"
+	ORGANIZATION "."
+	CONTACT-INFO
+		""
+	DESCRIPTION
+		"r"
+	REVISION "201704200000Z"
+	DESCRIPTION
+		""
+	::= { 1  3  9999 }
+
+
+chipGroup OBJECT-GROUP
+	OBJECTS {
+		chipType,
+		cpuClock,
+		chipModel,
+		numCores,
+		chipRevision }
+	STATUS  current
+	DESCRIPTION
+		"Chip Storage Group"
+	::= { groups 2 }
+
+wifiGroup OBJECT-GROUP
+	OBJECTS {
+		rssi,
+		bssi,
+		ssid,
+		ipaddress }
+	STATUS  current
+	DESCRIPTION ""
+	::= { groups 4 }
+
+espHeapGroup OBJECT-GROUP
+	OBJECTS {
+		freeHeap,
+		heapFragmentation,
+		maxFreeHeapBlock }
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.9999.33 --
+	::= { groups 8266 }
+
+maxFreeHeapBlock OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { heap 3 }
+
+
+chipType OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { chip 1 }
+
+
+cpuClock OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { chip 2 }
+
+
+chipModel OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { chip 3 }
+
+
+numCores OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { chip 4 }
+
+
+chipRevision OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { chip 5 }
+
+
+-- memory size, expressed in units of 1024bytes
+
+KBytes ::= Integer32 (0..2147483647)
+
+
+wifi OBJECT IDENTIFIER 	::= { esphome 4 }
+
+chip OBJECT IDENTIFIER 	::= { esphome 2 }
+
+heap OBJECT IDENTIFIER 	::= { esphome 8266 }
+
+rssi OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { wifi 1 }
+
+
+bssi OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { wifi 2 }
+
+
+ssid OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { wifi 3 }
+
+
+ipaddress OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { wifi 4 }
+
+
+freeHeap OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { heap 1 }
+
+
+heapFragmentation OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	::= { heap 2 }
+
+
+groups OBJECT IDENTIFIER 	::= { esphome 9999 }
+
+END

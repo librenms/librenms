@@ -1,0 +1,9 @@
+os: ericsson-tn
+text: 'Ericsson Traffic Node'
+type: wireless
+icon: ericsson
+discovery:
+    -
+        sysObjectID: 
+            - .1.3.6.1.4.1.193.81.1.1.3
+mib_dir: ericsson

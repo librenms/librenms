@@ -1,0 +1,1314 @@
+UHP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, enterprises, Counter32, Gauge32
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC;
+
+uhpV32	MODULE-IDENTITY
+		LAST-UPDATED	"201811021200Z"
+		ORGANIZATION	"UHP Networks"
+		CONTACT-INFO	"www.uhp.net"
+		DESCRIPTION	"UHP terminal MIB"
+		REVISION	"201810251200Z"
+		DESCRIPTION	"UHP terminal MIB"
+	::= { uhp 22 }
+
+
+
+
+
+
+uhp	OBJECT IDENTIFIER ::= { enterprises  8000 }
+control		OBJECT IDENTIFIER ::= { uhpV32   1 }
+demod1	    	OBJECT IDENTIFIER ::= { uhpV32   2 }
+demod2	    	OBJECT IDENTIFIER ::= { uhpV32   3 }
+modulator   	OBJECT IDENTIFIER ::= { uhpV32   4 }
+tdma		OBJECT IDENTIFIER ::= { uhpV32   5 }
+router		OBJECT IDENTIFIER ::= { uhpV32   6 }
+shaper		OBJECT IDENTIFIER ::= { uhpV32   7 }
+system		OBJECT IDENTIFIER ::= { uhpV32   8 }
+mobile		OBJECT IDENTIFIER ::= { uhpV32   9 }
+
+-- Control
+
+    saveConfig   OBJECT-TYPE
+        SYNTAX  INTEGER {
+            nosave(0),
+            save0(1),
+            save1(2),
+            save2(3),
+            save3(4)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+	    "Save current profile to EEPROM profile 0-3.
+	     Profile 0 is automativally loaded on restart by default."
+        ::= { control 1 }
+
+    reboot   OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noreboot(1),
+            reboot(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+	    "Reboot device immediately."
+        ::= { control 2 }
+
+    command   OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+	    "Issue a command to command-line interface."
+        ::= { control 3 }
+
+    configEdit   OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+	    "Profile or global config editing and viewing
+	     Complex input format, only for manufacturer."
+        ::= { control 4 }
+
+    profile   OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+	    "Get current profile or run specified profile (1-8)."
+        ::= { control 5 }
+
+-- Demod1
+
+    lbandSNR1  	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Signal to noise ratio at L-band demodulator input
+	     measured in 0.1 dB units."
+        ::= { demod1 1 }
+
+    lbandOffset1 OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Frequency offset value in KHz between PLL frequency and
+	     carrier real frequency."
+        ::= { demod1 2 }
+
+    inLvl1  	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Current input level x -10dBm"
+        ::= { demod1 3 }
+
+    inBytes1	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Demodulator1 traffic in bytes
+        (indexed by ACM channel)"
+        ::= { demod1 4 }
+
+-- Demod2
+
+    lbandSNR2  	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Signal to noise ratio at L-band demodulator input
+	     measured in 0.1 dB units."
+        ::= { demod2 1 }
+
+    lbandOffset2	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Frequency offset value in KHz between PLL frequency and
+	     carrier real frequency."
+        ::= { demod2 2 }
+
+    inLvl2  	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Current input level x -10dBm"
+        ::= { demod2 3 }
+
+    inBytes2	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Demodulator2 traffic in bytes
+        (indexed by ACM channel)"
+        ::= { demod2 4 }
+
+-- Modulator
+prioAll  OBJECT IDENTIFIER ::= { modulator   1 }
+    outBytesA	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator traffic in bytes
+        (indexed by ACM channel)"
+        ::= { prioAll 1 }
+
+    outPktsA	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator traffic in packets
+        (indexed by ACM channel)"
+        ::= { prioAll 2 }
+
+    dropsA	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator dropped packets
+        (indexed by ACM channel)"
+        ::= { prioAll 3 }
+
+    queueLenBA	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator queue length in bytes
+        (indexed by ACM channel)"
+        ::= { prioAll 4 }
+
+    queueLenPA	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator queue length in packets
+        (indexed by ACM channel)"
+        ::= { prioAll 5 }
+
+    numStations	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of stations per ACM channel
+        (indexed by ACM channel)"
+        ::= { prioAll 6 }
+
+prioP1  OBJECT IDENTIFIER ::= { modulator   2 }
+
+	outBytesP1	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P1(Low) priority traffic in bytes
+        (indexed by ACM channel)"
+        ::= { prioP1 1 }
+	outPktsP1	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P1(Low) priority traffic in packets
+        (indexed by ACM channel)"
+        ::= { prioP1 2 }
+	dropsP1	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P1(Low) priority dropped packets
+        (indexed by ACM channel)"
+        ::= { prioP1 3 }
+	queueLenBP1	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P1(Low) priority queue length in bytes
+        (indexed by ACM channel)"
+        ::= { prioP1 4 }
+	queueLenPP1	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P1(Low) priority queue length in packets
+        (indexed by ACM channel)"
+        ::= { prioP1 5 }
+
+prioP4  OBJECT IDENTIFIER ::= { modulator   3 }
+
+	outBytesP4	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P4(Med) priority traffic in bytes 
+        (indexed by ACM channel)"
+        ::= { prioP4 1 }
+	outPktsP4	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P4(Med) priority traffic in packets
+        (indexed by ACM channel)"
+        ::= { prioP4 2 }
+	dropsP4	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P4(Med) priority dropped packets
+        (indexed by ACM channel)"
+        ::= { prioP4 3 }
+	queueLenBP4	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P4(Med) priority queue length in bytes
+        (indexed by ACM channel)"
+        ::= { prioP4 4 }
+	queueLenPP4	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P4(Med) priority queue length in packets
+        (indexed by ACM channel)"
+        ::= { prioP4 5 }
+
+prioP7 OBJECT IDENTIFIER ::= { modulator   4 }
+
+	outBytesP7	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P7(High) priority traffic in bytes
+        (indexed by ACM channel)"
+        ::= { prioP7 1 }
+	outPktsP7	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P7(High) priority traffic in packets
+        (indexed by ACM channel)"
+        ::= { prioP7 2 }
+	dropsP7	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P7(High) priority dropped packets
+        (indexed by ACM channel)"
+        ::= { prioP7 3 }
+	queueLenBP7	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P7(High) priority queue length in bytes
+        (indexed by ACM channel)"
+        ::= { prioP7 4 }
+	queueLenPP7	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P7(High) priority queue length in packets
+        (indexed by ACM channel)"
+        ::= { prioP7 5 }
+
+prioCtrl OBJECT IDENTIFIER ::= { modulator   5 }
+
+	outBytesC	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator control traffic in bytes
+        (index 1 only)"
+        ::= { prioCtrl 1 }
+	outPktsC	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator control traffic in packets
+        (index 1 only)"
+        ::= { prioCtrl 2 }
+
+level OBJECT IDENTIFIER ::= { modulator   6 }
+
+	txLevel	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current TX level x -10dBm"
+        ::= { level 1 }
+
+	txLevelDelta	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current TX level delta from set level x -10dBm"
+        ::= { level 2 }
+
+	txMaxLevel	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Max TLC level x -10dBm"
+        ::= { level 3 }
+
+prioP2 OBJECT IDENTIFIER ::= { modulator   7 }
+
+	outBytesP2	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P2 priority traffic in bytes
+        (indexed by ACM channel)"
+        ::= { prioP2 1 }
+	outPktsP2	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P2 priority traffic in packets
+        (indexed by ACM channel)"
+        ::= { prioP2 2 }
+	dropsP2	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P2 priority dropped packets
+        (indexed by ACM channel)"
+        ::= { prioP2 3 }
+	queueLenBP2	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P2 priority queue length in bytes
+        (indexed by ACM channel)"
+        ::= { prioP2 4 }
+	queueLenPP2	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P2 priority queue length in packets
+        (indexed by ACM channel)"
+        ::= { prioP2 5 }
+
+prioP3 OBJECT IDENTIFIER ::= { modulator   8 }
+
+	outBytesP3	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P3 priority traffic in bytes
+        (indexed by ACM channel)"
+        ::= { prioP3 1 }
+	outPktsP3	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P3 priority traffic in packets
+        (indexed by ACM channel)"
+        ::= { prioP3 2 }
+	dropsP3	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P3 priority dropped packets
+        (indexed by ACM channel)"
+        ::= { prioP3 3 }
+	queueLenBP3	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P3 priority queue length in bytes
+        (indexed by ACM channel)"
+        ::= { prioP3 4 }
+	queueLenPP3	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P3 priority queue length in packets
+        (indexed by ACM channel)"
+        ::= { prioP3 5 }
+
+prioP5 OBJECT IDENTIFIER ::= { modulator   9 }
+
+	outBytesP5	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P5 priority traffic in bytes
+        (indexed by ACM channel)"
+        ::= { prioP5 1 }
+	outPktsP5	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P5 priority traffic in packets
+        (indexed by ACM channel)"
+        ::= { prioP5 2 }
+	dropsP5	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P5 priority dropped packets
+        (indexed by ACM channel)"
+        ::= { prioP5 3 }
+	queueLenBP5	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P5 priority queue length in bytes
+        (indexed by ACM channel)"
+        ::= { prioP5 4 }
+	queueLenPP5	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P5 priority queue length in packets
+        (indexed by ACM channel)"
+        ::= { prioP5 5 }
+
+prioP6 OBJECT IDENTIFIER ::= { modulator   10 }
+
+	outBytesP6	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P6 priority traffic in bytes
+        (indexed by ACM channel)"
+        ::= { prioP6 1 }
+	outPktsP6	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P6 priority traffic in packets
+        (indexed by ACM channel)"
+        ::= { prioP6 2 }
+	dropsP6	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P6 priority dropped packets
+        (indexed by ACM channel)"
+        ::= { prioP6 3 }
+	queueLenBP6	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P6 priority queue length in bytes
+        (indexed by ACM channel)"
+        ::= { prioP6 4 }
+	queueLenPP6	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Modulator P6 priority queue length in packets
+        (indexed by ACM channel)"
+        ::= { prioP6 5 }
+
+-- Router
+
+    unroutedPkts  	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of packets, router couldn't route anywhere
+	     (though they could have been tunneled)."
+        ::= { router 1 }
+
+    unroutedSource   OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Last source IP address of unrouted packet."
+        ::= { router 2 }
+
+    unroutedDest   OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Last destination IP address of unrouted packet."
+        ::= { router 3 }
+
+    outVlanBytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of bytes, transmitted via VLAN.
+	     Requires index, which is VLAN number."
+        ::= { router 4 }
+
+    inVlanBytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of bytes, received via VLAN.
+	     Requires index, which is VLAN number."
+        ::= { router 5 }
+
+    outSvlanBytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of bytes, transmitted via SVLAN.
+	     Requires index, which is SVLAN number."
+        ::= { router 6 }
+
+    inSvlanBytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of bytes, received via SVLAN.
+	     Requires index, which is SVLAN number."
+        ::= { router 7 }
+
+    inSvlanPackets OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of packets, received via SVLAN.
+	     Requires index, which is SVLAN number."
+        ::= { router 8 }
+
+--  TDMA
+
+tts		    OBJECT IDENTIFIER ::= { tdma   1 }
+inroute		OBJECT IDENTIFIER ::= { tdma   2 }
+server		OBJECT IDENTIFIER ::= { tdma   3 }
+remTable	OBJECT IDENTIFIER ::= { tdma   4 }
+station		OBJECT IDENTIFIER ::= { tdma   5 }
+
+-- TTS
+
+    tdelta 	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "HUB/Outroute - TTS value
+	    Inroute/remote - Timers delta between local station and hub
+	    In 10MHz ticks.
+		Developers only"
+        ::= { tts 1 }
+
+    tdtConfidence OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "HUB/Outroute - TTS confidence value 0-64
+	    Inroute/remote - Tdelta confidence 0-64"
+        ::= { tts 2 }
+
+    softErrors 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of soft errors of TTS/Tdelta measurement algorithm.
+	    Soft errors mean current value is outside averaged window."
+        ::= { tts 3 }
+		
+	hardErrors 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of hard errors of TTS/Tdelta measurement algorithm."
+        ::= { tts 4 }	
+
+
+    hubTTS 	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "HUB TTS value in 10MHz ticks"
+        ::= { tts 5 }
+
+    hubTTSconfidence OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "HUB TTS confidence value 0-64. It is requested from remotes or inroutes"
+        ::= { tts 6 }
+
+    remoteTTS 	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Remote TTS value with compensations in 10MHz ticks. Developers only"
+        ::= { tts 7 }
+
+-- Inroute
+
+    netState 	OBJECT-TYPE
+        SYNTAX  INTEGER {
+            off(0),
+            init(1),
+            noConfig(2),
+            useConfig(3),
+            redundant(4),
+            startRX(5),
+            cotmPointing(6),
+            startHubTX(7),
+            noRX(8),
+            identify(9),
+            getNetConfig(10),
+            calcDelays(11),
+            startTDMA(12),
+            startTX(13),
+            acquisition(14),
+            adjustment(15),
+            noStations(16),
+            operation(17)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Operation sequence level"
+        ::= { inroute 1 }
+
+    frameDelay 	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Delay in frames between TX and RX processing. Developers only"
+        ::= { inroute 2 }
+
+    sectionBW 	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Bandwidth in Bits/second of single slot in frame"
+        ::= { inroute 3 }
+
+    netRequest 	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Sum of all requests of all stations (slots)"
+        ::= { inroute 4 }
+	
+    freeSlots 	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of free-allocated slots in current frame"
+        ::= { inroute 5 }
+
+    netLoad 	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Network load in % (values, greater than 100% mean overload)"
+        ::= { inroute 6 }
+
+-- Server
+
+    serverStatus 	OBJECT-TYPE
+        SYNTAX  INTEGER {
+            off(0),
+            init(1),
+            noConfig(2),
+            useConfig(3),
+            redundant(4),
+            startRX(5),
+            cotmPointing(6),
+            startHubTX(7),
+            noRX(8),
+            identify(9),
+            getNetConfig(10),
+            calcDelays(11),
+            startTDMA(12),
+            startTX(13),
+            acquisition(14),
+            adjustment(15),
+            noStations(16),
+            operation(17)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Server reply status"
+        ::= { server 1 }
+
+    frameDuration 	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Frame duration in 10M ticks"
+        ::= { server 2 }
+
+-- Remotes statistics table ( No SNMP_NEXT, direct remotes 1-252 addressing by index)
+
+    rxBytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Summary number of bytes, received from this remote"
+        ::= { remTable 1 }
+
+    p1Bytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of P1(Low) priority bytes, received from this remote"
+        ::= { remTable 2 }
+
+    p4Bytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of P4(Med) priority bytes, received from this remote"
+        ::= { remTable 3 }
+
+    p7Bytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of P7(High) priority bytes, received from this remote"
+        ::= { remTable 4 }
+
+    crcErrors 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of CRC errors, during reception of this remote"
+        ::= { remTable 5 }
+
+     carrierToNoise	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Receive carrier-to-noise ratio of this remote in 0.1 dB steps"
+        ::= { remTable 6 }
+
+     freqOffset	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Receive Frequency offset of this remote in Hz"
+        ::= { remTable 7 }
+
+     remRecvHub	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "How this remote receives the hub in 0.1 dB steps"
+        ::= { remTable 8 }
+
+     linkState	OBJECT-TYPE
+        SYNTAX  INTEGER {
+            up(1),
+            down(2),
+            off(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Link state of this remote"
+        ::= { remTable 9 }
+
+     lastHeard	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Time in seconds since last burst was received from remote. Developers only"
+        ::= { remTable 10 }
+
+     downTimes	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "How many times remote changed state to DOWN"
+        ::= { remTable 11 }
+
+     totalRequest	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current non-real-time + real-time request from remote"
+        ::= { remTable 12 }
+
+     nrtRequest	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current non-real-time request from remote"
+        ::= { remTable 13 }
+
+     rtmRequest	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current real-time request from remote"
+        ::= { remTable 14 }
+
+     currentFP	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of sections, allocated in current frame plan for remote"
+        ::= { remTable 15 }
+
+     txLvl	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current transmit level x -0.1 dBm (1:360 -> -0.1:-36 dBm)"
+        ::= { remTable 16 }
+
+     faults	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Station faults bitmap: 1-service monitoring local warning (LWRN);2-service monitoring local alarm (LFLT);4-service monitoring network warning (NWRN);8-service monitoring network alarm (NFLT);0x10    system fault (SYST);0x20    reboot fault (REBT);0x40    LAN down (LAN);0x80    RX offset fault (OFFS);0x100   CRC errors (CRC);0x200   TLC fault (TLC)"
+        ::= { remTable 17 }
+
+     p2Bytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of P2 priority bytes, received from this remote"
+        ::= { remTable 18 }
+
+     p3Bytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of P3 priority bytes, received from this remote"
+        ::= { remTable 19 }
+
+     p5Bytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of P5 priority bytes, received from this remote"
+        ::= { remTable 20 }
+
+     p6Bytes 	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Number of P6 priority bytes, received from this remote"
+        ::= { remTable 21 }
+
+
+-- Station data
+
+    stationState OBJECT-TYPE
+        SYNTAX  INTEGER {
+	    off(0),
+            init(1),
+            noConfig(2),
+            useConfig(3),
+            redundant(4),
+            startRX(5),
+            cotmPointing(6),
+            startHubTX(7),
+            noRX(8),
+            identify(9),
+            getNetConfig(10),
+            calcDelays(11),
+            startTDMA(12),
+            startTX(13),
+            acquisition(14),
+            adjustment(15),
+            noStations(16),
+            operation(17)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Remote initialization sequence level"
+        ::= { station 1 }
+
+     remnrtRequest	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Request for non-real-time bandwidth in sections"
+        ::= { station 2 }
+
+     remrtRequest	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Request for real-time bandwidth in sections"
+        ::= { station 3 }
+
+     fpLost	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Lost frame plans number"
+        ::= { station 4 }
+
+     lvlOffset	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Offset between reference level and C/N level on hub. Developers only"
+        ::= { station 5 }
+
+     lvlAdjust	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "TX power level adjustment value in 0.1 dB steps"
+        ::= { station 6 }
+
+     frqOffset	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Frequency offset on hub. Developers only"
+        ::= { station 7 }
+
+     frqAdjust	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "TX frequency adjustment value in Hz. Developers only"
+        ::= { station 8 }
+
+     timeOffset	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Timing offset on hub in symbols"
+        ::= { station 9 }
+
+     timeAdjust	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "TX timing adjustment value in 10M ticks"
+        ::= { station 10 }
+
+-- Traffic Shaper stats  ( No SNMP_NEXT, direct stream 0-500 addressing by index)
+
+	streamSpeed	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current speed in Kbits per second of current stream"
+        ::= { shaper 1 }
+
+	streamP1Speed OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current speed in Kbits per second of P1(Low) priority sub-stream"
+        ::= { shaper 2 }
+
+	streamP4Speed OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current speed in Kbits per second of P4(Med) priority sub-stream"
+        ::= { shaper 3 }
+
+	streamP7Speed	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current speed in Kbits per second of P7(High) priority sub-stream"
+        ::= { shaper 4 }
+
+	streamDelay	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current packets delay in stream x 0.1s"
+        ::= { shaper 5 }
+
+	streamQueue	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current stream queue length in bytes"
+        ::= { shaper 6 }
+
+	streamP2Speed	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current speed in Kbits per second of P2 priority sub-stream"
+        ::= { shaper 7 }
+
+	streamP3Speed	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current speed in Kbits per second of P3 priority sub-stream"
+        ::= { shaper 8 }
+
+	streamP5Speed	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current speed in Kbits per second of P5 priority sub-stream"
+        ::= { shaper 9 }
+
+	streamP6Speed	OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current speed in Kbits per second of P6 priority sub-stream"
+        ::= { shaper 10 }
+
+-- System stats
+
+	temperature	OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current temperature"
+        ::= { system 1 }
+
+	cpuLoad	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current CPU load in percent"
+        ::= { system 2 }
+
+	buffers	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current buffers usage in percent"
+        ::= { system 3 }
+
+	redundancy OBJECT-TYPE
+        SYNTAX  INTEGER {
+            idle(0),
+            backup(1),
+            faults(2),
+            trying(3),
+            active(4),
+            off(5)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Current redundancy state"
+        ::= { system 4 }
+
+	swVersion OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Software version. Four numbers of version contained in four bytes
+	     in order of precedence (see as hexadecimal)."
+        ::= { system 5 }
+
+	releaseDate OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	    "Release date. Two low bytes of number contain year,
+	     then month and day (see as hexadecimal)."
+        ::= { system 6 }
+
+-- Mobile
+
+    version OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Software (protocol) version. Number 10 means V1.0"
+        ::= { mobile 1 }
+
+    serialNumber	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Serial number of this unit. If printed on the screen should be 
+	     printed as hexadecimal! Example - 4660 returned should be printed 
+	     as 1234 in hex."
+        ::= { mobile 2 }
+
+    inputLevel  	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Input baseband RF level in -0.1dBm steps. 500 means -50 dBm.
+	     Higher value means lower level. 800 (-80dBm) means no signal."
+        ::= { mobile 3 }
+
+
+    rxState	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Composite value to provide controller with receive and overall state.
+	     0 means no RX lock.
+	     1 means absence of coordinates (send location data).
+	     2 means absence of TX status (send TX control command).
+	     3-250 means RX lock and shows demodulator C/N level in 0.1dBm 
+		steps (e.g. 100 means C/N=10 dB).
+	     Actual in all modes of operation. In SCPC/Star modes shows
+	     SCPC demodulator level, in FullMesh mode burst demodulator level."
+        ::= { mobile 4 }
+
+
+    searchState  	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "GET
+	     Value in percent (0-100) of current carrier search sequence.
+	     As search for narrow (<1Msps) carrier with high offset (DRO
+	     LNB) can last up-to 30 seconds, controller can wait until
+	     the whole acquisition bandwidth is scanned at least once.
+	     SET
+	     Writing any value restarts search cycle."
+        ::= { mobile 5 }
+
+    txControl  	OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "GET
+	     Current TX status (0-off, 1-on).
+	     SET
+	     Writing 0 turns TX off, 1 - turns on."
+        ::= { mobile 6 }
+
+    location  	OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "GET
+	     Not applicable.
+	     SET
+	     NMEA RMC string
+	     $GPRMC,hhmmss.ss,A,GGMM.MM,P,gggmm.mm,J,v.v,b.b,ddmmyy,x.x,n,m*hh<CR><LF>
+	     Location should be re-supplied if changed more than 1 minute by any 	     coordinate."
+        ::= { mobile 7 }
+
+END

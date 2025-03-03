@@ -1,0 +1,1270 @@
+LUM-IFPHYSICAL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DateAndTime, DisplayString
+        FROM SNMPv2-TC
+    lumModules, lumIfPhysicalMIB
+        FROM LUM-REG
+    Unsigned32WithNA, ResetWithNA, SignalStatusWithNA, FaultStatusWithNA,
+    DisplayStringWithNA, Integer32WithNA, TrxMediaWithNA, CommandString,
+    MgmtNameString, SubrackNumber, TruthValueWithNA, AutoLambdaCapability
+        FROM LUM-TC;
+
+lumIfPhysicalMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201908300000Z" -- August 30th 2019
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The MIB module for management of physical port objects.
+
+         This module describes the physical layer in ITU-T Recommendation
+         G.709.
+
+        The tables contained in this MIB are:
+
+        (1) The General group contains some general attributes as time stamps
+             and tables sizes.
+
+        (2) The Trx group contains information and configuration for all
+             transceiver objects.
+
+        (3) The Cage group contains information and configuration for all
+             cage objects.
+
+"
+    REVISION
+        "201908300000Z" -- August 30th 2019
+    DESCRIPTION
+        "Changes made for release r33.1:
+        - Add auto-lambda attribute."
+    REVISION
+        "201903300000Z" -- March 30th 2019
+    DESCRIPTION
+        "Changes made for release r32.1:
+        - Add alarm signal format not supported.
+        - Add ifPhysicalTrxTunable attribute.
+        - Add alarm for TRX Encryption Communication Failure.
+        - Add alarm for TRX Self-test data corruption.
+        - Add alarm for TRX Does Not Support Encryption"
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+        - Enabled trxCommunicationFailure alarm for tp100gotnii.
+        - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201704210000Z" -- April 21th 2017
+    DESCRIPTION
+        "Changes made for release r28.1:
+        - Added trxCommunicationFailure alarm."
+    REVISION
+        "201612120000Z" -- December 12th 2016
+    DESCRIPTION
+        "Changes made for release r28.1:
+        - Added trxLowTemp alarm."
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28:
+        - Added tp100gotnii board.
+        - Added Transceiver Power Out Of Range alarm"
+    REVISION
+        "201512220000Z" -- December 22nd 2015
+    DESCRIPTION
+        "Changes made for release r27:
+        - Added fhau1 board
+        - Added fha1udc1 board"
+    REVISION
+        "201510300000Z" -- October 30th 2015
+    DESCRIPTION
+        "Added tpmrHL16GUni board"
+    REVISION
+        "201501230000Z" -- January 23rd 2015
+    DESCRIPTION
+        "Changes made for release r24:
+        - Added Optical Layer Mismatch alarm"
+    REVISION
+        "201410300000Z" -- October 30th 2014
+    DESCRIPTION
+        "Added tpmrHL16GUni board"
+    REVISION
+        "201409300000Z" -- September 30th 2014
+    DESCRIPTION
+        "Changes made for release r23.1:
+        - Added TRX Rx and Tx State attribute.
+        - Added mxp100gotn board."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Changes made for release r23:
+        - Changed board name from tp10gotn to tphex10gotn.
+        - Added tpmrHL16G board."
+    REVISION
+        "201311150000Z" -- November 15th 2013
+    DESCRIPTION
+        "Changes made for release r22:
+        - Added tp10gotn, tp100gotn board."
+    REVISION
+        "201211200000Z" -- November 20th 2011
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 47 }
+
+
+-- ----------------------------------------------------
+-- Compliance area, containing groups and compliance
+-- specifications.
+-- ----------------------------------------------------
+
+lumIfPhysicalConfs OBJECT IDENTIFIER ::= { lumIfPhysicalMIB 1 }
+lumIfPhysicalGroups OBJECT IDENTIFIER ::= { lumIfPhysicalConfs 1 }
+lumIfPhysicalCompl OBJECT IDENTIFIER ::= { lumIfPhysicalConfs 2 }
+
+
+-- ----------------------------------------------------
+-- Root for objects in the IFPHYSICAL MIB
+-- ----------------------------------------------------
+
+lumIfPhysicalMIBObjects OBJECT IDENTIFIER ::= { lumIfPhysicalMIB 2 }
+
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+ifPhysicalGeneral OBJECT IDENTIFIER ::= { lumIfPhysicalMIBObjects 1 }
+ifPhysicalTrxList OBJECT IDENTIFIER ::= { lumIfPhysicalMIBObjects 2 }
+ifPhysicalCageList OBJECT IDENTIFIER ::= { lumIfPhysicalMIBObjects 3 }
+
+-- ----------------------------------------------------
+-- General group
+-- ----------------------------------------------------
+
+ifPhysicalGeneralConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the MIB was
+        last changed.
+
+"
+    ::= { ifPhysicalGeneral 1 }
+
+ifPhysicalGeneralStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+	the MIB was last changed.
+
+"
+    ::= { ifPhysicalGeneral 2 }
+
+ifPhysicalGeneralIfPhysicalTrxTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of transceiver table
+
+"
+    ::= { ifPhysicalGeneral 3 }
+
+ifPhysicalGeneralIfPhysicalTrxConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifPhysicalGeneral 4 }
+
+ifPhysicalGeneralIfPhysicalTrxStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of the
+	MIB was last changed.
+
+"
+    ::= { ifPhysicalGeneral 5 }
+
+ifPhysicalGeneralIfPhysicalCageTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of transceiver table
+
+"
+    ::= { ifPhysicalGeneral 6 }
+
+ifPhysicalGeneralIfPhysicalCageConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifPhysicalGeneral 7 }
+
+ifPhysicalGeneralIfPhysicalCageStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of the
+	MIB was last changed.
+
+"
+    ::= { ifPhysicalGeneral 8 }
+
+-- ----------------------------------------------------
+-- Transceiver group
+-- ----------------------------------------------------
+
+ifPhysicalTrxTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfPhysicalTrxEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The if physical trx interface list."
+
+    ::= { ifPhysicalTrxList 1 }
+
+ifPhysicalTrxEntry OBJECT-TYPE
+    SYNTAX      IfPhysicalTrxEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifPhysical trx list.
+
+"
+    INDEX { ifPhysicalTrxIndex }
+    ::= { ifPhysicalTrxTable 1 }
+
+IfPhysicalTrxEntry ::=
+    SEQUENCE {
+        ifPhysicalTrxIndex                        	Unsigned32,
+        ifPhysicalTrxName                         	MgmtNameString,
+        ifPhysicalTrxConnIfBasicIfIndex           	Unsigned32WithNA,
+        ifPhysicalTrxLaserBias                    	Unsigned32WithNA,
+        ifPhysicalTrxLaserTemp                    	Integer32WithNA,
+        ifPhysicalTrxTrxClass                     	DisplayStringWithNA,
+        ifPhysicalTrxTrxMedia                     	TrxMediaWithNA,
+        ifPhysicalTrxActualTrxMedia               	TrxMediaWithNA,
+        ifPhysicalTrxTxSignalStatus               	SignalStatusWithNA,
+        ifPhysicalTrxRxSignalStatus               	SignalStatusWithNA,
+        ifPhysicalTrxTransmitterFailed            	FaultStatusWithNA,
+        ifPhysicalTrxNonQualifiedTrx              	FaultStatusWithNA,
+        ifPhysicalTrxTrxMissing                   	FaultStatusWithNA,
+        ifPhysicalTrxTrxMediaMismatch             	FaultStatusWithNA,
+        ifPhysicalTrxTrxRxState                   	DisplayStringWithNA,
+        ifPhysicalTrxTrxTxState                   	DisplayStringWithNA ,
+        ifPhysicalTrxOpticalLayerMappingMismatch	FaultStatusWithNA,
+        ifPhysicalTrxPowerCycleReset              	ResetWithNA,
+        ifPhysicalTrxUId                        	Unsigned32,
+        ifPhysicalTrxAid                        	DisplayString,
+        ifPhysicalTrxPhysicalLocation           	DisplayString,
+        ifPhysicalTrxPowerOutOfRange            	FaultStatusWithNA,
+        ifPhysicalTrxLowTemp                   	    FaultStatusWithNA,
+        ifPhysicalTrxCommunicationFailure           FaultStatusWithNA,
+        ifPhysicalTrxSignalFormatNotSupported       FaultStatusWithNA,
+        ifPhysicalTrxTunable                        TruthValueWithNA,
+        ifPhysicalTrxEncrCommunicationFailure       FaultStatusWithNA,
+        ifPhysicalTrxDoesNotSupportEncryption       FaultStatusWithNA,
+        ifPhysicalTrxSelfTestDataCorruption         FaultStatusWithNA,
+        ifPhysicalTrxAutoLambdaCapability           AutoLambdaCapability}
+
+ifPhysicalTrxIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPhysicalTrxEntry 1 }
+
+ifPhysicalTrxName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the transceiver, for example
+        'trx:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifPhysicalTrxEntry 2 }
+
+ifPhysicalTrxConnIfBasicIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index describing to which index in ifBasicIf table
+        this object is related to.
+
+"
+    ::= { ifPhysicalTrxEntry 3 }
+
+ifPhysicalTrxLaserBias OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Measures laser bias current value in tenth of
+        mA (0.1 mA).
+
+"
+    ::= { ifPhysicalTrxEntry 4 }
+
+ifPhysicalTrxLaserTemp OBJECT-TYPE
+    SYNTAX      Integer32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual laser temperature in units of
+        0.1 degrees Centigrades.
+
+"
+    ::= { ifPhysicalTrxEntry 5 }
+
+ifPhysicalTrxTrxClass OBJECT-TYPE
+    SYNTAX      DisplayStringWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "String that describes the transceiver class.
+
+"
+    DEFVAL { "" }
+    ::= { ifPhysicalTrxEntry 6 }
+
+ifPhysicalTrxTrxMedia OBJECT-TYPE
+    SYNTAX      TrxMediaWithNA
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the transceiver media.
+
+        For example 'optical' or 'electrical'.
+
+"
+    DEFVAL { optical }
+    ::= { ifPhysicalTrxEntry 7 }
+
+ifPhysicalTrxActualTrxMedia OBJECT-TYPE
+    SYNTAX      TrxMediaWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Defines the media and capability of the TRX.
+
+"
+    DEFVAL { optical }
+    ::= { ifPhysicalTrxEntry 8 }
+
+ifPhysicalTrxTxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (TX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+
+"
+    ::= { ifPhysicalTrxEntry 9 }
+
+ifPhysicalTrxRxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for incoming (RX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifPhysicalTrxEntry 10 }
+
+ifPhysicalTrxTransmitterFailed OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitter failed.
+
+        The transceiver hardware has detected a failure
+        in the transmitter part.
+
+        Alarm - The transmitter has failed
+
+        Ok - The transmitter is OK again
+
+"
+    ::= { ifPhysicalTrxEntry 11 }
+
+ifPhysicalTrxNonQualifiedTrx OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Non-qualified transceiver.
+
+        The inserted transceiver does not have a legal
+        manufacturer code.
+
+        Alarm - A non-qualified transceiver is inserted.
+
+        Ok - The transceiver is qualified.
+
+"
+    ::= { ifPhysicalTrxEntry 12 }
+
+ifPhysicalTrxTrxMissing OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transceiver missing.
+
+        An expected transceiver is missing.
+
+        Alarm - An expected transceiver is missing.
+
+        Ok - The missing transceiver is inserted.
+
+"
+    ::= { ifPhysicalTrxEntry 13 }
+
+ifPhysicalTrxTrxMediaMismatch OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transceiver media mismatch.
+
+        The TRX media does not match the expected one.
+
+        Alarm - Invalid or mismatching trx media is
+        detected.
+
+        Ok - The (pluggable) transceiver or board is
+        replaced, or the configuration is changed.
+
+"
+    ::= { ifPhysicalTrxEntry 14 }
+
+ifPhysicalTrxTrxRxState OBJECT-TYPE
+    SYNTAX      DisplayStringWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current Rx state of the transciever, in case it is
+        a coherent CFP. The unit is ready if state=Ready.
+
+        The states could be one of the followings:
+
+        Rx State: Init started.
+
+        Rx State: Init ready.
+
+        Rx State: Frequency ready.
+
+        Rx State: Input signal received.
+
+        Rx State: A/D Converter ready.
+
+        Rx State: Dispersion compensated.
+
+        Rx State: Ready.
+
+"
+    DEFVAL { "" }
+    ::= { ifPhysicalTrxEntry 15 }
+
+ifPhysicalTrxTrxTxState OBJECT-TYPE
+    SYNTAX      DisplayStringWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current Tx state of the transciever, in case it is
+        a coherent CFP. The unit is ready if state=Ready.
+
+        The states could be one of the followings:
+
+        Tx State: Init started.
+
+        Tx State: Init ready.
+
+        Tx State: Data path locked.
+
+        Tx State: Laser ready off.
+
+        Tx State: Laser ready.
+
+        Tx State: Laser bias ready.
+
+        Tx State: Ready.
+
+"
+    DEFVAL { "" }
+    ::= { ifPhysicalTrxEntry 16 }
+
+ifPhysicalTrxOpticalLayerMappingMismatch OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inserted transceiver does not support the
+        configuration of the optical layer mapping.
+
+        alarm: A transceiver with other supported optical layer
+               mapping than the requested mapping is inserted.
+
+        ok: The transceiver with the non-requested optical
+            layer mapping is removed, or the object is reconfigured.
+
+"
+    ::= { ifPhysicalTrxEntry 17 }
+
+ifPhysicalTrxPowerCycleReset OBJECT-TYPE
+    SYNTAX      ResetWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When the attribute is set to reset the trx power cycle
+        is re-initialised, meaning the trx is cold started. Then the attribute is set to normal again
+        automatically.
+
+        Note: This function is only to be used as a last resort to resolve a TRX deadlock. Please read I&C manual for further details before usage.
+
+        reset - Re-initialises the trx power cycle
+        normal - The trx power cycle is in normal state
+
+"
+    DEFVAL { normal }
+    ::= { ifPhysicalTrxEntry 18 }
+
+ifPhysicalTrxUId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPhysicalTrxEntry 19 }
+
+ifPhysicalTrxAid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The access identifier (AID) of the trx.
+         The format is according to GR-833.
+
+"
+    ::= { ifPhysicalTrxEntry 20 }
+
+ifPhysicalTrxPhysicalLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The physical location of the trx.
+         The format is according to GR-833.
+
+"
+    ::= { ifPhysicalTrxEntry 21 }
+
+ifPhysicalTrxPowerOutOfRange OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The power classification of the transceiver exceeds the design limit of the board.
+
+        alarm: A transceiver with a power classification that exceeds
+               the design limit of the board is inserted.
+
+        ok: The transceiver with a power classification that exceeds
+            the design limit of the board is removed.
+
+"
+    ::= { ifPhysicalTrxEntry 22 }
+
+ifPhysicalTrxLowTemp OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The temperature of the transceiver is below its designed limit.
+
+        alarm: The temperature of the transceiver is below its designed limit.
+
+        ok: The temperature of the transceiver is within designed limits.
+
+"
+    ::= { ifPhysicalTrxEntry 23 }
+
+ifPhysicalTrxCommunicationFailure OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The board is unable to communicate with the transceiver.
+
+        alarm: Protocol errors detected on the transceiver control link.
+
+        ok: No communication errors detected on the transceiver control link.
+
+"
+    ::= { ifPhysicalTrxEntry 24 }
+
+ifPhysicalTrxSignalFormatNotSupported OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The signal format is not supported on this transceiver.
+
+        alarm: Signal format not supported.
+
+        ok: Signal format supported.
+
+"
+    ::= { ifPhysicalTrxEntry 25 }
+
+ifPhysicalTrxTunable OBJECT-TYPE
+    SYNTAX      TruthValueWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transceiver is of tunable type.
+
+"
+    DEFVAL { notAvailable }
+    ::= { ifPhysicalTrxEntry 26 }
+
+ifPhysicalTrxEncrCommunicationFailure OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The board is unable to communicate with the transceiver for
+        encryption related configuration.
+
+        alarm: Protocol errors detected on the transceiver encryption control link.
+
+        ok: No communication errors detected on the transceiver encryption control link.
+
+"
+    ::= { ifPhysicalTrxEntry 27 }
+
+ifPhysicalTrxDoesNotSupportEncryption OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Non-Encryption capable TRX installed.
+
+        alarm: Non-Encryption capable TRX installed.
+
+        ok: Encryption capable TRX installed.
+
+"
+    ::= { ifPhysicalTrxEntry 28 }
+
+ifPhysicalTrxSelfTestDataCorruption OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TRX self-test data corruption.
+
+        alarm: TRX self-test data is corrupted.
+
+        ok: TRX self-test data is okay.
+
+"
+    ::= { ifPhysicalTrxEntry 29 }
+
+ifPhysicalTrxAutoLambdaCapability OBJECT-TYPE
+    SYNTAX      AutoLambdaCapability
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Auto Lambda capability of the TRX.
+
+        none           - Inserted TRX does not support auto lambda
+        notApplicable  - Interface does not support auto lambda or TRX is not inserted
+        dualEndedPeer  - TRX for dual ended peer auto lambda
+
+"
+    ::= { ifPhysicalTrxEntry 30 }
+
+-- ----------------------------------------------------
+-- Cage group
+-- ----------------------------------------------------
+
+ifPhysicalCageTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfPhysicalCageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The if physical cage list."
+
+    ::= { ifPhysicalCageList 1 }
+
+ifPhysicalCageEntry OBJECT-TYPE
+    SYNTAX      IfPhysicalCageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifPhysical cage list.
+
+"
+    INDEX { ifPhysicalCageIndex }
+    ::= { ifPhysicalCageTable 1 }
+
+IfPhysicalCageEntry ::=
+    SEQUENCE {
+        ifPhysicalCageIndex                              Unsigned32,
+        ifPhysicalCageName                               MgmtNameString,
+        ifPhysicalCageConnIfBasicIfIndex                 Unsigned32WithNA,
+        ifPhysicalCageSubrack                            SubrackNumber,
+        ifPhysicalCageSlot                               Unsigned32,
+        ifPhysicalCageAid                                DisplayString,
+        ifPhysicalCagePhysicalLocation                   DisplayString,
+        ifPhysicalCageEquipped                           TruthValueWithNA,
+        ifPhysicalCageUId                                Unsigned32}
+
+ifPhysicalCageIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPhysicalCageEntry 1 }
+
+ifPhysicalCageName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the cage, for example
+        'cage:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifPhysicalCageEntry 2 }
+
+ifPhysicalCageConnIfBasicIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index describing to which index in ifBasicIf table
+        this object is related to.
+
+"
+    ::= { ifPhysicalCageEntry 3 }
+
+
+
+ifPhysicalCageSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack in which the cage
+        module is present.
+
+"
+    ::= { ifPhysicalCageEntry 4 }
+
+ifPhysicalCageSlot OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot in which the cage
+        module is present.
+
+"
+    ::= { ifPhysicalCageEntry 5 }
+
+ifPhysicalCageAid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The access identifier (AID) of the cage.
+         The format is according to GR-833.
+
+"
+    ::= { ifPhysicalCageEntry 6 }
+
+
+ifPhysicalCagePhysicalLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The physical location of the cage.
+         The format is according to GR-833.
+
+"
+    ::= { ifPhysicalCageEntry 7 }
+
+
+ifPhysicalCageEquipped OBJECT-TYPE
+    SYNTAX      TruthValueWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Is the entity equipped.
+
+"
+    DEFVAL { notApplicable }
+    ::= { ifPhysicalCageEntry 8 }
+
+ifPhysicalCageUId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPhysicalCageEntry 9 }
+
+-- ----------------------------------------------------
+-- Notifications
+-- ----------------------------------------------------
+
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+ifPhysicalGeneralGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalGeneralConfigLastChangeTime,
+        ifPhysicalGeneralStateLastChangeTime,
+        ifPhysicalGeneralIfPhysicalTrxTableSize,
+        ifPhysicalGeneralIfPhysicalTrxConfigLastChangeTime,
+        ifPhysicalGeneralIfPhysicalTrxStateLastChangeTime }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The general objects."
+    ::= { lumIfPhysicalGroups 1 }
+
+ifPhysicalTrxGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalTrxIndex,
+        ifPhysicalTrxName,
+        ifPhysicalTrxConnIfBasicIfIndex,
+        ifPhysicalTrxLaserBias,
+        ifPhysicalTrxLaserTemp,
+        ifPhysicalTrxTrxClass,
+        ifPhysicalTrxTrxMedia,
+        ifPhysicalTrxActualTrxMedia,
+        ifPhysicalTrxTxSignalStatus,
+        ifPhysicalTrxRxSignalStatus,
+        ifPhysicalTrxTransmitterFailed,
+        ifPhysicalTrxNonQualifiedTrx,
+        ifPhysicalTrxTrxMissing,
+        ifPhysicalTrxTrxMediaMismatch }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPhysical transceiver objects (R20.0)."
+    ::= { lumIfPhysicalGroups 2 }
+
+ifPhysicalTrxGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalTrxIndex,
+        ifPhysicalTrxName,
+        ifPhysicalTrxConnIfBasicIfIndex,
+        ifPhysicalTrxLaserBias,
+        ifPhysicalTrxLaserTemp,
+        ifPhysicalTrxTrxClass,
+        ifPhysicalTrxTrxMedia,
+        ifPhysicalTrxActualTrxMedia,
+        ifPhysicalTrxTxSignalStatus,
+        ifPhysicalTrxRxSignalStatus,
+        ifPhysicalTrxTransmitterFailed,
+        ifPhysicalTrxNonQualifiedTrx,
+        ifPhysicalTrxTrxMissing,
+        ifPhysicalTrxTrxMediaMismatch,
+        ifPhysicalTrxTrxRxState,
+        ifPhysicalTrxTrxTxState }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPhysical transceiver objects (R23.1)."
+    ::= { lumIfPhysicalGroups 3 }
+
+ifPhysicalTrxGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalTrxIndex,
+        ifPhysicalTrxName,
+        ifPhysicalTrxConnIfBasicIfIndex,
+        ifPhysicalTrxLaserBias,
+        ifPhysicalTrxLaserTemp,
+        ifPhysicalTrxTrxClass,
+        ifPhysicalTrxTrxMedia,
+        ifPhysicalTrxActualTrxMedia,
+        ifPhysicalTrxTxSignalStatus,
+        ifPhysicalTrxRxSignalStatus,
+        ifPhysicalTrxTransmitterFailed,
+        ifPhysicalTrxNonQualifiedTrx,
+        ifPhysicalTrxTrxMissing,
+        ifPhysicalTrxTrxMediaMismatch,
+        ifPhysicalTrxTrxRxState,
+        ifPhysicalTrxTrxTxState,
+        ifPhysicalTrxOpticalLayerMappingMismatch }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPhysical transceiver objects (R24)."
+    ::= { lumIfPhysicalGroups 4 }
+
+ifPhysicalTrxGroupV4 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalTrxIndex,
+        ifPhysicalTrxName,
+        ifPhysicalTrxConnIfBasicIfIndex,
+        ifPhysicalTrxLaserBias,
+        ifPhysicalTrxLaserTemp,
+        ifPhysicalTrxTrxClass,
+        ifPhysicalTrxTrxMedia,
+        ifPhysicalTrxActualTrxMedia,
+        ifPhysicalTrxTxSignalStatus,
+        ifPhysicalTrxRxSignalStatus,
+        ifPhysicalTrxTransmitterFailed,
+        ifPhysicalTrxNonQualifiedTrx,
+        ifPhysicalTrxTrxMissing,
+        ifPhysicalTrxTrxMediaMismatch,
+        ifPhysicalTrxTrxRxState,
+        ifPhysicalTrxTrxTxState,
+        ifPhysicalTrxOpticalLayerMappingMismatch,
+        ifPhysicalTrxPowerCycleReset }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPhysical transceiver objects (R25)."
+    ::= { lumIfPhysicalGroups 5 }
+
+ifPhysicalTrxGroupV5 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalTrxIndex,
+        ifPhysicalTrxName,
+        ifPhysicalTrxConnIfBasicIfIndex,
+        ifPhysicalTrxLaserBias,
+        ifPhysicalTrxLaserTemp,
+        ifPhysicalTrxTrxClass,
+        ifPhysicalTrxTrxMedia,
+        ifPhysicalTrxActualTrxMedia,
+        ifPhysicalTrxTxSignalStatus,
+        ifPhysicalTrxRxSignalStatus,
+        ifPhysicalTrxTransmitterFailed,
+        ifPhysicalTrxNonQualifiedTrx,
+        ifPhysicalTrxTrxMissing,
+        ifPhysicalTrxTrxMediaMismatch,
+        ifPhysicalTrxTrxRxState,
+        ifPhysicalTrxTrxTxState,
+        ifPhysicalTrxOpticalLayerMappingMismatch,
+        ifPhysicalTrxPowerCycleReset,
+        ifPhysicalTrxUId}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPhysical transceiver objects (R27.1)."
+    ::= { lumIfPhysicalGroups 6 }
+
+ifPhysicalGeneralGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalGeneralConfigLastChangeTime,
+        ifPhysicalGeneralStateLastChangeTime,
+        ifPhysicalGeneralIfPhysicalTrxTableSize,
+        ifPhysicalGeneralIfPhysicalTrxConfigLastChangeTime,
+        ifPhysicalGeneralIfPhysicalTrxStateLastChangeTime,
+        ifPhysicalGeneralIfPhysicalCageTableSize,
+        ifPhysicalGeneralIfPhysicalCageConfigLastChangeTime,
+        ifPhysicalGeneralIfPhysicalCageStateLastChangeTime}
+    STATUS      current
+    DESCRIPTION
+        "The general objects."
+    ::= { lumIfPhysicalGroups 7 }
+
+ifPhysicalCageGroupV1 OBJECT-GROUP
+    OBJECTS {
+    ifPhysicalCageIndex,
+    ifPhysicalCageName,
+    ifPhysicalCageConnIfBasicIfIndex,
+    ifPhysicalCageSubrack,
+    ifPhysicalCageSlot,
+    ifPhysicalCageAid,
+    ifPhysicalCagePhysicalLocation,
+    ifPhysicalCageEquipped,
+    ifPhysicalCageUId}
+    STATUS      current
+    DESCRIPTION
+        "The ifPhysical cage objects (R28.0)."
+    ::= { lumIfPhysicalGroups 8 }
+
+ifPhysicalTrxGroupV6 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalTrxIndex,
+        ifPhysicalTrxName,
+        ifPhysicalTrxConnIfBasicIfIndex,
+        ifPhysicalTrxLaserBias,
+        ifPhysicalTrxLaserTemp,
+        ifPhysicalTrxTrxClass,
+        ifPhysicalTrxTrxMedia,
+        ifPhysicalTrxActualTrxMedia,
+        ifPhysicalTrxTxSignalStatus,
+        ifPhysicalTrxRxSignalStatus,
+        ifPhysicalTrxTransmitterFailed,
+        ifPhysicalTrxNonQualifiedTrx,
+        ifPhysicalTrxTrxMissing,
+        ifPhysicalTrxTrxMediaMismatch,
+        ifPhysicalTrxTrxRxState,
+        ifPhysicalTrxTrxTxState,
+        ifPhysicalTrxOpticalLayerMappingMismatch,
+        ifPhysicalTrxPowerCycleReset,
+        ifPhysicalTrxUId,
+        ifPhysicalTrxAid,
+        ifPhysicalTrxPhysicalLocation,
+        ifPhysicalTrxPowerOutOfRange}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPhysical transceiver objects (R28.0)."
+    ::= { lumIfPhysicalGroups 9 }
+
+ifPhysicalTrxGroupV7 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalTrxIndex,
+        ifPhysicalTrxName,
+        ifPhysicalTrxConnIfBasicIfIndex,
+        ifPhysicalTrxLaserBias,
+        ifPhysicalTrxLaserTemp,
+        ifPhysicalTrxTrxClass,
+        ifPhysicalTrxTrxMedia,
+        ifPhysicalTrxActualTrxMedia,
+        ifPhysicalTrxTxSignalStatus,
+        ifPhysicalTrxRxSignalStatus,
+        ifPhysicalTrxTransmitterFailed,
+        ifPhysicalTrxNonQualifiedTrx,
+        ifPhysicalTrxTrxMissing,
+        ifPhysicalTrxTrxMediaMismatch,
+        ifPhysicalTrxTrxRxState,
+        ifPhysicalTrxTrxTxState,
+        ifPhysicalTrxOpticalLayerMappingMismatch,
+        ifPhysicalTrxPowerCycleReset,
+        ifPhysicalTrxUId,
+        ifPhysicalTrxAid,
+        ifPhysicalTrxPhysicalLocation,
+        ifPhysicalTrxPowerOutOfRange,
+        ifPhysicalTrxLowTemp,
+        ifPhysicalTrxCommunicationFailure}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPhysical transceiver objects (R28.1)."
+    ::= { lumIfPhysicalGroups 10 }
+
+ifPhysicalTrxGroupV8 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalTrxIndex,
+        ifPhysicalTrxName,
+        ifPhysicalTrxConnIfBasicIfIndex,
+        ifPhysicalTrxLaserBias,
+        ifPhysicalTrxLaserTemp,
+        ifPhysicalTrxTrxClass,
+        ifPhysicalTrxTrxMedia,
+        ifPhysicalTrxActualTrxMedia,
+        ifPhysicalTrxTxSignalStatus,
+        ifPhysicalTrxRxSignalStatus,
+        ifPhysicalTrxTransmitterFailed,
+        ifPhysicalTrxNonQualifiedTrx,
+        ifPhysicalTrxTrxMissing,
+        ifPhysicalTrxTrxMediaMismatch,
+        ifPhysicalTrxTrxRxState,
+        ifPhysicalTrxTrxTxState,
+        ifPhysicalTrxOpticalLayerMappingMismatch,
+        ifPhysicalTrxPowerCycleReset,
+        ifPhysicalTrxUId,
+        ifPhysicalTrxAid,
+        ifPhysicalTrxPhysicalLocation,
+        ifPhysicalTrxPowerOutOfRange,
+        ifPhysicalTrxLowTemp,
+        ifPhysicalTrxCommunicationFailure,
+        ifPhysicalTrxSignalFormatNotSupported,
+        ifPhysicalTrxTunable,
+        ifPhysicalTrxEncrCommunicationFailure,
+        ifPhysicalTrxDoesNotSupportEncryption,
+        ifPhysicalTrxSelfTestDataCorruption}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPhysical transceiver objects (R32.1)."
+    ::= { lumIfPhysicalGroups 11 }
+
+ifPhysicalTrxGroupV9 OBJECT-GROUP
+    OBJECTS {
+        ifPhysicalTrxIndex,
+        ifPhysicalTrxName,
+        ifPhysicalTrxConnIfBasicIfIndex,
+        ifPhysicalTrxLaserBias,
+        ifPhysicalTrxLaserTemp,
+        ifPhysicalTrxTrxClass,
+        ifPhysicalTrxTrxMedia,
+        ifPhysicalTrxActualTrxMedia,
+        ifPhysicalTrxTxSignalStatus,
+        ifPhysicalTrxRxSignalStatus,
+        ifPhysicalTrxTransmitterFailed,
+        ifPhysicalTrxNonQualifiedTrx,
+        ifPhysicalTrxTrxMissing,
+        ifPhysicalTrxTrxMediaMismatch,
+        ifPhysicalTrxTrxRxState,
+        ifPhysicalTrxTrxTxState,
+        ifPhysicalTrxOpticalLayerMappingMismatch,
+        ifPhysicalTrxPowerCycleReset,
+        ifPhysicalTrxUId,
+        ifPhysicalTrxAid,
+        ifPhysicalTrxPhysicalLocation,
+        ifPhysicalTrxPowerOutOfRange,
+        ifPhysicalTrxLowTemp,
+        ifPhysicalTrxCommunicationFailure,
+        ifPhysicalTrxSignalFormatNotSupported,
+        ifPhysicalTrxTunable,
+        ifPhysicalTrxEncrCommunicationFailure,
+        ifPhysicalTrxDoesNotSupportEncryption,
+        ifPhysicalTrxSelfTestDataCorruption,
+        ifPhysicalTrxAutoLambdaCapability}
+    STATUS      current
+    DESCRIPTION
+        "The ifPhysical transceiver objects (R33.1)."
+    ::= { lumIfPhysicalGroups 12 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumIfPhysicalComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPhysical MIB. (R20.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPhysicalGeneralGroupV1,
+            ifPhysicalTrxGroupV1 }
+    ::= { lumIfPhysicalCompl 1 }
+
+lumIfPhysicalComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPhysical MIB. (R23.1)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPhysicalGeneralGroupV1,
+            ifPhysicalTrxGroupV2 }
+    ::= { lumIfPhysicalCompl 2 }
+
+lumIfPhysicalComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPhysical MIB. (R24)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPhysicalGeneralGroupV1,
+            ifPhysicalTrxGroupV3 }
+    ::= { lumIfPhysicalCompl 3 }
+
+lumIfPhysicalComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPhysical MIB. (27.1)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPhysicalGeneralGroupV1,
+            ifPhysicalTrxGroupV5 }
+    ::= { lumIfPhysicalCompl 4 }
+
+lumIfPhysicalComplV5 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPhysical MIB. (28.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPhysicalGeneralGroupV2,
+            ifPhysicalTrxGroupV6,
+            ifPhysicalCageGroupV1  }
+    ::= { lumIfPhysicalCompl 5 }
+
+lumIfPhysicalComplV6 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPhysical MIB. (28.1)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPhysicalGeneralGroupV2,
+            ifPhysicalTrxGroupV7,
+            ifPhysicalCageGroupV1  }
+    ::= { lumIfPhysicalCompl 6 }
+
+
+lumIfPhysicalComplV7 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPhysical MIB. (32.1)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPhysicalGeneralGroupV2,
+            ifPhysicalTrxGroupV8,
+            ifPhysicalCageGroupV1  }
+    ::= { lumIfPhysicalCompl 7 }
+
+lumIfPhysicalComplV8 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the ifPhysical MIB. (33.1)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPhysicalGeneralGroupV2,
+            ifPhysicalTrxGroupV9,
+            ifPhysicalCageGroupV1  }
+    ::= { lumIfPhysicalCompl 8 }
+
+END
+

@@ -1,0 +1,272 @@
+
+-- ===========================================================================
+
+
+EXTREME-FILETRANSFER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+      MODULE-IDENTITY, IpAddress, OBJECT-TYPE		
+                        FROM SNMPv2-SMI
+      DisplayString, TestAndIncr, RowStatus
+			FROM SNMPv2-TC
+      OwnerString       FROM RMON-MIB
+      extremeAgent	FROM EXTREME-BASE-MIB;
+
+extremeFileTransfer	MODULE-IDENTITY
+	LAST-UPDATED	"9810211630Z"
+	ORGANIZATION	"Extreme Networks, Inc."
+	CONTACT-INFO	"www.extremenetworks.com"
+	DESCRIPTION	"Extreme File transfer objects"
+	::= {extremeAgent 10}
+
+-- The file transfer group
+
+extremeFileTransferGroup OBJECT IDENTIFIER ::= { extremeFileTransfer 1 }
+
+extremeFileTransferNextAvailableIndex OBJECT-TYPE
+	SYNTAX  TestAndIncr
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+	      "The index of the next free row in the extremeFileTransferTable."
+	::= { extremeFileTransferGroup 1}
+
+extremeFileTransferTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF FileTransferEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A table of pending and completed file transfers."
+	::= { extremeFileTransferGroup 2 }
+
+extremeFileTransferEntry OBJECT-TYPE
+	SYNTAX	FileTransferEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+                "A table entry containing information on a pending
+                or completed file transfer."
+	INDEX	{ extremeFileTransferIndex }
+	::= { extremeFileTransferTable 1 }
+
+FileTransferEntry ::=
+	SEQUENCE {
+		extremeFileTransferIndex			INTEGER,
+		extremeFileTransferServerAddress		IpAddress,
+		extremeFileTransferFileName                    DisplayString,
+		extremeFileTransferOperation			INTEGER,
+		extremeFileTransferScheduledTime		OCTET STRING,
+		extremeFileTransferStartAdminStatus		INTEGER,
+		extremeFileTransferStartOperStatus		INTEGER,
+		extremeFileTransferLastExecutionStatus		INTEGER,
+		extremeFileTransferOwner                       OwnerString,
+		extremeFileTransferRowStatus			RowStatus
+	}
+		
+extremeFileTransferIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+		"An index into the file transfer table."
+        ::= { extremeFileTransferEntry 1 }
+
+extremeFileTransferServerAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+		"This is the address of the TFTP server from which to
+		download the image or configuration or upload the 
+		configuration."
+        ::= { extremeFileTransferEntry 2 }
+
+extremeFileTransferFileName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+		"This is the name of the file to be downloaded or uploaded."
+        ::= { extremeFileTransferEntry 3 }
+
+extremeFileTransferOperation OBJECT-TYPE
+         SYNTAX  INTEGER {
+                    downloadImageToPrimaryImmediate(1),
+                    downloadImageToSecondaryImmediate(2),
+                    downloadConfigImmediate(3),
+                    uploadConfigImmediate(4),
+                    scheduleConfigUploadPeriodic(5),
+                    scheduleConfigUploadOnce(6),
+                    scheduleImageDownloadToPrimaryOnce(7),
+                    scheduleImageDownloadToSecondaryOnce(8),
+		    scheduleConfigDownloadOnce(9)
+                 }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION 
+                 "Indication of the file transfer operation.
+                  This object allows configuration of uploads and/or
+                  downloads either immediately or at a scheduled time.
+
+		  A value of downloadImageToPrimaryImmediate(1) or 
+		  downloadImageToSecondaryImmediate(2) describes immediate 
+		  download of a software image to either the primary or 
+		  secondary permanent store. A value of 
+		  downloadConfigImmediate(3) describes immediate download
+		  of a configuration file to non-volatile store. A value
+		  of uploadConfigImmediate(4) describes the immediate upload
+		  of the currently running configuration to the server.
+
+		  A value of scheduleConfigUploadOnce(6) describes a single 
+		  upload of the current configuration to the server at the 
+		  time extremeFileTransferScheduledTime. A value of 
+		  scheduleConfigUploadPeriodic(5) describes daily uploads 
+		  of the current configuration to the server at the time 
+		  extremeFileTransferScheduledTime every day.
+
+		  A value of scheduleImageDownloadToPrimaryOnce(7) or 
+		  scheduleImageDownloadToSecondaryOnce(8) describes a single 
+		  download of a software image to either the primary or 
+		  secondary permanent store at the time
+		  extremeFileTransferScheduledTime.
+
+		  This object can be modified only if
+		  extremeFileTransferStartOperStatus for this entry is idle(1).
+
+                  Note that any attempts to modify this object including
+                  row creation which would result in multiple downloads
+                  would cause the operation to fail. Managers are
+                  strongly recommened to examine the 
+                  extremeFileTransferStartOperStatus object for the entries
+                  in the table to determine the status of downloads
+                  before attempting to modify this object."
+         ::= { extremeFileTransferEntry 4 }
+
+extremeFileTransferScheduledTime OBJECT-TYPE -- This convention is from RMON2
+        SYNTAX  OCTET STRING (SIZE (0 | 8 | 11))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The time of the day at which the file transfer operation 
+                should be initiated. This object is meaningful only for
+                scheduled file transfers.
+
+                field  octets  contents                  range
+                -----  ------  --------                  -----
+                1      1-2   year                      0..65536
+                2       3    month                     1..12
+                3       4    day                       1..31
+                4       5    hour                      0..23
+                5       6    minutes                   0..59
+                6       7    seconds                   0..60
+                                         (use 60 for leap-second)
+                7       8    deci-seconds              0..9
+                8       9    direction from UTC        '+' / '-'
+                9      10    hours from UTC            0..11
+                10      11    minutes from UTC         0..59
+
+                For example, Tuesday May 26, 1992 at 1:30:15 PM
+                EDT would be displayed as:
+
+                     1992-5-26,13:30:15.0,-4:0
+
+                Note that if only local time is known, then
+                timezone information (fields 8-10) is not
+                present, and if no time information is known, the null
+                string is returned."
+        ::= { extremeFileTransferEntry 5 }
+	
+extremeFileTransferStartAdminStatus OBJECT-TYPE
+         SYNTAX  INTEGER {
+                    start(1),
+                    cancel(2)       
+                 }
+         MAX-ACCESS  read-create
+         STATUS  current
+         DESCRIPTION 
+                 "Writing to this object initiates the upload/download or
+                 schedules one. The extremeFileTransferStartOperStatus object
+                 should be checked before attempting to set this object.
+                 This object cannot be modified while the 
+                 extremeFileTransferStartOperStatus is inProgress(3). This
+		 object can be set start(1) only if the
+		 extremeFileTransferStartOperStatus is idle(1). A scheduled
+		 upload/download will be cancelled by setting the value of
+		 this object to cancel(2)."
+         DEFVAL { cancel }
+        ::= { extremeFileTransferEntry 6}
+	
+extremeFileTransferStartOperStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  idle(1),
+                  scheduled(2),
+                  inProgress(3)
+                }
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION 
+		"The agent sets this value to reflect the current status of 
+                the file transfer operation. Reading this object is meaningful 
+                only if the extremeFileTransferRowStatus is active(1). The
+		current status is determined by the agent by examining the
+		values for extremeFileTransferOperation and
+		extremeFileTransferStartAdminStatus."
+        ::= { extremeFileTransferEntry 7 }
+
+extremeFileTransferLastExecutionStatus OBJECT-TYPE
+        SYNTAX  INTEGER { -- These values are from RMON-2
+                    success(1),
+                    statusUnknown(2),
+                    generalError(3),
+                    noResponseFromServer(4),
+                    checksumError(5),
+                    incompatibleImage(6),
+                    tftpFileNotFound(7),
+                    tftpAccessViolation(8),
+		    fileTooLarge(9),
+		    downloadInProgress(10)
+                }
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION 
+		"The  status of the last file transfer operation. This value 
+                is returned as statusUnknown(1) until the
+		extremeFileTransferRowStatus is set to active(1) or when the
+		extremeFileTransferStartOperStatus is inProgress(3). After an
+		upload/download, the agent will update this value with the
+		result of the file transfer. Managers should read this object
+		before modifying extremeFileTransferOperation because the
+		agent would set this value to statusUnknown(2) in such cases."
+        ::= { extremeFileTransferEntry 8 }
+
+extremeFileTransferOwner OBJECT-TYPE
+        SYNTAX  OwnerString(SIZE (0..32))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "Indicates the identity of the manager that configured this
+                 file transfer entry."
+        ::= { extremeFileTransferEntry 9 }
+
+extremeFileTransferRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "The status of this table entry. This object can not be
+		modified while the extremeFileTransferStatus is inProgress(1).
+		Setting this object to notInService(2) or destroy(6) will
+		cancel any scheduled uploads if this entry was configured for
+		one.
+
+                Note that any attempts to create new rows which would result
+		in multiple downloads would cause the row creation to fail.
+		Similarly, attempting to delete a row while
+		extremeFileTransferStartOperStatus is inProgress(3) would fail.
+		Managers are strongly recommened to examine the
+		extremeFileTransferStartOperStatus object for the entries in 
+                the table to determine the status of downloads before
+		attempting row creation/deletion."
+        ::= { extremeFileTransferEntry 10 }
+
+END

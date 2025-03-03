@@ -1,0 +1,453 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+    SIAE-AGGRL1-MANAGEMENT-MIB  
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             InterfaceIndexOrZero
+        FROM IF-MIB
+             RowStatus, StorageType,
+             TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    aggregationL1 MODULE-IDENTITY
+        LAST-UPDATED "201409290000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Level 1 aggregations management for SIAE equipments.
+            "
+        REVISION "201409290000Z"
+        DESCRIPTION 
+            "MIB version 01.00.01.
+             - Added table aggrL1ConnectionTable.
+             - Added TEXTUAL-CONVENTION AggregableType
+             - Revised document form.
+            "
+        REVISION "201405260000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00.
+            "
+    ::= { siaeMib 83 }
+
+------------------------------------------------------------------------------
+--  Level 1 aggregation GROUP
+------------------------------------------------------------------------------
+--
+--   Aggregators    HW aggregator       Aggregables
+--                                      Radios (or LAN connectors)
+--
+--   +--------+      +----------------+      +--------+
+--   | if.A   | ---- |+ -+- + - - - ->| ---- | ODU.A  |
+--   +--------+      | \  \  \        |      +--------+
+--                   |  \  \  \       |
+--   +--------+      |   \  \  \      |      +--------+
+--   | if.B   | ---- |- - - - - + - ->| ---- | ODU.B  |
+--   +--------+      |     \  \       |      +--------+
+--                   |      \  \      |
+--   +--------+      |       \  \     |      +--------+
+--   | if.C   | ---- |- - - - - -+- ->| ---- | ODU.C  |
+--   +--------+      | \       \      |      +--------+
+--                   |  \       \     |
+--   +--------+      |   \       \    |      +--------+
+--   | if.D   | ---- |- - + - - - + ->| ---- | ODU.D  |
+--   +--------+      |                |      +--------+
+--                   +----------------+
+--
+--                    Figure 1
+--
+--   L1 aggregator combines (aggregates) multiple network connections in
+--   parallel in order to increase throughput beyond what a single connection
+--   could sustain.
+--
+--   HW aggregator block realize this function. In the example show in Figure 1
+--   the HW aggregator block allows to realize up 2 aggregation:
+--     - if.A can send traffic to all ODUs
+--     - if.C can send traffic to ODU.C and ODU.D 
+--
+--   Table aggrL1CapabilityTable shows the capabilities of the HW aggregator
+--   block:
+--
+--   Table aggrL1Table allows the managers to create aggregations compliant
+--   with the capabilities explained in aggrL1CapabilityTable. Rows with equal
+--   aggrL1AggregatorIndex make an aggregation.
+--
+--   Table aggrL1ConnectionTable shows which aggregator send traffic to the
+--   specific Aggregable. This table take in account also radio configuration
+--   1+1, for example, if ODU.A and ODU.B are combined in a 1+1 configuration,
+--   this table shows that if.A sends (the same) traffic to both ODU.A and
+--   ODU.B.
+--
+--   Table aggrL1AlarmTable reports alarms for each aggregator used as a
+--   traffic source of an aggregation.
+--
+------------------------------------------------------------------------------
+
+------ Beginning -------------------------------------------------------------
+
+    -- Textual Conventions
+
+    AggregableType ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "Type of aggregable interface"
+        SYNTAX          INTEGER  {
+                                   other  (1),
+                                   radio  (2),
+                                   lan    (3)
+                                 }
+    -- MIB objects
+
+    aggrL1MibVersion OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+    ::= {aggregationL1 1}
+    
+-------  Begin of aggrL1CapabilityTable
+--
+    aggrL1CapabilityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  AggrL1CapabilityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of capability entries to show the manager all the 
+            possible L1 aggregations."
+    ::= {aggregationL1 2}
+    
+    aggrL1CapabilityEntry OBJECT-TYPE
+        SYNTAX      AggrL1CapabilityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry showing the manager the aggregator and the aggregable
+             interfaces that can be involved in L1 aggregations."
+        INDEX       {aggrL1CapabilityAggregableIndex,
+                     aggrL1CapabilityAggregableType,
+                     aggrL1CapabilityAggregatorIndex
+                    }
+    ::= {aggrL1CapabilityTable 1}
+
+    AggrL1CapabilityEntry  ::=
+        SEQUENCE  {
+            aggrL1CapabilityAggregableIndex                 Integer32,
+            aggrL1CapabilityAggregableType                  AggregableType,
+            aggrL1CapabilityAggregatorIndex                 InterfaceIndexOrZero
+            }
+       
+    aggrL1CapabilityAggregableIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object defines the aggregable physical interface that can be used 
+            in a L1 aggregation. If the interface is a radio, this object matches 
+            the index in radioTable, otherwise this object corresponds to the 
+            ifIndex in ifTable."
+    ::= {aggrL1CapabilityEntry 1}
+    
+    aggrL1CapabilityAggregableType  OBJECT-TYPE
+        SYNTAX      AggregableType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "L1 aggregable interface type. 
+            "
+    ::= {aggrL1CapabilityEntry 2}
+    
+    aggrL1CapabilityAggregatorIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object defines the ifIndex of each aggregator physical
+            interface that can be used as source of a L1 aggregation."
+    ::= {aggrL1CapabilityEntry 3}
+     
+--
+-------  End of aggrL1CapabilityTable
+
+-------  Begin of aggrL1Table
+--
+    aggrL1Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  AggrL1Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of L1 aggregation entries."
+    ::= {aggregationL1 3}
+    
+    aggrL1Entry OBJECT-TYPE
+        SYNTAX      AggrL1Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information applicable to a L1
+             aggregation. Rows with the same aggrL1AggregatorIndex share 
+             ethernet traffic and made up a L1 aggregation."
+             
+        INDEX       {aggrL1AggregableIndex,
+                     aggrL1AggregableType
+                    }
+    ::= {aggrL1Table 1}
+
+    AggrL1Entry  ::=
+        SEQUENCE  {aggrL1AggregableIndex              Integer32,
+                   aggrL1AggregableType               AggregableType,
+                   aggrL1AggregatorIndex              InterfaceIndexOrZero,
+                   aggrL1StorageType                  StorageType,
+                   aggrL1Rowstatus                    RowStatus  
+                  }
+            
+    aggrL1AggregableIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object defines the aggregable physical interface used in a given 
+            L1 aggregation. If the interface is a radio, this object matches 
+            the index in radioTable, otherwise, this object corresponds to the 
+            ifIndex in ifTable. It must correspond to a valid aggregable interface
+            in aggrL1CapabilityTable."
+    ::= {aggrL1Entry 1}
+    
+    aggrL1AggregableType    OBJECT-TYPE
+        SYNTAX      AggregableType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Interface type of the respective aggregable L1 interface."
+    ::= {aggrL1Entry 2}
+    
+    aggrL1AggregatorIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "This object defines the ifIndex of the physical interface 
+            used as source of a given L1 aggregation. It must correspond to a
+            valid aggregator interface in aggrL1CapabilityTable."
+    ::= {aggrL1Entry 3}
+    
+    aggrL1StorageType OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "The storage type for this conceptual row."
+    ::= {aggrL1Entry 4}
+    
+    aggrL1Rowstatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "Status of this conceptual row in aggrL1Table."
+    ::= {aggrL1Entry 5}
+   
+   -- 
+   -------  End of aggrL1Table
+   
+   -------  Begin of aggrL1AlarmTable
+   --
+   aggrL1AlarmTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AggrL1AlarmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with alarms related to L1 aggregations. NE agent adds an entry 
+             in this table when at least two aggregable interfaces (in aggrL1Table) are
+             connected to the same aggregator interface. NE agent removes an entry in 
+             this table when a L1 aggregation made up of more than one aggregable 
+             interfaces is modified in a L1 aggregation composed by one or less 
+             aggregable interfaces."
+    ::= {aggregationL1 4}
+
+    aggrL1AlarmEntry  OBJECT-TYPE
+        SYNTAX      AggrL1AlarmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "AggrL1Alarm entry."
+        INDEX       {aggrL1AlarmAggregatorIndex}
+    ::= {aggrL1AlarmTable 1}
+
+   AggrL1AlarmEntry  ::=
+        SEQUENCE {   
+            aggrL1AlarmAggregatorIndex            InterfaceIndexOrZero, 
+            aggrL1FailAlarm                       AlarmStatus,
+            aggrL1DegradeAlarm                    AlarmStatus,
+            aggrL1RealignmentAlarm                AlarmStatus            
+        }
+   
+  aggrL1AlarmAggregatorIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object defines the ifIndex of the physical interface 
+            used as source of a given L1 aggregation."
+    ::= {aggrL1AlarmEntry 1}
+        
+   aggrL1FailAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "L1 Aggregation Fail Alarm with associated severity."
+    ::= {aggrL1AlarmEntry 2}
+   
+   aggrL1DegradeAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "L1 Aggregation Degrade Alarm with associated severity."
+    ::= {aggrL1AlarmEntry 3}
+    
+   aggrL1RealignmentAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "L1 Aggregation Realignment Alarm with associated severity."
+    ::= {aggrL1AlarmEntry 4}
+    
+   -- 
+   -------  End of aggrL1AlarmTable
+     
+   aggrL1FailAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the L1 aggregation fail alarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {aggregationL1 5}
+    
+    aggrL1DegradeAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the L1 aggregation degrade alarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {aggregationL1 6}
+    
+      aggrL1RealignmentAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the L1 aggregation realignment alarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {aggregationL1 7}
+
+   -------  Begin of aggrL1ConnectionTable
+   --
+    aggrL1ConnectionTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  AggrL1ConnectionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of associations between aggregables and traffic source."
+    ::= {aggregationL1 8}
+    
+    aggrL1ConnectionEntry OBJECT-TYPE
+        SYNTAX      AggrL1ConnectionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing an associations between aggregable radios and
+             traffic source. Rows with the same aggrL1ConnAggregatorIndex
+             identifies aggregable radios that are connected to the same traffic
+             source. In the 1+1 radio configuration, traffic is the same on
+             each aggregable radio, in other radio configurations, traffic is
+             shared between each aggregable radio."
+             
+        INDEX       {aggrL1ConnAggregableIndex,
+                     aggrL1ConnAggregableType
+                    }
+    ::= {aggrL1ConnectionTable 1}
+
+    AggrL1ConnectionEntry  ::=
+        SEQUENCE  {aggrL1ConnAggregableIndex     Integer32,
+                   aggrL1ConnAggregableType      AggregableType,
+                   aggrL1ConnAggregatorIndex     InterfaceIndexOrZero
+                  }
+            
+    aggrL1ConnAggregableIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object defines the aggregable physical interface used in a
+            given  L1 aggregation (or radio protection). If the interface is a
+            radio, this object matches the index in radioTable, otherwise,
+            this object corresponds to the  ifIndex in ifTable.
+            It must correspond to a valid aggregable interface in
+            aggrL1CapabilityTable."
+    ::= {aggrL1ConnectionEntry 1}
+    
+    aggrL1ConnAggregableType    OBJECT-TYPE
+        SYNTAX      AggregableType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Interface type of the respective aggregable L1 interface."
+    ::= {aggrL1ConnectionEntry 2}
+    
+    aggrL1ConnAggregatorIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "This object defines the ifIndex of the physical interface 
+            used as source of a given L1 aggregation. It must correspond to a
+            valid aggregator interface in aggrL1CapabilityTable."
+    ::= {aggrL1ConnectionEntry 3}
+    
+   -- 
+   -------  End of aggrL1ConnectionTable
+ 
+------ End group -----------------------------------------------------------------
+
+---------------------------------- End  -------------------------------------
+
+
+END
+
+
+

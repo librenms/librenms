@@ -1,0 +1,637 @@
+-- *****************************************************************
+-- TN-RFC2544-MIB.smi:  Transition Networks RFC2544 MIB.
+--
+-- Copyright (c) 2015 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+TN-RFC2544-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32 FROM SNMPv2-SMI  
+    DisplayString, RowStatus, MacAddress FROM SNMPv2-TC
+    tnProducts FROM TRANSITION-SMI 
+    ;
+
+tnRFC2544    MODULE-IDENTITY
+     LAST-UPDATED "201506040000Z"
+     ORGANIZATION "Transition Networks, Inc."
+     CONTACT-INFO
+                 "       Transition Networks
+                         Technical Support
+                         10900 Red Circle Drive
+                         Minnetonka, MN 55343 USA
+                         Tel: +1-800-526-9267
+
+                     E-mail: techsupport@transition.com"
+     DESCRIPTION
+         "The MIB provides functionalities for RFC 2544 Performance Test Commands."
+     REVISION      "201506040000Z"
+     DESCRIPTION
+         "Initial Revision of this module"
+     REVISION      "201507140000Z"
+     DESCRIPTION
+         "Corrections to tnRFC2544ConfigCommonParamTestsToRunMask and
+          tnRFC2544ReportStatus"
+     REVISION      "201507210000Z"
+     DESCRIPTION
+         "Correction to tnRFC2544ConfigCommonParamDMAC"
+     REVISION      "201507240000Z"
+     DESCRIPTION
+         "Added tnRFC2544ConfigCommonRowStatus"
+     ::= { tnProducts 153 }
+
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+-- tnRFC2544ProfileTable
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+tnRFC2544ProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnRFC2544ProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to maintain the RFC2544 Profile Entries."
+    ::= { tnRFC2544 1 }
+
+tnRFC2544ProfileEntry OBJECT-TYPE
+    SYNTAX TnRFC2544ProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entries in this table correspond to the RFC2544 Profile Entries."
+    INDEX { tnRFC2544ProfileIndex }
+    ::= { tnRFC2544ProfileTable 1 }
+
+TnRFC2544ProfileEntry ::=
+    SEQUENCE {
+         tnRFC2544ProfileName         DisplayString,
+         tnRFC2544ProfileDescription  DisplayString
+    }
+
+tnRFC2544ProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name, ASCII range 33-126, of this table."
+    ::= { tnRFC2544ProfileEntry 1 }
+
+tnRFC2544ProfileDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The description of this table."
+    ::= { tnRFC2544ProfileEntry 2 }
+
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+-- tnRFC2544ConfigCommonParamTable
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+
+tnRFC2544ConfigCommonParamTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnRFC2544ConfigCommonParamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to maintain the RFC2544 Profile Configuration Common Parameters Entries."
+    ::= { tnRFC2544 2 }
+
+tnRFC2544ConfigCommonParamEntry OBJECT-TYPE
+    SYNTAX TnRFC2544ConfigCommonParamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entries in this table correspond to the RFC2544 Profile Configuration Common Parameters Entries."
+    INDEX { tnRFC2544ConfigCommonParamIndex }
+    ::= { tnRFC2544ConfigCommonParamTable 1 }
+
+TnRFC2544ConfigCommonParamEntry ::=
+    SEQUENCE {
+         tnRFC2544ConfigCommonParamName                        DisplayString,
+         tnRFC2544ConfigCommonParamDescription                 DisplayString,
+         tnRFC2544ConfigCommonParamMEGLevel                    Integer32,
+         tnRFC2544ConfigCommonParamEgressPort                  Integer32,
+         tnRFC2544ConfigCommonParamSequenceNumberCheck         INTEGER,
+         tnRFC2544ConfigCommonParamDwellTime                   Integer32,
+         tnRFC2544ConfigCommonParamType                        INTEGER,
+         tnRFC2544ConfigCommonParamVLANID                      Integer32,
+         tnRFC2544ConfigCommonParamPCP                         Integer32,
+         tnRFC2544ConfigCommonParamDEI                         Integer32,
+         tnRFC2544ConfigCommonParamDMAC                        MacAddress,
+         tnRFC2544ConfigCommonParamFrameSizeMask               BITS,
+         tnRFC2544ConfigCommonParamTestsToRunMask              BITS,
+         tnRFC2544ConfigCommonRowStatus                        INTEGER
+    }
+
+
+tnRFC2544ConfigCommonParamName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name, ASCII range 33-126, of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 1 }
+
+
+tnRFC2544ConfigCommonParamDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The description of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 2 }
+
+tnRFC2544ConfigCommonParamMEGLevel OBJECT-TYPE
+    SYNTAX      Integer32 (1..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MEG Level of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 3 }
+
+tnRFC2544ConfigCommonParamEgressPort OBJECT-TYPE
+    SYNTAX      Integer32 (1..6)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress Port of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 4 }
+
+tnRFC2544ConfigCommonParamSequenceNumberCheck OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   disable         (0),
+                   enable          (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sequence Number Check disable/enable of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 5 }
+
+tnRFC2544ConfigCommonParamDwellTime OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Dwell Time, in seconds, of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 6 }
+
+tnRFC2544ConfigCommonParamType OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   portDownMEP         (0),
+                   vlanBasedDownMEP    (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 7 }
+
+tnRFC2544ConfigCommonParamVLANID OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 8 }
+
+tnRFC2544ConfigCommonParamPCP OBJECT-TYPE
+    SYNTAX      Integer32 (1..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "PCP of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 9 }
+
+tnRFC2544ConfigCommonParamDEI OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DEI of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 10 }
+
+tnRFC2544ConfigCommonParamDMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The DMAC, 00-00-00-00-00-00 formatted, of this table."
+    ::= { tnRFC2544ConfigCommonParamEntry 11 }
+
+tnRFC2544ConfigCommonParamFrameSizeMask OBJECT-TYPE
+    SYNTAX BITS {
+           frameSize64(0),
+           frameSize128(1),
+           frameSize256(2),
+           frameSize512(3),
+           frameSize1024(4),
+           frameSize1280(5),
+           frameSize1518(6),
+           frameSize2000(7),
+           frameSize9600(8)
+           }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Frame Size Mask of this table.
+		 Bit 0 - 64 byte frames enabled if set to 1.
+		 Bit 1 - 128 byte frames enabled if set to 1.
+		 Bit 2 - 256 byte frames enabled if set to 1.
+		 Bit 3 - 512 byte frames enabled if set to 1.
+		 Bit 4 - 1024 byte frames enabled if set to 1.
+		 Bit 5 - 1280 byte frames enabled if set to 1.
+		 Bit 6 - 1518 byte frames enabled if set to 1.
+		 Bit 7 - 2000 byte frames enabled if set to 1.
+		 Bit 8 - 9600 byte frames enabled if set to 1.
+		 "	
+    ::= { tnRFC2544ConfigCommonParamEntry 12 }
+
+tnRFC2544ConfigCommonParamTestsToRunMask OBJECT-TYPE
+   SYNTAX BITS {
+           throughputTest(0),
+           latencyTest(1),
+           frameLossTest(2),
+           backToBackTest(3)           }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Tests To Run Mask of this table.
+		 Bit 0 - Throughput Test enabled if set to 1.
+		 Bit 1 - Latency Test enabled if set to 1.
+		 Bit 2 - Frame Loss Test enabled if set to 1.
+		 Bit 3 - Back To Back Test enabled if set to 1.
+		 "	
+    ::= { tnRFC2544ConfigCommonParamEntry 13 }
+ 
+tnRFC2544ConfigCommonRowStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   noAction  (0),              
+                   create    (1),  
+                   delete    (2)
+                 }
+    MAX-ACCESS      read-create    
+    STATUS          current
+    DESCRIPTION
+        "  - 'noAction', Do nothing.
+
+           - 'create', create a profile.
+
+           - 'delete', delete a profile."
+           
+    ::= { tnRFC2544ConfigCommonParamEntry 14 }
+
+  
+ 
+-- ----------------------------------------------------
+-- ----------------------------------------------------  
+-- tnRFC2544ConfigThroughputTestParamTable
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+
+tnRFC2544ConfigThroughputTestParamTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnRFC2544ConfigThroughputTestParamEntry
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This table is used to maintain the RFC2544 Profile Config Throughput Test Parameters Entries."
+    ::= { tnRFC2544 3 }
+
+tnRFC2544ConfigThroughputTestParamEntry OBJECT-TYPE
+    SYNTAX TnRFC2544ConfigThroughputTestParamEntry
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Entries in this table correspond to the RFC2544 Profile Config Throughput Test Parameters Entries."
+    INDEX { tnRFC2544ConfigThroughputTestParamIndex }
+    ::= { tnRFC2544ConfigThroughputTestParamTable 1 }
+
+TnRFC2544ConfigThroughputTestParamEntry ::=
+    SEQUENCE {
+         tnRFC2544ConfigThroughputTestParamTrialDuration           Integer32,
+         tnRFC2544ConfigThroughputTestParamMinRate                 Integer32,
+         tnRFC2544ConfigThroughputTestParamMaxRate                 Integer32,
+         tnRFC2544ConfigThroughputTestParamAccuracy                Integer32,
+         tnRFC2544ConfigThroughputTestParamAllowedFrameLoss        Integer32
+    }
+
+tnRFC2544ConfigThroughputTestParamTrialDuration OBJECT-TYPE
+    SYNTAX      Integer32 (1..1800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Trial Duration, in seconds, of this table."
+    ::= { tnRFC2544ConfigThroughputTestParamEntry 1 }    
+    
+tnRFC2544ConfigThroughputTestParamMinRate OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Minimum Rate, in permille, of this table."
+    ::= { tnRFC2544ConfigThroughputTestParamEntry 2 }
+    
+tnRFC2544ConfigThroughputTestParamMaxRate OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum Rate, in permille, of this table."
+    ::= { tnRFC2544ConfigThroughputTestParamEntry 3 }
+
+tnRFC2544ConfigThroughputTestParamAccuracy OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Accuracy, in permille, of this table."
+    ::= { tnRFC2544ConfigThroughputTestParamEntry 4 }
+
+tnRFC2544ConfigThroughputTestParamAllowedFrameLoss OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Allowed Frame Loss, in permille, of this table."
+    ::= { tnRFC2544ConfigThroughputTestParamEntry 5 }
+
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+-- tnRFC2544ConfigLatencyTestParamTable
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+
+tnRFC2544ConfigLatencyTestParamTable OBJECT-TYPE                                               
+    SYNTAX SEQUENCE OF TnRFC2544ConfigLatencyTestParamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to maintain the RFC2544 Profile Config Latency Test Parameters Entries."
+    ::= { tnRFC2544 4 }
+
+tnRFC2544ConfigLatencyTestParamEntry OBJECT-TYPE
+    SYNTAX TnRFC2544ConfigLatencyTestParamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entries in this table correspond to the RFC2544 Profile Config Latency Test Parameters Entries."
+    INDEX { tnRFC2544ConfigLatencyTestParamIndex }
+    ::= { tnRFC2544ConfigLatencyTestParamTable 1 }                                              
+
+TnRFC2544ConfigLatencyTestParamEntry ::=
+    SEQUENCE {
+         tnRFC2544ConfigLatencyTestParamTrialDuration               Integer32,
+         tnRFC2544ConfigLatencyTestParamDelayMeasurementInterval    Integer32,
+         tnRFC2544ConfigLatencyTestParamAllowedFrameLoss            Integer32
+    }
+
+tnRFC2544ConfigLatencyTestParamTrialDuration OBJECT-TYPE
+    SYNTAX      Integer32 (10..1800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Trial Duration, in seconds, of this table."
+    ::= { tnRFC2544ConfigLatencyTestParamEntry 1 }
+
+tnRFC2544ConfigLatencyTestParamDelayMeasurementInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Delay Measurement Interval, in seconds, of this table."
+    ::= { tnRFC2544ConfigLatencyTestParamEntry 2 }
+
+tnRFC2544ConfigLatencyTestParamAllowedFrameLoss OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Allowed Frame Loss, in permille, of this table."
+    ::= { tnRFC2544ConfigLatencyTestParamEntry 3 }
+
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+-- tnRFC2544ConfigFrameLossTestParamTable
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+tnRFC2544ConfigFrameLossTestParamTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnRFC2544ConfigFrameLossTestParamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to maintain the RFC2544 Profile Config Frame Loss Test Parameters Entries."
+    ::= { tnRFC2544 5 }
+
+tnRFC2544ConfigFrameLossTestParamEntry OBJECT-TYPE
+    SYNTAX TnRFC2544ConfigFrameLossTestParamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entries in this table correspond to the RFC2544 Profile Config Frame Loss Test Parameters Entries."
+    INDEX { tnRFC2544ConfigFrameLossTestParamIndex }
+    ::= { tnRFC2544ConfigFrameLossTestParamTable 1 }
+
+TnRFC2544ConfigFrameLossTestParamEntry ::=
+    SEQUENCE {
+         tnRFC2544ConfigFrameLossTestParamTrialDuration           Integer32,
+         tnRFC2544ConfigFrameLossTestParamMinRate                 Integer32,
+         tnRFC2544ConfigFrameLossTestParamMaxRate                 Integer32,
+         tnRFC2544ConfigFrameLossTestParamRateStep                Integer32
+    }
+
+tnRFC2544ConfigFrameLossTestParamTrialDuration OBJECT-TYPE
+    SYNTAX      Integer32 (1..1800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Trial Duration, in seconds, of this table."
+    ::= { tnRFC2544ConfigFrameLossTestParamEntry 1 }
+
+tnRFC2544ConfigFrameLossTestParamMinRate OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Minimum Rate, in permille, of this table."
+    ::= { tnRFC2544ConfigFrameLossTestParamEntry 2 }
+
+tnRFC2544ConfigFrameLossTestParamMaxRate OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum Rate, in permille, of this table."
+    ::= { tnRFC2544ConfigFrameLossTestParamEntry 3 }
+
+tnRFC2544ConfigFrameLossTestParamRateStep OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Rate Step, in permille, of this table."
+    ::= { tnRFC2544ConfigFrameLossTestParamEntry 4 }
+
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+-- tnRFC2544ConfigBackToBackTestParamTable
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+
+tnRFC2544ConfigBackToBackTestParamTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnRFC2544ConfigBackToBackTestParamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to maintain the RFC2544 Profile Config Back To Back Test Param Entries."
+    ::= { tnRFC2544 6 }
+
+tnRFC2544ConfigBackToBackTestParamEntry OBJECT-TYPE
+    SYNTAX TnRFC2544ConfigBackToBackTestParamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entries in this table correspond to the RFC2544 Profile Configuration Back To Back Test Parameters Entries."
+    INDEX { tnRFC2544ConfigBackToBackTestParamTrialDuration }
+    ::= { tnRFC2544ConfigBackToBackTestParamTable 1 }
+
+TnRFC2544ConfigBackToBackTestParamEntry ::=
+    SEQUENCE {
+         tnRFC2544ConfigBackToBackTestParamTrialDuration               Integer32,
+         tnRFC2544ConfigBackToBackTestParamTrialCount                  Integer32
+    }
+
+tnRFC2544ConfigBackToBackTestParamTrialDuration OBJECT-TYPE
+    SYNTAX      Integer32 (100..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Trial Duration, in seconds, of this table."
+    ::= { tnRFC2544ConfigBackToBackTestParamEntry 1 }
+
+tnRFC2544ConfigBackToBackTestParamTrialCount OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Trial count of this table."
+    ::= { tnRFC2544ConfigBackToBackTestParamEntry 2 }
+
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+-- tnRFC2544ReportTable
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+tnRFC2544ReportTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnRFC2544ReportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to maintain the RFC2544 Profile Config Back To Back Test Param Entries."
+    ::= { tnRFC2544 7 }
+
+tnRFC2544ReportEntry OBJECT-TYPE
+    SYNTAX TnRFC2544ReportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entries in this table correspond to the RFC2544 Profile Configuration Back To Back Test Parameters Entries."
+    INDEX { tnRFC2544ReportIndex }
+    ::= { tnRFC2544ReportTable 1 }
+
+TnRFC2544ReportEntry ::=
+    SEQUENCE {
+         tnRFC2544ReportName             DisplayString,
+ 		 tnRFC2544ReportDescr            DisplayString, 	
+         tnRFC2544ProfileName            DisplayString,
+         tnRFC2544CreateTime             DisplayString,
+		 tnRFC2544ReportStatus           INTEGER,
+         tnRFC2544DownloadTFTPServer     DisplayString,
+         tnRFC2544ReportAction           INTEGER
+    }
+
+tnRFC2544ReportName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (1..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of the report."
+    ::= { tnRFC2544ReportEntry 1 }
+
+tnRFC2544ReportDescr OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (1..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Report description."
+    ::= { tnRFC2544ReportEntry 2 }
+
+tnRFC2544ProfileName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (1..128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Name of profile."
+    ::= { tnRFC2544ReportEntry 3 }
+
+tnRFC2544CreateTime OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (1..128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Name of profile."
+    ::= { tnRFC2544ReportEntry 4 }
+              
+tnRFC2544ReportStatus OBJECT-TYPE
+    SYNTAX INTEGER { inactive (0), executing (1), cancelling (2), cancelled (3), passed (4), failed (5)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Report status."
+    ::= { tnRFC2544ReportEntry 5 }
+
+tnRFC2544DownloadTFTPServer  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "TFTP server URL on the form tftp://server[:port]/path-to-file
+        to place the report when a save report is next requested via this MIB.
+        This value is set to zero length when no address has been
+        specified. The report name will be used as the filename"
+    ::= { tnRFC2544ReportEntry 6 }
+ 
+tnRFC2544ReportAction OBJECT-TYPE 
+    SYNTAX      INTEGER{
+                   noAction     (0),              
+                   createAndRun (1),
+                   cancel       (2),
+                   delete       (3),
+                   save         (4)
+                }
+    MAX-ACCESS      read-create    STATUS          current
+    DESCRIPTION
+        "  - 'noAction', Do nothing.
+
+           - 'createAndRun', create a report and start execution of the test.
+
+           - 'cancel', cancel a test that is running.
+
+           - 'delete', delete a test.
+           
+           - 'save', save to a tftp server."
+
+    ::= { tnRFC2544ReportEntry 7 }
+
+END
+ 

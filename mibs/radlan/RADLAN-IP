@@ -1,32 +1,97 @@
 RADLAN-IP DEFINITIONS ::= BEGIN
 
 -- Title:      RADLAN IP Private Extension
--- Version:    7.40.00.00
--- Date:       29 Sep 2005
+-- Version:    7.45.00.00
+-- Date:       22 Jun 2006
 
 IMPORTS
     rnd                                                     FROM RADLAN-MIB
     ipAddrEntry                                             FROM IP-MIB
-    rip2IfConfEntry                                         FROM RFC1389-MIB
+    InterfaceIndexOrZero, InterfaceIndex                    FROM IF-MIB
+    rip2IfConfEntry                                         FROM RIPv2-MIB
     ipCidrRouteEntry,ipCidrRouteDest,
     ipCidrRouteMask, ipCidrRouteTos, ipCidrRouteNextHop     FROM IP-FORWARD-MIB
-    DisplayString                                           FROM SNMPv2-TC-v1
     Unsigned32, Integer32, Counter32, IpAddress,
     MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
-    RowStatus, TruthValue, TEXTUAL-CONVENTION               FROM SNMPv2-TC;
+    TEXTUAL-CONVENTION,
+    DisplayString, RowStatus, TruthValue, PhysAddress,
+    TimeStamp, RowPointer, TestAndIncr, StorageType         FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP                         FROM SNMPv2-CONF
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,
+    InetVersion, InetZoneIndex                              FROM INET-ADDRESS-MIB
+    InterfaceIndex                                          FROM IF-MIB
+    IpAddressOriginTC, IpAddressStatusTC
+                                                            FROM IP-MIB;
 
 
 ipSpec MODULE-IDENTITY
-       LAST-UPDATED "200509290000Z"
+       LAST-UPDATED "200606220000Z"
        ORGANIZATION "Radlan Computer Communications Ltd."
        CONTACT-INFO
             "radlan.com"
        DESCRIPTION
             "The private MIB module definition for IP MIB."
-       REVISION "200509290000Z"
+       REVISION "200606220000Z"
        DESCRIPTION
             "Initial version of this MIB."
        ::= { rnd 26 }
+
+
+--
+-- The textual conventions we define and use for rlIpAddressTable (in this MIB).
+--
+
+RlIpAddressOriginTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "The origin of the address.
+
+            following are same as ipAddressOriginTC in standard MIB:
+
+            manual(2) indicates that the address was manually configured
+            to a specified address, e.g., by user configuration.
+
+            dhcp(4) indicates an address that was assigned to this
+            system by a DHCP server.
+
+            linklayer(5) indicates an address created by IPv6 stateless
+            auto-configuration.
+
+            random(6) indicates an address chosen by the system at
+            random, e.g., an IPv4 address within 169.254/16, or an RFC
+            3041 privacy address.
+
+            following are additional to standard MIB:
+
+            autoConfig(7) indicates that the address was auto configured configured
+            to a specified address, e.g., not by user configuration.
+
+            eui64(8) indicates that the address was partially configured configured
+            to a specified address, e.g., address suffix is based on MAC address with
+            EUI-64 representation.
+
+            tunnelIsatap(9) indicates that the address an ISATATP tunnel representation.
+
+            tunnelIsatap(10) indicates that the address an 6to4 tunnel representation.
+
+            tunnelIsatap(11) indicates that the address was partially configured configured
+            to a specified address, e.g., address prefix is preconfigured.
+            "
+    SYNTAX     INTEGER {
+        other(1),
+        manual(2),
+        dhcp(4),
+        linklayer(5),
+        random(6),
+-- additional to standard MIB
+        autoConfig(7),
+        eui64(8),
+        tunnelIsatap(9),
+        tunnel6to4(10),
+        generalPrefix(11)
+    }
+
 
 
 rsIpAddrTable OBJECT-TYPE
@@ -61,7 +126,10 @@ RsIpAddrEntry ::= SEQUENCE {
     rsIpAdEntName                DisplayString,
     rsIpAdEntOwner               INTEGER,
     rsIpAdEntAdminStatus         INTEGER,
-    rsIpAdEntOperStatus                 INTEGER
+    rsIpAdEntOperStatus          INTEGER,
+    rsIpAdEntPrecedence          INTEGER,
+    rsIpAdEntUniqueStatus        INTEGER,
+    rsIpAdEntIcmpRedirectSend    INTEGER
 }
 
 rsIpAdEntAddr OBJECT-TYPE
@@ -203,6 +271,48 @@ rsIpAdEntOperStatus   OBJECT-TYPE
                 "If active the interface can be used to send and receive frames."
             ::= { rsIpAddrEntry 12 }
 
+rsIpAdEntPrecedence   OBJECT-TYPE
+            SYNTAX INTEGER (1..255)
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+               "The IP preference, to be selected as source IP for rsIpAdEntIfIndex.
+                this source IP selection is first by preference value.
+                if more than one IP has the same preference the one with the
+                lowest IP is selected.
+                (higher value -> higher preference)"
+            DEFVAL  { 1 }
+            ::= { rsIpAddrEntry 13 }
+
+rsIpAdEntUniqueStatus   OBJECT-TYPE
+            SYNTAX    INTEGER {
+                        valid (1),
+                        validDuplicated (2),
+                        tentative      (3),
+                        duplicated   (4),
+                        delayed (5),
+                        notReceived (6)
+            }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION       "The IP address unique status defines IP address
+                               state in an assignment process and
+                               after duplication detection."
+            ::= { rsIpAddrEntry 14 }
+
+rsIpAdEntIcmpRedirectSend OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables or disables sending of ICMP redirect messages to
+         re-send a packet through the same interface on which the packet was
+         received."
+    DEFVAL { enable }
+       ::= { rsIpAddrEntry 15 }
 
 icmpSpec               OBJECT IDENTIFIER ::= { ipSpec 2 }
 
@@ -459,8 +569,138 @@ rsArpMibVersion OBJECT-TYPE
                 rsArpRepliesSent
                 rsArpProxyRepliesSent
                 rsArpUnresolveTimer
-                rsArpMibVersion"
+                rsArpMibVersion
+          Version 3:
+            New MIB variables support:
+            rsArpStaticTable
+            rsArpInterfaceTable"
     ::= { arpSpec 8  }
+
+rsArpStaticTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RsArpStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table used for adding static ARP entries
+         without specifying Layer 2 interface."
+    ::= { arpSpec 9 }
+
+rsArpStaticEntry OBJECT-TYPE
+    SYNTAX  RsArpStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Each entry contains one IpAddress to `physical' address equivalence."
+    INDEX   { rsArpStaticIpAddress }
+              ::= { rsArpStaticTable 1 }
+
+RsArpStaticEntry ::= SEQUENCE {
+        rsArpStaticIpAddress    IpAddress,
+        rsArpStaticPhysAddress  PhysAddress,
+        rsArpStaticRowStatus    RowStatus
+    }
+
+rsArpStaticIpAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The IpAddress corresponding to the media-dependent `physical' address."
+    ::= { rsArpStaticEntry 1 }
+
+rsArpStaticPhysAddress OBJECT-TYPE
+    SYNTAX  PhysAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The media-dependent `physical' address."
+    ::= { rsArpStaticEntry 2 }
+
+
+rsArpStaticRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-write
+    STATUS current
+    DESCRIPTION
+        "Entry status."
+    ::= { rsArpStaticEntry  3 }
+
+
+rsArpInterfaceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RsArpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "L2 Interface specific configuration for ARP Application.
+         Entry in this table will be dynamically created,
+         when first IP Address is defined on specific L2 interface,
+         and destroyed when the last IP address on this L2 interface is removed"
+    ::= { arpSpec 10 }
+
+rsArpInterfaceEntry OBJECT-TYPE
+    SYNTAX  RsArpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Each entry contains L2 Interface specific configuration
+         for ARP Application."
+    INDEX   { rsArpInterfaceIfIndex }
+              ::= { rsArpInterfaceTable 1 }
+
+RsArpInterfaceEntry ::= SEQUENCE {
+        rsArpInterfaceIfIndex           InterfaceIndex,
+        rsArpInterfaceInactiveTimeOut   Unsigned32,
+        rsArpInterfaceArpProxy          INTEGER
+    }
+
+rsArpInterfaceIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The index value that uniquely identifies the interface to
+         which this entry is applicable.  The interface identified by
+         a particular value of this index is the same interface as
+         identified by the same value of the IF-MIB's ifIndex."
+    ::= { rsArpInterfaceEntry 1 }
+
+rsArpInterfaceInactiveTimeOut OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..40000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This variable defines the maximum time period (in second) that can
+          pass between ARP requests concerning an entry in the ARP table.
+          After this time period, the entry is deleted from the table.
+          Default value 0 means using value from rsArpInactiveTimeOut"
+    DEFVAL  { 0 }
+    ::= { rsArpInterfaceEntry 2  }
+
+rsArpInterfaceArpProxy OBJECT-TYPE
+    SYNTAX INTEGER {
+       enable(1),
+       disable(2)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "When ARP Proxy is enabled, the router can respond to
+          ARP requests for nodes located on a different sub-net,
+          provided they are it its network table. The router responds
+          with its own MAC address.
+          When ARP Proxy is disabled, the router responds only
+          to ARP requests for its own IP addresses."
+    DEFVAL  { disable }
+    ::= { rsArpInterfaceEntry 3  }
+
+rsArpNumOfEntries OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Displays how many ARP entries stored in ARP Table."
+    ::= { arpSpec 11  }
+
 
 tftp     OBJECT IDENTIFIER ::= { ipSpec 5 }
 
@@ -551,12 +791,13 @@ ipRipFilter    OBJECT IDENTIFIER ::= { ipSpec 8 }
 rsRipEnable OBJECT-TYPE
     SYNTAX  INTEGER {
         enable(1),
-        disable(2)
+        disable(2),
+        shutdown(3)
     }
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Enables or disables RIP."
+        "Enables, disables or shutdown (doesn't delete configuration) RIP."
 ::=  { ipSpec 9 }
 
 rsTelnetPassword OBJECT-TYPE
@@ -859,5 +1100,393 @@ rlIpStaticRouteOwner OBJECT-TYPE
 rlIpRouter OBJECT IDENTIFIER  ::=  { ipSpec 18 }
 
 
+rlIpAddressesNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This variable specifies current number of entries in rsIpAddrTable."
+    DEFVAL  { 0 }
+    ::=  { ipSpec 23 }
+
+rlIpStaticPrefixesNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This variable specifies current number of static prefixes in the system."
+    DEFVAL  { 0 }
+    ::=  { ipSpec 24 }
+
+rlIpTotalPrefixesNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This variable specifies current total number of prefixes in the system."
+    DEFVAL  { 0 }
+    ::=  { ipSpec 25 }
+
+--- rlManagementIPv4
+
+rlManagementIpv4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The system management IPv4 address which is kept between system modes changes"
+    ::= { ipSpec 32 }
+
+rlManagementIpv4Action OBJECT-TYPE
+    SYNTAX   INTEGER {
+                clear (1)
+             }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The system management IPv4 action:
+             clear - delete all ipv4 interfaces from startup configuration database except rlManagementIpv4"
+    ::= { ipSpec 33 }
+
+rlManagementIpIfindex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The system management IPs addresses ifIndex which is kept between system modes changes"
+    ::= { ipSpec 34 }
+
+rlSourceAddressSelectionTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlSourceAddressSelectionEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The table specifies IPv4 and IPv6 source 
+                       interfaces per application. Only supported 
+                       applications are present in the table."
+   ::= { ipSpec 35 }
+
+rlSourceAddressSelectionEntry OBJECT-TYPE
+   SYNTAX  RlSourceAddressSelectionEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "The row definition for this table."
+   INDEX { IMPLIED rlSourceAddressSelectionApp}
+   ::= { rlSourceAddressSelectionTable 1 }
+
+
+RlSourceAddressSelectionEntry ::= SEQUENCE {
+   rlSourceAddressSelectionApp                  DisplayString,
+   rlSourceAddressSelectionInterfaceIPv4        InterfaceIndexOrZero,
+   rlSourceAddressSelectionInterfaceIPv6        InterfaceIndexOrZero
+}
+
+rlSourceAddressSelectionApp OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..160))
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "The application which source interfaces are 
+                      defined in the entry."
+   ::= { rlSourceAddressSelectionEntry 1 }
+
+rlSourceAddressSelectionInterfaceIPv4 OBJECT-TYPE
+   SYNTAX InterfaceIndexOrZero
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "The ifIndex value of source interface for IPv4 address.
+                      Zero means the interface is undefined."
+   DEFVAL { 0 }
+   ::= { rlSourceAddressSelectionEntry 2 }
+
+rlSourceAddressSelectionInterfaceIPv6 OBJECT-TYPE
+   SYNTAX InterfaceIndexOrZero
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "The ifIndex value of source interface for IPv6 address.
+                      Zero means the interface is undefined."
+   DEFVAL { 0 }
+   ::= { rlSourceAddressSelectionEntry 3 }
+
+
+
+--
+-- Internet Address Table (Private/Extension)
+--
+
+rlIpAddressTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlIpAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "This table is parralel to MIB II ipAddressTable, and is used to
+            add/delete entries to/from that table.
+            The table contains addressing information relevant to the
+            entity's interfaces.
+
+            In addition to ipAddressTable defined in standard MIB a represenattion of
+            IPv6 addresses based on additionl address origin such as EUI-64, general
+            prefix etc.
+            In this case the address information is partial address information.
+            Together with the address origin and the general prefix (when needed) user can
+            construct full address information.
+
+            The index (key) for this table includes this information additionally to the address."
+    ::= { ipSpec 36 }
+
+rlIpAddressEntry OBJECT-TYPE
+    SYNTAX     RlIpAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An address mapping for a particular interface."
+    INDEX { rlIpAddressAddrType,
+            rlIpAddressAddr,
+            rlIpAddressOrigin,
+            rlIpAddressGeneralPrefixName }
+    ::= { rlIpAddressTable 1 }
+
+RlIpAddressEntry ::= SEQUENCE {
+        rlIpAddressAddrType     InetAddressType,
+        rlIpAddressAddr         InetAddress,
+        rlIpAddressOrigin       RlIpAddressOriginTC,
+        rlIpAddressGeneralPrefixName
+                                DisplayString,
+        rlIpAddressIfIndex      InterfaceIndex,
+        rlIpAddressExtdType     INTEGER,
+        rlIpAddressPrefix       RowPointer,
+        rlIpAddressStatus       IpAddressStatusTC,
+        rlIpAddressCreated      TimeStamp,
+        rlIpAddressLastChanged  TimeStamp,
+        rlIpAddressRowStatus    RowStatus,
+        rlIpAddressStorageType  StorageType,
+        rlIpAddressExtdPrefixLength InetAddressPrefixLength,
+        rlIpAddressCompleteAddr InetAddress,
+        rlIpAddressOperStatus   INTEGER
+    }
+
+rlIpAddressAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The address type of rlIpAddressAddr."
+    ::= { rlIpAddressEntry 1 }
+
+rlIpAddressAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The IP address to which this entry's addressing information
+            pertains.  The address type of this object is specified in
+            rlIpAddressAddrType.
+
+            In case of auto-configure address such as eui-64, general-prefix and others
+            it contains the partial address before appropriate manipulation.
+
+            Implementors need to be aware that if the size of
+            rlIpAddressAddr exceeds 116 octets, then OIDS of instances of
+            columns in this row will have more than 128 sub-identifiers
+            and cannot be accessed using SNMPv1, SNMPv2c, or SNMPv3.
+
+            Note:
+            Since interpeak doesn’t use origin, 3rd index (key) - rlIpAddressOrigin, as part of the key,
+            we assume that no same address can exists from different origins."
+    ::= { rlIpAddressEntry 2 }
+
+-- additional to standard MIB (1)
+
+rlIpAddressOrigin OBJECT-TYPE
+    SYNTAX     RlIpAddressOriginTC
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The origin of the address."
+    ::= { rlIpAddressEntry 3 }
+
+rlIpAddressGeneralPrefixName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name assigned to the prefix."
+    ::= { rlIpAddressEntry 4 }
+
+-- (1)
+
+rlIpAddressIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The index value that uniquely identifies the interface to
+            which this entry is applicable.  The interface identified by
+            a particular value of this index is the same interface as
+            identified by the same value of the IF-MIB's ifIndex."
+    ::= { rlIpAddressEntry 5 }
+
+rlIpAddressExtdType OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 unicast(1),
+                 anycast(2),
+                 broadcast(3),
+                 multicast(4)
+    }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "Extend standard field ipAddressType to multicast"
+    DEFVAL { unicast }
+    ::= { rlIpAddressEntry 6 }
+
+rlIpAddressPrefix OBJECT-TYPE
+    SYNTAX     RowPointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "A pointer to the row in the prefix table to which this
+            address belongs.  May be { 0 0 } if there is no such row."
+    DEFVAL { zeroDotZero }
+    ::= { rlIpAddressEntry 7 }
+
+-- following filed has changed to a key (2)
+-- rlIpAddressOrigin OBJECT-TYPE
+--     SYNTAX     IpAddressOriginTC
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--            "The origin of the address."
+--     ::= { rlIpAddressEntry 8 }
+-- (2)
+
+rlIpAddressStatus OBJECT-TYPE
+    SYNTAX     IpAddressStatusTC
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The status of the address, describing if the address can be
+            used for communication.
+
+            In the absence of other information, an IPv4 address is
+            always preferred(1)."
+    DEFVAL { preferred }
+    ::= { rlIpAddressEntry 8 }
+
+rlIpAddressCreated OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The value of sysUpTime at the time this entry was created.
+            If this entry was created prior to the last re-
+            initialization of the local network management subsystem,
+            then this object contains a zero value."
+    ::= { rlIpAddressEntry 9 }
+
+rlIpAddressLastChanged OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The value of sysUpTime at the time this entry was last
+            updated.  If this entry was updated prior to the last re-
+            initialization of the local network management subsystem,
+            then this object contains a zero value."
+    ::= { rlIpAddressEntry 10 }
+
+rlIpAddressRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The status of this conceptual row.
+
+            The RowStatus TC requires that this DESCRIPTION clause
+            states under which circumstances other objects in this row
+            can be modified.  The value of this object has no effect on
+            whether other objects in this conceptual row can be
+            modified.
+
+            A conceptual row can not be made active until the
+            rlIpAddressIfIndex has been set to a valid index."
+    ::= { rlIpAddressEntry 11 }
+
+rlIpAddressStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The storage type for this conceptual row.  If this object
+            has a value of 'permanent', then no other objects are
+            required to be able to be modified."
+    DEFVAL { volatile }
+    ::= { rlIpAddressEntry 12 }
+
+
+-- additional fields - based on 'ipAddressEntry' augmentation (3)
+
+rlIpAddressExtdPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+           "The prefix length of this address."
+    DEFVAL { 64 }
+    ::= { rlIpAddressEntry 13 }
+
+rlIpAddressCompleteAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The Complete IP address to which this entry's addressing information
+            pertains.
+
+            In case of auto-configure address such as eui-64, general-prefix and others
+            it contains the complete address after appropriate manipulation"
+    ::= { rlIpAddressEntry 14 }
+
+-- (3)
+
+rlIpAddressOperStatus   OBJECT-TYPE
+    SYNTAX INTEGER {
+               up(1),
+               down(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state of the IP address."
+    ::= { rlIpAddressEntry 15 }
+
+rlIpDefaultDSCP OBJECT-TYPE
+SYNTAX  INTEGER(0..63)
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+      "The default value inserted into the DSCP
+      field of the IP header of datagrams originated at
+      this entity, whenever a DSCP value is not supplied
+      by the application."
+::= { ipSpec 37 }
+
+rlIpDefaultUP OBJECT-TYPE
+SYNTAX  INTEGER(0..7)
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+      "The default value inserted into the User Priority
+      field in the 802.1q VLAN tag of IPv4 frames sent by the
+      CPU."
+::= { ipSpec 38 }
+
+rlIpv4MtuSize OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Sets the maximum transmission unit (MTU) size in bytes of IPv4 packets (payload)."
+    ::= { ipSpec 39 }
+
 END
+
 

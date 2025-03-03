@@ -1,0 +1,3852 @@
+ELTEK-DISTRIBUTED-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY, 
+	enterprises, Counter32, Integer32
+		FROM SNMPv2-SMI
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF
+	DisplayString
+		FROM SNMPv2-TC;
+
+eltek MODULE-IDENTITY
+	LAST-UPDATED "201501030825Z"
+	ORGANIZATION 
+		"ELTEK power System MIB Working Group"
+	CONTACT-INFO 
+		"Eltek R&D.
+		      Postal: Eltek AS
+		      P.O. Box 3043
+		      N-3003 Drammen
+		      Norway
+		      Tel: +47-32 20 32 00
+		      Fax: +47-32 20 31 20
+		      web:  www.eltek.com"
+	DESCRIPTION 
+		"Branch overview:
+		         Aeongold branch will be 1
+		         AL175 branch will be 2
+		         AL6000 branch will be 3
+		         Internal used branch will be 4
+		         Internal used branch will be 5
+		         OEM Smartpack branch will be 6
+		         ELTEK Common branch will be 7 (SmartPack, MCU, AEON w/WebPower sw V2.x)
+		         ELTEK Distributed branch will be 8 (SmartPack w/WebPower sw V3.x)
+		         ELTEK Distributed V2 branch will be 9 (SmartPack w/WebPower sw V4.0)
+		         ELTEK Distributed V3 branch will be 9 (SmartPack w/WebPower sw V4.1)
+		         ELTEK Distributed V4 branch will be 9 (SmartPack w/WebPower sw V4.1, V4.2, V4.3, V4.5 and compack V1.0, V1.01, V1.02, V1.03)
+		         ELTEK Distributed V5 branch will be 9 (SmartPack w/WebPower sw V4.1, V4.2, V4.3, V4.5, V4.6)
+		         ELTEK Distributed V6 branch will be 9 (SmartPack2 sw V1.1, V1.2, V1.3)
+		         ELTEK Distributed V7 branch will be 9 (SmartPack w/WebPower sw V4.1, V4.2, V4.3, V4.5, V4.6, V4.7 and compack V1.04, V1.05)
+		         ELTEK Distributed V8 branch will be 9 (SmartPack w/WebPower sw V4.9, V4.10, ComPack V1.04, V1.05, Smartpack2 V1.1, V1.2)
+		         ELTEK Distributed V9 branch will be 9 (SmartPack w/WebPower sw V4.11)
+		         ELTEK eNexus MIB branch will be 10 (SmartPack2 V2.x, SmartPack S V2.x and Compack V2.x)
+		         ELTEK Brasil office will have branch 11
+		         ELTEK BMS-EM MIB will have branch 12
+		         ELTEK TELMEX MIB will have branch 13"
+
+	REVISION "201602181416Z"
+	DESCRIPTION 
+		"Added new OIDs for battery test. End voltage, max discharge time and max discharge Ah.
+		"
+
+	REVISION "201501030825Z"
+	DESCRIPTION 
+		"Updates in miscellaneous info fields."
+
+	REVISION "201106051444Z"
+	DESCRIPTION 
+		"Added RectifierCapacityTraps.
+		Added systemServiceMode."
+
+	REVISION "201103221441Z"
+	DESCRIPTION 
+		"added smartpack2(7)  to systemSiteInfoControllerType"
+
+	REVISION "201010290829Z"
+	DESCRIPTION 
+		"Added traps and OID's for SolarChargers.
+		Added reading of values on programmable inputs of IO Monitor."
+
+	REVISION "200903121515Z"
+	DESCRIPTION 
+		"Added support for external IO monitor and Load monitor units.
+		Changes are done in the MIB to accomodate the v2c standard."
+
+	REVISION "200801301149Z"
+	DESCRIPTION 
+		"Some OIDs were added to this revision. Since all new stuff are additions and no existing information was moved, this V3 revision stays in branch 9. enjoy!"
+
+	REVISION "200706221127Z"
+	DESCRIPTION 
+		"Branch 9, contains mainly changes in the Traps format. The traps now meets SNMP v2c specification."
+
+	REVISION "200509071238Z"
+	DESCRIPTION 
+		"added battery test and boost start/stop and ac voltages"
+
+	REVISION "200506281130Z"
+	DESCRIPTION 
+		"First revision"
+::= { enterprises 12148 }
+
+
+-- Supported by SmartPack w/WebPower sw V4.1, V4.2x, V4.3, V4.4, V4.6 , V4.7, V4.8, V4.9, V4.10, V4.11, Compack V1.00, V1.01, V1.02, V1.03, V1.04 and Smartpack2 V1.0, V1.1 and V1.2.
+-- SNMP v2-C
+
+eltekDistributedPlantV9  OBJECT IDENTIFIER ::= { eltek 9 }
+
+-- This branch contains OIDs for configuration of the Smartpack & ComPack Control System's
+-- basic data and settings
+
+controlSystem        OBJECT IDENTIFIER ::= { eltekDistributedPlantV9 1 }
+systemTime           OBJECT IDENTIFIER ::= { controlSystem 1 }
+ioUnits              OBJECT IDENTIFIER ::= { controlSystem 17 }
+
+-- This branch contains OID's for configuration of the DC Power System's
+-- basic factory data and user's installation settings.
+
+dcSystem             OBJECT IDENTIFIER ::= { eltekDistributedPlantV9 2 }
+dcPlant              OBJECT IDENTIFIER ::= { dcSystem 1 }
+
+-- This branch contains OID's for configuration of the DC Power System's
+-- installation and location settings.
+
+systemSiteInfo       OBJECT IDENTIFIER ::= { dcPlant 3 }
+
+-- This branch contains OIDs for configuration of the DC Power System's
+-- battery charging and battery protection related settings.
+
+battery              OBJECT IDENTIFIER ::= { eltekDistributedPlantV9 3 }
+
+-- This branch contains OIDs for configuration of the DC Power System's
+-- Low Voltage Battery Disconnect Contactor (LVBD) related settings
+
+batteryLVD           OBJECT IDENTIFIER ::= { battery 17 }
+
+-- The OIDs contains the batterybanks in the system.
+
+batteryBanks         OBJECT IDENTIFIER ::= { battery 19 }
+
+-- These data are predicted values and shall be treated as such.
+
+batteryCapacityData  OBJECT IDENTIFIER ::= { battery 20 }
+
+-- The battery monitor control units that is used to measure additional battery parameters.
+
+batteryMonitorUnits  OBJECT IDENTIFIER ::= { battery 21 }
+
+-- Contains parameters for battery test
+
+batteryTest          OBJECT IDENTIFIER ::= { battery 24 }
+
+-- This branch contains OIDs related to the DC Load Distribution equipment
+
+loadDistribution     OBJECT IDENTIFIER ::= { eltekDistributedPlantV9 4 }
+
+-- This branch contains OIDs related to the Load Disconnect. This is related to Control unit 1 only.
+
+loadDistributionLVDStatus  OBJECT IDENTIFIER ::= { loadDistribution 3 }
+
+-- The load monitor control units that is used to measure additional load parameters.
+
+loadMonitorUnits     OBJECT IDENTIFIER ::= { loadDistribution 4 }
+
+-- This branch contains OIDs related to the rectifier parameters
+
+rectifier            OBJECT IDENTIFIER ::= { eltekDistributedPlantV9 5 }
+
+-- This branch contains OIDs for polling of the rectifier status.
+
+rectifierStatus      OBJECT IDENTIFIER ::= { rectifier 5 }
+acDistribution       OBJECT IDENTIFIER ::= { eltekDistributedPlantV9 6 }
+alarmGroup           OBJECT IDENTIFIER ::= { eltekDistributedPlantV9 7 }
+
+-- A selection of important alarms and events. These are used by the traps.
+
+alarmWellknownAlarms  OBJECT IDENTIFIER ::= { alarmGroup 1 }
+
+-- This branch contains OIDs related to the solar charger parameters
+
+solarCharger         OBJECT IDENTIFIER ::= { eltekDistributedPlantV9 9 }
+
+-- This branch contains OIDs for polling of the solar charger status.
+
+solarChargerStatus   OBJECT IDENTIFIER ::= { solarCharger 5 }
+
+systemTimeTime  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The system date and time. Used for event timestamps and logging"
+	::= { systemTime 1 }
+
+systemInfoRefresh  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		pushbutton (0),
+		refreshdata (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This is a push button function that will rebuild all the dynamic SNMP tables. 
+		When control units are removed or added this function must be executed to make sure
+		the tables are updated."
+	::= { controlSystem 2 }
+
+systemTrapRepeatRate  OBJECT-TYPE
+	SYNTAX     Integer32 (0..1440)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object sets the repeat rate of any active traps, in minutes.
+		Entering 0 (zero) will prevent repeating traps - one trap only will be sent per alarm event."
+	::= { controlSystem 3 }
+
+systemSendOffTrap  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		off (0),
+		on (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"A separate off-trap will be issued when an alarm condition goes off, if this flag is set to 1.
+		Entering 0 (zero) will prevent OFF traps from being transmitted."
+	::= { controlSystem 4 }
+
+systemNumOfControlUnits  OBJECT-TYPE
+	SYNTAX     Integer32 (0..8)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of Control units in a distributed system."
+	::= { controlSystem 5 }
+
+systemControlUnitIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"Index used for navigating in the table for configurable inputs."
+	::= { controlSystem 6 }
+
+systemControlUnitTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF SystemControlUnitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the status of the programmable inputs.
+		There is one row for each Control unit."
+	::= { controlSystem 7 }
+
+systemControlUnitEntry  OBJECT-TYPE
+	SYNTAX 	SystemControlUnitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { systemControlUnitIndex }
+	::= { systemControlUnitTable 1 }
+
+SystemControlUnitEntry ::= SEQUENCE {
+	inputControlUnitID
+		Integer32,
+	inputUserConfigurable1
+		INTEGER,
+	inputUserConfigurable2
+		INTEGER,
+	inputUserConfigurable3
+		INTEGER,
+	inputUserConfigurable4
+		INTEGER,
+	inputUserConfigurable5
+		INTEGER,
+	inputUserConfigurable6
+		INTEGER,
+	inputUserConfigurable7
+		INTEGER,
+	inputUserConfigurable8
+		INTEGER,
+	inputUserConfigurable9
+		INTEGER,
+	inputUserConfigurable10
+		INTEGER
+}
+
+inputControlUnitID  OBJECT-TYPE
+	SYNTAX     Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The ID of which Control unit to be read."
+	::= { systemControlUnitEntry 1 }
+
+inputUserConfigurable1  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. 
+		The description of the input is found in the systemControlUnitInputTable"
+	::= { systemControlUnitEntry 2 }
+
+inputUserConfigurable2  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. 
+		The description of the input is found in the systemControlUnitInputTable"
+	::= { systemControlUnitEntry 3 }
+
+inputUserConfigurable3  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. 
+		The description of the input is found in the systemControlUnitInputTable"
+	::= { systemControlUnitEntry 4 }
+
+inputUserConfigurable4  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. 
+		The description of the input is found in the systemControlUnitInputTable"
+	::= { systemControlUnitEntry 5 }
+
+inputUserConfigurable5  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. 
+		The description of the input is found in the systemControlUnitInputTable"
+	::= { systemControlUnitEntry 6 }
+
+inputUserConfigurable6  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. 
+		The description of the input is found in the systemControlUnitInputTable"
+	::= { systemControlUnitEntry 7 }
+
+inputUserConfigurable7  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. 
+		The description of the input is found in the systemControlUnitInputTable"
+	::= { systemControlUnitEntry 8 }
+
+inputUserConfigurable8  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. 
+		The description of the input is found in the systemControlUnitInputTable"
+	::= { systemControlUnitEntry 9 }
+
+inputUserConfigurable9  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. 
+		The description of the input is found in the systemControlUnitInputTable"
+	::= { systemControlUnitEntry 10 }
+
+inputUserConfigurable10  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. 
+		The description of the input is found in the systemControlUnitInputTable"
+	::= { systemControlUnitEntry 11 }
+
+systemLinkStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		linkdown (0),
+		linkup (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A flag showing the status of the serial port used between the HEIDI Webpower adapter 
+		or embedded WEB/SNMP card and the Smartpack Control system.
+		If this flag shows status linkdown, the propable cause is that the wrong baudrate is set,
+		which again is likely to happen when booting a brand new board.
+		Execute a 'systemInitiateEEPROM' command to fix.
+		Not applicable for ComPack control unit"
+	::= { controlSystem 8 }
+
+-- Executing this command will not return a response because the unit will reboot.
+-- 
+
+systemInitiateEEPROM  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		pushbutton (0),
+		start (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"Pushbutton function that initiates a forced write of default data to the SB70/SB72 eeprom. This function is used for 
+		productiontest only. The 3rd party OS used in this application are not able to write  
+		default data to EEPROM at boot time. A minimum set of configuration is thus created 
+		in RAM. A production test facility must therefore run this command as a part of the 
+		production test for the unit to function properly.
+		"
+	::= { controlSystem 9 }
+
+systemLastDigInput  OBJECT-TYPE
+	SYNTAX     Integer32 (1..10)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"The last Prog.Input that generated a trap. Used by Traps only."
+	::= { controlSystem 10 }
+
+systemTrapCounter  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"The number of times a trap has been repeated.. Only acessible for Traps."
+	::= { controlSystem 11 }
+
+systemHeartBeatTrapRepeatRate  OBJECT-TYPE
+	SYNTAX     Integer32 (0..1440)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The repeat rate for the systemHeartBeatTrap.
+		Setting this value to zero will disable the HeartBeatTrap."
+	::= { controlSystem 12 }
+
+systemResetManualAlarms  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		pushbutton (0),
+		apply (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"A pushutton that resets all manually resettable alarms in the controlsystem. Alarms that 
+		is not manually resettable will not be affected by this."
+	::= { controlSystem 13 }
+
+systemControlUnitInputIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"Index used for navigating in the table for configurable inputs."
+	::= { controlSystem 14 }
+
+systemControlUnitInputTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF SystemControlUnitInputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the description of the programmable inputs.
+		There is one row for each Control unit.
+		Programmable input alarms will have description attached to the traps that
+		explains the alarm. Default description is: ProgInput <Control unit ID>.x"
+	::= { controlSystem 15 }
+
+systemControlUnitInputEntry  OBJECT-TYPE
+	SYNTAX 	SystemControlUnitInputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { systemControlUnitInputIndex }
+	::= { systemControlUnitInputTable 1 }
+
+SystemControlUnitInputEntry ::= SEQUENCE {
+	inputUnitID
+		Integer32,
+	inputUserConfigurableText1
+		DisplayString,
+	inputUserConfigurableText2
+		DisplayString,
+	inputUserConfigurableText3
+		DisplayString,
+	inputUserConfigurableText4
+		DisplayString,
+	inputUserConfigurableText5
+		DisplayString,
+	inputUserConfigurableText6
+		DisplayString,
+	inputUserConfigurableText7
+		DisplayString,
+	inputUserConfigurableText8
+		DisplayString,
+	inputUserConfigurableText9
+		DisplayString,
+	inputUserConfigurableText10
+		DisplayString
+}
+
+inputUnitID  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The ID of which Control unit to be read."
+	::= { systemControlUnitInputEntry 1 }
+
+inputUserConfigurableText1  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.1."
+	::= { systemControlUnitInputEntry 2 }
+
+inputUserConfigurableText2  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.2."
+	::= { systemControlUnitInputEntry 3 }
+
+inputUserConfigurableText3  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.3."
+	::= { systemControlUnitInputEntry 4 }
+
+inputUserConfigurableText4  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.4."
+	::= { systemControlUnitInputEntry 5 }
+
+inputUserConfigurableText5  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.5."
+	::= { systemControlUnitInputEntry 6 }
+
+inputUserConfigurableText6  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.6."
+	::= { systemControlUnitInputEntry 7 }
+
+inputUserConfigurableText7  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.7."
+	::= { systemControlUnitInputEntry 8 }
+
+inputUserConfigurableText8  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.8."
+	::= { systemControlUnitInputEntry 9 }
+
+inputUserConfigurableText9  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.9."
+	::= { systemControlUnitInputEntry 10 }
+
+inputUserConfigurableText10  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.10."
+	::= { systemControlUnitInputEntry 11 }
+
+systemResetCtrlSystem  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		pushbutton (0),
+		reboot (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"A pushbutton function that resets the control system.
+		Configuration data will be kept."
+	::= { controlSystem 16 }
+
+ioUnitNumberOfUnits  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ioUnits 1 }
+
+ioUnitsIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..13)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ioUnits 2 }
+
+ioUnitsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF IoUnitsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ioUnits 3 }
+
+ioUnitsEntry  OBJECT-TYPE
+	SYNTAX 	IoUnitsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { ioUnitsIndex }
+	::= { ioUnitsTable 1 }
+
+IoUnitsEntry ::= SEQUENCE {
+	ioUnitID
+		Integer32,
+	ioUnitOutDoorTemp1
+		Integer32,
+	ioUnitOutDoorTemp2
+		Integer32,
+	ioUnitFanSpeed1
+		Integer32,
+	ioUnitFanSpeedDeltaValue1
+		Integer32,
+	ioUnitFanSpeed2
+		Integer32,
+	ioUnitFanSpeedDeltaValue2
+		Integer32,
+	ioUnitProgInputText1
+		DisplayString,
+	ioUnitProgInputStatus1
+		INTEGER,
+	ioUnitProgInputText2
+		DisplayString,
+	ioUnitProgInputStatus2
+		INTEGER,
+	ioUnitProgInputText3
+		DisplayString,
+	ioUnitProgInputStatus3
+		INTEGER,
+	ioUnitProgInputText4
+		DisplayString,
+	ioUnitProgInputStatus4
+		INTEGER,
+	ioUnitProgInputText5
+		DisplayString,
+	ioUnitProgInputStatus5
+		INTEGER,
+	ioUnitProgInputText6
+		DisplayString,
+	ioUnitProgInputStatus6
+		INTEGER,
+	ioUnitProgInputValue1
+		Integer32,
+	ioUnitProgInputValue2
+		Integer32,
+	ioUnitProgInputValue3
+		Integer32,
+	ioUnitProgInputValue4
+		Integer32,
+	ioUnitProgInputValue5
+		Integer32,
+	ioUnitProgInputValue6
+		Integer32
+}
+
+ioUnitID  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { ioUnitsEntry 1 }
+
+ioUnitOutDoorTemp1  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Deg. C/F; i.e. 25 = 25 Deg."
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured value of the temperature input.
+		Depending on the global setting in the Control unit, this value will be presented in Celsius
+		or Fahrenheit."
+	::= { ioUnitsEntry 2 }
+
+ioUnitOutDoorTemp2  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Deg. C/F; i.e. 25 = 25 Deg."
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured value of the temperature input.
+		Depending on the global setting in the Control unit, this value will be presented in Celsius
+		or Fahrenheit."
+	::= { ioUnitsEntry 3 }
+
+ioUnitFanSpeed1  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Percent %"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The speed of the cooling/ circulation fan.  The speed is a percentage of max RPM.  "
+	::= { ioUnitsEntry 4 }
+
+ioUnitFanSpeedDeltaValue1  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Percent %"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The deviation of the cooling/circulation fans speed set value.  Is a percentage of the desired value. "
+	::= { ioUnitsEntry 5 }
+
+ioUnitFanSpeed2  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Percent %"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The speed of the cooling/ circulation fan.  The speed is a percentage of max RPM. "
+	::= { ioUnitsEntry 6 }
+
+ioUnitFanSpeedDeltaValue2  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Percent %"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The deviation of the cooling/circulation fans speed set value.  Is a percentage of the desired value. "
+	::= { ioUnitsEntry 7 }
+
+ioUnitProgInputText1  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <I/Ounit ID>.1"
+	::= { ioUnitsEntry 8 }
+
+ioUnitProgInputStatus1  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. "
+	::= { ioUnitsEntry 9 }
+
+ioUnitProgInputText2  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <I/Ounit ID>.2"
+	::= { ioUnitsEntry 10 }
+
+ioUnitProgInputStatus2  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. "
+	::= { ioUnitsEntry 11 }
+
+ioUnitProgInputText3  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <I/Ounit ID>.3"
+	::= { ioUnitsEntry 12 }
+
+ioUnitProgInputStatus3  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. "
+	::= { ioUnitsEntry 13 }
+
+ioUnitProgInputText4  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <I/Ounit ID>.4"
+	::= { ioUnitsEntry 14 }
+
+ioUnitProgInputStatus4  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. "
+	::= { ioUnitsEntry 15 }
+
+ioUnitProgInputText5  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <I/Ounit ID>.5"
+	::= { ioUnitsEntry 16 }
+
+ioUnitProgInputStatus5  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. "
+	::= { ioUnitsEntry 17 }
+
+ioUnitProgInputText6  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <I/Ounit ID>.6"
+	::= { ioUnitsEntry 18 }
+
+ioUnitProgInputStatus6  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input status. "
+	::= { ioUnitsEntry 19 }
+
+ioUnitProgInputValue1  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 500 = 5.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value read on input."
+	::= { ioUnitsEntry 20 }
+
+ioUnitProgInputValue2  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 500 = 5.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value read on input."
+	::= { ioUnitsEntry 21 }
+
+ioUnitProgInputValue3  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 500 = 5.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value read on input."
+	::= { ioUnitsEntry 22 }
+
+ioUnitProgInputValue4  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 500 = 5.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value read on input."
+	::= { ioUnitsEntry 23 }
+
+ioUnitProgInputValue5  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 500 = 5.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value read on input."
+	::= { ioUnitsEntry 24 }
+
+ioUnitProgInputValue6  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 500 = 5.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value read on input."
+	::= { ioUnitsEntry 25 }
+
+systemServiceMode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		deactivate (0),
+		activate (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"This is a switch function to activate (1) or deactivate (0) servicemode. Status can also be read.
+		Servicemode prevent the system to operate relays or send traps or mail."
+	::= { controlSystem 18 }
+
+systemSiteInfoCustomer  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Customer name (as stored in the Control Unit)."
+	::= { systemSiteInfo 1 }
+
+systemSiteInfoLocation  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The system/site Location details (as stored in the Control Unit)."
+	::= { systemSiteInfo 2 }
+
+systemSiteInfoMessage1  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The system/site Info Message record #1 (as stored in the Control Unit). 31 Bytes."
+	::= { systemSiteInfo 3 }
+
+systemSiteInfoMessage2  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The system/site Info Message record #2 (as stored in the Control Unit). 31 Bytes."
+	::= { systemSiteInfo 4 }
+
+systemSiteInfoInstalledDate  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The system's Installed Date text string (as stored in the Control Unit) 16bytes."
+	::= { systemSiteInfo 5 }
+
+systemSiteInfoControllerType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		al175 (0),
+		al4000 (1),
+		al6000 (2),
+		al175oem (3),
+		mcu (4),
+		smartpack (5),
+		compack (6),
+		smartpack2 (7)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The system Controller Module currently connected.
+		0 = AL175
+		1 = AL4000 (Aeon Gold)
+		2 = AL6000
+		3 = AL175OEM
+		4 = MCU
+		5 = SmartPack
+		6 = ComPack"
+	::= { systemSiteInfo 6 }
+
+systemSiteInfoSystemSeriaNum  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The serial number for the complete system."
+	::= { systemSiteInfo 7 }
+
+systemSiteInfoControllerSeriaNum  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The serial number for Control unit 1."
+	::= { systemSiteInfo 8 }
+
+systemNominalVoltage  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		prs48v (0),
+		prs24v (1),
+		prs12v (2),
+		prs26v (3),
+		prs60v (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The nominal voltage rating. 24V/48V/60V systems.
+		0=48V
+		1=24V
+		2=Not used
+		3=Not used
+		4=60V"
+	::= { dcPlant 4 }
+
+systemOperationalStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		floatvoltreg (0),
+		floattempcomp (1),
+		batteryboost (2),
+		batterytest (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A summary status showing if the system is testing, boosting, floating etc.
+		0=Float, voltage regulated
+		1=Float, temperature comp. regulated;
+		2=boost
+		3=battery test"
+	::= { dcSystem 2 }
+
+batteryName  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..31))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A descriptive name of the battery installed in the system."
+	::= { battery 1 }
+
+batteryVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7500)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured battery voltage."
+	::= { battery 2 }
+
+batteryCurrent  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured total battery current.
+		This is the sum of all the enabled shunt measurements in the system.
+		Negative battery current indicates discharging of the batteries.
+		Positive battery current indicates charging of the batteries.
+		Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { battery 3 }
+
+batteryTemp  OBJECT-TYPE
+	SYNTAX     Integer32 (0..9999)
+	UNITS 	"Deg. C/F; i.e. 25 = 25 Deg."
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The highest value of the enabled battery temperature measurements.
+		Depending on the global setting in the Control unit, this value will be presented in Celsius
+		or Fahrenheit."
+	::= { battery 4 }
+
+batteryBreakerStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the battery fuses/breakers can be either normal(0) or alarm(1)."
+	::= { battery 5 }
+
+batteryChargeCurrentLimitCtrl  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/disable of the battery charge current limitation feature; 0=disable, 1=enable."
+	::= { battery 6 }
+
+batteryChargeCurrentLimitValue  OBJECT-TYPE
+	SYNTAX     Integer32 (0..32000)
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Battery charging current limit value. Used only when AC source is mains feed.
+		Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { battery 7 }
+
+batteryTempCompEnable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable (0) or Disable (1)  of Battery Temperature Compensated output regulation mode"
+	::= { battery 8 }
+
+batteryFloatVoltConfig  OBJECT-TYPE
+	SYNTAX     Integer32 (4300..6000)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The Voltage at which the DC System float charges.
+		Acts as reference voltage when running temperature compensated charging."
+	::= { battery 9 }
+
+batteryBoostVoltConfig  OBJECT-TYPE
+	SYNTAX     Integer32 (4300..6000)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The Voltage at which the DC System boost charges the batteries."
+	::= { battery 10 }
+
+batteryHighMajorAlarmVoltageConfig  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The Major High Battery Voltage alarm limit set voltage"
+	::= { battery 11 }
+
+batteryHighMinorAlarmVoltageConfig  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The Minor High Battery Voltage alarm limit set voltage"
+	::= { battery 12 }
+
+batteryLowMajorAlarmVoltageConfig  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The Major Low Battery Voltage Alarm limit set voltage"
+	::= { battery 13 }
+
+batteryLowMinorAlarmVoltageConfig  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The Minor Low Battery Voltage Alarm limit set voltage"
+	::= { battery 14 }
+
+batteryStartManualTest  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		pushbutton (0),
+		starttest (1),
+		stoptest (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This pushbutton will start or stop a manual battery test if the system allows it."
+	::= { battery 15 }
+
+batteryStartManualBoost  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		pushbutton (0),
+		startboost (1),
+		stopboost (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This pushbutton will start or stop a manual battery boost if the system allows it."
+	::= { battery 16 }
+
+batteryLVDStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		connected (0),
+		disconnected (1),
+		disabled (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Battery Contactor is connected(0), disconnected(1) or disabled(2)"
+	::= { batteryLVD 1 }
+
+batteryLVDDisconnectVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7200)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The Battery Contactors Disconnect Voltage"
+	::= { batteryLVD 2 }
+
+batteryLVDConnectVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7200)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The Battery Contactors Reconnect Voltage"
+	::= { batteryLVD 3 }
+
+batteryBanksNumofBanks  OBJECT-TYPE
+	SYNTAX     Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of Control units that is used to measure battery parameters. "
+	::= { battery 18 }
+
+-- This setpoint / value is common for all battery strings monitored and 
+-- is the major alarm limit.
+
+batterySymmetryDeltaLimitVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 150 = 1.50V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The allowable deviation of the symmetry voltage from the theoretical.
+		Exceeding this value in either direction (+/-) causes an alarm state."
+	::= { batteryBanks 1 }
+
+batteryBanksIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"Index used for navigating the rows 1..8  of batteryBanksTable "
+	::= { batteryBanks 2 }
+
+batteryBanksTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF BatteryBanksEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table of up to 8 battery banks. Each banks may have up to 8 symmetry measuments."
+	::= { batteryBanks 3 }
+
+batteryBanksEntry  OBJECT-TYPE
+	SYNTAX 	BatteryBanksEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { batteryBanksIndex }
+	::= { batteryBanksTable 1 }
+
+BatteryBanksEntry ::= SEQUENCE {
+	batteryBankID
+		Integer32,
+	batteryBanksSymmetry1enable
+		INTEGER,
+	batteryBanksSymmetry1status
+		INTEGER,
+	batteryBanksSymmetry1deltaVoltage
+		Integer32,
+	batteryBanksSymmetry2enable
+		INTEGER,
+	batteryBanksSymmetry2status
+		INTEGER,
+	batteryBanksSymmetry2deltaVoltage
+		Integer32,
+	batteryBanksSymmetry3enable
+		INTEGER,
+	batteryBanksSymmetry3status
+		INTEGER,
+	batteryBanksSymmetry3deltaVoltage
+		Integer32,
+	batteryBanksSymmetry4enable
+		INTEGER,
+	batteryBanksSymmetry4status
+		INTEGER,
+	batteryBanksSymmetry4deltaVoltage
+		Integer32,
+	batteryBanksSymmetry5enable
+		INTEGER,
+	batteryBanksSymmetry5status
+		INTEGER,
+	batteryBanksSymmetry5deltaVoltage
+		Integer32,
+	batteryBanksSymmetry6enable
+		INTEGER,
+	batteryBanksSymmetry6status
+		INTEGER,
+	batteryBanksSymmetry6deltaVoltage
+		Integer32,
+	batteryBanksSymmetry7enable
+		INTEGER,
+	batteryBanksSymmetry7status
+		INTEGER,
+	batteryBanksSymmetry7deltaVoltage
+		Integer32,
+	batteryBanksSymmetry8enable
+		INTEGER,
+	batteryBanksSymmetry8status
+		INTEGER,
+	batteryBanksSymmetry8deltaVoltage
+		Integer32
+}
+
+batteryBankID  OBJECT-TYPE
+	SYNTAX     Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The ID of the selected row in the table. i.e. the battery bank."
+	::= { batteryBanksEntry 1 }
+
+batteryBanksSymmetry1enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable the individual symmetry input. If disabled this will read 0 volts and 
+		the alarm flag will be turned off."
+	::= { batteryBanksEntry 2 }
+
+batteryBanksSymmetry1status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error
+		"
+	::= { batteryBanksEntry 3 }
+
+batteryBanksSymmetry1deltaVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 100 = 1.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The difference between the measured value and the expected value.
+		The expected value is calculated by taking the measured total batteryvoltage and divide
+		it with the number of battery blocks. You'll then have the theoretical correct value for 
+		each battery block."
+	::= { batteryBanksEntry 4 }
+
+batteryBanksSymmetry2enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable the individual symmetry input. If disabled this will read 0 volts and 
+		the alarm flag will be turned off."
+	::= { batteryBanksEntry 5 }
+
+batteryBanksSymmetry2status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { batteryBanksEntry 6 }
+
+batteryBanksSymmetry2deltaVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 100 = 1.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The difference between the measured value and the expected value.
+		The expected value is calculated by taking the measured total batteryvoltage and divide
+		it with the number of battery blocks. You'll then have the theoretical correct value for 
+		each battery block."
+	::= { batteryBanksEntry 7 }
+
+batteryBanksSymmetry3enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable the individual symmetry input. If disabled this will read 0 volts and 
+		the alarm flag will be turned off."
+	::= { batteryBanksEntry 8 }
+
+batteryBanksSymmetry3status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { batteryBanksEntry 9 }
+
+batteryBanksSymmetry3deltaVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 100 = 1.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The difference between the measured value and the expected value.
+		The expected value is calculated by taking the measured total batteryvoltage and divide
+		it with the number of battery blocks. You'll then have the theoretical correct value for 
+		each battery block."
+	::= { batteryBanksEntry 10 }
+
+batteryBanksSymmetry4enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable the individual symmetry input. If disabled this will read 0 volts and 
+		the alarm flag will be turned off."
+	::= { batteryBanksEntry 11 }
+
+batteryBanksSymmetry4status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { batteryBanksEntry 12 }
+
+batteryBanksSymmetry4deltaVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 100 = 1.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The difference between the measured value and the expected value.
+		The expected value is calculated by taking the measured total batteryvoltage and divide
+		it with the number of battery blocks. You'll then have the theoretical correct value for 
+		each battery block."
+	::= { batteryBanksEntry 13 }
+
+batteryBanksSymmetry5enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable the individual symmetry input. If disabled this will read 0 volts and 
+		the alarm flag will be turned off."
+	::= { batteryBanksEntry 14 }
+
+batteryBanksSymmetry5status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { batteryBanksEntry 15 }
+
+batteryBanksSymmetry5deltaVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 100 = 1.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The difference between the measured value and the expected value.
+		The expected value is calculated by taking the measured total batteryvoltage and divide
+		it with the number of battery blocks. You'll then have the theoretical correct value for 
+		each battery block."
+	::= { batteryBanksEntry 16 }
+
+batteryBanksSymmetry6enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable the individual symmetry input. If disabled this will read 0 volts and 
+		the alarm flag will be turned off."
+	::= { batteryBanksEntry 17 }
+
+batteryBanksSymmetry6status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { batteryBanksEntry 18 }
+
+batteryBanksSymmetry6deltaVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 100 = 1.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The difference between the measured value and the expected value.
+		The expected value is calculated by taking the measured total batteryvoltage and divide
+		it with the number of battery blocks. You'll then have the theoretical correct value for 
+		each battery block."
+	::= { batteryBanksEntry 19 }
+
+batteryBanksSymmetry7enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable the individual symmetry input. If disabled this will read 0 volts and 
+		the alarm flag will be turned off."
+	::= { batteryBanksEntry 20 }
+
+batteryBanksSymmetry7status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { batteryBanksEntry 21 }
+
+batteryBanksSymmetry7deltaVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 100 = 1.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The difference between the measured value and the expected value.
+		The expected value is calculated by taking the measured total batteryvoltage and divide
+		it with the number of battery blocks. You'll then have the theoretical correct value for 
+		each battery block."
+	::= { batteryBanksEntry 22 }
+
+batteryBanksSymmetry8enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable the individual symmetry input. If disabled this will read 0 volts and 
+		the alarm flag will be turned off."
+	::= { batteryBanksEntry 23 }
+
+batteryBanksSymmetry8status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { batteryBanksEntry 24 }
+
+batteryBanksSymmetry8deltaVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 100 = 1.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The difference between the measured value and the expected value.
+		The expected value is calculated by taking the measured total batteryvoltage and divide
+		it with the number of battery blocks. You'll then have the theoretical correct value for 
+		each battery block."
+	::= { batteryBanksEntry 25 }
+
+batteryBanksNumberOfStrings  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of strings in the power system."
+	::= { batteryBanks 4 }
+
+batteryBanksExtensionIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"Index used for navigating the rows 1..14  of batteryBanksExtensionTable "
+	::= { batteryBanks 5 }
+
+batteryBanksExtensionTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF BatteryBanksExtensionEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table shows the measured value on the symmetry inputs."
+	::= { batteryBanks 6 }
+
+batteryBanksExtensionEntry  OBJECT-TYPE
+	SYNTAX 	BatteryBanksExtensionEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { batteryBanksExtensionIndex }
+	::= { batteryBanksExtensionTable 1 }
+
+BatteryBanksExtensionEntry ::= SEQUENCE {
+	batteryBanksExtensionID
+		Integer32,
+	batteryBanksExtensionSymmetryInputValue1
+		Integer32,
+	batteryBanksExtensionSymmetryInputValue2
+		Integer32,
+	batteryBanksExtensionSymmetryInputValue3
+		Integer32,
+	batteryBanksExtensionSymmetryInputValue4
+		Integer32,
+	batteryBanksExtensionSymmetryInputValue5
+		Integer32,
+	batteryBanksExtensionSymmetryInputValue6
+		Integer32,
+	batteryBanksExtensionSymmetryInputValue7
+		Integer32,
+	batteryBanksExtensionSymmetryInputValue8
+		Integer32
+}
+
+batteryBanksExtensionID  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The ID of the selected row in the table. i.e. the battery bank."
+	::= { batteryBanksExtensionEntry 1 }
+
+batteryBanksExtensionSymmetryInputValue1  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { batteryBanksExtensionEntry 2 }
+
+batteryBanksExtensionSymmetryInputValue2  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { batteryBanksExtensionEntry 3 }
+
+batteryBanksExtensionSymmetryInputValue3  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { batteryBanksExtensionEntry 4 }
+
+batteryBanksExtensionSymmetryInputValue4  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { batteryBanksExtensionEntry 5 }
+
+batteryBanksExtensionSymmetryInputValue5  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { batteryBanksExtensionEntry 6 }
+
+batteryBanksExtensionSymmetryInputValue6  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { batteryBanksExtensionEntry 7 }
+
+batteryBanksExtensionSymmetryInputValue7  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { batteryBanksExtensionEntry 8 }
+
+batteryBanksExtensionSymmetryInputValue8  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { batteryBanksExtensionEntry 9 }
+
+batteryTimeToDisconnect  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Minutes; 40 = 40 minutes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Remaining time to low voltage battery disconnect."
+	REFERENCE 
+		"BatteryTimeLeft (minutes)"
+	::= { batteryCapacityData 1 }
+
+batteryCapacityLeft  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Ah/%;  23 = 23 Ah or in %"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Capacity left in the battery."
+	REFERENCE 
+		"BatteryRemCap"
+	::= { batteryCapacityData 2 }
+
+batteryCapacityUsed  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Ah/%;  23 = 23 Ah or in %"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Capacity consumed."
+	REFERENCE 
+		"BatteryUsedCap"
+	::= { batteryCapacityData 3 }
+
+batteryCapacityTotal  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Ah/%;  23 = 23 Ah or in %"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This is the total Capacity of the battery. This value is the installed capacity 
+		compensated with the last battery tests quality level"
+	REFERENCE 
+		"BatteryTotCap"
+	::= { batteryCapacityData 4 }
+
+batteryQuality  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"%"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This is the battery quality (%) of the latest battery test."
+	REFERENCE 
+		"BatteryQuality"
+	::= { batteryCapacityData 5 }
+
+battmonNumberOfUnits  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of battery monitor units in the power system."
+	::= { batteryMonitorUnits 1 }
+
+battmonUnitsIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		"Index used for navigating the rows 1..14  of battmonUnitsTable "
+	::= { batteryMonitorUnits 2 }
+
+battmonUnitsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF BattmonUnitsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table of up to 14 battery monitor control units.  "
+	::= { batteryMonitorUnits 3 }
+
+battmonUnitsEntry  OBJECT-TYPE
+	SYNTAX 	BattmonUnitsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { batteryBanksIndex }
+	::= { battmonUnitsTable 1 }
+
+BattmonUnitsEntry ::= SEQUENCE {
+	batteryMonitorID
+		Integer32,
+	batteryMonitorSymmetry1status
+		INTEGER,
+	batteryMonitorSymmetry1InputValue
+		Integer32,
+	batteryMonitorSymmetry2status
+		INTEGER,
+	batteryMonitorSymmetry2InputValue
+		Integer32,
+	batteryMonitorSymmetry3status
+		INTEGER,
+	batteryMonitorSymmetry3InputValue
+		Integer32,
+	batteryMonitorSymmetry4status
+		INTEGER,
+	batteryMonitorSymmetry4InputValue
+		Integer32,
+	batteryMonitorCurrentValue
+		Integer32,
+	batteryMonitorFuseStatus
+		INTEGER,
+	batteryMonitorTemperature
+		Integer32
+}
+
+batteryMonitorID  OBJECT-TYPE
+	SYNTAX     Integer32 (1..14)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The ID of the selected row"
+	::= { battmonUnitsEntry 1 }
+
+batteryMonitorSymmetry1status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { battmonUnitsEntry 2 }
+
+batteryMonitorSymmetry1InputValue  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { battmonUnitsEntry 3 }
+
+batteryMonitorSymmetry2status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { battmonUnitsEntry 4 }
+
+batteryMonitorSymmetry2InputValue  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { battmonUnitsEntry 5 }
+
+batteryMonitorSymmetry3status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { battmonUnitsEntry 6 }
+
+batteryMonitorSymmetry3InputValue  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { battmonUnitsEntry 7 }
+
+batteryMonitorSymmetry4status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (0),
+		minorAlarm (1),
+		majorAlarm (2),
+		disabled (3),
+		error (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contains the status of this battery symmetry input.
+		Possible States:
+		0=Normal
+		1=MinorAlarm
+		2=MajorAlarm
+		3=Disabled
+		4=Error"
+	::= { battmonUnitsEntry 8 }
+
+batteryMonitorSymmetry4InputValue  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 1200 = 12.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured voltage on the symmetry input."
+	::= { battmonUnitsEntry 9 }
+
+batteryMonitorCurrentValue  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The measured current to/from the battery.
+		Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { battmonUnitsEntry 10 }
+
+batteryMonitorFuseStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the battery fuse/breaker can be either normal(0) or alarm(1)."
+	::= { battmonUnitsEntry 11 }
+
+batteryMonitorTemperature  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Deg. C/F; i.e. 25 = 25 Deg."
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The battery temperature."
+	::= { battmonUnitsEntry 12 }
+
+batteryHighMajorTempAlarmLevel  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Deg. C/F; i.e. 25 = 25 Deg."
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This is the Major High Temperature Alarm level."
+	::= { battery 22 }
+
+-- Be aware that it is no validation against the Major High Temperature Alarm Level
+-- and therefore it is possible to set this value higher than the Major High Temperature Level.
+-- The consequense of doing this will be that the alarm will not be tripped until the 
+-- Minor High Temperature Level has been reached.
+
+batteryHighMinorTempAlarmLevel  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Deg. C/F; i.e. 25 = 25 Deg."
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This is the Minor High Temperature Alarm level."
+	::= { battery 23 }
+
+batteryTestEndVoltage  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"1/100 Volt; i.e. 190 = 1.90V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The end voltage for standard battery test (V/cell)
+		1/100 Volt; i.e. 190 = 1.90V"
+	::= { batteryTest 1 }
+
+batteryTestMaximumDischargeTime  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Minutes"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The maximum allowed run time for the battery test (Minutes)"
+	::= { batteryTest 2 }
+
+batteryTestMaximumDischargeAh  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Ah"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The maximum allowed discharge for the batteries during a battery test (Ah)"
+	::= { batteryTest 3 }
+
+loadDistributionCurrent  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The total load current
+		Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { loadDistribution 1 }
+
+loadDistributionBreakerStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the load fuses/breakers can be either normal(0) or alarm(1) "
+	::= { loadDistribution 2 }
+
+loadLVD1Enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disabled (0),
+		enabled (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The status of contactors configuration. 
+		'enabled' means that the contactor is in use.
+		'disabled' means that the contactor is disconfigured and not in use."
+	::= { loadDistributionLVDStatus 1 }
+
+loadLVD1Status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		connected (0),
+		disconnected (1),
+		disabled (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The load Contactor 1 is connected(0), disconnected(1) or disabled(2)"
+	::= { loadDistributionLVDStatus 2 }
+
+loadLVD1ConnectVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7200)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"LVLD1 Connect Voltage"
+	::= { loadDistributionLVDStatus 3 }
+
+loadLVD1DisconnectVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7200)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"LVLD1 Disconnect Voltage"
+	::= { loadDistributionLVDStatus 4 }
+
+loadLVD2Enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disabled (0),
+		enabled (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The status of contactors configuration. 
+		'enabled' means that the contactor is in use.
+		'disabled' means that the contactor is disconfigured and not in use."
+	::= { loadDistributionLVDStatus 5 }
+
+loadLVD2Status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		connected (0),
+		disconnected (1),
+		disabled (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The load Contactor 2 is connected(0), disconnected(1) or disabled(2)"
+	::= { loadDistributionLVDStatus 6 }
+
+loadLVD2ConnectVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7200)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"LVLD2 Connect Voltage"
+	::= { loadDistributionLVDStatus 7 }
+
+loadLVD2DisconnectVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7200)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"LVLD2 Disconnect Voltage"
+	::= { loadDistributionLVDStatus 8 }
+
+loadLVD3Enable  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disabled (0),
+		enabled (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The status of contactors configuration. 
+		'enabled' means that the contactor is in use.
+		'disabled' means that the contactor is disconfigured and not in use."
+	::= { loadDistributionLVDStatus 9 }
+
+loadLVD3Status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		connected (0),
+		disconnected (1),
+		disabled (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The load Contactor 3 is connected(0), disconnected(1) or disabled(2)"
+	::= { loadDistributionLVDStatus 10 }
+
+loadLVD3ConnectVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7200)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"LVLD3 Connect Voltage"
+	::= { loadDistributionLVDStatus 11 }
+
+loadLVD3DisconnectVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7200)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"LVLD3 Disconnect Voltage"
+	::= { loadDistributionLVDStatus 12 }
+
+loadmonitorNumberOfUnits  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { loadMonitorUnits 1 }
+
+loadMonitorUnitsIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..13)
+	MAX-ACCESS accessible-for-notify
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { loadMonitorUnits 2 }
+
+loadMonitorUnitsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF LoadMonitorUnitsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { loadMonitorUnits 3 }
+
+loadMonitorUnitsEntry  OBJECT-TYPE
+	SYNTAX 	LoadMonitorUnitsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { loadMonitorUnitsIndex }
+	::= { loadMonitorUnitsTable 1 }
+
+LoadMonitorUnitsEntry ::= SEQUENCE {
+	loadMonitorID
+		Integer32,
+	loadMonitorFuseStatus1
+		INTEGER,
+	loadMonitorCurrent1
+		Integer32,
+	loadMonitorFuseStatus2
+		INTEGER,
+	loadMonitorCurrent2
+		Integer32,
+	loadMonitorFuseStatus3
+		INTEGER,
+	loadMonitorCurrent3
+		Integer32,
+	loadMonitorFuseStatus4
+		INTEGER,
+	loadMonitorCurrent4
+		Integer32,
+	loadMonitorFuseStatus5
+		INTEGER,
+	loadMonitorCurrent5
+		Integer32,
+	loadMonitorFuseStatus6
+		INTEGER,
+	loadMonitorCurrent6
+		Integer32,
+	loadMonitorFuseStatus7
+		INTEGER,
+	loadMonitorCurrent7
+		Integer32,
+	loadMonitorFuseStatus8
+		INTEGER,
+	loadMonitorCurrent8
+		Integer32
+}
+
+loadMonitorID  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { loadMonitorUnitsEntry 1 }
+
+loadMonitorFuseStatus1  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the load fuses/breakers can be either normal(0) or alarm(1) "
+	::= { loadMonitorUnitsEntry 2 }
+
+loadMonitorCurrent1  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current consumed by this load branch. Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { loadMonitorUnitsEntry 3 }
+
+loadMonitorFuseStatus2  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the load fuses/breakers can be either normal(0) or alarm(1) "
+	::= { loadMonitorUnitsEntry 4 }
+
+loadMonitorCurrent2  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current consumed by this load branch. Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { loadMonitorUnitsEntry 5 }
+
+loadMonitorFuseStatus3  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the load fuses/breakers can be either normal(0) or alarm(1) "
+	::= { loadMonitorUnitsEntry 6 }
+
+loadMonitorCurrent3  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current consumed by this load branch. Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { loadMonitorUnitsEntry 7 }
+
+loadMonitorFuseStatus4  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the load fuses/breakers can be either normal(0) or alarm(1) "
+	::= { loadMonitorUnitsEntry 8 }
+
+loadMonitorCurrent4  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current consumed by this load branch. Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { loadMonitorUnitsEntry 9 }
+
+loadMonitorFuseStatus5  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the load fuses/breakers can be either normal(0) or alarm(1) "
+	::= { loadMonitorUnitsEntry 10 }
+
+loadMonitorCurrent5  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current consumed by this load branch. Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { loadMonitorUnitsEntry 11 }
+
+loadMonitorFuseStatus6  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the load fuses/breakers can be either normal(0) or alarm(1) "
+	::= { loadMonitorUnitsEntry 12 }
+
+loadMonitorCurrent6  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current consumed by this load branch. Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { loadMonitorUnitsEntry 13 }
+
+loadMonitorFuseStatus7  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the load fuses/breakers can be either normal(0) or alarm(1) "
+	::= { loadMonitorUnitsEntry 14 }
+
+loadMonitorCurrent7  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current consumed by this load branch. Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { loadMonitorUnitsEntry 15 }
+
+loadMonitorFuseStatus8  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the load fuses/breakers can be either normal(0) or alarm(1) "
+	::= { loadMonitorUnitsEntry 16 }
+
+loadMonitorCurrent8  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Amperes or DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current consumed by this load branch. Note that the units measured may be i Amperes or in Deciamperes depending on global system settings"
+	::= { loadMonitorUnitsEntry 17 }
+
+rectifierInstalledRectifiers  OBJECT-TYPE
+	SYNTAX     Integer32 (1..101)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of installed rectifiers for this DC Power System."
+	::= { rectifier 1 }
+
+rectifierRectifiersActive  OBJECT-TYPE
+	SYNTAX     Integer32 (1..101)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Not Used!"
+	::= { rectifier 2 }
+
+rectifierTotalCurrent  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"DeciAmperes; i.e. 20 = 2,0 Amperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The DC system's total delivered rectifier current"
+	::= { rectifier 3 }
+
+rectifierUtilization  OBJECT-TYPE
+	SYNTAX     Integer32 (0..100)
+	UNITS 	"%"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Utilization in % of available rectifier capacity"
+	REFERENCE 
+		"Rect.Capacity"
+	::= { rectifier 4 }
+
+rectifierStatusNoIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..95)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"An offset for the rectifierStatusTable array. The rectifier status table has 
+		a fixed number of 20 rows. This OID sets the offset for the rectifier in the first row
+		i.e. setting the index to 11 will give a range from rectifier ID12 to ID31.
+		Setting the index to 0 will give a range from rectifier ID1 to ID20."
+	::= { rectifierStatus 1 }
+
+rectifierStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF RectifierStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table listing up to 20 recifiers, starting from the rectifier number specified by rectifierStatusNoIndex"
+	::= { rectifierStatus 2 }
+
+rectifierStatusEntry  OBJECT-TYPE
+	SYNTAX 	RectifierStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A row of rectifier status data corresponding to the rectifierStatusNoIndex value"
+	INDEX { rectifierStatusID }
+	::= { rectifierStatusTable 1 }
+
+RectifierStatusEntry ::= SEQUENCE {
+	rectifierStatusID
+		Integer32,
+	rectifierStatusStatus
+		INTEGER,
+	rectifierStatusOutputCurrent
+		Integer32,
+	rectifierStatusOutputVoltage
+		Integer32,
+	rectifierStatusTemp
+		Integer32,
+	rectifierStatusType
+		DisplayString,
+	rectifierStatusSKU
+		DisplayString,
+	rectifierStatusSerialNo
+		DisplayString,
+	rectifierStatusRevisionLevel
+		DisplayString
+}
+
+rectifierStatusID  OBJECT-TYPE
+	SYNTAX     Integer32 (1..100)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The rectifier ID number of the rectifier."
+	::= { rectifierStatusEntry 1 }
+
+rectifierStatusStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notPresent (0),
+		normal (1),
+		alarm (2),
+		notUsed (3),
+		disabled (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The operational status of the rectifier record.
+		Not Present (0),
+		normal (1),
+		alarm (2),
+		notUsed (3),
+		disabled (4)
+		      
+		      "
+	::= { rectifierStatusEntry 2 }
+
+rectifierStatusOutputCurrent  OBJECT-TYPE
+	SYNTAX     Integer32 (0..65535)
+	UNITS 	"DeciAmperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The output current of the rectifier."
+	::= { rectifierStatusEntry 3 }
+
+rectifierStatusOutputVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..65535)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The rectifier voltage of the rectifier record."
+	::= { rectifierStatusEntry 4 }
+
+rectifierStatusTemp  OBJECT-TYPE
+	SYNTAX     Integer32 (0..65535)
+	UNITS 	"Deg. C/F; i.e. 35 = 35 Degrees"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The input air temperature of the rectifier."
+	::= { rectifierStatusEntry 5 }
+
+rectifierStatusType  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The rectifier article number string of the rectifier record."
+	::= { rectifierStatusEntry 6 }
+
+rectifierStatusSKU  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(1..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The rectifier part number."
+	::= { rectifierStatusEntry 7 }
+
+rectifierStatusSerialNo  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The rectifier serial number string of the rectifier record."
+	::= { rectifierStatusEntry 8 }
+
+rectifierStatusRevisionLevel  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The rectifier HW revision number string of the rectifier record."
+	::= { rectifierStatusEntry 9 }
+
+acVoltage1  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Volts AC"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The AC Voltage of phase 1"
+	::= { acDistribution 1 }
+
+acVoltage2  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Volts AC"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The AC Voltage of phase 2"
+	::= { acDistribution 2 }
+
+acVoltage3  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Volts AC"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The AC Voltage of phase 3"
+	::= { acDistribution 3 }
+
+alarmMajorHighBattVolt  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Major High Battery Voltage Alarm"
+	::= { alarmWellknownAlarms 1 }
+
+alarmMinorHighBattVolt  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Minor High Battery Voltage alarm"
+	::= { alarmWellknownAlarms 2 }
+
+alarmMajorLowBattVolt  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Major Low Battery Voltage Alarm"
+	::= { alarmWellknownAlarms 3 }
+
+alarmMinorLowBattVolt  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Minor Low Battery Voltage Alarm"
+	::= { alarmWellknownAlarms 4 }
+
+alarmMajorBatteryHighTemp  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Major High Battery Temperature alarm."
+	::= { alarmWellknownAlarms 5 }
+
+alarmMinorBatteryHighTemp  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Minor High Battery Temperature alarm."
+	::= { alarmWellknownAlarms 6 }
+
+alarmBatteryDisconnectOpen  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Battery Disconnect Contactor alarm"
+	::= { alarmWellknownAlarms 7 }
+
+alarmLVD1open  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The load Contactor 1 alarm. The contactor disconnect voltage has been
+		reached and the contactor has disconnected."
+	::= { alarmWellknownAlarms 8 }
+
+alarmLVD2open  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The load Contactor 2 alarm. The contactor disconnect voltage has been
+		reached and the contactor has disconnected."
+	::= { alarmWellknownAlarms 9 }
+
+alarmLVD3open  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The load Contactor 3 alarm. The contactor disconnect voltage has been
+		reached and the contactor has disconnected.
+		      "
+	::= { alarmWellknownAlarms 10 }
+
+alarmACmains  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The AC voltage has dropped below critical level, or one or more AC input phases was lost."
+	::= { alarmWellknownAlarms 11 }
+
+alarmBatteryBreakerOpen  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A battery breaker/fuse alarm."
+	::= { alarmWellknownAlarms 12 }
+
+alarmDistributionBreakerOpen  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A Load Distribution breaker/fuse alarm."
+	::= { alarmWellknownAlarms 13 }
+
+alarmMajorRectifier  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This is a Major Rectifier alarm."
+	::= { alarmWellknownAlarms 14 }
+
+alarmMinorRectifier  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This is a Minor Rectifier alarm."
+	::= { alarmWellknownAlarms 15 }
+
+alarmMajorBatterySymmetry  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery Symmetry Delta Voltage Major alarm."
+	::= { alarmWellknownAlarms 16 }
+
+alarmMinorBatterySymmetry  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Battery Symmetry Delta Voltage Minor alarm"
+	::= { alarmWellknownAlarms 17 }
+
+alarmBatteryLifeEnded  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The battery quality has dropped below critical level. 
+		A battery test has measured the fully charged capacity to be too low, 
+		and thus probably the battery lifecycle to be near expired."
+	REFERENCE 
+		"BatteryQuality"
+	::= { alarmWellknownAlarms 18 }
+
+alarmBatteryTestmodeEntered  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The system has lowered the battery charge voltage in order to discharge the batteries 
+		to a predefined level. When the criteria for stopping the battery testing is reached, the 
+		charge voltage is increased to commence normal charging."
+	::= { alarmWellknownAlarms 19 }
+
+alarmBatteryBoostmodeEntered  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The system has increased the battery charge voltage in order to boost the 
+		battery. When the criteria for stopping the battery boost is reached, 
+		the charge voltage is lowered to commence normal charging."
+	::= { alarmWellknownAlarms 20 }
+
+alarmIoUnitTemp1  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"High or low temperature alarm 1 from any of the IO units."
+	::= { alarmWellknownAlarms 21 }
+
+alarmIoUnitTemp2  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"High or low temperature alarm 2 from any of the IO units."
+	::= { alarmWellknownAlarms 22 }
+
+alarmIoUnitDeltaFanSpeed1  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Delta fan speed 1 from any of the IO units."
+	::= { alarmWellknownAlarms 23 }
+
+alarmIoUnitDeltaFanSpeed2  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Delta fan speed 2 from any of the IO units."
+	::= { alarmWellknownAlarms 24 }
+
+alarmMajorSolar  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This is a Major Solar alarm."
+	::= { alarmWellknownAlarms 25 }
+
+alarmMinorSolar  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This is a Major Solar alarm."
+	::= { alarmWellknownAlarms 26 }
+
+alarmMajorRectifierCapacity  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This is a Major Rectifier Capacity alarm."
+	::= { alarmWellknownAlarms 27 }
+
+alarmMinorRectifierCapacity  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		normal (0),
+		alarm (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This is a Minor Rectifier Capacity alarm."
+	::= { alarmWellknownAlarms 28 }
+
+dcSystemTraps  NOTIFICATION-GROUP
+	NOTIFICATIONS { alarmMajorHighBattVoltTrap, 
+		alarmMinorHighBattVoltTrap, 
+		alarmMajorLowBattVoltTrap, 
+		alarmMinorLowBattVoltTrap, 
+		alarmMajorBatteryHighTempTrap, 
+		alarmMinorBatteryHighTempTrap, 
+		alarmBatteryDisconnectOpenTrap, 
+		alarmLVD1openTrap, 
+		alarmLVD2openTrap, 
+		alarmLVD3openTrap, 
+		alarmACmainsTrap, 
+		alarmBatteryBreakerOpenTrap, 
+		alarmDistributionBreakerOpenTrap, 
+		alarmMajorRectifierTrap, 
+		alarmMinorRectifierTrap, 
+		alarmMajorBatterySymmetryTrap, 
+		alarmMinorBatterySymmetryTrap, 
+		alarmBatteryLifeEndedTrap, 
+		alarmBatteryTestmodeEnteredTrap, 
+		alarmBatteryBoostmodeEnteredTrap, 
+		alarmController1proginputTrap, 
+		alarmController2proginputTrap, 
+		alarmController3proginputTrap, 
+		alarmController4proginputTrap, 
+		alarmController5proginputTrap, 
+		alarmController6proginputTrap, 
+		alarmController7proginputTrap, 
+		alarmController8proginputTrap, 
+		infoHeartBeatTrap, 
+		alarmIoUnitTemp1Trap, 
+		alarmIoUnitTemp2Trap, 
+		alarmIoUnitDeltaFanSpeed1Trap, 
+		alarmIoUnitDeltaFanSpeed2Trap, 
+		alarmIoUnit1proginputTrap, 
+		alarmIoUnit2proginputTrap, 
+		alarmIoUnit3proginputTrap, 
+		alarmIoUnit4proginputTrap, 
+		alarmIoUnit5proginputTrap, 
+		alarmIoUnit6proginputTrap, 
+		alarmIoUnit7proginputTrap, 
+		alarmIoUnit8proginputTrap, 
+		alarmIoUnit9proginputTrap, 
+		alarmIoUnit10proginputTrap, 
+		alarmIoUnit11proginputTrap, 
+		alarmIoUnit12proginputTrap, 
+		alarmIoUnit13proginputTrap, 
+		alarmIoUnit14proginputTrap, 
+		alarmMajorSolarChargerTrap, 
+		alarmMinorSolarChargerTrap, 
+		alarmMajorRectifierCapacityTrap, 
+		alarmMinorRectifierCapacityTrap }
+	STATUS     current
+	DESCRIPTION 
+		" This branch contains the Alarm Notification Traps, which duplicate the alarmGroup OIDs.
+		       Each alarm condition is represented by a Alarm Condition Trap and an associated OFF
+		       Trap, which is optionally transmitted according to the state of  OID systemSendOffTrap"
+	::= { eltekDistributedPlantV9 8 }
+
+alarmMajorHighBattVoltTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMajorHighBattVolt, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Major High Battery Voltage alarm"
+	::= { dcSystemTraps 1 }
+
+alarmMinorHighBattVoltTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMinorHighBattVolt, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Minor High Battery Voltage alarm"
+	::= { dcSystemTraps 2 }
+
+alarmMajorLowBattVoltTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMajorLowBattVolt, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Major Low Battery Voltage Alarm"
+	::= { dcSystemTraps 3 }
+
+alarmMinorLowBattVoltTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMinorLowBattVolt, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Minor Low Battery Voltage Alarm"
+	::= { dcSystemTraps 4 }
+
+alarmMajorBatteryHighTempTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMajorBatteryHighTemp, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Major High Battery Temperature alarm."
+	::= { dcSystemTraps 5 }
+
+alarmMinorBatteryHighTempTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMinorBatteryHighTemp, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Minor High Battery Temperature alarm."
+	::= { dcSystemTraps 6 }
+
+alarmBatteryDisconnectOpenTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmBatteryDisconnectOpen, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Battery Disconnect Contactor alarm"
+	::= { dcSystemTraps 7 }
+
+alarmLVD1openTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmLVD1open, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The load Contactor 1 alarm. The contactor disconnect voltage has been
+		reached and the contactor has disconnected."
+	::= { dcSystemTraps 8 }
+
+alarmLVD2openTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmLVD2open, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The load Contactor 2 alarm. The contactor disconnect voltage has been
+		reached and the contactor has disconnected."
+	::= { dcSystemTraps 9 }
+
+alarmLVD3openTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmLVD3open, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The load Contactor 3 alarm. The contactor disconnect voltage has been
+		reached and the contactor has disconnected."
+	::= { dcSystemTraps 10 }
+
+alarmACmainsTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmACmains, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The AC voltage has dropped below critical level, or one or more AC input phases was lost."
+	::= { dcSystemTraps 11 }
+
+alarmBatteryBreakerOpenTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmBatteryBreakerOpen, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"A battery breaker/fuse alarm."
+	::= { dcSystemTraps 12 }
+
+alarmDistributionBreakerOpenTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmDistributionBreakerOpen, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"A Load Distribution breaker/fuse alarm."
+	::= { dcSystemTraps 13 }
+
+alarmMajorRectifierTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMajorRectifier, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This is a Major Rectifier alarm."
+	::= { dcSystemTraps 14 }
+
+alarmMinorRectifierTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMinorRectifier, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This is a Minor Rectifier alarm."
+	::= { dcSystemTraps 15 }
+
+alarmMajorBatterySymmetryTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMajorBatterySymmetry, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"Battery Symmetry Delta Voltage Major alarm"
+	::= { dcSystemTraps 16 }
+
+alarmMinorBatterySymmetryTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMinorBatterySymmetry, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"Battery Symmetry Delta Voltage Minor alarm"
+	::= { dcSystemTraps 17 }
+
+alarmBatteryLifeEndedTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmBatteryLifeEnded, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The battery quality has dropped below critical level. 
+		A battery test has measured the fully charged capacity to be too low, 
+		and thus probably the battery lifecycle to be near expired."
+	::= { dcSystemTraps 18 }
+
+alarmBatteryTestmodeEnteredTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmBatteryTestmodeEntered, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The system has lowered the battery charge voltage in order to discharge the batteries 
+		to a predefined level. When the criteria for stopping the battery testing is reached, the 
+		charge voltage is increased to commence normal charging."
+	::= { dcSystemTraps 19 }
+
+alarmBatteryBoostmodeEnteredTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmBatteryBoostmodeEntered, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The system has increased the battery charge voltage in order to boost the 
+		battery. When the criteria for stopping the battery boost is reached, 
+		the charge voltage is lowered to commence normal charging."
+	::= { dcSystemTraps 20 }
+
+alarmController1proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { inputUserConfigurable1, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		inputUserConfigurableText1 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for Control unit 1.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.x."
+	::= { dcSystemTraps 21 }
+
+alarmController2proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { inputUserConfigurable2, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		inputUserConfigurableText2 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for Control unit 2.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.x."
+	::= { dcSystemTraps 22 }
+
+alarmController3proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { inputUserConfigurable3, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		inputUserConfigurableText3 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for Control unit 3.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.x."
+	::= { dcSystemTraps 23 }
+
+alarmController4proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { inputUserConfigurable4, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		inputUserConfigurableText4 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for Control unit 4.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.x."
+	::= { dcSystemTraps 24 }
+
+alarmController5proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { inputUserConfigurable5, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		inputUserConfigurableText5 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for Control unit 5.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.x."
+	::= { dcSystemTraps 25 }
+
+alarmController6proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { inputUserConfigurable6, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		inputUserConfigurableText6 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for Control unit 6.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.x."
+	::= { dcSystemTraps 26 }
+
+alarmController7proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { inputUserConfigurable7, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		inputUserConfigurableText7 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for Control unit 7.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.x."
+	::= { dcSystemTraps 27 }
+
+alarmController8proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { inputUserConfigurable8, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		inputUserConfigurableText8 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for Control unit 8.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <Control unit ID>.x."
+	::= { dcSystemTraps 28 }
+
+infoHeartBeatTrap  NOTIFICATION-TYPE
+	OBJECTS { systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"When enabled, this trap will be transmitted at regular inervals. This trap is not 
+		intended to be an alarm but more like some information that the system is alive and 
+		the link is up."
+	::= { dcSystemTraps 29 }
+
+alarmIoUnitTemp1Trap  NOTIFICATION-TYPE
+	OBJECTS { alarmIoUnitTemp1, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"High or low temperature alarm 1 from any of the IO units."
+	::= { dcSystemTraps 30 }
+
+alarmIoUnitTemp2Trap  NOTIFICATION-TYPE
+	OBJECTS { alarmIoUnitTemp2, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"High or low temperature alarm 2 from any of the IO units."
+	::= { dcSystemTraps 31 }
+
+alarmIoUnitDeltaFanSpeed1Trap  NOTIFICATION-TYPE
+	OBJECTS { alarmIoUnitDeltaFanSpeed1, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"Delta fan speed 1 from any of the IO units.
+		Occurs if the fan speed deviation is above/below the configured level. "
+	::= { dcSystemTraps 32 }
+
+alarmIoUnitDeltaFanSpeed2Trap  NOTIFICATION-TYPE
+	OBJECTS { alarmIoUnitDeltaFanSpeed2, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"Delta fan speed 2 from any of the IO units.
+		Occurs if the fan speed deviation is above/below the configured level. "
+	::= { dcSystemTraps 33 }
+
+alarmIoUnit1proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus1, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText1 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 1.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 34 }
+
+alarmIoUnit2proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus2, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText2 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 2.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 35 }
+
+alarmIoUnit3proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus3, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText3 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 3.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 36 }
+
+alarmIoUnit4proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus4, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText4 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 4.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 37 }
+
+alarmIoUnit5proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus5, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText5 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 5.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 38 }
+
+alarmIoUnit6proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus6, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText6 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 6.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 39 }
+
+alarmIoUnit7proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus6, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText6 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 7.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 40 }
+
+alarmIoUnit8proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus6, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText6 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 8.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 41 }
+
+alarmIoUnit9proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus6, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText6 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 9.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 42 }
+
+alarmIoUnit10proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus6, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText6 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 10.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 43 }
+
+alarmIoUnit11proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus6, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText6 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 11.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 44 }
+
+alarmIoUnit12proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus6, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText6 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 12.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 45 }
+
+alarmIoUnit13proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus6, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText6 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 13.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 46 }
+
+alarmIoUnit14proginputTrap  NOTIFICATION-TYPE
+	OBJECTS { ioUnitProgInputStatus6, 
+		systemTrapCounter, 
+		systemLastDigInput, 
+		ioUnitProgInputText6 }
+	STATUS     current
+	DESCRIPTION 
+		"Programmable input alarm for IO Unit 14.
+		Programmable input alarms will have description attached that explains the alarm.
+		Default description is: ProgInput <IO Unit ID>.x."
+	::= { dcSystemTraps 47 }
+
+alarmMajorSolarChargerTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMajorSolar, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Major Solar Charger alarm"
+	::= { dcSystemTraps 48 }
+
+alarmMinorSolarChargerTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMinorSolar, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Minor Solar Charger alarm"
+	::= { dcSystemTraps 49 }
+
+alarmMajorRectifierCapacityTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMajorRectifierCapacity, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Major Rectifier Capacity alarm"
+	::= { dcSystemTraps 50 }
+
+alarmMinorRectifierCapacityTrap  NOTIFICATION-TYPE
+	OBJECTS { alarmMinorRectifierCapacity, 
+		systemTrapCounter }
+	STATUS     current
+	DESCRIPTION 
+		"The Minor Rectifier Capacity alarm"
+	::= { dcSystemTraps 51 }
+
+solarChargerInstalledsolarChargers  OBJECT-TYPE
+	SYNTAX     Integer32 (1..101)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of installed solar chargers for this DC Power System."
+	::= { solarCharger 1 }
+
+solarChargersActive  OBJECT-TYPE
+	SYNTAX     Integer32 (1..101)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Not Used!"
+	::= { solarCharger 2 }
+
+solarChargerTotalCurrent  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"DeciAmperes; i.e. 20 = 2,0 Amperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The DC system's total delivered solar current"
+	::= { solarCharger 3 }
+
+solarChargerUtilization  OBJECT-TYPE
+	SYNTAX     Integer32 (0..100)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Utilization in % of available solar capacity"
+	REFERENCE 
+		"Solar Capacity"
+	::= { solarCharger 4 }
+
+solarChargerStatusNoIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..95)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"An offset for the solarStatusTable array. The solar status table has 
+		a fixed number of 20 rows. This OID sets the offset for the solarcharger in the first row
+		i.e. setting the index to 11 will give a range from solarcharger ID12 to ID31.
+		Setting the index to 0 will give a range from solarcharger ID1 to ID20."
+	::= { solarChargerStatus 1 }
+
+solarChargerStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF SolarChargerStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table listing up to 20 solarchargers, starting from the solarcharger number specified by solarStatusNoIndex"
+	::= { solarChargerStatus 2 }
+
+solarChargerStatusEntry  OBJECT-TYPE
+	SYNTAX 	SolarChargerStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A row of rectifier status data corresponding to the rectifierStatusNoIndex value"
+	INDEX { solarChargerStatusID }
+	::= { solarChargerStatusTable 1 }
+
+SolarChargerStatusEntry ::= SEQUENCE {
+	solarChargerStatusID
+		Integer32,
+	solarChargerStatusStatus
+		INTEGER,
+	solarChargerOutputCurrent
+		Integer32,
+	solarChargerOutputVoltage
+		Integer32,
+	solarChargerTemp
+		Integer32,
+	solarChargerType
+		DisplayString,
+	solarChargerSKU
+		DisplayString,
+	solarChargerSerialNo
+		DisplayString,
+	solarChargerRevisionLevel
+		DisplayString
+}
+
+solarChargerStatusID  OBJECT-TYPE
+	SYNTAX     Integer32 (1..100)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The ID number of the solarcharger."
+	::= { solarChargerStatusEntry 1 }
+
+solarChargerStatusStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notPresent (0),
+		normal (1),
+		alarm (2),
+		notUsed (3),
+		disabled (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The operational status of the solarcharger record.
+		Not Present (0),
+		normal (1),
+		alarm (2),
+		notUsed (3),
+		disabled (4)
+		      
+		      "
+	::= { solarChargerStatusEntry 2 }
+
+solarChargerOutputCurrent  OBJECT-TYPE
+	SYNTAX     Integer32 (0..65535)
+	UNITS 	"DeciAmperes; i.e. 20 = 2,0 Amperes"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The output current of the solarcharger."
+	::= { solarChargerStatusEntry 3 }
+
+solarChargerOutputVoltage  OBJECT-TYPE
+	SYNTAX     Integer32 (0..65535)
+	UNITS 	"1/100 Volt; i.e. 5400 = 54.00V"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The output voltage of the solarcharger."
+	::= { solarChargerStatusEntry 4 }
+
+solarChargerTemp  OBJECT-TYPE
+	SYNTAX     Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The input air temperature of the solarcharger."
+	::= { solarChargerStatusEntry 5 }
+
+solarChargerType  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The article number string of the solarcharger."
+	::= { solarChargerStatusEntry 6 }
+
+solarChargerSKU  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(1..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The solarcharger part number."
+	::= { solarChargerStatusEntry 7 }
+
+solarChargerSerialNo  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The serial number string of the solarcharger."
+	::= { solarChargerStatusEntry 8 }
+
+solarChargerRevisionLevel  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The HW revision number string of the solarcharger."
+	::= { solarChargerStatusEntry 9 }
+
+END
+
+
+-- This MIB was created using NuDesign Team's Visual MIBuilder (Ver 4.4).

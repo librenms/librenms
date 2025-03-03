@@ -1,0 +1,125 @@
+-- **************************************************************************
+-- HILLSTONE-FAN-MIB
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V6   
+-- Description:	 Hillstone Networks FAN MIB Object Identifier Assignments
+-- **************************************************************************
+--
+
+HILLSTONE-FAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstoneFan
+		FROM HILLSTONE-SMI
+	OBJECT-TYPE
+		FROM RFC-1212	
+        RowStatus		
+		FROM SNMPv2-TC;
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+hillstoneFanObjects OBJECT IDENTIFIER ::= { hillstoneFan 1 }
+
+hillstoneFanNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The number of fans."
+    ::= { hillstoneFanObjects 1 } 
+
+hillstoneFanTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HillstoneFanEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "This table contains all the FAN data."
+::= { hillstoneFanObjects 2 }
+
+HillstoneFanEntry OBJECT-TYPE
+	SYNTAX HillstoneFanEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Define the parameters of FAN."
+INDEX { hillstoneFanIndex }
+::= { hillstoneFanTable 1 }
+	
+HillstoneFanEntry ::=
+SEQUENCE { 
+	hillstoneFanIndex
+		INTEGER,
+	hillstoneFanDescr
+		DisplayString,
+	hillstoneFanType
+		INTEGER,
+	hillstoneFanSpeed
+		INTEGER,
+	hillstoneFanState
+		INTEGER
+	}
+
+hillstoneFanIndex OBJECT-TYPE
+	SYNTAX INTEGER 
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The slot index of the FAN."
+::= { HillstoneFanEntry 1 }
+
+hillstoneFanDescr OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The slot description of the FAN."
+::= { HillstoneFanEntry 2 }
+
+hillstoneFanType OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		speed(0),
+		state(1)
+	} 
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The slot type of the FAN.When type is 0,please watch hillstoneFanSpeed.When type is 1,please watch hillstoneFanState.."
+::= { HillstoneFanEntry 3 }
+
+hillstoneFanSpeed OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The slot speed of the FAN."
+::= { HillstoneFanEntry 4 }
+
+hillstoneFanState OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		fine(0),
+		absent(1),
+		warning(2),
+		fail(3),
+		fail-or-nopower(4)
+	}
+	ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	    "The FAN state."
+::= { HillstoneFanEntry 5 }
+
+
+END

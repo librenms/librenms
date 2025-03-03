@@ -1,0 +1,2051 @@
+------------------------------------------------------------------------------
+--
+-- Title: EfficientIP Monitoring MIB
+--
+-- Version: 1.0
+-- Date: 2016-10-19
+-- Compatibility: SOLIDserver 6.0.1+
+-- 
+-- Description: This MIB defines MIB objects that make EfficientIP SOLIDserver
+-- monitoring data available to SNMP management applications.
+--
+-- Copyright (c) 2016 EfficientIP
+-- All Rights Reserved.
+--
+-- Note: The information and functionality described by this MIB file,
+-- like many MIB files, is subject to change without notice.
+-- Please examine the version number of this MIB and compare it
+-- to the version number you are expecting.
+--
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+-- Begin MIB
+------------------------------------------------------------------------------
+
+EIP-MON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        Integer32, Gauge32, Counter32, Counter64, MODULE-IDENTITY, OBJECT-TYPE,
+        enterprises
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF;
+
+eip     MODULE-IDENTITY
+        LAST-UPDATED "201609210000Z"
+        ORGANIZATION "EfficientIP"
+        CONTACT-INFO "support@efficientip.com"
+        DESCRIPTION "EfficientIP SOLIDserver monitoring MIB"
+        REVISION "201609210000Z"
+                DESCRIPTION "Initial version of this MIB module."
+        ::= { enterprises 2440 }
+
+products        OBJECT IDENTIFIER ::= { eip 1 }
+
+eipHw           OBJECT IDENTIFIER ::= { products 14 }
+eipHwAppliance  OBJECT IDENTIFIER ::= { eipHw  1 }
+eipHwHdd        OBJECT IDENTIFIER ::= { eipHw  2 }
+eipHwTemp       OBJECT IDENTIFIER ::= { eipHw  3 }
+eipHwFan        OBJECT IDENTIFIER ::= { eipHw  4 }
+eipHwPsu        OBJECT IDENTIFIER ::= { eipHw  5 }
+eipHwPower      OBJECT IDENTIFIER ::= { eipHw  6 }
+eipHwRaid       OBJECT IDENTIFIER ::= { eipHw  7 }
+eipHwCpu        OBJECT IDENTIFIER ::= { eipHw  8 }
+eipHwMem        OBJECT IDENTIFIER ::= { eipHw  9 }
+eipHwChassis    OBJECT IDENTIFIER ::= { eipHw 10 }
+
+eipNet          OBJECT IDENTIFIER ::= { products 15 }
+
+eipNetCfg       OBJECT IDENTIFIER ::= { eipNet 1 }
+eipNetCarp      OBJECT IDENTIFIER ::= { eipNetCfg 1 }
+eipNetCarpIf    OBJECT IDENTIFIER ::= { eipNetCarp 1 }
+eipNetLagg      OBJECT IDENTIFIER ::= { eipNetCfg 2 }
+
+eipNetStat      OBJECT IDENTIFIER ::= { eipNet 2 }
+eipNetStatHttp  OBJECT IDENTIFIER ::= { eipNetStat 1 }
+eipNetStatDns   OBJECT IDENTIFIER ::= { eipNetStat 2 }
+eipNetStatDhcp  OBJECT IDENTIFIER ::= { eipNetStat 3 }
+eipNetStatDb    OBJECT IDENTIFIER ::= { eipNetStat 4 }
+eipNetStatSnmp  OBJECT IDENTIFIER ::= { eipNetStat 5 }
+
+eipSvc          OBJECT IDENTIFIER ::= { products 16 }
+eipSvcSyslog    OBJECT IDENTIFIER ::= { eipSvc  1 }
+eipSvcSsh       OBJECT IDENTIFIER ::= { eipSvc  2 }
+eipSvcApache    OBJECT IDENTIFIER ::= { eipSvc  3 }
+eipSvcIpmServer OBJECT IDENTIFIER ::= { eipSvc  4 }
+eipSvcDatabase  OBJECT IDENTIFIER ::= { eipSvc  5 }
+eipSvcDhcp      OBJECT IDENTIFIER ::= { eipSvc  6 }
+eipSvcDhcpMs    OBJECT IDENTIFIER ::= { eipSvc  7 }
+eipSvcDns       OBJECT IDENTIFIER ::= { eipSvc  8 }
+eipSvcGuardian  OBJECT IDENTIFIER ::= { eipSvc  9 }
+eipSvcQuagga    OBJECT IDENTIFIER ::= { eipSvc 10 }
+eipSvcNtp       OBJECT IDENTIFIER ::= { eipSvc 11 }
+eipSvcTftp      OBJECT IDENTIFIER ::= { eipSvc 12 }
+eipSvcSnmp      OBJECT IDENTIFIER ::= { eipSvc 13 }
+eipSvcSendmail  OBJECT IDENTIFIER ::= { eipSvc 14 }
+
+eipSds          OBJECT IDENTIFIER ::= { products 17 }
+eipSdsVersion   OBJECT IDENTIFIER ::= { eipSds  1 }
+eipSdsMember    OBJECT IDENTIFIER ::= { eipSds  2 }
+
+eipCompliances  OBJECT IDENTIFIER ::= { products 1000 }
+
+eipMainCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "The compliance statement for SNMPv2 entities
+            which implement the EIP-MON-MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS { eipNetStatIn,
+                           eipNetStatOut,
+                           eipSvcStatus,
+                           eipSvcCpu,
+                           eipSvcMem,
+                           eipSvcDiskIoRead,
+                           eipSvcDiskIoWrite }
+        ::= { eipCompliances 1 }
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+-- eipHw
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+-- eipHwAppliance                                     .1.3.6.1.4.1.2440.1.14.1
+------------------------------------------------------------------------------
+
+eipHwApplianceModel OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Appliance model name."
+        ::= { eipHwAppliance 1 }
+
+eipHwApplianceSerial OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Appliance serial number."
+        ::= { eipHwAppliance 2 }
+
+eipHwApplianceBiosVersion OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Appliance BIOS version."
+        ::= { eipHwAppliance 3 }
+
+------------------------------------------------------------------------------
+-- eipHwHdd                                           .1.3.6.1.4.1.2440.1.14.2
+------------------------------------------------------------------------------
+
+eipHwHddFreeRoot OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Free disk space for / mount point (Kbytes)."
+        ::= { eipHwHdd 1 }
+
+eipHwHddUsedRootPercent OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Percentage of used disk space for / mount point."
+        ::= { eipHwHdd 2 }
+
+eipHwHddFreeTmp OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Free disk space for /tmp mount point (Kbytes)."
+        ::= { eipHwHdd 3 }
+
+eipHwHddUsedTmpPercent OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Percentage of used disk space for /tmp mount point."
+        ::= { eipHwHdd 4 }
+
+eipHwHddFreeVar OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Free disk space for /var mount point (Kbytes)."
+        ::= { eipHwHdd 5 }
+
+eipHwHddUsedVarPercent OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Percentage of used disk space for /var mount point."
+        ::= { eipHwHdd 6 }
+
+eipHwHddFreeData1 OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Free disk space for /data1 mount point (Kbytes)."
+        ::= { eipHwHdd 7 }
+
+eipHwHddUsedData1Percent OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Percentage of used disk space for /data1 mount point."
+        ::= { eipHwHdd 8 }
+
+eipHwHddUsedSwap OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Used swap space (Kbytes)."
+        ::= { eipHwHdd 50 }
+
+eipHwHddUsedSwapPercent OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Percentage of used swap space (%)."
+        ::= { eipHwHdd 51 }
+
+eipHwHddIoLoad OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Global disk I/O load (%)."
+        ::= { eipHwHdd 100 }
+
+------------------------------------------------------------------------------
+-- eipHwTemp                                          .1.3.6.1.4.1.2440.1.14.3
+------------------------------------------------------------------------------
+
+eipHwTempCpu OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "degrees C"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "CPU temperature (degrees C)."
+        ::= { eipHwTemp 1 }
+
+eipHwTempCpuCoreMax OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "degrees C"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Current maximum CPU core temperature (degrees C)."
+        ::= { eipHwTemp 2 }
+
+eipHwTempCpuCoreMin OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "degrees C"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Current minimum CPU core temperature (degrees C)."
+        ::= { eipHwTemp 3 }
+
+eipHwTempInlet OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "degrees C"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Inlet temperature (degrees C)."
+        ::= { eipHwTemp 4 }
+
+eipHwTempBaseboard OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "degrees C"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Baseboard temperature (degrees C)."
+        ::= { eipHwTemp 5 }
+
+eipHwTempRaidController OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "degrees C"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "RAID controller temperature (degrees C)."
+        ::= { eipHwTemp 6 }
+
+------------------------------------------------------------------------------
+-- eipHwFan                                           .1.3.6.1.4.1.2440.1.14.4
+------------------------------------------------------------------------------
+
+eipHwFan1Speed OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "RPM"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "FAN #1 Speed (RPM)."
+        ::= { eipHwFan 1 }
+
+eipHwFan2Speed OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "RPM"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "FAN #2 Speed (RPM)."
+        ::= { eipHwFan 2 }
+
+eipHwFan3Speed OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "RPM"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "FAN #3 Speed (RPM)."
+        ::= { eipHwFan 3 }
+
+eipHwFan4Speed OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "RPM"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "FAN #4 Speed (RPM)."
+        ::= { eipHwFan 4 }
+
+eipHwFan5Speed OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "RPM"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "FAN #5 Speed (RPM)."
+        ::= { eipHwFan 5 }
+
+eipHwFan6Speed OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "RPM"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "FAN #6 Speed (RPM)."
+        ::= { eipHwFan 6 }
+
+eipHwFan7Speed OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "RPM"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "FAN #7 Speed (RPM)."
+        ::= { eipHwFan 7 }
+
+eipHwFan8Speed OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "RPM"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "FAN #8 Speed (RPM)."
+        ::= { eipHwFan 8 }
+
+------------------------------------------------------------------------------
+-- eipHwPsu                                           .1.3.6.1.4.1.2440.1.14.5
+------------------------------------------------------------------------------
+
+eipHwPsuRedundancy OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), ok(1), failed(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Power supply redundancy status.
+		0 : no redundancy available
+		1 : fully redundant
+		2 : redundancy lost"
+        ::= { eipHwPsu 1 }
+
+eipHwPsu1Status OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), ok(1), present(2), notpresent(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Power supply #1 status.
+		0 : no power supply available
+		1 : AC connected
+		2 : power supply is present but unplugged
+		3 : power supply is not present"
+        ::= { eipHwPsu 2 }
+
+eipHwPsu2Status OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), ok(1), present(2), notpresent(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Power supply #2 status.
+		0 : no power supply available
+		1 : AC connected
+		2 : power supply is present but not connected
+		3 : power supply is not present"
+        ::= { eipHwPsu 3 }
+
+------------------------------------------------------------------------------
+-- eipHwPower                                         .1.3.6.1.4.1.2440.1.14.6
+------------------------------------------------------------------------------
+
+eipHwPowerInstant OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "W"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Instantaneous power reading (W)."
+        ::= { eipHwPower 1 }
+
+eipHwPowerCumulative OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "kWh"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Cumulative energy consumption (kWh)."
+        ::= { eipHwPower 2 }
+
+eipHwPowerPeak OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "W"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "System peak power (W)."
+        ::= { eipHwPower 3 }
+
+eipHwPowerPeakAmperage OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "mA"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "System peak amperage (mA)."
+        ::= { eipHwPower 4 }
+
+------------------------------------------------------------------------------
+-- eipHwRaid                                          .1.3.6.1.4.1.2440.1.14.7
+------------------------------------------------------------------------------
+
+eipHwRaidController OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Raid controller name."
+        ::= { eipHwRaid 1 }
+
+eipHwRaidStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), ok(1), degraded(2), offline(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Raid controller status.
+		0 : RAID is not enabled
+		1 : RAID is active
+		2 : RAID is degraded
+		3 : RAID is offline"
+        ::= { eipHwRaid 2 }
+
+eipHwRaidDisks OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of disks."
+        ::= { eipHwRaid 3 }
+
+eipHwRaidDisksCritical OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of critical disks."
+        ::= { eipHwRaid 4 }
+
+eipHwRaidDisksFailed OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of failed disks."
+        ::= { eipHwRaid 5 }
+
+eipHwRaidBbuStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), ok(1), degraded(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Raid backup battery unit status.
+                0 : BBU is not enabled
+                1 : BBU state is optimal
+                2 : BBU state is degraded"
+        ::= { eipHwRaid 6 }
+
+eipHwRaidBbuCharge OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Raid backup battery unit relative state of charge (%)."
+        ::= { eipHwRaid 7 }
+
+------------------------------------------------------------------------------
+-- eipHwCpu                                           .1.3.6.1.4.1.2440.1.14.8
+------------------------------------------------------------------------------
+
+eipHwCpuLoadInt OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The 1,5 and 15 minute load averages per core as an integer.
+                This is computed by taking the floating point
+                loadaverage value and multiplying by 100, then
+                converting the value to an integer."
+        ::= { eipHwCpu 1 }
+
+eipHwCpuCoreNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The number of CPU cores."
+        ::= { eipHwCpu 2 }
+
+------------------------------------------------------------------------------
+-- eipHwMem                                           .1.3.6.1.4.1.2440.1.14.9
+------------------------------------------------------------------------------
+
+eipHwMemUsed OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The percentage of used physical memory."
+        ::= { eipHwMem 1 }
+
+------------------------------------------------------------------------------
+-- eipHwChassis                                      .1.3.6.1.4.1.2440.1.14.10
+------------------------------------------------------------------------------
+
+eipHwChassisIntrusion OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), inactive(1), active(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The chassis intrusion detection status.
+		0 : no chassis intrusion information
+		1 : chassis intrusion alarm is inactive
+		2 : chassis intrusion alarm is active"
+        ::= { eipHwChassis 1 }
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+-- eipNet
+------------------------------------------------------------------------------
+
+eipNetStatIn OBJECT-GROUP
+    OBJECTS { eipNetStatHttpInOctets,
+              eipNetStatHttpInPkts,
+              eipNetStatDnsInOctets,
+              eipNetStatDnsInPkts,
+              eipNetStatDhcpInOctets,
+              eipNetStatDhcpInPkts,
+              eipNetStatDbInOctets,
+              eipNetStatDbInPkts,
+              eipNetStatSnmpInOctets,
+              eipNetStatSnmpInPkts}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing
+            network traffic info per protocol (incoming bytes or packets)."
+    ::= { eipNet 201 }
+
+eipNetStatOut OBJECT-GROUP
+    OBJECTS { eipNetStatHttpOutOctets,
+              eipNetStatHttpOutPkts,
+              eipNetStatDnsOutOctets,
+              eipNetStatDnsOutPkts,
+              eipNetStatDhcpOutOctets,
+              eipNetStatDhcpOutPkts,
+              eipNetStatDbOutOctets,
+              eipNetStatDbOutPkts,
+              eipNetStatSnmpOutPkts,
+              eipNetStatSnmpOutPkts}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing
+            network traffic info per protocol (outgoing bytes or packets)."
+    ::= { eipNet 202 }
+
+------------------------------------------------------------------------------
+-- eipNetCarpIf                                   .1.3.6.1.4.1.2440.1.15.1.1.1
+------------------------------------------------------------------------------
+
+eipNetCarpIfNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The number of CARP interfaces present on this system."
+        ::= { eipNetCarpIf 1 }
+
+EipNetCarpIfEntry ::= SEQUENCE {
+        eipNetCarpIfIndex   Integer32,
+        eipNetCarpIfDescr   OCTET STRING,
+        eipNetCarpIfVhid    Integer32,
+        eipNetCarpIfDev     OCTET STRING,
+        eipNetCarpIfAdvbase Integer32,
+        eipNetCarpIfAdvskew Integer32,
+        eipNetCarpIfState   Integer32
+}
+
+eipNetCarpIfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EipNetCarpIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "A list of CARP interface entries."
+        ::= { eipNetCarpIf 2 }
+
+eipNetCarpIfEntry OBJECT-TYPE
+        SYNTAX EipNetCarpIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Each entry contains one interface CARP."
+        INDEX	{ eipNetCarpIfIndex }
+        ::= { eipNetCarpIfTable 1 }
+
+eipNetCarpIfIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "A unique value, greater than zero, for each CARP interface."
+        ::= { eipNetCarpIfEntry 1 }
+
+eipNetCarpIfDescr OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The name of the CARP interface."
+        ::= { eipNetCarpIfEntry 2 }
+
+eipNetCarpIfVhid OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The Virtual HostID of the CARP interface."
+        ::= { eipNetCarpIfEntry 3 }
+
+eipNetCarpIfDev OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The parent interface that the CARP interface is bound to."
+        ::= { eipNetCarpIfEntry 4 }
+
+eipNetCarpIfAdvbase OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The advbase value of the CARP interface."
+        ::= { eipNetCarpIfEntry 5 }
+
+eipNetCarpIfAdvskew OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The advskew value of the CARP interface."
+        ::= { eipNetCarpIfEntry 6 }
+
+eipNetCarpIfState OBJECT-TYPE
+        SYNTAX INTEGER { init(0), backup(1), master(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Indicates the operational state of the CARP interface."
+        ::= { eipNetCarpIfEntry 7 }
+
+------------------------------------------------------------------------------
+-- eipNetLagg                                       .1.3.6.1.4.1.2440.1.15.1.2
+------------------------------------------------------------------------------
+
+eipNetLaggStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), ok(1), failed(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Global lagg status.
+		0 : no lagg configured
+		1 : all lagg interfaces are UP
+		2 : at least one lagg interface is DOWN"
+        ::= { eipNetLagg 1 }
+
+------------------------------------------------------------------------------
+-- eipNetStatHttp                                   .1.3.6.1.4.1.2440.1.15.2.1
+------------------------------------------------------------------------------
+
+eipNetStatHttpInOctets OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming HTTP traffic (bytes)."
+        ::= { eipNetStatHttp 1 }
+
+eipNetStatHttpInPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming HTTP traffic (packets)."
+        ::= { eipNetStatHttp 2 }
+
+eipNetStatHttpOutOctets OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing HTTP traffic (bytes)."
+        ::= { eipNetStatHttp 3 }
+
+eipNetStatHttpOutPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing HTTP traffic (packets)."
+        ::= { eipNetStatHttp 4 }
+
+------------------------------------------------------------------------------
+-- eipNetStatDns                                    .1.3.6.1.4.1.2440.1.15.2.2
+------------------------------------------------------------------------------
+
+eipNetStatDnsInOctets OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming DNS traffic (bytes)."
+        ::= { eipNetStatDns 1 }
+
+eipNetStatDnsInPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming DNS traffic (packets)."
+        ::= { eipNetStatDns 2 }
+
+eipNetStatDnsOutOctets OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing DNS traffic (bytes)."
+        ::= { eipNetStatDns 3 }
+
+eipNetStatDnsOutPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing DNS traffic (packets)."
+        ::= { eipNetStatDns 4 }
+
+------------------------------------------------------------------------------
+-- eipNetStatDhcp                                   .1.3.6.1.4.1.2440.1.15.2.3
+------------------------------------------------------------------------------
+
+eipNetStatDhcpInOctets OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming DHCP traffic (bytes)."
+        ::= { eipNetStatDhcp 1 }
+
+eipNetStatDhcpInPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming DHCP traffic (packets)."
+        ::= { eipNetStatDhcp 2 }
+
+eipNetStatDhcpOutOctets OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing DHCP traffic (bytes)."
+        ::= { eipNetStatDhcp 3 }
+
+eipNetStatDhcpOutPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing DHCP traffic (packets)."
+        ::= { eipNetStatDhcp 4 }
+
+------------------------------------------------------------------------------
+-- eipNetStatDb                                     .1.3.6.1.4.1.2440.1.15.2.4
+------------------------------------------------------------------------------
+
+eipNetStatDbInOctets OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming database replication traffic (bytes)."
+        ::= { eipNetStatDb 1 }
+
+eipNetStatDbInPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming database replication traffic (packets)."
+        ::= { eipNetStatDb 2 }
+
+eipNetStatDbOutOctets OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing database replication traffic (bytes)."
+        ::= { eipNetStatDb 3 }
+
+eipNetStatDbOutPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing database replication traffic (packets)."
+        ::= { eipNetStatDb 4 }
+
+------------------------------------------------------------------------------
+-- eipNetStatSnmp                                   .1.3.6.1.4.1.2440.1.15.2.5
+------------------------------------------------------------------------------
+
+eipNetStatSnmpInOctets OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming SNMP traffic (bytes)."
+        ::= { eipNetStatSnmp 1 }
+
+eipNetStatSnmpInPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Incoming SNMP traffic (packets)."
+        ::= { eipNetStatSnmp 2 }
+
+eipNetStatSnmpOutOctets OBJECT-TYPE
+        SYNTAX Counter64
+        UNITS "bytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing SNMP traffic (bytes)."
+        ::= { eipNetStatSnmp 3 }
+
+eipNetStatSnmpOutPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Outgoing SNMP traffic (packets)."
+        ::= { eipNetStatSnmp 4 }
+    
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+-- eipSvc
+------------------------------------------------------------------------------
+
+eipSvcStatus OBJECT-GROUP
+    OBJECTS { eipSvcSyslogStatus,
+              eipSvcSshStatus,
+              eipSvcApacheStatus,
+              eipSvcIpmServerStatus,
+              eipSvcDatabaseStatus,
+              eipSvcDhcpStatus,
+              eipSvcDhcpMsStatus,
+              eipSvcDnsStatus,
+              eipSvcGuardianStatus,
+              eipSvcQuaggaStatus,
+              eipSvcNtpStatus,
+              eipSvcTftpStatus,
+              eipSvcSnmpStatus,
+              eipSvcSendmailStatus }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing status info per service.
+            0 : service is disabled
+            1 : service is running
+            2 : service is misconfigured (running but disabled)
+            3 : service execution failed (enabled but not running)"
+    ::= { eipSvc 201 }
+
+eipSvcCpu OBJECT-GROUP
+    OBJECTS { eipSvcSyslogCpu,
+              eipSvcSshCpu,
+              eipSvcApacheCpu,
+              eipSvcIpmServerCpu,
+              eipSvcDatabaseCpu,
+              eipSvcDhcpCpu,
+              eipSvcDhcpMsCpu,
+              eipSvcDnsCpu,
+              eipSvcGuardianCpu,
+              eipSvcQuaggaCpu,
+              eipSvcNtpCpu,
+              eipSvcTftpCpu,
+              eipSvcSnmpCpu,
+              eipSvcSendmailCpu }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing
+            CPU usage per service (%)."
+    ::= { eipSvc 202 }
+
+eipSvcMem OBJECT-GROUP
+    OBJECTS { eipSvcSyslogMem,
+              eipSvcSshMem,
+              eipSvcApacheMem,
+              eipSvcIpmServerMem,
+              eipSvcDatabaseMem,
+              eipSvcDhcpMem,
+              eipSvcDhcpMsMem,
+              eipSvcDnsMem,
+              eipSvcGuardianMem,
+              eipSvcQuaggaMem,
+              eipSvcNtpMem,
+              eipSvcTftpMem,
+              eipSvcSnmpMem,
+              eipSvcSendmailMem }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing
+            memory usage info per service (Kbytes)."
+    ::= { eipSvc 203 }
+
+eipSvcDiskIoRead OBJECT-GROUP
+    OBJECTS { eipSvcSyslogDiskIoRead,
+              eipSvcSshDiskIoRead,
+              eipSvcApacheDiskIoRead,
+              eipSvcIpmServerDiskIoRead,
+              eipSvcDatabaseDiskIoRead,
+              eipSvcDhcpDiskIoRead,
+              eipSvcDhcpMsDiskIoRead,
+              eipSvcDnsDiskIoRead,
+              eipSvcGuardianDiskIoRead,
+              eipSvcQuaggaDiskIoRead,
+              eipSvcNtpDiskIoRead,
+              eipSvcTftpDiskIoRead,
+              eipSvcSnmpDiskIoRead,
+              eipSvcSendmailDiskIoRead }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing
+            disk IO usage info per service (blocks read)."
+    ::= { eipSvc 204 }
+
+eipSvcDiskIoWrite OBJECT-GROUP
+    OBJECTS { eipSvcSyslogDiskIoWrite,
+              eipSvcSshDiskIoWrite,
+              eipSvcApacheDiskIoWrite,
+              eipSvcIpmServerDiskIoWrite,
+              eipSvcDatabaseDiskIoWrite,
+              eipSvcDhcpDiskIoWrite,
+              eipSvcDhcpMsDiskIoWrite,
+              eipSvcDnsDiskIoWrite,
+              eipSvcGuardianDiskIoWrite,
+              eipSvcQuaggaDiskIoWrite,
+              eipSvcNtpDiskIoWrite,
+              eipSvcTftpDiskIoWrite,
+              eipSvcSnmpDiskIoWrite,
+              eipSvcSendmailDiskIoWrite }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing
+            disk IO usage info per service (blocks written)."
+    ::= { eipSvc 205 }
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+-- eipSvcSyslog                                       .1.3.6.1.4.1.2440.1.16.1
+------------------------------------------------------------------------------
+
+eipSvcSyslogStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Syslog service status.
+                1 : service is running
+                3 : service execution failed (not running)"
+        ::= { eipSvcSyslog 1 }
+
+eipSvcSyslogCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Syslog service CPU usage (%)."
+        ::= { eipSvcSyslog 2 }
+
+eipSvcSyslogMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Syslog service resident memory usage in Kbytes."
+        ::= { eipSvcSyslog 3 }
+
+eipSvcSyslogDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Syslog service disk IO: blocks read."
+        ::= { eipSvcSyslog 4 }
+
+eipSvcSyslogDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Syslog service disk IO: blocks written."
+        ::= { eipSvcSyslog 5 }
+
+------------------------------------------------------------------------------
+-- eipSvcSsh                                          .1.3.6.1.4.1.2440.1.16.2
+------------------------------------------------------------------------------
+
+eipSvcSshStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SSH service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcSsh 1 }
+
+eipSvcSshCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SSH service CPU usage (%)."
+        ::= { eipSvcSsh 2 }
+
+eipSvcSshMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SSH service resident memory usage in Kbytes."
+        ::= { eipSvcSsh 3 }
+
+eipSvcSshDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SSH service disk IO: blocks read."
+        ::= { eipSvcSsh 4 }
+
+eipSvcSshDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SSH service disk IO: blocks written."
+        ::= { eipSvcSsh 5 }
+
+eipSvcSshConnections OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "connections"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SSH established connections count."
+        ::= { eipSvcSsh 6 }
+
+------------------------------------------------------------------------------
+-- eipSvcApache                                       .1.3.6.1.4.1.2440.1.16.3
+------------------------------------------------------------------------------
+
+eipSvcApacheStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Apache service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcApache 1 }
+
+eipSvcApacheCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Apache service CPU usage (%)."
+        ::= { eipSvcApache 2 }
+
+eipSvcApacheMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Apache service resident memory usage in Kbytes."
+        ::= { eipSvcApache 3 }
+
+eipSvcApacheDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Apache service disk IO: blocks read."
+        ::= { eipSvcApache 4 }
+
+eipSvcApacheDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Apache service disk IO: blocks written."
+        ::= { eipSvcApache 5 }
+
+eipSvcApacheConnections OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "sessions"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Apache established connections count."
+        ::= { eipSvcApache 6 }
+
+------------------------------------------------------------------------------
+-- eipSvcIpmServer                                    .1.3.6.1.4.1.2440.1.16.4
+------------------------------------------------------------------------------
+
+eipSvcIpmServerStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "IPMServer service status.
+                1 : service is running
+                3 : service execution failed (not running)"
+        ::= { eipSvcIpmServer 1 }
+
+eipSvcIpmServerCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "IPMServer service CPU usage (%)."
+        ::= { eipSvcIpmServer 2 }
+
+eipSvcIpmServerMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "IPMServer service resident memory usage in Kbytes."
+        ::= { eipSvcIpmServer 3 }
+
+eipSvcIpmServerDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "IPMServer service disk IO: blocks read."
+        ::= { eipSvcIpmServer 4 }
+
+eipSvcIpmServerDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "IPMServer service disk IO: blocks written."
+        ::= { eipSvcIpmServer 5 }
+
+eipSvcIpmServerUserSessions OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "sessions"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "IPMServer service current active user sessions count."
+        ::= { eipSvcIpmServer 6 }
+
+eipSvcIpmServerThreads OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "threads"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of IPMServer service threads created since its start time."
+        ::= { eipSvcIpmServer 7 }
+
+eipSvcIpmServerDbQueries OBJECT-TYPE
+        SYNTAX Counter32
+        UNITS "queries"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of database queries done by IPMServer since its start time."
+        ::= { eipSvcIpmServer 8 }
+
+------------------------------------------------------------------------------
+-- eipSvcDatabase                                     .1.3.6.1.4.1.2440.1.16.5
+------------------------------------------------------------------------------
+
+eipSvcDatabaseStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Database service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcDatabase 1 }
+
+eipSvcDatabaseCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Database service CPU usage (%)."
+        ::= { eipSvcDatabase 2 }
+
+eipSvcDatabaseMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Database service resident memory usage in Kbytes."
+        ::= { eipSvcDatabase 3 }
+
+eipSvcDatabaseDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Database service disk IO: blocks read."
+        ::= { eipSvcDatabase 4 }
+
+eipSvcDatabaseDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Database service disk IO: blocks written."
+        ::= { eipSvcDatabase 5 }
+
+eipSvcDatabaseReplicationStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), active(1), initializing(2) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Database replication status.
+		This value is available on master only.
+                0 : replication is disabled
+                1 : replication is active
+                2 : replication is initializing"
+        ::= { eipSvcDatabase 6 }
+
+eipSvcDatabaseReplicationOffset OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Database replication offset (Kbytes)."
+        ::= { eipSvcDatabase 7 }
+
+eipSvcDatabaseReplicationLastReplay OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "s"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Database replication last replay delay (sec).
+		This value is available on hot-standby only."
+        ::= { eipSvcDatabase 8 }
+
+eipSvcDatabaseBackends OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of backends connected to the database."
+        ::= { eipSvcDatabase 9 }
+
+eipSvcDatabaseDeadlocks OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Number of deadlocks detected in the database."
+        ::= { eipSvcDatabase 10 }
+
+eipSvcDatabaseBloat OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Database bloat size (Kbytes)."
+        ::= { eipSvcDatabase 11 }
+
+------------------------------------------------------------------------------
+-- eipSvcDhcp                                         .1.3.6.1.4.1.2440.1.16.6
+------------------------------------------------------------------------------
+
+eipSvcDhcpStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DHCP service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcDhcp 1 }
+
+eipSvcDhcpCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DHCP service CPU usage (%)."
+        ::= { eipSvcDhcp 2 }
+
+eipSvcDhcpMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DHCP service resident memory usage in Kbytes."
+        ::= { eipSvcDhcp 3 }
+
+eipSvcDhcpDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DHCP service disk IO: blocks read."
+        ::= { eipSvcDhcp 4 }
+
+eipSvcDhcpDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DHCP service disk IO: blocks written."
+        ::= { eipSvcDhcp 5 }
+
+eipSvcDhcpFailoverNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The number of DHCP failover channels configured."
+        ::= { eipSvcDhcp 6 }
+
+EipSvcDhcpFailoverEntry ::= SEQUENCE {
+        eipSvcDhcpFailoverIndex  Integer32,
+        eipSvcDhcpFailoverName   OCTET STRING,
+        eipSvcDhcpFailoverStatus Integer32
+        }
+
+eipSvcDhcpFailoverTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EipSvcDhcpFailoverEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "A list of DHCP failover channel entries."
+        ::= { eipSvcDhcp 7 }
+
+eipSvcDhcpFailoverEntry OBJECT-TYPE
+        SYNTAX EipSvcDhcpFailoverEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Each entry contains one DHCP failover channel."
+        INDEX	{ eipSvcDhcpFailoverIndex }
+        ::= { eipSvcDhcpFailoverTable 1 }
+
+eipSvcDhcpFailoverIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "A unique value, greater than zero, for each DHCP failover channel."
+        ::= { eipSvcDhcpFailoverEntry 1 }
+
+eipSvcDhcpFailoverName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The name of the DHCP failover channel."
+        ::= { eipSvcDhcpFailoverEntry 2 }
+
+eipSvcDhcpFailoverStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                    unknown(0),
+                    startup(1), 
+                    normal(2),
+                    communicationsInterrupted(3),
+                    partnerDown(4),
+                    potentialConflict(5),
+                    recover(6),
+                    paused(7),
+                    shutdown(8),
+                    recoverDone(9),
+                    resolutionInterrupted(10),
+                    conflictDone(11),
+                    recoverWait(254)
+                }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DHCP failover status.
+                0 : unknown
+                1 : startup
+                2 : normal
+                3 : communications interrupted
+                4 : partner down
+                5 : potential conflict
+                6 : recover
+                7 : paused
+                8 : shutdown
+                9 : recover done
+                10 : resolution interrupted
+                11 : conflict done
+                254 : recover wait"
+        ::= { eipSvcDhcpFailoverEntry 3 }
+    
+------------------------------------------------------------------------------
+-- eipSvcDhcpMs                                       .1.3.6.1.4.1.2440.1.16.7
+------------------------------------------------------------------------------
+
+eipSvcDhcpMsStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "EIP MS DHCP service status.
+                0 : service is stopped
+                1 : service is running"
+        ::= { eipSvcDhcpMs 1 }
+
+eipSvcDhcpMsCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "EIP MS DHCP service CPU usage (%)."
+        ::= { eipSvcDhcpMs 2 }
+
+eipSvcDhcpMsMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "EIP MS DHCP service resident memory usage in Kbytes."
+        ::= { eipSvcDhcpMs 3 }
+
+eipSvcDhcpMsDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "EIP MS DHCP service disk IO: blocks read."
+        ::= { eipSvcDhcpMs 4 }
+
+eipSvcDhcpMsDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "EIP MS DHCP service disk IO: blocks written."
+        ::= { eipSvcDhcpMs 5 }
+
+------------------------------------------------------------------------------
+-- eipSvcDns                                          .1.3.6.1.4.1.2440.1.16.8
+------------------------------------------------------------------------------
+
+eipSvcDnsStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DNS service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcDns 1 }
+
+eipSvcDnsCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DNS service CPU usage (%)."
+        ::= { eipSvcDns 2 }
+
+eipSvcDnsMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DNS service resident memory usage in Kbytes."
+        ::= { eipSvcDns 3 }
+
+eipSvcDnsDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DNS service disk IO: blocks read."
+        ::= { eipSvcDns 4 }
+
+eipSvcDnsDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DNS service disk IO: blocks written."
+        ::= { eipSvcDns 5 }
+
+eipSvcDnsEngine OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..64))
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "DNS service engine name."
+        ::= { eipSvcDns 6 }
+
+------------------------------------------------------------------------------
+-- eipSvcGuardian                                     .1.3.6.1.4.1.2440.1.16.9
+------------------------------------------------------------------------------
+
+eipSvcGuardianStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "EIP Guardian service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcGuardian 1 }
+
+eipSvcGuardianCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "EIP Guardian service CPU usage (%)."
+        ::= { eipSvcGuardian 2 }
+
+eipSvcGuardianMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "EIP Guardian service resident memory usage in Kbytes."
+        ::= { eipSvcGuardian 3 }
+
+eipSvcGuardianDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "EIP Guardian service disk IO: blocks read."
+        ::= { eipSvcGuardian 4 }
+
+eipSvcGuardianDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "EIP Guardian service disk IO: blocks written."
+        ::= { eipSvcGuardian 5 }
+
+------------------------------------------------------------------------------
+-- eipSvcQuagga                                      .1.3.6.1.4.1.2440.1.16.10
+------------------------------------------------------------------------------
+
+eipSvcQuaggaStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Quagga service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcQuagga 1 }
+
+eipSvcQuaggaCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Quagga service CPU usage (%)."
+        ::= { eipSvcQuagga 2 }
+
+eipSvcQuaggaMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Quagga service resident memory usage in Kbytes."
+        ::= { eipSvcQuagga 3 }
+
+eipSvcQuaggaDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Quagga service disk IO: blocks read."
+        ::= { eipSvcQuagga 4 }
+
+eipSvcQuaggaDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Quagga service disk IO: blocks written."
+        ::= { eipSvcQuagga 5 }
+
+------------------------------------------------------------------------------
+-- eipSvcNtp                                         .1.3.6.1.4.1.2440.1.16.11
+------------------------------------------------------------------------------
+
+eipSvcNtpStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "NTP service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcNtp 1 }
+
+eipSvcNtpCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "NTP service CPU usage (%)."
+        ::= { eipSvcNtp 2 }
+
+eipSvcNtpMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "NTP service resident memory usage in Kbytes."
+        ::= { eipSvcNtp 3 }
+
+eipSvcNtpDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "NTP service disk IO: blocks read."
+        ::= { eipSvcNtp 4 }
+
+eipSvcNtpDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "NTP service disk IO: blocks written."
+        ::= { eipSvcNtp 5 }
+
+------------------------------------------------------------------------------
+-- eipSvcTftp                                        .1.3.6.1.4.1.2440.1.16.12
+------------------------------------------------------------------------------
+
+eipSvcTftpStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "TFTP service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcTftp 1 }
+
+eipSvcTftpCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "TFTP service CPU usage (%)."
+        ::= { eipSvcTftp 2 }
+
+eipSvcTftpMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "TFTP service resident memory usage in Kbytes."
+        ::= { eipSvcTftp 3 }
+
+eipSvcTftpDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "TFTP service disk IO: blocks read."
+        ::= { eipSvcTftp 4 }
+
+eipSvcTftpDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "TFTP service disk IO: blocks written."
+        ::= { eipSvcTftp 5 }
+
+------------------------------------------------------------------------------
+-- eipSvcSnmp                                        .1.3.6.1.4.1.2440.1.16.13
+------------------------------------------------------------------------------
+
+eipSvcSnmpStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SNMP service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcSnmp 1 }
+
+eipSvcSnmpCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SNMP service CPU usage (%)."
+        ::= { eipSvcSnmp 2 }
+
+eipSvcSnmpMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SNMP service resident memory usage in Kbytes."
+        ::= { eipSvcSnmp 3 }
+
+eipSvcSnmpDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SNMP service disk IO: blocks read."
+        ::= { eipSvcSnmp 4 }
+
+eipSvcSnmpDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SNMP service disk IO: blocks written."
+        ::= { eipSvcSnmp 5 }
+
+------------------------------------------------------------------------------
+-- eipSvcSendmail                                    .1.3.6.1.4.1.2440.1.16.14
+------------------------------------------------------------------------------
+
+eipSvcSendmailStatus OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), running(1), misconfigured(2), failed(3) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Sendmail service status.
+                0 : service is disabled
+                1 : service is running
+                2 : service is misconfigured (running but disabled)
+                3 : service execution failed (enabled but not running)"
+        ::= { eipSvcSendmail 1 }
+
+eipSvcSendmailCpu OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Sendmail service CPU usage (%)."
+        ::= { eipSvcSendmail 2 }
+
+eipSvcSendmailMem OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "Kbytes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Sendmail service resident memory usage in Kbytes."
+        ::= { eipSvcSendmail 3 }
+
+eipSvcSendmailDiskIoRead OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Sendmail service disk IO: blocks read."
+        ::= { eipSvcSendmail 4 }
+
+eipSvcSendmailDiskIoWrite OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "blocks"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Sendmail service disk IO: blocks written."
+        ::= { eipSvcSendmail 5 }
+
+eipSvcSendmailQueueSize OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "messages"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Sendmail service queue size."
+        ::= { eipSvcSendmail 6 }
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+-- eipSds
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+-- eipSdsVersion                                      .1.3.6.1.4.1.2440.1.17.1
+------------------------------------------------------------------------------
+
+eipSdsVersionOs OBJECT-TYPE
+        SYNTAX INTEGER { i386(0), amd64(1) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SOLIDserver version architecture.
+                0 : i386  (32b)
+                1 : amd64 (64b)"
+        ::= { eipSdsVersion 1 }
+
+eipSdsVersionNumber OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SOLIDserver version number."
+        ::= { eipSdsVersion 2 }
+
+eipSdsVersionDate OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(12))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SOLIDserver version date (YYYYMMDDHHMM)."
+        ::= { eipSdsVersion 3 }
+
+------------------------------------------------------------------------------
+-- eipSdsMember                                       .1.3.6.1.4.1.2440.1.17.2
+------------------------------------------------------------------------------
+
+eipSdsMemberRole OBJECT-TYPE
+        SYNTAX INTEGER {
+                    standalone(0),
+                    master(1),
+                    hotStandby(2),
+                    masterRecovered(3)
+                }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SOLIDserver role.
+                0 : standalone
+                1 : master
+                2 : hot-standby
+                3 : master recovered"
+        ::= { eipSdsMember 1 }
+
+eipSdsMemberStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                    ok(0),
+                    notConfigured(1),
+                    upgrading(2),
+                    initStandby(3),
+                    invalidCredentials(4),
+                    remoteManaged(5),
+                    timeout(6),
+                    splitBrain(7),
+                    replicationStopped(8)
+                }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "SOLIDserver status.
+                0 : ok
+                1 : not configured
+                2 : upgrading
+                3 : init standby
+                4 : invalid credentials
+                5 : remote managed
+                6 : timeout
+                7 : split-brain
+                8 : replication stopped"
+        ::= { eipSdsMember 2 }
+
+END
+
+------------------------------------------------------------------------------
+-- End MIB
+------------------------------------------------------------------------------

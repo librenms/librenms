@@ -1,0 +1,7 @@
+modules:
+    os:
+        sysDescr_regex:
+            - '/ (?<version>\d+\.\S+)/'
+            - '/(?<hardware>\S+)$/'
+        version: .1.3.6.1.4.1.8072.1.3.2.3.1.2.7.118.101.114.115.105.111.110
+        version_regex: '/(?<version>[\d._]+) \((?<hardware>[^)]+)\)/'

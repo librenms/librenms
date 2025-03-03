@@ -2,7 +2,7 @@
 -- == OG-STATUSv2-MIB:                                                  ==
 -- == Opengear status Management Information Base                    ==
 -- ==                                                                 ==
--- == (c) Copyright 2013-2014 Opengear Inc.                                ==
+-- == (c) Copyright 2013-2020 Opengear Inc.                                ==
 -- =====================================================================
 
 OG-STATUSv2-MIB DEFINITIONS ::= BEGIN
@@ -20,7 +20,7 @@ IMPORTS
 		FROM SNMPv2-TC;
 
 ogStatus2 MODULE-IDENTITY
-	LAST-UPDATED "201401280000Z"
+	LAST-UPDATED "202011100000Z"
 	ORGANIZATION "Opengear Inc."
 	CONTACT-INFO
 		"Opengear Inc.
@@ -28,7 +28,16 @@ ogStatus2 MODULE-IDENTITY
 		 Sandy, UT 84070
 		 support@opengear.com"
 	DESCRIPTION
+		"Extended network interface status for failover"
+	REVISION "202011100000Z"
+	DESCRIPTION
 		"Opengear extended status and alert MIB"
+	REVISION "201702030000Z"
+	DESCRIPTION
+		"Add CLI session alert."
+	REVISION "201608260000Z"
+	DESCRIPTION
+		"Correct Power Supply table and values."
 	REVISION "201401280000Z"
 	DESCRIPTION
 		"Initial revision"
@@ -576,7 +585,7 @@ ogWebUserTable OBJECT-TYPE
 	MAX-ACCESS not-accessible
 	STATUS     current
 	DESCRIPTION
-           "This entity's serial port users table."
+           "This entity's Web Interface users table."
 	::= { ogStatus2 7 }
 
 ogWebUserEntry OBJECT-TYPE
@@ -584,7 +593,7 @@ ogWebUserEntry OBJECT-TYPE
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
-		"A user logged in on the serial port"
+		"A user logged in to the Web Interface"
 	INDEX { ogWebUserIndex }
 	::= { ogWebUserTable 1 }
 
@@ -601,7 +610,7 @@ ogWebUserIndex OBJECT-TYPE
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
-		"Index within the network host active users table"
+		"Index within the Web Interface users table"
 	::= { ogWebUserEntry 1 }
 
 ogWebUserStartTime OBJECT-TYPE
@@ -986,7 +995,8 @@ ogEmdDioDirection OBJECT-TYPE
 ogEmdDioState OBJECT-TYPE
 	SYNTAX INTEGER {
 		high(1),
-		low(2)
+		low(2),
+		unavailable(3)
 	}
 	MAX-ACCESS read-only
 	STATUS current
@@ -1036,7 +1046,8 @@ NetInterfaceEntry ::= SEQUENCE {
         ogNetInterfaceIndex Integer32,
         ogNetInterfaceName  DisplayString,
         ogNetInterfaceType  INTEGER,
-        ogNetInterfaceState INTEGER
+        ogNetInterfaceState INTEGER,
+        ogNetInterfaceFailoverState INTEGER
 }
 
 ogNetInterfaceIndex OBJECT-TYPE
@@ -1083,6 +1094,21 @@ ogNetInterfaceState OBJECT-TYPE
 	DESCRIPTION
 		"The current status of this network interface entry."
 	::= { ogNetInterfaceEntry 4 }
+
+ogNetInterfaceFailoverState OBJECT-TYPE
+	SYNTAX INTEGER {
+		active(1),
+		failed(2),
+		dormant(3),
+		standby(4)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The failover status of this interface.
+		 The primary interface is either active or failed.
+		 The secondary interface is either standby, dormant or active."
+	::= { ogNetInterfaceEntry 5 }
 
 ogPowerSupplyTable OBJECT-TYPE
 	SYNTAX  SEQUENCE OF PowerSupplyEntry
@@ -1131,16 +1157,16 @@ ogPowerSupplyInputVoltage OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"Current temperature of the Power Supply"
+		"Input voltage of the Power Supply"
 	::= { ogPowerSupplyEntry 3 }
 
 ogPowerSupplyOutputCurrent OBJECT-TYPE
 	SYNTAX Integer32
-	UNITS "milliamps"
+	UNITS "0.01 Amps"
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"Current temperature of the Power Supply"
+		"Output current of the Power Supply"
 	::= { ogPowerSupplyEntry 4 }
 
 ogPowerSupplyTemperature OBJECT-TYPE
@@ -1149,7 +1175,7 @@ ogPowerSupplyTemperature OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"Current temperature of the Power Supply"
+		"Temperature of the Power Supply"
 	::= { ogPowerSupplyEntry 5 }
 
 ogUpsTable OBJECT-TYPE
@@ -1820,7 +1846,8 @@ CellModemEntry ::= SEQUENCE {
         ogCellModemSessionTime     Counter32,
         ogCellModemSelectedSimCard Counter32,
         ogCellModemTemperature     Integer32,
-        ogCellModemCounter         Counter32
+        ogCellModemCounter         Counter32,
+	ogCellModemIMSI            DisplayString
 }
 
 ogCellModemIndex OBJECT-TYPE
@@ -1967,6 +1994,14 @@ ogCellModemCounter OBJECT-TYPE
 	DESCRIPTION
 		"The number of alerts the modem has triggered."
 	::= { ogCellModemEntry 16 }
+
+ogCellModemIMSI OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The IMSI of the SIM currently in use by the Cellular Modem."
+	::= { ogCellModemEntry 17 }
 
 ogWifiClientTable OBJECT-TYPE
 	SYNTAX  SEQUENCE OF WifiClientEntry
@@ -2497,6 +2532,7 @@ ogCheckType OBJECT-TYPE
  		wirelessApAssociation(34),
  		wirelessApAuthentication(35),
  		dialPoolHealth(36),
+ 		cliUser(37),
 		custom(255)
  	}
  	MAX-ACCESS read-only
@@ -2757,6 +2793,7 @@ ogAlarmType OBJECT-TYPE
 		wirelessApDisassociation(87),
 		wirelessApAuthenticationFailure(88),
 		dialPoolHealth(89),
+		cliUserSession(90),
 		customCheckFailure(255),
 		unknown(65535)
 	}
@@ -3002,6 +3039,7 @@ ogCurrentAlarmType OBJECT-TYPE
 		wirelessApDisassociation(87),
 		wirelessApAuthenticationFailure(88),
 		dialPoolHealth(89),
+		cliUserSession(90),
 		customCheckFailure(255),
 		unknown(65535)
 	}
@@ -3786,6 +3824,28 @@ ogCustomNotification NOTIFICATION-TYPE
  		"The notification sent when a custom check is triggered."
  	::= { ogMibNotifications 33 }
 
+ogCliUserSessionNotification NOTIFICATION-TYPE
+ 	OBJECTS {
+		ogAlarmEventId,
+		ogAlarmName,
+		ogAlarmCheck,
+		ogAlarmInstance,
+		ogAlarmTime,
+		ogAlarmType,
+		ogAlarmSummary,
+		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmTriggerValue,
+		ogAlarmCurrentValue,
+		ogAlarmPreviousValue,
+		ogAlarmState
+ 	}
+ 	STATUS current
+ 	DESCRIPTION
+ 		"The notification sent when a user logs in or out of a CLI
+		session."
+ 	::= { ogMibNotifications 34 }
+
 -- End notifications
 
 -- conformance information
@@ -3886,6 +3946,7 @@ ogBasicStatusGroup OBJECT-GROUP
 	ogNetInterfaceName,
 	ogNetInterfaceType,
 	ogNetInterfaceState,
+	ogNetInterfaceFailoverState,
 	ogPowerSupplyName,
 	ogPowerSupplyInputVoltage,
 	ogPowerSupplyOutputCurrent,
@@ -3957,6 +4018,7 @@ ogBasicStatusGroup OBJECT-GROUP
         ogCellModemSelectedSimCard,
         ogCellModemTemperature,
         ogCellModemCounter,
+        ogCellModemIMSI,
         ogWifiClientInterface,
         ogWifiClientEnabled,
         ogWifiClientEssid,
@@ -4074,7 +4136,8 @@ ogBasicNotificationGroup NOTIFICATION-GROUP
                ogWifiApAssociationNotification,
                ogWifiApAuthNotification,
                ogDialPoolHealthNotification,
-               ogCustomNotification
+               ogCustomNotification,
+               ogCliUserSessionNotification
        }
        STATUS  current
        DESCRIPTION

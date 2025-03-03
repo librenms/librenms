@@ -1,0 +1,308 @@
+-- *------------------------------------------------
+-- * Firebrick 2900 L2TP MIB
+-- *
+-- * April 2020, C Malton
+-- *
+-- * Copyright (c) 2020 by Andrews & Arnold
+-- * 
+-- * See the Firebrick Manuals for more information
+-- *------------------------------------------------
+
+FIREBRICK-L2TP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    InetAddressType,
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    firebrickNewStyle
+        FROM FIREBRICK-MIB
+        ;
+
+fbL2tpMib MODULE-IDENTITY
+    LAST-UPDATED "202004060000Z"
+    ORGANIZATION "Andrews & Arnold Limited"
+    CONTACT-INFO
+        "Andrews & Arnold
+        Unit 1&2, Enterprise Court
+        Bracknell, Berkshire, RG12 1QS
+        United Kingdom
+
+        Tel: +44 3333 400 999
+        Email: support@aa.net.uk"
+    DESCRIPTION
+        "This is a MIB Module for monitoring the Firebrick-specific structures
+        for L2tp."
+    REVISION "202004060000Z"
+    DESCRIPTION "Initial version of this MIB module"
+    ::= { firebrickNewStyle 1701 }
+
+
+fbL2tpGeneral    OBJECT IDENTIFIER ::= { fbL2tpMib 0 }
+fbL2tpGeneralTunnels    OBJECT IDENTIFIER ::= { fbL2tpGeneral 1 }
+fbL2tpGeneralSessions    OBJECT IDENTIFIER ::= { fbL2tpGeneral 2 }
+
+fbL2tpFreeTunnels OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of tunnels in FREE state"
+    ::= { fbL2tpGeneralTunnels 0 }
+
+fbL2tpOpeningTunnels OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of tunnels in OPENING state"
+    ::= { fbL2tpGeneralTunnels 1 }
+
+fbL2tpLiveIncomingTunnels OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of tunnels in LIVE (Incoming) state"
+    ::= { fbL2tpGeneralTunnels 2 }
+
+fbL2tpLiveOutgoingTunnels OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of tunnels in LIVE (Outgoing) state"
+    ::= { fbL2tpGeneralTunnels 3 }
+
+fbL2tpClosingTunnels OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of tunnels in CLOSING state"
+    ::= { fbL2tpGeneralTunnels 4 }
+
+fbL2tpFailedTunnels OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of tunnels in FAILED state"
+    ::= { fbL2tpGeneralTunnels 5 }
+
+fbL2tpClosedTunnels OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of tunnels in CLOSED state"
+    ::= { fbL2tpGeneralTunnels 6 }
+
+fbL2tpFreeSessions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of sessions in FREE state"
+    ::= { fbL2tpGeneralSessions 0 }
+
+fbL2tpWaitingSessions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of sessions in WAITING state"
+    ::= { fbL2tpGeneralSessions 1 }
+
+fbL2tpOpeningSessions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of sessions in OPENING state"
+    ::= { fbL2tpGeneralSessions 2 }
+
+fbL2tpNegotiatingSessions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of sessions in NEGOTIATING state"
+    ::= { fbL2tpGeneralSessions 3 }
+
+fbL2tpAuthPendingSessions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of sessions in AUTH-PENDING state"
+    ::= { fbL2tpGeneralSessions 4 }
+
+fbL2tpStartedSessions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of sessions in STARTED state"
+    ::= { fbL2tpGeneralSessions 5 }
+
+fbL2tpLiveSessions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of sessions in LIVE state"
+    ::= { fbL2tpGeneralSessions 6 }
+
+fbL2tpAcctPendingSessions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of sessions in ACCT-PENDING state"
+    ::= { fbL2tpGeneralSessions 7 }
+
+fbL2tpClosingSessions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of sessions in CLOSING state"
+    ::= { fbL2tpGeneralSessions 8 }
+
+fbL2tpClosedSessions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of sessions in CLOSED state"
+    ::= { fbL2tpGeneralSessions 9 }
+
+fbL2tpSessionNegotiationSlotsFree OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of session negotiation slots free"
+    ::= { fbL2tpGeneralSessions 10 }
+
+
+
+-- *  Peers Table
+
+fbL2tpPeerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FbL2tpPeerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The list of L2TP peers for this Firebrick"
+    ::= { fbL2tpMib 1 }
+
+fbL2tpPeerEntry OBJECT-TYPE
+    SYNTAX FbL2tpPeerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the IPv4 BGP Peer Names Table"
+    INDEX { fbL2tpPeerAddressType, fbL2tpPeerAddress }
+    ::= { fbL2tpPeerTable 1 }
+
+FbL2tpPeerEntry ::= SEQUENCE {
+    fbL2tpPeerAddressType   InetAddressType,
+    fbL2tpPeerAddress       InetAddress,
+    fbL2tpPeerLoginName     DisplayString,
+    fbL2tpPeerHostName      DisplayString,
+    fbL2tpPeerInTunnels     Integer32,
+    fbL2tpPeerOutTunnels    Integer32,
+    fbL2tpPeerOldestUptime  Integer32,
+    fbL2tpPeerLiveTunnels   Integer32,
+    fbL2tpPeerSessions      Integer32
+}
+
+fbL2tpPeerAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The internet address for the peer.  The type of the address is 
+         determined by the value of the fbL2tpAddressType object."
+    ::= { fbL2tpPeerEntry 1 }
+
+fbL2tpPeerAddress OBJECT-TYPE
+    SYNTAX InetAddress (SIZE (4..20))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The internet address for the peer.  The type of the address is 
+         determined by the value of the fbL2tpAddressType object."
+    ::= { fbL2tpPeerEntry 2 }
+
+fbL2tpPeerLoginName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The login name of the L2TP Peer"
+    ::= { fbL2tpPeerEntry 3 }
+
+fbL2tpPeerHostName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The host name of the L2TP Peer"
+    ::= { fbL2tpPeerEntry 4 }
+
+fbL2tpPeerInTunnels OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The number of inbound tunnels from the L2TP peer"
+    ::= { fbL2tpPeerEntry 5 }
+
+fbL2tpPeerOutTunnels OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The number of outbound tunnels from the L2TP peer"
+    ::= { fbL2tpPeerEntry 6 }
+
+fbL2tpPeerOldestUptime OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The uptime of the oldest tunnel from the L2TP peer"
+    ::= { fbL2tpPeerEntry 7 }
+
+
+fbL2tpPeerLiveTunnels OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The number of live tunnels from the L2TP peer"
+    ::= { fbL2tpPeerEntry 8 }
+
+
+fbL2tpPeerSessions OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The number of sessions from the L2TP peer"
+    ::= { fbL2tpPeerEntry 9 }
+
+
+
+END

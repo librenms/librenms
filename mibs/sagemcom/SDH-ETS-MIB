@@ -1,0 +1,2923 @@
+--*******************************************************************
+--*    SAGEM SA			 							  				*
+--*******************************************************************
+--*******************************************************************
+
+--  Filename: sdh-ETS
+--  File type: .mib    
+-- 
+--  Description:	SNMPc source Mib file.
+--			The MIB module defines SDH transmition part of an equipment
+--          as it's modeled in ETSI ETS 300 304.
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History:  
+--		Name: F.Bonnevialle	
+--		Date: 12 12 2000 
+--		Desc: original
+--
+--		Name: S.LAURENT 	
+--		Date: 08 02 2001
+--		Desc: The synchronization functions of this MIB are deleted 
+-- 		and put in a new MIB SYNCHRO. 
+--
+--		Name: S.LAURENT 	
+--		Date: 11 04 2001
+--		Desc: * Modifications in MSA, VC4 and AU4 Tables. 
+--
+--		Name: S.LAURENT 	
+--		Date: 25 04 2001
+--		Desc: * Name Modification: ppi -> nspi (for not spi). 
+--		This change allow to accept more non-sdh interfaces such 
+--		as atm or Ethernet (which are not plesiochronous kind).  
+--			  * Size Modification of the vc4PathTrace Strings
+--			  * deletion of alarme and severity fields in MsaTable.				 
+-- 
+--		Name: F.Bonnevialle	
+--		Date: 30 04 2001 
+--		Desc: Description modification to match with ETS-300 304  
+--
+--		Name: S.LAURENT	
+--		Date: 09 08 2001 
+--		Desc: * Rights access modification on variables: vc12TTPSinkPointer
+--			  and vc3TTPSinkPointer 
+--			  * TUG3 Object Deletion: This object didn't give any adding
+--				information.
+--			  * Deletion of tu3CTPLom and tu12CTPLom variables
+--			  * Creation of au4CTPLom Variable adding to a new value in Au4CTPFailure Type( lom(3)) 
+--
+--		Name: S.LAURENT	
+--		Date: 30 08 2001 
+--		Desc: * comments modification on Au4CTPTable variables  
+--			  * Add a new value 'tu(20)' in AU4CTPType
+--			  * Deletion of tu3CTPLom and tu12CTPLom variables
+--			  * Creation of au4CTPLom Variable adding to a new value in Au4CTPFailure Type( lom(3)) 
+--
+--		Name: S.LAURENT	
+--		Date: 22 05 2002 
+--		Desc: * Creation of ChannelTable 
+--			  * Creation of BandwidthTable
+--			  * Add a new value 'channel(4)' in NspiSrcType
+--    
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+
+
+
+
+--*******************************************************************
+-- MIB: SDH-ETS-MIB
+--*******************************************************************
+SDH-ETS-MIB DEFINITIONS ::= BEGIN 
+
+--*******************************************************************
+-- IMPORTS
+--*******************************************************************
+
+   IMPORTS
+   sagemDr								FROM SAGEM-DR-MIB
+   SagemBoolean, Severity				FROM EQUIPMENT-MIB
+   MODULE-IDENTITY,OBJECT-TYPE      	FROM SNMPv2-SMI
+   DisplayString                    	FROM SNMPv2-TC; --RFC1213-MIB;
+   
+   sdhEts	MODULE-IDENTITY
+      LAST-UPDATED "0205220000Z"
+      ORGANIZATION "SAGEM-Tolbiac drd/ddp/tmhd"
+      CONTACT-INFO
+	"    "
+      DESCRIPTION 
+	"The MIB module defines SDH transmition part of an equipment 
+	This MIB use the logical model defined in ETSI ETS 300 304.
+	ETS 300 304 (February 1997) defines the SDH information 
+	model for the Network Element. 
+	This MIB refers to SHELF-MIB 
+	for the definition of the Board that supports the interface.
+	This MIB is refered by XCON-MIB that uses
+	the definition of termination point to create cross connection.
+	This MIB also define configuration of the different SDH blocs 
+	such as alarm monitoring and severity and give the current status of 
+	the termination point. 
+	"
+   ::= { sagemDr 110 }
+   
+   
+   -- Synchronous Physical Interface Trail Termination Point
+   -- Reference to ETS 300 304:
+   -- 		electricalSPITTPSink, electricalSPITTPSink 
+   -- 		opticalSPITTPSink, opticalSPITTPSink
+   spiTTP		OBJECT IDENTIFIER ::= { sdhEts 10 } 
+  
+   -- regenerator section terminaison  Trail Termination Point
+   -- Reference to ETS 300 304:
+   -- 		rsTTPSink, rsTTPSink 
+   rsTTP		OBJECT IDENTIFIER ::= { sdhEts 20 } 
+
+   -- regenerator section terminaison Connection Termination Point
+   -- Reference to ETS 300 304:
+   -- 		rsCTPSink, rsCTPSink 
+   rsCTP		OBJECT IDENTIFIER ::= { sdhEts 25 }
+
+   
+   -- multiplex section terminaison Trail Termination Point
+   -- Reference to ETS 300 304:
+   -- 		msTTPSink, msTTPSink 
+   msTTP		OBJECT IDENTIFIER ::= { sdhEts 30 } 
+   
+   -- multiplex section terminaison Connection Termination Point
+   -- Reference to ETS 300 304:
+   -- 		msCTPSink, msCTPSink 
+   msCTP		OBJECT IDENTIFIER ::= { sdhEts 35 } 
+ 
+   -- multiplex section adaptation
+   msa			OBJECT IDENTIFIER ::= { sdhEts 60 } 
+   
+   -- administrative unit order 4  Connection Termination Point  
+   -- Reference to ETS 300 304:
+   -- 		au4CTPSink, au4CTPSink 
+   au4CTP		OBJECT IDENTIFIER ::= { sdhEts 70 } 
+   
+   -- virtual container order 4  Trail Termination Point
+   -- Reference to ETS 300 304:
+   -- 		vc4TTPSink, vc4TPSink 
+   vc4TTP		OBJECT IDENTIFIER ::= { sdhEts 100 }  
+   
+   -- tributary unit order 3 Connection Termination Point
+   -- Reference to ETS 300 304:
+   -- 		tu3CTPSink, tu3CTPSink 
+   tu3CTP		OBJECT IDENTIFIER ::= { sdhEts 120 }
+       
+   -- virtual container order 3  Trail Termination Point
+   -- Reference to ETS 300 304:
+   -- 		vc3TTPSink, vc3TTPSink 
+   vc3TTP		OBJECT IDENTIFIER ::= { sdhEts 130 } 
+   
+   -- tributary unit order 12 Connection Termination Point
+   -- Reference to ETS 300 304:
+   -- 		tu12CTPSink, tu12CTPSink 
+   tu12CTP		OBJECT IDENTIFIER ::= { sdhEts 140 } 
+
+   -- virtual container order 12  Trail Termination Point
+   -- Reference to ETS 300 304:
+   -- 		vc12CTPSink, vc12CTPSink 
+   vc12TTP		OBJECT IDENTIFIER ::= { sdhEts 150 } 
+
+   -- non sdh Connection termination point Connection Termination Point
+   -- Reference to ETS 300 304:
+   -- 		p12CTPSink, p12CTPSink, p31CTPSink, p31CTPSink, ...
+   -- for PDH terminaison.
+   -- The object (table/type) can be updated to match other kind of 
+   -- non SDH terminaison such as Ethernet or ATM interface over SDH
+   nspiCTP		OBJECT IDENTIFIER ::= { sdhEts 160 } 
+
+   -- non sdh physical port  Trail Termination Point
+   -- Reference to ETS 300 304:
+   -- 		p12TTPSink, p12TTPSink, p31TTPSink, p31TTPSink, ...
+   -- for PDH terminaison.
+   -- The object (table/type) can be updated to match other kind of 
+   -- non SDH terminaison such as Ethernet or ATM interface over SDH   
+   nspiTTP		OBJECT IDENTIFIER ::= { sdhEts 170 } 
+
+   -- Channel  Layer
+   channel		OBJECT IDENTIFIER ::= { sdhEts 180 } 
+
+   -- Non sdh adaptation layer: Bandwidth
+   bandwidth	OBJECT IDENTIFIER ::= { sdhEts 190 } 
+
+
+
+-- Note on the srcPointer ans sinkPointer
+-- The transmission functions and interfaces include a set of integer named
+-- "Pointer". 
+-- These Pointers are used to link together the different SDH level.
+-- SinkPointer is used to go UP in the hierarchie (go to the physical interface)
+-- and SourcePointer is used to go Down (go to VC and sub VC)
+-- These pointer can be used to retreive all the contained TTP  
+-- or to retrieve the containing TTP and the physical interface (and board)
+
+-- Note on CTPIndex
+-- A CTP index is used to find a possible Connection Termination Point
+-- supported by a Trail Termination Point.
+-- If the CTP is not used for a Cross Connection the value is set to 0.  
+
+-- Remark
+-- rstCTP and mstCTP are not implemented. The MIB can be upgraded if these
+-- level of Connection are used.
+ 
+--*******************************************************************
+--*   TTP synchronous physical interface (spi)
+--*******************************************************************    
+   SpiTTPFailure ::= INTEGER 
+   {
+   	none(0),
+	los(1),
+	tf(2), 
+	losTf(3) 
+   } 
+   
+   Loopback    ::= INTEGER 
+   { 
+   	none(0), 
+   	line(1), 
+   	equipment(2), 
+   	lineEquipement(3)
+   }
+
+   STMLevel   ::= INTEGER
+   {
+   	stm1(1),
+   	stm4(4),
+   	stm16(16),
+   	stm64(64)
+   }
+   SpiTTPType     ::= INTEGER
+   {
+   	electrical(0),
+   	optical(1) 
+   }
+   
+   spiTTPNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of synchronous physical interface in equipment 
+	 = number of element in spiTTPTable "  
+      ::= { spiTTP 1 } 
+   
+   spiTTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF SpiTTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of synchronous physical interface in equipment."  
+      ::= { spiTTP 2 } 
+   
+   spiTTPEntry   OBJECT-TYPE
+      SYNTAX       SpiTTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular synchronous physical interface of the equipment." 
+      INDEX        { spiTTPIndex } 
+      ::= { spiTTPTable 1 } 
+
+   SpiTTPEntry ::= SEQUENCE 
+   {
+		spiTTPIndex			INTEGER,
+		spiTTPStmLevel		STMLevel,   
+		spiTTPType			SpiTTPType, 
+		spiTTPName			DisplayString,
+		spiTTPBoardIndex   	INTEGER,
+		spiTTPBoardAcces   	INTEGER,
+		spiTTPMonitor		SagemBoolean,
+		spiTTPFailure		SpiTTPFailure, 
+		spiTTPSeverity		Severity,  	
+		spiTTPLoopback		Loopback,
+		spiTTPLos     		Severity,
+		spiTTPTf     		Severity
+   }
+   
+   spiTTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	synchronous physical interface.
+	The value of this index is a constant value assigned to an entry at
+	equipment design time. It is usualy related to harware.
+	Exemple:
+	For ADR155c equipement index are 1,64,127,190 for STM1 interfaces.
+	For ADR2500c equipement index are:
+	 1,1009,2017,3025,4033,5041,6049,7057 for 8 STM16 or 8 STM4,
+	 1,253,505,757        1009,1261,1513,1765 |
+	 2017,2269,2521,2773  3025,3277,3529,3781 | --> for 8 (4*STM1) 
+	 4033,4285,4537,4789  5041,5293,5545,5797 |
+	 6049,6301,6553,6805  7057,7309,7561,7813 |	"
+      ::= { spiTTPEntry 1 } 
+   
+   spiTTPStmLevel   OBJECT-TYPE
+      SYNTAX       STMLevel
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The STM-n level of the interface."  
+      ::= { spiTTPEntry 2 } 
+   
+   spiTTPType   OBJECT-TYPE
+      SYNTAX       SpiTTPType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The kind of the interface: electrical or optical"  
+      ::= { spiTTPEntry 3 } 
+        
+   spiTTPName   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	synchronous physical interface entries. "  
+      ::= { spiTTPEntry 4 } 
+
+   spiTTPBoardIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Index of the Board that supports the physical acces 
+	of this interface. This index refers to another MIB that defines
+	the board"  
+      ::= { spiTTPEntry 5 } 
+   
+   spiTTPBoardAcces   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Friendly Index of the physical acces on the Board that supports 
+	the interface"  
+      ::= { spiTTPEntry 6 }
+      
+   spiTTPMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this synchronous physical interface."  
+      ::= { spiTTPEntry 7 } 
+   
+   spiTTPFailure   OBJECT-TYPE
+      SYNTAX       SpiTTPFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+    "Active failures on synchronous physical interface"  
+      ::= { spiTTPEntry 8 } 
+   
+   spiTTPSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+    "Severity associed with active failure for synchronous physical interface."  
+      ::= { spiTTPEntry 9 }     
+   
+   spiTTPLoopback   OBJECT-TYPE
+      SYNTAX       Loopback
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"This field gives the active loopback status on the
+	synchronous physical interface.
+	When its value is `line' the data flow recieved from the port side
+	is sent back to the line.
+	When its value is `equipment' the data flow recieved form equipment
+	side is send back.
+	The field can be set to a particular loopback value, even if there
+	no garantee that the loopback is really done. The real loopback status 
+	of the interface must be checked in the response.
+	The loopback can be cleared by the equipment when it cannot remain 
+	for any reason."  
+      ::= { spiTTPEntry 10 } 
+      
+   spiTTPLos   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Loss Of Signal failure
+	for synchronous physical interface."  
+      ::= { spiTTPEntry 20 } 
+   
+   spiTTPTf   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Tranmit Fail failure
+	for synchronous physical interface."  
+      ::= { spiTTPEntry 21 }              
+   -- End of synchronous physical interface description     
+     
+
+--*******************************************************************
+--* regenerator section terminaison (rst)  
+--******************************************************************* 
+   RsTTPFailure ::= INTEGER 
+   { 
+   	none(0), lof(1) 
+   }    
+   
+   EOWMode  ::= INTEGER
+   {
+   	codirectional(0),
+   	contradirectional(1)
+   }   
+   
+   rsTTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF RsTTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of regenerator section terminaison in equipment."  
+      ::= { rsTTP 2 } 
+   
+   rsTTPEntry   OBJECT-TYPE
+      SYNTAX       RsTTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular regenerator section terminaison of the equipment." 
+      INDEX   {rsTTPIndex}
+      ::= { rsTTPTable 1 } 
+
+   RsTTPEntry ::= SEQUENCE {
+	rsTTPIndex				INTEGER,   	-- spi index 
+	rsTTPMonitor	  		SagemBoolean,
+	rsTTPName           	DisplayString,
+	rsTTPFailure			RsTTPFailure,
+    rsTTPSeverity			Severity,
+    rsTTPEOWMode			EOWMode,   -- co or contra
+	rsTTPE1SrcPointer   	INTEGER,   -- Order Wire: index in x21Src  
+	rsTTPF1SrcPointer   	INTEGER,   -- User Chanel: not used
+	rsTTPEOWByteLine    	INTEGER,
+	rsTTPEOWByteColumn  	INTEGER,
+	rsTTPSesThreshold   	INTEGER,
+	rsTTPLof				Severity
+	}
+     
+   rsTTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	synchronous physical interface.
+	The value of this index is always the same as spiTTPIndex.
+	"
+      ::= { rsTTPEntry 1 }   
+           
+   rsTTPMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this regenerator section terminaison."  
+      ::= { rsTTPEntry 2 } 
+
+   rsTTPName   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	regenerator section terminaison entries. "  
+      ::= { rsTTPEntry 3 } 
+   
+   rsTTPFailure   OBJECT-TYPE
+      SYNTAX       RsTTPFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+    "Active failures on regenerator section terminaison"  
+      ::= { rsTTPEntry 4 } 
+   
+   rsTTPSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+    "Severity associed active Failure for regenerator section terminaison."  
+      ::= { rsTTPEntry 5 }    
+      
+   rsTTPEOWMode OBJECT-TYPE
+      SYNTAX       EOWMode
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Mode used for EOW: Codir or contradir Master"  
+      ::= { rsTTPEntry 8 }
+              
+   rsTTPE1SrcPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to
+	E1 RSOH byte (index in X21 table)
+	Usualy E1 carries X21 EOW (engineering order wire) data
+	and thus the pointer s value reference a mib X21 port entry.
+	Zero indicates not used"  
+      ::= { rsTTPEntry 9 } 
+   
+   rsTTPF1SrcPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+    "A reference to the object which sends the data flow to
+    F1 RSOH byte.Zero indicates not used"  
+      ::= { rsTTPEntry 10 } 
+   
+   rsTTPSesThreshold   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The number of errors above which the second is declared
+	severely errored for this interface/function.
+	This value apply for near and far interface/function
+	"  
+      ::= { rsTTPEntry 11 }   
+
+   rsTTPEOWByteLine  OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "The line determines the SOH byte selected for Engineering
+   Order Wire: SOH starts with 3 lines of RSOH (1,2,3) and 
+   finish with 5 lines of MSOH (5,6,7,8,9)
+   			E1 is on line 2 column 4.
+   Zero indicates EOW not used, value different from 2 means EOW 
+   not on E1"
+      ::= { rsTTPEntry 12 }
+
+   rsTTPEOWByteColumn OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "The column determines the SOH byte selected for Engineering 
+   Order Wire: SOH is composed of Col [1,9]
+    		 E1 is on line 2 column 4.
+   Zero indicates EOW not used, value different from 4 means EOW 
+   not on E1"
+      ::= { rsTTPEntry 13 }
+ 
+   rsTTPLof   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Loss Of Frame failure
+	for regenerator section terminaison."  
+      ::= { rsTTPEntry 20 } 
+   -- End of regenerator section terminaison description  
+ 
+--*******************************************************************
+--* multiplex section terminaison (mst) 
+--******************************************************************* 
+   ProtectionType ::= INTEGER 
+   {
+    	none(0), 
+    	msp(1),
+    	msSPRing(2)
+   }
+
+   MsTTPFailure ::= INTEGER 
+   {
+	none(0),
+	ais(1),
+	eber(2),
+	sd(4), 
+	sdRdi(12),
+	rdi(8) 
+   }   
+   
+   msTTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF MsTTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of multiplex section terminaison in equipment."  
+      ::= { msTTP 2 } 
+   
+   msTTPEntry   OBJECT-TYPE
+      SYNTAX       MsTTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular multiplex section terminaison of the equipment." 
+      INDEX        { msTTPIndex } 
+      ::= { msTTPTable 1 } 
+
+   MsTTPEntry ::= SEQUENCE 
+   {   
+    	msTTPIndex		 		INTEGER,	    -- spi Index
+    	msTTPProtectionType		ProtectionType,
+    	msTTPMonitor	  		SagemBoolean,
+		msTTPName         		DisplayString,
+		msTTPFailure			MsTTPFailure,
+    	msTTPSeverity			Severity,
+        msTTPEOWMode			EOWMode,       	-- co or contra
+        msTTPE2SrcPointer   	INTEGER,        -- Order Wire: index in x21Src 
+		msTTPMonEber        	SagemBoolean, 
+		msTTPEOWByteLine    	INTEGER,
+		msTTPEOWByteColumn  	INTEGER,
+		msTTPSdThreshold    	INTEGER,
+		msTTPSesThreshold   	INTEGER, 
+		msTTPEber  		  		Severity,
+		msTTPSd			  		Severity,
+		msTTPRdi			  	Severity	
+	}
+   
+   msTTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	synchronous physical interface.
+	The value of this index is always the same as spiTTPIndex"
+      ::= { msTTPEntry 1 }        
+           
+   msTTPProtectionType OBJECT-TYPE
+      SYNTAX       ProtectionType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "The value of this field indicates the kind of wanted multiplex section protection.
+    The default value is NONE.
+    if value is changed in msp(1) or msSPRing(2) then (if it's possible) an entry is created
+    respectivelly in mspTable or msSPRingTable. But these tables have to be completed to obtain 
+    a configured protection. 
+    If value is changed in None(0)then the associated entry in mspTable or msSPRingTable is deleted
+    (if it's possible)."
+      ::= { msTTPEntry 2 }    
+
+   msTTPMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this multiplex section terminaison."  
+      ::= { msTTPEntry 3 } 
+   
+   msTTPName   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	multiplex section terminaison entries. "  
+      ::= { msTTPEntry 4 } 
+   
+   msTTPFailure   OBJECT-TYPE
+      SYNTAX       MsTTPFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+    "Active failures on multiplex section terminaison"  
+      ::= { msTTPEntry 5 } 
+   
+   msTTPSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+    "Severity associed with active failures on multiplex section terminaison."  
+      ::= { msTTPEntry 6 }        
+   
+   msTTPEOWMode OBJECT-TYPE
+      SYNTAX       EOWMode
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Mode used for EOW: Codir or contradir Master"  
+      ::= { msTTPEntry 7 }
+   
+   msTTPE2SrcPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to
+	E2 MSOH byte.
+	Usualy E2 carries X21 EOW (engineering order wire) data.
+	The reference is an index in X21 table.Zero indicates not used"  
+      ::= { msTTPEntry 8 } 
+ 
+   msTTPEOWByteLine  OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "The line determines the SOH byte selected for Engineering
+   Order Wire: SOH starts with 3 lines of RSOH (1,2,3) and 
+   finish with 5 lines of MSOH (5,6,7,8,9)
+               E2 is on line 9 column 7.
+   Zero indicates not used, value different from 9 means EOW 
+   not on E2"
+      ::= { msTTPEntry 9 }
+
+   msTTPEOWByteColumn OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "The column determines the SOH byte selected for Engineering 
+   Order Wire: SOH is composed of Col [1,9]
+               E2 is on line 9 column 7.
+   Zero indicates EOW not used, value different from 7 means EOW 
+   not on E2"
+      ::= { msTTPEntry 10 }
+  
+   msTTPMonEber   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If the value of this field is true, the eber is monitored and is used as 
+	MSP and SETS criterium.
+	If this defect is detected, an ais signal is send downstream and
+	rdi upstream."  
+      ::= { msTTPEntry 11 } 
+   
+   msTTPSdThreshold   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A Signal Degrade failure is declared if the error block rate is
+	greater than 1E(-mstSdThreshold).
+	The Signal Degrade failure desapeared when the error block rate is
+	less than 1E(1 - mstSdThreshold)."  
+      ::= { msTTPEntry 12 } 
+   
+   msTTPSesThreshold   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The number of errors above which the second is declared
+	severely errored for this interface/function.
+	This value apply for near and far interface/function"  
+      ::= { msTTPEntry 13 }    
+         
+   msTTPEber   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Excecive Bit Error Rate failure
+	for multiplex section terminaison."  
+      ::= { msTTPEntry 20 } 
+   
+   msTTPSd   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Signal Degrade failure
+	for multiplex section terminaison."  
+      ::= { msTTPEntry 21 } 
+   
+   msTTPRdi   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Remote Defect Indication failure
+	for multiplex section terminaison."  
+      ::= { msTTPEntry 22 }    
+   -- End of multiplex section terminaison description  
+
+
+--*******************************************************************
+--* multiplex section adaptation (msa)  
+--*
+--* This part allow to know all the VC4 provided by the current boards
+--* of the equipment. There is no relation with the configured connections
+--******************************************************************* 
+ 
+   MsaSrcType ::= INTEGER 
+   {
+	none(0),
+	msa(1),
+	vc4(2)
+   }    
+   
+   MsaSinkType ::= INTEGER 
+   {
+	msa(0),
+	mst(1)
+   }     
+   
+   msaTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF MsaEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of multiplex section adaptation in equipment."  
+      ::= { msa 2 } 
+   
+   msaEntry   OBJECT-TYPE
+      SYNTAX       MsaEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular multiplex section adaptation of the equipment." 
+      INDEX        { msaIndex } 
+      ::= { msaTable 1 } 
+
+   MsaEntry ::= SEQUENCE 
+   {   
+		msaIndex			INTEGER,  -- spiTTPIndex if msaSinkType = mst 
+    	msaSTMLevel         STMLevel, 
+    	msaSinkType         MsaSinkType,  -- msa or mst
+    	msaSinkPointer      INTEGER, 	  -- index in msa (msaIndex) or mst (spiTTPIndex)
+		msaName         	DisplayString,
+    	msaSrc1Type			MsaSrcType, --msa or vc4
+        msaSrc2Type			MsaSrcType, --msa or vc4
+        msaSrc3Type			MsaSrcType, --msa or vc4
+        msaSrc4Type			MsaSrcType, --msa or vc4
+        msaSrc1Pointer     	INTEGER, -- index in msa (msaIndex) or mst (vc4Index)
+        msaSrc2Pointer     	INTEGER, -- index in msa (msaIndex) or mst (vc4Index), or 0
+        msaSrc3Pointer     	INTEGER, -- index in msa (msaIndex) or mst (vc4Index), or 0
+        msaSrc4Pointer     	INTEGER  -- index in msa (msaIndex) or mst (vc4Index), or 0
+	}
+   
+  msaIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Index of a particular entry among the
+	multiplex section adaptation entries. "  
+      ::= { msaEntry 1 } 
+ 
+   msaSTMLevel   OBJECT-TYPE
+      SYNTAX       STMLevel
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The STM-n level of the multiplex section adaptation."  
+      ::= { msaEntry 2 }
+
+   msaSinkType   OBJECT-TYPE
+      SYNTAX       MsaSinkType 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	" Type of msa sinkPointer: msa or mst"  
+      ::= { msaEntry 3 } 
+      
+   msaSinkPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on synchronous port interface side.
+	In most equipments, this value cannot be changed and points to
+	the MST it is hard wired with."  
+      ::= { msaEntry 4 } 
+   
+   msaName   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	multiplex section adaptation entries. "  
+      ::= { msaEntry 5 }        
+      
+   msaSrc1Type   OBJECT-TYPE
+      SYNTAX       MsaSrcType 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Type of msa srcPointer: msa or vc4"  
+      ::= { msaEntry 6 }  
+      
+   msaSrc2Type   OBJECT-TYPE
+      SYNTAX       MsaSrcType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Type of msa srcPointer: msa or vc4"  
+      ::= { msaEntry 7 }  
+      
+   msaSrc3Type   OBJECT-TYPE
+      SYNTAX       MsaSrcType 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Type of msa srcPointer: msa or vc4"  
+      ::= { msaEntry 8 } 
+      
+   msaSrc4Type   OBJECT-TYPE
+      SYNTAX       MsaSrcType 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Type of msa srcPointer: msa or vc4"  
+      ::= { msaEntry 9 }                     
+         
+   msaSrc1Pointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Table index of the object which sends the data flow to this
+	function on equipment side.
+	For STM16: 4 pseudo STM4 (group of 4STM1) identified by their 
+				index in msaTable. Theses indexes must be differents to thoses
+				 used by the MST Table.
+	For STM4:  4 VC4 identified by their index in vc4Table 
+    For STM1:  1 VC4 identified by its index in vc4Table 
+	"  
+      ::= { msaEntry 10 }         
+             
+   msaSrc2Pointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on equipment side.
+	In most equipments, this value cannot be changed and points to
+	the VC4 function it is hard wired with."  
+      ::= { msaEntry 11 } 
+   
+   msaSrc3Pointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on equipment side.
+	In most equipments, this value cannot be changed and points to
+	the VC4 function it is hard wired with."  
+      ::= { msaEntry 12 } 
+   
+   msaSrc4Pointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on equipment side.
+	In most equipments, this value cannot be changed and points to
+	the VC4 function it is hard wired with."  
+      ::= { msaEntry 13 } 
+   -- End of multiplex section adaptation description  
+
+   
+--*******************************************************************
+--*  Common Types 
+--******************************************************************* 
+   
+   CTPStatus ::= INTEGER 
+   {
+	free (0),
+	used (1)
+   }    
+    
+      
+--*******************************************************************
+--*  CTP administrative unit order 4 (au4) 
+--******************************************************************* 
+   Au4CTPFailure ::= INTEGER 
+   {
+    none(0),ais(1),lop(2),lom(3) 
+   }
+
+   Au4CTPCnxType  ::= INTEGER
+   {
+    none(0),au(1),au4c(4),au16c(16),tu(20)
+   }                                       
+   
+   au4CTPNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of administrative unit order 4 in equipment."  
+      ::= { au4CTP 1 } 
+   
+   au4CTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF Au4CTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of administrative unit order 4 in equipment which are availables for new connection or 
+	 used in connection. In that case, an indication on the connection type is set 
+	 into the au4CTPCnxType Variable.
+	 All au4 CTP, which are made up of lower connection level (tu3 or tu12), are set to 'used' value with 
+	 'tu' type connection indication ."  
+      ::= { au4CTP 2 } 
+   
+   au4CTPEntry   OBJECT-TYPE
+      SYNTAX       Au4CTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular administrative unit order 4 of the equipment." 
+      INDEX        { au4CTPIndex } 
+      ::= { au4CTPTable 1 } 
+
+   Au4CTPEntry ::= SEQUENCE 
+   {
+	au4CTPIndex          	INTEGER,
+    au4CTPStatus			CTPStatus,      -- free or used
+    au4CTPCnxType			Au4CTPCnxType,  -- depends on the connection type (none if no connection)
+	au4CTPName           	DisplayString,
+	au4CTPMonitor	  		SagemBoolean,
+	au4CTPFailure			Au4CTPFailure,
+    au4CTPSeverity			Severity,
+    au4CTPAis 				Severity,
+    au4CTPLop				Severity,
+    au4CTPLom				Severity
+   }
+
+   au4CTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	administrative unit order 4.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+      ::= { au4CTPEntry 1 } 
+          
+   au4CTPStatus   OBJECT-TYPE
+      SYNTAX       CTPStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"au4 connection point Status: free or used.
+	The 'free' value is used when there is no connection with this output CTP"   
+      ::= { au4CTPEntry 2 }   
+
+   au4CTPCnxType   OBJECT-TYPE
+      SYNTAX       Au4CTPCnxType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"au4 connection Type: none, au4, au4-4c,au4-16c,tu.
+	The 'none' value is used when there is no connection with this output CTP"  
+      ::= { au4CTPEntry 3 }   
+
+   au4CTPName   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	administrative unit order 4 entries. "  
+      ::= { au4CTPEntry 4 } 
+   	
+   au4CTPMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this administrative unit order 4."  
+      ::= { au4CTPEntry 6 } 
+   
+   au4CTPFailure   OBJECT-TYPE
+      SYNTAX       Au4CTPFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+    "Active failures on administrative unit order 4"  
+      ::= { au4CTPEntry 7 } 
+   
+   au4CTPSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+    "A reference to failure severity for administrative unit order 4."  
+      ::= { au4CTPEntry 8 }      
+   
+	au4CTPAis   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Alarme Indication Signal failure
+	for administrative unit order 4."  
+      ::= { au4CTPEntry 20 } 
+   
+   au4CTPLop   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Loss Of Pointer failure
+	for administrative unit order 4."  
+      ::= { au4CTPEntry 21 }            
+      
+   au4CTPLom   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Loss Of MultiFrame failure
+	for administrative unit order 4."  
+      ::= { au4CTPEntry 22 }    
+
+   -- End of administrative unit order 4 description  
+
+ 
+ 
+--*******************************************************************
+--* TTP virtual container order 4 (vc4-ttp)  
+--******************************************************************* 
+   Vc4TTPSinkType ::= INTEGER 
+   {
+    mst	 (1),
+    nspi (2)
+   }
+   
+   Vc4TTPTraceMode ::= INTEGER 
+   {
+    size1 	(1),
+    size16 (16)
+   }
+
+   Vc4TTPSignalLabel ::= INTEGER 
+   { 
+    unequiped(0), unspecified(1), tug(2), all1(255) 
+   }
+   
+   Vc4TTPFailure ::= INTEGER 
+   {
+	none (0),rdi  (1), sd   (2), sdRdi  (3),
+	uneq (4),uneqSd (6),plm  (8), plmRdi (9), plmSd (10), 
+	plmRdiSd(11),tim (16), timRdi(17), timSd (18), 
+	timRdiSd(19)
+	}
+ 
+   
+   vc4TTPNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of virtual container order 4 in equipment."  
+      ::= { vc4TTP 1 } 
+   
+   vc4TTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF Vc4TTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of virtual container order 4 in equipment.The number of records depends on the kinds of
+	 configured boards"  
+      ::= { vc4TTP 2 } 
+   
+   vc4TTPEntry   OBJECT-TYPE
+      SYNTAX       Vc4TTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular virtual container order 4 of the equipment." 
+      INDEX        { vc4TTPIndex } 
+      ::= { vc4TTPTable 1 } 
+
+
+   Vc4TTPEntry ::= SEQUENCE 
+   {
+		vc4TTPIndex                	INTEGER,
+		vc4TTPSinkPointer          	INTEGER,  	    --  MSTindex or nspiTTPindex 
+		vc4TTPSinkType				Vc4TTPSinkType, --  MST or nspi 
+		vc4TTPName                 	DisplayString,
+		vc4TTPMonitor              	SagemBoolean,
+		vc4TTPFailure				Vc4TTPFailure,
+    	vc4TTPSeverity				Severity,
+    	vc4TTPTraceMode				Vc4TTPTraceMode,
+		vc4TTPPathTraceExpected    	OCTET STRING (SIZE (16)),
+		vc4TTPPathTraceSent        	OCTET STRING (SIZE (16)),
+		vc4TTPPathTraceReceived    	OCTET STRING (SIZE (16)),
+		vc4TTPLabelExpected        	Vc4TTPSignalLabel,  
+		vc4TTPLabelSent            	Vc4TTPSignalLabel,
+		vc4TTPLabelReceived        	Vc4TTPSignalLabel,
+		vc4TTPSdThreshold          	INTEGER,
+		vc4TTPSesThreshold			INTEGER,
+		vc4TTPBidirectionnal       	SagemBoolean,
+		vc4TTPRdi	 				Severity,
+		vc4TTPSd 					Severity,
+		vc4TTPUneq   				Severity,
+		vc4TTPPlm  					Severity,
+		vc4TTPTimDis	       		SagemBoolean,
+		vc4TTPTim	 				Severity
+	}
+     
+   vc4TTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	virtual container order 4.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+      ::= { vc4TTPEntry 1 } 
+   
+   vc4TTPSinkPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on synchronous or unsynchronous port interface side.
+	This pointer corresponds to an index in the msTTPTable or nspiTTPTable."  
+      ::= { vc4TTPEntry 2 } 
+
+   vc4TTPSinkType   OBJECT-TYPE
+      SYNTAX       Vc4TTPSinkType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the kind of the sink Pointer"  
+      ::= { vc4TTPEntry 3 }   
+        
+   vc4TTPName   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	virtual container order 4 entries. "  
+      ::= { vc4TTPEntry 5 } 
+   
+   vc4TTPMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this virtual container order 4."  
+      ::= { vc4TTPEntry 6 } 
+   
+   vc4TTPFailure   OBJECT-TYPE
+      SYNTAX       Vc4TTPFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures on virtual container order 4"  
+      ::= { vc4TTPEntry 7 } 
+   
+   vc4TTPSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to failure severity for virtual container order 4."  
+      ::= { vc4TTPEntry 8 }     
+      
+   vc4TTPTraceMode   OBJECT-TYPE
+      SYNTAX       Vc4TTPTraceMode
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+        "Configuration of the pathTrace length (1 byte or 16 bytes)."  
+      ::= { vc4TTPEntry 9 }     
+      
+   vc4TTPPathTraceExpected   OBJECT-TYPE
+      SYNTAX       OCTET STRING (SIZE (16))
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The path trace is a user string that always follows the vc4.
+	If the value the received path trace does not match this one, a
+	tim (Trail Identifier Mismatch) failure is issued.
+	The value `?              ' match all possible received path trace."  
+      ::= { vc4TTPEntry 11 } 
+   
+   vc4TTPPathTraceSent   OBJECT-TYPE
+      SYNTAX       OCTET STRING (SIZE (16))
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The path trace is a user string that always follows the vc4.
+	The value of this field is sent in j1 byte as path trace for this vc4.
+	The default value is `all 0'."  
+      ::= { vc4TTPEntry 12 } 
+   
+   vc4TTPPathTraceReceived   OBJECT-TYPE
+      SYNTAX       OCTET STRING (SIZE (16))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The path trace is a user string that always follows the vc4.
+	The value is the actual path trace received in j1 byte"  
+      ::= { vc4TTPEntry 13 } 
+   
+   vc4TTPLabelExpected   OBJECT-TYPE
+      SYNTAX       Vc4TTPSignalLabel
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The signal label indicates the multiplexing structure of the vc4.
+	If the signal label received for this vc4 is not null and does
+	not match this field, a Signal Label Mismatch failure is detected.
+	If the received label is null a virtual container UNEQuiped
+	failure is detected."  
+      ::= { vc4TTPEntry 14 } 
+   
+   vc4TTPLabelSent   OBJECT-TYPE
+      SYNTAX       Vc4TTPSignalLabel
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The signal label indicates the multiplexing structure of the vc4.
+	The value of this field in sent as signal label for the vc4."  
+      ::= { vc4TTPEntry 15 } 
+   
+   vc4TTPLabelReceived   OBJECT-TYPE
+      SYNTAX       Vc4TTPSignalLabel
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The signal label indicates the multiplexing structure of the vc4.
+	The value of this field is the actual received signal label
+	for this vc4"  
+      ::= { vc4TTPEntry 16 } 
+   
+   vc4TTPSdThreshold   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A Signal Degrade failure is declared if the error block rate is
+	greater than 1E(-SdThreshold).
+	The Signal Degrade failure desapeared when the error block rate is
+	less than 1E(1 - SdThreshold)."  
+      ::= { vc4TTPEntry 17 } 
+   
+   vc4TTPSesThreshold   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The number of errors above which the second is declared
+	severely errored for this interface/function.
+	This value apply for near and far interface/function"  
+      ::= { vc4TTPEntry 18 } 
+   
+   vc4TTPBidirectionnal   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If set to false the equipment does not send Remote Defect Indication."  
+      ::= { vc4TTPEntry 19 }   
+   
+   vc4TTPRdi   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Remote Defect Indication failure
+	for virtual container order 4."  
+      ::= { vc4TTPEntry 20 } 
+   
+   vc4TTPSd   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Signal Degrade failure
+	for virtual container order 4."  
+      ::= { vc4TTPEntry 21 } 
+   
+   vc4TTPUneq   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with virtual container UNEQuiped failure
+	for virtual container order 4."  
+      ::= { vc4TTPEntry 22 } 
+   
+   vc4TTPPlm   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Path Label Mismatch failure
+	for virtual container order 4."  
+      ::= { vc4TTPEntry 23 } 
+   
+   vc4TTPTimDis   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If set to true the equipment does not manage the Tim Failure."  
+      ::= { vc4TTPEntry 24 } 
+
+   vc4TTPTim   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Trail Identifier Mismatch failure
+	for virtual container order 4."  
+      ::= { vc4TTPEntry 25 } 
+   -- End of virtual container order 4 description  
+
+
+
+--*******************************************************************
+--* CTP tributary unit 3 (tu3)  
+--******************************************************************* 
+
+   Tu3CTPFailure ::= INTEGER 
+   {
+	none (0),
+	ais  (1),
+	lop  (2) 
+   }
+   
+   tu3CTPNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of tributary unit in equipment."  
+      ::= { tu3CTP 1 } 
+   
+   tu3CTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF Tu3CTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of tributary units order 3 in equipment which are availables for new connection or used in
+ 	the same connection level. In that case, an indication on the connection point status is set into the 
+ 	tu3CTPStatus Variable.
+	 All tu3 CTP, which are involved in different connection level (tu12 or au4), disappear from
+	 this List."  
+      ::= { tu3CTP 2 } 
+   
+   tu3CTPEntry   OBJECT-TYPE
+      SYNTAX       Tu3CTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular tributary unit of the equipment." 
+      INDEX        { tu3CTPIndex}
+      ::= { tu3CTPTable 1 } 
+
+   Tu3CTPEntry ::= SEQUENCE 
+   {
+		tu3CTPIndex        	INTEGER,	
+		tu3CTPStatus     	CTPStatus, 		-- free or used
+		tu3CTPName          DisplayString,
+		tu3CTPMonitor       SagemBoolean,
+		tu3CTPFailure	    Tu3CTPFailure,
+    	tu3CTPSeverity		Severity,
+        tu3CTPAis  			Severity,
+        tu3CTPLop  			Severity		
+	}  
+    
+   tu3CTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647) 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Index that identifies the particular entry among the
+	tributary unit entries. "  
+      ::= { tu3CTPEntry 1 } 
+      
+   tu3CTPStatus   OBJECT-TYPE
+      SYNTAX       CTPStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"tu3 connection point Status: free or used.
+	The 'free' value is used when there is no connection with this output CTP"   
+      ::= { tu3CTPEntry 2 }     
+         
+   tu3CTPName   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	tributary unit entries. "  
+      ::= { tu3CTPEntry 5 } 
+   
+   tu3CTPMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this tributary unit."  
+      ::= { tu3CTPEntry 6 } 
+   
+   tu3CTPFailure   OBJECT-TYPE
+      SYNTAX       Tu3CTPFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures on tributary unit"  
+      ::= { tu3CTPEntry 7 } 
+   
+   tu3CTPSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to failure severity for tributary unit."  
+      ::= { tu3CTPEntry 8 }    
+       
+   tu3CTPAis   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Alarme Indication Signal failure
+	for tributary unit."  
+      ::= { tu3CTPEntry 20 } 
+   
+   tu3CTPLop   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Loss Of Pointer failure
+	for tributary unit."  
+      ::= { tu3CTPEntry 21 } 
+   -- End of tributary unit description  
+      
+--*******************************************************************
+--* CTP tributary unit 12 (tu12)  
+--******************************************************************* 
+   
+   Tu12CTPFailure ::= INTEGER 
+   {
+	none (0),
+	ais  (1),
+	lop  (2) 
+   }
+   
+   tu12CTPNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of tributary unit in equipment."  
+      ::= { tu12CTP 1 } 
+   
+   tu12CTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF Tu12CTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of tributary unit order 12 in equipment which are availables for new connection or 
+	 used in the same connection level. In that case, an indication on the connection point Status
+	 is set into the tu12CTPStatus Variable.
+	 All tu12 CTP, which are involved in a different connection level (tu3 or au4), disappear from
+	 this List."  
+      ::= { tu12CTP 2 } 
+   
+   tu12CTPEntry   OBJECT-TYPE
+      SYNTAX       Tu12CTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular tributary unit of the equipment." 
+      INDEX        { tu12CTPIndex } 
+      ::= { tu12CTPTable 1 } 
+
+   Tu12CTPEntry ::= SEQUENCE 
+   {
+		tu12CTPIndex				INTEGER,
+		tu12CTPStatus		   		CTPStatus,  -- free or used
+		tu12CTPName            		DisplayString,
+		tu12CTPMonitor  	       	SagemBoolean,
+		tu12CTPFailure	    	  	Tu12CTPFailure,
+    	tu12CTPSeverity				Severity,
+        tu12CTPAis  				Severity,
+        tu12CTPLop  				Severity
+	}
+   
+   tu12CTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular tu12."  
+      ::= { tu12CTPEntry 1 }     
+    
+   tu12CTPStatus   OBJECT-TYPE
+      SYNTAX       CTPStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"tu12 connection point Status: free or used.
+	The 'free' value is used when there is no connection with this output CTP"   
+      ::= { tu12CTPEntry 2 }     
+         
+   tu12CTPName   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	tributary unit entries. "  
+      ::= { tu12CTPEntry 5 } 
+   
+   tu12CTPMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this tributary unit."  
+      ::= { tu12CTPEntry 6 } 
+   
+   tu12CTPFailure   OBJECT-TYPE
+      SYNTAX       Tu12CTPFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures on tributary unit"  
+      ::= { tu12CTPEntry 7 } 
+   
+   tu12CTPSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to failure severity for tributary unit."  
+      ::= { tu12CTPEntry 8 }    
+          
+   tu12CTPAis   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Alarme Indication Signal failure
+	for tributary unit."  
+      ::= { tu12CTPEntry 20 } 
+   
+   tu12CTPLop   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Loss Of Pointer failure
+	for tributary unit."  
+      ::= { tu12CTPEntry 21 }
+   
+   -- End of tributary unit description                       
+ 
+--*******************************************************************
+--* virtual container order 3 (vc3)  
+--******************************************************************* 
+   Vc3TTPSinkType ::= INTEGER 
+   {
+    vc4	 (1),
+    nspi (2)
+   }
+ 
+   Vc3TTPSignalLabel ::= INTEGER 
+   {
+   	unequiped(0), unspecified(1),
+    mapping3445(4), all1(7)
+   }
+   
+   VcLoFailure ::= INTEGER 
+   {
+	none (0),
+	rdi  (1),
+	sd   (2), sdRdi  (3),
+	uneq (4), uneqSd (6),
+	plm  (8), plmRdi (9), plmSd (10), plmRdiSd(11),
+	tim (16), timRdi(17), timSd (18), timRdiSd(19) 
+   }
+
+   vc3TTPNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of virtual container order 3 in equipment."  
+      ::= { vc3TTP 1 } 
+   
+   vc3TTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF Vc3TTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of virtual container order 3 in equipment.The number of records depends on the kinds of
+	 configured boards"  
+      ::= { vc3TTP 2 } 
+   
+   vc3TTPEntry   OBJECT-TYPE
+      SYNTAX       Vc3TTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular virtual container order 3 of the equipment." 
+      INDEX        { vc3TTPIndex } 
+      ::= { vc3TTPTable 1 } 
+
+
+   Vc3TTPEntry ::= SEQUENCE 
+   {
+		vc3TTPIndex               	INTEGER,
+		vc3TTPSinkPointer         	INTEGER,      	-- nspiTTPIndex or VC4index
+		vc3TTPSinkType				Vc3TTPSinkType, -- Nspi or VC4
+		vc3TTPName                	DisplayString,
+		vc3TTPMonitor             	SagemBoolean,
+		vc3TTPFailure	           	VcLoFailure,
+    	vc3TTPSeverity	           	Severity, 
+		vc3TTPPathTraceExpected   	OCTET STRING,
+		vc3TTPPathTraceSent       	OCTET STRING,
+		vc3TTPPathTraceReceived   	OCTET STRING,
+		vc3TTPLabelExpected       	Vc3TTPSignalLabel,
+		vc3TTPLabelSent           	Vc3TTPSignalLabel,
+		vc3TTPLabelReceived       	Vc3TTPSignalLabel,
+		vc3TTPSdThreshold         	INTEGER,
+		vc3TTPSesThreshold        	INTEGER,
+		vc3TTPBidirectionnal      	SagemBoolean,
+		vc3TTPRdi  					Severity,
+        vc3TTPSd  					Severity, 
+        vc3TTPUneq  				Severity,
+        vc3TTPPlm  					Severity,
+        vc3TTPTim  					Severity
+	}
+   
+   
+   vc3TTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	virtual container order 3.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+      ::= { vc3TTPEntry 1 } 
+   
+   vc3TTPSinkPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on non-sdh physical port side."  
+      ::= { vc3TTPEntry 2 } 
+
+   vc3TTPSinkType   OBJECT-TYPE
+      SYNTAX       Vc3TTPSinkType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the kind of the sink Pointer"  
+      ::= { vc3TTPEntry 3 }    
+      
+   vc3TTPName   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	virtual container order 3 entries. "  
+      ::= { vc3TTPEntry 5 } 
+   
+   vc3TTPMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this virtual container order 3."  
+      ::= { vc3TTPEntry 6 } 
+   
+   vc3TTPFailure   OBJECT-TYPE
+      SYNTAX       VcLoFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures on virtual container order 3"  
+      ::= { vc3TTPEntry 7 } 
+   
+   vc3TTPSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to failure severity for virtual container order 3."  
+      ::= { vc3TTPEntry 8 }    
+         
+   vc3TTPPathTraceExpected   OBJECT-TYPE
+      SYNTAX       OCTET STRING (SIZE (16))
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The path trace is a user string that always follows the vc3.
+	If the value the received path trace does not match this one, a
+	tim (Trail Identifier Mismatch) failure is issued.
+	The value `?              ' match all possible received path trace."  
+      ::= { vc3TTPEntry 9 } 
+   
+   vc3TTPPathTraceSent   OBJECT-TYPE
+      SYNTAX       OCTET STRING (SIZE (1..15))
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The path trace is a user string that always follows the vc3.
+	The value of this field is sent in j1 byte as path trace for this vc3.
+	The default value is `all 0'."  
+      ::= { vc3TTPEntry 10 } 
+   
+   vc3TTPPathTraceReceived   OBJECT-TYPE
+      SYNTAX       OCTET STRING (SIZE (15))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The path trace is a user string that always follows the vc3.
+	The value is the actual path trace received in j1 byte"  
+      ::= { vc3TTPEntry 11 } 
+   
+   vc3TTPLabelExpected   OBJECT-TYPE
+      SYNTAX       Vc3TTPSignalLabel
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The signal label indicates the multiplexing structure of the vc3.
+	Usualy the value of this field cannot be modified as most equipment
+	use the asynchronous bit multiplexing.
+	For historical reasons the receipt of label `unspecified ' does not
+	produce a Signal Label Mismatch failure."  
+      ::= { vc3TTPEntry 12 } 
+   
+   vc3TTPLabelSent   OBJECT-TYPE
+      SYNTAX       Vc3TTPSignalLabel
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The signal label indicates the multiplexing structure of the vc3.
+	The value of this field is sent as signal label for the vc3.
+	The unspecified value is used for compatibilty with old sdh
+	equipments.
+	The `unequiped' value actives low order unequiped generator (lug).
+	In this case all 1 signal is inserted down and up stream."  
+      ::= { vc3TTPEntry 13 } 
+   
+   vc3TTPLabelReceived   OBJECT-TYPE
+      SYNTAX       Vc3TTPSignalLabel
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The signal label indicates the multiplexing structure of the vc3.
+	The value of this field is the actual received signal label
+	for this vc3"  
+      ::= { vc3TTPEntry 14 } 
+   
+   vc3TTPSdThreshold   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A Signal Degrade failure is declared if the error block rate is
+	greater than 1E(-SdThreshold).
+	The Signal Degrade failure desapeared when the error block rate is
+	less than 1E(1 - SdThreshold)."  
+      ::= { vc3TTPEntry 15 } 
+   
+   vc3TTPSesThreshold   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The number of errors above which the second is declared
+	severely errored for this interface/function.
+	This value apply for near and far interface/function"  
+      ::= { vc3TTPEntry 16 } 
+   
+   vc3TTPBidirectionnal   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If set to false the equipment does not send Remote Defect Indication."  
+      ::= { vc3TTPEntry 17 }   
+   
+    vc3TTPRdi   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Remote Defect Indication failure
+	for virtual container order 3."  
+      ::= { vc3TTPEntry 20 } 
+   
+   vc3TTPSd   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Signal Degrade failure
+	for virtual container order 3."  
+      ::= { vc3TTPEntry 21 } 
+  
+   vc3TTPUneq   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with virtual container UNEQuiped failure
+	for virtual container order 3."  
+      ::= { vc3TTPEntry 22 } 
+   
+   vc3TTPPlm   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Path Label Mismatch failure
+	for virtual container order 3."  
+      ::= { vc3TTPEntry 23 } 
+   
+   vc3TTPTim   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Trail Identifier Mismatch failure
+	for virtual container order 3."  
+      ::= { vc3TTPEntry 24 } 
+   -- End of virtual container order 3 description  
+
+--*******************************************************************
+--*  virtual container order 12 (vc12) 
+--******************************************************************* 
+   Vc12TTPSinkType ::= INTEGER 
+   {
+    vc4  (1),
+    nspi (2)
+   }
+
+   Vc12TTPSignalLabel ::= INTEGER 
+   {
+    unequiped(0), unspecified(1),
+    asyncBit(2), all1(7)
+   }
+     
+   vc12TTPNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of virtual container order 12 in equipment."  
+      ::= { vc12TTP 1 } 
+   
+   vc12TTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF Vc12TTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of virtual container order 12 in equipment.The number of records depends on the kinds of
+	 configured boards"  
+      ::= { vc12TTP 2 } 
+   
+   vc12TTPEntry   OBJECT-TYPE
+      SYNTAX       Vc12TTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular virtual container order 12 of the equipment." 
+      INDEX        { vc12TTPIndex } 
+      ::= { vc12TTPTable 1 }  
+   
+
+   Vc12TTPEntry ::= SEQUENCE 
+   {
+		vc12TTPIndex          		INTEGER, 
+		vc12TTPSinkPointer         	INTEGER,        -- nspiTTPIndex or VC4index
+		vc12TTPSinkType				Vc12TTPSinkType,   -- Nspi or Vc4
+		vc12TTPName           		DisplayString,
+		vc12TTPMonitor        		SagemBoolean,
+		vc12TTPFailure		  		VcLoFailure,
+        vc12TTPSeverity				Severity,
+		vc12TTPPathTraceExpected   	OCTET STRING,
+		vc12TTPPathTraceSent       	OCTET STRING,
+		vc12TTPPathTraceReceived   	OCTET STRING,
+		vc12TTPLabelExpected       	Vc12TTPSignalLabel,
+		vc12TTPLabelSent          	Vc12TTPSignalLabel,
+		vc12TTPLabelReceived       	Vc12TTPSignalLabel,
+		vc12TTPSdThreshold         	INTEGER,
+		vc12TTPSesThreshold			INTEGER,
+		vc12TTPBidirectionnal      	SagemBoolean,
+		vc12TTPRdi  				Severity,
+        vc12TTPSd  					Severity, 
+        vc12TTPUneq  				Severity,
+        vc12TTPPlm  				Severity,
+        vc12TTPTim  				Severity
+	}
+      
+   vc12TTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	virtual container order 12.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+      ::= { vc12TTPEntry 1 } 
+  
+   vc12TTPSinkPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on non-sdh physical port side."  
+      ::= { vc12TTPEntry 2 } 
+
+   vc12TTPSinkType   OBJECT-TYPE
+      SYNTAX       Vc12TTPSinkType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the kind of the sink Pointer"  
+      ::= { vc12TTPEntry 3 }    
+      
+   vc12TTPName   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	virtual container order 12 entries. "  
+      ::= { vc12TTPEntry 5 } 
+   
+   vc12TTPMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this virtual container order 12."  
+      ::= { vc12TTPEntry 6 } 
+   
+   vc12TTPFailure   OBJECT-TYPE
+      SYNTAX       VcLoFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures on virtual container order 12"  
+      ::= { vc12TTPEntry 7 } 
+   
+   vc12TTPSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to failure severity for virtual container order 12."  
+      ::= { vc12TTPEntry 8 }    
+   
+   
+   vc12TTPPathTraceExpected   OBJECT-TYPE
+      SYNTAX       OCTET STRING (SIZE (16))
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The path trace is a user string that always follows the vc12.
+	If the value the received path trace does not match this one, a
+	tim (Trail Identifier Mismatch) failure is issued.
+	The value `?              ' match all possible received path trace."  
+      ::= { vc12TTPEntry 9 } 
+   
+   vc12TTPPathTraceSent   OBJECT-TYPE
+      SYNTAX       OCTET STRING (SIZE (16))
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The path trace is a user string that always follows the vc12.
+	The value of this field is sent in j2 byte as path trace for this vc12.
+	The default value is `all 0'."  
+      ::= { vc12TTPEntry 10 } 
+   
+   vc12TTPPathTraceReceived   OBJECT-TYPE
+      SYNTAX       OCTET STRING (SIZE (16))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The path trace is a user string that always follows the vc12.
+	The value is the actual path trace received in j2 byte"  
+      ::= { vc12TTPEntry 11 } 
+   
+   vc12TTPLabelExpected   OBJECT-TYPE
+      SYNTAX       Vc12TTPSignalLabel
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The signal label indicates the multiplexing structure of the vc12.
+	Usualy the value of this field cannot be modified as most equipment
+	use the asynchronous bit multiplexing.
+	For historical reasons the receipt of label `unspecified ' does not
+	produce a Signal Label Mismatch failure."  
+      ::= { vc12TTPEntry 12 } 
+   
+   vc12TTPLabelSent   OBJECT-TYPE
+      SYNTAX       Vc12TTPSignalLabel
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The signal label indicates the multiplexing structure of the vc12.
+	The value of this field is sent as signal label for the vc12.
+	The unspecified value is used for compatibilty with old sdh
+	equipments.
+	The `unequiped' value actives low order unequiped generator (lug).
+	In this case all 1 signal is inserted down and up stream."  
+      ::= { vc12TTPEntry 13 } 
+   
+   vc12TTPLabelReceived   OBJECT-TYPE
+      SYNTAX       Vc12TTPSignalLabel
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "The signal label indicates the multiplexing structure of the vc12.
+	The value of this field is the actual received signal label
+	for this vc12"  
+      ::= { vc12TTPEntry 14 } 
+   
+   vc12TTPSdThreshold   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A Signal Degrade failure is declared if the error block rate is
+	greater than 1E(-SdThreshold).
+	The Signal Degrade failure desapeared when the error block rate is
+	less than 1E(1 - SdThreshold)."  
+      ::= { vc12TTPEntry 15 } 
+   
+   vc12TTPSesThreshold   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The number of errors above which the second is declared
+	severely errored for this interface/function.
+	This value apply for near and far interface/function"  
+      ::= { vc12TTPEntry 16 } 
+   
+   vc12TTPBidirectionnal   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"If set to false the equipment does not send Remote Defect Indication."  
+      ::= { vc12TTPEntry 17 }    
+    
+   vc12TTPRdi   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Remote Defect Indication failure
+	for virtual container order 12."  
+      ::= { vc12TTPEntry 20 } 
+   
+   vc12TTPSd   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Signal Degrade failure
+	for virtual container order 12."  
+      ::= { vc12TTPEntry 21 } 
+   
+   vc12TTPUneq   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with virtual container UNEQuiped failure
+	for virtual container order 12."  
+      ::= { vc12TTPEntry 22 } 
+   
+   vc12TTPPlm   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Path Label Mismatch failure
+	for virtual container order 12."  
+      ::= { vc12TTPEntry 23 } 
+   
+   vc12TTPTim   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Trail Identifier Mismatch failure
+	for virtual container order 12."  
+      ::= { vc12TTPEntry 24 }  
+   -- End of virtual container order 12 description  
+
+   
+
+--*******************************************************************
+--* non synchronous physical port (nspi)  
+--******************************************************************* 
+   
+   NspiSrcType ::= INTEGER 
+   {
+    vc12	(1),
+    vc3		(2),
+    vc4		(3),
+    channel (4)
+   }
+ 
+--*******************************************************************
+--* Nspi CTP  
+--*******************************************************************  
+  
+	nspiCTPNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular non-sdh physical port.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+      ::= { nspiCTP 1 } 
+   
+   nspiCTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF NspiCTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of non-sdh physical port in equipment."  
+      ::= { nspiCTP 2 } 
+   
+   nspiCTPEntry   OBJECT-TYPE
+      SYNTAX       NspiCTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular non-sdh physical port of the equipment." 
+      INDEX        { nspiCTPIndex } 
+      ::= { nspiCTPTable 1 } 
+
+
+   NspiCTPEntry ::= SEQUENCE 
+   {
+		nspiCTPIndex         	INTEGER,
+		nspiCTPTTPType      	NspiSrcType,   	-- VC3, VC12 or VC4 
+		nspiCTPStatus	 		CTPStatus,      -- free or used
+		nspiCTPName          	DisplayString
+   }  
+   
+   nspiCTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	non-sdh physical port.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+      ::= { nspiCTPEntry 1 } 
+  
+   nspiCTPTTPType   OBJECT-TYPE
+      SYNTAX       NspiSrcType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The type of VC which is associated to the nspi interface."  
+      ::= { nspiCTPEntry 2 } 
+   
+    nspiCTPStatus   OBJECT-TYPE
+      SYNTAX       CTPStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"nspi connection point Status: free or used.
+	The 'free' value is used when there is no connection with this output CTP"   
+      ::= { nspiCTPEntry 3 } 
+   
+   nspiCTPName   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	non-sdh physical port entries. "  
+      ::= { nspiCTPEntry 4 } 
+   
+   -- End of non-sdh physical port description  
+
+
+--*******************************************************************
+--* Nspi TTP  
+--*******************************************************************  
+   NspiTTPFailure ::= INTEGER 
+   {
+	none (0),
+	los  (1),
+	ais  (2) 
+   }
+   
+   NspiTTPType ::= INTEGER 
+   {
+    g703R75ohm  (1),
+    g703R120ohm (2),
+    x21			(10),
+    ethernet    (20),
+    atm			(30) 
+   }
+
+   NspiTTPLevel ::= INTEGER 
+   {
+    rate2Mb  (2),
+    rate10Mb (10),
+    rate34Mb (34),
+    rate45Mb (45),
+    rate100Mb (100),
+    rate140Mb (140),
+    rate1Gb   (1000)
+   }
+
+   
+   nspiTTPNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular non-sdh physical port.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+      ::= { nspiTTP 1 } 
+   
+   nspiTTPTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF NspiTTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of non-sdh physical port in equipment."  
+      ::= { nspiTTP 2 } 
+   
+   nspiTTPEntry   OBJECT-TYPE
+      SYNTAX       NspiTTPEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular non-sdh physical port of the equipment." 
+      INDEX        { nspiTTPIndex } 
+      ::= { nspiTTPTable 1 } 
+
+   NspiTTPEntry ::= SEQUENCE 
+   {
+		nspiTTPIndex         	INTEGER,
+		nspiTTPType         	NspiTTPType,
+		nspiTTPLevel         	NspiTTPLevel,
+		nspiTTPName          	DisplayString,
+		nspiTTPBoardIndex 		INTEGER,
+		nspiTTPBoardAcces		INTEGER,
+		nspiTTPSrcType			NspiSrcType,  -- VC3, VC12 or VC4 
+        nspiTTPSrcPointer    	INTEGER,	  -- VC index	        
+        nspiTTPMonitor       	SagemBoolean,
+		nspiTTPFailure			NspiTTPFailure,
+        nspiTTPSeverity			Severity,
+		nspiTTPLoopback      	Loopback,
+		nspiTTPLos            	Severity,
+		nspiTTPAis				Severity
+	}  
+   
+   nspiTTPIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	non-sdh physical port.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+      ::= { nspiTTPEntry 1 } 
+  
+   nspiTTPType   OBJECT-TYPE
+      SYNTAX       NspiTTPType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The type of media for the nspi interface."  
+      ::= { nspiTTPEntry 2 } 
+   
+   nspiTTPLevel   OBJECT-TYPE
+      SYNTAX       NspiTTPLevel
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The rate level of the nspi interface."  
+      ::= { nspiTTPEntry 3 } 
+   
+   nspiTTPName   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	non-sdh physical port entries. "  
+      ::= { nspiTTPEntry 4 } 
+   
+  nspiTTPBoardIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Index of the Board that supports the physical acces 
+	of this interface"  
+      ::= { nspiTTPEntry 5 } 
+  
+  nspiTTPBoardAcces   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Friendly Index of the physical acces on the Board that supports 
+	the interface"  
+      ::= { nspiTTPEntry 6 }  
+    
+   nspiTTPSrcType   OBJECT-TYPE
+      SYNTAX       NspiSrcType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the type of object which sends the data flow to this
+	interface. Usually the value is vc12, vc3 or vc4 types."  
+      ::= { nspiTTPEntry 7 } 
+
+   nspiTTPSrcPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	interface. Usually the value is the Index of a vc12, vc3 or vc4."  
+      ::= { nspiTTPEntry 8 } 
+
+  nspiTTPMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this non-sdh physical port."  
+      ::= { nspiTTPEntry 9 } 
+   
+   nspiTTPFailure   OBJECT-TYPE
+      SYNTAX       NspiTTPFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures on non-sdh physical port"  
+      ::= { nspiTTPEntry 10 } 
+   
+   nspiTTPSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to failure severity for non-sdh physical port."  
+      ::= { nspiTTPEntry 11 }    
+         
+   nspiTTPLoopback   OBJECT-TYPE
+      SYNTAX       Loopback
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"This field gives the active loopback status on the
+	non-sdh physical port.
+	When its value is `line' the data flow recieved from the port side
+	is sent back to the line.
+	When its value is `equipment' the data flow recieved form equipment
+	side is send back.
+	The field can be set to a particular loopback value, even if there
+	no garantee that the loopback is really done. The real loopback status 
+	of the interface must be checked in the response.
+	The loopback can be cleared by the equipment when it cannot remain 
+	for any reason."  
+      ::= { nspiTTPEntry 14 }     
+  
+  nspiTTPLos   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Loss Of Signal failure
+	for non-sdh physical port."  
+      ::= { nspiTTPEntry 20 } 
+   
+   nspiTTPAis   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associed with Alarme Indication Signal failure
+	for non-sdh physical port."  
+      ::= { nspiTTPEntry 21 }
+   -- End of non-sdh physical port description  
+ 
+ 
+--*******************************************************************
+--* Channel             
+--* This part allows to add a new decomposition level between nspi ports
+--* and SDH Containers.
+--*******************************************************************  
+   ChannelEncaps ::= INTEGER 
+   {
+	none (0),
+	atm  (1),
+	pos  (2),
+	gfp	 (3) 
+   }
+   
+   ChannelConcat ::= INTEGER 
+   {
+    none	  	(0),
+    virtual 	(1),
+    contiguous	(2) 
+   }
+
+   ChannelFailure ::= INTEGER 
+   {
+    none  	(0),
+    loa 	(1),
+    lom 	(2),
+    sqm		(3)
+   }
+
+   
+   channelNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of SDH Channels in equipment."  
+      ::= { channel 1 } 
+   
+   channelTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF ChannelEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of SDH Channels in equipment."  
+      ::= { channel 2 } 
+   
+   channelEntry   OBJECT-TYPE
+      SYNTAX       ChannelEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular SDH Channel of the equipment." 
+      INDEX        { channelIndex } 
+      ::= { channelTable 1 } 
+
+   ChannelEntry ::= SEQUENCE 
+   {
+		channelIndex         	INTEGER,        -- nspiTTPIndex
+		channelEncaps         	ChannelEncaps,
+		channelNbVc4         	INTEGER,
+		channelNbVc3          	INTEGER,
+		channelNbVc12	 		INTEGER,
+		channelConcat			ChannelConcat,
+		channelAdminStatus		INTEGER,  
+        channelOperStatus    	INTEGER,	 
+        channelFirstIndex      	INTEGER,
+		channelDelay			INTEGER,
+        channelMonitor			SagemBoolean,
+        channelFailure			ChannelFailure,
+        channelSeverity			Severity,
+		channelLoa      		Severity,
+		channelLom            	Severity,
+		channelSqm				Severity
+	}  
+   
+   channelIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	SDH Channel.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+      ::= { channelEntry 1 } 
+  
+   channelEncaps   OBJECT-TYPE
+      SYNTAX       ChannelEncaps
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The type of encapsulation used to map Data stream into Sdh containers"  
+      ::= { channelEntry 2 } 
+      
+   channelNbVc4   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Number of VC4 into the channel. "  
+      ::= { channelEntry 5 } 
+   
+   channelNbVc3   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Number of VC3 into the channel. "  
+      ::= { channelEntry 6 } 
+  
+   channelNbVc12   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Number of VC12 into the channel. "  
+      ::= { channelEntry 7 }  
+    
+   channelConcat   OBJECT-TYPE
+      SYNTAX       ChannelConcat
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The type of Concatenation used within the channel"  
+      ::= { channelEntry 8 } 
+ 
+   channelAdminStatus   OBJECT-TYPE
+      SYNTAX       INTEGER {
+                      up(1),       -- ready to pass packets
+                      down(2),
+                      testing(3)   -- in some test mode
+                   }
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The desired state of the channel.  The
+     testing(3) state indicates that no operational
+     packets can be passed."  
+      ::= { channelEntry 9 } 
+
+   channelOperStatus   OBJECT-TYPE
+      SYNTAX       INTEGER {
+                     up(1),       -- ready to pass packets
+                     down(2),
+                     testing(3)   -- in some test mode
+                   }
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The current operational state of the channel.
+     The testing(3) state indicates that no operational
+     packets can be passed."  
+      ::= { channelEntry 10 } 
+
+   channelFirstIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Index of the first Vc in the Channel when it is configured.
+	Otherwise this field is set to 0. "  
+      ::= { channelEntry 11 }  
+    
+   channelDelay   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"This field give the maximum delay (in millisecondes) for receiving virtual concatenated frames.
+	This field is set to 0 when channelConcat is different to virtual(1) "  
+      ::= { channelEntry 12 }  
+    
+   channelMonitor   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"When the value of this field is set to false, the failure detection
+	is stopped for this channel."  
+      ::= { channelEntry 13 } 
+   
+   channelFailure   OBJECT-TYPE
+      SYNTAX       ChannelFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "Active failures on channel"  
+      ::= { channelEntry 14 } 
+   
+   channelSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+        "A reference to failure severity for non-sdh physical port."  
+      ::= { channelEntry 15 }    
+         
+   channelLoa   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associated with Loss Of Alignment failure
+	for channel."  
+      ::= { channelEntry 16 }     
+  
+  channelLom   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associated with Loss Of Multiframe failure
+	for channel."  
+      ::= { channelEntry 17 } 
+   
+   channelSqm   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Severity associated with Sequence Mismatch failure
+	for channel."  
+      ::= { channelEntry 18 }
+   -- End of Channel description  
+ 
+ 
+ 
+--*******************************************************************
+--* Bandwidth
+--* This part allows to configure the bandwidth allocated to a Data Card
+--* It gives references of VC which are used by channels.
+--*******************************************************************  
+
+   bandwidthNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of bandwidth units which are available in the equipement.
+	The number of units depends on their type (Vc4, Vc3, Vc12), on the number 
+	of Data card and on the bandwidth size which has been configured for this card.
+	For a Data card which is mapped on a STM16, there are 16 Vc4 entries (or 3*16 Vc3 entries 
+	or 63*16 Vc12 entries) in the BandwidthTable. "  
+      ::= { bandwidth 1 } 
+   
+   bandwidthTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF BandwidthEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of Bandwidth units in equipment. It represent the bandwidth occupation of each non-sdh card"  
+      ::= { bandwidth 2 } 
+   
+   bandwidthEntry   OBJECT-TYPE
+      SYNTAX       BandwidthEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular unit part of a non-sdh card bandwidth." 
+      INDEX        { bandwidthIndex } 
+      ::= { bandwidthTable 1 } 
+
+   BandwidthEntry ::= SEQUENCE 
+   {
+		bandwidthIndex         	INTEGER,      -- VC index
+		bandwidthBoardIndex 	INTEGER,      -- BoardIndex
+		bandwidthSrcType       	NspiSrcType,  -- VC3, VC12 or VC4 
+		bandwidthSrcPointer    	INTEGER,      -- VC index	
+		bandwidthSinkType      	NspiSrcType,  -- Channel 
+		bandwidthSinkPointer   	INTEGER,      -- channelIndex	
+		bandwidthAdminStatus	INTEGER,  
+        bandwidthOperStatus    	INTEGER,	 
+		bandwidthPrevIndex      INTEGER,      -- VC index
+		bandwidthNextIndex      INTEGER       -- VC index
+	}  
+   
+   bandwidthIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular unit of a non-sdh card bandwidth.
+	 The value of index is a Vc Index which change when bandwidthSrcType value is modified. "  
+      ::= { bandwidthEntry 1 } 
+  
+  bandwidthBoardIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Index of the Board that supports the bandwidth unit."  
+      ::= { bandwidthEntry 2 } 
+  
+   bandwidthSrcType   OBJECT-TYPE
+      SYNTAX       NspiSrcType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Define the decomposition level of the bandwidth."  
+      ::= { bandwidthEntry 3 } 
+   
+   bandwidthSrcPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"this field is set to bandwidthIndex when the unit is used by a channel and set to 0 otherwise.
+	It defines the TTP and CTP index associated to the channel. "  
+      ::= { bandwidthEntry 4 } 
+    
+   bandwidthSinkType   OBJECT-TYPE
+      SYNTAX       NspiSrcType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the kind of the sink Pointer. Usually the value is Channel."  
+      ::= { bandwidthEntry 5 } 
+   
+   bandwidthSinkPointer   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	function on unsynchronous port interface side.
+	This pointer corresponds to an index in the channelTable. "  
+      ::= { bandwidthEntry 6 } 
+  
+   bandwidthAdminStatus   OBJECT-TYPE
+      SYNTAX       INTEGER {
+                      up(1),       -- ready to pass packets
+                      down(2),
+                      testing(3)   -- in some test mode
+                   }
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"The desired state of the Vc.  The
+     testing(3) state indicates that no operational
+     packets can be passed."  
+      ::= { bandwidthEntry 7 } 
+
+   bandwidthOperStatus   OBJECT-TYPE
+      SYNTAX       INTEGER {
+                     up(1),       -- ready to pass packets
+                     down(2),
+                     testing(3)   -- in some test mode
+                   }
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The current operational state of the Vc.
+     The testing(3) state indicates that no operational
+     packets can be passed."  
+      ::= { bandwidthEntry 8 } 
+
+   bandwidthPrevIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the previous VC into the channel. This field is set to 0 if the VC is not
+	associated to a channel or if it is the first Vc of the channel. "  
+      ::= { bandwidthEntry 9 } 
+
+   bandwidthNextIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the next VC into the channel. This field is set to 0 if the VC is not
+	associated to a channel or if it is the last Vc of the channel.  "  
+      ::= { bandwidthEntry 10 } 
+
+   -- End of Bandwidth description  
+         
+ END
+
+

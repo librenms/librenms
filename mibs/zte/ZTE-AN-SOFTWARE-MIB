@@ -1,0 +1,1838 @@
+ZTE-AN-SOFTWARE-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS     
+        DisplayString                     FROM SNMPv2-TC
+        DateAndTime                       FROM SNMPv2-TC
+        TruthValue                        FROM SNMPv2-TC
+        MODULE-IDENTITY                   FROM SNMPv2-SMI
+        OBJECT-TYPE                       FROM SNMPv2-SMI
+        Integer32                         FROM SNMPv2-SMI
+        NOTIFICATION-TYPE                 FROM SNMPv2-SMI
+        zxAnSystem                        FROM ZTE-AN-SMI
+        MODULE-COMPLIANCE                 FROM SNMPv2-CONF
+        OBJECT-GROUP                      FROM SNMPv2-CONF
+        NOTIFICATION-GROUP                FROM SNMPv2-CONF;
+
+
+    zxAnSoftwareMib  MODULE-IDENTITY
+        LAST-UPDATED    "201105260000Z"
+        ORGANIZATION    "ZTE Corporation"
+        CONTACT-INFO    "Zhou YuBin      ZTE Corporation
+                         Mail: zhou.yubing@zte.com.cn
+                         Tel : +86-21-68897315"
+        DESCRIPTION     "This MIB defines zte Access Node software management."
+        
+        REVISION        "201105260000Z"
+        DESCRIPTION
+        "Initial version of this MIB module."
+        ::=  {  zxAnSystem  30  }  
+    
+-------------------------------------------------------------------------------
+-- Following management objects are defined.
+-- 1. Card Running Software Information Table
+-- 2. Subcard Running Software Information Table
+-- 3. Saved Software Information Table
+-- 4. Software Manual Update Management Table
+-- 5. Software Manual Update Status Table
+-- 6. Subcard Software Manual Update Status Table
+-- 7. Software Automatic Update Check Management Table
+-- 8. Software Automatic Update Management Table
+-- 9. Software Swap Management Table
+-- 10. Saved Patch Information Table
+-- 11. Card Patch Running Status Information Table
+-- 12. Subcard Running Patch Information Table
+-- 13. Saved Patch Package Information Table
+-- 14. Saved Patch Package File Information Table
+
+-- Following notification objects are defined.
+-- 21. Software Notification
+
+-- Following conformance information is defined.
+-- 31. Software Conformance
+
+-------------------------------------------------------------------------------
+    zxAnSwObjects                   OBJECT IDENTIFIER   ::=  {  zxAnSoftwareMib            2  }
+    zxAnSwNotifications             OBJECT IDENTIFIER   ::=  {  zxAnSoftwareMib            3  }
+  
+    zxAnCardSwObjects               OBJECT IDENTIFIER   ::=  {  zxAnSwObjects              2  }
+    zxAnSwUpdateObjects             OBJECT IDENTIFIER   ::=  {  zxAnSwObjects              3  }
+    zxAnSwSwapObjects               OBJECT IDENTIFIER   ::=  {  zxAnSwObjects              4  }    
+    zxAnCardPatchObjects            OBJECT IDENTIFIER   ::=  {  zxAnSwObjects              5  }    
+    
+    zxAnSwManualUpdateObjects       OBJECT IDENTIFIER   ::=  {  zxAnSwUpdateObjects        2  }
+    zxAnSwManualUpdateGlobalObjects OBJECT IDENTIFIER   ::=  {  zxAnSwManualUpdateObjects  1  }
+    zxAnSwAutoUpdateObjects         OBJECT IDENTIFIER   ::=  {  zxAnSwUpdateObjects        3  }
+    zxAnSwAutoUpdateGlobalObjects   OBJECT IDENTIFIER   ::=  {  zxAnSwAutoUpdateObjects    1  }
+
+    zxAnSwAutoUpdateChkObjects      OBJECT IDENTIFIER   ::=  {  zxAnSwAutoUpdateGlobalObjects  1  }
+    zxAnSwAutoUpdateOperObjects     OBJECT IDENTIFIER   ::=  {  zxAnSwAutoUpdateGlobalObjects  2  }
+
+    zxAnSwSwapGlobalObjects         OBJECT IDENTIFIER   ::=  {  zxAnSwSwapObjects          1  }
+    
+    zxAnSwAutoUpdateTraps           OBJECT IDENTIFIER   ::=  {  zxAnSwNotifications        1  }     
+    
+-------------------------------------------------------------------------------
+-- 1.Card Running Software Information Table
+-------------------------------------------------------------------------------
+    zxAnSwCardRunningVerTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSwCardRunningVerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the card version information."
+        ::=  { zxAnCardSwObjects  2 }
+
+    zxAnSwCardRunningVerEntry   OBJECT-TYPE
+        SYNTAX      ZxAnSwCardRunningVerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnCardTable."
+        INDEX       {  zxAnSwCardRack, zxAnSwCardShelf, zxAnSwCardSlot  }
+        ::=  { zxAnSwCardRunningVerTable 1 }
+        
+    ZxAnSwCardRunningVerEntry  ::=  SEQUENCE {
+        zxAnSwCardRack                Integer32,
+        zxAnSwCardShelf               Integer32,
+        zxAnSwCardSlot                Integer32,
+        zxAnSwCardFileName            DisplayString,
+        zxAnSwCardFileType            DisplayString,
+        zxAnSwCardVersion             DisplayString,
+        zxAnSwCardFileLen             Integer32,
+        zxAnSwCardBuildTime           DateAndTime,
+        zxAnSwCardBootwareFileName    DisplayString,
+        zxAnSwCardBootwareFileType    DisplayString,
+        zxAnSwCardBootwareVersion     DisplayString,
+        zxAnSwCardBootwareFileLen     Integer32,
+        zxAnSwCardBootwareBuildTime   DateAndTime,
+        zxAnSwCardFirmware1FileName   DisplayString,
+        zxAnSwCardFirmware1FileType   DisplayString,
+        zxAnSwCardFirmware1Version    DisplayString,
+        zxAnSwCardFirmware1FileLen    Integer32,
+        zxAnSwCardFirmware1BuildTime  DateAndTime,        
+        zxAnSwCardFirmware2FileName   DisplayString,
+        zxAnSwCardFirmware2FileType   DisplayString,
+        zxAnSwCardFirmware2Version    DisplayString,
+        zxAnSwCardFirmware2FileLen    Integer32,
+        zxAnSwCardFirmware2BuildTime  DateAndTime,       
+        zxAnSwCardFirmware3FileName   DisplayString,
+        zxAnSwCardFirmware3FileType   DisplayString,
+        zxAnSwCardFirmware3Version    DisplayString,
+        zxAnSwCardFirmware3FileLen    Integer32,
+        zxAnSwCardFirmware3BuildTime  DateAndTime        
+        }
+        
+    zxAnSwCardRack      OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The rack number"
+        ::=  {  zxAnSwCardRunningVerEntry  1  }
+        
+    zxAnSwCardShelf     OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The shelf number"
+        ::=  {  zxAnSwCardRunningVerEntry  2  } 
+        
+    zxAnSwCardSlot      OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The slot number"
+        ::=  {  zxAnSwCardRunningVerEntry  3  }
+        
+    zxAnSwCardFileName                OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version file name of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  5  }
+
+    zxAnSwCardFileType                OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version file type of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  6  }
+        
+    zxAnSwCardVersion              OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version tag of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  7  }      
+
+    zxAnSwCardFileLen       OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version file length of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  8  }
+
+    zxAnSwCardBuildTime       OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time of version build. For example:
+                        yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwCardRunningVerEntry  9  }   
+        
+    zxAnSwCardBootwareFileName         OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The bootrom file name of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  10  }
+
+    zxAnSwCardBootwareFileType         OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The bootrom file type of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  11  }
+        
+    zxAnSwCardBootwareVersion              OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The bootrom tag of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  12  }      
+
+    zxAnSwCardBootwareFileLen       OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The bootrom file length of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  13  }
+
+    zxAnSwCardBootwareBuildTime       OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time of version build. For example:
+                        yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwCardRunningVerEntry  14  }   
+ 
+    zxAnSwCardFirmware1FileName  OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file name of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  15  }
+
+    zxAnSwCardFirmware1FileType OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file type of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  16  }
+        
+    zxAnSwCardFirmware1Version    OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware tag of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  17  }      
+
+    zxAnSwCardFirmware1FileLen       OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file length of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  18  }
+
+    zxAnSwCardFirmware1BuildTime OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION    "The time version build. For example:
+                       yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwCardRunningVerEntry  19  } 
+
+    zxAnSwCardFirmware2FileName  OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file name of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  20  }
+
+    zxAnSwCardFirmware2FileType  OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file type of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  21  }
+        
+    zxAnSwCardFirmware2Version    OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware tag of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  22  }      
+
+    zxAnSwCardFirmware2FileLen       OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file length of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  23  }
+
+    zxAnSwCardFirmware2BuildTime  OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time of version build. For example:
+                         yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwCardRunningVerEntry  24  }   
+
+    zxAnSwCardFirmware3FileName OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file name of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  25  }
+
+    zxAnSwCardFirmware3FileType OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file type of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  26  }
+        
+    zxAnSwCardFirmware3Version  OBJECT-TYPE 
+        SYNTAX        DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The firmware tag of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  27  }      
+
+    zxAnSwCardFirmware3FileLen       OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file length of the card."
+        ::=  {  zxAnSwCardRunningVerEntry  28  }
+
+    zxAnSwCardFirmware3BuildTime       OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time of version build. For example:
+                        yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwCardRunningVerEntry  29  }   
+
+-------------------------------------------------------------------------------
+-- 2. Subcard Running Software Information Table
+-------------------------------------------------------------------------------
+    zxAnSwSubcardRunningVerTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSwSubcardRunningVerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the sub card version information."
+        ::=  { zxAnCardSwObjects  3 }
+
+    zxAnSwSubcardRunningVerEntry   OBJECT-TYPE
+        SYNTAX      ZxAnSwSubcardRunningVerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnSwSubcardRunningVerTable."
+        INDEX       {  zxAnSwCardRack, zxAnSwCardShelf, zxAnSwCardSlot, 
+                    zxAnSwSubcardSlot  }
+        ::=  { zxAnSwSubcardRunningVerTable 1 }
+
+    ZxAnSwSubcardRunningVerEntry  ::=  SEQUENCE {
+        zxAnSwSubcardSlot                 Integer32,
+        zxAnSwSubcardFileName             DisplayString,
+        zxAnSwSubcardFileType             DisplayString,
+        zxAnSwSubcardVersion              DisplayString,
+        zxAnSwSubcardFileLen              Integer32,
+        zxAnSwSubcardBuildTime            DateAndTime,
+        zxAnSwSubcardBootwareFileName     DisplayString,
+        zxAnSwSubcardBootwareFileType     DisplayString,
+        zxAnSwSubcardBootwareVersion      DisplayString,
+        zxAnSwSubcardBootwareFileLen      Integer32,
+        zxAnSwSubcardBootwareBuildTime    DateAndTime,
+        zxAnSwSubcardFirmwareFileName     DisplayString,
+        zxAnSwSubcardFirmwareFileType     DisplayString,
+        zxAnSwSubcardFirmwareVersion      DisplayString,
+        zxAnSwSubcardFirmwareFileLen      Integer32,
+        zxAnSwSubcardFirmwareBuildTime    DateAndTime        
+        }
+
+    zxAnSwSubcardSlot               OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The slot number of the subcard"
+        ::=  {  zxAnSwSubcardRunningVerEntry  1  }
+        
+    zxAnSwSubcardFileName           OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version file name of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  3  }
+
+    zxAnSwSubcardFileType           OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version file type of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  4  }
+        
+    zxAnSwSubcardVersion             OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version tag of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  5  }      
+
+    zxAnSwSubcardFileLen             OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version file length of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  6  }
+
+    zxAnSwSubcardBuildTime       OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time of version build. For example:
+                        yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwSubcardRunningVerEntry  7  }   
+        
+    zxAnSwSubcardBootwareFileName     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The bootrom file name of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  8  }
+
+    zxAnSwSubcardBootwareFileType     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The bootrom file type of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  9  }
+        
+    zxAnSwSubcardBootwareVersion      OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The bootrom tag of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  10  }      
+
+    zxAnSwSubcardBootwareFileLen      OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The bootrom file length of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  11  }
+
+    zxAnSwSubcardBootwareBuildTime    OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time of version build. For example:
+                        yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwSubcardRunningVerEntry  12  }   
+ 
+    zxAnSwSubcardFirmwareFileName     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file name of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  13  }
+
+    zxAnSwSubcardFirmwareFileType     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file type of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  14  }
+        
+    zxAnSwSubcardFirmwareVersion      OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware tag of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  15  }      
+
+    zxAnSwSubcardFirmwareFileLen      OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware file length of the card."
+        ::=  {  zxAnSwSubcardRunningVerEntry  16  }
+
+    zxAnSwSubcardFirmwareBuildTime    OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time of version build. For example:
+                        yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwSubcardRunningVerEntry  17  }   
+  
+        
+-------------------------------------------------------------------------------
+-- 3.Saved Software information Table
+-------------------------------------------------------------------------------
+    zxAnSwImageTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSwImageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the saved version information in 
+                    version area MP."
+        ::=  { zxAnCardSwObjects  4 }
+
+    zxAnSwImageEntry   OBJECT-TYPE
+        SYNTAX      ZxAnSwImageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnSwImageTable."
+        INDEX   {zxAnSwCardRack,zxAnSwCardShelf,zxAnSwCardSlot, 
+                zxAnSwImageFileName}
+        ::=  { zxAnSwImageTable 1 }
+
+    ZxAnSwImageEntry  ::=  SEQUENCE {
+        zxAnSwImageFileName               DisplayString,
+        zxAnSwImageFileType               DisplayString,
+        zxAnSwImageVersion                DisplayString,
+        zxAnSwImageFileLen                Integer32,
+        zxAnSwImageBuildTime              DateAndTime,
+        zxAnSwImageActiveStatus           INTEGER,
+        zxAnSwImageDownloadTime           DateAndTime
+        }
+     
+        
+    zxAnSwImageFileName          OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     ""
+        ::=  {  zxAnSwImageEntry  1  }
+
+    zxAnSwImageFileType          OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version file type on the saved area."
+        ::=  {  zxAnSwImageEntry  2  }
+        
+    zxAnSwImageVersion           OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version tag on the saved area."
+        ::=  {  zxAnSwImageEntry  3  }      
+
+    zxAnSwImageFileLen           OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version file length on the saved area."
+        ::=  {  zxAnSwImageEntry  4  }
+
+    zxAnSwImageBuildTime       OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time of version build. For example:
+                        yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwImageEntry  5  } 
+
+    zxAnSwImageActiveStatus      OBJECT-TYPE 
+        SYNTAX          INTEGER  
+                {                       
+                       active(1),
+                       inactive(2),
+                       none(3)
+                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The status of saved MP version on the saved area.                        
+                        active(1):   active MP version.
+                        inactive(2): inactive MP version.
+                        none(3):     NP version, don't have active attribute.
+        "
+        ::=  {  zxAnSwImageEntry  6  }    
+        
+    zxAnSwImageDownloadTime       OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The downloading time of the version file."
+        ::=  {  zxAnSwImageEntry  7  }
+        
+-------------------------------------------------------------------------------
+-- 4 Software Manual Update Management Table
+-------------------------------------------------------------------------------
+    zxAnSwManualUpdateRack      OBJECT-TYPE     
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION  
+            "The rack number.    
+            The multi-variables binding rule should be complied 
+            with when a manager manual updates software. According 
+            to this rule,all the related mib variables must be 
+            included in one SNMP set operation. 
+                    
+            There are two types of variables: mandatory and 
+            optional. All of the mandatory variables must be 
+            included in one SNMP set operation. Optional variables 
+            may be included in one SNMP set operation with the 
+            mandatory variables, but must not be used alone. 
+                    
+            To manual update software, the mandatory and optional 
+            variables are as follows:
+            mandatoty: zxAnSwManualUpdateRack, 
+                       zxAnSwManualUpdateShelf,
+                       zxAnSwManualUpdateSlotList, 
+                       zxAnSwManualUpdateSwType
+            optional : none
+                        
+            To manual update subcard software, the mandatory and 
+            optional variables are as follows:
+            mandatoty: zxAnSwManualUpdateRack, 
+                       zxAnSwManualUpdateShelf,
+                       zxAnSwManualUpdateSlotList, 
+                       zxAnSwManualUpdateSwType,
+                       zxAnSwManualUpdateSubcardList
+            optional : none
+            "
+        ::=  {  zxAnSwManualUpdateGlobalObjects  1  }
+        
+    zxAnSwManualUpdateShelf     OBJECT-TYPE     
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "The shelf number. 
+            This variable must comply with the multi-variables 
+            binding rule described in zxAnSwManualUpdateRack." 
+        ::=  {  zxAnSwManualUpdateGlobalObjects  2  }
+
+    zxAnSwManualUpdateSlotList  OBJECT-TYPE     
+        SYNTAX      DisplayString  (SIZE (0 .. 64))  
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "The slot number. updating version file from MP to NP.
+            They can be updated in batch. For example: '1,2,3'
+            This variable must comply with the multi-variables 
+            binding rule described in zxAnSwManualUpdateRack."
+        ::=  {  zxAnSwManualUpdateGlobalObjects  3  }
+
+    zxAnSwManualUpdateSwType     OBJECT-TYPE     
+        SYNTAX      INTEGER {
+            bootware(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION     
+            "The software type is special to update.
+            This variable must comply with the multi-variables
+            binding rule described in zxAnSwManualUpdateRack.
+            bootware(1): update bootware."
+        ::=  {  zxAnSwManualUpdateGlobalObjects  4  }
+        
+    zxAnSwManualUpdateSubcardList   OBJECT-TYPE     
+        SYNTAX      DisplayString  (SIZE (0 .. 64))  
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION     
+            "The subcard number. updating version file from MP to subcard.
+            They can be updated in batch. For example: '1,2,3'
+            This variable must comply with the multi-variables 
+            binding rule described in zxAnSwManualUpdateRack.
+            If zxAnSwManualUpdateSlotList is '1,2' and 
+            zxAnSwManualUpdateSubcardList is '3,4', the actual operation object
+            like 'slot.subcard' is '1.3', '1.4', '2.3', '2.4'."
+        ::=  {  zxAnSwManualUpdateGlobalObjects  5  }
+
+-------------------------------------------------------------------------------
+-- 5. Software Manual Update Status Table
+-------------------------------------------------------------------------------
+    zxAnSwManualUpdateStatusTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSwManualUpdateStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the version updating status 
+                    information."
+        ::=  { zxAnSwManualUpdateObjects  5 }
+
+    zxAnSwManualUpdateStatusEntry   OBJECT-TYPE
+        SYNTAX      ZxAnSwManualUpdateStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnSwManualUpdateStatusTable."
+        INDEX       {  zxAnSwCardRack, zxAnSwCardShelf, zxAnSwCardSlot,
+                    zxAnSwManualUpdateSoftwareType  }
+        ::=  { zxAnSwManualUpdateStatusTable 1 }
+
+    ZxAnSwManualUpdateStatusEntry  ::=  SEQUENCE {
+        zxAnSwManualUpdateSoftwareType  INTEGER,
+        zxAnSwManualUpdateStatus        INTEGER,
+        zxAnSwManualFailedReason        INTEGER
+        }
+
+    zxAnSwManualUpdateSoftwareType       OBJECT-TYPE 
+        SYNTAX          INTEGER
+                        {
+                              bootware(1)
+                              -- Update bootware.
+                        }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The software type when updating version."
+        ::=  {  zxAnSwManualUpdateStatusEntry  1  }     
+
+    zxAnSwManualUpdateStatus       OBJECT-TYPE 
+        SYNTAX          INTEGER {negotiating(1),downloading(2),failed(3),
+                        success(4),sameversion(5)}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version status when updating version.
+                        negotiating(1):negotiating not starting
+                        downloading(2):updating from MP
+                        failed(3):     update failed
+                        success(4):    update successly
+                        sameVersion(5):not need update
+                        "
+        ::=  {  zxAnSwManualUpdateStatusEntry  2  }             
+
+    zxAnSwManualFailedReason       OBJECT-TYPE 
+        SYNTAX          INTEGER
+                  {
+                    noError(1),
+                      -- no error.
+                      
+                    noSupportCardHwVersion(2), 
+                      -- control card doesn't support the current card hardware
+                      -- version.
+                      
+                    mismatchCardHwVersion (3),
+                      -- control card's configuration and the current card
+                      -- hardware version are mismatch.
+                      
+                    mismatchCardConfData  (4),
+                      -- control card's configuration and the current card
+                      -- configuration data are mismatch.
+                    
+                    noSwInNe              (5),
+                      -- software for this card doesn't exist in control card.
+                      
+                    cardUpdateSwFailed    (6)
+                      -- the current card software update failed.
+                      
+                  }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The reason when updating version failed."
+        ::=  {  zxAnSwManualUpdateStatusEntry  3  }    
+        
+-------------------------------------------------------------------------------
+-- 6. Subcard Software Manual Update Status Table
+-------------------------------------------------------------------------------
+    zxAnSwSubcardMUpdateStatusTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSwSubcardMUpdateStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This table includes the subcard software updating status 
+            information."
+        ::= { zxAnSwManualUpdateObjects 6 }
+
+    zxAnSwSubcardMUpdateStatusEntry    OBJECT-TYPE
+        SYNTAX      ZxAnSwSubcardMUpdateStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "An entry in zxAnSwSubcardMUpdateStatusTable."
+        INDEX   { zxAnSwCardRack, zxAnSwCardShelf, zxAnSwCardSlot,
+                  zxAnSwSubcardSlot, zxAnSwSubcardMUpdateSoftwareType }
+        ::= { zxAnSwSubcardMUpdateStatusTable 1 }
+
+    ZxAnSwSubcardMUpdateStatusEntry ::= SEQUENCE {
+        zxAnSwSubcardMUpdateSoftwareType    INTEGER,
+        zxAnSwSubcardMUpdateStatus          INTEGER,
+        zxAnSwSubcardMUpdateFailedReason    INTEGER
+        }
+        
+    zxAnSwSubcardMUpdateSoftwareType   OBJECT-TYPE 
+        SYNTAX      INTEGER {
+            bootware(1)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "The software type when updating subcard software.
+            bootware(1): update bootware."
+        ::= { zxAnSwSubcardMUpdateStatusEntry 1 }     
+        
+
+    zxAnSwSubcardMUpdateStatus         OBJECT-TYPE 
+        SYNTAX      INTEGER {
+            negotiating(1),
+            downloading(2),
+            failed(3),
+            success(4),
+            sameversion(5)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The updating status when updating subcard software.
+            negotiating(1): negotiating not starting.
+            downloading(2): updating from MP.
+            failed(3): update failed.
+            success(4): update successfully.
+            sameVersion(5): not need to update.
+            "
+        ::= { zxAnSwSubcardMUpdateStatusEntry 2 }             
+
+    zxAnSwSubcardMUpdateFailedReason     OBJECT-TYPE 
+        SYNTAX      INTEGER {
+            noError(1),                    
+            noSupportCardHwVersion(2),     
+            mismatchCardHwVersion(3),
+            mismatchCardConfData(4),
+            noSwInNe(5),
+            cardUpdateSwFailed(6)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The reason when updating subcard software failed.
+            noError(1): no error.
+            noSupportCardHwVersion(2): control card doesn't support the 
+            current card hardware version.
+            mismatchCardHwVersion(3): control card's configuration and the
+            current card hardware version are mismatch.
+            mismatchCardConfData(4): control card's configuration and the
+            current card configuration data are mismatch.
+            noSwInNe(5): software for this card doesn't exist in control card.
+            cardUpdateSwFailed(6): the current card software update failed."
+        ::= { zxAnSwSubcardMUpdateStatusEntry 3 }    
+    
+-------------------------------------------------------------------------------
+-- 7. Software Automatic Update Check Management Table
+------------------------------------------------------------------------------- 
+    zxAnSwAutoUpdateChkEnable OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+                    "Enable or disable the software periodic check function.   
+                    
+                    The multi-variables binding rule should be complied with 
+                    when a software periodic check. According to this rule, 
+                    all the related mib variables must be included in one SNMP 
+                    set operation. 
+                    
+                    There are two types of variables: mandatory and optional.
+                    All of the mandatory variables must be included in one SNMP
+                    set operation. Optional variables may be included in one 
+                    SNMP set operation with the mandatory variables, but must 
+                    not be used alone. 
+                    
+                    To configure software periodic check(except disable 
+                    software periodic check function), the mandatory and 
+                    optional variables are as follows:
+                    mandatoty: zxAnSwAutoUpdateChkEnable, 
+                               zxAnSwAutoUpdateChkStartTime,
+                               zxAnSwAutoUpdateChkInterval
+                    optional : none
+                    "
+                    
+        DEFVAL    { disable }  
+        ::=  {  zxAnSwAutoUpdateChkObjects  1 }
+        
+    zxAnSwAutoUpdateChkStartTime OBJECT-TYPE 
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION     
+            "The start time of software periodic check.            
+            For example:yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33).   
+            
+            This variable must comply with the multi-variables binding 
+            rule described in zxAnSwAutoUpdateChkEnable.
+            "          
+        ::=  {  zxAnSwAutoUpdateChkObjects  2  }
+     
+    zxAnSwAutoUpdateChkInterval OBJECT-TYPE 
+        SYNTAX      Integer32(0..8760)
+        UNITS       "hours"   
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "The interval of software periodic check. 
+            Value 0 means unconfigured. 
+            Unit is hour.
+            
+            This variable must comply with the multi-variables binding 
+            rule described in zxAnSwAutoUpdateChkEnable.
+            " 
+        DEFVAL    { 24 }      
+        ::=  {  zxAnSwAutoUpdateChkObjects  3  }
+        
+    zxAnSwAutoUpdateCurrChkStartTime OBJECT-TYPE 
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+            "The start time of current software periodic check.            
+            For example:yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."      
+        ::=  {  zxAnSwAutoUpdateChkObjects  20  }
+    
+    zxAnSwAutoUpdateChkDifferFiles OBJECT-TYPE 
+        SYNTAX      DisplayString(SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The different files name between NE and file server. 
+            File name is separated by ',', For example:xxx,xxx,xxx."     
+        ::=  {  zxAnSwAutoUpdateChkObjects  21  }
+        
+    zxAnSwAutoUpdateChkStatus OBJECT-TYPE 
+        SYNTAX      INTEGER  {
+            notStarted(1),
+            inProgress(2),
+            success(3),
+            failed(4)               
+        }       
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+            "The status of software periodic check.
+            notStarted(1): Automatic update check not start     
+            inProgress(2): Automatic update check in progress
+            success(3):    Automatic update check successful
+            failed(4):     Automatic update check failed  
+            "
+        ::=  {  zxAnSwAutoUpdateChkObjects  22  }
+
+    zxAnSwAutoUpdateChkFailedReason OBJECT-TYPE     
+        SYNTAX      INTEGER  {
+            noError(1),
+            fileServerUnconfigured(2),
+            fileServerConnectFailed(3),
+            fileServerLoginFailed(4), 
+            fileServerPathError(5),
+            fileServerProtocolTypeError(6),          
+            deviceCheckFailed(7),             
+            otherErrors(255)            
+        }         
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+            "The failed reason of software periodic check.
+            noError(1):                       Automatic update check successful
+                                              or not start
+            fileServerUnconfigured(2):        Automatic update file server
+                                              is not configure
+            fileServerConnectFailed(3):       File server connect failed
+            fileServerLoginFailed(4):         File server configure is not
+                                              correct 
+            fileServerPathError(5):           File server configure path is 
+                                              not correct 
+            fileServerProtocolTypeError(6):   File server configure protocol 
+                                              type is not correct           
+            deviceCheckFailed(7):             NE flash error             
+            otherErrors(255):                 Error is not include above list                 
+            "
+        ::=  {  zxAnSwAutoUpdateChkObjects  23  } 
+
+-------------------------------------------------------------------------------
+-- 8. Software Automatic Update Management Table
+------------------------------------------------------------------------------- 
+    zxAnSwAutoUpdateAction OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            start(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "The automatic update action. 
+            It means to start the automatic update progress."
+        ::=  {  zxAnSwAutoUpdateOperObjects  1  } 
+        
+    zxAnSwAutoUpdateActiveEnable OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "Enable or disable the software active function. Active means to 
+            reset card except control card."
+        DEFVAL    { enable } 
+        ::=  {  zxAnSwAutoUpdateOperObjects  2  } 
+        
+    zxAnSwAutoUpdateSwBackupEnable OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            enable(1),
+            disable(2)
+        }   
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "Enable or disable the version file backup function."
+        DEFVAL    { enable }  
+        ::=  {  zxAnSwAutoUpdateOperObjects  3  } 
+        
+    zxAnSwAutoUpdateStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notStarted(1),
+            updateStarting(2),
+            backingUpFile(3),
+            versionFileAnalyzing(4),
+            versionFileDownloading(5),
+            versionFileDownloadComplete(6),
+            masterSlaveSynchronizing(7),
+            masterSlaveSyncComplete(8), 
+            versionFileLoading(9),            
+            bootUpdating(10),
+            bootUpdateComplete(11),
+            updateSuccess(12),
+            readyToReboot(13),
+            sameVersion(14),
+            updateFailed(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        "The status of automatic update.
+        notStarted(1):                 Not start
+        updateStarting(2):             Update Start
+        backingUpFile(3):              Backup software before update
+        versionFileAnalyzing(4):       Software analyzing
+        versionFileDownloading(5):     Software downloading
+        versionFileDownloadComplete(6):Software download completed
+        masterSlaveSynchronizing(7):   Synchronize software to slave board
+        masterSlaveSyncComplete(8):    Synchronize software completed
+        versionFileLoading(9):         Load software to card            
+        bootUpdating(10):              Update bootrom
+        bootUpdateComplete(11):        Update bootrom completed
+        updateSuccess(12):             Update successful
+        readyToReboot(13):             Update had beed finished,ready to reboot
+        sameVersion(14):               Update is not need for same version
+        updateFailed(255):             Update failed
+        "
+        ::=  {  zxAnSwAutoUpdateOperObjects  20  }
+
+    zxAnSwAutoUpdateCurrFileName OBJECT-TYPE 
+        SYNTAX      DisplayString(SIZE(0..64)) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+            "The name of current file which is updated."
+        ::=  {  zxAnSwAutoUpdateOperObjects  21  } 
+
+    zxAnSwAutoUpdateCurrFileSize OBJECT-TYPE 
+        SYNTAX      Integer32
+        UNITS       "bytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+            "The size of current file which is updated."
+        ::=  {  zxAnSwAutoUpdateOperObjects  22  }          
+    
+    zxAnSwAutoUpdateCurrFileProgress OBJECT-TYPE 
+        SYNTAX      Integer32(0..100)
+        UNITS       "percent"   
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+             "The updating progress of current file." 
+        ::=  {  zxAnSwAutoUpdateOperObjects  23  }
+
+    zxAnSwAutoUpdateTotalFiles OBJECT-TYPE     
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+            "Total count of files will be updated."
+        ::=  {  zxAnSwAutoUpdateOperObjects  24  }     
+
+    zxAnSwAutoUpdateSuccessFiles OBJECT-TYPE     
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+            "Count of files which are updated successfully."           
+        ::=  {  zxAnSwAutoUpdateOperObjects  25  }
+
+    zxAnSwAutoUpdateFailedReason OBJECT-TYPE
+        SYNTAX      INTEGER{
+            noError(1),
+            backupDataError(2),
+            backupLogError(3),
+            backupConfigurationError(4),
+            backupVersionFileError(5),
+            backupOtherError(6),
+            analyzingConfigurationError(7),
+            analyzingVersionFileError(8),
+            diskFull(9),
+            downloadingVersionFileError(10),
+            updateVersionFileError(11),
+            updateBootError(12),
+            masterSlaveSynchronizeError(13),
+            updateConflict(14),
+            unavailableServer(15),
+            slaveCardNotInService(16),
+            fileNotExist(17),
+            otherErrors(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The failed reason of automatic update.
+            noError(1),                     Update is not start or successful
+            backupDataError(2),             Backup data failed
+            backupLogError(3),              Backup log failed
+            backupConfigurationError(4),    Backup configuration failed
+            backupVersionFileError(5),      Backup software failed
+            backupOtherError(6),            Backup file failed is not above 
+                                            list
+            analyzingConfigurationError(7), Analyze configuration error
+            analyzingVersionFileError(8),   Analyze software error
+            diskFull(9),                    NE disk is full
+            downloadingVersionFileError(10),Download software failed
+            updateVersionFileError(11),     Update software failed
+            updateBootError(12),            Update bootrom failed
+            masterSlaveSynchronizeError(13),Synchronize software to slave board
+                                            failed
+            updateConflict(14),             Other update is executing
+            unavailableServer(15),          File server configure failed
+            slaveCardNotInService(16),      Slave board is not inservice
+            fileNotExist(17),               File not exist on server
+            otherErrors(255)                Other errors is not list above
+            "
+        ::=  {  zxAnSwAutoUpdateOperObjects  26  }  
+
+-------------------------------------------------------------------------------
+-- 9. Software Swap Management Table
+------------------------------------------------------------------------------- 
+    zxAnSwSwapRack      OBJECT-TYPE     
+        SYNTAX          Integer32 
+        MAX-ACCESS      read-write
+        STATUS        current
+        DESCRIPTION   " The Rack No. is used for swap version .
+                      The multi-variables binding rule should be complied 
+                      with when swap software. According to this rule, 
+                      all the related mib variables must be included in one 
+                      SNMP set operation. 
+                   
+                      There are two types of variables: mandatory and optional.
+                      All of the mandatory variables must be included in one 
+                      SNMP set operation. Optional variables may be included 
+                      in one SNMP set operation with the mandatory variables, 
+                      but must not be used alone. 
+                   
+                      To swap software, the mandatory and optional variables 
+                      are as follows:
+                      mandatoty:zxAnSwSwapRack, zxAnSwSwapShelf, zxAnSwSwapSlot
+                      optional :none
+                      "       
+                        
+        ::=  {  zxAnSwSwapGlobalObjects  1  }
+        
+    zxAnSwSwapShelf   OBJECT-TYPE     
+        SYNTAX          Integer32 
+        MAX-ACCESS      read-write
+        STATUS        current
+        DESCRIPTION   " The Shelf number is used for swap version.    
+                     
+                      This variable must comply with the multi-variables 
+                      binding rule described in zxAnSwSwapRack.
+                      "
+                        
+        ::=  {  zxAnSwSwapGlobalObjects  2  }
+
+    zxAnSwSwapSlot    OBJECT-TYPE     
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION   " The slot number is used for swap version.
+                      
+                      This variable must comply with the multi-variables
+                      binding rule described in zxAnSwSwapRack.
+                      "        
+                        
+        ::=  {  zxAnSwSwapGlobalObjects  3  }     
+
+------------------------------------------------------------------------------
+-- 10. Saved Patch Information Table
+------------------------------------------------------------------------------        
+    zxAnSwSavedPatchTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSwSavedPatchEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the saved patch information."
+        ::=  { zxAnCardPatchObjects  2 }
+
+    zxAnSwSavedPatchEntry   OBJECT-TYPE
+        SYNTAX      ZxAnSwSavedPatchEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnSwSavedPatchTable."
+        INDEX       { zxAnSwPatchRack,zxAnSwPatchShelf,
+                      zxAnSwPatchSlot,zxAnSwPatchName }
+        ::=  { zxAnSwSavedPatchTable 1 }
+
+    ZxAnSwSavedPatchEntry  ::=  SEQUENCE {
+        zxAnSwPatchRack             Integer32,
+        zxAnSwPatchShelf            Integer32,
+        zxAnSwPatchSlot             Integer32,
+        zxAnSwPatchName             DisplayString,
+        zxAnSwPatchOwnerSwVersion   DisplayString,
+        zxAnSwPatchVersion          DisplayString,
+        zxAnSwPatchSize             Integer32,
+        zxAnSwPatchBuildTime        DateAndTime,
+        zxAnSwPatchConfActiveStatus INTEGER,
+        zxAnSwPatchDescription      DisplayString
+    }
+
+    zxAnSwPatchRack     OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The rack number."
+        ::=  {  zxAnSwSavedPatchEntry  1  }
+
+    zxAnSwPatchShelf    OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The shelf number."
+        ::=  {  zxAnSwSavedPatchEntry  2  }
+
+    zxAnSwPatchSlot     OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The slot number."
+        ::=  {  zxAnSwSavedPatchEntry  3  }        
+        
+    zxAnSwPatchName     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The patch file name."
+        ::=  {  zxAnSwSavedPatchEntry  4  }
+
+    zxAnSwPatchOwnerSwVersion  OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The software version of the patch belonging to."
+        ::=  {  zxAnSwSavedPatchEntry  5  }
+
+    zxAnSwPatchVersion  OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version tag of the patch."
+        ::=  {  zxAnSwSavedPatchEntry  6  }
+
+    zxAnSwPatchSize OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "byte"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The patch file length."
+        ::=  {  zxAnSwSavedPatchEntry  7  }
+
+    zxAnSwPatchBuildTime  OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION    "The time of patch build. For example:
+                        yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwSavedPatchEntry  8  }
+
+    zxAnSwPatchConfActiveStatus  OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            activated(1),
+            deactivated(2)
+            }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The configured active status of the patch file.
+                        activated  -- to activate the patch file.
+                        deactivated -- to deactivate the patch file."
+        DEFVAL { deactivated }
+        ::=  {  zxAnSwSavedPatchEntry  9  }
+
+    zxAnSwPatchDescription  OBJECT-TYPE 
+        SYNTAX          DisplayString ( SIZE ( 0 .. 255  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The patch description."
+        ::=  {  zxAnSwSavedPatchEntry  10  }
+
+------------------------------------------------------------------------------
+-- 11. Card Patch Running Status Information Table
+------------------------------------------------------------------------------    
+    zxAnSwCardPatchRunStatusTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSwCardPatchRunStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This table includes the patch running status information of the 
+             card."
+        ::=  { zxAnCardPatchObjects  3 }
+
+    zxAnSwCardPatchRunStatusEntry   OBJECT-TYPE
+        SYNTAX      ZxAnSwCardPatchRunStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnSwCardPatchRunStatusTable."
+        INDEX       
+            {  zxAnSwPatchRack, 
+               zxAnSwPatchShelf,
+               zxAnSwPatchSlot, 
+               zxAnSwCardPatchName  }
+        ::=  { zxAnSwCardPatchRunStatusTable 1 }
+
+    ZxAnSwCardPatchRunStatusEntry  ::=  SEQUENCE {
+        zxAnSwCardPatchName            DisplayString,
+        zxAnSwCardPatchOwnerSwVersion  DisplayString,
+        zxAnSwCardPatchVersion         DisplayString,
+        zxAnSwCardPatchSize            Integer32,
+        zxAnSwCardPatchBuildTime       DateAndTime,
+        zxAnSwCardPatchActivatedTime   DateAndTime,
+        zxAnSwCardPatchDescription     DisplayString,
+        zxAnSwCardPatchRunningStatus   INTEGER
+        }
+
+    zxAnSwCardPatchName  OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..64))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The patch file name of the card."
+        ::=  {  zxAnSwCardPatchRunStatusEntry  1  }
+    
+    zxAnSwCardPatchOwnerSwVersion  OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The software version of the patch belonging to."
+        ::=  {  zxAnSwCardPatchRunStatusEntry  2  }
+
+    zxAnSwCardPatchVersion  OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version tag of the patch."
+        ::=  {  zxAnSwCardPatchRunStatusEntry  3  }
+
+    zxAnSwCardPatchSize  OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "byte"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The patch file length."
+        ::=  {  zxAnSwCardPatchRunStatusEntry  4  }
+    
+    zxAnSwCardPatchBuildTime  OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION    "The time of patch build. For example:
+                       yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwCardPatchRunStatusEntry  5  }
+
+    zxAnSwCardPatchActivatedTime  OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION    "The time of the patch activated. For example:
+                       yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwCardPatchRunStatusEntry  6  }
+
+    zxAnSwCardPatchDescription  OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The patch description."
+        ::=  {  zxAnSwCardPatchRunStatusEntry  7  }
+
+    zxAnSwCardPatchRunningStatus  OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            activatingSucceeded(1),
+            activatingFailed(2),
+            waitingToBeActivated(3),
+            resettingCardNeeded(4),
+            mismatched(5)
+            }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "The patch running status.
+             activatingSucceeded(1) : value 1 means the activating operation 
+                                      of the patch file is succeeded.
+             activatingFailed(2)    : value 2 means the activating operation 
+                                      of the patch file is failed.
+             waitingToBeActivated(3): value 3 means the patch file is waiting 
+                                      to be activated.
+             resettingCardNeeded(4) : value 4 means the patch file has been 
+                                      successfully activated and the card 
+                                      needs to be reset.
+             mismatched(5)          : value 5 means the version of the patch 
+                                      file is not matched with the version of
+                                      the card software."
+        ::=  {  zxAnSwCardPatchRunStatusEntry  8  }
+
+------------------------------------------------------------------------------
+-- 12. Subcard Running Patch Information Table
+------------------------------------------------------------------------------    
+    zxAnSwSubcardRunningPatchTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSwSubcardRunningPatchEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the subcard patch information."
+        ::=  { zxAnCardPatchObjects  4 }
+
+    zxAnSwSubcardRunningPatchEntry   OBJECT-TYPE
+        SYNTAX      ZxAnSwSubcardRunningPatchEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnSwSubcardRunningPatchTable."
+        INDEX       {  zxAnSwPatchRack,zxAnSwPatchShelf,
+                       zxAnSwPatchSlot,zxAnSwPatchSubcardSlot, 
+                       zxAnSwSubcardPatchName }
+        ::=  { zxAnSwSubcardRunningPatchTable 1 }
+
+    ZxAnSwSubcardRunningPatchEntry  ::=  SEQUENCE {
+        zxAnSwPatchSubcardSlot           Integer32,
+        zxAnSwSubcardPatchName           DisplayString,
+        zxAnSwSubcardPatchOwnerSwVersion DisplayString,
+        zxAnSwSubcardPatchVersion        DisplayString,
+        zxAnSwSubcardPatchSize           Integer32,
+        zxAnSwSubcardPatchBuildTime      DateAndTime,
+        zxAnSwSubcardPatchActivatedTime  DateAndTime,
+        zxAnSwSubcardPatchDescription    DisplayString
+        }
+
+    zxAnSwPatchSubcardSlot  OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The slot number of the subcard."
+        ::=  {  zxAnSwSubcardRunningPatchEntry  1  }
+
+    zxAnSwSubcardPatchName      OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The file name of the patch "
+        ::=  {  zxAnSwSubcardRunningPatchEntry  2  }
+
+    zxAnSwSubcardPatchOwnerSwVersion  OBJECT-TYPE
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The software version of the patch belonging to."
+        ::=  {  zxAnSwSubcardRunningPatchEntry  3  }
+
+    zxAnSwSubcardPatchVersion  OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version tag of the patch."
+        ::=  {  zxAnSwSubcardRunningPatchEntry  4  }
+
+    zxAnSwSubcardPatchSize OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "byte"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The patch file length."
+        ::=  {  zxAnSwSubcardRunningPatchEntry  5  }
+
+    zxAnSwSubcardPatchBuildTime  OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION    "The time of patch build. For example:
+                       yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwSubcardRunningPatchEntry  6  }
+
+    zxAnSwSubcardPatchActivatedTime  OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION    "The time of the patch activated. For example:
+                       yyyy-mm-dd HH:MM:SS.(2001-01-01 02:22:33)."
+        ::=  {  zxAnSwSubcardRunningPatchEntry  7  }
+
+    zxAnSwSubcardPatchDescription  OBJECT-TYPE 
+        SYNTAX          DisplayString ( SIZE ( 0 .. 255  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The patch description."
+        ::=  {  zxAnSwSubcardRunningPatchEntry  8  }
+
+------------------------------------------------------------------------------
+-- 13. Saved Patch Package information Table
+------------------------------------------------------------------------------
+    zxAnSwSavedPatchPackageTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSwSavedPatchPackageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This table includes the saved patch package information."
+        ::=  { zxAnCardPatchObjects  5 }
+
+    zxAnSwSavedPatchPackageEntry   OBJECT-TYPE
+        SYNTAX      ZxAnSwSavedPatchPackageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "An entry in zxAnSwSavedPatchPackageTable."
+        INDEX
+            { zxAnSwPatchRack,
+              zxAnSwPatchShelf,
+              zxAnSwPatchSlot,
+              zxAnSwPatchPkgName }
+        ::=  { zxAnSwSavedPatchPackageTable 1 }
+
+    ZxAnSwSavedPatchPackageEntry  ::=  SEQUENCE {
+        zxAnSwPatchPkgName               DisplayString,
+        zxAnSwPatchPkgVersion            DisplayString,
+        zxAnSwPatchPkgSize               Integer32,
+        zxAnSwPatchPkgBuildTime          DateAndTime,
+        zxAnSwPatchPkgDescription        DisplayString,   
+        zxAnSwPatchPkgConfActiveStatus   INTEGER,
+        zxAnSwPatchPkgActualActiveStatus INTEGER
+    }
+
+    zxAnSwPatchPkgName     OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (1..64))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The name of the patch package."
+        ::=  {  zxAnSwSavedPatchPackageEntry  1  }
+
+    zxAnSwPatchPkgVersion  OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The version of the patch package."
+        ::=  {  zxAnSwSavedPatchPackageEntry  2  }
+
+    zxAnSwPatchPkgSize OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "byte"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The size of the patch package."
+        ::=  {  zxAnSwSavedPatchPackageEntry  3  }
+
+    zxAnSwPatchPkgBuildTime  OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION    "The build time of patch package."
+        ::=  {  zxAnSwSavedPatchPackageEntry  4  }
+
+    zxAnSwPatchPkgDescription  OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The description of the patch package."
+        ::=  {  zxAnSwSavedPatchPackageEntry  5  }
+
+    zxAnSwPatchPkgConfActiveStatus  OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            activated(1),
+            deactivated(2)
+            }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+            "The configured active status of the patch package.
+             activated(1)   : value 1 means the configured active status of
+                              the patch package is activated.
+             deactivated(2) : value 2 means the configured active status of
+                              the patch package is deactivated."
+        DEFVAL { deactivated }
+        ::=  {  zxAnSwSavedPatchPackageEntry  6  }
+
+    zxAnSwPatchPkgActualActiveStatus OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            activated(1),
+            deactivated(2)
+            }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "The actual active status of the patch package.
+             activated(1)   : value 1 means the patch package is activated.
+             deactivated(2) : value 2 means the patch package is deactivated."
+        ::=  {  zxAnSwSavedPatchPackageEntry  7  }
+
+------------------------------------------------------------------------------
+-- 14. Saved Patch Package File Information Table
+------------------------------------------------------------------------------        
+    zxAnSwSavedPatchPackageFileTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSwSavedPatchPackageFileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This table includes the information of the file inside the patch
+             package."
+        ::=  { zxAnCardPatchObjects  6 }
+
+    zxAnSwSavedPatchPackageFileEntry   OBJECT-TYPE
+        SYNTAX      ZxAnSwSavedPatchPackageFileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "An entry in zxAnSwSavedPatchPackageFileTable."
+        INDEX       
+            { zxAnSwPatchRack,
+              zxAnSwPatchShelf,
+              zxAnSwPatchSlot,
+              zxAnSwPatchPkgName, 
+              zxAnSwPatchPkgFileName }
+        ::=  { zxAnSwSavedPatchPackageFileTable 1 }
+
+    ZxAnSwSavedPatchPackageFileEntry  ::=  SEQUENCE {
+        zxAnSwPatchPkgFileName                DisplayString,
+        zxAnSwPatchPkgFileBuildTime           DateAndTime,
+        zxAnSwPatchPkgFileNeedResetCard       INTEGER,
+        zxAnSwPatchPkgFileActiveStatus        INTEGER
+    }
+
+    zxAnSwPatchPkgFileName     OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (1..64))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "The name of the file inside the patch package."
+        ::=  {  zxAnSwSavedPatchPackageFileEntry  1  }
+        
+    zxAnSwPatchPkgFileBuildTime  OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION    
+            "The build time of the file inside the patch package."
+        ::=  {  zxAnSwSavedPatchPackageFileEntry  2  }
+
+    zxAnSwPatchPkgFileNeedResetCard OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            yes(1),
+            no(2)
+            }         
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "Whether the card needs to be reset.
+             yes(1) : value 1 means need to reset the card.
+             no(2) :  value 2 means no need to reset the card."
+        ::=  {  zxAnSwSavedPatchPackageFileEntry  3  }
+
+    zxAnSwPatchPkgFileActiveStatus OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            activated(1),
+            deactivated(2)
+            }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "The patch file active status.                     
+             activated(1)   : value 1 means the patch file is activated.
+             deactivated(2) : value 2 means the patch file is deactivated."
+        ::=  {  zxAnSwSavedPatchPackageFileEntry  4  }
+
+-------------------------------------------------------------------------------
+-- 21 Software Notification
+-------------------------------------------------------------------------------
+
+    zxAnSwAutoUpdateFinished NOTIFICATION-TYPE
+        OBJECTS { zxAnSwAutoUpdateStatus,zxAnSwAutoUpdateFailedReason }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnSwAutoUpdateFinished is sent when the agent has detected 
+            that the automatic update is finished."
+        ::= { zxAnSwAutoUpdateTraps 1 }
+    
+    zxAnSwAutoUpdateSwDiffer NOTIFICATION-TYPE
+        OBJECTS { zxAnSwAutoUpdateCurrChkStartTime, 
+                  zxAnSwAutoUpdateChkDifferFiles }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnSwAutoUpdateSwDiffer is sent when the agent has 
+            detected different version files between NE and file server."
+        ::= { zxAnSwAutoUpdateTraps 2 }
+    
+    zxAnSwAutoUpdateSwChkFailed NOTIFICATION-TYPE
+        OBJECTS { zxAnSwAutoUpdateCurrChkStartTime, 
+                  zxAnSwAutoUpdateChkFailedReason }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnSwAutoUpdateSwChkFailed is sent when the agent has 
+            detected that version check is failed."
+        ::= { zxAnSwAutoUpdateTraps 3 }
+        
+-------------------------------------------------------------------------------
+-- 31. Software Conformance
+-------------------------------------------------------------------------------    
+    zxAnSwConformance      OBJECT IDENTIFIER   ::=  {  zxAnSoftwareMib     4  }
+    
+    zxAnSwCompliances      OBJECT IDENTIFIER   ::=  {  zxAnSwConformance   1  }
+    zxAnSwGroups           OBJECT IDENTIFIER   ::=  {  zxAnSwConformance   2  }
+
+    zxAnSwCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for SNMP entities which implement the
+            ZTE-AN-SOFTWARE-MIB."
+        MODULE -- this module
+        
+            MANDATORY-GROUPS { 
+                 zxAnSwCardRunVerGroup,
+                 zxAnSwSubcardRunVerGroup,
+                 zxAnSwImageGroup,
+                 zxAnSwManualUpdateGroup,
+                 zxAnSwManualUpdateStatusGroup,
+                 zxAnSwAutoUpdateChkGroup,
+                 zxAnSwAutoUpdateOperGroup,
+                 zxAnSwSwapGroup,
+                 zxAnSwNotificationsGroup
+                }
+        ::= { zxAnSwCompliances 1 }
+                  
+    zxAnSwCardRunVerGroup OBJECT-GROUP
+        OBJECTS {
+                 zxAnSwCardFileName, zxAnSwCardFileType, zxAnSwCardVersion, 
+                 zxAnSwCardFileLen, zxAnSwCardBuildTime, 
+                 zxAnSwCardBootwareFileName, zxAnSwCardBootwareFileType, 
+                 zxAnSwCardBootwareVersion, zxAnSwCardBootwareFileLen, 
+                 zxAnSwCardBootwareBuildTime, zxAnSwCardFirmware1FileName,
+                 zxAnSwCardFirmware1FileType, zxAnSwCardFirmware1Version, 
+                 zxAnSwCardFirmware1FileLen, zxAnSwCardFirmware1BuildTime,
+                 zxAnSwCardFirmware2FileName, zxAnSwCardFirmware2FileType,
+                 zxAnSwCardFirmware2Version, zxAnSwCardFirmware2FileLen,
+                 zxAnSwCardFirmware2BuildTime, zxAnSwCardFirmware3FileName, 
+                 zxAnSwCardFirmware3FileType, zxAnSwCardFirmware3Version,       
+                 zxAnSwCardFirmware3FileLen, zxAnSwCardFirmware3BuildTime
+                }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent chassis 
+             version information, include card running version information."
+
+        ::= { zxAnSwGroups 1 }
+
+    zxAnSwSubcardRunVerGroup OBJECT-GROUP
+        OBJECTS {zxAnSwSubcardFileName, 
+                 zxAnSwSubcardFileType, zxAnSwSubcardVersion, 
+                 zxAnSwSubcardFileLen, zxAnSwSubcardBuildTime,
+                 zxAnSwSubcardBootwareFileName, zxAnSwSubcardBootwareFileType, 
+                 zxAnSwSubcardBootwareVersion, zxAnSwSubcardBootwareFileLen, 
+                 zxAnSwSubcardBootwareBuildTime, zxAnSwSubcardFirmwareFileName,
+                 zxAnSwSubcardFirmwareFileType, zxAnSwSubcardFirmwareVersion, 
+                 zxAnSwSubcardFirmwareFileLen, zxAnSwSubcardFirmwareBuildTime
+                }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent chassis 
+             version information, include subcard running version information."
+
+        ::= { zxAnSwGroups 2 }                            
+
+    zxAnSwImageGroup OBJECT-GROUP
+        OBJECTS {zxAnSwImageFileType, zxAnSwImageVersion, zxAnSwImageFileLen,
+                 zxAnSwImageBuildTime, zxAnSwImageActiveStatus
+                }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent chassis 
+             version information, include card saved version information."
+
+        ::= { zxAnSwGroups 3 }     
+
+    zxAnSwManualUpdateGroup OBJECT-GROUP
+        OBJECTS {zxAnSwManualUpdateRack, zxAnSwManualUpdateShelf, 
+                 zxAnSwManualUpdateSlotList, zxAnSwManualUpdateSwType
+                }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to update software by 
+            manual."
+
+        ::= { zxAnSwGroups 4 } 
+        
+    zxAnSwManualUpdateStatusGroup OBJECT-GROUP
+        OBJECTS {zxAnSwManualUpdateStatus, zxAnSwManualFailedReason
+                }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent chassis
+             software update status."
+
+        ::= { zxAnSwGroups 5 } 
+
+    zxAnSwAutoUpdateChkGroup OBJECT-GROUP
+        OBJECTS { zxAnSwAutoUpdateChkEnable, zxAnSwAutoUpdateChkStartTime, 
+                  zxAnSwAutoUpdateChkInterval,
+                  zxAnSwAutoUpdateCurrChkStartTime, 
+                  zxAnSwAutoUpdateChkDifferFiles, zxAnSwAutoUpdateChkStatus,
+                  zxAnSwAutoUpdateChkFailedReason
+                }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to management version 
+            automatic updating.
+            Automatic version check to list the different files name between
+            NE and file server."
+
+        ::= { zxAnSwGroups 6 } 
+        
+    zxAnSwAutoUpdateOperGroup OBJECT-GROUP
+        OBJECTS { zxAnSwAutoUpdateAction, zxAnSwAutoUpdateActiveEnable,
+                  zxAnSwAutoUpdateSwBackupEnable, zxAnSwAutoUpdateStatus, 
+                  zxAnSwAutoUpdateCurrFileName, zxAnSwAutoUpdateCurrFileSize, 
+                  zxAnSwAutoUpdateCurrFileProgress, zxAnSwAutoUpdateTotalFiles,
+                  zxAnSwAutoUpdateSuccessFiles, zxAnSwAutoUpdateFailedReason
+                }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to management version 
+            automatic updating.
+            Automatic version update to download version from file server and 
+            to take effect."
+
+        ::= { zxAnSwGroups 7 } 
+        
+    zxAnSwSwapGroup OBJECT-GROUP
+        OBJECTS { zxAnSwSwapRack, zxAnSwSwapShelf, zxAnSwSwapSlot
+                }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to swap version ."
+
+        ::= { zxAnSwGroups 8 }         
+        
+    zxAnSwNotificationsGroup OBJECT-GROUP
+        OBJECTS {  zxAnSwAutoUpdateFinished, zxAnSwAutoUpdateSwDiffer,
+                   zxAnSwAutoUpdateSwChkFailed
+                }
+        STATUS current
+        DESCRIPTION 
+            "The notifications which indicate specific changes, 
+            include automatic update check,automatic update status."
+
+        ::= { zxAnSwGroups 9 } 
+END

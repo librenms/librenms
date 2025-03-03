@@ -5,12 +5,14 @@ type: printer
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysDescr:
-        - Samsung C
-        - Samsung S
-        - Samsung ML
+    -
+        sysDescr:
+            - 'Samsung C'
+            - 'Samsung S'
+            - 'Samsung ML'
+            - 'Samsung M4080FX'
+            - 'Samsung X'
 discovery_modules:
-    toner: 1
+    printer-supplies:   true
 poller_modules:
-    toner: 1
-
+    printer-supplies:   true

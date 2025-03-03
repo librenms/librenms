@@ -14,7 +14,7 @@ IMPORTS
 
 
 rlRmonControl  MODULE-IDENTITY
-                 LAST-UPDATED "200406010000Z"
+                 LAST-UPDATED "200406010001Z"
                  ORGANIZATION "Cisco Systems, Inc."
 
                  CONTACT-INFO
@@ -330,6 +330,41 @@ rlControlHistoryMaxEntries OBJECT-TYPE
        "Maximum number of rlHistoryTable entries."
    DEFVAL  { 300 }
    ::= {rlRmonControl 8}
+
+-- 
+-- rlEtherStatsTable
+-- 
+rlEtherStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlEtherStatsEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of Ethernet statistics entries."
+    ::= { rlRmonControl 9 }
+
+rlEtherStatsEntry OBJECT-TYPE
+    SYNTAX     RlEtherStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the rlEtherStatsTable."
+    AUGMENTS   { etherStatsEntry }
+    ::= { rlEtherStatsTable 1 }
+
+RlEtherStatsEntry ::= SEQUENCE {
+	rlEtherStatsPkts1519toMaxOctets     Counter32
+}
+
+rlEtherStatsPkts1519toMaxOctets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of packets (including bad
+        packets) received that were at least 1518 
+		octets in length inclusive
+        (excluding framing bits but including FCS octets)."
+    ::= { rlEtherStatsEntry 1 }
 
 END
 

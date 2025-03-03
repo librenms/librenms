@@ -1,0 +1,674 @@
+-- ==========================================================================
+-- Copyright (c) 2004-2010 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The purpose of this MIB file is to provide the definition of
+--              voice dial control configuration, it includes the common
+--              cofiguration of entities, and special configuration for
+--              pots entities and VoIP entities.
+-- Reference:
+-- Version: V1.2
+-- History:
+-- V1.0 2008-02-17 Initial version, created by Tian Xiaoqiang, Qu Jin
+-- V1.1 2009-04-16 Add number management table 'hh3cVoEntityNumberTable', by
+--                 Qu Pingping.
+-- V1.2 2009-12-09 Add g729br8 to "Hh3cCodecType", Wang Tong.
+--                 Modify scope of hh3cVoEntityNumberAuthUser, 
+--                 from 31 to 63 by yangzhanhua.
+-- ==========================================================================
+HH3C-VOICE-DIAL-CONTROL-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32
+    FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, RowStatus, TruthValue
+    FROM SNMPv2-TC
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+        AbsoluteCounter32
+    FROM DIAL-CONTROL-MIB
+        hh3cVoice
+    FROM HH3C-OID-MIB;
+
+
+hh3cVoiceEntityControl MODULE-IDENTITY
+    LAST-UPDATED "200904160000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB file is to provide the definition of
+        voice dial control configuration."
+    REVISION "200904160000Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cVoice 14 }
+
+-- ======================================
+--          Type declaration
+-- ======================================
+Hh3cCodecType      ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+        "Type of Codec."
+SYNTAX  INTEGER
+        {
+        g711a(1),
+        g711u(2),
+        g723r53(3),
+        g723r63(4),
+        g729r8(5),
+        g729a(6),
+        g726r16(7),
+        g726r24(8),
+        g726r32(9),
+        g726r40(10),
+        unknown(11),
+        g729br8(12)
+        }
+
+Hh3cOutBandMode    ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+        "Type of OutBandMode."
+SYNTAX  INTEGER
+        {
+        voice(1),
+        h245AlphaNumeric(2),
+        h225(3),
+        sip(4),
+        nte(5),
+        vofr(6)
+        }
+
+Hh3cFaxProtocolType    ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+        "Type of FaxProtocol."
+SYNTAX INTEGER
+        {
+        t38(1),
+        standardt38(2),
+        pcmG711alaw(3),
+        pcmG711ulaw(4)
+        }
+
+Hh3cFaxBaudrateType    ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+        "Type of FaxBaudrate."
+SYNTAX INTEGER
+        {
+        disable(1),
+        voice(2),
+        b2400(3),
+        b4800(4),
+        b9600(5),
+        b14400(6)
+        }
+Hh3cFaxTrainMode   ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+        "Type of FaxTrainMode."
+SYNTAX INTEGER
+        {
+        local(1),
+        ppp(2)
+        }
+
+Hh3cRegisterdStatus    ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+        "Type of Registerd Status."
+SYNTAX INTEGER
+        {
+        other(1),           -- pots entity has not matched number or has not
+                            -- line with valid voice subscriber-line, or has not
+                            -- turned on registered switch
+        offline(2),         -- register failed or out of management with server
+        online(3),          -- register successfully
+        login(4),           -- registering to the server
+        logout(5)           -- registering out from the server
+        }
+
+hh3cVoEntityObjects OBJECT IDENTIFIER ::= { hh3cVoiceEntityControl 1 }
+
+-- ========================================================================
+--                      hh3cVoEntityCreateTable
+--
+-- ========================================================================
+
+hh3cVoEntityCreateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HH3CVoEntityCreateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table contains the voice entity information that
+        is used to create an ifIndexed row."
+    ::= { hh3cVoEntityObjects 1 }
+
+hh3cVoEntityCreateEntry OBJECT-TYPE
+    SYNTAX      HH3CVoEntityCreateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cVoEntityCreateTable."
+    INDEX
+        {
+            hh3cVoEntityIndex
+        }
+    ::= { hh3cVoEntityCreateTable 1 }
+
+HH3CVoEntityCreateEntry ::= SEQUENCE
+    {
+        hh3cVoEntityIndex        Integer32,
+        hh3cVoEntityType         INTEGER,
+        hh3cVoEntityRowStatus    RowStatus
+    }
+
+hh3cVoEntityIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index that uniquely identifies a voice entity."
+    ::= { hh3cVoEntityCreateEntry 1 }
+
+hh3cVoEntityType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            pots(1),
+            voip(2),
+            vofr(3)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify the type of voice related encapsulation."
+    ::= { hh3cVoEntityCreateEntry 2 }
+
+hh3cVoEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        " This object is used to create, delete or modify a row in
+        this table. The hh3cVoEntityType object should not be
+        modified once the new row has been created."
+    ::= { hh3cVoEntityCreateEntry 3 }
+
+-- ========================================================================
+--                      hh3cVoEntityCommonConfigTable
+--
+-- ========================================================================
+hh3cVoEntityCommonConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HH3CVoEntityCommonConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the general voice entity information."
+    ::= { hh3cVoEntityObjects 2 }
+
+
+hh3cVoEntityCommonConfigEntry OBJECT-TYPE
+    SYNTAX      HH3CVoEntityCommonConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cVoEntityCommonConfigTable."
+    INDEX
+        {
+            hh3cVoEntityCfgIndex
+        }
+    ::= { hh3cVoEntityCommonConfigTable 1 }
+
+
+HH3CVoEntityCommonConfigEntry ::= SEQUENCE
+    {
+        hh3cVoEntityCfgIndex                Integer32,
+        hh3cVoEntityCfgCodec1st             Hh3cCodecType,
+        hh3cVoEntityCfgCodec2nd             Hh3cCodecType,
+        hh3cVoEntityCfgCodec3rd             Hh3cCodecType,
+        hh3cVoEntityCfgCodec4th             Hh3cCodecType,
+        hh3cVoEntityCfgDSCP                 Integer32,
+        hh3cVoEntityCfgVADEnable            TruthValue,
+        hh3cVoEntityCfgOutbandMode          Hh3cOutBandMode,
+        hh3cVoEntityCfgFaxLevel             Integer32,
+        hh3cVoEntityCfgFaxBaudrate          Hh3cFaxBaudrateType,
+        hh3cVoEntityCfgFaxLocalTrainPara    Integer32,
+        hh3cVoEntityCfgFaxProtocol          Hh3cFaxProtocolType,
+        hh3cVoEntityCfgFaxHRPackNum         Integer32,
+        hh3cVoEntityCfgFaxLRPackNum         Integer32,
+        hh3cVoEntityCfgFaxSendNSFEnable     TruthValue,
+        hh3cVoEntityCfgFaxTrainMode         Hh3cFaxTrainMode,
+        hh3cVoEntityCfgFaxEcm               TruthValue,
+        hh3cVoEntityCfgPriority             Integer32,
+        hh3cVoEntityCfgDescription          OCTET STRING
+    }
+
+hh3cVoEntityCfgIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index that uniquely identifies a voice entity."
+    ::= { hh3cVoEntityCommonConfigEntry 1 }
+
+hh3cVoEntityCfgCodec1st OBJECT-TYPE
+    SYNTAX      Hh3cCodecType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the first desirable CODEC of speech
+        of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 2 }
+
+
+hh3cVoEntityCfgCodec2nd OBJECT-TYPE
+    SYNTAX      Hh3cCodecType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the second desirable CODEC of speech
+        of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 3 }
+
+
+hh3cVoEntityCfgCodec3rd OBJECT-TYPE
+    SYNTAX      Hh3cCodecType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the third desirable CODEC of speech
+        of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 4 }
+
+
+hh3cVoEntityCfgCodec4th OBJECT-TYPE
+    SYNTAX      Hh3cCodecType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the forth desirable CODEC of speech
+        of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 5 }
+
+
+hh3cVoEntityCfgDSCP OBJECT-TYPE
+    SYNTAX      Integer32(0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the DSCP(Different Service Code Point)
+        value of voice packets."
+    ::= { hh3cVoEntityCommonConfigEntry 6 }
+
+
+hh3cVoEntityCfgVADEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the VAD(Voice Activity Detection)
+        is enabled."
+    ::= { hh3cVoEntityCommonConfigEntry 7 }
+
+
+hh3cVoEntityCfgOutbandMode OBJECT-TYPE
+    SYNTAX      Hh3cOutBandMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the DTMF(Dual Tone Multi-Frequency)
+        outband type of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 8 }
+
+
+hh3cVoEntityCfgFaxLevel OBJECT-TYPE
+    SYNTAX      Integer32(-60..-3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the fax level of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 9 }
+
+
+hh3cVoEntityCfgFaxBaudrate OBJECT-TYPE
+    SYNTAX      Hh3cFaxBaudrateType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the fax baudrate of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 10 }
+
+
+hh3cVoEntityCfgFaxLocalTrainPara OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the fax local train threshold of this
+        dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 11 }
+
+
+hh3cVoEntityCfgFaxProtocol OBJECT-TYPE
+    SYNTAX      Hh3cFaxProtocolType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the fax protocol of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 12 }
+
+
+hh3cVoEntityCfgFaxHRPackNum OBJECT-TYPE
+    SYNTAX      Integer32(0..2)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the high speed redundancy packet
+        numbers of t38 and standard-t38."
+    ::= { hh3cVoEntityCommonConfigEntry 13 }
+
+
+hh3cVoEntityCfgFaxLRPackNum OBJECT-TYPE
+    SYNTAX      Integer32(0..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the low speed redundancy packet
+        numbers of t38 and standard-t38."
+    ::= { hh3cVoEntityCommonConfigEntry 14 }
+
+
+hh3cVoEntityCfgFaxSendNSFEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether sends NSF(Non-Standard Faculty)
+        to fax of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 15 }
+
+
+hh3cVoEntityCfgFaxTrainMode OBJECT-TYPE
+    SYNTAX      Hh3cFaxTrainMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the fax train mode of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 16 }
+
+
+hh3cVoEntityCfgFaxEcm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the ECM(Error Correct Mode)
+        is enabled."
+    ::= { hh3cVoEntityCommonConfigEntry 17 }
+
+
+hh3cVoEntityCfgPriority OBJECT-TYPE
+    SYNTAX      Integer32(0..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the priority of this dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 18 }
+
+
+hh3cVoEntityCfgDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the textual description of this
+        dial entity."
+    ::= { hh3cVoEntityCommonConfigEntry 19 }
+
+
+
+
+-- ========================================================================
+--                      hh3cVoPOTSEntityConfigTable
+--
+-- ========================================================================
+hh3cVoPOTSEntityConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HH3CVoPOTSEntityConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the POTS(Public Switched Telephone Network)
+        entity information."
+    ::= { hh3cVoEntityObjects 3 }
+
+
+hh3cVoPOTSEntityConfigEntry OBJECT-TYPE
+    SYNTAX      HH3CVoPOTSEntityConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cVoPOTSEntityConfigTable."
+    INDEX
+        {
+            hh3cVoPOTSEntityConfigIndex
+        }
+    ::= { hh3cVoPOTSEntityConfigTable 1 }
+
+
+HH3CVoPOTSEntityConfigEntry ::= SEQUENCE
+    {
+        hh3cVoPOTSEntityConfigIndex      Integer32,
+        hh3cVoPOTSEntityConfigPrefix     OCTET STRING,
+        hh3cVoPOTSEntityConfigSubLine    OCTET STRING,
+        hh3cVoPOTSEntityConfigSendNum    Integer32
+    }
+
+hh3cVoPOTSEntityConfigIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index that uniquely identifies a voice entity."
+    ::= { hh3cVoPOTSEntityConfigEntry 1 }
+
+
+hh3cVoPOTSEntityConfigPrefix OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the prefix which is added to the
+        called number."
+    ::= { hh3cVoPOTSEntityConfigEntry 2 }
+
+
+hh3cVoPOTSEntityConfigSubLine OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the voice subscriber line of
+        this dial entity."
+    ::= { hh3cVoPOTSEntityConfigEntry 3 }
+
+
+hh3cVoPOTSEntityConfigSendNum OBJECT-TYPE
+    SYNTAX      Integer32(0..31|65534|65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the digit of phone number to be
+        sent to the destination.
+        0..31: Number of digits (that are extracted from the end of a number)
+        to be sent, in the range of 0 to 31. It is not greater than the total
+        number of digits of the called number.
+        65534: Sends all digits of a called number.
+        65535: Sends a truncated called number."
+    ::= { hh3cVoPOTSEntityConfigEntry 4 }
+
+
+
+-- ========================================================================
+--                      hh3cVoVoIPEntityConfigTable
+--
+-- ========================================================================
+hh3cVoVoIPEntityConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HH3CVoVoIPEntityConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the VoIP entity information."
+    ::= { hh3cVoEntityObjects 4 }
+
+
+hh3cVoVoIPEntityConfigEntry OBJECT-TYPE
+    SYNTAX      HH3CVoVoIPEntityConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cVoVoIPEntityConfigTable."
+    INDEX
+        {
+            hh3cVoVoIPEntityCfgIndex
+        }
+    ::= { hh3cVoVoIPEntityConfigTable 1 }
+
+
+HH3CVoVoIPEntityConfigEntry ::= SEQUENCE
+    {
+        hh3cVoVoIPEntityCfgIndex             Integer32,
+        hh3cVoVoIPEntityCfgTargetType        INTEGER,
+        hh3cVoVoIPEntityCfgTargetAddrType    InetAddressType,
+        hh3cVoVoIPEntityCfgTargetAddr        InetAddress
+    }
+
+hh3cVoVoIPEntityCfgIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index that uniquely identifies a voice entity."
+    ::= { hh3cVoVoIPEntityConfigEntry 1 }
+
+
+hh3cVoVoIPEntityCfgTargetType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            unknown(1),
+            ras(2),
+            h323IpAddress(3),
+            sipIpAddress(4),
+            sipProxy(5)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the type of the session target of this entity."
+    ::= { hh3cVoVoIPEntityConfigEntry 2 }
+
+
+hh3cVoVoIPEntityCfgTargetAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP address type of object hh3cVoVoIPEntityCfgTargetAddr."
+    ::= { hh3cVoVoIPEntityConfigEntry 3 }
+
+
+hh3cVoVoIPEntityCfgTargetAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the target IP address."
+    ::= { hh3cVoVoIPEntityConfigEntry 4 }
+
+-- ========================================================================
+--                      hh3cVoEntityNumberTable
+--
+-- ========================================================================
+hh3cVoEntityNumberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVoEntityNumberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table contains the number management information."
+    ::= { hh3cVoEntityObjects 5 }
+
+
+hh3cVoEntityNumberEntry OBJECT-TYPE
+    SYNTAX      Hh3cVoEntityNumberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cVoEntityNumberTable.  Hh3cVoEntityIndex
+        is used to uniquely identify these numbers registered on
+        the server.  The same value of hh3cVoEntityIndex used in
+        the corresponding HH3CVoEntityCommonConfigTable is used here."
+    INDEX
+        {
+            hh3cVoEntityIndex
+        }
+    ::= { hh3cVoEntityNumberTable 1 }
+
+Hh3cVoEntityNumberEntry ::= SEQUENCE
+{
+    hh3cVoEntityNumberAuthUser                   OCTET STRING,
+    hh3cVoEntityNumberPasswordType               Integer32,
+    hh3cVoEntityNumberPassword                   OCTET STRING,
+    hh3cVoEntityNumberStatus                     Hh3cRegisterdStatus,
+    hh3cVoEntityNumberExpires                    Integer32
+}
+
+hh3cVoEntityNumberAuthUser OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the username of the entity number to authorize."
+    ::= { hh3cVoEntityNumberEntry 1 }
+
+hh3cVoEntityNumberPasswordType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the password type of the entity number to authorize.
+         The encrypting type of password:
+         0 : password simple, means password is clean text.
+         1 : password cipher, means password is encrypted text.
+         default is 65535."
+    ::= { hh3cVoEntityNumberEntry 2 }
+
+hh3cVoEntityNumberPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..16 | 24))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the password of the entity number to authorize."
+    ::= { hh3cVoEntityNumberEntry 3 }
+
+hh3cVoEntityNumberStatus OBJECT-TYPE
+    SYNTAX      Hh3cRegisterdStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the current state of the entity number."
+    ::= { hh3cVoEntityNumberEntry 4 }
+
+hh3cVoEntityNumberExpires OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the interval time for entity number updating registered message."
+    ::= { hh3cVoEntityNumberEntry 5 }
+
+END

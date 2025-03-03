@@ -1,0 +1,24 @@
+# This file contains a list of commits that are not likely what you
+# are looking for in a blame, such as mass reformatting or renaming.
+# You can set this file as a default ignore file for blame by running
+# the following command.
+#
+# $ git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Apply fixes from StyleCI
+77c531527c0bf218038f8349e81f50d5386739a6
+82f43cb98dbe25d6e6fea4e787fa26aca898e41d
+29f45ca352a8c5d5c308f93ce1240b7fdfc1c936
+2fc3a2121107c796cb0cf3e310c3a869a5b5798f
+
+# Fix coding style part 2
+d8693f05ae4d9ec884cd2c2d850e7f78ba9dc2ae
+
+# Merge pull request #1449 from job/coding_style_old_files2
+61b14557ce45f8c6d90482075464aad1fae5e209
+
+# Merge pull request #1444 from job/coding_style_old_files2
+4ebabc634ab098d4f9721ea7f357baf029a6bf9c
+
+# Merge pull request #1431 from job/coding_style_old_files
+89206b393978d8b42e3755698ca5542be7277270

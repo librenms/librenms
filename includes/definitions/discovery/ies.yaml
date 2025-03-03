@@ -1,0 +1,4 @@
+modules:
+  os:
+    version: ZYXEL-AS-MIB::accessSwitchFWVersion.0
+    sysDescr_regex: '/IES-1000.(?<hardware>.*) version V(?<version>\S+)/'

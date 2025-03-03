@@ -1,0 +1,3963 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Private IPFPM MIB
+-- Reference:
+-- Version: V1.35
+-- History:
+--          Wang XuanXuan,2012-08-13,Create 
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types be imported
+-- 
+-- ==================================================================
+
+HUAWEI-IPFPM-MIB DEFINITIONS ::= BEGIN
+ 
+IMPORTS
+    hwDatacomm            
+        FROM HUAWEI-MIB            
+    InterfaceIndex          
+        FROM IF-MIB             
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+        FROM SNMPv2-CONF            
+    IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE, 
+    MODULE-IDENTITY, NOTIFICATION-TYPE            
+        FROM SNMPv2-SMI           
+    RowStatus, TruthValue, TimeStamp, TEXTUAL-CONVENTION            
+        FROM SNMPv2-TC;
+
+    
+    
+    hwIpfpmMib MODULE-IDENTITY 
+        LAST-UPDATED "201708171704Z"-- 
+        ORGANIZATION 
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+            "Huawei Industrial Base
+			  Bantian, Longgang
+			   Shenzhen 518129
+			   People's Republic of China
+			   Website: http://www.huawei.com
+			   Email: support@huawei.com
+			"
+        DESCRIPTION 
+            "This MIB describes objects to manage IPFPM (IP Flow 
+            Performance Measurement). IPFPM provides a method for IP 
+            flow performance measurement, in which MCP (Measurement 
+            Control Point),DCP (Data Collecting Point) and TLP 
+            (Target Logic Point) are three kinds of roles working 
+            together. TLP is responsible for implementing measurement 
+            and generating the measurement data. DCP manages TLPs and 
+            get measurement data from them to report to MCP. MCP 
+            works as the control role to collect and calculate the 
+            measurement data that DCP reported."
+        REVISION "201708171704Z"  
+        DESCRIPTION  "revision 1.35, modify the description of hwIpfpmMultiOneDelayRecovery, hwIpfpmMultiTwoDelayRecovery"
+        REVISION "201707211530Z"  
+        DESCRIPTION  "revision 1.34, add hwIpfpmDcpInstTlpIndexTable, hwIpfpmDcpInstTlpNHIndexTable"
+        REVISION "201707211451Z"  
+        DESCRIPTION  "revision 1.33, modify the description of hwIpfpmMcpInstTlpMaxNum, hwIpfpmMcpAchMaxNum, hwIpfpmDcpMcpVpnType, hwIpfpmPeriodSource, hwIpfpmMcpInstDesc, hwIpfpmDcpInstTlpBackwardFlowLabelFlag"
+        REVISION "201608191122Z"  
+        DESCRIPTION  "revision 1.32, add hwIpfpmDcpFlowVxlan and hwIpfpmDcpFlowVni,hwIpfpmMcpInstTlpMaxNum, hwIpfpmMcpAchMaxNum"
+        REVISION "201607262022Z"  
+        DESCRIPTION  "revision 1.31, modify hwIpfpmDcpInstTlpLspLabel2 and hwIpfpmDcpInstTlpBackwardLspLabel2"
+        REVISION "201605172022Z"  
+        DESCRIPTION  "revision 1.30, modify the description of hwIpfpmDcpNexthopIp"
+        REVISION "201603292003Z"      
+        DESCRIPTION  "revision 1.29, modify hwIpfpmMcpAuthKey, hwIpfpmDcpAuthKey, hwIpfpmDcpInstAuthKey OBJECT-TYPE range"
+        REVISION "201602251100Z"      
+        DESCRIPTION  "revision 1.28, add hwIpfpmDcpInstTlpNHTable"
+        REVISION "201510211700Z"      
+        DESCRIPTION  "revision 1.27, add for multiDelay"
+        REVISION "201510131700Z"      
+        DESCRIPTION  "revision 1.26, modify the spelling mistake of the word label"
+        REVISION "201508142059Z"      
+        DESCRIPTION  "revision 1.25, modify the DEFVAL of hwIpfpmMcpId ,hwIpfpmDcpFlowDstAddr, hwIpfpmDcpFlowSrcAddr,hwIpfpmDcpId,hwIpfpmDcpId node"
+        REVISION "201505071555Z"      
+        DESCRIPTION  "revision 1.24, modify the type of hwIpfpmDcpTlpExtIfIndex node"	
+        REVISION "201507091658Z"      
+        DESCRIPTION  "revision 1.23, modify the value of hwIpfpmDcpInstGroupId node range"	
+        REVISION "201505061255Z"                                                  
+        DESCRIPTION  "revision 1.22, add hwIpfpmDcpTlpQueryExtTable and  hwIpfpmDcpTlpExtTable "
+        REVISION "201505051555Z"                                                  
+        DESCRIPTION  "revision 1.21, add hwIpfpmDcpInstGroupId "
+        REVISION "201504161527Z"                                                  
+        DESCRIPTION  "revision 1.20, add enum bidirectional (3) value for hwIpfpmMcpFlowType mib node"
+        REVISION "201502061143Z"                                                  
+        DESCRIPTION  "revision 1.19, modify table index"
+        REVISION "201412291626Z"                                                  
+        DESCRIPTION  "revision 1.18, modify hwIpfpmDcpInstTlpTable for atom"
+        REVISION "201406261000Z"
+        DESCRIPTION  "revision 1.17, add new VB in hwIpfpmDcpInstTlpTable for SFP"
+        REVISION "201402121000Z"
+        DESCRIPTION  "revision 1.16, modify size list of hwIpfpmDcpSourceInstId, hwIpfpmDcpInstTlpVpnLabel, hwIpfpmDcpInstTlpLspLabel"
+        REVISION "201312171000Z"
+        DESCRIPTION  "revision 1.15, add hwIpfpmTlpExceed, hwIpfpmTlpRecovery, hwIpfpmTlpExceedBoardId, hwIpfpmTlpNumber, hwIpfpmTlpThreshold"
+        REVISION "201310252000Z"
+        DESCRIPTION  "revision 1.14, add description in the threshold trap"
+        REVISION "201309252000Z"
+        DESCRIPTION  "revision 1.13, support flow-label"  
+        REVISION "201309232000Z"
+        DESCRIPTION  "revision 1.12, add hwIpfpmDcpMcpVpnName, hwIpfpmDcpMcpVpnType, hwIpfpmDcpInstMcpVpnName, hwIpfpmDcpInstMcpVpnType"  
+        REVISION "201308182038Z"
+        DESCRIPTION  "revision 1.11, add hwIpfpmDcpFlowConflict"            
+        REVISION "201308142038Z"
+        DESCRIPTION  "revision 1.10"
+        REVISION "201308051504Z"
+        DESCRIPTION  "revision 1.09"
+        REVISION "201307041612Z"
+        DESCRIPTION  "revision 1.08"
+        REVISION "201306221450Z"
+        DESCRIPTION  "revision 1.07"
+        REVISION "201306041403Z"
+        DESCRIPTION  "revision 1.06"
+        REVISION "201304271730Z"
+        DESCRIPTION  "revision 1.05"
+        REVISION "201303271011Z"
+        DESCRIPTION  "revision 1.04"
+        REVISION "201303261011Z"
+        DESCRIPTION  "revision 1.03"
+        REVISION "201303131150Z"
+        DESCRIPTION  "revision"
+        REVISION "201302181150Z"
+        DESCRIPTION  "init"        
+        ::= { hwDatacomm 316 }
+    
+--
+-- Textual conventions
+--
+    HWEnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes that the status of some function is enabled or 
+        disabled."
+    SYNTAX INTEGER
+        {
+        enabled(1),
+        disabled(2)
+        }
+        
+    HWIpfpmStatErrInfo ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes whether the statistics data is invalid or not 
+        and the reason of invalidation."
+    SYNTAX INTEGER
+        {
+        noErr(0),
+        initialIntervalForward(1),
+        initialIntervalBackward(2),
+        initialIntervalBidirection(3),
+        inconsistInterval(4),
+        asynClock(5),
+        incompleteDataForward(6),
+        incompleteDataBackward(7),
+        incompleteDataBidirection(8),
+        noFlowDataForward(9),
+        noFlowDataBackward(10),
+        noFlowDataBidirection(11),
+        errFlowDataForward(12),
+        errFlowDataBackward(13),
+        errFlowDataBidirection(14),
+        multiDataOneDelay(15),
+        multiDataTwoDelay(16),
+        errDelayVariationForward(17),
+        errDelayVariationBackward(18),
+        errDelayVariationBidirection(19),
+        errMultiSourceSwitch(20),
+        unknownErr(21)   
+        }
+        
+    HWIpfpmMeasureFlag ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the optional bit of an IP packet for 
+        IPFPM measurement."
+    SYNTAX INTEGER
+        {
+        flagsBit0(1),
+        tosBit3(2),
+        tosBit4(3),
+        tosBit5(4),
+        tosBit6(5),
+        tosBit7(6)
+        }
+        
+    HWIpfpmFlowType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the type of flow in an test instance."
+    SYNTAX INTEGER
+        {
+        null(0),
+        forward(1),
+        backward(2),
+        bidirectional(3),
+        forwardandbackward(4)
+        }
+        
+   HWIpfpmMcpFlowType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the type of flow in an test instance."
+    SYNTAX INTEGER
+        {
+        none         (0),
+        forward      (1),
+        backward     (2),
+        bidirectional  (3)
+        }
+    
+    HWIpfpmFlowTlpDirec ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the role of flow TLP in the measurement 
+        network."
+    SYNTAX INTEGER
+        {
+        ingress(1),
+        egress(2)
+        }
+        
+    HWIpfpmTlpRole ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the TLP point."
+    SYNTAX INTEGER
+        {
+        in-point(1),
+        out-point(2),
+        mid-point(3)        
+        } 
+    HWIpfpmDelayTlpRole ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the TLP point in delay measure."
+    SYNTAX INTEGER
+        {
+        e2e(1),
+        section(2)        
+        }  
+        
+    HWIpfpmLossTlpRole ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the TLP point in loss measure."
+    SYNTAX INTEGER
+        {
+        e2e(1),
+        section(2)        
+        } 
+	
+    HWIpfpmMcpTlpRole ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the role of TLP in the ACH."
+    SYNTAX INTEGER
+        {
+        in-group(1),
+        out-group(2)
+        }      
+          
+
+        
+    HWIpfpmAuthType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the type of IPFPM authentication."
+    SYNTAX INTEGER
+        {
+        hmac-sha256(1)
+        }                
+
+    HWIpfpmDelayMeasType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the type of delay measure of an test instance."
+    SYNTAX INTEGER
+        {
+        null(0),
+        oneway(1),
+        twoway(2)
+        }
+        
+       
+    HWIpfpmMeasTimeRangeType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the type of on-demand loss or delay measure of an test instance."
+    SYNTAX INTEGER
+        {
+        null(0),
+        timerange5m(5),
+        timerange10m(10),
+        timerange15m(15),
+        timerange30m(30)
+        }
+        
+    HWIpfpmInstIntervalType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the interval type of an test instance."
+    SYNTAX INTEGER
+        {
+        interval1s(1),
+        interval10s(10),
+        interval60s(60),
+        interval600s(600)
+        }
+  
+    HWIpfpmInstType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the type of an test instance."
+    SYNTAX INTEGER
+        {
+        unicast(0),
+        multicastsrc(1),
+        multicastrecv(2)
+        }
+
+    HWIpfpmMMSType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the type of multicastsrc."
+    SYNTAX INTEGER
+        {
+        master     (0),
+        slave      (1)
+        }
+	
+    HWIpfpmVpnType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the type of VPN.
+         The value 'none' represents the public network, the value 'manage-vpn' 
+	 represents the net-mange VPN. and the value 'vpn-instance' represents 
+	 the normal VPN instance."
+    SYNTAX INTEGER
+        {
+        none   (0),
+        manage-vpn (1),
+        vpn-instance (2)        
+        }
+
+    HWIpfpmClockSoure ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the type of ClockSoure.
+         The value 'ntp' represents using ntp."
+    SYNTAX INTEGER
+        {
+        default  (0),
+        ntp      (1)
+        }
+		
+    HWIpfpmTlpRoleIndex ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This TC describes the TLP midpoint."
+    SYNTAX INTEGER
+        {
+        mid-point(3)        
+        } 
+--
+-- Node definitions
+--    
+    hwIpfpmMcpObjects OBJECT IDENTIFIER ::= { hwIpfpmMib 1 }
+    hwIpfpmDcpObjects OBJECT IDENTIFIER ::= { hwIpfpmMib 2 }
+    hwIpfpmTraps OBJECT IDENTIFIER ::= { hwIpfpmMib 3 }
+    hwIpfpmConformance OBJECT IDENTIFIER ::= { hwIpfpmMib 4 }
+        
+--
+-- IPFPM MIB Objects
+--
+    hwIpfpmMcpConfiguration OBJECT IDENTIFIER ::= { hwIpfpmMcpObjects 1 }
+    hwIpfpmMcpStatistics OBJECT IDENTIFIER ::= { hwIpfpmMcpObjects 2 }
+    hwIpfpmDcpConfiguration OBJECT IDENTIFIER ::= { hwIpfpmDcpObjects 1 }   
+    hwIpfpmDcpTrapObjects OBJECT   IDENTIFIER ::= { hwIpfpmDcpObjects 2 }  
+
+        
+-- ==================================================================    
+-- IPFPM MCP configuration group
+-- ==================================================================
+    --
+    -- hwIpfpmMcpGlobalTable: MCP global configure information
+    --
+    
+    hwIpfpmMcpGlobalTable OBJECT IDENTIFIER ::= { hwIpfpmMcpConfiguration 1 }
+    
+    hwIpfpmMcpEnable OBJECT-TYPE
+    SYNTAX HWEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object indicates that the MCP (Measurement Control 
+        Point) function is 'enabled(1)' or 'disabled(2)'."
+    DEFVAL { disabled }
+    ::= { hwIpfpmMcpGlobalTable 1 }
+    
+    hwIpfpmMcpId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value of this object indicates the identification of MCP.
+         The value 0.0.0.0 represents that it is not configured."     
+    ::= { hwIpfpmMcpGlobalTable 2 }
+    
+    hwIpfpmMcpUdpPort OBJECT-TYPE
+    SYNTAX Integer32(1024..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value of this object indicates the port that MCP listens 
+        on as the server."
+    DEFVAL { 65030 }
+    ::= { hwIpfpmMcpGlobalTable 3 }
+ 
+    --
+    -- hwIpfpmMcpAuthTable: MCP authenticaiton information
+    --
+    hwIpfpmMcpAuthTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpAuthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains attribute of MCP authenticaiton."
+    ::= { hwIpfpmMcpConfiguration 4 }
+    
+    hwIpfpmMcpAuthEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpAuthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM authenticaiton configuration information."
+    INDEX { hwIpfpmMcpAuthKeyId }
+    ::= { hwIpfpmMcpAuthTable 1 }
+    
+    HwIpfpmMcpAuthEntry ::=
+		SEQUENCE { 
+        hwIpfpmMcpAuthKeyId
+			  Integer32,
+			  hwIpfpmMcpAuthType
+			  HWIpfpmAuthType,
+			  hwIpfpmMcpAuthKey
+		          OCTET STRING,
+			  hwIpfpmMcpAuthRowStatus
+		          RowStatus
+    }
+    
+    hwIpfpmMcpAuthKeyId OBJECT-TYPE
+    SYNTAX Integer32(1..64)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identification of the authentication key."
+    ::= { hwIpfpmMcpAuthEntry 1 }
+    
+    hwIpfpmMcpAuthType OBJECT-TYPE
+    SYNTAX HWIpfpmAuthType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Authentication type of the key. The enumeration 
+        'hmac-sha256(1)' represents the password is sent after being 
+        encrypted through hmac-sha256. By default, authentication is not configured."
+    ::= { hwIpfpmMcpAuthEntry 2 }
+    
+    hwIpfpmMcpAuthKey OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (0..432))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The password used as an IPFPM authentication key."
+    ::= { hwIpfpmMcpAuthEntry 3 }
+    
+    hwIpfpmMcpAuthRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmMcpAuthEntry 4 }
+    
+-- ==================================================================    
+-- IPFPM MCP Instance configuration group
+-- ==================================================================     
+    --
+    -- hwIpfpmMcpInstTable: MCP test instance information
+    --
+    hwIpfpmMcpInstTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpInstEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains attribute of MCP test instances."
+    ::= { hwIpfpmMcpConfiguration 5 }
+    
+    hwIpfpmMcpInstEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpInstEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM configuration information for a particular MCP test 
+        instance."
+    INDEX { hwIpfpmMcpInstId }
+    ::= { hwIpfpmMcpInstTable 1 }
+    
+    HwIpfpmMcpInstEntry ::=
+		SEQUENCE { 
+        hwIpfpmMcpInstId
+				    Integer32,
+				hwIpfpmMcpInstDesc
+			            OCTET STRING,
+			        hwIpfpmMcpLossRatioUpThres
+				    Integer32,
+				hwIpfpmMcpLossRatioLowThres
+				    Integer32,
+				hwIpfpmMcpOneDelayUpThres
+				    Integer32,
+				hwIpfpmMcpOneDelayLowThres
+				    Integer32,
+				hwIpfpmMcpTwoDelayUpThres
+				    Integer32,
+				hwIpfpmMcpTwoDelayLowThres
+				    Integer32,
+		                hwIpfpmMcpMeasureEnable
+		                    HWEnabledStatus,				    
+				hwIpfpmMcpInstRowStatus
+			            RowStatus,
+			        hwIpfpmMcpInstType
+			            HWIpfpmInstType,
+			        hwIpfpmMcpSourceInstId
+			            Integer32
+    }
+    
+    hwIpfpmMcpInstId OBJECT-TYPE
+    SYNTAX Integer32 (1..8355838|16711681..16777214)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identification of the test instance."
+    ::= { hwIpfpmMcpInstEntry 1 }
+    
+    hwIpfpmMcpInstDesc OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the IP FPM instance description on an MCP.
+         if the string length is 0, it represents that it is not configured."
+    ::= { hwIpfpmMcpInstEntry 2 }
+  
+    hwIpfpmMcpLossRatioUpThres OBJECT-TYPE
+    SYNTAX Integer32(0..100000000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This value divided by 1000000 is the upper threshold of loss ratio(%) for alarm.
+         The value 0 represents that it is not configured, and the alarm is not enabled."
+    DEFVAL { 0 }    
+    ::= { hwIpfpmMcpInstEntry 3 }
+    
+    hwIpfpmMcpLossRatioLowThres OBJECT-TYPE
+    SYNTAX Integer32(0..100000000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This value divided by 1000000 is the lower threshold of loss ratio(%) for alarm recovery.
+         The value 0 represents that it is not configured, and the alarm is not enabled."
+    DEFVAL { 0 }    
+    ::= { hwIpfpmMcpInstEntry 4 }
+    
+    hwIpfpmMcpOneDelayUpThres OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Upper threshold of one-way delay(microsecond) for alarm.
+         The value 0 represents that it is not configured, and the alarm is not enabled."
+    DEFVAL { 0 }    
+    ::= { hwIpfpmMcpInstEntry 5 }
+    
+    hwIpfpmMcpOneDelayLowThres OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Lower threshold of one-way delay(microsecond) for alarm recovery.
+         The value 0 represents that it is not configured, and the alarm is not enabled."
+    DEFVAL { 0 }       
+    ::= { hwIpfpmMcpInstEntry 6 }
+    
+    hwIpfpmMcpTwoDelayUpThres OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Upper threshold of two-way delay(microsecond) for alarm.
+         The value 0 represents that it is not configured, and the alarm is not enabled."
+    DEFVAL { 0 }           
+    ::= { hwIpfpmMcpInstEntry 7 }
+    
+    hwIpfpmMcpTwoDelayLowThres OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Lower threshold of two-way delay(microsecond) for alarm recovery.
+         The value 0 represents that it is not configured, and the alarm is not enabled."
+    DEFVAL { 0 }    
+    ::= { hwIpfpmMcpInstEntry 8 }
+    
+    hwIpfpmMcpMeasureEnable OBJECT-TYPE
+    SYNTAX HWEnabledStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates that the MCP instance measure function is 'enabled(1)' or 'disabled(2)'."
+    DEFVAL { enabled }
+    ::= { hwIpfpmMcpInstEntry 9 }      
+         
+    hwIpfpmMcpInstRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmMcpInstEntry 10 }
+
+    hwIpfpmMcpInstType OBJECT-TYPE
+    SYNTAX HWIpfpmInstType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates that the MCP instance type. 
+        'unicast(0)' means unicast measurement instance.
+        'multicastsrc(1)' means multicast measurement source instance.
+        'multicastrecv(2)' means multicast measurement receiver instance."
+    ::= { hwIpfpmMcpInstEntry 11 }
+
+    hwIpfpmMcpSourceInstId OBJECT-TYPE
+    SYNTAX Integer32 (0|16711681..16777214)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the source instance of multicastrecv. 
+         This object is only valid when hwIpfpmMcpInstType is 'multicastrecv(2)'.
+         We can ingore this object value when hwIpfpmMcpInstType is not 'multicastrecv(2)'."
+    ::= { hwIpfpmMcpInstEntry 12 }        
+
+    --
+    -- hwIpfpmMcpDcpTable: DCP information of MCP test instance
+    --
+    hwIpfpmMcpDcpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpDcpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table describe the DCPs belonging to MCP test 
+        instances."
+    ::= { hwIpfpmMcpConfiguration 6 }
+    
+    hwIpfpmMcpDcpEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpDcpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM DCPs information for a particular MCP test instance."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpDcpId }
+    ::= { hwIpfpmMcpDcpTable 1 }
+    
+    HwIpfpmMcpDcpEntry ::=
+		SEQUENCE { 
+        hwIpfpmMcpDcpId
+				    IpAddress,
+				hwIpfpmMcpDcpRowStatus
+			            RowStatus
+    }
+    
+    hwIpfpmMcpDcpId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identification of DCP which belongs to the test instance."
+    ::= { hwIpfpmMcpDcpEntry 1 }
+    
+    hwIpfpmMcpDcpRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmMcpDcpEntry 2 }
+    
+    
+    --
+    -- hwIpfpmMcpAchTable: ACH information of MCP test instance
+    --
+    hwIpfpmMcpAchTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpAchEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table describe the ACHs(Atomic Closed Hop) belonging to 
+        MCP test instances."
+    ::= { hwIpfpmMcpConfiguration 7 }
+    
+    hwIpfpmMcpAchEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpAchEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM ACHs(Atomic Closed Hop) information for a particular 
+        MCP test instance."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId }
+    ::= { hwIpfpmMcpAchTable 1 }
+    
+    HwIpfpmMcpAchEntry ::=
+		SEQUENCE { 
+	                  hwIpfpmMcpAchId
+		              Integer32,
+		          hwIpfpmMcpFlowType
+		              HWIpfpmMcpFlowType,
+			  hwIpfpmMcpAchRowStatus
+			      RowStatus
+    }
+    
+    hwIpfpmMcpAchId OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The object indicates the identification of the ACH."
+    ::= { hwIpfpmMcpAchEntry 1 }
+        
+    hwIpfpmMcpFlowType OBJECT-TYPE
+    SYNTAX HWIpfpmMcpFlowType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the flow that the ACH monitors is 
+        'forward(1)' or 'backward(2)', 'bidirectional(3)'. The value none(0) represents that it is not configured."
+    DEFVAL { none } 
+    ::= { hwIpfpmMcpAchEntry 2 }  
+    
+    hwIpfpmMcpAchRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmMcpAchEntry 3 }
+    
+
+    --
+    -- hwIpfpmMcpTlpTable: TLP information of MCP ACH
+    --
+    hwIpfpmMcpTlpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpTlpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table describe the TLPs(Target Logical Port) belonging to 
+        MCP ACHs."
+    ::= { hwIpfpmMcpConfiguration 8 }
+    
+    hwIpfpmMcpTlpEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpTlpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM TLPs(Target Logical Port) information for a particular 
+        MCP ACH."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpTlpRole, hwIpfpmMcpTlpDcpId, hwIpfpmMcpTlpId}
+    ::= { hwIpfpmMcpTlpTable 1 }
+    
+    HwIpfpmMcpTlpEntry ::=
+		SEQUENCE { 
+			  hwIpfpmMcpTlpRole
+			      HWIpfpmMcpTlpRole,
+			  hwIpfpmMcpTlpDcpId
+			      IpAddress,			      
+			  hwIpfpmMcpTlpId
+			      Integer32,			      
+			  hwIpfpmMcpTlpRowStatus
+			      RowStatus			  
+    }
+    
+    hwIpfpmMcpTlpRole OBJECT-TYPE
+    SYNTAX HWIpfpmMcpTlpRole
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The object indicates the TLP belongs to 'in-group(1)' or 'out-group(2)' 
+        of the ACH."
+    ::= { hwIpfpmMcpTlpEntry 1 }
+    
+    hwIpfpmMcpTlpDcpId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The object indicates the dcp which the tlp belongs to."
+    ::= { hwIpfpmMcpTlpEntry 2 }  
+        
+    hwIpfpmMcpTlpId OBJECT-TYPE
+    SYNTAX Integer32(1..16777215)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The object indicates the identification of the TLP."
+    ::= { hwIpfpmMcpTlpEntry 3 }    
+     
+    hwIpfpmMcpTlpRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmMcpTlpEntry 4 }
+
+
+    --
+    -- hwIpfpmMcpSrcInstReferQueryTable: the counter information of source instance referrd 
+    --
+    hwIpfpmMcpSrcInstReferQueryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpSrcInstReferQueryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table describes the information of multicast source instance referred by some multicast receiver instances."
+    ::= { hwIpfpmMcpConfiguration 9 }
+    
+    hwIpfpmMcpSrcInstReferQueryEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpSrcInstReferQueryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The information is that the multicast source instance referred by some multicast receiver instances."
+    INDEX { hwIpfpmMcpInstId}
+    ::= { hwIpfpmMcpSrcInstReferQueryTable 1 }
+    
+    HwIpfpmMcpSrcInstReferQueryEntry ::=
+		SEQUENCE { 
+			  hwIpfpmMcpSrcInstReferCnt
+			      Integer32		  
+    }
+    
+    hwIpfpmMcpSrcInstReferCnt OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The object indicates the counter that the multicast source instance referred by some multicast receiver instances."
+    ::= { hwIpfpmMcpSrcInstReferQueryEntry 1 }
+       
+-- ==================================================================    
+-- IPFPM MCP Instance statistics group
+-- ==================================================================    
+    --
+    -- hwIpfpmMcpStatisticsTable: MCP global statistics information
+    --
+   
+    hwIpfpmMcpStatisticsTable OBJECT IDENTIFIER ::= { hwIpfpmMcpStatistics 1 }
+    
+    hwIpfpmMcpInstSpec OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates the global instance specification of MCP."
+    ::= { hwIpfpmMcpStatisticsTable 1 }
+
+    hwIpfpmMcpInstCurNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates the current instance number of MCP."
+    ::= { hwIpfpmMcpStatisticsTable 2 }
+    
+    hwIpfpmMcpInstTlpMaxNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates the maximum number of all instance TLP can be managed by MCP. For statistical instances of which the statistical period is 1s, the number of used instance-specific TLPs is 10 times the actual number of configured instance-specific TLPs. For statistical instances of which the statistical period is 10s or longer, the number of used instance-specific TLPs is the same as the actual number of configured instance-specific TLPs.
+		-1 means unused of this number"
+    ::= { hwIpfpmMcpStatisticsTable 3 }
+
+    hwIpfpmMcpAchMaxNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates the total number of all ACH can be managed by MCP. For statistical instances of which the statistical period is 1s, the number of used instance-specific ACHs is 10 times the actual number of configured instance-specific ACHs. For statistical instances of which the statistical period is 10s or longer, the number of used instance-specific ACHs is the same as the actual number of configured instance-specific ACHs.
+		-1 means unused of this number"
+    ::= { hwIpfpmMcpStatisticsTable 4 }
+
+    --
+    -- hwIpfpmMcpInstAchIndexTable: One-way delay statistics of test 
+    -- instance
+    hwIpfpmMcpInstAchIndexTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpInstAchIndexEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains the index of MCP 
+        test instances and ACH."
+    ::= { hwIpfpmMcpStatistics 3 }
+    
+    hwIpfpmMcpInstAchIndexEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpInstAchIndexEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of a particular test instance and ACH."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId }
+    ::= { hwIpfpmMcpInstAchIndexTable 1 }
+    
+    HwIpfpmMcpInstAchIndexEntry ::=
+		SEQUENCE { 
+        hwIpfpmMcpSeqNo
+				    Counter64
+    }
+    
+    hwIpfpmMcpSeqNo OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Sequence of a particular test instance and ACH."
+    ::= { hwIpfpmMcpInstAchIndexEntry 1 }
+
+	
+    --
+    -- hwIpfpmMcpLossStatsTable: Loss statistics of test instance
+    --
+    hwIpfpmMcpLossStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpLossStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains loss measure statistics of MCP test 
+        instances."
+    ::= { hwIpfpmMcpStatistics 4 }
+    
+    hwIpfpmMcpLossStatsEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpLossStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Loss measure statistics of an interval for a particular 
+        test instance."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow }
+    ::= { hwIpfpmMcpLossStatsTable 1 }
+    
+    HwIpfpmMcpLossStatsEntry ::=
+		SEQUENCE {
+				hwIpfpmMcpSeqNoHigh
+				    Unsigned32,
+				hwIpfpmMcpSeqNoLow
+				    Unsigned32,				    		
+				hwIpfpmMcpLossErrInfo
+				    HWIpfpmStatErrInfo,
+				hwIpfpmMcpForwardLossPkts
+				    Counter64,
+				hwIpfpmMcpForwardLossPktsSign
+				    Integer32,				    
+				hwIpfpmMcpForwardLossBytes
+				    Counter64,			
+				hwIpfpmMcpForwardLossBytesSign
+				    Integer32,				    				    
+				hwIpfpmMcpForwardPkts
+				    Counter64,
+				hwIpfpmMcpForwardBytes
+				    Counter64,
+				hwIpfpmMcpForwardLossRatio
+				    Integer32,
+				hwIpfpmMcpBackwardLossPkts
+				    Counter64,
+				hwIpfpmMcpBackwardLossPktsSign
+				    Integer32,
+				hwIpfpmMcpBackwardLossBytes
+				    Counter64,
+				hwIpfpmMcpBackwardLossBytesSign
+				    Integer32,
+				hwIpfpmMcpBackwardPkts
+				    Counter64,
+				hwIpfpmMcpBackwardBytes
+				    Counter64,
+				hwIpfpmMcpBackwardLossRatio
+				    Integer32,
+				hwIpfpmMcpForwardLossMMSType
+				    HWIpfpmMMSType,
+				hwIpfpmMcpForwardLossMMSSwitch
+				    TruthValue
+    }
+    hwIpfpmMcpSeqNoHigh OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "High 32-bit of the hwIpfpmMcpSeqNo."
+    ::= { hwIpfpmMcpLossStatsEntry 1 }
+    
+    hwIpfpmMcpSeqNoLow OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Low 32-bit of the hwIpfpmMcpSeqNo."
+    ::= { hwIpfpmMcpLossStatsEntry 2 }
+            
+    hwIpfpmMcpLossErrInfo OBJECT-TYPE
+    SYNTAX HWIpfpmStatErrInfo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The error code to indicate the validity and the invalidation 
+        reason of an interval's loss measure statistics."
+    ::= { hwIpfpmMcpLossStatsEntry 3 }
+    
+    hwIpfpmMcpForwardLossPkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The absolute value of loss packets of forward flow measurement."
+    ::= { hwIpfpmMcpLossStatsEntry 4 }
+    
+    hwIpfpmMcpForwardLossPktsSign OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The sign of loss packets of forward flow measurement.
+        1 means positive number, -1 means negative number."
+    ::= { hwIpfpmMcpLossStatsEntry 5 }
+    
+    hwIpfpmMcpForwardLossBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The absolute value of loss bytes of forward flow measurement."
+    ::= { hwIpfpmMcpLossStatsEntry 6 }
+
+    hwIpfpmMcpForwardLossBytesSign OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The sign of loss bytes of forward flow measurement.
+        1 means positive number, -1 means negative number."
+    ::= { hwIpfpmMcpLossStatsEntry 7 }
+    
+    hwIpfpmMcpForwardPkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The packets of forward flow measurement."
+    ::= { hwIpfpmMcpLossStatsEntry 8 }
+    
+    hwIpfpmMcpForwardBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The bytes of forward flow measurement."
+    ::= { hwIpfpmMcpLossStatsEntry 9 }
+    
+    hwIpfpmMcpForwardLossRatio OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value divided by 1000000 is the loss ratio(%) of forward flow measurement."
+    ::= { hwIpfpmMcpLossStatsEntry 10 }
+    
+    hwIpfpmMcpBackwardLossPkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The absolute value of loss packets of backward flow measurement."
+    ::= { hwIpfpmMcpLossStatsEntry 11 }
+
+    hwIpfpmMcpBackwardLossPktsSign OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The sign of loss loss packets of backward flow measurement.
+        1 means positive number, -1 means negative number."
+    ::= { hwIpfpmMcpLossStatsEntry 12 }
+    
+    hwIpfpmMcpBackwardLossBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The absolute value of loss bytes of backward flow measurement."
+    ::= { hwIpfpmMcpLossStatsEntry 13 }
+
+    hwIpfpmMcpBackwardLossBytesSign OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The sign of loss bytes of backward flow measurement.
+        1 means positive number, -1 means negative number."
+    ::= { hwIpfpmMcpLossStatsEntry 14 }
+        
+    hwIpfpmMcpBackwardPkts OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The packets of backward flow measurement."
+    ::= { hwIpfpmMcpLossStatsEntry 15 }
+    
+    hwIpfpmMcpBackwardBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The bytes of backward flow measurement."
+    ::= { hwIpfpmMcpLossStatsEntry 16 }
+    
+    hwIpfpmMcpBackwardLossRatio OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value divided by 1000000 is the loss ratio(%) of backward flow measurement."
+    ::= { hwIpfpmMcpLossStatsEntry 17 }
+
+    hwIpfpmMcpForwardLossMMSType OBJECT-TYPE
+    SYNTAX HWIpfpmMMSType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value indicate multicastsrc type is 'master(0)' or 'slave(1)'."      
+    ::= { hwIpfpmMcpLossStatsEntry 18 }
+
+    hwIpfpmMcpForwardLossMMSSwitch OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value indicate whether multicastsrc switched in this period."
+    ::= { hwIpfpmMcpLossStatsEntry 19 }
+    
+    --
+    -- hwIpfpmMcpOneDelayStatTable: One-way delay statistics of test 
+    -- instance
+    hwIpfpmMcpOneDelayStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpOneDelayStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains one-way delay measure statistics of MCP 
+        test instances."
+    ::= { hwIpfpmMcpStatistics 5 }
+    
+    hwIpfpmMcpOneDelayStatEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpOneDelayStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "One-way delay measure statistics of an interval for a 
+        particular test instance."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow }
+    ::= { hwIpfpmMcpOneDelayStatTable 1 }
+    
+    HwIpfpmMcpOneDelayStatEntry ::=
+		SEQUENCE {
+				hwIpfpmMcpOneDelayErrInfo
+				    HWIpfpmStatErrInfo,
+				hwIpfpmMcpForwardOneDelay
+				    Integer32,
+				hwIpfpmMcpForwardOneDelayVariation
+				    Integer32,
+				hwIpfpmMcpBackwardOneDelay
+				    Integer32,
+				hwIpfpmMcpBackwardOneDelayVariation
+				    Integer32,
+				hwIpfpmMcpForwardOneDelayMMSType
+				    HWIpfpmMMSType	
+    }
+    
+    hwIpfpmMcpOneDelayErrInfo OBJECT-TYPE
+    SYNTAX HWIpfpmStatErrInfo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The error code to indicate the validity and the invalidation 
+        reason of an interval's one-way delay measure statistics."
+    ::= { hwIpfpmMcpOneDelayStatEntry 1 }
+    
+    hwIpfpmMcpForwardOneDelay OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The one-way delay(microsecond) of forward flow."
+    ::= { hwIpfpmMcpOneDelayStatEntry 2 }
+    
+    hwIpfpmMcpForwardOneDelayVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The one-way delay variation(microsecond) of forward flow."
+    ::= { hwIpfpmMcpOneDelayStatEntry 3 }
+    
+    hwIpfpmMcpBackwardOneDelay OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The one-way delay(microsecond) of backward flow."
+    ::= { hwIpfpmMcpOneDelayStatEntry 4 }
+    
+    hwIpfpmMcpBackwardOneDelayVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The one-way delay variation(microsecond) of backward flow."
+    ::= { hwIpfpmMcpOneDelayStatEntry 5 }
+
+    hwIpfpmMcpForwardOneDelayMMSType OBJECT-TYPE
+    SYNTAX HWIpfpmMMSType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value indicate multicastsrc type is 'master(0)' or 'slave(1)'."
+    ::= { hwIpfpmMcpOneDelayStatEntry 6 }
+       	
+    --
+    -- hwIpfpmMcpTwoDelayStatTable: Two-way delay statistics of test instance
+    --
+    hwIpfpmMcpTwoDelayStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpTwoDelayStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains two-way delay measure statistics of MCP 
+        test instances."
+    ::= { hwIpfpmMcpStatistics 6 }
+    
+    hwIpfpmMcpTwoDelayStatEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpTwoDelayStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Two-way delay measure statistics of an interval for a 
+        particular test instance."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow }
+    ::= { hwIpfpmMcpTwoDelayStatTable 1 }
+    
+    HwIpfpmMcpTwoDelayStatEntry ::=
+		SEQUENCE {
+				hwIpfpmMcpTwoDelayErrInfo
+				    HWIpfpmStatErrInfo,
+				hwIpfpmMcpTwoDelay
+				    Integer32,
+				hwIpfpmMcpTwoDelayVariation
+				    Integer32,
+				hwIpfpmMcpForwardDelay
+				    Integer32,
+				hwIpfpmMcpForwardDelayVariation
+				    Integer32,
+				hwIpfpmMcpBackwardDelay
+				    Integer32,
+				hwIpfpmMcpBackwardDelayVariation
+				    Integer32
+    }
+    
+    hwIpfpmMcpTwoDelayErrInfo OBJECT-TYPE
+    SYNTAX HWIpfpmStatErrInfo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The error code to indicate the validity and the invalidation 
+        reason of an interval's two-way delay measure statistics."
+    ::= { hwIpfpmMcpTwoDelayStatEntry 1 }
+    
+    hwIpfpmMcpTwoDelay OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The two-way delay(microsecond) of monitored flow."
+    ::= { hwIpfpmMcpTwoDelayStatEntry 2 }
+    
+    hwIpfpmMcpTwoDelayVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The two-way delay variation(microsecond) of monitored flow."
+    ::= { hwIpfpmMcpTwoDelayStatEntry 3 }
+    
+    hwIpfpmMcpForwardDelay OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The forward flow delay(microsecond) in two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayStatEntry 4 }
+    
+    hwIpfpmMcpForwardDelayVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The forward flow variation(microsecond) in two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayStatEntry 5 }
+    
+    hwIpfpmMcpBackwardDelay OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The backward flow delay(microsecond) in two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayStatEntry 6 }
+    
+    hwIpfpmMcpBackwardDelayVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The backward flow variation(microsecond) in two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayStatEntry 7 }
+    
+    --
+    -- hwIpfpmMcpOneDelayMultiStatTable: Multi-in-point one-way delay statistics of test instance 
+    -- 
+    hwIpfpmMcpOneDelayMultiStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpOneDelayMultiStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains multi-in-point one-way delay measure statistics of MCP
+        test instances."
+    ::= { hwIpfpmMcpStatistics 7 }
+
+    hwIpfpmMcpOneDelayMultiStatEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpOneDelayMultiStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Multi-in-point one-way delay measure statistics of an interval for a
+        particular test instance."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow, hwIpfpmMcpOneDelayFlowType, hwIpfpmMcpOneDelayMultiSrcDCP, hwIpfpmMcpOneDelayMultiSrcTLP, hwIpfpmMcpOneDelayMultiDesDCP, hwIpfpmMcpOneDelayMultiDesTLP}
+    ::= { hwIpfpmMcpOneDelayMultiStatTable 1 }
+    
+    HwIpfpmMcpOneDelayMultiStatEntry ::=
+        SEQUENCE {
+                hwIpfpmMcpOneDelayFlowType
+                    HWIpfpmMcpFlowType,				
+                hwIpfpmMcpOneDelayMultiSrcDCP
+                    IpAddress,
+                hwIpfpmMcpOneDelayMultiSrcTLP
+                    Integer32,
+                hwIpfpmMcpOneDelayMultiDesDCP
+                    IpAddress,
+                hwIpfpmMcpOneDelayMultiDesTLP
+                    Integer32,
+                hwIpfpmMcpOneDelayMultiErrInfo
+                    HWIpfpmStatErrInfo,
+                hwIpfpmMcpOneDelayMulti
+                    Integer32,
+                hwIpfpmMcpOneDelayMultiVariation
+                    Integer32
+    }
+
+    hwIpfpmMcpOneDelayFlowType OBJECT-TYPE
+    SYNTAX HWIpfpmMcpFlowType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The flow type for multi-in-point one-delay. "
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 1 }	
+    
+    hwIpfpmMcpOneDelayMultiSrcDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay source DCP."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 2 }
+
+    hwIpfpmMcpOneDelayMultiSrcTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay source TLP."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 3 }
+
+    hwIpfpmMcpOneDelayMultiDesDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay destination DCP."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 4 }
+
+    hwIpfpmMcpOneDelayMultiDesTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay destination TLP."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 5 }
+
+    hwIpfpmMcpOneDelayMultiErrInfo OBJECT-TYPE
+    SYNTAX HWIpfpmStatErrInfo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The error code to indicate the validity and the invalidation
+        reason of an interval's multi-in-point one-way delay measure statistics."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 6 }
+
+    hwIpfpmMcpOneDelayMulti OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay(microsecond)."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 7 }
+
+    hwIpfpmMcpOneDelayMultiVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point one-way delay variation(microsecond)."
+    ::= { hwIpfpmMcpOneDelayMultiStatEntry 8 }
+
+    --
+    -- hwIpfpmMcpTwoDelayMultiStatTable: Multi-in-point two-way delay statistics of test instance
+    --
+    hwIpfpmMcpTwoDelayMultiStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmMcpTwoDelayMultiStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The tables contains multi-in-point two-way delay measure statistics of MCP
+        test instances."
+    ::= { hwIpfpmMcpStatistics 8 }
+
+    hwIpfpmMcpTwoDelayMultiStatEntry OBJECT-TYPE
+    SYNTAX HwIpfpmMcpTwoDelayMultiStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Multi-in-point two-way delay measure statistics of an interval for a
+        particular test instance."
+    INDEX { hwIpfpmMcpInstId, hwIpfpmMcpAchId, hwIpfpmMcpSeqNoHigh, hwIpfpmMcpSeqNoLow, hwIpfpmMcpForwardDelayMultiSrcDCP, hwIpfpmMcpForwardDelayMultiSrcTLP, hwIpfpmMcpForwardDelayMultiDesDCP, hwIpfpmMcpForwardDelayMultiDesTLP, hwIpfpmMcpBackwardDelayMultiSrcDCP, hwIpfpmMcpBackwardDelayMultiSrcTLP, hwIpfpmMcpBackwardDelayMultiDesDCP, hwIpfpmMcpBackwardDelayMultiDesTLP}
+    ::= { hwIpfpmMcpTwoDelayMultiStatTable 1 }
+
+    HwIpfpmMcpTwoDelayMultiStatEntry ::=
+        SEQUENCE {
+                hwIpfpmMcpForwardDelayMultiSrcDCP
+                    IpAddress,
+                hwIpfpmMcpForwardDelayMultiSrcTLP
+                    Integer32,
+                hwIpfpmMcpForwardDelayMultiDesDCP
+                    IpAddress,
+                hwIpfpmMcpForwardDelayMultiDesTLP
+                    Integer32,
+                hwIpfpmMcpBackwardDelayMultiSrcDCP
+                    IpAddress,
+                hwIpfpmMcpBackwardDelayMultiSrcTLP
+                    Integer32,
+                hwIpfpmMcpBackwardDelayMultiDesDCP
+                    IpAddress,
+                hwIpfpmMcpBackwardDelayMultiDesTLP
+                    Integer32,
+                hwIpfpmMcpTwoDelayMultiErrInfo
+                    HWIpfpmStatErrInfo,
+                hwIpfpmMcpTwoDelayMulti
+                    Integer32,
+                hwIpfpmMcpTwoDelayMultiVariation
+                    Integer32,
+                hwIpfpmMcpForwardDelayMulti
+                    Integer32,
+                hwIpfpmMcpForwardDelayMultiVariation
+                    Integer32,
+                hwIpfpmMcpBackwardDelayMulti
+                    Integer32,
+                hwIpfpmMcpBackwardDelayMultiVariation
+                    Integer32
+    }
+
+    hwIpfpmMcpForwardDelayMultiSrcDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay source DCP of forward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 1 }
+
+    hwIpfpmMcpForwardDelayMultiSrcTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay source TLP of forward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 2 }
+
+    hwIpfpmMcpForwardDelayMultiDesDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay destination DCP of forward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 3 }
+
+    hwIpfpmMcpForwardDelayMultiDesTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay destination TLP of forward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 4 }
+
+    hwIpfpmMcpBackwardDelayMultiSrcDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay source DCP of backward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 5 }
+
+    hwIpfpmMcpBackwardDelayMultiSrcTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay source TLP of backward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 6 }
+
+    hwIpfpmMcpBackwardDelayMultiDesDCP OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay destination DCP of backward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 7 }
+
+    hwIpfpmMcpBackwardDelayMultiDesTLP OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay destination TLP of backward flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 8 }
+
+    hwIpfpmMcpTwoDelayMultiErrInfo OBJECT-TYPE
+    SYNTAX HWIpfpmStatErrInfo
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The error code to indicate the validity and the invalidation
+        reason of an interval's multi-in-point two-way delay measure statistics."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 9 }
+
+    hwIpfpmMcpTwoDelayMulti OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay(microsecond) of monitored flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 10 }
+
+    hwIpfpmMcpTwoDelayMultiVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The multi-in-point two-way delay variation(microsecond) of monitored flow."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 11 }
+
+    hwIpfpmMcpForwardDelayMulti OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The forward flow delay(microsecond) in multi-in-point two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 12 }
+
+    hwIpfpmMcpForwardDelayMultiVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The forward flow variation(microsecond) in multi-in-point two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 13 }
+
+    hwIpfpmMcpBackwardDelayMulti OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The backward flow delay(microsecond) in multi-in-point two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 14 }
+
+    hwIpfpmMcpBackwardDelayMultiVariation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The backward flow variation(microsecond) in multi-in-point two-way delay measurement."
+    ::= { hwIpfpmMcpTwoDelayMultiStatEntry 15 }
+
+-- ==================================================================
+-- IPFPM DCP configuration group
+-- ==================================================================
+    --
+    -- hwIpfpmDcpGlobalTable: DCP global configure information
+    --
+   
+    hwIpfpmDcpGlobalTable OBJECT IDENTIFIER ::= { hwIpfpmDcpConfiguration 1 }
+    
+    hwIpfpmDcpEnable OBJECT-TYPE
+    SYNTAX HWEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object indicates that the DCP (Data Collecting 
+        Point) function is 'enabled(1)' or 'disabled(2)'."
+    DEFVAL { disabled }
+    ::= { hwIpfpmDcpGlobalTable 1 }
+    
+    hwIpfpmDcpId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value of this object indicates the identification of DCP.
+         The value 0.0.0.0 represents that it is not configured." 
+    ::= { hwIpfpmDcpGlobalTable 2 }
+       
+ hwIpfpmDcpMeasureColorFlag OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (3..3))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This string object indicates the bits of an IP packet used for color 
+        measurement. the length of string is 3,first and second character range is <1-6>,
+        third  character range is <0-6>.
+        the three characters can not same.
+        The character '0' represents none flag bit.
+        The character '1' represents the bit0 of the FLAGS byte. 
+        The character '2' represents the bit3 of the TOS byte. 
+        The character '3' represents the bit4 of the TOS byte. 
+        The character '4' represents the bit5 of the TOS byte. 
+        The character '5' represents the bit6 of the TOS byte. 
+        The character '6' represents the bit7 of the TOS byte.
+        the first character represents loss measurement color-bit,
+        the second character represents delay measurement color-bit, 
+        the third character represents multicast measurement color-bit."  
+    ::= { hwIpfpmDcpGlobalTable 3 }
+
+    
+    hwIpfpmDcpMcpId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Identification of the MCP that DCP reports measure data of 
+        the test instances not specified the object 
+        'hwIpfpmDcpInstMcpId' to. The value 0.0.0.0 represents that it is 
+        not configured."
+    ::= { hwIpfpmDcpGlobalTable 6 }
+    
+    hwIpfpmDcpMcpPort OBJECT-TYPE
+    SYNTAX Integer32(1024..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The listening port of the MCP that DCP reports measure 
+        data of the test instances not specified the object 
+        'hwIpfpmDcpInstMcpPort' to. It need setting 'hwIpfpmDcpMcpId' 
+        first before setting this object."
+    DEFVAL { 65030 }
+    ::= { hwIpfpmDcpGlobalTable 7 } 
+    
+    hwIpfpmDcpMcpVpnName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (0..31))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the VPN instance through which the DCP and the MCP communicates.
+         'hwIpfpmDcpInstMcpId' should be setted first before setting this object."
+    ::= { hwIpfpmDcpGlobalTable 8 } 
+    
+    hwIpfpmDcpMcpVpnType OBJECT-TYPE
+    SYNTAX HWIpfpmVpnType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The type of the VPN instance. 'hwIpfpmDcpInstMcpId' should be setted first 
+         before setting this object.
+             Available options:
+             none(0)
+             manage-vpn(1)
+             vpn-instance(2)"
+    ::= { hwIpfpmDcpGlobalTable 9 } 
+
+    hwIpfpmPeriodSource OBJECT-TYPE
+    SYNTAX HWIpfpmClockSoure
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The clock source using by period.Priority should be given to the use of
+         this setting in period calculation.
+              Available options: 
+              default(0)
+              ntp(1)"
+    ::= { hwIpfpmDcpGlobalTable 10 } 
+
+    --
+    -- hwIpfpmDcpAuthTable: DCP global authentication information
+    --
+    hwIpfpmDcpAuthTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpAuthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains authentication of DCP."
+    ::= { hwIpfpmDcpConfiguration 7 }  
+    
+    hwIpfpmDcpAuthEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpAuthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM authentication information for DCP"
+    INDEX { hwIpfpmDcpAuthKeyId  }
+    ::= { hwIpfpmDcpAuthTable 1 }
+    
+    HwIpfpmDcpAuthEntry ::=
+		SEQUENCE { 
+                                                                                      hwIpfpmDcpAuthKeyId
+				    Integer32,
+				hwIpfpmDcpAuthType
+				    HWIpfpmAuthType,
+				hwIpfpmDcpAuthKey
+				    OCTET STRING,						
+				hwIpfpmDcpAuthRowStatus
+				    RowStatus
+    }
+    
+    hwIpfpmDcpAuthKeyId OBJECT-TYPE
+    SYNTAX Integer32(1..64)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identification of the DCP authentication."
+    ::= { hwIpfpmDcpAuthEntry 1 }
+	
+    hwIpfpmDcpAuthType OBJECT-TYPE
+    SYNTAX HWIpfpmAuthType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Authentication type of the DCP. The enumeration 
+        'hmac-sha256(1)' represents the password is sent after being 
+        encrypted through hmac-sha256. By default, authentication is not configured."
+    ::= { hwIpfpmDcpAuthEntry 2 }
+    
+    hwIpfpmDcpAuthKey OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (0..432))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The password used as an IPFPM authentication key."
+    ::= { hwIpfpmDcpAuthEntry 3 }
+    
+    hwIpfpmDcpAuthRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpAuthEntry 4 }
+
+-- ==================================================================    
+-- IPFPM DCP instance configuration group
+-- ==================================================================
+    --
+    -- hwIpfpmDcpInstTable: DCP test instance information
+    --
+    hwIpfpmDcpInstTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpInstEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains attribute of DCP test instances."
+    ::= { hwIpfpmDcpConfiguration 8 }
+    
+    hwIpfpmDcpInstEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpInstEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM configuration information for a particular DCP test 
+        instance."
+    INDEX { hwIpfpmDcpInstId  }
+    ::= { hwIpfpmDcpInstTable 1 }
+    
+    HwIpfpmDcpInstEntry ::=
+		SEQUENCE { 
+            hwIpfpmDcpInstId
+                Integer32,
+            hwIpfpmDcpInstDesc
+                OCTET STRING,
+            hwIpfpmDcpInstMcpId
+                IpAddress,
+            hwIpfpmDcpInstMcpPort
+                Integer32,
+            hwIpfpmDcpInstInterval
+                HWIpfpmInstIntervalType,
+            hwIpfpmDcpInstRowStatus
+                RowStatus,
+            hwIpfpmDcpInstType
+                HWIpfpmInstType,
+            hwIpfpmDcpSourceInstId
+                Integer32,
+            hwIpfpmDcpInstMcpVpnName
+                OCTET STRING,
+            hwIpfpmDcpInstMcpVpnType
+                HWIpfpmVpnType,
+            hwIpfpmDcpInstGroupId
+                Integer32
+    }
+    
+    hwIpfpmDcpInstId OBJECT-TYPE
+    SYNTAX Integer32 (1..8355838|16711681..16777214)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Identification of the test instance."
+    ::= { hwIpfpmDcpInstEntry 1 }
+    
+    hwIpfpmDcpInstDesc OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Description of the test instance.
+         if the string length is 0, it represents that it is not configured."
+    ::= { hwIpfpmDcpInstEntry 2 }
+    
+    hwIpfpmDcpInstMcpId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Identification of the MCP that DCP reports measure data of 
+        this test instance to. The value 0.0.0.0 represents that it is not 
+        configured"
+    ::= { hwIpfpmDcpInstEntry 3 }
+    
+    hwIpfpmDcpInstMcpPort OBJECT-TYPE
+    SYNTAX Integer32(1024..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The listening port of the MCP that DCP reports measure 
+        data of this test instance to. It need setting 
+        'hwIpfpmDcpInstMcpId' first before setting this object."
+    DEFVAL { 65030 }
+    ::= { hwIpfpmDcpInstEntry 4 }
+    
+    hwIpfpmDcpInstInterval OBJECT-TYPE
+    SYNTAX HWIpfpmInstIntervalType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates that interval of an test instance is
+        'interval1s(1)' or 'interval10s(10)' or 'interval60s(60)'
+        or 'interval600s(600)'."
+    DEFVAL { interval10s }
+    ::= { hwIpfpmDcpInstEntry 5 }
+    
+    hwIpfpmDcpInstRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpInstEntry 6 }
+    
+    hwIpfpmDcpInstType OBJECT-TYPE
+    SYNTAX HWIpfpmInstType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "type of the test instance."
+    ::= { hwIpfpmDcpInstEntry 7 }
+
+   
+    hwIpfpmDcpSourceInstId OBJECT-TYPE
+    SYNTAX Integer32(0 | 16711681..16777214)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Identification of the source instance."
+    ::= { hwIpfpmDcpInstEntry 8 }
+	
+    hwIpfpmDcpInstMcpVpnName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (0..31))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The name of the VPN instance through which the DCP and the MCP communicates.
+         'hwIpfpmDcpInstMcpId' should be setted first before setting this object."
+    ::= { hwIpfpmDcpInstEntry 9 } 
+    
+    hwIpfpmDcpInstMcpVpnType OBJECT-TYPE
+    SYNTAX HWIpfpmVpnType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The type of the VPN instance. 'hwIpfpmDcpInstMcpId' should be setted first 
+	before setting this object."
+    ::= { hwIpfpmDcpInstEntry 10 } 
+    
+    hwIpfpmDcpInstGroupId OBJECT-TYPE
+    SYNTAX Integer32 (0..8355838)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The group identification of the test instance."
+    ::= { hwIpfpmDcpInstEntry 11 }
+
+    --
+    -- hwIpfpmDcpInstAuthTable: DCP test instance authentication information
+    --
+    hwIpfpmDcpInstAuthTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpInstAuthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains authentication of DCP test instances."
+    ::= { hwIpfpmDcpConfiguration 9 }  
+    
+    hwIpfpmDcpInstAuthEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpInstAuthEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM authentication information for a particular DCP test 
+        instance."
+    INDEX { hwIpfpmDcpInstId, hwIpfpmDcpInstAuthKeyId }
+    ::= { hwIpfpmDcpInstAuthTable 1 }
+    
+    HwIpfpmDcpInstAuthEntry ::=
+		SEQUENCE { 
+        hwIpfpmDcpInstAuthKeyId
+				    Integer32,
+				hwIpfpmDcpInstAuthType
+				    HWIpfpmAuthType,
+				hwIpfpmDcpInstAuthKey
+				    OCTET STRING,						
+				hwIpfpmDcpInstAuthRowStatus
+				    RowStatus
+    }
+    
+    hwIpfpmDcpInstAuthKeyId OBJECT-TYPE
+    SYNTAX Integer32(1..64)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identification of the DCP authentication."
+    ::= { hwIpfpmDcpInstAuthEntry 1 }
+	
+    hwIpfpmDcpInstAuthType OBJECT-TYPE
+    SYNTAX HWIpfpmAuthType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Authentication type of DCP instance authentication. The 
+        enumeration 'hmac-sha256(1)' represents the password is sent after 
+        being encrypted through hmac-sha256. By default, authentication is 
+		not configured. If this object is not configured and object 
+		'hwIpfpmDcpAuthType' is configured, then this instance uses 
+		'hwIpfpmDcpInstAuthType' and 'hwIpfpmDcpInstAuthKey' 
+		as its authentication."
+    ::= { hwIpfpmDcpInstAuthEntry 2 }
+    
+    hwIpfpmDcpInstAuthKey OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (0..432))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The password used as an DCP test instance authentication key."
+    ::= { hwIpfpmDcpInstAuthEntry 3 }
+    
+    hwIpfpmDcpInstAuthRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpInstAuthEntry 4 }
+
+    
+    --
+    -- hwIpfpmDcpFlowTable: DCP flow information of test instance 
+    --
+    hwIpfpmDcpFlowTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpFlowEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains flow attribute of DCP test instances."
+    ::= { hwIpfpmDcpConfiguration 10 }
+    
+    hwIpfpmDcpFlowEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpFlowEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM configuration information for a particular DCP test 
+        instance flow."
+    INDEX { hwIpfpmDcpInstId, hwIpfpmDcpFlowType }
+    ::= { hwIpfpmDcpFlowTable 1 }
+    
+    HwIpfpmDcpFlowEntry ::=
+		SEQUENCE { 
+                                                                                     hwIpfpmDcpFlowType
+				    HWIpfpmFlowType,
+				hwIpfpmDcpFlowProtocol
+				    Integer32,
+				hwIpfpmDcpFlowDscp
+				    Integer32,
+				hwIpfpmDcpFlowSrcAddr
+				    IpAddress,
+				hwIpfpmDcpFlowSrcMaskLen
+				    Integer32,
+				hwIpfpmDcpFlowDstAddr
+				    IpAddress,
+				hwIpfpmDcpFlowDstMaskLen
+				    Integer32,
+				hwIpfpmDcpFlowSrcPortBgn
+				    Integer32,
+				hwIpfpmDcpFlowSrcPortEnd
+				    Integer32,
+				hwIpfpmDcpFlowDstPortBgn
+				    Integer32,
+				hwIpfpmDcpFlowDstPortEnd
+				    Integer32,
+				hwIpfpmDcpFlowRowStatus
+				    RowStatus,
+                                                                                    hwIpfpmDcpFlowOuterSrcAddr
+                                                                                          IpAddress,
+                                                                                   hwIpfpmDcpFlowOuterDstAddr
+                                                                                         IpAddress,
+                                                                                  hwIpfpmDcpFlowForwardGtpTeid
+                                                                                        Unsigned32,
+                                                                                 hwIpfpmDcpFlowBackwardGtpTeid
+                                                                                        Unsigned32,
+                                                                                 hwIpfpmDcpFlowVxlan
+                                                                                       TruthValue,
+                                                                                 hwIpfpmDcpFlowVni
+                                                                                       Integer32	    
+    }
+    
+    hwIpfpmDcpFlowType OBJECT-TYPE
+    SYNTAX HWIpfpmFlowType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "This object indicates that the flow is 'forward(1)' or 
+        'backward(2)' or 'bidirectional(3)'."
+    ::= { hwIpfpmDcpFlowEntry 1 }
+    
+    hwIpfpmDcpFlowProtocol OBJECT-TYPE
+    SYNTAX Integer32(0..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the protocol specified as the flow feature.
+        'hwIpfpmDcpFlowSrcPortBgn', 'hwIpfpmDcpFlowSrcPortEnd', 
+        'hwIpfpmDcpFlowDstPortBgn', and 'hwIpfpmDcpFlowDstPortEnd' can be 
+        configured only when the value is 6(tcp) or 17(udp). The value 0 
+        represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 2 }
+    
+    hwIpfpmDcpFlowDscp OBJECT-TYPE
+    SYNTAX Integer32(-1..63)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the DSCP specified as the flow 
+        feature. The value -1 represents that this object is 
+        not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpFlowEntry 3 }
+    
+    hwIpfpmDcpFlowSrcAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the source ip address specified as the 
+        flow feature. The value 0.0.0.0 represents that this object is not configured."
+    ::= { hwIpfpmDcpFlowEntry 4 }
+    
+    hwIpfpmDcpFlowSrcMaskLen OBJECT-TYPE
+    SYNTAX Integer32(1..32)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the source ip mask length specified 
+        as the flow feature."
+    DEFVAL { 32 }
+    ::= { hwIpfpmDcpFlowEntry 5 }
+    
+    hwIpfpmDcpFlowDstAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the destination ip address specified 
+        as the flow feature. The value 0.0.0.0 represents that this object 
+        is not configured."
+    ::= { hwIpfpmDcpFlowEntry 6 }
+    
+    hwIpfpmDcpFlowDstMaskLen OBJECT-TYPE
+    SYNTAX Integer32(1..32)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the destination ip mask length 
+        specified as the flow feature."
+    DEFVAL { 32 }
+    ::= { hwIpfpmDcpFlowEntry 7 }
+    
+    hwIpfpmDcpFlowSrcPortBgn OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the begin value of source port 
+        specified as the flow feature. It need configure
+        'hwIpfpmDcpFlowProtocol' first before configure this 
+        object. The value 0 represents that this object is not
+        configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 8 }
+    
+    hwIpfpmDcpFlowSrcPortEnd OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the end value of source port 
+        specified as the flow feature. It need configure
+        'hwIpfpmDcpFlowProtocol' first before configure this 
+        object. The value 0 represents that this object is 
+        not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 9 }
+    
+    hwIpfpmDcpFlowDstPortBgn OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the begin value of destination port 
+        specified as the flow feature. It need configure
+        'hwIpfpmDcpFlowProtocol' first before configure this object.
+        The value 0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 10 }
+    
+    hwIpfpmDcpFlowDstPortEnd OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the end value of destination port 
+        specified as the flow feature. It need configure
+        'hwIpfpmDcpFlowProtocol' first before configure this object.
+        The value 0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 11 }
+    
+    hwIpfpmDcpFlowRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpFlowEntry 12 }
+    
+    hwIpfpmDcpFlowOuterSrcAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the outer source ip address specified as the 
+        flow feature. The value 0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 13 }
+    
+    hwIpfpmDcpFlowOuterDstAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the outer destination ip address specified as the 
+        flow feature. The value 0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 14 }
+    
+    hwIpfpmDcpFlowForwardGtpTeid OBJECT-TYPE
+    SYNTAX Unsigned32(0..4294967294)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the value of forward gtp teid
+        specified as the flow feature. The value 0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 15 }
+    
+    hwIpfpmDcpFlowBackwardGtpTeid OBJECT-TYPE
+    SYNTAX Unsigned32(0..4294967294)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the value of backward gtp teid
+        specified as the flow feature. The value 0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 16 }
+    
+    hwIpfpmDcpFlowVxlan OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The Vxlan of the flow feature. The value 
+        false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpFlowEntry 17 }
+	
+    hwIpfpmDcpFlowVni OBJECT-TYPE
+    SYNTAX Integer32(0..16000000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the value of vni
+        specified as the flow feature. The value 0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpFlowEntry 18 }
+
+    --
+    -- hwIpfpmDcpInstTlpTable: DCP TLP information of DCP test instance 
+    --
+    hwIpfpmDcpInstTlpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpInstTlpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains attribute of TLPs."
+    ::= { hwIpfpmDcpConfiguration 11 }
+    
+    hwIpfpmDcpInstTlpEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpInstTlpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM configuration information for a particular TLP."
+    INDEX { hwIpfpmDcpInstId, 
+            hwIpfpmDcpTlpId }
+    ::= { hwIpfpmDcpInstTlpTable 1 }
+    
+    HwIpfpmDcpInstTlpEntry ::=
+		SEQUENCE { 		                
+				hwIpfpmDcpInstTlpRole
+				    HWIpfpmTlpRole,
+				hwIpfpmDcpInstTlpFlowType
+		                                               HWIpfpmFlowType,
+				hwIpfpmDcpInstTlpDirec
+				    HWIpfpmFlowTlpDirec,
+				hwIpfpmDcpInstTlpVpnLabel
+				    Integer32,
+				hwIpfpmDcpInstTlpCtrlWordFlag
+				    TruthValue,
+				hwIpfpmDcpInstTlpLspLabel
+				    Integer32,
+				hwIpfpmDcpInstTlpL2VpnFlag
+				    TruthValue, 
+				hwIpfpmDcpInstTlpTpId
+				    OCTET STRING,				    
+				hwIpfpmDcpInstTlpRowStatus
+				    RowStatus,
+				hwIpfpmDcpInstTlpMultiSrcType
+				    HWIpfpmMMSType,
+				hwIpfpmDcpInstTlpFlowLabelFlag
+				    TruthValue,
+				hwIpfpmDcpInstTlpLspLabel2
+				    Integer32, 
+				hwIpfpmDcpInstTlpLspLabel3
+				    Integer32,
+				hwIpfpmDcpInstTlpOuterVlan
+				    Integer32,
+				hwIpfpmDcpInstTlpInnerVlan
+				    Integer32,
+				hwIpfpmDcpInstTlpBackwardVpnLabel
+				    Integer32,
+				hwIpfpmDcpInstTlpBackwardCtrlWordFlag
+		                                              TruthValue,
+				hwIpfpmDcpInstTlpBackwardLspLabel
+		                                               Integer32,
+				hwIpfpmDcpInstTlpBackwardLspLabel2
+				    Integer32,
+				hwIpfpmDcpInstTlpBackwardLspLabel3
+				    Integer32,
+				hwIpfpmDcpInstTlpBackwardL2VpnFlag
+				    TruthValue,
+				hwIpfpmDcpInstTlpBackwardFlowLabelFlag
+				    TruthValue,
+				hwIpfpmDcpInstTlpBackwardOuterVlan
+				    Integer32,
+				hwIpfpmDcpInstTlpBackwardInnerVlan
+		                                               Integer32,
+				hwIpfpmDcpInstTlpBackwardTpId
+		                                               OCTET STRING    					    				     				    
+    }
+    
+    
+    hwIpfpmDcpInstTlpRole OBJECT-TYPE
+    SYNTAX HWIpfpmTlpRole
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the TLP position 'in-point(1)' or 'out-point(2) or 'mid-point(3)'."
+    ::= { hwIpfpmDcpInstTlpEntry 1 }
+    
+    hwIpfpmDcpInstTlpFlowType OBJECT-TYPE
+    SYNTAX HWIpfpmFlowType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the flow type of the instance TLP is 
+        'forward(1)' or 'backward(2)' or 'bidirectional(3)' or 
+        'forwardandbackward(4)'. Only 'forward(1)' and 'backward(2)'
+        can be configured when 'hwIpfpmDcpInstTlpRole' is 
+        'mid-point(3)'. The value 'null(0)' represents that this 
+        flow is not configured under the instance."
+    ::= { hwIpfpmDcpInstTlpEntry 2 } 
+    
+    hwIpfpmDcpInstTlpDirec OBJECT-TYPE
+    SYNTAX HWIpfpmFlowTlpDirec
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the TLP is 'ingress(1)' or 'egress(2)' 
+        of the flow of DCP test instance."
+    ::= { hwIpfpmDcpInstTlpEntry 3 }
+    
+    hwIpfpmDcpInstTlpVpnLabel OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The VPN label of of the flow that the TLP measured. The 
+        value -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpEntry 4 }
+    
+    hwIpfpmDcpInstTlpCtrlWordFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The control word flag of the flow that the TLP measured. The value 
+        false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpEntry 5 }
+    
+    hwIpfpmDcpInstTlpLspLabel OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpEntry 6 }
+    
+    hwIpfpmDcpInstTlpL2VpnFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The L2VPN flag of the flow that the TLP measured. The value 
+        false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpEntry 7 } 
+    
+    hwIpfpmDcpInstTlpTpId OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (3..4))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The tpid for vlan. The value range is from '600' to 'FFFF'."
+    DEFVAL { 8100 }
+    ::= { hwIpfpmDcpInstTlpEntry 8 }   
+    
+    hwIpfpmDcpInstTlpRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpInstTlpEntry 9 }
+    
+    hwIpfpmDcpInstTlpMultiSrcType OBJECT-TYPE
+    SYNTAX HWIpfpmMMSType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the type of multicastsrc 'master(0)'or 'slave(1)'."
+    ::= { hwIpfpmDcpInstTlpEntry 10 }
+    
+    hwIpfpmDcpInstTlpFlowLabelFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This value indicate whether the flow-label is configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpEntry 11 } 
+
+    hwIpfpmDcpInstTlpLspLabel2 OBJECT-TYPE
+    SYNTAX Integer32(-2..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured. The value
+        -2 represents that this object matches any label."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpEntry 12 }
+
+    hwIpfpmDcpInstTlpLspLabel3 OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpEntry 13 }      
+
+    hwIpfpmDcpInstTlpOuterVlan OBJECT-TYPE
+    SYNTAX Integer32(0..4094)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The outer-vlan id of the flow that the TLP measured. The value 
+        0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpInstTlpEntry 14 }  
+
+    hwIpfpmDcpInstTlpInnerVlan OBJECT-TYPE
+    SYNTAX Integer32(0..4094)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The inner-vlan id of the flow that the TLP measured. The value 
+        0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpInstTlpEntry 15 } 
+    
+    hwIpfpmDcpInstTlpBackwardVpnLabel OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The VPN label of of the flow that the TLP measured. The 
+        value -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpEntry 16 }
+    
+    hwIpfpmDcpInstTlpBackwardCtrlWordFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The control word flag of the flow that the TLP measured. The value 
+    	false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpEntry 17 }	
+    	
+    hwIpfpmDcpInstTlpBackwardLspLabel OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+    	-1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpEntry 18 }
+    
+    hwIpfpmDcpInstTlpBackwardLspLabel2 OBJECT-TYPE
+    SYNTAX Integer32(-2..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured. The value
+        -2 represents that this object matches any label."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpEntry 19 }
+    
+    hwIpfpmDcpInstTlpBackwardLspLabel3 OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpEntry 20 }     
+    
+    hwIpfpmDcpInstTlpBackwardL2VpnFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The L2VPN flag of the flow that the TLP measured. The value 
+    	false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpEntry 21 } 
+    		
+    hwIpfpmDcpInstTlpBackwardFlowLabelFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates whether the flow label function is configured for the backward target flow. If the value is false(2), the flow label function is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpEntry 22 }
+    
+    hwIpfpmDcpInstTlpBackwardOuterVlan OBJECT-TYPE
+    SYNTAX Integer32(0..4094)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The outer-vlan id of the flow that the TLP measured. The value 
+    	0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpInstTlpEntry 23 } 
+    
+    hwIpfpmDcpInstTlpBackwardInnerVlan OBJECT-TYPE
+    SYNTAX Integer32(0..4094)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The inner-vlan id of the flow that the TLP measured. The value 
+    	0 represents that this object is not configured."
+    DEFVAL { 0 }
+    ::= { hwIpfpmDcpInstTlpEntry 24 } 
+    
+    hwIpfpmDcpInstTlpBackwardTpId OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (3..4))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The tpid for vlan. The value range is from '600' to 'FFFF'."
+        DEFVAL { 8100 }
+    ::= { hwIpfpmDcpInstTlpEntry 25 }   
+    
+    --
+    -- hwIpfpmDcpLossMeasTable: Loss measure information of DCP test 
+    -- instance
+    --
+    hwIpfpmDcpLossMeasTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpLossMeasEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains loss measure information of DCP test 
+        instances."
+    ::= { hwIpfpmDcpConfiguration 12 }
+    
+    hwIpfpmDcpLossMeasEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpLossMeasEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM loss measure configuration information for a particular  
+        DCP test instance."
+    INDEX { hwIpfpmDcpInstId,  hwIpfpmDcpLossTlpRole}
+    ::= { hwIpfpmDcpLossMeasTable 1 }
+    
+    HwIpfpmDcpLossMeasEntry ::=
+		SEQUENCE {
+				hwIpfpmDcpLossEnable
+				    HWEnabledStatus,
+				hwIpfpmDcpLossContEnable
+				    HWEnabledStatus,
+				hwIpfpmDcpLossTimeRange
+				    HWIpfpmMeasTimeRangeType,
+				hwIpfpmDcpLossTlpRole
+				    HWIpfpmLossTlpRole
+    } 
+    
+    hwIpfpmDcpLossEnable OBJECT-TYPE
+    SYNTAX HWEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object indicates that the on-demand loss measure 
+        function is 'enabled(1)' or 'disabled(2)'."
+    DEFVAL { disabled }
+    ::= { hwIpfpmDcpLossMeasEntry 1 }
+    
+    hwIpfpmDcpLossContEnable OBJECT-TYPE
+    SYNTAX HWEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object indicates that the continual loss measure 
+        function is 'enabled(1)' or 'disabled(2)'."
+    DEFVAL { disabled }
+    ::= { hwIpfpmDcpLossMeasEntry 2 }
+    
+    hwIpfpmDcpLossTimeRange OBJECT-TYPE
+    SYNTAX HWIpfpmMeasTimeRangeType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The time range in which the on-demand loss measure 
+        function is enabled. The enumeration values include
+        'timerange5m(5)', 'timerange10m(10)', 'timerange15m(15)',
+        and 'timerange30m(30)'. The value 'null(0)' represents 
+        that this object is not configured."
+    ::= { hwIpfpmDcpLossMeasEntry 3 }    
+    hwIpfpmDcpLossTlpRole OBJECT-TYPE
+    SYNTAX HWIpfpmLossTlpRole
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION         
+         "The type of TLP that loss measure enabled on. The 
+        enumeration values include 'e2e(1)','section(2)'
+         . The value 'e2e(1)' represents that this object is end-end.
+          The value 'section(2)' represents that this object is mid-point."
+    DEFVAL { e2e }
+    ::= { hwIpfpmDcpLossMeasEntry 4 }  
+    
+    --
+    -- hwIpfpmDcpDelayMeasTable: Delay measure information  
+    -- of DCP test instance
+    --
+    hwIpfpmDcpDelayMeasTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpDelayMeasEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains delay measure information of DCP  
+        test instances."
+    ::= { hwIpfpmDcpConfiguration 13 }
+    
+    hwIpfpmDcpDelayMeasEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpDelayMeasEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM delay measure configuration information for a particular  
+        DCP test instance."
+    INDEX { hwIpfpmDcpInstId, hwIpfpmDcpDelayTlpRole}
+    ::= { hwIpfpmDcpDelayMeasTable 1 }
+    
+    HwIpfpmDcpDelayMeasEntry ::=
+		SEQUENCE {
+				hwIpfpmDcpDelayEnable
+				    HWEnabledStatus,
+				hwIpfpmDcpDelayContEnable
+				    HWEnabledStatus,
+				hwIpfpmDcpDelayMeasType   
+				    HWIpfpmDelayMeasType,
+				hwIpfpmDcpDelayTimeRange
+				    HWIpfpmMeasTimeRangeType,
+				hwIpfpmDcpDelayTlpRole
+				    HWIpfpmDelayTlpRole,
+				hwIpfpmDcpDelayForwardTlpId
+				    Integer32,
+				hwIpfpmDcpDelayBackwardTlpId
+				    Integer32
+    }
+    
+    hwIpfpmDcpDelayEnable OBJECT-TYPE
+    SYNTAX HWEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object indicates that the on-demand delay 
+        measure function is 'enabled(1)' or 'disabled(2)'."
+    DEFVAL { disabled }        
+    ::= { hwIpfpmDcpDelayMeasEntry 1 }
+    
+    hwIpfpmDcpDelayContEnable OBJECT-TYPE
+    SYNTAX HWEnabledStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object indicates that the continual delay 
+        measure function is 'enabled(1)' or 'disabled(2)'."
+    DEFVAL { disabled } 
+    ::= { hwIpfpmDcpDelayMeasEntry 2 }
+    
+    hwIpfpmDcpDelayMeasType OBJECT-TYPE
+    SYNTAX HWIpfpmDelayMeasType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The type of delay measure. The enumeration values 
+        include 'oneway(1)' and 'twoway(2)'. The value 
+        'null(0)' represents that this object is not 
+        configured."
+    ::= { hwIpfpmDcpDelayMeasEntry 3 }
+    
+    hwIpfpmDcpDelayTimeRange OBJECT-TYPE
+    SYNTAX HWIpfpmMeasTimeRangeType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The time range in which the on-demand delay measure 
+        function is enabled. The enumeration values include
+        'timerange5m(5)', 'timerange10m(10)', 'timerange15m(15)',
+        and 'timerange30m(30)'. The value 'null(0)' represents 
+        that this object is not configured."
+    ::= { hwIpfpmDcpDelayMeasEntry 4 }
+    
+    hwIpfpmDcpDelayTlpRole OBJECT-TYPE
+    SYNTAX HWIpfpmDelayTlpRole
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The type of TLP that  delay measure enabled on. The 
+        enumeration values include 'e2e(1)','section(2)'
+         . The value 'e2e(1)' represents that this object is end-end.
+          The value 'section(2)' represents that this object is mid-point."
+    DEFVAL { e2e }
+    ::= { hwIpfpmDcpDelayMeasEntry 5 }
+    
+    hwIpfpmDcpDelayForwardTlpId OBJECT-TYPE
+    SYNTAX Integer32(0..16777215)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The ingress TLP of the flow for one-way delay measure 
+        or the ingress TLP of the forward flow for two-way delay 
+        measure. The value 0 represents that this object is not 
+        configured."     
+    DEFVAL { 0 }  
+    ::= { hwIpfpmDcpDelayMeasEntry 6 }
+    
+    hwIpfpmDcpDelayBackwardTlpId OBJECT-TYPE
+    SYNTAX Integer32(0..16777215)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The ingress TLP of the backward flow for two-way delay 
+        measure. The value 0 represents that this object is 
+        not configured."
+    DEFVAL { 0 } 
+    ::= { hwIpfpmDcpDelayMeasEntry 7 }
+ 
+
+-- ==================================================================    
+-- IPFPM DCP TLP configuration group
+-- ==================================================================
+    --
+    -- hwIpfpmDcpTlpTable: DCP TLP information
+    --
+    hwIpfpmDcpTlpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpTlpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains attribute of TLPs."
+    ::= { hwIpfpmDcpConfiguration 14 }
+    
+    hwIpfpmDcpTlpEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpTlpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM configuration information for a particular TLP on interface."
+    INDEX {hwIpfpmDcpTlpId }
+    ::= { hwIpfpmDcpTlpTable 1 }
+    
+    HwIpfpmDcpTlpEntry ::=
+		SEQUENCE {
+        			hwIpfpmDcpTlpId
+				    Integer32,				
+				hwIpfpmDcpTlpIfIndex
+				    InterfaceIndex,			
+				hwIpfpmDcpTlpRowStatus
+				    RowStatus,
+				hwIpfpmDcpTlpVlanId
+				    Integer32	
+    }
+    
+    hwIpfpmDcpTlpId OBJECT-TYPE
+    SYNTAX Integer32(1..16777215)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identification of TLP."
+    ::= { hwIpfpmDcpTlpEntry 1 } 
+    
+    hwIpfpmDcpTlpIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The index of the port that the TLP configured on."
+    ::= { hwIpfpmDcpTlpEntry 2 }  
+      
+    hwIpfpmDcpTlpRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpTlpEntry 3 }  
+    
+    
+    hwIpfpmDcpTlpVlanId OBJECT-TYPE
+    SYNTAX Integer32(0..4094|65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID of the TLP measured. The value 0 represents 
+        ce-default-vlan. The value 65535 represents that this 
+        object is not configured."
+    ::= { hwIpfpmDcpTlpEntry 4 }
+    
+ -- ==================================================================    
+-- IPFPM DCP TLP query group
+-- ==================================================================
+    --
+    -- hwIpfpmDcpTlpQueryTable: DCP TLP id information
+    --
+    hwIpfpmDcpTlpQueryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpTlpQueryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains the query interface ifindex and TLP ID with the interface."
+    ::= { hwIpfpmDcpConfiguration 15 }
+    
+    hwIpfpmDcpTlpQueryEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpTlpQueryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The TLP information which is configured with the interface."
+    INDEX { hwIpfpmDcpTlpQueryIfIndex, hwIpfpmDcpTlpQueryVlanId }
+    ::= { hwIpfpmDcpTlpQueryTable 1 }
+    
+    HwIpfpmDcpTlpQueryEntry ::=
+		SEQUENCE {					
+				hwIpfpmDcpTlpQueryIfIndex
+				    InterfaceIndex,
+				hwIpfpmDcpTlpQueryTlpId
+				    Integer32,
+				hwIpfpmDcpTlpQueryVlanId
+				    Integer32	
+	
+    }
+    
+    hwIpfpmDcpTlpQueryIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The interface index which is configured with TLP."
+    ::= { hwIpfpmDcpTlpQueryEntry 1 }
+    
+    hwIpfpmDcpTlpQueryTlpId OBJECT-TYPE
+    SYNTAX Integer32(1..16777215)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The TLP ID which is configured on the interface."
+    ::= { hwIpfpmDcpTlpQueryEntry 2 }    
+    
+    hwIpfpmDcpTlpQueryVlanId OBJECT-TYPE
+    SYNTAX Integer32(0..4094|65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID of the TLP measured. The value 0 
+        represents ce-default-vlan. The value 65535 
+        represents that this object is not configured."
+    ::= { hwIpfpmDcpTlpQueryEntry 3 }   
+    
+    --
+    -- hwIpfpmDcpSrcInstReferQueryTable:  the counter information of source instance referrd
+    --
+    hwIpfpmDcpSrcInstReferQueryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpSrcInstReferQueryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table describes the information of multicast source instance referred by some multicast receiver instances."
+    ::= { hwIpfpmDcpConfiguration 16 }
+    
+    hwIpfpmDcpSrcInstReferQueryEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpSrcInstReferQueryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The information is that the multicast source instance referred by some multicast receiver instances."
+    INDEX { hwIpfpmDcpInstId}
+    ::= { hwIpfpmDcpSrcInstReferQueryTable 1 }
+    
+    HwIpfpmDcpSrcInstReferQueryEntry ::=
+		SEQUENCE { 
+			  hwIpfpmDcpSrcInstReferCnt
+			      Integer32		  
+    }
+    
+    hwIpfpmDcpSrcInstReferCnt OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The object indicates the counter that the multicast source instance referred by some multicast receiver instances."
+    ::= { hwIpfpmDcpSrcInstReferQueryEntry 1 }
+ 
+ 
+    hwIpfpmTlpExceedBoardId  OBJECT-TYPE                          
+    SYNTAX Integer32                                
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The board ID that the tlp exceed the threshold."
+    ::= { hwIpfpmDcpTrapObjects 1 } 
+                           
+    hwIpfpmTlpNumber  OBJECT-TYPE                                
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The number of tlp."                             
+    ::= { hwIpfpmDcpTrapObjects 2 } 
+                           
+    hwIpfpmTlpThreshold  OBJECT-TYPE                            
+    SYNTAX Integer32                                       
+    MAX-ACCESS accessible-for-notify                       
+    STATUS current                                         
+    DESCRIPTION                                            
+        " The threshold of tlp."                         
+    ::= { hwIpfpmDcpTrapObjects 3 }       
+    
+    --
+    -- hwIpfpmDcpTlpQueryExtTable: DCP TLP id information
+    --
+    hwIpfpmDcpTlpQueryExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpTlpQueryExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains the query interface ifindex and TLP ID with the interface."
+    ::= { hwIpfpmDcpConfiguration 17 }
+    
+    hwIpfpmDcpTlpQueryExtEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpTlpQueryExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The TLP information which is configured with the interface."
+    INDEX { hwIpfpmDcpTlpQueryExtIfIndex, hwIpfpmDcpTlpQueryExtVlanId, hwIpfpmDcpTlpQueryExtOntId, hwIpfpmDcpTlpQueryExtOntPortType, hwIpfpmDcpTlpQueryExtOntPortId }
+    ::= { hwIpfpmDcpTlpQueryExtTable 1 }
+    
+    HwIpfpmDcpTlpQueryExtEntry ::=
+		SEQUENCE {					
+				hwIpfpmDcpTlpQueryExtIfIndex
+				    InterfaceIndex,
+				hwIpfpmDcpTlpQueryExtTlpId
+				    Integer32,
+				hwIpfpmDcpTlpQueryExtVlanId
+				    Integer32,
+			        hwIpfpmDcpTlpQueryExtOntId
+			            Integer32,
+			        hwIpfpmDcpTlpQueryExtOntPortType
+			            INTEGER,
+			        hwIpfpmDcpTlpQueryExtOntPortId
+			            Integer32	
+	
+    }
+    
+    hwIpfpmDcpTlpQueryExtIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The interface index which is configured with TLP."
+    ::= { hwIpfpmDcpTlpQueryExtEntry 1 }
+    
+    hwIpfpmDcpTlpQueryExtTlpId OBJECT-TYPE
+    SYNTAX Integer32(1..16777215)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The TLP ID which is configured on the interface."
+    ::= { hwIpfpmDcpTlpQueryExtEntry 2 }    
+    
+    hwIpfpmDcpTlpQueryExtVlanId OBJECT-TYPE
+    SYNTAX Integer32(0..4094|65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID of the TLP measured. The value 0 
+        represents ce-default-vlan. The value 65535 
+        represents that this object is not configured."
+    ::= { hwIpfpmDcpTlpQueryExtEntry 3 } 
+    
+    hwIpfpmDcpTlpQueryExtOntId  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS   not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the ONT ID."
+    ::= { hwIpfpmDcpTlpQueryExtEntry 4 }
+            
+    hwIpfpmDcpTlpQueryExtOntPortType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+              eth (47),
+              invalid(-1)
+              }
+    MAX-ACCESS   not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the ONT port's type.
+        Options: 
+        1. eth (47))   -indicates ONT port's type is the eth type.
+        2. invalid(-1) -indicates ONT port's type is not matched.
+        "
+    ::= { hwIpfpmDcpTlpQueryExtEntry 5 }
+
+    hwIpfpmDcpTlpQueryExtOntPortId  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the ONT port ID."
+    ::= { hwIpfpmDcpTlpQueryExtEntry 6 }
+    
+    --
+    -- hwIpfpmDcpTlpExtTable: DCP TLP information
+    --
+    hwIpfpmDcpTlpExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpTlpExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains attribute of TLPs."
+    ::= { hwIpfpmDcpConfiguration 18 }
+    
+    hwIpfpmDcpTlpExtEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpTlpExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM configuration information for a particular TLP on interface."
+    INDEX {hwIpfpmDcpExtTlpId }
+    ::= { hwIpfpmDcpTlpExtTable 1 }
+    
+    HwIpfpmDcpTlpExtEntry ::=
+		SEQUENCE {
+        			hwIpfpmDcpExtTlpId
+				    Integer32,				
+				hwIpfpmDcpTlpExtIfIndex
+				    Integer32,
+				hwIpfpmDcpTlpExtRowStatus
+				    RowStatus,
+				hwIpfpmDcpTlpExtVlanId
+				    Integer32,
+				hwIpfpmDcpTlpExtOntId
+				    Integer32,
+				hwIpfpmDcpTlpExtOntPortType
+				    INTEGER,
+			        hwIpfpmDcpTlpExtOntPortId
+			            Integer32
+			        
+    }
+    
+    hwIpfpmDcpExtTlpId OBJECT-TYPE
+    SYNTAX Integer32(1..16777215)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identification of TLP."
+    ::= { hwIpfpmDcpTlpExtEntry 1 } 
+    
+    hwIpfpmDcpTlpExtIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The index of the port that the TLP configured on."
+    ::= { hwIpfpmDcpTlpExtEntry 2 }  
+      
+    hwIpfpmDcpTlpExtRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpTlpExtEntry 3 }  
+    
+    hwIpfpmDcpTlpExtVlanId OBJECT-TYPE
+    SYNTAX Integer32(0..4094|65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID of the TLP measured. The value 0 represents 
+        ce-default-vlan. The value 65535 represents that this 
+        object is not configured."
+    ::= { hwIpfpmDcpTlpExtEntry 4 }
+    
+    hwIpfpmDcpTlpExtOntId  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS   read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the ONT ID.
+        The value -1 represents that this object is not configured."
+    ::= { hwIpfpmDcpTlpExtEntry 5 }
+            
+    hwIpfpmDcpTlpExtOntPortType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+              eth (47),
+              invalid(-1)
+              }
+    MAX-ACCESS   read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the ONT port's type.
+        Options: 
+        1. eth (47))   -indicates ONT port's type is the eth type.
+        2. invalid(-1) -indicates ONT port's type is not matched.
+       DEFVAL { -1 }  .
+        "
+    ::= { hwIpfpmDcpTlpExtEntry 6 }
+
+    hwIpfpmDcpTlpExtOntPortId  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the ONT port ID.
+        The value -1 represents that this object is not configured."
+    ::= { hwIpfpmDcpTlpExtEntry 7 }
+
+	
+    --Begin add for nexthop
+    -- hwIpfpmDcpInstTlpNHTable: DCP TLP nexthop information
+    hwIpfpmDcpInstTlpNHTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpInstTlpNHEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM nexthop configuration information for a particular TLP of the test instance."
+    ::= { hwIpfpmDcpConfiguration 19 }
+    
+    hwIpfpmDcpInstTlpNHEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpInstTlpNHEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM nexthop configuration information for a particular TLP."
+    INDEX { hwIpfpmDcpInstId, 
+            hwIpfpmDcpTlpId,
+	    hwIpfpmDcpNexthopIp}
+    ::= { hwIpfpmDcpInstTlpNHTable 1 }
+    
+    HwIpfpmDcpInstTlpNHEntry ::=
+		SEQUENCE { 		                
+				hwIpfpmDcpNexthopIp
+				    IpAddress,								    
+				hwIpfpmDcpInstTlpNHRowStatus
+				    RowStatus    					    				     				    
+    }
+	
+    hwIpfpmDcpNexthopIp OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The object indicates the nexthop information for a particular TLP."
+    ::= { hwIpfpmDcpInstTlpNHEntry 1 }  
+		
+	
+    hwIpfpmDcpInstTlpNHRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpInstTlpNHEntry 2 }
+	
+    --End add for nexthop 
+	
+    --
+    -- hwIpfpmDcpInstTlpIndexTable: DCP TLP information of DCP test instance 
+    --
+    hwIpfpmDcpInstTlpIndexTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpInstTlpIndexEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table contains attribute of TLPs for load balancing paths."
+    ::= { hwIpfpmDcpConfiguration 20 }
+    
+    hwIpfpmDcpInstTlpIndexEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpInstTlpIndexEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM configuration information for a particular load balancing path TLP."
+    INDEX { hwIpfpmDcpInstId, 
+            hwIpfpmDcpTlpId,
+            hwIpfpmIndex }
+    ::= { hwIpfpmDcpInstTlpIndexTable 1 }
+    
+    HwIpfpmDcpInstTlpIndexEntry ::=
+		SEQUENCE { 		                
+				hwIpfpmIndex
+				    Integer32,
+				hwIpfpmDcpInstTlpRoleIndex
+				    HWIpfpmTlpRoleIndex,
+				hwIpfpmDcpInstTlpFlowTypeIndex
+		                    HWIpfpmFlowType,
+				hwIpfpmDcpInstTlpDirecIndex
+				    HWIpfpmFlowTlpDirec,
+				hwIpfpmDcpInstTlpVpnLabelIndex
+				    Integer32,
+				hwIpfpmDcpInstTlpCtrlWordFlagIndex
+				    TruthValue,
+				hwIpfpmDcpInstTlpLspLabelIndex
+				    Integer32,
+				hwIpfpmDcpInstTlpL2VpnFlagIndex
+				    TruthValue, 
+				hwIpfpmDcpInstTlpTpIdIndex
+				    OCTET STRING,				    
+				hwIpfpmDcpInstTlpRowStatusIndex
+				    RowStatus,
+				hwIpfpmDcpInstTlpFlowLabelFlagIndex
+				    TruthValue,
+				hwIpfpmDcpInstTlpLspLabel2Index
+				    Integer32, 
+				hwIpfpmDcpInstTlpBackwardVpnLabelIndex
+				    Integer32,
+				hwIpfpmDcpInstTlpBackwardCtrlWordFlagIndex
+		                                              TruthValue,
+				hwIpfpmDcpInstTlpBackwardLspLabelIndex
+		                                               Integer32,
+				hwIpfpmDcpInstTlpBackwardLspLabel2Index
+				    Integer32,
+				hwIpfpmDcpInstTlpBackwardL2VpnFlagIndex
+				    TruthValue,
+				hwIpfpmDcpInstTlpBackwardFlowLabelFlagIndex
+				    TruthValue,
+				hwIpfpmDcpInstTlpBackwardTpIdIndex
+		                    OCTET STRING
+    }
+    
+    
+    hwIpfpmIndex OBJECT-TYPE
+    SYNTAX Integer32(1..16)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The indexid of a load balancing path. The value range is from '1' to '16'."
+    ::= { hwIpfpmDcpInstTlpIndexEntry 1 }   
+	
+    hwIpfpmDcpInstTlpRoleIndex OBJECT-TYPE
+    SYNTAX HWIpfpmTlpRoleIndex
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the TLP position 'mid-point(3)'."
+    ::= { hwIpfpmDcpInstTlpIndexEntry 2 }
+    
+    hwIpfpmDcpInstTlpFlowTypeIndex OBJECT-TYPE
+    SYNTAX HWIpfpmFlowType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the flow type of the instance TLP is 
+        'forward(1)' or 'backward(2)' or 'bidirectional(3)' or 
+        'forwardandbackward(4)'. Only 'forward(1)' and 'backward(2)'
+        can be configured when 'hwIpfpmDcpInstTlpRoleIndex' is 
+        'mid-point(3)'. The value 'null(0)' represents that this 
+        flow is not configured under the instance."
+    ::= { hwIpfpmDcpInstTlpIndexEntry 3 } 
+    
+    hwIpfpmDcpInstTlpDirecIndex OBJECT-TYPE
+    SYNTAX HWIpfpmFlowTlpDirec
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object indicates the TLP is 'ingress(1)' or 'egress(2)' 
+        of the flow of DCP test instance."
+    ::= { hwIpfpmDcpInstTlpIndexEntry 4 }
+    
+    hwIpfpmDcpInstTlpVpnLabelIndex OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The VPN label of of the flow that the TLP measured. The 
+        value -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 5 }
+    
+    hwIpfpmDcpInstTlpCtrlWordFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The control word flag of the flow that the TLP measured. The value 
+        false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 6 }
+    
+    hwIpfpmDcpInstTlpLspLabelIndex OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 7 }
+    
+    hwIpfpmDcpInstTlpL2VpnFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The L2VPN flag of the flow that the TLP measured. The value 
+        false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 8 } 
+    
+    hwIpfpmDcpInstTlpTpIdIndex OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (3..4))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The tpid for vlan. The value range is from '600' to 'FFFF'."
+    DEFVAL { 8100 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 9 }   
+    
+    hwIpfpmDcpInstTlpRowStatusIndex OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpInstTlpIndexEntry 10 }
+    
+    hwIpfpmDcpInstTlpFlowLabelFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This value indicate whether the flow-label is configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 11 } 
+
+    hwIpfpmDcpInstTlpLspLabel2Index OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured. The value
+        -2 represents that this object matches any label."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 12 } 
+    
+    hwIpfpmDcpInstTlpBackwardVpnLabelIndex OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The VPN label of of the flow that the TLP measured. The 
+        value -1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 13 }
+    
+    hwIpfpmDcpInstTlpBackwardCtrlWordFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The control word flag of the flow that the TLP measured. The value 
+    	false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 14 }	
+    	
+    hwIpfpmDcpInstTlpBackwardLspLabelIndex OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+    	-1 represents that this object is not configured."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 15 }
+    
+    hwIpfpmDcpInstTlpBackwardLspLabel2Index OBJECT-TYPE
+    SYNTAX Integer32(-1..1048575)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The LSP label of the flow that the TLP measured. The value 
+        -1 represents that this object is not configured. The value
+        -2 represents that this object matches any label."
+    DEFVAL { -1 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 16 }
+      
+    
+    hwIpfpmDcpInstTlpBackwardL2VpnFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The L2VPN flag of the flow that the TLP measured. The value 
+    	false(2) represents that this object is not configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 17 } 
+    		
+    hwIpfpmDcpInstTlpBackwardFlowLabelFlagIndex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This value indicate whether the flow-label is configured."
+    DEFVAL { false }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 18 }
+    
+    hwIpfpmDcpInstTlpBackwardTpIdIndex OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (3..4))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The tpid for vlan. The value range is from '600' to 'FFFF'."
+        DEFVAL { 8100 }
+    ::= { hwIpfpmDcpInstTlpIndexEntry 19 }   
+	
+	
+    -- hwIpfpmDcpInstTlpNHIndexTable: DCP TLP nexthop information
+    hwIpfpmDcpInstTlpNHIndexTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwIpfpmDcpInstTlpNHIndexEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM nexthop configuration information for a particular TLP of the test instance."
+    ::= { hwIpfpmDcpConfiguration 21 }
+    
+    hwIpfpmDcpInstTlpNHIndexEntry OBJECT-TYPE
+    SYNTAX HwIpfpmDcpInstTlpNHIndexEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IPFPM nexthop configuration information for a  a particular load balancing path TLP."
+    INDEX { hwIpfpmDcpInstId, 
+            hwIpfpmDcpTlpId,
+            hwIpfpmIndex,
+	    hwIpfpmDcpNexthopIp}
+    ::= { hwIpfpmDcpInstTlpNHIndexTable 1 }
+    
+    HwIpfpmDcpInstTlpNHIndexEntry ::=
+		SEQUENCE { 		                							    
+				hwIpfpmDcpInstTlpNHIndexRowStatus
+				    RowStatus    					    				     				    
+    }
+		
+	
+    hwIpfpmDcpInstTlpNHIndexRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Used for controlling the creation and deletion of this row."
+    ::= { hwIpfpmDcpInstTlpNHIndexEntry 1 }
+	
+	
+	
+-- ==================================================================    
+-- IPFPM Traps
+-- ==================================================================   
+    hwIpfpmLossRatioExceed NOTIFICATION-TYPE
+    OBJECTS {
+    		hwIpfpmMcpFlowType,
+	        hwIpfpmMcpForwardLossRatio,
+		hwIpfpmMcpBackwardLossRatio,
+		hwIpfpmMcpInstDesc
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmLossRatioExceed trap is sent when the loss ratio 
+        of IPFPM test instance exceeds the uppper threshold in 
+        continuous five test intervals."
+    ::= { hwIpfpmTraps 1 }
+    
+    hwIpfpmLossRatioRecovery NOTIFICATION-TYPE
+    OBJECTS {
+    		hwIpfpmMcpFlowType,
+                hwIpfpmMcpForwardLossRatio,
+		hwIpfpmMcpBackwardLossRatio,
+		hwIpfpmMcpInstDesc
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmLossRatioRecovery trap is sent when the loss ratio 
+        of IPFPM test instance is under the lower threshold in 
+        continuous five test intervals."
+    ::= { hwIpfpmTraps 2 }
+    
+    hwIpfpmOneDelayExceed NOTIFICATION-TYPE
+    OBJECTS {
+    		hwIpfpmMcpFlowType,
+  	        hwIpfpmMcpForwardOneDelay,
+        	hwIpfpmMcpBackwardOneDelay,
+        	hwIpfpmMcpInstDesc
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmOneDelayExceed trap is sent when the one-way delay 
+        of IPFPM test instance exceeds the uppper threshold in 
+        continuous five test intervals."
+    ::= { hwIpfpmTraps 3 }
+    
+    hwIpfpmOneDelayRecovery NOTIFICATION-TYPE
+    OBJECTS {
+    		hwIpfpmMcpFlowType,
+	        hwIpfpmMcpForwardOneDelay,
+	        hwIpfpmMcpBackwardOneDelay,
+	        hwIpfpmMcpInstDesc
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmOneDelayRecovery trap is sent when the one-way delay 
+        of IPFPM test instance is under the lower threshold in 
+        continuous five test intervals."
+    ::= { hwIpfpmTraps 4 }
+    
+    hwIpfpmTwoDelayExceed NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmMcpTwoDelay,
+        hwIpfpmMcpInstDesc
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmTwoDelayExceed trap is sent when the two-way delay 
+        of IPFPM test instance exceeds the uppper threshold in 
+        continuous five test intervals."
+    ::= { hwIpfpmTraps 5 }
+    
+    hwIpfpmTwoDelayRecovery NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmMcpTwoDelay,
+        hwIpfpmMcpInstDesc
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmTwoDelayRecovery trap is sent when the two-way delay 
+        of IPFPM test instance is under the lower threshold in 
+        continuous five test intervals."
+    ::= { hwIpfpmTraps 6 }
+	
+    hwIpfpmDcpFlowConflict NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmDcpInstId,
+        hwIpfpmDcpFlowType,
+        hwIpfpmDcpInstId,
+        hwIpfpmDcpFlowType
+    }
+    STATUS current
+    DESCRIPTION
+        "A hwIpfpmDcpFlowConflict trap is sent when the flow 
+        configuration conflicts with another existing flow configuration.
+        The first hwIpfpmDcpInstId and hwIpfpmDcpFlowType indicates the specified flow.
+        The second hwIpfpmDcpInstId and hwIpfpmDcpFlowType indicates the existing flow."
+    ::= { hwIpfpmTraps 7 }
+    
+    hwIpfpmTlpExceed NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmTlpExceedBoardId,
+        hwIpfpmTlpNumber,
+        hwIpfpmTlpThreshold
+    }
+    STATUS current
+    DESCRIPTION
+        "A hwIpfpmTlpExceed trap is sent when the number of board tlp exceeds the threshold."
+    ::= { hwIpfpmTraps 8 }
+    
+    hwIpfpmTlpRecovery NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmTlpExceedBoardId,
+        hwIpfpmTlpNumber,
+        hwIpfpmTlpThreshold
+    }
+    STATUS current
+    DESCRIPTION
+        "A hwIpfpmTlpRecovery trap is sent when the number of board tlp is under the threshold."
+    ::= { hwIpfpmTraps 9 }   
+    
+    hwIpfpmMultiOneDelayExceed NOTIFICATION-TYPE
+    OBJECTS {
+  	        hwIpfpmMcpOneDelayMulti
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmMultiOneDelayExceed trap is sent when the one-way delay 
+        of IPFPM test instance exceeds the uppper threshold in 
+        continuous five test intervals. This trap supports multi one-way delay for a period."
+    ::= { hwIpfpmTraps 10 }
+    
+    hwIpfpmMultiOneDelayRecovery NOTIFICATION-TYPE
+    OBJECTS {
+    		hwIpfpmMcpOneDelayMulti
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmMultiOneDelayRecovery trap is sent when the one-way delay 
+        of IPFPM test instance is under the lower threshold in 
+        continuous five test intervals. This trap supports multi one-way delay for a period."
+    ::= { hwIpfpmTraps 11 }
+    
+    hwIpfpmMultiTwoDelayExceed NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmMcpTwoDelayMulti
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmMultiTwoDelayExceed trap is sent when the two-way delay 
+        of IPFPM test instance exceeds the uppper threshold in 
+        continuous five test intervals. This trap supports multi two-way delay for a period."
+    ::= { hwIpfpmTraps 12 }
+    
+    hwIpfpmMultiTwoDelayRecovery NOTIFICATION-TYPE
+    OBJECTS {
+        hwIpfpmMcpTwoDelayMulti
+    }
+    STATUS current
+    DESCRIPTION 
+        "A hwIpfpmMultiTwoDelayRecovery trap is sent when the two-way delay 
+        of IPFPM test instance is under the lower threshold in 
+        continuous five test intervals. This trap supports multi two-way delay for a period."
+    ::= { hwIpfpmTraps 13 }
+    
+-- ==================================================================    
+-- IPFPM Compliances and groups
+-- ==================================================================
+    hwIpfpmCompliances OBJECT IDENTIFIER ::= { hwIpfpmConformance 1 }
+    hwIpfpmGroups OBJECT IDENTIFIER ::= { hwIpfpmConformance 2 }
+    
+    -- compliance statements
+    hwIpfpmCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for entities which implement the 
+        IPFPM MIB."
+    MODULE 
+        MANDATORY-GROUPS { hwIpfpmMcpConfigGroup,
+        hwIpfpmMcpInstConfigGroup,
+        hwIpfpmMcpStatsGroup,
+        hwIpfpmDcpConfigGroup,
+        hwIpfpmDcpInstConfigGroup,
+        hwIpfpmDcpTlpConfigGroup,
+        hwIpfpmTrapsGroup
+        }
+    ::= { hwIpfpmCompliances 1 }  
+    
+    -- MIB groupings
+    hwIpfpmMcpConfigGroup OBJECT-GROUP
+    OBJECTS {
+    hwIpfpmMcpEnable,
+    hwIpfpmMcpId,
+    hwIpfpmMcpUdpPort,
+    hwIpfpmMcpAuthType,
+    hwIpfpmMcpAuthKey,
+    hwIpfpmMcpAuthRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to configure the
+        IPFPM MCP behavior."
+    ::= { hwIpfpmGroups 1 }
+    
+    hwIpfpmMcpInstConfigGroup OBJECT-GROUP
+    OBJECTS {
+    hwIpfpmMcpInstDesc,
+    hwIpfpmMcpLossRatioUpThres,
+    hwIpfpmMcpLossRatioLowThres,
+    hwIpfpmMcpOneDelayUpThres,
+    hwIpfpmMcpOneDelayLowThres,
+    hwIpfpmMcpTwoDelayUpThres,
+    hwIpfpmMcpTwoDelayLowThres,
+    hwIpfpmMcpMeasureEnable,
+    hwIpfpmMcpInstRowStatus,
+    hwIpfpmMcpInstType,
+    hwIpfpmMcpSourceInstId,
+    hwIpfpmMcpDcpRowStatus,
+    hwIpfpmMcpFlowType,   
+    hwIpfpmMcpAchRowStatus,
+    hwIpfpmMcpTlpRowStatus,
+    hwIpfpmMcpSrcInstReferCnt   
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to configure the
+        IPFPM MCP test instance behavior."
+    ::= { hwIpfpmGroups 2 }
+    
+    hwIpfpmMcpStatsGroup OBJECT-GROUP
+    OBJECTS {
+    		hwIpfpmMcpInstSpec,
+ 		hwIpfpmMcpInstCurNum, 
+	                     hwIpfpmMcpInstTlpMaxNum,
+		hwIpfpmMcpAchMaxNum,  		
+    		hwIpfpmMcpSeqNo, 
+    		hwIpfpmMcpLossErrInfo,
+		hwIpfpmMcpForwardLossPkts,
+		hwIpfpmMcpForwardLossPktsSign,
+		hwIpfpmMcpForwardLossBytes,
+		hwIpfpmMcpForwardLossBytesSign,
+		hwIpfpmMcpForwardPkts,
+		hwIpfpmMcpForwardBytes,
+		hwIpfpmMcpForwardLossRatio,
+		hwIpfpmMcpBackwardLossPkts,
+		hwIpfpmMcpBackwardLossPktsSign,
+		hwIpfpmMcpBackwardLossBytes,
+		hwIpfpmMcpBackwardLossBytesSign,
+		hwIpfpmMcpBackwardPkts,
+		hwIpfpmMcpBackwardBytes,
+		hwIpfpmMcpBackwardLossRatio,
+		hwIpfpmMcpForwardLossMMSType,
+		hwIpfpmMcpForwardLossMMSSwitch,
+		hwIpfpmMcpOneDelayErrInfo,
+		hwIpfpmMcpForwardOneDelay,
+		hwIpfpmMcpForwardOneDelayVariation,
+		hwIpfpmMcpBackwardOneDelay,
+		hwIpfpmMcpBackwardOneDelayVariation,
+		hwIpfpmMcpForwardOneDelayMMSType,
+		hwIpfpmMcpTwoDelayErrInfo,
+		hwIpfpmMcpTwoDelay,
+		hwIpfpmMcpTwoDelayVariation,
+		hwIpfpmMcpForwardDelay,
+		hwIpfpmMcpForwardDelayVariation,
+		hwIpfpmMcpBackwardDelay,
+		hwIpfpmMcpBackwardDelayVariation
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to represent the
+        IPFPM test instance statistics."
+    ::= { hwIpfpmGroups 3 }
+    
+    hwIpfpmDcpConfigGroup OBJECT-GROUP
+    OBJECTS {
+		hwIpfpmDcpEnable,
+		hwIpfpmDcpId,
+		hwIpfpmDcpMeasureColorFlag,
+		hwIpfpmDcpMcpId,
+		hwIpfpmDcpMcpPort,
+		hwIpfpmDcpMcpVpnName,
+		hwIpfpmDcpMcpVpnType,
+		hwIpfpmDcpAuthType,
+		hwIpfpmDcpAuthKey,
+		hwIpfpmDcpAuthRowStatus,
+       hwIpfpmPeriodSource		
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to configure the
+        IPFPM DCP behavior."
+    ::= { hwIpfpmGroups 4 }
+    
+    hwIpfpmDcpInstConfigGroup OBJECT-GROUP
+    OBJECTS {
+    hwIpfpmDcpInstId,
+		hwIpfpmDcpInstDesc,
+		hwIpfpmDcpInstMcpId,
+		hwIpfpmDcpInstMcpPort,
+		hwIpfpmDcpInstInterval,		
+		hwIpfpmDcpInstAuthType,
+		hwIpfpmDcpInstAuthKey,
+		hwIpfpmDcpInstAuthRowStatus,	
+		hwIpfpmDcpInstRowStatus,
+		hwIpfpmDcpInstType,
+		hwIpfpmDcpSourceInstId,
+		hwIpfpmDcpInstMcpVpnName,
+		hwIpfpmDcpInstMcpVpnType,
+		hwIpfpmDcpInstGroupId,
+		hwIpfpmDcpFlowType,
+		hwIpfpmDcpFlowProtocol,
+		hwIpfpmDcpFlowDscp,
+		hwIpfpmDcpFlowSrcAddr,
+		hwIpfpmDcpFlowSrcMaskLen,
+		hwIpfpmDcpFlowDstAddr,
+		hwIpfpmDcpFlowDstMaskLen,
+		hwIpfpmDcpFlowSrcPortBgn,
+		hwIpfpmDcpFlowSrcPortEnd,
+		hwIpfpmDcpFlowDstPortBgn,
+		hwIpfpmDcpFlowDstPortEnd,
+		hwIpfpmDcpFlowRowStatus,
+		hwIpfpmDcpFlowOuterSrcAddr,
+		hwIpfpmDcpFlowOuterDstAddr,
+		hwIpfpmDcpFlowForwardGtpTeid,
+		hwIpfpmDcpFlowBackwardGtpTeid,
+		hwIpfpmDcpFlowVxlan,
+		hwIpfpmDcpFlowVni,
+		hwIpfpmDcpInstTlpRole,
+		hwIpfpmDcpInstTlpRoleIndex,		
+		hwIpfpmDcpInstTlpFlowType,
+		hwIpfpmDcpInstTlpFlowTypeIndex,		
+		hwIpfpmDcpInstTlpDirec, 
+		hwIpfpmDcpInstTlpDirecIndex,		
+		hwIpfpmDcpInstTlpVpnLabel,  
+		hwIpfpmDcpInstTlpVpnLabelIndex,		
+		hwIpfpmDcpInstTlpCtrlWordFlag, 
+		hwIpfpmDcpInstTlpCtrlWordFlagIndex,  		
+		hwIpfpmDcpInstTlpLspLabel,
+		hwIpfpmDcpInstTlpLspLabelIndex,		
+		hwIpfpmDcpInstTlpL2VpnFlag,
+		hwIpfpmDcpInstTlpL2VpnFlagIndex,
+		hwIpfpmDcpInstTlpTpId, 
+		hwIpfpmDcpInstTlpTpIdIndex,
+		hwIpfpmDcpInstTlpRowStatus,
+		hwIpfpmDcpInstTlpRowStatusIndex,		
+		hwIpfpmDcpInstTlpMultiSrcType,  
+		hwIpfpmDcpInstTlpFlowLabelFlag,
+		hwIpfpmDcpInstTlpFlowLabelFlagIndex,
+		hwIpfpmDcpInstTlpLspLabel2,
+		hwIpfpmDcpInstTlpLspLabel2Index,
+		hwIpfpmDcpInstTlpLspLabel3,
+		hwIpfpmDcpInstTlpOuterVlan,
+		hwIpfpmDcpInstTlpInnerVlan,
+		hwIpfpmDcpInstTlpBackwardVpnLabel,
+		hwIpfpmDcpInstTlpBackwardVpnLabelIndex,
+		hwIpfpmDcpInstTlpBackwardCtrlWordFlag,
+		hwIpfpmDcpInstTlpBackwardCtrlWordFlagIndex,
+		hwIpfpmDcpInstTlpBackwardLspLabel,
+		hwIpfpmDcpInstTlpBackwardLspLabelIndex,
+		hwIpfpmDcpInstTlpBackwardLspLabel2,
+		hwIpfpmDcpInstTlpBackwardLspLabel2Index,
+		hwIpfpmDcpInstTlpBackwardLspLabel3,
+		hwIpfpmDcpInstTlpBackwardL2VpnFlag,
+		hwIpfpmDcpInstTlpBackwardL2VpnFlagIndex,
+		hwIpfpmDcpInstTlpBackwardFlowLabelFlag,
+		hwIpfpmDcpInstTlpBackwardFlowLabelFlagIndex,
+		hwIpfpmDcpInstTlpBackwardOuterVlan,
+		hwIpfpmDcpInstTlpBackwardInnerVlan,
+		hwIpfpmDcpInstTlpBackwardTpId,
+		hwIpfpmDcpInstTlpBackwardTpIdIndex,		
+		hwIpfpmDcpInstTlpNHRowStatus,
+		hwIpfpmDcpLossEnable,                     	    
+		hwIpfpmDcpLossContEnable,                            
+		hwIpfpmDcpLossTimeRange,
+		hwIpfpmDcpDelayEnable,
+		hwIpfpmDcpDelayContEnable,
+		hwIpfpmDcpDelayMeasType,
+		hwIpfpmDcpDelayTimeRange,
+		hwIpfpmDcpDelayForwardTlpId,
+		hwIpfpmDcpDelayBackwardTlpId,
+		hwIpfpmDcpSrcInstReferCnt
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to configure the
+        IPFPM DCP test instance behavior."
+    ::= { hwIpfpmGroups 5 }
+    
+    hwIpfpmDcpTlpConfigGroup OBJECT-GROUP
+    OBJECTS {
+		hwIpfpmDcpTlpIfIndex,
+		hwIpfpmDcpTlpRowStatus,
+		hwIpfpmDcpTlpVlanId,
+	        hwIpfpmDcpTlpQueryTlpId,
+		hwIpfpmTlpExceedBoardId,
+		hwIpfpmTlpNumber,
+		hwIpfpmTlpThreshold
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to configure the
+        IPFPM TLP behavior."
+    ::= { hwIpfpmGroups 6 }
+    
+    hwIpfpmTrapsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+    		hwIpfpmLossRatioExceed,
+		hwIpfpmLossRatioRecovery,
+		hwIpfpmOneDelayExceed,
+		hwIpfpmOneDelayRecovery,
+		hwIpfpmTwoDelayExceed,
+		hwIpfpmTwoDelayRecovery,
+		hwIpfpmDcpFlowConflict,
+		hwIpfpmTlpExceed,
+		hwIpfpmTlpRecovery,
+		hwIpfpmMultiOneDelayExceed,
+		hwIpfpmMultiOneDelayRecovery,
+		hwIpfpmMultiTwoDelayExceed,
+		hwIpfpmMultiTwoDelayRecovery		
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of traps used to indicate that the measured 
+        network performance is in fault or not."
+    ::= { hwIpfpmGroups 7 }  
+
+    hwIpfpmMcpMultiDelayStatsGroup OBJECT-GROUP
+    OBJECTS {
+        hwIpfpmMcpOneDelayMultiErrInfo,
+        hwIpfpmMcpOneDelayMulti,
+        hwIpfpmMcpOneDelayMultiVariation,
+        hwIpfpmMcpTwoDelayMultiErrInfo,
+        hwIpfpmMcpTwoDelayMulti,
+        hwIpfpmMcpTwoDelayMultiVariation,
+        hwIpfpmMcpForwardDelayMulti,
+        hwIpfpmMcpForwardDelayMultiVariation,
+        hwIpfpmMcpBackwardDelayMulti,
+        hwIpfpmMcpBackwardDelayMultiVariation
+		}
+    STATUS current
+    DESCRIPTION
+        "The collection of objects which are used to represent the
+        IPFPM test instance statistics for multi-in-point delay measurement"
+    ::= { hwIpfpmGroups 8 }
+END

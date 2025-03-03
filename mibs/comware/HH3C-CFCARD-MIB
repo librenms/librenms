@@ -1,0 +1,311 @@
+-- =============================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:  provide the info about CF Card.
+-- Version: V1.0
+-- History:
+--   V1.0 Initial Version created by lizhiyong
+-- =============================================================
+HH3C-CFCARD-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hh3cCfCard
+                FROM HH3C-OID-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+            Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI;
+
+
+--  December 24, 2004 at 15:41 GMT
+        hh3cCfCardMIB MODULE-IDENTITY
+            LAST-UPDATED "200412240000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                "This MIB provides the information about CF Card."
+            ::= { hh3cCfCard 1 }
+
+
+
+
+        hh3cCfCardMIBObjects OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "Objects used for CF Card management."
+            ::= { hh3cCfCardMIB 1 }
+
+
+        hh3cCfCardScalarObjects OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The scalar objects for the CF Card(s)."
+            ::= { hh3cCfCardMIBObjects 1 }
+
+
+        hh3cCfCardNumber OBJECT-TYPE
+            SYNTAX INTEGER (0..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of the CF Card(s) at present."
+            ::= { hh3cCfCardScalarObjects 1 }
+
+
+        hh3cCfCardInfoObjects OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The basic information about CF Card(s)."
+            ::= { hh3cCfCardMIBObjects 2 }
+
+
+        hh3cCfCardInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HH3CCfCardInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the basic information about CF Card(s)."
+            ::= { hh3cCfCardInfoObjects 2 }
+
+
+        hh3cCfCardInfoEntry OBJECT-TYPE
+            SYNTAX HH3CCfCardInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This list contains the basic information about CF Card."
+            INDEX { hh3cCfCardIndex }
+            ::= { hh3cCfCardInfoTable 1 }
+
+
+        HH3CCfCardInfoEntry ::=
+            SEQUENCE {
+                hh3cCfCardIndex
+                    INTEGER,
+                hh3cCfCardIsPresent
+                    INTEGER,
+                hh3cCfCardContainedIn
+                    INTEGER,
+                hh3cCfCardParentRelPos
+                    INTEGER,
+                hh3cCfCardDescription
+                    OCTET STRING,
+                hh3cCfCardSerialNumber
+                    OCTET STRING,
+                hh3cCfCardFirewareVersion
+                    OCTET STRING,
+                hh3cCfCardModelNumber
+                    OCTET STRING,
+                hh3cCfCardState
+                    INTEGER,
+                hh3cCfCardSize
+                    Unsigned32,
+                hh3cCfCardUsedSize
+                    Unsigned32,
+                hh3cCfCardFreeSize
+                    Unsigned32
+             }
+
+        hh3cCfCardIndex OBJECT-TYPE
+            SYNTAX INTEGER (1..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the table."
+            ::= { hh3cCfCardInfoEntry 1 }
+
+
+        hh3cCfCardIsPresent OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                yes(1),
+                no(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value indicates whether the CF Card is present or not."
+            ::= { hh3cCfCardInfoEntry 2 }
+
+
+        hh3cCfCardContainedIn OBJECT-TYPE
+            SYNTAX INTEGER (0..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the slot which containes this CF Card "
+            ::= { hh3cCfCardInfoEntry 3 }
+
+
+        hh3cCfCardParentRelPos OBJECT-TYPE
+            SYNTAX INTEGER (0..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An indication of the relative position of this CF Card
+                among all the CF Card contained in the same slot."
+            ::= { hh3cCfCardInfoEntry 4 }
+
+
+        hh3cCfCardDescription OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Description of CF Card."
+            ::= { hh3cCfCardInfoEntry 5 }
+
+
+        hh3cCfCardSerialNumber OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The serial number of CF Card."
+            ::= { hh3cCfCardInfoEntry 6 }
+
+
+        hh3cCfCardFirewareVersion OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The firmware revision of CF Card."
+            ::= { hh3cCfCardInfoEntry 7 }
+
+
+        hh3cCfCardModelNumber OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The model number containing infomation of manufacturer."
+            ::= { hh3cCfCardInfoEntry 8 }
+
+
+        hh3cCfCardState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                sNoError(1),          -- No error
+                sFormatError(2),      -- Format error
+                sSectorBufferError(3),-- Sector Buffer error
+                sECCError(4),         -- ECC circuitry error
+                sCMPError(5),         -- Controlling microprocessor error
+                sSlaveError(128),     -- Slave error in True IDE Mode
+                sIOError(240),        -- I/O error
+                sOther(255)           -- Unknown status
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The state of CF Card."
+            ::= { hh3cCfCardInfoEntry 9 }
+
+
+        hh3cCfCardSize OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "byte"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The size of CF Card."
+            ::= { hh3cCfCardInfoEntry 10 }
+
+
+        hh3cCfCardUsedSize OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "byte"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The used size of CF Card."
+            ::= { hh3cCfCardInfoEntry 11 }
+
+
+        hh3cCfCardFreeSize OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "byte"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The free size of CF Card."
+            ::= { hh3cCfCardInfoEntry 12 }
+
+
+        hh3cCfCardNotifications OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "Notification about the CF Card."
+            ::= { hh3cCfCardMIB 2 }
+
+
+        hh3cCfCardNotificationsV2 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "Root node for the Notification."
+            ::= { hh3cCfCardNotifications 0 }
+
+
+        hh3cCfCardHotSwapOn NOTIFICATION-TYPE
+            OBJECTS { hh3cCfCardContainedIn, hh3cCfCardParentRelPos, hh3cCfCardDescription }
+            STATUS current
+            DESCRIPTION
+                "This notification is sent when a CF Card is hot swapped in."
+            ::= { hh3cCfCardNotificationsV2 1 }
+
+
+        hh3cCfCardHotSwapOff NOTIFICATION-TYPE
+            OBJECTS { hh3cCfCardContainedIn, hh3cCfCardParentRelPos, hh3cCfCardDescription }
+            STATUS current
+            DESCRIPTION
+                "This notification is sent when a CF Card is hot swapped out."
+            ::= { hh3cCfCardNotificationsV2 2 }
+
+
+        hh3cCfCardMIBConformance OBJECT IDENTIFIER ::= { hh3cCfCardMIB 4 }
+
+
+        hh3cCfCardMIBGroups OBJECT IDENTIFIER ::= { hh3cCfCardMIBConformance 1 }
+
+
+        hh3ccurrentObjectGroup OBJECT-GROUP
+            OBJECTS { hh3cCfCardNumber, hh3cCfCardIndex, hh3cCfCardIsPresent,
+                    hh3cCfCardContainedIn, hh3cCfCardParentRelPos, hh3cCfCardDescription,
+                    hh3cCfCardSerialNumber, hh3cCfCardFirewareVersion, hh3cCfCardModelNumber,
+                    hh3cCfCardState, hh3cCfCardSize, hh3cCfCardUsedSize, hh3cCfCardFreeSize
+                    }
+            STATUS current
+            DESCRIPTION
+                "A collection of objects."
+            ::= { hh3cCfCardMIBGroups 1 }
+
+
+        hh3ccurrentNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hh3cCfCardHotSwapOn, hh3cCfCardHotSwapOff }
+            STATUS current
+            DESCRIPTION
+                "Notification group."
+            ::= { hh3cCfCardMIBGroups 2 }
+
+
+        hh3cCfCardMIBCompliances OBJECT IDENTIFIER ::= { hh3cCfCardMIBConformance 2 }
+
+
+
+        hh3cbasicCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                "The compliance statement."
+            MODULE -- this module
+                MANDATORY-GROUPS { hh3ccurrentObjectGroup, hh3ccurrentNotificationGroup }
+            ::= { hh3cCfCardMIBCompliances 1 }
+
+
+
+    END

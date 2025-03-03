@@ -1,0 +1,73 @@
+mib: UBNT-UFIBER-MIB
+modules:
+    os:
+        sysDescr_regex: '/v(?<version>\d+\.\d+\.\d+)/'
+        hardware: UBNT-UFIBER-MIB::ubntModel.0
+        version: UBNT-UFIBER-MIB::ubntVersion.0
+        serial:  UBNT-UFIBER-MIB::ubntSerialNumber.0
+
+    sensors:
+        state:
+            data:
+                -
+                    oid: ubntSfpsTable
+                    value: ubntSfpUp
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.7.2.1.3.{{ $index }}'
+                    high_limit: 2
+                    descr: '{{ $ubntSfpName }}'
+                    states:
+                        - { descr: Up, graph: 0, value: 1, generic: 0 }
+                        - { descr: Down, graph: 0, value: 2, generic: 2 }
+                -
+                    oid: ubntOnusTable
+                    value: ubntOnuOnline
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.6.2.1.3.{{ $index }}'
+                    high_limit: 2
+                    descr: 'ONU {{ $ubntOnuName }} Connection State'
+                    states:
+                        - { descr: Up, graph: 0, value: 1, generic: 0 }
+                        - { descr: Down, graph: 0, value: 2, generic: 2 }
+        count:
+            data:
+                -
+                    oid: ubntOnusCount
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.6.1.{{ $index }}'
+                    index: 'ubntOnusCount.{{ $index }}'
+                    descr: "Number of ONU's"
+        temperature:
+            data:
+                -
+                    oid:  ubntThermsTable
+                    value: ubntThermTemperature
+                    divisor: 1000
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.4.2.1.3.{{ $index }}'
+                    index: 'ubntThermTemperature.{{ $index }}'
+                    descr: 'Temperatures {{ $index }}'
+        fanspeed:
+            data:
+                -
+                    oid: ubntFansTable
+                    value: ubntFanRpm
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.5.2.1.3.{{ $index }}'
+                    index: 'ubntFanRpm.{{ $index }}'
+                    descr: 'Fan #{{ $index }}'
+
+
+        dbm:
+            data:
+                -
+                    oid: ubntOnusTable
+                    value: ubntOnuRxPower
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.6.2.1.9.{{ $index }}'
+                    descr: "ONU {{ $ubntOnuName }} RX Power"
+                    group: ONUs RX
+                    index: 'rx-{{ $index }}'
+                    divisor: 100
+                -
+                    oid: ubntOnusTable
+                    value: ubntOnuTxPower
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.6.2.1.8.{{ $index }}'
+                    descr: "ONU {{ $ubntOnuName }} TX Power"
+                    group: ONUs TX
+                    index: 'tx-{{ $index }}'
+                    divisor: 100

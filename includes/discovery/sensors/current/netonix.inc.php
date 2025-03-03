@@ -15,14 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 echo 'Netonix: ';
 
 $dcinput_oid = '.1.3.6.1.4.1.46242.7.0'; // NETONIX-SWITCH-MIB::dcdcInputCurrent.0
@@ -31,5 +30,5 @@ $descr = 'DC Input Current';
 $divisor = 10;
 
 if (is_numeric($dcinput_value) && $dcinput_value > 0) {
-    discover_sensor($valid['sensor'], 'current', $device, $dcinput_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $dcinput_value / $divisor);
+    discover_sensor(null, 'current', $device, $dcinput_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $dcinput_value / $divisor);
 }

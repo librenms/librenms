@@ -1,0 +1,49 @@
+os: ssu2000
+text: 'Microsemi Synchronization Supply Unit'
+type: appliance
+icon: microsemi
+mib_dir: microsemi
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.601.3.1.
+discovery_modules:
+    ports: false
+    storage: false
+    bgp-peers: false
+    ntp: false
+    stp: false
+    ospf: false
+    vlans: false
+    arp-table: false
+    mempools: false
+    entity-physical: false
+    ucd-diskio: false
+    processors: false
+    mpls: false
+    wireless: false
+    fdb-table: false
+    services: false
+    cisco-vrf-lite: false
+    ucd-mib: false
+    applications: false
+poller_modules:
+    ucd-mib: false
+    ports: false
+    storage: false
+    bgp-peers: false
+    ntp: false
+    stp: false
+    vlans: false
+    arp-table: false
+    mempools: false
+    entity-physical: false
+    ucd-diskio: false
+    processors: false
+    mpls: false
+    wireless: false
+    fdb-table: false
+    services: false
+    cisco-vrf-lite: false
+    applications: false
+    ospf: false

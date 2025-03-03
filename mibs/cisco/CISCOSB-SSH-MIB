@@ -14,7 +14,7 @@ IMPORTS
 
 
    rlSsh MODULE-IDENTITY
-      LAST-UPDATED "200209300024Z"  -- September 30, 2002
+      LAST-UPDATED "202105170000Z"  -- September 30, 2002
       ORGANIZATION "Cisco Systems, Inc."
 
       CONTACT-INFO
@@ -50,6 +50,7 @@ RlSshPublicKeyAlgorithm ::= TEXTUAL-CONVENTION
         rsa1(0),
         rsa(1),
         dsa(2),
+        ec(3),
         none(999)
     }
 
@@ -638,8 +639,10 @@ rlSshServerDefaultKeyFlag OBJECT-TYPE
     SYNTAX  INTEGER {
            rsa(1),
            dsa(2),
-           all(3),
-           none(4)
+           rsa-dsa(3),
+           ec(4),
+           all(99),
+           none(100)
     }
     MAX-ACCESS      read-only
     STATUS current
@@ -647,7 +650,7 @@ rlSshServerDefaultKeyFlag OBJECT-TYPE
         "This scalar indicates which of the SSH server keys are default keys
          (automatically generated)."
     ::= { rlSshServer 105 }
-    
+
 rlSshServerDeleteSelfKey OBJECT-TYPE
     SYNTAX  RlSshPublicKeyAlgorithm
     MAX-ACCESS      read-write
@@ -656,7 +659,7 @@ rlSshServerDeleteSelfKey OBJECT-TYPE
            "Setting to a value other than 'none' results in deleting the server self
            key of the chosen type. As a result a default key may be created
            (according to the MTSC..)"
-      ::= { rlSshServer 106 }    
+      ::= { rlSshServer 106 }
 
 rlSshServerEnablePublicKeyAuthAutoLogin OBJECT-TYPE
     SYNTAX   INTEGER {
@@ -827,7 +830,8 @@ rlSshClientAuthenticationMethod OBJECT-TYPE
     SYNTAX   INTEGER {
         public-key-rsa(1),
         public-key-dsa(2),
-        password(3)
+        password(3),
+        public-key-ec(4)
     }
     MAX-ACCESS      read-write
     STATUS current
@@ -1146,8 +1150,10 @@ rlSshClientDefaultKeyFlag OBJECT-TYPE
     SYNTAX  INTEGER {
            rsa(1),
            dsa(2),
-           all(3),
-           none(4)
+           rsa-dsa(3),
+           ec(4),
+           all(99),
+           none(100)
     }
     MAX-ACCESS      read-only
     STATUS current
@@ -1156,3 +1162,4 @@ rlSshClientDefaultKeyFlag OBJECT-TYPE
          (automatically generated)."
     ::= { rlSshClient 12 }
 END
+

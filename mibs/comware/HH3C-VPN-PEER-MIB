@@ -1,0 +1,131 @@
+-- ==========================================================================
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: The MIB contains the managed objects definitions for the Virtual
+--              Private Network (VPN) peer on devices supporting this feature.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2016-03-09 Initial version created by qujin
+-- ==========================================================================
+HH3C-VPN-PEER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Counter64
+        FROM SNMPv2-SMI;
+
+hh3cVpnPeer MODULE-IDENTITY
+    LAST-UPDATED "201603091600Z"        -- 9th March, 2016 at 16:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085
+         "
+    DESCRIPTION
+        "This MIB provides information about VPN peers.  This MIB is applicable to PE devices.
+        Some objects in this MIB may be used only for some specific products,
+        so users should refer to the related documents to acquire more
+        detailed information.
+        "
+    REVISION "201603091600Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 165 }
+
+
+-- =================================================================
+-- Note that a scalar group should be defined firstly and all
+-- scalar objects are placed under that group.
+-- =================================================================
+hh3cVpnPeerGroup OBJECT IDENTIFIER ::= { hh3cVpnPeer 1 }
+
+-- =================================================================
+-- The section below describes statistics of VPN peer on a device.
+-- =================================================================
+hh3cVpnPeerStat OBJECT IDENTIFIER ::= { hh3cVpnPeerGroup 1 }
+
+-- =============================================================================
+-- hh3cVpnPeerStatTable Definition
+-- =============================================================================
+hh3cVpnPeerStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVpnPeerStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains objects to get statistic information
+         of a VPN peer on a device."
+    ::= { hh3cVpnPeerStat 1 }
+
+hh3cVpnPeerStatEntry OBJECT-TYPE
+    SYNTAX      Hh3cVpnPeerStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry items"
+    INDEX
+        {
+            hh3cVpnPeerName
+        }
+    ::= { hh3cVpnPeerStatTable 1 }
+
+Hh3cVpnPeerStatEntry ::=
+    SEQUENCE {
+        hh3cVpnPeerName
+            OCTET STRING,
+        hh3cVpnPeerOutPassPkts
+            Counter64,
+        hh3cVpnPeerOutPassBytes
+            Counter64,
+        hh3cVpnPeerOutDropPkts
+            Counter64,
+        hh3cVpnPeerOutDropBytes
+            Counter64
+             }
+
+hh3cVpnPeerName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique human-readable value for each VPN peer."
+    ::= { hh3cVpnPeerStatEntry 1 }
+
+hh3cVpnPeerOutPassPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets transmitted out of the VPN peer."
+    ::= { hh3cVpnPeerStatEntry 2 }
+
+hh3cVpnPeerOutPassBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of bytes transmitted out of the VPN peer."
+    ::= { hh3cVpnPeerStatEntry 3 }
+
+hh3cVpnPeerOutDropPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of dropped packets transmitted out of the VPN peer."
+    ::= { hh3cVpnPeerStatEntry 4 }
+
+hh3cVpnPeerOutDropBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of dropped bytes transmitted out of the VPN peer."
+    ::= { hh3cVpnPeerStatEntry 5 }
+
+
+END

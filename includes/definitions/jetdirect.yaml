@@ -1,18 +1,20 @@
 os: jetdirect
 group: printer
 text: 'HP Print server'
-ifname: 1
+ifname: true
 type: printer
 icon: hp
 over:
     - { graph: device_toner, text: Toner }
 discovery_modules:
-    toner: 1
+    printer-supplies:   true
 poller_modules:
-    toner: 1
+    printer-supplies:   true
 discovery:
-    - sysDescr:
-        - JETDIRECT
-        - HP ETHERNET MULTI-ENVIRONMENT
-    - sysObjectId_regex:
-        - '/^.1.3.6.1.4.1.11.1$/'
+    -
+        sysDescr:
+            - JETDIRECT
+            - HP ETHERNET MULTI-ENVIRONMENT
+    -
+        sysObjectID_regex:
+            - '/^.1.3.6.1.4.1.11.1$/'

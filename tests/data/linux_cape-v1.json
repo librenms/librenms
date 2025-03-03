@@ -1,0 +1,1066 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "cape",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "cape",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "anti_issues",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "api_calls",
+                    "value": 27734,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "banned",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "completed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "confidence",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "critical",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "debug",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "distributed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "dropped_files",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "error",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "failed_analysis",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "failed_processing",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "failed_reporting",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "files_written",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "info",
+                    "value": 43,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "malscore",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "pending",
+                    "value": 10195,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "recovered",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "reg_keys_mod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "reported",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "running",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "running_processes",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0anti_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0api_calls",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0confidence",
+                    "value": 30,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0dropped_files",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0files_written",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0malscore",
+                    "value": 4.7,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0regkeysmod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0running_processes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0severity",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0signatures_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s0weight",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1anti_issues",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1api_calls",
+                    "value": 27734,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1confidence",
+                    "value": 100,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1dropped_files",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1files_written",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1malscore",
+                    "value": 10,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1regkeysmod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1running_processes",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1severity",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1signatures_total",
+                    "value": 18,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s1weight",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2anti_issues",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2api_calls",
+                    "value": 27734,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2confidence",
+                    "value": 70,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2dropped_files",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2files_written",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2malscore",
+                    "value": 5.3,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2regkeysmod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2running_processes",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2severity",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2signatures_total",
+                    "value": 18,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s2weight",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3anti_issues",
+                    "value": 0.75,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3api_calls",
+                    "value": 6933.5,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3confidence",
+                    "value": 77.906976744186,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3dropped_files",
+                    "value": 0.5,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3files_written",
+                    "value": 1.0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3malscore",
+                    "value": 7.075,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3regkeysmod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3running_processes",
+                    "value": 0.5,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3severity",
+                    "value": 1.953488372093,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3signatures_total",
+                    "value": 4.5,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s3weight",
+                    "value": 0.90697674418605,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4anti_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4api_calls",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4confidence",
+                    "value": 100,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4dropped_files",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4files_written",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4malscore",
+                    "value": 6.8,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4regkeysmod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4running_processes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4severity",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4signatures_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s4weight",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5anti_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5api_calls",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5confidence",
+                    "value": 100,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5dropped_files",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5files_written",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5malscore",
+                    "value": 4.7,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5regkeysmod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5running_processes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5severity",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5signatures_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s5weight",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6anti_issues",
+                    "value": 2.25,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6api_calls",
+                    "value": 192293689,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6confidence",
+                    "value": 802.65780730897,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6dropped_files",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6files_written",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6malscore",
+                    "value": 7.7225,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6regkeysmod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6running_processes",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6severity",
+                    "value": 0.71207087486157,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6signatures_total",
+                    "value": 81,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s6weight",
+                    "value": 0.086378737541528,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7anti_issues",
+                    "value": 1.5,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7api_calls",
+                    "value": 13867,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7confidence",
+                    "value": 28.331216128309,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7dropped_files",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7files_written",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7malscore",
+                    "value": 2.778938646318,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7regkeysmod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7running_processes",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7severity",
+                    "value": 0.8438429207273,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7signatures_total",
+                    "value": 9,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s7weight",
+                    "value": 0.29390259873218,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8anti_issues",
+                    "value": 1.6875,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8api_calls",
+                    "value": 144220266.75,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8confidence",
+                    "value": 783.99134667388,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8dropped_files",
+                    "value": 0.75,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8files_written",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8malscore",
+                    "value": 5.791875,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8regkeysmod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8running_processes",
+                    "value": 0.75,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8severity",
+                    "value": 0.69551108707409,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8signatures_total",
+                    "value": 60.75,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s8weight",
+                    "value": 0.084369929691725,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9anti_issues",
+                    "value": 1.2990381056767,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9api_calls",
+                    "value": 12009.174274279,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9confidence",
+                    "value": 27.999845475893,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9crash_issues",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9domains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9dropped_files",
+                    "value": 0.86602540378444,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9files_written",
+                    "value": 1.7320508075689,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9malscore",
+                    "value": 2.4066314632698,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9regkeysmod",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9running_processes",
+                    "value": 0.86602540378444,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9severity",
+                    "value": 0.83397307335075,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9signatures_total",
+                    "value": 7.7942286340599,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "s9weight",
+                    "value": 0.29046502318132,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "signatures_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "signatures_total",
+                    "value": 18,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "timedout",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "total_tasks",
+                    "value": 7,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "warning",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "weight",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
+                    "metric": "wrong_prog",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                }
+            ]
+        }
+    }
+}

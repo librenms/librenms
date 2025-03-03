@@ -1,0 +1,526 @@
+OAW-AP1361 DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        enterprises, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY,
+        NOTIFICATION-TYPE, Counter32
+                 FROM SNMPv2-SMI
+		deviceNGOAWAp1361
+				FROM
+		ALCATEL-NGOAW-DEVICES-MIB				 
+        DisplayString , MacAddress, RowStatus,
+        TruthValue                              FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, 
+        NOTIFICATION-GROUP                      FROM SNMPv2-CONF 
+
+        ifIndex                                 FROM RFC1213-MIB;			
+	
+	apInfo      OBJECT IDENTIFIER ::= { deviceNGOAWAp1361 1 }
+
+
+DisplayString ::=
+    OCTET STRING
+
+apBaseInfo       OBJECT IDENTIFIER ::= { apInfo 1 }
+apRadioInfo       OBJECT IDENTIFIER ::= { apInfo 2 }
+apWlanInfo       OBJECT IDENTIFIER ::= { apInfo 3 }
+apClientInfo       OBJECT IDENTIFIER ::= { apInfo 4 }
+
+-- the System group
+-- **********************************************************************
+-- * AP Info Table
+-- **********************************************************************
+
+apMacAddress OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { apBaseInfo 1 }
+
+apSysName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { apBaseInfo 2 }
+
+apIPAddress OBJECT-TYPE
+    SYNTAX  NetworkAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { apBaseInfo 3 }
+	
+apGroupName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { apBaseInfo 4 }
+	
+apModel OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { apBaseInfo 5 }
+
+apSerial  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { apBaseInfo 6 }
+
+apMemoryUtilization OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { apBaseInfo 7 }
+
+apCpuUtilization OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { apBaseInfo 8}	
+	
+apSysUpTime OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { apBaseInfo 9 }
+
+-- **********************************************************************
+-- *apRadioInfoTable
+-- **********************************************************************
+apRadioInfoTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApRadioInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apRadioInfo  1}
+
+ApRadioInfoEntry  OBJECT-TYPE
+SYNTAX ApRadioInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {apRadioIndex}
+::= { apRadioInfoTable 1 }
+
+ApRadioInfoEntry   ::=SEQUENCE {
+apRadioIndex  Integer32,
+apRadioMacAddress    DisplayString,
+apRadioBand    INTEGER,
+apRadioChannel       INTEGER,
+apRadioTxpower     INTEGER,
+apRadioUtilization     INTEGER,
+apRadioTxTotalFrames     Counter64,
+apRadioTxManagementFrames     Counter64,
+apRadioTxDataFrames      Counter64,
+apRadioTxBytes     Counter64,
+apRadioTxDrops     Counter64,
+apRadioRxTotalFrames     Counter64,
+apRadioRxManagementFrames     Counter64,
+apRadioRxDataFrames     Counter64,
+apRadioRxBytes     Counter64,
+apRadioRxBadFrames     Counter64}
+
+apRadioIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={ApRadioInfoEntry 1}
+
+apRadioMacAddress OBJECT-TYPE
+SYNTAX  DisplayString
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {ApRadioInfoEntry 2}
+
+apRadioBand   OBJECT-TYPE
+SYNTAX  INTEGER
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {ApRadioInfoEntry 3}
+
+apRadioChannel  OBJECT-TYPE
+SYNTAX  INTEGER
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {ApRadioInfoEntry 4}
+
+apRadioTxpower  OBJECT-TYPE
+SYNTAX  INTEGER
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {ApRadioInfoEntry 5}
+
+apRadioUtilization   OBJECT-TYPE
+SYNTAX   INTEGER
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 6 }
+
+apRadioTxTotalFrames  OBJECT-TYPE
+SYNTAX    Counter64
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 7}
+
+apRadioTxManagementFrames OBJECT-TYPE
+SYNTAX    Counter64
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 8}
+
+apRadioTxDataFrames  OBJECT-TYPE
+SYNTAX   Counter64
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 9}
+
+apRadioTxBytes  OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 10}
+
+apRadioTxDrops  OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 11}
+
+apRadioRxTotalFrames  OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 12}
+
+apRadioRxManagementFrames  OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 13}
+
+apRadioRxDataFrames  OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 14}
+
+apRadioRxBytes  OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 15}
+
+apRadioRxBadFrames  OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+" "
+::= { ApRadioInfoEntry 16}
+
+-- **********************************************************************
+-- *apWlanInfoTable
+-- **********************************************************************
+apWlanInfoTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApWlanInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apWlanInfo  1}
+
+ApWlanInfoEntry  OBJECT-TYPE
+SYNTAX ApWlanInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+INDEX {apWlanIndex}
+::= { apWlanInfoTable 1 }
+
+ApWlanInfoEntry   ::=SEQUENCE {
+apWlanIndex  Integer32,
+apWlanMacAddress    DisplayString,
+apWlanEssid   	 OCTET STRING,
+apWlanTxTotalFrames     Counter64,
+apWlanTxBytes     Counter64,
+apWlanRxTotalFrames     Counter64,
+apWlanRxBytes     Counter64}
+
+apWlanIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={ApWlanInfoEntry 1}
+
+
+apWlanEssid OBJECT-TYPE
+SYNTAX  OCTET STRING
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {ApWlanInfoEntry 2}
+
+apWlanMacAddress OBJECT-TYPE
+SYNTAX  DisplayString
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {ApWlanInfoEntry 3}
+
+apWlanTxTotalFrames   OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {ApWlanInfoEntry 4}
+
+apWlanTxBytes  OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {ApWlanInfoEntry 5}
+
+apWlanRxTotalFrames  OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {ApWlanInfoEntry 6}
+
+apWlanRxBytes  OBJECT-TYPE
+SYNTAX  Counter64
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {ApWlanInfoEntry 7}
+
+-- **********************************************************************
+-- *apClientInfoTable
+-- **********************************************************************
+apClientInfoTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApClientInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apClientInfo  1}
+
+ApClientInfoEntry  OBJECT-TYPE
+SYNTAX ApClientInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {apClientIndex}
+::= { apClientInfoTable 1 }
+
+ApClientInfoEntry   ::=SEQUENCE {
+apClientIndex  Integer32,
+apClientMacAddress    DisplayString,
+apClientIPAddress    IpAddress,
+apClientWlanService   	 OCTET STRING,
+apClientSNR     INTEGER,
+apClientDeviceFamily     OCTET STRING,
+apClientOS     OCTET STRING,
+apClientUptime     Integer32,
+apClientTxFrames    Counter64,
+apClientTxBytes   Counter64,
+apClientTxRate   Counter64,
+apClientTxRetries   Counter64,
+apClientRxFrames   Counter64,
+apClientRxBytes  Counter64,
+apClientRxRate  Counter64,
+apClientRxRetries Counter64
+}
+
+apClientIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={ApClientInfoEntry 1}
+
+apClientMacAddress OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { ApClientInfoEntry 2 }
+
+apClientIPAddress OBJECT-TYPE
+    SYNTAX  NetworkAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { ApClientInfoEntry 3 }
+
+apClientWlanService OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { ApClientInfoEntry 4 }
+	
+apClientSNR OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    ""
+    ::= { ApClientInfoEntry 5 }
+
+apClientDeviceFamily OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 6 }
+
+apClientOS OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 7 }
+
+apClientUptime OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 8}
+
+apClientTxFrames OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 9}	
+
+apClientTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 10}	
+	
+apClientTxRate OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 11}	
+
+apClientTxRetries OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 12}
+	
+apClientRxFrames OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 13}	
+
+apClientRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 14}	
+
+apClientRxRate OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 15}		
+
+apClientRxRetries OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+	""
+    ::= { ApClientInfoEntry 16}	
+	
+END

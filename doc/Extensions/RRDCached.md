@@ -1,29 +1,36 @@
-source: Extensions/RRDCached.md
 # Setting up RRDCached
 
-This document will explain how to setup RRDCached for LibreNMS.
+ - [Github: Oetiker RRDCached](https://github.com/oetiker/rrdtool-1.x/)
+ - [RRDCached](https://oss.oetiker.ch/rrdtool/doc/rrdcached.en.html)
 
-> If you are using rrdtool / rrdcached version 1.5 or above then this now supports creating rrd files over rrdcached. 
-If you have rrdcached 1.5.5 or above, we can also tune over rrdcached.
-To enable this set the following config:
+This document will explain how to set up RRDCached for LibreNMS.
 
-```php
-$config['rrdtool_version'] = '1.5.5';
-```
+Since version 1.5, rrdtool / rrdcached now supports creating rrd files
+over rrdcached. If you have rrdcached 1.5.5 or above, you can also
+tune over rrdcached. To enable this set the following config:
 
-### Support matrix
+!!! setting "poller/rrdtool"
+    ```bash
+    lnms config:set rrdtool_version '1.5.5'
+    ```
+
+This setting has to be the exact version of rrdtool you are running.
+
+NOTE: This feature requires your client version of rrdtool to be 1.5.5
+or newer, in addition to your rrdcached version.
+
+## Distributed Poller Support Matrix
 
 Shared FS: Is a shared filesystem required?
 
 Features: Supported features in the version indicated.
 
-          G = Graphs.
-
-          C = Create RRD files.
-
-          U = Update RRD files.
-
-          T = Tune RRD files.
+```
+G = Graphs.
+C = Create RRD files.
+U = Update RRD files.
+T = Tune RRD files.
+```
 
 | Version | Shared FS | Features |
 | ------- | :-------: | -------- |
@@ -31,139 +38,299 @@ Features: Supported features in the version indicated.
 | <1.5.5  | Yes       | G,U      |
 | >=1.5.5 | No        | G,C,U    |
 | >=1.6.x | No        | G,C,U    |
+| >=1.8.x | No        | G,C,U,T  |
 
-### RRDCached installation Debian Jessie (rrdcached 1.4.8)
-```ssh
-sudo apt-get install rrdcached
-```
+It is recommended that you monitor your LibreNMS server with LibreNMS
+so you can view the disk I/O usage delta.
 
-- Edit /opt/librenms/config.php to include:
-```php
-$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
-```
-- Edit /etc/default/rrdcached to include:
-```ssh
-OPTS="-s librenms"
-OPTS="$OPTS -l unix:/var/run/rrdcached.sock"
-OPTS="$OPTS -j /var/lib/rrdcached/journal/ -F"
-OPTS="$OPTS -b /opt/librenms/rrd/ -B"
-OPTS="$OPTS -w 1800 -z 1800 -f 3600 -t 4"
-```
 
-### RRDCached installation Ubuntu 16
-```ssh
-sudo apt-get install rrdcached
-```
+## Installation
 
-- Edit /opt/librenms/config.php to include:
-```php
-$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
-```
-- Edit /etc/default/rrdcached to include:
-```ssh
-DAEMON=/usr/bin/rrdcached
-WRITE_TIMEOUT=1800
-WRITE_JITTER=1800
-BASE_PATH=/opt/librenms/rrd/
-JOURNAL_PATH=/var/lib/rrdcached/journal/
-PIDFILE=/var/run/rrdcached.pid
-SOCKFILE=/var/run/rrdcached.sock
-SOCKGROUP=librenms
-BASE_OPTIONS="-B -F"
-```
+Ubuntu and Debian are very similar, the main difference is the location of the `PIDFILE`.
 
-### RRDCached installation CentOS 6
-This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
-In this example, we'll use the Repoforge repository.
+=== "Ubuntu"
 
-```ssh
-rpm -ivh http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
-vi /etc/yum.repos.d/rpmforge.repo
-```
-- Enable the Extra repo
+    For info about version of rrdcached to install, see [Ubuntu packages](https://launchpad.net/ubuntu/+source/rrdtool/)
 
-```ssh
-yum update rrdtool
-vi /etc/yum.repos.d/rpmforge.repo
-```
-- Disable the [rpmforge] and [rpmforge-extras] repos again
+     1. Install rrdcached
 
-```ssh
-vi /etc/sysconfig/rrdcached
+        ```bash
+        sudo apt-get install rrdcached
+        ```
 
-# Settings for rrdcached
-OPTIONS="-w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/"
-RRDC_USER=librenms
+     2. Edit `/etc/default/rrdcached` to include:
 
-mkdir /var/run/rrdcached
-chown librenms:librenms /var/run/rrdcached/
-chown librenms:librenms /var/rrdtool/
-chown librenms:librenms /var/rrdtool/rrdcached/
-chkconfig rrdcached on
-service rrdcached start
-```
+        ```bash
+        BASE_OPTIONS="-B -F -R"
+        BASE_PATH=/opt/librenms/rrd/
+        DAEMON_GROUP=librenms
+        DAEMON_USER=librenms
+        DAEMON=/usr/bin/rrdcached
+        JOURNAL_PATH=/var/lib/rrdcached/journal/
+        PIDFILE=/run/rrdcached.pid
+        SOCKFILE=/run/rrdcached.sock
+        SOCKGROUP=librenms
+        WRITE_JITTER=1800
+        WRITE_THREADS=4
+        WRITE_TIMEOUT=1800
+        ```
 
-- Edit /opt/librenms/config.php to include:
-```php
-$config['rrdcached']    = "unix:/var/run/rrdcached/rrdcached.sock";
-```
-### RRDCached installation CentOS 7
-This example is based on a fresh LibreNMS install, on a minimal CentOS 7.x installation.
-We'll use the epel-release and setup a RRDCached as a service.
-It is recommended that you monitor your LibreNMS server with LibreNMS so you can view the disk I/O usage delta.
-See [Installation (RHEL CentOS)][1] for localhost monitoring.
+     3. Fix permissions
 
-- Install the EPEL and update the repos and RRDtool.
-```ssh
-yum install epel-release
-yum update
-yum update rrdtool
-```
+        ```bash
+        chown librenms:librenms /var/lib/rrdcached/journal/
+        ```
 
-- Create the needed directories, set ownership and permissions.
-```ssh
-mkdir /var/run/rrdcached
-chown librenms:librenms /var/run/rrdcached
-chmod 755 /var/run/rrdcached
-```
+     4. Restart the rrdcached service
 
-- Create an rrdcached service for easy daemon management.
-```ssh
-touch /etc/systemd/system/rrdcached.service
-```
-- Edit rrdcached.service and paste the example config:
-```ssh
-[Unit]
-Description=Data caching daemon for rrdtool
-After=network.service
+        ```bash
+        systemctl restart rrdcached.service
+        ```
 
-[Service]
-Type=forking
-PIDFile=/run/rrdcached.pid
-ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/var/run/rrdcached/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/
+=== "Debian"
+    
+    For info about version of rrdcached to install, see [Debian packages](https://packages.debian.org/search?keywords=rrdcached)
 
-[Install]
-WantedBy=default.target
-```
 
-- Reload the systemd unit files from disk, so it can recognize the newly created rrdcached.service. Enable the rrdcached.service on boot and start the service.
-```ssh
-systemctl daemon-reload
-systemctl enable --now rrdcached.service
-```
+     1. Install rrdcached
 
-- Edit /opt/librenms/config.php to include:
-```ssh
-$config['rrdcached']    = "unix:/var/run/rrdcached/rrdcached.sock";
-```
+        ```bash
+        sudo apt-get install rrdcached
+        ```
+
+     2. Edit `/etc/default/rrdcached` to include:
+
+        ```bash
+        BASE_OPTIONS="-B -F -R"
+        BASE_PATH=/opt/librenms/rrd/
+        DAEMON_GROUP=librenms
+        DAEMON_USER=librenms
+        DAEMON=/usr/bin/rrdcached
+        JOURNAL_PATH=/var/lib/rrdcached/journal/
+        PIDFILE=/var/run/rrdcached.pid
+        SOCKFILE=/run/rrdcached.sock
+        SOCKGROUP=librenms
+        WRITE_JITTER=1800
+        WRITE_THREADS=4
+        WRITE_TIMEOUT=1800
+        ```
+
+     3. Fix permissions
+
+        ```bash
+        chown librenms:librenms /var/lib/rrdcached/journal/
+        ```
+
+     4. Restart the rrdcached service
+
+        ```bash
+        systemctl restart rrdcached.service
+        ```
+
+
+=== "Red Hat/CentOS 8"
+
+    !!! note
+        `rrdcached` is installed as part of the `rrdtool` package, but the `rrdcached` service is not setup by default, unlike the Ubuntu/Debian setup.
+
+        The intermediate files generated during the process for the SELinux policy (e.g., `rrdcached_librenms.mod` and `rrdcached_librenms.pp`) do not need to be saved after the policy module is successfully installed.
+
+
+     1. link in the service and reload:
+
+        ```bash
+        ln -s /opt/librenms/dist/rrdcached/rrdcached.service /etc/systemd/system/
+        systemctl daemon-reload
+        ```
+
+     2. Configure SELinux for RRDCached
+
+
+         1. Compile the SELinux Policy Compile the SELinux policy module using the following command:
+
+            ```bash
+            checkmodule -M -m -o /tmp/rrdcached_librenms.mod /opt/librenms/dist/rrdcached/rrdcached_librenms.te
+            ```
+
+            Explanation:
+             - `-M`: Enable the module compiler.
+             - `-m`: Enable the module version format.
+             - `-o`: Specify the output file name.
+
+         2. Package the Policy Module Package the compiled module into a loadable policy package:
+
+            ```bash
+            semodule_package -o /tmp/rrdcached_librenms.pp -m /tmp/rrdcached_librenms.mod
+            ```
+
+            Explanation:
+             - `-o`: Specify the output file name.
+             - `-m`: Specify the input file name.
+
+         3. Apply the Policy Module Apply the policy module to the system:
+
+            ```bash
+            semodule -i /tmp/rrdcached_librenms.pp
+            ```
+
+            Explanation:
+             - `-i`: Install the policy module.
+
+     3. Start RRDcached and enable for start at boot
+
+        ```bash
+        systemctl enable --now rrdcached.service
+        ```
+
+=== "CentOS 6"
+
+    This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
+    In this example, we'll use the Repoforge repository.
+
+    ```bash
+    rpm -ivh http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+    ```
+
+    Enable the Extra repo
+
+    ```bash
+    vi /etc/yum.repos.d/rpmforge.repo
+    ```
+
+    Install rrdtool
+
+    ```bash
+    yum update rrdtool
+    ```
+
+    Disable the [rpmforge] and [rpmforge-extras] repos again
+
+    ```bash
+    vi /etc/yum.repos.d/rpmforge.repo
+    ```
+
+    Edit the rrdcached config `/etc/sysconfig/rrdcached`:
+
+    ```bash
+    # Settings for rrdcached
+    OPTIONS="-w 1800 -z 1800 -f 3600 -s librenms -U librenms -G librenms -B -R -j /var/tmp -l unix:/run/rrdcached.sock -t 4 -F -b /opt/librenms/rrd/"
+    RRDC_USER=librenms
+    ```
+
+    ```bash
+    mkdir /var/run/rrdcached
+    chown librenms:librenms /var/run/rrdcached/
+    chown librenms:librenms /var/rrdtool/
+    chown librenms:librenms /var/rrdtool/rrdcached/
+    ```
+
+    ```bash
+    chkconfig rrdcached on
+    ```
+
+    Restart rrdcached
+
+    ```bash
+    service rrdcached start
+    ```
+
+### Network RRDCached
+
+For remote RRDCached server make sure you have network option `-L` in `/var/default/rrdcached` or `rrdcached.unit`
+
+=== "Debian/Ubuntu"
+
+    Edit `/etc/default/rrdcached` to include:
+    ```bash
+    NETWORK_OPTIONS="-L"
+    ```
+
+## LibreNMS config
+
+Edit your LibreNMS config by running the following:
+
+=== "Local RRDCached"
+
+    !!! setting "poller/rrdtool"
+        ```bash
+        lnms config:set rrdcached "unix:/run/rrdcached.sock"
+        ```
+
+=== "Network RRDCached"
+
+    !!! setting "poller/rrdtool"
+        ```bash
+        lnms config:set rrdcached "${IPADDRESS}:42217"
+        ```
+    !!! note
+        Change `${IPADDRESS}` to the ip the rrdcached server is listening on.
+
+## Verify
+
 Check to see if the graphs are being drawn in LibreNMS. This might take a few minutes.
 After at least one poll cycle (5 mins), check the LibreNMS disk I/O performance delta.
-Disk I/O can be found under the menu Devices>All Devices>[localhost hostname]>Health>Disk I/O.
+Disk I/O can be found under the menu Devices>All Devices>[localhost_hostname]>Health>Disk I/O.
 
 Depending on many factors, you should see the Ops/sec drop by ~30-40%.
 
-#### Securing RRCached
-Please see [RRDCached Security](RRDCached-Security.md)
+### Verify SELINUX
 
-[1]: http://librenms.readthedocs.org/Installation/Installation-CentOS-7-Apache/
-"Add localhost to LibreNMS"
+If you are using SELinux, and you have issue you can verify the policy module is installed by running the following command:
+
+```bash
+semodule -l | grep rrdcached_librenms
+```
+
+Test Functionality: Ensure LibreNMS can successfully interact with RRDcached without SELinux denials. Check SELinux logs for any denials:
+
+```bash
+ausearch -m avc -ts recent
+```
+
+If there are no denials, the policy module has been successfully installed and Librenms can interact with RRDcached.
+
+## Securing RRCached
+
+According to the [man page](https://linux.die.net/man/1/rrdcached),
+under "SECURITY CONSIDERATIONS", rrdcached has no authentication or security except for running under a unix socket. If you choose to use a network socket instead of a unix socket, you will need to secure your rrdcached installation. To do so you can proxy rrdcached using
+nginx to allow only specific IPs to connect.
+
+Using the same setup above, using nginx version 1.9.0 or later, you can follow this setup to proxy the default rrdcached port to the local unix socket.
+
+(You can use `./conf.d` for your configuration as well)
+
+`mkdir /etc/nginx/streams-{available,enabled}`
+
+add the following to your nginx.conf file:
+
+```nginx
+#/etc/nginx/nginx.conf
+...u
+stream {
+    include /etc/nginx/streams-enabled/*;
+}
+```
+
+Add this to `/etc/nginx/streams-available/rrd`
+
+```nginx
+server {
+    listen 42217;
+
+    error_log  /var/log/nginx/rrd.stream.error.log;
+
+    allow $LibreNMS_IP;
+    deny all;
+
+    proxy_pass unix:/run/rrdcached.sock;
+}
+
+```
+
+Replace `$LibreNMS_IP` with the ip of the server that will be using rrdcached. You can specify more than one `allow` statement. This will bind nginx to TCP 42217 (the default rrdcached port), allow the specified IPs to connect, and deny all others.
+
+next, we'll symlink the config to streams-enabled:
+`ln -s /etc/nginx/streams-{available,enabled}/rrd`
+
+and reload nginx
+`service nginx reload`

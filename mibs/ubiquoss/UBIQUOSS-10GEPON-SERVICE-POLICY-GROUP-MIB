@@ -1,0 +1,203 @@
+-- *****************************************************************
+-- UBIQUOSS-10GEPON-SERVICE-POLICY-GROUP-MIB.my
+--
+-- Jul. 2013, Hangil Won   
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+	UBIQUOSS-10GEPON-SERVICE-POLICY-GROUP-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			entPhysicalIndex			
+				FROM ENTITY-MIB			
+			ifIndex			
+				FROM RFC1213-MIB			
+			Integer32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			DisplayString			
+				FROM SNMPv2-TC
+			ubi10GEponGroupMIB		                 
+				FROM UBQS-SMI 			
+			ubiPortIndex
+				FROM UBQS-INTERFACE-MIB;  
+
+	
+	
+		ubi10gServicePolicyMIB MODULE-IDENTITY 
+			LAST-UPDATED "201601072200Z"		
+			ORGANIZATION 
+				"Ubiquoss Inc."
+			CONTACT-INFO 
+				"Chair		: Hangil Won
+							  Ubiquoss Inc.
+				 Postal:	: 8F Ubiquoss B/D, 68, Pangyo-ro
+				 			  255beon-gil, Bundang-gu, Seongnam-si,
+				 			  Gyeonggi-do, 463-400, Republic of Korea							  
+				 EMail: 	: hg88pro@ubiquoss.com"
+			DESCRIPTION 
+				"This MIB module defines epon service policy information"
+			::= { ubi10GEponGroupMIB  4 }      		
+	
+	
+-- ***********************************************************
+-- Node definitions
+-- ***********************************************************                
+
+	   ubi10gServicePolicyMIBObjects	OBJECT IDENTIFIER ::= { ubi10gServicePolicyMIB 1 } 
+
+-- ***********************************************************
+-- ponServicePolicy
+-- ***********************************************************	              
+
+		ubi10gPonServicePolicy OBJECT IDENTIFIER ::= { ubi10gServicePolicyMIBObjects 1 }  		
+
+-- ***********************************************************	
+-- olt10gServicePolicy
+-- ***********************************************************			           
+        olt10gServicePolicyTable OBJECT-TYPE
+        	SYNTAX SEQUENCE OF Olt10gServicePolicyEntry
+        	MAX-ACCESS not-accessible
+        	STATUS current
+        	DESCRIPTION
+				"Apply service policy to OLT."
+			::= { ubi10gPonServicePolicy 1 }
+			
+		 olt10gServicePolicyEntry OBJECT-TYPE
+			SYNTAX Olt10gServicePolicyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { uniPortIndex }
+			::= { olt10gServicePolicyTable 1 }
+		
+         Olt10gServicePolicyEntry ::=
+			SEQUENCE { 
+				olt10gServicePolicyServiceMapName
+					DisplayString
+			 }
+		
+		olt10gServicePolicyServiceMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..63))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Service map name to apply."
+			::= { olt10gServicePolicyEntry 1 }
+
+		                                                                                 
+-- ***********************************************************
+-- onu10gServicePolicyTable
+-- ***********************************************************			
+		onu10gServicePolicyTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Onu10gServicePolicyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPonServicePolicy 2 }
+		
+		onu10gServicePolicyEntry OBJECT-TYPE
+			SYNTAX Onu10gServicePolicyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId }
+			::= { onu10gServicePolicyTable 1 }
+		
+		Onu10gServicePolicyEntry ::=
+			SEQUENCE { 
+				onu10gServicePolicySlaMapName
+					DisplayString,
+				onu10gServicePolicyBridgeMapName
+					DisplayString,
+				onu10gServicePolicyMcastMapName
+					DisplayString
+			 }
+
+		onu10gServicePolicySlaMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gServicePolicyEntry 1 }
+		
+		onu10gServicePolicyBridgeMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gServicePolicyEntry 2 }
+		
+		onu10gServicePolicyMcastMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onu10gServicePolicyEntry 3 }           		                                                                             
+
+-- ***********************************************************
+-- default10gServicePolicy
+-- ***********************************************************		
+		default10gServicePolicy OBJECT IDENTIFIER ::= { ubi10gPonServicePolicy 3 }   
+		
+		default10gServicePolicySlaMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { default10gServicePolicy 1 }
+		
+		default10gServicePolicyBridgeMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { default10gServicePolicy 2 }
+		
+		default10gServicePolicyMcastMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { default10gServicePolicy 3 }  
+
+		defaultHybrid10gServicePolicySlaMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { default10gServicePolicy 4 }
+		
+		defaultHybrid10gServicePolicyBridgeMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { default10gServicePolicy 5 }
+		
+		defaultHybrid10gServicePolicyMcastMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { default10gServicePolicy 6 }  
+
+END
+-- ***********************************************************
+-- UBIQUOSS-10GEPON-SERVICE-POLICY-MIB.my
+-- ***********************************************************
+

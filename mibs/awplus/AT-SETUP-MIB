@@ -1,0 +1,831 @@
+-- ============================================================================
+-- AT-SETUP.MIB, Allied Telesis enterprise MIB:
+-- Device Setup for the AlliedWare Plus(tm) operating system
+--
+-- Copyright (c) 2010 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-SETUP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules
+                FROM AT-SMI-MIB
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            DisplayString, TruthValue, TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+
+        setup MODULE-IDENTITY
+            LAST-UPDATED "201404300000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The AT Setup MIB for managing the software installation and
+                configuration files."
+            REVISION "201404300000Z"
+            DESCRIPTION
+                "Updated decriptions to refer to chassisMappingTable"
+            REVISION "201310140000Z"
+            DESCRIPTION
+                "Added new requirement to the objects nextBootLastSetResult and backupLastSetResult,
+                as to check for the existence of a valid release license on the device. If a valid license
+                is not found then these objects will give an appropriate error message."
+            REVISION "201209210000Z"
+            DESCRIPTION
+                "Added chassis switch (e.g. SBx8100) descriptions to stack-related MIB objects"
+            REVISION "201011200000Z"
+            DESCRIPTION
+                "Addition of new objects to support system file operations on
+                stacked devices."
+            REVISION "201010080000Z"
+            DESCRIPTION
+                "Minor changes to help messages."
+            REVISION "201009100000Z"
+            DESCRIPTION
+                "Generic syntax tidy up."
+            REVISION "201009080000Z"
+            DESCRIPTION
+                "Added backupConfig object. The nextBootPath and bootcnfgPath objects will
+                now accept a file stored in card:. The nextBootPath object will only accept
+                a file on card if this is supported by the bootloader."
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "201004090000Z"
+            DESCRIPTION
+                "A set to the runCnfgSaveAs object will now be immediately responded before
+                the actual saving operation starts. This prevents the request from being
+                timed out while the saving is still progressing. A new object
+                runCnfgSaveAsStatus is defined which can be polled to obtain the status of
+                the current/previous saving operation."
+            REVISION "200810020000Z"
+            DESCRIPTION
+                "Added support for obtaining GUI applet version information."
+            REVISION "200809300000Z"
+            DESCRIPTION
+                "Add branch serviceConfig."
+            REVISION "200809240000Z"
+            DESCRIPTION
+                "Moved file copy branch to the new AT-FILEv2 MIB.
+                Allowed clearing of currentFirmware, nextBootFirmware and nextBootConfig
+                by setting the path objects with an empty string."
+            REVISION "200805210000Z"
+            DESCRIPTION
+                "Initial revision."
+            ::= { modules 500 }
+
+
+
+
+--  Textual Conventions
+        SystemFileOperationType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Indicates the current status of an attempt to modify a system
+                file setting."
+            SYNTAX INTEGER
+                {
+                idle(1),
+                success(2),
+                failure(3),
+                saving(4),
+                syncing(5)
+                }
+
+
+--
+-- Node definitions
+--
+
+        restartDevice OBJECT-TYPE
+            SYNTAX Integer32 (0..1)
+            MAX-ACCESS read-write
+            STATUS deprecated
+            DESCRIPTION
+                "This object forces a standalone unit or stack of devices to
+                restart immediately when set with a value of 1. For a chassis
+                switch, this object causes the whole chassis to restart
+                immediately. Reading the object will always return zero.
+                
+                NOTE: This object has been replaced by the
+                restartStkMemberDevice object."
+            ::= { setup 1 }
+
+
+        restartStkMemberDevice OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object causes a specified device to restart immediately.
+                The restart is initiated by setting its value to the device's
+                stack member ID. For a chassis switch, it corresponds to the
+                card ID. For VCStack Plus, 1-12 refers to the cards on VCS
+                stack member 1 and 13-24 refers to the cards on VCS stack
+                member 2. Refer to chassisMappingTable for more details.
+                This object causes the specified card to restart immediately.
+                Setting its value to zero will cause all devices in the stack
+                (or a standalone device) to restart. Reading the object will
+                always return zero."
+            ::= { setup 4 }
+
+
+-- ---------------------------------------------------------- --
+-- The firmware objects
+-- ---------------------------------------------------------- --
+        firmware OBJECT IDENTIFIER ::= { setup 2 }
+
+
+        currentFirmware OBJECT IDENTIFIER ::= { firmware 1 }
+
+
+        currSoftVersion OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The major.minor.interim version of the firmware that the device is
+                currently running. Will return 0 if the version cannot be determined."
+            ::= { currentFirmware 1 }
+
+
+        currSoftName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of the firmware that the device is currently running."
+            ::= { currentFirmware 2 }
+
+
+        currSoftSaveAs OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS deprecated
+            DESCRIPTION
+                "Set with a filename to save the currently running software to
+                the root of flash. Only one save operation can be executed at a
+                time across all SNMP users, and the filename must not contain
+                whitespace characters.
+
+                Immediately upon executing the set action, the actual firmware
+                save operation will be started and continue on the device until
+                it has completed or a failure occurs.
+
+                Subsequent reads of the object will return one of several
+                results:
+
+                saving x            A saving operation is currently in
+                                    progress. Another save cannot be started
+                                    while the object is returning this value.
+
+                x success           The last save operation was successfully
+                                    completed.
+
+                x failure: [error]  The last save operation failed, due to the
+                                    descriptive message attached. The most
+                                    common failure is lack of disk space.
+
+                idle                There is no save operation in progress and
+                                    a new one may be started.
+
+                Upon reading a success or failure message, the message will be
+                cleared and the next read will result in an 'idle' message. A
+                new save operation can now be executed.
+
+                NOTE: This object has been replaced by objects currSoftSaveToFile,
+                currSoftSaveStatus and currSoftLastSaveResult."
+            ::= { currentFirmware 3 }
+
+
+        currSoftSaveToFile OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set with a URL (e.g. 'flash:/filename.rel' or
+                'card:/filename.rel') to save the currently running software to
+                the root of flash or SD card. Only one save operation can be
+                executed at a time across all SNMP users, and an operation may
+                not be started unless the current value of currSoftSaveStatus
+                is 'idle'. The URL must not contain whitespace characters.
+
+                Immediately upon executing the set action, the actual firmware
+                save operation will be started and continue on the device until
+                it has completed or a failure occurs. The current status of the
+                operation can be determined by reading currSoftSaveStatus, and
+                the result of the last completed operation is indicated by
+                currSoftLastSaveResult.
+                
+                When read, this object will return the URL of the last
+                firmware save operation that was attempted."
+            ::= { currentFirmware 4 }
+
+
+        currSoftSaveStatus OBJECT-TYPE
+            SYNTAX SystemFileOperationType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Returns the status of any current operation to store the
+                running software to a release file. The following values may
+                be returned:
+
+                1 (idle)                There is no release file save operation
+                                        in progress.
+
+                2 (success)             The last release file save operation
+                                        completed successfully.
+
+                3 (failure)             The last release file save operation
+                                        failed.
+
+                4 (saving)              A release file save operation is
+                                        currently in progress.
+
+                When a read of this object returns a value of 'success' or
+                'failure', it will immediately be reset to 'idle' and a new
+                operation may be initiated if desired. A detailed description
+                of the last completed operation may be determined by reading
+                currSoftLastSaveResult." 
+            ::= { currentFirmware 5 }
+
+
+        currSoftLastSaveResult OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Gives an indication of the result of the last completed SNMP
+                operation to save the running firmware to a release file."
+            ::= { currentFirmware 6 }
+
+
+        nextBootFirmware OBJECT IDENTIFIER ::= { firmware 2 }
+
+
+        nextBootVersion OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The major.minor.interim version of the firmware that the
+                device is currently set to boot from. Will return 0 if the
+                version cannot be determined."
+            ::= { nextBootFirmware 1 }
+
+
+        nextBootPath OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The full path of the release to be used the next time the
+                device restarts. There is no guarantee that the file
+                referenced exists (i.e. it may have been deleted since the boot
+                path was last set).
+
+                Only one set operation can be executed at a time across all
+                SNMP users, and an operation may not be started unless the
+                current value of nextBootSetStatus is 'idle'. The path must not
+                contain whitespace characters.
+
+                Immediately upon setting this object, the system will attempt
+                to set the new boot path, and the process will continue on the
+                device until it has completed or a failure occurs. The current
+                status of the operation can be determined by reading
+                nextBootSetStatus, and the result of the last completed
+                operation is indicated by nextBootLastSetResult.
+
+                This object can be set with an empty string in order to clear
+                the current boot firmware. Otherwise, the path should be of the
+                form 'flash:/filename.rel' or 'card:/filename.rel'.
+
+                There are several requirements that must be met in order to set
+                a boot release file successfully:
+                - The file must exist.
+                - The file must be in the root of flash (on the active master
+                  in a stacked environment) or card.
+                - The file must not be the same as the currently set backup
+                  release.
+                - The file must have a .rel suffix.
+                - The file must be a valid release file.
+                - In a stacked environment, there must be enough disk space
+                  available to store the release file on each stack member.
+                - The device must have a current release license for the
+                  specified release."
+            ::= { nextBootFirmware 2 }
+
+
+        nextBootSetStatus OBJECT-TYPE
+            SYNTAX SystemFileOperationType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Returns the status of any current operation to set the next
+                boot release file. The following values may be returned:
+
+                1 (idle)                There is no boot release setting
+                                        operation in progress.
+
+                2 (success)             The last boot release setting
+                                        operation completed successfully.
+
+                3 (failure)             The last boot release setting
+                                        operation failed.
+
+                5 (syncing)             A boot release setting operation is
+                                        currently in progress and the file is
+                                        being syncronised across the stack or
+                                        system.
+
+                When a read of this object returns a value of 'success' or
+                'failure', it will immediately be reset to 'idle' and a new
+                operation may be initiated if desired. A detailed description
+                of the last completed operation may be determined by reading
+                nextBootLastSetResult." 
+            ::= { nextBootFirmware 3 }
+
+
+        nextBootLastSetResult OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Gives an indication of the result of the last completed SNMP
+                operation to set the boot release filename."
+            ::= { nextBootFirmware 4 }
+
+
+        backupFirmware OBJECT IDENTIFIER ::= { firmware 3 }
+
+
+        backupVersion OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The major.minor.interim version of the firmware that the
+                device will boot from as a backup. This will return 0 if the
+                version cannot be determined."
+            ::= { backupFirmware 1 }
+
+
+        backupPath OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The full path of the release file to be used as a backup in
+                the event of the main release file failing to boot. There is no
+                guarantee that the file referenced exists (i.e. it may have
+                been deleted since the backup path was last set).
+
+                Only one set operation can be executed at a time across all
+                SNMP users, and an operation may not be started unless the
+                current value of backupSetStatus is 'idle'. The path must not
+                contain whitespace characters.
+
+                Immediately upon setting this object, the system will attempt
+                to set the new backup path, and the process will continue on
+                the device until it has completed or a failure occurs. The
+                current status of the operation can be determined by reading
+                backupSetStatus, and the result of the last completed operation
+                is indicated by backupLastSetResult.
+
+                This object can be set with an empty string in order to clear
+                the current backup firmware. Otherwise, the path should be of
+                the form 'flash:/filename.rel' or 'card:/filename.rel'.
+
+                There are several requirements that must be met in order to set
+                a backup release file successfully:
+                - The file must exist.
+                - The file must be in the root of flash (on the active master
+                  in a stacked environment) or card.
+                - The file must not be the same as the currently set backup
+                  release.
+                - The file must have a .rel suffix.
+                - The file must be a valid release file.
+                - In a stacked environment, there must be enough disk space
+                  available to store the release file on each stack member.
+                - The device must have a current release license for the
+                  specified release."
+            ::= { backupFirmware 2 }
+
+
+        backupSetStatus OBJECT-TYPE
+            SYNTAX SystemFileOperationType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Returns the status of any current operation to set the backup
+                boot release file. The following values may be returned:
+
+                1 (idle)                There is no backup boot release setting
+                                        operation in progress.
+
+                2 (success)             The last backup boot release setting
+                                        operation completed successfully.
+
+                3 (failure)             The last backup boot release setting
+                                        operation failed.
+
+                5 (syncing)             A backup boot release setting operation
+                                        is currently in progress and the file
+                                        is being syncronised across the stack
+                                        or system.
+
+                When a read of this object returns a value of 'success' or
+                'failure', it will immediately be reset to 'idle' and a new
+                operation may be initiated if desired. A detailed description
+                of the last completed operation may be determined by reading
+                backupLastSetResult." 
+            ::= { backupFirmware 3 }
+
+
+        backupLastSetResult OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Gives an indication of the result of the last completed SNMP
+                operation to set the backup boot release filename."
+            ::= { backupFirmware 4 }
+
+
+-- ---------------------------------------------------------- --
+-- The configuration file objects
+-- ---------------------------------------------------------- --
+        deviceConfiguration OBJECT IDENTIFIER ::= { setup 3 }
+
+
+        runningConfig OBJECT IDENTIFIER ::= { deviceConfiguration 1 }
+
+
+        runCnfgSaveAs OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set with a URL to save the running configuration to the flash
+                or card filesystem using that filename (e.g.
+                'flash:/myconfig.cfg' or 'card:/myconfig.cfg').
+                
+                Only one set operation can be executed at a time across all
+                SNMP users, and an operation may not be started unless the
+                current value of runCnfgSaveAsStatus is 'idle'. The URL must
+                not contain whitespace characters.
+                
+                Immediately upon setting this object, the system will attempt
+                to save the running configuration, and the process will
+                continue on the device until it has completed or a failure
+                occurs. The current status of the operation can be determined
+                by reading runCnfgSaveAsStatus, and the result of the last
+                completed operation is indicated by runCnfgLastSaveResult.
+            
+                When read, this object will return the URL of the last
+                configuration save operation that was attempted."
+            ::= { runningConfig 1 }
+
+
+        runCnfgSaveAsStatus OBJECT-TYPE
+            SYNTAX SystemFileOperationType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Returns the status of any current operation to save the
+                running configuration. The following values may be returned:
+
+                1 (idle)                There is no config file save operation
+                                        in progress.
+
+                2 (success)             The last config file save operation
+                                        completed successfully.
+
+                3 (failure)             The last config file save operation
+                                        failed.
+
+                4 (saving)              A config file save operation is
+                                        currently in progress.
+
+                When a read of this object returns a value of 'success' or
+                'failure', it will immediately be reset to 'idle' and a new
+                operation may be initiated if desired. A detailed description
+                of the last completed operation may be determined by reading
+                runCnfgLastSaveResult." 
+            ::= { runningConfig 2 }
+
+
+        runCnfgLastSaveResult OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Gives an indication of the result of the last completed SNMP
+                operation to save the running configuration."
+            ::= { runningConfig 3 }
+
+
+        nextBootConfig OBJECT IDENTIFIER ::= { deviceConfiguration 2 }
+
+
+        bootCnfgPath OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The full path of the configuration file to be used the next
+                time the device restarts. There is no guarantee that the file
+                referenced exists (i.e. it may have been deleted since the
+                configuration path was last set).
+
+                Only one set operation can be executed at a time across all
+                SNMP users, and an operation may not be started unless the
+                current value of bootCnfgSetStatus is 'idle'. The path must not
+                contain whitespace characters.
+
+                Immediately upon setting this object, the system will attempt
+                to set the new configuration path, and the process will
+                continue on the device until it has completed or a failure
+                occurs. The current status of the operation can be determined
+                by reading bootCnfgSetStatus, and the result of the last
+                completed operation is indicated by bootCnfgLastSetResult.
+
+                This object can be set with an empty string in order to clear
+                the current boot configuration. Otherwise, the path should be
+                of the form 'flash:/filename.cfg' or 'card:/filename.cfg'.
+
+                There are several requirements that must be met in order to set
+                a boot configuration file successfully:
+                - The file must exist.
+                - The file must be in the flash (on the active master in a
+                  stacked environment) or card filesystems.
+                - The file must have a .cfg suffix.
+                - In a stacked environment, there must be enough disk space
+                  available to store the configuration file on each stack
+                  member."
+            ::= { nextBootConfig 1 }
+
+
+        bootCnfgExists OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object will return TRUE if the currently defined boot
+                configuration file exists, or FALSE otherwise."
+            ::= { nextBootConfig 2 }
+
+
+        bootCnfgSetStatus OBJECT-TYPE
+            SYNTAX SystemFileOperationType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Returns the status of any current operation to set the next
+                boot configuration file. The following values may be returned:
+
+                1 (idle)                There is no boot configuration setting
+                                        operation in progress.
+
+                2 (success)             The last boot configuration setting
+                                        operation completed successfully.
+
+                3 (failure)             The last boot configuration setting
+                                        operation failed.
+
+                5 (syncing)             A boot configuration setting operation
+                                        is currently in progress and the file
+                                        is being syncronised across the stack
+                                        or system.
+
+                When a read of this object returns a value of 'success' or
+                'failure', it will immediately be reset to 'idle' and a new
+                operation may be initiated if desired. A detailed description
+                of the last completed operation may be determined by reading
+                bootCnfgLastSetResult." 
+            ::= { nextBootConfig 3 }
+
+
+        bootCnfgLastSetResult OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Gives an indication of the result of the last completed SNMP
+                operation to set the boot configuration filename."
+            ::= { nextBootConfig 4 }
+
+
+        defaultConfig OBJECT IDENTIFIER ::= { deviceConfiguration 3 }
+
+
+        dfltCnfgPath OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The full path of the configuration file to be used upon device
+                restart, if no user-defined boot or backup configuration files
+                can be found. There is no guarantee that the file referenced
+                exists (i.e. it may have been deleted).
+
+                This object is not settable - the default configuration file is
+                always 'flash:/default.cfg'"
+            ::= { defaultConfig 1 }
+
+
+        dfltCnfgExists OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object will return TRUE if the currently defined default
+                configuration file exists, or FALSE otherwise."
+            ::= { defaultConfig 2 }
+
+
+        backupConfig OBJECT IDENTIFIER ::= { deviceConfiguration 4 }
+
+
+        backupCnfgPath OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The full path of the backup configuration file to be used the
+                next time the device restarts, if the boot configuration file
+                cannot be accessed. There is no guarantee that the file
+                referenced exists (i.e. it may have been deleted since the
+                backup configuration path was last set).
+
+                Only one set operation can be executed at a time across all
+                SNMP users, and an operation may not be started unless the
+                current value of backupCnfgSetStatus is 'idle'. The path must
+                not contain whitespace characters.
+
+                Immediately upon setting this object, the system will attempt
+                to set the new backup configuration path, and the process will
+                continue on the device until it has completed or a failure
+                occurs. The current status of the operation can be determined
+                by reading backupCnfgSetStatus, and the result of the last
+                completed operation is indicated by backupCnfgLastSetResult.
+
+                This object can be set with an empty string in order to clear
+                the current backup configuration. Otherwise, the path should be
+                of the form 'flash:/filename.cfg' or 'card:/filename.cfg'.
+
+                There are several requirements that must be met in order to set
+                a backup configuration file successfully:
+                - The file must exist.
+                - The file must be in the flash (on the active master in a
+                  stacked environment) or card filesystems.
+                - The file must have a .cfg suffix.
+                - In a stacked environment, there must be enough disk space
+                  available to store the configuration file on each stack
+                  member."
+            ::= { backupConfig 1 }
+
+
+        backupCnfgExists OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object will return TRUE if the currently defined backup
+                configuration file exists, or FALSE otherwise."
+            ::= { backupConfig 2 }
+
+
+        backupCnfgSetStatus OBJECT-TYPE
+            SYNTAX SystemFileOperationType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Returns the status of any current operation to set the next
+                backup boot configuration file. The following values may be
+                returned:
+
+                1 (idle)                There is no backup boot configuration
+                                        setting operation in progress.
+
+                2 (success)             The last backup boot configuration
+                                        setting operation completed
+                                        successfully.
+
+                3 (failure)             The last backup boot configuration
+                                        setting operation failed.
+
+                5 (syncing)             A backup boot configuration setting
+                                        operation is currently in progress and
+                                        the file is being syncronised across
+                                        the stack or system.
+
+                When a read of this object returns a value of 'success' or
+                'failure', it will immediately be reset to 'idle' and a new
+                operation may be initiated if desired. A detailed description
+                of the last completed operation may be determined by reading
+                backupCnfgLastSetResult." 
+            ::= { backupConfig 3 }
+
+
+        backupCnfgLastSetResult OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Gives an indication of the result of the last completed SNMP
+                operation to set the backup boot configuration filename."
+            ::= { backupConfig 4 }
+
+
+        serviceConfig OBJECT IDENTIFIER ::= { setup 5 }
+
+
+        srvcTelnetEnable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object represents the state of the telnet server of a device.
+
+                A management application can find out the telnet server is either
+                enabled	or disabled by reading this object.
+
+                To either enable or disable the telnet server, a management
+                application can SET this object with value 'enable(1)' or
+                'disable(2)' respectively."
+            ::= { serviceConfig 1 }
+
+
+        srvcSshEnable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object represents the state of the ssh server of a device.
+
+                A management application can find out the ssh server is either
+                enabled	or disabled by reading this object.
+
+                To either enable or disable the ssh server, a management
+                application can SET this object with value 'enable(1)' or
+                'disable(2)' respectively."
+            ::= { serviceConfig 2 }
+
+-- ---------------------------------------------------------- --
+-- GUI applet configuration file objects
+-- ---------------------------------------------------------- --
+
+        guiConfig OBJECT IDENTIFIER ::= { setup 6 }
+
+
+        guiAppletConfig OBJECT IDENTIFIER ::= { guiConfig 1 }
+
+
+        guiAppletSysSwVer OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the system software release that the
+                currently selected GUI applet was designed to run on.
+
+                The system will automatically search for GUI applet files
+                residing in the root directory of flash, and will select the
+                latest available one that is applicable to the currently
+                running system software. This will be the applet that is
+                uploaded to a user's web browser when they initiate use of the
+                GUI."
+            ::= { guiAppletConfig 1 }
+
+
+        guiAppletSwVer OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the software version of the currently
+                selected GUI applet.
+
+                The system will automatically search for GUI applet files
+                residing in the root directory of flash, and will select the
+                latest available one that is applicable to the currently
+                running system software. This will be the applet that is
+                uploaded to a user's web browser when they initiate use of the
+                GUI."
+            ::= { guiAppletConfig 2 }
+
+
+
+    END
+
+--
+-- at-setup.mib
+--
+

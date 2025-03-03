@@ -1,0 +1,15 @@
+os: trendnet
+text: 'TRENDnet Switch'
+type: network
+icon: trendnet
+snmp_bulk: false
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.28866.2.34
+            - .1.3.6.1.4.1.28866.2.46
+            - .1.3.6.1.4.1.28866.2.48
+            - .1.3.6.1.4.1.28866.2.49
+            - .1.3.6.1.4.1.28866.2.51

@@ -1,0 +1,291 @@
+-- *****************************************************************
+-- Dry Contacts MIB
+-- *****************************************************************
+
+SL-DRY-CON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, Counter64,
+	Gauge32 			     			FROM SNMPv2-SMI
+	DisplayString, TruthValue, RowStatus
+								  		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex, ifIndex            	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+	sitelight				      		FROM SL-NE-MIB;
+
+slDryConMib MODULE-IDENTITY
+	LAST-UPDATED "200108070000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the Dry Contacts."
+	::= { sitelight 7 }
+
+        
+slDryConOut      OBJECT IDENTIFIER ::= { slDryConMib 1} 
+slDryConIn       OBJECT IDENTIFIER ::= { slDryConMib 2} 
+slDryConTraps    OBJECT IDENTIFIER ::= { slDryConMib 3} 
+
+-- ******************************************* 
+-- Dry Contact Outputs 
+-- *******************************************  
+
+
+slDryConAlarmCutoff OBJECT-TYPE
+	SYNTAX INTEGER {
+		dummy(1)
+	} 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this variable cause to Alarms Cutoff."
+	::= {slDryConOut 1}        
+
+slDryConOutTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlDryConOutEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "The Dry Contact Out table configure the dry contact outputs."
+     ::= { slDryConOut 2 }
+
+slDryConOutEntry OBJECT-TYPE
+    SYNTAX SlDryConOutEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "There is an entry for each Output Dry Contact" 
+    INDEX   { slDryConOutIndex }
+     ::= { slDryConOutTable 1 }
+
+SlDryConOutEntry ::=
+    SEQUENCE {
+         slDryConOutIndex			   	INTEGER,
+         slDryConOutCommand			   	INTEGER,
+         slDryConOutActiveStatus		TruthValue
+	} 
+	
+
+slDryConOutIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..4)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The index of the output dry contact."
+	::= {slDryConOutEntry 1}        
+
+slDryConOutCommand OBJECT-TYPE
+	SYNTAX INTEGER {
+		activate(1),
+		deactivate(2),
+		clear(3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this object controls the output dry contact state:
+		 	activate(1) - activate the output dry contact
+		 	deactivate(2) - dectivate the output dry contact
+		 	clear(3) - clears the output dry contact command
+		 The object value can also be read by the management. 
+		 In this case the agent should return the current command 
+		 to the management. The object value should not be kept in 
+		 the NVRAM because it is used only for testing.
+		 The intial value should be clear(3)."
+	::= {slDryConOutEntry 2}        
+
+slDryConOutActiveStatus OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current status of the output dry contact:
+			TRUE - means that it is currently active
+			FLASE - means that it is not active"
+	::= {slDryConOutEntry 3}        
+
+-- ******************************************* 
+-- Dry Contact Inputs 
+-- *******************************************  
+
+slDryConLastChange OBJECT-TYPE
+	SYNTAX INTEGER {
+		dummy(1)
+	} 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Sys Uptime at the last input change."
+	::= {slDryConIn 1}        
+
+slDryConInTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlDryConInEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "The Dry Contact In table describes the dry contacts inputs."
+     ::= { slDryConIn 2 }
+
+slDryConInEntry OBJECT-TYPE
+    SYNTAX SlDryConInEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "There is an entry for each Input Dry Contact" 
+    INDEX   { slDryConInIndex }
+     ::= { slDryConInTable 1 }
+
+SlDryConInEntry ::=
+    SEQUENCE {
+         slDryConInIndex			   	INTEGER,
+         slDryConInDescription		   	DisplayString,
+         slDryConInSeverity			   	INTEGER,
+         slDryConInEnable			   	INTEGER,
+         slDryConInPolarity			   	INTEGER,
+         slDryConInStatus			   	INTEGER,
+         slDryConInAlmType				INTEGER
+	} 
+	
+
+slDryConInIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..4)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The index of the input dry contact."
+	::= {slDryConInEntry 1}        
+
+slDryConInDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(0..40))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"A textual description of the input dry contact alarm."
+	REFERENCE
+		"GR-833-CORE Appendix L (<almmsg>)."
+	::= {slDryConInEntry 2}        
+
+slDryConInSeverity OBJECT-TYPE
+	SYNTAX INTEGER {
+		critical(1),
+		major(2),
+		minor(3),
+		cleared(4),
+		notification(5)
+	} 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"A severity of the input dry contact alarm."
+	::= {slDryConInEntry 3}        
+
+slDryConInEnable OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(2)
+	} 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable the input dry contact alarm report generation."
+	::= {slDryConInEntry 4}        
+
+slDryConInPolarity OBJECT-TYPE
+	SYNTAX INTEGER {
+		activeClose(1),
+		activeOpen(2)
+	} 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Determines the input dry contact alarm polarity."
+	::= {slDryConInEntry 5}        
+
+slDryConInStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		active(1),
+		inactive(2)
+	} 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Describe the current input dry contact alarm status."
+	::= {slDryConInEntry 6}        
+
+slDryConInAlmType OBJECT-TYPE
+	SYNTAX INTEGER {
+		aircompr(1),  -- Air compressor failure
+		aircond(2),   -- Air conditioning failure
+		airdryd(3),   -- Air dryer failure
+		batdschrg(4), -- Battery discharging
+		battery(5),   -- Battery failure
+		clfan(6),     -- Cooling fan failure
+		cpmajor(7),   -- Centralized Power Major Environmental Alarm or Major Equipment Failure
+		cpminor(8),   -- Centralized Power Minor Environmental Alarm or Minor Equipment Failure
+		engine(9),    -- Engine failure
+		engoprg(10),  -- Engine operating
+		explgs(11),   -- Explosive gas
+		firdetr(12),  -- Fire detector failure
+		fire(13),     -- Fire
+		flood(14),    -- Flood
+		fuse(15),     -- Fuse failure
+		gen(16),      -- Generator failure
+		hiair(17),    -- High airflow
+		hihum(18),    -- High humidity
+		hitemp(19),   -- High temperature
+		hiwtr(20),    -- High water
+		intruder(21), -- Intrusion
+		lwbatvg(22),  -- Low battery voltage
+		lwfuel(23),   -- Low fuel
+		lwhum(24),    -- Low humidity
+		lwpres(25),   -- Low cable pressure
+		lwtemp(26),   -- Low temperature
+		lwwtr(27),    -- Low water
+		misc(28),     -- Miscellaneous
+		opendr(29),   -- Open door
+		pump(30),     -- Pump failure
+		power(31),    -- Commercial power failure
+		pwrX(32),     -- X Volt power supply failure (X is a positive integer)
+		rect(33),     -- Rectifier failure
+		recthi(34),   -- Rectifier high voltage
+		rectlo(35),   -- Rectifier low voltage
+		smoke(36),    -- Smoke
+		toxicgas(37), -- Toxic gas
+		ventn(38)     -- Ventilation system failure
+	} 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Describe the current input dry contact alarm type."
+	REFERENCE
+		"GR-833-CORE Appendix F Table 1."
+	::= {slDryConInEntry 7}        
+
+
+-- ******************************************* 
+-- Dry Contact Traps 
+-- *******************************************  
+
+slDryConStatusChangeTrap NOTIFICATION-TYPE
+	OBJECTS { slDryConInIndex, slDryConInStatus, slDryConInAlmType }
+	STATUS  current
+	DESCRIPTION
+		"An slDryConStatusChangeTrap notification is sent when
+		the the Status of an input dry contact is changed and the
+		corresponding alarm is enabled.
+		In order to shoten the Trap, the DisplayString that 
+		describes the alarm is not sent. To find out this string
+		the NMS should use the index and get it from the table."
+	::= { slDryConTraps 1 }  
+
+
+
+END
+
+
+

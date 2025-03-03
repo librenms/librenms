@@ -1,0 +1,352 @@
+   BROCADE-VCS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE,
+       Integer32, Gauge32,
+       Counter32, Unsigned32              FROM SNMPv2-SMI
+       MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF
+       TruthValue, TEXTUAL-CONVENTION,
+       DisplayString                      FROM SNMPv2-TC
+       InetAddress, InetAddressType       FROM INET-ADDRESS-MIB
+       FcWwn                              FROM Brocade-TC
+       bcsiModules                        FROM Brocade-REG-MIB;
+
+   brocadeVcsMIB MODULE-IDENTITY
+       LAST-UPDATED "201504080000Z"
+       ORGANIZATION
+              "Brocade Communications Systems Inc."
+       CONTACT-INFO
+              "130 Holger Way,
+               San Jose, CA
+               95134 USA.
+
+               Phone: +1-408-333-8000
+               Email: vivekk@brocade.com"
+       DESCRIPTION
+              "The MIB module for the monitoring of VCS fabrics. VCS 
+               fabrics is a proprietary technology of Brocade.
+
+               A VCS fabric consists of a set of inter-connected 
+               Brocade VDX switches. These set of switches together
+               behave like a single L2 switch to the outside world.
+               The cluster can operate in 2 modes: fabric mode and 
+               Logical chassis mode.
+               In fabric mode, the switches together behave like a 
+               single L2 switch - but configuration on each switch
+               is independent of the other.
+               In logical chassis mode, one switch in the fabric is 
+               elected as the principal switch. All configurations 
+               need to be done only from the principal switch.
+               This is synced across to all the switches in the fabric.
+               Thus the configuration information is the same on all 
+               the switches." 
+
+       REVISION      "201504080000Z"
+       DESCRIPTION
+              "Initial version."
+       ::= { bcsiModules  6 }
+
+   brocadeVcsMIBObjects     OBJECT IDENTIFIER ::= { brocadeVcsMIB 1 }
+   brocadeVcsMIBConformance OBJECT IDENTIFIER ::= { brocadeVcsMIB 2 }
+
+   VcsConfigMode ::= TEXTUAL-CONVENTION
+       STATUS     current
+       DESCRIPTION
+              "The configuration mode that is in effect in the VCS 
+               fabric.
+               local(1) - configuration is local to the switch.
+               distributed(2) - configuration is to be done from the 
+                                principal switch and will be the same
+                                across all the switches in the fabric."
+       SYNTAX INTEGER {
+                local(1),
+                distributed(2)
+       }
+
+   VcsOperationMode ::= TEXTUAL-CONVENTION
+       STATUS     current
+       DESCRIPTION
+              "The operational mode of the fabric.
+               fabricCluster(1) - the entire set of switches in the 
+                                  cluster behaves like a single L2 
+                                  switch to the outer world. However,
+                                  configuration is local to each switch.
+               logicalChassis(2) - in this case the fabric behaves 
+                                   like a single L2 switch and the 
+                                   configuration is driven from the
+                                   principal switch and is the same 
+                                   across all switches in the fabric." 
+       SYNTAX INTEGER {
+                fabricCluster(1),
+                logicalChassis(2)
+       }
+
+   VcsIdentifier ::= TEXTUAL-CONVENTION
+       STATUS     current
+       DESCRIPTION
+              "A number that uniquely identifies a fabric. Two different 
+               fabrics would have different identifiers."
+       SYNTAX Unsigned32 (1 .. 8192)
+
+   VcsRbridgeId ::= TEXTUAL-CONVENTION
+       STATUS     current
+       DESCRIPTION
+              "A number that uniquely identifies a switch within a fabric."
+       SYNTAX Unsigned32 (1 .. 239)
+
+   VcsClusterCondition ::= TEXTUAL-CONVENTION
+       STATUS     current
+       DESCRIPTION
+              "The state of the fabric as a whole.
+               good(1) - indicates that all switches are in good 
+                         condition and cluster is fine.
+               degraded(2) - indicates that one or more switches are 
+                             offline and cluster has degraded.
+               error(3) - Internal error state."
+       SYNTAX INTEGER {
+               good(1),
+               degraded(2),
+               error(3)
+       }
+
+   vcsConfigMode OBJECT-TYPE
+       SYNTAX     VcsConfigMode
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+	      "The configuration mode of this cluster that is in effect."
+   ::=  { brocadeVcsMIBObjects 1 }
+
+   vcsModeOfOperation OBJECT-TYPE
+       SYNTAX     VcsOperationMode
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The operational mode of this cluster."
+   ::= { brocadeVcsMIBObjects 2 }
+
+   vcsIdentifier OBJECT-TYPE
+       SYNTAX     VcsIdentifier
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The unique identifier of this cluster."
+   ::= { brocadeVcsMIBObjects 3 }
+
+   vcsVirtualIpV4Address  OBJECT-TYPE
+       SYNTAX     InetAddress
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The virtual IPv4 address of the cluster. Management 
+               stations can use this address to send requests."
+   ::= { brocadeVcsMIBObjects 4 }
+
+   vcsVirtualIpV6Address OBJECT-TYPE
+       SYNTAX     InetAddress
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The virtual IPv6 address of the cluster. Management 
+               stations can use this address to send requests."
+   ::= { brocadeVcsMIBObjects 5 }
+
+   vcsVirtualIpAssociatedRbridgeId OBJECT-TYPE
+       SYNTAX     VcsRbridgeId
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The rbridge-id of the switch that hosts the virtual IP 
+               address."
+   ::= { brocadeVcsMIBObjects 6 }
+
+   vcsVirtualIpInterfaceId OBJECT-TYPE
+       SYNTAX     Unsigned32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The interface Id that is configured in the case of 
+               inband configuration. If it is not inband configuration,
+               then this object will contain the value 0."
+   ::= { brocadeVcsMIBObjects 7 }
+
+   vcsVirtualIpV4OperStatus OBJECT-TYPE
+       SYNTAX     INTEGER {
+                     up(1),
+                     down(2)
+                  }
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The operational status of the virtual IPv4 address."
+   ::= { brocadeVcsMIBObjects 8 }
+
+   vcsVirtualIpV6OperStatus OBJECT-TYPE
+       SYNTAX     INTEGER {
+	             up(1),
+                     down(2)
+                  }
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The operational status of the virtual IPv6 address."
+   ::= { brocadeVcsMIBObjects 9 }
+
+   vcsNumNodesInCluster OBJECT-TYPE
+       SYNTAX     Unsigned32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The number of switches in the cluster that are currently 
+               online."
+   ::= { brocadeVcsMIBObjects 10 }
+
+   vcsClusterCondition OBJECT-TYPE
+       SYNTAX         VcsClusterCondition
+       MAX-ACCESS     read-only
+       STATUS         current
+       DESCRIPTION
+              "The condition of the cluster as a whole."
+   ::= { brocadeVcsMIBObjects 11 }
+
+   vcsFabricIslTable  OBJECT-TYPE
+      SYNTAX     SEQUENCE OF VcsFabricIslEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+             "This table contains all the ISLs (Inter Switch Link) on 
+              the local device." 
+
+   ::= { brocadeVcsMIBObjects 12 }
+
+   vcsFabricIslEntry OBJECT-TYPE
+      SYNTAX     VcsFabricIslEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+             "Represents a single Inter Switch Link (ISL) on this 
+              switch."
+	  INDEX { vcsFabricIslIndex }
+   ::= { vcsFabricIslTable 1 }
+  
+   VcsFabricIslEntry ::= SEQUENCE {
+      vcsFabricIslIndex           Unsigned32,
+      vcsFabricIslIntfName        DisplayString,
+      vcsFabricIslNbrIntfName     DisplayString,
+      vcsFabricIslNbrWWN          FcWwn,
+      vcsFabricIslNbrName         DisplayString,
+      vcsFabricIslBW              Unsigned32,
+      vcsFabricIslIsTrunk         TruthValue 
+   }
+    
+   vcsFabricIslIndex OBJECT-TYPE
+       SYNTAX     Unsigned32 
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+              "A unique id to distinguish this ISL from others on the 
+               local device."
+       ::= { vcsFabricIslEntry 1 }
+
+   vcsFabricIslIntfName OBJECT-TYPE
+       SYNTAX     DisplayString 
+       MAX-ACCESS read-only 
+       STATUS     current
+       DESCRIPTION
+              "The interface name (ifName) of the interface on which 
+               the ISL is formed on this switch."
+       ::= { vcsFabricIslEntry 2 }
+
+   vcsFabricIslNbrIntfName OBJECT-TYPE
+       SYNTAX     DisplayString 
+       MAX-ACCESS read-only 
+       STATUS     current
+       DESCRIPTION
+	      "The interface name (ifName) of the interface on the 
+               neighboring switch for this ISL."
+       ::= { vcsFabricIslEntry 3 }
+
+   vcsFabricIslNbrWWN OBJECT-TYPE
+       SYNTAX     FcWwn 
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The World Wide Name (WWN) of the neighboring switch 
+               for this ISL."
+       ::= { vcsFabricIslEntry 4 }
+
+   vcsFabricIslNbrName  OBJECT-TYPE
+       SYNTAX     DisplayString
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The name of the neighboring switch on which this ISL 
+               is formed."
+       ::= { vcsFabricIslEntry 5 }
+
+   vcsFabricIslBW  OBJECT-TYPE
+       SYNTAX     Unsigned32
+       UNITS      "megabytes"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "The band-width of this ISL."
+       ::= { vcsFabricIslEntry 6 }
+
+   vcsFabricIslIsTrunk  OBJECT-TYPE
+       SYNTAX     TruthValue 
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+              "An indication whether this ISL is a trunk interface.
+               A value of true(1) means it is a trunk.
+               A value of false(2) means it is not a trunk."
+       ::= { vcsFabricIslEntry 7 }
+
+   --  Conformance information
+
+   brocadeVcsConformanceGroups
+        OBJECT IDENTIFIER ::= { brocadeVcsMIBConformance 1 }
+
+   brocadeVcsCompliances
+        OBJECT IDENTIFIER ::= { brocadeVcsMIBConformance 2 }
+
+   --  Compliance statements
+
+   brocadeVcsCompliance MODULE-COMPLIANCE
+      STATUS     current
+      DESCRIPTION
+             "The compliance information for this MIB."
+      MODULE -- this module
+      MANDATORY-GROUPS { brocadeVcsObjectsGroup }
+
+      ::= { brocadeVcsCompliances 1 }
+
+   -- units of conformance
+
+   brocadeVcsObjectsGroup OBJECT-GROUP
+       OBJECTS { vcsConfigMode,
+                 vcsModeOfOperation,
+                 vcsIdentifier,
+                 vcsVirtualIpV4Address,
+                 vcsVirtualIpV6Address,
+                 vcsVirtualIpAssociatedRbridgeId,
+                 vcsVirtualIpInterfaceId,
+                 vcsVirtualIpV4OperStatus,
+                 vcsVirtualIpV6OperStatus,
+                 vcsNumNodesInCluster,
+                 vcsClusterCondition,
+                 vcsFabricIslIndex,
+                 vcsFabricIslIntfName,
+                 vcsFabricIslNbrIntfName, 
+                 vcsFabricIslNbrWWN, 
+                 vcsFabricIslNbrName, 
+                 vcsFabricIslBW, 
+                 vcsFabricIslIsTrunk
+           }
+       STATUS     current
+       DESCRIPTION
+              "The MIB objects related  to VCS monitoring."
+       ::= { brocadeVcsConformanceGroups 1 }
+
+   END

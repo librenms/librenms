@@ -11,7 +11,7 @@ IMPORTS
     TruthValue, DisplayString, RowStatus    FROM SNMPv2-TC;
 
 rlEmbWeb MODULE-IDENTITY
-         LAST-UPDATED "200607030000Z"
+         LAST-UPDATED "200607030001Z"
          ORGANIZATION "Cisco Systems, Inc."
 
          CONTACT-INFO
@@ -415,7 +415,8 @@ RlEmWebServiceEntry ::= SEQUENCE {
     rlEmWebServiceMaxUsers       INTEGER,
     rlEmWebServiceProtocol       RlEmbWebProtocol,
     rlEmWebServiceCertificateId  INTEGER,
-    rlEmWebServiceMaxIdleTimeOut INTEGER
+    rlEmWebServiceMaxIdleTimeOut INTEGER,
+    rlEmWebServiceMaxHardTimeOut INTEGER
 }
 
 rlEmWebServiceId OBJECT-TYPE
@@ -500,6 +501,45 @@ rlEmWebServiceMaxIdleTimeOut OBJECT-TYPE
          will cause the service to go back to it's initialization value."
     DEFVAL  { 3932160 }
     ::=  { rlEmWebServiceEntry 8 }
+
+rlEmWebServiceMaxHardTimeOut OBJECT-TYPE
+    SYNTAX  INTEGER (0..3932160)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "A user connected to the device via an HTTP session is
+         automatically logged out after this amount of time (in seconds) regardless of the amount of HTTP activity.
+         Maximal value is 168 hours.
+         The value 0 is supported as 'no timeout'. Setting this field to 3932160
+         will cause the service to go back to it's initialization value."
+    DEFVAL  { 3932160 }
+    ::=  { rlEmWebServiceEntry 9 }
+
+
+
+rlEmWebMaxHardTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (0..604800)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "A user connected to the device via an HTTP session is
+         automatically logged out after this amount of time regardless of the amount of HTTP activity.
+         Maximal value is 168 hours.
+         The value 0 is supported as 'no timeout'."
+    DEFVAL  { 86400 }
+    ::= { rlEmbWeb 31 }
+
+rlEmWebMaxHttpsHardTimeout OBJECT-TYPE
+    SYNTAX  INTEGER (0..604800)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "A user connected to the device via an HTTPS session is
+         automatically logged out after this amount of time regardless of the amount of HTTPS activity.
+         Maximal value is 168 hours.
+         The value 0 is supported as 'no timeout'."
+    DEFVAL  { 86400 }
+    ::= { rlEmbWeb 32 }
 
 END
 

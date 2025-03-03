@@ -1,0 +1,60 @@
+-- ============================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Arp source suppression MIB.
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2013-10-14
+--   Initial version, created by yanjun
+-- ============================================================================
+HH3C-ARP-SOURCE-SUPPRESSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+    FROM SNMPv2-SMI
+        TruthValue
+    FROM SNMPv2-TC;
+
+-- Node definitions
+hh3cARPSourceSuppression MODULE-IDENTITY
+    LAST-UPDATED "201310141800Z"        -- OCT 14, 2013 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB file is to provide the definition of the ARP source
+        suppression. "
+    REVISION "201310141800Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 146 }
+
+hh3cARPSourceSuppressionObjects OBJECT IDENTIFIER ::= { hh3cARPSourceSuppression 1 }
+
+hh3cARPSourceSuppressionGlobal OBJECT IDENTIFIER  ::= { hh3cARPSourceSuppressionObjects 1 }
+
+hh3cARPSourceSuppressionEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable ARP source suppression function."
+    ::= { hh3cARPSourceSuppressionGlobal 1 }
+
+hh3cARPSourceSuppressionLimit OBJECT-TYPE
+    SYNTAX      Unsigned32(2..1024)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set the maximum number of unresolvable packets that the device
+         can receive from a device in five seconds."
+    DEFVAL { 10 }
+    ::= { hh3cARPSourceSuppressionGlobal 2 }
+END

@@ -1,0 +1,722 @@
+-- ============================================================================
+-- ATKK-WLAN-ACCESS.MIB, Allied Telesis enterprise MIB: Wireless access point
+-- Copyright (C) 2010-2016 by Allied Telesis Holdings K.K.
+-- All rights reserved.
+--
+-- Version      : 1.6.3
+-- Description  : Private MIB for wireless access point listed below.
+--              : AT-TQ2403, AT-TQ2403EX, AT-TQ2450, AT-TQ3600,
+--              : AT-TQ3200, AT-TQ3400,   AT-TQ4400, AT-TQ4600, AT-TQ4400e
+-- ============================================================================
+
+ATKK-WLAN-ACCESS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    wirelessLanmMIB,
+    wirelesslan
+        FROM AT-SMI-MIB
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    Integer32,
+    enterprises,
+    Counter32 
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    MacAddress 
+        FROM SNMPv2-TC;
+
+atkkWlanAccess MODULE-IDENTITY
+    LAST-UPDATED "201605250000Z"
+    ORGANIZATION "Allied Telesis K.K."
+    CONTACT-INFO
+        "http://www.allied-telesis.co.jp"
+
+    DESCRIPTION
+        "Private MIB for the AT-TQ series wireless access point."
+
+    REVISION "201605250000Z"
+    DESCRIPTION
+        "1.6.3: - Fixed MIB structure error."
+
+    REVISION "201603230000Z"
+    DESCRIPTION
+        "1.6.2: - Added radar detected channels to DFS radar detection trap."
+
+    REVISION "201506170000Z"
+    DESCRIPTION
+        "1.6.1: - Supported trap for DFS Radar detection."
+
+    REVISION "201505110000Z"
+    DESCRIPTION
+        "1.6.0: - Supported AT-TQ4400e."
+
+    REVISION "201409300000Z"
+    DESCRIPTION
+        "1.5.1: - Changed to import AT-SMI-MIB from ATKK-WLAN-SMI-MIB."
+
+    REVISION "201311220000Z"
+    DESCRIPTION
+        "1.5.0: - Supported AT-TQ3200/AT-TQ3400/AT-TQ4400/AT-TQ4600.
+                - Added 11ac to atkkWiAcClient80211Spec and
+                  atkkWiAcAP80211Spec."
+
+    REVISION "201208130000Z"
+    DESCRIPTION
+        "1.4.0: - Supported AT-TQ3600."
+
+    REVISION "201207090000Z"
+    DESCRIPTION
+        "1.3.2: - Supported atkkWiAcAPDetectConfig2 for TQ2450 wlan1 AP detect 
+                  configuration."
+
+    REVISION "201206060000Z"
+    DESCRIPTION
+        "1.3.1: - Expand the range of TrapHostString and CommunityString to 256."
+
+    REVISION "201201110000Z"
+    DESCRIPTION
+        "1.3.0: - Supported AT-TQ2450.
+                - Added 11n to atkkWiAcClient80211Spec and
+                  atkkWiAcClient80211Spec."
+
+    REVISION "201104080000Z"
+    DESCRIPTION
+        "1.2.0: - Supported AT-TQ2403EX."
+
+    REVISION "201008200000Z"
+    DESCRIPTION
+        "1.1.0: - Supported UserID by the Associated-STAs 
+                  information, STA Associated/Disassociated trap 
+                  and Filtered STA trap.
+                - Added RADIUS Authentication result trap.
+                - Added trap config by the AP information.
+                - Standardized the file head.
+                - Corrected typo."
+
+    REVISION "200907280000Z" -- YYYYMMDDHHMMZ
+    DESCRIPTION
+        "1.0.0: Initial release."
+    ::= { wirelessLanmMIB 6 }
+
+
+tq2403          OBJECT IDENTIFIER ::= { wirelesslan 13 }
+tq2450          OBJECT IDENTIFIER ::= { wirelesslan 19 }
+tq2403ex        OBJECT IDENTIFIER ::= { wirelesslan 20 }
+tq3600          OBJECT IDENTIFIER ::= { wirelesslan 22 }
+tq3200          OBJECT IDENTIFIER ::= { wirelesslan 24 }
+tq3400          OBJECT IDENTIFIER ::= { wirelesslan 25 }
+tq4400          OBJECT IDENTIFIER ::= { wirelesslan 26 }
+tq4600          OBJECT IDENTIFIER ::= { wirelesslan 27 }
+tq4400e         OBJECT IDENTIFIER ::= { wirelesslan 34 }
+
+
+--
+-- textual conventions
+--
+
+SsidString ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is string for SSID(Service Set ID)."
+    SYNTAX OCTET STRING (SIZE (0..32))
+
+UserIdString ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is string for RADIUS UserID."
+    SYNTAX OCTET STRING (SIZE (0..255))
+
+TrapHostString ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is string for trap host IP address/hostname."
+    SYNTAX OCTET STRING (SIZE (1..256))
+
+CommunityString ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is string for trap community."
+    SYNTAX OCTET STRING (SIZE (1..256))
+
+TrapString ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is string for trap messages."
+    SYNTAX OCTET STRING (SIZE (1..256))
+
+ChannelString ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This type is string for channels which detected radar."
+    SYNTAX OCTET STRING (SIZE (1..32))
+
+--
+-- MIB module version (for NMS convenience)
+--
+
+atkkWiAcVersion OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The version number of this MIB module"
+    ::= { atkkWlanAccess 1 }
+
+
+--
+-- AP information
+--
+
+atkkWiAcApInfo OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "AP information"
+    ::= { atkkWlanAccess 6 }
+
+atkkWiAcApInfoTrapTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AtkkWiAcApInfoTrapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table that contains information about 
+               a trap configuration of this AP."
+    ::= { atkkWiAcApInfo 1 }
+
+atkkWiAcApInfoTrapEntry OBJECT-TYPE
+    SYNTAX AtkkWiAcApInfoTrapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about a trap configuration."
+    INDEX
+    {
+      atkkWiAcApTrapHost
+    }
+    ::= { atkkWiAcApInfoTrapTable 1 }
+
+AtkkWiAcApInfoTrapEntry ::=
+    SEQUENCE
+    {
+      atkkWiAcApTrapHost                    TrapHostString,
+      atkkWiAcApTrapCommunity               CommunityString,
+      atkkWiAcApTrapColdStartConfig         INTEGER,
+      atkkWiAcApTrapLinkConfig              INTEGER,
+      atkkWiAcApTrapAuthenticationConfig    INTEGER,
+      atkkWiAcApTrapAssociationConfig       INTEGER,
+      atkkWiAcApTrapUnknownApConfig         INTEGER,
+      atkkWiAcApTrapFilteredStaConfig       INTEGER,
+      atkkWiAcApTrapRadiusAuthSuccessConfig INTEGER,
+      atkkWiAcApTrapRadiusAuthFailConfig    INTEGER,
+      atkkWiAcApTrapDfsDetectedConfig       INTEGER
+    }
+
+atkkWiAcApTrapHost OBJECT-TYPE
+    SYNTAX TrapHostString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "TrapHost configuration of this AP."
+    ::= { atkkWiAcApInfoTrapEntry 1 }
+
+atkkWiAcApTrapCommunity OBJECT-TYPE
+    SYNTAX CommunityString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "TrapCommunity configuration of this AP."
+    ::= { atkkWiAcApInfoTrapEntry 2 }
+
+atkkWiAcApTrapColdStartConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable configuration of the ColdStart trap."
+    ::= { atkkWiAcApInfoTrapEntry 3 }
+
+atkkWiAcApTrapLinkConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable configuration of the Link up/down trap."
+    ::= { atkkWiAcApInfoTrapEntry 4 }
+
+atkkWiAcApTrapAuthenticationConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable configuration of the Authentication trap."
+    ::= { atkkWiAcApInfoTrapEntry 5 }
+
+atkkWiAcApTrapAssociationConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable configuration of 
+                an STA Association/Disassociation trap."
+    ::= { atkkWiAcApInfoTrapEntry 6 }
+
+atkkWiAcApTrapUnknownApConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable configuration of an Unknown AP detection trap."
+    ::= { atkkWiAcApInfoTrapEntry 7 }
+
+atkkWiAcApTrapFilteredStaConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable configuration of a Filtered STA detection trap."
+    ::= { atkkWiAcApInfoTrapEntry 8 }
+
+atkkWiAcApTrapRadiusAuthSuccessConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable configuration of the RADIUS Authentication success trap."
+    ::= { atkkWiAcApInfoTrapEntry 9 }
+
+atkkWiAcApTrapRadiusAuthFailConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable configuration of the RADIUS Authentication fail trap."
+    ::= { atkkWiAcApInfoTrapEntry 10 }
+
+atkkWiAcApTrapDfsDetectedConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable configuration of the DFS Detected trap."
+    ::= { atkkWiAcApInfoTrapEntry 11 }
+
+
+--
+-- Associated-STAs information
+--
+
+atkkWiAcClients OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Connected Stations List.
+         This list consists of entries which describe STAs which are
+         currently connected (associated) to the AP."
+    ::= { atkkWlanAccess 2 }
+
+atkkWiAcClientTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AtkkWiAcClientEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains information about STAs
+                 which are currently connected to the AP."
+    ::= { atkkWiAcClients 1 }
+     
+atkkWiAcClientEntry OBJECT-TYPE
+    SYNTAX AtkkWiAcClientEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about a STA."
+    INDEX
+    {
+      atkkWiAcClientAddress
+    }
+    ::= { atkkWiAcClientTable 1 }
+
+AtkkWiAcClientEntry ::=
+    SEQUENCE
+    {
+      atkkWiAcClientAddress   MacAddress,
+      atkkWiAcClientSSID      SsidString,
+      atkkWiAcClient80211Spec INTEGER,
+      atkkWiAcClientChannel   Integer32,
+      atkkWiAcClientAge       Counter32,
+      atkkWiAcClientUserID    UserIdString
+    }
+
+atkkWiAcClientAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC address identifying a peer STA."
+    ::= { atkkWiAcClientEntry 1 }
+
+atkkWiAcClientSSID OBJECT-TYPE
+    SYNTAX SsidString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSID to which the STA is associated."
+    ::= { atkkWiAcClientEntry 2 }
+
+atkkWiAcClient80211Spec OBJECT-TYPE
+    SYNTAX INTEGER {
+      unknown(1),
+      dot11b(2),
+      dot11g(3),
+      dot11a(4),
+      dot11ng(5),
+      dot11na(6),
+      dot11ac(7)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "802.11 technology which the STA is using."
+    ::= { atkkWiAcClientEntry 3 }
+
+atkkWiAcClientChannel OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The radio channel which the STA is using."
+    ::= { atkkWiAcClientEntry 4 }
+
+atkkWiAcClientAge OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Time (in seconds) since the STA was associated."
+    ::= { atkkWiAcClientEntry 5 }
+
+atkkWiAcClientUserID OBJECT-TYPE
+    SYNTAX UserIdString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "UserID of the STA which is associated."
+    ::= { atkkWiAcClientEntry 6 }
+
+--
+-- Neighbor AP information
+--
+
+atkkWiAcAPs OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Neighboring APs List. 
+         This list consists of entries which describe APs which is
+         found by the AP."
+    ::= { atkkWlanAccess 3 }
+
+atkkWiAcAPTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AtkkWiAcAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains information about APs
+         nearby."
+    ::= { atkkWiAcAPs 1 }
+     
+atkkWiAcAPEntry OBJECT-TYPE
+    SYNTAX AtkkWiAcAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about a neighboring AP."
+    INDEX
+    {
+      atkkWiAcAPAddress
+    }
+    ::= { atkkWiAcAPTable 1 }
+
+AtkkWiAcAPEntry ::=
+    SEQUENCE
+    {
+      atkkWiAcAPAddress       MacAddress,
+      atkkWiAcAPSSID          SsidString,
+      atkkWiAcAP80211Spec     INTEGER,
+      atkkWiAcAPChannel       Integer32,
+      atkkWiAcAPRSSI          Integer32,
+      atkkWiAcAPRadarDetected TrapString,
+      atkkWiAcAPChannels      ChannelString
+    }
+
+atkkWiAcAPAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC address of the neighbor AP."
+    ::= { atkkWiAcAPEntry 1 }
+
+atkkWiAcAPSSID OBJECT-TYPE
+    SYNTAX SsidString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSID of the neighbor AP."
+    ::= { atkkWiAcAPEntry 2 }
+
+atkkWiAcAP80211Spec OBJECT-TYPE
+    SYNTAX INTEGER {
+      unknown(1),
+      dot11b(2),
+      dot11g(3),
+      dot11a(4),
+      dot11ng(5),
+      dot11na(6),
+      dot11ac(7)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "802.11 technology which the neighbor AP is using."
+    ::= { atkkWiAcAPEntry 3 }
+
+atkkWiAcAPChannel OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The radio channel which the neighbor AP is using."
+    ::= { atkkWiAcAPEntry 4 }
+
+atkkWiAcAPRSSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "RSSI (signal strength) of the neighbor AP."
+    ::= { atkkWiAcAPEntry 5 }
+
+atkkWiAcAPRadarDetected OBJECT-TYPE
+    SYNTAX TrapString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The message of Radar Detected."
+    ::= { atkkWiAcAPEntry 6 }
+
+atkkWiAcAPChannels OBJECT-TYPE
+    SYNTAX ChannelString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The channels of Radar Detected."
+    ::= { atkkWiAcAPEntry 7 }
+
+atkkWiAcAPDetectConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The enable/disable configuration of the Neighbor AP detection.
+         wlan0/wlan1 for TQ2403/EX
+         wlan0 for TQ2450/TQ3600/TQ3200/TQ3400/TQ4400/TQ4600/TQ4400e"
+    ::= { atkkWiAcAPs 2 }
+
+atkkWiAcAPDetectConfig2 OBJECT-TYPE
+    SYNTAX INTEGER {
+      enabled(1),
+      disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The enable/disable configuration of the Neighbor AP detection.
+         wlan1 for TQ2450/TQ3600/TQ3400/TQ4400/TQ4600/TQ4400e"
+    ::= { atkkWiAcAPs 3 }
+
+--
+-- MAC address filters (ACL)
+--
+
+atkkWiAcMacACL OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "MAC address filters List."
+    ::= { atkkWlanAccess 4 }
+
+atkkWiAcMacACLTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AtkkWiAcMacACLEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains MAC address filters."
+    ::= { atkkWiAcMacACL 1 }
+
+atkkWiAcMacACLEntry OBJECT-TYPE
+    SYNTAX AtkkWiAcMacACLEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "MAC address filter."
+    INDEX
+    {
+      atkkWiAcMacACLAddress
+    }
+    ::= { atkkWiAcMacACLTable 1 }
+
+AtkkWiAcMacACLEntry ::=
+    SEQUENCE
+    {
+      atkkWiAcMacACLAddress MacAddress
+    }
+
+atkkWiAcMacACLAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC address which is filtered."
+    ::= { atkkWiAcMacACLEntry 1 }
+
+atkkWiAcMacACLModeConfig OBJECT-TYPE
+    SYNTAX INTEGER {
+      deny(1),
+      accept(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The mode configuration of the MAC filtering."
+    ::= { atkkWiAcMacACL 2 }
+
+--
+-- Private Notifications(Traps)
+--
+
+atkkWiAcNotification            OBJECT IDENTIFIER ::= { atkkWlanAccess 5 }
+
+atkkWiAcNotificationObjects     OBJECT IDENTIFIER ::= { atkkWiAcNotification 0 }
+
+atkkWiAcAssociated NOTIFICATION-TYPE
+    OBJECTS {
+      atkkWiAcClientAddress,
+      atkkWiAcClientSSID,
+      atkkWiAcClient80211Spec,
+      atkkWiAcClientChannel,
+      atkkWiAcClientAge,
+      atkkWiAcClientUserID
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is sent when a STA was connected."
+    ::= { atkkWiAcNotificationObjects 1 }
+
+atkkWiAcDisassociated NOTIFICATION-TYPE
+    OBJECTS {
+      atkkWiAcClientAddress,
+      atkkWiAcClientSSID,
+      atkkWiAcClient80211Spec,
+      atkkWiAcClientChannel,
+      atkkWiAcClientAge,
+      atkkWiAcClientUserID
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is sent when a STA was disconnected."
+    ::= { atkkWiAcNotificationObjects 2 }
+
+atkkWiAcUnknownAP NOTIFICATION-TYPE
+    OBJECTS {
+      atkkWiAcAPAddress,
+      atkkWiAcAPSSID,
+      atkkWiAcAP80211Spec,
+      atkkWiAcAPChannel,
+      atkkWiAcAPRSSI
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is sent when an unknown AP was detected."
+    ::= { atkkWiAcNotificationObjects 3 }
+
+atkkWiAcFiltered NOTIFICATION-TYPE
+    OBJECTS {
+      atkkWiAcClientAddress,
+      atkkWiAcClientSSID,
+      atkkWiAcClient80211Spec,
+      atkkWiAcClientChannel,
+      atkkWiAcClientAge,
+      atkkWiAcClientUserID
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is sent when an STA was denied by MAC filters."
+    ::= { atkkWiAcNotificationObjects 4 }
+
+atkkWiAcRadiusAuthSucceeded NOTIFICATION-TYPE
+    OBJECTS {
+      atkkWiAcClientAddress,
+      atkkWiAcClientSSID,
+      atkkWiAcClientUserID
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is sent when RADIUS authentication of 
+              an STA succeeded."
+    ::= { atkkWiAcNotificationObjects 5 }
+
+atkkWiAcRadiusAuthFailed NOTIFICATION-TYPE
+    OBJECTS {
+      atkkWiAcClientAddress,
+      atkkWiAcClientSSID,
+      atkkWiAcClientUserID
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is sent when RADIUS authentication of 
+              an STA failed."
+    ::= { atkkWiAcNotificationObjects 6 }
+
+atkkWiAcRadarDetected NOTIFICATION-TYPE
+    OBJECTS {
+      atkkWiAcAPRadarDetected,
+      atkkWiAcAPChannels
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is sent when Radar detected."
+    ::= { atkkWiAcNotificationObjects 7 }
+
+END
+
+--
+-- ATKK-WLAN-ACCESS
+--

@@ -1,0 +1,387 @@
+ARRIS-D5-TEST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, DateAndTime
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE         
+        FROM SNMPv2-CONF            
+    arrisD5UEQam
+        FROM ARRIS-MIB;
+
+    d5TestMIB  MODULE-IDENTITY
+        LAST-UPDATED "200901150000Z" -- 15th January 2009
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB returns a table of test results that have been run on the
+             D5-UEQAM. It reports general pass or fail test results as well as
+             test specific result information.
+             It also allows for tests to be configured and run to support diagnostics
+             and the manufacturing process."
+        REVISION "200812010000Z"
+        DESCRIPTION "Initial version"
+        ::= { arrisD5UEQam 19 }
+
+    D5TestState ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A type definition for controlling test state."
+        SYNTAX    INTEGER {
+                            idle(0),
+                            start(1),
+                            stop(2),
+                            startCategory(3),
+                            startSlot(4),
+                            startAll(5),
+                            clearCategory(6),
+                            clearSlot(7),
+                            clearAll(8)
+                          }
+
+    D5TestStatus ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A type definition for current test state."
+        SYNTAX    INTEGER {
+                            complete(1),
+                            skipped(2),
+                            notRun(3),
+                            running(4),
+                            stopped(5),
+                            continuous(6)
+                          }
+
+    D5TestResult ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A type definition for simple test results."
+        SYNTAX    INTEGER {
+                            passed(1),
+                            failed(2),
+                            notAvailable(3),
+                            incomplete(4)
+                          }
+        
+    d5TestControl OBJECT IDENTIFIER ::= { d5TestMIB 1 }
+        
+    d5TestControlSlot OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Slot number on which to perform a test"
+        ::= { d5TestControl 1 }
+        
+    d5TestControlCategory OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Category of test to configure"
+        ::= { d5TestControl 2 }
+        
+    d5TestControlNumber OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Test number of test to configure"
+        ::= { d5TestControl 3 }
+        
+    d5TestControlState OBJECT-TYPE
+        SYNTAX      D5TestState
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "State to set for the test."
+        ::= { d5TestControl 4 }
+        
+    d5TestControlIterations OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Number of times to run the test. 0 to run repeatedly until stopped."
+        ::= { d5TestControl 5 }
+        
+    d5TestControlArg0 OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Optional argument to control test behaviour"
+        ::= { d5TestControl 6 }
+        
+    d5TestControlArg1 OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Optional argument to control test behaviour"
+        ::= { d5TestControl 7 }
+        
+    d5TestControlArg2 OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Optional argument to control test behaviour"
+        ::= { d5TestControl 8 }
+        
+    d5TestControlArg3 OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Optional argument to control test behaviour"
+        ::= { d5TestControl 9 }
+
+    d5TestResultTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF D5TestResultEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+        "This table contains a list of D5 test-results."
+        ::= { d5TestMIB 2 }
+        
+    d5TestResultEntry  OBJECT-TYPE
+        SYNTAX  D5TestResultEntry
+        MAX-ACCESS  not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry for a single categorised test and corresponding result."
+        INDEX { d5TestSlot, d5TestCategory, d5TestNumber }
+        ::= { d5TestResultTable 1 }
+        
+    D5TestResultEntry ::= SEQUENCE {
+        d5TestSlot              Unsigned32,
+        d5TestCategory          Unsigned32,
+        d5TestNumber            Unsigned32,
+        d5TestDescr             DisplayString,
+        d5TestStatus            D5TestStatus,
+        d5TestLastRunTime       DateAndTime,
+        d5TestResult            D5TestResult,
+        d5TestResultVector0     Unsigned32,
+        d5TestResultVector1     Unsigned32,
+        d5TestResultVector2     Unsigned32,
+        d5TestResultVector3     Unsigned32,
+        d5TestResultVector4     Unsigned32,
+        d5TestResultVector5     Unsigned32,
+        d5TestResultVector6     Unsigned32,
+        d5TestResultVector7     Unsigned32,
+        d5TestResultVector8     Unsigned32,
+        d5TestResultVector9     Unsigned32,
+        d5TestResultVector10    Unsigned32,
+        d5TestResultVector11    Unsigned32,
+        d5TestResultVector12    Unsigned32,
+        d5TestResultVector13    Unsigned32,
+        d5TestResultVector14    Unsigned32,
+        d5TestResultVector15    Unsigned32
+    }
+    d5TestSlot  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "D5 slot containing the card on which the test was run"
+        ::= { d5TestResultEntry 1 }
+    d5TestCategory  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Test category"
+        ::= { d5TestResultEntry 2 }
+    d5TestNumber  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Test number, unique withing this test category."
+        ::= { d5TestResultEntry 3 }
+    d5TestDescr  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Brief description of the test"
+        ::= { d5TestResultEntry 4 }
+    d5TestStatus  OBJECT-TYPE
+        SYNTAX      D5TestStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current state of this test"
+        ::= { d5TestResultEntry 5 }
+    d5TestLastRunTime  OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Last time this test was run"
+        ::= { d5TestResultEntry 6 }
+    d5TestResult  OBJECT-TYPE
+        SYNTAX      D5TestResult
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Test result summary"
+        ::= { d5TestResultEntry 7 }
+    d5TestResultVector0  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 8 }
+    d5TestResultVector1  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 9 }
+    d5TestResultVector2  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 10 }
+    d5TestResultVector3  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 11 }       
+    d5TestResultVector4  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 12 }
+    d5TestResultVector5  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 13 }
+    d5TestResultVector6  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 14 }
+    d5TestResultVector7  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 15 }       
+    d5TestResultVector8  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 16 }
+    d5TestResultVector9  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 17 }
+    d5TestResultVector10  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 18 }
+    d5TestResultVector11  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 19 }       
+    d5TestResultVector12  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 20 }
+    d5TestResultVector13  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 21 }
+    d5TestResultVector14  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 22 }
+    d5TestResultVector15  OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Result data specific to the test in this row"
+        ::= { d5TestResultEntry 23 }       
+
+-- ------------------------------------------------------------------------
+-- Conformance section
+-- ------------------------------------------------------------------------
+        
+        d5TestMibConformance OBJECT IDENTIFIER ::= { d5TestMIB 99 }
+
+        
+        d5TestMibGroups OBJECT IDENTIFIER ::= { d5TestMibConformance 1 }
+
+        
+        d5TestMibGroup OBJECT-GROUP
+            OBJECTS { d5TestControlSlot, d5TestControlCategory, d5TestControlNumber,
+                      d5TestControlState, d5TestControlIterations, d5TestControlArg0,
+                      d5TestControlArg1, d5TestControlArg2, d5TestControlArg3,
+                      d5TestDescr, d5TestStatus, d5TestLastRunTime, d5TestResult,
+                      d5TestResultVector1, d5TestResultVector2, d5TestResultVector3,
+                      d5TestResultVector4 }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { d5TestMibGroups 1 }
+        
+        d5TestMibCompliances OBJECT IDENTIFIER ::= { d5TestMibConformance 2 }
+
+        
+        d5TestMibCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            MODULE -- this module
+                MANDATORY-GROUPS { d5TestMibGroup }
+            ::= { d5TestMibCompliances 1 }
+
+
+ END

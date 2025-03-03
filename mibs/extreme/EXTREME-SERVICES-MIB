@@ -1,0 +1,412 @@
+
+-- ===================================================
+--
+-- Extreme Services
+--
+
+EXTREME-SERVICES-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE    FROM SNMPv2-SMI
+        InetAddressType, InetAddress    FROM INET-ADDRESS-MIB
+        extremeAgent                    FROM EXTREME-BASE-MIB
+        TruthValue, RowStatus           FROM SNMPv2-TC;
+
+        
+        extremeServices MODULE-IDENTITY
+                      LAST-UPDATED "0007240000Z"
+                      ORGANIZATION "Extreme Networks, Inc."
+                      CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme Upper layer services objects"
+        ::= { extremeAgent 26 }
+
+	extremeSyslog OBJECT IDENTIFIER ::= {extremeServices 1} 
+	extremeDNS OBJECT IDENTIFIER ::= {extremeServices 3} 
+    extremeAuthServer   OBJECT IDENTIFIER ::= {extremeServices 4}
+
+	AuthServerType ::= TEXTUAL-CONVENTION
+	  STATUS	current
+	  DESCRIPTION
+		"The type of authentication/accounting server."
+	  SYNTAX INTEGER { radius(1), radius-acct(2), tacacs(3), tacacs-acct(4) }
+
+	AuthServerAccessType ::= TEXTUAL-CONVENTION
+	  STATUS	current
+	  DESCRIPTION
+		"Specifies whether the server is for authenticating mangement or netlogin accesses"
+	  SYNTAX INTEGER { mgmt-access(1), netlogin(2) }
+
+        extremeRemoteSyslogServerTable      OBJECT-TYPE
+            SYNTAX       SEQUENCE OF ExtremeRemoteSyslogServerEntry
+            MAX-ACCESS          not-accessible
+            STATUS              current
+            DESCRIPTION     
+                "This table is used to configure remote syslog 
+		servers and contains information on the same."
+            ::= { extremeSyslog 1 }
+
+        extremeRemoteSyslogServerEntry      OBJECT-TYPE
+            SYNTAX              ExtremeRemoteSyslogServerEntry
+            MAX-ACCESS          not-accessible
+            STATUS              current
+            DESCRIPTION
+                "An entry in the extremeRemoteSyslogServerTable."
+            INDEX { extremeRemoteSyslogServerAddressType, 				     	     
+	    	    extremeRemoteSyslogServerAddress,
+                    extremeRemoteSyslogServerPort, 			                 
+		    extremeRemoteSyslogServerFacility
+                    }
+            ::= { extremeRemoteSyslogServerTable 1 }
+
+        ExtremeRemoteSyslogServerEntry ::= SEQUENCE {
+                extremeRemoteSyslogServerAddressType InetAddressType,
+                extremeRemoteSyslogServerAddress     InetAddress,
+                extremeRemoteSyslogServerPort        INTEGER,
+                extremeRemoteSyslogServerFacility    INTEGER,
+                extremeRemoteSyslogServerSeverity    BITS,
+                extremeRemoteSyslogServerStatus      RowStatus
+        }
+         
+        extremeRemoteSyslogServerAddressType          OBJECT-TYPE
+                SYNTAX                          InetAddressType
+                MAX-ACCESS                      read-only
+                STATUS                          current
+                DESCRIPTION
+                    "The type of address specified in the object 				
+		    'extremeRemoteSyslogServerAddress'.
+                    Currently, only 'ipv4' and 'dns' are supported."
+                DEFVAL { ipv4 }
+            ::= { extremeRemoteSyslogServerEntry 1 }
+
+      extremeRemoteSyslogServerAddress           OBJECT-TYPE
+                SYNTAX                  InetAddress (SIZE (1..255))
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION
+                    "The address of the remote syslog server. This 
+		    can be a DNS name or an IPv4 address." 
+                    
+            ::= { extremeRemoteSyslogServerEntry 2 }
+
+     extremeRemoteSyslogServerPort                    OBJECT-TYPE
+                SYNTAX                          INTEGER (0..65535)
+                MAX-ACCESS                      read-only
+                STATUS                          current
+                DESCRIPTION
+                    "The UDP port number of the remote syslog server 				
+		    to which syslog messages will
+                    be sent."
+            ::= { extremeRemoteSyslogServerEntry 3 }
+
+      extremeRemoteSyslogServerFacility               OBJECT-TYPE
+                SYNTAX                          INTEGER {
+                                                local0(1),
+                                                local1(2),
+                                                local2(3),
+                                                local3(4),
+                                                local4(5),
+                                                local5(6),
+                                                local6(7),
+                                                local7(8)
+                                                }
+                MAX-ACCESS                      read-only
+                STATUS                          current
+                DESCRIPTION
+                    "The facility which will be sent in all syslog 				
+		    messages to this remote syslog server."
+            ::= { extremeRemoteSyslogServerEntry 4 }
+
+      extremeRemoteSyslogServerSeverity               OBJECT-TYPE
+            SYNTAX  BITS { 
+				critical(0),
+				error(1),
+				warning(2),
+				notice(3),
+				info(4),
+				debugSummary(5),
+				debugVerbose(6),
+				debugData(7)					
+				}
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                    "The syslog message severity. All syslog messages of the specified severity for
+                    which the Bits are set, will be sent to this syslog server. When setting this object
+                    in a 'createAndGo' request, all lower bits upto and including the desired bit position
+                    must be set. For example, if bit info(4) needs to be set then bits critical(0), 
+                    error(1), warning(2), notice(3) and info(4) must also be set in the request. 
+                    Consequently, all syslog messages of a given severity and higher will be sent to 
+                    the syslog server. It is not possible to send messages that match only a few selected
+                    non-contiguous severities."
+                DEFVAL { '11111111'B }
+            ::= { extremeRemoteSyslogServerEntry 5 }
+
+      extremeRemoteSyslogServerStatus               OBJECT-TYPE
+                SYNTAX                          RowStatus
+                MAX-ACCESS                      read-create
+                STATUS                          current
+                DESCRIPTION
+                    "The status of the Row as per standard row  				
+		    status conventions. Only 'createAndGo', 'active' and 
+		    'destroy' will be supported. It is not possible
+		    to change the values of the objects of a row 					
+		    once it has been created, except by 'destroy'ing and 
+		    re-creating the row."
+                   
+            ::= { extremeRemoteSyslogServerEntry 6 }
+
+        extremeEnableRemoteSyslog OBJECT-TYPE
+                SYNTAX TruthValue
+        	MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                "The enable/disable status of remote syslog messages."
+	::= { extremeSyslog 2 }
+
+extremeDNSServerTable      OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ExtremeDNSServerEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION     
+            "This table is used to configure DNS servers. There can be at most two
+             rows in this table."
+      ::= { extremeDNS 1 }
+
+extremeDNSServerEntry      OBJECT-TYPE
+        SYNTAX              ExtremeDNSServerEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "An entry in the extremeDNSServerTable."
+        INDEX { extremeDNSServerAddressIndex
+              }
+     ::= { extremeDNSServerTable 1 }
+
+ExtremeDNSServerEntry ::= SEQUENCE {
+                extremeDNSServerAddressIndex    INTEGER,
+                extremeDNSServerAddressType     InetAddressType,
+                extremeDNSServerAddress         InetAddress
+        }
+
+      extremeDNSServerAddressIndex              OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This is an integer index. Only 1 and 2 are supported for this"
+            ::= { extremeDNSServerEntry 1 }
+
+      extremeDNSServerAddressType                OBJECT-TYPE
+                SYNTAX                       InetAddressType 
+                MAX-ACCESS                   read-only
+                STATUS                       current
+                DESCRIPTION
+                    "The address type of the DNS server. This can be a DNS name or
+                    an IPv4 address."
+
+            ::= { extremeDNSServerEntry 2 }
+
+      extremeDNSServerAddress                OBJECT-TYPE
+                SYNTAX                       InetAddress (SIZE (1..255))
+                MAX-ACCESS                   read-only
+                STATUS                       current
+                DESCRIPTION
+                    "The address of the DNS server. This can be a DNS name or
+                    an IPv4 address."
+
+            ::= { extremeDNSServerEntry 3 }
+
+extremeAuthServerEnableTable OBJECT-TYPE
+      SYNTAX     SEQUENCE OF ExtremeAuthServerEnableEntry
+      MAX-ACCESS not-accessible
+      STATUS     current 
+      DESCRIPTION
+         "This table is used to enable/disable Auth servers"
+   ::=   { extremeAuthServer 1 }
+
+extremeAuthServerEnableEntry   OBJECT-TYPE
+        SYNTAX                 ExtremeAuthServerEnableEntry
+        MAX-ACCESS             not-accessible
+        STATUS                 current
+        DESCRIPTION
+            "An entry in the extremeAuthServerEnableTable."
+        INDEX { extremeAuthServerEnableServerType,
+                extremeAuthServerEnableAccessType }
+     ::= { extremeAuthServerEnableTable 1 }
+
+ExtremeAuthServerEnableEntry ::= SEQUENCE {
+        extremeAuthServerEnableServerType    AuthServerType,
+        extremeAuthServerEnableAccessType    AuthServerAccessType,
+        extremeAuthServerEnable              TruthValue }
+
+extremeAuthServerEnableServerType OBJECT-TYPE
+	SYNTAX		AuthServerType
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether this is a radius/radius-acct/tacacs/tacacs-acct server"
+	::= { extremeAuthServerEnableEntry 1 }
+
+extremeAuthServerEnableAccessType OBJECT-TYPE
+	SYNTAX		AuthServerAccessType
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether this server is for management access or netlogin access."
+	::= { extremeAuthServerEnableEntry 2 }
+
+extremeAuthServerEnable OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS current
+  DESCRIPTION
+  "Enable/Disable the Radius/tacas Server"
+  DEFVAL { false }
+ ::= { extremeAuthServerEnableEntry 3 }
+
+extremeAuthServerTable      OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ExtremeAuthServerEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION     
+            "This table is used to configure radius/tacacs servers."
+      ::= { extremeAuthServer 2 }
+
+extremeAuthServerEntry      OBJECT-TYPE
+        SYNTAX              ExtremeAuthServerEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION
+            "An entry in the extremeAuthServerTable."
+        INDEX { extremeAuthServerIndex
+              }
+     ::= { extremeAuthServerTable 1 }
+
+ExtremeAuthServerEntry ::= SEQUENCE {
+        extremeAuthServerIndex    INTEGER,
+        extremeAuthServerAddressType     InetAddressType,
+        extremeAuthServerAddress         InetAddress,
+	extremeAuthServerClientAddressType InetAddressType,
+	extremeAuthServerClientAddress	InetAddress,
+	extremeAuthServerPort 		INTEGER,
+	extremeAuthServerSecret 	OCTET STRING,
+	extremeAuthServerReTransmit	INTEGER,
+	extremeAuthServerType		 AuthServerType,
+	extremeAuthServerIsPrimary	TruthValue,
+	extremeAuthServerAccessType	AuthServerAccessType,
+	extremeAuthServerStatus		RowStatus}
+
+extremeAuthServerIndex OBJECT-TYPE
+	SYNTAX		INTEGER(1..8)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Integer index of the server."
+	::= { extremeAuthServerEntry 1 }
+
+extremeAuthServerAddressType OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Type IP address of the radius/tacas server. "
+	::= { extremeAuthServerEntry 2 }
+
+extremeAuthServerAddress OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"IP address of the radius/tacas server."
+	::= { extremeAuthServerEntry 3 }
+
+extremeAuthServerClientAddressType OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Type of IP address to use as the SRC address when
+		 contacting the the radius/tacas server. The radius/tacas server
+		 should be configured with this address as one of its
+		 clients. The switch should have a VLAN with this IP
+		 address."
+	::= { extremeAuthServerEntry 4 }
+
+extremeAuthServerClientAddress OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"IP address to use as the SRC address when contacting the
+		 the radius/tacas server. The radius/tacas server should be
+                 configured with this address as one of its clients. The 
+                 switch should have a VLAN with this IP address."
+	::= { extremeAuthServerEntry 5 }
+
+extremeAuthServerPort OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Port number of the radius/tacas server."
+	::= { extremeAuthServerEntry 6 }
+
+extremeAuthServerSecret OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This is the shared secret between the Authenticator
+		 and radius/tacas server.  This is logically write-only."
+	::= { extremeAuthServerEntry 7 }
+
+extremeAuthServerReTransmit OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"This is the timeout in seconds after which the 
+		 Authenticator will re transmit requests to the
+		 radius/tacas server."
+	::= { extremeAuthServerEntry 8 }
+
+extremeAuthServerType OBJECT-TYPE
+	SYNTAX		AuthServerType
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether this is a radius/radius-acct/tacacs/tacacs-acct server"
+	::= { extremeAuthServerEntry 9 }
+
+extremeAuthServerIsPrimary OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether this is the primary or the
+		secondary server. Is TRUE if the server is primary."
+	::= { extremeAuthServerEntry 10 }
+
+extremeAuthServerAccessType OBJECT-TYPE
+	SYNTAX		AuthServerAccessType
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Specifies whether this server is for management access or netlogin access"
+	::= { extremeAuthServerEntry 11 }
+
+extremeAuthServerStatus               OBJECT-TYPE
+          SYNTAX                          RowStatus
+          MAX-ACCESS                      read-create
+          STATUS                          current
+          DESCRIPTION
+                    "The status of the Row as per standard row  				
+		    status conventions. Only 'createAndGo', 'active' and 
+		    'destroy' will be supported. It is not possible
+		    to change the values of the objects of a row 					
+		    once it has been created, except by 'destroy'ing and 
+		    re-creating the row."
+                   
+            ::= { extremeAuthServerEntry 12 }
+
+
+END

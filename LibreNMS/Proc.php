@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,6 +26,7 @@
 namespace LibreNMS;
 
 use Exception;
+use Illuminate\Support\Str;
 
 class Proc
 {
@@ -44,29 +45,35 @@ class Proc
     private $_synchronous;
 
     /**
+     * @var int|null hold the exit code, we can only get this on the first process_status after exit
+     */
+    private $_exitcode = null;
+
+    /**
      * Create and run a new process
      * Most arguments match proc_open()
      *
-     * @param string $cmd the command to execute
-     * @param array $descriptorspec the definition of pipes to initialize
-     * @param null $cwd working directory to change to
-     * @param array|null $env array of environment variables to set
-     * @param bool $blocking set the output pipes to blocking (default: false)
+     * @param  string  $cmd  the command to execute
+     * @param  array  $descriptorspec  the definition of pipes to initialize
+     * @param  string|null  $cwd  working directory to change to
+     * @param  array|null  $env  array of environment variables to set
+     * @param  bool  $blocking  set the output pipes to blocking (default: false)
+     *
      * @throws Exception the command was unable to execute
      */
     public function __construct(
         $cmd,
-        $descriptorspec = array(
-            0 => array("pipe", "r"),
-            1 => array("pipe", "w"),
-            2 => array("pipe", "w")
-        ),
+        $descriptorspec = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ],
         $cwd = null,
         $env = null,
         $blocking = false
     ) {
         $this->_process = proc_open($cmd, $descriptorspec, $this->_pipes, $cwd, $env);
-        if (!is_resource($this->_process)) {
+        if (! is_resource($this->_process)) {
             throw new Exception("Command failed: $cmd");
         }
         stream_set_blocking($this->_pipes[1], $blocking);
@@ -91,7 +98,7 @@ class Proc
      * 1 - stdout
      * 2 - stderr
      *
-     * @param int $nr pipe number (0-2)
+     * @param  int  $nr  pipe number (0-2)
      * @return resource the pipe handle
      */
     public function pipe($nr)
@@ -99,14 +106,13 @@ class Proc
         return $this->_pipes[$nr];
     }
 
-
     /**
      * Send a command to this process and return the output
      * the output may not correspond to this command if this
      * process is not synchronous
      * If the command isn't terminated with a newline, add one
      *
-     * @param $command
+     * @param  string  $command
      * @return array
      */
     public function sendCommand($command)
@@ -119,7 +125,7 @@ class Proc
     /**
      * Send data to stdin
      *
-     * @param string $data the string to send
+     * @param  string  $data  the string to send
      */
     public function sendInput($data)
     {
@@ -130,19 +136,20 @@ class Proc
      * Gets the current output of the process
      * If this process is set to synchronous, wait for output
      *
-     * @param int $timeout time to wait for output, only applies if this process is synchronous
+     * @param  int  $timeout  time to wait for output, only applies if this process is synchronous
      * @return array [stdout, stderr]
      */
     public function getOutput($timeout = 15)
     {
         if ($this->_synchronous) {
-            $pipes = array($this->_pipes[1], $this->_pipes[2]);
+            $pipes = [$this->_pipes[1], $this->_pipes[2]];
             $w = null;
             $x = null;
 
             stream_select($pipes, $w, $x, $timeout);
         }
-        return array(stream_get_contents($this->_pipes[1]), stream_get_contents($this->_pipes[2]));
+
+        return [stream_get_contents($this->_pipes[1]), stream_get_contents($this->_pipes[2])];
     }
 
     /**
@@ -165,13 +172,19 @@ class Proc
      * ** Warning: this will block until the process closes.
      * Some processes might not close on their own.
      *
-     * @param string $command the final command to send (appends newline if one is ommited)
+     * @param  string  $command  the final command to send (appends newline if one is ommited)
      * @return int the exit status of this process (-1 means error)
      */
     public function close($command = null)
     {
         if (isset($command)) {
-            $this->sendInput($this->checkAddEOL($command));
+            try {
+                if (is_resource($this->_pipes[0])) {
+                    $this->sendInput($this->checkAddEOL($command));
+                }
+            } catch (\ErrorException $e) {
+                // might have closed already
+            }
         }
 
         $this->closePipes();
@@ -184,10 +197,12 @@ class Proc
      * Please attempt to run close() instead of this
      * This will be called when this object is destroyed if the process is still running
      *
-     * @param int $signal the signal to send
+     * @param  int  $timeout  how many microseconds to wait before terminating (SIGKILL)
+     * @param  int  $signal  the signal to send
+     *
      * @throws Exception
      */
-    public function terminate($signal = 15)
+    public function terminate($timeout = 3000, $signal = 15)
     {
         $status = $this->getStatus();
 
@@ -195,13 +210,28 @@ class Proc
 
         $closed = proc_terminate($this->_process, $signal);
 
-        if (!$closed) {
+        $time = 0;
+        while ($time < $timeout) {
+            $closed = ! $this->isRunning();
+            if ($closed) {
+                break;
+            }
+
+            usleep(100);
+            $time += 100;
+        }
+
+        if (! $closed) {
             // try harder
-            $killed = posix_kill($status['pid'], 9); //9 is the SIGKILL signal
+            if (function_exists('posix_kill')) {
+                $killed = posix_kill($status['pid'], 9); //9 is the SIGKILL signal
+            } else {
+                $killed = proc_terminate($this->_process, 9);
+            }
             proc_close($this->_process);
 
-            if (!$killed && $this->isRunning()) {
-                throw new Exception("Terminate failed!");
+            if (! $killed && $this->isRunning()) {
+                throw new Exception('Terminate failed!');
             }
         }
     }
@@ -214,7 +244,13 @@ class Proc
      */
     public function getStatus()
     {
-        return proc_get_status($this->_process);
+        $status = proc_get_status($this->_process);
+
+        if ($status['running'] === false && is_null($this->_exitcode)) {
+            $this->_exitcode = $status['exitcode'];
+        }
+
+        return $status;
     }
 
     /**
@@ -224,16 +260,29 @@ class Proc
      */
     public function isRunning()
     {
-        if (!is_resource($this->_process)) {
+        if (! is_resource($this->_process)) {
             return false;
         }
         $st = $this->getStatus();
-        return isset($st['running']);
+
+        return isset($st['running']) && $st['running'];
+    }
+
+    /**
+     * Returns the exit code from the process.
+     * Will return null unless isRunning() or getStatus() has been run and returns false.
+     *
+     * @return int|null
+     */
+    public function getExitCode()
+    {
+        return $this->_exitcode;
     }
 
     /**
      * If this process waits for output
-     * @return boolean
+     *
+     * @return bool
      */
     public function isSynchronous()
     {
@@ -245,7 +294,7 @@ class Proc
      * It is advisable not to change this mid way as output could get mixed up
      * or you could end up blocking until the getOutput timeout expires
      *
-     * @param boolean $synchronous
+     * @param  bool  $synchronous
      */
     public function setSynchronous($synchronous)
     {
@@ -256,14 +305,15 @@ class Proc
      * Add and end of line character to a string if
      * it doesn't already end with one
      *
-     * @param $string
+     * @param  string  $string
      * @return string
      */
     private function checkAddEOL($string)
     {
-        if (!ends_with($string, PHP_EOL)) {
+        if (! Str::endsWith($string, PHP_EOL)) {
             $string .= PHP_EOL;
         }
+
         return $string;
     }
 }

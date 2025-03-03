@@ -1,0 +1,11 @@
+os: unifi-usp
+text: 'Ubiquiti UniFi'
+type: power
+icon: ubiquiti
+snmp_bulk: false
+mib_dir: ubnt
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        sysDescr_regex:
+            - '/^USP-/'

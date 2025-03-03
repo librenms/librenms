@@ -1,0 +1,2314 @@
+-- *****************************************************************
+-- TN-EVC-MIB.my : TN Ethernet Virtual Connection MIB
+--
+-- Copyright (c) 2014 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+TN-EVC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Unsigned32,
+    Counter64
+        FROM SNMPv2-SMI
+    InetAddress FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    entPhysicalIndex FROM ENTITY-MIB
+    TEXTUAL-CONVENTION,
+    TruthValue,
+    RowStatus,
+    MacAddress,
+    StorageType
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    VlanId,
+    VlanIdOrAny,
+    VlanIdOrNone,
+    VlanIdOrAnyOrNone,
+    PortList
+        FROM Q-BRIDGE-MIB
+    ifIndex,
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    tnProducts
+        FROM TRANSITION-SMI;
+
+tnEvcMib MODULE-IDENTITY
+    LAST-UPDATED    "201405060000Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+                  Technical Support
+
+                  10900 Red Circle Drive
+                  Minnetonka, MN 55343 USA
+                  Tel: +1-800-526-9267
+
+                  E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "TBD"
+    REVISION        "201204200000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    REVISION        "201207060000Z"
+    DESCRIPTION
+        "Add L2CP to the mib."
+    REVISION        "201401090000Z"
+    DESCRIPTION
+        "Add tnEvcName to MIB module."
+    REVISION        "201405060000Z"
+    DESCRIPTION
+        "Add Serval MIBs to MIB module."
+    ::= { tnProducts 106 }
+
+tnEvcObjects  OBJECT IDENTIFIER
+    ::= { tnEvcMib 1 }
+
+tnEvcCfgMgmtGroup       OBJECT IDENTIFIER ::= { tnEvcObjects 1 }
+tnEvcStatGroup          OBJECT IDENTIFIER ::= { tnEvcObjects 2 }
+tnEvcL2cpMgmtGroup      OBJECT IDENTIFIER ::= { tnEvcObjects 3 }
+
+-- EVC port table
+
+tnEvcPortTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEvcPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table displays and sets current EVC port configurations.
+
+        This table has a sparse depedent relationship on the ifTable,
+        containing a row for each ifEntry having an ifType of
+        'ethernetCsmacd' capable of supporting Ethernet services."
+    ::= { tnEvcCfgMgmtGroup 1 }
+
+tnEvcPortEntry OBJECT-TYPE
+    SYNTAX          TnEvcPortEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an EVC port configuration."
+    INDEX           { ifIndex }
+    ::= { tnEvcPortTable 1 }
+
+TnEvcPortEntry ::= SEQUENCE {
+        tnEvcPortDEIMode                    INTEGER,
+        tnEvcPortTagMode                    INTEGER,
+        tnEvcPortAddressMode                INTEGER
+}
+
+tnEvcPortDEIMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        coloured(1),
+                        fixed(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The DEI mode for an NNI port determines whether frames transmitted on the port will have the DEI field
+         in the outer tag marked based on the colour of the frame. The allowed values are:
+
+           'coloured':
+               The DEI is 1 for yellow frames and 0 for green frames.
+
+           'fixed':
+                The DEI value is determined by ECE rules.
+            "
+    ::= { tnEvcPortEntry 1 }
+
+tnEvcPortTagMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        inner(1),
+                        outer(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The inner tag type is used to determine whether an inner tag is inserted in frames
+         forwarded to NNI ports. The possible values are:
+
+           'inner':
+               An inner tag is not inserted.
+
+           'outer':
+                An inner C-tag is inserted.
+            "
+    ::= { tnEvcPortEntry 2 }
+
+tnEvcPortAddressMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        source(1),
+                        destination(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The IP/MAC address mode specifying whether the EVC classification must be based on
+         source (SMAC/SIP) or destination (DMAC/DIP) addresses. The allowed values are:
+         'source':
+              Enable SMAC/SIP matching.
+         'destination':
+              Enable DMAC/DIP matching.
+         "
+    ::= { tnEvcPortEntry 3 }
+
+
+-- EVC tables
+
+tnEvcTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEvcEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of EVC(Ethernet Virtual Circuit)."
+    ::= { tnEvcCfgMgmtGroup 2 }
+
+tnEvcEntry OBJECT-TYPE
+    SYNTAX          TnEvcEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an EVC.
+
+        Each entry in this table represents an EVC and can be created or deleted
+        by the management system."
+    INDEX           { tnEvcIndex }
+    ::= { tnEvcTable 1 }
+
+TnEvcEntry ::= SEQUENCE {
+        tnEvcIndex                      INTEGER,
+        tnEvcNNIPortlist                PortList,
+        tnEvcVid                        VlanIdOrAny,
+        tnEvcIVid                       VlanIdOrAny,
+        tnEvcLearning                   INTEGER,
+        tnEvcInnerTagType               INTEGER,
+        tnEvcInnerVidMode               INTEGER,
+        tnEvcInnerVid                   VlanIdOrAnyOrNone,
+        tnEvcInnerPCPDEIPreservation    INTEGER,
+        tnEvcInnerPCP                   INTEGER,
+        tnEvcInnerDEI                   INTEGER,
+        tnEvcOuterVid                   VlanIdOrAnyOrNone,
+        tnEvcStatus                     RowStatus,
+        tnEvcPolicerID                  INTEGER,
+        tnEvcName                       OCTET STRING
+}
+
+tnEvcIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..11111)  -- range added by Jing
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The identifier of the EVC. "
+        ::= { tnEvcEntry 1 }
+
+tnEvcNNIPortlist OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The list of Network to Network Interfaces for the EVC."
+    ::= { tnEvcEntry 2 }
+
+tnEvcVid OBJECT-TYPE
+    SYNTAX          VlanIdOrAny    -- changed from VlanId to VlanIdOrAny by Jing
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The VLAN ID in the PB network.
+        It may be inserted in a C-tag, S-tag or S-custom tag
+        depending on the NNI port VLAN configuration.
+         The allowed range is from 1 through 4094"
+    ::= { tnEvcEntry 3 }
+
+tnEvcIVid OBJECT-TYPE
+    SYNTAX          VlanIdOrAny    -- changed from VlanId to VlanIdOrAny by Jing
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Internal/classified VLAN ID in the PB network.
+        The allowed range is from 1 through 4094"
+    ::= { tnEvcEntry 4 }
+
+tnEvcLearning  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      enable(1),
+                      disable(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The learning mode for the EVC controls whether source MAC addresses are learned for frames matching the EVC.
+        Learning may be disabled if the EVC only includes two UNI/NNI ports. The allowed values are:
+        Enabled: Learning is enabled (MAC addresses are learned).
+          Disabled: Learning is disabled (MAC addresses are not learned)."
+    ::= { tnEvcEntry 5 }
+
+tnEvcInnerTagType OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      none(1),
+                      cTag(2),
+                      sTag(3),
+                      sCustomTag(4)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The inner tag type is used to determine whether an inner tag is inserted in frames forwarded to NNI ports.
+         The allowed values are:
+           None: An inner tag is not inserted.
+           cTag: An inner C-tag is inserted.
+           sTag: An inner S-tag is inserted.
+           sCustomTag: An inner tag is inserted and the tag type is determined by the VLAN port configuration of the NNI."
+    ::= { tnEvcEntry 6 }
+
+tnEvcInnerVidMode OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      normal(1),
+                      tunnel(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The inner VID Mode affects the VID in the inner and outer tag. The allowed values are:
+          normal: The VID of the two outer tags aren't swapped.
+          tunnel: The VID of the two outer tags are swapped,
+            so that the VID of the outer tag is taken from the Inner Tag configuration
+            and the VID of the inner tag is the EVC VID.
+            In this mode, the NNI ports are normally configured to do EVC classification based on the inner tag.
+        "
+    ::= { tnEvcEntry 7 }
+
+tnEvcInnerVid  OBJECT-TYPE
+    SYNTAX          VlanIdOrAnyOrNone   -- changed from:VlanId to VlanIdOrAny by Jing
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Inner tag VLAN ID. The allowed range is from 0 through 4094."
+    ::= { tnEvcEntry 8 }
+
+tnEvcInnerPCPDEIPreservation    OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      preserved(1),
+                      fixed(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The inner tag PCP and DEI preservation. The allowed values are:
+          Preserved: The inner tag PCP and DEI is preserved.
+          Fixed: The inner tag PCP and DEI is fixed. "
+    ::= { tnEvcEntry 9 }
+
+tnEvcInnerPCP OBJECT-TYPE
+    SYNTAX          INTEGER(0..7)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The inner tag PCP value. The allowed range is from 0 through 7. "
+    ::= { tnEvcEntry 10 }
+
+tnEvcInnerDEI  OBJECT-TYPE
+    SYNTAX          INTEGER(0..1)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The inner tag DEI value. The allowed value is 0 or 1."
+    ::= { tnEvcEntry 11 }
+
+tnEvcOuterVid     OBJECT-TYPE
+    SYNTAX          VlanIdOrAnyOrNone   -- changed from:VlanId to VlanIdOrAny by Jing
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Outer tag VLAN ID. The allowed range is from 0 through 4094."
+    ::= { tnEvcEntry 12 }
+
+tnEvcStatus  OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status of this conceptual row entry of EVC table. This object isused to manage the
+      creation and deletion of conceptual rows.
+
+      The status column has six defined values:
+
+           - 'active', which indicates that the conceptual row is
+           available for use by the managed device;
+
+           - 'notInService', which indicates that the conceptual
+           row exists in the agent, but is unavailable for use by
+           the managed device (see NOTE below);
+
+           - 'notReady', which indicates that the conceptual row
+           exists in the agent, but is missing information
+           necessary in order to be available for use by the
+           managed device;
+
+           - 'createAndGo', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row and to have its status automatically set
+           to active, making it available for use by the managed
+           device;
+
+           - 'createAndWait', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row (but not make it available for use by
+           the managed device); and,
+
+           - 'destroy', which is supplied by a management station
+           wishing to delete all of the instances associated with
+           an existing conceptual row.
+
+           For a detailed description of this object, please refer to
+           SNMPv2-TC MIB."
+    ::= { tnEvcEntry 13 }
+
+tnEvcPolicerID OBJECT-TYPE
+    SYNTAX          INTEGER(1..4095)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The ingress bandwidth profile mode for the EVC. The possible values are:
+            Specific: The allowed range is from 1 through 128.
+            Discard: All received frames are discarded for the EVC. The value is 4094.
+            None: None bandwidth profile for the EVC. The value is 4095."
+    ::= { tnEvcEntry 14 }
+
+tnEvcName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..127))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "EVC Administrative Name."
+    ::= { tnEvcEntry 15 }
+
+-- ECE tables
+
+tnEvcEceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEvcEceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of EVC control entry."
+    ::= { tnEvcCfgMgmtGroup 3 }
+
+tnEvcEceEntry OBJECT-TYPE
+    SYNTAX          TnEvcEceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an ECE.
+
+        The system automatically creates an entry when the system or
+        the EMS/NMS creates a row in the cevcECETable.  Likewise, the
+        system automatically destroys an entry when the system or
+        the EMS/NMS destroys the corresponding row in the cevcECETable."
+    INDEX           { tnEvcEceId }
+    ::= { tnEvcEceTable 1 }
+
+TnEvcEceEntry ::= SEQUENCE {
+        tnEvcEceId                  INTEGER,
+        tnEvcEceNextEceId           INTEGER,
+        tnEvcEceUNIPortlist         PortList,
+        tnEvcEceTagType             INTEGER,
+
+        tnEvcEceTagVIDFilterType    INTEGER,
+        tnEvcEceTagVIDFilterVal     VlanIdOrAnyOrNone,
+        tnEvcEceTagVIDFilterStart   VlanIdOrAnyOrNone,
+        tnEvcEceTagVIDFilterEnd     VlanIdOrAnyOrNone,
+
+        tnEvcEceTagPCP              BITS,
+        tnEvcEceTagDEI              INTEGER,
+        tnEvcEceTagFrameType        INTEGER,
+
+        --ipv4/ipv6 common
+        tnEvcEceProtoType           INTEGER,
+        tnEvcEceProtoVal            INTEGER,
+        tnEvcEceDscpFilterType      INTEGER,
+        tnEvcEceDscpFilterVal       INTEGER,
+        tnEvcEceDscpRangeStart      INTEGER,
+        tnEvcEceDscpRangeEnd        INTEGER,
+
+        tnEvcEceSrcPortFilterType   INTEGER,
+        tnEvcEceSrcPortFilterNo     INTEGER,
+        tnEvcEceSrcPortRangeStart   INTEGER,
+        tnEvcEceSrcPortRangeEnd     INTEGER,
+
+        tnEvcEceDstPortFilterType   INTEGER,
+        tnEvcEceDstPortFilterNo     INTEGER,
+        tnEvcEceDstPortRangeStart   INTEGER,
+        tnEvcEceDstPortRangeEnd     INTEGER,
+
+        --ipv4 speciific
+        tnEvcEceIpv4DipSipFilter    INTEGER,
+        tnEvcEceIpv4DipSipAddr      InetAddress,
+        tnEvcEceIpv4DipSipMask      InetAddress,
+        tnEvcEceIpv4Fragment        INTEGER,
+
+        --ipv6 specific
+        tnEvcEceIpv6DipSipFilter    INTEGER,
+        tnEvcEceIpv6DipSipAddr      Unsigned32,
+        tnEvcEceIpv6DipSipMask      Unsigned32,
+
+        --outer tag
+        tnEvcEceOuterMode              INTEGER,
+        tnEvcEceOuterPCPDEIPreserve    INTEGER,
+        tnEvcEceOuterPCP               INTEGER,
+        tnEvcEceOuterDEI               INTEGER,
+
+        --Action
+        tnEvcEceActDirection           INTEGER,
+        tnEvcEceActEvcidFilterType     INTEGER,
+        tnEvcEceActEvcidVal            INTEGER,
+        tnEvcEceActTagPopCount         INTEGER,
+        tnEvcEceActPolicyId            INTEGER,
+        tnEvcEceActClass               INTEGER,
+
+        -- MAC Parameter
+        tnEvcEceDMacSMacFilterType     INTEGER,
+        tnEvcEceDMacSMacVal            MacAddress,
+        tnEvcEceDMacType               INTEGER,
+
+        tnEvcEceConflict               INTEGER,
+
+        tnEvcEceStatus                 RowStatus
+
+}
+
+tnEvcEceId OBJECT-TYPE
+        SYNTAX      INTEGER (1..11111)  -- range added by Jing
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The identifier of the ECE. "
+        ::= { tnEvcEceEntry 1 }
+
+tnEvcEceNextEceId OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Specify the created ECE is placed before which ECE. "
+        ::= { tnEvcEceEntry 2 }
+
+tnEvcEceUNIPortlist OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The list of User to Network Interfaces for the ECE."
+    ::= { tnEvcEceEntry 3 }
+
+tnEvcEceTagType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      tagged(1),
+                      untagged(2),
+                      any(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The tag type for the ECE. The possible values are:
+         tagged: The ECE will match tagged frames only.
+         untagged: The ECE will match untagged frames only.
+         any: The ECE will match both tagged and untagged frames. "
+    ::= { tnEvcEceEntry 4 }
+
+tnEvcEceTagVIDFilterType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The VLAN ID filter for matching the ECE. It only significant if tag type 'Tagged'
+         is selected. The possible values are:
+         any: No VLAN ID filter is specified. (VLAN ID filter status is 'don't-care'.)
+         specific: If you want to filter a specific VLAN ID value with this ECE, choose this
+                   value. A field for entering a specific value appears.
+         range: If you want to filter a specific VLAN ID range filter with this ECE, choose
+                this value. A field for entering a range appears.  "
+    ::= { tnEvcEceEntry 5 }
+
+tnEvcEceTagVIDFilterVal  OBJECT-TYPE
+    SYNTAX          VlanIdOrAnyOrNone  -- changed from VlanIdOrNone by Jing
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the VLAN ID filter, you can enter a specific value.
+         The allowed value is from 0 through 4094. "
+    ::= { tnEvcEceEntry 6 }
+
+tnEvcEceTagVIDFilterStart  OBJECT-TYPE
+    SYNTAX          VlanIdOrAnyOrNone  -- changed from VlanIdOrNone by Jing
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the VLAN ID filter, you can enter a specific range.
+         The allowed range start is from 0 through 4094.  "
+    ::= { tnEvcEceEntry 7 }
+
+tnEvcEceTagVIDFilterEnd  OBJECT-TYPE
+    SYNTAX          VlanIdOrAnyOrNone  -- changed from VlanIdOrNone by Jing
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the VLAN ID filter, you can enter a specific range.
+         The allowed range end is from 0 through 4094.  "
+    ::= { tnEvcEceEntry 8 }
+
+tnEvcEceTagPCP  OBJECT-TYPE
+    SYNTAX          BITS {
+                      none(0)  -- added by Jing
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The PCP value for mataching the ECE. It only significant if tag type 'Tagged' is selected.
+         The possible values are:
+         any: The ECE will match any PCP value(all bits will be set to 1).
+         specific: each bit matchs a specific PCP of ECE(from bit0 to bit7).
+         range: The ECE will match PCP values in the selected range, valid range bit0-bit1, bit2-bit3,
+         bit4-bit5, bit6-bit7, bit0-bit3 or bit4-bit7.  "
+    ::= { tnEvcEceEntry 9 }
+
+tnEvcEceTagDEI  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      dei0(2),
+                      dei1(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The DEI value for mataching the ECE. It only significant if tag type 'Tagged' is selected.
+         The allowed value is: 0, 1 or Any.  "
+    ::= { tnEvcEceEntry 10 }
+
+tnEvcEceTagFrameType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      etype(2),
+                      llc(3),
+                      snap(4),
+                      ipv4(5),
+                      ipv6(6),
+                      l2cp(7)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The frame type for the ECE. The possible values are:
+         any: The ECE will match any frame type.
+         etype: The ECE will match Ethernet Type frames only.
+         llc: The ECE will match LLC frames only.
+         snap: The ECE will match SNAP frames only.
+         ipv4: The ECE will match IPv4 frames only.
+         ipv6: The ECE will match IPv6 frames only.
+         l2cp: The ECE will match L2CP frames only.  "
+    ::= { tnEvcEceEntry 11 }
+
+tnEvcEceProtoType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      udp(2),
+                      tcp(3),
+                      other(4)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The IP protocol for matching the ECE. The possible values are:
+         any: No protocol filter is specified. (Protocol filter status is 'don't-care'.)
+         udp: Specify the UDP for matching the ECE.
+         tcp: Specify the TCP for matching the ECE.
+         other: If you want to filter a specific protocol value with this ECE,
+                   choose this value. A field for entering a specific value appears. "
+    ::= { tnEvcEceEntry 12 }
+
+tnEvcEceProtoVal  OBJECT-TYPE
+    SYNTAX          INTEGER(0..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the protocol filter, you can enter a specific value.
+         The allowed value is from 0 through 255."
+    ::= { tnEvcEceEntry 13 }
+
+tnEvcEceDscpFilterType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The DSCP filter for matching the ECE. The possible values are:
+         any: No DSCP filter is specified. (DSCP filter status is 'don't-care'.)
+         specific: If you want to filter a specific DSCP value with this ECE, choose this value.
+                   A field for entering a specific value appears.
+         range: If you want to filter a specific DSCP range filter with this ECE, choose this value.
+                A field for entering a range appears.   "
+    ::= { tnEvcEceEntry 14}
+
+tnEvcEceDscpFilterVal  OBJECT-TYPE
+    SYNTAX          INTEGER(0..63)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the DSCP filter, you can enter a specific value.
+         The allowed value is from 0 through 63.    "
+    ::= { tnEvcEceEntry 15 }
+
+tnEvcEceDscpRangeStart  OBJECT-TYPE
+    SYNTAX          INTEGER(0..63)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the DSCP filter, you can enter a specific range.
+         The allowed range start is from 0 through 63.    "
+    ::= { tnEvcEceEntry 16 }
+
+tnEvcEceDscpRangeEnd  OBJECT-TYPE
+    SYNTAX          INTEGER(0..63)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the DSCP filter, you can enter a specific range.
+         The allowed range end is from 0 through 63.    "
+    ::= { tnEvcEceEntry 17 }
+
+tnEvcEceSrcPortFilterType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The TCP/UDP source port for matching the ECE. It only significant if protocol
+         filter 'UDP' or 'TCP' is selected. The possible values are:
+         any: No TCP/UDP source port filter is specified. (Source port filter status is 'don't-care'.)
+         specific: If you want to filter a specific TCP/UDP source port No. with this ECE, choose this value.
+                   A field for entering a specific No. appears.
+         range: If you want to filter a specific TCP/UDP source port range filter with this ECE, choose
+                this value. A field for entering a range appears.   "
+    ::= { tnEvcEceEntry 18 }
+
+tnEvcEceSrcPortFilterNo  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the source port filter, you can enter a specific value.
+         The allowed value is from 0 through 65535.     "
+    ::= { tnEvcEceEntry 19 }
+
+tnEvcEceSrcPortRangeStart  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the source port filter, you can enter a specific range.
+         The allowed range start is from 0 through 65535.    "
+    ::= { tnEvcEceEntry 20 }
+
+tnEvcEceSrcPortRangeEnd  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the source port filter, you can enter a specific range.
+         The allowed range end is from 0 through 65535.    "
+    ::= { tnEvcEceEntry 21 }
+
+tnEvcEceDstPortFilterType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The TCP/UDP destination port for matching the ECE. It only significant if protocol
+         filter 'UDP' or 'TCP' is selected. The possible values are:
+         any: No TCP/UDP destination port filter is specified. (Source port filter status is 'don't-care'.)
+         specific: If you want to filter a specific TCP/UDP source port No. with this ECE, choose this value.
+                   A field for entering a specific No. appears.
+         range: If you want to filter a specific TCP/UDP source port range filter with this ECE, choose
+                this value. A field for entering a range appears.   "
+    ::= { tnEvcEceEntry 22 }
+
+tnEvcEceDstPortFilterNo  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the destination port filter, you can enter a specific value.
+         The allowed value is from 0 through 65535.     "
+    ::= { tnEvcEceEntry 23 }
+
+tnEvcEceDstPortRangeStart  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the destination port filter, you can enter a specific range.
+         The allowed range start is from 0 through 65535.    "
+    ::= { tnEvcEceEntry 24 }
+
+tnEvcEceDstPortRangeEnd  OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the destination port filter, you can enter a specific range.
+         The allowed range end is from 0 through 65535.    "
+    ::= { tnEvcEceEntry 25 }
+
+tnEvcEceIpv4DipSipFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      host(2),
+                      network(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The source/destination IP address for matching the ECE. It depend on by the port address mode,
+         when port address mode is set to 'Source' then the field is used for source address. Similarly
+         when port address mode is set to 'Destination' then the field is used for destination address.
+         The possible values are:
+         Any: No SIP/DIP filter is specified. (SIP/DIP filter status is 'don't-care'.)
+         Host: If you want to filter a specific host address with this ECE, choose this value. A field
+               for entering a host address appears.
+         Network: If you want to filter a specific network address with this ECE, choose this value.
+                  A Two fields for entering a specific network address and network mask appears.    "
+    ::= { tnEvcEceEntry 26 }
+
+tnEvcEceIpv4DipSipAddr  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the SIP/DIP filter, you can enter a specific host or
+         network address."
+    ::= { tnEvcEceEntry 27 }
+
+tnEvcEceIpv4DipSipMask  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the SIP/DIP filter, you can enter a specific network mask."
+    ::= { tnEvcEceEntry 28 }
+
+tnEvcEceIpv4Fragment  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      fragment(2),
+                      nonfragment(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The IPv4 Fragment for matching the ECE. This involves the settings for the More Fragments (MF) bit
+         and the Fragment Offset (FRAG OFFSET) field for an IPv4 frame. The possible values are:
+         any: The ECE will match any MF bit.
+         fragment: IPv4 frames where the MF bit is set or the FRAG OFFSET field is greater than zero must be
+                   able to match this entry.
+         nonfragment: IPv4 frames where the MF bit is set or the FRAG OFFSET field is greater than zero must
+                       not be able to match this entry. "
+    ::= { tnEvcEceEntry 29 }
+
+tnEvcEceIpv6DipSipFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The source/destination IP address for matching the ECE. It depend on by the port address mode,
+         when port address mode is set to 'Source' then the field is used for source address. Similarly
+         when port address mode is set to 'Destination' then the field is used for destination address.
+         The possible values are:
+         Any: No SIP/DIP filter is specified. (SIP/DIP filter status is 'don't-care'.)
+         specific: If you want to filter a specific host address with this ECE, choose this value. A field
+               for entering a host address appears."
+    ::= { tnEvcEceEntry 30 }
+
+tnEvcEceIpv6DipSipAddr  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the SIP/DIP filter, you can enter a specific host or
+         network address. When 'IPv6' is selected for the Frame Type, the field only supported 32 bits for
+         IPv6 address."
+    ::= { tnEvcEceEntry 31 }
+
+tnEvcEceIpv6DipSipMask  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the SIP/DIP filter, you can enter a specific network mask.
+         When 'IPv6' is selected for the Frame Type, the field only supported 32 bits for IPv6 address mask."
+    ::= { tnEvcEceEntry 32 }
+
+tnEvcEceOuterMode  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      enabled(1),
+                      disabled(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The outer tag PCP and DEI preservation for the ECE. The possible values are:
+         enabled: Enable outer tag for nni-to-uni direction for the ECE.
+         disabled: Disable outer tag for nni-to-uni direction for the ECE.  "
+    ::= { tnEvcEceEntry 33 }
+
+tnEvcEceOuterPCPDEIPreserve  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      preserved(1),
+                      fixed(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The outer tag PCP and DEI preservation for the ECE. The possible values are:
+         preserved: The outer tag PCP and DEI is preserved.
+         fixed: The outer tag PCP and DEI is fixed.   "
+    ::= { tnEvcEceEntry 34 }
+
+tnEvcEceOuterPCP  OBJECT-TYPE
+    SYNTAX          INTEGER(0..7)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The outer tag PCP value for the ECE. The allowed range is from 0 through 7. "
+    ::= { tnEvcEceEntry 35 }
+
+tnEvcEceOuterDEI  OBJECT-TYPE
+    SYNTAX          INTEGER(0..1)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The outer tag DEI value for the ECE. The allowed value is 0 or 1.  "
+    ::= { tnEvcEceEntry 36 }
+
+tnEvcEceActDirection  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      both(1),
+                      uni2nni(2),
+                      nni2uni(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The EVCs and ECEs are used to setup flows in one or both directions as determined by the ECE
+         Direction parameter. If the ECE is bidirectional, the ingress rules of the NNI ports will be
+         setup to match the traffic being forwarded to NNI ports. The possible values are:
+         both: Bidirectional.
+         uni2nni: Unidirectional from UNI to NNI.
+         nni2uni: Unidirectional from NNI to UNI. "
+    ::= { tnEvcEceEntry 37 }
+
+tnEvcEceActEvcidFilterType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The outer tag PCP and DEI preservation for the ECE. The possible values are:
+         any: No EVC ID filter is specified. (EVC ID filter status is 'don't-care'.)
+         specific: If you want to filter a specific EVC ID with this ECE, choose this
+                   value. A field for entering a specific value appears. "
+    ::= { tnEvcEceEntry 38 }
+
+tnEvcEceActEvcidVal  OBJECT-TYPE
+    SYNTAX          INTEGER(1..128)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the VLAN ID filter, you can enter a specific
+         value. The allowed value is from 1 through 128.  "
+    ::= { tnEvcEceEntry 39 }
+
+tnEvcEceActTagPopCount  OBJECT-TYPE
+    SYNTAX          INTEGER(0..2)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The ingress tag pop count for the ECE. The allowed range is from 0 through 2."
+    ::= { tnEvcEceEntry 40 }
+
+tnEvcEceActPolicyId  OBJECT-TYPE
+    SYNTAX          INTEGER(0..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The ACL Policy ID for the ECE for matching ACL rules. The allowed range is
+         from 0 through 255."
+    ::= { tnEvcEceEntry 41 }
+
+tnEvcEceActClass  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      tc0(1),
+                      tc1(2),
+                      tc2(3),
+                      tc3(4),
+                      tc4(5),
+                      tc5(6),
+                      tc6(7),
+                      tc7(8),
+                      disabled(9)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The traffic class for the ECE. The allowed range is from 0 through 8 or disabled. "
+    ::= { tnEvcEceEntry 42 }
+
+tnEvcEceDMacSMacFilterType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The source/destination MAC address for matching the ECE. It depend on by the port
+         address mode, when port address mode is set to 'Source' then the field is used for
+         source MAC address. Similarly when port address mode is set to 'Destination' then
+         the field is used for destination MAC address. The possible values are:
+         any: No SMAC/DMAC filter is specified. (SMAC/DMAC filter status is 'don't-care'.)
+         specific: If you want to filter a specific SMAC/DMAC value with this ECE, choose
+                   this value. A field for entering a specific value appears. "
+    ::= { tnEvcEceEntry 43 }
+
+tnEvcEceDMacSMacVal  OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the SMAC/DMAC filter, you can enter a specific value.
+         The legal format is 'xx-xx-xx-xx-xx-xx' or 'xx.xx.xx.xx.xx.xx' or 'xxxxxxxxxxxx' (x is
+         a hexadecimal digit).  "
+    ::= { tnEvcEceEntry 44 }
+
+tnEvcEceDMacType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      unicast(2),
+                      multicast(3),
+                      broadcast(4),
+                      specific(5)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The destination MAC address for matching the ECE. The possible values are:
+         any: No destination MAC address is specified.
+         unicast: Frame must be unicast.
+         multicast: Frame must be multicast.
+         broadcast: Frame must be broadcast.
+         specific:  If you want to filter a specific DMAC value with this ECE, choose this value."
+    ::= { tnEvcEceEntry 45 }
+
+tnEvcEceConflict  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      yes(1),
+                      no(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the hardware status of the specific ECE. The specific ECE is not applied to
+         the hardware due to hardware limitations. "
+    ::= { tnEvcEceEntry 46 }
+
+tnEvcEceStatus  OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status of this conceptual row entry of ECE table. This object isused to manage the
+      creation and deletion of conceptual rows.
+
+      The status column has six defined values:
+
+           - 'active', which indicates that the conceptual row is
+           available for use by the managed device;
+
+           - 'notInService', which indicates that the conceptual
+           row exists in the agent, but is unavailable for use by
+           the managed device (see NOTE below);
+
+           - 'notReady', which indicates that the conceptual row
+           exists in the agent, but is missing information
+           necessary in order to be available for use by the
+           managed device;
+
+           - 'createAndGo', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row and to have its status automatically set
+           to active, making it available for use by the managed
+           device;
+
+           - 'createAndWait', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row (but not make it available for use by
+           the managed device); and,
+
+           - 'destroy', which is supplied by a management station
+           wishing to delete all of the instances associated with
+           an existing conceptual row.
+
+           For a detailed description of this object, please refer to
+           SNMPv2-TC MIB."
+    ::= { tnEvcEceEntry 47 }
+
+--cevcBandwidthProfiles
+
+tnEvcBandwidthProfilesTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEvcBandwidthProfilesEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry displays and sets current EVC ingress bandwidth profile configurations.
+         These policers may be used to limit the traffic received on UNI ports."
+    ::= { tnEvcCfgMgmtGroup 4 }
+
+tnEvcBandwidthProfilesEntry OBJECT-TYPE
+    SYNTAX          TnEvcBandwidthProfilesEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an entry of EVC ingress bandwidth profile configuration."
+    INDEX           { tnEvcBandwidthProfilesIndex }
+    ::= { tnEvcBandwidthProfilesTable 1 }
+
+TnEvcBandwidthProfilesEntry ::= SEQUENCE {
+        tnEvcBandwidthProfilesIndex       INTEGER,
+        tnEvcBandwidthProfilesPolicerMode INTEGER,
+        tnEvcBandwidthProfilesCIR         INTEGER,
+        tnEvcBandwidthProfilesCBS         INTEGER,
+        tnEvcBandwidthProfilesEIR         INTEGER,
+        tnEvcBandwidthProfilesEBS         INTEGER,
+        tnEvcBandwidthProfilesState       INTEGER
+}
+
+tnEvcBandwidthProfilesIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..11111)  -- range added by Jing
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The EVC bandwidth profiles policer index."
+        ::= { tnEvcBandwidthProfilesEntry 1 }
+
+tnEvcBandwidthProfilesPolicerMode OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      coupled(1),
+                      aware(2),
+                      blind(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The colour mode of the bandwidth profile. The allowed values are:
+          coupled: Colour-aware mode with coupling enabled.
+          aware: Colour-aware mode with coupling disabled. "
+    ::= { tnEvcBandwidthProfilesEntry 2 }
+
+tnEvcBandwidthProfilesCIR OBJECT-TYPE
+    SYNTAX          INTEGER(0..10000000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Committed Information Rate of the bandwidth profile. The allowed range is from 0 through 10,000,000 kilobit per second."
+    ::= { tnEvcBandwidthProfilesEntry 3 }
+
+tnEvcBandwidthProfilesCBS OBJECT-TYPE
+    SYNTAX          INTEGER(0..100000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Committed Burst Size of the bandwidth profile. The allowed range is from 0 through 100,000 bytes. "
+    ::= { tnEvcBandwidthProfilesEntry 4 }
+
+tnEvcBandwidthProfilesEIR OBJECT-TYPE
+    SYNTAX          INTEGER(0..10000000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Excess Information Rate of the bandwidth profile. The allowed range is from 0 through 10,000,000 kilobit per second."
+    ::= { tnEvcBandwidthProfilesEntry 5 }
+
+tnEvcBandwidthProfilesEBS OBJECT-TYPE
+    SYNTAX          INTEGER(0..100000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Excess Burst Size of the bandwidth profile. The allowed range is from 0 through 100,000 bytes. "
+    ::= { tnEvcBandwidthProfilesEntry 6 }
+
+tnEvcBandwidthProfilesState OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      enabled(1),
+                      disabled(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The administrative state of the bandwidth profile.
+         The allowed values are:
+          enabled: The bandwidth profile enabled.
+          disabled: The bandwidth profile is disabled."
+    ::= { tnEvcBandwidthProfilesEntry 7 }
+
+-- exttable
+tnEvcExtEceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEvcExtEceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of EVC control entry."
+    ::= { tnEvcCfgMgmtGroup 5 }
+
+tnEvcExtEceEntry OBJECT-TYPE
+    SYNTAX          TnEvcExtEceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an ECE.
+        The system automatically creates an entry when the system or
+        the EMS/NMS creates a row in the cevcECETable.  Likewise, the
+        system automatically destroys an entry when the system or
+        the EMS/NMS destroys the corresponding row in the cevcECETable."
+    AUGMENTS       { tnEvcEceEntry }
+    ::= { tnEvcExtEceTable 1 }
+
+TnEvcExtEceEntry ::= SEQUENCE {
+        tnEvcEceInnerTagType             INTEGER,
+        tnEvcEceInnerTagVIDFilterType    INTEGER,
+        tnEvcEceInnerTagVIDFilterVal     VlanIdOrNone,
+        tnEvcEceInnerTagVIDFilterStart   VlanIdOrNone,
+        tnEvcEceInnerTagVIDFilterEnd     VlanIdOrNone,
+        tnEvcEceInnerTagPCP              BITS,
+        tnEvcEceInnerTagDEI              INTEGER,
+        tnEvcEcePolicer                  INTEGER,
+        tnEvcEceOuterVid                 VlanIdOrNone,
+        tnEvcEceNNIInnerTagType          INTEGER,
+        tnEvcEceInnerVid                 VlanIdOrNone,
+        tnEvcEceInnerPCPDEIPreserve      INTEGER,
+        tnEvcEceInnerPCP                 INTEGER,
+        tnEvcEceInnerDEI                 INTEGER,
+        -- MAC Parameter
+        tnEvcEceDMacVal                  MacAddress,
+        --outer tag
+        tnEvcEceOuterPCPMode             INTEGER,
+        tnEvcEceOuterDEIMode             INTEGER,
+        --Action
+        tnEvcEceActRuleType              INTEGER,
+        tnEvcEceActTxLookupType          INTEGER,
+        tnEvcEceActDropPrecType          INTEGER,
+        -- Egress InnerTag
+        tnEvcEceInnerPcpMode          INTEGER,
+        tnEvcEceIInnerDeiMode         INTEGER,
+        -- IPv4
+        tnEvcEceIpv4DipFilter            INTEGER,
+        tnEvcEceIpv4DipAddr              InetAddress,
+        tnEvcEceIpv4DipMask              InetAddress,
+        -- IPv6
+        tnEvcEceIpv6DipFilter            INTEGER,
+        tnEvcEceIpv6DipAddr              Unsigned32,
+        tnEvcEceIpv6DipMask              Unsigned32,
+        -- Ingress Matching
+        tnEvcEceLookup                   INTEGER,
+        -- ETYPE
+        tnEvcEceEtypeFilter              INTEGER,
+        tnEvcEceEtypeValue               Unsigned32,
+        tnEvcEceEtypeDataFilter          INTEGER,
+        tnEvcEceEtypeData                Unsigned32,
+        tnEvcEceEtypeDataMask            Unsigned32,
+        -- LLC
+        tnEvcEceLlcDSAPFilter            INTEGER,
+        tnEvcEceLlcDSAPValue             Unsigned32,
+        tnEvcEceLlcSSAPFilter            INTEGER,
+        tnEvcEceLlcSSAPValue             Unsigned32,
+        tnEvcEceLlcCtrlFilter            INTEGER,
+        tnEvcEceLlcCtrlValue             Unsigned32,
+        tnEvcEceLlcDataFilter            INTEGER,
+        tnEvcEceLlcDataValue             Unsigned32,
+        tnEvcEceLlcDataMask              Unsigned32,
+        -- SNAP
+        tnEvcEceSnapOuiFilter            INTEGER,
+        tnEvcEceSnapOuiValue             Unsigned32,
+        tnEvcEceSnapPidFilter            INTEGER,
+        tnEvcEceSnapPidValue             Unsigned32,
+        -- L2CP
+        tnEvcEceL2cpProtoType          INTEGER
+}
+
+tnEvcEceInnerTagType  OBJECT-TYPE
+    SYNTAX            INTEGER{
+                        any(1),
+                        untagged(2),
+                        tagged(3),
+                        c-tag(4),
+                        s-tag(5)
+                      }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Inner tag type for the ECE. The possible values are:
+         tagged: The ECE will match tagged frames only.
+         untagged: The ECE will match untagged frames only.
+         any: The ECE will match both tagged and untagged frames.
+         If supported:
+         C-Tagged: The ECE will match custom tagged frames only.
+         S-Tagged: The ECE will match service tagged frames only."
+    ::= { tnEvcExtEceEntry 1 }
+
+tnEvcEceInnerTagVIDFilterType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2),
+                      range(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Inner VLAN ID filter for matching the ECE. It only significant if tag type 'Tagged'
+         is selected. The possible values are:
+         any: No VLAN ID filter is specified. (VLAN ID filter status is 'don't-care'.)
+         specific: If you want to filter a specific VLAN ID value with this ECE, choose this
+                   value. A field for entering a specific value appears.
+         range: If you want to filter a specific VLAN ID range filter with this ECE, choose
+                this value. A field for entering a range appears.  "
+    ::= { tnEvcExtEceEntry 2 }
+
+tnEvcEceInnerTagVIDFilterVal  OBJECT-TYPE
+    SYNTAX          VlanIdOrNone
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the Inner VLAN ID filter, you can enter a specific value.
+         The allowed value is from 0 through 4094. "
+    ::= { tnEvcExtEceEntry 3 }
+
+tnEvcEceInnerTagVIDFilterStart OBJECT-TYPE
+    SYNTAX          VlanIdOrNone
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the Inner VLAN ID filter, you can enter a specific range.
+         The allowed range start is from 0 through 4094.  "
+    ::= { tnEvcExtEceEntry 4 }
+
+tnEvcEceInnerTagVIDFilterEnd OBJECT-TYPE
+    SYNTAX          VlanIdOrNone
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "When 'Range' is selected for the Inner VLAN ID filter, you can enter a specific range.
+         The allowed range end  is from 0 through 4094.  "
+    ::= { tnEvcExtEceEntry 5 }
+
+tnEvcEceInnerTagPCP OBJECT-TYPE
+    SYNTAX          BITS {
+                      none(0)  -- added by Jing
+                    }
+
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The PCP value for matching the ECE. It only significant if tag type 'Tagged' is selected.
+         The possible values are:
+         any: The ECE will match any PCP value(all bits will be set to 1).
+         specific: each bit matchs a specific PCP of ECE(from bit0 to bit7).
+         range: The ECE will match PCP values in the selected range, valid range bit0-bit1, bit2-bit3,
+         bit4-bit5, bit6-bit7, bit0-bit3 or bit4-bit7.  "
+    ::= { tnEvcExtEceEntry 6 }
+
+tnEvcEceInnerTagDEI OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      dei0(2),
+                      dei1(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The DEI value for matching the ECE. It only significant if tag type 'Tagged' is selected.
+         The allowed value is: 0, 1 or Any.  "
+    ::= { tnEvcExtEceEntry 7 }
+
+tnEvcEcePolicer OBJECT-TYPE
+    SYNTAX          INTEGER(1..4096)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The ingress bandwidth profile mode for the EVC. The possible values are:
+            Specific: The allowed range is from 1 through 128.
+            Discard: All received frames are discarded for the EVC. The value is 4094.
+            None: None bandwidth profile for the EVC. The value is 4095.
+            EVC:The bandwidth profile for the specified EVC ID is used. The value is 4096."
+    ::= { tnEvcExtEceEntry 8 }
+
+tnEvcEceOuterVid OBJECT-TYPE
+    SYNTAX          VlanIdOrNone
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The EVC outer tag VID for UNI ports. The allowed value is from 0 through 4094."
+    ::= { tnEvcExtEceEntry 9 }
+
+tnEvcEceNNIInnerTagType OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      none(0),
+                      ctag(1),
+                      stag(2),
+                      sctag(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The inner type for the ECE determines whether an inner tag is inserted in frames forwarded to NNI ports.\
+         The possible values are:
+            None: An inner tag is not inserted.
+            C-tag: An inner C-tag is inserted.
+            S-tag: An inner S-tag is inserted.
+            S-custom-tag: An inner tag is inserted and the tag type is determined by the VLAN port configuration of the NNI.
+        "
+    ::= { tnEvcExtEceEntry 10 }
+
+tnEvcEceInnerVid OBJECT-TYPE
+    SYNTAX          VlanIdOrNone
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The inner tag VLAN ID for the ECE. The allowed range is from 0 through 4094."
+    ::= { tnEvcExtEceEntry 11 }
+
+tnEvcEceInnerPCPDEIPreserve OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      preserved(1),
+                      fixed(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The inner tag PCP and DEI preservation for the ECE. The possible values are:
+           Preserved: The inner tag PCP and DEI is preserved.
+           Fixed: The inner tag PCP and DEI is fixed.
+        "
+    ::= { tnEvcExtEceEntry 12 }
+
+tnEvcEceInnerPCP OBJECT-TYPE
+    SYNTAX          INTEGER(0..7)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The inner tag PCP value for the ECE. The allowed range is from 0 through 7."
+    ::= { tnEvcExtEceEntry 13 }
+
+tnEvcEceInnerDEI OBJECT-TYPE
+    SYNTAX          INTEGER(0..1)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The inner tag DEI value for the ECE. The allowed value is 0 or 1."
+    ::= { tnEvcExtEceEntry 14 }
+
+tnEvcEceDMacVal  OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the DMAC filter, you can enter a specific value.
+         The legal format is 'xx-xx-xx-xx-xx-xx' or 'xx.xx.xx.xx.xx.xx' or 'xxxxxxxxxxxx' (x is
+         a hexadecimal digit).  "
+    ::= { tnEvcExtEceEntry 15 }
+
+tnEvcEceOuterPCPMode  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      classified(1),
+                      fixed(2),
+                      mapped(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The outer tag PCP mode for the ECE. The possible values are:
+             Classified: The outer tag PCP Mode is classified.
+             Fixed: The outer tag PCP Mode is fixed.
+             Mapped: The outer tag PCP Mode is based on mapped (QOS, DP)."
+    ::= { tnEvcExtEceEntry 16 }
+
+tnEvcEceOuterDEIMode  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      classified(1),
+                      fixed(2),
+                      dropPrec(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The outer tag DEI mode for the ECE. The possible values are:
+             Classified: The outer tag DEI mode is classified.
+             Fixed: The outer tag DEI mode is fixed.
+             Drop Precedence: The outer tag DEI mode is drop precedence."
+    ::= { tnEvcExtEceEntry 17 }
+
+tnEvcEceActRuleType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      both(1),
+                      rx(2),
+                      tx(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The rule type for the ECE. The possible values are:
+             Both: Ingress and egress rule.
+             RX: Ingress rule.
+             TX: Egress rule."
+    ::= { tnEvcExtEceEntry 18 }
+
+tnEvcEceActTxLookupType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      vidLookup(1),
+                      vidPCP(2),
+                      isdx(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The TX lookup for the ECE. The possible values are:
+             VID lookup: The TX lookup is based on VID.
+             VID-PCP: The TX lookup is based on VID and PCP.
+             ISDX: The TX lookup is based on ISDX."
+    ::= { tnEvcExtEceEntry 19 }
+
+tnEvcEceActDropPrecType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      dp0(1),
+                      dp1(2),
+                      disabled(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The drop precedence for the ECE. The allowed range is 0, 1 or disabled."
+    ::= { tnEvcExtEceEntry 20 }
+
+tnEvcEceInnerPcpMode  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      classified(1),
+                      fixed(2),
+                      mapped(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The inner tag PCP mode for the ECE. The possible values are:
+             Classified: The inner tag PCP Mode is classified.
+             Fixed: The inner tag PCP Mode is classified.
+             Mapped: The inner tag PCP Mode is based on mapped (QOS, DP)."
+    ::= { tnEvcExtEceEntry 21 }
+
+tnEvcEceIInnerDeiMode  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      classified(1),
+                      fixed(2),
+                      dropPrecedence(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The inner tag DEI mode for the ECE. The possible values are:
+            Classified: The inner tag DEI mode is classified.
+            Fixed: The inner tag DEI mode is fixed.
+            Drop Precedence: The inner tag DEI mode is drop precedence."
+    ::= { tnEvcExtEceEntry 22 }
+
+tnEvcEceIpv4DipFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      host(2),
+                      network(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The destination IP address for matching the ECE.
+         The possible values are:
+         Any: No DIP filter is specified. (DIP filter status is 'don't-care'.)
+         Host: If you want to filter a specific host address with this ECE, choose this value. A field
+               for entering a host address appears.
+         Network: If you want to filter a specific network address with this ECE, choose this value.
+                  A Two fields for entering a specific network address and network mask appears.    "
+    ::= { tnEvcExtEceEntry 23 }
+
+tnEvcEceIpv4DipAddr  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the DIP filter, you can enter a specific host or
+         network address."
+    ::= { tnEvcExtEceEntry 24 }
+
+tnEvcEceIpv4DipMask  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the DIP filter, you can enter a specific network mask."
+    ::= { tnEvcExtEceEntry 25 }
+
+tnEvcEceIpv6DipFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      host(2),
+                      network(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The destination IP address for matching the ECE.
+         The possible values are:
+         Any: No DIP filter is specified. (DIP filter status is 'don't-care'.)
+         Host: If you want to filter a specific host address with this ECE, choose this value. A field
+               for entering a host address appears.
+         Network: If you want to filter a specific network address with this ECE, choose this value.
+                  A Two fields for entering a specific network address and network mask appears.    "
+    ::= { tnEvcExtEceEntry 26 }
+
+tnEvcEceIpv6DipAddr  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the DIP filter, you can enter a specific host or
+         network address."
+    ::= { tnEvcExtEceEntry 27 }
+
+tnEvcEceIpv6DipMask  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Host' or 'Network' is selected for the DIP filter, you can enter a specific network mask."
+    ::= { tnEvcExtEceEntry 28 }
+
+tnEvcEceLookup  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      basic(1),
+                      advanced(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The looup type for matching the ECE. The allowed values are:
+         Basic: First lookup for basic classification.
+         Advanced: Second lookup for advanced classification."
+    ::= { tnEvcExtEceEntry 29 }
+
+tnEvcEceEtypeFilter  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The Ethernet type value for matching the ECE. The possible values are:
+         Any: No Ethernet type value filter is specified. (Ethernet type filter status is 'don't-care'.)
+         Specific: If you want to filter a specific Ethernet type value with this ECE, choose this value."
+    ::= { tnEvcExtEceEntry 30 }
+
+tnEvcEceEtypeValue  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the Ethernet type filter, you can enter a specific value.
+         The allowed value is from 0x600 through 0xFFFF but exclude 0x0800(IPv4), 0x806(ARP) and 0x86DD(IPv6)."
+    ::= { tnEvcExtEceEntry 31 }
+
+tnEvcEceEtypeDataFilter OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The Ethernet type data for matching the ECE. The possible values are:
+         Any: No Ethernet type data filter is specified. (Ethernet type filter status is 'don't-care'.)
+         Specific: If you want to filter a specific Ethernet type value with this ECE, choose this value."
+    ::= { tnEvcExtEceEntry 32 }
+
+tnEvcEceEtypeData OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the Ethernet type filter, you can enter a specific value.
+         The allowed value is from 0x600 through 0xFFFF but exclude 0x0800(IPv4), 0x806(ARP) and 0x86DD(IPv6)."
+    ::= { tnEvcExtEceEntry 33 }
+
+tnEvcEceEtypeDataMask OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the Ethernet type data filter, you can enter a specific value.
+         It is a pair of the Ethernet type data and its mask. The allowed value is from 0x0 through 0xFFFF."
+    ::= { tnEvcExtEceEntry 34 }
+
+tnEvcEceLlcDSAPFilter OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The LLC DSAP for matching the ECE. The possible values are:
+         Any: No LLC DSAP value filter is specified. (LLC DSAP filter status is 'don't-care'.)
+         Specific: If you want to filter a specific LLC DSAP value with this ECE, choose this value."
+    ::= { tnEvcExtEceEntry 35 }
+
+tnEvcEceLlcDSAPValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the LLC DSAP filter, you can enter a specific value.
+         The allowed value is from 0x0 through 0xFF"
+    ::= { tnEvcExtEceEntry 36 }
+
+tnEvcEceLlcSSAPFilter OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The LLC SSAP for matching the ECE. The possible values are:
+         Any: No LLC SSAP value filter is specified. (LLC SSAP filter status is 'don't-care'.)
+         Specific: If you want to filter a specific LLC SSAP value with this ECE, choose this value."
+    ::= { tnEvcExtEceEntry 37 }
+
+tnEvcEceLlcSSAPValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the LLC SSAP filter, you can enter a specific value.
+         The allowed value is from 0x0 through 0xFF."
+    ::= { tnEvcExtEceEntry 38 }
+
+tnEvcEceLlcCtrlFilter OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The LLC control for matching the ECE. The possible values are:
+         Any: No LLC control value filter is specified. (LLC control filter status is 'don't-care'.)
+         Specific: If you want to filter a specific LLC control value with this ECE, choose this value."
+    ::= { tnEvcExtEceEntry 39 }
+
+tnEvcEceLlcCtrlValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the LLC control filter, you can enter a specific value.
+         The allowed value is from 0x0 through 0xFF."
+    ::= { tnEvcExtEceEntry 40 }
+
+tnEvcEceLlcDataFilter OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The LLC data for matching the ECE. The possible values are:
+         Any: No LLC data filter is specified. (LLC filter status is 'don't-care'.)
+         Specific: If you want to filter a specific LLC value with this ECE, choose this value."
+    ::= { tnEvcExtEceEntry 41 }
+
+tnEvcEceLlcDataValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the LLC data filter, you can enter a specific value.
+         It is a pair of the LLC data and its mask. The allowed value is from 0x0 through 0xFFFF."
+    ::= { tnEvcExtEceEntry 42 }
+
+tnEvcEceLlcDataMask OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the LLC data filter, you can enter a specific mask.
+         The allowed value is from 0x0 through 0xFFFF."
+    ::= { tnEvcExtEceEntry 43 }
+
+tnEvcEceSnapOuiFilter OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The SNAP OUI for matching the ECE. The possible values are:
+         Any: No SNAP OUI value filter is specified. (SNAP OUI filter status is 'don't-care'.)
+         Specific: If you want to filter a specific SNAP OUI value with this ECE, choose this value."
+    ::= { tnEvcExtEceEntry 44 }
+
+tnEvcEceSnapOuiValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the SNAP OUI filter, you can enter a specific value.
+         The allowed value is from 00-00-00 through FF-FF-FF."
+    ::= { tnEvcExtEceEntry 45 }
+
+tnEvcEceSnapPidFilter OBJECT-TYPE
+    SYNTAX          INTEGER{
+                      any(1),
+                      specific(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The SNAP PID for matching the ECE. The possible values are:
+         Any: No SNAP PID value filter is specified. (SNAP PID filter status is 'don't-care'.)
+         Specific: If you want to filter a specific SNAP PID value with this ECE, choose this value."
+    ::= { tnEvcExtEceEntry 46 }
+
+tnEvcEceSnapPidValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When 'Specific' is selected for the SNAP PID filter, you can enter a specific value.
+         The allowed value is from 0x0 through 0xFFFF."
+    ::= { tnEvcExtEceEntry 47 }
+
+tnEvcEceL2cpProtoType  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                    stpRstpMstp(1),
+                    pause(2),
+                    lacp(3),
+                    lamp(4),
+                    linkOam(5),
+                    portAuth8021x(6),
+                    elmi(7),
+                    pbGroupAddr(8),
+                    pbGvrp(9),
+                    lldp(10),
+                    gmrp(11),
+                    gvrp(12),
+                    uld(13),
+                    pagp(14),
+                    pvstPvstP(15),
+                    ciscoBpdu(16),
+                    cdp(17),
+                    vtp(18),
+                    dtp(19),
+                    stpUplinkFast(20),
+                    ciscoCfm(21)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+         "The L2CP type for the ECE. The possible values are:
+         STP/RSTP/MSTP: Match STP/RSTP/MSTP frames.
+         Pause: Match Pause frames.
+         LACP: Match LACP frames.
+         LAMP: Match LAMP frames.
+         Link OAM(802.1ah): Match Link OAM(802.1ah) frames.
+         Port Authentication(802.1x): Match Port Authentication(802.1x) frames.
+         E-LMI: Match PB Group Address frames.
+         PB Group Address: Match PB Group Address frames.
+         PB GVRP: Match PB GVRP frames.
+         LLDP: Match LLDP frames.
+         GMRP: Match GMRP frames.
+         GVRP: Match GVRP frames.
+         ULD: Match ULD frames.
+         PAgP: Match PAgP frames.
+         PVST/PVST+: Match PVST/PVST+ frames.
+         Cisco BPDU: Match Cisco BPDU frames.
+         CDP: Match CDP frames.
+         VTP: Match VTP frames.
+         DTP: Match DTP frames.
+         STP Uplink Fast: Match STP Uplink Fast frames.
+         Cisco CFM: Match Cisco CFM frames."
+    ::= { tnEvcExtEceEntry 48 }
+
+-- EVC statistics table
+tnEvcStatTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEvcStatEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides NNI port traffic statistics for the selected EVC.
+         It also shows counters for UNI ports of ECEs mapping to the EVC."
+    ::= { tnEvcStatGroup 1 }
+
+tnEvcStatEntry OBJECT-TYPE
+    SYNTAX          TnEvcStatEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an entry of EVC statistics."
+    INDEX           { ifIndex, tnEvcStatClass }
+    ::= { tnEvcStatTable 1 }
+
+TnEvcStatEntry ::= SEQUENCE {
+        tnEvcStatClass                    INTEGER,
+        tnEvcStatGreenFrameRx             Counter64,
+        tnEvcStatGreenFrameTx             Counter64,
+        tnEvcStatYellowFrameRx            Counter64,
+        tnEvcStatYellowFrameTx            Counter64,
+        tnEvcStatRedFrameRx               Counter64,
+        tnEvcStatDiscardGreenFrame        Counter64,
+        tnEvcStatDiscardYellowFrame       Counter64,
+        tnEvcStatClear                    TruthValue
+}
+
+tnEvcStatClass OBJECT-TYPE
+        SYNTAX      INTEGER (1..11111)  -- range added by Jing
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The traffic class for the EVC. "
+        ::= { tnEvcStatEntry 1 }
+
+tnEvcStatGreenFrameRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of green received. "
+        ::= { tnEvcStatEntry 2 }
+
+tnEvcStatGreenFrameTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of green transmitted. "
+        ::= { tnEvcStatEntry 3 }
+
+tnEvcStatYellowFrameRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of yellow received. "
+        ::= { tnEvcStatEntry 4 }
+
+tnEvcStatYellowFrameTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of yellow transmitted. "
+        ::= { tnEvcStatEntry 5 }
+
+tnEvcStatRedFrameRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of red received. "
+        ::= { tnEvcStatEntry 6 }
+
+tnEvcStatDiscardGreenFrame OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of discarded in the green color. "
+        ::= { tnEvcStatEntry 7 }
+
+tnEvcStatDiscardYellowFrame OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of discarded in the yellow color.  "
+        ::= { tnEvcStatEntry 8 }
+
+tnEvcStatClear OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Clears the counters for selected ports when
+             the value of tnEvcStatClear is true."
+        ::= { tnEvcStatEntry 9 }
+
+-- EVC statistics table  for S4140
+tnEvcExtStatTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnEvcExtStatEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides port traffic statistics for the selected EVC.
+         It also shows counters for UNI ports of ECEs mapping to the EVC."
+    ::= { tnEvcStatGroup 2 }
+
+tnEvcExtStatEntry OBJECT-TYPE
+    SYNTAX          TnEvcExtStatEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an entry of EVC statistics."
+    INDEX           { tnEvcExtStatType, tnEvcExtStatIndex, tnEvcExtStatPort }
+    ::= { tnEvcExtStatTable 1 }
+
+TnEvcExtStatEntry ::= SEQUENCE {
+        tnEvcExtStatType                   INTEGER,
+        tnEvcExtStatIndex                  INTEGER,
+        tnEvcExtStatPort                   INTEGER,
+        tnEvcExtStatGreenFrameRx           Counter64,
+        tnEvcExtStatGreenFrameTx           Counter64,
+        tnEvcExtStatGreenBytesRx           Counter64,
+        tnEvcExtStatGreenBytesTx           Counter64,
+        tnEvcExtStatYellowFrameRx          Counter64,
+        tnEvcExtStatYellowFrameTx          Counter64,
+        tnEvcExtStatYellowBytesRx          Counter64,
+        tnEvcExtStatYellowBytesTx          Counter64,
+        tnEvcExtStatRedFrameRx             Counter64,
+        tnEvcExtStatRedBytesRx             Counter64,
+        tnEvcExtStatDiscardFrameRx         Counter64,
+        tnEvcExtStatDiscardFrameTx         Counter64,
+        tnEvcExtStatDiscardBytesRx         Counter64,
+        tnEvcExtStatDiscardBytesTx         Counter64,
+        tnEvcExtStatclear                  TruthValue
+}
+
+tnEvcExtStatType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        evc(1),
+                        ece(2)
+                    }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The traffic class for the EVC."
+        ::= { tnEvcExtStatEntry 1 }
+
+tnEvcExtStatIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..11111)  -- range added by Jing
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The EVC or ECE index."
+        ::= { tnEvcExtStatEntry 2 }
+
+tnEvcExtStatPort OBJECT-TYPE
+        SYNTAX      INTEGER (1..11111)  -- range added by Jing
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The EVC or ECE index."
+        ::= { tnEvcExtStatEntry 3 }
+
+tnEvcExtStatGreenFrameRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Frames of green received."
+        ::= { tnEvcExtStatEntry 4 }
+
+tnEvcExtStatGreenFrameTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Frames of green transmitted."
+        ::= { tnEvcExtStatEntry 5 }
+
+tnEvcExtStatGreenBytesRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Bytes of green received."
+        ::= { tnEvcExtStatEntry 6 }
+
+tnEvcExtStatGreenBytesTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Bytes of green transmitted."
+        ::= { tnEvcExtStatEntry 7 }
+
+tnEvcExtStatYellowFrameRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Frames of yellow received."
+        ::= { tnEvcExtStatEntry 8 }
+
+tnEvcExtStatYellowFrameTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Frames of yellow transmitted."
+        ::= { tnEvcExtStatEntry 9 }
+
+tnEvcExtStatYellowBytesRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Bytes of yellow received."
+        ::= { tnEvcExtStatEntry 10 }
+
+tnEvcExtStatYellowBytesTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Bytes of yellow transmitted."
+        ::= { tnEvcExtStatEntry 11 }
+
+tnEvcExtStatRedFrameRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Frames of red received."
+        ::= { tnEvcExtStatEntry 12 }
+
+tnEvcExtStatRedBytesRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Bytes of red received."
+        ::= { tnEvcExtStatEntry 13 }
+
+tnEvcExtStatDiscardFrameRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Frames of discarded received."
+        ::= { tnEvcExtStatEntry 14 }
+
+tnEvcExtStatDiscardFrameTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Frames of discarded transmitted."
+        ::= { tnEvcExtStatEntry 15 }
+
+tnEvcExtStatDiscardBytesRx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Bytes of discarded received."
+        ::= { tnEvcExtStatEntry 16 }
+
+tnEvcExtStatDiscardBytesTx OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number Bytes of discarded transmitted."
+        ::= { tnEvcExtStatEntry 17 }
+
+tnEvcExtStatclear OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Clear the value by EVC or ECE index."
+        ::= { tnEvcExtStatEntry 18 }
+
+--
+-- Ethernet Service Interface L2CP Table
+--
+
+tnEvcL2cpCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEvcL2cpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table supports L2CP settings."
+    ::= { tnEvcL2cpMgmtGroup 3 }
+
+tnEvcL2cpCfgEntry OBJECT-TYPE
+    SYNTAX      TnEvcL2cpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "L2CP settings table entry."
+    INDEX { tnEvcL2cpCfgInterfaceNumber, tnEvcL2cpCfgIndex }
+    ::= { tnEvcL2cpCfgTable 1 }
+
+TnEvcL2cpCfgEntry ::= SEQUENCE {
+      tnEvcL2cpCfgInterfaceNumber  Unsigned32,
+      tnEvcL2cpCfgIndex            Unsigned32,
+      tnEvcL2cpCfgType             INTEGER,
+      tnEvcL2cpCfgMatchScope       INTEGER,
+      tnEvcL2cpCfgMacAddress       MacAddress,
+      tnEvcL2cpCfgProtocol         Unsigned32,
+      tnEvcL2cpCfgSubType          Unsigned32,
+      tnEvcL2cpCfgEvcName          OCTET STRING,
+      tnEvcL2cpCfgValid            INTEGER,
+      tnEvcL2cpCfgRowStatus        RowStatus
+    }
+
+
+tnEvcL2cpCfgInterfaceNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Sets L2CP interface number."
+    ::= { tnEvcL2cpCfgEntry 1 }
+
+tnEvcL2cpCfgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Sets L2CP index number on an interface."
+    ::= { tnEvcL2cpCfgEntry 2 }
+
+tnEvcL2cpCfgType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        discard   (1),
+        tunnel    (2),
+        peer      (3),
+        passToEvc (4),
+        peerToEvc (5)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Sets L2CP type setting."
+    ::= { tnEvcL2cpCfgEntry 3 }
+
+tnEvcL2cpCfgMatchScope OBJECT-TYPE
+    SYNTAX      INTEGER {
+        destinationAddressOnly         (1),
+        daPlusProtocol                 (2),
+        daPlusProtocolPlusSubtype      (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Sets L2CP selection matching scope."
+    ::= { tnEvcL2cpCfgEntry 4 }
+
+tnEvcL2cpCfgMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Sets L2CP Destination MAC address."
+    ::= { tnEvcL2cpCfgEntry 5 }
+
+tnEvcL2cpCfgProtocol OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Sets L2CP protocol."
+    ::= { tnEvcL2cpCfgEntry 6 }
+
+tnEvcL2cpCfgSubType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Sets L2CP subtype for the protocol selected."
+    ::= { tnEvcL2cpCfgEntry 7 }
+
+tnEvcL2cpCfgEvcName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..45))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Sets L2CP EVC association."
+    ::= { tnEvcL2cpCfgEntry 8 }
+
+tnEvcL2cpCfgValid OBJECT-TYPE
+    SYNTAX      INTEGER {
+        invalid (1),
+        valid  (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Sets L2CP valid instance."
+    ::= { tnEvcL2cpCfgEntry 9 }
+
+tnEvcL2cpCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row cannot be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+   ::= { tnEvcL2cpCfgEntry 10 }
+---
+-- conformance information
+tnEvcConformance OBJECT IDENTIFIER ::= { tnEvcObjects 8 }
+tnEvcGroups OBJECT IDENTIFIER ::= { tnEvcConformance 1 }
+-- MIB groupings
+tnEvcPortConfigGroup OBJECT-GROUP
+OBJECTS {
+tnEvcPortDEIMode,
+tnEvcPortTagMode,
+tnEvcPortAddressMode
+}
+STATUS current
+DESCRIPTION
+"The collection of objects which are used to configure or
+describe the configuration or behavior of the S3280."
+::= { tnEvcGroups 1 }
+tnEvcJaguarPortConfigGroup OBJECT-GROUP
+OBJECTS {
+tnEvcPortDEIMode
+}
+STATUS current
+DESCRIPTION
+"The collection of objects which are used to configure or
+describe the configuration or behavior of the S4140."
+::= { tnEvcGroups 2 }
+tnEvcTableGroup OBJECT-GROUP
+OBJECTS {
+tnEvcNNIPortlist,
+tnEvcVid,
+tnEvcIVid,
+tnEvcLearning,
+tnEvcPolicerID
+}
+STATUS current
+DESCRIPTION
+"The collection of objects which are used to configure or
+describe the configuration or behavior of the S4140."
+::= { tnEvcGroups 3 }
+END

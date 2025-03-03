@@ -1,0 +1,127 @@
+--MibName=rosMgmtVersion
+-- =======================================================================
+-- Version info 
+--
+-- Version 0.1 Created 2019.09.10 by wanghaisheng
+-- This version of MIB is created just for the use of Network Management Systems
+-- display the version info of the device.
+--
+-- Copyright(c) 2002-2019 by RAISECOM TECH, Ltd.     
+-- modify history
+-- 02, 20200407, wanghaisheng, add rosMgmtSoftVersion.
+-- 01, 20190915, wanghaisheng, Created.
+--                   
+-- =======================================================================
+
+    ROSMGMT-VERSION-MIB DEFINITIONS ::= BEGIN
+                                                               
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE     FROM SNMPv2-SMI        
+		MacAddress                       FROM SNMPv2-TC                 
+        rosMgmt               	 FROM RAISECOM-BASE-MIB  
+    ;
+    rosMgmtVersion MODULE-IDENTITY    
+				LAST-UPDATED    "201909100000Z"
+				ORGANIZATION    "Raisecom Science & Technology Co., ltd"
+				CONTACT-INFO    "www.rosMgmt.com"					
+				DESCRIPTION     
+						"The device version info Enterprise MIB definition."
+				REVISION   "201909100000Z"  -- 10 September 2019
+				DESCRIPTION
+				"RAISECOM ALARM MIB initial version."						
+			::= { rosMgmt 131 }
+
+	--rosMgmtVersionNotifications            OBJECT IDENTIFIER ::= { rosMgmtVersion 0 }
+	rosMgmtVersionObjects                  OBJECT IDENTIFIER ::= { rosMgmtVersion 1 }
+
+	rosMgmtVersionScalarGroup OBJECT IDENTIFIER ::= { rosMgmtVersionObjects 1 }
+	
+	rosMgmtRosVersion    OBJECT-TYPE
+        SYNTAX OCTET STRING  
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "ros software version."
+        ::= { rosMgmtVersionScalarGroup 1 }
+		
+	rosMgmtHardwareVersion    OBJECT-TYPE
+        SYNTAX OCTET STRING   
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "ros hardware version."
+        ::= { rosMgmtVersionScalarGroup 2 }
+		
+	rosMgmtBootstrapVersion    OBJECT-TYPE
+        SYNTAX OCTET STRING  
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "ros bootstrap version."
+        ::= { rosMgmtVersionScalarGroup 3 }
+		
+	rosMgmtSerialNumber OBJECT-TYPE
+        SYNTAX OCTET STRING  
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The serial number of the motherboard."
+        ::= { rosMgmtVersionScalarGroup 4 }  
+		
+	rosMgmtFpgaVersion OBJECT-TYPE
+        SYNTAX OCTET STRING  
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "ros fpga version."
+        ::= { rosMgmtVersionScalarGroup 5 }
+		
+	rosMgmtProductVersion OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "product version"
+        ::= { rosMgmtVersionScalarGroup 6 } 
+        
+	rosMgmtCmpAbName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "manufacturer abbreviated name"
+        ::= { rosMgmtVersionScalarGroup 7 }
+     
+	rosMgmtCmpFullName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "manufacturer full name"
+        ::= { rosMgmtVersionScalarGroup 8 } 
+		
+	rosMgmtDeviceName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "device name"
+        ::= { rosMgmtVersionScalarGroup 9 }    
+
+	rosMgmtMacAddress OBJECT-TYPE 
+        SYNTAX   MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "MAC address."
+        ::= { rosMgmtVersionScalarGroup 10} 
+		
+	rosMgmtSoftVersion OBJECT-TYPE 
+        SYNTAX   OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Software version of the devcie."
+        ::= { rosMgmtVersionScalarGroup 11} 
+                                        
+END    

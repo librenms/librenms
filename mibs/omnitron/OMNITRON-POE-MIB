@@ -1,0 +1,406 @@
+OMNITRON-POE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, IpAddress
+        FROM SNMPv2-SMI           -- RFC-2578
+    TruthValue
+        FROM SNMPv2-TC            -- RFC-2579
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF          -- RFC-2580
+    omnitron, OstPortSingleIndex, OstFloatValue
+        FROM OMNITRON-TC-MIB;     -- Omnitron Enterprise Extension MIB
+
+omnitronPoeMib MODULE-IDENTITY
+    LAST-UPDATED "201501191200Z"     -- January 19, 2015
+    ORGANIZATION "Omnitron Systems Technology, Inc."
+    CONTACT-INFO "Omnitron Systems Technology, Inc.
+                  38 Tesla
+                  Irvine, CA 92618-4670
+                  USA
+
+             Tel: (949) 250 6510
+             Fax: (949) 250 6514
+          E-mail: info@omnitron-systems.com
+   International: +1 949 250 6510
+
+                  Technical Support and Customer Service
+             Tel: (800) 675 8410
+          E-mail: support@omnitron-systems.com
+   International: +1 949 250 6510"
+
+    DESCRIPTION
+            "Omnitron PoE MIB for use with iConverter Management Modules v5.2
+             and NetOutlook.
+
+             Copyright 2015 Omnitron Systems Technology, Inc.
+             All rights reserved.
+            "
+
+    REVISION    "201501191200Z"     -- January 19, 2015
+    DESCRIPTION "Initial version of v5.2 MIB.
+                "
+    ::= { omnitron 15 }
+
+
+--------------------------------------------------------------------------------
+-- Power Over Ethernet (PoE) Global Configuration Table
+--------------------------------------------------------------------------------
+
+ostPoeGlobalCfgTable  OBJECT IDENTIFIER ::= { omnitronPoeMib 1 }
+
+ostPoeGlobalCfgPwrLimitationEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object specifies whether the PoE PSE power limiting function is enabled.
+
+        The value 'true' indicates that PoE PSE limiting is enabled.
+
+        The value 'false' indicates that PoE PSE limiting is disabled.
+       "
+    DEFVAL { false }
+    ::= { ostPoeGlobalCfgTable 1 }
+
+ostPoeGlobalCfgTotalPwr OBJECT-TYPE
+    SYNTAX      OstFloatValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the total power sourced in Watts.
+       "
+    DEFVAL { "0.0" }
+    ::= { ostPoeGlobalCfgTable 2 }
+
+
+--------------------------------------------------------------------------------
+-- Power Over Ethernet (PoE) Port Configuration Table
+--------------------------------------------------------------------------------
+
+ostPoePortCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OstPoePortCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table supports the port PoE configurations."
+    ::= { omnitronPoeMib 2 }
+
+ostPoePortCfgEntry OBJECT-TYPE
+    SYNTAX      OstPoePortCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This is a PoE port configuration table entry."
+    INDEX { ostPoePortCfgIndex }
+    ::= { ostPoePortCfgTable 1 }
+
+OstPoePortCfgEntry ::= SEQUENCE {
+    ostPoePortCfgIndex                   OstPortSingleIndex,
+    ostPoePortPseEnable                  INTEGER,
+    ostPoePortPse60wMode                 INTEGER,
+    ostPoePortPdMode                     INTEGER,
+    ostPoePortPseVoltageSupplied         OstFloatValue,
+    ostPoePortPseCurrentSupplied         OstFloatValue,
+    ostPoePortPseStatus                  INTEGER,
+
+    ostPoePortHeartbeatEnable            INTEGER,
+    ostPoePortHeartbeatIpAddress         IpAddress,
+    ostPoePortHeartbeatInterval          Unsigned32,
+    ostPoePortHeartbeatErrorDetection    Unsigned32,
+    ostPoePortHeartbeatErrorAction       INTEGER,
+    ostPoePortHeartbeatNumberRestarts    Unsigned32,
+    ostPoEPortHeartbeatStatus            INTEGER,
+    ostPoEPortHeartbeatDeferTime         Unsigned32
+    }
+
+ostPoePortCfgIndex OBJECT-TYPE
+    SYNTAX      OstPortSingleIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An index that is used to identify a specific PoE port number."
+    ::= { ostPoePortCfgEntry 1 }
+
+
+ostPoePortPseEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pseDisabled   (1),
+        pseEnabled    (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PSE port enable.
+
+        pseDisabled(1)           PSE power source is disabled
+        pseEnabled(2)            PSE power source is enabled
+       "
+    DEFVAL { pseEnabled }
+    ::= { ostPoePortCfgEntry 2 }
+
+ostPoePortPse60wMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pse60wNotAvail (0),
+        pse60wAuto     (1),
+        pse60wForce    (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The object is the PoE PSE 60W mode enable. This is the same control as
+        the physical DIP switch.
+
+        pse60wNotAvail           PSE 60W function not available
+        pse60wAuto(1)            PSE 60W auto mode enabled
+        pse60wForce(2)           PSE 60W force mode enabled
+       "
+    DEFVAL { pse60wAuto }
+    ::= { ostPoePortCfgEntry 3 }
+
+ostPoePortPdMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pdModeNotDetected    (1),
+        pdModeNotClassified  (2),
+        pdModeFailure        (3),
+        pdModeClass0         (4),
+        pdModeClass1         (5),
+        pdModeClass2         (6),
+        pdModeClass3         (7),
+        pdModeClass4         (8),
+        pdMode60W            (9)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PD classification mode.
+
+        pdModeNotDetected(1)     PD is not detected
+        pdModeNotClassified(2)   PD is not classified
+        pdModeFailure(3)         PD classification failure
+        pdModeClass0(4)          PD is 802.3af Class 0 15W device
+        pdModeClass1(5)          PD is 802.3af Class 1 4W device
+        pdModeClass2(6)          PD is 802.3af Class 2 7W device
+        pdModeClass3(7)          PD is 802.3af Class 3 15W device
+        pdModeClass4(8)          PD is 802.3at Class 4 30W device
+        pdMode60W(9)             PD is 60W device
+       "
+    DEFVAL { pdModeNotDetected }
+    ::= { ostPoePortCfgEntry 4 }
+
+ostPoePortPseVoltageSupplied OBJECT-TYPE
+    SYNTAX      OstFloatValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the voltage output from the PSE port in volts.
+       "
+    DEFVAL { "0.0" }
+    ::= { ostPoePortCfgEntry 5 }
+
+ostPoePortPseCurrentSupplied OBJECT-TYPE
+    SYNTAX      OstFloatValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the current output from the PSE port in mA
+        (milliamps).
+       "
+    DEFVAL { "0.0" }
+    ::= { ostPoePortCfgEntry 6 }
+
+ostPoePortPseStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable        (1),
+        pdNormal             (2),
+        pdOverCurrent        (3),
+        pdBrownOut           (4),
+        pdInsufficientPower  (5)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PSE port status.
+
+        notApplicable(1)        PD device not connected or port disabled
+        pdNormal(2)             PD device is being powered fully
+        pdOverCurrent(3)        PD device is consuming too much current
+        pdBrownOut(4)           PD device is not fully powered
+        pdInsufficientPower(5)  PD device not powered due to lack of power
+
+        A write to this object restarts the PSE function and classification.
+       "
+    DEFVAL { notApplicable }
+    ::= { ostPoePortCfgEntry 7 }
+
+ostPoePortHeartbeatEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+        heartbeatDisabled   (1),
+        heartbeatEnabled    (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PSE heartbeat enable.
+
+        heartbeatDisabled(1)     PSE PD heartbeat is disabled
+        heartbeatEnabled(2)      PSE PD heartbeat is enabled
+       "
+    DEFVAL { heartbeatDisabled }
+    ::= { ostPoePortCfgEntry 8 }
+
+ostPoePortHeartbeatIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PD heartbeat IP address to ping.
+       "
+    DEFVAL { '00000000'H }
+    ::= { ostPoePortCfgEntry 9 }
+
+ostPoePortHeartbeatInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PSE PD heartbeat transmission interval in seconds.
+       "
+    DEFVAL { 1 }
+    ::= { ostPoePortCfgEntry 10 }
+
+ostPoePortHeartbeatErrorDetection OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PSE PD heartbeat number of consecutively lost
+        heartbeat pings before an errored condition is declared. The number
+        of consecutive error counts is cleared when a valid heartbeat
+        response is received.
+       "
+    DEFVAL { 3 }
+    ::= { ostPoePortCfgEntry 11 }
+
+ostPoePortHeartbeatErrorAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+        errorLostIgnored         (1),
+        errorRestart             (2),
+        errorShutdown            (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PSE heartbeat errored condition action.
+
+        errorLostIgnored(1)      PD heartbeat errored condition is ignored
+        errorRestart(2)          PD heartbeat errored condition results
+                                   in a restart
+        errorShutdown(3)         PD heartbeat errored condition results
+                                   in a shutdown (power removed)
+       "
+    DEFVAL { errorLostIgnored }
+    ::= { ostPoePortCfgEntry 12 }
+
+ostPoePortHeartbeatNumberRestarts OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16384)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PSE PD number of restarts when an errored
+        hearbeat condition occurs. This object is only used when
+        ostPoePortHeartbeatErrorAction is configured as 'errorRestart'
+
+        A value of zero indicates restarts never stop.
+       "
+    DEFVAL { 0 }
+    ::= { ostPoePortCfgEntry 13 }
+
+
+ostPoEPortHeartbeatStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        heartbeatDisabled   (1),
+        heartbeatAvailable  (2),
+        heartbeatErrored    (3),
+        heartbeatRestart    (4),
+        heartbeatShutdown   (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PSE PD heartbeat status.
+
+        heartbeatDisabled(1)    PSE PD heartbeat is disabled
+        heartbeatAvailable(2)   PSE PD heartbeats are being received
+        heartbeatErrored(3)     PSE PD heartbeat is in an errored condition
+        heartbeatRestart(4)     PSE PD heartbeat error has caused a PSE restart
+        heartbeatShutdown(5)    PSE PD heartbeat error has caused a PSE shutdown
+       "
+    DEFVAL { heartbeatDisabled }
+    ::= { ostPoePortCfgEntry 14 }
+
+ostPoEPortHeartbeatDeferTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE heartbeat PSE PD heartbeat transmission delay
+        interval in seconds after the port has been reenabled. The delay is
+        the amount of time after power has been applied before the heartbeat
+        function starts and hence the detection of heartbeat errors.
+       "
+    DEFVAL { 5 }
+    ::= { ostPoePortCfgEntry 15 }
+
+
+--------------------------------------------------------------------------------
+-- Conformance Information
+--------------------------------------------------------------------------------
+ostPoeCompliances       OBJECT IDENTIFIER ::= { omnitronPoeMib 3 }
+ostPoeGroups            OBJECT IDENTIFIER ::= { omnitronPoeMib 4 }
+
+
+--------------------------------------------------------------------------------
+-- Omnitron PoE MIB Units of conformance
+--------------------------------------------------------------------------------
+ostPoeGroup OBJECT-GROUP
+    OBJECTS {
+        ostPoeGlobalCfgPwrLimitationEnable,
+        ostPoeGlobalCfgTotalPwr,
+
+        ostPoePortPseEnable,
+        ostPoePortPse60wMode,
+        ostPoePortPdMode,
+        ostPoePortPseVoltageSupplied,
+        ostPoePortPseCurrentSupplied,
+        ostPoePortPseStatus,
+
+        ostPoePortHeartbeatEnable,
+        ostPoePortHeartbeatIpAddress,
+        ostPoePortHeartbeatInterval,
+        ostPoePortHeartbeatErrorDetection,
+        ostPoePortHeartbeatErrorAction,
+        ostPoePortHeartbeatNumberRestarts,
+        ostPoEPortHeartbeatStatus,
+        ostPoEPortHeartbeatDeferTime
+    }
+    STATUS      current
+    DESCRIPTION
+       "Mandatory objects for the PoE functional group."
+    ::= { ostPoeGroups 1 }
+
+
+--------------------------------------------------------------------------------
+-- Omnitron POE MIB Compliance statements
+-------------------------------------------------------------------------------
+ostPoeCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION "The compliance statement for the Omnitron PoE MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            ostPoeGroup
+        }
+    ::= { ostPoeCompliances 2 }
+
+
+END
+

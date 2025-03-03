@@ -1,0 +1,1164 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-CFM-MIB.mib
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-CFM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Unsigned32               FROM SNMPv2-SMI    -- [RFC2578]
+DisplayString,
+RowStatus,
+TruthValue,
+MacAddress
+FROM SNMPv2-TC -- [RFC2579]
+
+Dot1afCfmIndexIntegerNextFree,
+Dot1agCfmMDLevelOrNone,
+dot1agCfmMaCompEntry,
+dot1agCfmMepEntry,
+dot1agCfmLtrEntry,
+dot1agCfmMdIndex,
+dot1agCfmMaIndex,
+dot1agCfmMepIdentifier,
+dot1agCfmMepDbRMepIdentifier
+FROM IEEE8021-CFM-MIB
+
+switch
+FROM PRVT-SWITCH-MIB
+
+VlanId FROM Q-BRIDGE-MIB -- [RFC4363]
+;
+
+prvtCfmMib MODULE-IDENTITY
+LAST-UPDATED "201101180000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+" BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+DESCRIPTION
+"Prvt extension of Connectivity Fault Management module for managing IEEE 802.1ag"
+
+
+-- revision history
+REVISION "201209120000Z"
+DESCRIPTION
+"Added prvtCfmMepManageCCMTLV"
+REVISION "201104180000Z"
+DESCRIPTION
+"Added prvtCfmMepSuportedRemoteMepsNo"
+REVISION "201101180000Z"
+DESCRIPTION
+"Added AIS/LCK traps"
+REVISION "201007080000Z"
+DESCRIPTION
+"Added prvtCfmMaAisLckVlan table"
+REVISION "201004080000Z"
+DESCRIPTION
+"Changed description for prvtCfmMepAisCondition"
+REVISION "201003170000Z"
+DESCRIPTION
+"Add posibility to enable/disable 1wJitter, 2wJitter, FrameLoss and Latency
+on a CFM profile."
+REVISION "200906200000Z"
+DESCRIPTION
+"Fixed some minor description issues, removed prvtCfmProfileFrameLossBucketSize"
+REVISION "200808190000Z"
+DESCRIPTION
+"Added prvtCfmMepTransmitLbmSuccessRate, prvtCfmMepTransmitLbmMinTime,
+prvtCfmMepTransmitLbmAvgTime, prvtCfmMepTransmitLbmMaxTime,
+prvtCfmLbrBadMsdu."
+REVISION "200806240000Z"
+DESCRIPTION
+"Added prvtCfmStatus"
+REVISION "200801200000Z"
+DESCRIPTION
+"Initial"
+::= { switch 131 }
+
+prvtCfmMibNotifications OBJECT IDENTIFIER ::= { prvtCfmMib 0 }
+prvtCfmMibObjects OBJECT IDENTIFIER ::= { prvtCfmMib 1 }
+prvtCfmMibConformance OBJECT IDENTIFIER ::= { prvtCfmMib 2 }
+
+prvtCfmUpdateInterval OBJECT-TYPE
+SYNTAX Unsigned32 (0..65535)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Time between monitoring parameters update (in seconds).
+A value of 0 suspends the monitoring task and a
+value different from 0 resumes it. Default is 20 seconds."
+DEFVAL { 20 }
+::= { prvtCfmMibObjects 1 }
+
+prvtCfmStatus OBJECT-TYPE
+SYNTAX INTEGER {
+enable ( 1 ),
+disable ( 2 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Enable/disable cfm."
+::= { prvtCfmMibObjects 2 }
+
+prvtCfmProfile OBJECT IDENTIFIER ::= { prvtCfmMibObjects 3 }
+
+prvtCfmProfileTableNextIndex OBJECT-TYPE
+SYNTAX Dot1afCfmIndexIntegerNextFree
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object contains an unused value for prvtCfmProfileIndex in
+the prvtCfmProfileTable, or a zero to indicate that none exist."
+::= { prvtCfmProfile 1 }
+
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+prvtCfmProfileTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCfmProfileEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Table contains loopback results from all remote MEPs in the MA."
+::= { prvtCfmProfile 2 }
+
+prvtCfmProfileEntry OBJECT-TYPE
+SYNTAX PrvtCfmProfileEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "a"
+INDEX { prvtCfmProfileIndex }
+::= { prvtCfmProfileTable 1 }
+
+PrvtCfmProfileEntry ::= SEQUENCE {
+prvtCfmProfileIndex Unsigned32,
+prvtCfmProfileName DisplayString,
+prvtCfmProfilePriority Unsigned32,
+prvtCfmProfileRate Unsigned32,
+prvtCfmProfileSize Unsigned32,
+prvtCfmProfileBucketSize Unsigned32,
+prvtCfmProfile1wJitterError Unsigned32,
+prvtCfmProfile1wJitterWarning Unsigned32,
+prvtCfmProfileJitterError Unsigned32,
+prvtCfmProfileJitterErrorPeriod Unsigned32,
+prvtCfmProfileJitterWarning Unsigned32,
+prvtCfmProfileJitterWarningPeriod Unsigned32,
+prvtCfmProfileFrameLossError Unsigned32,
+prvtCfmProfileFrameLossWarning Unsigned32,
+prvtCfmProfileLatencyError Unsigned32,
+prvtCfmProfileLatencyErrorPeriod Unsigned32,
+prvtCfmProfileLatencyWarning Unsigned32,
+prvtCfmProfileLatencyWarningPeriod Unsigned32,
+prvtCfmProfileRowStatus RowStatus,
+prvtCfmProfile1wJitterEnable TruthValue,
+prvtCfmProfileJitterEnable TruthValue,
+prvtCfmProfileFrameLossEnable TruthValue,
+prvtCfmProfileLatencyEnable TruthValue
+}
+
+prvtCfmProfileIndex OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Table index."
+::= { prvtCfmProfileEntry 1 }
+
+prvtCfmProfileName OBJECT-TYPE
+SYNTAX DisplayString (SIZE(1..20))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Profile name."
+::= { prvtCfmProfileEntry 2 }
+
+prvtCfmProfilePriority OBJECT-TYPE
+SYNTAX Unsigned32 (0..7)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"802.1p class-of-service setting."
+DEFVAL { 0 }
+::= { prvtCfmProfileEntry 3 }
+
+prvtCfmProfileRate OBJECT-TYPE
+SYNTAX Unsigned32 (1..3)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Number of Request packets to send each time."
+DEFVAL { 1 }
+::= { prvtCfmProfileEntry 4 }
+
+prvtCfmProfileSize OBJECT-TYPE
+SYNTAX Unsigned32 (0..1462)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Size of data TLV included in probe packets (in octets)."
+DEFVAL { 0 }
+::= { prvtCfmProfileEntry 5 }
+
+prvtCfmProfileBucketSize OBJECT-TYPE
+SYNTAX Unsigned32 (2..255)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Number of the results to save for results calculation."
+DEFVAL { 20 }
+::= { prvtCfmProfileEntry 6 }
+
+prvtCfmProfile1wJitterError OBJECT-TYPE
+SYNTAX Unsigned32 (1..10000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies one-way jitter error values to monitor in milliseconds."
+DEFVAL { 350 }
+::= { prvtCfmProfileEntry 7 }
+
+prvtCfmProfile1wJitterWarning OBJECT-TYPE
+SYNTAX Unsigned32 (1..10000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies one-way jitter warning values to monitor in milliseconds."
+DEFVAL { 300 }
+::= { prvtCfmProfileEntry 8 }
+
+prvtCfmProfileJitterError OBJECT-TYPE
+SYNTAX Unsigned32 (1..10000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies round-trip jitter error values to monitor in milliseconds."
+DEFVAL { 700 }
+::= { prvtCfmProfileEntry 9 }
+
+prvtCfmProfileJitterErrorPeriod OBJECT-TYPE
+SYNTAX Unsigned32 (1..3600)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies the duration jitter occurs in seconds."
+DEFVAL { 90 }
+::= { prvtCfmProfileEntry 10 }
+
+prvtCfmProfileJitterWarning OBJECT-TYPE
+SYNTAX Unsigned32 (1..10000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies round-trip jitter warning values
+to monitor in milliseconds. If set value is greater than the
+jitter-error it means that the warning is disabled."
+DEFVAL { 600 }
+::= { prvtCfmProfileEntry 11 }
+
+prvtCfmProfileJitterWarningPeriod OBJECT-TYPE
+SYNTAX Unsigned32 (1..3600)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies the duration jitter occurs in seconds."
+DEFVAL { 180 }
+::= { prvtCfmProfileEntry 12 }
+
+prvtCfmProfileFrameLossError OBJECT-TYPE
+SYNTAX Unsigned32 (0..99)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies round-trip frame-loss error
+values to monitor. The default is
+frame-loss of 10% is reported."
+DEFVAL { 10 }
+::= { prvtCfmProfileEntry 13 }
+
+prvtCfmProfileFrameLossWarning OBJECT-TYPE
+SYNTAX Unsigned32 (0..99)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies round-trip frame-loss warning
+values to monitor. The default is frame-loss
+of 8% is reported. If set value is greater
+than the frame-loss-error it means
+that the warning is disable."
+DEFVAL { 8 }
+::= { prvtCfmProfileEntry 14 }
+
+prvtCfmProfileLatencyError OBJECT-TYPE
+SYNTAX Unsigned32 (1..10000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies round-trip latency error values to monitor in milliseconds."
+DEFVAL { 2000 }
+::= { prvtCfmProfileEntry 15 }
+
+prvtCfmProfileLatencyErrorPeriod OBJECT-TYPE
+SYNTAX Unsigned32 (1..3600)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies the duration latency increase occurs in seconds."
+DEFVAL { 90 }
+::= { prvtCfmProfileEntry 16 }
+
+prvtCfmProfileLatencyWarning OBJECT-TYPE
+SYNTAX Unsigned32 (1..10000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies round-trip latency error values to
+monitor in milliseconds. If set value is greater than the
+latency-error it means that the warning is disabled."
+DEFVAL { 1600 }
+::= { prvtCfmProfileEntry 17 }
+
+prvtCfmProfileLatencyWarningPeriod OBJECT-TYPE
+SYNTAX Unsigned32 (1..3600)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specifies the duration latency increase occurs in seconds."
+DEFVAL { 180 }
+::= { prvtCfmProfileEntry 18 }
+
+prvtCfmProfileRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The status of the row.
+The writable columns in a row can not be changed if the row
+is active. All columns must have a valid value before a row
+can be activated.
+"
+::= { prvtCfmProfileEntry 19 }
+
+prvtCfmProfile1wJitterEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"A boolean showing if one way jitter calculation is enabled."
+DEFVAL { true }
+::= { prvtCfmProfileEntry 20 }
+
+prvtCfmProfileJitterEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"A boolean showing if two way jitter calculation is enabled."
+DEFVAL { true }
+::= { prvtCfmProfileEntry 21 }
+
+prvtCfmProfileFrameLossEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"A boolean showing if frame loss calculation is enabled."
+DEFVAL { true }
+::= { prvtCfmProfileEntry 22 }
+
+prvtCfmProfileLatencyEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"A boolean showing if latency calculation is enabled."
+DEFVAL { true }
+::= { prvtCfmProfileEntry 23 }
+
+
+prvtCfmProcess OBJECT IDENTIFIER ::= { prvtCfmMibObjects 4 }
+
+prvtCfmProcessTableNextIndex OBJECT-TYPE
+SYNTAX Dot1afCfmIndexIntegerNextFree
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object contains an unused value for prvtCfmProcessIndex in
+the prvtCfmProcessTable, or a zero to indicate that none exists."
+::= { prvtCfmProcess 1 }
+
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+prvtCfmProcessTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCfmProcessEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Private extension of dot1agCfmMaNetTable.
+Controls the two-way monitoring process
+for MEP's in the MA."
+::= { prvtCfmProcess 2 }
+
+prvtCfmProcessEntry OBJECT-TYPE
+SYNTAX PrvtCfmProcessEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "a"
+INDEX { dot1agCfmMdIndex, dot1agCfmMaIndex, prvtCfmProcessIndex }
+::= { prvtCfmProcessTable 1 }
+
+PrvtCfmProcessEntry ::= SEQUENCE {
+prvtCfmProcessIndex Unsigned32,
+prvtCfmProcessProfileIndex Unsigned32,
+prvtCfmProcessName OCTET STRING,
+prvtCfmProcessStatus TruthValue,
+prvtCfmProcessRepeatInterval Unsigned32,
+prvtCfmProcessPacketType INTEGER,
+prvtCfmProcessUnreturnedPkts Unsigned32,
+prvtCfmProcessRowStatus RowStatus
+}
+
+prvtCfmProcessIndex OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Table index."
+::= { prvtCfmProcessEntry 1 }
+
+prvtCfmProcessProfileIndex OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Index of the monitoring profile to be used."
+DEFVAL { 1 }
+::= { prvtCfmProcessEntry 2 }
+
+prvtCfmProcessName OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE(1..20))
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The name of the process. Should be unique per domain/MA"
+::= { prvtCfmProcessEntry 3 }
+
+prvtCfmProcessStatus OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Enable/disable two-way monitoring process for MEP's in the MA."
+DEFVAL { true }
+::= { prvtCfmProcessEntry 4 }
+
+prvtCfmProcessRepeatInterval OBJECT-TYPE
+SYNTAX Unsigned32 (1..420)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Repeating frequency of the monitoring process."
+DEFVAL { 60 }
+::= { prvtCfmProcessEntry 5 }
+
+prvtCfmProcessPacketType OBJECT-TYPE
+SYNTAX INTEGER {
+cfm (1),
+y1731 (2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Use CFM Loopback or Y.1731 LMMs and DMMs packets."
+DEFVAL { cfm }
+::= { prvtCfmProcessEntry 6 }
+
+prvtCfmProcessUnreturnedPkts OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of requests for which a reply hasn't been
+received. These packets will be counted as lost
+when they enter timeout."
+DEFVAL { 0 }
+::= { prvtCfmProcessEntry 7 }
+
+prvtCfmProcessRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The status of the row.
+The writable columns in a row can not be changed if the row
+is active. All columns must have a valid value before a row
+can be activated."
+::= { prvtCfmProcessEntry 8 }
+
+-- ------------------------------------------------
+-- ------------------------------------------------
+
+prvtCfmProcessResult OBJECT IDENTIFIER ::= { prvtCfmMibObjects 5 }
+
+prvtCfmProcessResultTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCfmProcessResultEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Table contains process results."
+::= { prvtCfmProcessResult 1 }
+
+prvtCfmProcessResultEntry OBJECT-TYPE
+SYNTAX PrvtCfmProcessResultEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "a"
+INDEX { dot1agCfmMdIndex, dot1agCfmMaIndex,
+prvtCfmProcessIndex, dot1agCfmMepDbRMepIdentifier }
+::= { prvtCfmProcessResultTable 1 }
+
+PrvtCfmProcessResultEntry ::= SEQUENCE {
+prvtCfmProcessResultOneWayJitter Unsigned32,
+prvtCfmProcessResultTwoWayJitter Unsigned32,
+prvtCfmProcessResultLatency Unsigned32,
+prvtCfmProcessResultFrameloss Unsigned32
+}
+
+prvtCfmProcessResultOneWayJitter OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"One way jitter calculated for a specific remote MEP in milliseconds"
+::= { prvtCfmProcessResultEntry 1 }
+
+prvtCfmProcessResultTwoWayJitter OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Two way jitter calculated for a specific remote MEP in milliseconds"
+::= { prvtCfmProcessResultEntry 2 }
+
+prvtCfmProcessResultLatency OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Two way latency calculated for a specific remote MEP
+in milliseconds"
+::= { prvtCfmProcessResultEntry 3 }
+
+prvtCfmProcessResultFrameloss OBJECT-TYPE
+SYNTAX Unsigned32 (0..10000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Two way frameloss calculated for a specific remote MEP
+in units of hundredths of percent.
+Note: When prvtCfmProcessResultFrameloss has value of 10000, all the values of
+prvtCfmProcessResultOneWayJitter, prvtCfmProcessResultTwoWayJitter and
+prvtCfmProcessResultLatency are irrelevant."
+::= { prvtCfmProcessResultEntry 4 }
+
+-- ------------------------------------------------
+-- ------------------------------------------------
+
+prvtCfmMa OBJECT IDENTIFIER ::= { prvtCfmMibObjects 6 }
+
+prvtCfmMaTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCfmMaEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Table includes extra variables needed for Y.1731
+support and service awareness"
+::= { prvtCfmMa 1 }
+
+prvtCfmMaEntry OBJECT-TYPE
+SYNTAX PrvtCfmMaEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "a"
+AUGMENTS { dot1agCfmMaCompEntry }
+::= { prvtCfmMaTable 1 }
+
+PrvtCfmMaEntry ::= SEQUENCE {
+prvtCfmMaCompAisLckEnabled TruthValue,
+prvtCfmMaCompAisLckLevel Dot1agCfmMDLevelOrNone,
+prvtCfmMaCompAisLckInterval INTEGER,
+prvtCfmMaCompAisLckPriority Unsigned32,
+prvtCfmMaCompServiceId Unsigned32,
+prvtCfmMaCompNumberOfServices Unsigned32,
+prvtCfmMaCompClearConnectivity Unsigned32
+}
+
+prvtCfmMaCompAisLckEnabled OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Turn the AIS & LCK features on/off."
+DEFVAL { false }
+::= { prvtCfmMaEntry 1 }
+
+prvtCfmMaCompAisLckLevel OBJECT-TYPE
+SYNTAX Dot1agCfmMDLevelOrNone
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+	"The MD level at which AIS & LCK frames will be sent.
+	It should be greater then that of the current domain.
+	The default value is '-1' representing 'not-configured'."     
+DEFVAL {-1}
+::= { prvtCfmMaEntry 2 }
+
+prvtCfmMaCompAisLckInterval OBJECT-TYPE
+SYNTAX INTEGER {
+interval1s (1),
+interval1min (2) }
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The time interval at which AIS and LCK frames will be sent"
+DEFVAL { interval1s }
+::= { prvtCfmMaEntry 3 }
+
+prvtCfmMaCompAisLckPriority OBJECT-TYPE
+SYNTAX Unsigned32 (0..7)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"COS parameter for the outgoing AIS & LCK frames.
+ The default value is '6'"
+DEFVAL { 6 }
+::= { prvtCfmMaEntry 4 }
+
+prvtCfmMaCompServiceId OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The primary service ID attached to this MA"
+DEFVAL { 0 }
+::= { prvtCfmMaEntry 5 }
+
+prvtCfmMaCompNumberOfServices OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of services attached to this MA"
+DEFVAL { 1 }
+::= { prvtCfmMaEntry 6 }
+
+prvtCfmMaCompClearConnectivity OBJECT-TYPE
+SYNTAX Unsigned32 (0..8191)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Number of MEP or 0 for all"
+DEFVAL { 0 }
+::= { prvtCfmMaEntry 7 }
+
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+prvtCfmMep OBJECT IDENTIFIER ::= { prvtCfmMibObjects 7 }
+
+prvtCfmMepTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCfmMepEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "a"
+::= { prvtCfmMep 1 }
+
+prvtCfmMepEntry OBJECT-TYPE
+SYNTAX PrvtCfmMepEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "a"
+AUGMENTS { dot1agCfmMepEntry }
+::= { prvtCfmMepTable 1 }
+
+PrvtCfmMepEntry ::= SEQUENCE {
+prvtCfmMepAlarmSupressed TruthValue,
+prvtCfmMepAisCondition TruthValue,
+prvtCfmMepLckCondition TruthValue,
+prvtCfmMepAisLifetime INTEGER,
+prvtCfmMepLckLifetime INTEGER,
+prvtCfmMepTransmitMcastLbm TruthValue,
+prvtCfmMepTransmitLbmInfinite TruthValue,
+prvtCfmMepTransmitLbmDelay Unsigned32,
+prvtCfmMepTransmitLbmTimeout Unsigned32,
+prvtCfmMepTransmitLtmTimeout Unsigned32,
+prvtCfmMepTransmitLbmSentPkts Unsigned32,
+prvtCfmMepTransmitLbmSuccessRate Unsigned32,
+prvtCfmMepTransmitLbmMinTime Unsigned32,
+prvtCfmMepTransmitLbmAvgTime Unsigned32,
+prvtCfmMepTransmitLbmMaxTime Unsigned32,
+prvtCfmMepSuportedRemoteMepsNo INTEGER,
+prvtCfmMepExcludeCCMTLV DisplayString
+}
+
+prvtCfmMepAlarmSupressed OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"A boolean showing if an AIS or LCK packet
+was received from a lower level"
+DEFVAL { false }
+::= { prvtCfmMepEntry 1 }
+
+prvtCfmMepAisCondition OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"A boolean showing if there is AIS condition. The value of the object is true (an AIS condition), when
+there is a  detection of signal-fail condition at a Server layer or reception of AIS at a server (sub-) layer MEP [AIS condition/Rec.
+ITU-T Y.1731].
+The AIS condition will exit when following criteria is met: During an interval equal to 3.5 times the AIS transmission
+period indicated in the AIS frames received earlier, the MEP does not receive AIS frames or, when ETH-CC is used,
+upon clearing of LOC defect at MEP /Appendix I/Rec. ITU-T Y.1731.
+If prvtCfmMaCompAisLckLevel is configured the MEP should send AIS packets."
+DEFVAL { false }
+::= { prvtCfmMepEntry 2 }
+
+prvtCfmMepLckCondition OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"A boolean showing if the MEP should lock the service
+towards the client and send LCK packets"
+DEFVAL { false }
+::= { prvtCfmMepEntry 3 }
+
+prvtCfmMepAisLifetime OBJECT-TYPE
+SYNTAX INTEGER {
+		nolifetime    (0),
+lifetime35s (1),
+lifetime35min (2) }
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+	"The lifetime of the last received AIS packet.
+	During an interval equal to 3.5 times the AIS transmission period indicated
+	in the AIS frames received earlier, the MEP does not receive AIS frames.
+	The value is valid (non-zero) if AIS packets are being received."
+::= { prvtCfmMepEntry 4 }
+
+prvtCfmMepLckLifetime OBJECT-TYPE
+SYNTAX INTEGER {
+		nolifetime    (0),
+lifetime35s (1),
+lifetime35min (2) }
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+	"The lifetime of the last received LCK packet.
+	During an interval equal to 3.5 times the LCK transmission period indicated
+	in the LCK frames received earlier, the MEP does not receive LCK frames.
+	The value is valid (non-zero) if AIS packets are being received."
+::= { prvtCfmMepEntry 5 }
+
+prvtCfmMepTransmitMcastLbm OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"A boolean to control sending Y.1731 multicast loopback."
+DEFVAL { false }
+::= { prvtCfmMepEntry 6 }
+
+prvtCfmMepTransmitLbmInfinite OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"A boolean to control sending LBMs continuously until the
+operation is explicitly stopped by setting this back to false"
+DEFVAL { false }
+::= { prvtCfmMepEntry 7 }
+
+prvtCfmMepTransmitLbmDelay OBJECT-TYPE
+SYNTAX Unsigned32 (0..60)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"An amount of time to wait between sent LBMs (in seconds)."
+DEFVAL { 1 }
+::= { prvtCfmMepEntry 8 }
+
+prvtCfmMepTransmitLbmTimeout OBJECT-TYPE
+SYNTAX Unsigned32 (1..60)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"An amount of time to wait after the last sent LBM if no
+LBR is received (in seconds)."
+DEFVAL { 5 }
+::= { prvtCfmMepEntry 9 }
+
+prvtCfmMepTransmitLtmTimeout OBJECT-TYPE
+SYNTAX Unsigned32 (1..60)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"An amount of time to wait after the last sent LTM if no
+LTR is received (in seconds)."
+DEFVAL { 5 }
+::= { prvtCfmMepEntry 10 }
+
+prvtCfmMepTransmitLbmSentPkts OBJECT-TYPE
+SYNTAX Unsigned32 (1..1024)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of successfully sent packets in the current LBM
+session."
+::= { prvtCfmMepEntry 11 }
+
+prvtCfmMepTransmitLbmSuccessRate OBJECT-TYPE
+SYNTAX Unsigned32 (1..10000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Success rate of the current LBM session (in percentage*100)."
+::= { prvtCfmMepEntry 12 }
+
+prvtCfmMepTransmitLbmMinTime OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Minimum LBR response time (in msec)."
+::= { prvtCfmMepEntry 13 }
+
+prvtCfmMepTransmitLbmAvgTime OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Average LBR response time (in msec)."
+::= { prvtCfmMepEntry 14 }
+
+prvtCfmMepTransmitLbmMaxTime OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Maximum LBR response time (in msec)."
+::= { prvtCfmMepEntry 15 }
+
+prvtCfmMepSuportedRemoteMepsNo OBJECT-TYPE
+SYNTAX INTEGER{
+remoteMeps8 (8),
+remoteMeps16 (16),
+remoteMeps24 (24),
+remoteMeps32 (32)
+} 
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The number of suported remote meps (for TMarc3x0 and TMarc280 devices)"
+DEFVAL {remoteMeps8}
+::= { prvtCfmMepEntry 16 }
+
+prvtCfmMepExcludeCCMTLV OBJECT-TYPE
+SYNTAX DisplayString (SIZE(2))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Bitmask that specifies what TLVs should be  excluded(for TMarc3x0 and TMarc280 devices):
+	   On set opertaion:
+	   BIT4 =  MSB Include/Exclude bit - if it is 1 the tlv is excluded from the specific CCM packet,if it is 0 the tlv will be included in the specific CCM packet
+	   BIT3 =      If set 1 the OrgSpecific TLV will be  excluded or included 
+	   BIT2 =      If set 1 the InterfaceStatus TLV will be excluded or included
+	   BIT1 = 	   If set 1 the PortStatus TLV will be excluded or included
+	   BIT0 =  LSB If set 1 the Sender ID TLV will be excluded or included 
+	   Examples: 
+	    If Interface Status and Port Status will be excluded the bitmask will look like this:
+	   16 in hexadecimal BIT4 BIT3 BIT2 BIT1 BIT0 
+						  1     0    1     1   0
+		If Interface Status and Port Status will be included the bitmask will look like this:
+	    06 in hexadecimal BIT4 BIT3 BIT2 BIT1 BIT0 
+						  0     0    1     1   0
+		On get operation it shows the bits corresponding to the  excluded tlvs
+		If Interface Status and Port Status are excluded:
+		 06 in hexadecimal - 0    1     1   0 
+	    "
+	::= { prvtCfmMepEntry 17 }
+
+-- ------------------------------------------------
+-- ------------------------------------------------
+
+prvtCfmLbrTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCfmLbrEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Table contains loopback results following the last loopback operation."
+::= { prvtCfmMep 2 }
+
+prvtCfmLbrEntry OBJECT-TYPE
+SYNTAX PrvtCfmLbrEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "a"
+INDEX { dot1agCfmMdIndex, dot1agCfmMaIndex, dot1agCfmMepIdentifier,
+prvtCfmLbrSeqNumber, prvtCfmLbrReceiveOrder }
+::= { prvtCfmLbrTable 1 }
+
+PrvtCfmLbrEntry ::= SEQUENCE {
+prvtCfmLbrSeqNumber Unsigned32,
+prvtCfmLbrReceiveOrder Unsigned32,
+prvtCfmLbrTime Unsigned32,
+prvtCfmLbrMacAddress MacAddress,
+prvtCfmLbrBadMsdu TruthValue
+}
+
+prvtCfmLbrSeqNumber OBJECT-TYPE
+SYNTAX Unsigned32 (0..4294967295)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Transaction identifier/Sequence number of the received LBR."
+::= { prvtCfmLbrEntry 1}
+
+prvtCfmLbrReceiveOrder OBJECT-TYPE
+SYNTAX Unsigned32 (1..4294967295)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An index to distinguish among multiple LBRs with the same LBR
+Transaction Identifier field value. This situation can appear
+in the case of multicast loopback.
+"
+::= { prvtCfmLbrEntry 2 }
+
+prvtCfmLbrTime OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Remote MEPs response time in milliseconds."
+::= { prvtCfmLbrEntry 3 }
+
+prvtCfmLbrMacAddress OBJECT-TYPE
+SYNTAX MacAddress
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Remote MEPs mac address. For unicast loopback
+this is the same as dot1agCfmMepTransmitLbmDestMacAddress,
+but for multicast loopback there will be different entries."
+::= { prvtCfmLbrEntry 4 }
+
+prvtCfmLbrBadMsdu OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Result of the Data TLV verification."
+::= { prvtCfmLbrEntry 5 }
+
+-- ------------------------------------------------
+-- ------------------------------------------------
+
+prvtCfmLtrTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCfmLtrEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table adds the possibility to measure the response
+time to a linktrace request."
+::= { prvtCfmMep 3 }
+
+prvtCfmLtrEntry OBJECT-TYPE
+SYNTAX PrvtCfmLtrEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "a"
+AUGMENTS { dot1agCfmLtrEntry }
+::= { prvtCfmLtrTable 1 }
+
+PrvtCfmLtrEntry ::= SEQUENCE {
+prvtCfmLtrTime Unsigned32
+}
+
+prvtCfmLtrTime OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Remote MPs response time in milliseconds."
+::= { prvtCfmLtrEntry 1 }
+
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+prvtCfmMaAisLckVlan OBJECT IDENTIFIER ::= { prvtCfmMibObjects 8 }
+
+prvtCfmMaAisLckVlanTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtCfmMaAisLckVlanEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Table includes extra variables needed for AIS/LCK configurable vlans"
+::= { prvtCfmMaAisLckVlan 1 }
+
+prvtCfmMaAisLckVlanEntry OBJECT-TYPE
+SYNTAX PrvtCfmMaAisLckVlanEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Table includes extra variables needed for AIS/LCK configurable vlans"
+INDEX {dot1agCfmMdIndex, dot1agCfmMaIndex, prvtCfmMaAisLckVlanId }
+::= { prvtCfmMaAisLckVlanTable 1 }
+
+PrvtCfmMaAisLckVlanEntry ::= SEQUENCE {
+prvtCfmMaAisLckVlanId        VlanId,
+prvtCfmMaAisLckVlanRowStatus RowStatus
+}
+
+prvtCfmMaAisLckVlanId OBJECT-TYPE
+SYNTAX VlanId
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Vlan ID (towards customer level) that the generated AIS/LCK packets should use."
+::= { prvtCfmMaAisLckVlanEntry 1 }
+
+prvtCfmMaAisLckVlanRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The status of the row."
+::= { prvtCfmMaAisLckVlanEntry 2 }
+
+-- ------------------------------------------------
+-- ------------------------------------------------
+
+-- ***********************************************
+-- **************** Notification *****************
+-- ***********************************************
+
+prvtCfm1wJitterThreshold NOTIFICATION-TYPE
+OBJECTS {
+prvtCfmProcessResultOneWayJitter,
+prvtCfmProfile1wJitterWarning,
+prvtCfmProfile1wJitterError
+}
+STATUS current
+DESCRIPTION
+"This trap should be sent whenever the one way jitter
+on a CFM test will surpass one of the 2 defined thresholds."
+::= { prvtCfmMibNotifications 1 }
+
+prvtCfmJitterThreshold NOTIFICATION-TYPE
+OBJECTS {
+prvtCfmProcessResultTwoWayJitter,
+prvtCfmProfileJitterWarning,
+prvtCfmProfileJitterWarningPeriod,
+prvtCfmProfileJitterError,
+prvtCfmProfileJitterErrorPeriod
+}
+STATUS current
+DESCRIPTION
+"This trap should be sent whenever the two way jitter
+on a CFM test will surpass one of the 2 defined thresholds."
+::= { prvtCfmMibNotifications 2 }
+
+prvtCfmFrameLossThreshold NOTIFICATION-TYPE
+OBJECTS {
+prvtCfmProcessResultFrameloss,
+prvtCfmProfileFrameLossWarning,
+prvtCfmProfileFrameLossError
+}
+STATUS current
+DESCRIPTION
+"This trap should be sent whenever the frame loss
+on a CFM test will surpass one of the 2 defined 
+thresholds."
+::= { prvtCfmMibNotifications 3 }
+
+prvtCfmLatencyThreshold NOTIFICATION-TYPE
+OBJECTS {
+prvtCfmProcessResultLatency,
+prvtCfmProfileLatencyWarning,
+prvtCfmProfileLatencyWarningPeriod,
+prvtCfmProfileLatencyError,
+prvtCfmProfileLatencyErrorPeriod
+}
+STATUS current
+DESCRIPTION
+"This trap should be sent whenever the latency
+on a CFM test will surpass one of the 2 defined 
+thresholds."
+::= { prvtCfmMibNotifications 4 }
+
+prvtCfmAisReceived NOTIFICATION-TYPE
+OBJECTS {
+prvtCfmMepAisLifetime
+}
+STATUS current
+DESCRIPTION
+"This trap is issued whenever an AIS condition with specified lifetime on a MEP is met."
+::= { prvtCfmMibNotifications 5 }
+
+prvtCfmLckReceived NOTIFICATION-TYPE
+OBJECTS {
+prvtCfmMepLckLifetime
+}
+STATUS current
+DESCRIPTION
+"This trap is issued whenever an LCK condition with specified lifetime on a MEP is met."
+::= { prvtCfmMibNotifications 6 }
+
+END
+

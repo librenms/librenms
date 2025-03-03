@@ -1,0 +1,48 @@
+modules:
+    os:
+        hardware:
+            - TELDAT-MIB::telAdminStatusSystemBoardType.0
+            - TELDAT-MIB::telAdminStatusSystemBoardRevision.0
+        hardware_template: '{{ TELDAT-MIB::telAdminStatusSystemBoardType.0 }} (rev {{ TELDAT-MIB::telAdminStatusSystemBoardRevision.0 }})'
+        #serial: TELDAT-MIB::telAdminStatusSystemNumSerie.0
+        version: TELDAT-MIB::telAdminStatusSystemAppVersion.0
+        sysDescr_regex: '/S\/N: (?<serial>\S+)/'
+    mempools:
+        data:
+            #- 
+            #    total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotal
+            #    class: system
+            #    descr: 'Total System Memory'
+            #    index: 0
+            -
+                total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotalnoncache
+                free: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemFreenoncache
+                class: shared
+                descr: 'NonCache Memory'
+                index: 1
+            -
+                total: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemTotalcache
+                free: TELDAT-MON-CommonInfo-MIB::telProdNpMonSistemMemFreecache
+                descr: 'Cache Memory'
+                class: cached
+                index: 2
+    processors:
+        data:
+            -
+                oid: TELDAT-MON-CPU-MIB::teldatCPUBusyGroup
+                value: teldatCPUBusy5sec
+                num_oid: '.1.3.6.1.4.1.2007.4.1.2.1.2.1.1.1.{{ $index }}'
+                descr: 'CPU Utilization 5sec'
+                index: cpu5.{{ $index }}
+            -
+                oid: TELDAT-MON-CPU-MIB::teldatCPUBusyGroup
+                value: teldatCPUBusy1min
+                num_oid: '.1.3.6.1.4.1.2007.4.1.2.1.2.1.1.2.{{ $index }}'
+                descr: 'CPU Utilization 1min'
+                index: cpu60.{{ $index }}
+            -
+                oid: TELDAT-MON-CPU-MIB::teldatCPUBusyGroup
+                value: teldatCPUBusy5min
+                num_oid: '.1.3.6.1.4.1.2007.4.1.2.1.2.1.1.3.{{ $index }}'
+                descr: 'CPU Utilization 5min'
+                index: cpu300.{{ $index }}

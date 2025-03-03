@@ -1,0 +1,77 @@
+mib: SYMM-SMI
+modules:
+    os:
+        hardware:
+            - SYMM-SMI::ntpSysSystem.0
+            - SYMM-SMI::etcModel.0
+        hardware_template: '{{ SYMM-SMI::ntpSysSystem.0 }} {{ SYMM-SMI::etcModel.0 }}'
+        serial: SYMM-SMI::etcSerialNbr.0
+        version: SYMM-SMI::etcVersion.0
+    sensors:
+        count:
+            data:
+                -
+                    oid: gpsUTCOffset
+                    num_oid: '.1.3.6.1.4.1.9070.1.2.3.1.5.1.3.2.{{ $index }}'
+                    descr: 'GPS UTC Offset'
+        state:
+            data:
+                -
+                    oid: ntpSysMode
+                    num_oid: '.1.3.6.1.4.1.9070.1.2.3.1.5.1.1.18.{{ $index }}'
+                    descr: 'NTP Mode'
+                    state_name: ntpSysMode
+                    states:
+                        - { value:  0, generic: 3, graph: 1, descr: 'unspecified' }
+                        - { value:  1, generic: 0, graph: 1, descr: 'symmetric active' }
+                        - { value:  2, generic: 0, graph: 1, descr: 'symmetric passive' }
+                        - { value:  3, generic: 1, graph: 1, descr: 'client' }
+                        - { value:  4, generic: 0, graph: 1, descr: 'server' }
+                        - { value:  5, generic: 0, graph: 1, descr: 'broadcast' }
+                        - { value:  6, generic: 3, graph: 1, descr: 'reserved for NTP control messages' }
+                        - { value:  7, generic: 3, graph: 1, descr: 'reserved for private use' }
+                -
+                    oid: tymingStatus
+                    num_oid: '.1.3.6.1.4.1.9070.1.2.3.1.5.1.2.1.{{ $index }}'
+                    descr: 'Hardware Clock State'
+                    state_name: tymingStatus
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'Good' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'Bad' }
+                -
+                    oid: gpsHealth
+                    num_oid: '.1.3.6.1.4.1.9070.1.2.3.1.5.1.3.3.{{ $index }}'
+                    descr: 'GPS Receiver Health'
+                    state_name: gpsHealth
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'Receiver Down' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'Unknown Mode' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Acquiring Signal' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'Bad Geometry' }
+                        - { value: 4, generic: 0, graph: 1, descr: 'Propagate Mode' }
+                        - { value: 5, generic: 0, graph: 1, descr: '2D Solution' }
+                        - { value: 6, generic: 0, graph: 1, descr: '3D Solution' }
+                        - { value: 7, generic: 0, graph: 1, descr: 'Position Hold' }
+                        - { value: 8, generic: 0, graph: 1, descr: 'Time Valid' }
+                -
+                    oid: tymingSource
+                    num_oid: '.1.3.6.1.4.1.9070.1.2.3.1.5.1.2.2.{{ $index }}'
+                    descr: 'Hardware Clock Source'
+                    state_name: tymingSource
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'None' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'GPS' }
+                        - { value: 4, generic: 0, graph: 1, descr: 'GPS' }
+                        - { value: 8, generic: 0, graph: 1, descr: 'IRIG' }
+                        - { value: 16, generic: 0, graph: 1, descr: 'External 1PPS' }
+                        - { value: 24, generic: 0, graph: 1, descr: 'External 10MHz' }
+                        - { value: 31, generic: 1, graph: 1, descr: 'Free-run' }
+                -
+                    oid: gpsMode
+                    num_oid: '.1.3.6.1.4.1.9070.1.2.3.1.5.1.3.5.{{ $index }}'
+                    descr: 'GPS Receiver Mode'
+                    state_name: gpsMode
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'Receiver Mode: Survey' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Receiver Mode: Dynamic' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'Receiver Mode: Hold' }

@@ -1,0 +1,790 @@
+
+
+                -- Teldat, S.A.
+
+                -- Parque Tecnol�gico de Madrid
+
+                -- 28760, Tres Cantos (Madrid)
+
+                -- Tlf: +34-918076565
+
+                -- Fax: +34-918076521
+
+                -- e-mail: id@teldat.com
+
+
+            -- MIB privada de Teldat
+
+            -- Monitorizaci�n del interfaz CELLULAR
+
+
+    -- Historial:
+    --      28-06-18    P. Alonso        DR1042 eNB parameter as cellid when LTE.
+    --      20-04-18    P. Alonso        DR1042 New LTE eNB parameter.
+    --      21-03-18    Benjamin G.      DR1007 Dual-SIM IMSI information availability.
+    --      22-01-18    P. Alonso        ER#1254 New LTE cell ID parameter.
+    --      01-02-17    fmiguel          LTE SINR added to cellular MIB and monitoring
+    --      27-07-16    P. Alonso        XH 5175 cellular interface statistics for NIC.
+    --      13-06-16    N. Moro          DR 559. New SNMP tables: teldatCellularProfDialTable
+    --                                    and teldatCellularRecChangesTable
+    --      25-02-16    J. Rodrigo       DR-204. Sierra Wireless MC74xx support.
+    --      07-02-14    M.A. Pastor      XH 3523. Errors with HP Openview 9.20
+    -- 1.6  11-01-13    E. Amorena       XH 2610. MIBs compilation.
+    -- 1.5  28-06-12    Thales           Compilation error solved
+    -- 1.4  10-02-12    FDMB             Throughput included
+    -- 1.3  26-06-08    FDMB             Incluido SIM ICC
+    -- 1.2  19-07-07    M.A. Berrojo     Estado del interfaz es enumeracion
+    -- 1.1  18-07-07    M.A. Berrojo     Se agregan estadisticos de nivel 3
+    --                                   correspondientes a tr�fico intercambiado
+    --                                   por radio
+    -- 1.0  08-05-07    M.A. Berrojo     Implementaci�n inicial
+--------------------------------------------------------------------------------
+
+TELDAT-MON-INTERF-CELLULAR-MIB
+
+    DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE
+            FROM RFC-1212
+        DisplayString
+            FROM RFC1213-MIB
+        telProdNpMonInterfRouter
+            FROM TELDAT-SW-STRUCTURE-MIB;
+
+
+-- Monitorizaci�n privada del interfaz CELLULAR
+
+telProdNpMonInterfCellular OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 18 }
+
+
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+--  Global Cellular monitoring variables
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+--  Global Info Cellular monitoring variables
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+teldatCellularInfoInterfaceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TeldatCellularInfoInterfaceEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Table of information available for Cellular interfaces.
+        Each row represents an interface"
+    ::= { telProdNpMonInterfCellular 1 }
+
+teldatCellularInfoInterfaceEntry OBJECT-TYPE
+    SYNTAX  TeldatCellularInfoInterfaceEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A base list of objects that are information about a Cellular interface.
+        The inex is the number of the interface"
+    INDEX   { teldatCellularInfoInterfaceIndex }
+    ::= { teldatCellularInfoInterfaceTable 1 }
+
+TeldatCellularInfoInterfaceEntry ::= SEQUENCE
+{
+    teldatCellularInfoInterfaceIndex                INTEGER,
+    teldatCellularInfoInterfaceModuleManufacturer   DisplayString,
+    teldatCellularInfoInterfaceModuleModel          DisplayString,
+    teldatCellularInfoInterfaceModuleFirmware       DisplayString,
+    teldatCellularInfoInterfaceModuleIMEI           DisplayString,
+    teldatCellularInfoInterfaceModuleIMSI           DisplayString,
+    teldatCellularInfoInterfaceSIMId                DisplayString,
+    teldatCellularInfoInterfaceSIMIcc               DisplayString
+}
+
+teldatCellularInfoInterfaceIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1 .. 255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Interface index"
+    ::= { teldatCellularInfoInterfaceEntry 1 }
+
+teldatCellularInfoInterfaceModuleManufacturer OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular module manufacturer."
+    ::={ teldatCellularInfoInterfaceEntry 2 }
+
+teldatCellularInfoInterfaceModuleModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular module model."
+    ::={ teldatCellularInfoInterfaceEntry 3 }
+
+teldatCellularInfoInterfaceModuleFirmware OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular module firmware release."
+    ::={ teldatCellularInfoInterfaceEntry 4 }
+
+teldatCellularInfoInterfaceModuleIMEI OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular module IMEI."
+    ::={ teldatCellularInfoInterfaceEntry 5 }
+
+teldatCellularInfoInterfaceModuleIMSI OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular module IMSI."
+    ::={ teldatCellularInfoInterfaceEntry 6 }
+
+teldatCellularInfoInterfaceSIMId OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular active SIM ID."
+    ::={ teldatCellularInfoInterfaceEntry 7 }
+
+teldatCellularInfoInterfaceSIMIcc OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular active SIM ICC."
+    ::={ teldatCellularInfoInterfaceEntry 8 }
+
+
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+--  Global Stats group Cellular monitoring variables
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+teldatCellularStatObject    OBJECT IDENTIFIER ::= { telProdNpMonInterfCellular 3 }
+
+--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+--   Cellular State Table, interface variables
+--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+teldatCellularStateInterfaceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TeldatCellularStateInterfaceEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Table of Cellular interface state information."
+    ::= { teldatCellularStatObject 1 }
+
+teldatCellularStateInterfaceEntry OBJECT-TYPE
+    SYNTAX  TeldatCellularStateInterfaceEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A base list of objects that are interface state information."
+    INDEX   { teldatCellularStateInterfaceIndex}
+    ::= { teldatCellularStateInterfaceTable 1 }
+
+TeldatCellularStateInterfaceEntry ::= SEQUENCE
+{
+    teldatCellularStateInterfaceIndex           INTEGER,
+    teldatCellularStateInterfaceState           DisplayString,
+    teldatCellularStateInterfaceDropPing        INTEGER,
+    teldatCellularStateInterfaceDropTrace       INTEGER,
+    teldatCellularStateInterfaceDropTraffic     INTEGER,
+    teldatCellularStateInterfaceTConnTime       INTEGER,
+    teldatCellularStateInterfaceCConnTime       INTEGER,
+    teldatCellularStateInterfaceCurDial         DisplayString,
+    teldatCellularStateInterfaceNCall           INTEGER,
+    teldatCellularStateInterfaceDestination     DisplayString,
+    teldatCellularStateInterfaceTime2Sp         INTEGER
+}
+
+teldatCellularStateInterfaceIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1 .. 255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular Interface index."
+    ::={ teldatCellularStateInterfaceEntry 1 }
+
+teldatCellularStateInterfaceState OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Call state."
+    ::={ teldatCellularStateInterfaceEntry 2 }
+
+teldatCellularStateInterfaceDropPing OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of calls dropped due to ping supervision."
+    ::={ teldatCellularStateInterfaceEntry 3 }
+
+teldatCellularStateInterfaceDropTrace OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of calls dropped due to traceroute supervision."
+    ::={ teldatCellularStateInterfaceEntry 4 }
+
+teldatCellularStateInterfaceDropTraffic OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of calls dropped due to traffic supervision."
+    ::={ teldatCellularStateInterfaceEntry 5 }
+
+teldatCellularStateInterfaceTConnTime OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Total connection time ."
+    ::={ teldatCellularStateInterfaceEntry 6 }
+
+teldatCellularStateInterfaceCConnTime OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Current connection time."
+    ::={ teldatCellularStateInterfaceEntry 7 }
+
+teldatCellularStateInterfaceCurDial OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Current dial-profile used."
+    ::={ teldatCellularStateInterfaceEntry 8 }
+
+teldatCellularStateInterfaceNCall OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of processed calls."
+    ::={ teldatCellularStateInterfaceEntry 9 }
+
+teldatCellularStateInterfaceDestination OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Connection destination."
+    ::={ teldatCellularStateInterfaceEntry 10 }
+
+teldatCellularStateInterfaceTime2Sp OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Time to establish the call."
+    ::={ teldatCellularStateInterfaceEntry 11 }
+
+
+--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+--   Cellular State Table, Mobile variables
+--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+teldatCellularStateMobileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TeldatCellularStateMobileEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Table of Cellular mobile state information."
+    ::= { teldatCellularStatObject 2 }
+
+teldatCellularStateMobileEntry OBJECT-TYPE
+    SYNTAX  TeldatCellularStateMobileEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A base list of objects that are mobile state information."
+    INDEX   { teldatCellularStateMobileIndex }
+    ::= { teldatCellularStateMobileTable 1 }
+
+TeldatCellularStateMobileEntry ::= SEQUENCE
+{
+    teldatCellularStateMobileIndex                      INTEGER,
+    teldatCellularStateMobileRegistrationState          INTEGER,
+    teldatCellularStateMobilePublicLandMobileNtwCode    INTEGER,
+    teldatCellularStateMobileCellLocationAreaCode       INTEGER,
+    teldatCellularStateMobileCellId                     INTEGER,
+    teldatCellularStateMobileRadioTechnology            DisplayString,
+    teldatCellularStateMobileRadioBand                  DisplayString,
+    teldatCellularStateMobileRxSignalCodePwr            INTEGER,
+    teldatCellularStateMobileEnergyChipByPwrdnsty       INTEGER,
+    teldatCellularStateMobileSignalQuality              INTEGER,
+    teldatCellularStateMobileTemperature                INTEGER,
+    teldatCellularStateMobileRxPackets                  INTEGER,
+    teldatCellularStateMobileRxBytes                    INTEGER,
+    teldatCellularStateMobileTxPackets                  INTEGER,
+    teldatCellularStateMobileTxBytes                    INTEGER,
+    teldatCellularStateMobileRxBpsLast1s                INTEGER,
+    teldatCellularStateMobileTxBpsLast1s                INTEGER,
+    teldatCellularStateMobileRxBpsLast1m                INTEGER,
+    teldatCellularStateMobileTxBpsLast1m                INTEGER,
+    teldatCellularStateMobileRxBpsLast5m                INTEGER,
+    teldatCellularStateMobileTxBpsLast5m                INTEGER,
+    teldatCellularStateMobileRxRSRP                     INTEGER,
+    teldatCellularStateMobileRxRSRQ                     INTEGER,
+    teldatCellularStateMobileRxSINR                     INTEGER,
+    teldatCellularStateMobileLTECellId                  INTEGER
+}
+
+teldatCellularStateMobileIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1 .. 255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile state index."
+    ::={ teldatCellularStateMobileEntry 1 }
+
+teldatCellularStateMobileRegistrationState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        searching(0),
+        home-network(1),
+        attaching(2),
+        denied(3),
+        unknown(4),
+        roaming(5)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile registration state ()."
+    ::={ teldatCellularStateMobileEntry  2 }
+
+teldatCellularStateMobilePublicLandMobileNtwCode OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Public land mobile network used (+COPS)."
+    ::={ teldatCellularStateMobileEntry  3 }
+
+
+teldatCellularStateMobileCellLocationAreaCode OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile cell location area code (+CGREG)."
+    ::={ teldatCellularStateMobileEntry  4 }
+
+teldatCellularStateMobileCellId OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile used cell id (+CGREG)."
+    ::={ teldatCellularStateMobileEntry  5 }
+
+
+teldatCellularStateMobileRadioTechnology OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile current radio access tecnology used (!GETRAT)."
+    ::={ teldatCellularStateMobileEntry  6 }
+
+teldatCellularStateMobileRadioBand OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile current active band (!GETBAND)."
+    ::={ teldatCellularStateMobileEntry  7 }
+
+
+teldatCellularStateMobileRxSignalCodePwr OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile received signal code power (RSCP)."
+    ::={ teldatCellularStateMobileEntry  8 }
+
+teldatCellularStateMobileEnergyChipByPwrdnsty OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile total energy per chip per power density (EcNo)."
+    ::={ teldatCellularStateMobileEntry  9 }
+
+teldatCellularStateMobileSignalQuality OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile reception signal quality (+CSQ)."
+    ::={ teldatCellularStateMobileEntry  10 }
+
+
+teldatCellularStateMobileTemperature OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile temperature (!PCTEMP)."
+    ::={ teldatCellularStateMobileEntry  11 }
+
+teldatCellularStateMobileRxPackets OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of data packtes received by the radio interface"
+    ::={ teldatCellularStateMobileEntry  12 }
+
+teldatCellularStateMobileRxBytes OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of data bytes received by the radio interface"
+    ::={ teldatCellularStateMobileEntry  13 }
+
+teldatCellularStateMobileTxPackets OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of data packtes sent by the radio interface"
+    ::={ teldatCellularStateMobileEntry  14 }
+
+teldatCellularStateMobileTxBytes OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Number of data packtes sent by the radio interface"
+    ::={ teldatCellularStateMobileEntry  15 }
+
+teldatCellularStateMobileRxBpsLast1s OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Rx througput measured in the last second in bps"
+    ::={ teldatCellularStateMobileEntry  16 }
+
+teldatCellularStateMobileTxBpsLast1s OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Tx througput measured in the last second in bps"
+    ::={ teldatCellularStateMobileEntry  17 }
+
+teldatCellularStateMobileRxBpsLast1m OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Rx througput measured in the last minute in bps"
+    ::={ teldatCellularStateMobileEntry  18 }
+
+teldatCellularStateMobileTxBpsLast1m OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Tx througput measured in the last minute in bps"
+    ::={ teldatCellularStateMobileEntry  19 }
+
+teldatCellularStateMobileRxBpsLast5m OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Rx througput measured in the last five minutes in bps"
+    ::={ teldatCellularStateMobileEntry  20 }
+
+teldatCellularStateMobileTxBpsLast5m OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Tx througput measured in the last five minutes in bps"
+    ::={ teldatCellularStateMobileEntry  21 }
+
+
+teldatCellularStateMobileRxRSRP OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile reference symbol received power (RSRP)."
+    ::={ teldatCellularStateMobileEntry  22 }
+
+
+teldatCellularStateMobileRxRSRQ OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile reference signal received quality (RSRQ)."
+    ::={ teldatCellularStateMobileEntry  23 }
+
+teldatCellularStateMobileRxSINR OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile signal versus noise ratio (SINR)."
+    ::={ teldatCellularStateMobileEntry  24 }
+
+teldatCellularStateMobileLTECellId OBJECT-TYPE
+    SYNTAX  Gauge32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile used LTE cell id."
+    ::={ teldatCellularStateMobileEntry  25 }
+
+
+--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+--   Cellular SIM Management Table,
+--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+teldatCellularSIMMngTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TeldatCellularSIMMngEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Table of Cellular SIM Management information."
+    ::= { teldatCellularStatObject 3 }
+
+teldatCellularSIMMngEntry OBJECT-TYPE
+    SYNTAX  TeldatCellularSIMMngEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A base list of objects that are sim management information."
+    INDEX   { teldatCellularSIMMngIndex }
+    ::= { teldatCellularSIMMngTable 1 }
+
+TeldatCellularSIMMngEntry ::= SEQUENCE
+{
+    teldatCellularSIMMngIndex                      INTEGER,
+    teldatCellularSIMMngCurrentSIMSocket           INTEGER,
+    teldatCellularSIMMngMainSIMSocket              INTEGER,
+    teldatCellularSIMMngSupervisionSIMSocket       INTEGER,
+    teldatCellularSIMMngSIMImsiInfoSocket1         DisplayString,
+    teldatCellularSIMMngSIMIdInfoSocket1           DisplayString,
+    teldatCellularSIMMngSIMImsiInfoSocket2         DisplayString,
+    teldatCellularSIMMngSIMIdInfoSocket2           DisplayString
+}
+
+teldatCellularSIMMngIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1 .. 255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Cellular mobile state index."
+    ::={ teldatCellularSIMMngEntry 1 }
+
+teldatCellularSIMMngCurrentSIMSocket OBJECT-TYPE
+    SYNTAX  INTEGER {
+        external-socket1(0),
+        internal-socket2(1)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Current SIM Socket."
+    ::={ teldatCellularSIMMngEntry  2 }
+
+teldatCellularSIMMngMainSIMSocket OBJECT-TYPE
+    SYNTAX  INTEGER {
+        external-socket1(0),
+        internal-socket2(1)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Main SIM Socket."
+    ::={ teldatCellularSIMMngEntry  3 }
+
+teldatCellularSIMMngSupervisionSIMSocket OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(0),
+        enabled(1)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Supervision SIM Socket state."
+    ::={ teldatCellularSIMMngEntry  4 }
+
+teldatCellularSIMMngSIMImsiInfoSocket1 OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "IMSI of the SIM inserted in Socket1"
+    ::={ teldatCellularSIMMngEntry 5 }
+
+teldatCellularSIMMngSIMIdInfoSocket1 OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "SIM ID of the SIM inserted in Socket1"
+    ::={ teldatCellularSIMMngEntry 6 }
+
+teldatCellularSIMMngSIMImsiInfoSocket2 OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "IMSI of the SIM inserted in Socket2"
+    ::={ teldatCellularSIMMngEntry 7 }
+
+teldatCellularSIMMngSIMIdInfoSocket2 OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "SIM ID of the SIM inserted in Socket2"
+    ::={ teldatCellularSIMMngEntry 8 }
+
+
+--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+--   Cellular Profile Dial Table,
+--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+teldatCellularProfDialTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TeldatCellularProfDialEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Table of Cellular Dial Profile information."
+    ::= { teldatCellularStatObject 4 }
+
+teldatCellularProfDialEntry OBJECT-TYPE
+    SYNTAX  TeldatCellularProfDialEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of objects that show Dial Profile information"
+    INDEX   { teldatCellularProfDialIfcIndex }
+    ::= { teldatCellularProfDialTable 1 }
+
+TeldatCellularProfDialEntry ::= SEQUENCE
+{
+    teldatCellularProfDialIfcIndex             INTEGER,
+    teldatCellularProfDialName1					       DisplayString,
+    teldatCellularProfDialAPN1                 DisplayString,
+    teldatCellularProfDialName2					       DisplayString,
+    teldatCellularProfDialAPN2                 DisplayString
+}
+
+teldatCellularProfDialIfcIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1 .. 255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Interface index."
+    ::={ teldatCellularProfDialEntry 1 }
+
+teldatCellularProfDialName1 OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Dial Profile Name(1) associated to cellular interface."
+    ::={ teldatCellularProfDialEntry 2 }
+
+teldatCellularProfDialAPN1 OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Access Point Name(1) associated to cellular interface."
+    ::={ teldatCellularProfDialEntry 3 }
+
+teldatCellularProfDialName2 OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Dial Profile Name(2) associated to cellular interface."
+    ::={ teldatCellularProfDialEntry 4 }
+
+teldatCellularProfDialAPN2 OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Access Point Name(2) associated to cellular interface."
+    ::={ teldatCellularProfDialEntry 5 }
+
+--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+--   Cellular Record Changes Table,
+--  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+teldatCellularRecChangesTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TeldatCellularRecChangesEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Table of Cellular record-changes information."
+    ::= { teldatCellularStatObject 5 }
+
+teldatCellularRecChangesEntry OBJECT-TYPE
+    SYNTAX  TeldatCellularRecChangesEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of objects that show information about cellular record-changes"
+    INDEX   { teldatCellularRecChangesIfcIndex }
+    ::= { teldatCellularRecChangesTable 1 }
+
+TeldatCellularRecChangesEntry ::= SEQUENCE
+{
+    teldatCellularRecChangesIfcIndex           INTEGER,
+    teldatCellularRecChangesPLMNTimeStamp		   DisplayString,
+    teldatCellularRecChangesPLMNCode				   DisplayString
+}
+
+teldatCellularRecChangesIfcIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1 .. 255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Interface index."
+    ::={ teldatCellularRecChangesEntry 1 }
+
+teldatCellularRecChangesPLMNTimeStamp OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Display the timestamp of the latest change of Public Land Mobile Network (PLMN) code."
+    ::={ teldatCellularRecChangesEntry 2 }
+
+teldatCellularRecChangesPLMNCode OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Display the latest change of Public Land Mobile Network (PLMN) code."
+    ::={ teldatCellularRecChangesEntry 3 }
+
+END

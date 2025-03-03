@@ -1,0 +1,227 @@
+-- =====================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--      This MIB module is for configuring and monitoring SAN (Storage Area
+--      Network) aggregation group related entities.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 Initial version created by qiaoxinghua 2012-12-6
+-- =====================================================================
+HH3C-SAN-AGG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cSan
+        FROM HH3C-VSAN-MIB
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ifIndex, ifDescr
+        FROM IF-MIB;
+
+hh3cSanAgg MODULE-IDENTITY
+    LAST-UPDATED   "201302250940Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085
+        "
+    DESCRIPTION
+        "This MIB module is for configuring and monitoring SAN (Storage
+        Area Networks) aggregation group related MIB objects.
+
+        This MIB can be used to add or delete a SAN aggregation group,
+        and make one or more FC (Fiber Channel) ports join or leave the
+        group, as well as show their states."
+    REVISION       "201302250940Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cSan 2 }
+
+
+Hh3cMemberList ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A list of values concerning the member ports in a SAN
+        aggregation group.
+
+        Each 4 octets within this value list specifies a member
+        in a SAN aggregation group.
+        A zero-length string value means this list has no member,
+        and the maximum length of this string depends on the maximum
+        number of members a SAN aggregation supports."
+    SYNTAX       OCTET STRING
+--
+-- Node definitions
+--
+hh3cSanAggMibObjects OBJECT IDENTIFIER ::= { hh3cSanAgg 1 }
+
+hh3cSanAggMaxMemberNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value specifies the maximum member number that a SAN
+        aggregation group supports, and this restriction depends on
+        product customization."
+    ::= { hh3cSanAggMibObjects 1 }
+
+hh3cSanAggGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSanAggGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of SAN aggregation objects to be used in configuring
+        and monitoring a SAN aggregation group and its members."
+    ::= { hh3cSanAgg 2 }
+
+hh3cSanAggGroupEntry OBJECT-TYPE
+    SYNTAX Hh3cSanAggGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A group of SAN aggregation objects to be used in configuring
+        and monitoring a SAN aggregation group and its members."
+    INDEX { hh3cSanAggGroupNumber }
+    ::= { hh3cSanAggGroupTable 1 }
+
+Hh3cSanAggGroupEntry ::=
+    SEQUENCE {
+        hh3cSanAggGroupNumber
+            Integer32,
+        hh3cSanAggGroupIndex
+            Integer32,
+        hh3cSanAggMemberList
+            Hh3cMemberList,
+        hh3cSanAggMemberStateList
+            Hh3cMemberList,
+        hh3cSanAggGroupRowStatus
+            RowStatus
+       }
+
+hh3cSanAggGroupNumber OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The serial number of the current SAN aggregation group."
+    ::= { hh3cSanAggGroupEntry 1 }
+
+hh3cSanAggGroupIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ifIndex of the current SAN aggregation group."
+    ::= { hh3cSanAggGroupEntry 2 }
+
+hh3cSanAggMemberList OBJECT-TYPE
+    SYNTAX Hh3cMemberList
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "List of member's ifIndex in the current SAN aggregation group.
+
+        If there is no member in the SAN aggregation group, the list
+        length should be zero.  Otherwise each member's ifIndex value
+        occupies 4 octets.  The greatest length of this list depends
+        on the maximum number of members a SAN aggregation group
+        supports, which can be customized and therefore is not a fixed
+        value.
+
+        When getting the group members' ifIndexes, the result was sorted
+        in ascending order of ifIndex values.  However, when setting the
+        group members' ifIndexes, the sequence of ifIndex values is not
+        required."
+    ::= { hh3cSanAggGroupEntry 3 }
+
+hh3cSanAggMemberStateList OBJECT-TYPE
+    SYNTAX Hh3cMemberList
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "List of member's state in current SAN aggregation group, where the
+         state value is sorted in ascending order of member's ifIndex, which
+         is consistent with the 'get' result of 'hh3cSanAggMemberList'.
+
+         The explanation of this value's length is as same as the
+         'hh3cSanAggMemberList'.
+
+         Each member's state value occupies 4 octets.  The value specifications
+         are listed as follows:
+         1: This member hasn't passed the link negotiation.
+         2: This member has passed the link negotiation but has not been
+            selected.
+         3: This member has been selected."
+    ::= { hh3cSanAggGroupEntry 4 }
+
+hh3cSanAggGroupRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "RowStatus.  Now only three states are supported:
+        createAndGo, active, and destroy."
+    ::= { hh3cSanAggGroupEntry 5 }
+
+hh3cSanAggObjForNotification OBJECT IDENTIFIER ::= { hh3cSanAgg 3 }
+
+hh3cSanAggGroupPreviousSpeed OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS  "gigabit bps"
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The previous speed of the SAN aggregation group."
+    ::= { hh3cSanAggObjForNotification 1 }
+
+hh3cSanAggGroupCurrentSpeed OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS  "gigabit bps"
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The current speed of the SAN aggregation group."
+    ::= { hh3cSanAggObjForNotification 2 }
+
+hh3cSanAggNotifications OBJECT IDENTIFIER ::= { hh3cSanAgg 4 }
+
+hh3cSanAggNotificationPrefix OBJECT IDENTIFIER ::= { hh3cSanAggNotifications 0 }
+
+hh3cSanAggGroupSpeedChange NOTIFICATION-TYPE
+    OBJECTS { hh3cSanAggGroupNumber,
+              hh3cSanAggGroupPreviousSpeed,
+              hh3cSanAggGroupCurrentSpeed }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered whenever a SAN
+         aggregation group changes its speed."
+    ::= { hh3cSanAggNotificationPrefix 1 }
+
+
+hh3cSanAggMemberInactive NOTIFICATION-TYPE
+    OBJECTS { hh3cSanAggGroupNumber,
+              ifIndex,
+              ifDescr }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered whenever any member
+         in a SAN aggregation group is made inactive."
+    ::= { hh3cSanAggNotificationPrefix 2 }
+
+hh3cSanAggMemberActive NOTIFICATION-TYPE
+    OBJECTS { hh3cSanAggGroupNumber,
+              ifIndex,
+              ifDescr }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered whenever any member
+         in a SAN aggregation group is made active."
+    ::= { hh3cSanAggNotificationPrefix 3 }
+
+END

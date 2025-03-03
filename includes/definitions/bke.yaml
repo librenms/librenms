@@ -1,0 +1,8 @@
+os: bke
+text: 'BKE'
+type: power
+icon: bke
+group: bke
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.27533

@@ -1,0 +1,901 @@
+-- File Name : PBI-MGSYSTEM-MIB
+-- Date      : Thu Sep 21 14:37:41 CST 2006
+-- Author    : AdventNet Agent Toolkit Java Edition - MIB Editor 6
+
+
+
+PBI-MGSYSTEM-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		DisplayString, TruthValue, RowStatus
+			FROM SNMPv2-TC
+		DisplayString
+			FROM RFC1213-MIB
+		mg
+			FROM PBI-MAIN-MIB
+		MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises, IpAddress
+			FROM SNMPv2-SMI;
+
+	mgSystem	MODULE-IDENTITY
+		LAST-UPDATED	"200609131023Z"
+		ORGANIZATION	"PBI"
+		CONTACT-INFO	"Tel:(010)82617178 
+									Fax:(010)82610263 
+									E-mail:mkt@pbi-china.com"
+		DESCRIPTION		"use this mib to manage the devise infomation"
+		REVISION		"200609131023Z"
+		DESCRIPTION		""
+		::=  {  mg  1  }
+
+	basicInfo	OBJECT IDENTIFIER
+		::=  {  mgSystem  1  }
+
+	unitName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Digital headend device name"
+		::=  {  basicInfo  1  }
+
+	serialNumber	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Device serial number"
+		::=  {  basicInfo  2  }
+
+	fpgaVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"FPGA version number"
+		::=  {  basicInfo  3  }
+
+	mcuVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"MCU version number"
+		::=  {  basicInfo  4  }
+
+	macAddress	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"MAC address"
+		::=  {  basicInfo  5  }
+
+	gateway	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Device gateway"
+		::=  {  basicInfo  6  }
+
+	deviceIP	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Local device IP address "
+		::=  {  basicInfo  7  }
+
+	subnetMask	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Device subnet mask"
+		::=  {  basicInfo  8  }
+
+	trapIpAddress	OBJECT-TYPE
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Trap IP address,can been set in device and send trap data to the appointed PC"
+		::=  {  basicInfo  9  }
+
+	upgrade	OBJECT-TYPE	
+		SYNTAX			INTEGER     ( -2147483648 .. 2147483647  )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"if it is enable,it will been permitted to upgrade by network,otherwise disable"
+		::=  {  basicInfo  10  }
+
+	upgradeIP	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Upgrade IP address can been set by  manual in device, we can upgrade software version when new software be released"
+		::=  {  basicInfo  11  }
+
+	default	OBJECT-TYPE	
+		SYNTAX			INTEGER  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Device renew to factory setup"
+		::=  {  basicInfo  12  }
+
+	deviceType	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Device type: 3000tm = 1111; 3000mux = 2222; 3000ec = 3333; 4000p = 4444; UDI4000Mx = 5555; reserve = 6666"
+		::=  {  basicInfo  13  }
+
+	hardwareVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Device hardware version"
+		::=  {  basicInfo  14  }
+
+	externdBoard	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  basicInfo  15  }
+
+	trapDeviceOffTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TrapDeviceOffEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  { basicInfo  16 }
+     
+  trapDeviceOffEntry	OBJECT-TYPE
+		SYNTAX		TrapDeviceOffEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  deviceOffDeviceName  }
+		::=  { trapDeviceOffTable 1 }
+           
+	TrapDeviceOffEntry  ::=  
+		SEQUENCE {
+			deviceOffDeviceName    DisplayString,
+			deviceOffDeviceIP      DisplayString, 
+			deviceOffReserve       DisplayString,
+			deviceOffLevel         DisplayString,
+			deviceOffTriggerTime   DisplayString,
+			deviceOffDescription   DisplayString
+		}
+
+	deviceOffDeviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device name"
+		::=  {  trapDeviceOffEntry  1  }
+
+	deviceOffDeviceIP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device IP address"
+		::=  {  trapDeviceOffEntry  2  } 
+		    
+	deviceOffReserve	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device IP address"
+		::=  {  trapDeviceOffEntry  3  } 
+		    		  		    
+	deviceOffLevel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Alarm level: level 2"
+		::=  {  trapDeviceOffEntry  4  }
+		
+	deviceOffTriggerTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Event trigger time"
+		::=  {  trapDeviceOffEntry  5  }
+		
+	deviceOffDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Device Off"
+		::=  {  trapDeviceOffEntry  6  }
+
+ 	trapDeviceOnTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TrapDeviceOnEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  { basicInfo  17 }
+     
+  trapDeviceOnEntry	OBJECT-TYPE
+		SYNTAX		TrapDeviceOnEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  deviceOnDeviceName  }
+		::=  { trapDeviceOnTable 1 }
+           
+	TrapDeviceOnEntry  ::=
+		SEQUENCE {
+			deviceOnDeviceName    DisplayString,
+			deviceOnDeviceIP      DisplayString,
+			deviceOnReserve       DisplayString,
+			deviceOnLevel         DisplayString,
+			deviceOnTriggerTime   DisplayString,
+			deviceOnDescription   DisplayString
+		}
+
+	deviceOnDeviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device name"
+		::=  {  trapDeviceOnEntry  1  }
+
+	deviceOnDeviceIP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device IP address"
+		::=  {  trapDeviceOnEntry  2  }
+
+  deviceOnReserve	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device IP address"
+		::=  {  trapDeviceOnEntry  3  }
+		
+	deviceOnLevel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Alarm leve: level 2"
+		::=  {  trapDeviceOnEntry  4  }
+
+	deviceOnTriggerTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Event trigger time"
+		::=  {  trapDeviceOnEntry  5  }
+		
+	deviceOnDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Description information "
+		::=  {  trapDeviceOnEntry  6  }
+
+ 	trapFanFailedTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TrapFanFailedEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  { basicInfo  18 }
+     
+  trapFanFailedEntry	OBJECT-TYPE
+		SYNTAX		TrapFanFailedEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  fanFailedDeviceName  }
+		::=  { trapFanFailedTable 1 }     
+           
+	TrapFanFailedEntry  ::=
+		SEQUENCE {
+			fanFailedDeviceName    DisplayString,
+			fanFailedDeviceIP      DisplayString,
+			fanFailedReserve       DisplayString,
+    	fanFailedLevel         DisplayString,
+			fanFailedTriggerTime   DisplayString,
+			fanFailedDescription   DisplayString
+		}
+
+	fanFailedDeviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device name"
+		::=  {  trapFanFailedEntry  1  }
+
+	fanFailedDeviceIP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device IP address"
+		::=  {  trapFanFailedEntry  2  }
+
+  fanFailedReserve	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device IP address"
+		::=  {  trapFanFailedEntry  3  }
+		
+	fanFailedLevel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Alarm level: level 1"
+		::=  {  trapFanFailedEntry  4  }
+		
+	fanFailedTriggerTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Event trigger time"
+		::=  {  trapFanFailedEntry  5  }
+		
+	fanFailedDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Description information "
+		::=  {  trapFanFailedEntry  6  }
+      
+  trapSignalOffTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TrapSignalOffEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  { basicInfo  19 }
+
+  trapSignalOffEntry	OBJECT-TYPE
+		SYNTAX		TrapSignalOffEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  signalOffDeviceName  }
+		::=  { trapSignalOffTable 1 }  
+           
+	TrapSignalOffEntry  ::=
+		SEQUENCE {
+			signalOffDeviceName    DisplayString,
+			signalOffDeviceIP      DisplayString, 
+			signalOffChannel			 DisplayString,
+			signalOffLevel         DisplayString,
+			signalOffTriggerTime   DisplayString,
+			signalOffDescription   DisplayString,
+			signalOffSlot	       	 DisplayString
+		}
+
+	signalOffDeviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device name "
+		::=  {  trapSignalOffEntry  1  }
+
+	signalOffDeviceIP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device IP address "
+		::=  {  trapSignalOffEntry  2  }
+		
+	signalOffChannel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" the channel for signal off trap "
+		::=  {  trapSignalOffEntry  3  }
+				
+	signalOffLevel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Alarm level: level 3 "
+		::=  {  trapSignalOffEntry  4  }
+		
+	signalOffTriggerTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Event trigger time "
+		::=  {  trapSignalOffEntry  5  }
+		
+	signalOffDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Description information "
+		::=  {  trapSignalOffEntry  6  }
+	
+	signalOffSlot	OBJECT-TYPE
+	  SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Slot number"
+		::=  {  trapSignalOffEntry  7  }
+	
+  trapSignalOnTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TrapSignalOnEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  { basicInfo  20 }
+     
+  trapSignalOnEntry	OBJECT-TYPE
+		SYNTAX		TrapSignalOnEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  signalOnDeviceName  }
+		::=  { trapSignalOnTable 1 }   
+           
+	TrapSignalOnEntry  ::=
+		SEQUENCE {
+			signalOnDeviceName    DisplayString,
+			signalOnDeviceIP      DisplayString, 
+			signalOnChannel				DisplayString, 
+			signalOnLevel         DisplayString,
+			signalOnTriggerTime   DisplayString,
+			signalOnDescription   DisplayString,
+			signalOnSlot					DisplayString
+		}
+
+	signalOnDeviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"device name"
+		::=  {  trapSignalOnEntry  1  }
+
+	signalOnDeviceIP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device IP address "
+		::=  {  trapSignalOnEntry  2  }
+
+	signalOnChannel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" the channel for signal on trap "
+		::=  {  trapSignalOnEntry  3  }
+		
+	signalOnLevel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Alarm level: level 3 "
+		::=  {  trapSignalOnEntry  4  }
+		
+	signalOnTriggerTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Event trigger time"
+		::=  {  trapSignalOnEntry  5  }
+		
+	signalOnDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Description information "
+		::=  {  trapSignalOnEntry  6  }
+		 
+	signalOnSlot	OBJECT-TYPE
+	  SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Slot number "
+		::=  {  trapSignalOnEntry  7  }	
+		     
+	trapSignalChangeTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TrapSignalChangeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  { basicInfo  21 }
+		
+  trapSignalChangeEntry	OBJECT-TYPE
+		SYNTAX		TrapSignalChangeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  signalChangeDeviceName  }
+		::=  { trapSignalChangeTable 1 }     
+           
+	TrapSignalChangeEntry  ::=
+		SEQUENCE {
+			signalChangeDeviceName     DisplayString,
+			signalChangeDeviceIP       DisplayString, 
+			signalChangeChannel				 DisplayString,
+			signalChangeLevel          DisplayString,
+			signalChangeTriggerTime    DisplayString,
+			signalChangeDescription    DisplayString,
+			signalChangeSlot	         DisplayString
+		}
+
+	signalChangeDeviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device name "
+		::=  {  trapSignalChangeEntry  1  }
+
+	signalChangeDeviceIP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device IP address "
+		::=  {  trapSignalChangeEntry  2  }
+
+	signalChangeChannel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" the channel for signal change trap "
+		::=  {  trapSignalChangeEntry  3  }
+		
+	signalChangeLevel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Alarm level: level 3 "
+		::=  {  trapSignalChangeEntry  4  }
+		
+	signalChangeTriggerTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Event trigger time "
+		::=  {  trapSignalChangeEntry  5  }
+		
+	signalChangeDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Description information "
+		::=  {  trapSignalChangeEntry  6  }  
+		
+	signalChangeSlot	OBJECT-TYPE
+	  SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Slot number"
+		::=  {  trapSignalChangeEntry  7  } 		                                    
+		                                
+  trapTSOverflowTable	OBJECT-TYPE	
+		SYNTAX SEQUENCE  OF  TrapTSOverflowEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  { basicInfo  22 }
+     
+  trapTSOverflowEntry	OBJECT-TYPE
+		SYNTAX		TrapTSOverflowEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  tsOverflowDeviceName  }
+		::=  { trapTSOverflowTable 1 }     
+           
+	TrapTSOverflowEntry  ::=
+		SEQUENCE {
+			tsOverflowDeviceName    DisplayString,
+			tsOverflowDeviceIP      DisplayString, 
+			tsOverflowChannel       DisplayString,
+			tsOverflowLevel         DisplayString,
+			tsOverflowTriggerTime   DisplayString,
+			tsOverflowDescription   DisplayString,
+			tsOverflowSlot	        DisplayString
+		}
+
+	tsOverflowDeviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device name "
+		::=  {  trapTSOverflowEntry  1  }
+
+	tsOverflowDeviceIP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device IP address "
+		::=  {  trapTSOverflowEntry  2  }
+		  
+	tsOverflowChannel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" the channel for TS overflow trap "
+		::=  {  trapTSOverflowEntry  3  } 
+  
+	tsOverflowLevel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Alarm level: level 1 "
+		::=  {  trapTSOverflowEntry  4  }
+		
+	tsOverflowTriggerTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Event trigger time "
+		::=  {  trapTSOverflowEntry  5  }
+		
+	tsOverflowDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Description information "
+		::=  {  trapTSOverflowEntry  6  }
+	
+	tsOverflowSlot	 OBJECT-TYPE
+	  SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Slot number"
+		::=  {  trapTSOverflowEntry  7  }
+		
+  rebootCommand	OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"send reboot unit command: send 1 to Agent for reboot"
+		::=  {  basicInfo  23  }  
+		
+  trapTSIDErrorTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TrapTSIDErrorEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  {  basicInfo  24  }
+		
+  trapTSIDErrorEntry	OBJECT-TYPE
+		SYNTAX		TrapTSIDErrorEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  tsIDErrorDeviceName  }
+		::=  { trapTSIDErrorTable 1 } 
+           
+	TrapTSIDErrorEntry  ::=
+		SEQUENCE {
+			tsIDErrorDeviceName    DisplayString,
+			tsIDErrorDeviceIP      DisplayString, 
+			tsIDErrorTsID     		 DisplayString,
+			tsIDErrorLevel         DisplayString,
+			tsIDErrorTriggerTime   DisplayString,
+			tsIDErrorDescription   DisplayString,
+			tsIDErrorSlot	         DisplayString
+  }
+
+	tsIDErrorDeviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device name "
+		::=  {  trapTSIDErrorEntry  1  }
+
+	tsIDErrorDeviceIP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device IP address "
+		::=  {  trapTSIDErrorEntry  2  }
+		  
+ 	tsIDErrorTsID	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" wrong ts id "
+		::=  {  trapTSIDErrorEntry  3  } 
+  
+	tsIDErrorLevel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Alarm level: level 1"
+		::=  {  trapTSIDErrorEntry  4  }
+		
+	tsIDErrorTriggerTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Event trigger time"
+		::=  {  trapTSIDErrorEntry  5  }
+
+	tsIDErrorDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Description information "
+		::=  {  trapTSIDErrorEntry  6  }
+	
+	tsIDErrorSlot	OBJECT-TYPE
+	  SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Slot number"
+		::=  {  trapTSIDErrorEntry  7  }
+                                         
+ trapTSIDRightTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TrapTSIDRightEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  {  basicInfo  25  }
+	
+	trapTSIDRightEntry	OBJECT-TYPE
+		SYNTAX		TrapTSIDRightEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  tsIDRightDeviceName  }
+		::=  { trapTSIDRightTable 1 }     
+           
+	TrapTSIDRightEntry  ::=
+		SEQUENCE {
+			tsIDRightDeviceName    DisplayString,
+			tsIDRightDeviceIP      DisplayString, 
+			tsIDRightTSID     		 DisplayString,
+			tsIDRightLevel         DisplayString,
+			tsIDRightTriggerTime   DisplayString,
+			tsIDRightDescription   DisplayString,
+			tsIDRightSlot	       	 DisplayString
+		}
+
+	tsIDRightDeviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device name "
+		::=  {  trapTSIDRightEntry  1  }
+
+	tsIDRightDeviceIP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device IP address "
+		::=  {  trapTSIDRightEntry  2  }
+		  
+ 	tsIDRightTSID	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" right ts id "
+		::=  {  trapTSIDRightEntry  3  } 
+  
+	tsIDRightLevel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Alarm level: level 1 "
+		::=  {  trapTSIDRightEntry  4  }
+		
+	tsIDRightTriggerTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Event trigger time "
+		::=  {  trapTSIDRightEntry  5  }
+		
+	tsIDRightDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Description information "
+		::=  {  trapTSIDRightEntry  6  }
+	
+	tsIDRightSlot	       OBJECT-TYPE
+	   SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" Slot number "
+		::=  {  trapTSIDRightEntry  7  }  
+	
+	trapTSBitRateNormalTable	OBJECT-TYPE	
+		SYNTAX SEQUENCE  OF  TrapTSBitRateNormalEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	" Description "
+		::=  { basicInfo  26 }
+     
+  trapTSBitRateNormalEntry	OBJECT-TYPE
+		SYNTAX		TrapTSBitRateNormalEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	" Row Description "
+		INDEX		{  tsBitRateNormalDeviceName  }
+		::=  { trapTSBitRateNormalTable 1 }     
+           
+	TrapTSBitRateNormalEntry  ::=
+		SEQUENCE {
+			tsBitRateNormalDeviceName    DisplayString,
+			tsBitRateNormalDeviceIP      DisplayString, 
+			tsBitRateNormalChannel       DisplayString,
+			tsBitRateNormalLevel         DisplayString,
+			tsBitRateNormalTriggerTime   DisplayString,
+			tsBitRateNormalDescription   DisplayString,
+			tsBitRateNormalSlot	         DisplayString
+		}
+
+	tsBitRateNormalDeviceName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device name "
+		::=  {  trapTSBitRateNormalEntry  1  }
+
+	tsBitRateNormalDeviceIP	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" device IP address"
+		::=  {  trapTSBitRateNormalEntry  2  }
+		  
+	tsBitRateNormalChannel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		" the channel for TS bit rate normal trap "
+		::=  {  trapTSBitRateNormalEntry  3  } 
+  
+	tsBitRateNormalLevel	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Alarm level: level 1"
+		::=  {  trapTSBitRateNormalEntry  4  }
+		
+	tsBitRateNormalTriggerTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Event trigger time"
+		::=  {  trapTSBitRateNormalEntry  5  }
+		
+	tsBitRateNormalDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Description information "
+		::=  {  trapTSBitRateNormalEntry  6  }
+		
+	tsBitRateNormalSlot  OBJECT-TYPE
+	  SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Slot number"
+		::=  {  trapTSBitRateNormalEntry  7  }
+		
+	virtualGroupInfo	OBJECT-TYPE	
+		SYNTAX			 DisplayString
+		MAX-ACCESS	 read-write
+		STATUS			 current
+		DESCRIPTION  "virtual group info"
+		::=  {  basicInfo  27  }
+		
+  moduleNumber	OBJECT-TYPE	
+		SYNTAX			 INTEGER
+		MAX-ACCESS	 read-only
+		STATUS			 current
+		DESCRIPTION  "the module number"
+		::=  {  basicInfo  28  }
+		
+	chestTemp	OBJECT-TYPE	
+		SYNTAX			 INTEGER
+		MAX-ACCESS	 read-only
+		STATUS			 current
+		DESCRIPTION  "the chest Temperature"
+		::=  {  basicInfo  29  }
+		
+	lcdSwitch	OBJECT-TYPE
+		SYNTAX			 INTEGER {
+			alwaysOn(0),
+			time(1)
+		}
+		MAX-ACCESS	 read-write
+		STATUS			 current
+		DESCRIPTION  " control LCD background "
+		::=  {  basicInfo  35  }
+	
+END

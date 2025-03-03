@@ -1,0 +1,87 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.659",
+                    "sysDescr": "Cisco IOS Software, Catalyst 4500 L3 Switch Software (cat4500-IPBASEK9-M), Version 15.0(2)SG11, RELEASE SOFTWARE (fc2)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2016 by Cisco Systems, Inc.\r\nCompiled Mon 24-Oct-16 10:00 by pr",
+                    "sysContact": "<private>",
+                    "version": "15.0(2)SG11",
+                    "hardware": "WS-C4948-10GE",
+                    "features": "IPBASEK9",
+                    "location": "<private>",
+                    "os": "ios",
+                    "type": "network",
+                    "serial": "<private>",
+                    "icon": "cisco.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 1,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": "Switch System",
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "<private>",
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 1000,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": null,
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "WS-C4948-10GE",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
+                    "entPhysicalContainedIn": 2,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 1001,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": null,
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": "",
+                    "entPhysicalContainedIn": 1000,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -1,0 +1,1000 @@
+-- =================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: description of Port Security
+-- Reference:
+-- Version: V1.8
+-- History:
+--   V1.0 2004-11-24, Created by lijian
+--   V1.1 2005-2-23,  Modified by Zhangmin
+--        Add objects:hh3cSecureRalmAuthDomain,hh3cSecureRalmAuthOfflineTime
+--                    hh3cSecureRalmAuthServerTimeoutTime,
+--                    hh3cSecureRalmLoginFailure,hh3cSecureRalmLogon
+--                    hh3cSecureRalmLogoff
+--   V1.2 2005-10-21, Modified the value range of 'hh3cSecureRalmAuthPassword'
+--                    from (0..16) to (0..63) by lijian
+--   V1.3 2006-01-21, Add TruthValue and hh3cSecureAssignTable by wangyingxia
+--   V1.4 2006-02-24, Modified the description of hh3cSecureBindingTable
+--                    Modified the range of hh3cSecureBindingIndex by xulei
+--   V1.5 2006-05-27, Add hh3cSecureMacControl by ludi
+--   V1.6 2006-11-16, Add macAddressAndUserLoginSecure
+--                    and macAddressAndUserLoginSecureExt for hh3cSecurePortMode
+--                    by huangyang
+--   V1.7 2012-04-11, Modified the range of hh3cSecureRalmAuthOfflineTime by xuyonggang
+--   V1.8 2014-06-05, Modified the range of hh3cSecureRalmAuthDomain by wuqiang
+-- =================================================================
+HH3C-PORT-SECURITY-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    hh3cPortSecurity
+        FROM HH3C-OID-MIB
+    ifAdminStatus,ifIndex
+        FROM RFC1213-MIB
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, Integer32, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, MacAddress, TruthValue
+        FROM SNMPv2-TC
+    dot1xAuthSessionUserName, dot1xAuthSessionAuthenticMethod,
+    dot1xAuthSessionTerminateCause, dot1xPaePortNumber
+        FROM IEEE8021-PAE-MIB
+        ;
+
+hh3cPortSecurityMIB MODULE-IDENTITY
+    LAST-UPDATED "200411240000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "The MIB module is used for managing port security."
+    REVISION "200411240000Z"
+    DESCRIPTION
+        "The Initial Version of hh3cPortSecurityMIB"
+    ::= { hh3cPortSecurity 1 }
+
+
+hh3cPortSecurityLeaf OBJECT IDENTIFIER ::= {hh3cPortSecurityMIB 1}
+
+--
+-- SECURITY ACCESS CONTROL OBJECT
+--
+
+hh3cSecurePortSecurityControl OBJECT-TYPE
+    SYNTAX      INTEGER{enabled(1),disabled(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This attribute controls the system wide operation of network
+        access control.  The configured port security options only become
+        operational when this attribute is set to enabled."
+    ::= {hh3cPortSecurityLeaf 1}
+
+
+
+--
+-- SECURITY TABLE 'VLAN membership list' OBJECT
+--
+
+hh3cSecurePortVlanMembershipList OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This is a dummy MIB object referenced by the hh3csecureLogon and
+        hh3csecureLogoff traps.  This object contains a comma separated list of
+        the VLAN identifiers (0-4095) assigned to a port.  A tagged VLAN has a
+        'T' suffix after the VLAN number and an untagged VLAN may have an
+        optional 'U' suffix."
+    ::= {hh3cPortSecurityLeaf 2}
+
+--
+-- RADIUS Authenticated Login using MAC-address GROUP
+--
+
+hh3cSecureRalmObjects    OBJECT IDENTIFIER ::= { hh3cPortSecurityLeaf 4 }
+
+hh3cSecureRalmDefaultSessionTime OBJECT-TYPE
+    SYNTAX      INTEGER(1..1000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the default session lifetime in seconds before
+        a forwarding MAC address is re-authenticated.
+        The default time is 1800 seconds."
+    ::= { hh3cSecureRalmObjects 1 }
+
+
+hh3cSecureRalmHoldoffTime OBJECT-TYPE
+    SYNTAX      INTEGER(1..1000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the time in seconds before
+        a blocked (denied) MAC address can be re-authenticated.
+        The default time is 60 seconds."
+    ::= { hh3cSecureRalmObjects 2 }
+
+
+hh3cSecureRalmReauthenticate OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Writing a MAC address to this object causes an
+        immediate RALM re-authentication of this address (can be on
+        any port).  If the MAC address not currently known to RALM,
+        it silently ignores the write."
+    ::= { hh3cSecureRalmObjects 3 }
+
+hh3cSecureRalmAuthMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            papUsernameAsMacAddress(1),
+            papUsernameFixed(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This controls how MAC addresses are authenticated.
+
+        papUsernameAsMacAddress(1)
+            Authentication uses the RADIUS server by
+            sending a PAP request with Username and
+            Password both equal to the MAC address being
+            authenticated.  This is the default.
+
+        papUsernameFixed(2)
+            Authentication uses the RADIUS server by
+            sending a PAP request with Username and
+            Password coming from the hh3cSecureRalmAuthUsername and
+            hh3cSecureRalmAuthPassword MIB objects.  In this mode
+            the RADIUS server would normally take into account
+            the request's calling-station-id attribute, which is
+            the MAC address of the host being authenticated."
+    ::= { hh3cSecureRalmObjects 4 }
+
+hh3cSecureRalmAuthUsername OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the username used for authentication requests
+        where hh3cSecureRalmAuthMode is papUsernameFixed.
+        Default shall be 'mac'."
+    ::= { hh3cSecureRalmObjects 5 }
+
+hh3cSecureRalmAuthPassword OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the password used for authentication requests
+        where hh3cSecureRalmAuthMode is papUsernameFixed.
+        Default shall be a null string."
+    ::= { hh3cSecureRalmObjects 6 }
+
+hh3cSecureRalmAuthDomain OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MAC-authentication users may be configured in a specific domain,
+        which excludes 802.1x and other authentication users. This
+        specifies the domain of all MAC-authentication users."
+    ::= {hh3cSecureRalmObjects 7}
+
+hh3cSecureRalmAuthOfflineTime OBJECT-TYPE
+    SYNTAX      Integer32 (60..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Switch isn't informed when online user is offline,
+        so switch should be able to detect offline and inform radius
+        server to stop accounting when there is no traffic of the user.
+        This attribute configures the timer interval of offline-detect.
+        The default time is 300 seconds."
+    DEFVAL { 300 }
+    ::= {hh3cSecureRalmObjects 8}
+
+hh3cSecureRalmAuthServerTimeoutTime OBJECT-TYPE
+    SYNTAX      INTEGER(1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When switch sends request packets (include connecting
+        request and offline request, etc) to radius server and
+        there is no response, switch will terminate the authentication
+        process. This attribute configures the timer interval of
+        server-timeout. The default time is 100 seconds."
+    DEFVAL { 100 }
+    ::= {hh3cSecureRalmObjects 9}
+
+hh3cSecureMacControl OBJECT-TYPE
+    SYNTAX      INTEGER{enabled(1),disabled(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This attribute controls the system wide operation of
+        mac-authentication.  The system-wide mac-authentication options
+        become non-operational when this attribute is set to disabled.
+        This is required for hh3cSecurePortSecurityControl to be enabled."
+    ::= { hh3cSecureRalmObjects 10 }
+
+hh3cPortSecurityTables OBJECT IDENTIFIER ::= {hh3cPortSecurityMIB 2}
+
+hh3cSecurePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSecurePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines the security status of each secure port.
+        Each port can have a number of authorised MAC addresses, and these are
+        stored in the hh3cSecureAddressTable."
+    ::= {hh3cPortSecurityTables 1}
+
+
+hh3cSecurePortEntry OBJECT-TYPE
+    SYNTAX      Hh3cSecurePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "There is a row in this table for each secure port, and
+        allows repeater ports to be configured for security on a per port basis.
+        It is indexed using the object ifIndex in RFC1213-MIB."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= {hh3cSecurePortTable 1}
+
+
+Hh3cSecurePortEntry ::= SEQUENCE
+    {
+        hh3cSecurePortMode                 INTEGER,
+        hh3cSecureNeedToKnowMode           INTEGER,
+        hh3cSecureIntrusionAction          INTEGER,
+        hh3cSecureNumberAddresses          Integer32,
+        hh3cSecureNumberAddressesStored    Integer32,
+        hh3cSecureMaximumAddresses         Integer32
+    }
+
+hh3cSecurePortMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            noRestrictions(1),
+            continuousLearning(2),
+            autoLearn(3),
+            secure(4),
+            userLogin(5),
+            userLoginSecure(6),
+            userLoginWithOUI(7),
+            macAddressWithRadius(8),
+            macAddressOrUserLoginSecure(9),
+            macAddressElseUserLoginSecure(10),
+            userLoginSecureExt(11),
+            macAddressOrUserLoginSecureExt(12),
+            macAddressElseUserLoginSecureExt(13),
+            macAddressAndUserLoginSecure(14),
+            macAddressAndUserLoginSecureExt(15)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determines the learning and security modes of the port.
+        See hh3cSecureNeedToKnowMode and hh3cSecureIntrusionAction to
+        configure Need To Know and Intrusion Action on each port.
+        (When in a learning mode, hh3cSecureNumberAddresses determines the maximum
+        number of addresses that can be learned on the port.  This is set
+        by the user.)
+
+        noRestrictions(1)    All of the security features are disabled.
+
+        continuousLearning(2)   Addresses are learned continually.  If more
+            addresses are learned than are permitted on the
+            port, then one of the older entries will be aged
+            out.  Need To Know and Intrusion Action depends on
+            hh3cSecureNeedToKnowMode and hh3cSecureIntrusionAction
+            respectively.
+
+        autoLearn(3)      All addresses for this port are deleted, and then
+            addresses are learned up to the number permitted.
+            hh3cSecurePortMode is then set to secure.  Need To
+            Know and Intrusion Action depends on
+            hh3cSecureNeedToKnowMode and hh3cSecureIntrusionAction
+            respectively.
+
+        secure(4)      Learning is disabled. Need To Know and Intrusion
+            Action depends on hh3cSecureNeedToKnowMode and
+            hh3cSecureIntrusionAction respectively.
+
+        userLogin(5)   Access to the port is denied until the port client is
+            authorised (by 802.1X or other authentication mechanism).
+            Once authorised, traffic will be accepted from any MAC
+            address.  The Need To Know and Intrusion Action are ignored.
+
+        userLoginSecure(6) Access to the port is denied until the port client
+            is authorised (by 802.1X or other authentication mechanism).
+            When the client is authorised, the MAC address is added to the
+            Secure Address Table.
+            The hh3cSecureMaximumAddresses is set to one automatically when
+            this mode is entered.  Any existing MAC addresses in the Secure
+            Address Table are deleted.  Need To Know and Intrusion Action
+            depends on hh3cSecureNeedToKnowMode and hh3cSecureIntrusionAction
+            respectively.  Learning is disabled.
+
+        userLoginWithOUI(7) This mode is similar to the userLoginSecure mode
+            except that a second MAC address may be placed in the Secure
+            Address Table.  This second address is authorised based on the
+            MAC address OUI value.
+            If a new device with an authorised OUI value is discovered,
+            the previous entry is deleted.  Traffic from the
+            OUI authorised device will be accepted even if the user has
+            not been authenticated.  Need To Know and Intrusion Action
+            depends on hh3cSecureNeedToKnowMode and hh3cSecureIntrusionAction
+            respectively.
+
+        macAddressWithRadius(8) This selects the RADIUS Authenticated Login using
+            MAC-address (RALM) security mode on the port.  This feature controls
+            network access of a host based on authenticating its MAC
+            address.  Once authorised, the host is allowed access to the
+            network.  If unauthorised, the port can be configured to deny
+            access to this MAC address or to allow some access depending
+            upon the port VLAN and QoS configuration.
+            Where access is allowed, the MAC address is added to the Secure
+            Address Table.
+
+        macAddressOrUserLoginSecure(9) This selects both the macAddressWithRadius and
+            userLoginSecure modes together such that either or both are allowed to
+            authorised access.  Where both authorised access, userLoginSecure takes
+            precedence.
+
+        macAddressElseUserLoginSecure(10) This selects both the macAddressWithRadius and
+            userLoginSecure modes together such that the MAC address is first
+            authenticated and only if this fails does the userLoginSecure then attempt
+            user authentication.
+
+        userLoginSecureExt(11) Access to the port is denied until the port client
+            is authorised (by 802.1X or other authentication mechanism).
+            When the client is authorised, the MAC address is added to the
+            Secure Address Table.
+            The hh3cSecureNumberAddresses is restricted by the value of hh3cSecureMaximumAddresses
+            automatically when this mode is entered.
+            Any existing MAC addresses in the Secure Address Table are deleted.
+            Need To Know and Intrusion Action depends on hh3cSecureNeedToKnowMode
+            and hh3cSecureIntrusionAction respectively.  Learning is disabled.
+
+        macAddressOrUserLoginSecureExt(12) This selects both the macAddressWithRadius and
+            userLoginSecureExt modes together such that either or both are allowed to
+            authorised access.  Where both authorised access, userLoginSecure takes
+            precedence.
+
+        macAddressElseUserLoginSecureExt(13) This selects both the macAddressWithRadius and
+            userLoginSecureExt modes together such that the MAC address is first
+            authenticated and only if this fails does the userLoginSecure then attempt
+            user authentication.
+
+        macAddressAndUserLoginSecure(14) This selects both the macAddressWithRadius and
+            userLoginSecure modes together such that the MAC address is first
+            authenticated and only if this succeeds does the userLoginSecure then attempt
+            user authentication.
+
+        macAddressAndUserLoginSecureExt(15) This selects both the macAddressWithRadius and
+            userLoginSecureExt modes together such that the MAC address is first
+            authenticated and only if this succeeds does the userLoginSecure then attempt
+            user authentication.
+        "
+    ::= {hh3cSecurePortEntry 1}
+
+
+hh3cSecureNeedToKnowMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            notAvailable(1),
+            disabled(2),
+            needToKnowOnly(3),
+            needToKnowWithBroadcastsAllowed(4),
+            needToKnowWithMulticastsAllowed(5),
+            permanentNeedToKnowOnly(6),
+            permanentNeedToKnowWithBroadcastsAllowed(7),
+            permanentNeedToKnowWithMulticastsAllowed(8)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Attribute to determine which frames are to be forwarded to
+        this port intact.
+
+        1 - Need To Know is not available.
+        2 - All frames.
+        3 - Frames addressed to the authorised devices only.
+        4 - Frames addressed to the authorised devices, plus all broadcast
+            frames.
+        5 - Frames addressed to the authorised devices, plus all broadcast
+            and multicast frames.
+        6 - As 3 and cannot be changed.
+        7 - As 4 and cannot be changed.
+        8 - As 5 and cannot be changed.
+
+        If this object returns 1,6,7 or 8, it means that the Need To Know
+        configuration cannot be changed, and any attempt to write to this object
+        will cause an error."
+    ::= {hh3cSecurePortEntry 2}
+
+
+hh3cSecureIntrusionAction OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            notAvailable(1),
+            noAction(2),
+            disablePort(3),
+            disablePortTemporarily(4),
+            allowDefaultAccess(5),
+            blockMacAddress(6)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Attribute to determine the action if an unauthorised device
+        transmits on this port."
+    ::= {hh3cSecurePortEntry 3}
+
+--
+-- The following 3 objects are used to allow multiple MAC addresses to be
+-- assigned to the port.
+
+hh3cSecureNumberAddresses OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of addresses that the port can learn or
+        store. Reducing this number may cause some addresses to be deleted.
+        This value is set by the user and cannot be automatically changed by the
+        agent.  The maximum number will not include and limit the number of
+        static mac addresses that configured by manager.
+
+        The following relationship must be preserved.
+        hh3cSecureNumberAddressesStored <= hh3cSecureNumberAddresses <=
+        hh3cSecureMaximumAddresses
+        "
+    ::= {hh3cSecurePortEntry 4}
+
+
+hh3cSecureNumberAddressesStored OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of addresses that are currently in the
+        AddressTable for this port.  If this object has the same value as
+        hh3cSecureNumberAddresses, then no more addresses can be authorised on this
+        port.  The number will not include and limit the number of
+        static mac addresses that configured by manager.
+
+        Those objects are bound by the relationship:
+        hh3cSecureNumberAddressesStored <= hh3cSecureNumberAddresses <=
+        hh3cSecureMaximumAddresses
+        "
+    ::= {hh3cSecurePortEntry 5}
+
+
+hh3cSecureMaximumAddresses OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This indicates the maximum value that hh3cSecureNumberAddresses
+        can be set to.  It is dependent on the resources available so may change,
+        eg. if resources are shared between ports, then this value can both
+        increase and decrease.  This object must be read before setting
+        hh3cSecureNumberAddresses.
+
+        Those objects are bound by the relationship:
+        hh3cSecureNumberAddressesStored <= hh3cSecureNumberAddresses <=
+        hh3cSecureMaximumAddresses
+        "
+    ::= {hh3cSecurePortEntry 6}
+
+--
+-- SECURE ADDRESS TABLE
+--
+
+hh3cSecureAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSecureAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table stores the MAC addresses assigned to each
+        port.  This table can be written to by the agent as well as the
+        management station."
+    ::= {hh3cPortSecurityTables 2}
+
+
+hh3cSecureAddressEntry OBJECT-TYPE
+    SYNTAX      Hh3cSecureAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table allows multiple addresses to be assigned to each
+        secure port.  It is indexed using the objects ifIndex,
+        hh3cSecureAddrMAC and hh3cSecureVlanID."
+    INDEX
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            hh3cSecureAddrVlanID
+        }
+    ::= {hh3cSecureAddressTable 1}
+
+
+Hh3cSecureAddressEntry ::= SEQUENCE
+    {
+        hh3cSecureAddrMAC          MacAddress,
+        hh3cSecureAddrVlanID       Integer32,
+        hh3cSecureAddrMACStatus    INTEGER,
+        hh3cSecureAddrRowStatus    RowStatus
+    }
+
+
+hh3cSecureAddrMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of a station assigned to this port.
+        This is the second index into the hh3cSecureAddressTable."
+    ::= {hh3cSecureAddressEntry 1}
+
+hh3cSecureAddrVlanID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Vlan ID associate with the port and the MAC address.
+        This is the third index into the hh3cSecureAddressTable."
+    ::= {hh3cSecureAddressEntry 2}
+
+hh3cSecureAddrMACStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            addressBlackhole(1),
+            addressUserConfig(2),
+            addressDot1xAuth(3),
+            addressRALM(4)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The state of the mac address assigned to this port.
+
+        addressBlackhole (1) the mac address is a blackhole address,
+            Each packet whose source address is equal to this address will be
+            dropped by the agent.
+        addressUserConfig (2) the mac address configed by user with this state
+            are preserved across power cycles and resets.
+        addressDot1xAuth (3) the mac address is authorized by 802.1x authenticator,
+            User can not configure this mac address.  This value is used for GET
+            and GETNEXT operation.
+        addressRALM (4) the mac address is authorized by RALM authenticator,
+            User can not configure this mac address.  This value is used for GET
+            and GETNEXT operation.
+        "
+    ::= {hh3cSecureAddressEntry 3}
+
+
+hh3cSecureAddrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This manages the creation and deletion or rows, and shows
+        the current status of the indexed MAC address.  This object has the
+        following values.
+
+        active(1)        The indexed MAC address is authorised on this port.
+        notInService(2)  Not Supported.
+        notReady(3)      Not Supported.
+        createAndGo(4)   Assign a new MAC address to the port and authorise
+                         immediately.
+        createAndWait(5) Not Supported.
+        destroy(6)       Delete this entry.
+
+        When creating a new entry, index a new row and use createAndGo(4).
+        When reading this object, only active(1) will be
+        returned.
+        "
+    ::= {hh3cSecureAddressEntry 4}
+
+
+--
+-- SECURE OUI TABLE
+--
+
+hh3cSecureOUITable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSecureOUIEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table stores the OUI values for OUI based
+        authentication."
+    ::= {hh3cPortSecurityTables 3}
+
+
+hh3cSecureOUIEntry OBJECT-TYPE
+    SYNTAX      Hh3cSecureOUIEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a row in the hh3cSecureOUITable."
+    INDEX
+        {
+            hh3cSecureOUIIndex
+        }
+    ::= {hh3cSecureOUITable 1}
+
+
+Hh3cSecureOUIEntry ::= SEQUENCE
+    {
+        hh3cSecureOUIIndex        INTEGER,
+        hh3cSecureOUI             OCTET STRING,
+        hh3cSecureOUIRowStatus    RowStatus
+    }
+
+
+hh3cSecureOUIIndex OBJECT-TYPE
+    SYNTAX      INTEGER(1..1024)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index number.  This is the first index into the
+        hh3cSecureOUITable."
+    ::= {hh3cSecureOUIEntry 1}
+
+
+hh3cSecureOUI OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(3))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The OUI value for an authorised device."
+    ::= {hh3cSecureOUIEntry 2}
+
+
+hh3cSecureOUIRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This manages the creation and deletion of rows, and shows
+        the current status of the entry.
+
+        active(1)       The indexed OUI value is authorised.
+        notInService(2) Not Supported.
+        notReady(3)     Not Supported.
+        createAndGo(4)  Assign a new OUI to the unit and authorise
+                        immediately.
+        createAndWait(5) Not Supported.
+        destroy(6)      Delete this entry.
+
+        When creating a new entry, index a new row and use createAndGo(4) .
+        When reading this object, only active(1) will be returned.
+        "
+    ::= {hh3cSecureOUIEntry 3}
+
+--
+-- IP+MAC+PORT BINDING TABLE
+--
+
+hh3cSecureBindingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSecureBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table stores the elements of binding rules include the
+        MAC addresses, the IP address and the port.  Only the frame exactly
+        matching the binding rules can be forwarded.  This table can be
+        written to by the agent as well as the management station."
+    ::= {hh3cPortSecurityTables 4}
+
+
+hh3cSecureBindingEntry OBJECT-TYPE
+    SYNTAX      Hh3cSecureBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table allows multiple binding rules.  It is indexed using the object
+        hh3cSecureBindingIndex."
+    INDEX
+        {
+            hh3cSecureBindingIndex
+        }
+    ::= {hh3cSecureBindingTable 1}
+
+
+Hh3cSecureBindingEntry ::= SEQUENCE
+    {
+        hh3cSecureBindingIndex        Integer32,
+        hh3cSecureBindingPort         Integer32,
+        hh3cSecureBindingAddrMAC      MacAddress,
+        hh3cSecureBindingAddrIp       IpAddress,
+        hh3cSecureBindingRowStatus    RowStatus
+    }
+
+hh3cSecureBindingIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index number.  This is the first index into the
+        hh3cSecureBindingTable."
+    ::= {hh3cSecureBindingEntry 1}
+
+hh3cSecureBindingPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The port number of the port bound with the IP address
+        and the MAC address."
+    ::= {hh3cSecureBindingEntry 2}
+
+hh3cSecureBindingAddrMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MAC address bound with the port and the IP address."
+    ::= {hh3cSecureBindingEntry 3}
+
+hh3cSecureBindingAddrIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address bound with the port and the MAC address."
+    ::= {hh3cSecureBindingEntry 4}
+
+hh3cSecureBindingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This manages the creation and deletion or rows, and shows
+        status of the entry.  This object has the following values.
+
+        active(1)        The indexed MAC address is authorised on this port.
+        notInService(2)  Not Supported.
+        notReady(3)      Not Supported.
+        createAndGo(4)   Assign a new MAC address to the port and authorise
+                         immediately.
+        createAndWait(5) Not Supported.
+        destroy(6)       Delete this entry.
+
+        When creating a new entry, index a new row and use createAndGo(4).
+        When reading this object, only active(1) will be
+        returned.
+        "
+    ::= {hh3cSecureBindingEntry 5}
+--
+-- PORT ASSIGN TABLE
+--
+hh3cSecureAssignTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSecureAssignEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of port assignment management information about authorised user."
+    ::= {hh3cPortSecurityTables 5}
+
+
+hh3cSecureAssignEntry OBJECT-TYPE
+    SYNTAX      Hh3cSecureAssignEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing information about port assignment
+        about authorised user."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= {hh3cSecureAssignTable 1}
+
+
+Hh3cSecureAssignEntry ::= SEQUENCE
+    {
+        hh3cSecureAssignEnable      TruthValue,
+        hh3cSecureVlanAssignment    OCTET STRING
+    }
+
+hh3cSecureAssignEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The user-based port configuration control. Setting this attribute
+        TRUE causes the port to be configured with any configuration
+        parameters supplied by the authentication server. Setting this
+        attribute to FALSE causes any configuration parameters supplied
+        by the authentication server to be ignored."
+    DEFVAL  {true}
+    ::= { hh3cSecureAssignEntry 1 }
+
+hh3cSecureVlanAssignment OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN membership assigned to the port for the authorised user.
+        This contains the actual value received from the authentication
+        server. This object will contain a null value if there is no user
+        authorised to access the port or if the authorised user was not
+        assigned a VLAN membership."
+    ::= { hh3cSecureAssignEntry 2 }
+
+-- **********************************************************************
+-- Define enterprise repeater traps. Rules for traps are that any
+-- varbind must be from a table in which the first qualifier on the
+-- object id is the service identifier of the 'thing' causing the trap.
+-- **********************************************************************
+hh3cPortSecurityNotifications OBJECT IDENTIFIER ::= {hh3cPortSecurityMIB 3}
+
+hh3cSecureAddressLearned NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a new station has been learned.  The
+        port on which the address was received is the first object,
+        and the MAC address of the learned station is in the second object."
+    ::= {hh3cPortSecurityNotifications 1}
+
+
+hh3cSecureViolation NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            ifAdminStatus
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent whenever a security violation has occurred.
+        The port on which the violation occured is the first object,
+        and the MAC address of the offending station is in the second object.
+        ifAdminStatus indicates if the port has been disabled because of the violation.
+        The implementation may not send violation traps from the same port
+        at intervals of less than 5 seconds."
+    ::= {hh3cPortSecurityNotifications 2}
+
+
+hh3cSecureLoginFailure NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            dot1xAuthSessionUserName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent whenever a user network access
+        authentication has failed.  The port on which the violation occured is
+        the first object, and the MAC address of the offending station is in
+        the second object.  The dot1xAuthSessionUserName is the identity supplied
+        during the user authentication."
+    ::= {hh3cPortSecurityNotifications 3}
+
+
+hh3cSecureLogon NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            dot1xAuthSessionUserName,
+            dot1xAuthSessionAuthenticMethod,
+            hh3cSecurePortVlanMembershipList
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a new session is started for
+        an authorised port user.  The port on which the violation occured is
+        the first object, and the MAC address of the offending station is in
+        the second object.
+        The dot1xAuthSessionUserName is the identity supplied during the user
+        authentication.  The dot1xAuthSessionAuthenticMethod indicates how the
+        user was authorised.  The hh3cSecurePortVlanMembershipList object
+        identifies the VLAN membership assigned to the port on session
+        activation."
+    ::= {hh3cPortSecurityNotifications 4}
+
+
+hh3cSecureLogoff NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            dot1xAuthSessionUserName,
+            dot1xAuthSessionTerminateCause,
+            hh3cSecurePortVlanMembershipList
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a user session is terminated.
+        The port on which the violation occured is the first object,
+        and the MAC address of the offending station is in the second object.
+        The dot1xAuthSessionUserName is the identity supplied during the user
+        authentication.  The dot1xAuthSessionTerminateCause indicates the
+        reason why the session was terminated.
+        The hh3cSecurePortVlanMembershipList object identifies the VLAN
+        membership assigned to the port on session termination."
+    ::= {hh3cPortSecurityNotifications 5}
+
+hh3cSecureRalmLoginFailure NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            hh3cSecureRalmAuthMode,
+            hh3cSecureRalmAuthUsername
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent whenever a user network access
+        authentication has failed.  The port on which the violation
+        occured is the first object, and the MAC address of the
+        offending station is in the second object. The authentication mode
+        indicates how the user was authorised. The hh3cSecureRalmAuthUsername
+        is the identity supplied during the user authentication."
+    ::= {hh3cPortSecurityNotifications 6}
+
+
+hh3cSecureRalmLogon NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            hh3cSecureRalmAuthMode,
+            hh3cSecureRalmAuthUsername,
+            hh3cSecurePortVlanMembershipList
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a new session is started for
+        an authorised port user.  The port on which the violation
+        occured is the first object, and the MAC address of
+        the offending station is in the second object. The authentication mode
+        indicates how the user was authorised. The hh3cSecureRalmAuthUsername is
+        the identity supplied during the user authentication. The
+        hh3cSecurePortVlanMembershipList object identifies the VLAN
+        membership assigned to the port on session activation."
+    ::= {hh3cPortSecurityNotifications 7}
+
+
+hh3cSecureRalmLogoff NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            hh3cSecureRalmAuthMode,
+            hh3cSecureRalmAuthUsername,
+            hh3cSecurePortVlanMembershipList
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a new session is started for
+        an authorised port user.  The port on which the violation
+        occured is the first object, and the MAC address of the
+        offending station is in the second object. The authentication mode
+        indicates how the user was authorised. The hh3cSecureRalmAuthUsername is
+        the identity supplied during the user authentication. The
+        hh3cSecurePortVlanMembershipList object identifies the VLAN
+        membership assigned to the port on session activation."
+    ::= {hh3cPortSecurityNotifications 8}
+END

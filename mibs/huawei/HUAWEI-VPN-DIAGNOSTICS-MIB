@@ -1,0 +1,1107 @@
+--  =================================================================
+-- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: VPN diagnostics MIB. 
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              V1.0 zhuxiao,luobin 2008.08.08,publish 
+--              
+--  
+-- =================================================================
+
+    HUAWEI-VPN-DIAGNOSTICS-MIB DEFINITIONS ::= BEGIN
+ 
+                 IMPORTS
+                        hwDatacomm            
+                                FROM HUAWEI-MIB
+                        HWL2VpnVcEncapsType                        
+                                FROM HUAWEI-VPLS-EXT-MIB                        
+                        InetAddressType, InetAddress                        
+                                FROM INET-ADDRESS-MIB                        
+                        EnabledStatus                        
+                                FROM P-BRIDGE-MIB   								
+            OBJECT-GROUP, MODULE-COMPLIANCE             
+                FROM SNMPv2-CONF            
+            mib-2, IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI            
+            MacAddress, RowStatus, DisplayString, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC ;
+    
+    
+--                     
+        vpndiagnostics MODULE-IDENTITY 
+            LAST-UPDATED "201401181722Z"     
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "HUAWEI service quality detect funcion."
+  
+            REVISION "201401181722Z"
+            DESCRIPTION 
+                "Modify type of hwVpnCfgPingPwId and hwVpnCfgPingResultPwId at 2014-01-18."                  
+            REVISION "201312160958Z"
+            DESCRIPTION 
+                "Modify type of hwVpnCfgPingPwId and hwVpnCfgPingResultPwId at 2013-12-16."                
+            REVISION "201307161600Z"
+            DESCRIPTION 
+                "Modify description of hwOamMacCountReset at 2013-7-16."
+            REVISION "200806061600Z"
+            DESCRIPTION 
+                "Inition at 2008-6-6."
+            ::= { hwDatacomm 172 }        
+    
+--
+-- Textual conventions
+--
+
+        MacOpType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Select test type"
+            SYNTAX INTEGER
+                {
+                populate(1),
+                purge(2)
+                }
+    
+--
+-- Node definitions
+--
+
+        
+        macoper OBJECT IDENTIFIER ::= { vpndiagnostics 1 }
+
+
+--  ===========================================================================            
+-- populateBase
+-- ===========================================================================             
+        
+        populateBase OBJECT IDENTIFIER ::= { macoper 1 }
+
+    
+        
+        hwOamMacPopulateCount OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received populate packets in current device."
+            ::= { populateBase 1 }
+        
+        
+        hwOamMacPurgeCount OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received purge packets in current device."
+            ::= { populateBase 2 }
+
+                 
+        hwOamMacPurgeRegCount OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received purge(register) packets in current device."
+            ::= { populateBase 3 }
+        
+        
+        hwOamMacCountReset OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                populatereset(1),
+                purgereset(2),
+                purgeregreset(3),
+                allreset(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset the count of hwOamMacPopulateCount and hwOamMacPurgeCount, the value  1 
+                means reset hwOamMacPopulateCount,the value is 2 means reset hwOamMacPurgeCount,
+                the value is 3 means reset hwOamMacPurgeRegCount ,the value is 4 means reset hwOamMacPopulateCount and hwOamMacPurgeCount,hwOamMacPurgeRegCount , When read, it always returns value 4."
+            ::= { populateBase 4 }
+        
+        
+        hwOamMacSwitch OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates the switch of enabling MAC populate,if the value is 1, enable; if the value is 2, disable."
+            ::= { populateBase 5 }
+            
+        hwOamMacEntryNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The entry number of hwOamMacDisplayTable."
+            ::= { populateBase 6 }            
+        
+--  ===========================================================================            
+-- hwOamMacOperTable
+-- ===========================================================================                        
+        
+        hwOamMacOperTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwOamMacOperEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table which to be populate or purge operation."
+            ::= { macoper 2 }
+        
+        
+        hwOamMacOperEntry OBJECT-TYPE
+            SYNTAX HwOamMacOperEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entries of hwOamMacOperTable."
+            INDEX { hwOamMacOperIndex }
+            ::= { hwOamMacOperTable 1 }
+        
+        HwOamMacOperEntry ::=
+            SEQUENCE { 
+                hwOamMacOperIndex
+                    Integer32,
+                hwOamMacOperAddress
+                    MacAddress,
+                hwOamMacOperVsiName
+                    OCTET STRING,
+                hwOamMacOperType
+                    MacOpType,
+                hwOamMacOperRegister
+                    EnabledStatus,
+                hwOamMacOperFlood
+                    EnabledStatus,
+                hwOamMacOperNum
+                    Integer32,                
+                hwOamMacOperRowStatus
+                    RowStatus
+             }
+
+        
+        hwOamMacOperIndex OBJECT-TYPE
+            SYNTAX Integer32 (1)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of hwOamMacOperIndex,it is always 1."
+            ::= { hwOamMacOperEntry 1 }
+        
+        
+        hwOamMacOperAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The MAC that to be populated or purged."
+            ::= { hwOamMacOperEntry 2 }
+        
+        
+        hwOamMacOperVsiName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The name or other identifier referring to the VSI 
+                which is correlative to the hwOamMac."
+            ::= { hwOamMacOperEntry 3 }
+        
+        
+        hwOamMacOperType OBJECT-TYPE
+            SYNTAX MacOpType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The operate type,1 means populate,2 means purge."
+            ::= { hwOamMacOperEntry 4 }
+        
+        
+        hwOamMacOperRegister OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "while purge a OAM MAC,register it to be a reserved MAC . 
+                1 means register, 2 means not register. Defaut is 2."
+            DEFVAL { disable }
+            ::= { hwOamMacOperEntry 5 }
+        
+        
+        hwOamMacOperFlood OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Broadcast the packet or not. 1 means broadcast, 2 means don`t broadcast.Defaut is 2."
+            DEFVAL { disable }
+            ::= { hwOamMacOperEntry 6 }
+        
+        
+        hwOamMacOperNum OBJECT-TYPE
+            SYNTAX Integer32 (1..5)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The number of packets which want to be sent."
+            DEFVAL { 3 }
+            ::= { hwOamMacOperEntry 7 }
+        
+                
+        hwOamMacOperRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The operating state of the row."
+            ::= { hwOamMacOperEntry 8 }
+        
+--  ===========================================================================            
+-- hwOamMacListTable
+-- ===========================================================================
+        
+        hwOamMacListTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwOamMacListEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table which displays the OAM MAC applied at huawei."
+            ::= { macoper 3 }
+        
+        
+        hwOamMacListEntry OBJECT-TYPE
+            SYNTAX HwOamMacListEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Display the OAM MAC applied at huawei."
+            INDEX { hwOamMacListIndex }
+            ::= { hwOamMacListTable 1 }
+        
+        HwOamMacListEntry ::=
+            SEQUENCE { 
+                hwOamMacListIndex
+                    Integer32,
+                hwOamMacListAddress
+                    MacAddress
+             }
+
+        
+        hwOamMacListIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of hwOamMacListIndex."
+            ::= { hwOamMacListEntry 1 }
+        
+        
+        hwOamMacListAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The OAM MAC applied at huawei."
+            ::= { hwOamMacListEntry 2 }
+        
+--  ===========================================================================            
+-- hwOamMacDisplayTable
+-- ===========================================================================
+        
+        hwOamMacDisplayTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwOamMacDisplayEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table which displays the result of populate or purge operation."
+            ::= { macoper 4 }
+        
+        
+        hwOamMacDisplayEntry OBJECT-TYPE
+            SYNTAX HwOamMacDisplayEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entries of hwOamMacDisplayTable."
+            INDEX { hwOamMacDisplayIndex }
+            ::= { hwOamMacDisplayTable 1 }
+        
+        HwOamMacDisplayEntry ::=
+            SEQUENCE { 
+                hwOamMacDisplayIndex
+                    Integer32,
+                hwOamMacDisplayAddress
+                    MacAddress,
+                hwOamMacDisplayType
+                    MacOpType,
+                hwOamMacDisplayVsiName
+                    OCTET STRING,
+                hwOamMacDisplayAgeTime 
+                            Integer32,
+                hwOamMacDisplayLsrId
+                            IpAddress
+             }
+
+        
+        hwOamMacDisplayIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..100)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of hwOamMacDisplayEntry, the value range is from 1 to 100."
+            ::= { hwOamMacDisplayEntry 1 }
+        
+        
+        hwOamMacDisplayAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The OAM MAC that had been populated or purged."
+            ::= { hwOamMacDisplayEntry 2 }
+        
+        
+        hwOamMacDisplayType OBJECT-TYPE
+            SYNTAX MacOpType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The OAM MAC type, 1 means populate, 2 means purge."
+            ::= { hwOamMacDisplayEntry 3 }
+        
+        
+        hwOamMacDisplayVsiName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name or other identifier referring to the VSI 
+                which is correlative to the hwOamMac."
+            ::= { hwOamMacDisplayEntry 4 }
+            
+                hwOamMacDisplayAgeTime OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The age time of the entry."
+            ::= { hwOamMacDisplayEntry 5 }            
+
+        hwOamMacDisplayLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The LSR-ID of the sender."
+            ::= { hwOamMacDisplayEntry 6 }                
+        
+--   ============================================================================   
+-- identify the group
+-- ============================================================================        
+        macoperConformance OBJECT IDENTIFIER ::= { macoper 5 }
+        hwOamMacGroup OBJECT IDENTIFIER ::= { macoperConformance 1 }
+		
+		macoperCompliances OBJECT IDENTIFIER ::= { macoperConformance 2 }
+				
+		macoperCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+			    "Description."
+			MODULE -- this module
+			MANDATORY-GROUPS { hwPopuBaseGroup, hwOamMacOperGroup, hwOamMacListGroup, hwOamMacDisplayGroup }
+			::= { macoperCompliances 1 }				
+        
+        
+        hwPopuBaseGroup OBJECT-GROUP
+            OBJECTS { hwOamMacPopulateCount, hwOamMacPurgeCount, hwOamMacPurgeRegCount,hwOamMacCountReset, hwOamMacSwitch, hwOamMacEntryNum}
+            STATUS current
+            DESCRIPTION 
+                                "hwPopuBaseGroup."
+            ::= { hwOamMacGroup 1 }
+        
+        
+        hwOamMacOperGroup OBJECT-GROUP
+            OBJECTS { hwOamMacOperAddress, hwOamMacOperVsiName, hwOamMacOperType, hwOamMacOperRegister, hwOamMacOperFlood, 
+                hwOamMacOperNum, hwOamMacOperRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects indicating information of IP address of interface,
+                contain Ip address, Ip address mask and Ip address acquiring method."
+            ::= { hwOamMacGroup 2 }
+        
+        
+        hwOamMacListGroup OBJECT-GROUP
+            OBJECTS { hwOamMacListAddress }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects indicating information of IP address of interface,
+                contain Ip address, Ip address mask and Ip address acquiring method."
+            ::= { hwOamMacGroup 3 }
+        
+        
+        hwOamMacDisplayGroup OBJECT-GROUP
+            OBJECTS { hwOamMacDisplayAddress, hwOamMacDisplayType, hwOamMacDisplayVsiName,hwOamMacDisplayAgeTime,hwOamMacDisplayLsrId}
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects indicating information of IP address of interface,
+                contain Ip address, Ip address mask and Ip address acquiring method."
+            ::= { hwOamMacGroup 4 }
+
+
+--  ===========================================================================            
+-- hwVpnCfgPing
+-- ===========================================================================
+                hwVpnCfgPing OBJECT IDENTIFIER ::= { vpndiagnostics 2 }
+
+                
+                hwVpnCfgPingTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwVpnCfgPingEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "hwVpnCfgPingTable."
+                        ::= { hwVpnCfgPing 1 }
+
+                
+                hwVpnCfgPingEntry OBJECT-TYPE
+                        SYNTAX HwVpnCfgPingEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates that the index of this table is hwVpnCfgPingIndex."
+                        INDEX { hwVpnCfgPingIndex }
+                        ::= { hwVpnCfgPingTable 1 }
+
+                
+                HwVpnCfgPingEntry ::=
+                        SEQUENCE { 
+                                hwVpnCfgPingIndex
+                                        Integer32,
+                                hwVpnCfgPingPeerIpType
+                                        InetAddressType,
+                                hwVpnCfgPingPeerIp
+                                        InetAddress,
+                                hwVpnCfgPingVpnIdType
+                                        INTEGER,
+                                hwVpnCfgPingVpnId
+                                        OCTET STRING,
+                                hwVpnCfgPingPwId
+                                        Integer32,                                        
+                                hwVpnCfgPingTunnelUsed
+                                        INTEGER,
+                                hwVpnCfgPingOperation
+                                        EnabledStatus,
+                                hwVpnCfgPingResultDetail
+                                        INTEGER,                                        
+                                hwVpnCfgPingRowStatus
+                                    RowStatus,
+                                hwVpnCfgPingSecondary
+                                    INTEGER,
+                                hwVpnCfgPingIfName
+                                    DisplayString,
+                                hwVpnCfgPingPwIdNew
+                                        Unsigned32                                      
+                         }
+
+                hwVpnCfgPingIndex OBJECT-TYPE
+                        SYNTAX Integer32 (1..65535)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the index of an operation instance."
+                        ::= { hwVpnCfgPingEntry 1 }
+
+                
+                hwVpnCfgPingPeerIpType OBJECT-TYPE
+                        SYNTAX InetAddressType
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the type of the peer IP address. It is used to identify the value type of hwVpnCfgPingPeerIp, which can be IPv4 or IPv6."
+                        ::= { hwVpnCfgPingEntry 2 }
+
+                
+                hwVpnCfgPingPeerIp OBJECT-TYPE
+                        SYNTAX InetAddress
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the peer IP address."
+                        ::= { hwVpnCfgPingEntry 3 }
+
+                
+                hwVpnCfgPingVpnIdType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                martiniVPLS(1),
+                                kompellaVPLS(2),
+                                l3vpn(3),
+                                pwe3(4),
+                                martiniVLL(5),
+                                bgpadVPLS(6),
+                                unknown(255)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the VPN ID type, that is, the type of hwVPNCFGPingVPNID. The VPN ID type can be VPLS, L3VPN, PWE3, or Martini VLL."
+                        ::= { hwVpnCfgPingEntry 4 }
+
+                
+                hwVpnCfgPingVpnId OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the VPN ID, expressed in a character string. The VPN ID is VSI-Name for VPLS, VPN-Instance for L3VPN, and invalid for PWE3 and Martini VLL."
+                        ::= { hwVpnCfgPingEntry 5 }
+
+                
+                hwVpnCfgPingPwId OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates PW-ID. This value is set for the parameter only when the VPLS is in Martini mode. Otherwise, the value is 0."
+                        ::= { hwVpnCfgPingEntry 6 }
+
+                
+                hwVpnCfgPingTunnelUsed OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                normal(1),
+                                localOnly(2),
+                                remoteOnly(3),
+                                localAndRemote(4)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the mode of forwarding request packets or response packets (such as tunnel forwarding)."
+                        ::= { hwVpnCfgPingEntry 7 }
+
+                
+                hwVpnCfgPingOperation OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates two values: enable(1) and disable(2). enable(1) indicates that the operation instance is started; disable(2) indicates that the operation instance is stopped."
+                        ::= { hwVpnCfgPingEntry 8 }    
+                        
+                        
+                hwVpnCfgPingResultDetail OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                requestSentReplyRecieved(1),
+                                requestSentReplyTimeout(2),
+                                requestFailedReplyFailed(3),
+                                noResult(255)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the result detail of ping operation."
+                        ::= { hwVpnCfgPingEntry 9 }
+
+        
+                hwVpnCfgPingRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "This object indicates the row status."
+                        ::= { hwVpnCfgPingEntry 10 }
+
+                hwVpnCfgPingSecondary OBJECT-TYPE
+                        SYNTAX INTEGER
+                            {
+                            primary(0),
+                            secondary(1),
+                            unknown(255)
+                            }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the local secondary PW."
+                        ::= { hwVpnCfgPingEntry 11 }
+
+                hwVpnCfgPingIfName OBJECT-TYPE
+                        SYNTAX DisplayString
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                            "This object indicates the name of the AC interface."
+                        ::= { hwVpnCfgPingEntry 12 }
+
+                hwVpnCfgPingPwIdNew OBJECT-TYPE
+                        SYNTAX Unsigned32
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates PW-ID. This value is set for the parameter only when the VPLS is in Martini mode. Otherwise, the value is 0.
+                                 Because hwVpnCfgPingPwId ranges from -2147483647 to +2147483647, failing to cover the range from 2147483648 to 4294967295, this object 
+                                 ranging from 0 to 4294967295 is therefore added."
+                        ::= { hwVpnCfgPingEntry 13 }
+                
+                hwVpnCfgPingResultTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwVpnCfgPingResultEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "hwVpnCfgPingResultTable."
+                        ::= { hwVpnCfgPing 2 }
+
+                
+                hwVpnCfgPingResultEntry OBJECT-TYPE
+                        SYNTAX HwVpnCfgPingResultEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates that indexes of this table are hwVpnCfgPingIndex and hwVpnCfgPingResultLocation."
+                        INDEX { hwVpnCfgPingIndex, hwVpnCfgPingResultLocation }
+                        ::= { hwVpnCfgPingResultTable 1 }
+
+                
+                HwVpnCfgPingResultEntry ::=
+                        SEQUENCE { 
+                                hwVpnCfgPingResultLocation
+                                        INTEGER,
+                                hwVpnCfgPingResultVpnIdType
+                                        INTEGER,
+                                hwVpnCfgPingResultVpnId
+                                        DisplayString,
+                                hwVpnCfgPingResultDesc
+                                        DisplayString,
+                                hwVpnCfgPingResultVpnAdminStatus
+                                        INTEGER,
+                                hwVpnCfgPingResultOperStatus
+                                        INTEGER,
+                                hwVpnCfgPingResultMtu
+                                        Integer32,
+                                hwVpnCfgPingResultCeCount
+                                        Integer32,
+                                hwVpnCfgPingResultActualIpType
+                                        InetAddressType,
+                                hwVpnCfgPingResultActualIp
+                                        InetAddress,
+                                hwVpnCfgPingResultPeerIpType
+                                        InetAddressType,
+                                hwVpnCfgPingResultPeerIp
+                                        InetAddress,
+                                hwVpnCfgPingResultPwId
+                                        Integer32,
+                                hwVpnCfgPingResultPeType
+                                        INTEGER,
+                                hwVpnCfgPingResultVcType
+                                        HWL2VpnVcEncapsType,
+                                hwVpnCfgPingResultLabelIn
+                                        Integer32,
+                                hwVpnCfgPingResultLableOut
+                                        Integer32,
+                                hwVpnCfgPingResultControlWord
+                                        INTEGER,
+                                hwVpnCfgPingResultPriOrSec
+                                        INTEGER,   
+                                hwVpnCfgPingResultVplsID
+                                       OCTET STRING,
+                                hwVpnCfgPingResultRD
+                                       OCTET STRING,
+                                hwVpnCfgPingResultPwIdNew
+                                        Unsigned32                                       
+                         }
+
+                hwVpnCfgPingResultLocation OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                local(1),
+                                remote(2)
+                                }
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates two values: local(1) and remote(2). local(1) indicates configurations of the local end displayed in the probe result. remote(2) indicates configurations of the peer end displayed in the probe result."
+                        ::= { hwVpnCfgPingResultEntry 1 }
+
+                
+                hwVpnCfgPingResultVpnIdType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                martiniVPLS(1),
+                                kompellaVPLS(2),
+                                l3vpn(3),
+                                pwe3(4),
+                                martiniVLL(5),
+                                bgpadVPLS(6),                                
+                                unknown(255)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the VPN ID type, that is, the type of hwVPNCFGPingVPNID. The VPN ID type can be VPLS, L3VPN, PWE3, or Martini VLL."
+                        ::= { hwVpnCfgPingResultEntry 2 }
+
+                
+                hwVpnCfgPingResultVpnId OBJECT-TYPE
+                        SYNTAX DisplayString
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the VPN ID, expressed in a character string. The VPN ID is VSI-Name for VPLS, VPN-Instance for L3VPN, and invalid for PWE3 and Martini VLL."
+                        ::= { hwVpnCfgPingResultEntry 3 }
+
+                
+                hwVpnCfgPingResultDesc OBJECT-TYPE
+                        SYNTAX DisplayString
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the description of the VPN."
+                        ::= { hwVpnCfgPingResultEntry 4 }
+
+                
+                hwVpnCfgPingResultVpnAdminStatus OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                up(1),
+                                down(2),
+                                unknown(255)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the management status of the VPN: up(1), down(2), and unknown(255)."
+                        ::= { hwVpnCfgPingResultEntry 5 }
+
+                
+                hwVpnCfgPingResultOperStatus OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                up(1),
+                                down(2),
+                                unknown(255)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the operation status of the VPN: up(1), down(2), and unknown(255)."
+                        ::= { hwVpnCfgPingResultEntry 6 }
+
+                
+                hwVpnCfgPingResultMtu OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the MTU value. The object represents the MTU value of the AC interface when the VPN type is PWE3 or Martini VLL, represents the MTU value of the VSI when the VPN type is VPLS. If the value of the object cannot be obtained, the object value is considered as 0."
+                        ::= { hwVpnCfgPingResultEntry 7 }
+
+                
+                hwVpnCfgPingResultCeCount OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the number of CEs."
+                        ::= { hwVpnCfgPingResultEntry 8 }
+
+                
+                hwVpnCfgPingResultActualIpType OBJECT-TYPE
+                        SYNTAX InetAddressType
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the type of the IP address of the PW on the local PE. It is used to identify the value type of hwVpnCfgPingResultActualIp."
+                        ::= { hwVpnCfgPingResultEntry 9 }
+
+                
+                hwVpnCfgPingResultActualIp OBJECT-TYPE
+                        SYNTAX InetAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the IP address of the PW on the local PE."
+                        ::= { hwVpnCfgPingResultEntry 10 }
+
+                
+                hwVpnCfgPingResultPeerIpType OBJECT-TYPE
+                        SYNTAX InetAddressType
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the type of the IP address of the PW on the peer PE. It is used to identify the value type of hwVpnCfgPingResultPeerIP."
+                        ::= { hwVpnCfgPingResultEntry 11 }
+
+                
+                hwVpnCfgPingResultPeerIp OBJECT-TYPE
+                        SYNTAX InetAddress
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the IP address of the PW on the peer PE."
+                        ::= { hwVpnCfgPingResultEntry 12 }
+
+                
+                hwVpnCfgPingResultPwId OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates PW-ID."
+                        ::= { hwVpnCfgPingResultEntry 13 }
+
+                
+                hwVpnCfgPingResultPeType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                upe(1),
+                                spe(2),
+                                unknown(255)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the type of the PE (Whether the PE is an SPE.)"
+                        ::= { hwVpnCfgPingResultEntry 14 }
+
+                
+                hwVpnCfgPingResultVcType OBJECT-TYPE
+                        SYNTAX HWL2VpnVcEncapsType
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the VC type."
+                        ::= { hwVpnCfgPingResultEntry 15 }
+
+                
+                hwVpnCfgPingResultLabelIn OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the incoming label of the interface at the PW side."
+                        ::= { hwVpnCfgPingResultEntry 16 }
+
+                
+                hwVpnCfgPingResultLableOut OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the outgoing label of the interface at the PW side."
+                        ::= { hwVpnCfgPingResultEntry 17 }
+
+        
+                hwVpnCfgPingResultControlWord OBJECT-TYPE
+                        SYNTAX INTEGER
+                            {
+                            disable(0),
+                            enable(1),
+                            unknown(255)
+                            }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether the keyword control-word is configured."
+                        ::= { hwVpnCfgPingResultEntry 18 }
+
+                hwVpnCfgPingResultPriOrSec OBJECT-TYPE
+                        SYNTAX INTEGER
+                            {
+                            primary(0),
+                            secondary(1),
+                            unknown(255)
+                            }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether the local PW is a primary PW or a secondary PW."
+                        ::= { hwVpnCfgPingResultEntry 19 }       
+                                                           
+                hwVpnCfgPingResultVplsID OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the virtual private LAN service id."
+                        ::= { hwVpnCfgPingResultEntry 20}  
+                        
+                hwVpnCfgPingResultRD OBJECT-TYPE
+                        SYNTAX OCTET STRING 
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the route distinguisher."
+                        ::= { hwVpnCfgPingResultEntry 21 }
+
+               hwVpnCfgPingResultPwIdNew OBJECT-TYPE
+                        SYNTAX Unsigned32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates PW-ID. Because hwVpnCfgPingResultPwId ranges from -2147483647 to +2147483647, failing to cover the range from 2147483648 to 4294967295, 
+                                 this object ranging from 0 to 4294967295 is therefore added."
+                        ::= { hwVpnCfgPingResultEntry 22 }
+                                                                    
+                                                                                                                                                                                                     
+		hwVpnCfgPingConformance OBJECT IDENTIFIER ::= { hwVpnCfgPing 3 }                                                                                                                                                                                                     
+                                                                    
+                hwVpnCfgPingGroups OBJECT IDENTIFIER ::= { hwVpnCfgPingConformance 1 }
+				
+                hwVpnCfgPingCompliances OBJECT IDENTIFIER ::= { hwVpnCfgPingConformance 2 }
+				
+		hwVpnCfgPingCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE -- this module
+			MANDATORY-GROUPS { hwVpnCfgPingGroup, hwVpnCfgPingResultGroup, hwVpnCfgPingResultIRtGroup, hwVpnCfgPingResultERtGroup }
+			::= { hwVpnCfgPingCompliances 1 }  				
+
+                
+                hwVpnCfgPingGroup OBJECT-GROUP
+                        OBJECTS { hwVpnCfgPingPeerIpType, hwVpnCfgPingPeerIp, hwVpnCfgPingVpnIdType, hwVpnCfgPingVpnId, hwVpnCfgPingPwId, 
+                                hwVpnCfgPingTunnelUsed, hwVpnCfgPingOperation, hwVpnCfgPingResultDetail, hwVpnCfgPingRowStatus, hwVpnCfgPingIfName, 
+                                hwVpnCfgPingSecondary, hwVpnCfgPingPwIdNew }
+                        STATUS current
+                        DESCRIPTION 
+                                "hwVpnCfgPingGroup."
+                        ::= { hwVpnCfgPingGroups 1 }
+
+                
+                hwVpnCfgPingResultGroup OBJECT-GROUP
+                        OBJECTS { hwVpnCfgPingResultVpnIdType, hwVpnCfgPingResultVpnId, hwVpnCfgPingResultDesc, hwVpnCfgPingResultVpnAdminStatus, hwVpnCfgPingResultOperStatus, 
+                                hwVpnCfgPingResultMtu, hwVpnCfgPingResultCeCount, hwVpnCfgPingResultActualIpType, hwVpnCfgPingResultActualIp, hwVpnCfgPingResultPeerIpType, 
+                                hwVpnCfgPingResultPeerIp, hwVpnCfgPingResultPwId, hwVpnCfgPingResultPeType, hwVpnCfgPingResultVcType, hwVpnCfgPingResultLabelIn, 
+                                hwVpnCfgPingResultLableOut, hwVpnCfgPingResultControlWord, hwVpnCfgPingResultPriOrSec, hwVpnCfgPingResultVplsID, hwVpnCfgPingResultRD, hwVpnCfgPingResultPwIdNew}
+                        STATUS current
+                        DESCRIPTION 
+                                "hwVpnCfgPingResultGroup."
+                        ::= { hwVpnCfgPingGroups 2 }
+
+                hwVpnCfgPingResultIRtGroup OBJECT-GROUP
+                        OBJECTS { hwVpnCfgPingResultIRtIndex , hwVpnCfgPingResultIRt  }
+                        STATUS current
+                        DESCRIPTION 
+                                "hwVpnCfgPingResultIRtGroup."
+                        ::= { hwVpnCfgPingGroups 3 }
+
+
+                hwVpnCfgPingResultERtGroup OBJECT-GROUP
+                        OBJECTS { hwVpnCfgPingResultERtIndex , hwVpnCfgPingResultERt  }
+                        STATUS current
+                        DESCRIPTION 
+                                "hwVpnCfgPingResultERtGroup."
+                        ::= { hwVpnCfgPingGroups 4 }
+
+
+                hwVpnCfgPingResultIRtTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwVpnCfgPingResultIRtEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "hwVpnCfgPingResultIRtTable."
+                        ::= { hwVpnCfgPing 4 }
+
+                
+                hwVpnCfgPingResultIRtEntry OBJECT-TYPE
+                        SYNTAX HwVpnCfgPingResultIRtEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates that indexes of this table are hwVpnCfgPingIndex and hwVpnCfgPingResultLocation."
+                        INDEX { hwVpnCfgPingIndex, hwVpnCfgPingResultLocation, hwVpnCfgPingResultIRtIndex }
+                        ::= { hwVpnCfgPingResultIRtTable 1 }
+
+                
+                HwVpnCfgPingResultIRtEntry ::=
+                        SEQUENCE {
+                                hwVpnCfgPingResultIRtIndex
+                                        Integer32,
+                                hwVpnCfgPingResultIRt
+                                        OCTET STRING
+                              
+                         }
+
+                hwVpnCfgPingResultIRtIndex OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the index of an import vpn target."
+                        ::= { hwVpnCfgPingResultIRtEntry 1 }
+
+
+                
+                hwVpnCfgPingResultIRt OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the import vpn target."
+                        ::= { hwVpnCfgPingResultIRtEntry 2 }
+                                                                    
+                 hwVpnCfgPingResultERtTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwVpnCfgPingResultERtEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "hwVpnCfgPingResultERtTable."
+                        ::= { hwVpnCfgPing 5 }
+
+                
+                hwVpnCfgPingResultERtEntry OBJECT-TYPE
+                        SYNTAX HwVpnCfgPingResultERtEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates that indexes of this table are hwVpnCfgPingIndex and hwVpnCfgPingResultLocation."
+                        INDEX { hwVpnCfgPingIndex, hwVpnCfgPingResultLocation, hwVpnCfgPingResultERtIndex }
+                        ::= { hwVpnCfgPingResultERtTable 1 }
+
+                
+                HwVpnCfgPingResultERtEntry ::=
+                        SEQUENCE { 
+                                hwVpnCfgPingResultERtIndex
+                                        Integer32,
+                                hwVpnCfgPingResultERt
+                                        OCTET STRING
+                         }
+
+                hwVpnCfgPingResultERtIndex OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the index of an export vpn target.."
+                        ::= { hwVpnCfgPingResultERtEntry 1 }
+                
+                hwVpnCfgPingResultERt OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the export vpn target."
+                        ::= { hwVpnCfgPingResultERtEntry 2 }                
+        
+        END
+
+--
+-- HUAWEI-VPN-DIAGNOSTICS-MIB.mib
+--

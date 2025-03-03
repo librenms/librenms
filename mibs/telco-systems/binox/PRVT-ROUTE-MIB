@@ -1,0 +1,369 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-ROUTE-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-ROUTE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Ipv6Address
+        FROM IPV6-TC
+    routingProtocols
+        FROM PRVT-SWITCH-MIB
+    IpAddress, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtRouteMIB MODULE-IDENTITY
+    LAST-UPDATED "200901270000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "Mib containing information about
+         dynamic and configurable routes in the system."
+    REVISION    "200901270000Z"
+    DESCRIPTION 
+        "Initial version"
+    ::= { routingProtocols 3 }
+
+
+NetPrefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d/1d"
+    STATUS      current
+    DESCRIPTION 
+        "Prefix"
+    SYNTAX      OCTET STRING
+
+prvtRouteMIBObjects OBJECT IDENTIFIER
+    ::= { prvtRouteMIB 1 }
+
+prvtDynamicRouteTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtDynamicRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "System dynamic routes."
+    ::= { prvtRouteMIBObjects 1 }
+
+prvtDynamicRouteEntry OBJECT-TYPE
+    SYNTAX      PrvtDynamicRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The conceptual row represents a routing entry."
+    INDEX       { prvtDynamicRoutePrefix, prvtDynamicRouteNextHop, 
+                  prvtDynamicRouteType, prvtDynamicRouteDistance }
+    ::= { prvtDynamicRouteTable 1 }
+
+PrvtDynamicRouteEntry ::= SEQUENCE {
+    prvtDynamicRoutePrefix          OCTET STRING,
+    prvtDynamicRouteNextHop         IpAddress,
+    prvtDynamicRouteType            INTEGER,
+    prvtDynamicRouteDistance        Unsigned32,
+    prvtDynamicRouteFlags           BITS,
+    prvtDynamicRouteNextHopType     INTEGER,
+    prvtDynamicRouteNextHopFlags    BITS,
+    prvtDynamicRouteMetrics         Unsigned32,
+    prvtDynamicRouteUptime          OCTET STRING,
+    prvtDynamicRouteIfName          OCTET STRING
+}
+
+prvtDynamicRoutePrefix OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Dynamic route prefix."
+    ::= { prvtDynamicRouteEntry 1 }
+
+prvtDynamicRouteNextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Dynamic route next hop."
+    ::= { prvtDynamicRouteEntry 2 }
+
+prvtDynamicRouteType OBJECT-TYPE
+    SYNTAX      INTEGER { system(1), kernel(2), connect(3), static(4), 
+                    rip(5), ripng(6), ospf(7), ospf6(8), bgp(9), fib(10), 
+                    vrrp(11), irdp(12), dhcp(13), pimd(14), isis1(15), 
+                    isis2(16), bfd(17), test(18), max(19) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Dynamic route type."
+    ::= { prvtDynamicRouteEntry 3 }
+
+prvtDynamicRouteDistance OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Dynamic route distance."
+    ::= { prvtDynamicRouteEntry 4 }
+
+prvtDynamicRouteFlags OBJECT-TYPE
+    SYNTAX      BITS { internal(0), selfroute(1), blackhole(2), ibgp(3), 
+                    selected(4), changed(5), static(6), deleted(7), 
+                    staticarp(8), mplsIngress(9), mplsEgress(10), 
+                    outband(11), selfIp(12), vrrpIp(13) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Dynamic route flags."
+    ::= { prvtDynamicRouteEntry 5 }
+
+prvtDynamicRouteNextHopType OBJECT-TYPE
+    SYNTAX      INTEGER { ifindex(1), ifname(2), ipv4(3), ipv4Ifindex(4), 
+                    ipv4Ifname(5), ipv6(6), ipv6Ifindex(7), 
+                    ipv6Ifname(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Dynamic route hop type."
+    ::= { prvtDynamicRouteEntry 6 }
+
+prvtDynamicRouteNextHopFlags OBJECT-TYPE
+    SYNTAX      BITS { active(0), fib(1), recursive(2), notready(3), 
+                    outband(4), fibsetOutband(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Dynamic route hop flags."
+    ::= { prvtDynamicRouteEntry 7 }
+
+prvtDynamicRouteMetrics OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Dynamic route metrics."
+    ::= { prvtDynamicRouteEntry 8 }
+
+prvtDynamicRouteUptime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A length of time.
+         
+         Duration values are in the ISO 8601 duration format, where
+         P represents 'Period',
+         nY represents the number of years,
+         nM the number of months,
+         nD the number of days,
+         T is the date/time separator,
+         nH the number of hours,
+         nM the number of minutes,
+         nS the number of seconds.
+         So P2DT23H32M51S means 'A period of 2 days, 23 hours, 32 minutes, and 51 seconds'.
+         
+         PnYnMnDTnH nMnS (e.g., P2DT23H32M51S)
+         
+         We use the duration data type to convey values like
+         the time left until a listing ends.
+         For ended listings, the time left is PT0S (zero seconds).
+         
+         xs:duration is part of the XML schema namespace defined as:
+         
+         xmlns:xs='http://www.w3.org/2001/XMLSchema' "
+    ::= { prvtDynamicRouteEntry 9 }
+
+prvtDynamicRouteIfName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Dynamic route name."
+    ::= { prvtDynamicRouteEntry 10 }
+
+prvtCfgRouteTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtCfgRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table with configurable routes. To create entry in
+         this table use prvtCfgRouteRowStatus with
+         createAndGo(4) or createAndWait(5).
+         For example static route :
+         static-route 88.65.85.4/32 43.13.15.18 3
+         will be represented as :
+         prvtCfgRouteRowStatus.88.65.85.4.32.43.13.15.18.3"
+    ::= { prvtRouteMIBObjects 2 }
+
+prvtCfgRouteEntry OBJECT-TYPE
+    SYNTAX      PrvtCfgRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The conceptual row represents a routing entry."
+    INDEX       { prvtCfgRoutePrefix, prvtCfgRouteNextHop, 
+                  prvtCfgRouteDistance }
+    ::= { prvtCfgRouteTable 1 }
+
+PrvtCfgRouteEntry ::= SEQUENCE {
+    prvtCfgRoutePrefix      OCTET STRING,
+    prvtCfgRouteNextHop     IpAddress,
+    prvtCfgRouteDistance    Unsigned32,
+    prvtCfgRouteRowStatus   RowStatus
+}
+
+prvtCfgRoutePrefix OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Route prefix."
+    ::= { prvtCfgRouteEntry 1 }
+
+prvtCfgRouteNextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Route next hop."
+    ::= { prvtCfgRouteEntry 2 }
+
+prvtCfgRouteDistance OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Route distance."
+    ::= { prvtCfgRouteEntry 3 }
+
+prvtCfgRouteRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Create static route."
+    ::= { prvtCfgRouteEntry 4 }
+
+prvtCfgIPv6RouteTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtCfgIPv6RouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table with configurable routes. To create entry in
+         this table use prvtCfgIPv6RouteRowStatus with
+         createAndGo(4) or createAndWait(5).
+         For example static route :
+         router static-ipv6-route ::/0 2001:fd8::7 10
+         will be represented as :
+         prvtCfgIPv6RouteRowStatus.4.58.58.47.48.32.1.15.216.0.0.0.0.0.0.0.0.0.0.0.7.10 
+         or
+         1.3.6.1.4.1.738.10.6.4.3.1.3.1.4 --> prvtCfgIPv6RouteRowStatus OID
+         v --> Value --> createAndGo(4) 
+         prvtCfgIPv6RouteRowStatus    <--|v  :  :  /  0 2001:0f  d8: 00: 00: 00: 00: 00: 07|10 
+         1.3.6.1.4.1.738.10.6.4.3.1.3.1.4.4.58.58.47.48.32.1.15.216.0.0.0.0.0.0.0.0.0.0.0.7.10"
+    ::= { prvtRouteMIBObjects 3 }
+
+prvtCfgIPv6RouteEntry OBJECT-TYPE
+    SYNTAX      PrvtCfgIPv6RouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The conceptual row represents a IPv6 routing entry."
+    INDEX       { prvtCfgIPv6RoutePrefix, prvtCfgIPv6RouteNextHop, 
+                  prvtCfgIPv6RouteDistance }
+    ::= { prvtCfgIPv6RouteTable 1 }
+
+PrvtCfgIPv6RouteEntry ::= SEQUENCE {
+    prvtCfgIPv6RoutePrefix      OCTET STRING,
+    prvtCfgIPv6RouteNextHop     Ipv6Address,
+    prvtCfgIPv6RouteDistance    Unsigned32,
+    prvtCfgIPv6RouteRowStatus   RowStatus
+}
+
+prvtCfgIPv6RoutePrefix OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "IPv6 route prefix."
+    ::= { prvtCfgIPv6RouteEntry 1 }
+
+prvtCfgIPv6RouteNextHop OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "IPv6 route next hop."
+    ::= { prvtCfgIPv6RouteEntry 2 }
+
+prvtCfgIPv6RouteDistance OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "IPv6 route distance."
+    ::= { prvtCfgIPv6RouteEntry 3 }
+
+prvtCfgIPv6RouteRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Create static IPv6 route."
+    ::= { prvtCfgIPv6RouteEntry 4 }
+
+prvtGlobalIPv6Forwarding OBJECT-TYPE
+    SYNTAX      INTEGER { host(1), router(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Configure IPv6 behavior."
+    ::= { prvtRouteMIBObjects 4 }
+
+prvtGlobalIPv6Disable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Configure IPv6 behavior."
+    ::= { prvtRouteMIBObjects 5 }
+
+END -- end of module PRVT-ROUTE-MIB.

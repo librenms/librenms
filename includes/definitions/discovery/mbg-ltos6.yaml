@@ -1,0 +1,119 @@
+mib: MBG-SNMP-LTNG-MIB
+modules:
+    os:
+        serial: MBG-SNMP-LTNG-MIB::mbgLtNgSerialNumber.0
+        version: MBG-SNMP-LTNG-MIB::mbgLtNgFirmwareVersion.0
+    sensors:
+        count:
+            data:
+                -
+                    oid: mbgLtNgRefclockStatusA
+                    value: mbgLtNgRefclockStatusA
+                    num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.6.{{ $index }}'
+                    descr: 'Antenna A{{ $index }} Satellites'
+                    low_warn_limit: 0
+                    low_limit: 0
+                    index: 'mbgLtNgRefclockStatusA.{{ $index }}'
+                -
+                    oid: mbgLtNgRefclockStatusB
+                    value: mbgLtNgRefclockStatusB
+                    num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.8.{{ $index }}'
+                    descr: 'Antenna B{{ $index }} Satellites'
+                    low_warn_limit: 0
+                    low_limit: 0
+                    index: 'mbgLtNgRefclockStatusB.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: mbgLtNgRefclockType
+                    value: mbgLtNgRefclockType
+                    num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.2.{{ $index }}'
+                    descr: 'Reference Clock Type'
+                    index: 'mbgLtNgRefclockType.{{ $index }}'
+                    states:
+                        - { value: 0, descr: unknown, graph: 0, generic: 3 }
+                        - { value: 1, descr: gps166, graph: 1, generic: 0 }
+                        - { value: 2, descr: gps167, graph: 2, generic: 0 }
+                        - { value: 3, descr: gps167SV, graph: 3, generic: 0 }
+                        - { value: 4, descr: gps167PC, graph: 4, generic: 0 }
+                        - { value: 5, descr: gps167PCI, graph: 5, generic: 0 }
+                        - { value: 6, descr: gps163, graph: 6, generic: 0 }
+                        - { value: 7, descr: gps168PCI, graph: 7, generic: 0 }
+                        - { value: 8, descr: gps161, graph: 8, generic: 0 }
+                        - { value: 9, descr: gps169PCI, graph: 9, generic: 0 }
+                        - { value: 10, descr: tcr167PCI, graph: 10, generic: 0 }
+                        - { value: 11, descr: gps164, graph: 11, generic: 0 }
+                        - { value: 12, descr: gps170PCI, graph: 12, generic: 0 }
+                        - { value: 13, descr: pzf511, graph: 13, generic: 0 }
+                        - { value: 14, descr: gps170, graph: 14, generic: 0 }
+                        - { value: 15, descr: tcr511, graph: 15, generic: 0 }
+                        - { value: 16, descr: am511, graph: 16, generic: 0 }
+                        - { value: 17, descr: msf511, graph: 17, generic: 0 }
+                        - { value: 18, descr: grc170, graph: 18, generic: 0 }
+                        - { value: 19, descr: gps170PEX, graph: 19, generic: 0 }
+                        - { value: 20, descr: gps162, graph: 20, generic: 0 }
+                        - { value: 21, descr: ptp270PEX, graph: 21, generic: 0 }
+                        - { value: 22, descr: frc511PEX, graph: 22, generic: 0 }
+                        - { value: 23, descr: gen170, graph: 23, generic: 0 }
+                        - { value: 24, descr: tcr170PEX, graph: 24, generic: 0 }
+                        - { value: 25, descr: wwvb511, graph: 25, generic: 0 }
+                        - { value: 26, descr: mgr170, graph: 26, generic: 0 }
+                        - { value: 27, descr: jjy511, graph: 27, generic: 0 }
+                        - { value: 28, descr: pzf600, graph: 28, generic: 0 }
+                        - { value: 29, descr: tcr600, graph: 29, generic: 0 }
+                        - { value: 30, descr: gps180, graph: 30, generic: 0 }
+                        - { value: 31, descr: gln170, graph: 31, generic: 0 }
+                        - { value: 32, descr: gps180PEX, graph: 32, generic: 0 }
+                        - { value: 33, descr: tcr180PEX, graph: 33, generic: 0 }
+                        - { value: 34, descr: pzf180PEX, graph: 34, generic: 0 }
+                        - { value: 35, descr: mgr180, graph: 35, generic: 0 }
+                        - { value: 36, descr: msf600, graph: 36, generic: 0 }
+                        - { value: 37, descr: wwvb600, graph: 37, generic: 0 }
+                        - { value: 38, descr: jjy600, graph: 38, generic: 0 }
+                        - { value: 39, descr: gps180HS, graph: 39, generic: 0 }
+                        - { value: 40, descr: gps180AMC, graph: 40, generic: 0 }
+                        - { value: 41, descr: esi180, graph: 41, generic: 0 }
+                        - { value: 42, descr: cpe180, graph: 42, generic: 0 }
+                        - { value: 43, descr: lno180, graph: 43, generic: 0 }
+                        - { value: 44, descr: grc180, graph: 44, generic: 0 }
+                        - { value: 45, descr: liu, graph: 45, generic: 0 }
+                        - { value: 46, descr: dcf600HS, graph: 46, generic: 0 }
+                        - { value: 47, descr: dcf600RS, graph: 47, generic: 0 }
+                        - { value: 48, descr: mri, graph: 48, generic: 0 }
+                        - { value: 49, descr: bpe, graph: 49, generic: 0 }
+                        - { value: 50, descr: gln180Pex, graph: 50, generic: 0 }
+                        - { value: 51, descr: n2x, graph: 51, generic: 0 }
+                        - { value: 52, descr: rsc180, graph: 52, generic: 0 }
+                        - { value: 53, descr: lneGb, graph: 53, generic: 0 }
+                        - { value: 54, descr: lnePpg180, graph: 54, generic: 0 }
+                        - { value: 55, descr: scg, graph: 55, generic: 0 }
+                        - { value: 56, descr: mdu300, graph: 56, generic: 0 }
+                        - { value: 57, descr: sdi, graph: 57, generic: 0 }
+                        - { value: 58, descr: fdm180, graph: 58, generic: 0 }
+                        - { value: 59, descr: spt, graph: 59, generic: 0 }
+                        - { value: 60, descr: pzf180, graph: 60, generic: 0 }
+                        - { value: 61, descr: rel1000, graph: 61, generic: 0 }
+                -
+                    oid: mbgLtNgRefclockUsage
+                    value: mbgLtNgRefclockUsage
+                    num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.3.{{ $index }}'
+                    descr: 'Reference Clock Usage'
+                    index: 'mbgLtNgRefclockUsage.{{ $index }}'
+                    states:
+                        - { value: 0, descr: notAvailable, graph: 0, generic: 2 }
+                        - { value: 1, descr: secondary, graph: 1, generic: 0 }
+                        - { value: 2, descr: compare, graph: 2, generic: 1 }
+                        - { value: 3, descr: primary, graph: 3, generic: 0 }
+                -
+                    oid: mbgLtNgRefclockState
+                    value: mbgLtNgRefclockState
+                    num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.5.{{ $index }}'
+                    descr: 'Reference Clock State'
+                    index: 'mbgLtNgRefclockState.{{ $index }}'
+                    states:
+                        - { value: 0, descr: notAvailable, graph: 0, generic: 2 }
+                        - { value: 1, descr: synchronized, graph: 1, generic: 0 }
+                        - { value: 2, descr: notSynchronized, graph: 2, generic: 0 }
+
+
+                

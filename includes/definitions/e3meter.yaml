@@ -1,0 +1,14 @@
+os: e3meter
+text: 'E3 Meter'
+type: power
+icon: riedo
+mib_dir: riedo
+over:
+    - { graph: device_power, text: Power }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_frequency, text: Frequency }
+    - { graph: device_temperature, text: Temperature }
+discovery:
+    -
+        sysObjectID:
+            - '.1.3.6.1.4.1.21695.1.'

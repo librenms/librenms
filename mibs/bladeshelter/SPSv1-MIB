@@ -1,0 +1,3694 @@
+-- powertek
+-- MIB for 1phase Products 
+--
+-- { iso org(3) dod(6) internet(1) private(4) enterprises(1) powertek(42610)
+-- product(1) pdu(4) sps(4)
+-- ==============================================================================================
+---
+---     Revision History
+---
+---     v0.10   14-Feb-2014     ChainLiu
+---     v0.11   11-Mar-2014     JimmyYang
+---     v0.12   01-Sep-2014     ChainLiu/
+---     v0.13   24-Nov-2014     ChainLiu 
+---     v0.14   12-Aug-2015     ChainLiu 
+-- ==============================================================================================
+
+SPSv1-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  enterprises
+    FROM RFC1155-SMI
+  OBJECT-TYPE
+    FROM RFC-1212
+  DisplayString
+    FROM RFC1213-MIB
+  TRAP-TYPE
+    FROM RFC-1215;
+
+powertek             OBJECT IDENTIFIER ::= { enterprises 42610 }
+product              OBJECT IDENTIFIER ::= { powertek 1 }
+pdu                  OBJECT IDENTIFIER ::= { product 4 }
+sps                  OBJECT IDENTIFIER ::= { pdu 4 }
+pduObjects           OBJECT IDENTIFIER ::= { sps 1 }
+pduTraps             OBJECT IDENTIFIER ::= { sps 2 }
+
+pduIdent             OBJECT IDENTIFIER ::= { pduObjects 1 }
+pduNetwork           OBJECT IDENTIFIER ::= { pduObjects 2 }
+pduSystem            OBJECT IDENTIFIER ::= { pduObjects 3 }
+pduSNMP              OBJECT IDENTIFIER ::= { pduObjects 4 }
+pduEmail             OBJECT IDENTIFIER ::= { pduObjects 5 }
+pduPwrMonitoring     OBJECT IDENTIFIER ::= { pduObjects 6 }
+pduEnvMonitoring     OBJECT IDENTIFIER ::= { pduObjects 7 }
+
+-- ===========================================================================
+--
+-- pduIdent
+--
+--  pdu Identification Group
+--
+-- ===========================================================================
+pduIdentAgentSoftwareVersion OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..63))
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+               "The firmware version of the device."
+      ::= { pduIdent 1 }
+
+pduIdentSerialNumber OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..31))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+               "A Model of this device."
+      ::= { pduIdent 2 }
+
+
+pduNetworkTcpip    OBJECT IDENTIFIER ::= { pduNetwork 1 }
+-- ===========================================================================
+--
+-- pduNetworkTcpip
+--
+--  Network Configuration Group of the device.
+--
+-- ===========================================================================
+
+pduNetworkTcpipDhcpControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable DHCP protocol"
+        ::= { pduNetworkTcpip 1 }
+
+pduNetworkTcpipIpv4    OBJECT IDENTIFIER ::= { pduNetworkTcpip 2 }
+-- ===========================================================================
+--
+-- pduNetworkTcpipIpv4
+--
+--  Ip address Configuration Group of the device.
+--
+-- ===========================================================================
+pduNetworkTcpipIpv4Address OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The ip address that NMS can identify the managed device."
+        ::= { pduNetworkTcpipIpv4 1}
+
+pduNetworkTcpipIpv4Gateway OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The default gateway that allow device managed through routers."
+        ::= { pduNetworkTcpipIpv4 2}
+
+pduNetworkTcpipIpv4Subnet OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Internet address subnet mask"
+        ::= { pduNetworkTcpipIpv4 3}
+
+pduNetworkTcpipIpv4PrimaryDNS OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Internet address of Primary DNS Server"
+        ::= { pduNetworkTcpipIpv4 4}
+
+pduNetworkTcpipIpv4SecondaryDNS OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Internet address of Secondary DNS"
+        ::= { pduNetworkTcpipIpv4 5}
+
+pduNetworkTcpipIpv6    OBJECT IDENTIFIER ::= { pduNetworkTcpip 3 }
+-- ===========================================================================
+--
+-- pduNetworkTcpipIpv6
+--
+--  Ip address Configuration Group of the device.
+--
+-- ===========================================================================
+pduNetworkTcpipIpv6Control OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable IPv6 protocol"
+        ::= { pduNetworkTcpipIpv6 1 }
+
+pduNetworkTcpipIpv6AutoConfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+                auto(1),
+                manual(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "IPv6 Auto-config or Maual setting"
+        ::= { pduNetworkTcpipIpv6 2 }
+
+pduNetworkTcpipIpv6Address OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The ipv6 address that NMS can identify the managed device."
+        ::= { pduNetworkTcpipIpv6 3}
+
+pduNetworkTcpipIpv6Prefix OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The prefix length for ipv6 address."
+        ::= { pduNetworkTcpipIpv6 4}
+
+pduNetworkTcpipIpv6Router OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The default gateway that allow device managed through routers."
+        ::= { pduNetworkTcpipIpv6 5}
+
+pduNetworkTcpipIpv6PrimaryDNS OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Internet address of Primary DNS Server"
+        ::= { pduNetworkTcpipIpv6 6}
+
+pduNetworkTcpipIpv6SecondaryDNS OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Internet address of Secondary DNS"
+        ::= { pduNetworkTcpipIpv6 7}
+
+
+
+pduNetworkSecurity    OBJECT IDENTIFIER ::= { pduNetwork 2 }
+-- ===========================================================================
+--
+-- pduNetworkSecurity
+--
+--  Network Security Group of the device.
+--
+-- ===========================================================================
+pduNetworkSecurityControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable Network Access Protection"
+        ::= { pduNetworkSecurity 1 }
+
+pduNetworkSecuritySsh    OBJECT IDENTIFIER ::= { pduNetworkSecurity 2 }
+-- ===========================================================================
+--
+-- pduNetworkSecuritySsh
+--
+--  SSH Security Group Group of the device.
+--
+-- ===========================================================================
+pduNetworkSecuritySshControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable SSH Access Protection"
+        ::= { pduNetworkSecuritySsh 1 }
+
+pduNetworkSecuritySshInterval OBJECT-TYPE
+        SYNTAX  INTEGER {
+                oneMinute(1),
+                fiveMinutes(2),
+                tenMinutes(3),
+                thirtyMinutes(4)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Detecting Interval of SSH Access Protection"
+        ::= { pduNetworkSecuritySsh 2 }
+
+pduNetworkSecuritySshFailTimes OBJECT-TYPE
+        SYNTAX  INTEGER {
+                five(1),
+                ten(2),
+                twenty(3),
+                thirty(4),
+                hundred(5)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Unsuccessful attempts of SSH Access Protection"
+        ::= { pduNetworkSecuritySsh 3 }
+
+pduNetworkSecuritySshBlock OBJECT-TYPE
+        SYNTAX  INTEGER {
+                fiveMinutes(1),
+                thirtyMinutes(2),
+                oneHour(3),
+                oneDay(4)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Block Time of SSH Access Protection"
+        ::= { pduNetworkSecuritySsh 4 }
+
+pduNetworkSecuritySnmp    OBJECT IDENTIFIER ::= { pduNetworkSecurity 3 }
+-- ===========================================================================
+--
+-- pduNetworkSecuritySnmp
+--
+--  SNMP Security Group Group of the device.
+--
+-- ===========================================================================
+pduNetworkSecuritySnmpControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable SNMP Access Protection"
+        ::= { pduNetworkSecuritySnmp 1 }
+
+pduNetworkSecuritySnmpInterval OBJECT-TYPE
+        SYNTAX  INTEGER {
+                oneMinute(1),
+                fiveMinutes(2),
+                tenMinutes(3),
+                thirtyMinutes(4)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Detecting Interval of SNMP Access Protection"
+        ::= { pduNetworkSecuritySnmp 2 }
+
+pduNetworkSecuritySnmpFailTimes OBJECT-TYPE
+        SYNTAX  INTEGER {
+                five(1),
+                ten(2),
+                twenty(3),
+                thirty(4),
+                hundred(5)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Unsuccessful attempts of SNMP Access Protection"
+        ::= { pduNetworkSecuritySnmp 3 }
+
+pduNetworkSecuritySnmpBlock OBJECT-TYPE
+        SYNTAX  INTEGER {
+                fiveMinutes(1),
+                thirtyMinutes(2),
+                oneHour(3),
+                oneDay(4)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Block Time of SNMP Access Protection"
+        ::= { pduNetworkSecuritySnmp 4 }
+
+pduNetworkSecurityHttp    OBJECT IDENTIFIER ::= { pduNetworkSecurity 4 }
+-- ===========================================================================
+--
+-- pduNetworkSecurityHttp
+--
+--  HTTP Security Group Group of the device.
+--
+-- ===========================================================================
+pduNetworkSecurityHttpControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable HTTP Access Protection"
+        ::= { pduNetworkSecurityHttp 1 }
+
+pduNetworkSecurityHttpInterval OBJECT-TYPE
+        SYNTAX  INTEGER {
+                oneMinute(1),
+                fiveMinutes(2),
+                tenMinutes(3),
+                thirtyMinutes(4)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Detecting Interval of HTTP Access Protection"
+        ::= { pduNetworkSecurityHttp 2 }
+
+pduNetworkSecurityHttpFailTimes OBJECT-TYPE
+        SYNTAX  INTEGER {
+                five(1),
+                ten(2),
+                twenty(3),
+                thirty(4),
+                hundred(5)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Unsuccessful attempts of HTTP Access Protection"
+        ::= { pduNetworkSecurityHttp 3 }
+
+pduNetworkSecurityHttpBlock OBJECT-TYPE
+        SYNTAX  INTEGER {
+                fiveMinutes(1),
+                thirtyMinutes(2),
+                oneHour(3),
+                oneDay(4)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Block Time of HTTP Access Protection"
+        ::= { pduNetworkSecurityHttp 4 }
+
+
+pduNetworkService    OBJECT IDENTIFIER ::= { pduNetwork 3 }
+-- ===========================================================================
+--
+-- pduNetworkService
+--
+--  Network Service Group of the device.
+--
+-- ===========================================================================
+
+pduNetworkServiceSsh    OBJECT IDENTIFIER ::= { pduNetworkService 1 }
+-- ===========================================================================
+--
+-- pduNetworkServiceSsh
+--
+--  SSH Service Group of the device.
+--
+-- ===========================================================================
+pduNetworkServiceSshControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable SSH Server Service"
+        ::= { pduNetworkServiceSsh 1 }
+
+pduNetworkServiceSshPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Port Number of SSH Server Service"
+        ::= { pduNetworkServiceSsh 2 }
+
+
+pduNetworkServiceSsl    OBJECT IDENTIFIER ::= { pduNetworkService 2 }
+-- ===========================================================================
+--
+-- pduNetworkServiceSsl
+--
+--  HTTPs Service Group of the device.
+--
+-- ===========================================================================
+pduNetworkServiceSslControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable HTTPs Server Service"
+        ::= { pduNetworkServiceSsl 1 }
+
+pduNetworkServiceSslPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Port Number of HTTPs Server Service"
+        ::= { pduNetworkServiceSsl 2 }
+
+pduNetworkServiceSslForce OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Force use HTTPs Server Service only."
+        ::= { pduNetworkServiceSsl 3 }
+
+pduNetworkServicePingControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable to response to PING request."
+        ::= { pduNetworkService 3 }
+
+
+pduNetworkServiceRadius    OBJECT IDENTIFIER ::= { pduNetworkService 4 }
+-- ===========================================================================
+--
+-- pduNetworkServiceRadius
+--
+--  RADIUS Client Service Group of the device.
+--
+-- ===========================================================================
+pduNetworkServiceRadiusControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable RADIUS Client Service"
+        ::= { pduNetworkServiceRadius 1 }
+
+pduNetworkServiceRadiusIp OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The IP Address of RADIUS Client Service"
+        ::= { pduNetworkServiceRadius 2 }
+
+pduNetworkServiceRadiusPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Port Number of RADIUS Client Service"
+        ::= { pduNetworkServiceRadius 3 }
+
+pduNetworkServiceRadiusSecretKey OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Secret Key of RADIUS Client Service"
+        ::= { pduNetworkServiceRadius 4 }
+
+pduNetworkServiceRadiusTimeout OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Timeout Interval of RADIUS Client Service in seconds"
+        ::= { pduNetworkServiceRadius 5 }
+
+pduNetworkServiceRadiusRetry OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Retry Times of RADIUS Client Service"
+        ::= { pduNetworkServiceRadius 6 }
+
+
+-- ===========================================================================
+--
+-- pduSystem
+--
+--  System Management Group of the device.
+--
+-- ===========================================================================
+pduSystemName OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The name of system."
+       ::= { pduSystem 1 }
+
+pduSystemContact OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..31))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The contact of system."
+      ::= { pduSystem 2 }
+
+pduSystemLocation OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..31))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The location of system."
+      ::= { pduSystem 3 }
+
+pduSystemLogInterval OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Log Interval of device"
+        ::= { pduSystem 4 }
+
+pduSystemWebRefresh OBJECT-TYPE
+        SYNTAX INTEGER (3..60)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Web Refresh Interval of device"
+        ::= { pduSystem 5 }
+
+pduSystemTime    OBJECT IDENTIFIER ::= { pduSystem 6 }
+-- ===========================================================================
+--
+-- pduSystemTime
+--
+--  Date/Time Configuration Group of the device.
+--
+-- ===========================================================================
+pduSystemTimeDisplay OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The date/time in agent"
+        ::= { pduSystemTime 1 }
+
+pduSystemTimeZone OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    gMT-1200InternationalDateLineWest(1),
+                    gMT-1200Eniwetok-Kwajalein(2),
+                    gMT-1100MidwayIsland-Samoa(3),
+                    gMT-1000Hawaii(4),
+                    gMT-0900Alaska(5),
+                    gMT-0800PacificTime-Tijuana(6),
+                    gMT-0700Arizona-MountainTime(7),
+                    gMT-0700Chihuahua-LaPaz-Mazatlan(8),
+                    gMT-0700MountainTime(9),
+                    gMT-0600CentralAmerica(10),
+                    gMT-0600CentralTime(11),
+                    gMT-0600Guadalajara-MexicoCity-Monterrey(12),
+                    gMT-0600Saskatchewan(13),
+                    gMT-0500Bogota-Lima-Quito(14),
+                    gMT-0500EasternTime(15),
+                    gMT-0500Indiana(16),
+                    gMT-0400AtlanticTime(17),
+                    gMT-0400Caracas-LaPaz(18),
+                    gMT-0400Santiago(19),
+                    gMT-0330Newfoundland(20),
+                    gMT-0300Brasilia(21),
+                    gMT-0300BuenosAires-Georgetown(22),
+                    gMT-0300Greenland(23),
+                    gMT-0200Mid-Atlantic(24),
+                    gMT-0100Azores(25),
+                    gMT-0100CapeVerdeIs(26),
+                    gMT-0000Casablanca-Monrovia(27),
+                    gMT-0000GreenwichMeanTime-Dublin-Edinburgh-Lisbon-London(28),
+                    gMT0100Amsterdam-Berlin-Bern-Rome-Stockholm-Vienna(29),
+                    gMT0100Belgrade-Bratislava-Budapest-Ljubljana-Prague(30),
+                    gMT0100Brussels-Copenhagen-Madrid-Paris(31),
+                    gMT0100Sarajevo-Skopje-Warsaw-Zagreb(32),
+                    gMT0100WestCentralAfrica(33),
+                    gMT0200Athens-Istanbul-Minsk(34),
+                    gMT0200Bucharest(35),
+                    gMT0200Cairo(36),
+                    gMT0200Harare-Pretoria(37),
+                    gMT0200Helsinki-Kyiv-Riga-Sofia-Tallinn-Vilnius(38),
+                    gMT0200Jerusalem(39),
+                    gMT0300Baghdad(40),
+                    gMT0300Kuwait-Riyadh(41),
+                    gMT0300Moscow-StPetersburg-Volgograd(42),
+                    gMT0300Nairobi(43),
+                    gMT0330Tehran(44),
+                    gMT0400AbuDhabi-Muscat(45),
+                    gMT0400Baku-Tbilisi-Yerevan(46),
+                    gMT0430Kabul(47),
+                    gMT0500Ekaterinburg(48),
+                    gMT0500Islamabad-Karachi-Tashkent(49),
+                    gMT0530Bombay-Calcutta(50),
+                    gMT0530Chennai-Kolkata-Mumbai-NewDelhi(51),
+                    gMT0545Kathmandu(52),
+                    gMT0600Almaty-Novosibirsk(53),
+                    gMT0600Astana-Dhaka(54),
+                    gMT0600SriJayawardenepura(55),
+                    gMT0630Rangoon(56),
+                    gMT0700Bangkok-Hanoi-Jakarta(57),
+                    gMT0700Krasnoyarsk(58),
+                    gMT0800Beijing-Chongqing-HongKong-Urumqi(59),
+                    gMT0800Irkutsk-UlaanBataar(60),
+                    gMT0800KualaLumpur-Singapore(61),
+                    gMT0800Perth(62),
+                    gMT0800Taipei(63),
+                    gMT0900Osaka-Sapporo-Tokyo(64),
+                    gMT0900Seoul(65),
+                    gMT0900Yakutsk(66),
+                    gMT0930Adelaide(67),
+                    gMT0930Darwin(68),
+                    gMT1000Brisbane(69),
+                    gMT1000Canberra-Melbourne-Sydney(70),
+                    gMT1000Guam-PortMoresby(71),
+                    gMT1000Hobart(72),
+                    gMT1000Vladivostok(73),
+                    gMT1100Magadan-SolomonIs-NewCaledonia(74),
+                    gMT1200Auckland-Wellington(75),
+                    gMT1200Fiji-Kamchatka-MarshallIs(76),
+                    gMT1300NukuAlofa(77)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Time Zone to use when synchronize with NTP server."
+        ::= { pduSystemTime 2 }
+
+pduSystemTimeFormat OBJECT-TYPE
+        SYNTAX  INTEGER {
+                mmddyyyy(1),
+                ddmmyyyy(2),
+                yyyymmdd(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Date Format"
+        ::= { pduSystemTime 3 }
+
+pduSystemTimeSetting OBJECT-TYPE
+        SYNTAX  INTEGER {
+                twentyFourHrFormat(1),
+                twelveHrFormat(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Time Setting"
+        ::= { pduSystemTime 4 }
+
+pduSystemTimeDayLightSaving OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable the Day Light Saving when synchronize with NTP server."
+        ::= { pduSystemTime 5 }
+
+pduSystemTimeManual    OBJECT IDENTIFIER ::= { pduSystemTime 6 }
+-- ===========================================================================
+--
+-- pduSystemTimeManual
+--
+--  Manual Time Setting Configuration Group of the device.
+--
+-- ===========================================================================
+pduSystemTimeManualDate OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (10..10))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The date in agent, format is (dd/mm/yyyy)"
+        ::= { pduSystemTimeManual 1 }
+
+pduSystemTimeManualTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (8..8))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time in agent, format is (hh:mm:ss)"
+        ::= { pduSystemTimeManual 2 }
+
+pduSystemTimeNtp    OBJECT IDENTIFIER ::= { pduSystemTime 7 }
+-- ===========================================================================
+--
+-- pduSystemTimeNtp
+--
+--  NTP Configuration Group of the device.
+--
+-- ===========================================================================
+pduSystemTimeNtpControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable or disable the agent to synchronize date/time with NTP server."
+        ::= { pduSystemTimeNtp 1 }
+
+pduSystemTimeNtpServer OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..63))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The ip address of NTP server."
+       ::= { pduSystemTimeNtp 2 }
+
+pduSystemTimeNtpSyncInterval OBJECT-TYPE
+       SYNTAX INTEGER
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The Sync Interval with NTP server."
+       ::= { pduSystemTimeNtp 3 }
+
+pduSystemTimeNtpSyncUnit OBJECT-TYPE
+        SYNTAX  INTEGER {
+                day(1),
+                month(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Unit of Sync Interval"
+        ::= { pduSystemTimeNtp 4 }
+
+pduSystemResetToDefault OBJECT-TYPE
+        SYNTAX  INTEGER {
+                nothing(1),
+                reset(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reset the parameter of PDU to default."
+        ::= { pduSystem 7 }
+
+pduSystemReboot OBJECT-TYPE
+        SYNTAX  INTEGER {
+                nothing(1),
+                reboot(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reboot the system of PDU."
+        ::= { pduSystem 8 }
+
+-- ===========================================================================
+--
+-- pduSNMP
+--
+--  SNMP Configuration Group of the device.
+--
+-- ===========================================================================
+pduSnmpControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable SNMP protocol."
+        ::= { pduSNMP 1 }
+        
+pduSnmpPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The UDP port for SNMP."
+        ::= { pduSNMP 2}
+
+pduSnmpVersion OBJECT-TYPE
+        SYNTAX  INTEGER {
+                v1(1),
+                v2(2),
+                v3(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set SNMP version."
+        ::= { pduSNMP 3 }
+
+pduSnmpTrapsReceiversTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduSnmpTrapsReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of managers to send traps to.  The number of
+                 entries is given by the value of pduSnmpNumTrapReceivers"
+        ::= { pduSNMP 4}
+
+pduSnmpTrapsReceiversEntry OBJECT-TYPE
+        SYNTAX PduSnmpTrapsReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The managers to send traps to."
+        INDEX  { trapsIndex}
+        ::= { pduSnmpTrapsReceiversTable 1 }
+
+PduSnmpTrapsReceiversEntry ::=
+        SEQUENCE {
+                trapsIndex
+                        INTEGER,
+                trapsReceiverAddr
+                        DisplayString,
+                receiverEventLevel
+                        INTEGER,
+                receiverSnmpVer
+                        INTEGER,
+                receiverDescription
+                         DisplayString
+        }
+
+trapsIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..15)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a trap receiver entry."
+        ::= { pduSnmpTrapsReceiversEntry 1 }
+
+trapsReceiverAddr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The IP address of the manager to send a trap to."
+        ::= { pduSnmpTrapsReceiversEntry 2 }
+
+receiverEventLevel OBJECT-TYPE
+        SYNTAX  INTEGER {
+                critical(1),
+                warning(2),
+                informational(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The severity level of traps to be received by this manager."
+        ::= { pduSnmpTrapsReceiversEntry 3 }
+
+receiverSnmpVer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                v1(1),
+                v2(2),
+                v3(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The SNMP Trap version of trap receivers."
+        ::= { pduSnmpTrapsReceiversEntry 4 }
+
+receiverDescription OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..63))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Description of trap receivers"
+        ::= { pduSnmpTrapsReceiversEntry 5 }
+
+
+-- ===========================================================================
+--
+-- pduEmail
+--
+--  Email Configuration Group of the device.
+--
+-- ===========================================================================
+pduEmailServer OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..63))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The address of Email server."
+       ::= { pduEmail 1 }
+
+pduEmailPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The UDP port for Email Server."
+        ::= { pduEmail 2}
+
+pduEmailSenderEmail OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..63))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The sender's Email address"
+       ::= { pduEmail 3 }
+
+pduEmailPrefix OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The prefix string of mail subject"
+       ::= { pduEmail 4 }
+
+pduEmailAuthControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable SMTP Authentication."
+        ::= { pduEmail 5 }
+
+pduEmailAuthUsername OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The user name of SMTP Authentication"
+       ::= { pduEmail 6 }
+
+pduEmailAuthPassword OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The password of SMTP Authentication"
+       ::= { pduEmail 7 }
+
+pduEmailReceiversTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduEmailReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of managers to send email notification to."
+        ::= { pduEmail 8}
+
+pduEmailReceiversEntry OBJECT-TYPE
+        SYNTAX PduEmailReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The managers to send email notification to."
+        INDEX  { mailRecvIndex}
+        ::= { pduEmailReceiversTable 1 }
+
+PduEmailReceiversEntry ::=
+        SEQUENCE {
+                mailRecvIndex
+                        INTEGER,
+                mailRecvReceiverAddr
+                        DisplayString,
+                mailRecvEmailType
+                        INTEGER,
+                mailRecvEventLevel
+                        INTEGER,
+                mailRecvDescription
+                         DisplayString
+        }
+
+mailRecvIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..15)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a email notification receiver entry."
+        ::= { pduEmailReceiversEntry 1 }
+
+mailRecvReceiverAddr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..63))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Email address of the manager to send a email notification to."
+        ::= { pduEmailReceiversEntry 2 }
+
+mailRecvEmailType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                events(2),
+                status(3),
+                both(4)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Email Type of email notification receivers."
+        ::= { pduEmailReceiversEntry 3 }
+
+mailRecvEventLevel OBJECT-TYPE
+        SYNTAX  INTEGER {
+                critical(1),
+                warning(2),
+                informational(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The severity level of email notification to be received by this manager."
+        ::= { pduEmailReceiversEntry 4 }
+
+mailRecvDescription OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..63))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Description of email notification receivers"
+        ::= { pduEmailReceiversEntry 5 }
+
+pduPwrMonitoringInlet      OBJECT IDENTIFIER ::= { pduPwrMonitoring 1 }
+-- ===========================================================================
+--
+-- pduPwrMonitoringInlet
+--
+--  Inlet Management Group of the device.
+--
+-- ===========================================================================
+pduPwrMonitoringInletNum OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The number of Inlet."
+        ::= { pduPwrMonitoringInlet 1}
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringInletStatusTable
+--
+--  Inlet Status Group
+--
+-- ===========================================================================
+pduPwrMonitoringInletStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringInletStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display status of Inlet."
+        ::= { pduPwrMonitoringInlet 2}
+
+pduPwrMonitoringInletStatusEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringInletStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display status of Inlet."
+        INDEX  { inletIndex}
+        ::= { pduPwrMonitoringInletStatusTable 1 }
+
+PduPwrMonitoringInletStatusEntry ::=
+        SEQUENCE {
+                inletIndex
+                        INTEGER,
+                inletPowerAll
+                        INTEGER,
+                inletResetFrom
+                        DisplayString,
+                inletEnergy
+                        INTEGER,
+                inletStatus
+                        INTEGER,
+                inletCurrPhase1
+                        INTEGER,
+                inletCurrPhase2
+                        INTEGER,
+                inletCurrPhase3
+                        INTEGER,
+                inletVoltPhase1
+                        INTEGER,
+                inletVoltPhase2
+                        INTEGER,
+                inletVoltPhase3
+                        INTEGER,
+                inletPwrFactorPhase1
+                        INTEGER,
+                inletPwrFactorPhase2
+                        INTEGER,
+                inletPwrFactorPhase3
+                        INTEGER,
+                inletPowerPhase1
+                        INTEGER,
+                inletPowerPhase2
+                        INTEGER,
+                inletPowerPhase3
+                        INTEGER,
+                inletStatusPhase1
+                        INTEGER,
+                inletStatusPhase2
+                        INTEGER,
+                inletStatusPhase3
+                        INTEGER
+        }
+
+inletIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..3)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to Inlet status entry."
+        ::= { pduPwrMonitoringInletStatusEntry 1 }
+
+inletPowerAll OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1W"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The total power of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 2 }
+
+inletResetFrom OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The reset date of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 3 }
+
+inletEnergy OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "KWh"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The total energy of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 4 }
+
+inletStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                warning(2),
+                critical(3)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Status of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 5 }
+
+inletCurrPhase1 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.01A"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase1 current of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 6 }
+
+inletCurrPhase2 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.01A"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase2 current of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 7 }
+
+inletCurrPhase3 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.01A"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase3 current of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 8 }
+
+inletVoltPhase1 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1V"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase1 voltage of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 9 }
+
+inletVoltPhase2 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1V"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase2 voltage of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 10 }
+
+inletVoltPhase3 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1V"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase3 voltage of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 11 }
+
+inletPwrFactorPhase1 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase1 power factor of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 12 }
+
+inletPwrFactorPhase2 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase2 power factor of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 13 }
+
+inletPwrFactorPhase3 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase3 power factor of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 14 }
+
+inletPowerPhase1 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1W"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase1 power of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 15 }
+
+inletPowerPhase2 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1W"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase2 power of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 16 }
+
+inletPowerPhase3 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1W"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase3 power of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 17 }
+
+inletStatusPhase1 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                warning(2),
+                critical(3)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase1 status of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 18 }
+
+inletStatusPhase2 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                warning(2),
+                critical(3)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase2 status of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 19 }
+
+inletStatusPhase3 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                warning(2),
+                critical(3)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The phase3 status of inlet."
+        ::= { pduPwrMonitoringInletStatusEntry 20 }
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringInletCfgTable
+--
+--  Inlet Configuration Group
+--
+-- ===========================================================================
+pduPwrMonitoringInletCfgTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringInletCfgEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to configure thresholds of inlet."
+        ::= { pduPwrMonitoringInlet 3}
+
+pduPwrMonitoringInletCfgEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringInletCfgEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to configure thresholds of inlet."
+        INDEX  { inletCfgIndex}
+        ::= { pduPwrMonitoringInletCfgTable 1 }
+
+PduPwrMonitoringInletCfgEntry ::=
+        SEQUENCE {
+                inletCfgIndex
+                        INTEGER,
+                inletCfgLoadCritical
+                        INTEGER,
+                inletCfgLoadWarning
+                        INTEGER,
+                inletCfgCurrCritPhase1
+                        INTEGER,
+                inletCfgCurrCritPhase2
+                        INTEGER,
+                inletCfgCurrCritPhase3
+                        INTEGER,
+                inletCfgCurrWarnPhase1
+                        INTEGER,
+                inletCfgCurrWarnPhase2
+                        INTEGER,
+                inletCfgCurrWarnPhase3
+                        INTEGER,
+                inletCfgVoltCritPhase1
+                        INTEGER,
+                inletCfgVoltCritPhase2
+                        INTEGER,
+                inletCfgVoltCritPhase3
+                        INTEGER,
+                inletCfgVoltWarnPhase1
+                        INTEGER,
+                inletCfgVoltWarnPhase2
+                        INTEGER,
+                inletCfgVoltWarnPhase3
+                        INTEGER
+        }
+
+inletCfgIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..3)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to inlet configuration entry."
+        ::= { pduPwrMonitoringInletCfgEntry 1 }
+
+inletCfgLoadCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1kW"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of inlet load."
+        ::= { pduPwrMonitoringInletCfgEntry 2 }
+
+inletCfgLoadWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1kW"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of inlet load."
+        ::= { pduPwrMonitoringInletCfgEntry 3 }
+
+inletCfgCurrCritPhase1 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of pahse1 current of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 4 }
+
+inletCfgCurrCritPhase2 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of pahse2 current of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 5 }
+
+inletCfgCurrCritPhase3 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of pahse3 current of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 6 }
+
+inletCfgCurrWarnPhase1 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of pahse1 current of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 7 }
+
+inletCfgCurrWarnPhase2 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of pahse2 current of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 8 }
+
+inletCfgCurrWarnPhase3 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of pahse3 current of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 9 }
+
+inletCfgVoltCritPhase1 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1V"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of pahse1 voltage of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 10 }
+
+inletCfgVoltCritPhase2 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1V"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of pahse2 voltage of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 11 }
+
+inletCfgVoltCritPhase3 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1V"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of pahse3 voltage of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 12 }
+
+inletCfgVoltWarnPhase1 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1V"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of pahse1 voltage of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 13 }
+
+inletCfgVoltWarnPhase2 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1V"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of pahse2 voltage of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 14 }
+
+inletCfgVoltWarnPhase3 OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1V"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of pahse3 voltage of inlet."
+        ::= { pduPwrMonitoringInletCfgEntry 15 }
+
+pduPwrMonitoringOutlet      OBJECT IDENTIFIER ::= { pduPwrMonitoring 2 }
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutlet
+--
+--  Outlet Management Group of the device.
+--
+-- ===========================================================================
+
+pduPwrMonitoringOutletPduA    OBJECT IDENTIFIER ::= { pduPwrMonitoringOutlet 1 }
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletPduA
+--
+--  Outlet of Device1 management Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletNumPduA OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The number of PduA Outlet."
+        ::= { pduPwrMonitoringOutletPduA 1}
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletStatusTablePduA
+--
+--  Outlet of Device1 Status Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletStatusTablePduA OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletStatusPduAEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display status of PduA outlet."
+        ::= { pduPwrMonitoringOutletPduA 2}
+
+pduPwrMonitoringOutletStatusPduAEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletStatusPduAEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display status of PduA outlet."
+        INDEX  { outletPduAIndex}
+        ::= { pduPwrMonitoringOutletStatusTablePduA 1 }
+
+PduPwrMonitoringOutletStatusPduAEntry ::=
+        SEQUENCE {
+                outletPduAIndex
+                        INTEGER,
+                outletPduAState
+                        INTEGER,
+                outletPduACurrent
+                        INTEGER,
+                outletPduAPwrFactor
+                        INTEGER,
+                outletPduAPower
+                        INTEGER,
+                outletPduAEnergy
+                        INTEGER,
+                outletPduAResetFrom
+                        DisplayString,
+                outletPduAStatus
+                        INTEGER
+        }
+
+outletPduAIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet status of PduA."
+        ::= { pduPwrMonitoringOutletStatusPduAEntry 1 }
+
+outletPduAState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The state of PduA outlet."
+        ::= { pduPwrMonitoringOutletStatusPduAEntry 2 }
+
+outletPduACurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.01A"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current of PduA outlet."
+        ::= { pduPwrMonitoringOutletStatusPduAEntry 3 }
+
+outletPduAPwrFactor OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The power factor of PduA outlet."
+        ::= { pduPwrMonitoringOutletStatusPduAEntry 4 }
+
+outletPduAPower OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1W"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The power of PduA outlet."
+        ::= { pduPwrMonitoringOutletStatusPduAEntry 5 }
+
+outletPduAEnergy OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "KWh"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The energy of PduA outlet."
+        ::= { pduPwrMonitoringOutletStatusPduAEntry 6 }
+
+outletPduAResetFrom OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The reset date of PduA outlet."
+        ::= { pduPwrMonitoringOutletStatusPduAEntry 7 }
+
+outletPduAStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                warning(2),
+                critical(3)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The status of PduA outlet."
+        ::= { pduPwrMonitoringOutletStatusPduAEntry 8 }
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletCfgTablePduA
+--
+--  Outlet of Device1 Configuration Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletCfgTablePduA OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletCfgPduAEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display configuration of PduA outlet."
+        ::= { pduPwrMonitoringOutletPduA 3}
+
+pduPwrMonitoringOutletCfgPduAEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletCfgPduAEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display configuration of PduA outlet."
+        INDEX  { outletCfgPduAIndex}
+        ::= { pduPwrMonitoringOutletCfgTablePduA 1 }
+
+PduPwrMonitoringOutletCfgPduAEntry ::=
+        SEQUENCE {
+                outletCfgPduAIndex
+                        INTEGER,
+                outletCfgPduAName
+                        DisplayString,
+                outletCfgPduADelayOnStatus
+                        INTEGER,
+                outletCfgPduADelayOnTime
+                        INTEGER,
+                outletCfgPduADelayOffStatus
+                        INTEGER,
+                outletCfgPduADelayOffTime
+                        INTEGER,
+                outletCfgPduAReboot
+                        INTEGER,
+                outletCfgPduAOverCurrCritical
+                        INTEGER,
+                outletCfgPduAOverCurrWarning
+                        INTEGER,
+                outletCfgPduAOverPwrCritical
+                        INTEGER,
+                outletCfgPduAOverPwrWarning
+                        INTEGER
+        }
+
+outletCfgPduAIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet configuration of PduA."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 1 }
+
+outletCfgPduAName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The name for outlet of PduA."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 2 }
+
+outletCfgPduADelayOnStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                nodelay(1),
+                delay(2)                
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On status of PduA outlet."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 3 }
+
+outletCfgPduADelayOnTime OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On time of PduA outlet."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 4 }
+
+outletCfgPduADelayOffStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                nodelay(1),
+                delay(2)                
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay Off status of PduA outlet."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 5 }
+
+outletCfgPduADelayOffTime OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay Off time of PduA outlet."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 6 }
+
+outletCfgPduAReboot OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On reboot duration of PduA outlet."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 7 }
+
+outletCfgPduAOverCurrCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of current of PduA outlet."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 8 }
+
+outletCfgPduAOverCurrWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of current of PduA outlet."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 9 }
+
+outletCfgPduAOverPwrCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "1W"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of power of PduA outlet."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 10 }
+
+outletCfgPduAOverPwrWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "1W"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of power of PduA outlet."
+        ::= { pduPwrMonitoringOutletCfgPduAEntry 11 }
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletCtlTablePduA
+--
+--  Outlet of Device1 Control Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletCtlTablePduA OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletCtlPduAEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display control of PduA outlet."
+        ::= { pduPwrMonitoringOutletPduA 4}
+
+pduPwrMonitoringOutletCtlPduAEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletCtlPduAEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display control of PduA outlet."
+        INDEX  { outletCtlPduAIndex}
+        ::= { pduPwrMonitoringOutletCtlTablePduA 1 }
+
+PduPwrMonitoringOutletCtlPduAEntry ::=
+        SEQUENCE {
+                outletCtlPduAIndex
+                        INTEGER,
+                outletCtlPduAControl
+                        INTEGER
+        }
+
+outletCtlPduAIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet control of PduA."
+        ::= { pduPwrMonitoringOutletCtlPduAEntry 1 }
+
+outletCtlPduAControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                immediateOn(1),
+                delayedOn(2),
+                immediateOff(3),
+                delayedOff(4),
+                immediateCycle(5),
+                delayedCycle(6)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The control-type of PduA outlet."
+        ::= { pduPwrMonitoringOutletCtlPduAEntry 2 }
+
+pduPwrMonitoringOutletPduB    OBJECT IDENTIFIER ::= { pduPwrMonitoringOutlet 2 }
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletPduB
+--
+--  Outlet of Device2 management Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletNumPduB OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The number of PduB Outlet."
+        ::= { pduPwrMonitoringOutletPduB 1}
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletStatusTablePduB
+--
+--  Outlet of Device2 Status Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletStatusTablePduB OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletStatusPduBEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display status of PduB outlet."
+        ::= { pduPwrMonitoringOutletPduB 2}
+
+pduPwrMonitoringOutletStatusPduBEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletStatusPduBEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display status of PduB outlet."
+        INDEX  { outletPduBIndex}
+        ::= { pduPwrMonitoringOutletStatusTablePduB 1 }
+
+PduPwrMonitoringOutletStatusPduBEntry ::=
+        SEQUENCE {
+                outletPduBIndex
+                        INTEGER,
+                outletPduBState
+                        INTEGER,
+                outletPduBCurrent
+                        INTEGER,
+                outletPduBPwrFactor
+                        INTEGER,
+                outletPduBPower
+                        INTEGER,
+                outletPduBEnergy
+                        INTEGER,
+                outletPduBResetFrom
+                        DisplayString,
+                outletPduBStatus
+                        INTEGER
+        }
+
+outletPduBIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet status of PduB."
+        ::= { pduPwrMonitoringOutletStatusPduBEntry 1 }
+
+outletPduBState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The state of PduB outlet."
+        ::= { pduPwrMonitoringOutletStatusPduBEntry 2 }
+
+outletPduBCurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.01A"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current of PduB outlet."
+        ::= { pduPwrMonitoringOutletStatusPduBEntry 3 }
+
+outletPduBPwrFactor OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The power factor of PduB outlet."
+        ::= { pduPwrMonitoringOutletStatusPduBEntry 4 }
+
+outletPduBPower OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1W"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The power of PduB outlet."
+        ::= { pduPwrMonitoringOutletStatusPduBEntry 5 }
+
+outletPduBEnergy OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "KWh"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The energy of PduB outlet."
+        ::= { pduPwrMonitoringOutletStatusPduBEntry 6 }
+
+outletPduBResetFrom OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The reset date of PduB outlet."
+        ::= { pduPwrMonitoringOutletStatusPduBEntry 7 }
+
+outletPduBStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                warning(2),
+                critical(3)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The status of PduB outlet."
+        ::= { pduPwrMonitoringOutletStatusPduBEntry 8 }
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletCfgTablePduB
+--
+--  Outlet of Device2 Configuration Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletCfgTablePduB OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletCfgPduBEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display configuration of PduB outlet."
+        ::= { pduPwrMonitoringOutletPduB 3}
+
+pduPwrMonitoringOutletCfgPduBEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletCfgPduBEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display configuration of PduB outlet."
+        INDEX  { outletCfgPduBIndex}
+        ::= { pduPwrMonitoringOutletCfgTablePduB 1 }
+
+PduPwrMonitoringOutletCfgPduBEntry ::=
+        SEQUENCE {
+                outletCfgPduBIndex
+                        INTEGER,
+                outletCfgPduBName
+                        DisplayString,
+                outletCfgPduBDelayOnStatus
+                        INTEGER,
+                outletCfgPduBDelayOnTime
+                        INTEGER,
+                outletCfgPduBDelayOffStatus
+                        INTEGER,
+                outletCfgPduBDelayOffTime
+                        INTEGER,
+                outletCfgPduBReboot
+                        INTEGER,
+                outletCfgPduBOverCurrCritical
+                        INTEGER,
+                outletCfgPduBOverCurrWarning
+                        INTEGER,
+                outletCfgPduBOverPwrCritical
+                        INTEGER,
+                outletCfgPduBOverPwrWarning
+                        INTEGER
+        }
+
+outletCfgPduBIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet configuration of PduB."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 1 }
+
+outletCfgPduBName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The name for outlet of PduB."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 2 }
+
+outletCfgPduBDelayOnStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                nodelay(1),
+                delay(2)                
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On status of PduB outlet."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 3 }
+
+outletCfgPduBDelayOnTime OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On time of PduB outlet."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 4 }
+
+outletCfgPduBDelayOffStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                nodelay(1),
+                delay(2)                
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay Off status of PduB outlet."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 5 }
+
+outletCfgPduBDelayOffTime OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay Off time of PduB outlet."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 6 }
+
+outletCfgPduBReboot OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On reboot duration of PduB outlet."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 7 }
+
+outletCfgPduBOverCurrCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of current of PduB outlet."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 8 }
+
+outletCfgPduBOverCurrWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of current of PduB outlet."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 9 }
+
+outletCfgPduBOverPwrCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "1W"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of power of PduB outlet."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 10 }
+
+outletCfgPduBOverPwrWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "1W"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of power of PduB outlet."
+        ::= { pduPwrMonitoringOutletCfgPduBEntry 11 }
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletCtlTablePduB
+--
+--  Outlet of Device2 Control Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletCtlTablePduB OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletCtlPduBEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display control of PduB outlet."
+        ::= { pduPwrMonitoringOutletPduB 4}
+
+pduPwrMonitoringOutletCtlPduBEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletCtlPduBEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display control of PduB outlet."
+        INDEX  { outletCtlPduBIndex}
+        ::= { pduPwrMonitoringOutletCtlTablePduB 1 }
+
+PduPwrMonitoringOutletCtlPduBEntry ::=
+        SEQUENCE {
+                outletCtlPduBIndex
+                        INTEGER,
+                outletCtlPduBControl
+                        INTEGER
+        }
+
+outletCtlPduBIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet control of PduB."
+        ::= { pduPwrMonitoringOutletCtlPduBEntry 1 }
+
+outletCtlPduBControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                immediateOn(1),
+                delayedOn(2),
+                immediateOff(3),
+                delayedOff(4),
+                immediateCycle(5),
+                delayedCycle(6)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The control-type of PduB outlet."
+        ::= { pduPwrMonitoringOutletCtlPduBEntry 2 }
+
+pduPwrMonitoringOutletPduC    OBJECT IDENTIFIER ::= { pduPwrMonitoringOutlet 3 }
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletPduC
+--
+--  Outlet of Device3 management Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletNumPduC OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The number of PduC Outlet."
+        ::= { pduPwrMonitoringOutletPduC 1}
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletStatusTablePduC
+--
+--  Outlet of Device3 Status Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletStatusTablePduC OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletStatusPduCEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display status of PduC outlet."
+        ::= { pduPwrMonitoringOutletPduC 2}
+
+pduPwrMonitoringOutletStatusPduCEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletStatusPduCEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display status of PduC outlet."
+        INDEX  { outletPduCIndex}
+        ::= { pduPwrMonitoringOutletStatusTablePduC 1 }
+
+PduPwrMonitoringOutletStatusPduCEntry ::=
+        SEQUENCE {
+                outletPduCIndex
+                        INTEGER,
+                outletPduCState
+                        INTEGER,
+                outletPduCCurrent
+                        INTEGER,
+                outletPduCPwrFactor
+                        INTEGER,
+                outletPduCPower
+                        INTEGER,
+                outletPduCEnergy
+                        INTEGER,
+                outletPduCResetFrom
+                        DisplayString,
+                outletPduCStatus
+                        INTEGER
+        }
+
+outletPduCIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet status of PduC."
+        ::= { pduPwrMonitoringOutletStatusPduCEntry 1 }
+
+outletPduCState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The state of PduC outlet."
+        ::= { pduPwrMonitoringOutletStatusPduCEntry 2 }
+
+outletPduCCurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.01A"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current of PduC outlet."
+        ::= { pduPwrMonitoringOutletStatusPduCEntry 3 }
+
+outletPduCPwrFactor OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The power factor of PduC outlet."
+        ::= { pduPwrMonitoringOutletStatusPduCEntry 4 }
+
+outletPduCPower OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1W"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The power of PduC outlet."
+        ::= { pduPwrMonitoringOutletStatusPduCEntry 5 }
+
+outletPduCEnergy OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "KWh"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The energy of PduC outlet."
+        ::= { pduPwrMonitoringOutletStatusPduCEntry 6 }
+
+outletPduCResetFrom OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The reset date of PduC outlet."
+        ::= { pduPwrMonitoringOutletStatusPduCEntry 7 }
+
+outletPduCStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                warning(2),
+                critical(3)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The status of PduC outlet."
+        ::= { pduPwrMonitoringOutletStatusPduCEntry 8 }
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletCfgTablePduC
+--
+--  Outlet of Device3 Configuration Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletCfgTablePduC OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletCfgPduCEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display configuration of PduC outlet."
+        ::= { pduPwrMonitoringOutletPduC 3}
+
+pduPwrMonitoringOutletCfgPduCEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletCfgPduCEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display configuration of PduC outlet."
+        INDEX  { outletCfgPduCIndex}
+        ::= { pduPwrMonitoringOutletCfgTablePduC 1 }
+
+PduPwrMonitoringOutletCfgPduCEntry ::=
+        SEQUENCE {
+                outletCfgPduCIndex
+                        INTEGER,
+                outletCfgPduCName
+                        DisplayString,
+                outletCfgPduCDelayOnStatus
+                        INTEGER,
+                outletCfgPduCDelayOnTime
+                        INTEGER,
+                outletCfgPduCDelayOffStatus
+                        INTEGER,
+                outletCfgPduCDelayOffTime
+                        INTEGER,
+                outletCfgPduCReboot
+                        INTEGER,
+                outletCfgPduCOverCurrCritical
+                        INTEGER,
+                outletCfgPduCOverCurrWarning
+                        INTEGER,
+                outletCfgPduCOverPwrCritical
+                        INTEGER,
+                outletCfgPduCOverPwrWarning
+                        INTEGER
+        }
+
+outletCfgPduCIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet configuration of PduC."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 1 }
+
+outletCfgPduCName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The name for outlet of PduC."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 2 }
+
+outletCfgPduCDelayOnStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                nodelay(1),
+                delay(2)                
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On status of PduC outlet."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 3 }
+
+outletCfgPduCDelayOnTime OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On time of PduC outlet."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 4 }
+
+outletCfgPduCDelayOffStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                nodelay(1),
+                delay(2)                
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay Off status of PduC outlet."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 5 }
+
+outletCfgPduCDelayOffTime OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay Off time of PduC outlet."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 6 }
+
+outletCfgPduCReboot OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On reboot duration of PduC outlet."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 7 }
+
+outletCfgPduCOverCurrCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of current of PduC outlet."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 8 }
+
+outletCfgPduCOverCurrWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of current of PduC outlet."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 9 }
+
+outletCfgPduCOverPwrCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "1W"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of power of PduC outlet."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 10 }
+
+outletCfgPduCOverPwrWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "1W"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of power of PduC outlet."
+        ::= { pduPwrMonitoringOutletCfgPduCEntry 11 }
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletCtlTablePduC
+--
+--  Outlet of Device3 Control Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletCtlTablePduC OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletCtlPduCEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display control of PduC outlet."
+        ::= { pduPwrMonitoringOutletPduC 4}
+
+pduPwrMonitoringOutletCtlPduCEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletCtlPduCEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display control of PduC outlet."
+        INDEX  { outletCtlPduCIndex}
+        ::= { pduPwrMonitoringOutletCtlTablePduC 1 }
+
+PduPwrMonitoringOutletCtlPduCEntry ::=
+        SEQUENCE {
+                outletCtlPduCIndex
+                        INTEGER,
+                outletCtlPduCControl
+                        INTEGER
+        }
+
+outletCtlPduCIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet control of PduC."
+        ::= { pduPwrMonitoringOutletCtlPduCEntry 1 }
+
+outletCtlPduCControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                immediateOn(1),
+                delayedOn(2),
+                immediateOff(3),
+                delayedOff(4),
+                immediateCycle(5),
+                delayedCycle(6)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The control-type of PduC outlet."
+        ::= { pduPwrMonitoringOutletCtlPduCEntry 2 }
+
+pduPwrMonitoringOutletPduD    OBJECT IDENTIFIER ::= { pduPwrMonitoringOutlet 4 }
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletPduD
+--
+--  Outlet of Device4 management Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletNumPduD OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The number of PduD Outlet."
+        ::= { pduPwrMonitoringOutletPduD 1}
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletStatusTablePduD
+--
+--  Outlet of Device3 Status Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletStatusTablePduD OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletStatusPduDEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display status of PduD outlet."
+        ::= { pduPwrMonitoringOutletPduD 2}
+
+pduPwrMonitoringOutletStatusPduDEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletStatusPduDEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display status of PduD outlet."
+        INDEX  { outletPduDIndex}
+        ::= { pduPwrMonitoringOutletStatusTablePduD 1 }
+
+PduPwrMonitoringOutletStatusPduDEntry ::=
+        SEQUENCE {
+                outletPduDIndex
+                        INTEGER,
+                outletPduDState
+                        INTEGER,
+                outletPduDCurrent
+                        INTEGER,
+                outletPduDPwrFactor
+                        INTEGER,
+                outletPduDPower
+                        INTEGER,
+                outletPduDEnergy
+                        INTEGER,
+                outletPduDResetFrom
+                        DisplayString,
+                outletPduDStatus
+                        INTEGER
+        }
+
+outletPduDIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet status of PduD."
+        ::= { pduPwrMonitoringOutletStatusPduDEntry 1 }
+
+outletPduDState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The state of PduD outlet."
+        ::= { pduPwrMonitoringOutletStatusPduDEntry 2 }
+
+outletPduDCurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.01A"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The current of PduD outlet."
+        ::= { pduPwrMonitoringOutletStatusPduDEntry 3 }
+
+outletPduDPwrFactor OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The power factor of PduD outlet."
+        ::= { pduPwrMonitoringOutletStatusPduDEntry 4 }
+
+outletPduDPower OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1W"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The power of PduD outlet."
+        ::= { pduPwrMonitoringOutletStatusPduDEntry 5 }
+
+outletPduDEnergy OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "KWh"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The energy of PduD outlet."
+        ::= { pduPwrMonitoringOutletStatusPduDEntry 6 }
+
+outletPduDResetFrom OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The reset date of PduD outlet."
+        ::= { pduPwrMonitoringOutletStatusPduDEntry 7 }
+
+outletPduDStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                warning(2),
+                critical(3)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The status of PduD outlet."
+        ::= { pduPwrMonitoringOutletStatusPduDEntry 8 }
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletCfgTablePduD
+--
+--  Outlet of Device4 Configuration Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletCfgTablePduD OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletCfgPduDEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display configuration of PduD outlet."
+        ::= { pduPwrMonitoringOutletPduD 3}
+
+pduPwrMonitoringOutletCfgPduDEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletCfgPduDEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display configuration of PduD outlet."
+        INDEX  { outletCfgPduDIndex}
+        ::= { pduPwrMonitoringOutletCfgTablePduD 1 }
+
+PduPwrMonitoringOutletCfgPduDEntry ::=
+        SEQUENCE {
+                outletCfgPduDIndex
+                        INTEGER,
+                outletCfgPduDName
+                        DisplayString,
+                outletCfgPduDDelayOnStatus
+                        INTEGER,
+                outletCfgPduDDelayOnTime
+                        INTEGER,
+                outletCfgPduDDelayOffStatus
+                        INTEGER,
+                outletCfgPduDDelayOffTime
+                        INTEGER,
+                outletCfgPduDReboot
+                        INTEGER,
+                outletCfgPduDOverCurrCritical
+                        INTEGER,
+                outletCfgPduDOverCurrWarning
+                        INTEGER,
+                outletCfgPduDOverPwrCritical
+                        INTEGER,
+                outletCfgPduDOverPwrWarning
+                        INTEGER
+        }
+
+outletCfgPduDIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet configuration of PduD."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 1 }
+
+outletCfgPduDName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The name for outlet of PduD."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 2 }
+
+outletCfgPduDDelayOnStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                nodelay(1),
+                delay(2)                
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On status of PduD outlet."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 3 }
+
+outletCfgPduDDelayOnTime OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On time of PduD outlet."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 4 }
+
+outletCfgPduDDelayOffStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                nodelay(1),
+                delay(2)                
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay Off status of PduD outlet."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 5 }
+
+outletCfgPduDDelayOffTime OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay Off time of PduD outlet."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 6 }
+
+outletCfgPduDReboot OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "seconds"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay On reboot duration of PduD outlet."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 7 }
+
+outletCfgPduDOverCurrCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of current of PduD outlet."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 8 }
+
+outletCfgPduDOverCurrWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1A"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of current of PduD outlet."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 9 }
+
+outletCfgPduDOverPwrCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "1W"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Critical Threshold of power of PduD outlet."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 10 }
+
+outletCfgPduDOverPwrWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "1W"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Warning Threshold of power of PduD outlet."
+        ::= { pduPwrMonitoringOutletCfgPduDEntry 11 }
+
+-- ===========================================================================
+--
+-- pduPwrMonitoringOutletCtlTablePduD
+--
+--  Outlet of Device4 Control Group.
+--
+-- ===========================================================================
+pduPwrMonitoringOutletCtlTablePduD OBJECT-TYPE
+        SYNTAX SEQUENCE OF PduPwrMonitoringOutletCtlPduDEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display control of PduD outlet."
+        ::= { pduPwrMonitoringOutletPduD 4}
+
+pduPwrMonitoringOutletCtlPduDEntry OBJECT-TYPE
+        SYNTAX PduPwrMonitoringOutletCtlPduDEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list to display control of PduD outlet."
+        INDEX  { outletCtlPduDIndex}
+        ::= { pduPwrMonitoringOutletCtlTablePduD 1 }
+
+PduPwrMonitoringOutletCtlPduDEntry ::=
+        SEQUENCE {
+                outletCtlPduDIndex
+                        INTEGER,
+                outletCtlPduDControl
+                        INTEGER
+        }
+
+outletCtlPduDIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..41)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to outlet control of PduD."
+        ::= { pduPwrMonitoringOutletCtlPduDEntry 1 }
+
+outletCtlPduDControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                immediateOn(1),
+                delayedOn(2),
+                immediateOff(3),
+                delayedOff(4),
+                immediateCycle(5),
+                delayedCycle(6)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The control-type of PduD outlet."
+        ::= { pduPwrMonitoringOutletCtlPduDEntry 2 }
+
+pduEnvMonitoringStatus      OBJECT IDENTIFIER ::= { pduEnvMonitoring 1 }
+-- ===========================================================================
+--
+-- pduEnvMonitoringStatus
+--
+--  Emd Status Group.
+--
+-- ===========================================================================
+pduEnvMonitoringTemp OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "degC"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The temperature of EMD."
+        ::= { pduEnvMonitoringStatus 1 }
+
+pduEnvMonitoringHumi OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The humidity of EMD."
+        ::= { pduEnvMonitoringStatus 2 }
+
+pduEnvMonitoringTempAlarm OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                warning(2),
+                critical(3)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The temperature status of EMD."
+        ::= { pduEnvMonitoringStatus 3 }
+
+pduEnvMonitoringHumiAlarm OBJECT-TYPE
+        SYNTAX  INTEGER {
+                normal(1),
+                warning(2),
+                critical(3)                
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The humidity status of EMD."
+        ::= { pduEnvMonitoringStatus 4 }
+
+pduEnvMonitoringCfg      OBJECT IDENTIFIER ::= { pduEnvMonitoring 2 }
+-- ===========================================================================
+--
+-- pduEnvMonitoringCfg
+--
+--  Emd Configuration Group.
+--
+-- ===========================================================================
+pduEnvMonitoringControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable the EMD."
+        ::= { pduEnvMonitoringCfg 1 }
+
+pduEnvMonitoringTempHighCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "degC"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The High Critical Threshold of temperature of EMD."
+        ::= { pduEnvMonitoringCfg 2 }
+
+pduEnvMonitoringTempHighWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "degC"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The High Warning Threshold of temperature of EMD."
+        ::= { pduEnvMonitoringCfg 3 }
+
+pduEnvMonitoringTempLowCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "degC"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Low Critical Threshold of temperature of EMD."
+        ::= { pduEnvMonitoringCfg 4 }
+
+pduEnvMonitoringTempLowWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "degC"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Low Warning Threshold of temperature of EMD."
+        ::= { pduEnvMonitoringCfg 5 }
+
+pduEnvMonitoringTempHystersis OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "degC"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Hystersis of Temperature of EMD."
+        ::= { pduEnvMonitoringCfg 6 }
+
+pduEnvMonitoringTempOffset OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "degC"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Offset of Temperature of EMD."
+        ::= { pduEnvMonitoringCfg 7 }
+
+pduEnvMonitoringHumiHighCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The High Crtitcal Threshold of humidity of EMD."
+        ::= { pduEnvMonitoringCfg 8 }
+
+pduEnvMonitoringHumiHighWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The High Warning Threshold of humidity of EMD."
+        ::= { pduEnvMonitoringCfg 9 }
+
+pduEnvMonitoringHumiLowCritical OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Low Crtitcal Threshold of humidity of EMD."
+        ::= { pduEnvMonitoringCfg 10 }
+
+pduEnvMonitoringHumiLowWarning OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Low Warning Threshold of humidity of EMD."
+        ::= { pduEnvMonitoringCfg 11 }
+
+pduEnvMonitoringHumiHystersis OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Hystersis of Humidity of EMD."
+        ::= { pduEnvMonitoringCfg 12 }
+
+pduEnvMonitoringHumiOffset OBJECT-TYPE
+        SYNTAX INTEGER
+        UNITS  "0.1%"
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Ofset of Humidity of EMD."
+        ::= { pduEnvMonitoringCfg 13 }
+
+-- ===========================================================================
+-- pduTraps
+--
+-- iPoManIII Trap group
+-- ===========================================================================
+
+   -- This section defines the well-known notifications sent by
+   -- agents.
+
+pduSystemColdBoot TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Cold boot."
+        ::= 1
+
+pduSystemWarmBoot TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Warm boot."
+        ::= 2
+
+pduSystemRestart TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: System restart."
+        ::= 3
+
+pduResetToDefault TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Parameters reset to default."
+        ::= 4
+
+pduFirmUpgrade TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Firmware upgrade."
+        ::= 5
+
+pduSystemLogClear TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: System log cleared."
+        ::= 6
+
+pduEventlogClear TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Event log cleared."
+        ::= 7
+
+pduInletHistoryClear TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet history log cleared."
+        ::= 8
+
+pduOutletHistoryClear TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet history log cleared."
+        ::= 9
+
+pduSystemTimeChangeUser TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Time changed by user."
+        ::= 10
+
+pduSystemTimeChangeNtp TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Time synced with NTP server."
+        ::= 11
+
+pduSystemTimeChangeRtc TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Time changed by RTC."
+        ::= 12
+
+pduMailTestPass TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Test mail pass."
+        ::= 13
+
+pduMailTestFail TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Test mail failed."
+        ::= 14
+
+pduMailSentPass TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Mail sent successfully."
+        ::= 15
+
+pduMailSentFail TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Mail sent failed."
+        ::= 16
+
+pduSystemCfgChange TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Parameter changed."
+        ::= 17
+
+pduSystemParamImport TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Import XML configuration."
+        ::= 18
+
+pduInletCommLost TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet communication lost."
+        ::= 19
+
+pduInletCommRestore TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet communication restore."
+        ::= 20
+		
+pduOutletCommLost TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet communication lost."
+        ::= 21
+
+pduOutletCommRestore TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet communication restore"
+        ::= 22
+
+pduOutletOnUser TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet turned on by user."
+        ::= 23
+
+pduOutletOnSchedule TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet turned on by schedule."
+        ::= 24
+
+pduOutletOffUser TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet turned off by user."
+        ::= 25
+
+pduOutletOffSchedule TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet turned off by schedule."
+        ::= 26
+        
+pduOutletRebootUser TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet reboot by user."
+        ::= 27
+
+pduOutletRebootSchedule TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet reboot by schedule."
+        ::= 28
+
+pduInletEnergyReset TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet energy reset."
+        ::= 29
+
+pduOutletEnergyReset TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet energy reset."
+        ::= 30
+
+pduSetUser TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Assign outlet to user."
+        ::= 31
+
+pduDeletUser TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Delete user."
+        ::= 32
+
+pduUpgradeInletSuccess TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet upgrade successfully."
+        ::= 33
+
+pduUpgradeInletFail TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet upgrade fail."
+        ::= 34
+
+pduUpgradeOutletSuccess TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet upgrade successfully."
+        ::= 35
+
+pduUpgradeOutletFail TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet upgrade fail."
+        ::= 36
+
+pduEmdTempHighWarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Temperature had returned from high warning to normal."
+        ::= 101
+
+pduEmdTempHighWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Temperature was higher than high warning set point."
+        ::= 102
+
+pduEmdTempLowWarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Temperature had returned from low warning to normal."
+        ::= 103
+
+pduEmdTempLowWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Temperature was lower than low warning set point."
+        ::= 104
+
+pduEmdTempHighCritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Temperature had returned from high critical to high warning."
+        ::= 105
+
+pduEmdTempHighCritical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Temperature was higher than high critical set point."
+        ::= 106
+
+pduEmdTempLowCritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Temperature had returned from low critical to low warning."
+        ::= 107
+
+pduEmdTempLowCritical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Temperature was lower than low critical set point."
+        ::= 108
+
+pduEmdHumiHighWarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Humidity had returned from high warning to normal."
+        ::= 109
+
+pduEmdHumiHighWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Humidity was higher than high warning set point."
+        ::= 110
+
+pduEmdHumiLowWarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Humidity had returned from low warning to normal."
+        ::= 111
+
+pduEmdHumiLowWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Humidity was lower than low warning set point."
+        ::= 112
+
+pduEmdHumiHighCritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Humidity had returned from high critical to high warning."
+        ::= 113
+
+pduEmdHumiHighCritical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Humidity was higher than high critical set point."
+        ::= 114
+        
+pduEmdHumiLowCritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Humidity had returned from low critical to low warning."
+        ::= 115
+
+pduEmdHumiLowCritical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Humidity was lower than low critical set point."
+        ::= 116
+
+pduEmdAlarm1NotActive TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Alarm-1 became inactive."
+        ::= 117
+
+pduEmdAlarm1Active TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Alarm-1 became active."
+        ::= 118
+
+pduEmdAlarm2NotActive TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Alarm-2 became inactive."
+        ::= 119
+
+pduEmdAlarm2Active TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Alarm-2 became active."
+        ::= 120
+
+pduRs485Online TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: RS485 Sensor was online."
+        ::= 121
+
+pduRs485Offline TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: RS485 Sensor was offline."
+        ::= 122
+
+pduInletLoadCritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet load had returned from critical to warning."
+        ::= 123
+
+pduInletLoadCritical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Inlet load was higher than critical set point."
+        ::= 124
+
+pduInletLoadWarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet load had returned from warning to normal."
+        ::= 125
+
+pduInletLoadWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Inlet load was higher than warning set point."
+        ::= 126
+
+pduInletCurrPhase1CritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase1 current had returned from critical to warning."
+        ::= 127
+
+pduInletCurrPhase1Critical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Inlet phase1 current was higher than critical set point."
+        ::= 128
+
+pduInletCurrPhase1WarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase1 current had returned from warning to normal."
+        ::= 129
+
+pduInletCurrPhase1Warn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Inlet phase1 current was higher than warning set point."
+        ::= 130
+
+pduInletCurrPhase2CritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase2 current had returned from critical to warning."
+        ::= 131
+
+pduInletCurrPhase2Critical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Inlet phase2 current was higher than critical set point."
+        ::= 132
+
+pduInletCurrPhase2WarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase2 current had returned from warning to normal."
+        ::= 133
+
+pduInletCurrPhase2Warn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Inlet phase2 current was higher than warning set point."
+        ::= 134
+
+
+pduInletCurrPhase3CritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase3 current had returned from critical to warning."
+        ::= 135
+
+pduInletCurrPhase3Critical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Inlet phase3 current was higher than critical set point."
+        ::= 136
+
+pduInletCurrPhase3WarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase3 current had returned from warning to normal."
+        ::= 137
+
+pduInletCurrPhase3Warn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Inlet phase3 current had returned from critical to warning."
+        ::= 138
+
+pduInletVoltPhase1CritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase1 voltage had returned from critical to warning."
+        ::= 139
+
+pduInletVoltPhase1Critical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Inlet phase1 voltage was higher than critical set point."
+        ::= 140
+
+pduInletVoltPhase1WarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase1 voltage had returned from warning to normal."
+        ::= 141
+
+pduInletVoltPhase1Warn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Inlet phase1 voltage was higher than warning set point."
+        ::= 142
+
+pduInletVoltPhase2CritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase2 voltage had returned from critical to warning."
+        ::= 143
+
+pduInletVoltPhase2Critical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Inlet phase2 voltage was higher than critical set point."
+        ::= 144
+
+pduInletVoltPhase2WarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase2 voltage had returned from warning to normal."
+        ::= 145
+
+pduInletVoltPhase2Warn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Inlet phase2 voltage was higher than warning set point."
+        ::= 146
+
+pduInletVoltPhase3CritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase3 voltage had returned from critical to warning."
+        ::= 147
+
+pduInletVoltPhase3Critical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Inlet phase3 voltage was higher than critical set point."
+        ::= 148
+
+pduInletVoltPhase3WarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Inlet phase3 voltage had returned from warning to normal."
+        ::= 149
+
+pduInletVoltPhase3Warn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Inlet phase3 voltage was higher than warning set point."
+        ::= 150
+
+pduOutletCurrCritToWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet current had returned from critical to warning."
+        ::= 151
+
+pduOutletCurrCritical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Outlet current was higher than critical set point."
+        ::= 152
+
+pduOutletCurrWarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet current had returned from warning to normal."
+        ::= 153
+
+pduOutletCurrWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Outlet current was higher than warning set point."
+        ::= 154
+
+pduOutletPwrCritTOWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet power had returned from critical to warning."
+        ::= 155
+
+pduOutletPwrCritical TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Critical: Outlet power was higher than critical set point."
+        ::= 156
+
+pduOutletPwrWarnToNormal TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Outlet power had returned from warning to normal."
+        ::= 157
+
+pduOutletPwrWarn TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Warning: Outlet power was higher than warning set point."
+        ::= 158
+
+pduAlarm1Disabled TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Alarm-1 became disabled."
+        ::= 159
+
+pduAlarm2Disabled TRAP-TYPE
+        ENTERPRISE pduTraps
+        DESCRIPTION
+                "Informational: Alarm-2 became disabled."
+        ::= 160
+
+END        

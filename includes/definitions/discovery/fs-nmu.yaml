@@ -1,0 +1,6 @@
+mib: OAP-NMU
+modules:
+    os:
+        hardware: OAP-NMU::deviceType.0
+        serial: OAP-NMU::serialNumber.0
+        version: OAP-NMU::softwareVersion.0

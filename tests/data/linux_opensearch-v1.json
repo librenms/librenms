@@ -1,0 +1,535 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "opensearch",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "opensearch",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"cluster\":\"vulpes\"}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "c_act_pri_shards",
+                    "value": 262,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "c_act_shards",
+                    "value": 262,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "c_act_shards_perc",
+                    "value": 52.929292929293,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "c_data_nodes",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "c_delayed_shards",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "c_in_fl_fetch",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "c_init_shards",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "c_nodes",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "c_pending_tasks",
+                    "value": 212,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "c_rel_shards",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "c_task_max_in_time",
+                    "value": 76717,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "status",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tf_periodic",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tf_time",
+                    "value": 79694,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tf_total",
+                    "value": 261,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tfd_evictions",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tfd_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tg_exists_time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tg_exists_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tg_missing_time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tg_missing_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tg_time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tg_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ti_del_time",
+                    "value": 100,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ti_del_total",
+                    "value": 285,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ti_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ti_noop_up_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ti_throttled",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ti_throttled_time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ti_time",
+                    "value": 2643104411,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ti_total",
+                    "value": 9212092,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tm_docs",
+                    "value": 434455886,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tm_size",
+                    "value": 136565980034,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tm_throttled_size",
+                    "value": 4850140622,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tm_throttled_time",
+                    "value": 76881,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tm_time",
+                    "value": 498616621,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tm_total",
+                    "value": 180358,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tqc_cache_count",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tqc_cache_size",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tqc_evictions",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tqc_hit",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tqc_miss",
+                    "value": 378,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tqc_size",
+                    "value": 2160,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tqc_total",
+                    "value": 382,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tr_ext_time",
+                    "value": 700610451,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tr_ext_total",
+                    "value": 155976,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tr_time",
+                    "value": 690103910,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tr_total",
+                    "value": 156038,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "trc_evictions",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "trc_hits",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "trc_misses",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "trc_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ts_f_time",
+                    "value": 41073,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ts_f_total",
+                    "value": 876,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ts_q_time",
+                    "value": 11234,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ts_q_total",
+                    "value": 876,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ts_sc_time",
+                    "value": 25901,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ts_sc_total",
+                    "value": 520,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ts_su_time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ts_su_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_count",
+                    "value": 2066,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_docval_size",
+                    "value": 11440192,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_fbs_size",
+                    "value": 15304,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_fields_size",
+                    "value": 1069920,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_indwrt_size",
+                    "value": 8396888,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_norms_size",
+                    "value": 12096,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_points_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_size",
+                    "value": 87278368,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_terms_size",
+                    "value": 74756160,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_tvector_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tseg_vermap_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tst_res_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tst_size",
+                    "value": 18325569074,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ttl_last_mod_age",
+                    "value": 26686572,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ttl_ops",
+                    "value": 259545,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ttl_size",
+                    "value": 162559260,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ttl_uncom_ops",
+                    "value": 259545,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "ttl_uncom_size",
+                    "value": 162559260,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tw_time",
+                    "value": 111862,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                },
+                {
+                    "metric": "tw_total",
+                    "value": 155742,
+                    "value_prev": null,
+                    "app_type": "opensearch"
+                }
+            ]
+        }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64",
+                    "sysContact": "<private>",
+                    "version": "3.10.0-693.5.2.el7.x86_64",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

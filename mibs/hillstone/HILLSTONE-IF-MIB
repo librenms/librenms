@@ -1,0 +1,258 @@
+-- ***********************************************************************
+-- HILLSTONE-IF-MIB   
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V3    
+-- Description:	 Hillstone Networks IF MIB Object Identifier Assignments
+-- ***********************************************************************
+--
+
+HILLSTONE-IF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstoneInterface
+		FROM HILLSTONE-SMI
+	OBJECT-TYPE
+		FROM RFC-1212;	
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+hillstoneIfObjects OBJECT IDENTIFIER ::= { hillstoneInterface 1 }
+
+--
+-- If Ext MIB Objects
+--
+hillstoneWanIfNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The number of wan interfaces."
+    ::= { hillstoneIfObjects 1 } 
+     
+hillstoneLanIfNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The number of lan interfaces."
+    ::= { hillstoneIfObjects 2 } 
+
+hillstoneIfAttriTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HillstoneIfAttriEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"The table for representing the interface attribute."
+::= { hillstoneIfObjects 3 }  
+
+HillstoneIfAttriEntry OBJECT-TYPE
+	SYNTAX HillstoneIfAttriEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION ""
+INDEX { hillstoneIfIndex }
+::= { hillstoneIfAttriTable 1 } 
+
+HillstoneIfAttriEntry ::= 
+    SEQUENCE { 
+	hillstoneIfIndex
+	    INTEGER,
+	hillstoneIfName
+	    DisplayString,
+	hillstoneIfAttribute 
+	    INTEGER,
+	hillstoneIfNetAddress
+		IpAddress,
+	hillstoneIfNetMask
+		IpAddress,
+	hillstoneIfManageIp
+		IpAddress,
+	hillstoneIfSecIpAddress0
+		IpAddress,
+	hillstoneIfSecNetMask0
+		IpAddress,
+	hillstoneIfSecIpAddress1
+		IpAddress,
+	hillstoneIfSecNetMask1
+		IpAddress,
+	hillstoneIfSecIpAddress2
+		IpAddress,
+	hillstoneIfSecNetMask2
+		IpAddress,
+	hillstoneIfSecIpAddress3
+		IpAddress,
+	hillstoneIfSecNetMask3
+		IpAddress,
+	hillstoneIfSecIpAddress4
+		IpAddress,
+	hillstoneIfSecNetMask4
+		IpAddress,
+	hillstoneIfSecIpAddress5
+		IpAddress,
+	hillstoneIfSecNetMask5
+		IpAddress		
+	     }
+hillstoneIfIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"ucIfIndex equals to IfIndex of IF-MIB."
+::= { HillstoneIfAttriEntry 1 }  
+
+hillstoneIfName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"ifDescr equals to IfIndex of IF-MIB."
+::= { HillstoneIfAttriEntry 2 }
+
+hillstoneIfAttribute OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		unknown(0),
+		lan(1),
+		wan(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Attribute of this interface: 0 for Unknown, 1 for LAN, 2 for WAN."
+::= { HillstoneIfAttriEntry 3 }
+
+hillstoneIfNetAddress OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The ip address of the interface."
+::= { HillstoneIfAttriEntry 4 }
+
+hillstoneIfNetMask OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The netmask of the interface, ip address and manage ip address of the the interface are in the same subnet."
+::= { HillstoneIfAttriEntry 5 }
+
+hillstoneIfManageIp OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The manage ip address of the interface."
+::= { HillstoneIfAttriEntry 6 }
+
+hillstoneIfSecIpAddress0 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address0 of the interface."
+::= { HillstoneIfAttriEntry 7 }
+
+hillstoneIfSecNetMask0 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address0 netmask of the interface."
+::= { HillstoneIfAttriEntry 8 }
+
+hillstoneIfSecIpAddress1 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address1 of the interface."
+::= { HillstoneIfAttriEntry 9 }
+
+hillstoneIfSecNetMask1 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address1 netmask of the interface."
+::= { HillstoneIfAttriEntry 10 }
+
+hillstoneIfSecIpAddress2 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address2 of the interface."
+::= { HillstoneIfAttriEntry 11 }
+
+hillstoneIfSecNetMask2 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address2 netmask of the interface."
+::= { HillstoneIfAttriEntry 12 }
+
+hillstoneIfSecIpAddress3 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address3 of the interface."
+::= { HillstoneIfAttriEntry 13 }
+
+hillstoneIfSecNetMask3 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address3 netmask of the interface."
+::= { HillstoneIfAttriEntry 14 }
+
+hillstoneIfSecIpAddress4 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address4 of the interface."
+::= { HillstoneIfAttriEntry 15 }
+
+hillstoneIfSecNetMask4 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address4 netmask of the interface."
+::= { HillstoneIfAttriEntry 16 }
+
+hillstoneIfSecIpAddress5 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address5 of the interface."
+::= { HillstoneIfAttriEntry 17 }
+
+hillstoneIfSecNetMask5 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The second ip address5 netmask of the interface."
+::= { HillstoneIfAttriEntry 18 }
+
+
+
+
+END

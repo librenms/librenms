@@ -1,0 +1,347 @@
+
+AcPerfH323SIPGateway DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+       OBJECT-TYPE, 
+       MODULE-IDENTITY                             FROM SNMPv2-SMI
+       enterprises                                 FROM SNMPv2-SMI;
+
+	audioCodes       OBJECT IDENTIFIER ::= {enterprises 5003}
+	acRegistrations  OBJECT IDENTIFIER ::= {audioCodes 7}
+	acGeneric        OBJECT IDENTIFIER ::= {audioCodes 8}
+	acProducts       OBJECT IDENTIFIER ::= {audioCodes 9}	
+	acPerformance    OBJECT IDENTIFIER ::= {audioCodes 10}	
+
+       
+acPerfH323SIPGateway  MODULE-IDENTITY       
+    LAST-UPDATED "200511031451Z"          --Thursday, November 03, 2005
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: AudioCodes LTD
+             4 Horesh Road
+             Yehud 56470, ISRAEL
+     Tel:    972-3-5394000
+     Email:  support@audiocodes.com"               
+		
+
+    DESCRIPTION       
+    "This MIB defines the enterprise-specific objects needed
+     to support performance management of the AudioCodes product.
+     Performance measurements are grouped into the following MIB trees:
+
+            acPerfIvr  - performance measurements related to the IVR service
+            acPerfBct  - performance measurements related to the BCT service
+            acPerfConf - performance measurements related to the Conferencing service
+            acPerfTt   - performance measurements related to the Test Trunk service"
+
+
+    REVISION "200311200000Z"
+       DESCRIPTION
+         "Version 4.4. November 20, 2003. Made these changes:
+             o  Initial revision"
+
+    ::= {acPerformance 3}
+
+--
+-- Abbreviations used:
+--   Annc       announcement(s)
+--   IVR        Interactive Voice Response
+--   Conf       Conferencing
+--   NE         network element
+--   TT         Test Trunks
+--
+
+-- The following conventions are used in this MIB:
+
+--   The "Product" attribute lists the products in which the
+--   performance measurement is maintained. Current products
+--   are:
+--
+--     Media Servers
+--       IPmedia 2000
+--     Media Gateways
+--       Mediant 2000/5000/8000 (wireline)
+--       Stretto 2000/5000/8000 (wireless)
+--
+
+--   The "Capabilities" attribute lists the capabilities that must be
+--   configured on the system for the performance measurement to be
+--   maintained.  The possible values are IVR, Conferencing, BCT, TT
+--   and Trunking Gateway. Some performance measurements are not
+--   related to any particular capabilities. In those cases, the value
+--   of Capabilities attribute is "All".
+
+--
+-- Notes on IVR Service Performance Measurements
+--
+
+-- In response to a request to play an announcement, the media server
+-- may play multiple audio segments. The media server maintains
+-- performance data for the overall announcement request as well as
+-- for the individual segments.
+
+-- In naming of the performance measurements, "Play" is used to refer
+-- to the overall announcement request. "PlaySegment" is used to refer
+-- to the playing of an individual segment.
+
+--
+-- Notes on Play Collect
+--
+
+-- Play Collect involves playing of an initial prompt, collection of digits, followed
+-- by actions which are dependent on the digits (or lack of digits) that are collected.
+-- These are the prompts that can be specified (all are optional):
+--
+--    ip    initial prompt
+--    nd    no digits reprompt (if not specified, use rp)
+--    rp    reprompt (if not specified, use ip)
+--    fa    failure, played once at end
+--    sa    success, played once at end
+--
+-- The request can specify the number of attempts, before playing the fa prompt. If no
+-- number of attempts value is supplied on the request, then a default is used.
+--
+-- The prompts can be either simple or complex announcements.
+--
+-- Continuous Digit Collect operations, which can be considered a special type of play
+-- collect, are not tracked by any of the acPlayCollect performance measurements,
+-- but are instead tracked in a special group of performance measurements.
+
+--
+-- Notes on Continuous Digit Collect
+--
+
+-- Continuous Digit Collect - Digits are collected during the entire
+-- life of a call. No prompts are played.  Continuous Digit Collect
+-- is typically used in a BCT call.
+--
+-- Continuous Digit Collect operations can be considered a special type of play
+-- collect, but are not tracked by any of the acPlayCollect performance measurements.
+
+
+
+ 
+ 
+
+
+
+
+
+
+     acPerfH323SIPGWCommon         OBJECT IDENTIFIER ::= {acPerfH323SIPGateway 1}
+
+
+     acPerfH323SIPGWCalls          OBJECT IDENTIFIER ::= {acPerfH323SIPGWCommon 1}
+
+
+     acPerfTel2IP                  OBJECT IDENTIFIER ::= {acPerfH323SIPGWCalls 1}
+
+
+     acPerfTel2IPAttemptedCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of Attempted SIP/H323 calls."
+       ::= {acPerfTel2IP 1}
+
+
+
+     acPerfTel2IPEstablishedCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of established (connected and voice activated) SIP/H323 calls."
+       ::= {acPerfTel2IP 2}
+
+
+
+     acPerfTel2IPBusyCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of Destination Busy SIP/H323 calls."
+       ::= {acPerfTel2IP 3}
+
+
+
+     acPerfTel2IPNoAnswerCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of No Answer SIP/H323 calls."
+       ::= {acPerfTel2IP 4}
+
+
+
+     acPerfTel2IPNoRouteCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of No Route SIP/H323 calls. Most likely to be due to wrong number."
+       ::= {acPerfTel2IP 5}
+
+
+
+     acPerfTel2IPNoMatchCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of No capability match between peers on SIP/H323 calls."
+       ::= {acPerfTel2IP 6}
+
+
+
+     acPerfTel2IPFailCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of fax attempted SIP/H323 calls."
+       ::= {acPerfTel2IP 7}
+
+
+
+     acPerfTel2IPFaxAttemptedCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of Attempted SIP/H323 calls."
+       ::= {acPerfTel2IP 8}
+
+
+
+     acPerfTel2IPFaxSuccessCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of Attempted SIP/H323 fax success calls."
+       ::= {acPerfTel2IP 9}
+
+
+
+     acPerfTel2IPTotalDuration OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "total duration of SIP/H323 calls."
+       ::= {acPerfTel2IP 10}
+
+
+
+     acPerfIP2Tel                  OBJECT IDENTIFIER ::= {acPerfH323SIPGWCalls 2}
+
+
+     acPerfIP2TelAttemptedCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of Attempted SIP/H323 calls."
+       ::= {acPerfIP2Tel 1}
+
+
+
+     acPerfIP2TelEstablishedCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of established (connected and voice activated) SIP/H323 calls."
+       ::= {acPerfIP2Tel 2}
+
+
+
+     acPerfIP2TelBusyCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of Destination Busy SIP/H323 calls."
+       ::= {acPerfIP2Tel 3}
+
+
+
+     acPerfIP2TelNoAnswerCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of No Answer SIP/H323 calls."
+       ::= {acPerfIP2Tel 4}
+
+
+
+     acPerfIP2TelNoRouteCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of No Route SIP/H323 calls. Most likely to be due to wrong number."
+       ::= {acPerfIP2Tel 5}
+
+
+
+     acPerfIP2TelNoMatchCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of No capability match between peers on SIP/H323 calls."
+       ::= {acPerfIP2Tel 6}
+
+
+
+     acPerfIP2TelFailCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of fax attempted SIP/H323 calls."
+       ::= {acPerfIP2Tel 7}
+
+
+
+     acPerfIP2TelFaxAttemptedCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of Attempted SIP/H323 calls."
+       ::= {acPerfIP2Tel 8}
+
+
+
+     acPerfIP2TelFaxSuccessCalls OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of Attempted SIP/H323 fax success calls."
+       ::= {acPerfIP2Tel 9}
+
+
+
+     acPerfIP2TelTotalDuration OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "total duration of SIP/H323 calls."
+       ::= {acPerfIP2Tel 10}
+
+
+
+
+
+END

@@ -1,0 +1,359 @@
+-- =====================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: SAVA MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2020-06-30
+--     Initial version
+-- =====================================================================
+HH3C-SAVA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB                         --RFC2863
+    InetVersion,InetAddressType
+        FROM INET-ADDRESS-MIB               --RFC4001
+    Ipv6AddressPrefix
+        FROM IPV6-TC                         --RFC2465
+        ;
+
+
+hh3cSava MODULE-IDENTITY
+    LAST-UPDATED "202006300000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The MIB module for support configuration and monitoring of SAVA Module."
+    REVISION "202006300000Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 191 }
+
+    Hh3cSavaOwnerString ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "255a"
+        STATUS       current
+        DESCRIPTION
+           "This data type is used to indicate the subnet. "
+        SYNTAX       OCTET STRING (SIZE(0..255))
+--
+-- Node definitions
+--
+hh3cSavaObjects OBJECT IDENTIFIER ::= { hh3cSava 1 }
+
+-- System parameters for SAVA protocol
+
+hh3cSavaSystemTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cSavaSystemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The table containing SAVA system-wide parameters."
+    ::= { hh3cSavaObjects 1 }
+
+
+hh3cSavaSystemEntry OBJECT-TYPE
+    SYNTAX     Hh3cSavaSystemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry containing SAVA system-wide parameters for a
+            particular IP version.
+           "
+    INDEX { hh3cSavaSystemIPVersion  }
+    ::=   { hh3cSavaSystemTable 1 }
+
+Hh3cSavaSystemEntry ::=
+    SEQUENCE {
+        hh3cSavaSystemIPVersion              InetVersion,
+        hh3cSavaSystemNotify                 TruthValue,
+        hh3cSavaSystemNotifyInterval         Unsigned32,
+        hh3cSavaSystemNotifyNumber           Unsigned32
+    }
+
+hh3cSavaSystemIPVersion OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The IP version. "
+    ::= { hh3cSavaSystemEntry 1 }
+
+
+hh3cSavaSystemNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "An log switch for spoofing Notify.
+            true, the attribute is set.
+            false, the attribute is not set.
+          "
+    ::= { hh3cSavaSystemEntry 2 }
+
+hh3cSavaSystemNotifyInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0|5..3600)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "Interval for log.0, 5 to 3600s.
+          "
+    ::= { hh3cSavaSystemEntry 3 }
+
+
+hh3cSavaSystemNotifyNumber OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..128)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "Number of spoofing notify: 1~128.
+          "
+    ::= { hh3cSavaSystemEntry 4 }
+
+-- interface parameters for SAVA
+
+hh3cSavaIfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cSavaIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The table containing SAVA parameters of each interface."
+    ::= { hh3cSavaObjects 2 }
+
+hh3cSavaIfEntry OBJECT-TYPE
+    SYNTAX     Hh3cSavaIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry containing SAVA running parameters of an interface."
+    INDEX {
+            hh3cSavaIfIPVersion,
+            hh3cSavaIfIndex
+          }
+    ::= { hh3cSavaIfTable 1 }
+
+
+Hh3cSavaIfEntry ::=
+    SEQUENCE {
+        hh3cSavaIfIPVersion          InetVersion,
+        hh3cSavaIfIndex              InterfaceIndex,
+        hh3cSavaIfEnable             TruthValue,
+        hh3cSavaIfRemoteRoutetag     Unsigned32,
+        hh3cSavaIfAccessSubnet       Hh3cSavaOwnerString
+    }
+
+hh3cSavaIfIPVersion      OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The IP version. "
+    ::= { hh3cSavaIfEntry 1 }
+
+hh3cSavaIfIndex  OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The index value that uniquely identifies the interface to
+            which this entry is applicable.  The interface identified by
+            a particular value of this index is the same interface as
+            identified by the same value of the IF-MIB's ifIndex.
+           "
+    ::= { hh3cSavaIfEntry 2 }
+
+hh3cSavaIfEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "An attribute defined in SAVA protocol.
+            true, the attribute is set.
+            false, the attribute is not set.
+           "
+    ::= { hh3cSavaIfEntry 3 }
+
+hh3cSavaIfRemoteRoutetag OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The number of route tag."
+    ::= { hh3cSavaIfEntry 4 }
+
+
+hh3cSavaIfAccessSubnet OBJECT-TYPE
+    SYNTAX     Hh3cSavaOwnerString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "An access-net which the interface connect to.
+          "
+    ::= { hh3cSavaIfEntry 5 }
+
+
+
+-- prefix Table for SAVA
+
+hh3cSavaPrefixTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cSavaPrefixEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The table containing the prefix for SAVA.
+           "
+    ::= { hh3cSavaObjects 3 }
+
+hh3cSavaPrefixEntry OBJECT-TYPE
+    SYNTAX     Hh3cSavaPrefixEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry containing the prefix for SAVA.
+            Entries are keyed on the source IP address type,
+            binding type, anchor, and source IP address.
+           "
+    INDEX {
+            hh3cSavaPrefixAddressType,
+            hh3cSavaPrefixIfIndex,
+            hh3cSavaPrefixAddress,
+            hh3cSavaPrefixLength
+          }
+    ::= { hh3cSavaPrefixTable 1 }
+
+Hh3cSavaPrefixEntry ::=
+    SEQUENCE {
+        hh3cSavaPrefixAddressType  InetAddressType,
+        hh3cSavaPrefixIfIndex      InterfaceIndex,
+        hh3cSavaPrefixAddress      Ipv6AddressPrefix,
+        hh3cSavaPrefixLength       Unsigned32,
+        hh3cSavaPrefixSource       INTEGER
+     }
+
+hh3cSavaPrefixAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "IP address type of the  prefix ."
+    ::= { hh3cSavaPrefixEntry 1 }
+
+hh3cSavaPrefixIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The index value that uniquely identifies the interface to
+            which this entry is applicable.  The interface identified by
+            a particular value of this index is the same interface as
+            identified by the same value of the IF-MIB's ifIndex.
+           "
+    ::= { hh3cSavaPrefixEntry 2 }
+
+hh3cSavaPrefixAddress OBJECT-TYPE
+    SYNTAX     Ipv6AddressPrefix
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The prefix's IP address"
+    ::= { hh3cSavaPrefixEntry 3 }
+
+
+hh3cSavaPrefixLength OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "mask length of prefix."
+    ::= { hh3cSavaPrefixEntry 4 }
+
+hh3cSavaPrefixSource OBJECT-TYPE
+    SYNTAX     INTEGER  {
+                   localroute(1),
+                   remoteroute(2),
+                   otherif(3)
+              }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The origin of the prefix. "
+    ::= { hh3cSavaPrefixEntry 5 }
+
+
+
+-- Count of packets dropped because of validation failure for each interface.
+
+hh3cSavaCountTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cSavaCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The table containing count of packets dropped because of validation failure."
+    ::= { hh3cSavaObjects 4 }
+
+hh3cSavaCountEntry OBJECT-TYPE
+    SYNTAX     Hh3cSavaCountEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "An entry containing count of packets dropped because of validation failure for each interface."
+    INDEX { hh3cSavaCountIPVersion,
+            hh3cSavaCountIfIndex
+          }
+    ::= { hh3cSavaCountTable 1 }
+
+Hh3cSavaCountEntry ::=
+    SEQUENCE {
+        hh3cSavaCountIPVersion          InetVersion,
+        hh3cSavaCountIfIndex            InterfaceIndex,
+        hh3cSavaCountFilterPkt          Counter64,
+        hh3cSavaCountFilterOctets       Counter64
+    }
+
+hh3cSavaCountIPVersion      OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The IP version."
+    ::= { hh3cSavaCountEntry 1 }
+
+hh3cSavaCountIfIndex            OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The Interface."
+    ::= { hh3cSavaCountEntry 2 }
+
+
+hh3cSavaCountFilterPkt OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The count of packets dropped."
+    ::= { hh3cSavaCountEntry 3 }
+
+
+hh3cSavaCountFilterOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The octets of packets dropped."
+    ::= { hh3cSavaCountEntry 4 }
+END

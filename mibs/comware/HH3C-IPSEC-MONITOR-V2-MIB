@@ -1,0 +1,2361 @@
+-- ====================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: The MIB is designed to get IPsec tunnels' statistic information.
+-- Reference:
+-- Version: 1.2
+-- History:
+--   V1.0: The initial version created by Wanghaisheng and Weiyanheng.
+--   V1.1: 2017-10-31 Added hh3cIPsecTunnelStatByDescripV2Table,hh3cIPsecConnectionStopV2,
+--         hh3cIPsecConnectionStartV2,hh3cIPsecConnectionStopCntlV2 and
+--         hh3cIPsecConnectionStartCntlV2 by shihaohao
+--   V1.2: 2021-04-23 Added by Yangbaotao. This revision is about the node
+--         Hh3cIPsecEncryptAlgoV2 and Hh3cIPsecAuthAlgoV2.
+--         Deprecated hh3cIPsecTunIKETunLocalIDVal1V2,
+--         hh3cIPsecTunIKETunRemoteIDVal1V2,added hh3cIPsecTunIKETunLocalIDVal3V2
+--         hh3cIPsecTunIKETunRemoteIDVal3V2 by Zhaoming.
+-- =====================================================================
+HH3C-IPSEC-MONITOR-V2-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        ifIndex
+            FROM RFC1213-MIB
+        InterfaceIndex
+            FROM IF-MIB
+        DisplayString, TEXTUAL-CONVENTION, TruthValue
+            FROM SNMPv2-TC
+        Integer32, Counter32, Counter64, OBJECT-TYPE,
+        MODULE-IDENTITY, Gauge32, NOTIFICATION-TYPE, Unsigned32
+            FROM SNMPv2-SMI
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        hh3cCommon
+            FROM HH3C-OID-MIB;
+
+    hh3cIPsecMonitorV2 MODULE-IDENTITY
+        LAST-UPDATED "202104231730Z"
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085"
+        DESCRIPTION
+            "The MIB is designed to get statistic information of IPsec tunnels.
+             With this MIB, we can get information of a certain tunnel or all
+             tunnels."
+         REVISION "202104231730Z"
+         DESCRIPTION
+            "This revision is about the node Hh3cIPsecEncryptAlgoV2
+             and Hh3cIPsecAuthAlgoV2.Deprecate hh3cIPsecTunIKETunLocalIDVal1V2,
+             hh3cIPsecTunIKETunRemoteIDVal1V2, add hh3cIPsecTunIKETunLocalIDVal3V2
+             and hh3cIPsecTunIKETunRemoteIDVal3V2."
+         REVISION "201710311650Z"
+         DESCRIPTION
+            "Add the objects of hh3cIPsecTunnelStatByDescripV2Table,hh3cIPsecConnectionStopV2,
+            hh3cIPsecConnectionStartV2,hh3cIPsecConnectionStopCntlV2 and
+            hh3cIPsecConnectionStartCntlV2."
+        REVISION
+            "201206270000Z"
+        DESCRIPTION
+            "Initial version."
+        ::= { hh3cCommon 126 }
+
+    Hh3cIPsecDiffHellmanGrpV2   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The Diffie Hellman Group used in the IKE and IPsec negotiations.
+             invalidGroup(2147483647) is defined as invalid value."
+        SYNTAX INTEGER {
+            none(0),
+            dhGroup1(1),
+            dhGroup2(2),
+            dhGroup5(5),
+            dhGroup14(14),
+            dhGroup24(24),
+            invalidGroup(2147483647)
+        }
+
+    Hh3cIPsecEncapModeV2        ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The encapsulation mode used by an IPsec Phase-2 Tunnel.
+             invalidMode(2147483647) is defined as invalid value."
+        SYNTAX INTEGER {
+            tunnel(1),
+            transport(2),
+            invalidMode(2147483647)
+        }
+
+    Hh3cIPsecEncryptAlgoV2   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The encryption algorithm used in the IKE and IPsec negotiations.
+             invalidAlg(2147483647) is defined as invalid value."
+        SYNTAX INTEGER {
+            none(0),
+            desCbc(1),
+            ideaCbc(2),
+            blowfishCbc(3),
+            rc5R16B64Cbc(4),
+            tripleDesCbc(5),
+            castCbc(6),
+            aesCbc(7),
+            nsaCbc(8),
+            aesCbc128(9),
+            aesCbc192(10),
+            aesCbc256(11),
+            aesCtr(12),
+            aesCamelliaCbc(13),
+            rc4(14),
+            sm1Cbc128(128),
+            sm1Cbc192(129),
+            sm1Cbc256(130),
+            sm4Cbc(131),
+            invalidAlg(2147483647)
+        }
+
+    Hh3cIPsecAuthAlgoV2   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The authentication algorithm used in the IKE negotiations.
+             invalidAlg(2147483647) is defined as invalid value."
+        SYNTAX INTEGER {
+            none(0),
+            md5(1),
+            sha1(2),
+            sha256(3),
+            sha384(4),
+            sha512(5),
+            sm3(128),
+            invalidAlg(2147483647)
+        }
+
+    Hh3cIPsecSaProtocolV2   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The protocol of security association."
+        SYNTAX INTEGER {
+            reserved(0),
+            ah(2),
+            esp(3),
+            ipcomp(4)
+        }
+
+    Hh3cIPsecIDTypeV2   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The type of IPsec Identity."
+        SYNTAX INTEGER {
+            reserved(0),
+            ipv4Addr(1),
+            fqdn(2),         -- fully-qualified domain name
+            userFqdn(3),     -- fully-qualified username
+            ipv4AddrSubnet(4),
+            ipv6Addr(5),
+            ipv6AddrSubnet(6),
+            ipv4AddrRange(7),
+            ipv6AddrRange(8),
+            derAsn1Dn(9),    -- the binary DER encoding of an ASN.1 X.500 Distinguished
+                             -- Name [X.501] of the princIPal whose certificates are
+                             -- being exchanged to establish the SA.
+            derAsn1Gn(10),   -- the binary DER encoding of an ASN.1 X.500 GeneralName
+                             -- [X.509] of the princIPal whose certificates are being
+                             -- exchanged to establish the SA.
+            keyId(11)        -- specifies an opaque byte stream which may be used to
+                             -- pass vendor-specific information necessary to identify
+                             -- which pre-shared key should be used to authenticate
+                             -- Aggressive mode negotiations.
+        }
+
+    Hh3cIPsecTrafficTypeV2   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The type of the data flow."
+        SYNTAX INTEGER {
+            ipv4Addr(1),
+            ipv4AddrSubnet(4),
+            ipv6Addr(5),
+            ipv6AddrSubnet(6),
+            ipv4AddrRange(7),
+            ipv6AddrRange(8)
+        }
+
+    Hh3cIPsecNegoTypeV2   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The type of key used by an IPsec Phase-2 Tunnel.
+            invalidType(2147483647) is defined as invalid value."
+        SYNTAX INTEGER {
+            ike(1),
+            manual(2),
+            invalidType(2147483647)
+        }
+
+    Hh3cIPsecTunnelStateV2   ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "The state of IPsec tunnel."
+        SYNTAX INTEGER {
+            active(1),
+            timeout(2)
+        }
+
+-- ========================================================================
+-- Node definitions
+-- ========================================================================
+-- Begin the node of hh3cIPsecObjectsV2.
+
+    hh3cIPsecObjectsV2 OBJECT IDENTIFIER ::= { hh3cIPsecMonitorV2 1 }
+
+-- =======================================
+-- Begin the hh3cIPsecScalarObjectsV2.
+-- =======================================
+    hh3cIPsecScalarObjectsV2 OBJECT IDENTIFIER ::= { hh3cIPsecObjectsV2 1 }
+
+    hh3cIPsecMIBVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Version string of this MIB."
+        ::= { hh3cIPsecScalarObjectsV2 1 }
+
+-- ===============================================
+-- Begin the table of hh3cIPsecTunnelV2Table.
+-- ===============================================
+
+    hh3cIPsecTunnelV2Table OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cIPsecTunnelV2Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IPsec Phase-2 Tunnel Table.  There is one entry in this
+             table for each active IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecObjectsV2 2 }
+
+    hh3cIPsecTunnelV2Entry OBJECT-TYPE
+        SYNTAX Hh3cIPsecTunnelV2Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Information about hh3cIPsecTunnelV2Table."
+        INDEX { hh3cIPsecTunIndexV2 }
+        ::= { hh3cIPsecTunnelV2Table 1 }
+
+    Hh3cIPsecTunnelV2Entry ::=
+        SEQUENCE {
+            hh3cIPsecTunIndexV2
+                Integer32,
+            hh3cIPsecTunIfIndexV2
+                InterfaceIndex,
+            hh3cIPsecTunIKETunnelIndexV2
+                Integer32,
+            hh3cIPsecTunIKETunLocalIDTypeV2
+                Hh3cIPsecIDTypeV2,
+            hh3cIPsecTunIKETunLocalIDVal1V2
+                DisplayString,
+            hh3cIPsecTunIKETunLocalIDVal2V2
+                DisplayString,
+            hh3cIPsecTunIKETunRemoteIDTypeV2
+                Hh3cIPsecIDTypeV2,
+            hh3cIPsecTunIKETunRemoteIDVal1V2
+                DisplayString,
+            hh3cIPsecTunIKETunRemoteIDVal2V2
+                DisplayString,
+            hh3cIPsecTunLocalAddrTypeV2
+                InetAddressType,
+            hh3cIPsecTunLocalAddrV2
+                InetAddress,
+            hh3cIPsecTunRemoteAddrTypeV2
+                InetAddressType,
+            hh3cIPsecTunRemoteAddrV2
+                InetAddress,
+            hh3cIPsecTunKeyTypeV2
+                Hh3cIPsecNegoTypeV2,
+            hh3cIPsecTunEncapModeV2
+                Hh3cIPsecEncapModeV2,
+            hh3cIPsecTunInitiatorV2
+                INTEGER,
+            hh3cIPsecTunLifeSizeV2
+                Gauge32,
+            hh3cIPsecTunLifeTimeV2
+                Integer32,
+            hh3cIPsecTunRemainTimeV2
+                Integer32,
+            hh3cIPsecTunActiveTimeV2
+                Integer32,
+            hh3cIPsecTunRemainSizeV2
+                Gauge32,
+            hh3cIPsecTunTotalRefreshesV2
+                Counter32,
+            hh3cIPsecTunCurrentSaInstancesV2
+                Gauge32,
+            hh3cIPsecTunInSaEncryptAlgoV2
+                Hh3cIPsecEncryptAlgoV2,
+            hh3cIPsecTunInSaAhAuthAlgoV2
+                Hh3cIPsecAuthAlgoV2,
+            hh3cIPsecTunInSaEspAuthAlgoV2
+                Hh3cIPsecAuthAlgoV2,
+            hh3cIPsecTunDiffHellmanGrpV2
+                Hh3cIPsecDiffHellmanGrpV2,
+            hh3cIPsecTunOutSaEncryptAlgoV2
+                Hh3cIPsecEncryptAlgoV2,
+            hh3cIPsecTunOutSaAhAuthAlgoV2
+                Hh3cIPsecAuthAlgoV2,
+            hh3cIPsecTunOutSaEspAuthAlgoV2
+                Hh3cIPsecAuthAlgoV2,
+            hh3cIPsecTunPolicyNameV2
+                OCTET STRING,
+            hh3cIPsecTunPolicyNumV2
+                Integer32,
+            hh3cIPsecTunStatusV2
+                INTEGER,
+            hh3cIPsecTunPolicyDescriptionV2
+                OCTET STRING,
+            hh3cIPsecTunIKETunLocalIDVal3V2
+                OCTET STRING,
+            hh3cIPsecTunIKETunRemoteIDVal3V2
+                OCTET STRING
+        }
+
+    hh3cIPsecTunIndexV2 OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The index of IPsec Phase-2 Tunnel Table.  The value of
+             the index is a number which begins at one and is
+             incremented with each tunnel that is created.  The
+             value of this object will wrap at 2147483647."
+        ::= { hh3cIPsecTunnelV2Entry 1 }
+
+    hh3cIPsecTunIfIndexV2 OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The interface index( the ifIndex of ifTable )."
+        ::= { hh3cIPsecTunnelV2Entry 2 }
+
+    hh3cIPsecTunIKETunnelIndexV2 OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of the associated IPsec Phase-1 IKE Tunnel
+             (IKETunIndex in the IKETunnelTable).  2147483647 is defined as
+             invalid value."
+        ::= { hh3cIPsecTunnelV2Entry 3 }
+
+    hh3cIPsecTunIKETunLocalIDTypeV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecIDTypeV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the local peer identity for the associated IPsec
+             Phase-1 IKE Tunnel (IKETunLocalType in the IKETunnelTable)."
+        ::= { hh3cIPsecTunnelV2Entry 4 }
+
+    hh3cIPsecTunIKETunLocalIDVal1V2 OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS deprecated
+        DESCRIPTION
+            "The value of the local peer identity for the associated IPsec
+             Phase-1 IKE Tunnel (IKETunLocalValue1 in the IKETunnelTable).
+
+             If the local peer type is ipv4Addr/ipv6Addr, this is the IP address
+             used to identify the local peer.
+
+             If the local peer type is ipv4AddrSubnet/ipv6AddrSubnet, this is
+             the subnet address.
+
+             If the local peer type is ipv4AddrRange/ipv6AddrRange, this is
+             the beginning IP address of the range.
+
+             If the local peer type is fqdn/userFqdn, this is the host name
+             used to identify the local peer.
+
+             If the local peer type is derAsn1Dn, this is the binary DER
+             encoding of an ASN.1 X.500 Distinguished Name [X.501] of the
+             principal whose certificates are being exchanged to establish
+             the SA.
+
+             If the local peer type is derAsn1Gn, this is the binary DER
+             encoding of an ASN.1 X.500 GeneralName [X.509] of the principal
+             whose certificates are being exchanged to establish the SA.
+
+             If the local peer type is keyId, this is an opaque byte
+             stream which may be used to pass vendor-specific information
+             necessary to identify which pre-shared key should be used to
+             authenticate Aggressive mode negotiations.
+
+             The local peer identity may not exceed 255 characters in length.
+             The complete value will be displayed by hh3cIPsecTunIKETunLocalIDVal3V2"
+        ::= { hh3cIPsecTunnelV2Entry 5 }
+
+    hh3cIPsecTunIKETunLocalIDVal2V2 OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The second specification of the local peer's IP address for the
+             associated IPsec Phase-1 IKE Tunnel (IKETunLocalValue2 in the
+             IKETunnelTable).
+
+             If the local peer type is ipv4AddrSubnet/ipv6AddrSubnet, this
+             is the subnet mask.
+
+             If the local peer type is ipv4AddrRange/ipv6AddrRange, this is
+             the ending IP address of the range.
+
+             If the local peer type is others, this is a zero-length string."
+        ::= { hh3cIPsecTunnelV2Entry 6 }
+
+    hh3cIPsecTunIKETunRemoteIDTypeV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecIDTypeV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the remote peer identity for the associated IPsec
+             Phase-1 IKE Tunnel (IKETunRemoteType in the IKETunnelTable)."
+        ::= { hh3cIPsecTunnelV2Entry 7 }
+
+    hh3cIPsecTunIKETunRemoteIDVal1V2 OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS deprecated
+        DESCRIPTION
+            "The value of the remote peer identity for the associated IPsec
+             Phase-1 IKE Tunnel (IKETunRemoteValue1 in the IKETunnelTable).
+
+             If the remote peer type is ipv4Addr/ipv6Addr, this is the IP address
+             used to identify the remote peer.
+
+             If the remote peer type is ipv4AddrSubnet/ipv6AddrSubnet, this is
+             the subnet address.
+
+             If the remote peer type is ipv4AddrRange/ipv6AddrRange, this is
+             the beginning IP address of the range.
+
+             If the remote peer type is fqdn/userFqdn, this is the host name
+             used to identify the remote peer.
+
+             If the remote peer type is derAsn1Dn, this is the binary DER
+             encoding of an ASN.1 X.500 Distinguished Name [X.501] of the
+             principal whose certificates are being exchanged to establish
+             the SA.
+
+             If the remote peer type is derAsn1Gn, this is the binary DER
+             encoding of an ASN.1 X.500 GeneralName [X.509] of the principal
+             whose certificates are being exchanged to establish the SA.
+
+             If the remote peer type is keyId, this is an opaque byte
+             stream which may be used to pass vendor-specific information
+             necessary to identify which pre-shared key should be used to
+             authenticate Aggressive mode negotiations.
+
+             The remote peer identity may not exceed 255 characters in length.
+             The complete value will be displayed by hh3cIPsecTunIKETunRemoteIDVal3V2"
+        ::= { hh3cIPsecTunnelV2Entry 8 }
+
+    hh3cIPsecTunIKETunRemoteIDVal2V2 OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The second specification of the remote peer's IP address for the
+             associated IPsec Phase-1 IKE Tunnel(IKETunRemoteValue2 in the
+             IKETunnelTable).
+
+             If the remote peer type is ipv4AddrSubnet/ipv6AddrSubnet, this
+             is the subnet mask.
+
+             If the remote peer type is ipv4AddrRange/ipv6AddrRange, this is
+             the ending IP address of the range.
+
+             If the remote peer type is others, this is a zero-length string."
+        ::= { hh3cIPsecTunnelV2Entry 9 }
+
+    hh3cIPsecTunLocalAddrTypeV2 OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the IP address for the local peer of the IPsec Phase-2
+            Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 10 }
+
+    hh3cIPsecTunLocalAddrV2 OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The IP address of the local peer for the IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 11 }
+
+    hh3cIPsecTunRemoteAddrTypeV2 OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the IP address for the remote peer of the IPsec Phase-2
+             Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 12 }
+
+    hh3cIPsecTunRemoteAddrV2 OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The IP address of the remote peer for the IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 13 }
+
+    hh3cIPsecTunKeyTypeV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecNegoTypeV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The key negotiate mode used by the IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 14 }
+
+    hh3cIPsecTunEncapModeV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecEncapModeV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The encapsulation mode used by the IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 15 }
+
+    hh3cIPsecTunInitiatorV2 OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                local(1),
+                remote(2),
+                none(2147483647)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The initiator of this IPsec tunnel.  Value none is used for manual
+             IPsec tunnel, for there is no initiator or responder in this method."
+        ::= { hh3cIPsecTunnelV2Entry 16 }
+
+    hh3cIPsecTunLifeSizeV2 OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The negotiated LifeSize of the IPsec Phase-2 Tunnel in kilobytes.
+             0 is defined as invalid value."
+        ::= { hh3cIPsecTunnelV2Entry 17 }
+
+    hh3cIPsecTunLifeTimeV2 OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The negotiated LifeTime of the IPsec Phase-2 Tunnel in seconds.
+             2147483647 is defined as invalid value."
+        ::= { hh3cIPsecTunnelV2Entry 18 }
+
+    hh3cIPsecTunRemainTimeV2 OBJECT-TYPE
+        SYNTAX Integer32 (0..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The remain time of SA in seconds.  2147483647 is defined as invalid
+            value."
+        ::= { hh3cIPsecTunnelV2Entry 19 }
+
+    hh3cIPsecTunActiveTimeV2 OBJECT-TYPE
+        SYNTAX Integer32 (0..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The duration the IPsec Phase-2 Tunnel has been active in
+             hundredths of seconds.  2147483647 is defined as invalid value."
+        ::= { hh3cIPsecTunnelV2Entry 20 }
+
+    hh3cIPsecTunRemainSizeV2 OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The remain LifeSize of SA in kilobytes.  0 is defined as
+            invalid value."
+        ::= { hh3cIPsecTunnelV2Entry 21 }
+
+    hh3cIPsecTunTotalRefreshesV2 OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of security association refreshing performed."
+        ::= { hh3cIPsecTunnelV2Entry 22 }
+
+    hh3cIPsecTunCurrentSaInstancesV2 OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of security associations which are currently active
+             or expiring."
+        ::= { hh3cIPsecTunnelV2Entry 23 }
+
+    hh3cIPsecTunInSaEncryptAlgoV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecEncryptAlgoV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The encryption algorithm used by the inbound security association
+             of the IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 24 }
+
+    hh3cIPsecTunInSaAhAuthAlgoV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecAuthAlgoV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The authentication algorithm used by the inbound authentication
+             header (AH) security association of the IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 25 }
+
+    hh3cIPsecTunInSaEspAuthAlgoV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecAuthAlgoV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The authentication algorithm used by the inbound encapsulation
+             security protocol(ESP) security association of the IPsec
+             Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 26 }
+
+    hh3cIPsecTunDiffHellmanGrpV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecDiffHellmanGrpV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Diffie Hellman Group used by the security association of the
+             IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 27 }
+
+    hh3cIPsecTunOutSaEncryptAlgoV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecEncryptAlgoV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The encryption algorithm used by the outbound security
+             association of the IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 28 }
+
+    hh3cIPsecTunOutSaAhAuthAlgoV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecAuthAlgoV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The authentication algorithm used by the outbound
+             authentication header (AH) security association of
+             the IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 29 }
+
+    hh3cIPsecTunOutSaEspAuthAlgoV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecAuthAlgoV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The authentication algorithm used by the outbound encapsulation
+             security protocol(ESP) security association of the IPsec
+             Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 30 }
+
+    hh3cIPsecTunPolicyNameV2 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..63))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The policy name used by this IPsec tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 31 }
+
+    hh3cIPsecTunPolicyNumV2 OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sequence number of policy used by this IPsec tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 32 }
+
+    hh3cIPsecTunStatusV2 OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                initial(1),
+                ready(2),
+                rekeyed(3),
+                closed(4)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of the IPsec Tunnel."
+        ::= { hh3cIPsecTunnelV2Entry 33 }
+
+    hh3cIPsecTunPolicyDescriptionV2 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IPsec policy description of an IPsec tunne."
+        ::= { hh3cIPsecTunnelV2Entry 34 }
+
+    hh3cIPsecTunIKETunLocalIDVal3V2 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..2047))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of the local peer identity for the associated IPsec
+             Phase-1 IKE Tunnel (IKETunLocalValue1 in the IKETunnelTable).
+
+             If the local peer type is ipv4Addr/ipv6Addr, this is the IP address
+             used to identify the local peer.
+
+             If the local peer type is ipv4AddrSubnet/ipv6AddrSubnet, this is
+             the subnet address.
+
+             If the local peer type is ipv4AddrRange/ipv6AddrRange, this is
+             the beginning IP address of the range.
+
+             If the local peer type is fqdn/userFqdn, this is the host name
+             used to identify the local peer.
+
+             If the local peer type is derAsn1Dn, this is the binary DER
+             encoding of an ASN.1 X.500 Distinguished Name [X.501] of the
+             principal whose certificates are being exchanged to establish
+             the SA.
+
+             If the local peer type is derAsn1Gn, this is the binary DER
+             encoding of an ASN.1 X.500 GeneralName [X.509] of the principal
+             whose certificates are being exchanged to establish the SA.
+
+             If the local peer type is keyId, this is an opaque byte
+             stream which may be used to pass vendor-specific information
+             necessary to identify which pre-shared key should be used to
+             authenticate Aggressive mode negotiations."
+        ::= { hh3cIPsecTunnelV2Entry 35 }
+
+    hh3cIPsecTunIKETunRemoteIDVal3V2 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..2047))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of the remote peer identity for the associated IPsec
+             Phase-1 IKE Tunnel (IKETunRemoteValue1 in the IKETunnelTable).
+
+             If the remote peer type is ipv4Addr/ipv6Addr, this is the IP address
+             used to identify the remote peer.
+
+             If the remote peer type is ipv4AddrSubnet/ipv6AddrSubnet, this is
+             the subnet address.
+
+             If the remote peer type is ipv4AddrRange/ipv6AddrRange, this is
+             the beginning IP address of the range.
+
+             If the remote peer type is fqdn/userFqdn, this is the host name
+             used to identify the remote peer.
+
+             If the remote peer type is derAsn1Dn, this is the binary DER
+             encoding of an ASN.1 X.500 Distinguished Name [X.501] of the
+             principal whose certificates are being exchanged to establish
+             the SA.
+
+             If the remote peer type is derAsn1Gn, this is the binary DER
+             encoding of an ASN.1 X.500 GeneralName [X.509] of the principal
+             whose certificates are being exchanged to establish the SA.
+
+             If the remote peer type is keyId, this is an opaque byte
+             stream which may be used to pass vendor-specific information
+             necessary to identify which pre-shared key should be used to
+             authenticate Aggressive mode negotiations."
+        ::= { hh3cIPsecTunnelV2Entry 36 }
+
+
+-- ===============================================
+-- Begin the table of hh3cIPsecTunnelStatV2Table.
+-- ===============================================
+
+    hh3cIPsecTunnelStatV2Table OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cIPsecTunnelStatV2Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IPsec Phase-2 Tunnel Statistics Table."
+        ::= { hh3cIPsecObjectsV2 3 }
+
+    hh3cIPsecTunnelStatV2Entry OBJECT-TYPE
+        SYNTAX Hh3cIPsecTunnelStatV2Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Information about hh3cIPsecTunnelStatV2Table."
+        INDEX { hh3cIPsecTunIndexV2 }
+        ::= { hh3cIPsecTunnelStatV2Table 1 }
+
+    Hh3cIPsecTunnelStatV2Entry ::=
+        SEQUENCE {
+            hh3cIPsecTunInOctetsV2
+                Counter64,
+            hh3cIPsecTunInDecompOctetsV2
+                Counter64,
+            hh3cIPsecTunInPktsV2
+                Counter64,
+            hh3cIPsecTunInDropPktsV2
+                Counter64,
+            hh3cIPsecTunInReplayDropPktsV2
+                Counter64,
+            hh3cIPsecTunInAuthFailsV2
+                Counter64,
+            hh3cIPsecTunInDecryptFailsV2
+                Counter64,
+            hh3cIPsecTunOutOctetsV2
+                Counter64,
+            hh3cIPsecTunOutUncompOctetsV2
+                Counter64,
+            hh3cIPsecTunOutPktsV2
+                Counter64,
+            hh3cIPsecTunOutDropPktsV2
+                Counter64,
+            hh3cIPsecTunOutEncryptFailsV2
+                Counter64,
+            hh3cIPsecTunNoMemoryDropPktsV2
+                Counter64,
+            hh3cIPsecTunQueueFullDropPktsV2
+                Counter64,
+            hh3cIPsecTunInvalidLenDropPktsV2
+                Counter64,
+            hh3cIPsecTunTooLongDropPktsV2
+                Counter64,
+            hh3cIPsecTunInvalidSaDropPktsV2
+                Counter64
+        }
+
+    hh3cIPsecTunInOctetsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of octets received by this IPsec Phase-2 Tunnel.
+             This value is accumulated BEFORE determining whether or not the
+             packet should be decompressed."
+        ::= { hh3cIPsecTunnelStatV2Entry 1 }
+
+    hh3cIPsecTunInDecompOctetsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of decompressed octets received by this IPsec
+             Phase-2 Tunnel.  This value is accumulated AFTER the packet
+             is decompressed."
+        ::= { hh3cIPsecTunnelStatV2Entry 2 }
+
+    hh3cIPsecTunInPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets received by this IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 3 }
+
+    hh3cIPsecTunInDropPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped during receiving process
+             by this IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 4 }
+
+    hh3cIPsecTunInReplayDropPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped during
+             receiving process due to Anti-Replay process
+             by this IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 5 }
+
+    hh3cIPsecTunInAuthFailsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of inbound authentication's
+             which ended in failure by this IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 6 }
+
+    hh3cIPsecTunInDecryptFailsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of inbound decryption's
+             which ended in failure by this IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 7 }
+
+    hh3cIPsecTunOutOctetsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of octets sent by this IPsec Phase-2 Tunnel.
+             This value is accumulated AFTER determining whether or not
+             the packet should be compressed."
+        ::= { hh3cIPsecTunnelStatV2Entry 8 }
+
+    hh3cIPsecTunOutUncompOctetsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of uncompressed octets sent by this IPsec Phase-2
+             Tunnel.  This value is accumulated BEFORE the packet is compressed."
+        ::= { hh3cIPsecTunnelStatV2Entry 9 }
+
+    hh3cIPsecTunOutPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets sent by this IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 10 }
+
+    hh3cIPsecTunOutDropPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped during sending process
+             by this IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 11 }
+
+    hh3cIPsecTunOutEncryptFailsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of outbound encryption's which ended in failure
+             by this IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 12 }
+
+    hh3cIPsecTunNoMemoryDropPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to no enough memory by this
+             IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 13 }
+
+    hh3cIPsecTunQueueFullDropPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to queue full by this
+             IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 14 }
+
+    hh3cIPsecTunInvalidLenDropPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to invalid length packet
+             by this IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 15 }
+
+    hh3cIPsecTunTooLongDropPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to too long packet by this
+             IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 16 }
+
+    hh3cIPsecTunInvalidSaDropPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to invalid SA by this
+             IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecTunnelStatV2Entry 17 }
+
+-- ===============================================
+-- Begin the table of hh3cIPsecSaV2Table.
+-- ===============================================
+
+    hh3cIPsecSaV2Table OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cIPsecSaV2Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IPsec Phase-2 Security Protection Index Table.  This table
+             contains an entry for each active and expiring security association."
+        ::= { hh3cIPsecObjectsV2 4 }
+
+    hh3cIPsecSaV2Entry OBJECT-TYPE
+        SYNTAX Hh3cIPsecSaV2Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Information about hh3cIPsecSaV2Table."
+        INDEX { hh3cIPsecTunIndexV2,hh3cIPsecSaIndexV2 }
+        ::= { hh3cIPsecSaV2Table 1 }
+
+    Hh3cIPsecSaV2Entry ::=
+        SEQUENCE {
+            hh3cIPsecSaIndexV2
+                Integer32,
+            hh3cIPsecSaDirectionV2
+                INTEGER,
+            hh3cIPsecSaSpiValueV2
+                Unsigned32,
+            hh3cIPsecSaSecProtocolV2
+                Hh3cIPsecSaProtocolV2,
+            hh3cIPsecSaEncryptAlgoV2
+                Hh3cIPsecEncryptAlgoV2,
+            hh3cIPsecSaAuthAlgoV2
+                Hh3cIPsecAuthAlgoV2,
+            hh3cIPsecSaStatusV2
+                INTEGER
+        }
+
+    hh3cIPsecSaIndexV2 OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The number of the Sa associated with the Phase-2 Tunnel
+             Table.  The value of this index is a number which begins
+             at one and is incremented with each Sa associated with
+             an IPsec Phase-2 Tunnel.  The value of this object will
+             wrap at 2,147,483,647."
+        ::= { hh3cIPsecSaV2Entry 1 }
+
+    hh3cIPsecSaDirectionV2 OBJECT-TYPE
+        SYNTAX INTEGER {
+            in(1),
+            out(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The direction of the SA."
+        ::= { hh3cIPsecSaV2Entry 2 }
+
+    hh3cIPsecSaSpiValueV2 OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of the SPI."
+        ::= { hh3cIPsecSaV2Entry 3 }
+
+    hh3cIPsecSaSecProtocolV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecSaProtocolV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The security protocol of the SA."
+        ::= { hh3cIPsecSaV2Entry 4 }
+
+    hh3cIPsecSaEncryptAlgoV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecEncryptAlgoV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The encryption algorithm used by the security association
+             of the IPsec Phase-2 Tunnel."
+        ::= { hh3cIPsecSaV2Entry 5 }
+
+    hh3cIPsecSaAuthAlgoV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecAuthAlgoV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The authentication algorithm used by the SA."
+        ::= { hh3cIPsecSaV2Entry 6 }
+
+    hh3cIPsecSaStatusV2 OBJECT-TYPE
+        SYNTAX INTEGER {
+            active(1),
+            expiring(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of the SA."
+        ::= { hh3cIPsecSaV2Entry 7 }
+
+-- ===============================================
+-- Begin the table of hh3cIPsecTrafficV2Table.
+-- ===============================================
+
+    hh3cIPsecTrafficV2Table OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cIPsecTrafficV2Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IPsec Phase-2 Tunnel Traffic Table."
+        ::= { hh3cIPsecObjectsV2 5 }
+
+    hh3cIPsecTrafficV2Entry OBJECT-TYPE
+        SYNTAX Hh3cIPsecTrafficV2Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Information about hh3cIPsecTrafficV2Table."
+        INDEX { hh3cIPsecTunIndexV2 }
+        ::= { hh3cIPsecTrafficV2Table 1 }
+
+    Hh3cIPsecTrafficV2Entry ::=
+        SEQUENCE {
+            hh3cIPsecTrafficLocalTypeV2
+                Hh3cIPsecTrafficTypeV2,
+            hh3cIPsecTrafficLocalAddr1TypeV2
+                InetAddressType,
+            hh3cIPsecTrafficLocalAddr1V2
+                InetAddress,
+            hh3cIPsecTrafficLocalAddr2TypeV2
+                InetAddressType,
+            hh3cIPsecTrafficLocalAddr2V2
+                InetAddress,
+            hh3cIPsecTrafficLocalProtocol1V2
+                Integer32,
+            hh3cIPsecTrafficLocalProtocol2V2
+                Integer32,
+            hh3cIPsecTrafficLocalPort1V2
+                Integer32,
+            hh3cIPsecTrafficLocalPort2V2
+                Integer32,
+            hh3cIPsecTrafficRemoteTypeV2
+                Hh3cIPsecTrafficTypeV2,
+            hh3cIPsecTrafficRemAddr1TypeV2
+                InetAddressType,
+            hh3cIPsecTrafficRemAddr1V2
+                InetAddress,
+            hh3cIPsecTrafficRemAddr2TypeV2
+                InetAddressType,
+            hh3cIPsecTrafficRemAddr2V2
+                InetAddress,
+            hh3cIPsecTrafficRemoPro1V2
+                Integer32,
+            hh3cIPsecTrafficRemoPro2V2
+                Integer32,
+            hh3cIPsecTrafficRemPort1V2
+                Integer32,
+            hh3cIPsecTrafficRemPort2V2
+                Integer32
+    }
+
+    hh3cIPsecTrafficLocalTypeV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecTrafficTypeV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the local peer's traffic.  Possible values are:
+            1) A single IP address
+            2) An IP address range
+            3) An IP subnet"
+        ::= { hh3cIPsecTrafficV2Entry 1 }
+
+    hh3cIPsecTrafficLocalAddr1TypeV2 OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the first IP address specification for the local peer's
+             traffic."
+        ::= { hh3cIPsecTrafficV2Entry 2 }
+
+    hh3cIPsecTrafficLocalAddr1V2 OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The first IP address specification of the local peer's traffic.
+
+            If the local peer's traffic type is single IP address, this is the
+            IP address.
+
+            If the local peer's traffic type is IP subnet, this is the subnet address.
+
+            If the local peer's traffic type is IP address range, this is the
+            beginning IP address of the range."
+        ::= { hh3cIPsecTrafficV2Entry 3 }
+
+    hh3cIPsecTrafficLocalAddr2TypeV2 OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the second IP address specification for the local peer's
+             traffic."
+        ::= { hh3cIPsecTrafficV2Entry 4 }
+
+    hh3cIPsecTrafficLocalAddr2V2 OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The second IP address specification of the local peer's traffic.
+
+            If the local peer's traffic type is single IP address, this is the
+            IP address.
+
+            If the local peer's traffic type is IP subnet, this is the subnet mask.
+
+            If the local peer's traffic type is IP address range, this is the
+            ending IP address of the range."
+        ::= { hh3cIPsecTrafficV2Entry 5 }
+
+    hh3cIPsecTrafficLocalProtocol1V2 OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The first protocol number specification of the local peer's traffic.
+
+            If the protocol type of the local peer's traffic is single protocol,
+            this is the protocol number.
+
+            If the protocol type of the local peer's traffic is protocol range,
+            this is the beginning protocol number of the range."
+        ::= { hh3cIPsecTrafficV2Entry 6 }
+
+    hh3cIPsecTrafficLocalProtocol2V2 OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The second protocol number specification of the local peer's traffic.
+
+            If the protocol type of the local peer's traffic is single protocol,
+            this is the protocol number.
+
+            If the protocol type of the local peer's traffic is protocol range,
+            this is the ending protocol number of the range."
+        ::= { hh3cIPsecTrafficV2Entry 7 }
+
+    hh3cIPsecTrafficLocalPort1V2 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The first port number specification of the local peer's traffic.
+
+            If the port type of the local peer's traffic is single port, this is
+            the port number.
+
+            If the port type of the local peer's traffic is port range, this is
+            the beginning port number of the range."
+        ::= { hh3cIPsecTrafficV2Entry 8 }
+
+    hh3cIPsecTrafficLocalPort2V2 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The second port number specification of the local peer's traffic.
+
+            If the port type of the local peer's traffic is single port, this is
+            the port number.
+
+            If the port type of the local peer's traffic is port range, this is
+            the ending port number of the range."
+        ::= { hh3cIPsecTrafficV2Entry 9 }
+
+    hh3cIPsecTrafficRemoteTypeV2 OBJECT-TYPE
+        SYNTAX Hh3cIPsecTrafficTypeV2
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the remote peer's traffic.  Possible values are:
+            1) A single IP address
+            2) An IP address range
+            3) An IP subnet"
+        ::= { hh3cIPsecTrafficV2Entry 10 }
+
+    hh3cIPsecTrafficRemAddr1TypeV2 OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the first IP address specification for the remote peer's
+             traffic."
+        ::= { hh3cIPsecTrafficV2Entry 11 }
+
+    hh3cIPsecTrafficRemAddr1V2 OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The first IP address specification of the remote peer's traffic.
+
+            If the remote traffic type is single IP address, this is the IP address.
+
+            If the remote traffic type is IP subnet, this is the subnet address.
+
+            If the remote traffic type is IP address range, this is the beginning
+            IP address of the range."
+        ::= { hh3cIPsecTrafficV2Entry 12 }
+
+    hh3cIPsecTrafficRemAddr2TypeV2 OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of the second IP address specification for the remote peer's
+             traffic."
+        ::= { hh3cIPsecTrafficV2Entry 13 }
+
+    hh3cIPsecTrafficRemAddr2V2 OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The second IP address specification of the remote peer's traffic.
+
+            If the remote traffic type is single IP address, this is the IP address.
+
+            If the remote traffic type is IP subnet, this is the subnet mask.
+
+            If the remote traffic type is IP address range, this is the ending IP
+            address of the range."
+        ::= { hh3cIPsecTrafficV2Entry 14 }
+
+    hh3cIPsecTrafficRemoPro1V2 OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The first protocol number specification of the remote peer's traffic.
+
+            If the protocol type of the remote peer's traffic is single protocol,
+            this is the protocol number.
+
+            If the protocol type of the remote peer's traffic is protocol range,
+            this is the beginning protocol number of the range."
+        ::= { hh3cIPsecTrafficV2Entry 15 }
+
+    hh3cIPsecTrafficRemoPro2V2 OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The second protocol number specification of the remote peer's traffic.
+
+            If the protocol type of the remote peer's traffic is single protocol,
+            this is the protocol number.
+
+            If the protocol type of the remote peer's traffic is protocol range,
+            this is the ending protocol number of the range."
+        ::= { hh3cIPsecTrafficV2Entry 16 }
+
+    hh3cIPsecTrafficRemPort1V2 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The first port number specification of the remote peer's traffic.
+
+            If the port type of the remote peer's traffic is single port,
+            this is the port number.
+
+            If the port type of the remote peer's traffic is port range,
+            this is the beginning port number of the range."
+        ::= { hh3cIPsecTrafficV2Entry 17 }
+
+    hh3cIPsecTrafficRemPort2V2 OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The second port number specification of the remote peer's traffic.
+
+            If the port type of the remote peer's traffic is single port,
+            this is the port number.
+
+            If the port type of the remote peer's traffic is port range,
+            this is the ending port number of the range."
+        ::= { hh3cIPsecTrafficV2Entry 18 }
+
+-- ===============================================
+-- Begin the hh3cIPsecGlobalStatsV2.
+-- ===============================================
+
+    hh3cIPsecGlobalStatsV2 OBJECT IDENTIFIER ::= { hh3cIPsecObjectsV2 6 }
+
+    hh3cIPsecGlobalActiveTunnelsV2 OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of currently active IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 1 }
+
+    hh3cIPsecGlobalActiveSasV2 OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of currently active or expiring IPsec Phase-2 SA."
+        ::= { hh3cIPsecGlobalStatsV2 2 }
+
+    hh3cIPsecGlobalInOctetsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of octets received by all current and previous
+             IPsec Phase-2 Tunnels.  This value is accumulated BEFORE determining
+             whether or not the packet should be decompressed."
+        ::= { hh3cIPsecGlobalStatsV2 3 }
+
+    hh3cIPsecGlobalInDecompOctetsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of decompressed octets received by all current
+             and previous IPsec Phase-2 Tunnels.  This value is accumulated
+             AFTER the packet is decompressed."
+        ::= { hh3cIPsecGlobalStatsV2 4 }
+
+    hh3cIPsecGlobalInPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets received by all current and
+             previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 5 }
+
+    hh3cIPsecGlobalInDropsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped during receiving
+             process by all current and previous IPsec Phase-2
+             Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 6 }
+
+    hh3cIPsecGlobalInReplayDropsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped during receiving
+             process due to Anti-Replay process by all
+             current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 7 }
+
+    hh3cIPsecGlobalInAuthFailsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of inbound authentication's which ended
+             in failure by all current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 8 }
+
+    hh3cIPsecGlobalInDecryptFailsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of inbound decryption's which ended in
+             failure by all current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 9 }
+
+    hh3cIPsecGlobalOutOctetsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of octets sent by all current and previous
+             IPsec Phase-2 Tunnels.  This value is accumulated AFTER
+             determining whether or not the packet should be compressed."
+        ::= { hh3cIPsecGlobalStatsV2 10 }
+
+    hh3cIPsecGlobalOutUncompOctetsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of uncompressed octets sent by all current
+             and previous IPsec Phase-2 Tunnels.  This value is accumulated
+             BEFORE the packet is compressed."
+        ::= { hh3cIPsecGlobalStatsV2 11 }
+
+    hh3cIPsecGlobalOutPktsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets sent by all current and previous
+             IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 12 }
+
+    hh3cIPsecGlobalOutDropsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped during sending process
+             by all current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 13 }
+
+    hh3cIPsecGlobalOutEncryptFailsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of outbound encryption's which ended in failure
+             by all current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 14 }
+
+    hh3cIPsecGlobalNoMemoryDropsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to no enough memory
+             by all current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 15 }
+
+    hh3cIPsecGlobalNoFindSaDropsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to not find SA by
+             all current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 16 }
+
+    hh3cIPsecGlobalQueueFullDropsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to queue full by
+             all current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 17 }
+
+    hh3cIPsecGlobalInvalidLenDropsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to invalid packet
+             length by all current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 18 }
+
+    hh3cIPsecGlobalTooLongDropsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to too long packet by
+             all current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 19 }
+
+    hh3cIPsecGlobalInvalidSaDropsV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped due to invalid SA by all
+             current and previous IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecGlobalStatsV2 20 }
+
+-- ===============================================
+-- Begin the hh3cIPsecTrapObjectV2.
+-- ===============================================
+
+    hh3cIPsecTrapObjectV2 OBJECT IDENTIFIER ::= { hh3cIPsecObjectsV2 7 }
+
+    hh3cIPsecPolicyNameV2 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..63))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The IPsec policy name with a trap."
+        ::= { hh3cIPsecTrapObjectV2 1 }
+
+    hh3cIPsecPolicySeqNumV2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The IPsec policy sequence number with a trap."
+        ::= { hh3cIPsecTrapObjectV2 2 }
+
+    hh3cIPsecPolicySizeV2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The number of IPsec policies with a trap."
+        ::= { hh3cIPsecTrapObjectV2 3 }
+
+-- ===============================================
+-- Begin the hh3cIPsecTrapCntlV2.
+-- ===============================================
+
+
+    hh3cIPsecTrapCntlV2 OBJECT IDENTIFIER ::= { hh3cIPsecObjectsV2 8 }
+
+    hh3cIPsecTrapGlobalCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether all IPsec traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 1 }
+
+    hh3cIPsecTunnelStartTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecTunnelStartV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 2 }
+
+    hh3cIPsecTunnelStopTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecTunnelStopV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 3 }
+
+    hh3cIPsecNoSaTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecNoSaFailureV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 4 }
+
+    hh3cIPsecAuthFailureTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecAuthFailFailureV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 5 }
+
+    hh3cIPsecEncryFailureTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecEncryFailFailureV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 6 }
+
+    hh3cIPsecDecryFailureTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecDecryFailFailureV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 7 }
+
+    hh3cIPsecInvalidSaTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecInvalidSaFailureV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 8 }
+
+    hh3cIPsecPolicyAddTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecPolicyAddV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 9 }
+
+    hh3cIPsecPolicyDelTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecPolicyDelV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 10 }
+
+    hh3cIPsecPolicyAttachTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecPolicyAttachV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 11 }
+
+    hh3cIPsecPolicyDetachTrapCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecPolicyDetachV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 12 }
+
+    hh3cIPsecConnectionStartCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecConnectionStartV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 13 }
+
+    hh3cIPsecConnectionStopCntlV2 OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates whether hh3cIPsecConnectionStopV2 traps should be generated."
+        ::= { hh3cIPsecTrapCntlV2 14 }
+
+-- ===============================================
+-- definition of traps.
+-- ===============================================
+
+    hh3cIPsecTrapV2 OBJECT IDENTIFIER ::= { hh3cIPsecObjectsV2 9 }
+
+    hh3cIPsecNotificationsV2 OBJECT IDENTIFIER ::= { hh3cIPsecTrapV2 0 }
+
+    hh3cIPsecTunnelStartV2 NOTIFICATION-TYPE
+        OBJECTS {
+                    hh3cIPsecTunIndexV2,
+                    hh3cIPsecTunLocalAddrTypeV2,
+                    hh3cIPsecTunLocalAddrV2,
+                    hh3cIPsecTunRemoteAddrTypeV2,
+                    hh3cIPsecTunRemoteAddrV2,
+                    hh3cIPsecTunLifeTimeV2,
+                    hh3cIPsecTunLifeSizeV2
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when an IPsec Phase-2
+             Tunnel is created."
+        ::= { hh3cIPsecNotificationsV2 1 }
+
+    hh3cIPsecTunnelStopV2 NOTIFICATION-TYPE
+        OBJECTS {
+                    hh3cIPsecTunIndexV2,
+                    hh3cIPsecTunLocalAddrTypeV2,
+                    hh3cIPsecTunLocalAddrV2,
+                    hh3cIPsecTunRemoteAddrTypeV2,
+                    hh3cIPsecTunRemoteAddrV2,
+                    hh3cIPsecTunActiveTimeV2
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when an IPsec Phase-2
+             Tunnel is deleted."
+        ::= { hh3cIPsecNotificationsV2 2 }
+
+    hh3cIPsecNoSaFailureV2 NOTIFICATION-TYPE
+        OBJECTS {
+                    hh3cIPsecTunIndexV2,
+                    hh3cIPsecTunLocalAddrTypeV2,
+                    hh3cIPsecTunLocalAddrV2,
+                    hh3cIPsecTunRemoteAddrTypeV2,
+                    hh3cIPsecTunRemoteAddrV2
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when an IPsec Phase-2
+             non-existent SA error occurs."
+        ::= { hh3cIPsecNotificationsV2 3 }
+
+    hh3cIPsecAuthFailFailureV2 NOTIFICATION-TYPE
+        OBJECTS {
+                    hh3cIPsecTunIndexV2,
+                    hh3cIPsecTunLocalAddrTypeV2,
+                    hh3cIPsecTunLocalAddrV2,
+                    hh3cIPsecTunRemoteAddrTypeV2,
+                    hh3cIPsecTunRemoteAddrV2
+                  }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when the IPsec phase-2
+             authentication failure occurs."
+        ::= { hh3cIPsecNotificationsV2 4 }
+
+    hh3cIPsecEncryFailFailureV2 NOTIFICATION-TYPE
+        OBJECTS {
+                    hh3cIPsecTunIndexV2,
+                    hh3cIPsecTunLocalAddrTypeV2,
+                    hh3cIPsecTunLocalAddrV2,
+                    hh3cIPsecTunRemoteAddrTypeV2,
+                    hh3cIPsecTunRemoteAddrV2
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when the IPsec phase-2
+             tunnel has an encrypting failure."
+        ::= { hh3cIPsecNotificationsV2 5 }
+
+    hh3cIPsecDecryFailFailureV2 NOTIFICATION-TYPE
+        OBJECTS {
+                    hh3cIPsecTunIndexV2,
+                    hh3cIPsecTunLocalAddrTypeV2,
+                    hh3cIPsecTunLocalAddrV2,
+                    hh3cIPsecTunRemoteAddrTypeV2,
+                    hh3cIPsecTunRemoteAddrV2
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when the IPsec phase-2
+             tunnel has a decrypting failure."
+        ::= { hh3cIPsecNotificationsV2 6 }
+
+    hh3cIPsecInvalidSaFailureV2 NOTIFICATION-TYPE
+        OBJECTS {
+                    hh3cIPsecTunIndexV2,
+                    hh3cIPsecSaIndexV2,
+                    hh3cIPsecTunLocalAddrTypeV2,
+                    hh3cIPsecTunLocalAddrV2,
+                    hh3cIPsecTunRemoteAddrTypeV2,
+                    hh3cIPsecTunRemoteAddrV2,
+                    hh3cIPsecSaSpiValueV2
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when the IPsec phase-2
+             invalid SA failure occurs."
+        ::= { hh3cIPsecNotificationsV2 7 }
+
+    hh3cIPsecPolicyAddV2 NOTIFICATION-TYPE
+        OBJECTS { hh3cIPsecPolicyNameV2,
+                  hh3cIPsecPolicySeqNumV2,
+                  hh3cIPsecPolicySizeV2
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when an IPsec policy is added."
+        ::= { hh3cIPsecNotificationsV2 8 }
+
+    hh3cIPsecPolicyDelV2 NOTIFICATION-TYPE
+        OBJECTS { hh3cIPsecPolicyNameV2,
+                  hh3cIPsecPolicySeqNumV2,
+                  hh3cIPsecPolicySizeV2
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when an IPsec policy is deleted."
+        ::= { hh3cIPsecNotificationsV2 9 }
+
+    hh3cIPsecPolicyAttachV2 NOTIFICATION-TYPE
+        OBJECTS { hh3cIPsecPolicyNameV2,
+                  hh3cIPsecPolicySizeV2,
+                  ifIndex
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when an IPsec policy is attached
+             with one interface."
+        ::= { hh3cIPsecNotificationsV2 10 }
+
+    hh3cIPsecPolicyDetachV2 NOTIFICATION-TYPE
+        OBJECTS { hh3cIPsecPolicyNameV2,
+                  hh3cIPsecPolicySizeV2,
+                  ifIndex
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when an IPsec policy is detached
+             with one interface."
+        ::= { hh3cIPsecNotificationsV2 11 }
+
+    hh3cIPsecConnectionStartV2 NOTIFICATION-TYPE
+        OBJECTS {
+                    hh3cIPsecPolicyDescripV2
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when an IPsec connection
+             is created."
+        ::= { hh3cIPsecNotificationsV2 12 }
+
+    hh3cIPsecConnectionStopV2 NOTIFICATION-TYPE
+        OBJECTS {
+                    hh3cIPsecPolicyDescripV2
+                }
+        STATUS     current
+        DESCRIPTION
+            "This notification is generated when an IPsec connection
+             is terminated."
+        ::= { hh3cIPsecNotificationsV2 13 }
+
+-- ===============================================
+-- Begin the table of hh3cIPsecTunnelStatByDescripV2Table.
+-- ===============================================
+
+    hh3cIPsecTunnelStatByDescripV2Table OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cIPsecTunnelStatByDescripV2Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains IPsec phase-2 tunnel statistics by description."
+        ::= { hh3cIPsecObjectsV2 10 }
+
+    hh3cIPsecTunnelStatByDescripV2Entry OBJECT-TYPE
+        SYNTAX Hh3cIPsecTunnelStatByDescripV2Entry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry of IPsec phase-2 tunnels statistics by description table."
+        INDEX { hh3cIPsecPolicyDescripV2 }
+        ::= { hh3cIPsecTunnelStatByDescripV2Table 1 }
+
+    Hh3cIPsecTunnelStatByDescripV2Entry ::=
+        SEQUENCE {
+            hh3cIPsecPolicyDescripV2
+                OCTET STRING,
+            hh3cIPsecTunInOctetsByDescripV2
+                Counter64,
+            hh3cIPsecTunInDecompOctetsByDescripV2
+                Counter64,
+            hh3cIPsecTunInPktsByDescripV2
+                Counter64,
+            hh3cIPsecTunInDropPktsByDescripV2
+                Counter64,
+            hh3cIPsecTunInReplayDropPktsByDescripV2
+                Counter64,
+            hh3cIPsecTunInAuthFailsByDescripV2
+                Counter64,
+            hh3cIPsecTunInDecryptFailsByDescripV2
+                Counter64,
+            hh3cIPsecTunOutOctetsByDescripV2
+                Counter64,
+            hh3cIPsecTunOutUncompOctetsByDescripV2
+                Counter64,
+            hh3cIPsecTunOutPktsByDescripV2
+                Counter64,
+            hh3cIPsecTunOutDropPktsByDescripV2
+                Counter64,
+            hh3cIPsecTunOutEncryptFailsByDescripV2
+                Counter64,
+            hh3cIPsecTunNoMemoryDropPktsByDescripV2
+                Counter64,
+            hh3cIPsecTunQueueFullDropPktsByDescripV2
+                Counter64,
+            hh3cIPsecTunInvalidLenDropPktsByDescripV2
+                Counter64,
+            hh3cIPsecTunTooLongDropPktsByDescripV2
+                Counter64,
+            hh3cIPsecTunInvalidSaDropPktsByDescripV2
+                Counter64
+        }
+
+    hh3cIPsecPolicyDescripV2 OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..80))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The IPsec policy's description."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 1 }
+
+    hh3cIPsecTunInOctetsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of octets received by IPsec phase-2 tunnels.
+             This value is accumulated BEFORE determining whether or not the
+             packet should be decompressed."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 2 }
+
+    hh3cIPsecTunInDecompOctetsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of decompressed octets received by IPsec
+             phase-2 tunnels.  This value is accumulated AFTER the packet
+             is decompressed."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 3 }
+
+    hh3cIPsecTunInPktsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets received by IPsec phase-2 tunnels."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 4 }
+
+    hh3cIPsecTunInDropPktsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped by IPsec phase-2 tunnels during receiving process."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 5 }
+
+    hh3cIPsecTunInReplayDropPktsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of receive  packets dropped by IPsec phase-2 tunnels
+            due to Anti-Replay processing."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 6 }
+
+    hh3cIPsecTunInAuthFailsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of inbound authentication
+             failures on IPsec phase-2 tunnels."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 7 }
+
+    hh3cIPsecTunInDecryptFailsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of inbound decryption
+             failures on IPsec phase-2 tunnels."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 8 }
+
+    hh3cIPsecTunOutOctetsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of octets sent by IPsec phase-2 tunnels.
+             This value is accumulated AFTER determining whether or not
+             the packet should be compressed."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 9 }
+
+    hh3cIPsecTunOutUncompOctetsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of uncompressed octets sent by IPsec phase-2
+             tunnels.  This value is accumulated BEFORE the packet is compressed."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 10 }
+
+    hh3cIPsecTunOutPktsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets sent by IPsec phase-2 tunnels."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 11 }
+
+    hh3cIPsecTunOutDropPktsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped by IPsec phase-2 tunnels during sending process."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 12 }
+
+    hh3cIPsecTunOutEncryptFailsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of outbound encryption failures
+             on IPsec Phase-2 Tunnels."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 13 }
+
+    hh3cIPsecTunNoMemoryDropPktsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped by IPsec phase-2 tunnels due to no enough memory."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 14 }
+
+    hh3cIPsecTunQueueFullDropPktsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped by
+             IPsec phase-2 tunnels due to queue full."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 15 }
+
+    hh3cIPsecTunInvalidLenDropPktsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped by IPsec phase-2 tunnels due to invalid length packet."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 16 }
+
+    hh3cIPsecTunTooLongDropPktsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped by IPsec phase-2 tunnels due to packet."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 17 }
+
+    hh3cIPsecTunInvalidSaDropPktsByDescripV2 OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of packets dropped by IPsec phase-2 tunnels due to invalid SA."
+        ::= { hh3cIPsecTunnelStatByDescripV2Entry 18 }
+
+-- ===============================================
+-- Conformance Information
+-- ===============================================
+    hh3cIPsecConformanceV2   OBJECT IDENTIFIER
+        ::= { hh3cIPsecMonitorV2 2 }
+    hh3cIPsecCompliancesV2   OBJECT IDENTIFIER
+        ::= { hh3cIPsecConformanceV2 1 }
+    hh3cIPsecGroupsV2        OBJECT IDENTIFIER
+        ::= { hh3cIPsecConformanceV2 2 }
+
+-- ===============================================
+-- Compliance Statements
+-- ===============================================
+    hh3cIPsecComplianceV2 MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            " "
+        MODULE -- this module
+        MANDATORY-GROUPS
+            {
+                hh3cIPsecScalarObjectsGroupV2,
+                hh3cIPsecTunnelTableGroupV2,
+                hh3cIPsecTunnelStatGroupV2,
+                hh3cIPsecSaGroupV2,
+                hh3cIPsecTrafficTableGroupV2,
+                hh3cIPsecGlobalStatsGroupV2,
+                hh3cIPsecTrapObjectGroupV2,
+                hh3cIPsecTrapCntlGroupV2,
+                hh3cIPsecTrapGroupV2
+            }
+        ::= { hh3cIPsecCompliancesV2 1 }
+
+    hh3cIPsecScalarObjectsGroupV2 OBJECT-GROUP
+        OBJECTS {
+                    hh3cIPsecMIBVersion
+                }
+        STATUS current
+        DESCRIPTION
+            "The group contains all of scalar objects of the MIB."
+        ::= { hh3cIPsecGroupsV2 1 }
+
+    hh3cIPsecTunnelTableGroupV2 OBJECT-GROUP
+        OBJECTS {
+                    hh3cIPsecTunIfIndexV2,
+                    hh3cIPsecTunIKETunnelIndexV2,
+                    hh3cIPsecTunIKETunLocalIDTypeV2,
+                    hh3cIPsecTunIKETunLocalIDVal1V2,
+                    hh3cIPsecTunIKETunLocalIDVal2V2,
+                    hh3cIPsecTunIKETunRemoteIDTypeV2,
+                    hh3cIPsecTunIKETunRemoteIDVal1V2,
+                    hh3cIPsecTunIKETunRemoteIDVal2V2,
+                    hh3cIPsecTunLocalAddrTypeV2,
+                    hh3cIPsecTunLocalAddrV2,
+                    hh3cIPsecTunRemoteAddrTypeV2,
+                    hh3cIPsecTunRemoteAddrV2,
+                    hh3cIPsecTunKeyTypeV2,
+                    hh3cIPsecTunEncapModeV2,
+                    hh3cIPsecTunInitiatorV2,
+                    hh3cIPsecTunLifeSizeV2,
+                    hh3cIPsecTunLifeTimeV2,
+                    hh3cIPsecTunRemainTimeV2,
+                    hh3cIPsecTunActiveTimeV2,
+                    hh3cIPsecTunRemainSizeV2,
+                    hh3cIPsecTunTotalRefreshesV2,
+                    hh3cIPsecTunCurrentSaInstancesV2,
+                    hh3cIPsecTunInSaEncryptAlgoV2,
+                    hh3cIPsecTunInSaAhAuthAlgoV2,
+                    hh3cIPsecTunInSaEspAuthAlgoV2,
+                    hh3cIPsecTunDiffHellmanGrpV2,
+                    hh3cIPsecTunOutSaEncryptAlgoV2,
+                    hh3cIPsecTunOutSaAhAuthAlgoV2,
+                    hh3cIPsecTunOutSaEspAuthAlgoV2,
+                    hh3cIPsecTunPolicyNameV2,
+                    hh3cIPsecTunPolicyNumV2,
+                    hh3cIPsecTunStatusV2,
+                    hh3cIPsecTunPolicyDescriptionV2,
+                    hh3cIPsecTunIKETunLocalIDVal3V2,
+                    hh3cIPsecTunIKETunRemoteIDVal3V2
+                }
+        STATUS current
+        DESCRIPTION
+            "The group contains the IPsec tunnel's property information."
+        ::= { hh3cIPsecGroupsV2 2 }
+
+    hh3cIPsecTunnelStatGroupV2 OBJECT-GROUP
+        OBJECTS {
+                    hh3cIPsecTunInOctetsV2,
+                    hh3cIPsecTunInDecompOctetsV2,
+                    hh3cIPsecTunInPktsV2,
+                    hh3cIPsecTunInDropPktsV2,
+                    hh3cIPsecTunInReplayDropPktsV2,
+                    hh3cIPsecTunInAuthFailsV2,
+                    hh3cIPsecTunInDecryptFailsV2,
+                    hh3cIPsecTunOutOctetsV2,
+                    hh3cIPsecTunOutUncompOctetsV2,
+                    hh3cIPsecTunOutPktsV2,
+                    hh3cIPsecTunOutDropPktsV2,
+                    hh3cIPsecTunOutEncryptFailsV2,
+                    hh3cIPsecTunNoMemoryDropPktsV2,
+                    hh3cIPsecTunQueueFullDropPktsV2,
+                    hh3cIPsecTunInvalidLenDropPktsV2,
+                    hh3cIPsecTunTooLongDropPktsV2,
+                    hh3cIPsecTunInvalidSaDropPktsV2
+                }
+        STATUS current
+        DESCRIPTION
+            "The group contains the IPsec tunnel's statistic information."
+        ::= { hh3cIPsecGroupsV2 3 }
+
+    hh3cIPsecSaGroupV2 OBJECT-GROUP
+        OBJECTS {
+                    hh3cIPsecSaDirectionV2,
+                    hh3cIPsecSaSpiValueV2,
+                    hh3cIPsecSaSecProtocolV2,
+                    hh3cIPsecSaEncryptAlgoV2,
+                    hh3cIPsecSaAuthAlgoV2,
+                    hh3cIPsecSaStatusV2
+                }
+        STATUS current
+        DESCRIPTION
+            "The group contains the SA's property information."
+        ::= { hh3cIPsecGroupsV2 4 }
+
+    hh3cIPsecTrafficTableGroupV2 OBJECT-GROUP
+        OBJECTS {
+            hh3cIPsecTrafficLocalTypeV2,
+            hh3cIPsecTrafficLocalAddr1TypeV2,
+            hh3cIPsecTrafficLocalAddr1V2,
+            hh3cIPsecTrafficLocalAddr2TypeV2,
+            hh3cIPsecTrafficLocalAddr2V2,
+            hh3cIPsecTrafficLocalProtocol1V2,
+            hh3cIPsecTrafficLocalProtocol2V2,
+            hh3cIPsecTrafficLocalPort1V2,
+            hh3cIPsecTrafficLocalPort2V2,
+            hh3cIPsecTrafficRemoteTypeV2,
+            hh3cIPsecTrafficRemAddr1TypeV2,
+            hh3cIPsecTrafficRemAddr1V2,
+            hh3cIPsecTrafficRemAddr2TypeV2,
+            hh3cIPsecTrafficRemAddr2V2,
+            hh3cIPsecTrafficRemoPro1V2,
+            hh3cIPsecTrafficRemoPro2V2,
+            hh3cIPsecTrafficRemPort1V2,
+            hh3cIPsecTrafficRemPort2V2
+        }
+        STATUS current
+        DESCRIPTION
+            "The group contains the property information of the
+             data flow protected by IPsec tunnel."
+        ::= { hh3cIPsecGroupsV2 5 }
+
+    hh3cIPsecGlobalStatsGroupV2 OBJECT-GROUP
+        OBJECTS {
+                    hh3cIPsecGlobalActiveTunnelsV2,
+                    hh3cIPsecGlobalActiveSasV2,
+                    hh3cIPsecGlobalInOctetsV2,
+                    hh3cIPsecGlobalInDecompOctetsV2,
+                    hh3cIPsecGlobalInPktsV2,
+                    hh3cIPsecGlobalInDropsV2,
+                    hh3cIPsecGlobalInReplayDropsV2,
+                    hh3cIPsecGlobalInAuthFailsV2,
+                    hh3cIPsecGlobalInDecryptFailsV2,
+                    hh3cIPsecGlobalOutOctetsV2,
+                    hh3cIPsecGlobalOutUncompOctetsV2,
+                    hh3cIPsecGlobalOutPktsV2,
+                    hh3cIPsecGlobalOutDropsV2,
+                    hh3cIPsecGlobalOutEncryptFailsV2,
+                    hh3cIPsecGlobalNoMemoryDropsV2,
+                    hh3cIPsecGlobalNoFindSaDropsV2,
+                    hh3cIPsecGlobalQueueFullDropsV2,
+                    hh3cIPsecGlobalInvalidLenDropsV2,
+                    hh3cIPsecGlobalTooLongDropsV2,
+                    hh3cIPsecGlobalInvalidSaDropsV2
+                }
+        STATUS current
+        DESCRIPTION
+            "The group contains all of the IPsec tunnel's statistic
+             information."
+        ::= { hh3cIPsecGroupsV2 6 }
+
+    hh3cIPsecTrapObjectGroupV2 OBJECT-GROUP
+        OBJECTS {
+                    hh3cIPsecPolicyNameV2,
+                    hh3cIPsecPolicySeqNumV2,
+                    hh3cIPsecPolicySizeV2
+                }
+        STATUS current
+        DESCRIPTION
+            "The group contains all of trap objects of IPsec tunnels."
+        ::= { hh3cIPsecGroupsV2 7 }
+
+    hh3cIPsecTrapCntlGroupV2 OBJECT-GROUP
+        OBJECTS {
+                    hh3cIPsecTrapGlobalCntlV2,
+                    hh3cIPsecTunnelStartTrapCntlV2,
+                    hh3cIPsecTunnelStopTrapCntlV2,
+                    hh3cIPsecNoSaTrapCntlV2,
+                    hh3cIPsecAuthFailureTrapCntlV2,
+                    hh3cIPsecEncryFailureTrapCntlV2,
+                    hh3cIPsecDecryFailureTrapCntlV2,
+                    hh3cIPsecInvalidSaTrapCntlV2,
+                    hh3cIPsecPolicyAddTrapCntlV2,
+                    hh3cIPsecPolicyDelTrapCntlV2,
+                    hh3cIPsecPolicyAttachTrapCntlV2,
+                    hh3cIPsecPolicyDetachTrapCntlV2
+                }
+        STATUS current
+        DESCRIPTION
+            "The group contains all of trap switches of IPsec tunnels."
+        ::= { hh3cIPsecGroupsV2 8 }
+
+    hh3cIPsecTrapGroupV2 NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                          hh3cIPsecTunnelStartV2,
+                          hh3cIPsecTunnelStopV2,
+                          hh3cIPsecNoSaFailureV2,
+                          hh3cIPsecAuthFailFailureV2,
+                          hh3cIPsecEncryFailFailureV2,
+                          hh3cIPsecDecryFailFailureV2,
+                          hh3cIPsecInvalidSaFailureV2,
+                          hh3cIPsecPolicyAddV2,
+                          hh3cIPsecPolicyDelV2,
+                          hh3cIPsecPolicyAttachV2,
+                          hh3cIPsecPolicyDetachV2,
+                          hh3cIPsecConnectionStartV2,
+                          hh3cIPsecConnectionStopV2
+                      }
+        STATUS current
+        DESCRIPTION
+            "The group contains all of trap of IPsec tunnels."
+        ::= { hh3cIPsecGroupsV2 9 }
+
+
+END
+

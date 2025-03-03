@@ -1,0 +1,663 @@
+-- *****************************************************************
+-- UBQS-MPLS-PW-MIB : Ubiquoss Pseudowire MIB
+--   
+-- Jun 2011,  Park Hyung Eun
+--
+-- Copyright (c) 2011 by Ubiquoss, Corp.
+--   
+-- All rights reserved.
+-- ***************************************************************
+
+UBQS-MPLS-PW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,            
+    Unsigned32,
+    Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF         
+    InetAddress, 
+    InetAddressType,
+    InetAddressPrefixLength,    
+    InetAddressPrefixLength
+    	FROM INET-ADDRESS-MIB     
+    IpAddress,
+    RowStatus,
+    TimeStamp,
+    DisplayString,    
+    TruthValue,       
+    MacAddress,
+    TEXTUAL-CONVENTION
+    	FROM SNMPv2-TC       	 
+    InterfaceIndex                     
+    	FROM IF-MIB    
+   mplsStdMIB, MplsLSPID, MplsLabel, MplsBitRate,
+   MplsOwner
+      FROM MPLS-TC-STD-MIB                               -- [RFC3811]    	
+    ubiMplsGroupMIB
+        FROM UBQS-SMI;
+
+
+ubiPwMIB MODULE-IDENTITY
+        LAST-UPDATED    "201106210000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        "This MIB module defines the Psedowire information of 
+          MPLS Protocol."
+     ::= { ubiMplsGroupMIB 2 }
+
+
+
+-- ***********************************************************
+-- Textual Conventions
+-- ***********************************************************          
+                              
+                              
+-- ***************************************************************
+--   ubiPwMIB
+-- ***************************************************************
+ubiPwMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiPwMIB 0 } 
+ubiPwMIBObjects  				OBJECT IDENTIFIER		::= { ubiPwMIB 1 }     
+ubiPwMIBConformance  			OBJECT IDENTIFIER		::= { ubiPwMIB 2 }
+        
+            
+ubiPwGlobal						 OBJECT IDENTIFIER		::= { ubiPwMIBObjects 1 } 
+ubiPwFdb					     OBJECT IDENTIFIER		::= { ubiPwMIBObjects 7 } 
+                    
+                         
+ -- ***************************************************************
+--   ubiPwMIBNotificationPrefix
+-- ***************************************************************
+                                           
+-- ***********************************************************
+-- ubiPwGlobal
+-- ***********************************************************
+ 	ubiPwPlatformNodeType OBJECT-TYPE
+    	SYNTAX          INTEGER {   
+    		none(0),
+    		cot(1),
+    		int(2),
+    		rt(3)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiPwGlobal 1 }   
+
+ --	ubiPwMode OBJECT-TYPE
+ --   	SYNTAX          INTEGER {        
+ --   		none(0),
+ --   		non_revert(1),
+ --   		revert(2)
+ --   	}
+ --   	MAX-ACCESS      read-create
+ --   	STATUS          current
+ --  		DESCRIPTION
+ --       	""              
+ --       DEFVAL 	{ revert }
+ --      	::= { ubiPwGlobal 2 }
+       	
+ --  	ubiPwRevertTimeout	OBJECT-TYPE
+ --   	SYNTAX          Gauge32
+ --   	MAX-ACCESS      read-create
+ --   	STATUS          current
+  -- 		DESCRIPTION
+   --     	""      
+   --    	::= { ubiPwGlobal 3 }     
+                                           
+                                      
+-- ***********************************************************
+-- ubiPwInstanceTable
+-- ***********************************************************   
+	ubiPwInstanceTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiPwInstanceEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiPwMIBObjects 2 }
+
+	ubiPwInstanceEntry OBJECT-TYPE
+    	SYNTAX          UbiPwInstanceEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiPwInstId, ubiPwInstName } 
+    	::= { ubiPwInstanceTable 1 }
+
+	UbiPwInstanceEntry ::= SEQUENCE {       
+			ubiPwInstName				DisplayString, 	  
+			ubiPwInstId					Integer32,  
+            ubiPwInstType				INTEGER,    
+            ubiPwInstMtu				Integer32,
+            ubiPwInstDescr				DisplayString,
+            ubiPwInstRowStatus			RowStatus
+	}
+  
+ 	ubiPwInstId OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      not-accessible
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiPwInstanceEntry 1 }   
+    
+ 	ubiPwInstName OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""      
+	   	::= { ubiPwInstanceEntry 2 } 
+
+   	ubiPwInstType OBJECT-TYPE
+        SYNTAX			INTEGER {
+        	none(0),
+        	ethernet(1),
+        	vlan(2)
+        }
+        MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""
+    	::= { ubiPwInstanceEntry 3 }
+
+  	ubiPwInstMtu OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-write
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwInstanceEntry 4 }       
+       	
+   	ubiPwInstDescr OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-write
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwInstanceEntry 5 }            	
+                                  	   	    
+  	ubiPwInstRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwInstanceEntry 6 }              	
+
+                                     
+-- ***********************************************************
+-- ubiPwIfBindTable
+-- ***********************************************************   
+	ubiPwIfBindTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiPwIfBindEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiPwMIBObjects 3 }
+
+	ubiPwIfBindEntry OBJECT-TYPE
+    	SYNTAX          UbiPwIfBindEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ifIndex, ubiPwInstName, ubiPwIfBindVlanId } 
+    	::= { ubiPwIfBindTable 1 }
+
+	UbiPwIfBindEntry ::= SEQUENCE {         
+			ubiPwIfBindPwName				DisplayString,
+			ubiPwIfBindVlanId				Integer32, 
+			ubiPwIfBindType					INTEGER, 
+            ubiPwIfBindRowStatus			RowStatus
+	}
+
+
+ 	ubiPwIfBindPwName OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiPwIfBindEntry 1 }   
+  
+ 	ubiPwIfBindVlanId OBJECT-TYPE
+    	SYNTAX          Integer32 (0..4094)
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiPwIfBindEntry 2 }   
+  
+ 	ubiPwIfBindType OBJECT-TYPE
+    	SYNTAX          INTEGER {         
+    		none(0),
+    		ethernet(1),
+    		vlan(2)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiPwIfBindEntry 3 }   
+
+  	ubiPwIfBindRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwIfBindEntry 4 }              	
+                           
+                           
+
+-- ***********************************************************
+-- ubiPwTable
+-- ***********************************************************   
+	ubiPwTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiPwEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiPwMIBObjects 4 }
+
+	ubiPwEntry OBJECT-TYPE
+    	SYNTAX          UbiPwEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiPwIndex } 
+    	::= { ubiPwTable 1 }
+
+	UbiPwEntry ::= SEQUENCE {         
+			ubiPwIndex					Integer32,  
+			ubiPwId						Integer32,   
+            ubiPwAddressType			InetAddressType,
+            ubiPwAddress				InetAddress,
+            ubiPwTunnelName				DisplayString,
+            ubiPwTunnelId				Integer32,    
+            ubiPwTunnelDirection		INTEGER,
+            ubiPwRemNodetype			INTEGER,   
+            ubiPwOperState				INTEGER,
+       --     ubiPwMode					INTEGER,
+       --     ubiPwRevertTimeout		Gauge32,
+            ubiPwSplitHorizon 			INTEGER,
+            ubiPwInLabel				MplsLabel,     
+            ubiPwOutLabel               MplsLabel,      
+            ubiPwActiveState			INTEGER,
+            ubiPwRowStatus				RowStatus      	
+	}
+  
+ 	ubiPwIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      not-accessible
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiPwEntry 1 }   
+    
+ 	ubiPwId OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""      
+	   	::= { ubiPwEntry 2 } 
+ 
+  	ubiPwAddressType OBJECT-TYPE
+    	SYNTAX          InetAddressType
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 3 }       
+       	
+   	ubiPwAddress OBJECT-TYPE
+    	SYNTAX          InetAddress
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 4 }            	
+   
+   	ubiPwTunnelName OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 5 }
+       	
+   	ubiPwTunnelId	OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 6 }       	
+   
+   	ubiPwTunnelDirection OBJECT-TYPE
+    	SYNTAX          INTEGER {       
+    		forward(1),
+    		reverse(2)
+    	}
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 7 }     
+       	   
+   	ubiPwRemNodetype OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    		none(0),
+    		cot(1),
+    		int(2),
+    		rt(3)
+    	}
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 8 }
+  
+   	ubiPwOperState OBJECT-TYPE
+    	SYNTAX          INTEGER {     
+    		down(1),
+    		active(2),
+    		complete(3),  
+    		up(4)
+       	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 9 }            	
+
+   	ubiPwSplitHorizon	 OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    		enable(1),
+    		disable(2)
+    	}
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 10 }          	
+   
+   	ubiPwInLabel OBJECT-TYPE
+    	SYNTAX          MplsLabel
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""              
+       	::= { ubiPwEntry 11 }
+       	
+   	ubiPwOutLabel  	OBJECT-TYPE
+    	SYNTAX          MplsLabel
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 12 }       	   	
+       	   
+   	ubiPwActiveState OBJECT-TYPE
+    	SYNTAX          INTEGER { 
+    		none(0),  
+    		primaryUp(1),
+    		backupUp(2),
+    		primaryActive(3),
+    		backupActive(4)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 13 }
+
+  	ubiPwRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwEntry 14 }     
+                         
+    
+                                     
+-- ***********************************************************
+-- ubiPwForwardingTable
+-- ***********************************************************   
+	ubiPwForwardingTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiPwForwardingEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiPwMIBObjects 5 }
+
+	ubiPwForwardingEntry OBJECT-TYPE
+    	SYNTAX          UbiPwForwardingEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiPwInstId, ubiPwForwardingFtnId } 
+    	::= { ubiPwForwardingTable 1 }
+
+	UbiPwForwardingEntry ::= SEQUENCE {         
+			ubiPwForwardingFtnId				Integer32, 
+			ubiPwForwardingPrimary				INTEGER, 
+			ubiPwForwardingTunnelLabel			MplsLabel,
+			ubiPwForwardingTunnelOutIfIndex		Integer32                      
+	}
+  
+ 	ubiPwForwardingFtnId OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiPwForwardingEntry 1 }   
+
+ 	ubiPwForwardingPrimary OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    	 	none(0),
+    	 	primary(1),
+    	 	backup(2)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwForwardingEntry 2 }                        
+                    
+ 	ubiPwForwardingTunnelLabel OBJECT-TYPE
+    	SYNTAX          MplsLabel
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiPwForwardingEntry 3 } 
+     
+ 	ubiPwForwardingTunnelOutIfIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiPwForwardingEntry 4 } 
+
+
+-- ***********************************************************
+-- ubiPwStatic TODO
+-- ***********************************************************                                 
+ 
+                                     
+-- ***********************************************************
+-- ubiPwFdb
+-- ***********************************************************         
+
+  	ubiPwFdbDynamicCount OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwFdb 1 }      
+
+  	ubiPwFdbStaticCount OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwFdb 2 }      
+
+  	ubiPwFdbMulticastCount OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwFdb 3 }      
+
+
+  	ubiPwFdbAvailableMaxCount OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiPwFdb 4 }      
+
+
+-- ubiVplsFdbTable
+
+	ubiVplsFdbTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiVplsFdbEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiPwFdb 5 }
+
+	ubiVplsFdbEntry OBJECT-TYPE
+    	SYNTAX          UbiVplsFdbEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiPwInstId, ubiVplsFdbPeerAddress } 
+    	::= { ubiVplsFdbTable 1 }
+
+	UbiVplsFdbEntry ::= SEQUENCE {         
+			ubiVplsFdbMacAddress			MacAddress,  
+            ubiVplsFdbPeerAddress			IpAddress,
+            ubiVplsFdbIfIndex				InterfaceIndex,
+            ubiVplsFdbType					INTEGER,
+            ubiVplsFdbForward				TruthValue				
+	}
+  
+ 	ubiVplsFdbMacAddress OBJECT-TYPE
+    	SYNTAX         	MacAddress
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiVplsFdbEntry 1 }   
+	   		   	
+ 	ubiVplsFdbPeerAddress OBJECT-TYPE
+    	SYNTAX         	IpAddress
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiVplsFdbEntry 2 }   
+	   	
+ 	ubiVplsFdbIfIndex OBJECT-TYPE
+    	SYNTAX         	InterfaceIndex
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiVplsFdbEntry 3 }   
+	   	   	    
+  	ubiVplsFdbType OBJECT-TYPE
+    	SYNTAX          INTEGER {           
+    		none(0),
+    		static(1),
+    		dynamic(2),
+    		multicast(3)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiVplsFdbEntry 4 }              	
+ 
+  	ubiVplsFdbForward OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiVplsFdbEntry 5 }   
+	   	
+                          
+
+                          
+-- ***********************************************************
+-- ubiPwMIBConformance
+-- ***********************************************************
+ubiPwMIBCompliances  	OBJECT IDENTIFIER		::= { ubiPwMIBConformance 1 }
+ubiPwMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiPwMIBConformance 2 }
+-- Compliance
+
+	ubiPwMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for entities which
+        	implement the UBQS-PW-MIB"
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {  
+    			ubiPwMIBGroup
+        }  
+        GROUP    ubiPwMIBGroup
+        DESCRIPTION 
+        	"The ubiPwMIBGroup is applicable for implementations which
+ 			need to get the pseudowire information."    
+     	::= { ubiPwMIBCompliances 1 }
+
+
+	ubiPwMIBGroup OBJECT-GROUP
+    	OBJECTS         {     
+    	}   
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about the pseudowire information."
+    	::= { ubiPwMIBGroups 1 }
+    	                               
+    	                               
+END

@@ -3,7 +3,7 @@
 --
 -- October 26 2001, Software LAB
 --
--- Copyright (c) 1993-2001 by Super Micro Computer Inc.
+-- Copyright (c) 1993-2019 Super Micro Computer, Inc.
 -- All rights reserved.
 -- 
 -- *****************************************************************
@@ -87,7 +87,9 @@ SMHealthMonitorEntry ::=
 		smHealthMonitorMaxReading	Integer32,
 		smHealthMonitorMinReading	Integer32,
 		smHealthMonitorDivisor		Integer32,
-		smHealthMonitorMonitor		TruthValue
+		smHealthMonitorMonitor		TruthValue,
+		smHealthMonitorReadingUnit	DisplayString,
+		smHealthMonitorStatus		Integer32
 	}
 
 smHealthMonitorIndex OBJECT-TYPE
@@ -95,7 +97,7 @@ smHealthMonitorIndex OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS	    current
 	DESCRIPTION
-		"The unique value which identifies this Monitor device."
+		"The unique value identifies this Monitor device."
 	::= { smHealthMonitorEntry 1 }
 
 smHealthMonitorName OBJECT-TYPE
@@ -120,11 +122,10 @@ smHealthMonitorReading OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS	    current
 	DESCRIPTION
-		"Indicates the value from the Monitor device that are
-		currently in use on the managed device.
-		FAN reading is in unit of RPM,
-		Voltage reading is in unit of mV,
-		Temperture reading is in unit of degree C"
+		"Indicates the reading value for the Monitor device that are currently in use on the managed device.
+		FAN readings are displayed in RPM.
+		Voltage readings are displayed in mV.
+		Temperture readings are displayed in Celsius."
 	::= { smHealthMonitorEntry 4 }
 
 smHealthMonitorHighLimit OBJECT-TYPE
@@ -132,12 +133,9 @@ smHealthMonitorHighLimit OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS	    current
 	DESCRIPTION
-		"Indicates the value for the High limitation 
-		for the Monitor device that are currently in use on the
-		managed device.
-		Apply to Temperature and Voltage deivces only.
-		Voltage limit is in unit of mV,
-		Temperture limit is in unit of degree C"
+		"Indicates the the High limit for the Monitor device that are currently in use on the managed device.
+		This is applied to Temperature and Voltage devices only.
+		Voltage limit is displayed in mV, and Temperture limit is displayed in Celsius."
 	::= { smHealthMonitorEntry 5 }
 
 smHealthMonitorLowLimit OBJECT-TYPE
@@ -145,12 +143,8 @@ smHealthMonitorLowLimit OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS	    current
 	DESCRIPTION
-		"Indicates the value for the Low limitation 
-		for the Monitor device that are currently in use on the
-		managed device.
-		FAN limit is in unit of RPM,
-		Voltage limit is in unit of mV,
-		Temperture limit is in unit of degree C"
+		"Indicates the value for the Low limitation for the Monitor device that are currently in use on the managed device.
+		FAN limit is displayed in RPM, Voltage limit is displayed in mV, and Temperture limit is displayed in Celsius."
 	::= { smHealthMonitorEntry 6 }
 
 smHealthMonitorMaxReading OBJECT-TYPE
@@ -158,12 +152,10 @@ smHealthMonitorMaxReading OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS	    current
 	DESCRIPTION
-		"Indicates the value for the possible Maximum reading value 
-		for the Monitor device that are currently in use on the
-		managed device.
-		FAN reading is in unit of RPM,
-		Voltage reading is in unit of mV,
-		Temperture reading is in unit of degree C"
+		"Indicates the value for the possible Maximum reading value for the Monitor device that are currently in use on the managed device.
+		FAN readings are displayed in RPM.
+		Voltage readings are displayed in mV.
+		Temperture readings are in Celsius."
 	::= { smHealthMonitorEntry 7 }
 
 smHealthMonitorMinReading OBJECT-TYPE
@@ -171,12 +163,10 @@ smHealthMonitorMinReading OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS	    current
 	DESCRIPTION
-		"Indicates the value for the possible Minimum reading value 
-		for the Monitor device that are currently in use on the
-		managed device.
-		FAN reading is in unit of RPM,
-		Voltage reading is in unit of mV,
-		Temperture reading is in unit of degree C"
+		"Indicates the value for the possible Minimum reading value for the Monitor device that are currently in use on the managed device.
+		FAN readings are displayed in RPM.
+		Voltage readings are displayed in mV.
+		Temperture readings are displayed in Celsius."
 	::= { smHealthMonitorEntry 8 }
 
 smHealthMonitorDivisor OBJECT-TYPE
@@ -184,9 +174,8 @@ smHealthMonitorDivisor OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS	    current
 	DESCRIPTION
-		"Indicates the value for the Divisor for the Fan
-		device that are currently in use on the managed device.
-		Apply to Fan devices only."
+		"Indicates the value for the Divisor for the Fan device that are currently in use on the managed device.
+		This is applied to Fan devices only."
 	::= { smHealthMonitorEntry 9 }
 
 smHealthMonitorMonitor OBJECT-TYPE
@@ -194,10 +183,29 @@ smHealthMonitorMonitor OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS	    current
 	DESCRIPTION
-		"Indicates the monitoring status for the Fan device 
-		that are currently in use on the managed device.
-		1 = monitor, 2=do not monitor"
+		"Indicates the monitoring status for the Fan device that are currently in use on the managed device.
+		0 = not monitored, 1 = monitored."
 	::= { smHealthMonitorEntry 10 }
+
+smHealthMonitorReadingUnit OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the reading unit of the monitor device."
+	::= { smHealthMonitorEntry 11 }
+
+smHealthMonitorStatus OBJECT-TYPE
+	SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the status of the monitor device. Values:
+		 0: OK
+		 1: Warning
+		 2: Critical
+		"
+	::= { smHealthMonitorEntry 12 }
                                       
 -- notifications
 
@@ -242,5 +250,25 @@ smHealthMonitorGroup OBJECT-GROUP
 	DESCRIPTION
 		"A collection of objects providing Monitor devices."
 	::= { smHealthGroups 1 }
+
+smHealthAllinoneStatus OBJECT-TYPE
+	SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the all-in-one status of the monitoring items. Values:
+		 0: OK
+		 1: Warning
+		 2: Critical
+		"
+	::= { smHealth 2 }
+
+smHealthAllinoneMsg  OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The all-in-one status message of the monitoring items."
+	::= { smHealth 3 }
 
 END

@@ -1,0 +1,152 @@
+-- MIB File: BROCADE-MODULE-MEM-UTIL-MIB.mib
+-- *********************************************************************
+
+-- BROCADE-MODULE-MEM-UTIL-MIB.mib: Extreme module memory util MIB
+--
+-- Copyright (c) 2018 Extreme Networks, Inc.
+-- All rights reserved.
+
+-- *********************************************************************
+
+BROCADE-MODULE-MEM-UTIL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Gauge32
+        FROM SNMPv2-SMI
+    bcsiModules
+        FROM Brocade-REG-MIB;
+
+brocadeModuleMemUtilMIB  MODULE-IDENTITY
+    LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+    ORGANIZATION "Extreme Networks, Inc."
+    CONTACT-INFO
+         "Postal:  Extreme Networks, Inc.
+                   6480 Via Del Oro
+                   San Jose, CA 95119 USA
+          Phone:   +1 408 579-2800
+          E-mail:  support@extremenetworks.com
+          WWW:     http://www.extremenetworks.com"
+    DESCRIPTION
+      "This MIB module supports the per module Memory utilization."
+	  
+    REVISION	    "201805291200Z" -- May 29, 2018 12:00pm
+    DESCRIPTION	
+        "Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+    REVISION        "201611250000Z" -- 25 November 2016
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcsiModules 13 }
+
+bcsiModuleMemUtilNotifications OBJECT IDENTIFIER
+    ::=  { brocadeModuleMemUtilMIB 0 }
+bcsiModuleMemUtilObjects OBJECT IDENTIFIER
+    ::=  { brocadeModuleMemUtilMIB 1 }
+bcsiModuleMemUtilConformance OBJECT IDENTIFIER
+    ::=  { brocadeModuleMemUtilMIB 2 }
+
+bcsiModuleMemUtilTable     OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BcsiModuleMemUtilEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table to list per module Memory utilization in the device."
+    ::= { bcsiModuleMemUtilObjects 1 }
+
+bcsiModuleMemUtilEntry OBJECT-TYPE
+    SYNTAX  BcsiModuleMemUtilEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the Memory utilization table."
+    INDEX   {
+        bcsiModuleMemUtilSlotNum
+    }
+    ::= { bcsiModuleMemUtilTable 1 }
+
+BcsiModuleMemUtilEntry ::= SEQUENCE {
+    bcsiModuleMemUtilSlotNum
+        Integer32,
+    bcsiModuleMemTotal
+        Unsigned32,
+    bcsiModuleMemAvailable
+        Gauge32,
+    bcsiModuleMemUtil100thPercent
+        Gauge32
+    }
+
+bcsiModuleMemUtilSlotNum OBJECT-TYPE
+    SYNTAX Integer32
+	MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The slot number of the module that contains the memory.
+         Slot number in SLX are: MM1 = 1, MM2 = 2, LC1 = 3, LC2 =4
+         and so on."
+    ::= { bcsiModuleMemUtilEntry 1 }
+
+	bcsiModuleMemTotal OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "kilo Bytes"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total memory in kilobytes within the module."
+    ::= { bcsiModuleMemUtilEntry 2 }
+
+bcsiModuleMemAvailable OBJECT-TYPE
+    SYNTAX Gauge32
+    UNITS "kilo Bytes"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The available total memory in kilobytes within this module."
+     ::= { bcsiModuleMemUtilEntry 3 }
+
+bcsiModuleMemUtil100thPercent OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "It Indicates the dynamic memory that is currently utilized within this
+        module, in units of one-hundredth of a percent.
+		For example-a value of 200 indicates 2 percent utilization."
+    ::= { bcsiModuleMemUtilEntry 4 }
+
+--
+-- Conformance
+--
+
+bcsiModuleMemUtilCompliances OBJECT IDENTIFIER
+                             ::= { bcsiModuleMemUtilConformance 1 }
+bcsiModuleMemUtilGroups       OBJECT IDENTIFIER
+                             ::= { bcsiModuleMemUtilConformance 2 }
+
+bcsiModuleMemUtilCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which
+        implement BROCADE-MODULE-MEM-UTIL-MIB."
+    MODULE MANDATORY-GROUPS { bcsiModuleMemUtilizationGroup }
+    ::= { bcsiModuleMemUtilCompliances 1 }
+
+--
+-- Units of Conformance
+--
+
+bcsiModuleMemUtilizationGroup  OBJECT-GROUP
+    OBJECTS {
+    bcsiModuleMemUtilSlotNum,
+    bcsiModuleMemTotal,
+    bcsiModuleMemAvailable,
+    bcsiModuleMemUtil100thPercent
+    }
+    STATUS         current
+    DESCRIPTION
+        "A collection of objects for per module Memory utilization value."
+    ::= { bcsiModuleMemUtilGroups 1 }
+
+END
+
+-- ========================================================================================
+
+

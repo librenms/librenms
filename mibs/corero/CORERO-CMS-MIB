@@ -1,0 +1,775 @@
+CORERO-CMS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    TimeTicks, Counter32, Unsigned32, Counter64, enterprises, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, TestAndIncr, TimeStamp, RowStatus, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+
+coreroCMSMIB MODULE-IDENTITY
+    LAST-UPDATED "201706160000Z"
+    ORGANIZATION "Corero Network Security"
+    CONTACT-INFO
+            "       Corero Support
+             E-mail: support.portal@corero.com"
+    DESCRIPTION
+            "Corero Management Server MIB."
+    REVISION      "201706160000Z"
+    DESCRIPTION
+            "Added interface error counts."
+    REVISION      "201601280000Z"
+    DESCRIPTION
+            "Added Protection Group Interface statistics."
+    REVISION      "201404240000Z"
+    DESCRIPTION
+            "First version."
+
+    ::= { corero 4 }
+
+corero OBJECT IDENTIFIER ::= { enterprises 41036 }
+
+-- Administrative assignments ++++---------------------------------
+
+coreroCMSMIBObjects     OBJECT IDENTIFIER ::= { coreroCMSMIB 1 }
+coreroCMSMIBConformance OBJECT IDENTIFIER ::= { coreroCMSMIB 2 }
+
+-- ----------------------------------------------------------------
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+TYPE-CMS-MODULE-STATE ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      String
+
+--
+-- The defense node aggregates the defense status and statistics of the site
+-- It has several nodes corresponding to the different containers in the defense-summary yang
+--
+defense              OBJECT IDENTIFIER ::= { coreroCMSMIBObjects 1 }
+defenseStatus        OBJECT IDENTIFIER ::= { defense 1 }
+
+defenseStatusThreatAwareness OBJECT IDENTIFIER ::= { defenseStatus 1 }
+
+excessivePacketsFromBadClients OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Awareness indication for this type of threat."
+    DEFVAL { false }
+    ::= { defenseStatusThreatAwareness 1 }
+
+excessiveProxySetupRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Proxy is no longer supported in the system."
+    DEFVAL { false }
+    ::= { defenseStatusThreatAwareness 2 }
+
+excessiveNewIpAddresses OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Awareness indication for this type of threat."
+    DEFVAL { false }
+    ::= { defenseStatusThreatAwareness 3 }
+
+excessiveAddressTableUsage OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Awareness indication for this type of threat."
+    DEFVAL { false }
+    ::= { defenseStatusThreatAwareness 4 }
+
+excessiveTcpSetupRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Awareness indication for this type of threat."
+    DEFVAL { false }
+    ::= { defenseStatusThreatAwareness 5 }
+
+excessiveNonTcpSetupRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Awareness indication for this type of threat."
+    DEFVAL { false }
+    ::= { defenseStatusThreatAwareness 6 }
+
+excessiveFailedProxyRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Proxy is no longer supported in the system."
+    DEFVAL { false }
+    ::= { defenseStatusThreatAwareness 7 }
+
+
+defenseStatistics        OBJECT IDENTIFIER ::= { defense 2 }
+
+defenseBlockRateStatistics OBJECT IDENTIFIER ::= { defenseStatistics 1 }
+
+
+allRulesBlockRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "All rules block rate (packets/sec)"
+    ::= { defenseBlockRateStatistics 1 }
+
+systemIssueBlockRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "System isues rules block rate is not longer supported in the system"
+    ::= { defenseBlockRateStatistics 2 }
+
+networkAccessRestrictionBlockRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Network threat access restriction rules block rate is not longer supported in the system"
+    ::= { defenseBlockRateStatistics 3 }
+
+networkRateLimitBlockRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Network thread rate limit rules block rate is not longer supported in the system"
+    ::= { defenseBlockRateStatistics 4 }
+
+networkProtocolValidationBlockRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+         "Network threat protocol validation rules block rate is not longer supported in the system"
+    ::= { defenseBlockRateStatistics 5 }
+
+networkIntegrityAnalysisBlockRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+         "Network threat integrity analysis rules block rate is not longer supported in the system"
+    ::= { defenseBlockRateStatistics 6 }
+
+applicationAccessRestrictionBlockRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+          "Application threat access restriction rules block rate is not longer supported in the system"
+    ::= { defenseBlockRateStatistics 7 }
+
+applicationRateLimitBlockRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+          "Application threat rate limit rules block rate is not longer supported in the system"
+    ::= { defenseBlockRateStatistics 8 }
+
+applicationProtocolValidationBlockRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+          "Application threat protocol validation rules block rate is not longer supported in the system"
+    ::= { defenseBlockRateStatistics 9 }
+
+applicationIntegrityAnalysisBlockRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+          "Application integrity analysis rules block rate is not longer supported in the system"
+    ::= { defenseBlockRateStatistics 10 }
+
+
+defenseSetupRateStatistics OBJECT IDENTIFIER ::= { defenseStatistics 2 }
+
+tcpSetupRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "TCP protocol flow setup rate (packets/sec)"
+    ::= { defenseSetupRateStatistics 1 }
+
+nonTcpSetupRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Non-TCP protocol aggregate flow setup rate (packets/sec)"
+    ::= { defenseSetupRateStatistics 2 }
+
+udpSetupRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "UDP protocol flow setup rate (packets/sec)"
+    ::= { defenseSetupRateStatistics 3 }
+
+icmpSetupRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "ICMP protocol flow setup rate (packets/sec)"
+    ::= { defenseSetupRateStatistics 4 }
+
+otherIpSetupRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "IP protocols other than TCP and UDP flow setup rate (packets/sec)"
+    ::= { defenseSetupRateStatistics 5 }
+
+defenseUsageStatistics OBJECT IDENTIFIER ::= { defenseStatistics 3 }
+
+inUseFlows OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Total number of flows in use across the devices"
+    ::= { defenseUsageStatistics 1 }
+
+inUseTcpFlows OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Total number of TCP flows in use across the devices"
+    ::= { defenseUsageStatistics 2 }
+
+inUseUdpFlows OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Total number of UDP flows in use across the devices"
+    ::= { defenseUsageStatistics 3 }
+
+inUseIcmpFlows OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Total number of ICMP flows in use across the devices"
+    ::= { defenseUsageStatistics 4 }
+
+inUseOtherFlows OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Total number of non-TCP, non-UDP, non-ICMP flows in use across the devices"
+    ::= { defenseUsageStatistics 5 }
+
+totalProxySetups OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+          "Proxy is no longer supported in the system"
+    ::= { defenseUsageStatistics 6 }
+
+totalProxyFailedSetups OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+          "Proxy is no longer supported in the system"
+    ::= { defenseUsageStatistics 7 }
+
+defenseInterfaceStatistics OBJECT IDENTIFIER ::= { defenseStatistics 4 }
+
+externalPortPacketReceiveRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Receive rate on external ports (packets per second)"
+    ::= { defenseInterfaceStatistics 1 }
+
+externalPortBitReceiveRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Receive rate on external ports (Mbits per second)"
+    ::= { defenseInterfaceStatistics 2 }
+
+externalPortPacketTransmitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Transmit rate on external ports (packets per second)"
+    ::= { defenseInterfaceStatistics 3 }
+
+externalPortBitTransmitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Transmit rate on external ports (Mbits per second)"
+    ::= { defenseInterfaceStatistics 4 }
+
+internalPortPacketReceiveRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Receive rate on internal ports (packets per second)"
+    ::= { defenseInterfaceStatistics 5 }
+
+internalPortBitReceiveRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Receive rate on internal ports (Mbits per second)"
+    ::= { defenseInterfaceStatistics 6 }
+
+internalPortPacketTransmitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Transmit rate on internal ports (packets per second)"
+    ::= { defenseInterfaceStatistics 7 }
+
+internalPortBitTransmitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Transmit rate on internal ports (Mbits per second)"
+    ::= { defenseInterfaceStatistics 8 }
+
+externalPortReceivedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets received to the external port"
+    ::= { defenseInterfaceStatistics 9 }
+
+externalPortTransmittedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets transmitted from the external port"
+    ::= { defenseInterfaceStatistics 10 }
+
+externalPortReceivedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Number of bytes received to the external port"
+    ::= { defenseInterfaceStatistics 11 }
+
+externalPortTransmittedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of bytes transmitted from external port"
+    ::= { defenseInterfaceStatistics 12 }
+
+internalPortReceivedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets received to the internal port"
+    ::= { defenseInterfaceStatistics 13 }
+
+internalPortTransmittedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets transmitted from the internal port"
+    ::= { defenseInterfaceStatistics 14 }
+
+internalPortReceivedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of bytes received to the internal port"
+    ::= { defenseInterfaceStatistics 15 }
+
+internalPortTransmittedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of bytes transmitted from the internal port"
+    ::= { defenseInterfaceStatistics 16 }
+
+externalPortReceivedBadCrcPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets received to the external port with an invalid CRC"
+    ::= { defenseInterfaceStatistics 17 }
+
+internalPortReceivedBadCrcPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets received to the internal port with an invalid CRC"
+    ::= { defenseInterfaceStatistics 18 }
+
+externalPortReceivedOversizedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of oversized packets received to the external port"
+    ::= { defenseInterfaceStatistics 19 }
+
+internalPortReceivedOversizedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of oversized packets received to the internal port"
+    ::= { defenseInterfaceStatistics 20 }
+
+externalPortReceivedJabberPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of jabber packets received to the external port"
+    ::= { defenseInterfaceStatistics 21 }
+
+internalPortReceivedJabberPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of jabber packets received to the internal port"
+    ::= { defenseInterfaceStatistics 22 }
+
+externalPortTransmitErrorPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of errors transmitting packets from the external port"
+    ::= { defenseInterfaceStatistics 23 }
+
+internalPortTransmitErrorPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of errors transmitting packets from the internal port"
+    ::= { defenseInterfaceStatistics 24 }
+
+defenseIpAddressStatistics OBJECT IDENTIFIER ::= { defenseStatistics 5 }
+
+inUseAddresses OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Total number of IP table entries across the devices"
+    ::= { defenseIpAddressStatistics 1 }
+
+inUseTrustedAddresses OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Total number of trusted IP addresses across the devices"
+    ::= { defenseIpAddressStatistics 2 }
+
+inUseSuspiciousAddresses OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Total number of suspicious IP addresses across the devices"
+    ::= { defenseIpAddressStatistics 3 }
+
+inUseMaliciousAddresses OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Total number of malicious IP addresses across the devices"
+    ::= { defenseIpAddressStatistics 4 }
+
+inUseUnclassifiedAddresses OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Total number of unclassified IP addresses across the devices"
+    ::= { defenseIpAddressStatistics 5 }
+
+
+protectionGroupStatistics OBJECT IDENTIFIER ::= { defense 3 }
+
+protectionGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ProtectionGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Table containing interface statistics for the Protection Group"
+    ::= { protectionGroupStatistics 1 }
+
+protectionGroupEntry OBJECT-TYPE
+    SYNTAX      ProtectionGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Port Statistic"
+    INDEX       { pgName }
+    ::= { protectionGroupTable 1 }
+
+ProtectionGroupEntry ::= SEQUENCE {
+    pgName                                 OCTET STRING ,
+    pgExternalPortReceivedPackets Counter64,
+    pgExternalPortTransmittedPackets Counter64,
+    pgExternalPortReceivedBytes Counter64,
+    pgExternalPortTransmittedBytes Counter64,
+    pgInternalPortReceivedPackets Counter64,
+    pgInternalPortTransmittedPackets Counter64,
+    pgInternalPortReceivedBytes Counter64,
+    pgInternalPortTransmittedBytes Counter64,
+    pgExternalPortReceivedBadCrcPackets Counter64,
+    pgInternalPortReceivedBadCrcPackets Counter64,
+    pgExternalPortReceivedOversizedPackets Counter64,
+    pgInternalPortReceivedOversizedPackets Counter64,
+    pgExternalPortReceivedJabberPackets Counter64,
+    pgInternalPortReceivedJabberPackets Counter64,
+    pgExternalPortTransmitErrorPackets Counter64,
+    pgInternalPortTransmitErrorPackets Counter64
+}
+
+pgName OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Protection group name as an Index"
+    ::= { protectionGroupEntry 1 }
+
+pgExternalPortReceivedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets received to the external port"
+    ::= { protectionGroupEntry 2 }
+
+pgExternalPortTransmittedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets transmitted from the external port"
+    ::= { protectionGroupEntry 3 }
+
+pgExternalPortReceivedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Number of bytes received to the external port"
+    ::= { protectionGroupEntry 4 }
+
+pgExternalPortTransmittedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of bytes transmitted from external port"
+    ::= { protectionGroupEntry 5 }
+
+pgInternalPortReceivedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets received to the internal port"
+    ::= { protectionGroupEntry 6 }
+
+pgInternalPortTransmittedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets transmitted from the internal port"
+    ::= { protectionGroupEntry 7 }
+
+pgInternalPortReceivedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of bytes received to the internal port"
+    ::= { protectionGroupEntry 8 }
+
+pgInternalPortTransmittedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of bytes transmitted from the internal port"
+    ::= { protectionGroupEntry 9 }
+
+pgExternalPortReceivedBadCrcPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets received to the external port with an invalid CRC"
+    ::= { protectionGroupEntry 10 }
+
+pgInternalPortReceivedBadCrcPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of packets received to the internal port with an invalid CRC"
+    ::= { protectionGroupEntry 11 }
+
+pgExternalPortReceivedOversizedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of oversized packets received to the external port"
+    ::= { protectionGroupEntry 12 }
+
+pgInternalPortReceivedOversizedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of oversized packets received to the internal port"
+    ::= { protectionGroupEntry 13 }
+
+pgExternalPortReceivedJabberPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of jabber packets received to the external port"
+    ::= { protectionGroupEntry 14 }
+
+pgInternalPortReceivedJabberPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of jabber packets received to the internal port"
+    ::= { protectionGroupEntry 15 }
+
+pgExternalPortTransmitErrorPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of errors transmitting packets from the external port"
+    ::= { protectionGroupEntry 16 }
+
+pgInternalPortTransmitErrorPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Number of errors transmitting packets from the internal port"
+    ::= { protectionGroupEntry 17 }
+
+
+
+-- Conformance ----------------------------------------------------
+coreroCMSMIBCompliances OBJECT IDENTIFIER ::= { coreroCMSMIBConformance 1 }
+coreroCMSMIBGroups      OBJECT IDENTIFIER ::= { coreroCMSMIBConformance 2 }
+
+
+-- compliance statements
+
+coreroCMSMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMPv2 entities which
+            implement the SNMPv2 MIB."
+    MODULE  -- this module
+        -- MANDATORY-GROUPS { snmpGroup, snmpSetGroup, systemGroup,
+        --                   snmpBasicNotificationsGroup }
+
+        GROUP   defenseGroup
+        DESCRIPTION
+            "This group is mandatory for SNMPv2 entities which
+            support community-based authentication."
+
+    ::= { coreroCMSMIBCompliances 2 }
+
+
+-- units of conformance
+
+defenseGroup OBJECT-GROUP
+    OBJECTS {
+                defenseStatus,
+                defenseStatistics,
+                protectionGroupStatistics
+             }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing status and statistics for the site."
+    ::= { coreroCMSMIBGroups 1 }
+
+
+END

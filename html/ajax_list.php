@@ -13,21 +13,26 @@
  * the source code distribution for details.
  */
 
-$init_modules = array('web', 'auth');
+use LibreNMS\Util\Debug;
+
+$init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!$_SESSION['authenticated']) {
-    echo "Unauthenticated\n";
-    exit;
+if (! Auth::check()) {
+    exit('Unauthorized');
 }
 
-set_debug($_REQUEST['debug']);
+Debug::set($_REQUEST['debug']);
 
-$id = mres($_REQUEST['id']);
+$type = basename($_REQUEST['type']);
 
-if (isset($id)) {
-    if (file_exists("includes/list/$id.inc.php")) {
-        header('Content-type: application/json');
-        include_once "includes/list/$id.inc.php";
-    }
+if ($type && file_exists("includes/html/list/$type.inc.php")) {
+    header('Content-type: application/json');
+
+    [$results, $more] = include "includes/html/list/$type.inc.php";
+
+    exit(json_encode([
+        'results' => $results,
+        'pagination' => ['more' => $more],
+    ]));
 }

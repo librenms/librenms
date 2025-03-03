@@ -2,11 +2,12 @@ os: infinity
 text: 'LigoWave Infinity'
 type: wireless
 icon: ligowave
-nobulk: 1
+snmp_bulk: false
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysDescr_regex:
-        - '/^NFT 2N/'
+    -
+        sysObjectID: .1.3.6.1.4.1.10002.1
+        sysDescr_regex: '/^NFT 2/'

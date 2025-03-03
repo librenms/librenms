@@ -1,0 +1,306 @@
+ALCATEL-IND1-WEBMGT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE,
+                Counter32, Integer32, IpAddress
+                        FROM SNMPv2-SMI
+                RowStatus
+                        FROM SNMPv2-TC
+                SnmpAdminString
+                        FROM SNMP-FRAMEWORK-MIB
+                MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                        FROM SNMPv2-CONF
+                InetAddress, InetAddressType
+                        FROM INET-ADDRESS-MIB
+                softentIND1WebMgt
+                        FROM ALCATEL-IND1-BASE;
+
+        alcatelIND1WebMgtMIB MODULE-IDENTITY
+                LAST-UPDATED    "201005130000Z"
+    ORGANIZATION    "Alcatel-Lucent"
+                CONTACT-INFO
+                        "Please consult with Customer Service to ensure the most appropriate
+                        version of this document is used with the products in question:
+
+                        Alcatel-Lucent, Enterprise Solutions Division
+                       (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+                Telephone:               North America  +1 800 995 2696
+                                           Latin America  +1 877 919 9526
+                                             Europe         +31 23 556 0100
+                                       Asia           +65 394 7933
+                                         All Other      +1 818 878 4507
+
+             Electronic Mail:         support@ind.alcatel.com
+                        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+        DESCRIPTION
+            "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 WebView - web based embedded device manager.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201005130000Z"
+        DESCRIPTION
+            "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
+
+
+        ::= { softentIND1WebMgt 1 }
+
+
+
+        alcatelIND1WebMgtMIBNotifications OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For WebView MIB Subsystem Notifications."
+        ::= { alcatelIND1WebMgtMIB 0 }
+
+       alcatelIND1WebMgtMIBObjects OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                "Branch For WebView Subsystem Managed Objects."
+                ::= { alcatelIND1WebMgtMIB  1 }
+
+        alcatelIND1WebMgtMIBConformance OBJECT-IDENTITY
+        STATUS current
+                DESCRIPTION
+                "Branch For WebView Subsystem Conformance Information."
+                ::= { alcatelIND1WebMgtMIB  2 }
+
+
+        alcatelIND1WebMgtMIBGroups OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                "Branch For WebView Subsystem Groups of managed objects."
+                ::= { alcatelIND1WebMgtMIBConformance 1 }
+
+
+        alcatelIND1WebMgtMIBCompliances OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                "Branch For WebView Subsystem Compliance Statements."
+                ::= { alcatelIND1WebMgtMIBConformance 2 }
+
+-- WebView Global Configuration parameters and objects
+
+       alaIND1WebMgtAdminStatus OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+            "Enable/Disable access to WebView.  If WebView access is disabled, the
+            WebView server will not be disabled automatically."
+                DEFVAL { enable }
+         ::= { alcatelIND1WebMgtMIBObjects 1 }
+
+
+        alaIND1WebMgtSSL OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                              }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+            "Enable/Disable forced SSL for WebView."
+                DEFVAL { enable }
+         ::= { alcatelIND1WebMgtMIBObjects 2}
+
+
+        alaIND1WebMgtHttpPort OBJECT-TYPE
+            SYNTAX  Integer32 (80 | 1024..65535)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "The user configurable TCP port for switch's
+                 http access. Default is 80."
+            DEFVAL { 80 }
+         ::= { alcatelIND1WebMgtMIBObjects 3 }
+
+        alaIND1WebMgtHttpsPort OBJECT-TYPE
+            SYNTAX  Integer32 (443 | 1024..65535)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                 "The user configurable TCP port for switch's https
+                 access. Default is 443."
+            DEFVAL { 443 }
+         ::= { alcatelIND1WebMgtMIBObjects 4 }
+
+        alaIND1WebMgtServerStatus OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2),
+			restarting(3),
+                        error(4)
+                              }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+            "Enable/Disable WebView embedded server.
+             If the WebView server is disabled and WebView access is enabled, access will be
+             automatically disabled.  However, if the server was disabled and changes to enabled,
+             WebView access will not be automatically enabled.
+             Status restarting and error are max-access read-only
+             (the error code string can be read using alaIND1WebMgtServerError)."
+                DEFVAL { enable }
+         ::= { alcatelIND1WebMgtMIBObjects 5 }
+
+        alaIND1WebMgtServerError OBJECT-TYPE
+            SYNTAX  SnmpAdminString (SIZE (0..127))
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+            "Error code string when WebView Server is in error status.
+             Format is 'Error Num: {Number}. {String message}.' where
+             {Number} is an integer representing the error code and
+             {String message} is the error string message."
+         ::= { alcatelIND1WebMgtMIBObjects 6 }
+
+        alcatelIND1WebMgtCertObjects OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+            "Branch For WebView SSL Certificate Objects."
+         ::= { alcatelIND1WebMgtMIBObjects  8 }
+
+-- WebView parameters and objects related to the SSL Certificate
+
+        alcatelIND1WebMgtCertFile OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        none(1),
+                        default(2),
+                        user(3)
+                            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+            "Triggers certificate file to be synchronize across the chassis.
+            The default value may not be used when setting this object.
+            The default will always be returned when getting this object."
+                DEFVAL { none }
+         ::= { alcatelIND1WebMgtCertObjects 1 } 
+
+        alcatelIND1WebMgtCertMD5 OBJECT-TYPE
+            SYNTAX  SnmpAdminString (SIZE (0..32))
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+            "The md5 of the certificate indicated by alcatelIND1WebMgtCertFile.
+            This value can be filled in when doing a set but it must match the md5
+            of the file on the primary master CMM. This object will always return
+            the default value."
+            DEFVAL  { "" }
+         ::= { alcatelIND1WebMgtCertObjects 2 } 
+
+
+--
+-- Trap definition
+--
+
+webMgtTrapsObj  OBJECT IDENTIFIER ::= { alcatelIND1WebMgtMIBObjects 7 }
+
+  webMgtServerErrorTrap  NOTIFICATION-TYPE
+      OBJECTS {
+              webMgtServerError
+            }
+        STATUS  current
+        DESCRIPTION
+            "This trap is sent to management station(s) when the
+             Web Management server goes into error state after
+             crashing twice within a minute."
+        ::= { alcatelIND1WebMgtMIBNotifications 1 }
+
+  webMgtServerError  OBJECT-TYPE
+      SYNTAX  SnmpAdminString (SIZE (0..127))
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+            "Error code string of WebView Server error, same as alaIND1WebMgtServerError."
+         ::= { webMgtTrapsObj 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+alaIND1WebMgtConfigMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Compliance statement for Learned Port Security."
+    MODULE
+        MANDATORY-GROUPS
+        {
+            alaIND1WebMgtConfigMIBGroup,
+            alaIND1WebMgtNotificationGroup,
+            alaIND1WebMgtConfigMIBCertGroup
+        }
+    ::= { alcatelIND1WebMgtMIBCompliances 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaIND1WebMgtConfigMIBGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaIND1WebMgtAdminStatus,
+            alaIND1WebMgtSSL,
+            alaIND1WebMgtHttpPort,
+            alaIND1WebMgtHttpsPort,
+            alaIND1WebMgtServerStatus,
+            alaIND1WebMgtServerError,
+            webMgtServerError
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for global configuration parameters defining
+                         the behavior of the embedded web server."
+        ::= { alcatelIND1WebMgtMIBGroups 1 }
+
+alaIND1WebMgtNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS
+   {
+       webMgtServerErrorTrap
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of notifications for Web Management."
+   ::= { alcatelIND1WebMgtMIBGroups 2 }
+
+alaIND1WebMgtConfigMIBCertGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alcatelIND1WebMgtCertFile,
+            alcatelIND1WebMgtCertMD5
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for global configuration parameters defining
+                         the behavior of the embedded web server's SSL certificate."
+        ::= { alcatelIND1WebMgtMIBGroups 3 }
+
+END

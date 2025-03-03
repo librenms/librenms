@@ -3,7 +3,7 @@ EATON-EPDU-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 	OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, 
-	Counter32, Unsigned32, Integer32
+	Counter32, Unsigned32, Integer32, enterprises
 		FROM SNMPv2-SMI
 	NOTIFICATION-GROUP, OBJECT-GROUP, MODULE-COMPLIANCE
 		FROM SNMPv2-CONF
@@ -12,14 +12,42 @@ IMPORTS
 	pduAgent
 		FROM EATON-OIDS;
 
+-- The 3 assignments below are redundant with the one declared in the import file EATON-OIDS.txt
+-- because of the compatibility with some SNMP host software that do not support manufacturer import files.
+-- Take care not to diverge from the import file.
+eaton OBJECT IDENTIFIER ::= { enterprises 534 }
+products OBJECT IDENTIFIER ::= { eaton 6  }
+pduAgent OBJECT IDENTIFIER ::= { products 6  }
+
 eatonEpdu MODULE-IDENTITY
-	LAST-UPDATED "201312181200Z"
+	LAST-UPDATED "201805301500Z"
 	ORGANIZATION 
 		"Eaton Corporation"
 	CONTACT-INFO 
 		"www.eaton.com/epdu"
 	DESCRIPTION 
 		"The MIB module for Eaton ePDUs (Enclosure Power Distribution Units)."
+
+	REVISION "201805301500Z"
+	DESCRIPTION 
+		"- Add information about architecture of the ePDU.
+		- Add outlet automatic shutoff."
+
+	REVISION "201709111200Z"
+	DESCRIPTION 
+		"- Add physical name for input, outlet and gang.
+		- Add friendly name for input.
+		- Add input identification for outlet.
+		- Add the nominal power for ePDU input.
+		- Add a new outlet type sdg300 (31)."
+
+	REVISION "201704201200Z"
+	DESCRIPTION 
+		"Add color codes for each input and group. Color codes are decimal values."
+
+	REVISION "201502231200Z"
+	DESCRIPTION 
+		"Fix compatibility with some SNMP host software by adding some assignments."
 
 	REVISION "201409291200Z"
 	DESCRIPTION 
@@ -73,7 +101,6 @@ eatonEpdu MODULE-IDENTITY
 	DESCRIPTION 
 		"Initial release."
 ::= { pduAgent 7 }
-
 
 UnixTimeStamp ::= TEXTUAL-CONVENTION
 	STATUS     current
@@ -339,6 +366,8 @@ UnitEntry ::= SEQUENCE {
 		INTEGER,
 	unitType
 		INTEGER,
+	systemType
+		INTEGER,
 	inputCount
 		Integer32,
 	groupCount
@@ -452,7 +481,9 @@ unitType  OBJECT-TYPE
 		switched (1),
 		advancedMonitored (2),
 		managed (3),
-		monitored (4)
+		monitored (4),
+		basic (5),
+		inlineMonitored (6)
 	}
 	MAX-ACCESS read-only
 	STATUS     current
@@ -461,9 +492,22 @@ unitType  OBJECT-TYPE
             Monitored (MI) - input and usually section/group monitoring.
             Advanced Monitored (AM) - input, section/group, and outlet monitoring.
             Switched (SW) - input and section/group monitoring, outlet switching.
-            Managed (MA) - input, section/group, and outlet monitoring plug outlet switching."
+            Basic (BA) - no communication card.
+            Inline Monitored (IL) - input and usually one section/group monitoring."
 	::= { unitEntry 10 }
 
+systemType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		unknown (0),
+		g3ePDU (1),
+		g3HDePDU (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Architecture of the ePDU electronic."
+	::= { unitEntry 11 }
+  
 inputCount  OBJECT-TYPE
 	SYNTAX     Integer32
 	MAX-ACCESS read-only
@@ -661,7 +705,11 @@ InputEntry ::= SEQUENCE {
 	inputPowerCount
 		Integer32,
 	inputPlugType
-		INTEGER
+		INTEGER,
+	inputFeedColor
+		Unsigned32,
+	inputFeedName
+		OCTET STRING
 }
 
 inputIndex  OBJECT-TYPE
@@ -777,6 +825,25 @@ inputPlugType  OBJECT-TYPE
 	DESCRIPTION 
 		"Identifies which plug is on the input."
 	::= { inputEntry 8 }
+
+inputFeedColor  OBJECT-TYPE
+	SYNTAX     Unsigned32 (0..16777215)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Color code of the input feed."
+	::= { inputEntry 9 }
+
+inputFeedName  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..31))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"A descriptive name for the input."
+	::= { inputEntry 10 }
+
+
+
 
 inputVoltageTable  OBJECT-TYPE
 	SYNTAX SEQUENCE OF InputVoltageEntry
@@ -902,6 +969,8 @@ inputVoltageThUpperCritical  OBJECT-TYPE
 		          that this object is not available."
 	::= { inputVoltageEntry 8 }
 
+
+
 inputCurrentTable  OBJECT-TYPE
 	SYNTAX SEQUENCE OF InputCurrentEntry
 	MAX-ACCESS not-accessible
@@ -944,7 +1013,9 @@ InputCurrentEntry ::= SEQUENCE {
 	inputCurrentCrestFactor
 		Integer32,
 	inputCurrentPercentLoad
-		Integer32
+		Integer32,
+	inputPhaseDesignator
+		DisplayString
 }
 
 inputCurrentIndex  OBJECT-TYPE
@@ -1057,6 +1128,17 @@ inputCurrentPercentLoad  OBJECT-TYPE
                   percentage, for example 80% will be returned as 80.  A negative
                   value indicates that this object is not available."
 	::= { inputCurrentEntry 11 }
+
+inputPhaseDesignator  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(2..4))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Alphanumeric physical name for the input."
+	::= { inputCurrentEntry 12 }
+
+
+
 
 inputPowerTable  OBJECT-TYPE
 	SYNTAX SEQUENCE OF InputPowerEntry
@@ -1209,6 +1291,8 @@ InputTotalPowerEntry ::= SEQUENCE {
 	inputTotalPowerFactor
 		Integer32,
 	inputTotalVAR
+		Integer32,
+	inputPowerCapacity
 		Integer32
 }
 
@@ -1267,6 +1351,14 @@ inputTotalVAR  OBJECT-TYPE
 		          that this object is not available."
 	::= { inputTotalPowerEntry 8 }
 
+inputPowerCapacity  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Typical power capacity of the input.  A negative value indicates that
+		the hardware current capacity is unknown."
+	::= { inputTotalPowerEntry 9 }
 
 
 
@@ -1301,6 +1393,12 @@ GroupEntry ::= SEQUENCE {
 	groupBreakerStatus
 		INTEGER,
 	groupChildCount
+		Integer32,
+	groupColor
+		Unsigned32,
+	groupDesignator
+		DisplayString,
+	groupInputIndex
 		Integer32
 }
 
@@ -1364,6 +1462,33 @@ groupChildCount  OBJECT-TYPE
 	DESCRIPTION 
 		"Number of children for this group."
 	::= { groupEntry 6 }
+
+groupColor  OBJECT-TYPE
+	SYNTAX     Unsigned32 (0..16777215)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Background color code of the group. Color codes are decimal values."
+	::= { groupEntry 7 }
+
+groupDesignator  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(2..4))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Alphanumeric physical name for the group.  This value may be written
+		      on the face of the unit."
+	::= { groupEntry 8 }
+
+groupInputIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Identifies the input on which the group is connected."
+	::= { groupEntry 9 }
+
+
 
 groupChildTable  OBJECT-TYPE
 	SYNTAX SEQUENCE OF GroupChildEntry
@@ -1773,7 +1898,7 @@ GroupControlEntry ::= SEQUENCE {
 		INTEGER,
 	groupControlOffCmd
 		Integer32,
-	groupControl0nCmd
+	groupControlOnCmd
 		Integer32,
 	groupControlRebootCmd
 		Integer32
@@ -1810,7 +1935,7 @@ groupControlOffCmd  OBJECT-TYPE
 		          commands.  These will respond with an error if a command value of > 0 is written to this object."
 	::= { groupControlEntry 3 }
 
-groupControl0nCmd  OBJECT-TYPE
+groupControlOnCmd  OBJECT-TYPE
 	SYNTAX     Integer32 (-1..99999)
 	MAX-ACCESS read-write
 	STATUS     current
@@ -1875,6 +2000,10 @@ OutletEntry ::= SEQUENCE {
 	outletParentCount
 		Integer32,
 	outletType
+		INTEGER,
+	outletDesignator
+		DisplayString,
+	outletPhaseID
 		INTEGER
 }
 
@@ -1927,14 +2056,50 @@ outletType  OBJECT-TYPE
 		nema620 (26),
 		nemaL620 (27),
 		nemaL630 (28),
-        nemaL715 (29),
-        rf203p277 (30)
+    nemaL715 (29),
+    rf203p277 (30),
+       sdg300 (31)
 	}
 	MAX-ACCESS read-only
 	STATUS     current
 	DESCRIPTION 
 		"The physical type of outlet."
 	::= { outletEntry 5 }
+
+outletDesignator  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(2..4))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Alphanumeric physical name for the outlet."
+	::= { outletEntry 6 }
+
+outletPhaseID  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		singlePhase (1),
+		phase1toN (2),
+		phase2toN (3),
+		phase3toN (4),
+		phase1to2 (5),
+		phase2to3 (6),
+		phase3to1 (7),
+		phase12N (8),
+		phase23N (9),
+		phase31N (10),
+		phase123 (11),
+		phase123N (12)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Value indicates which phases are connected to each outlet in this table row - single phase
+		voltage, phase 1 to neutral, phase 2 to neutral, phase 3 to neutral, phase 1 to phase 2,
+		phase 2 to phase 3, phase 3 to phase 1, split-phase with phases 1 and 2, split phase 
+		with phases 2 and 3, split phase with phases 3 and 1, three-phase delta, and three-phase wye."
+	::= { outletEntry 7 }
+
+
+
 
 outletParentTable  OBJECT-TYPE
 	SYNTAX SEQUENCE OF OutletParentEntry
@@ -2152,7 +2317,8 @@ outletCurrentThStatus  OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS     current
 	DESCRIPTION 
-		"Status of the measured outlet current relative to the configured thresholds."
+		"Status of the measured outlet current relative to the configured thresholds. 
+		          A negative value indicates that this object is not available."
 	::= { outletCurrentEntry 4 }
 
 outletCurrentThLowerWarning  OBJECT-TYPE
@@ -2461,6 +2627,47 @@ outletControlShutoffDelay  OBJECT-TYPE
     An application which need to shutoff properly an outlet will read this parameter first
     then write it to the command outletControlOffCmd."
     	::= { outletControlEntry 10 }
+
+
+outletGlobalTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF OutletGlobalEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A list of globlal configuration on all outlets."
+	::= { outlets 7 }
+
+outletGlobalEntry  OBJECT-TYPE
+	SYNTAX 	OutletGlobalEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry for a global variable on all outlets."
+	INDEX { strappingIndex 
+    }
+	::= { outletGlobalTable 1 }
+
+OutletGlobalEntry ::= SEQUENCE {
+	outletAutomaticShutoff
+		INTEGER
+}
+
+outletAutomaticShutoff  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApplicable (0),
+		keepTheCurrentPosition (1),
+		shutoffTheOutlets (2)
+	}	
+  MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Determines the state of all outlets when the unit is power off:
+        0 : not applicable (read only)
+        1 : Keep the outlet relays in the current position when the PDU is powered down
+        2 : Makes the outlet relays go to the position that shutoffs the outlets when the PDU is powered down"
+	::= { outletGlobalEntry 2 }
+
+
 
 temperatureTable  OBJECT-TYPE
 	SYNTAX SEQUENCE OF TemperatureEntry
@@ -2824,10 +3031,12 @@ epduOptionalGroup  OBJECT-GROUP
 		contactName, 
 		contactProbeStatus, 
 		contactState, 
-		groupChildCount, 
+		groupBreakerStatus, 
+		groupChildCount,
 		groupChildOID, 
 		groupChildType, 
-		groupControl0nCmd, 
+		groupColor, 
+		groupControlOnCmd, 
 		groupControlOffCmd, 
 		groupControlRebootCmd, 
 		groupControlStatus, 
@@ -2841,10 +3050,11 @@ epduOptionalGroup  OBJECT-GROUP
 		groupCurrentThStatus, 
 		groupCurrentThUpperCritical, 
 		groupCurrentThUpperWarning, 
+		groupDesignator, 
 		groupID, 
 		groupIndex, 
+		groupInputIndex, 
 		groupName, 
-		groupBreakerStatus, 
 		groupPowerFactor, 
 		groupType, 
 		groupVA, 
@@ -2882,13 +3092,23 @@ epduOptionalGroup  OBJECT-GROUP
 		inputCurrentThStatus, 
 		inputCurrentThUpperCritical, 
 		inputCurrentThUpperWarning, 
+		inputFeedColor,
+		inputFeedName,
 		inputFrequency, 
 		inputFrequencyStatus, 
 		inputIndex, 
+		inputPhaseDesignator, 
 		inputPlugType, 
+		inputPowerCapacity, 
 		inputPowerCount, 
 		inputPowerFactor, 
 		inputPowerMeasType, 
+		inputTotalPowerFactor,
+		inputTotalVA,
+		inputTotalVAR,
+		inputTotalWatts,
+		inputTotalWh,
+		inputTotalWhTimer,
 		inputType, 
 		inputVA, 
 		inputVAR, 
@@ -2904,16 +3124,11 @@ epduOptionalGroup  OBJECT-GROUP
 		inputWatts, 
 		inputWh, 
 		inputWhTimer, 
-        inputTotalVA,
-        inputTotalWatts,
-        inputTotalWh,
-        inputTotalWhTimer,
-        inputTotalPowerFactor,
-        inputTotalVAR,
 		internalStatus, 
 		lcdControl,
-    outletControlSwitchable,
-    outletControlShutoffDelay,
+		outletAutomaticShutoff,
+		outletControlSwitchable,
+		outletControlShutoffDelay,
 		outletControlOffCmd, 
 		outletControlOnCmd, 
 		outletControlPowerOnState, 
@@ -2925,18 +3140,20 @@ epduOptionalGroup  OBJECT-GROUP
 		outletCurrent, 
 		outletCurrentCapacity, 
 		outletCurrentCrestFactor, 
-        outletCurrentPercentLoad,
+		outletCurrentPercentLoad,
 		outletCurrentThLowerCritical, 
 		outletCurrentThLowerWarning, 
 		outletCurrentThStatus, 
 		outletCurrentThUpperCritical, 
 		outletCurrentThUpperWarning, 
+		outletDesignator, 
 		outletID, 
 		outletIndex, 
 		outletName, 
 		outletParentCount, 
 		outletParentOID, 
 		outletParentType, 
+		outletPhaseID,
 		outletPowerFactor, 
 		outletType, 
 		outletVA, 
@@ -2955,12 +3172,12 @@ epduOptionalGroup  OBJECT-GROUP
 		serialNumber, 
 		strappingIndex, 
 		strappingStatus, 
+		systemType, 
 		temperatureCount, 
 		temperatureIndex, 
 		temperatureName, 
 		temperatureProbeStatus, 
 		temperatureScale, 
-		unitType, 
 		temperatureThLowerCritical, 
 		temperatureThLowerWarning, 
 		temperatureThStatus, 
@@ -2971,7 +3188,8 @@ epduOptionalGroup  OBJECT-GROUP
 		unitControlOnCmd, 
 		unitName, 
 		unitsPresent,
-        userName }
+		unitType, 
+    userName }
 	STATUS     current
 	DESCRIPTION 
 		"Most objects in this MIB are optional."

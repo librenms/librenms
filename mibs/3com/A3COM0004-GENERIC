@@ -1,0 +1,87 @@
+-- **********************************************************************
+--
+-- Name:        3Com ESD Generic MIB branches
+-- 
+-- Description: 
+--      This is the register for all MIB branches under a3com.generic.
+--      These MIB branches are declared in the source file:
+--              /vobs/shelf/gma/gmi/bdn.mib
+--
+--      This document is currently maintained by:
+--              Les Bell        Les_Bell@3Com.com	4-400-8025
+--
+-- History  Date        Reason for Change
+--
+-- 1.00     1997        Issued as 3Com RFC.
+-- some history was lost
+-- 1.50 17 March 00     Added branch for qos
+-- 1.60 23 Oct 00       Added branch for L4 Re-direction
+-- ================================
+-- YY/MM/DD Author      Comments
+-- ================================
+-- 01/12/06 EL Bell     Added a3ComTrafficStats {41} a3ComRadiusMIB {42}
+-- 01/12/11 P Biti      Added a3ComBackup-mib { 43}
+-- 02/04/30 EL Bell     Added a3comLicenseGroup {44}
+-- 02/09/30 EL Bell     Added a3ComPowerEthernetExt {45}
+-- 03/02/06 EL Bell     Added a3ComQBridgeMIB {46}
+-- 03/02/14 EL Bell     Added a3ComFabric {47}
+-- 03/06/13 EL Bell     Added a3ComLinkAgg {48}
+-- 03/12/22 EL Bell     Added a3ComPaeMIB {49} + a3ComSntpGroup {50}
+-- **********************************************************************
+-- Copyright (c) 3Com Corporation. All Rights Reserved.
+-- **********************************************************************
+
+A3COM0004-GENERIC DEFINITIONS ::= BEGIN
+
+        IMPORTS generic FROM A3Com-products-MIB ;
+
+setup             OBJECT IDENTIFIER ::= {generic 2}
+sysLoader         OBJECT IDENTIFIER ::= {generic 3}
+security          OBJECT IDENTIFIER ::= {generic 4}
+gauges            OBJECT IDENTIFIER ::= {generic 5}
+asciiAgent        OBJECT IDENTIFIER ::= {generic 6}
+serialIf          OBJECT IDENTIFIER ::= {generic 7}
+repeaterMgmt      OBJECT IDENTIFIER ::= {generic 8}
+endStation        OBJECT IDENTIFIER ::= {generic 9}
+localSnmp         OBJECT IDENTIFIER ::= {generic 10}
+manager           OBJECT IDENTIFIER ::= {generic 11}
+unusedGeneric12   OBJECT IDENTIFIER ::= {generic 12}
+chassis           OBJECT IDENTIFIER ::= {generic 14}
+mrmResilience     OBJECT IDENTIFIER ::= {generic 15}
+tokenRing         OBJECT IDENTIFIER ::= {generic 16}
+multiRepeater     OBJECT IDENTIFIER ::= {generic 17}
+bridgeMgmt        OBJECT IDENTIFIER ::= {generic 18}
+fault             OBJECT IDENTIFIER ::= {generic 19}
+poll              OBJECT IDENTIFIER ::= {generic 20}
+powerSupply       OBJECT IDENTIFIER ::= {generic 21}
+securePort        OBJECT IDENTIFIER ::= {generic 22}
+alertLed          OBJECT IDENTIFIER ::= {generic 23}
+remoteControl     OBJECT IDENTIFIER ::= {generic 24}
+rmonExtensions    OBJECT IDENTIFIER ::= {generic 25}
+rfc1516extensions OBJECT IDENTIFIER ::= {generic 26}
+superStackIIconfig OBJECT IDENTIFIER ::= {generic 27}
+extendedIfInfo    OBJECT IDENTIFIER ::= {generic 28}
+a3ComVlan         OBJECT IDENTIFIER ::= {generic 29}
+vlanServerClient  OBJECT IDENTIFIER ::= {generic 30}
+segmentLoadBalancing  OBJECT IDENTIFIER ::= {generic 31}
+virtualFileSystem OBJECT IDENTIFIER ::= {generic 32}
+smartAutosensing  OBJECT IDENTIFIER ::= {generic 33}
+brasica2          OBJECT IDENTIFIER ::= {generic 34}
+smaVlanSupport    OBJECT IDENTIFIER ::= {generic 35}
+a3ComBridgeExt    OBJECT IDENTIFIER ::= {generic 36}
+igmpMIB           OBJECT IDENTIFIER ::= {generic 37}
+mibSummary        OBJECT IDENTIFIER ::= {generic 38}
+qosProfiles       OBJECT IDENTIFIER ::= {generic 39}
+l4Redirect        OBJECT IDENTIFIER ::= {generic 40}
+a3ComTrafficStats OBJECT IDENTIFIER ::= {generic 41}
+a3ComRadiusMIB    OBJECT IDENTIFIER ::= {generic 42}
+a3ComBackup-mib   OBJECT IDENTIFIER ::= {generic 43}
+a3comLicenseGroup OBJECT IDENTIFIER ::= {generic 44}    -- 3FC-485
+a3ComPowerEthernetExt OBJECT IDENTIFIER ::= {generic 45} -- 3FC-484
+a3ComQBridgeMIB   OBJECT IDENTIFIER ::= {generic 46}    -- 3FC-493
+a3ComFabric       OBJECT IDENTIFIER ::= {generic 47}    -- 3FC-491
+a3ComLinkAgg      OBJECT IDENTIFIER ::= {generic 48}    -- 3FC-490
+a3ComPaeMIB       OBJECT IDENTIFIER ::= {generic 49}
+a3ComSntpGroup    OBJECT IDENTIFIER ::= {generic 50}    -- 3FC-515
+
+END

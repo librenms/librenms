@@ -1,166 +1,115 @@
 <?php
 
+use App\Models\AccessPoint;
+use Illuminate\Support\Collection;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Mac;
 
 if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
-    global $config;
-
-    $polled = time();
-
-    // Build SNMP Cache Array
-    // stuff about the controller
-    $switch_info_oids    = array(
-        'wlsxSwitchRole',
-        'wlsxSwitchMasterIp',
-    );
-    $switch_counter_oids = array(
-        'wlsxSwitchTotalNumAccessPoints.0',
-        'wlsxSwitchTotalNumStationsAssociated.0',
-    );
-
-
-    $switch_apinfo_oids = array(
-        'wlsxWlanRadioEntry',
-        'wlanAPChInterferenceIndex',
-    );
-    $switch_apname_oids = array('wlsxWlanRadioEntry.16');
-
-
-    // initialize arrays to avoid overwriting them in foreach loops below
-    $aruba_stats = array();
-    $aruba_apstats = array();
-    $aruba_apnames = array();
-
-    $aruba_oids = array_merge($switch_info_oids, $switch_counter_oids);
-    echo 'Caching Oids: ';
-    foreach ($aruba_oids as $oid) {
-        echo "$oid ";
-        $aruba_stats = snmpwalk_cache_oid($device, $oid, $aruba_stats, 'WLSX-SWITCH-MIB');
-    }
-
-    foreach ($switch_apinfo_oids as $oid) {
-        echo "$oid ";
-        $aruba_apstats = snmpwalk_cache_oid_num($device, $oid, $aruba_apstats, 'WLSX-WLAN-MIB');
-    }
-
-    foreach ($switch_apname_oids as $oid) {
-        echo "$oid ";
-        $aruba_apnames = snmpwalk_cache_oid_num($device, $oid, $aruba_apnames, 'WLSX-WLAN-MIB');
-    }
-
-
-    echo "\n";
+    // get data about the controller
+    $aruba_stats = SnmpQuery::get([
+        'WLSX-SWITCH-MIB::wlsxSwitchTotalNumAccessPoints.0',
+        'WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0',
+    ])->values();
 
     $rrd_name = 'aruba-controller';
     $rrd_def = RrdDefinition::make()
         ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
         ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
 
-    $fields = array(
-        'NUMAPS'     => $aruba_stats[0]['wlsxSwitchTotalNumAccessPoints'],
-        'NUMCLIENTS' => $aruba_stats[0]['wlsxSwitchTotalNumStationsAssociated'],
-    );
+    $fields = [
+        'NUMAPS' => $aruba_stats['WLSX-SWITCH-MIB::wlsxSwitchTotalNumAccessPoints.0'],
+        'NUMCLIENTS' => $aruba_stats['WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0'],
+    ];
 
     $tags = compact('rrd_name', 'rrd_def');
     data_update($device, 'aruba-controller', $tags, $fields);
 
+    // get AP data
+    $aruba_apstats = SnmpQuery::enumStrings()->walk([
+        'WLSX-WLAN-MIB::wlsxWlanRadioTable',
+        'WLSX-WLAN-MIB::wlanAPChInterferenceIndex',
+    ])->table(2);
 
-    $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', array($device['device_id']));
+    $aps = new Collection;
+    $db_aps = DeviceCache::getPrimary()->accessPoints->keyBy->getCompositeKey();
 
+    foreach ($aruba_apstats as $mac => $radio) {
+        foreach ($radio as $radionum => $data) {
+            $ap = new AccessPoint([
+                'name' => $data['WLSX-WLAN-MIB::wlanAPRadioAPName'] ?? null,
+                'radio_number' => $radionum,
+                'type' => $data['WLSX-WLAN-MIB::wlanAPRadioType'] ?? null,
+                'mac_addr' => Mac::parse($mac)->readable(),
+                'channel' => $data['WLSX-WLAN-MIB::wlanAPRadioChannel'] ?? null,
+                'txpow' => isset($data['WLSX-WLAN-MIB::wlanAPRadioTransmitPower10x']) ? ($data['WLSX-WLAN-MIB::wlanAPRadioTransmitPower10x'] / 10) : ($data['WLSX-WLAN-MIB::wlanAPRadioTransmitPower'] ?? 0) / 2,
+                'radioutil' => $data['WLSX-WLAN-MIB::wlanAPRadioUtilization'] ?? null,
+                'numasoclients' => $data['WLSX-WLAN-MIB::wlanAPRadioNumAssociatedClients'] ?? null,
+                'nummonclients' => $data['WLSX-WLAN-MIB::wlanAPRadioNumMonitoredClients'] ?? null,
+                'numactbssid' => $data['WLSX-WLAN-MIB::wlanAPRadioNumActiveBSSIDs'] ?? null,
+                'nummonbssid' => $data['WLSX-WLAN-MIB::wlanAPRadioNumMonitoredBSSIDs'] ?? null,
+                'interference' => isset($data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex']) ? ($data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex'] / 600) : null,
+            ]);
 
-    foreach ($aruba_apnames as $key => $value) {
-        $radioid       = str_replace('1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.16.', '', $key);
-        $name          = $value[''];
-        $type          = $aruba_apstats["1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.2.$radioid"][''];
-        $channel       = ($aruba_apstats["1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.3.$radioid"][''] + 0);
-        $txpow         = ($aruba_apstats["1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.4.$radioid"][''] + 0);
-        $radioutil     = ($aruba_apstats["1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.6.$radioid"][''] + 0);
-        $numasoclients = ($aruba_apstats["1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.7.$radioid"][''] + 0);
-        $nummonclients = ($aruba_apstats["1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.8.$radioid"][''] + 0);
-        $numactbssid   = ($aruba_apstats["1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.9.$radioid"][''] + 0);
-        $nummonbssid   = ($aruba_apstats["1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.10.$radioid"][''] + 0);
-        $interference  = ($aruba_apstats["1.3.6.1.4.1.14823.2.2.1.5.3.1.6.1.11.$radioid"][''] + 0);
+            Log::debug(<<<DEBUG
+> mac:            $ap->mac_addr
+  radionum:       $ap->radio_number
+  name:           $ap->name
+  type:           $ap->type
+  channel:        $ap->channel
+  txpow:          $ap->txpow
+  radioutil:      $ap->radioutil
+  numasoclients:  $ap->numasoclients
+  interference:   $ap->interference
+DEBUG);
 
-        $radionum = substr($radioid, (strlen($radioid) - 1), 1);
+            // if there is a numeric channel, assume the rest of the data is valid, I guess
+            if (is_numeric($ap->channel)) {
+                $rrd_def = RrdDefinition::make()
+                    ->addDataset('channel', 'GAUGE', 0, 200)
+                    ->addDataset('txpow', 'GAUGE', 0, 200)
+                    ->addDataset('radioutil', 'GAUGE', 0, 100)
+                    ->addDataset('nummonclients', 'GAUGE', 0, 500)
+                    ->addDataset('nummonbssid', 'GAUGE', 0, 200)
+                    ->addDataset('numasoclients', 'GAUGE', 0, 500)
+                    ->addDataset('interference', 'GAUGE', 0, 2000);
 
-        if ($debug) {
-            echo "* radioid: $radioid\n";
-            echo "  radionum: $radionum\n";
-            echo "  name: $name\n";
-            echo "  type: $type\n";
-            echo "  channel: $channel\n";
-            echo "  txpow: $txpow\n";
-            echo "  radioutil: $radioutil\n";
-            echo "  numasoclients: $numasoclients\n";
-            echo "  interference: $interference\n";
-        }
+                $fields = $ap->only([
+                    'channel',
+                    'txpow',
+                    'radioutil',
+                    'nummonclients',
+                    'nummonbssid',
+                    'numasoclients',
+                    'interference',
+                ]);
 
-        // if there is a numeric channel, assume the rest of the data is valid, I guess
-        if (is_numeric($channel)) {
-            $rrd_name = array('arubaap',  $name.$radionum);
+                $tags = [
+                    'name' => $ap->name,
+                    'radionum' => $ap->radio_number,
+                    'rrd_name' => ['arubaap', $ap->name . $ap->radio_number],
+                    'rrd_def' => $rrd_def,
+                ];
 
-            $rrd_def = RrdDefinition::make()
-                ->addDataset('channel', 'GAUGE', 0, 200)
-                ->addDataset('txpow', 'GAUGE', 0, 200)
-                ->addDataset('radioutil', 'GAUGE', 0, 100)
-                ->addDataset('nummonclients', 'GAUGE', 0, 500)
-                ->addDataset('nummonbssid', 'GAUGE', 0, 200)
-                ->addDataset('numasoclients', 'GAUGE', 0, 500)
-                ->addDataset('interference', 'GAUGE', 0, 2000);
+                data_update($device, 'aruba', $tags, $fields);
 
-            $fields = array(
-                'channel'         => $channel,
-                'txpow'           => $txpow,
-                'radioutil'       => $radioutil,
-                'nummonclients'   => $nummonclients,
-                'nummonbssid'     => $nummonbssid,
-                'numasoclients'   => $numasoclients,
-                'interference'    => $interference,
-            );
-
-            $tags = array(
-                'name' => $name,
-                'radionum' => $radionum,
-                'rrd_name' => $rrd_name,
-                'rrd_def' => $rrd_def
-            );
-
-            data_update($device, 'aruba', $tags, $fields);
-        }
-
-        // generate the mac address
-        $macparts = explode('.', $radioid, -1);
-        $mac      = '';
-        foreach ($macparts as $part) {
-            $mac .= sprintf('%02x', $part).':';
-        }
-
-        $mac = rtrim($mac, ':');
-
-
-        $foundid = 0;
-
-        for ($z = 0; $z < sizeof($ap_db); $z++) {
-            if ($ap_db[$z]['name'] == $name && $ap_db[$z]['radio_number'] == $radionum) {
-                $foundid           = $ap_db[$z]['accesspoint_id'];
-                $ap_db[$z]['seen'] = 1;
-                continue;
+                // sync to DB
+                $ap_key = $ap->getCompositeKey();
+                if ($db_aps->has($ap_key)) {
+                    // ap exists in DB, update it
+                    $db_ap = $db_aps->get($ap_key);
+                    $db_ap->fill($ap->getAttributes());
+                    $db_ap->deleted = 0;
+                    $db_ap->save();
+                    $db_aps->forget($ap_key); // remove valid APs from collection
+                } else {
+                    // save new to DB
+                    DeviceCache::getPrimary()->accessPoints()->save($ap);
+                }
             }
         }
-
-
-
-        if ($foundid == 0) {
-            $ap_id = dbInsert(array('device_id' => $device['device_id'], 'name' => $name, 'radio_number' => $radionum, 'type' => $type, 'mac_addr' => $mac, 'channel' => $channel, 'txpow' => $txpow, 'radioutil' => $radioutil, 'numasoclients' => $numasoclients, 'nummonclients' => $nummonclients, 'numactbssid' => $numactbssid, 'nummonbssid' => $nummonbssid, 'interference' => $interference), 'access_points');
-        } else {
-            dbUpdate(array('mac_addr' => $mac, 'deleted' => 0, 'channel' => $channel, 'txpow' => $txpow, 'radioutil' => $radioutil, 'numasoclients' => $numasoclients, 'nummonclients' => $nummonclients, 'numactbssid' => $numactbssid, 'nummonbssid' => $nummonbssid, 'interference' => $interference), 'access_points', '`accesspoint_id` = ?', array($foundid));
-        }
-    }//end foreach
+    }
 
     // mark APs which are not on this controller anymore as deleted
-    for ($z = 0; $z < sizeof($ap_db); $z++) {
-        if (!isset($ap_db[$z]['seen']) && $ap_db[$z]['deleted'] == 0) {
-            dbUpdate(array('deleted' => 1), 'access_points', '`accesspoint_id` = ?', array($ap_db[$z]['accesspoint_id']));
-        }
-    }
+    $db_aps->each->update(['deleted' => 1]);
 }//end if

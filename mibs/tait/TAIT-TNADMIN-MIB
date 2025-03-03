@@ -1,0 +1,173 @@
+TAIT-TNADMIN-MIB DEFINITIONS ::= BEGIN
+--
+-- Versions:
+--
+-- Release 1
+-- Preliminary support for monitoring of core network server.
+--
+-- Notes:
+--  None
+--
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, Integer32
+      FROM SNMPv2-SMI
+   DisplayString
+      FROM SNMPv2-TC
+   MODULE-COMPLIANCE, OBJECT-GROUP
+      FROM SNMPv2-CONF
+   tnAdminMibModule, tnAdminMIB
+      FROM TAIT-TNADMIN-MODULE-MIB
+   PercentHundredths, TaitServiceState
+      FROM TAIT-TNADMIN-TC;
+
+tnAdminMibObjNotif MODULE-IDENTITY
+   LAST-UPDATED "202002101200Z"
+   ORGANIZATION "www.taitradio.com"
+   CONTACT-INFO
+      "postal: Tait International Limited
+               245 Wooldridge Road
+               Harewood
+               Christchurch
+               PO Box 1645
+               Christchurch
+               New Zealand
+       phone:  +64 3358 3399
+       email:  support@taitradio.com"
+   DESCRIPTION "TaitNet Administration objects and notifications definition."
+
+   REVISION "202002101200Z"
+   DESCRIPTION "Initial revision of this module."
+      ::= { tnAdminMibModule 2 }
+
+-- Conformance area, containing groups and compliance specifications.
+tnAdminConfs OBJECT IDENTIFIER ::= { tnAdminMIB 1 }
+tnAdminGroups OBJECT IDENTIFIER ::= { tnAdminConfs 1 }
+tnAdminCompl OBJECT IDENTIFIER ::= { tnAdminConfs 2 }
+
+-- Sub-tree for objects and for each functional area.
+tnAdminObjs OBJECT IDENTIFIER ::= { tnAdminMIB 2 }
+tnAdminTaitServiceObjs OBJECT IDENTIFIER ::= { tnAdminObjs 1 }
+
+-- Sub-tree for events.
+tnAdminEvents OBJECT IDENTIFIER ::= { tnAdminMIB 3 }
+
+-- Tait service table
+tnAdminTaitServiceTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF TnAdminTaitServiceEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "This table stores the details of Tait services."
+      ::= { tnAdminTaitServiceObjs 1 }
+
+tnAdminTaitServiceEntry OBJECT-TYPE
+   SYNTAX TnAdminTaitServiceEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The table entry index specification, the Tait service ID."
+   INDEX { tnAdminTaitServicePort }
+      ::= { tnAdminTaitServiceTable 1 }
+
+TnAdminTaitServiceEntry ::=
+   SEQUENCE {
+      tnAdminTaitServicePort Integer32,
+      tnAdminTaitServiceName DisplayString,
+      tnAdminTaitServiceVersion DisplayString,
+      tnAdminTaitServiceSize Integer32,
+      tnAdminTaitServiceRam PercentHundredths,
+      tnAdminTaitServiceCpu PercentHundredths,
+      tnAdminTaitServiceUptime Integer32,
+      tnAdminTaitServiceState TaitServiceState,
+      tnAdminTaitServiceProcessId Integer32
+   }
+
+tnAdminTaitServicePort OBJECT-TYPE
+   SYNTAX Integer32 (1..65535)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The HTTPS port used by a service."
+      ::= { tnAdminTaitServiceEntry 1 }
+
+tnAdminTaitServiceName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The name of the service."
+      ::= { tnAdminTaitServiceEntry 2 }
+
+tnAdminTaitServiceVersion OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The version of the firmware installed in a service."
+      ::= { tnAdminTaitServiceEntry 3 }
+
+tnAdminTaitServiceSize OBJECT-TYPE
+   SYNTAX Integer32 (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The current memory usage of a service, in kilobytes."
+      ::= { tnAdminTaitServiceEntry 4 }
+
+tnAdminTaitServiceRam OBJECT-TYPE
+   SYNTAX PercentHundredths
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The current memory usage of a service, in percent."
+      ::= { tnAdminTaitServiceEntry 5 }
+
+tnAdminTaitServiceCpu OBJECT-TYPE
+   SYNTAX PercentHundredths
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The current CPU usage of a service, in percent."
+      ::= { tnAdminTaitServiceEntry 6 }
+
+tnAdminTaitServiceUptime OBJECT-TYPE
+   SYNTAX Integer32 (0..2147483647)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The total time, in seconds, a service has been running since it was started. Resets to 0 when the service is stopped."
+      ::= { tnAdminTaitServiceEntry 7 }
+
+tnAdminTaitServiceState OBJECT-TYPE
+   SYNTAX TaitServiceState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The current state of a service. State values are Running (0), Watchdog Stopped (1), Application Stopped (2), Stopped (3), and Not Installed (4)."
+      ::= { tnAdminTaitServiceEntry 8 }
+
+tnAdminTaitServiceProcessId OBJECT-TYPE
+   SYNTAX Integer32 (0..4194304)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The current process ID of a service. A value of 0 is returned when the service is not running."
+      ::= { tnAdminTaitServiceEntry 9 }
+
+-- Groups
+tnAdminTaitServiceGroup OBJECT-GROUP
+   OBJECTS {
+      tnAdminTaitServiceName,
+      tnAdminTaitServiceVersion,
+      tnAdminTaitServiceSize,
+      tnAdminTaitServiceRam,
+      tnAdminTaitServiceCpu,
+      tnAdminTaitServiceUptime,
+      tnAdminTaitServiceState,
+      tnAdminTaitServiceProcessId
+   }
+   STATUS current
+   DESCRIPTION "The objects that describe the status of a Tait service."
+      ::= { tnAdminGroups 2 }
+
+-- Compliance specifications
+tn9300ComplianceV1 MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION "The implementation requirements for the Tait TNADMIN MIB."
+   MODULE -- This Module
+      MANDATORY-GROUPS {
+         tnAdminTaitServiceGroup
+      }
+      ::= { tnAdminCompl 1 }
+
+END

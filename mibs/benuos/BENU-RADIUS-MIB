@@ -1,0 +1,2262 @@
+BENU-RADIUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Integer32 ,Unsigned32, MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+
+   DisplayString, TEXTUAL-CONVENTION
+      FROM SNMPv2-TC
+
+   InetAddressType, InetAddress
+      FROM INET-ADDRESS-MIB
+
+   benuWAG FROM BENU-WAG-MIB;
+
+benuRadiusMIB  MODULE-IDENTITY 
+            LAST-UPDATED "201607280000Z" -- Jul 28, 2016
+
+
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "This MIB module defines management information
+                related to the AAA clients.
+
+                Copyright (C)  2013 by Benu Networks, Inc.
+                All rights reserved."
+
+            REVISION "201607280000Z" -- Jul 28, 2016
+            DESCRIPTION "Modified BAAAGroupAuthEntry, BAAAGroupAcctEntry, BAAAGroupCoAEntry"
+
+            REVISION "201603170000Z" -- March 17, 2016 
+            DESCRIPTION "Removed multiple instance indexes from BenuRadiusInstance. "
+
+            REVISION "201506240000Z" -- June 24, 2015
+            DESCRIPTION "Modified bRadiusProxyAuthTPSIntervalDuration description."
+
+            REVISION "201505210000Z" -- May 21, 2015
+            DESCRIPTION "Changed oid values for bRadiusProxyAuthTPSLowReached and bRadiusProxyAuthTPSHighReached."
+
+            REVISION "201505200000Z" -- May 20, 2015
+            DESCRIPTION "Modified description of bRadiusProxyAuthTPSIntervalDuration."
+
+            REVISION "201503160000Z" -- March 16, 2015
+            DESCRIPTION "Added units to processing times in bRadiusLatencyAuthTable"
+
+            REVISION "201503020000Z" -- March 02, 2015
+            DESCRIPTION "Added bRadiusLatencyAuthTable"
+
+            REVISION "201502240000Z" -- February 24, 2015
+            DESCRIPTION "Added bRadiusProxySubscriberDeleted in bRadiusProxyServerAuthTable"
+
+            REVISION "201501260000Z" -- January 26, 2015
+            DESCRIPTION "Updated notification assignments to comply with
+            standards (RFC 2578)."
+
+
+            REVISION "201501020000Z" --  January 02, 2015
+            DESCRIPTION "Added bRadiusProxyAuthTPSTable, bRadiusProxyAuthTPSLowReached and bRadiusProxyAuthTPSHighReached"
+
+            REVISION "201412020000Z" --  December 02, 2014
+            DESCRIPTION "Changed bRadiusNotifObjects from index 2 to 0"
+
+            REVISION "201407170000Z" --  July 17, 2014
+            DESCRIPTION "Added radius proxy server Acct table"
+
+            REVISION "201405190000Z" --  May 19, 2014
+            DESCRIPTION "Added radius proxy server Authtable"
+
+            REVISION "201304180000Z" --  April 18, 2013
+            DESCRIPTION "Initial Version"
+
+    ::= { benuWAG 4 }
+
+-- declare top-level MIB objects for each component
+
+BenuRadiusInstance ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION "An identifier that uniquely identifies
+                 the Benu RADIUS Proxy instance.
+                 They are as follows:
+
+                     1  RADIUS instance 0
+                "
+    SYNTAX       INTEGER {
+       radiusInstance0(1)
+    }
+
+bRadiusMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "RADIUS server information is defined in this branch."
+   ::= { benuRadiusMIB 1 }
+
+bRadiusNotifications  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Notifications related to RADIUS server
+       are defined in this branch."
+   ::= { benuRadiusMIB 0 }
+
+bRadiusNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+       "Notification objects related to RADIUS server
+        are defined in this branch."
+   ::= { benuRadiusMIB 2 }   
+
+bRadiusProxyMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "RADIUS Proxyserver information is defined in this branch."
+   ::= { benuRadiusMIB 3 }
+
+bRadiusProxyNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Notifications related to RADIUS Proxy server
+       are defined in this branch."
+   ::= { benuRadiusMIB 4 }
+
+
+
+-- RADIUS server authentication Table
+
+bRadiusServerAuthTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BRadiusServerAuthEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "A list of authentication RADIUS server information."
+   ::= { bRadiusMIBObjects 1 }
+
+bRadiusServerAuthEntry  OBJECT-TYPE
+   SYNTAX      BRadiusServerAuthEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "A logical row in the bRadiusServerAuthTable."
+   INDEX {
+      bRadiusAuthStatsInterval,
+      bRadiusAuthServerIndex
+   }
+   ::= { bRadiusServerAuthTable 1}
+
+BRadiusServerAuthEntry ::= SEQUENCE {
+    bRadiusAuthStatsInterval                    Integer32,
+    bRadiusAuthServerIndex                      Integer32,
+    bRadiusAuthServerInetAddressType            InetAddressType,
+    bRadiusAuthServerInetAddress                InetAddress,
+    bRadiusAuthIntervalDuration                 Integer32,
+    bRadiusAccessRequestSent                    Unsigned32,
+    bRadiusAccessAcceptReceived                 Unsigned32,
+    bRadiusAccessRejectReceived                 Unsigned32,
+    bRadiusAccessChallengeReceived              Unsigned32,
+    bRadiusAccessRequestResent                  Unsigned32,
+    bRadiusAccessRequestDropped                 Unsigned32,
+    bRadiusAccessRequestTimedOut                Unsigned32,
+    bRadiusAccessRequestSentFail                Unsigned32,
+    bRadiusAccessPeakRequestPending             Unsigned32,
+    bRadiusAccessMalformedRespDropped           Unsigned32,
+    bRadiusAccessBadAuthenticatorRcvd           Unsigned32,
+    bRadiusAccessServerMarkedDead               Unsigned32,
+    bRadiusAuthLatencyMin                       Unsigned32,
+    bRadiusAuthLatencyMax                       Unsigned32,
+    bRadiusAuthLatencyAvg                       Unsigned32,
+    bRadiusAuthLatencyLast                      Unsigned32,
+    bRadiusAuthAAAGroupName                     DisplayString
+}
+bRadiusAuthStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics data, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and 
+       IntervalCount(n), the most and least recent intervals respectively, the following
+       applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for 1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount."
+   ::= { bRadiusServerAuthEntry 1 }
+
+bRadiusAuthServerIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying each RADIUS
+        Authentication server with which this client
+        communicates."
+   ::= { bRadiusServerAuthEntry 2 }
+
+bRadiusAuthServerInetAddressType  OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The type of address format used for the
+       bRadiusAuthServerInetAddress object."
+   ::= { bRadiusServerAuthEntry 3 }
+
+bRadiusAuthServerInetAddress  OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The IP address of the RADIUS Authentication
+      server referred to in this table entry, using
+      the version-neutral IP address format."
+   ::= { bRadiusServerAuthEntry 4 }
+
+bRadiusAuthIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics accumulation interval in minutes."
+   ::= { bRadiusServerAuthEntry 5 }
+
+
+bRadiusAccessRequestSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Request message(s) sent."
+   ::= { bRadiusServerAuthEntry 6 }
+
+bRadiusAccessAcceptReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Accept message(s) received."
+   ::= { bRadiusServerAuthEntry 7 }
+
+bRadiusAccessRejectReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Reject message(s) received."
+   ::= { bRadiusServerAuthEntry 8 }
+
+bRadiusAccessChallengeReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Challenge message(s) received."
+   ::= { bRadiusServerAuthEntry 9 }
+
+bRadiusAccessRequestResent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of Access-Request message(s) resent to server
+       as no response was received."
+   ::= { bRadiusServerAuthEntry 10 }
+
+bRadiusAccessRequestDropped  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of Access-Request message(s) dropped."
+   ::= { bRadiusServerAuthEntry 11 }
+
+bRadiusAccessRequestTimedOut  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+       "The count of the number of Access-Request message(s) for which
+       no response is received even after maximum number of retransmissions."
+   ::= { bRadiusServerAuthEntry 12 }
+
+bRadiusAccessRequestSentFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of Access-Request message(s) for which send() failed."
+   ::= { bRadiusServerAuthEntry 13 }
+
+bRadiusAccessPeakRequestPending  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the peak number of outstanding Access-Request message(s) reached in a
+        measurement interval period."
+   ::= { bRadiusServerAuthEntry 14 }
+
+bRadiusAccessMalformedRespDropped  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of dropped malformed message(s) received from RADIUS authentication server."
+   ::= { bRadiusServerAuthEntry 15 }
+
+bRadiusAccessBadAuthenticatorRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of packets received from RADIUS server with bad authenticator."
+   ::= { bRadiusServerAuthEntry 16 }
+
+bRadiusAccessServerMarkedDead  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+       "The count of the number of times a RADIUS server is marked dead during the measurement interval."
+   ::= { bRadiusServerAuthEntry 17 }
+
+bRadiusAuthLatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the minimum time interval, between all Access-Request
+       message(s) sent by the AAA process residing in the WAG to the RADIUS Server 
+       and the  corresponding Access-Accept/Reject message(s) received by the AAA process.
+       The value is in in microseconds."
+   ::= { bRadiusServerAuthEntry 18 }
+
+bRadiusAuthLatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the maximum time interval, between all Access-Request
+       message(s) sent by the AAA process residing in the WAG to the RADIUS Server and 
+       the  corresponding Access-Accept/Reject message(s) received by the AAA process.
+       The value is in in microseconds."
+   ::= { bRadiusServerAuthEntry 19 }
+
+bRadiusAuthLatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the average time interval, between all Access-Request
+       message(s) sent by the AAA process residing in the WAG to the RADIUS Server and 
+       the  corresponding Access-Accept/Reject message(s) received by the AAA process.
+       The value is in in microseconds."
+   ::= { bRadiusServerAuthEntry 20 }
+
+bRadiusAuthLatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the time interval, between the most recent Access-Request
+       message sent by the AAA process residing in the WAG to the RADIUS Server 
+       and the corresponding Access-Accept/Reject message received by the AAA process.
+       The value is in in microseconds."
+   ::= { bRadiusServerAuthEntry 21  }
+
+
+bRadiusAuthAAAGroupName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "AAA server group to which this RADIUS server belongs."
+   ::= { bRadiusServerAuthEntry 22 }
+
+-- RADIUS Proxy server authentication Table
+
+bRadiusProxyServerAuthTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BRadiusProxyServerAuthEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of authentication RADIUS Proxy server information."
+   ::= { bRadiusProxyMIBObjects 1 }
+
+bRadiusProxyServerAuthEntry  OBJECT-TYPE
+   SYNTAX      BRadiusProxyServerAuthEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the Radius Proxy server Auth Table."
+   INDEX {
+      bRadiusProxyAuthStatsInterval,
+      bRadiusProxyAuthServerIndex
+   }
+   ::= { bRadiusProxyServerAuthTable 1}
+
+BRadiusProxyServerAuthEntry::= SEQUENCE {
+    bRadiusProxyAuthStatsInterval                    Integer32,
+    bRadiusProxyAuthServerIndex                      Integer32,
+    bRadiusProxyAuthServerInetAddressType            InetAddressType,
+    bRadiusProxyAuthServerInetAddress                InetAddress,
+    bRadiusProxyAuthIntervalDuration                 Integer32,
+    bRadiusProxyAccessRequestRcvd                    Unsigned32,
+    bRadiusProxyAccessUnknownTypeRcvd                Unsigned32,
+    bRadiusProxyAccessUnknownClientRcvd              Unsigned32,
+    bRadiusProxyAccessRequestDropped                 Unsigned32,
+    bRadiusProxyAccessSentFail                       Unsigned32,
+    bRadiusProxyAccessBadAuthenticatorRcvd           Unsigned32,
+    bRadiusProxyAccessAcceptRcvd                     Unsigned32,
+    bRadiusProxyAccessRejectRcvd                     Unsigned32,
+    bRadiusProxyAccessChallengeRcvd                  Unsigned32,
+    bRadiusProxySubscriberBlocked                    Unsigned32,
+    bRadiusProxySubscriberDeleted                    Unsigned32
+}
+bRadiusProxyAuthStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated.
+       The interval index one indicates the latest interval for which
+       statistics accumulation was completed. Older the statistics data, greater the
+       interval index value.    In a system supporting a history of n intervals with 
+       IntervalCount(1) and IntervalCount(n), the most and least recent intervals 
+       respectively, the following applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for 1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount."
+   ::= { bRadiusProxyServerAuthEntry 1 }
+
+bRadiusProxyAuthServerIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying each RADIUS
+        Authentication Proxy server with which this clients
+        communicates."
+   ::= { bRadiusProxyServerAuthEntry 2 }
+
+bRadiusProxyAuthServerInetAddressType  OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The type of address format used for the
+       bRadiusProxyAuthServerInetAddress object."
+   ::= { bRadiusProxyServerAuthEntry 3 }
+
+bRadiusProxyAuthServerInetAddress  OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The IP address of the RADIUS Authentication
+      proxy server referred to in this table entry, using
+      the version-neutral IP address format."
+   ::= { bRadiusProxyServerAuthEntry 4 }
+
+bRadiusProxyAuthIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics accumulation interval in minutes."
+   ::= { bRadiusProxyServerAuthEntry 5 }
+
+bRadiusProxyAccessRequestRcvd   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Request message(s) received."
+   ::= { bRadiusProxyServerAuthEntry 6 }
+
+bRadiusProxyAccessUnknownTypeRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Unknown message(s) received."
+   ::= { bRadiusProxyServerAuthEntry 7 }
+
+bRadiusProxyAccessUnknownClientRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of  message(s) received by Radius
+         Proxy server from unknown clients."
+   ::= { bRadiusProxyServerAuthEntry 8 }
+
+bRadiusProxyAccessRequestDropped  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of Access-Request message(s) dropped by the 
+        radius proxy server ."
+   ::= { bRadiusProxyServerAuthEntry 9 }
+
+bRadiusProxyAccessSentFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of message(s)received by the radius proxy 
+         server from clients for which transmit failed."
+   ::= { bRadiusProxyServerAuthEntry 10 }
+
+bRadiusProxyAccessBadAuthenticatorRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of packets received by the radius proxy server
+         from clients  with bad authenticator."
+   ::= { bRadiusProxyServerAuthEntry 11 }
+
+bRadiusProxyAccessAcceptRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Accept message(s) received."
+   ::= { bRadiusProxyServerAuthEntry 12 }
+
+bRadiusProxyAccessRejectRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Reject message(s) received."
+   ::= { bRadiusProxyServerAuthEntry 13 }
+
+bRadiusProxyAccessChallengeRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Access-Challenge message(s) received."
+   ::= { bRadiusProxyServerAuthEntry 14 }
+
+bRadiusProxySubscriberBlocked  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of subscribers blocked by the proxy
+        server."
+   ::= { bRadiusProxyServerAuthEntry 15 }
+
+bRadiusProxySubscriberDeleted  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of subscribers deleted by the proxy
+        server."
+   ::= { bRadiusProxyServerAuthEntry 16 }
+
+-- RADIUS Proxy authentication TPS Table
+
+bRadiusProxyAuthTPSTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BRadiusProxyAuthTPSEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "An informative list of RADIUS Proxy authentication transactions."
+   ::= { bRadiusProxyMIBObjects 3 }
+
+bRadiusProxyAuthTPSEntry  OBJECT-TYPE
+   SYNTAX      BRadiusProxyAuthTPSEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the Radius Proxy Auth TPS Table."
+   INDEX {
+      bRadiusProxyAuthTPSInterval
+   }
+   ::= { bRadiusProxyAuthTPSTable 1}
+
+BRadiusProxyAuthTPSEntry::= SEQUENCE {
+    bRadiusProxyAuthTPSInterval             Integer32,
+    bRadiusProxyAuthTPSIntervalDuration     Unsigned32,
+    bRadiusProxyAuthTPSLow                  Unsigned32,
+    bRadiusProxyAuthTPSHigh                 Unsigned32,
+    bRadiusProxyAuthTPS                     Unsigned32
+}
+
+bRadiusProxyAuthTPSInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated.
+       The interval index one indicates the latest interval for which
+       statistics accumulation was completed. Older the statistics data, greater the
+       interval index value.    In a system supporting a history of n intervals with 
+       IntervalCount(1) and IntervalCount(n), the most and least recent intervals 
+       respectively, the following applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for 1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount."
+   ::= { bRadiusProxyAuthTPSEntry 1 }
+
+bRadiusProxyAuthTPSIntervalDuration  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Configured interval duration of Radius transactions in seconds"
+   ::= { bRadiusProxyAuthTPSEntry 2 }
+
+bRadiusProxyAuthTPSLow  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The low value configured for the particular interval"
+   ::= { bRadiusProxyAuthTPSEntry 3 }
+
+bRadiusProxyAuthTPSHigh  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The high value configured for the particular interval"
+   ::= { bRadiusProxyAuthTPSEntry 4 }
+
+bRadiusProxyAuthTPS  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Total number of Radius Proxy transactions for the Radius tps interval"
+   ::= { bRadiusProxyAuthTPSEntry 5 }
+
+
+
+-- RADIUS server accounting Table
+
+bRadiusServerAcctTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BRadiusServerAcctEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of accounting RADIUS server information."
+   ::= { bRadiusMIBObjects 2 }
+
+bRadiusServerAcctEntry  OBJECT-TYPE
+   SYNTAX      BRadiusServerAcctEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bRadiusServerAcctTable."
+   INDEX {
+      bRadiusAcctStatsInterval,
+      bRadiusAcctServerIndex
+   }
+   ::= { bRadiusServerAcctTable 1}
+
+BRadiusServerAcctEntry ::= SEQUENCE {
+    bRadiusAcctStatsInterval                    Integer32,
+    bRadiusAcctServerIndex                      Integer32,
+    bRadiusAcctServerInetAddressType            InetAddressType,
+    bRadiusAcctServerInetAddress                InetAddress,
+    bRadiusAcctIntervalDuration                 Integer32,
+    bRadiusAcctRequestSent                      Unsigned32,
+    bRadiusAcctStartRequestSent                 Unsigned32,
+    bRadiusAcctStopRequestSent                  Unsigned32,
+    bRadiusAcctInterimUpdateSent                Unsigned32,
+    bRadiusAcctResponseReceived                 Unsigned32,
+    bRadiusAcctRequestResent                    Unsigned32,
+    bRadiusAcctRequestDropped                   Unsigned32,
+    bRadiusAcctRequestTimedOut                  Unsigned32,
+    bRadiusAcctRequestSentFail                  Unsigned32,
+    bRadiusAcctPeakRequestPending               Unsigned32,
+    bRadiusAcctMalformedRespDropped             Unsigned32,
+    bRadiusAcctBadAuthenticatorRcvd             Unsigned32,
+    bRadiusAcctServerMarkedDead                 Unsigned32,
+    bRadiusAcctLatencyMin                       Unsigned32,
+    bRadiusAcctLatencyMax                       Unsigned32,
+    bRadiusAcctLatencyAvg                       Unsigned32,
+    bRadiusAcctLatencyLast                      Unsigned32,
+    bRadiusAcctAAAGroupName                     DisplayString
+}
+
+bRadiusAcctStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics data, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n), the most and least recent intervals respectively, the following
+       applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount."
+   ::= { bRadiusServerAcctEntry 1 }
+
+bRadiusAcctServerIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying each RADIUS
+        Accounting server with which this client
+        communicates."
+   ::= { bRadiusServerAcctEntry 2 }
+
+bRadiusAcctServerInetAddressType  OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The type of address format used for the
+       bRadiusAcctServerInetAddress object."
+   ::= { bRadiusServerAcctEntry 3 }
+
+bRadiusAcctServerInetAddress  OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The IP address of the RADIUS Accounting
+      server referred to in this table entry, using
+      the version-neutral IP address format."
+   ::= { bRadiusServerAcctEntry 4 }
+
+bRadiusAcctIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics accumulation interval in minutes."
+   ::= { bRadiusServerAcctEntry 5 }
+
+bRadiusAcctRequestSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+       "The count of the total number of Accounting-Request message(s) sent."
+   ::= { bRadiusServerAcctEntry 6 }
+
+bRadiusAcctStartRequestSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Request Start message(s) sent."
+   ::= { bRadiusServerAcctEntry 7 }
+
+bRadiusAcctStopRequestSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+       "The count of the total number of Accounting-Request Stop message(s) sent."
+   ::= { bRadiusServerAcctEntry 8 }
+
+bRadiusAcctInterimUpdateSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+       "The count of the total number of Accounting-Request Interim-Update message(s) sent."
+   ::= { bRadiusServerAcctEntry 9 }
+
+bRadiusAcctResponseReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Response message(s) received."
+   ::= { bRadiusServerAcctEntry 10 }
+
+
+bRadiusAcctRequestResent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of Accounting-Request message(s) resent to server 
+       as no response was received."
+   ::= { bRadiusServerAcctEntry 11 }
+
+bRadiusAcctRequestDropped  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of Accounting-Request message(s) dropped."
+   ::= { bRadiusServerAcctEntry 12 }
+
+bRadiusAcctRequestTimedOut  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of Accounting-Request message(s) for which no response
+        is received even after maximum number of retransmissions."
+   ::= { bRadiusServerAcctEntry 13 }
+
+bRadiusAcctRequestSentFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+       "The count of the number of Accounting-Request message(s) for which send() failed."
+   ::= { bRadiusServerAcctEntry 14 }
+
+bRadiusAcctPeakRequestPending  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+       "The count of the peak number of outstanding Accounting-Request message(s) reached in
+        a measurement interval period."
+   ::= { bRadiusServerAcctEntry 15 }
+
+bRadiusAcctMalformedRespDropped  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of dropped malformed packets received from RADIUS accounting server."
+   ::= { bRadiusServerAcctEntry 16 }
+
+bRadiusAcctBadAuthenticatorRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of packets received from AAA server with bad authenticator."
+   ::= { bRadiusServerAcctEntry 17 }
+
+bRadiusAcctServerMarkedDead  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the number of times a server is marked dead during the measurement interval."
+   ::= { bRadiusServerAcctEntry 18 }
+
+bRadiusAcctLatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the minimum time interval, between all Accounting-Request
+       message(s) (Start/Interim Update/Stop) sent by the AAA process residing in 
+       the WAG to the RADIUS Server and the corresponding Accounting-Response message(s) 
+       received by the AAA process.
+       The value is in in microseconds."
+   ::= { bRadiusServerAcctEntry 19 }
+
+bRadiusAcctLatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the maximum time interval, between all Accounting-Request
+       message(s) (Start/Interim Update/Stop) sent by the AAA process residing in the 
+       WAG to the RADIUS Server and the corresponding Accounting-Response message(s) 
+       received by the AAA process.
+       The value is in in microseconds."
+   ::= { bRadiusServerAcctEntry 20 }
+
+bRadiusAcctLatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the average time interval, between all Accounting-Request
+       message(s) (Start/Interim Update/Stop) sent by the AAA process residing in the 
+       WAG to the RADIUS Server and the corresponding Accounting-Response message(s) 
+       received by the AAA process.
+       The value is in in microseconds."
+   ::= { bRadiusServerAcctEntry 21 }
+
+bRadiusAcctLatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the time interval, between the most recent Accounting-Request
+       message (Start/Interim Update/Stop) sent by the AAA process residing in the WAG 
+       to the RADIUS Server and the corresponding Accounting-Response message received 
+       by the AAA process.
+       The value is in in microseconds."
+   ::= { bRadiusServerAcctEntry 22 }
+
+bRadiusAcctAAAGroupName  OBJECT-TYPE 
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "AAA server group to which this radius server belongs."
+   ::= { bRadiusServerAcctEntry 23 }
+
+-- RADIUS Proxy server accounting Table
+
+bRadiusProxyServerAcctTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BRadiusProxyServerAcctEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of accounting RADIUS Proxy Accounting server information."
+   ::= { bRadiusProxyMIBObjects 2 }
+
+bRadiusProxyServerAcctEntry  OBJECT-TYPE
+   SYNTAX      BRadiusProxyServerAcctEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bRadiusProxyServerAcctTable."
+   INDEX {
+      bRadiusProxyAcctStatsInterval,
+      bRadiusProxyAcctServerIndex
+   }
+   ::= { bRadiusProxyServerAcctTable 1}
+
+BRadiusProxyServerAcctEntry ::= SEQUENCE {
+    bRadiusProxyAcctStatsInterval                    Integer32,
+    bRadiusProxyAcctServerIndex                      Integer32,
+    bRadiusProxyAcctServerInetAddressType            InetAddressType,
+    bRadiusProxyAcctServerInetAddress                InetAddress,
+    bRadiusProxyAcctIntervalDuration                 Integer32,
+    bRadiusProxyAcctRequestRcvd                      Unsigned32,
+    bRadiusProxyAcctRequestSent                      Unsigned32,
+    bRadiusProxyAcctStartRequestRcvd                 Unsigned32,
+    bRadiusProxyAcctStopRequestRcvd                  Unsigned32,
+    bRadiusProxyAcctInterimUpdateRcvd                Unsigned32,
+    bRadiusProxyAcctStartRequestSent                 Unsigned32,
+    bRadiusProxyAcctStopRequestSent                  Unsigned32,
+    bRadiusProxyAcctInterimUpdateSent                Unsigned32,
+    bRadiusProxyAcctResponseRcvd                     Unsigned32,
+    bRadiusProxyAcctResponseSent                     Unsigned32
+}
+
+bRadiusProxyAcctStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated.
+       The interval index one indicates the latest interval for which
+statistics
+       accumulation was completed. Older the statistics data, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1)
+and
+       IntervalCount(n), the most and least recent intervals respectively, the
+following
+       applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount."
+   ::= { bRadiusProxyServerAcctEntry 1 }
+
+bRadiusProxyAcctServerIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying each RADIUS
+        Proxy Accounting server with which  client
+        communicates."
+   ::= { bRadiusProxyServerAcctEntry 2 }
+
+bRadiusProxyAcctServerInetAddressType  OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The type of address format used for the
+       bRadiusProxyAcctServerInetAddress object."
+   ::= { bRadiusProxyServerAcctEntry 3 }
+
+bRadiusProxyAcctServerInetAddress  OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "The IP address of the RADIUS Accounting proxy
+      server referred to in this table entry, using
+      the version-neutral IP address format."
+   ::= { bRadiusProxyServerAcctEntry 4 }
+
+bRadiusProxyAcctIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Duration of statistics accumulation interval in minutes."
+   ::= { bRadiusProxyServerAcctEntry 5 }
+
+bRadiusProxyAcctRequestRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Request message(s)
+        received."
+   ::= { bRadiusProxyServerAcctEntry 6 }
+
+bRadiusProxyAcctRequestSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Request message(s) sent."
+   ::= { bRadiusProxyServerAcctEntry 7 }
+
+bRadiusProxyAcctStartRequestRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Request Start message(s)
+        received."
+   ::= { bRadiusProxyServerAcctEntry 8 }
+
+bRadiusProxyAcctStopRequestRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Request Stop 
+        message(s) received."
+   ::= { bRadiusProxyServerAcctEntry 9 }
+
+bRadiusProxyAcctInterimUpdateRcvd   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Request Interim-Update
+        message(s) received."
+   ::= { bRadiusProxyServerAcctEntry 10 }
+
+bRadiusProxyAcctStartRequestSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Request Start message(s)
+        sent."
+   ::= { bRadiusProxyServerAcctEntry 11 }
+
+bRadiusProxyAcctStopRequestSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Request Stop 
+        message(s) sent."
+   ::= { bRadiusProxyServerAcctEntry 12 }
+
+bRadiusProxyAcctInterimUpdateSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Request Interim-Update 
+        message(s) sent."
+   ::= { bRadiusProxyServerAcctEntry 13 }
+
+bRadiusProxyAcctResponseRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Response message(s)
+        received."
+   ::= { bRadiusProxyServerAcctEntry 14 }
+
+bRadiusProxyAcctResponseSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Accounting-Response message(s)
+         sent."
+   ::= { bRadiusProxyServerAcctEntry 15 }
+
+
+
+-- RADIUS client CoA Table
+
+bRadiusClientCoATable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BRadiusClientCoAEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of CoA RADIUS client information."
+   ::= { bRadiusMIBObjects 3 }
+
+bRadiusClientCoAEntry  OBJECT-TYPE
+   SYNTAX      BRadiusClientCoAEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bRadiusClientCoATable."
+   INDEX {
+      bRadiusCOAStatsInterval,
+      bRadiusCoAClientIndex
+   }
+   ::= { bRadiusClientCoATable 1}
+
+BRadiusClientCoAEntry ::= SEQUENCE {
+    bRadiusCOAStatsInterval                                   Integer32,
+    bRadiusCoAClientIndex                                     Integer32,
+    bRadiusCoAClientInetAddressType                           InetAddressType,
+    bRadiusCoAClientInetAddress                               InetAddress,
+    bRadiusCoAIntervalDuration                                Integer32,
+    bRadiusCoAAckSent                                         Unsigned32,
+    bRadiusCoANackSent                                        Unsigned32,
+    bRadiusCoARequestReceived                                 Unsigned32,
+    bRadiusCoARequestDropped                                  Unsigned32,
+    bRadiusCoAReqDropDueToDupReq                              Unsigned32,
+    bRadiusCoAReqDropDueToInvalidTime                         Unsigned32,
+    bRadiusCoAReqDropDueToBadAuthenticator                    Unsigned32,
+    bRadiusCoANackDueToInvalidReq                             Unsigned32,
+    bRadiusCoANackDueToExceedMaxOutstanding                   Unsigned32,
+    bRadiusDisconnectRequestReceived                          Unsigned32,
+    bRadiusDisconnectAckSent                                  Unsigned32,
+    bRadiusDisconnectNackSent                                 Unsigned32,
+    bRadiusDisconnectRequestDropped                           Unsigned32,
+    bRadiusDisconnectReqDropDueToDupReq                       Unsigned32,
+    bRadiusDisconnectReqDropDueToInvalidTime                  Unsigned32,
+    bRadiusDisconnectReqDropDueToBadAuthenticator             Unsigned32,
+    bRadiusDisconnectNackDueToInvalidReq                      Unsigned32,
+    bRadiusDisconnectNackDueToExceedMaxOutstanding            Unsigned32,
+    bRadiusCoALatencyMin                                      Unsigned32,
+    bRadiusCoALatencyMax                                      Unsigned32,
+    bRadiusCoALatencyAvg                                      Unsigned32,
+    bRadiusCoALatencyLast                                     Unsigned32,
+    bRadiusCoADMLatencyMin                                    Unsigned32,
+    bRadiusCoADMLatencyMax                                    Unsigned32,
+    bRadiusCoADMLatencyAvg                                    Unsigned32,
+    bRadiusCoADMLatencyLast                                   Unsigned32,
+    bRadiusCoAAAAGroupName                                    DisplayString
+}
+bRadiusCOAStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n), the most and least recent intervals respectively, the following
+       applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount."
+   ::= { bRadiusClientCoAEntry 1 }
+
+bRadiusCoAClientIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying each RADIUS
+        CoA client with which this server
+        communicates."
+   ::= { bRadiusClientCoAEntry 2 }
+
+bRadiusCoAClientInetAddressType  OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The type of address format used for the
+       bRadiusCoAClientInetAddress object."
+   ::= { bRadiusClientCoAEntry 3 }
+
+bRadiusCoAClientInetAddress  OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+     "The IP address of the RADIUS CoA
+      server referred to in this table entry, using
+      the version-neutral IP address format."
+   ::= { bRadiusClientCoAEntry 4 }
+
+bRadiusCoAIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics accumulation interval in minutes."
+   ::= { bRadiusClientCoAEntry 5 }
+
+bRadiusCoAAckSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of CoA-Ack message(s) sent."
+   ::= { bRadiusClientCoAEntry 6 }
+
+bRadiusCoANackSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of CoA-Nack message(s) sent."
+   ::= { bRadiusClientCoAEntry 7 }
+
+bRadiusCoARequestReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of CoA-Request message(s) received."
+   ::= { bRadiusClientCoAEntry 8 }
+
+bRadiusCoARequestDropped  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of CoA-Request message(s) dropped."
+   ::= { bRadiusClientCoAEntry 9 }
+
+bRadiusCoAReqDropDueToDupReq  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of duplicate CoA-Request message(s) dropped."
+   ::= { bRadiusClientCoAEntry 10 }
+
+bRadiusCoAReqDropDueToInvalidTime  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of dropped CoA-Request message(s)
+        due to invalid timestamp in the message."
+   ::= { bRadiusClientCoAEntry 11 }
+
+bRadiusCoAReqDropDueToBadAuthenticator  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of dropped CoA-Request message(s) from an invalid client."
+   ::= { bRadiusClientCoAEntry 12 }
+
+bRadiusCoANackDueToInvalidReq  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of CoA-Nack message(s) sent due to invalid request."
+   ::= { bRadiusClientCoAEntry 13 }
+
+bRadiusCoANackDueToExceedMaxOutstanding  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of CoA-Nack message(s)
+        sent due to outstanding requests exceeding the maximum value."
+   ::= { bRadiusClientCoAEntry 14 }
+
+
+bRadiusDisconnectRequestReceived  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Disconnect-Request message(s) received."
+   ::= { bRadiusClientCoAEntry 15 }
+
+bRadiusDisconnectAckSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Disconnect-Ack message(s) sent."
+   ::= { bRadiusClientCoAEntry 16 }
+
+bRadiusDisconnectNackSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Disconnect-Nack message(s) sent."
+   ::= { bRadiusClientCoAEntry 17 }
+
+
+bRadiusDisconnectRequestDropped  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Disconnect-Request message(s) dropped."
+   ::= { bRadiusClientCoAEntry 18 }
+
+bRadiusDisconnectReqDropDueToDupReq  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of duplicate Disconnect-Request message(s) dropped."
+   ::= { bRadiusClientCoAEntry 19 }
+
+bRadiusDisconnectReqDropDueToInvalidTime  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of dropped Disconnect-Request message(s)
+        due to invalid timestamp in the message."
+   ::= { bRadiusClientCoAEntry 20 }
+
+bRadiusDisconnectReqDropDueToBadAuthenticator  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of dropped Disconnect-Request message(s) from an invalid client."
+   ::= { bRadiusClientCoAEntry 21 }
+
+bRadiusDisconnectNackDueToInvalidReq  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Disconnect-Nack message(s) sent due to invalid request."
+   ::= { bRadiusClientCoAEntry 22 }
+
+bRadiusDisconnectNackDueToExceedMaxOutstanding  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the total number of Disconnect-Nack message(s)
+        sent due to outstanding requests exceeding the maximum value."
+   ::= { bRadiusClientCoAEntry 23 }
+
+bRadiusCoALatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the minimum time interval, between all CoA-Request
+       message(s) received from the RADIUS server and their corresponding
+       CoA-Ack/Nack message(s) sent by the RADIUS client.
+       The value is in in microseconds."
+   ::= { bRadiusClientCoAEntry 24 }
+
+bRadiusCoALatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the maximum time interval, between all CoA-Request
+       message(s) received from the RADIUS server and their corresponding
+       CoA-Ack/Nack message(s) sent by the RADIUS client.
+       The value is in in microseconds."
+   ::= { bRadiusClientCoAEntry 25 }
+
+bRadiusCoALatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the average time interval, between all CoA-Request
+       message(s) received from the RADIUS server and their corresponding
+       CoA-Ack/Nack message(s) sent by the RADIUS client.
+       The value is in in microseconds."
+   ::= { bRadiusClientCoAEntry 26 }
+
+bRadiusCoALatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+      "The measure of the time interval, between the most recent CoA-Request
+       message received from the RADIUS server and its corresponding CoA-Ack/Nack
+       message received by the RADIUS client. 
+       The value is in in microseconds."
+   ::= { bRadiusClientCoAEntry 27 }
+
+bRadiusCoADMLatencyMin  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the minimum time interval, between all Disconnect-Request
+       message(s) received from the RADIUS server and their corresponding 
+       Disconnect-Ack/Nack message(s) sent by the RADIUS client.
+       The value is in in microseconds."
+   ::= { bRadiusClientCoAEntry 28 }
+
+bRadiusCoADMLatencyMax  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the maximum time interval, between all Disconnect-Request
+       message(s) received from the RADIUS server and their corresponding
+       Disconnect-Ack/Nack message(s) sent by the RADIUS client.
+       The value is in in microseconds."
+   ::= { bRadiusClientCoAEntry 29 }
+
+bRadiusCoADMLatencyAvg  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the average time interval, between all Disconnect-Request
+       message(s) received from the RADIUS server and their corresponding
+       Disconnect-Ack/Nack message(s) sent by the RADIUS client.
+       The value is in in microseconds."
+   ::= { bRadiusClientCoAEntry 30 }
+
+bRadiusCoADMLatencyLast  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The measure of the time interval, between the most recent Disconnect-Request
+       message received from the RADIUS server and its corresponding Disconnect-Ack/Nack
+       message received by the RADIUS client.
+       The value is in in microseconds."
+   ::= { bRadiusClientCoAEntry 31 } 
+
+bRadiusCoAAAAGroupName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+      "AAA server group to which this RADIUS server belongs."
+   ::= { bRadiusClientCoAEntry 32 }
+
+-- AAA group Authentication Table
+
+bAAAGroupAuthTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BAAAGroupAuthEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of Authentication AAA group information."
+   ::= { bRadiusMIBObjects 4 }
+
+bAAAGroupAuthEntry  OBJECT-TYPE
+   SYNTAX      BAAAGroupAuthEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bAAAGroupAuthTable."
+   INDEX {
+      bAAAGroupAuthStatsInterval,
+      bAAAGroupAuthIndex
+   }
+   ::= { bAAAGroupAuthTable 1}
+
+BAAAGroupAuthEntry ::= SEQUENCE {
+    bAAAGroupAuthStatsInterval                     Integer32,
+    bAAAGroupAuthIndex                             Integer32,
+    bAAAGroupAuthName                              DisplayString,
+    bAAAGroupAuthIntervalDuration                  Integer32,
+    bAAAGroupMaximumOutstandingAuthReqs            Unsigned32,
+    bAAAGroupPeakOutstandingAuthReqsReached        Unsigned32,
+    bAAAGroupAuthReqsDropped                       Unsigned32,
+    bAAAGroupOutstandingAuthReqsHighThreshold      Unsigned32,
+    bAAAGroupOutstandingAuthReqsLowThreshold       Unsigned32,
+    bAAAGroupAuthCurrentOutstanding                Unsigned32 
+}
+
+bAAAGroupAuthStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n), the most and least recent intervals respectively, the following
+       applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount."
+   ::= { bAAAGroupAuthEntry 1 }
+
+bAAAGroupAuthIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying each RADIUS
+        Authentication server group "
+   ::= { bAAAGroupAuthEntry 2 }
+
+bAAAGroupAuthName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "AAA group Authentication name"
+   ::= { bAAAGroupAuthEntry 3 }
+
+bAAAGroupAuthIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics accumulation interval in minutes."
+   ::= { bAAAGroupAuthEntry 4 }
+
+bAAAGroupMaximumOutstandingAuthReqs  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Maximum number of outstanding Access-Request message(s) configured for this group."
+   ::= { bAAAGroupAuthEntry 5 } 
+
+bAAAGroupPeakOutstandingAuthReqsReached  OBJECT-TYPE
+   SYNTAX      Unsigned32 
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+       "The count of the peak number of outstanding Access-Request message(s)
+        reached during the measurement interval."
+   ::= { bAAAGroupAuthEntry 6 }
+
+bAAAGroupAuthReqsDropped  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the Access-Rrequest message(s) at group level
+       which could not be sent to any server and
+       were dropped as the overflow queue was exhausted."
+   ::= { bAAAGroupAuthEntry 7 }
+
+bAAAGroupOutstandingAuthReqsHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The high threshold for outstanding Access-Request message(s) in this
+        AAA group. If a bAAAGroupOutstandingAuthReqsLow event has
+        been generated (or no bAAAGroupOutstandingAuthReqsHigh was
+        generated previously) for this AAA group, and the value for
+        outstanding Access-Request message(s) has exceeded the value of
+        bAAAGroupOutstandingAuthReqsHighThreshold, then a
+        bAAAGroupOutstandingAuthReqsHigh event will be generated.  No more
+        bAAAGroupOutstandingAuthReqsHigh events will be generated for this
+        AAA group during this execution of the AAA group client until the
+        value for outstanding Access-Request message(s) becomes equal to or less
+        than the value of bAAAGroupOutstandingAuthReqsLowThreshold."
+   ::= { bAAAGroupAuthEntry 8 }
+
+bAAAGroupOutstandingAuthReqsLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The low threshold for outstanding Access-Request message(s) in this
+        AAA group. If the value for outstanding Access-Request message(s) in
+        this group becomes equal to or less than this value and the current
+        condition for bAAAGroupOutstandingAuthReqsHigh is raised, then a
+        bAAAGroupOutstandingAuthReqsLow event will be generated. No more
+        bAAAGroupOutstandingAuthReqsLow events will be generated for this
+        AAA group during this execution of the AAA group client until the
+        value for outstanding Access-Request message(s) has exceeded the value of
+        bAAAGroupOutstandingAuthReqsLowThreshold."
+   ::= { bAAAGroupAuthEntry 9 }
+
+bAAAGroupAuthCurrentOutstanding  OBJECT-TYPE 
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+       "The current number of outstanding authentication requests." 
+   ::= { bAAAGroupAuthEntry 10  }
+
+-- AAA group Accounting Table
+
+bAAAGroupAcctTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BAAAGroupAcctEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of AAA group Accounting information."
+   ::= { bRadiusMIBObjects 5 }
+
+bAAAGroupAcctEntry  OBJECT-TYPE
+   SYNTAX      BAAAGroupAcctEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bAAAGroupAcctTable."
+   INDEX {
+      bAAAGroupAcctStatsInterval,
+      bAAAGroupAcctIndex
+   }
+   ::= { bAAAGroupAcctTable 1}
+
+BAAAGroupAcctEntry ::= SEQUENCE {
+    bAAAGroupAcctStatsInterval                     Integer32,
+    bAAAGroupAcctIndex                             Integer32,
+    bAAAGroupAcctName                              DisplayString,
+    bAAAGroupAcctIntervalDuration                  Integer32,
+    bAAAGroupMaximumOutstandingAcctReqs            Unsigned32,
+    bAAAGroupPeakOutstandingAcctReqsReached        Unsigned32,
+    bAAAGroupAcctReqsDropped                       Unsigned32,
+    bAAAGroupOutstandingAcctReqsHighThreshold      Unsigned32,
+    bAAAGroupOutstandingAcctReqsLowThreshold       Unsigned32,
+    bAAAGroupAcctCurrentOutstanding                Unsigned32
+}
+
+bAAAGroupAcctStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n), the most and least recent intervals respectively, the following
+       applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount."
+   ::= { bAAAGroupAcctEntry 1 }
+
+bAAAGroupAcctIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying each RADIUS
+        Accounting server group."
+   ::= { bAAAGroupAcctEntry 2 }
+
+bAAAGroupAcctName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "AAA group Accounting name."
+   ::= { bAAAGroupAcctEntry 3 }
+
+bAAAGroupAcctIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics accumulation interval in minutes."
+   ::= { bAAAGroupAcctEntry 4 }
+
+bAAAGroupMaximumOutstandingAcctReqs  OBJECT-TYPE
+   SYNTAX      Unsigned32 
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Maximum number of outstanding Accounting-Request message(s) configured
+        for this group."
+   ::= { bAAAGroupAcctEntry 5 }
+
+bAAAGroupPeakOutstandingAcctReqsReached  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The count of the peak number of outstanding Accounting-Request message(s)
+        reached during the measurement interval."
+   ::= { bAAAGroupAcctEntry 6 }
+
+
+bAAAGroupAcctReqsDropped  OBJECT-TYPE 
+   SYNTAX      Unsigned32 
+   MAX-ACCESS  read-only
+   STATUS      current 
+   DESCRIPTION 
+       "The count of the Accounting-Request message(s) at group level
+       which could not be sent to any server and 
+       were dropped as overflow queue was exhausted."
+   ::= { bAAAGroupAcctEntry 7 }
+
+
+bAAAGroupOutstandingAcctReqsHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+        "The high threshold for outstanding Accounting-Request message(s) in this
+        AAA group. If a bAAAGroupOutstandingAcctReqsLow event had
+        been generated (or no bAAAGroupOutstandingAcctReqsHigh event was
+        generated previously) for this AAA group, and the value for
+        outstanding Accounting-Request has exceeded the value of
+        bAAAGroupOutstandingAcctReqsHighThreshold, then a
+        bAAAGroupOutstandingAcctReqsHigh event will be generated. No more
+        bAAAGroupOutstandingAcctReqsHigh events will be generated for this
+        AAA group during this execution of the AAA group client until the
+        value for outstanding Accounting-Requests becomes equal to or less
+        than the value of bAAAGroupOutstandingAcctReqsLowThreshold."
+   ::= { bAAAGroupAcctEntry 8 }
+
+bAAAGroupOutstandingAcctReqsLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+        "The low threshold for outstanding Accounting-Request message(s) in this
+        AAA group. If the value for outstanding Accounting-Request message(s) in
+        this group becomes equal to or less than this value and the current
+        condition for bAAAGroupOutstandingAcctReqsHigh is raised, then a
+        bAAAGroupOutstandingAcctReqsLow event will be generated. No more
+        bAAAGroupOutstandingAcctReqsLow events will be generated for this
+        AAA group during this execution of the AAA group client until the
+        value for outstanding Accounting-Requests has exceeded the value of
+        bAAAGroupOutstandingAcctReqsLowThreshold."
+   ::= { bAAAGroupAcctEntry 9 }
+
+bAAAGroupAcctCurrentOutstanding  OBJECT-TYPE 
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+            "The current number of outstanding accounting requests." 
+   ::= { bAAAGroupAcctEntry 10  }
+
+-- AAA group CoA Table
+
+bAAAGroupCoATable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BAAAGroupCoAEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of AAA group CoA information."
+   ::= { bRadiusMIBObjects 6 }
+
+bAAAGroupCoAEntry  OBJECT-TYPE
+   SYNTAX      BAAAGroupCoAEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bAAAGroupCoATable."
+   INDEX {
+      bAAAGroupCoAStatsInterval,
+      bAAAGroupCoAIndex
+   }
+   ::= { bAAAGroupCoATable 1}
+   
+BAAAGroupCoAEntry ::= SEQUENCE {
+    bAAAGroupCoAStatsInterval                          Integer32,
+    bAAAGroupCoAIndex                                  Integer32,
+    bAAAGroupCoAName                                   DisplayString,
+    bAAAGroupCoAIntervalDuration                       Integer32,
+    bAAAGroupCoANumOfClients                           Unsigned32,
+    bAAAGroupCoAReqsDropDueToInvalidClient             Unsigned32,
+    bAAAGroupDisconnectReqsDropDueToInvalidClient      Unsigned32,
+    bAAAGroupMaximumOutstandingCoAReqs                 Unsigned32,
+    bAAAGroupPeakOutstandingCoAReqs                    Unsigned32,
+    bAAAGroupOutstandingCoAReqsHighThreshold           Unsigned32,
+    bAAAGroupOutstandingCoAReqsLowThreshold            Unsigned32,
+    bAAAGroupCoaCurrentOutstanding                     Unsigned32
+}
+
+bAAAGroupCoAStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for  1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount,"
+   ::= { bAAAGroupCoAEntry 1 }
+
+bAAAGroupCoAIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying each
+        COA Group."
+   ::= { bAAAGroupCoAEntry 2 }
+
+bAAAGroupCoAName  OBJECT-TYPE
+   SYNTAX      DisplayString 
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "AAA group CoA name."
+   ::= { bAAAGroupCoAEntry 3 }
+
+bAAAGroupCoAIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics accumulation interval in minutes."
+   ::= { bAAAGroupCoAEntry 4 }
+
+bAAAGroupCoANumOfClients  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "Number of clients which have sent CoA."
+   ::= { bAAAGroupCoAEntry 5 } 
+
+bAAAGroupCoAReqsDropDueToInvalidClient  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Number Of CoA-Request message(s) dropped from an invalid client."
+   ::= { bAAAGroupCoAEntry 6 }
+
+bAAAGroupDisconnectReqsDropDueToInvalidClient  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Number Of Disconnect-Request message(s) dropped from an invalid client."
+   ::= { bAAAGroupCoAEntry 7 }
+
+bAAAGroupMaximumOutstandingCoAReqs  OBJECT-TYPE
+   SYNTAX      Unsigned32 
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Maximum number of outstanding CoA-Request or Disconnect-Request message(s)
+        configured for this group. Any requests after this value will be dropped."
+   ::= { bAAAGroupCoAEntry 8 }
+
+bAAAGroupPeakOutstandingCoAReqs  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Current number of outstanding CoA or Disconnect Request message(s)
+        in this group."
+   ::= { bAAAGroupCoAEntry 9 }
+
+bAAAGroupOutstandingCoAReqsHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The high threshold for outstanding CoA or Disconnect Request message(s) in this
+        AAA group. If a bAAAGroupOutstandingCoAReqsLow event has been generated
+       (or no bAAAGroupOutstandingCoAReqsHigh was generated previously) for
+        this AAA group, and the value for outstanding CoA or Disconnect
+        Request message(s) has exceeded the value of
+        bAAAGroupOutstandingCoAReqsHighThreshold, then a
+        bAAAGroupOutstandingCoAReqsHigh event will be generated. No more
+        bAAAGroupOutstandingCoAReqsHigh events will be generated for this
+        AAA group during this execution of the AAA group client until the value
+        for outstanding CoA or Disconnect Request message(s) becomes equal to or
+        less than the value of bAAAGroupOutstandingCoAReqsLowThreshold."
+   ::= { bAAAGroupCoAEntry 10 }
+
+bAAAGroupOutstandingCoAReqsLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The low threshold for outstanding CoA or Disconnect Request message(s) in this
+        AAA group. If the value for outstanding CoA or Disconnect Request message(s) in
+        this group becomes equal to or less than this value and the current
+        condition for bAAAGroupOutstandingCoAReqsHigh is raised, then a
+        bAAAGroupOutstandingCoAReqsLow event will be generated. No more
+        bAAAGroupOutstandingCoAReqsLow events will be generated for this
+        AAA group during this execution of the AAA group client until the
+        value for outstanding CoA or Disconnect Request message(s) has exceeded the
+        value of bAAAGroupOutstandingCoAReqsLowThreshold."
+   ::= { bAAAGroupCoAEntry 11 }
+
+bAAAGroupCoaCurrentOutstanding  OBJECT-TYPE 
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+        "The current number of outstanding coa requests." 
+   ::= { bAAAGroupCoAEntry 12  }
+
+-- RADIUS latency Table
+
+bRadiusLatencyAuthTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BRadiusLatencyAuthEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Latency information list for authentication RADIUS server instance."
+   ::= { bRadiusMIBObjects 7 }
+
+bRadiusLatencyAuthEntry  OBJECT-TYPE
+   SYNTAX      BRadiusLatencyAuthEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bRadiusLatencyAuthTable."
+   INDEX {
+      bRadiusAuthLatencyStatsInterval,
+      bRadiusAuthInstanceIndex
+   }
+   ::= { bRadiusLatencyAuthTable 1}
+
+BRadiusLatencyAuthEntry ::= SEQUENCE {
+    bRadiusAuthLatencyStatsInterval                 Integer32,
+    bRadiusAuthInstanceIndex                        BenuRadiusInstance,
+    bRadiusAuthLatencyIntervalDuration              Integer32,
+    bRadiusAuthRequestTotalPackets                  Unsigned32,
+    bRadiusAuthRequestMaximumProcessingTime         Unsigned32,
+    bRadiusAuthRequestMinimumProcessingTime         Unsigned32,
+    bRadiusAuthRequestAverageProcessingTime         Unsigned32,
+    bRadiusAuthRequestProcessingTimeGreaterthan1MS  Unsigned32,
+    bRadiusAuthResponseTotalPackets                 Unsigned32,
+    bRadiusAuthResponseMaximumProcessingTime        Unsigned32,
+    bRadiusAuthResponseMinimumProcessingTime        Unsigned32,
+    bRadiusAuthResponseAverageProcessingTime        Unsigned32,
+    bRadiusAuthResponseProcessingTimeGreaterthan1MS Unsigned32
+}
+
+bRadiusAuthLatencyStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics data, greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n), the most and least recent intervals respectively, the following
+       applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for 1 <= i < n
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount."
+   ::= { bRadiusLatencyAuthEntry 1 }
+
+bRadiusAuthInstanceIndex  OBJECT-TYPE
+   SYNTAX      BenuRadiusInstance
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A number uniquely identifying each RADIUS Authentication instance"
+   ::= { bRadiusLatencyAuthEntry 2 }
+
+bRadiusAuthLatencyIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of statistics accumulation interval in minutes."
+   ::= { bRadiusLatencyAuthEntry 3 }
+
+bRadiusAuthRequestTotalPackets  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of Access-Request packets for this instance"
+   ::= { bRadiusLatencyAuthEntry 4 }
+
+bRadiusAuthRequestMaximumProcessingTime  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "microseconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The Maximum Processing Time for an Access-Request packet"
+   ::= { bRadiusLatencyAuthEntry 5 }
+
+bRadiusAuthRequestMinimumProcessingTime  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "microseconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The Minimum Processing Time for an Access-Request packet"
+   ::= { bRadiusLatencyAuthEntry 6 }
+
+bRadiusAuthRequestAverageProcessingTime  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "microseconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The Average Processing Time for an Access-Request packet"
+   ::= { bRadiusLatencyAuthEntry 7 }
+
+bRadiusAuthRequestProcessingTimeGreaterthan1MS  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The number of Access-Request packets for which processing time is 
+       greater than 1ms."
+   ::= { bRadiusLatencyAuthEntry 8 }
+
+bRadiusAuthResponseTotalPackets  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of packets received in response to Access-Request packets."
+   ::= { bRadiusLatencyAuthEntry 9 }
+
+bRadiusAuthResponseMaximumProcessingTime  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "microseconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The maximum processing time of a packet received in response to an
+      Access-Request."
+   ::= { bRadiusLatencyAuthEntry 10 }
+
+bRadiusAuthResponseMinimumProcessingTime  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "microseconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The minimum processing time of a packet received in response to an
+      Access-Request."
+   ::= { bRadiusLatencyAuthEntry 11 }
+
+bRadiusAuthResponseAverageProcessingTime  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "microseconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The average processing time of a packet received in response to an
+      Access-Request."
+   ::= { bRadiusLatencyAuthEntry 12 }
+
+bRadiusAuthResponseProcessingTimeGreaterthan1MS  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The number of response packets for which processing time is greater
+       than 1ms."
+   ::= { bRadiusLatencyAuthEntry 13 }
+
+
+-- Radius server notifications
+
+bRadiusServerIPAddrType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "IP Address type (IPv4 or IPv6) of the RADIUS server."
+    ::= { bRadiusNotifObjects 1 }
+
+bRadiusServerIPAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "IP Address of the RADIUS server."
+    ::= { bRadiusNotifObjects 2 }
+
+bAAAGroupOutstandingAuthReqsLow    NOTIFICATION-TYPE
+    OBJECTS         {
+                        bAAAGroupAuthName,
+                        bAAAGroupMaximumOutstandingAuthReqs,
+                        bAAAGroupOutstandingAuthReqsLowThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of outstanding Access-
+        Request message(s) for a particular AAA group is cleared, meaning that it
+        has fallen below the value of bAAAGroupOutstandingAuthReqsLowThreshold
+        for that AAA group."
+    ::= { bRadiusNotifications 1 }
+
+bAAAGroupOutstandingAuthReqsHigh NOTIFICATION-TYPE
+    OBJECTS         {
+                        bAAAGroupAuthName,
+                        bAAAGroupMaximumOutstandingAuthReqs,
+                        bAAAGroupOutstandingAuthReqsHighThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of outstanding
+        Access-Request message(s) for a particular AAA group has risen above the
+        value of bAAAGroupOutstandingAuthReqsHighThreshold for that
+        AAA group."
+    ::= { bRadiusNotifications 2 }
+
+bAAAGroupOutstandingAcctReqsLow    NOTIFICATION-TYPE
+    OBJECTS         {
+                        bAAAGroupAcctName,
+                        bAAAGroupMaximumOutstandingAcctReqs,
+                        bAAAGroupOutstandingAcctReqsLowThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of outstanding Accounting-
+        Request message(s) for a particular AAA group is cleared, meaning that it
+        has fallen below the value of bAAAGroupOutstandingAcctReqsLowThreshold
+        for that AAA group."
+    ::= { bRadiusNotifications 3 }
+
+bAAAGroupOutstandingAcctReqsHigh NOTIFICATION-TYPE
+    OBJECTS         {
+                        bAAAGroupAcctName,
+                        bAAAGroupMaximumOutstandingAcctReqs,
+                        bAAAGroupOutstandingAcctReqsHighThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of outstanding
+        Accounting-Request message(s) for a particular AAA group has risen above the
+        value of bAAAGroupOutstandingAcctReqsHighThreshold for that
+        AAA group."
+    ::= { bRadiusNotifications 4 }
+
+bAAAGroupOutstandingCoAReqsLow    NOTIFICATION-TYPE
+    OBJECTS         {
+                        bAAAGroupCoAName,
+                        bAAAGroupMaximumOutstandingCoAReqs,
+                        bAAAGroupOutstandingCoAReqsLowThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of outstanding Accounting-
+        Request message(s) for a particular AAA group is cleared, meaning that it has fallen
+        below the value of bAAAGroupOutstandingCoAReqsLowThreshold for that
+        AAA group."
+    ::= { bRadiusNotifications  5 }
+
+bAAAGroupOutstandingCoAReqsHigh NOTIFICATION-TYPE
+    OBJECTS         {
+                        bAAAGroupCoAName,
+                        bAAAGroupMaximumOutstandingCoAReqs,
+                        bAAAGroupOutstandingCoAReqsHighThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of outstanding
+        Accounting-Requests for a particular AAA group has risen above the
+        value of bAAAGroupOutstandingCoAReqsHighThreshold for that
+        AAA group."
+    ::= { bRadiusNotifications 6 }
+
+bRadiusAuthServerMarkedDead NOTIFICATION-TYPE
+    OBJECTS         {
+                        bRadiusServerIPAddrType,
+                        bRadiusServerIPAddress
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that an authentication RADIUS server has been marked dead."
+    ::= { bRadiusNotifications 7 }
+
+bRadiusAuthServerMarkedAlive NOTIFICATION-TYPE
+    OBJECTS         {
+                        bRadiusServerIPAddrType,
+                        bRadiusServerIPAddress
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that an authentication RADIUS server has become alive."
+    ::= { bRadiusNotifications 8 }
+
+bRadiusAccountingServerMarkedDead NOTIFICATION-TYPE
+    OBJECTS         {
+                        bRadiusServerIPAddrType,
+                        bRadiusServerIPAddress
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that an accounting RADIUS server has been marked dead" 
+    ::= { bRadiusNotifications 9 }
+
+bRadiusAccountingServerMarkedAlive NOTIFICATION-TYPE
+    OBJECTS         {
+                        bRadiusServerIPAddrType,
+                        bRadiusServerIPAddress
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that an accounting RADIUS server has become alive" 
+    ::= { bRadiusNotifications 10 }
+
+bRadiusProxyAuthTPSLowReached  NOTIFICATION-TYPE
+    OBJECTS         {
+                        bRadiusProxyAuthTPS
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the total number of Radius Proxy transactions
+        for the particular interval has fallen below the value bRadiusProxyAuthTPSLow."
+    ::= { bRadiusNotifications 11 }
+
+bRadiusProxyAuthTPSHighReached  NOTIFICATION-TYPE
+    OBJECTS         {
+                        bRadiusProxyAuthTPS
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the total number of Radius Proxy transactions
+        for the particular interval has risen above the value bRadiusProxyAuthTPSHigh."
+    ::= { bRadiusNotifications 12 }
+
+END
+

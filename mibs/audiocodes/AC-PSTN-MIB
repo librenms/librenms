@@ -1,0 +1,2309 @@
+
+AC-PSTN-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        Unsigned32,
+        Integer32,
+        enterprises                                 FROM SNMPv2-SMI
+		RowStatus      			 					FROM SNMPv2-TC
+		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+		InetAddressType, InetAddress        FROM INET-ADDRESS-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP,
+		NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+		audioCodes,       
+        acRegistrations,
+        acGeneric, 
+        acProducts,acBoardMibs		FROM AUDIOCODES-TYPES-MIB;
+
+       
+acPSTN  MODULE-IDENTITY       
+    LAST-UPDATED "201209241539Z"          --Monday, September 24 2012
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+	     AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+	     Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+
+    DESCRIPTION       
+    ""
+
+
+
+    ::= {acBoardMibs 9}  
+
+
+
+
+
+
+
+
+     acPSTNConfiguration OBJECT IDENTIFIER ::= {acPSTN 1}
+
+
+     acTrunkConfig OBJECT IDENTIFIER ::= {acPSTNConfiguration 1}
+
+
+     acTrunk OBJECT IDENTIFIER ::= {acTrunkConfig 1}
+
+
+     -- ****************************************
+     -- acTrunk table declaration
+     -- ****************************************
+     acTrunkTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcTrunkEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acTrunk 1}
+
+
+
+     -- ****************************************
+     -- acTrunk table entry
+     -- ****************************************
+     acTrunkEntry OBJECT-TYPE
+       SYNTAX AcTrunkEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acTrunkIndex}
+       ::= {acTrunkTable 1}
+
+
+
+     -- ****************************************
+     -- acTrunk TABLE
+     -- ****************************************
+     AcTrunkEntry ::= SEQUENCE {
+       acTrunkIndex                                    Unsigned32,
+       acTrunkAdministrativeState                      INTEGER,
+       acTrunkProtocolType                             INTEGER,
+       acTrunkClockMaster                              INTEGER,
+       acTrunkFramingMethod                            INTEGER,
+       acTrunkLineCode                                 INTEGER,
+       acTrunkTraceLevel                               INTEGER,
+       acTrunkDialPlanName                             SnmpAdminString,
+       acTrunkLineType                                 INTEGER,
+       acTrunkAutoClockPriority                        Unsigned32,
+       acTrunkDeactivate                               INTEGER,
+       acTrunkLoopbackConfig                           INTEGER
+     }
+
+
+
+     acTrunkIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..83)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Trunk ID at board in which the call is taking place.
+AC INI-Param: N/A"
+       ::= {acTrunkEntry 1}
+
+
+
+     acTrunkAdministrativeState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  locked(0)
+,
+                  unLocked(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Trunk Administrative State.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acTrunkEntry 2}
+
+
+
+     acTrunkProtocolType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  nONE(0)
+,
+                  e1EuroISDN(1)
+,
+                  t1Cas(2)
+,
+                  t1RawCas(3)
+,
+                  t1Transparent(4)
+,
+                  e1Transparent31(5)
+,
+                  e1Transparent30(6)
+,
+                  e1Mfcr2(7)
+,
+                  e1CasR2(8)
+,
+                  e1RawCAS(9)
+,
+                  t1-NI2ISDN(10)
+,
+                  t1-4EssISDN(11)
+,
+                  t1-5Ess-9-ISDN(12)
+,
+                  t1-5Ess-10-ISDN(13)
+,
+                  t1-Dms100-ISDN(14)
+,
+                  j1-TRANSPARENT(15)
+,
+                  t1-NTT-ISDN(16)
+,
+                  e1-AUSTEL-ISDN(17)
+,
+                  e1-HKT-ISDN(18)
+,
+                  e1-KOR-ISDN(19)
+,
+                  t1-HKT-ISDN(20)
+,
+                  e1-QSIG(21)
+,
+                  e1-TNZ-22(22)
+,
+                  t1-EXTRA-23(23)
+,
+                  t1-IUA(28)
+,
+                  e1-IUA(29)
+,
+                  e1-EXTRA-30(30)
+,
+                  e1-FRENCH-VN3-ISDN(31)
+,
+                  t1-EXTRA-32(32)
+,
+                  eXTRA-33(33)
+,
+                  t1-EURO-ISDN(34)
+,
+                  t1-DMS100-MERIDIAN-ISDN(35)
+,
+                  t1-NI1-ISDN(36)
+,
+                  e1-DUA(37)
+,
+                  e1-Q931-PACKETS(38)
+,
+                  t1-Q931-PACKETS(39)
+,
+                  e1-NI2-ISDN(40)
+,
+                  e1-CAS-R15(41)
+,
+                  v5(43)
+,
+                  bRI-EURO-ISDN(50)
+,
+                  bRI-NI-2(51)
+,
+                  bRI-DMS100(52)
+,
+                  bRI-5ESS(53)
+,
+                  bRI-QSIG(54)
+,
+                  bRI-VNG(55)
+,
+                  bRI-NTT(56)
+,
+                  bRI-IUA(57)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to set the PSTN protocol to be used for this trunk. Relevant
+only when TDMBusType=acFRAMERS (2). 
+Either:
+NONE = 0 
+E1_EURO_ISDN = 1 
+T1_CAS = 2 
+T1_RAW_CAS = 3 
+T1_TRANSPARENT = 4 
+E1_TRANSPARENT_31 = 5 
+E1_TRANSPARENT_30 = 6 
+E1_MFCR2 = 7 
+E1_CAS = 8 
+E1_RAW_CAS = 9 
+T1_NI2_ISDN = 10 
+T1_4ESS_ISDN = 11 
+T1_5ESS_9_ISDN = 12 
+T1_5ESS_10_ISDN = 13 
+T1_DMS100_ISDN = 14 
+J1_TRANSPARENT = 15 
+T1_NTT_ISDN = 16 
+E1_AUSTEL_ISDN = 17 
+E1_HKT_ISDN = 18 
+E1_KOR_ISDN = 19 
+T1_HKT_ISDN = 20 
+E1_QSIG = 21 
+E1_TNZ_ISDN = 22 
+T1_QSIG = 23 
+T1_IUA = 28 
+E1_IUA = 29 
+E1_FRENCH_VN6_ISDN = 30 
+E1_FRENCH_VN3_ISDN = 31 
+T1_EURO_ISDN = 34 
+T1_DMS100_MERIDIAN_ISDN = 35 
+T1_NI1_ISDN = 36 
+E1_DUA = 37 
+E1_Q931_PACKETS = 38
+T1_Q931_PACKETS = 39
+E1_NI2_ISDN = 40
+E1-CAS-R15 = 41
+V5 = 43
+BRI-EURO-ISDN = 50
+BRI-NI-2 = 51
+BRI-DMS100 = 52
+BRI-5ESS = 53
+BRI-QSIG = 54
+BRI-VNG = 55
+BRI-NTT = 56
+BRI-IUA = 57.
+.
+Access: Online.
+AC INI-Param: PROTOCOLTYPE"
+       ::= {acTrunkEntry 3}
+
+
+
+     acTrunkClockMaster OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acCLOCK-MASTER-OFF(0)
+,
+                  acCLOCK-MASTER-ON(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to select the trunk clock source. 
+
+0 = acCLOCK_MASTER_OFF (clock recovered from the line)
+1 = acCLOCK_MASTER_ON (the trunk clock source is provided by
+the internal/TDM bus clock source depending on the parameter
+TDM Bus Clock Source).
+Access: Online.
+AC INI-Param: CLOCKMASTER"
+       ::= {acTrunkEntry 4}
+
+
+
+     acTrunkFramingMethod OBJECT-TYPE
+       SYNTAX INTEGER {
+                  eXTENDED-SUPER-FRAME(0)
+,
+                  sUPER-FRAME(1)
+,
+                  e1-FRAMING-DDF(2)
+,
+                  e1-FRAMING-MFF-CRC4(3)
+,
+                  e1-FRAMING-MFF-CRC4-EXT(4)
+,
+                  t1-FRAMING-F4(6)
+,
+                  t1-FRAMING-F12(7)
+,
+                  t1-FRAMING-ESF(8)
+,
+                  t1-FRAMING-ESF-CRC6 (9)
+,
+                  t1-FRAMING-F72(10)
+,
+                  t1-FRAMING-ESF-CRC6-JT(11)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects the Framing method to be used for this trunk.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acTrunkEntry 5}
+
+
+
+     acTrunkLineCode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acB8ZS(0)
+,
+                  acAMI(1)
+,
+                  acHDB3(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Use to select line code. B8ZS or AMI for T1 spans and HDB3 or
+AMI for E1 spans.
+
+0 = Use B8ZS line code (for T1 trunks only = default)
+1 = Use AMI line code (for T1 or E1 trunks)
+2 = Use HDB3 line code (for E1 trunks only).
+Access: Online.
+AC INI-Param: LINECODE"
+       ::= {acTrunkEntry 6}
+
+
+
+     acTrunkTraceLevel OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acNO-TRACE(0)
+,
+                  acFULL-ISDN-TRACE(1)
+,
+                  acLAYER3-ISDN-TRACE(2)
+,
+                  acONLY-ISDN-Q931-MSGS-TRACE(3)
+,
+                  acLAYER3-ISDN-TRACE-NO-DUPLICATION(4)
+,
+                  acFULL-ISDN-TRACE-WITH-DUPLICATION(5)
+,
+                  acISDN-Q931-RAW-DATA-TRACE(6)
+,
+                  acISDN-Q921-RAW-DATA-TRACE(7)
+,
+                  acISDN-Q931-Q921-RAW-DATA-TRACE(8)
+,
+                  acSS7-MTP2(10)
+,
+                  acSS7-MTP2-AND-APPLI(11)
+,
+                  acSS7-MTP2-SL-L3-NO-MSU(12)
+,
+                  acSS7-AAL(15)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the Trace level:
+acNO_TRACE = 0
+acFULL_ISDN_TRACE = 1
+acLAYER3_ISDN_TRACE = 2
+acONLY_ISDN_Q931_MSGS_TRACE = 3
+acLAYER3_ISDN_TRACE_NO_DUPLICATION = 4
+acFULL_ISDN_TRACE_WITH_DUPLICATION = 5
+acISDN_Q931_RAW_DATA_TRACE = 6
+acISDN_Q921_RAW_DATA_TRACE = 7
+acISDN_Q931_Q921_RAW_DATA_TRACE = 8
+acSS7_MTP2 = 10
+acSS7_MTP2_AND_APPLI = 11
+acSS7_MTP2_SL_L3_NO_MSU = 12
+acSS7_AAL = 15.
+Access: Online.
+AC INI-Param: TRACELEVEL"
+       ::= {acTrunkEntry 7}
+
+
+
+     acTrunkDialPlanName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..11))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the Dial Plan name that will be used on the specific trunk.
+
+Range = string 11 characters.
+Access: Instant.
+AC INI-Param: CasTrunkDialPlanName"
+       ::= {acTrunkEntry 8}
+
+
+
+     acTrunkLineType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  lineTypeE1(10)
+,
+                  lineTypeT1(11)
+,
+                  lineTypeBRI(12)
+,
+                  lineTypeUnknown(21)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Line type.
+lineTypeBRI(12) - If the physical type is BRI.
+lineTypeE1(10)/lineTypeT1(11) - For non BRI IF when there are
+other lines that are already configured to either E1 or T1.
+lineTypeUnknown(-1) - For non BRI IF when no lines are configured.
+AC INI-Param: N/A"
+       ::= {acTrunkEntry 9}
+
+
+
+     acTrunkAutoClockPriority OBJECT-TYPE
+       SYNTAX Unsigned32 (0..100)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the trunk priority for auto-clock fallback (Priority
+range: 0 - 100 (0 - 99 are priority settings, in which 0 =
+highest Priority and is the default setting
+ 100 = Do not choose this trunk).
+Access: Online.
+AC INI-Param: AutoClockTrunkPriority"
+       ::= {acTrunkEntry 10}
+
+
+
+     acTrunkDeactivate OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notAvailable(0)
+,
+                  deActivated(1)
+,
+                  activated(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Deactivating a trunk forces AIS alarm on that trunk. Deactivation
+is used for trunk maintenance without locking the trunk.
+Activating the trunk will stop the alarm on the trunk.
+notAvailable(0) appears when the trunk is locked. The trunk
+can't be SET to this state.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acTrunkEntry 11}
+
+
+
+     acTrunkLoopbackConfig OBJECT-TYPE
+       SYNTAX INTEGER {
+                  noLoop(0)
+,
+                  lineLoop(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This variable represents the loopback state of the trunk.
+Access: Offline.
+AC INI-Param: N/A"
+       ::= {acTrunkEntry 12}
+
+
+
+     acTrunkLine OBJECT IDENTIFIER ::= {acTrunkConfig 2}
+
+
+     -- ****************************************
+     -- acTrunkLine table declaration
+     -- ****************************************
+     acTrunkLineTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcTrunkLineEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           " "
+       ::= {acTrunkLine 1}
+
+
+
+     -- ****************************************
+     -- acTrunkLine table entry
+     -- ****************************************
+     acTrunkLineEntry OBJECT-TYPE
+       SYNTAX AcTrunkLineEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "configuration of the DS1 interface. "
+       INDEX {acTrunkIndex}
+       ::= {acTrunkLineTable 1}
+
+
+
+     -- ****************************************
+     -- acTrunkLine TABLE
+     -- ****************************************
+     AcTrunkLineEntry ::= SEQUENCE {
+       acTrunkLineBuildOutLoss                         INTEGER,
+       acTrunkLineBuildOutOverwrite                    INTEGER,
+       acTrunkLineBuildOutXPM0                         Unsigned32,
+       acTrunkLineBuildOutXPM1                         Unsigned32,
+       acTrunkLineBuildOutXPM2                         Unsigned32
+     }
+
+
+
+     acTrunkLineBuildOutLoss OBJECT-TYPE
+       SYNTAX INTEGER {
+                  ac0DB(0)
+,
+                  ac7-5DB(1)
+,
+                  ac15DB(2)
+,
+                  ac22-5DB(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to select the line build out loss to be used for this trunk.
+
+0 = 0 dB
+1 = 7.5 dB
+2 = 15 dB
+3 = 22.5 dB.
+Access: Online.
+AC INI-Param: LINEBUILDOUT.LOSS"
+       ::= {acTrunkLineEntry 1}
+
+
+
+     acTrunkLineBuildOutOverwrite OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acNO-OVER-WRITE(0)
+,
+                  acOVER-WRITE(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to overwrite the Framer's XPM registers values (these registers
+control the line pulse shape).
+
+0 = No overwrite
+1 = Overwrite.
+Access: Online.
+AC INI-Param: LINEBUILDOUT.OVERWRITE"
+       ::= {acTrunkLineEntry 2}
+
+
+
+     acTrunkLineBuildOutXPM0 OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to control the Framer's XPM0 register value (line pulse
+shape control). 
+Applicable only when TrunkConfig.LineBuildOut.Overwrite=1.
+
+Should be used only by expert users.
+
+Range = 0 to 255.
+Access: Online.
+AC INI-Param: LINEBUILDOUT.XPM0"
+       ::= {acTrunkLineEntry 3}
+
+
+
+     acTrunkLineBuildOutXPM1 OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to control the Framer's XPM1 register value (line pulse
+shape control).
+Applicable only when TrunkConfig.LineBuildOut.Overwrite=1.
+Should be used only by expert users.
+
+Range = 0 to 255.
+Access: Online.
+AC INI-Param: LINEBUILDOUT.XPM1"
+       ::= {acTrunkLineEntry 4}
+
+
+
+     acTrunkLineBuildOutXPM2 OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to control the Framer's XPM2 register value (line pulse
+shape control). 
+Applicable only when TrunkConfig.LineBuildOut.Overwrite=1.
+
+Should be used only by expert users.
+
+Range = 0 to 255.
+Access: Online.
+AC INI-Param: LINEBUILDOUT.XPM2"
+       ::= {acTrunkLineEntry 5}
+
+
+
+     acTrunkISDN OBJECT IDENTIFIER ::= {acTrunkConfig 3}
+
+
+     acTrunkISDNCommon OBJECT IDENTIFIER ::= {acTrunkISDN 1}
+
+
+     -- ****************************************
+     -- acTrunkISDNCommon table declaration
+     -- ****************************************
+     acTrunkISDNCommonTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcTrunkISDNCommonEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acTrunkISDNCommon 1}
+
+
+
+     -- ****************************************
+     -- acTrunkISDNCommon table entry
+     -- ****************************************
+     acTrunkISDNCommonEntry OBJECT-TYPE
+       SYNTAX AcTrunkISDNCommonEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acTrunkIndex}
+       ::= {acTrunkISDNCommonTable 1}
+
+
+
+     -- ****************************************
+     -- acTrunkISDNCommon TABLE
+     -- ****************************************
+     AcTrunkISDNCommonEntry ::= SEQUENCE {
+       acTrunkISDNCommonTerminationSide                INTEGER,
+       acTrunkISDNCommonQ931LayerResponseBehavior      Integer32,
+       acTrunkISDNCommonIncomingCallsBehavior          Unsigned32,
+       acTrunkISDNCommonOutgoingCallsBehavior          Unsigned32,
+       acTrunkISDNCommonGeneralCCBehavior              Unsigned32,
+       acTrunkISDNCommonIuaInterfaceId                 Integer32,
+       acTrunkISDNCommonDuplicateQ931BuffMode          Unsigned32,
+       acTrunkISDNCommonBRILayer2Mode                  INTEGER,
+       acTrunkISDNCommonNSBehaviour2                   Unsigned32,
+       acTrunkISDNCommonRestartBChannel                Integer32
+     }
+
+
+
+     acTrunkISDNCommonTerminationSide OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acUSER-TERMINATION-SIDE(0)
+,
+                  acNETWORK-TERMINATION-SIDE(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Used to set the ISDN Termination to either User or Network.
+Termination = For ISDN only.
+User side = 0
+Network side = 1.
+Access: Online.
+AC INI-Param: TERMINATIONSIDE"
+       ::= {acTrunkISDNCommonEntry 1}
+
+
+
+     acTrunkISDNCommonQ931LayerResponseBehavior OBJECT-TYPE
+       SYNTAX Integer32 (-2147483647..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Bit-field used to determine several behavior options, which
+influence how the Q.931 protocol behaves.
+Access: Online.
+AC INI-Param: ISDNIBEHAVIOR"
+       ::= {acTrunkISDNCommonEntry 2}
+
+
+
+     acTrunkISDNCommonIncomingCallsBehavior OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This is the bit-field used to determine several behavior options
+that influence how the ISDN Stack INCOMING calls behave.
+Refer to the Appendix A.8 'ISDN Flexible Behavior' in the
+VoPLib Reference Library User's Manual Document #: LTRT-00740.
+Access: Online.
+AC INI-Param: ISDNINCALLSBEHAVIOR"
+       ::= {acTrunkISDNCommonEntry 3}
+
+
+
+     acTrunkISDNCommonOutgoingCallsBehavior OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This is the bit-field used to determine several behavior options
+that influence how the ISDN Stack OUTGOING calls behave.
+Refer to Appendix A.8 in the 'VoPLib Reference Library User's
+Manual.
+Access: Online.
+AC INI-Param: ISDNOUTCALLSBEHAVIOR"
+       ::= {acTrunkISDNCommonEntry 4}
+
+
+
+     acTrunkISDNCommonGeneralCCBehavior OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This is the bit-field used to determine several general ISDN
+behavior options. Refer to the Appendix A.8 'ISDN Flexible
+Behavior' in the VoPLib Reference Library User's Manual Document
+#: LTRT-00740.
+Access: Online.
+AC INI-Param: ISDNGENERALCCBEHAVIOR"
+       ::= {acTrunkISDNCommonEntry 5}
+
+
+
+     acTrunkISDNCommonIuaInterfaceId OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Defines the IUA trunk interface ID value - unsigned integer
+- in RFC 3057 - SIGTRAN. Default = 0xFFFFFFFF.
+AC INI-Param: N/A"
+       ::= {acTrunkISDNCommonEntry 6}
+
+
+
+     acTrunkISDNCommonDuplicateQ931BuffMode OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Activates / de-activates delivery of raw Q.931 messages. Refer
+to the VoPLib documentation ('ISDN Flexible Behavior').
+Access: Online.
+AC INI-Param: ISDNDUPLICATEQ931BUFFMODE"
+       ::= {acTrunkISDNCommonEntry 7}
+
+
+
+     acTrunkISDNCommonBRILayer2Mode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  bRI-L2-MODE-P2P(0)
+,
+                  bRI-L2-MODE-P2MP(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Indicates point to point or point to Multipoint mode for layer2.
+Applicable in BRI trunks only. One of the following values:
+Point to point = 0
+Point to Multipoint = 1
+
+.
+Access: Online.
+AC INI-Param: BriLayer2Mode"
+       ::= {acTrunkISDNCommonEntry 8}
+
+
+
+     acTrunkISDNCommonNSBehaviour2 OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Bit-field used to determine several behavior options, which
+influence how the Q.931 protocol behaves.
+Refer to the VoPLib documentation (ISDN Flexible Behavior).
+Access: Online.
+AC INI-Param: ISDNNSBehaviour2"
+       ::= {acTrunkISDNCommonEntry 9}
+
+
+
+     acTrunkISDNCommonRestartBChannel OBJECT-TYPE
+       SYNTAX Integer32 (-1..31)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sends restart request for a specific B-channel. Only ONE restart
+request at a time for a given trunk should be sent, since
+the restart state machine is not on per B-channel basis,
+but on a per trunk basis. Inputs:
+E1: -1, 1 - 31. 
+T1: -1, 1 - 24. 
+Use -1 to reset and re-initialize all B-channels in the selected
+trunk.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acTrunkISDNCommonEntry 10}
+
+
+
+     acTrunkISDNNfas OBJECT IDENTIFIER ::= {acTrunkISDN 2}
+
+
+     -- ****************************************
+     -- acTrunkISDNNfas table declaration
+     -- ****************************************
+     acTrunkISDNNfasTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcTrunkISDNNfasEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acTrunkISDNNfas 1}
+
+
+
+     -- ****************************************
+     -- acTrunkISDNNfas table entry
+     -- ****************************************
+     acTrunkISDNNfasEntry OBJECT-TYPE
+       SYNTAX AcTrunkISDNNfasEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acTrunkIndex}
+       ::= {acTrunkISDNNfasTable 1}
+
+
+
+     -- ****************************************
+     -- acTrunkISDNNfas TABLE
+     -- ****************************************
+     AcTrunkISDNNfasEntry ::= SEQUENCE {
+       acTrunkISDNNfasDchConfig                        INTEGER,
+       acTrunkISDNNfasInterfaceId                      Unsigned32,
+       acTrunkISDNNfasGroupNumber                      Unsigned32
+     }
+
+
+
+     acTrunkISDNNfasDchConfig OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acDCH-CONFIG-PRIMARY(0)
+,
+                  acDCH-CONFIG-BACKUP(1)
+,
+                  acDCH-CONFIG-NFAS(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines D-channel configuration. This setting is only applicable
+to ISDN PRI protocols that support NFAS and/or D-channel
+backup procedures.
+
+0 = D-channel is Primary
+1 = Backup
+2 = NFAS.
+Access: Online.
+AC INI-Param: DCHCONFIG"
+       ::= {acTrunkISDNNfasEntry 1}
+
+
+
+     acTrunkISDNNfasInterfaceId OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the Interface ID. Works with NS_EXPLICIT_INTERFACE_ID.
+Refer to the VoPLib documentation(ISDN Flexible Behavior).
+
+Default = (unsigned char)-1.
+
+Range = 0 to 255.
+Access: Online.
+AC INI-Param: ISDNNFASINTERFACEID"
+       ::= {acTrunkISDNNfasEntry 2}
+
+
+
+     acTrunkISDNNfasGroupNumber OBJECT-TYPE
+       SYNTAX Unsigned32 (0..12)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Relevant only for T1 ISDN NFAS trunks indicates the group number
+of the NFAS group. ;Valid NFAS group numbers are only
+1 to 9, 0 indicating that this trunk is not NFAS (in this
+case the ISDNNFASInterfaceID and DchConfig parameters are ignored).
+Access: Online.
+AC INI-Param: NFASGROUPNUMBER"
+       ::= {acTrunkISDNNfasEntry 3}
+
+
+
+     acTrunkISDNDpnss OBJECT IDENTIFIER ::= {acTrunkISDN 3}
+
+
+     -- ****************************************
+     -- acTrunkISDNDpnss table declaration
+     -- ****************************************
+     acTrunkISDNDpnssTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcTrunkISDNDpnssEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acTrunkISDNDpnss 1}
+
+
+
+     -- ****************************************
+     -- acTrunkISDNDpnss table entry
+     -- ****************************************
+     acTrunkISDNDpnssEntry OBJECT-TYPE
+       SYNTAX AcTrunkISDNDpnssEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acTrunkIndex}
+       ::= {acTrunkISDNDpnssTable 1}
+
+
+
+     -- ****************************************
+     -- acTrunkISDNDpnss TABLE
+     -- ****************************************
+     AcTrunkISDNDpnssEntry ::= SEQUENCE {
+       acTrunkISDNDpnssBehavior                        Unsigned32,
+       acTrunkISDNDpnssNumRealChannels                 Unsigned32,
+       acTrunkISDNDpnssNumVirtualChannels              Unsigned32
+     }
+
+
+
+     acTrunkISDNDpnssBehavior OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The DPNSSBehaviour parameter represents a Bit field parameter.
+Each bit represents a specific type of  DPNSS behavior. Currently
+only the first 2 bits are in use.
+
+ - DPNSS_BEHAV_STOP_SABMR_AFTER_NL_AND_NT1 bit: (bit #0, bit
+mask 0x0001)
+
+When set to 1: DPNSS stops repeating SABMR after NL and NT1
+limits are exceeded.
+When set to 0: DPNSS continues repeating SABMR after NL and
+NT1 limits are exceeded.
+Default is 0 (continue repeating SABMR)
+
+- DPNSS_BEHAV_FULL_STARTUP_SUCCESS bit: (bit #1, bit mask 0x0002)
+
+When set to 1: the Startup Procedure is considered as a SUCCESS
+only when ALL DLCs succeeded to Reset
+
+
+When set to 0: the Startup Procedure is considered as a SUCCESS
+as soon as 1 DLC succeeded to Reset
+
+Default is 0: (only partial reset is considered as a success).
+
+.
+Access: Online.
+AC INI-Param: DPNSSBehavior"
+       ::= {acTrunkISDNDpnssEntry 1}
+
+
+
+     acTrunkISDNDpnssNumRealChannels OBJECT-TYPE
+       SYNTAX Unsigned32 (1..30)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter is relevant only to protocol ISDN DPNSS. Defines
+the number of real channels. Default value is 30. Valid
+range 1 to 30.
+Access: Online.
+AC INI-Param: DPNSSNumRealChannels"
+       ::= {acTrunkISDNDpnssEntry 2}
+
+
+
+     acTrunkISDNDpnssNumVirtualChannels OBJECT-TYPE
+       SYNTAX Unsigned32 (0..30)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter is relevant only to protocol ISDN DPNSS. Defines
+the number of virtual channels. Default value is 30. Valid
+range 0 to 30.
+Access: Online.
+AC INI-Param: DPNSSNumVirtualChannels"
+       ::= {acTrunkISDNDpnssEntry 3}
+
+
+
+     acTrunkCAS OBJECT IDENTIFIER ::= {acTrunkConfig 4}
+
+
+     -- ****************************************
+     -- acTrunkCAS table declaration
+     -- ****************************************
+     acTrunkCASTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcTrunkCASEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acTrunkCAS 1}
+
+
+
+     -- ****************************************
+     -- acTrunkCAS table entry
+     -- ****************************************
+     acTrunkCASEntry OBJECT-TYPE
+       SYNTAX AcTrunkCASEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acTrunkIndex}
+       ::= {acTrunkCASTable 1}
+
+
+
+     -- ****************************************
+     -- acTrunkCAS TABLE
+     -- ****************************************
+     AcTrunkCASEntry ::= SEQUENCE {
+       acTrunkCASTablesIndex                           Unsigned32,
+       acTrunkCASTablePerChannel                       SnmpAdminString
+     }
+
+
+
+     acTrunkCASTablesIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter determines which CAS protocol file to use on
+a specific trunk. The index value corresponds to the number
+configured for the parameter CASFileName_X.
+Range = not greater than the parameter defining the PSTN CAS
+Table Num.
+Access: Online.
+AC INI-Param: CASTABLEINDEX"
+       ::= {acTrunkCASEntry 1}
+
+
+
+     acTrunkCASTablePerChannel OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..63))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the Cas protocol table index per channel.
+User need to set each channel the table number 0-7, with comma
+saperator between channels:
+'1,3,1,3,1,3..'.
+Access: Instant.
+AC INI-Param: CasChannelIndex"
+       ::= {acTrunkCASEntry 2}
+
+
+
+     acTrunkV5 OBJECT IDENTIFIER ::= {acTrunkConfig 5}
+
+
+     -- ****************************************
+     -- acTrunkV5 table declaration
+     -- ****************************************
+     acTrunkV5Table OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcTrunkV5Entry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acTrunkV5 1}
+
+
+
+     -- ****************************************
+     -- acTrunkV5 table entry
+     -- ****************************************
+     acTrunkV5Entry OBJECT-TYPE
+       SYNTAX AcTrunkV5Entry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acTrunkIndex}
+       ::= {acTrunkV5Table 1}
+
+
+
+     -- ****************************************
+     -- acTrunkV5 TABLE
+     -- ****************************************
+     AcTrunkV5Entry ::= SEQUENCE {
+       acTrunkV5NumberOfCChannels                      Unsigned32,
+       acTrunkV5ProtocolSide                           INTEGER
+     }
+
+
+
+     acTrunkV5NumberOfCChannels OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Indicates the number of timeslots used as communication channels
+in a V5 trunk.
+0 - No C-channel, the trunk is voice only.
+1 - Timeslot 16 is used for the V5 signaling
+
+.
+Access: Online.
+AC INI-Param: V5NumberOfCChannels"
+       ::= {acTrunkV5Entry 1}
+
+
+
+     acTrunkV5ProtocolSide OBJECT-TYPE
+       SYNTAX INTEGER {
+                  an-Side(0)
+,
+                  le-Side(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Indicates the V5 side of the V5 protocol served by the trunk..
+0 - AN side.
+1 - LE side
+
+.
+Access: Online.
+AC INI-Param: V5ProtocolSide"
+       ::= {acTrunkV5Entry 2}
+
+
+
+     acTrunkGlobal OBJECT IDENTIFIER ::= {acTrunkConfig 8}
+
+
+     acTrunkGlobalLifeLineType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  hW-Only(0)
+,
+                  hW-And-Link-Detection(1)
+,
+                  hW-And-Link-And-Network-Detection(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter is used to define the type of trunk lifeline.
+Short trunks 1-2, 3-4.
+0 = Activate lifeline on power down
+1 = Activate lifeline on power down or on detection of LAN
+disconnect
+2 = Activate lifeline on power down or on detection of LAN
+disconnect or loss of ping.
+Access: Offline.
+AC INI-Param: TrunkLifeLineType"
+       ::= {acTrunkGlobal 1}
+
+
+
+     acTrunkGlobalBChannelAlarms OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "When set to 1 B-Channels Alarms will be sent.
+Access: Offline.
+AC INI-Param: BChannelAlarms"
+       ::= {acTrunkGlobal 2}
+
+
+
+     acISDNConfig OBJECT IDENTIFIER ::= {acPSTNConfiguration 2}
+
+
+     acMiscISDN OBJECT IDENTIFIER ::= {acISDNConfig 1}
+
+
+     acMiscISDNQ931RelayMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+,
+                  activateLAPDmessaging (1)
+,
+                  layer3-IS-IUA (3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Activates / de-activates the ISDN level 3 Q.931 Relay Mode.
+ 
+Choose 0 or ActivateLAPDmessaging or Q931_RELAY_TO_HOST or
+Layer3_IS_IUA.
+Access: Offline.
+AC INI-Param: Q931RELAYMODE"
+       ::= {acMiscISDN 1}
+
+
+
+     acMiscISDNDuplicateQ931BuffMode OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "
+Access: Offline.
+AC INI-Param: ISDNDUPLICATEQ931BUFFMODE"
+       ::= {acMiscISDN 2}
+
+
+
+     acDS3Config OBJECT IDENTIFIER ::= {acPSTNConfiguration 3}
+
+
+     acDS3ConfigFramingMethod OBJECT-TYPE
+       SYNTAX INTEGER {
+                  dS3-M23(0)
+,
+                  dS3-C-BIT-PARITY(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Used to select the physical DS3 framing method to be used in
+this board. 
+0 = M23 framing
+1 = C Bit Parity.
+Access: Offline.
+AC INI-Param: DS3FRAMINGMETHOD"
+       ::= {acDS3Config 1}
+
+
+
+     acDS3ConfigClockSource OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acClock-Source-External(0)
+,
+                  acClock-Source-Local-Board(1)
+,
+                  acClock-Source-Local-PLL(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Selects the physical DS3 framing method to be used in this board.
+Applicable only to the TP-2810.
+
+0 = DS3 Clock is recovered from the line
+1 = DS3 trunk clock source is provided by the board's internal
+clock
+2 = Clock is taken from the local PLL which is not synchronized
+with any other clock.
+Access: Offline.
+AC INI-Param: DS3CLOCKSOURCE"
+       ::= {acDS3Config 2}
+
+
+
+     acDS3ConfigLineBuiltOut OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acLINE-BUILT-OUT-LEVEL-1(0)
+,
+                  acLINE-BUILT-OUT-LEVEL-2(1)
+,
+                  acLINE-BUILT-OUT-LEVEL-3(2)
+,
+                  acLINE-BUILT-OUT-LEVEL-4(3)
+,
+                  acLINE-BUILT-OUT-LEVEL-5(4)
+,
+                  acLINE-BUILT-OUT-LEVEL-6(5)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Used to select the DS3 line build out. Applies only to the TP-2810.
+Access: Offline.
+AC INI-Param: DS3LINEBUILTOUT"
+       ::= {acDS3Config 3}
+
+
+
+     acCasConfig OBJECT IDENTIFIER ::= {acPSTNConfiguration 4}
+
+
+     acCasConfigEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter enables or disables the possibility CAS protocol
+configuration. At TP6310 When this parameter is enable the
+conference will disabled in case it's relevant.
+
+0 = Disable
+1 = Enable.
+Access: Offline.
+AC INI-Param: CASProtocolEnable"
+       ::= {acCasConfig 1}
+
+
+
+     acCASFile OBJECT IDENTIFIER ::= {acCasConfig 2}
+
+
+     -- ****************************************
+     -- acCASFile table declaration
+     -- ****************************************
+     acCASFileTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCASFileEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acCASFile 1}
+
+
+
+     -- ****************************************
+     -- acCASFile table entry
+     -- ****************************************
+     acCASFileEntry OBJECT-TYPE
+       SYNTAX AcCASFileEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCASFileIndex}
+       ::= {acCASFileTable 1}
+
+
+
+     -- ****************************************
+     -- acCASFile TABLE
+     -- ****************************************
+     AcCASFileEntry ::= SEQUENCE {
+       acCASFileIndex                                  Unsigned32,
+       acCASFileName                                   SnmpAdminString
+     }
+
+
+
+     acCASFileIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Cas Table Indexd.
+AC INI-Param: N/A"
+       ::= {acCASFileEntry 1}
+
+
+
+     acCASFileName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "This is a pointer to the CAS filename index (0-7). The index
+is CASFileName_X. CASFileName_0 through to CASFileName_7 are
+the path and names of the CAS protocol configuration files.
+AC INI-Param: CASFILENAME"
+       ::= {acCASFileEntry 2}
+
+
+
+     acSonetSDH OBJECT IDENTIFIER ::= {acPSTNConfiguration 5}
+
+
+     -- ****************************************
+     -- acSonetSDH table declaration
+     -- ****************************************
+     acSonetSDHTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcSonetSDHEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acSonetSDH 1}
+
+
+
+     -- ****************************************
+     -- acSonetSDH table entry
+     -- ****************************************
+     acSonetSDHEntry OBJECT-TYPE
+       SYNTAX AcSonetSDHEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acSonetSDHIndex}
+       ::= {acSonetSDHTable 1}
+
+
+
+     -- ****************************************
+     -- acSonetSDH TABLE
+     -- ****************************************
+     AcSonetSDHEntry ::= SEQUENCE {
+       acSonetSDHIndex                                 Unsigned32,
+       acSonetSDHFbrGrpMappingType                     INTEGER,
+       acSonetSDHFbrGrpKlmNumberingScheme              INTEGER,
+       acSonetSDHFbrGrpAPSDirectionMode                INTEGER,
+       acSonetSDHFbrGrpAPSRevertMode                   INTEGER,
+       acSonetSDHFbrGrpAPSWaitToRestoreTime            Unsigned32
+     }
+
+
+
+     acSonetSDHIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (1..1)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Fiber groupe index.
+AC INI-Param: N/A"
+       ::= {acSonetSDHEntry 1}
+
+
+
+     acSonetSDHFbrGrpMappingType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  asynchronousVT15andDS1(0)
+,
+                  asynchronousTU12andE1(1)
+,
+                  sTS1asynchronousDS3(3)
+,
+                  undefined(15)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects SDH/SONET mapping type (signal label + payload mapping
+type) for the PSTN interface.
+Generally per Fiber Group.
+Single Fiber Group supported in the PSTN interface of TP6310
+and TP12610.
+Applicable only to the TP-6310 and TP-12610.
+Relevant only when acSysTDMBusType = acFRAMERS (2).
+0 = Asynchronous VT1.5 and DS1
+1 = Asynchronous TU12 and E1
+3 = Asynchronous mapping of DS3 in STS1, DS3 channelized to
+DS1s
+15 = Undefined
+Should be in coordination with other parameters as follows:
+- sonetMediumType
+- acTrunkProtocolType.
+Access: Offline.
+AC INI-Param: SDHFbrGrp_Mapping_Type"
+       ::= {acSonetSDHEntry 2}
+
+
+
+     acSonetSDHFbrGrpKlmNumberingScheme OBJECT-TYPE
+       SYNTAX INTEGER {
+                  numberingScheme-MLK(0)
+,
+                  numberingScheme-LMK(1)
+,
+                  numberingScheme-KLM(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Provides VC/VT numbering scheme for STM-1/OC3 fiber group.
+Access: Offline.
+AC INI-Param: SDHFbrGrp_KLM_Numbering_Scheme"
+       ::= {acSonetSDHEntry 3}
+
+
+
+     acSonetSDHFbrGrpAPSDirectionMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  unidirectional(0)
+,
+                  bidirectional(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the Automatic Protection Switch Unidir/Bidir mode for the
+Fiber Group.
+Access: Offline.
+AC INI-Param: SDHFbrGrp_APS_DirMode"
+       ::= {acSonetSDHEntry 4}
+
+
+
+     acSonetSDHFbrGrpAPSRevertMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  nonRevertive(0)
+,
+                  revertive(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the Automatic Protection Switch Revertive mode for the
+Fiber Group.
+Access: Offline.
+AC INI-Param: SDHFbrGrp_APS_RevertMode"
+       ::= {acSonetSDHEntry 5}
+
+
+
+     acSonetSDHFbrGrpAPSWaitToRestoreTime OBJECT-TYPE
+       SYNTAX Unsigned32 (5..12)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the APS Wait-to-restore time for the Fiber Group.
+Access: Offline.
+AC INI-Param: SDHFbrGrp_APS_WTR"
+       ::= {acSonetSDHEntry 6}
+
+
+
+     acPSTNStatus OBJECT IDENTIFIER ::= {acPSTN 2}
+
+
+     acTrunkStatus OBJECT IDENTIFIER ::= {acPSTNStatus 1}
+
+
+     -- ****************************************
+     -- acTrunkStatus table declaration
+     -- ****************************************
+     acTrunkStatusTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcTrunkStatusEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acTrunkStatus 1}
+
+
+
+     -- ****************************************
+     -- acTrunkStatus table entry
+     -- ****************************************
+     acTrunkStatusEntry OBJECT-TYPE
+       SYNTAX AcTrunkStatusEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acTrunkIndex}
+       ::= {acTrunkStatusTable 1}
+
+
+
+     -- ****************************************
+     -- acTrunkStatus TABLE
+     -- ****************************************
+     AcTrunkStatusEntry ::= SEQUENCE {
+       acTrunkStatusLedStatusColor                     INTEGER,
+       acTrunkStatusLedStatusState                     INTEGER,
+       acTrunkStatusChannels                           OCTET STRING,
+       acTrunkStatusV5InterfaceNum                     Integer32,
+       acTrunkStatusV5LinkID                           Integer32,
+       acTrunkStatusDChannel                           INTEGER,
+       acTrunkStatusAlarm                              INTEGER,
+       acTrunkStatusDchannelActivity                   INTEGER
+     }
+
+
+
+     acTrunkStatusLedStatusColor OBJECT-TYPE
+       SYNTAX INTEGER {
+                  off(0)
+,
+                  red(1)
+,
+                  green(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Trunk led status color.
+AC INI-Param: N/A"
+       ::= {acTrunkStatusEntry 1}
+
+
+
+     acTrunkStatusLedStatusState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  steady(0)
+,
+                  blink(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Trunk led status blinking rate.
+AC INI-Param: N/A"
+       ::= {acTrunkStatusEntry 2}
+
+
+
+     acTrunkStatusChannels OBJECT-TYPE
+       SYNTAX OCTET STRING (SIZE (0..16))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Reperesents Trunk's Channels-Status. 
+Each nibble (half Byte) presents one channel status, as following:
+ 1 - invalid B-Channel.
+ 2 - None.
+ 3 - Open.
+ 4 - Media.
+ 5 - SS7.
+ 6 - HDLC.
+ 7 - DPNSS. 
+ 8 - CAS.
+ 9 - Out Of Service.
+ 10 - Maintenance.
+AC INI-Param: N/A"
+       ::= {acTrunkStatusEntry 3}
+
+
+
+     acTrunkStatusV5InterfaceNum OBJECT-TYPE
+       SYNTAX Integer32 (-1..31)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "V5.2 interface containing this trunk.
+ -1 means information not available or not relevant.
+AC INI-Param: N/A"
+       ::= {acTrunkStatusEntry 4}
+
+
+
+     acTrunkStatusV5LinkID OBJECT-TYPE
+       SYNTAX Integer32 (-1..62)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "V5.2 link containing this trunk.
+ -1 means information not available or not relevant.
+AC INI-Param: N/A"
+       ::= {acTrunkStatusEntry 5}
+
+
+
+     acTrunkStatusDChannel OBJECT-TYPE
+       SYNTAX INTEGER {
+                  dChannelEstablished(0)
+,
+                  dChannelNotEstablished(1)
+,
+                  dChannelNotApplicable(10)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the trunk's D channel status.
+ 0 - dChannelEstablished
+ 1 - dChannelNotEstablished
+10 - dChannelNotApplicable.
+AC INI-Param: N/A"
+       ::= {acTrunkStatusEntry 6}
+
+
+
+     acTrunkStatusAlarm OBJECT-TYPE
+       SYNTAX INTEGER {
+                  greyDisabled(0)
+,
+                  greenActive(1)
+,
+                  redLosLof(2)
+,
+                  blueAis(3)
+,
+                  yellowRai(4)
+,
+                  orangeDChannel(5)
+,
+                  purpleLowerLayerDown(6)
+,
+                  darkOrangeNFASAlarm(7)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the trunk's alarm status.
+0 - Disabled.
+1 - Active  - OK.
+2 - LOS/LOF Alarm.
+3 - AIS Alarm.
+4 - RAI Alram.
+5 - D-Channel Alarm.
+6 - Lower Layer Down.
+7 - NFAS Alarm.
+AC INI-Param: N/A"
+       ::= {acTrunkStatusEntry 7}
+
+
+
+     acTrunkStatusDchannelActivity OBJECT-TYPE
+       SYNTAX INTEGER {
+                  dChannelActive(0)
+,
+                  dChannelStandby(1)
+,
+                  dChannelNotApplicable(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Defines D-channel status. This parameter is only applicable
+to ISDN PRI protocols that support NFAS and/or D-channel backup
+procedures.
+0 = Active channel
+1 = Standby channel
+2 = Not applicable (this trunk doesn’t have D-channel defined).
+AC INI-Param: N/A"
+       ::= {acTrunkStatusEntry 8}
+
+
+
+     acDigitalLegs OBJECT IDENTIFIER ::= {acPSTNStatus 2}
+
+
+     -- ****************************************
+     -- acDigitalLegs table declaration
+     -- ****************************************
+     acDigitalLegsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcDigitalLegsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acDigitalLegs 1}
+
+
+
+     -- ****************************************
+     -- acDigitalLegs table entry
+     -- ****************************************
+     acDigitalLegsEntry OBJECT-TYPE
+       SYNTAX AcDigitalLegsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acDigitalLegsLegIndex}
+       ::= {acDigitalLegsTable 1}
+
+
+
+     -- ****************************************
+     -- acDigitalLegs TABLE
+     -- ****************************************
+     AcDigitalLegsEntry ::= SEQUENCE {
+       acDigitalLegsLegIndex                           Unsigned32,
+       acDigitalLegsCallIndex                          Unsigned32,
+       acDigitalLegsTrunk                              Unsigned32,
+       acDigitalLegsBchannel                           Unsigned32,
+       acDigitalLegsEchoCanceller                      INTEGER,
+       acDigitalLegsDTMFDetection                      INTEGER,
+       acDigitalLegsVoiceVolume                        Unsigned32,
+       acDigitalLegsHighPassFilter                     INTEGER,
+       acDigitalLegsInputGain                          INTEGER,
+       acDigitalLegsDSPDevice                          Unsigned32,
+       acDigitalLegsLegName                            SnmpAdminString
+     }
+
+
+
+     acDigitalLegsLegIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Decribes The Digital EndPoint In A Call.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 1}
+
+
+
+     acDigitalLegsCallIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Decribes The Call which The Digital EndPoint Participant In
+It.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 2}
+
+
+
+     acDigitalLegsTrunk OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Trunk the Leg belong to.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 3}
+
+
+
+     acDigitalLegsBchannel OBJECT-TYPE
+       SYNTAX Unsigned32 (0..76500)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Bchannel the Leg belong to.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 4}
+
+
+
+     acDigitalLegsEchoCanceller OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables the Echo Canceller.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 5}
+
+
+
+     acDigitalLegsDTMFDetection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables the DTMF Detection.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 6}
+
+
+
+     acDigitalLegsVoiceVolume OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describs the volume of the voice in dB.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 7}
+
+
+
+     acDigitalLegsHighPassFilter OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Enables or Disables theHigh Pass Filter.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 8}
+
+
+
+     acDigitalLegsInputGain OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Input Gain on the leg in dB.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 9}
+
+
+
+     acDigitalLegsDSPDevice OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "describes the DSP Device the Leg connected to.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 10}
+
+
+
+     acDigitalLegsLegName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Leg Name as in the Control Protocol.
+AC INI-Param: N/A"
+       ::= {acDigitalLegsEntry 11}
+
+
+
+     acSDHKLMNumberingScheme OBJECT IDENTIFIER ::= {acPSTNStatus 3}
+
+
+     -- ****************************************
+     -- acSDHKLMNumberingScheme table declaration
+     -- ****************************************
+     acSDHKLMNumberingSchemeTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcSDHKLMNumberingSchemeEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acSDHKLMNumberingScheme 1}
+
+
+
+     -- ****************************************
+     -- acSDHKLMNumberingScheme table entry
+     -- ****************************************
+     acSDHKLMNumberingSchemeEntry OBJECT-TYPE
+       SYNTAX AcSDHKLMNumberingSchemeEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acSDHKLMNumberingSchemeTrunkIndex}
+       ::= {acSDHKLMNumberingSchemeTable 1}
+
+
+
+     -- ****************************************
+     -- acSDHKLMNumberingScheme TABLE
+     -- ****************************************
+     AcSDHKLMNumberingSchemeEntry ::= SEQUENCE {
+       acSDHKLMNumberingSchemeTrunkIndex               Unsigned32,
+       acSDHKLMNumberingSchemeTUG3OrSTS1               Unsigned32,
+       acSDHKLMNumberingSchemeTUG2OrVTG                Unsigned32,
+       acSDHKLMNumberingSchemeTU12OrVT15               Unsigned32
+     }
+
+
+
+     acSDHKLMNumberingSchemeTrunkIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Trunk Number.
+AC INI-Param: N/A"
+       ::= {acSDHKLMNumberingSchemeEntry 1}
+
+
+
+     acSDHKLMNumberingSchemeTUG3OrSTS1 OBJECT-TYPE
+       SYNTAX Unsigned32 (1..3)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acSDHKLMNumberingSchemeEntry 2}
+
+
+
+     acSDHKLMNumberingSchemeTUG2OrVTG OBJECT-TYPE
+       SYNTAX Unsigned32 (1..7)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acSDHKLMNumberingSchemeEntry 3}
+
+
+
+     acSDHKLMNumberingSchemeTU12OrVT15 OBJECT-TYPE
+       SYNTAX Unsigned32 (1..4)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acSDHKLMNumberingSchemeEntry 4}
+
+
+
+     acFiberGroupStatus OBJECT IDENTIFIER ::= {acPSTNStatus 4}
+
+
+     acFiberGroupStatusActiveLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Fiber group active link number.
+0 - there is no active fiber group link.
+AC INI-Param: N/A"
+       ::= {acFiberGroupStatus 1}
+
+
+
+     acNFASGroupStatus OBJECT IDENTIFIER ::= {acPSTNStatus 5}
+
+
+     -- ****************************************
+     -- acNFASGroupStatus table declaration
+     -- ****************************************
+     acNFASGroupStatusTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcNFASGroupStatusEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acNFASGroupStatus 1}
+
+
+
+     -- ****************************************
+     -- acNFASGroupStatus table entry
+     -- ****************************************
+     acNFASGroupStatusEntry OBJECT-TYPE
+       SYNTAX AcNFASGroupStatusEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acNFASGroupStatusIndex}
+       ::= {acNFASGroupStatusTable 1}
+
+
+
+     -- ****************************************
+     -- acNFASGroupStatus TABLE
+     -- ****************************************
+     AcNFASGroupStatusEntry ::= SEQUENCE {
+       acNFASGroupStatusIndex                          Unsigned32,
+       acNFASGroupStatusGroupStatus                    INTEGER,
+       acNFASGroupStatusPrimaryDChannel                Integer32,
+       acNFASGroupStatusBackupDChannel                 Integer32,
+       acNFASGroupStatusAction                         INTEGER,
+       acNFASGroupStatusActionResult                   SnmpAdminString,
+       acNFASGroupStatusPrimaryDChannelActivity        INTEGER,
+       acNFASGroupStatusBackupDChannelActivity         INTEGER
+     }
+
+
+
+     acNFASGroupStatusIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (1..12)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "NFAS Group Index.
+AC INI-Param: N/A"
+       ::= {acNFASGroupStatusEntry 1}
+
+
+
+     acNFASGroupStatusGroupStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notExists(-1)
+,
+                  inService(0)
+,
+                  outOfService(1)
+,
+                  swactInProgress(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the status of the NFAS group.
+AC INI-Param: N/A"
+       ::= {acNFASGroupStatusEntry 2}
+
+
+
+     acNFASGroupStatusPrimaryDChannel OBJECT-TYPE
+       SYNTAX Integer32 (-1..83)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The NFAS Group Configured Primary D-Channel.
+-1 means no D-channel Configured.
+AC INI-Param: N/A"
+       ::= {acNFASGroupStatusEntry 3}
+
+
+
+     acNFASGroupStatusBackupDChannel OBJECT-TYPE
+       SYNTAX Integer32 (-1..83)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The NFAS Group Configured Backup D-Channel.
+-1 means no D-channel Configured.
+AC INI-Param: N/A"
+       ::= {acNFASGroupStatusEntry 4}
+
+
+
+     acNFASGroupStatusAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  actionDone(0)
+,
+                  switchOver(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Switches ISDN signaling from active to standby (backup) D-channel
+of the NFAS Group.
+Access: Instant.
+AC INI-Param: N/A"
+       ::= {acNFASGroupStatusEntry 5}
+
+
+
+     acNFASGroupStatusActionResult OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..40))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Action result. Includes action status (success, failure or notApplicable).
+AC INI-Param: N/A"
+       ::= {acNFASGroupStatusEntry 6}
+
+
+
+     acNFASGroupStatusPrimaryDChannelActivity OBJECT-TYPE
+       SYNTAX INTEGER {
+                  dChannelActive(0)
+,
+                  dChannelStandby(1)
+,
+                  dChannelNotApplicable(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Defines Primary D-channel status. This parameter is only applicable
+to ISDN PRI protocols that support NFAS and/or D-channel
+backup procedures.
+0 = Active channel
+1 = Standby channel
+2 = Not applicable (this trunk doesn’t have D-channel defined).
+AC INI-Param: N/A"
+       ::= {acNFASGroupStatusEntry 7}
+
+
+
+     acNFASGroupStatusBackupDChannelActivity OBJECT-TYPE
+       SYNTAX INTEGER {
+                  dChannelActive(0)
+,
+                  dChannelStandby(1)
+,
+                  dChannelNotApplicable(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Defines Backup D-channel status. This parameter is only applicable
+to ISDN PRI protocols that support NFAS and/or D-channel
+backup procedures.
+0 = Active channel
+1 = Standby channel
+2 = Not applicable (this trunk doesn’t have D-channel defined).
+AC INI-Param: N/A"
+       ::= {acNFASGroupStatusEntry 8}
+
+
+
+
+
+END

@@ -1,0 +1,23 @@
+os: stulz
+text: 'Stulz GMBH Klimatechnik'
+type: environment
+icon: stulz
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery_modules:
+    arp-table: false
+    bgp-peers: false
+    cisco-vrf-lite: false
+    discovery-protocols: false
+    fdb-table: false
+    hr-device: false
+    mpls: false
+    storage: false
+    stp: false
+    ucd-diskio: false
+    vlans: false
+    wireless: false
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.29462.
+snmp_bulk: false

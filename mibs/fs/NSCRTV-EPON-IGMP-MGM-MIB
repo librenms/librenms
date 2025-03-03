@@ -1,0 +1,732 @@
+
+NSCRTV-EPON-IGMP-MGM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    DateAndTime, MacAddress, TimeStamp, RowStatus, TruthValue, DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    EponDeviceIndex, EponCardIndex, EponPortIndex, EponAlarmCode, EponAlarmInstance, EponSeverityType,
+    AutoNegotiationTechAbility, TAddress, EponStats15MinRecordType, EponStats24HourRecordType, EponStatsThresholdType
+		FROM NSCRTV-EPONEOC-EPON-MIB
+    igmpManagementObjects
+        FROM NSCRTV-EPONEOC-EPON-MIB;
+
+--------------------------------------------------------------------------------
+--  igmpManagementObjects[IGMP管理项](1.3.6.1.4.1.17409.2.3.6)
+-------------------------------------------------------------------------------- 
+    igmpEntityTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IgmpEntityEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+		IGMP实体表"
+      ::= { igmpManagementObjects 1 }
+    
+    igmpEntityEntry OBJECT-TYPE
+      SYNTAX IgmpEntityEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { igmpDeviceIndex }
+      ::= { igmpEntityTable 1 }
+    
+    IgmpEntityEntry ::=
+      SEQUENCE { 
+        igmpDeviceIndex
+          INTEGER,
+        igmpMode
+          INTEGER,
+        maxQueryResponseTime
+          INTEGER,
+        robustVariable
+          INTEGER,
+        queryInterval
+          INTEGER,
+        lastMemberQueryInterval
+          INTEGER,
+        lastMemberQueryCount
+          INTEGER,
+        igmpVersion
+          INTEGER
+       }
+    
+    igmpDeviceIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        设备索引号。        
+        For OLT, set to corresponding device        
+        For ONU, set to 0"
+      ::= { igmpEntityEntry 1 }
+
+    igmpMode OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        centralized(1),
+        distributedwithcm(2),
+        disabled(3),
+        distributedwocm(4)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        IGMP工作模式
+        centralized(1)      - All the multicast control is done by OLT
+        distributedwithcm(2)    - Both OLT and ONU perform IGMP proxy and  
+                      controlled multicast will be enabled. At 
+                      this case, if igmp joins shall follow the 
+                      definition in multicastPackageList, for the
+                      port  
+        disabled(3)       - Disable IGMP proxy on OLT and ONU
+        distributedwocm(4)    - Both OLT and ONU perform IGMP proxy and  
+                      controlled multicast will be disabled. At 
+                      this case, if igmp joins shall be accept even
+                      violate the definition in multicastPackageList, 
+                      for the port.  
+        "
+      DEFVAL { disabled }
+      ::= { igmpEntityEntry 2 }
+    
+    maxQueryResponseTime OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "tenth second"
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        最大响应查询时间
+        单位：1/10秒
+        This is used for sending general query"
+      ::= { igmpEntityEntry 3 }
+
+    robustVariable OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        健壮性变量
+        This is used for sending general query
+        No less than 1"
+      ::= { igmpEntityEntry 4 }
+
+    
+    queryInterval OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "seconds"
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        发送查询报文的时间间隔
+        单位：秒
+        This is used for sending general query
+        "
+      ::= { igmpEntityEntry 5 }
+    
+    lastMemberQueryInterval OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "tenth second"
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        Max Response Time inserted into Group-Specific Queries sent in response 
+        to Leave Group messages, and is also the amount of time between 
+        Group-Specific Query messages
+        "
+      ::= { igmpEntityEntry 6 }
+      
+    lastMemberQueryCount OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        Number of Group-Specific Queries sent before the router assumes there 
+        are no local members
+        "               
+      ::= { igmpEntityEntry 7 }
+    
+    igmpVersion OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        v1(1),
+        v2(2),
+        v3(3)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        IGMP版本"
+      DEFVAL { v2 }
+      ::= { igmpEntityEntry 8 }
+
+    
+    igmpProxyParaTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IgmpProxyParaEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        IGMP proxy参数表 - 频道列表"
+      ::= { igmpManagementObjects 2 }
+    
+    igmpProxyParaEntry OBJECT-TYPE
+      SYNTAX IgmpProxyParaEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { proxyIndex }
+      ::= { igmpProxyParaTable 1 }
+    
+    IgmpProxyParaEntry ::=
+      SEQUENCE { 
+        proxyIndex
+          INTEGER,
+        proxyName
+          OCTET STRING,
+        proxySrcIPAddress
+          IpAddress,
+        proxyMulticastVID
+          INTEGER,
+        proxyMulticastIPAddress
+          IpAddress,
+        multicastAssuredBW
+          Unsigned32,
+        multicastMaxBW
+          Unsigned32,
+        proxyRowStatus
+          RowStatus
+       }
+
+    proxyIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..2000)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        IGMP Proxy索引号 - 频道号"
+      ::= { igmpProxyParaEntry 1 }
+    
+    proxyName OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (0..256))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        IGMP Proxy别名（如央视、文广传媒等）"
+      ::= { igmpProxyParaEntry 2 }
+    
+    proxySrcIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        proxy源IP地址"
+      ::= { igmpProxyParaEntry 3 }
+    
+    proxyMulticastVID OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        IGMP Proxy对应组播VID
+        注：只有在可控组播模式下组播VID才有意义"
+      ::= { igmpProxyParaEntry 4 }
+    
+    proxyMulticastIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        组播IP地址"
+      ::= { igmpProxyParaEntry 5 }
+    
+    multicastAssuredBW OBJECT-TYPE
+      SYNTAX Unsigned32
+      UNITS "kbps"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        组播保证带宽        
+        单位：kbps"
+      ::= { igmpProxyParaEntry 6 }
+    
+    multicastMaxBW OBJECT-TYPE
+      SYNTAX Unsigned32
+      UNITS "kbps"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        组播最大带宽        
+        单位：kbps"
+      ::= { igmpProxyParaEntry 7 }
+    
+    proxyRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        行状态"
+      ::= { igmpProxyParaEntry 8 }
+    
+    igmpForwardingTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IgmpForwardingEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Multicast forwarding table        
+        "
+      ::= { igmpManagementObjects 3 }
+    
+    igmpForwardingEntry OBJECT-TYPE
+      SYNTAX IgmpForwardingEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { groupDeviceIndex, groupVlanIndex, groupMacAddress }
+      ::= { igmpForwardingTable 1 }    
+    IgmpForwardingEntry ::=
+      SEQUENCE { 
+        groupDeviceIndex
+          INTEGER,
+        groupVlanIndex
+          INTEGER,
+        groupMacAddress
+          MacAddress,
+        groupPortList
+          OCTET STRING
+       }
+
+    groupDeviceIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        设备索引号。        
+        For OLT, set to corresponding OLT device
+        For ONU, set to 0
+        "
+      ::= { igmpForwardingEntry 1 }
+
+    groupVlanIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Vlan索引号"
+      ::= { igmpForwardingEntry 2 }
+
+    
+    groupMacAddress OBJECT-TYPE
+      SYNTAX MacAddress
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        组Mac地址索引号"
+      ::= { igmpForwardingEntry 3 }
+    
+    groupPortList OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        Forwarding port list
+        1. OLT
+        -------------------------------------------------------------------
+        It is presented by member port list. Each member port is identified
+        by 4-byte format, same as TC of EponDeviceIndex. The actual length of
+        this string depends of the number of member ports in the port list.
+        The relationship is:
+        Length of the string = 4 * (NUM of member ports)  
+        For example, if device 1, port 1/2 and 2/3 is the member ports, 
+        then this object will be presented as:
+        01 01 02 00 01 02 03 00
+        
+        2. ONU
+        -------------------------------------------------------------------
+        It is presented by member port list. Each member port is identified
+        by 2-byte format, One for slot ID, the last for port ID. The actual 
+        length of this string depends of the number of member ports. If the 
+        ONU is fixed (not modulized), set slot ID to 0, the NMS could ignore 
+        the slot info.
+        Note that, slot here shall follow the last byte definition of 
+        EponCardIndex to indicate the main-slot and sub-slot index.  
+        The relationship is:
+        Length of the string = 2 * (NUM of member ports)  
+        For example, if port 1/2 and 3/4 is the member ports of the group, 
+        then the object is presented as:
+        01 02 03 04       
+        "
+      ::= { igmpForwardingEntry 4 }
+    
+    controllededMulticastTable OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION 
+        "
+        可控组播表"
+      ::= { igmpManagementObjects 4 }
+    
+     controlledMulticastUserAuthorityTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF ControlledMulticastUserAuthorityEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        可控组播用户权限表
+        "
+      ::= { controllededMulticastTable 1 }
+    
+    controlledMulticastUserAuthorityEntry OBJECT-TYPE
+      SYNTAX ControlledMulticastUserAuthorityEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { cmDeviceIndex, cmCardIndex, cmPortIndex }
+      ::= { controlledMulticastUserAuthorityTable 1 }
+    
+    ControlledMulticastUserAuthorityEntry ::=
+      SEQUENCE { 
+        cmDeviceIndex
+          EponDeviceIndex,
+        cmCardIndex
+          EponCardIndex,
+        cmPortIndex 
+          EponPortIndex,
+        multicastPackageList
+          OCTET STRING,
+        igmpGlobalBW
+          Unsigned32,
+        igmpGlobalBWUsed  
+          Unsigned32,
+        cmUserAuthorityRowStatus
+          RowStatus         
+       }
+
+    cmDeviceIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        设备索引号        
+        For OLT, set to corresponding device/slot/port/ONU
+        For ONU, set to 0"
+      ::= { controlledMulticastUserAuthorityEntry 1 }
+
+    cmCardIndex  OBJECT-TYPE
+      SYNTAX EponCardIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        板卡索引号        
+        Set to corresponding UNI slot
+        "
+      ::= { controlledMulticastUserAuthorityEntry 2 }
+
+    cmPortIndex OBJECT-TYPE
+      SYNTAX EponPortIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Port ID        
+        Set to corresponding UNI port
+        "
+      ::= { controlledMulticastUserAuthorityEntry 3 }
+    
+    multicastPackageList OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(0..250))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        可控组播组列表.        
+        用法类似于cmProxyList，每个bit对应于cmIndex"
+      ::= { controlledMulticastUserAuthorityEntry 4 }
+
+    igmpGlobalBW OBJECT-TYPE
+      SYNTAX Unsigned32
+      UNITS "kbps"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        IGMP全局带宽池大小 - 该端口支持的最大组播带宽
+        单位：kbps"
+      ::= { controlledMulticastUserAuthorityEntry 5 }
+    
+    igmpGlobalBWUsed OBJECT-TYPE
+      SYNTAX Unsigned32
+      UNITS "kbps"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        IGMP全局带宽池当前使用大小 - 该端口当前实际使用的组播带宽        
+        单位：kbps"
+      ::= { controlledMulticastUserAuthorityEntry 6 }
+
+    cmUserAuthorityRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        ""
+      ::= { controlledMulticastUserAuthorityEntry 7 }
+    
+    controlledMulticastPackageTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF ControlledMulticastPackageEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        可控组播业务包表"
+      ::= { controllededMulticastTable 2 }
+    
+    controlledMulticastPackageEntry OBJECT-TYPE
+      SYNTAX ControlledMulticastPackageEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { cmIndex }
+      ::= { controlledMulticastPackageTable 1 }
+    
+    ControlledMulticastPackageEntry ::=
+      SEQUENCE { 
+        cmIndex
+          INTEGER,
+        cmName
+          OCTET STRING,
+        cmProxyList
+          OCTET STRING,
+        multicastUserAuthority
+          INTEGER,
+        maxRequestChannelNum
+          INTEGER,
+        singlePreviewTime
+          INTEGER,
+        totalPreviewTime
+          INTEGER,
+        previewResetTime
+          INTEGER,
+        previewCount
+          INTEGER,
+        cmRowStatus
+          RowStatus
+       }
+
+    cmIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..2000)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      ::= { controlledMulticastPackageEntry 1 }
+    
+    cmName OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(0..256))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        该可控组播业务包名称"
+      ::= { controlledMulticastPackageEntry 2 }
+    
+    cmProxyList OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE (0..250))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        该可控组播业务包支持的Proxy列表
+        采用类似INTERNET比特顺序，从左到右的OCTET分别为OCTET 0, OCTET 1, ...
+        每个OCTET的bit从左到右分别为bit0，bit1，...，bit7。
+        按照bit和OCTET由小到大的顺序，每个bit对应于igmpProxyParaTable中的
+        一个proxyIndex，如果bit置位，表示该proxyIndex支持，否则不支持。        
+        举例来说，如果规划了80个频道，proxyIndex范围为1..80，用10个字节表示
+        proxy列表，假设该PON口只支持频道列表1,15,38，对应的cmProxyList可以
+        设置成0x80 02 00 00 04 00 00 00 00 00"
+      ::= { controlledMulticastPackageEntry 3 }
+    
+    multicastUserAuthority OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        permit(1),
+        preview(2),
+        deny(3)
+        }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        用户权限（permit、preview、deny）"
+      ::= { controlledMulticastPackageEntry 4 }
+
+    maxRequestChannelNum OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        最大允许请求频道数"
+      ::= { controlledMulticastPackageEntry 5 }
+    
+    singlePreviewTime OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "seconds"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        单次预览时长，单位：秒"
+      ::= { controlledMulticastPackageEntry 6 }
+    
+    totalPreviewTime OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "seconds"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        预览总时长，单位：秒"
+      ::= { controlledMulticastPackageEntry 7 }
+    
+    previewResetTime OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "seconds"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        预览复位时间，单位：秒"
+      ::= { controlledMulticastPackageEntry 8 }
+    
+    previewCount OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        预览次数"
+      ::= { controlledMulticastPackageEntry 9 }
+  
+    cmRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        行状态"
+      ::= { controlledMulticastPackageEntry 10 }
+    igmpOnuUniTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF igmpOnuUniEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of igmpOnuUniTable   entries. "
+        ::= { igmpManagementObjects 5 }
+        
+    igmpOnuUniEntry   OBJECT-TYPE
+        SYNTAX      igmpOnuUniEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION  
+            "The igmpOnuUniEntry Information"
+        INDEX   { uniMvlanDeviceIndex,uniMvlanCardIndex,uniMvlanPortIndex}   
+        ::={ igmpOnuUniTable  1 }   
+        
+    igmpOnuUniEntry  ::= SEQUENCE {
+        uniMvlanDeviceIndex            EponDeviceIndex,
+        uniMvlanCardIndex              EponCardIndex,
+        uniMvlanPortIndex              EponPortIndex,
+        uniMvlanVid                    OCTET STRING,
+        uniMaxMultiNum                 INTEGER,
+        uniMvlanTag                    INTEGER,
+        uniMvlanRowstatus              INTEGER
+        }
+       
+    uniMvlanDeviceIndex            OBJECT-TYPE
+        SYNTAX      EponDeviceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "设备索引 "
+        ::= { igmpOnuUniEntry  1 }   
+        
+    uniMvlanCardIndex              OBJECT-TYPE
+        SYNTAX      EponCardIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "板卡索引"
+        ::= { igmpOnuUniEntry  2 }  
+
+    uniMvlanPortIndex              OBJECT-TYPE
+        SYNTAX      EponPortIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "端口索引"
+        ::= { igmpOnuUniEntry  3 }  
+
+    uniMvlanVid                    OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..20))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "uni端口组播vlan  最大8个）"
+        ::= { igmpOnuUniEntry  4 }
+
+    uniMaxMultiNum                       OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "最大组播数"
+        ::= { igmpOnuUniEntry  5 }
+
+    uniMvlanTag                    OBJECT-TYPE
+        SYNTAX      INTEGER(0..1)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "是否剥离，0：剥离 1：不剥离"
+        ::= { igmpOnuUniEntry  6 }
+   
+   uniMvlanRowstatus              OBJECT-TYPE
+        SYNTAX      INTEGER  
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "行状态"
+        ::= { igmpOnuUniEntry  7 }
+--
+-- END of NSCRTV-EPON-IGMP-MGM-MIB
+--
+
+END

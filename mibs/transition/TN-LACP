@@ -1,0 +1,396 @@
+-- *****************************************************************
+-- TN-LACP-MIB.mib : TN MPLS-TP private MIB
+--
+-- Copyright (c) 2015 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+TN-LACP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    tnProducts
+        FROM TRANSITION-SMI
+    Counter64 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC  
+    PortList FROM Q-BRIDGE-MIB
+    TNInterfaceIndex FROM TN-TC
+    TNUnsigned16 FROM TN-TC
+    TNUnsigned8 FROM TN-TC
+    DisplayString FROM SNMPv2-TC
+   ;
+
+tnLacpMib MODULE-IDENTITY
+   LAST-UPDATED "201507150000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for DHCP settings."
+
+        REVISION "201507150000Z"
+        DESCRIPTION
+        "Initial Revision of this module"
+    ::= { tnProducts 35 }
+
+tnLacpConfigPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLacpConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of the LACP port configurations"
+    ::= { tnLacpMib 1 }
+
+tnLacpConfigPortEntry OBJECT-TYPE
+    SYNTAX      TNLacpConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each port has a set of parameters"
+    INDEX       { tnLacpConfigPortInterfaceNo }
+    ::= { tnLacpConfigPortTable 1 }
+
+TNLacpConfigPortEntry ::= SEQUENCE {
+    tnLacpConfigPortInterfaceNo   TNInterfaceIndex,
+    tnLacpConfigPortDot3adAggrActorAdminMode      INTEGER,  
+    tnLacpConfigPortDot3adAggrActorKeyMode      INTEGER,  
+    tnLacpConfigPortDot3adAggrActorAdminKey   Unsigned32,
+    tnLacpConfigPortDot3adAggrRole    INTEGER,
+    tnLacpConfigPortDot3adAggrTimeout     INTEGER,
+    tnLacpConfigPortDot3adAggrPortPriority    Unsigned32
+}
+
+tnLacpConfigPortInterfaceNo OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number."
+    ::= { tnLacpConfigPortEntry 1 }
+
+tnLacpConfigPortDot3adAggrActorAdminMode OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   disabled   (0),
+                   enabled    (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Control whether port is LACP enabled(1) or disabled(0)."
+    ::= { tnLacpConfigPortEntry 2 }
+
+tnLacpConfigPortDot3adAggrActorKeyMode OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   auto      (0),
+                   specific  (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The Auto setting will set the key as appropriate by the physical 
+         link speed, 10Mb = 1, 100Mb = 2, 1Gb = 3. Using the Specific setting, 
+         a user-defined value can be entered. Ports with the same Key value 
+         can participate in the same aggregation group, while ports with 
+         different keys cannot."
+    ::= { tnLacpConfigPortEntry 3 }
+
+tnLacpConfigPortDot3adAggrActorAdminKey OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The current administrative value of the Key for the Aggregator. The
+         administrative Key value may differ from the operational Key value for
+         the reasons discussed in 43.6.2. This is a 16-bit, read-write value.
+         The meaning of particular Key values is of local significance"
+    ::= { tnLacpConfigPortEntry 4 }
+
+tnLacpConfigPortDot3adAggrRole OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   passive   (0),
+                   active    (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The Role shows the LACP activity status. The Active(true) will transmit
+         LACP packets each second, while Passive(false) will wait for a LACP
+         packet from a partner"
+    ::= { tnLacpConfigPortEntry 5 }
+
+tnLacpConfigPortDot3adAggrTimeout OBJECT-TYPE
+     SYNTAX      INTEGER{
+                   slow   (0),
+                   fast   (1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The Timeout controls the period between BPDU transmissions. Fast(true)
+         will transmit LACP packets each second, while Slow(0) will wait for 30
+         seconds before sending a LACP packet."
+    ::= { tnLacpConfigPortEntry 6 }
+
+tnLacpConfigPortDot3adAggrPortPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The Port Priority controls the priority of the port. If the LACP
+         partner wants to form a larger group than is supported by this device
+         then this parameter will control which ports will be active and which
+         ports will be in a backup role. Lower number means greater priority."
+    ::= { tnLacpConfigPortEntry 7 }
+
+tnLacpStatusSystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLacpStatusSystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of the LACP system status"
+    ::= { tnLacpMib 2 }
+
+tnLacpStatusSystemEntry OBJECT-TYPE
+    SYNTAX      TNLacpStatusSystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each lag has a set of parameters"
+    INDEX       { tnLacpStatusSystemDot3adAggrID }
+    ::= { tnLacpStatusSystemTable 1 }
+
+TNLacpStatusSystemEntry ::= SEQUENCE {
+    tnLacpStatusSystemDot3adAggrID    DisplayString,
+    tnLacpStatusSystemDot3adAggrPartnerSystemID   MacAddress,
+    tnLacpStatusSystemDot3adAggrPartnerOperKey    TNUnsigned16,
+    tnLacpStatusSystemDot3adAggrPartnerOperSystemPriority     TNUnsigned16,
+    tnLacpStatusSystemDot3adAggrPartnerStateLastChanged   Unsigned32,
+    tnLacpStatusSystemDot3adAggrLocalPorts    PortList
+}
+
+tnLacpStatusSystemDot3adAggrID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The aggregation ID for a particular link aggregation group."
+    ::= { tnLacpStatusSystemEntry 1 } 
+
+tnLacpStatusSystemDot3adAggrPartnerSystemID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The system ID (MAC address) of the aggregation partner."
+    ::= { tnLacpStatusSystemEntry 2 }
+
+tnLacpStatusSystemDot3adAggrPartnerOperKey OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The Key that the partner has assigned to this aggregation ID."
+    ::= { tnLacpStatusSystemEntry 3 }
+
+tnLacpStatusSystemDot3adAggrPartnerOperSystemPriority OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A 2-octet read-only value indicating the operational value of priority
+         associated with the Partner's System ID. The value of this attribute
+         may contain the manually configured value carried in
+         aAggPortPartnerAdminSystemPriority if there is no protocol Partner."
+    ::= { tnLacpStatusSystemEntry 4 }
+
+tnLacpStatusSystemDot3adAggrPartnerStateLastChanged OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The time in second since this aggregation changed"
+    ::= { tnLacpStatusSystemEntry 5 }
+
+tnLacpStatusSystemDot3adAggrLocalPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Local port list"
+    ::= { tnLacpStatusSystemEntry 6 }
+ 
+tnLacpStatusPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLacpStatusPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of the LACP port status"
+    ::= { tnLacpMib 3 }
+
+tnLacpStatusPortEntry OBJECT-TYPE
+    SYNTAX      TNLacpStatusPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each port has a set of parameters"
+    INDEX       { tnLacpStatusPortInterfaceNo }
+    ::= { tnLacpStatusPortTable 1 }
+
+TNLacpStatusPortEntry ::= SEQUENCE {
+    tnLacpStatusPortInterfaceNo   TNInterfaceIndex,
+    tnLacpStatusPortDot3adAggrActorAdminMode  INTEGER,
+    tnLacpStatusPortDot3adAggrActorAdminKey   INTEGER,
+    tnLacpStatusPortDot3adAggrActorID         DisplayString,
+    tnLacpStatusPortDot3adAggrPartnerSystemID  MacAddress,
+    tnLacpStatusPortDot3adAggrPartnerOperPortIndex    INTEGER,
+    tnLacpStatusPortDot3adAggrPartnerOperPortPriority     TNUnsigned16
+}
+
+tnLacpStatusPortInterfaceNo OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number."
+    ::= { tnLacpStatusPortEntry 1 }
+
+tnLacpStatusPortDot3adAggrActorAdminMode OBJECT-TYPE
+     SYNTAX      INTEGER{
+                   no   (0),
+                   yes  (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the current Admin mode of port, if LACP enabled then returns true
+         else returns false."
+    ::= { tnLacpStatusPortEntry 2 }
+
+tnLacpStatusPortDot3adAggrActorAdminKey OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the current administrative value of the Key for the Aggregator.
+         The administrative Key value may differ from the operational Key value
+         for the reasons discussed in 43.6.2. This is a 16-bit, read-write
+         value. The meaning of particular Key values is of local significance"
+    ::= { tnLacpStatusPortEntry 3 }
+
+
+tnLacpStatusPortDot3adAggrActorID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The Aggregation ID assigned to this aggregation group."
+    ::= { tnLacpStatusPortEntry 4 } 
+ 
+tnLacpStatusPortDot3adAggrPartnerSystemID  OBJECT-TYPE
+   SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The system ID (MAC address) of the aggregation partner."
+    ::= { tnLacpStatusPortEntry 5 }
+
+
+tnLacpStatusPortDot3adAggrPartnerOperPortIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the port index of the partner port connected to this port."
+    ::= { tnLacpStatusPortEntry 6 }
+
+tnLacpStatusPortDot3adAggrPartnerOperPortPriority OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the port priority of the port partner port connected to this
+         port."
+    ::= { tnLacpStatusPortEntry 7 }
+
+tnLacpStatisticsPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLacpStatisticsPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of the LACP port statistics"
+    ::= { tnLacpMib 4 }
+
+tnLacpStatisticsPortEntry OBJECT-TYPE
+    SYNTAX      TNLacpStatisticsPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each port has a set of parameters"
+    INDEX       { tnLacpStatisticsPortInterfaceNo }
+    ::= { tnLacpStatisticsPortTable 1 }
+
+TNLacpStatisticsPortEntry ::= SEQUENCE {
+    tnLacpStatisticsPortInterfaceNo   TNInterfaceIndex,
+    tnLacpStatisticsPortDot3adAggrRxFrames    Unsigned32,
+    tnLacpStatisticsPortDot3adAggrTxFrames    Unsigned32,
+    tnLacpStatisticsPortDot3adAggrRxUnknownFrames     Unsigned32,
+    tnLacpStatisticsPortDot3adAggrRxIllegalFrames     Unsigned32
+}
+
+tnLacpStatisticsPortInterfaceNo OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number."
+    ::= { tnLacpStatisticsPortEntry 1 }
+
+tnLacpStatisticsPortDot3adAggrRxFrames OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows received LACP frame count."
+    ::= { tnLacpStatisticsPortEntry 2 }
+
+tnLacpStatisticsPortDot3adAggrTxFrames OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows transmitted LACP frame count."
+    ::= { tnLacpStatisticsPortEntry 3 } 
+    
+tnLacpStatisticsPortDot3adAggrRxUnknownFrames OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows recevied unknown LACP frame count."
+    ::= { tnLacpStatisticsPortEntry 4 }
+
+tnLacpStatisticsPortDot3adAggrRxIllegalFrames OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows recevied illegal LACP frame count."
+    ::= { tnLacpStatisticsPortEntry 5 }
+
+END

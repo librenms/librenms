@@ -1,0 +1,70 @@
+-- ==================================================================
+-- Copyright (C) 2004 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:  Lan Switch Multicast MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2004-12-20 Created by Wangxiaodong
+--
+-- ==================================================================
+--
+-- ==================================================================
+--
+-- Variables and types be imported
+--
+-- ==================================================================
+HH3C-MULTICAST-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+
+    MODULE-IDENTITY,OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+    hh3cMulticast MODULE-IDENTITY
+        LAST-UPDATED "200504290000Z"
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "The multicast global configuration MIB"
+        REVISION "200504290000Z"
+        DESCRIPTION
+            "The initial version of this MIB file."
+        ::= { hh3cCommon  50 }
+
+    EnabledStatus ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "A simple status value for the object."
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+    hh3cMulticastObject OBJECT IDENTIFIER ::= {  hh3cMulticast 1  }
+
+    hh3cMulticastEnable OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "To enable or disable global multicast."
+        DEFVAL     { disabled }
+        ::= { hh3cMulticastObject  1 }
+
+
+END

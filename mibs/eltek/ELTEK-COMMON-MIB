@@ -1,0 +1,81 @@
+
+-- Eltek Toplevel MIB for Digital Power plant designs
+
+
+-- Eltek MIB for ELTEK Distributed Control System Power plant designs
+
+ELTEK-COMMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY, 
+	mib-2, enterprises, Counter32, Integer32
+		FROM SNMPv2-SMI
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF
+	DisplayString
+		FROM SNMPv2-TC;
+
+eltek MODULE-IDENTITY
+	LAST-UPDATED "201501030825Z"
+	ORGANIZATION 
+		"ELTEK dcSystem MIB Working Group"
+	CONTACT-INFO 
+		"Eltek R&D.
+		      Postal: Eltek AS
+		      P.O. Box 3043
+		      N-3003 Drammen
+		      Norway
+		      Tel: +47-32 20 32 00
+		      Fax: +47-32 20 31 20
+		      web:  www.eltek.com"
+	DESCRIPTION 
+		"An ongoing effort toward a generic MIB for all ELTEK products.
+		Branch overview:
+		Aeongold branch will be 1
+		AL175 branch will be 2
+		AL6000 branch will be 3
+		Internal used branch will be 4
+		Internal used branch will be 5
+		OEM Smartpack branch will be 6
+		ELTEK Common branch will be 7 (SmartPack, MCU, AEON w/WebPower sw V2.x)
+		ELTEK Distributed branch will be 8 (SmartPack w/WebPower sw V3.x)
+		ELTEK Distributed V2 branch will be 9 (SmartPack w/WebPower sw V4.0)
+		ELTEK Distributed V3 branch will be 9 (SmartPack w/WebPower sw V4.1)
+		ELTEK Distributed V4 branch will be 9 (SmartPack w/WebPower sw V4.1, V4.2, V4.3 and compack 1.xx)
+		ELTEK Distributed V5 branch will be 9 (SmartPack w/WebPower sw V4.6)
+		ELTEK Distributed V6 branch will be 9 (SmartPack w/WebPower sw V4.6, Smartpack2 V1.1)
+		ELTEK Distributed V7 branch will be 9 (SmartPack w/WebPower sw V4.7, V4.8, ComPack V1.04, Smartpack2 V1.1, V1.2)
+		ELTEK Distributed V8 branch will be 9 (SmartPack w/WebPower sw V4.9, ComPack V1.04, Smartpack2 V1.1, V1.2)"
+
+	REVISION "201501030825Z"
+	DESCRIPTION 
+		"Updates in miscellaneous info fields."
+
+	REVISION "201010290829Z"
+	DESCRIPTION 
+		"Added traps and OID's for SolarChargers.
+		Added reading of values on programmable inputs of IO Monitor."
+
+	REVISION "200903121515Z"
+	DESCRIPTION 
+		"Added support for external IO monitor and Load monitor units.
+		Changes are done in the MIB to accomodate the v2c standard."
+
+	REVISION "200801301149Z"
+	DESCRIPTION 
+		"Some OIDs were added to this revision. Since all new stuff are additions and no existing information was moved, this V3 revision stays in branch 9. enjoy!"
+
+	REVISION "200706221127Z"
+	DESCRIPTION 
+		"Branch 9, contains mainly changes in the Traps format. The traps now meets SNMP v2c specification."
+
+	REVISION "200509071238Z"
+	DESCRIPTION 
+		"added battery test and boost start/stop and ac voltages"
+
+	REVISION "200506281130Z"
+	DESCRIPTION 
+		"First revision"
+::= { enterprises 12148 }
+
+END

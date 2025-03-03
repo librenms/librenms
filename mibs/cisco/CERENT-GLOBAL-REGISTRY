@@ -1,0 +1,2662 @@
+-- ************************************************************************
+-- Cisco OTBU Global Registration MIB module
+--
+-- This module contains the top-level registrations for the Cisco OTBU.
+--
+-- Copyright (c) 1998-1999 by Cerent Corporation, Inc.  All rights reserved.
+-- Copyright (c) 2000-2005 by Cisco Systems, Inc.
+-- All rights reserved.
+--
+-- ************************************************************************
+
+CERENT-GLOBAL-REGISTRY DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-IDENTITY,
+enterprises
+FROM SNMPv2-SMI;
+
+cerentGlobalRegModule MODULE-IDENTITY
+LAST-UPDATED "0410010000Z" -- 2004/Oct/01
+ORGANIZATION "Cisco Systems"
+CONTACT-INFO
+"         Support@Cisco.com
+
+ Postal:  Cisco Systems, Inc.
+	  1450 N. McDowell Blvd.
+	  Petaluma, CA  94954
+	  USA
+
+    Tel: 1-877-323-7368"
+
+DESCRIPTION
+"This module provides the global registrations for all
+ other Cisco OTBU MIB modules."
+
+REVISION "0410010000Z" -- 2004/Oct/01
+DESCRIPTION
+"This file can be used with R5.0 release."
+
+::= { cerentModules 10 }
+
+-- The root of the sub-tree for Cisco OTBU
+
+cerent OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Sub-tree for Cisco OTBU. Cerent enterprise OID
+ provided by IANA is used."
+::= { enterprises 3607 }
+
+-- Sub-tree for registration
+
+cerentRegistry OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Sub-tree for registrations for all Cisco OTBU modules."
+::= { cerent 1 }
+
+
+-- Sub-tree for enterprise-wide objects and events
+
+cerentGeneric OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Sub-tree for common object and event definitions."
+::= { cerent 2 }
+
+cerentGenericDummyObjects OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"Sub-tree for object and event definitions
+	 which are defined for compilation compatibility
+	 reasons. These objects will never be implemented!"
+::= { cerentGeneric 1 }
+
+
+-- Sub-tree for product-line specific objects and events
+
+cerentExperimental OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"cerentExperimental provides a root object identifier from
+	which experimental MIBs may be temporarily based.
+	A MIB module in the cerentExperimental sub-tree will be
+moved under cerentGeneric or cerentProducts whenever
+the development of that module is deemed completed."
+::= { cerent 3 }
+
+-- Sub-tree for specifying agent capabilities
+
+cerentAgentCapabilities OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"cerentAgentCaps provides a root object identifier from
+	which AGENT-CAPABILITIES values may be assigned."
+::= { cerent 4 }
+
+-- Sub-tree for specifying requirements
+
+cerentRequirements OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Sub-tree for management application requirements."
+::= { cerent 5 }
+
+-- Sub-tree for all temporary objects and events
+
+cerentProducts OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Sub-tree for specific object and event definitions."
+::= { cerent 6 }
+
+-- Sub-tree for all Cisco OTBU MIB modules
+-- All the all sub-identifier are in 10s. This will facilitate
+-- insertion of another oid without disturbing the existing order.
+
+cerentModules OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Sub-tree to register MIB modules."
+::= { cerentRegistry 10 }
+
+cerentCommunicationEquipment OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Sub-tree to register all Cisco manufactured
+	 equipment (OTBU only)."
+::= { cerentRegistry 20 }
+
+-- Sub-tree for all Cisco OTBU board products
+
+cerentComponents OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Sub-tree to register all Cisco OTBU boards."
+::= { cerentRegistry 30 }
+
+-- Sub-tree for ADM product line
+
+cerentADMs OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Sub-tree to register Cisco OTBU products - Switches."
+::= { cerentCommunicationEquipment 10 }
+
+cerentDwdmDevices OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Sub-tree to register Cisco OTBU products - DWDM devices."
+::= { cerentCommunicationEquipment 20 }
+
+-- Id of Cisco ONS 15454
+
+cerent454Node OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The SNMP agent will return this as the value of
+ sysObjectID of system group in MIB-II for
+ Cisco ONS 15454"
+::= { cerentADMs 10 }
+
+-- Id of Cisco ONS 15327
+
+cerent327Node OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"The SNMP agent will return this as the value of
+ sysObjectID of system group in MIB-II for
+ Cisco ONS 15327"
+::= { cerentADMs 20 }
+
+-- Id of Cisco ONS 15600
+
+cerent600Node OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"The SNMP agent will return this as the value of
+ sysObjectID of system group in MIB-II for
+ Cisco ONS 15600"
+::= { cerentADMs 30 }
+
+-- Id of Cisco ONS 15310 CL
+
+cerent310Node OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"The SNMP agent will return this as the value of
+ sysObjectID of system group in MIB-II for
+ Cisco ONS 15310"
+::= { cerentADMs 40 }
+
+-- Id of Cisco ONS 15310 MA SONET
+
+cerent310MaAnsiNode OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"The SNMP agent will return this as the value of
+ sysObjectID of system group in MIB-II for
+  Cisco ONS 15310-MA SONET MULTISERVICE PLATFORM"
+::= { cerentADMs 50 }
+
+-- Id of Cisco ONS 15310 MA SDH
+
+cerent310MaEtsiNode OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"The SNMP agent will return this as the value of
+ sysObjectID of system group in MIB-II for
+ Cisco ONS 15310-MA SDH MULTISERVICE PLATFORM"
+::= { cerentADMs 60 }
+
+-- Id of Cisco ONS 15456 UTS-TNC
+
+cerent454M6Node OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"The SNMP agent will return this as the value of
+ sysObjectID of system group in MIB-II for
+ Cisco ONS 15456-M6 MULTISERVICE PLATFORM"
+::= { cerentADMs 70 }
+
+
+cerent454M2Node OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"The SNMP agent will return this as the value of
+ sysObjectID of system group in MIB-II for
+ Cisco ONS 15456-M2 MULTISERVICE PLATFORM"
+::= { cerentADMs 80 }
+
+
+-- Ids of Cisco ONS 15216 devices
+
+cerent15216OpmNode OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"The SNMP agent will return this as the value of
+ sysObjectID of system group in MIB-II for
+ Cisco ONS 15216 OPM"
+::= { cerentDwdmDevices 10 }
+
+cerent15216EdfaNode OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"The SNMP agent will return this as the value of
+ sysObjectID of system group in MIB-II for
+ Cisco ONS 15216 EDFA"
+::= { cerentDwdmDevices 20 }
+
+-- Components OIDs
+
+cerentOtherComponent OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"An unknown component is installed or the component
+	 type is unavailable."
+::= { cerentComponents 1 }
+
+cerentTcc OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for Cisco OTBU Timing Communications
+	and Control card."
+::= { cerentComponents 10 }
+
+cerentXc OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for Cross Connect card."
+::= { cerentComponents 20 }
+
+cerentDs114 OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for DS1-14 card."
+::= { cerentComponents 30 }
+
+cerentDs1n14 OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for DS1N-14 card."
+::= { cerentComponents 40 }
+
+cerentDs312 OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for DS3-12 card."
+::= { cerentComponents 50 }
+
+cerentOc3ir OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for OC3-IR card."
+::= { cerentComponents 60 }
+
+cerentOc12ir OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for OC12-IR card."
+::= { cerentComponents 70 }
+
+cerentOc12lr1310 OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for OC12-LR-1310 card."
+::= { cerentComponents 80 }
+
+cerentOc48ir OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for OC48-IR card."
+::= { cerentComponents 90 }
+
+cerentOc48lr OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for OC48-LR card."
+::= { cerentComponents 100 }
+
+cerentFanTray OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	""
+::= { cerentComponents 110 }
+
+cerentFanSlot OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	""
+::= { cerentComponents 120 }
+
+cerentIoSlot OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	""
+::= { cerentComponents 130 }
+
+cerentXcSlot OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	""
+::= { cerentComponents 140 }
+
+cerentAicSlot OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	""
+::= { cerentComponents 150 }
+
+cerentTccSlot OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	""
+::= { cerentComponents 160 }
+
+cerentBackPlane454 OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	""
+::= { cerentComponents 170 }
+
+cerentChassis454 OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	""
+::= { cerentComponents 180 }
+
+cerentPowerSupply OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Power Supply"
+::= { cerentComponents 1500 }
+
+cerentDs3nCard OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Ds3n card."
+::= { cerentComponents 190 }
+
+cerentDs3XmCard OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Ds3Xm card."
+::= { cerentComponents 200 }
+
+cerentOc3Card OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Oc3 card."
+::= { cerentComponents 210 }
+
+cerentOc3OctaCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+  "Oc3-8 card."
+::= { cerentComponents 212 }
+
+cerentOc12Card OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Oc12 card."
+::= { cerentComponents 220 }
+
+cerentOc48Card OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Oc48 card."
+::= { cerentComponents 230 }
+
+cerentEc1Card OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Ec1 card."
+::= { cerentComponents 240 }
+
+cerentEc1nCard OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Ec1n card."
+::= { cerentComponents 250 }
+
+cerentEpos100Card OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"EPOS 100 card."
+::= { cerentComponents 260 }
+
+cerentEpos1000Card OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"EPOS 1000 card."
+::= { cerentComponents 270 }
+
+cerentAicCard OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"AIC card."
+::= { cerentComponents 280 }
+
+cerentXcVtCard OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"VT cross connect card."
+::= { cerentComponents 290 }
+
+cerentEther1000Port OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Ether1000 port."
+::= { cerentComponents 300 }
+
+cerentEther100Port OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Ether100 port."
+::= { cerentComponents 310 }
+
+cerentDs1VtMappedPort OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Mapped Ds1-Vt port."
+::= { cerentComponents 320 }
+
+cerentDs3XmPort OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Ds3Xm port."
+::= { cerentComponents 330 }
+
+cerentDs3Port OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Ds3 port."
+::= { cerentComponents 340 }
+
+cerentEc1Port OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Ec1 port."
+::= { cerentComponents 350 }
+
+cerentOc3Port OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Oc3 port."
+::= { cerentComponents 360 }
+
+cerentOc12Port OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Oc12 port."
+::= { cerentComponents 370 }
+
+cerentDs1E156LineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Cerent DS1 E1 56 Port Line Card"
+::= { cerentComponents 1470}
+
+cerentMrc12LineCard  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Cerent Multirate 12 Port Line Card"
+::= { cerentComponents 1480}
+
+cerentOc192XfpLineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Cerent OC192 XFP Line card"
+::= { cerentComponents 1490}
+
+cerentOc48Port OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Oc48 port."
+::= { cerentComponents 380 }
+
+cerentOrderwirePort OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Orderwire port."
+::= { cerentComponents 390 }
+
+cerentSensorComponent OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Misc. sensor component."
+::= { cerentComponents 400 }
+
+cerentChassis15327 OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Chassis of 15327"
+::= { cerentComponents 410 }
+
+cerentBackPlane15327 OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Backplane of 15327"
+::= { cerentComponents 420 }
+
+cerentXtcCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Xtc Card"
+::= { cerentComponents 430 }
+
+cerentMicCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Mic Card"
+::= { cerentComponents 440 }
+
+cerentMicExtCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Mic Ext Card"
+::= { cerentComponents 450 }
+
+cerentXtcSlot OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Xtc Slot"
+::= { cerentComponents 460 }
+
+cerentMicSlot OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Mic Slot"
+::= { cerentComponents 470 }
+
+cerentVicEncoderLineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Vic Encoder Line Card"
+::= { cerentComponents 480 }
+
+cerentVicDecoderLineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Vic Decoder Line Card"
+::= { cerentComponents 490 }
+
+cerentVicEncoderPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Vic Encoder Port"
+::= { cerentComponents 500 }
+
+cerentVicDecoderPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Vic Decoder Port"
+::= { cerentComponents 510 }
+
+cerentVicTestPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Vic Test Port"
+::= { cerentComponents 520 }
+
+cerentAip OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 530 }
+
+cerentBicSmb OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Backplane interface card - SMB connector"
+::= { cerentComponents 540 }
+
+cerentBicBnc OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Backplane interface card - BNC connector"
+::= { cerentComponents 550 }
+
+cerentFcb OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 560 }
+
+cerentEnvironmentControl OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Environment Control"
+::= { cerentComponents 570 }
+
+cerentLedIndicator OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"LED Indicator"
+::= { cerentComponents 580 }
+
+cerentAudibleAlarm OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Audible Alarm"
+::= { cerentComponents 590 }
+
+cerentXc10g OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Cross Connect 192 card"
+::= { cerentComponents 600 }
+
+cerentOc192Card OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OC192 Card"
+::= { cerentComponents 610 }
+
+cerentOc192Port OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OC192 Port"
+::= { cerentComponents 620 }
+
+cerentDs3eCard  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"DS3E Line Card"
+::= { cerentComponents 630 }
+
+cerentDs3neCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"DS3NE Line Card"
+::= { cerentComponents 640 }
+
+-- Cisco ONS 15216 OPM VendorType OIDS
+
+cerent15216OpmChassis  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 650 }
+
+cerent15216OpmBackPlane OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 660 }
+
+cerent15216OpmSlot OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 670 }
+
+cerent15216OpmController OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OPM Controller Module"
+::= { cerentComponents 680 }
+
+cerent15216OpmSpectrometer OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OPM Spectrometer Module"
+::= { cerentComponents 690 }
+
+cerent15216OpmOpticalSwitch OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OPM Optical Switch Module"
+::= { cerentComponents 700 }
+
+cerent15216OpmOpticalPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OPM Optical Port"
+::= { cerentComponents 710 }
+
+cerent15216OpmSerialPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OPM RS-232 port for Craft"
+::= { cerentComponents 720 }
+
+cerent15216OpmLedIndicator OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OPM LED"
+::= { cerentComponents 730 }
+
+cerent15216OpmRelay OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OPM Relay"
+::= { cerentComponents 740 }
+
+cerent15216OpmPowerSupply OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OPM Power Supply"
+::= { cerentComponents 750 }
+
+cerent15216OpmPcmciaSlot OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OPM PCMCIA slot"
+::= { cerentComponents 760 }
+
+cerentOc12QuadCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Four Port OC12 Line Card"
+::= { cerentComponents 770 }
+
+cerentG1000QuadCard OBJECT-IDENTITY
+STATUS  deprecated
+DESCRIPTION
+"G1000-4 Card"
+::= { cerentComponents 780 }
+
+cerentG1000Port OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"G1000 Port"
+::= { cerentComponents 790 }
+
+cerentMlEtherPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Ether Port on ML Series Ether card"
+::= { cerentComponents 791 }
+
+cerentMlPosPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"POS Port on ML Series Ether card"
+::= { cerentComponents 792 }
+
+cerentG1000GenericCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"G1000 Card"
+::= { cerentComponents 800 }
+
+cerentML100GenericCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ML100T ether Card"
+::= { cerentComponents 801 }
+
+cerentML1000GenericCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ML1000T ether Card"
+::= { cerentComponents 802 }
+
+cerentG1K4Card OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"G1K-4 Card"
+::= { cerentComponents 810 }
+
+cerentOc192IrCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OC192 Intermediate Reach Card"
+::= { cerentComponents 820 }
+
+cerentOc192LrCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OC192 Long Reach Card"
+::= { cerentComponents 830 }
+
+cerentOc192ItuCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OC192 ITU Card"
+::= { cerentComponents 840 }
+
+cerentOc3n1Card OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OC3 1-port Card"
+::= { cerentComponents 850 }
+
+ape OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 860 }
+
+oneGePort    OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"1 GBit/Sec Ethernet Port"
+::= { cerentComponents 870 }
+
+tenGePort    OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"10 GBit/Sec Ethernet Port"
+::= { cerentComponents 880 }
+
+esconPort    OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 890 }
+
+dv6000Port    OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 900 }
+
+cerentE1n14 OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"The OID definition for E1N-14 card."
+::= { cerentComponents 910 }
+
+cerentBackPlane454SDH OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	""
+::= { cerentComponents 911 }
+
+cerentChassis454SDH OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	""
+::= { cerentComponents 912 }
+
+cerentDs3inCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"Ds3in card."
+::= { cerentComponents 913 }
+
+cerentE312Card OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"E3-12 card."
+::= { cerentComponents 914 }
+
+cerentE1Port OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"E1 port."
+::= { cerentComponents 915 }
+
+cerentDs3iPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"Ds3i port."
+::= { cerentComponents 916 }
+
+cerentE3Port OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"E3 port"
+::= { cerentComponents 917 }
+
+cerentAlmPwrSlot OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"EFCA Alarm/Power slot"
+::= { cerentComponents 918 }
+
+cerentCrftTmgSlot OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"EFCA Craft/Timing Slot"
+::= { cerentComponents 919 }
+
+cerentAlmPwr OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"EFCA Alarm/Power Card"
+::= { cerentComponents 920 }
+
+cerentCrftTmg OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"EFCA Craft/Timing Card"
+::= { cerentComponents 921 }
+
+cerentFmecDb OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"FMEC-DB card"
+::= { cerentComponents 922 }
+
+cerentFmecSmzE1 OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"FMEC-SMZ-E1 card"
+::= { cerentComponents 923 }
+
+cerentFmecBlank OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"FMEC-BLANK card"
+::= { cerentComponents 924 }
+
+cerentXcVxlCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"VC cross connect card."
+::= { cerentComponents 925 }
+
+cerentEfca454Sdh OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"EFCA"
+::= { cerentComponents 926 }
+
+cerentFmecSlot OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"FMEC Slot"
+::= { cerentComponents 927 }
+
+cerentFmecSmzE3 OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"FMEC Slot"
+::= { cerentComponents 928 }
+
+cerentDs3i OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"FMEC Slot"
+::= { cerentComponents 929 }
+
+-- Cisco 15216 EDFA OIDs : begin
+
+cerent15216EdfaChassis  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 930 }
+
+-- Cisco 15216 EDFA OIDs : end
+
+cerentAici OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Aici Card"
+::= { cerentComponents 931 }
+
+cerentFudcPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Aici F-UDC Port"
+::= { cerentComponents 932 }
+
+cerentDccPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Aici DCC-UDC Port"
+::= { cerentComponents 933 }
+
+cerentAiciAep OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Aici Alarm Expansion Panel"
+::= { cerentComponents 934 }
+
+cerentAiciAie OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Aici Alarm Interface Extension"
+::= { cerentComponents 935 }
+
+cerentXcVxl25GCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"XCVXL25G card"
+::= { cerentComponents 936 }
+
+cerentE114 OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"The OID definition for E1-14 card."
+::= { cerentComponents 937 }
+
+cerentPIMSlot  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Pluggable IO Module Slot"
+::= { cerentComponents 940 }
+
+cerentPIM4PPM  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Pluggable IO Module containing 4 Pluggable Port Modules."
+::= { cerentComponents 950 }
+
+cerentPPMSlot  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Pluggable Port Module Slot"
+::= { cerentComponents 960 }
+
+cerentPPM1Port  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Pluggable Port Module containing one Port"
+::= { cerentComponents 970 }
+
+cerentChassis15310ClOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Chassis of ONS15310 CL"
+::= { cerentComponents 1000 }
+
+cerentChassis15310MaAnsiOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Chassis of ONS15310 MA ANSI"
+::= { cerentComponents 1010 }
+
+cerentChassis15310MaEtsiOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Chassis of ONS15310 MA ETSI"
+::= { cerentComponents 1020 }
+
+cerentBackplane15310ClOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Backplane of ONS15310 CL"
+::= { cerentComponents 1030 }
+
+cerentBackplane15310MaAnsiOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Backplane of ONS15310 MA ANSI"
+::= { cerentComponents 1040 }
+
+cerentBackplane15310MaEtsiOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Backplane of ONS15310 MA ETSI"
+::= { cerentComponents 1050 }
+
+cerentCtxCardOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"CTX Card"
+::= { cerentComponents 1060 }
+
+cerentBbeLineCardOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"BBE Line Card"
+::= { cerentComponents 1070 }
+
+cerentWbeLineCardOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"WBE Line Card"
+::= { cerentComponents 1080 }
+
+cerentCtxSlotOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"CTX Slot"
+::= { cerentComponents 1090 }
+
+cerentBbeSlotOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"BBE Slot"
+::= { cerentComponents 1100 }
+
+cerentWbeSlotOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"WBE Slot"
+::= { cerentComponents 1110 }
+
+cerentAsap4LineCardOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ASAP Four Ports Line Card"
+::= { cerentComponents 1120 }
+
+cerentMrc4LineCardOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"MRC Four ports Line Card"
+::= { cerentComponents 1130 }
+
+cerent310CE100t8LineCardOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ML2 Mapper Line Card"
+::= { cerentComponents 1140 }
+
+cerent310ML100t8LineCardOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ML2 L2L3 Line Card"
+::= { cerentComponents 1150 }
+
+cerentL1PPosPortOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"L1P POS port"
+::= { cerentComponents 1160 }
+
+cerentL1PEtherPortOid OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"L1P Ether port"
+::= { cerentComponents 1170 }
+
+fc10gPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"10 GBit/Sec Fiber Channel Port"
+::= { cerentComponents 1180 }
+
+ficon1gport OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1190 }
+
+ficon2gport OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1200 }
+
+ficon4gport OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1710 }
+
+cerentOc192Card4Ports OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ONS OC192 4 ports I/O card"
+::= { cerentComponents 1210 }
+
+cerentOc48Card8Ports OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ONS OC48 8 ports I/O card"
+::= { cerentComponents 1215 }
+
+cerentOc48Card16Ports OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ONS OC48 16 ports I/O card"
+::= { cerentComponents 1220 }
+
+cerent15600ControllerSlot OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ONS 15600 controller card slot"
+::= { cerentComponents 1225 }
+
+cerentTsc OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ONS 15600 Timing Shelf Controller card"
+::= { cerentComponents 1230 }
+
+cerentChassis600 OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Chassis of ONS 15600"
+::= { cerentComponents 1235 }
+
+cerentBackPlane600 OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Backplane of ONS 15600"
+::= { cerentComponents 1240 }
+
+cerentCap OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ONS 15600 Customer Access Panel"
+::= { cerentComponents 1245 }
+
+cerentCxc OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ONS 15600 Cross Connect Card"
+::= { cerentComponents 1250 }
+
+cerentCxcSlot OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ONS 15600 Cross Connect Card Slot"
+::= { cerentComponents 1255 }
+
+cerentFillerCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"ONS 15600 Filler Card"
+::= { cerentComponents 1260 }
+
+cerentFcmrLineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1265 }
+
+cerentFcmrPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1270 }
+
+cerentDs3Xm12Card OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"Ds3Xm12 card."
+::= { cerentComponents 1285 }
+
+ds3Ec148LineCard  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1290 }
+
+gfpPort  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1300 }
+
+cerent454CE100t8LineCardOid  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1310 }
+
+bicUniv  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1320 }
+
+bicUnknown  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1330 }
+
+sdiD1VideoPort  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1340 }
+
+hdtvPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1350 }
+
+passThruPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1360 }
+
+etrCloPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1370 }
+
+iscPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1380 }
+
+fc1gPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1390 }
+
+fc2gPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1400 }
+
+fc4gPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1700 }
+
+mrSlot  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1410 }
+
+isc3Port OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1420 }
+
+isc3Peer1gPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1720 }
+
+isc3Peer2gPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 1730 }
+
+cerentDs1i14 OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for DS1I-14 card."
+::= { cerentComponents 1430 }
+
+cerentFmecDs1i14 OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"The OID definition for FMEC-SMZ-DS1I-14 card."
+::= { cerentComponents 1440 }
+
+cerentBackPlane454HD OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"15454 High Density Backplane"
+::= { cerentComponents 1450 }
+
+cerentTxpd10GCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"TXP_MR_10G_LINE_CARD"
+::= { cerentComponents 1550 }
+
+cerentTxpd10ECard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"TXP_MR_10E_LINE_CARD"
+::= { cerentComponents 1275 }
+
+cerentTxpd25GCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"TXP_MR_2_5G_LINE_CARD"
+::= { cerentComponents 1560 }
+
+cerentTxpdP25GCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"TXPP_MR_2_5G_LINE_CARD"
+::= { cerentComponents 1570 }
+
+cerentTxpd10EXCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"TXP-MR-10EX_LINE_CARD"
+::= { cerentComponents 4160 }
+
+cerentOtu2Port OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Otu2 port."
+::= { cerentComponents 4220 }
+
+cerentTxpdP10EXCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"TXPP-MR-10EX_LINE_CARD"
+::= { cerentComponents 4165 }
+
+cerentMuxpd25G10GCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"MXP_2_5G_10G_LINE_CARD"
+::= { cerentComponents 1580 }
+
+cerentMuxpd25G10ECard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"MXP_2_5G_10E_LINE_CARD"
+::= { cerentComponents 1280 }
+
+cerentMuxpd25G10XCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"MXP_2_5G_10X_LINE_CARD"
+::= { cerentComponents 4170 }
+
+cerentDwdmClientPort  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"DWDM client port."
+::= { cerentComponents 1590 }
+
+cerentDwdmTrunkPort  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"DWDM trunk port."
+::= { cerentComponents 1600 }
+
+cerentMuxpdMr25GCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"MXP_MR_2_5G_LINE_CARD."
+::= { cerentComponents 1610 }
+
+cerentMuxpdPMr25GCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"MXPP_MR_2_5G_LINE_CARD."
+::= { cerentComponents 1620 }
+
+cerentMxpMr10DmexCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"MXP-MR-10DMEX card."
+::= { cerentComponents 4270 }
+
+cerentXpdGECard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"GE_XP_LINE_CARD."
+::= { cerentComponents 4210 }
+
+cerentXpd10GECard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"10GE_XP_LINE_CARD."
+::= { cerentComponents 4205 }
+
+cerentMm850Port  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"MM_850_PORT."
+::= { cerentComponents 1630 }
+
+cerentSm1310Port  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"SM_1310_PORT."
+::= { cerentComponents 1640 }
+
+cerentXcVxcCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"VC cross connect card."
+::= { cerentComponents 1670 }
+
+cerentXcVxc25GCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"XCVXC 2.5G card"
+::= { cerentComponents 1680 }
+
+cerentOptBstECard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Enhanced Optical Booster Card."
+::= { cerentComponents 1690 }
+
+cerentE1P42LineCard
+OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"E1_42_LINE_CARD."
+::= { cerentComponents 4000 }
+
+cerentE1nP42LineCard
+OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"E1N_42_LINE_CARD."
+::= { cerentComponents 4005 }
+
+cerentFmecE1P42TypeUnprotW120Card
+OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"FMEC_E1_42_UNPROT_120_CARD."
+::= { cerentComponents 4010 }
+
+cerentFmecE1P42Type1To3W120aCard
+OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"FMEC_E1_42_1TO3_120A_CARD."
+::= { cerentComponents 4015 }
+
+cerentFmecE1P42Type1To3W120bCard
+OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"FMEC_E1_42_1TO3_120B_CARD."
+::= { cerentComponents 4020 }
+
+cerentStm1e12LineCard
+OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"STM1E_12_LINE_CARD."
+::= { cerentComponents 4025 }
+
+cerentStm1ePort
+OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"STM1E_PORT."
+::= { cerentComponents 4030 }
+
+cerentFmec155eUnprotCard
+OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"FMEC_155E_CARD_UNPROT."
+::= { cerentComponents 4035 }
+
+cerentFmec155e1To1Card
+OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"FMEC_155E_CARD_1TO1."
+::= { cerentComponents 4040 }
+
+cerentFmec155e1To3Card
+OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"FMEC_155E_CARD_1TO3."
+::= { cerentComponents 4045 }
+
+-- EDFA3 OIDs  begin
+
+cerent15216Edfa3ShelfController  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 4050 }
+
+cerent15216Edfa3OpticsModule OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+""
+::= { cerentComponents 4051 }
+
+cerent15216EdfaEtherPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"Ether port."
+::= { cerentComponents 4052 }
+
+cerent15216EdfaSerialPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"Serial port."
+::= { cerentComponents 4053 }
+
+-- EDFA3 OIDs end
+
+cerentMl100X8LineCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"ML-100X 8-ports Card."
+::= { cerentComponents 4055}
+
+cerentOscmCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Service Channel Module Card."
+::= { cerentComponents 3200 }
+
+cerentOscCsmCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Service Channel with COmbiner/Separator module Card."
+::= { cerentComponents 3205 }
+
+cerentOptPreCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Pre-Amplifier Card."
+::= { cerentComponents 3210 }
+
+cerentOptBstCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Booster Card."
+::= { cerentComponents 3215 }
+
+cerentOptAmp17Card  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Low Gain C-Band Amplifier."
+::= { cerentComponents 4175 }
+
+cerentOptAmp23Card  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"High Gain C-Band Amplifier."
+::= { cerentComponents 4180 }
+
+cerentOptDemux32ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical De-Mutiplexer 32 Channels Card."
+::= { cerentComponents 3220 }
+
+cerentOptDemux40ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical De-Mutiplexer 40 Channels Card."
+::= { cerentComponents 4195 }
+
+cerentOptMux32ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Mutiplexer 32 Channels Card."
+::= { cerentComponents 3225 }
+
+cerentOptMux40ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Mutiplexer 40 Channels Card."
+::= { cerentComponents 4190 }
+
+cerentOptWxc40ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Wavelenght Cross Connect 40 Channels Card."
+::= { cerentComponents 4200 }
+
+cerentOptMuxDemux4ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Multiplexer/De-Mutiplexer 4 Channels Card."
+::= { cerentComponents 3230 }
+
+cerentOadm1ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical ADM with 1 Channel Card."
+::= { cerentComponents 3235 }
+
+cerentOadm2ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical ADM with 2 Channels Card."
+::= { cerentComponents 3240 }
+
+cerentOadm4ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical ADM with 4 Channels Card."
+::= { cerentComponents 3245 }
+
+cerentOadm1BnCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical ADM with 1 Band Card."
+::= { cerentComponents 3250 }
+
+cerentOadm10GCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical ADM 10G Card."
+::= { cerentComponents 4215 }
+
+cerentOadm4BnCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical ADM with 4 Bands Card."
+::= { cerentComponents 3255 }
+
+cerentOptDemux32RChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical De-Mutiplexer 32 Channels Reconfigurable Card."
+::= { cerentComponents 980 }
+
+cerentOptWss32ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Wavelenght Selectable Switch 32 Channels Reconfigurable Card."
+::= { cerentComponents 990 }
+
+cerentOptWss40ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Wavelenght Selectable Switch 40 Channels Reconfigurable Card."
+::= { cerentComponents 4185 }
+
+cerentOTSPort  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Transport Port."
+::= { cerentComponents 3260 }
+
+cerentAOTSPort  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Amplifier Transport Port."
+::= { cerentComponents 3265 }
+
+cerentOMSPort  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Multiplex Section Port."
+::= { cerentComponents 3270 }
+
+cerentOCHPort  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Channel Port."
+::= { cerentComponents 3275 }
+
+cerentOptBstLCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"L-band amplifier."
+::= { cerentComponents 4060 }
+
+cerentOptAmpLCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"L-band pre-amplifier."
+::= { cerentComponents 4065 }
+
+cerentOptAmpCCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"C-band amplifier."
+::= { cerentComponents 4255 }
+
+cerentOptRAmpCCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"C-band RAMAN amplifier."
+::= { cerentComponents 4285 }
+
+cerentOptRAmpECard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"C-band Enhanced RAMAN amplifier."
+::= { cerentComponents 4287 }
+
+cerentDmx32LCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"L-band 32 ch. demux."
+::= { cerentComponents 4070 }
+
+cerentWss32LCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"L-band 32 ch. WSS."
+::= { cerentComponents 4075 }
+
+cerentWss40LCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"L-band 40 ch. WSS."
+::= { cerentComponents 4225 }
+
+cerentWssCE40Card  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"CE 40 ch. WSS."
+::= { cerentComponents 4260 }
+
+cerentMux40LCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"L-band 40 ch. MUX."
+::= { cerentComponents 4230 }
+
+cerentDmx40LCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"L-band 40 ch. DMX."
+::= { cerentComponents 4235 }
+
+cerentDmxCE40Card  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"CE 40 ch. DMX."
+::= { cerentComponents 4265 }
+
+cerentWxc40LCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"L-band 40 ch. WXC."
+::= { cerentComponents 4240 }
+
+cerentMMUCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"MMU."
+::= { cerentComponents 4080 }
+
+cerentPSMCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"PSM."
+::= { cerentComponents 4282 }
+
+cerentXP10G4LineCard	OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"XP_4_10G_LINE_CARD."
+::= { cerentComponents 4290 }
+
+cerent40SMR1Card  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"40 SMR1 C"
+::= { cerentComponents 4305 }
+
+cerent40SMR2Card  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"40 SMR2 C"
+::= { cerentComponents 4310 }
+
+cerentOptWxc80ChCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Optical Wavelenght Cross Connect 80 Channels Card."
+::= { cerentComponents 4315 }
+
+-- cards for UTS-TNC
+cerentBackPlaneM2  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Backplane for UTS-TNC M2 platform"
+::= { cerentComponents 4510 }
+
+cerentChassisM2Ansi  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Chassis for UTS-TNC M2 ANSI platform"
+::= { cerentComponents 4520 }
+
+cerentChassisM2Etsi  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Backplane for UTS-TNC M2 SDH platform"
+::= { cerentComponents 4530 }
+
+cerentBackPlaneM6  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Back plane for M6"
+::= { cerentComponents 4540 }
+
+cerentChassisM6Ansi  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Cerent Chassis M6 Ansi"
+::= { cerentComponents 4550 }
+
+cerentChassisM6Etsi  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Chassis  for UTS-TNC M6 platform"
+::= { cerentComponents 4560 }
+
+cerentPowerSupplyUts  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Power supply for UTS mounted on ECU"
+::= { cerentComponents 4570 }
+
+cerentFlashUts  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"FALSH unit  for UTS mounted on ECU"
+::= { cerentComponents 4580 }
+
+cerentAicInUts  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"AIC IN on ECU "
+::= { cerentComponents 4590 }
+
+cerentAicOutUts  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"AIC OUT for ECU"
+::= { cerentComponents 4600 }
+
+cerentIscEqptUts  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"ISC eqpt on ECU"
+::= { cerentComponents 4610 }
+
+cerentUdcVoipEmsUts  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"UDC VOIP unit on ECU"
+::= { cerentComponents 4620 }
+
+cerentBitsUts  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"BITS unit on ECU"
+::= { cerentComponents 4630 }
+
+cerentFanTrayUts OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"FAN Tray UTS"
+::= { cerentComponents 4640 }
+
+cerentAlarmDryContactUts OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Alarm Dry Contact UTS"
+::= { cerentComponents 4645 }
+
+cerentIoUts  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"IO UTS"
+::= { cerentComponents 4660 }
+
+cerentEcuTray  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"ECU Tray"
+::= { cerentComponents 4670 }
+
+cerentTncUtsCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+	"Transport Node Controller UTS card"
+::= { cerentComponents 4680 }
+
+
+cerentTscUtsCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Transport Shelf Controller UTS card"
+::= { cerentComponents 4690 }
+
+cerentUsbUtsPortCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"UTS USB Port "
+::= { cerentComponents 4655 }
+
+cerentUsbUts  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"UTS USB Module "
+::= { cerentComponents 4650 }
+
+
+cerentTncTscUtsSlot  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Transport Node Controller Universal Transport Shelf Slot"
+::= { cerentComponents 4700 }
+
+cerentEcuSlot OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"ECU slot"
+::= { cerentComponents 4710 }
+
+cerentMscIscUtsPort  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Multi Shelf Controller - Inter shelf Controller"
+::= { cerentComponents 4720 }
+
+cerentTncFePort  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"FE Port"
+::= { cerentComponents 4730 }
+
+cerentPtSystem  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"CPT System - NGXP System"
+::= { cerentComponents 4740 }
+
+cerentPtf10GECard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"CPT System - Uplink Card"
+::= { cerentComponents 4745 }
+
+cerentPt10GECard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"CPT System - TRIB Card"
+::= { cerentComponents 4750 }
+
+cerentPtsaGECard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"CPT System - Satellite Box"
+::= { cerentComponents 4755 }
+
+cerentMsIsc100tCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"ms-isc-100t."
+::= { cerentComponents 4085 }
+
+cerentMxpMr10DmeCard  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"mxp-mr-10dme."
+::= { cerentComponents 4090 }
+
+cerentCE1000Card OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"CE1000 card"
+::= { cerentComponents 4095 }
+
+cerentCE1000EtherPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Ether Port on CE1000 card"
+::= { cerentComponents 4100 }
+
+cerentCE1000PosPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"POS Port on CE1000 card"
+::= { cerentComponents 4105}
+
+cerentPIM1PPM  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Pluggable IO Module containing 1 Pluggable Port Modules."
+::= { cerentComponents 4110 }
+
+cerentCEMR454Card  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"CEMR 454 card"
+::= { cerentComponents 4115 }
+
+cerentCEMR310Card  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"CEMR 310 card"
+::= { cerentComponents 4120 }
+
+cerentCTX2500Card OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"CTX 2500 Card"
+::= { cerentComponents 4125}
+
+cerentDs128Ds3EC13LineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"DS1 28 ports, DS3 EC1 Line Card"
+::= { cerentComponents 4130}
+
+cerentDs184Ds3EC13LineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"DS1 84 ports, DS3 EC1 Line Card"
+::= { cerentComponents 4135}
+
+cerentDs3EC16LineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"DS3 EC1 Line Card"
+::= { cerentComponents 4140}
+
+cerentBicTelco OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Backplane Interface Card -- Telco"
+::= { cerentComponents 4145}
+
+cerentBicCmn OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Backplane Interface Card -- Cmn"
+::= { cerentComponents 4150}
+
+cerentRanSvcLineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Radio Access Network Service Card"
+::= { cerentComponents 4155}
+
+cerentIlkPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Interl Link Port on 10G ADM card"
+::= { cerentComponents 4245}
+
+cerentOc192Card4PortsDwdm OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OC192 4Ports DWDM Card"
+::= { cerentComponents 4250 }
+
+cerentMrc25G12LineCard  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Multi Rate Card 2.5G with 12 ports"
+::= { cerentComponents 4275}
+
+cerentMrc25G4LineCard  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Multi Rate Card 2.5G with 4 ports"
+::= { cerentComponents 4280}
+
+cerentE121E3DS33LineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"E1 21 ports, E3 DS3 Line Card"
+::= { cerentComponents 4295}
+
+cerentE163E3DS33LineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"E1 63 ports, E3 DS3 Line Card"
+::= { cerentComponents 4300}
+
+cerentMd40OddPassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive Mux Dmx Odd"
+::= { cerentComponents 4320}
+
+cerentMd40EvenPassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive Mux Dmx Even"
+::= { cerentComponents 4325}
+
+cerentMdId50PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive interleav/deinterleav"
+::= { cerentComponents 4330}
+
+cerentPP4SMRPassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"15216 PP 4 mesh unit"
+::= { cerentComponents 4335}
+
+cerentPPMESH4PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"15454 PP MESH 4 unit"
+::= { cerentComponents 4340}
+
+cerentPPMESH8PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"15454 PP MESH 8 unit"
+::= { cerentComponents 4345}
+
+cerentDcuPassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive DCU unit"
+::= { cerentComponents 4350}
+
+cerentCTDcuPassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Coarse Tunable DCU unit"
+::= { cerentComponents 4355}
+
+cerentFTDcuPassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Fine Tunable DCU unit"
+::= { cerentComponents 4360}
+
+fortyGePort    OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"40 GBit/Sec Ethernet Port"
+::= { cerentComponents 4365 }
+
+fc8gPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"8 GBit/Sec Fiber Channel Port"
+::= { cerentComponents 4370 }
+
+cerentOtu3Port OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"OTU3 port."
+::= { cerentComponents 4375 }
+
+cerentOc768Port OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+"Oc768 port."
+::= { cerentComponents 4380 }
+
+cerentMechanicalUnit OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+"Mechanical Unit."
+::= { cerentComponents 4385 }
+
+cerent40GTxpCard OBJECT-IDENTITY
+STATUS      current
+DESCRIPTION
+"40GBit/s. Transponder C Band."
+::= { cerentComponents 4390 }
+
+cerent40GMxpCard OBJECT-IDENTITY
+STATUS      current
+DESCRIPTION
+"40GBit/s. Muxponder C Band."
+::= { cerentComponents 4395 }
+
+cerent40EMxpCard OBJECT-IDENTITY
+STATUS      current
+DESCRIPTION
+"40GBit/s. Muxponder C Band."
+::= { cerentComponents 4400 }
+
+cerentArXpCard OBJECT-IDENTITY
+STATUS      current
+DESCRIPTION
+"Any Rate Transponder/MuxPonder Card"
+::= { cerentComponents 4535 }
+
+cerentArMxpCard OBJECT-IDENTITY
+STATUS      current
+DESCRIPTION
+"Any Rate TXP/MXP Card"
+::= { cerentComponents 4545 }
+
+cerent15216ID50PassiveUnit OBJECT-IDENTITY
+STATUS      current
+DESCRIPTION
+"15216 interleav/deinterleav"
+::= { cerentComponents 4405 }
+
+cerent40ETxpCard OBJECT-IDENTITY
+STATUS      current
+DESCRIPTION
+"40GBit/s. Transponder C Band."
+::= { cerentComponents 4415 }
+
+cerentOtu1Port OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"OTU1 Port."
+::= { cerentComponents 4725 }
+
+cerentIsc3stp1gPort OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"ISC3STP1G Port."
+::= { cerentComponents 4732 }
+
+cerentIsc3stp2gPort OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"ISC3STP2G Port."
+::= { cerentComponents 4735 }
+
+cerentSdi3gvideoPort OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"SDI3GVIDEO Port."
+::= { cerentComponents 4742 }
+
+cerentAutoPort OBJECT-IDENTITY
+STATUS	current
+DESCRIPTION
+	"AUTO Port."
+::= { cerentComponents 4747 }
+
+cerentOptEdfa17Card  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"Low Gain C-Band Edfa Amplifier."
+::= { cerentComponents 4420 }
+
+cerentOptEdfa24Card  OBJECT-IDENTITY
+STATUS current
+DESCRIPTION
+"High Gain C-Band Edfa Amplifier."
+::= { cerentComponents 4425 }
+
+cerentFld303PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Fld 303 Passive Unit"
+::= { cerentComponents 4760}
+
+cerentFld334PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+" cerent Fld 334 Passive Unit"
+::= { cerentComponents 4765}
+
+cerentFld366PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"cerent Fld 366 Passive Unit"
+::= { cerentComponents 4770}
+
+cerentFld397PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"cerent Fld 397 Passive Unit"
+::= { cerentComponents 4775}
+
+cerentFld429PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"cerent Fld 429 Passive Unit"
+::= { cerentComponents 4780}
+
+cerentFld461PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"cerent Fld 461 Passive Unit"
+::= { cerentComponents 4785}
+
+cerentFld493PassiveUnit  OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"cerent Fld 493 Passive Unit"
+::= { cerentComponents 4790}
+
+cerentFld525PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"cerent Fld 525 Passive Unit"
+::= { cerentComponents 4795}
+
+cerentFld557PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"cerent Fld 557 Passive Unit"
+::= { cerentComponents 4800}
+
+cerentFld589PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"cerent Fld 589 Passive Unit"
+::= { cerentComponents 4805}
+
+cerentFldOscPassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"cerent Fld Osc Passive Unit"
+::= { cerentComponents 4810}
+
+cerentFlcCwdm8PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"cerent Flc Cwdm8 Passive Unit"
+::= { cerentComponents 4815}
+
+cerentSdsdiPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"SDSDI Port"
+::= { cerentComponents 4820}
+
+cerentHdsdiPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"HDSDI Port"
+::= { cerentComponents 4825}
+
+cerentOptRampCTPCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"cerent OPT RAMP CTP Card"
+::= { cerentComponents 4830}
+
+cerentOptRampCOPCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+	"cerent OPT RAMP COP Card"
+::= { cerentComponents 4835}
+
+cerentFbgdcu165PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive FBGDCU 165 unit"
+::= { cerentComponents 4840}
+
+cerentFbgdcu331PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive FBGDCU 331 unit"
+::= { cerentComponents 4845}
+
+cerentFbgdcu496PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive FBGDCU 496 unit"
+::= { cerentComponents 4850}
+
+cerentFbgdcu661PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive FBGDCU 661 unit"
+::= { cerentComponents 4855}
+
+cerentFbgdcu826PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive FBGDCU 826 unit"
+::= { cerentComponents 4860}
+
+cerentFbgdcu992PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive FBGDCU 992 unit"
+::= { cerentComponents 4865}
+
+cerentFbgdcu1157PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive FBGDCU 1157 unit"
+::= { cerentComponents 4870}
+
+cerentFbgdcu1322PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive FBGDCU 1322 unit"
+::= { cerentComponents 4875}
+
+cerentFbgdcu1653PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive FBGDCU 1653 unit"
+::= { cerentComponents 4880}
+
+cerentFbgdcu1983PassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive FBGDCU 1983 unit"
+::= { cerentComponents 4885}
+
+cerentMd48OddPassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive Mux Dmx 48 ODD"
+::= { cerentComponents 4900}
+
+cerentMd48EvenPassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Passive Mux Dmx 48 EVEN"
+::= { cerentComponents 4905}
+
+cerentMd48CmPassiveUnit OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+
+"Passive 48 interleav/deinterleav"
+::= { cerentComponents 4910}
+
+cerentOtu4Port OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OTU4 Port"
+::= { cerentComponents 4915}
+
+cerentOneHundredGePort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"One Hundred GE Port"
+::= { cerentComponents 4920}
+
+cerentHundredGigLineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"Hundred Gig Line Card"
+::= { cerentComponents 4925}
+
+cerentTENxTENGigLineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"TENxTEN Gig Line Card"
+::= { cerentComponents 4930}
+
+cerentCfpLineCard OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"CFP Line Card"
+::= { cerentComponents 4935}
+
+cerentOTLPort OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+"OTL Port"
+::= { cerentComponents 4940}
+
+cerentHundredgigPlim OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Hundred gig PLIM"
+    ::= { cerentComponents 4945}
+
+cerentWseLineCard OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "WSE Line Card"
+    ::= { cerentComponents 4947}
+
+cerentArXpeCard OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Any Rate Xponder Card"
+    ::= { cerentComponents 4950 }
+
+cerentCPAK100GLineCard OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "CPAK 100G Line Card"
+    ::= { cerentComponents 5010}
+
+cerentEDRA126C OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "EDRA1_26C"
+    ::= { cerentComponents 4955}
+
+cerentEDRA135C OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "EDRA1_35C"
+    ::= { cerentComponents 4960}
+
+cerentEDRA226C OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "EDRA2_26C"
+    ::= { cerentComponents 4965}
+
+cerentEDRA235C OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "EDRA2_35C"
+    ::= { cerentComponents 4970}
+
+cerentWXC16FSLineCard OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "WXC16 FS Line Card"
+    ::= { cerentComponents 4975}
+
+cerentPassiv1x16COFSC OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Passive 1x16 COFS C"
+    ::= { cerentComponents 4980}
+    
+cerentPassive4x4COFSC OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Passive 4x4 COFS C"
+    ::= { cerentComponents 4985}
+    
+cerentPassiveMODDEG5 OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Passive MOD DEG 5"
+    ::= { cerentComponents 4990}
+
+cerentPassiveMODUPG4 OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Passive MOD UPG 4"
+    ::= { cerentComponents 4995}
+    
+cerentPassiveMPO8LCADPT OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Passive MPO 8LC ADPT"
+    ::= { cerentComponents 5000}
+    
+cerentPassiveASTEDFA OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Passive AST EDFA"
+    ::= { cerentComponents 5005}    
+    
+END

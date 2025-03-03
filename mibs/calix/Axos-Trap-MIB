@@ -1,0 +1,127 @@
+Axos-Trap-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    NOTIFICATION-TYPE, IpAddress, MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    axosAlarmIndex,axosAlarmName,axosAlarmType,axosAlarmCategory,
+    axosAlarmInstanceId,axosAlarmSeverity,
+    axosAlarmServiceAffecting,axosAlarmAddress,
+    axosAlarmText,axosAlarmTimeStamp,axosAlarmTime,
+    axosAlarmAdditionalInfo,axosEventAdditionalInfo1,
+    axosEventAdditionalInfo2,axosEventAdditionalInfo3,
+    axosEventAdditionalInfo4,axosEventAdditionalInfo5,
+    axosEventAdditionalInfo6,axosEventAdditionalInfo7
+        FROM AXOS-ALARM-MIB
+    axosModules
+        FROM CALIX-PRODUCT-MIB;
+
+    axosTrapModule MODULE-IDENTITY
+    LAST-UPDATED "201604250000Z"
+    ORGANIZATION "Calix"
+    CONTACT-INFO
+            "       Calix Networks, Inc.
+
+	    Postal: 1035 North McDowell Boulevard
+	            Petaluma, CA  94954-1173
+		    USA
+
+	     Phone: +1 707 766 3000
+	       Fax: +1 707 766 3100
+
+	    E-mail: mib-info@calix.com"
+    DESCRIPTION
+        "Describes all the notifications related to Calix 
+         AXOS products."
+    REVISION "201604250000Z"
+    DESCRIPTION
+        "Initial revision"
+
+    ::= { axosModules 1 }
+
+    axosTrap OBJECT IDENTIFIER ::= { axosTrapModule 1}
+    axosNotificationObjects OBJECT IDENTIFIER ::= { axosTrap 1 }
+    axosNotifications       OBJECT IDENTIFIER ::= { axosTrap 2 }
+     
+--Objects in the Notification.
+
+axosTrapSequenceNo OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is an incrementing counter that shows
+                the sequence number of the last trap sent. This
+                may be used to indentify a missing trap. This
+                value is reset to 0 when the system is reset."
+    ::= { axosNotificationObjects 1 }
+
+--Traps
+
+axosTrapAlarmRaised NOTIFICATION-TYPE
+    OBJECTS {
+        axosTrapSequenceNo,
+        axosAlarmIndex,
+        axosAlarmName,
+        axosAlarmType,
+        axosAlarmCategory,
+        axosAlarmInstanceId,
+        axosAlarmSeverity,
+        axosAlarmServiceAffecting,
+        axosAlarmAddress,
+        axosAlarmText,
+        axosAlarmTimeStamp,
+        axosAlarmTime,
+        axosAlarmAdditionalInfo
+        }
+    STATUS      current
+    DESCRIPTION "axosTrapAlarmRaised is generated whenever an
+                alarm is raised"
+    ::= { axosNotifications 1 }
+
+axosTrapAlarmCleared NOTIFICATION-TYPE
+    OBJECTS {
+        axosTrapSequenceNo,
+        axosAlarmIndex,
+        axosAlarmName,
+        axosAlarmType,
+        axosAlarmCategory,
+        axosAlarmInstanceId,
+        axosAlarmSeverity,
+        axosAlarmServiceAffecting,
+        axosAlarmAddress,
+        axosAlarmText,
+        axosAlarmTimeStamp,
+        axosAlarmTime,
+        axosAlarmAdditionalInfo
+        }
+    STATUS      current
+    DESCRIPTION "axosTrapAlarmRaised is generated whenever an
+                alarm is cleared"
+    ::= { axosNotifications 2 }
+
+axosTrapEvent NOTIFICATION-TYPE
+    OBJECTS {
+        axosTrapSequenceNo,
+        axosAlarmIndex,
+        axosAlarmName,
+        axosAlarmType,
+        axosAlarmCategory,
+        axosAlarmAddress,
+        axosAlarmText,
+        axosAlarmTimeStamp,
+        axosAlarmTime,
+        axosEventAdditionalInfo1,
+        axosEventAdditionalInfo2,
+        axosEventAdditionalInfo3,
+        axosEventAdditionalInfo4,
+        axosEventAdditionalInfo5,
+        axosEventAdditionalInfo6,
+        axosEventAdditionalInfo7
+        }
+    STATUS      current
+    DESCRIPTION "axosTrapEvent is sent whenever an
+                event is generated"
+    ::= { axosNotifications 3 }
+
+END
+

@@ -15,21 +15,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 echo 'coolingUnitStatusAnalogEntry ';
-$pre_cache['cooling_unit_analog'] = snmpwalk_cache_oid($device, 'coolingUnitStatusAnalogEntry', array(), 'PowerNet-MIB');
+$pre_cache['cooling_unit_analog'] = snmpwalk_cache_oid($device, 'coolingUnitStatusAnalogEntry', [], 'PowerNet-MIB');
 
 echo 'upsPhaseNumInputPhases ';
 $pre_cache['apcups_phase_count'] = snmp_get($device, 'upsPhaseNumInputPhases.1', '-OQv', 'PowerNet-MIB');
 
 echo 'memSensorsStatusTable ';
-$pre_cache['mem_sensors_status'] = snmpwalk_cache_oid($device, 'memSensorsStatusTable', array(), 'PowerNet-MIB', null, '-OQUse');
+$pre_cache['mem_sensors_status'] = snmpwalk_cache_oid($device, 'memSensorsStatusTable', [], 'PowerNet-MIB', null, '-OQUse');
 
 echo 'memSensorsStatusSysTempUnits ';
 $pre_cache['memSensorsStatusSysTempUnits'] = snmp_get($device, 'memSensorsStatusSysTempUnits.0', '-OQv', 'PowerNet-MIB');

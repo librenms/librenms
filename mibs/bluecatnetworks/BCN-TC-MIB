@@ -1,0 +1,63 @@
+-- Copyright 2017 BlueCat Networks. All rights reserved.
+-- *****************************************************************
+-- BCN-SMI-MIB.mib:  BlueCat Networks Textual Conventions
+--
+-- December 2010, Fabian Ischia
+--
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+BCN-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    bcnModules
+        FROM BCN-SMI-MIB;
+
+bcnTCMIB MODULE-IDENTITY
+    LAST-UPDATED "201011300000Z"
+    ORGANIZATION "BlueCat Networks Inc."
+    CONTACT-INFO
+        "Adonis Technical Support
+        BlueCat Networks Inc.
+ 		 
+        Tel: +1 866 491 2228 (toll free)
+ 		     +1 416 646 8400 (international) 
+        Email: support@bluecatnetworks.com"
+    DESCRIPTION
+        "This module defines Textual Conventions used throughout BlueCat mibs."
+    REVISION     "201011300000Z"
+    DESCRIPTION "Initial version of this MIB module."
+ 	::= { bcnModules 3 }
+
+BcnAlarmSeverity ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Alarm severity. Valid values are:
+        1 Okay. The component that was experiencing a problem has recovered
+          or a normal, expected operation has taken place.
+        2 Other. The event does not require severity assessment or the 
+          severity cannot be determined. 
+        3 Informational: Informational event that requires no further action. 
+        4 Minor: Minor event that does not require user intervention. 
+        5 Warning: An event occurred that might affect services, but is part
+          of a system or user initiated process. It might indicate that a
+          service is transitioning states.
+        6 Major: Event that requires user intervention and assistance. 
+        7 Critical: Problem that affects services and system operations, 
+          and requires immediate assistance."
+    SYNTAX          INTEGER {
+        ok(1),
+        other(10),
+        inform(20),
+        minor(30),
+        warning(40),
+        major(50),
+        critical(60)
+    }
+
+END

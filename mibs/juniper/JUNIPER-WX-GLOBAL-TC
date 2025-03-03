@@ -1,0 +1,133 @@
+
+-- End - JUNIPER-WX-GLOBAL-REG Module
+
+-- ========================================================================
+-- Start - JUNIPER-WX-GLOBAL-TC Module
+
+-- WX Global Textual Conventions
+--
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+JUNIPER-WX-GLOBAL-TC DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY
+			FROM SNMPv2-SMI
+		TEXTUAL-CONVENTION
+			FROM SNMPv2-TC
+		jnxWxModules
+			FROM JUNIPER-WX-GLOBAL-REG;
+
+	jnxWxGlobalTcModule MODULE-IDENTITY
+		LAST-UPDATED			"200107292200Z"
+		ORGANIZATION			"Juniper Networks, Inc"
+		CONTACT-INFO			"
+					Customer Support
+					Juniper Networks, Inc.
+					1194 North Mathilda Avenue
+					Sunnyvale, CA  94089
+
+					+1 888-314-JTAC
+					support@juniper.net"
+
+		DESCRIPTION				"
+			A MIB module containing textual conventions
+			for Juniper Networks' enterprise MIB modules.
+			These textual conventions are used across all WX products."
+
+		REVISION				"200606081800Z"
+		DESCRIPTION				"
+			Update contact and MIB with Juniper information
+			Add wxc590 and wx60 chassis type."
+
+		REVISION				"200505091010Z"
+		DESCRIPTION				"
+			Add wxc250 chassis type."
+
+		REVISION				"200403151400Z"
+		DESCRIPTION				"
+			Add wx100 chassis type."
+
+		REVISION				"200306262000Z"
+		DESCRIPTION				"
+			Add wx80 chassis type."
+
+		REVISION				"200211071900Z"
+		DESCRIPTION				"
+			Add wx20 chassis type."
+
+		REVISION				"200107292200Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module JUNIPER-WX-GLOBAL-TC."
+
+		::= { jnxWxModules 2 }
+
+	-- No WX textual conventions yet!
+
+	TcAppName ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT			"64a"
+		STATUS					current
+		DESCRIPTION				"
+			Represents the name of an application.
+
+			This has all the restrictions of the DisplayString textual
+			convention with the following additional ones:
+
+			- Only the following characters/character ranges are allowed:
+				0-9
+				A-Z
+				a-z
+				:./#$&_-+()'
+				<space>
+
+			Any object defined using this syntax may not exceed 64
+			characters in length."
+		SYNTAX       OCTET STRING (SIZE (0..64))
+
+	TcQosIdentifier ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT			"24a"
+		STATUS					current
+		DESCRIPTION				"
+			Represents the name of a QoS class, a tunnel or
+			a tunnel ip address encoded as a string.
+
+			This has all the restrictions of the DisplayString textual
+			convention with the following additional ones:
+
+			- Only the following characters/character ranges are allowed:
+				0-9
+				A-Z
+				a-z
+				:./#$&_-+()'
+				<space>
+
+			Any object defined using this syntax may not exceed 24
+			characters in length."
+		SYNTAX       OCTET STRING (SIZE (0..24))
+
+	TcChassisType ::= TEXTUAL-CONVENTION
+		STATUS					current
+		DESCRIPTION				"
+			Enumerates all possible chassis types for WX devices."
+		SYNTAX
+			INTEGER
+			{
+				jnxWxOther(1),
+				jnxWx50(2),
+				jnxWx20(3),
+				jnxWx80(4),
+				jnxWx100(5),
+				jnxWxc500(6),
+				jnxWx15(7),
+				jnxWxc250(8),
+				jnxWx100V3(9),
+				jnxWx60(10),
+				jnxWxc590(11),
+				jnxIsm200Wxc(12),
+				jnxWxc1800(13),
+				jnxWxc2600(14),
+				jnxWxc3400(15)
+			}
+END

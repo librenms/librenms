@@ -1,0 +1,172 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This file describes the hh3c MIB implementation of
+--              redundancy power and fan
+-- Reference: 
+-- Version: V2.0
+-- History: 
+-- V2.0 2004-10-12 updated by gaolong
+--      Add MODULE-IDENTITY clause.
+--      Re-write with SMIv2 syntax.
+--      Re-write IMPORTS clause.
+-- ==================================================================
+
+HH3C-REDUNDANCY-POWER-MIB DEFINITIONS ::= BEGIN
+-- From file: "redundancy_power.mib"
+
+IMPORTS  
+    NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI  
+    hh3cmlsr
+        FROM HH3C-OID-MIB;
+
+    hh3credundancyPower MODULE-IDENTITY
+        LAST-UPDATED "200112200000Z"	
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION 
+                " "
+        ::= { hh3cmlsr 4 }
+
+hh3credundancyFan    OBJECT IDENTIFIER ::= { hh3cmlsr 5 }
+
+hh3credundancyPowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cRedundancyPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table describles the attributes of every power unit.
+        "
+    ::= { hh3credundancyPower 1 }
+
+hh3credundancyPowerEntry OBJECT-TYPE
+    SYNTAX Hh3cRedundancyPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains the attributes 
+        associated with a single power unit entity."
+    INDEX { hh3credundancyPowerID }
+    ::= { hh3credundancyPowerTable 1 }
+
+Hh3cRedundancyPowerEntry ::= SEQUENCE {
+    hh3credundancyPowerID 	        INTEGER,
+    hh3credundancyPowerStatus 	INTEGER,
+    hh3credundancyPowerPreviousStatus 	INTEGER
+     }
+
+hh3credundancyPowerID OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The identify of power uinit.
+        This is also the index of this table."
+    ::= { hh3credundancyPowerEntry 1 }
+
+hh3credundancyPowerStatus OBJECT-TYPE
+    SYNTAX INTEGER{
+                   space(1),
+                   normal(2),
+                   fail(3)
+                  } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of every redundancy power unit.
+        if power unit doesn't exists, take the value 'space';
+        if power unit is present and normal, take the value 'narmal'
+        if power unit is present but fail, take the value 'fail'"
+    ::= { hh3credundancyPowerEntry 2 }
+
+hh3credundancyPowerPreviousStatus OBJECT-TYPE
+    SYNTAX INTEGER{
+                   space(1),
+                   normal(2),
+                   fail(3)
+                  } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The last status of every redundancy power unit "
+    ::= { hh3credundancyPowerEntry 3 }
+
+
+
+hh3credundancyFanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cRedundancyFanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table describles the attributes of every power unit.
+        "
+    ::= { hh3credundancyFan 1 }
+
+hh3credundancyFanEntry OBJECT-TYPE
+    SYNTAX Hh3cRedundancyFanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains the attributes 
+        associated with a single power unit entity."
+    INDEX { hh3credundancyFanID }
+    ::= { hh3credundancyFanTable 1 }
+
+Hh3cRedundancyFanEntry ::= SEQUENCE {
+    hh3credundancyFanID 	        INTEGER,
+    hh3credundancyFanStatus 	INTEGER
+     }
+
+hh3credundancyFanID OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The identify of power uinit.
+        This is also the index of this table."
+    ::= { hh3credundancyFanEntry 1 }
+
+hh3credundancyFanStatus OBJECT-TYPE
+    SYNTAX INTEGER{
+                   normal(1),
+                   fail(2)                   
+                  } 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of every redundancy power unit.
+        if power unit doesn't exists, take the value 'space';
+        if power unit is present and normal, take the value 'narmal'
+        if power unit is present but fail, take the value 'fail'"
+    ::= { hh3credundancyFanEntry 2 }
+
+
+hh3cpowerTraps OBJECT IDENTIFIER ::= { hh3credundancyPower 2 }
+
+hh3cpowerStatusChangedTrap NOTIFICATION-TYPE
+     OBJECTS { hh3credundancyPowerID,hh3credundancyPowerStatus,hh3credundancyPowerPreviousStatus}
+     STATUS  current
+     DESCRIPTION
+	"This trap is generated when the satus of a power unit is changed."
+    ::= { hh3cpowerTraps 1 }
+
+
+hh3cfanTraps OBJECT IDENTIFIER ::= { hh3credundancyFan 2 }
+
+hh3cfanStatusChangedTrap NOTIFICATION-TYPE
+     OBJECTS { hh3credundancyFanID,hh3credundancyFanStatus}
+     STATUS  current
+     DESCRIPTION
+	"This trap is generated when the satus of a power unit is changed."
+    ::= { hh3cfanTraps 1 }
+
+
+END
+

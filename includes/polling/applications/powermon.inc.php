@@ -1,0 +1,63 @@
+<?php
+
+/*
+
+LibreNMS Application for monitoring power consumption and cost
+
+@link       https://www.upaya.net.au/
+@copyright  2021 Ben Carbery
+@author     Ben Carbery <yrebrac@upaya.net.au>
+
+LICENSE - GPLv3
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
+
+*/
+
+use App\Models\Eventlog;
+use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\RRD\RrdDefinition;
+
+$name = 'powermon';
+
+try {
+    $result = json_app_get($device, $name);
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []);
+    // Set empty metrics and error message
+    Eventlog::log('application ' . $name . ' caught JsonAppException');
+
+    return;
+}
+// should be doing something with error codes/messages returned in the snmp
+// result or will they be caught above?
+
+$rrd_def = RrdDefinition::make()
+    ->addDataset('watts-gauge', 'GAUGE', 0)
+    ->addDataset('watts-abs', 'ABSOLUTE', 0)
+    ->addDataset('rate', 'GAUGE', 0);
+
+$fields = [
+    'watts-gauge' => $result['data']['reading'],
+    'watts-abs' => $result['data']['reading'],
+    'rate' => $result['data']['supply']['rate'],
+];
+
+/*
+Eventlog::log(
+      "watts-gauage: " . $result['data']['reading']
+    . ", watts-abs: " . $result['data']['reading']
+);
+ */
+
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
+data_update($device, 'app', $tags, $fields);
+update_application($app, 'OK', $fields);

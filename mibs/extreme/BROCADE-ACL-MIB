@@ -1,0 +1,636 @@
+-- MIB File: BROCADE-ACL-MIB.mib
+-- *********************************************************************
+--
+-- BROCADE-ACL-MIB.mib : Extreme MIB for ACLs
+--
+-- Copyright (c) 2018 Extreme Networks, Inc.
+-- All rights reserved.
+--
+-- ***************************************************************
+
+BROCADE-ACL-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+
+	MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32
+
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP
+
+        FROM SNMPv2-CONF
+
+    TEXTUAL-CONVENTION
+
+        FROM SNMPv2-TC
+
+	ifIndex
+
+        FROM IF-MIB
+
+    bcsiModules
+
+        FROM Brocade-REG-MIB;
+
+brocadeACLMIB   MODULE-IDENTITY
+    LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+
+    ORGANIZATION "Extreme Networks, Inc."
+
+    CONTACT-INFO
+
+         "Postal:  Extreme Networks, Inc.
+
+                   6480 Via Del Oro
+
+                   San Jose, CA 95119 USA
+
+          Phone:   +1 408 579-2800
+
+          E-mail:  support@extremenetworks.com
+
+          WWW:     http://www.extremenetworks.com"
+
+    DESCRIPTION
+
+             "MIB module for management of ACLs."
+    
+    REVISION	"201805291200Z" -- May 29, 2018 12:00pm
+    
+    DESCRIPTION	"Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+
+   ::= {bcsiModules 16}
+
+bcsiACLNotifications  OBJECT IDENTIFIER ::=  { brocadeACLMIB 0 }
+
+bcsiACLObjects        OBJECT IDENTIFIER ::=  { brocadeACLMIB 1 }
+
+bcsiACLConformance    OBJECT IDENTIFIER ::=  { brocadeACLMIB 2 }
+
+BcsiTrafficDirection ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The packet flow direction within an interface for which ACL needs to be applied."
+	SYNTAX  INTEGER { inbound(1), outbound(2) }
+
+BcsiAclNameString ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT "255t"
+	STATUS      current
+	DESCRIPTION
+		"The name for a given access-list."
+	SYNTAX  OCTET STRING (SIZE (0..255))
+
+BcsiAclAction ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+		"The action to be taken on the packet after filtering is done."
+	SYNTAX  INTEGER { deny(1), permit(2), hardDrop(3) }
+
+BcsiVlanIdOrNoneTC ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT "d"
+	STATUS       current
+	DESCRIPTION
+		"The VLAN-ID that uniquely identifies a specific VLAN,
+		or no VLAN.  The special value of zero is used to
+		indicate that no VLAN-ID is present or used.  This can
+		be used in any situation where an object or a table entry
+		must refer either to a specific VLAN, or to no VLAN.
+
+		Note that a MIB object that is defined using this
+		TEXTUAL-CONVENTION should clarify the meaning of
+		'no VLAN' (i.e., the special value 0)."
+	SYNTAX    Unsigned32 (0 | 1..4090)
+
+BcsiPortQosTC ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+		"The port QOS Priority hardware queue. 1 is lowest priority, 8 is the highest."
+   SYNTAX  INTEGER {
+				   
+				   level1(1),
+				   level2(2),
+				   level3(3),
+				   level4(4),
+				   level5(5),
+				   level6(6),
+				   level7(7),
+				   level0(8),
+				   invalid(127)
+				   }
+				   
+BcsiAclType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"Type of ACL, extended or standard."
+	SYNTAX  INTEGER {
+					standard(1),
+					extended(2)
+					}
+					
+BcsiAclMacType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"Ways of representing the source mac address. 
+		The souce mac address will be accepted in the following 3 formats:
+		Mac address in HHHH.HHHH.HHHH format, Any source mac address, Host specific mac address."
+	SYNTAX  INTEGER {
+					standard(1),
+					any(2),
+					host(3)
+					}
+					
+BcsiAclLevel ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"ACLs can be defined at various levels of the OSI model"
+	SYNTAX  INTEGER {
+					l2(1),
+					ipv4(2),
+					ipv6(3)
+					}
+	
+BcsiVlanTagFormat ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"A VLAN can be untagged, single tagged or double tagged"
+	SYNTAX  INTEGER {
+					singleTagged(1),
+					doubleTagged(2),
+					untagged(3)
+					}
+					
+BcsiDropPrecedenceForce  ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"Represents Priority"
+	SYNTAX  INTEGER {
+					zero(0),
+					one(1),
+					two(2)
+					}
+	
+--	
+-- Mapping table for ACL name to ID
+--
+	
+bcsiAclNameToIdMappingTable   OBJECT-TYPE
+	SYNTAX		SEQUENCE OF BcsiAclNameToAclIdMappingEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This table maps the string name of an ACL to its numeric ACL ID for both L2 and L3 ACLs."
+	::= { bcsiACLObjects 1 }
+	
+bcsiAclNameToAclIdMappingEntry       OBJECT-TYPE
+	SYNTAX		BcsiAclNameToAclIdMappingEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the bcsiAclNameToIdMappingTable which lists the ACl-ID for ACL-Names."
+	INDEX   {bcsiAclNametoAclIdMappingAclName}
+	::= { bcsiAclNameToIdMappingTable 1 }
+	
+BcsiAclNameToAclIdMappingEntry ::= SEQUENCE {
+		bcsiAclNametoAclIdMappingAclName
+			BcsiAclNameString,
+		bcsiAclNametoAclIdMappingAclId
+			Unsigned32,
+		bcsiAclNametoAclIdMappingAclType
+			BcsiAclType,
+		bcsiAclNametoAclIdMappingAclLevel
+			BcsiAclLevel
+}
+
+bcsiAclNametoAclIdMappingAclName	OBJECT-TYPE
+	SYNTAX		BcsiAclNameString
+	MAX-ACCESS	not-accessible 
+	STATUS		current
+	DESCRIPTION
+		"Name of the ACL."
+	::= {bcsiAclNameToAclIdMappingEntry 1}
+	
+bcsiAclNametoAclIdMappingAclId	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Numeric ID of the ACL."
+	::= {bcsiAclNameToAclIdMappingEntry 2}
+	
+bcsiAclNametoAclIdMappingAclType	OBJECT-TYPE
+	SYNTAX		BcsiAclType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ACL can be of two types, namely standard and extended ACL."
+	::= {bcsiAclNameToAclIdMappingEntry 3}
+	
+bcsiAclNametoAclIdMappingAclLevel	OBJECT-TYPE
+	SYNTAX		BcsiAclLevel
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Protocol Layer at which ACLs are applied. L2 and L3 are the supported levels."
+	::= {bcsiAclNameToAclIdMappingEntry 4}
+--
+
+-- L2 Named ACL Rule Table
+
+--
+
+bcsiL2NamedAclRuleTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF BcsiL2NamedAclRuleEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Table to display the L2 Named Access Control List Information listed below among others:
+		- Source MAC address
+		- Source MAC mask
+		- Destination MAC address
+		- Destination MAC mask
+		- VLAN ID
+		- Ethernet type"
+	::= { bcsiACLObjects 2 }
+
+bcsiL2NamedAclRuleEntry	OBJECT-TYPE
+	SYNTAX		BcsiL2NamedAclRuleEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the L2 Access Control List table."
+	INDEX   { bcsiL2NamedAclId, bcsiL2NamedAclSequenceNumber }
+	::= { bcsiL2NamedAclRuleTable 1 }
+
+BcsiL2NamedAclRuleEntry ::= SEQUENCE {
+	bcsiL2NamedAclId
+		Unsigned32,
+	bcsiL2NamedAclSequenceNumber
+		Unsigned32,
+	bcsiL2NamedAclName
+		BcsiAclNameString,
+	bcsiL2NamedAclAction
+		BcsiAclAction,
+	bcsiL2NamedAclSourceType
+		BcsiAclMacType,
+	bcsiL2NamedAclSourceMac
+		MacAddress,
+	bcsiL2NamedAclSourceMacMask
+		MacAddress,
+	bcsiL2NamedAclDestinationType
+		BcsiAclMacType,
+	bcsiL2NamedAclDestinationMac
+		MacAddress,
+	bcsiL2NamedAclDestinationMacMask
+		MacAddress,
+	bcsiL2NamedAclCount
+		TruthValue,
+	bcsiL2NamedAclCopySflow
+		TruthValue,
+	bcsiL2NamedAclDropPrecedenceForce
+		BcsiDropPrecedenceForce,
+	bcsiL2NamedAclVlanTagFormat
+		BcsiVlanTagFormat,
+	bcsiL2NamedAclInnerVlanId
+		BcsiVlanIdOrNoneTC,
+	bcsiL2NamedAclOuterVlanId
+		BcsiVlanIdOrNoneTC,
+	bcsiL2NamedAclVlanId
+		BcsiVlanIdOrNoneTC,
+	bcsiL2NamedAclEthernetType
+		Unsigned32,
+	bcsiL2NamedAclArpGuard
+		TruthValue,
+	bcsiL2NamedAclDot1Priority
+		BcsiPortQosTC,
+	bcsiL2NamedAclDot1PriorityForce
+		BcsiPortQosTC,
+	bcsiL2NamedAclMirrorPackets
+		TruthValue,
+	bcsiL2NamedAclLogEnable
+		TruthValue
+	}
+
+bcsiL2NamedAclId	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Unique Numeric ID of ACL.
+		It is the same as bcsiAclNametoAclIdMappingAclId in bcsiAclNameToIdMappingTable"
+	::= { bcsiL2NamedAclRuleEntry 1 }
+	
+bcsiL2NamedAclSequenceNumber	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Sequence number is the number associated with rules of ACL"
+	::= { bcsiL2NamedAclRuleEntry 2 }
+
+bcsiL2NamedAclName	OBJECT-TYPE
+	SYNTAX		BcsiAclNameString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Represents the name of each configured L2 named ACL. 
+		It is the same as bcsiAclNametoAclIdMappingAclName in bcsiAclNameToIdMappingTable"
+	::= { bcsiL2NamedAclRuleEntry 3 }
+
+bcsiL2NamedAclAction	OBJECT-TYPE
+	SYNTAX		BcsiAclAction
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Action to take if the ingress L2 packet matches this ACL."
+	::= { bcsiL2NamedAclRuleEntry 4 }
+	
+bcsiL2NamedAclSourceType	OBJECT-TYPE
+	SYNTAX		BcsiAclMacType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Source can be represented in three ways:
+				1.	Mac address in HHHH.HHHH.HHHH format.    
+				2.	Any source mac address
+				3.	Host specific mac address 
+
+		Interpretation of bcsiL2NamedAclSourceMacMask depends on the value of this object"
+	::= { bcsiL2NamedAclRuleEntry 5 }
+	
+bcsiL2NamedAclSourceMac	OBJECT-TYPE
+	SYNTAX		MacAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Optional Source MAC address. It depends on the value of bcsiL2NamedAclSourceType.
+		For standard(1) value of bcsiL2NamedAclSourceType, bcsiL2NamedAclSourceMac is user specified value.
+		For any(2) value of bcsiL2NamedAclSourceType, bcsiL2NamedAclSourceMac is 0.
+		For host(3) value of bcsiL2NamedAclSourceType, bcsiL2NamedAclSourceMac is user specified value.
+		"
+	::= { bcsiL2NamedAclRuleEntry 6 }
+
+bcsiL2NamedAclSourceMacMask	OBJECT-TYPE
+	SYNTAX		MacAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Optional Source MAC address mask.		
+		By default,  it matches with any source MAC within a packet.
+		To match on the first two bytes of the address
+		aabb.ccdd.eeff, use the mask ffff.0000.0000. In this case,
+		the clause matches all source MAC addresses that contain
+		'aabb' as the first two bytes and any values in the 
+		remaining bytes of the MAC address. 
+
+		Applicable for Extended ACLs only."
+	::= { bcsiL2NamedAclRuleEntry 7 }
+	
+bcsiL2NamedAclDestinationType	OBJECT-TYPE
+	SYNTAX		BcsiAclMacType
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Destination can be represented in three ways. 
+			1.	Mac address in HHHH.HHHH.HHHH format.    
+			2.	Any destination mac address
+			3.	Host specific mac address 
+		Interpretation of bcsiL2NamedAclDestinationMacMask depends on the value of this object
+		"
+	::= { bcsiL2NamedAclRuleEntry 8 }
+
+bcsiL2NamedAclDestinationMac	OBJECT-TYPE
+	SYNTAX		MacAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Optional destination MAC address. By default, it matches with any destination MAC within a packet.
+		It depends on the value of bcsiL2NamedAclDestinationType.
+		For standard(1) value of bcsiL2NamedAclDestinationType, bcsiL2NamedAclDestinationMac is user specified value.
+        For any(2) value of bcsiL2NamedAclDestinationType, bcsiL2NamedAclDestinationMac is 0.
+        For host(3) value of bcsiL2NamedAclDestinationType, bcsiL2NamedAclDestinationMac is user specified value.
+
+		Applicable for Extended ACLs only."
+	::= { bcsiL2NamedAclRuleEntry 9 }
+
+bcsiL2NamedAclDestinationMacMask	OBJECT-TYPE
+	SYNTAX		MacAddress
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Optional destination MAC address mask.
+		By default, it matches with any destination MAC within a packet.
+		To match on the first two bytes of the address
+		aabb.ccdd.eeff, use the mask ffff.0000.0000. In this case,
+		the clause matches all destination MAC addresses that contain
+		'aabb' as the first two bytes and any values in the
+		remaining bytes of the MAC address.
+
+		Applicable for Extended ACLs only."
+	::= { bcsiL2NamedAclRuleEntry 10 }
+	
+bcsiL2NamedAclCount	OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Indicates if the user has enabled/disabled count for number of
+		packets against which the configured action is taken, for a given rule"
+	::= { bcsiL2NamedAclRuleEntry 11 }
+	
+bcsiL2NamedAclCopySflow 	OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Indicates whether to sample the packet for sflow collection or not"
+	::= { bcsiL2NamedAclRuleEntry 12 }
+	
+bcsiL2NamedAclDropPrecedenceForce 	OBJECT-TYPE
+	SYNTAX		BcsiDropPrecedenceForce
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Force ingress drop precedence"
+	::= { bcsiL2NamedAclRuleEntry 13 }
+	
+bcsiL2NamedAclVlanTagFormat	OBJECT-TYPE
+	SYNTAX		BcsiVlanTagFormat
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Vlan tag format can be of 3 types, namely single-tagged, double-tagged and untagged.
+		When neither of these 3 types of tag are used, the feild is represented by 0.
+		When the value of this field is single-tagged(1),bcsiL2NamedAclVlanId represents the Vlan ID."
+	::= { bcsiL2NamedAclRuleEntry 14 }
+	
+bcsiL2NamedAclInnerVlanId	OBJECT-TYPE
+	SYNTAX		BcsiVlanIdOrNoneTC
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"vlan ID of the tagged inner vlan.
+		If bcsiL2NamedAclVlanTagFormat is double-tagged(2),
+		then 0 value of this field indicates any."
+	::= { bcsiL2NamedAclRuleEntry 15 }
+	
+bcsiL2NamedAclOuterVlanId	OBJECT-TYPE
+	SYNTAX		BcsiVlanIdOrNoneTC
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Vlan ID of the tagged outer vlan.
+		If bcsiL2NamedAclVlanTagFormat is double-tagged(2),
+		then 0 value of bcsiL2NamedAclInnerVlanId indicates any."
+	::= { bcsiL2NamedAclRuleEntry 16 }
+	
+bcsiL2NamedAclVlanId 	OBJECT-TYPE
+	SYNTAX		BcsiVlanIdOrNoneTC
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Optional VLAN ID to match against that of the incoming packet.
+		By default, the VLAN ID field is ignored during the match. In this case,
+		value 0 is returned.
+		This field is interpreted as Vlan ID when bcsiL2NamedAclVlanTagFormat is either
+		0(not tagged) or 1(single-tagged).
+		Supported for Extended ACL only."
+	DEFVAL  { 0 }
+	::= { bcsiL2NamedAclRuleEntry 17 }
+
+bcsiL2NamedAclEthernetType 	OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Ethernet Type to match against the 'Ethertype' field
+		in the L2 header of the incoming packet. 
+		By default, etype field is ignored during the match.
+
+		Applicable for Extended ACLs only."
+	DEFVAL  { 0 }
+	::= { bcsiL2NamedAclRuleEntry 18 }
+	
+bcsiL2NamedAclArpGuard 	OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Represents enabling/disabling of arp-gurad for a given ACL"
+	::= { bcsiL2NamedAclRuleEntry 19 }
+
+bcsiL2NamedAclDot1Priority 	OBJECT-TYPE
+	SYNTAX		BcsiPortQosTC
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The priority option assigns traffic that matches the ACL to a
+		hardware forwarding queue. In addition to changing the internal
+		forwarding priority, if the outgoing interface is an 802.1q interface,
+		this option maps the specified priority to its equivalent 802.1p (QoS)
+		priority and marks the packet with the new 802.1p priority.
+		This option is applicable for inbound ACLs only.
+		NOTE: bcsiL2NamedAclDot1Priority following bcsiL2NamedAclDot1PriorityForce
+		cannot be used together in an ACL entry.
+
+		Applicable for Extended ACLs only."
+	DEFVAL  { level0 }
+	::= { bcsiL2NamedAclRuleEntry 20 }
+
+bcsiL2NamedAclDot1PriorityForce 	OBJECT-TYPE
+	SYNTAX		BcsiPortQosTC
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The priority-force option assigns packets of outgoing traffic
+		that match the ACL to a specific hardware forwarding queue,
+		even though the incoming packet may be assigned to another queue.
+		This option is applicable for inbound ACLs only.
+		NOTE: bcsiL2NamedAclDot1Priority following bcsiL2NamedAclDot1PriorityForce
+		cannot be used together in an ACL entry.
+
+		Applicable for Extended ACL only"
+	DEFVAL  { level0 }
+	::= { bcsiL2NamedAclRuleEntry 21 }
+
+bcsiL2NamedAclMirrorPackets OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS  	read-write
+	STATUS		current
+	DESCRIPTION
+		"Mirror packets matching ACL permit clause.
+		Applicable for Extended ACLs only"
+	DEFVAL  { false }
+	::= { bcsiL2NamedAclRuleEntry 22 }
+
+bcsiL2NamedAclLogEnable	OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Optional parameter to enable logging only when deny clause
+		is specified. Note that traffic denied by implicit deny mechanism is not
+		subject to logging. The implicit deny kicks in when the traffic
+		does not match any of the clauses and there is no 'permit any any'
+		clause specified at the end."
+	DEFVAL  { false }
+	::= { bcsiL2NamedAclRuleEntry 23 }
+
+--
+
+-- L2 ACL Binding Table
+
+--
+
+bcsiAclIfBindTable   OBJECT-TYPE
+	SYNTAX		SEQUENCE OF BcsiAclIfBindEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Table for binding L2 and L3 ACLs to interfaces.
+		- One cannot bind Layer 2 ACLs and Layer 3 ACLs to the same port.
+		However, configuration can be made on one port to use Layer 2 ACLs, and
+		another port on the same device to use Layer 3 ACLs.
+		- In general, Layer 2 ACLs cannot be bound to virtual interfaces, unlike L3 ACLs.
+		- One can not modify an existing Layer 2 ACL clause. For that, one must
+		unbind the ACL, delete it and make a new clause.
+		"
+	::= { bcsiACLObjects 3 }
+
+bcsiAclIfBindEntry       OBJECT-TYPE
+	SYNTAX		BcsiAclIfBindEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the L2 and L3 ACL binding table which lists the ACL bindings to an interface.
+		"
+	INDEX   {ifIndex, bcsiAclIfBindDirection}
+	::= { bcsiAclIfBindTable 1 }
+
+BcsiAclIfBindEntry ::= SEQUENCE {
+	bcsiAclIfBindDirection
+		BcsiTrafficDirection,
+	bcsiAclIfBindAclName
+        BcsiAclNameString
+	}
+
+bcsiAclIfBindDirection   OBJECT-TYPE
+	SYNTAX		BcsiTrafficDirection
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Direction in which this ACL should be applied on this port."
+	::= { bcsiAclIfBindEntry 1 }
+
+bcsiAclIfBindAclName      OBJECT-TYPE
+    SYNTAX      BcsiAclNameString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the Name of each configured L2 or L3 named ACL.
+		It is the same as bcsiAclNametoAclIdMappingAclName in bcsiAclNameToIdMappingTable"
+    ::= { bcsiAclIfBindEntry 2 }
+
+END
+
+-- ========================================================================================

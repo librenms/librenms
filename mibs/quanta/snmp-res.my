@@ -1,0 +1,382 @@
+SNMP-RESEARCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises
+        FROM SNMPv2-SMI;
+
+-- The top node
+snmpResearch             OBJECT IDENTIFIER ::= { enterprises 99 } 
+
+--
+-- snmpResearch.1:  SNMP Research Products
+--
+snmpResearchNode         OBJECT IDENTIFIER ::= { snmpResearch 1 }
+
+--
+-- SNMP Research Agents
+--
+snmpResearchAgent        OBJECT IDENTIFIER ::= { snmpResearchNode 1 }
+
+-- UNIX
+snmpResearchUNIXAgent    OBJECT IDENTIFIER ::= { snmpResearchAgent 1 }
+snmpResearchSnmpd        OBJECT IDENTIFIER ::= { snmpResearchUNIXAgent 1 }
+
+-- Proxies
+snmpResearchProxyAgent   OBJECT IDENTIFIER ::= { snmpResearchAgent 2 }
+snmpResearchLb100Proxy   OBJECT IDENTIFIER ::= { snmpResearchProxyAgent 1 }
+
+-- All of the snmpResearchDogProxy and snmpResearchTcuProxy objects
+-- removed.  Do not use these branch of the tree.
+-- snmpResearchDogProxy  OBJECT IDENTIFIER ::= { snmpResearchAgent 2 2 }
+-- snmpResearchTcuProxy  OBJECT IDENTIFIER ::= { snmpResearchAgent 2 3 }
+
+-- EMANATE Master Agent
+snmpResearchEMANATEMasterAgent OBJECT IDENTIFIER ::= { snmpResearchAgent 3 }
+
+-- EMANATE Master Agents on Various OSs 
+solarisEMANATEMasterAgent      OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 1 }
+solarisTCPEMANATEMasterAgent   OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 2 }
+solarisx86TCPEMANATEMasterAgent OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 3 }
+sunosEMANATEMasterAgent        OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 4 }
+dguxEMANATEMasterAgent         OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 5 }
+hpuxEMANATEMasterAgent         OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 6 }
+vxworksEMANATEMasterAgent      OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 7 }
+hprtEMANATEMasterAgent         OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 8 }
+aixEMANATEMasterAgent          OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 9 }
+sco3EMANATEMasterAgent         OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 10 }
+ntEMANATEMasterAgent           OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 11 }
+win31EMANATEMasterAgent        OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 12 }
+dynixEMANATEMasterAgent        OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 13 }
+osf1EMANATEMasterAgent         OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 14 }
+ncrEMANATEMasterAgent          OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 15 }
+sco5EMANATEMasterAgent         OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 16 }
+solarisx86EMANATEMasterAgent   OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 17 }
+freebsdEMANATEMasterAgent      OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 18 }
+irixEMANATEMasterAgent         OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 19 }
+os2EMANATEMasterAgent          OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 20 }
+unixwareEMANATEMasterAgent     OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 21 }
+bsdiEMANATEMasterAgent         OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 22 }
+sinixEMANATEMasterAgent        OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 23 }
+ftxEMANATEMasterAgent          OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 24 }
+hpux10EMANATEMasterAgent       OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 25 }
+dguxx86EMANATEMasterAgent      OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 26 }
+unixware21EMANATEMasterAgent   OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 27 }
+linuxEMANATEMasterAgent        OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 28 }
+osf4EMANATEMasterAgent         OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 29 }
+hpux11EMANATEMasterAgent       OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 30 }
+nextEMANATEMasterAgent         OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 31 }
+netbsdEMANATEMasterAgent       OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 32 }
+openvmsEMANATEMasterAgent      OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 33 }
+sol64EMANATEMasterAgent        OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 34 }
+sol64x86EMANATEMasterAgent     OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 35 }
+hpux64EMANATEMasterAgent       OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 36 }
+aix64EMANATEMasterAgent        OBJECT IDENTIFIER ::= { snmpResearchEMANATEMasterAgent 37 }
+
+
+
+-- LATIN Agents
+snmpResearchLTxxxAgent       OBJECT IDENTIFIER ::= { snmpResearchAgent 4 }
+snmpResearchLT301Agent       OBJECT IDENTIFIER ::= { snmpResearchLTxxxAgent 1 }
+-- snmpResearchLT301AgentE   OBJECT IDENTIFIER ::= { snmpResearchLT301Agent 1 }
+-- snmpResearchLT301AgentW   OBJECT IDENTIFIER ::= { snmpResearchLT301Agent 2 }
+-- snmpResearchLT301AgentEW  OBJECT IDENTIFIER ::= { snmpResearchLT301Agent 3 }
+-- snmpResearchLT301AgentM   OBJECT IDENTIFIER ::= { snmpResearchLT301Agent 4 }
+-- snmpResearchLT301AgentME  OBJECT IDENTIFIER ::= { snmpResearchLT301Agent 5 }
+-- snmpResearchLT301AgentMW  OBJECT IDENTIFIER ::= { snmpResearchLT301Agent 6 }
+-- snmpResearchLT301AgentMEW OBJECT IDENTIFIER ::= { snmpResearchLT301Agent 7 }
+
+-- 
+-- SNMP Research Managers
+--
+-- Note that these objects are not currently used.  The Security Pack
+-- MIB object (snmpSecurityPackMIB) occurs under the MIB registry below.
+snmpResearchManager          OBJECT IDENTIFIER ::= { snmpResearchNode 2 }
+snmpSecurityPack             OBJECT IDENTIFIER ::= { snmpResearchManager 1 }
+snmpSecurityPackTgtOid       OBJECT IDENTIFIER ::= { snmpSecurityPack 1 }
+
+--
+-- snmpResearch.2:  SNMP Research MIBs
+--
+snmpResearchVarVersion OBJECT IDENTIFIER ::= { snmpResearch 2 }
+
+-- Nothing under the first branch of the SNMP Research MIBs tree
+-- is used at all.
+-- snmpResearchVarVer1    OBJECT IDENTIFIER ::= { snmpResearchVarVersion 1 }
+-- snmpResearchVarLb100   OBJECT IDENTIFIER ::= { snmpResearchVarVer1 1 }
+-- lb100PktTrans          OBJECT IDENTIFIER ::= { snmpResearchVarLb100 1 }
+-- lb100PktRecv           OBJECT IDENTIFIER ::= { snmpResearchVarLb100 2 }
+-- lb100Seconds           OBJECT IDENTIFIER ::= { snmpResearchVarLb100 3 }
+
+--
+-- snmpResearch.3:  historic and not reusable
+--
+--snmpResearchFunctions   OBJECT IDENTIFIER ::= { snmpResearch 3 }
+
+--
+-- snmpResearch.4:  historic and not reusable
+--
+--expressions             OBJECT IDENTIFIER ::= { snmpResearch 4 }
+
+--
+-- snmpResearch.5:  unused
+--
+
+--
+-- snmpResearch.6:  unused
+--
+
+--
+-- snmpResearch.7:  unused
+--
+
+--
+-- snmpResearch.8:  unused
+--
+
+--
+-- snmpResearch.9:  unused
+--
+
+--
+-- snmpResearch.10:  used in the past and not reusable
+-- These OIDs were used in conjunction with the now historic
+-- party-based SNMPv2.
+
+--
+-- snmpResearch.11:  unused
+--
+
+--
+-- snmpResearch.12:  branch in which we register all of our MIB Modules
+--
+snmpResearchMIBs OBJECT IDENTIFIER ::= { snmpResearch 12 }
+
+psMIB            OBJECT IDENTIFIER ::= { snmpResearchMIBs 2 }
+testMIB          OBJECT IDENTIFIER ::= { snmpResearchMIBs 3 }
+snmpResearchload OBJECT IDENTIFIER ::= { snmpResearchMIBs 4 }
+oldExamples      OBJECT IDENTIFIER ::= { snmpResearchMIBs 5 }
+dmiTestMIB       OBJECT IDENTIFIER ::= { snmpResearchMIBs 6 }
+emacs2           OBJECT IDENTIFIER ::= { snmpResearchMIBs 7 }
+sample           OBJECT IDENTIFIER ::= { snmpResearchMIBs 8 }
+etc              OBJECT IDENTIFIER ::= { snmpResearchMIBs 9 }
+
+-- Private:  Do not use.
+spakes           OBJECT IDENTIFIER ::= { snmpResearchMIBs 10 }
+-- srEvalMsg        OBJECT IDENTIFIER ::= { snmpResearchMIBs 10 2 1 }
+-- srEvalTrap       OBJECT IDENTIFIER ::= { snmpResearchMIBs 10 2 2 0 1 }
+
+demo             OBJECT IDENTIFIER ::= { snmpResearchMIBs 12 }
+newV2ip          OBJECT IDENTIFIER ::= { snmpResearchMIBs 13 }
+newV2udp         OBJECT IDENTIFIER ::= { snmpResearchMIBs 14 }
+-- newV2tcp         OBJECT IDENTIFIER ::= { snmpResearchMIBs 15 }
+-- clusterMIB       OBJECT IDENTIFIER ::= { snmpResearchMIBs 15 }
+
+-- instance-level reservation objects
+instanceRep      OBJECT IDENTIFIER ::= { snmpResearchMIBs 17 }
+
+-- BRASS
+brassMIB         OBJECT IDENTIFIER ::= { snmpResearchMIBs 18 }
+
+
+--
+-- snmpResearch.12.19:  branch in which we register our example MIBs
+-- the SNMP Research example MIBs for showing product capabilities
+-- are found in this branch
+srExamples       OBJECT IDENTIFIER ::= { snmpResearchMIBs 19 }
+srBasics         OBJECT IDENTIFIER ::= { srExamples 1 }
+srProductFeatures OBJECT IDENTIFIER ::= { srExamples 2 }
+
+-- Private:  Do not use.
+-- moulton       OBJECT IDENTIFIER ::= { snmpResearchMIBs 20 }
+
+-- various product MIBs
+latin            OBJECT IDENTIFIER ::= { snmpResearchMIBs 21 }
+
+-- the Windows 95/NT Subagent Adapter
+-- msnsa         OBJECT IDENTIFIER ::= { snmpResearchMIBs 22 }
+
+processControl   OBJECT IDENTIFIER ::= { snmpResearchMIBs 23 }
+-- retired:  htmlPage       OBJECT IDENTIFIER ::= { snmpResearchMIBs 24 }
+ltHardware       OBJECT IDENTIFIER ::= { snmpResearchMIBs 25 }
+
+-- Private:  Do not use.
+-- larsViklund   OBJECT IDENTIFIER ::= { snmpResearchMIBs 26 }
+
+alias            OBJECT IDENTIFIER ::= { snmpResearchMIBs 27 }
+softTrap         OBJECT IDENTIFIER ::= { snmpResearchMIBs 28 }
+
+-- Critical Application MIB
+critApp          OBJECT IDENTIFIER ::= { snmpResearchMIBs 29 }
+
+-- DR-Web HTML Custom page MIB
+htmlpage         OBJECT IDENTIFIER ::= { snmpResearchMIBs 30 }
+
+-- MIB used for a demo
+phoneSwitch      OBJECT IDENTIFIER ::= { snmpResearchMIBs 31 }
+
+-- MIB for mapping from HTTP users to SNMP authentication information
+httpToSnmpAuthMappingMIB  OBJECT IDENTIFIER ::= { snmpResearchMIBs 32 }
+
+-- This is the re-mapped SNMPv2* communityMIB, now called srCommunityMIB
+srCommunityMIB   OBJECT IDENTIFIER ::= { snmpResearchMIBs 33 }
+
+-- MIB for testing SNMP agents.
+srAgtTest        OBJECT IDENTIFIER ::= { snmpResearchMIBs 34 }
+
+-- This MIB augments the usmUserTable with an SnmpTagValue
+usmTargetTagMIB  OBJECT IDENTIFIER ::= { snmpResearchMIBs 35 }
+
+-- This MIB augments the snmpTargetAddrTable with an address mask
+tgtAddressMaskMIB OBJECT IDENTIFIER ::= { snmpResearchMIBs 36 }
+
+-- MIB objects for Proxy Agent Option
+srProxyAgentOption     OBJECT IDENTIFIER ::= { snmpResearchMIBs 55 }
+
+--
+-- snmpResearch.12.37 was used for a "trap MIB" temporarily
+-- and has been put in as the softtrap MIB.  This branch should
+-- not be used!
+-- trap           OBJECT IDENTIFIER ::= { snmpResearchMIBs 37 }
+
+siServiceMIB           OBJECT IDENTIFIER ::= { snmpResearchMIBs 38 } 
+siFsMonitor            OBJECT IDENTIFIER ::= { snmpResearchMIBs 39 }
+siLog                  OBJECT IDENTIFIER ::= { snmpResearchMIBs 40 }
+
+-- This MIB augments the DISMAN-SCRIPT-MIB
+smExtensionMIB         OBJECT IDENTIFIER ::= { snmpResearchMIBs 41 }
+
+-- For CIAgent evals
+siCIAgentEval          OBJECT IDENTIFIER ::= { snmpResearchMIBs 42 }
+siCIAgentEvalExpiredMsg  OBJECT IDENTIFIER ::= { siCIAgentEval 1 }
+siCIAgentEvalExpiredTrap OBJECT IDENTIFIER ::= { siCIAgentEval 10 }
+
+siKernelMIB            OBJECT IDENTIFIER ::= { snmpResearchMIBs 43 }
+
+-- MIB for SNMP Research's autodiscovery
+srAutoDiscovery        OBJECT IDENTIFIER ::= { snmpResearchMIBs 44 }
+
+-- MIB for SNMP Research Securiy Pack.  The choice of the prefix
+-- "snmp" rather than "sr" is deliberate (as other vendors may
+-- encorporate this MIB in their management applications).
+snmpSecurityPackMIB    OBJECT IDENTIFIER ::= { snmpResearchMIBs 45}
+
+srAgentInfo    OBJECT IDENTIFIER ::= { snmpResearchMIBs 46}
+
+-- MIB for EPIC CLI. Includes stat counters and the epicCLI user table.
+epicCLIMIB    OBJECT IDENTIFIER ::= { snmpResearchMIBs 47}
+
+mgrHintsMIB  OBJECT IDENTIFIER ::= { snmpResearchMIBs 48 }
+
+-- BRASS and Security Pack configuration MIB.  Maintains'
+-- command line info in stable storage.
+
+srSpMIB			OBJECT IDENTIFIER ::= { snmpResearchMIBs 49 }
+
+-- example MIB used in classes taught by SNMP Research
+-- childMIB            OBJECT IDENTIFIER ::= { snmpResearchMIBs 144 }
+
+-- BRASS auxiliary information MIB
+brassAuxiliaryInfo    OBJECT IDENTIFIER ::= { snmpResearchMIBs 50}
+
+--- MIB for generic component user table. Hope to eventually use this
+--- for the CLI, EPIC, XML, ...... so we do not have to keep adding username
+--- tables for each new component.
+componentUserMIB    OBJECT IDENTIFIER ::= { snmpResearchMIBs 51}
+
+-- distributed Brass MIB to identify the remote forwarder infomation.
+-- up/down trap, routing table, etc.
+distBrassMIB      OBJECT IDENTIFIER ::= { snmpResearchMIBs 52 }
+
+-- Queuing/printing emulation demonstration MIBs (SAM)
+queueEmulation    OBJECT IDENTIFIER ::= { snmpResearchMIBs 53 }
+
+-- MIB objects for Native Agent Adapter
+srNativeAgentAdapter     OBJECT IDENTIFIER ::= { snmpResearchMIBs 54 }
+
+-- MIB objects for Proxy Agent Option
+srProxyAgentOption     OBJECT IDENTIFIER ::= { snmpResearchMIBs 55 }
+
+--
+-- snmpResearch.13:  branch in which we register our "programs"
+--
+srPrograms        OBJECT IDENTIFIER ::= { snmpResearch 13 }
+
+--
+-- snmpResearch.14:  historic, but not reusable
+--
+-- rptrGroup      OBJECT IDENTIFIER ::= { snmpResearch 14 }
+
+--
+-- snmpResearch.15:  registration of experimental MIBs and names.
+--
+-- This branch is particularly used for MIBs that we hope will move to
+-- more permanent locations by publication.  Includes a branch for MIBs
+-- and domains
+srExperimental    OBJECT IDENTIFIER ::= { snmpResearch 15 }
+
+srExperimentalMIBs OBJECT IDENTIFIER ::= { srExperimental 1 }
+srExperimentalDomains  OBJECT IDENTIFIER ::= { srExperimental 2 }
+srExperimentalAPOErrorCodes  OBJECT IDENTIFIER ::= { srExperimental 3 }
+srExperimentalAPOConsortium  OBJECT IDENTIFIER ::= { srExperimental 4 }
+
+httpSecurityMIB   OBJECT IDENTIFIER ::= { srExperimentalMIBs 1 }
+
+reconfigMIB       OBJECT IDENTIFIER ::= { srExperimentalMIBs 2 }
+reconfigAgent     OBJECT IDENTIFIER ::= { reconfigMIB 1 }
+loadSubagent      OBJECT IDENTIFIER ::= { reconfigMIB 2 }
+
+srSmExt           OBJECT IDENTIFIER ::= { srExperimentalMIBs 3 }
+--srSmExt           OBJECT IDENTIFIER ::= { srExperimentalMIBs 4 }
+eventMIB          OBJECT IDENTIFIER ::= { srExperimentalMIBs 5 } -- draft 5
+--nestMIB           OBJECT IDENTIFIER ::= { srExperimentalMIBs 6 }
+--sip               OBJECT IDENTIFIER ::= { srExperimentalMIBs 7 }
+--apoExample1       OBJECT IDENTIFIER ::= { srExperimentalMIBs 8 }
+--l2CritAppMIB      OBJECT IDENTIFIER ::= { srExperimentalMIBs 9 }
+
+httpTCPIPDomain        OBJECT IDENTIFIER ::= { srExperimentalDomains 1 }
+snmpTCPDomain          OBJECT IDENTIFIER ::= { srExperimentalDomains 2 }
+
+--
+-- snmpResearch.16:  SecureIntelligence
+--
+-- This branch contains OID assignments for the SecureIntelligence project
+--
+secureIntelligence       OBJECT IDENTIFIER ::= { snmpResearch 16 } 
+
+enterpol                 OBJECT IDENTIFIER ::= { secureIntelligence 1 }
+enterpolEvents           OBJECT IDENTIFIER ::= { enterpol 1 }
+enterpolStatusEvents     OBJECT IDENTIFIER ::= { enterpolEvents 1 }
+enterpolPingFailed       OBJECT IDENTIFIER ::= { enterpolStatusEvents 1 }
+enterpolPollFailed       OBJECT IDENTIFIER ::= { enterpolStatusEvents 2 }
+enterpolCdistribEvents   OBJECT IDENTIFIER ::= { enterpolEvents 2 }
+enterpolRemoteEvents     OBJECT IDENTIFIER ::= { enterpolEvents 3 }
+enterpolVarBinds         OBJECT IDENTIFIER ::= { enterpol 2 }
+enterpolMapName          OBJECT IDENTIFIER ::= { enterpolVarBinds 1 }
+enterpolScript           OBJECT IDENTIFIER ::= { enterpolVarBinds 2 }
+enterpolProcesses        OBJECT IDENTIFIER ::= { enterpol 3 }
+cdistrib                 OBJECT IDENTIFIER ::= { enterpolProcesses 1 }
+pconfig                  OBJECT IDENTIFIER ::= { enterpolProcesses 2 }
+enterpolSubsystems       OBJECT IDENTIFIER ::= { enterpol 4 }
+pmamm                    OBJECT IDENTIFIER ::= { enterpolSubsystems 1 }
+
+--
+--  snmpResearch.17  Policy-based Management MIBS
+--
+--  This branch contains OID assignments for auxiliary pieces
+--  of the Policy-based Management products
+--
+
+policyBasedManagement    OBJECT IDENTIFIER ::= { snmpResearch 17 }
+pbmScratchPad		 OBJECT IDENTIFIER ::= { policyBasedManagement 1 }
+
+--
+-- snmpResearch.18    Agent Capabilities
+--
+srAgentCapabilities      OBJECT IDENTIFIER ::= { snmpResearch 18 }
+
+--
+-- snmpResearch.42:   Mid-Level Manager MIB
+--
+mlmMIB                   OBJECT IDENTIFIER ::= { snmpResearch 42 }
+
+END

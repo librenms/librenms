@@ -1,0 +1,3 @@
+modules:
+    os:
+        sysDescr_regex: '/Acano Server (?<version>[^,]+)/'

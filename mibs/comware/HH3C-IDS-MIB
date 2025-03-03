@@ -1,0 +1,346 @@
+-- ==================================================================
+-- Copyright (C) 2005 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: IDS Management MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--     V1.00 2005/08/18 Created by Wang Hanlin
+-- ==================================================================
+HH3C-IDS-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hh3cCommon
+                FROM HH3C-OID-MIB
+            Integer32, Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB;
+
+        hh3cIDSMib MODULE-IDENTITY
+            LAST-UPDATED "200507141942Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                "This MIB describes IDS private information.
+                IDS(Instruction Detecting System) is used to detect intruder activity. "
+            ::= { hh3cIds 1 }
+
+--
+-- Node definitions
+--
+        hh3cIds OBJECT IDENTIFIER ::= { hh3cCommon 47 }
+
+        hh3cIDSTrapGroup OBJECT IDENTIFIER ::= { hh3cIDSMib 1 }
+
+        hh3cIDSTrapInfo OBJECT IDENTIFIER ::= { hh3cIDSTrapGroup 1 }
+
+        hh3cIDSTrapIPFragmentQueueLen OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The length of IP fragment queue."
+            ::= { hh3cIDSTrapInfo 1 }
+
+        hh3cIDSTrapStatSessionTabLen OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The length of status session table."
+            ::= { hh3cIDSTrapInfo 2 }
+
+        hh3cIDSTrapIPAddressType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The type of IP Address."
+            ::= { hh3cIDSTrapInfo 3 }
+
+        hh3cIDSTrapIPAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP Address."
+            ::= { hh3cIDSTrapInfo 4 }
+
+        hh3cIDSTrapUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "User name."
+            ::= { hh3cIDSTrapInfo 5 }
+
+        hh3cIDSTrapLoginType OBJECT-TYPE
+            SYNTAX INTEGER {
+                telnet(1),
+                ssh(2),
+                web(3)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Login type, including telnet, ssh and web."
+            ::= { hh3cIDSTrapInfo 6 }
+
+        hh3cIDSTrapUpgradeType OBJECT-TYPE
+            SYNTAX INTEGER {
+                programme(1),    -- image file of system
+                crb(2),          -- custom rule base
+                vrb(3)           -- vendor rule base
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Upgrade type, including programme(system image),
+                crb(custom rule base, one kind of configuration file),
+                vrb(vendor rule base, one kind of configuration file)."
+            ::= { hh3cIDSTrapInfo 7 }
+
+        hh3cIDSTrapCRLName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "CRL(Certificate Revoke List) name."
+            ::= { hh3cIDSTrapInfo 8 }
+
+        hh3cIDSTrapCertName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Certificate name."
+            ::= { hh3cIDSTrapInfo 9 }
+
+        hh3cIDSTrapDetectRuleID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The rule ID which is a unique identifier for a specified
+                detect rule."
+            ::= { hh3cIDSTrapInfo 10 }
+
+        hh3cIDSTrapEngineID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "A unique number used to identify an interface."
+            ::= { hh3cIDSTrapInfo 11 }
+
+        hh3cIDSTrapFileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..256))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The file name."
+            ::= { hh3cIDSTrapInfo 12 }
+
+        hh3cIDSTrapCfgLineInFile OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The line number in the configuration file."
+            ::= { hh3cIDSTrapInfo 13 }
+
+        hh3cIDSTrapReasonForError OBJECT-TYPE
+           SYNTAX OCTET STRING (SIZE(0..256))
+           MAX-ACCESS accessible-for-notify
+           STATUS current
+           DESCRIPTION
+               "The information of the notification. Although the format and
+               content of this object are device specific, they should be
+               defined uniformly in the device."
+           ::= { hh3cIDSTrapInfo 14 }
+
+        hh3cIDSTrap OBJECT IDENTIFIER ::= { hh3cIDSTrapGroup 2 }
+
+        hh3cIDSTrapPrefix OBJECT IDENTIFIER ::= { hh3cIDSTrap 0 }
+
+        hh3cIDSTrapIPFragQueueFull NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapIPFragmentQueueLen,
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when the IP fragment
+                queue is full.  The hh3cIDSTrapIPFragmentQueueLen describes
+                the length of current fragment queue.
+                The hh3cIDSTrapReasonForError describes reason for error."
+            ::= { hh3cIDSTrapPrefix 1 }
+
+        hh3cIDSTrapStatSessTabFull NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapStatSessionTabLen,
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when the status session
+                table is full.  The hh3cIDSTrapStatSessionTabLen describes the
+                length of current status session table.
+                The hh3cIDSTrapReasonForError describes reason for error."
+            ::= { hh3cIDSTrapPrefix 2 }
+
+        hh3cIDSTrapDetectRuleParseFail NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapDetectRuleID,
+                hh3cIDSTrapEngineID,
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when failing to parse
+                the rules for detecting.  The hh3cIDSTrapDetectRuleID object describes
+                rule ID. The hh3cIDSTrapEngineID object identifies an interface
+                the rule applies to. The hh3cIDSTrapReasonForError object
+                describes reason for error."
+            ::= { hh3cIDSTrapPrefix 3 }
+
+        hh3cIDSTrapDBConnLost NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapIPAddressType,
+                hh3cIDSTrapIPAddress,
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when connecting with
+                database server fails. The hh3cIDSTrapIPAddressType object describes
+                the IP address type of database server.  The hh3cIDSTrapIPAddress
+                object describes the IP address of database server. The
+                hh3cIDSTrapReasonForError describes reason of connecting failure."
+            ::= { hh3cIDSTrapPrefix 4 }
+
+        hh3cIDSTrapCRLNeedUpdate NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapCRLName,
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when IDS device detects
+                that CRL is out of date.  The hh3cIDSTrapCRLName object
+                describes the CRL(Certificate Revoke List) name.
+                The hh3cIDSTrapReasonForError object describes reason for error."
+            ::= { hh3cIDSTrapPrefix 5 }
+
+        hh3cIDSTrapCertOverdue NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapCertName,
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when IDS device detects
+                that certificate is overdue.  The hh3cIDSTrapCertName object
+                describes the certificate name.  The hh3cIDSTrapReasonForError
+                object describes reason for error."
+            ::= { hh3cIDSTrapPrefix 6 }
+
+       hh3cIDSTrapTooManyLoginFail NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapUserName,
+                hh3cIDSTrapIPAddressType,
+                hh3cIDSTrapIPAddress,
+                hh3cIDSTrapLoginType,
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when the login
+                failure times of a user over a certain number.
+                The hh3cIDSTrapUserName object describes the user name
+                when logging in.  The hh3cIDSTrapIPAddressType object
+                describes the IP address type of client. The
+                hh3cIDSTrapIPAddress object describes the IP address of
+                client.  The hh3cIDSTrapLoginType object describes
+                login type, including: telnet, ssh, web.
+                The hh3cIDSTrapReasonForError object describes reason for error."
+            ::= { hh3cIDSTrapPrefix 7 }
+
+       hh3cIDSTrapUpgradeError NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapUpgradeType,
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when upgrading fails.
+                The hh3cIDSTrapUpgradeType object describes upgrade type,
+                including: programme, vrb. The hh3cIDSTrapReasonForError
+                object describes reason for error."
+            ::= { hh3cIDSTrapPrefix 8 }
+
+        hh3cIDSTrapFileAccessError NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapFileName,
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when accessing file
+                fails.  The hh3cIDSTrapFileName object describes the name
+                of file accessed. The hh3cIDSTrapReasonForError object describes
+                reason for error."
+            ::= { hh3cIDSTrapPrefix 9 }
+
+        hh3cIDSTrapConsArithMemLow NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when memory used by
+                constructing the arithmetic to seek content is lacking.
+                The hh3cIDSTrapReasonForError object describes reason for error."
+            ::= { hh3cIDSTrapPrefix 10 }
+
+        hh3cIDSTrapSSRAMOperFail NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when reading or
+                writing SSRAM of CIE card fails. The hh3cIDSTrapReasonForError
+                object describes reason for error."
+            ::= { hh3cIDSTrapPrefix 11 }
+
+        hh3cIDSTrapPacketProcessDisorder NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cIDSTrapReasonForError
+                }
+            STATUS current
+            DESCRIPTION
+                "This notification will be generated when packets processed
+                is in disorder. The hh3cIDSTrapReasonForError object describes
+                reason for error."
+            ::= { hh3cIDSTrapPrefix 12 }
+
+        hh3cIDSTrapCfgFileFormatError    NOTIFICATION-TYPE
+            OBJECTS { hh3cIDSTrapFileName, hh3cIDSTrapCfgLineInFile }
+            STATUS current
+            DESCRIPTION
+                "When devices startup and load the configuration file,
+                if format error is found, this notification will be generated.
+                The hh3cIDSTrapFileName object describes the name of
+                configuration file. The hh3cIDSTrapCfgLineInFile object
+                describes the line number in the file."
+            ::= { hh3cIDSTrapPrefix 13 }
+
+END

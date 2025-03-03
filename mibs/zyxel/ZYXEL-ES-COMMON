@@ -1,0 +1,424 @@
+-- **********************************************
+-- ZyXEL Communications Corporation
+--
+-- Enterprise Solution MIB definitions
+-- Common MIBs (COMMON)
+--
+-- Julian Wu
+--
+-- Copyright by ZyXEL Communications Corp.
+-- All rights reserved.
+-- **********************************************
+
+ZYXEL-ES-COMMON DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE		FROM SNMPv2-SMI
+
+	OBJECT-GROUP,
+	MODULE-COMPLIANCE	FROM SNMPv2-CONF
+
+	DisplayString	FROM SNMPv2-TC
+	EnabledStatus	FROM  P-BRIDGE-MIB
+
+	esMgmt			FROM ZYXEL-ES-SMI
+	esConformance			FROM ZYXEL-ES-SMI;
+
+esSysInfo MODULE-IDENTITY
+	LAST-UPDATED	"201009200000Z"    
+	ORGANIZATION "Enterprise Solution ZyXEL"     
+	CONTACT-INFO
+		""	   
+	DESCRIPTION
+		"The subtree for system information"
+	::= { esMgmt 1 }
+
+esSysMgmt MODULE-IDENTITY
+	LAST-UPDATED	"201009060000Z" 
+	ORGANIZATION "Enterprise Solution ZyXEL"     
+	CONTACT-INFO
+		""	   
+	DESCRIPTION
+		"The subtree for basic system management"
+	::= { esMgmt 2 }
+
+-- esSysInfo OIDs
+
+SwPlatform ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"The indicattion of software platform.
+
+		zynos  : ZyNOS.
+		zld    : ZLD.
+		other  : Other operating system."
+
+	SYNTAX INTEGER {
+		other(1),
+		zynos(2),
+		zld(3)
+	}
+
+
+
+sysSwPlatform OBJECT-TYPE
+	SYNTAX		SwPlatform
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The software platform information."
+	::= { esSysInfo 1 }
+
+sysSwMajorVersion OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The major version of software platform."
+	::= { esSysInfo 2 }
+
+sysSwMinorVersion OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The minor version of software platform."
+	::= { esSysInfo 3 }
+
+sysSwModel OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The device model ID."
+	::= { esSysInfo 4 }
+
+sysSwPatchNumber OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The firmeare patch number."
+	::= { esSysInfo 5 }
+
+sysSwVersionString OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The detail software version."
+	::= { esSysInfo 6 }
+
+sysSwDay OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The day of software build date."
+	::= { esSysInfo 7 }
+
+sysSwMonth OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The month of software build date."
+	::= { esSysInfo 8 }
+
+sysSwYear OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The year of software build date."
+	::= { esSysInfo 9 }
+
+sysProductFamily OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The product line information."
+	::= { esSysInfo 10 }
+
+sysProductModel OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The device model name."
+	::= { esSysInfo 11 }
+
+sysProductSerialNumber OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The searial number of this device."
+	::= { esSysInfo 12 }
+
+sysHwMajorVersion OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The major version of hardware platform."
+	::= { esSysInfo 13 }
+
+sysHwMinorVersion OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The minor version of hardware platform."
+	::= { esSysInfo 14 }
+	
+sysHwVersionString OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The detail hardware version."
+	::= { esSysInfo 15 }    
+	
+sysCountryCode OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"System Country."
+	::= { esSysInfo 16 }
+
+-- sysCurrentDateTime is obsoleted. don't use it.
+sysCurrentDateTime OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		obsolete
+	DESCRIPTION
+        	"System current date time."
+	::= { esSysInfo 17 }
+
+-- sysCurrentTime is obsoleted. don't use it.
+sysCurrentTime OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		obsolete
+	DESCRIPTION
+		""
+	::= { esSysInfo 18 }
+
+-- sysActiveSessionNum is only used in NXC5200.
+sysActiveSessionNum OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The number of active session."
+	::= { esSysInfo 19 }
+
+
+-- esSysMgmt OIDs
+
+MgmtAlarmStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		""
+	SYNTAX BITS {
+		sysAlarmDetected(0),
+		sysTemperatureError(1),
+		sysFanRPMError(2),
+		sysVoltageRangeError(3)
+	}
+
+sysMgmtReboot OBJECT-TYPE   
+	SYNTAX  INTEGER {  
+		running(0),
+		reboot (1)
+	}
+
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { esSysMgmt 1 }
+
+sysMgmtConfigSave OBJECT-TYPE
+	SYNTAX  INTEGER {  
+		running(0),
+		save (1)
+	}
+
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { esSysMgmt 2 }
+
+sysMgmtRestoreDefaultConfig OBJECT-TYPE
+	SYNTAX  INTEGER {  
+		running(0),
+		restore (1)
+	}                       
+	
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { esSysMgmt 3 }
+
+sysMgmtCPUUsage OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Device CPU usage (%)"
+	::= { esSysMgmt 4 }
+
+sysMgmtMemUsage OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Device memory usage (%)"
+	::= { esSysMgmt 5 }
+
+sysMgmtFlashUsage OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Device flash usage (%)"
+	::= { esSysMgmt 6 }
+
+sysMgmtCPU5SecUsage OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Average CPU usage in 5 seconds. (%)"
+	::= { esSysMgmt 7 }
+
+sysMgmtCPU1MinUsage OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Average CPU usage in 1 minute. (%)"
+	::= { esSysMgmt 8 }
+
+sysMgmtCPU5MinUsage OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Average CPU usage in 5 minutes. (%)"
+	::= { esSysMgmt 9 }
+
+sysMgmtBootupConfigIndex OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { esSysMgmt 10 }
+
+
+sysMgmtBootupImageIndex OBJECT-TYPE
+	SYNTAX		INTEGER (0..100)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { esSysMgmt 11 }
+
+-- sysMgmtAlarmStatus is obsoleted, don't use it.
+sysMgmtAlarmStatus OBJECT-TYPE
+	SYNTAX		MgmtAlarmStatus
+	MAX-ACCESS	read-only
+	STATUS		obsolete
+	DESCRIPTION
+		""
+	::= { esSysMgmt 12 }
+
+-- sysMgmtVLANControl is used only for NWA1K series and NWA1300-NJ.
+sysMgmtVLANControl OBJECT-TYPE
+    SYNTAX		EnabledStatus
+    MAX-ACCESS	read-write
+    STATUS		deprecated
+    DESCRIPTION
+        "Enable/Disable management vlan."
+    ::= { esSysMgmt 13 }
+
+-- sysMgmtVLANID is used only for NWA1K series and NWA1300-NJ.
+sysMgmtVLANID OBJECT-TYPE
+	SYNTAX		INTEGER (0..4094)
+	MAX-ACCESS	read-write
+	STATUS		deprecated
+	DESCRIPTION
+		"Management vlan id."
+	::= { esSysMgmt 14 }
+
+-- sys8021QControl is used only for NWA1K series.
+sys8021QControl OBJECT-TYPE
+    SYNTAX		EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "System vlan status."
+    ::= { esSysMgmt 15 }
+
+
+-- compliance statements for ES-COMMON
+
+esBasicCompliances	OBJECT IDENTIFIER ::= { esConformance 1 }
+esBasicGroups		OBJECT IDENTIFIER ::= { esConformance 2 }
+
+esBasicCompliance MODULE-COMPLIANCE
+	STATUS		current
+	DESCRIPTION
+		"The compliance statement for ES common MIB"
+	MODULE -- this module
+		MANDATORY-GROUPS {
+			esSysInfoGroup,
+			esSysMgmtGroup
+		}
+	::= { esBasicCompliances 1 }
+
+esSysInfoGroup OBJECT-GROUP
+	OBJECTS {
+		sysSwPlatform,
+		sysSwMajorVersion,
+		sysSwMinorVersion,
+		sysSwModel,
+		sysSwPatchNumber,
+		sysSwVersionString,
+		sysSwDay,
+		sysSwMonth,
+		sysSwYear,
+		sysProductFamily,
+		sysProductModel,
+		sysProductSerialNumber
+	}
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { esBasicGroups 1 }
+
+esSysMgmtGroup OBJECT-GROUP
+	OBJECTS {
+		sysMgmtReboot,
+		sysMgmtConfigSave,
+		sysMgmtRestoreDefaultConfig,
+		sysMgmtCPUUsage,
+		sysMgmtMemUsage
+	}
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { esBasicGroups 2 }
+
+END
+

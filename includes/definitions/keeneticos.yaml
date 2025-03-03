@@ -1,0 +1,11 @@
+os: keeneticos
+group: keenetic
+text: 'KeeneticOS'
+type: network
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysDescr_regex:
+            - '/^Keenetic/'

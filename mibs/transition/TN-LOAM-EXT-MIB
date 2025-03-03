@@ -1,0 +1,116 @@
+-- *************************************************************************************************
+-- TN-LOAM-EXT-MIB.mib:  Enterprise MIB for Interface/VLAN management
+--
+-- Copyright (c) 2012 by Transition Networks, Inc.
+-- All rights reserved.
+--                     
+-- *************************************************************************************************
+--
+
+TN-LOAM-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises FROM SNMPv2-SMI
+	RowStatus, TruthValue FROM SNMPv2-TC
+	ifIndex, InterfaceIndex FROM IF-MIB  
+	tnProducts FROM TRANSITION-SMI;		
+
+tnLOAMExtMIB MODULE-IDENTITY
+	LAST-UPDATED "201201080000Z"
+	ORGANIZATION "Transition Networks, Inc."
+	CONTACT-INFO
+		"	Transition Networks
+			10900 Red Circle Drive
+			Minnetonka, MN 55343 USA
+			Tel: +1-800-526-9267
+			
+		    E-mail: techsupport@transition.com"
+	DESCRIPTION
+		"The mib module for managing Link OAM (IEEE 802.3ah Clause 57) enterprise extensions."                           
+
+	REVISION      "201201080000Z"
+		DESCRIPTION  
+		"Second Revision of this module, naming prefix change to accmodate more products."
+		
+	REVISION      "200901080000Z"
+		DESCRIPTION  
+		"Initial Revision of this module"
+	::= { tnProducts 7 }
+                    
+-- 
+-- Section 1 
+--                                                         
+tnLOAMNotifications OBJECT IDENTIFIER ::= { tnLOAMExtMIB 0 }       
+tnLOAMObjects 		OBJECT IDENTIFIER ::= { tnLOAMExtMIB 1 }
+tnLOAMConformance 	OBJECT IDENTIFIER ::= { tnLOAMExtMIB 2 }
+	 
+
+tnLOAMIfMgmt        OBJECT IDENTIFIER ::= { tnLOAMObjects 1 }   
+
+--
+-- ION SOAM (Interface, VLAN Tag) managment table
+--	 
+tnLOAMIfMgmtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnLOAMIfMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "This table has entries which generate an synthetic indentifier for a given interface, VLAN service mapping."
+    ::= { tnLOAMIfMgmt 1 }    
+        
+tnLOAMIfMgmtEntry OBJECT-TYPE
+    SYNTAX      TnLOAMIfMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "A entry in the table represents Link OAM management extension for an interface."
+    INDEX  { ifIndex }        
+    ::= { tnLOAMIfMgmtTable 1 }
+                                     
+TnLOAMIfMgmtEntry ::= 
+    SEQUENCE 
+    {              
+        tnLOAMIfModeCtrl             	INTEGER,
+        tnLOAMIfClearStats				INTEGER,
+        tnLOAMIfMUXState    	        INTEGER,
+        tnLOAMIfPARState				INTEGER
+    }
+
+tnLOAMIfModeCtrl OBJECT-TYPE
+    SYNTAX     INTEGER {auto(1), manual(2)}
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object can be used to provision the Link OAM mode for this interface. 
+	 	In auto(1) mode , the interface is set to active/passive depending on
+	 	if the device is in a chassis or stand-alone. Applicable to Chassis based products.
+	 	In manual(2) mode lets the user choose the Link OAM mode (active/passive)."
+    ::= { tnLOAMIfMgmtEntry 1 }
+       
+tnLOAMIfClearStats OBJECT-TYPE
+    SYNTAX     INTEGER { reset(1), doNothing(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This mib variable can be used to clear all Link OAM statisitical counters for
+        this interface."
+    ::= { tnLOAMIfMgmtEntry 2 }    
+    
+tnLOAMIfMUXState OBJECT-TYPE
+    SYNTAX     INTEGER { forward(1), discard(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The status of interface's multiplexer state."
+    ::= { tnLOAMIfMgmtEntry 3 }   
+
+tnLOAMIfPARState OBJECT-TYPE
+    SYNTAX     INTEGER { forward(1), loopback(2), discard(3)  }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The status of interface's Parser state."
+    ::= { tnLOAMIfMgmtEntry 4 }    
+END    

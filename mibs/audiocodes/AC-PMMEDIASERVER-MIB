@@ -1,0 +1,1840 @@
+
+AC-PM-MediaServer-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        Unsigned32,
+		Integer32,
+        enterprises                                 FROM SNMPv2-SMI
+		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+		audioCodes,       
+		acRegistrations,
+		acGeneric, 
+		acProducts,acBoardMibs,acPerformance		FROM AUDIOCODES-TYPES-MIB;
+
+       
+acPMMediaServer  MODULE-IDENTITY       
+    LAST-UPDATED "200706181116Z"          --Monday, June 18, 2007
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+			 AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+			 Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+		
+
+    DESCRIPTION       
+    "The AC-PM-MediaServer MIB offers performance monitoring
+For the Media Server related elements in Audiocodes' devices.
+The Configuration sub-tree is for configuring the interval
+Period length for the entire AC-PM-MediaServer MIB, and the 
+different tables' thresholds.
+The Data sub-tree presents the tables of monitored
+elements.
+
+Note  - for the entire MIB the value (-1) means the value
+Asked for is either not supported or currently not relevant
+(this is for when values asked for are for intervals not yet
+recorded."
+
+
+
+    ::= {acPerformance 14}  
+
+
+
+
+
+
+
+
+     acPMMediaServerConfiguration OBJECT IDENTIFIER ::= {acPMMediaServer 1}
+
+
+     acPMMediaServerConfigurationPeriodLength OBJECT-TYPE
+       SYNTAX Unsigned32 (0..894780)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Length of monitoring intervals for entire MIB.
+Time is in minutes."
+       ::= {acPMMediaServerConfiguration 1}
+
+
+
+     acPMMediaServerConfigurationResetTotalCounters OBJECT-TYPE
+       SYNTAX INTEGER {
+                  resetCountersDone(1)
+,
+                  resetTotalCounters(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Total-Counters Reset.  To reset the total counters, set the
+value of this object to resetTotalCounters(2)."
+       ::= {acPMMediaServerConfiguration 2}
+
+
+
+     acPMMediaServerData OBJECT IDENTIFIER ::= {acPMMediaServer 2}
+
+
+     acPMMediaServerDataAcPMMediaServerTimeFromStartOfInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The time in seconds since the start of the current interval.
+MIB specific."
+       ::= {acPMMediaServerData 1}
+
+
+
+     acPMMediaServerIvr OBJECT IDENTIFIER ::= {acPMMediaServerData 21}
+
+
+     -- ****************************************
+     -- acPMIvrPlay table decleration
+     -- ****************************************
+     acPMIvrPlayTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrPlayEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Announcement requests and their results received from the call."
+       ::= {acPMMediaServerIvr 21}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlay table entry
+     -- ****************************************
+     acPMIvrPlayEntry OBJECT-TYPE
+       SYNTAX AcPMIvrPlayEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrPlayType,acPMIvrPlayInterval}
+       ::= {acPMIvrPlayTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlay TABLE
+     -- ****************************************
+     AcPMIvrPlayEntry ::= SEQUENCE {
+       acPMIvrPlayType                                 INTEGER,
+       acPMIvrPlayInterval                             Unsigned32,
+       acPMIvrPlayVal                                  Counter32
+     }
+
+
+
+     acPMIvrPlayType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  requstes(0)
+,
+                  successful(1)
+,
+                  failedDueToLackOfResources(2)
+,
+                  failedDueToProvMismatch(3)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "0 - requstes 			
+1 - Successful			
+2 - FailedDueToLackOfResources	
+3 - FailedDueToProvMismatch	
+."
+       ::= {acPMIvrPlayEntry 1}
+
+
+
+     acPMIvrPlayInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrPlayEntry 2}
+
+
+
+     acPMIvrPlayVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrPlayEntry 3}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayInProgress table decleration
+     -- ****************************************
+     acPMIvrPlayInProgressTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrPlayInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of announcement operations that are currently in progress."
+       ::= {acPMMediaServerIvr 22}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayInProgress table entry
+     -- ****************************************
+     acPMIvrPlayInProgressEntry OBJECT-TYPE
+       SYNTAX AcPMIvrPlayInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrPlayInProgressInterval}
+       ::= {acPMIvrPlayInProgressTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayInProgress TABLE
+     -- ****************************************
+     AcPMIvrPlayInProgressEntry ::= SEQUENCE {
+       acPMIvrPlayInProgressInterval                   Unsigned32,
+       acPMIvrPlayInProgressVal                        Gauge32,
+       acPMIvrPlayInProgressVolume                     Counter32,
+       acPMIvrPlayInProgressFullDayAverage             Integer32
+     }
+
+
+
+     acPMIvrPlayInProgressInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrPlayInProgressEntry 1}
+
+
+
+     acPMIvrPlayInProgressVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrPlayInProgressEntry 2}
+
+
+
+     acPMIvrPlayInProgressVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMIvrPlayInProgressEntry 3}
+
+
+
+     acPMIvrPlayInProgressFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMIvrPlayInProgressEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayDuration table decleration
+     -- ****************************************
+     acPMIvrPlayDurationTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrPlayDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration, in seconds, of all successful announcement requests. "
+       ::= {acPMMediaServerIvr 23}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayDuration table entry
+     -- ****************************************
+     acPMIvrPlayDurationEntry OBJECT-TYPE
+       SYNTAX AcPMIvrPlayDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrPlayDurationInterval}
+       ::= {acPMIvrPlayDurationTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayDuration TABLE
+     -- ****************************************
+     AcPMIvrPlayDurationEntry ::= SEQUENCE {
+       acPMIvrPlayDurationInterval                     Unsigned32,
+       acPMIvrPlayDurationVal                          Gauge32,
+       acPMIvrPlayDurationVolume                       Counter32,
+       acPMIvrPlayDurationAverage                      Integer32
+     }
+
+
+
+     acPMIvrPlayDurationInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrPlayDurationEntry 1}
+
+
+
+     acPMIvrPlayDurationVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrPlayDurationEntry 2}
+
+
+
+     acPMIvrPlayDurationVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMIvrPlayDurationEntry 3}
+
+
+
+     acPMIvrPlayDurationAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMIvrPlayDurationEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayCollect table decleration
+     -- ****************************************
+     acPMIvrPlayCollectTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrPlayCollectEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Play collect requests and their results received from the call."
+       ::= {acPMMediaServerIvr 24}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayCollect table entry
+     -- ****************************************
+     acPMIvrPlayCollectEntry OBJECT-TYPE
+       SYNTAX AcPMIvrPlayCollectEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrPlayCollectType,acPMIvrPlayCollectInterval}
+       ::= {acPMIvrPlayCollectTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayCollect TABLE
+     -- ****************************************
+     AcPMIvrPlayCollectEntry ::= SEQUENCE {
+       acPMIvrPlayCollectType                          INTEGER,
+       acPMIvrPlayCollectInterval                      Unsigned32,
+       acPMIvrPlayCollectVal                           Counter32
+     }
+
+
+
+     acPMIvrPlayCollectType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  requstes(0)
+,
+                  successful(1)
+,
+                  failedDueToLackOfResources(2)
+,
+                  failedDueToProvMismatch(3)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "0 - requstes 			
+1 - Successful			
+2 - FailedDueToLackOfResources	
+3 - FailedDueToProvMismatch	
+."
+       ::= {acPMIvrPlayCollectEntry 1}
+
+
+
+     acPMIvrPlayCollectInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrPlayCollectEntry 2}
+
+
+
+     acPMIvrPlayCollectVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrPlayCollectEntry 3}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayCollectInProgress table decleration
+     -- ****************************************
+     acPMIvrPlayCollectInProgressTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrPlayCollectInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of play collect operations that are currently in progress."
+       ::= {acPMMediaServerIvr 25}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayCollectInProgress table entry
+     -- ****************************************
+     acPMIvrPlayCollectInProgressEntry OBJECT-TYPE
+       SYNTAX AcPMIvrPlayCollectInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrPlayCollectInProgressInterval}
+       ::= {acPMIvrPlayCollectInProgressTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayCollectInProgress TABLE
+     -- ****************************************
+     AcPMIvrPlayCollectInProgressEntry ::= SEQUENCE {
+       acPMIvrPlayCollectInProgressInterval            Unsigned32,
+       acPMIvrPlayCollectInProgressVal                 Gauge32,
+       acPMIvrPlayCollectInProgressVolume              Counter32,
+       acPMIvrPlayCollectInProgressFullDayAverage      Integer32
+     }
+
+
+
+     acPMIvrPlayCollectInProgressInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrPlayCollectInProgressEntry 1}
+
+
+
+     acPMIvrPlayCollectInProgressVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrPlayCollectInProgressEntry 2}
+
+
+
+     acPMIvrPlayCollectInProgressVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMIvrPlayCollectInProgressEntry 3}
+
+
+
+     acPMIvrPlayCollectInProgressFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMIvrPlayCollectInProgressEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayCollectDuration table decleration
+     -- ****************************************
+     acPMIvrPlayCollectDurationTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrPlayCollectDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration, in seconds, of all successful play collect requests."
+       ::= {acPMMediaServerIvr 26}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayCollectDuration table entry
+     -- ****************************************
+     acPMIvrPlayCollectDurationEntry OBJECT-TYPE
+       SYNTAX AcPMIvrPlayCollectDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrPlayCollectDurationInterval}
+       ::= {acPMIvrPlayCollectDurationTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayCollectDuration TABLE
+     -- ****************************************
+     AcPMIvrPlayCollectDurationEntry ::= SEQUENCE {
+       acPMIvrPlayCollectDurationInterval              Unsigned32,
+       acPMIvrPlayCollectDurationVal                   Gauge32,
+       acPMIvrPlayCollectDurationVolume                Counter32,
+       acPMIvrPlayCollectDurationAverage               Integer32
+     }
+
+
+
+     acPMIvrPlayCollectDurationInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrPlayCollectDurationEntry 1}
+
+
+
+     acPMIvrPlayCollectDurationVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrPlayCollectDurationEntry 2}
+
+
+
+     acPMIvrPlayCollectDurationVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMIvrPlayCollectDurationEntry 3}
+
+
+
+     acPMIvrPlayCollectDurationAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMIvrPlayCollectDurationEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayRecord table decleration
+     -- ****************************************
+     acPMIvrPlayRecordTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrPlayRecordEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Play record requests and their results received from the call."
+       ::= {acPMMediaServerIvr 27}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayRecord table entry
+     -- ****************************************
+     acPMIvrPlayRecordEntry OBJECT-TYPE
+       SYNTAX AcPMIvrPlayRecordEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrPlayRecordType,acPMIvrPlayRecordInterval}
+       ::= {acPMIvrPlayRecordTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayRecord TABLE
+     -- ****************************************
+     AcPMIvrPlayRecordEntry ::= SEQUENCE {
+       acPMIvrPlayRecordType                           INTEGER,
+       acPMIvrPlayRecordInterval                       Unsigned32,
+       acPMIvrPlayRecordVal                            Counter32
+     }
+
+
+
+     acPMIvrPlayRecordType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  requstes(0)
+,
+                  successful(1)
+,
+                  failedDueToLackOfResources(2)
+,
+                  failedDueToProvMismatch(3)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "0 - requstes 			
+1 - Successful			
+2 - FailedDueToLackOfResources	
+3 - FailedDueToProvMismatch	
+."
+       ::= {acPMIvrPlayRecordEntry 1}
+
+
+
+     acPMIvrPlayRecordInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrPlayRecordEntry 2}
+
+
+
+     acPMIvrPlayRecordVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrPlayRecordEntry 3}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayRecordInProgress table decleration
+     -- ****************************************
+     acPMIvrPlayRecordInProgressTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrPlayRecordInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of play record operations that are currently in progress."
+       ::= {acPMMediaServerIvr 28}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayRecordInProgress table entry
+     -- ****************************************
+     acPMIvrPlayRecordInProgressEntry OBJECT-TYPE
+       SYNTAX AcPMIvrPlayRecordInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrPlayRecordInProgressInterval}
+       ::= {acPMIvrPlayRecordInProgressTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayRecordInProgress TABLE
+     -- ****************************************
+     AcPMIvrPlayRecordInProgressEntry ::= SEQUENCE {
+       acPMIvrPlayRecordInProgressInterval             Unsigned32,
+       acPMIvrPlayRecordInProgressVal                  Gauge32,
+       acPMIvrPlayRecordInProgressVolume               Counter32,
+       acPMIvrPlayRecordInProgressFullDayAverage       Integer32
+     }
+
+
+
+     acPMIvrPlayRecordInProgressInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrPlayRecordInProgressEntry 1}
+
+
+
+     acPMIvrPlayRecordInProgressVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrPlayRecordInProgressEntry 2}
+
+
+
+     acPMIvrPlayRecordInProgressVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMIvrPlayRecordInProgressEntry 3}
+
+
+
+     acPMIvrPlayRecordInProgressFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMIvrPlayRecordInProgressEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayRecordDuration table decleration
+     -- ****************************************
+     acPMIvrPlayRecordDurationTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrPlayRecordDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration, in seconds, of all successful play record requests."
+       ::= {acPMMediaServerIvr 29}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayRecordDuration table entry
+     -- ****************************************
+     acPMIvrPlayRecordDurationEntry OBJECT-TYPE
+       SYNTAX AcPMIvrPlayRecordDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrPlayRecordDurationInterval}
+       ::= {acPMIvrPlayRecordDurationTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrPlayRecordDuration TABLE
+     -- ****************************************
+     AcPMIvrPlayRecordDurationEntry ::= SEQUENCE {
+       acPMIvrPlayRecordDurationInterval               Unsigned32,
+       acPMIvrPlayRecordDurationVal                    Gauge32,
+       acPMIvrPlayRecordDurationVolume                 Counter32,
+       acPMIvrPlayRecordDurationAverage                Integer32
+     }
+
+
+
+     acPMIvrPlayRecordDurationInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrPlayRecordDurationEntry 1}
+
+
+
+     acPMIvrPlayRecordDurationVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrPlayRecordDurationEntry 2}
+
+
+
+     acPMIvrPlayRecordDurationVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMIvrPlayRecordDurationEntry 3}
+
+
+
+     acPMIvrPlayRecordDurationAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMIvrPlayRecordDurationEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMIvrContDigitCollect table decleration
+     -- ****************************************
+     acPMIvrContDigitCollectTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrContDigitCollectEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Digit collect requests and their results received from the call."
+       ::= {acPMMediaServerIvr 30}
+
+
+
+     -- ****************************************
+     -- acPMIvrContDigitCollect table entry
+     -- ****************************************
+     acPMIvrContDigitCollectEntry OBJECT-TYPE
+       SYNTAX AcPMIvrContDigitCollectEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrContDigitCollectType,acPMIvrContDigitCollectInterval}
+       ::= {acPMIvrContDigitCollectTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrContDigitCollect TABLE
+     -- ****************************************
+     AcPMIvrContDigitCollectEntry ::= SEQUENCE {
+       acPMIvrContDigitCollectType                     INTEGER,
+       acPMIvrContDigitCollectInterval                 Unsigned32,
+       acPMIvrContDigitCollectVal                      Counter32
+     }
+
+
+
+     acPMIvrContDigitCollectType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  requstes(0)
+,
+                  successful(1)
+,
+                  failedDueToLackOfResources(2)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "0 - requstes 			
+1 - Successful			
+2 - FailedDueToLackOfResources	
+."
+       ::= {acPMIvrContDigitCollectEntry 1}
+
+
+
+     acPMIvrContDigitCollectInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrContDigitCollectEntry 2}
+
+
+
+     acPMIvrContDigitCollectVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrContDigitCollectEntry 3}
+
+
+
+     -- ****************************************
+     -- acPMIvrContDigitCollectInProgress table decleration
+     -- ****************************************
+     acPMIvrContDigitCollectInProgressTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrContDigitCollectInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The number of digit collect requests that are currently in progress."
+       ::= {acPMMediaServerIvr 31}
+
+
+
+     -- ****************************************
+     -- acPMIvrContDigitCollectInProgress table entry
+     -- ****************************************
+     acPMIvrContDigitCollectInProgressEntry OBJECT-TYPE
+       SYNTAX AcPMIvrContDigitCollectInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrContDigitCollectInProgressInterval}
+       ::= {acPMIvrContDigitCollectInProgressTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrContDigitCollectInProgress TABLE
+     -- ****************************************
+     AcPMIvrContDigitCollectInProgressEntry ::= SEQUENCE {
+       acPMIvrContDigitCollectInProgressInterval       Unsigned32,
+       acPMIvrContDigitCollectInProgressVal            Gauge32,
+       acPMIvrContDigitCollectInProgressVolume         Counter32
+     }
+
+
+
+     acPMIvrContDigitCollectInProgressInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrContDigitCollectInProgressEntry 1}
+
+
+
+     acPMIvrContDigitCollectInProgressVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrContDigitCollectInProgressEntry 2}
+
+
+
+     acPMIvrContDigitCollectInProgressVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMIvrContDigitCollectInProgressEntry 3}
+
+
+
+     -- ****************************************
+     -- acPMIvrContDigitCollectDuration table decleration
+     -- ****************************************
+     acPMIvrContDigitCollectDurationTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMIvrContDigitCollectDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration, in seconds, of all successful digit collect requests.  "
+       ::= {acPMMediaServerIvr 32}
+
+
+
+     -- ****************************************
+     -- acPMIvrContDigitCollectDuration table entry
+     -- ****************************************
+     acPMIvrContDigitCollectDurationEntry OBJECT-TYPE
+       SYNTAX AcPMIvrContDigitCollectDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMIvrContDigitCollectDurationInterval}
+       ::= {acPMIvrContDigitCollectDurationTable 1}
+
+
+
+     -- ****************************************
+     -- acPMIvrContDigitCollectDuration TABLE
+     -- ****************************************
+     AcPMIvrContDigitCollectDurationEntry ::= SEQUENCE {
+       acPMIvrContDigitCollectDurationInterval         Unsigned32,
+       acPMIvrContDigitCollectDurationVal              Gauge32,
+       acPMIvrContDigitCollectDurationVolume           Counter32,
+       acPMIvrContDigitCollectDurationAverage          Integer32
+     }
+
+
+
+     acPMIvrContDigitCollectDurationInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMIvrContDigitCollectDurationEntry 1}
+
+
+
+     acPMIvrContDigitCollectDurationVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMIvrContDigitCollectDurationEntry 2}
+
+
+
+     acPMIvrContDigitCollectDurationVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMIvrContDigitCollectDurationEntry 3}
+
+
+
+     acPMIvrContDigitCollectDurationAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMIvrContDigitCollectDurationEntry 4}
+
+
+
+     acPMMediaServerBct OBJECT IDENTIFIER ::= {acPMMediaServerData 31}
+
+
+     -- ****************************************
+     -- acPMBct table decleration
+     -- ****************************************
+     acPMBctTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMBctEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Total number of BCT contexts."
+       ::= {acPMMediaServerBct 21}
+
+
+
+     -- ****************************************
+     -- acPMBct table entry
+     -- ****************************************
+     acPMBctEntry OBJECT-TYPE
+       SYNTAX AcPMBctEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMBctType,acPMBctInterval}
+       ::= {acPMBctTable 1}
+
+
+
+     -- ****************************************
+     -- acPMBct TABLE
+     -- ****************************************
+     AcPMBctEntry ::= SEQUENCE {
+       acPMBctType                                     INTEGER,
+       acPMBctInterval                                 Unsigned32,
+       acPMBctVal                                      Counter32
+     }
+
+
+
+     acPMBctType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  requstes(0)
+,
+                  successful(1)
+,
+                  failedDueToLackOfResources(2)
+,
+                  participants(3)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "0 - requests
+ 1 - Successful
+ 2 - Failure Due To lack of resources
+ 3 - Participants."
+       ::= {acPMBctEntry 1}
+
+
+
+     acPMBctInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMBctEntry 2}
+
+
+
+     acPMBctVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMBctEntry 3}
+
+
+
+     -- ****************************************
+     -- acPMBctInProgress table decleration
+     -- ****************************************
+     acPMBctInProgressTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMBctInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The number of BCT calls/participants  that are currently in progress.."
+       ::= {acPMMediaServerBct 22}
+
+
+
+     -- ****************************************
+     -- acPMBctInProgress table entry
+     -- ****************************************
+     acPMBctInProgressEntry OBJECT-TYPE
+       SYNTAX AcPMBctInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMBctInProgressType,acPMBctInProgressInterval}
+       ::= {acPMBctInProgressTable 1}
+
+
+
+     -- ****************************************
+     -- acPMBctInProgress TABLE
+     -- ****************************************
+     AcPMBctInProgressEntry ::= SEQUENCE {
+       acPMBctInProgressType                           INTEGER,
+       acPMBctInProgressInterval                       Unsigned32,
+       acPMBctInProgressVal                            Gauge32,
+       acPMBctInProgressVolume                         Counter32
+     }
+
+
+
+     acPMBctInProgressType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  bct(0)
+,
+                  participants(1)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "0 - Bct
+ 1 - participants."
+       ::= {acPMBctInProgressEntry 1}
+
+
+
+     acPMBctInProgressInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMBctInProgressEntry 2}
+
+
+
+     acPMBctInProgressVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMBctInProgressEntry 3}
+
+
+
+     acPMBctInProgressVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMBctInProgressEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMBctDuration table decleration
+     -- ****************************************
+     acPMBctDurationTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMBctDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration, in seconds, of all successful BCT contexts."
+       ::= {acPMMediaServerBct 23}
+
+
+
+     -- ****************************************
+     -- acPMBctDuration table entry
+     -- ****************************************
+     acPMBctDurationEntry OBJECT-TYPE
+       SYNTAX AcPMBctDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMBctDurationInterval}
+       ::= {acPMBctDurationTable 1}
+
+
+
+     -- ****************************************
+     -- acPMBctDuration TABLE
+     -- ****************************************
+     AcPMBctDurationEntry ::= SEQUENCE {
+       acPMBctDurationInterval                         Unsigned32,
+       acPMBctDurationVal                              Gauge32,
+       acPMBctDurationVolume                           Counter32,
+       acPMBctDurationAverage                          Integer32
+     }
+
+
+
+     acPMBctDurationInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMBctDurationEntry 1}
+
+
+
+     acPMBctDurationVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMBctDurationEntry 2}
+
+
+
+     acPMBctDurationVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMBctDurationEntry 3}
+
+
+
+     acPMBctDurationAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMBctDurationEntry 4}
+
+
+
+     acPMMediaServerConference OBJECT IDENTIFIER ::= {acPMMediaServerData 41}
+
+
+     -- ****************************************
+     -- acPMConf table decleration
+     -- ****************************************
+     acPMConfTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMConfEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Total number of conferences processed."
+       ::= {acPMMediaServerConference 21}
+
+
+
+     -- ****************************************
+     -- acPMConf table entry
+     -- ****************************************
+     acPMConfEntry OBJECT-TYPE
+       SYNTAX AcPMConfEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMConfType,acPMConfInterval}
+       ::= {acPMConfTable 1}
+
+
+
+     -- ****************************************
+     -- acPMConf TABLE
+     -- ****************************************
+     AcPMConfEntry ::= SEQUENCE {
+       acPMConfType                                    INTEGER,
+       acPMConfInterval                                Unsigned32,
+       acPMConfVal                                     Counter32
+     }
+
+
+
+     acPMConfType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  requstes(0)
+,
+                  successful(1)
+,
+                  failedDueToLackOfResources(2)
+,
+                  participants(3)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "0 - requests
+ 1 - Successful
+ 2 - Failure Due To lack of resources
+ 3 - Participants."
+       ::= {acPMConfEntry 1}
+
+
+
+     acPMConfInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMConfEntry 2}
+
+
+
+     acPMConfVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMConfEntry 3}
+
+
+
+     -- ****************************************
+     -- acPMConfInProgress table decleration
+     -- ****************************************
+     acPMConfInProgressTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMConfInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The number of conferences/participants currently in progress."
+       ::= {acPMMediaServerConference 22}
+
+
+
+     -- ****************************************
+     -- acPMConfInProgress table entry
+     -- ****************************************
+     acPMConfInProgressEntry OBJECT-TYPE
+       SYNTAX AcPMConfInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMConfInProgressType,acPMConfInProgressInterval}
+       ::= {acPMConfInProgressTable 1}
+
+
+
+     -- ****************************************
+     -- acPMConfInProgress TABLE
+     -- ****************************************
+     AcPMConfInProgressEntry ::= SEQUENCE {
+       acPMConfInProgressType                          INTEGER,
+       acPMConfInProgressInterval                      Unsigned32,
+       acPMConfInProgressVal                           Gauge32,
+       acPMConfInProgressVolume                        Counter32
+     }
+
+
+
+     acPMConfInProgressType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  conference(0)
+,
+                  participants(1)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "0 - Conference
+ 1 - participants."
+       ::= {acPMConfInProgressEntry 1}
+
+
+
+     acPMConfInProgressInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMConfInProgressEntry 2}
+
+
+
+     acPMConfInProgressVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMConfInProgressEntry 3}
+
+
+
+     acPMConfInProgressVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMConfInProgressEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMConfDuration table decleration
+     -- ****************************************
+     acPMConfDurationTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMConfDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration, in seconds, of all successful conferences."
+       ::= {acPMMediaServerConference 23}
+
+
+
+     -- ****************************************
+     -- acPMConfDuration table entry
+     -- ****************************************
+     acPMConfDurationEntry OBJECT-TYPE
+       SYNTAX AcPMConfDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMConfDurationInterval}
+       ::= {acPMConfDurationTable 1}
+
+
+
+     -- ****************************************
+     -- acPMConfDuration TABLE
+     -- ****************************************
+     AcPMConfDurationEntry ::= SEQUENCE {
+       acPMConfDurationInterval                        Unsigned32,
+       acPMConfDurationVal                             Gauge32,
+       acPMConfDurationVolume                          Counter32,
+       acPMConfDurationAverage                         Integer32
+     }
+
+
+
+     acPMConfDurationInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMConfDurationEntry 1}
+
+
+
+     acPMConfDurationVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMConfDurationEntry 2}
+
+
+
+     acPMConfDurationVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMConfDurationEntry 3}
+
+
+
+     acPMConfDurationAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMConfDurationEntry 4}
+
+
+
+     acPMMediaServerTrunkTest OBJECT IDENTIFIER ::= {acPMMediaServerData 51}
+
+
+     -- ****************************************
+     -- acPMTrunkTest table decleration
+     -- ****************************************
+     acPMTrunkTestTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMTrunkTestEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of test trunk calls requested."
+       ::= {acPMMediaServerTrunkTest 21}
+
+
+
+     -- ****************************************
+     -- acPMTrunkTest table entry
+     -- ****************************************
+     acPMTrunkTestEntry OBJECT-TYPE
+       SYNTAX AcPMTrunkTestEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMTrunkTestType,acPMTrunkTestInterval}
+       ::= {acPMTrunkTestTable 1}
+
+
+
+     -- ****************************************
+     -- acPMTrunkTest TABLE
+     -- ****************************************
+     AcPMTrunkTestEntry ::= SEQUENCE {
+       acPMTrunkTestType                               INTEGER,
+       acPMTrunkTestInterval                           Unsigned32,
+       acPMTrunkTestVal                                Counter32
+     }
+
+
+
+     acPMTrunkTestType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  requstes(0)
+,
+                  successful(1)
+,
+                  failedDueToLackOfResources(2)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "0 - requests
+ 1 - Successful
+ 2 - Failure Due To lack of resources
+."
+       ::= {acPMTrunkTestEntry 1}
+
+
+
+     acPMTrunkTestInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMTrunkTestEntry 2}
+
+
+
+     acPMTrunkTestVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMTrunkTestEntry 3}
+
+
+
+     -- ****************************************
+     -- acPMTrunkTestInProgress table decleration
+     -- ****************************************
+     acPMTrunkTestInProgressTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMTrunkTestInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The number of test trunk calls that are currently in progress."
+       ::= {acPMMediaServerTrunkTest 22}
+
+
+
+     -- ****************************************
+     -- acPMTrunkTestInProgress table entry
+     -- ****************************************
+     acPMTrunkTestInProgressEntry OBJECT-TYPE
+       SYNTAX AcPMTrunkTestInProgressEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMTrunkTestInProgressInterval}
+       ::= {acPMTrunkTestInProgressTable 1}
+
+
+
+     -- ****************************************
+     -- acPMTrunkTestInProgress TABLE
+     -- ****************************************
+     AcPMTrunkTestInProgressEntry ::= SEQUENCE {
+       acPMTrunkTestInProgressInterval                 Unsigned32,
+       acPMTrunkTestInProgressVal                      Gauge32,
+       acPMTrunkTestInProgressVolume                   Counter32
+     }
+
+
+
+     acPMTrunkTestInProgressInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMTrunkTestInProgressEntry 1}
+
+
+
+     acPMTrunkTestInProgressVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMTrunkTestInProgressEntry 2}
+
+
+
+     acPMTrunkTestInProgressVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMTrunkTestInProgressEntry 3}
+
+
+
+     -- ****************************************
+     -- acPMTrunkTestDuration table decleration
+     -- ****************************************
+     acPMTrunkTestDurationTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMTrunkTestDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration, in seconds, of all successful test trunk requests.  "
+       ::= {acPMMediaServerTrunkTest 23}
+
+
+
+     -- ****************************************
+     -- acPMTrunkTestDuration table entry
+     -- ****************************************
+     acPMTrunkTestDurationEntry OBJECT-TYPE
+       SYNTAX AcPMTrunkTestDurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMTrunkTestDurationInterval}
+       ::= {acPMTrunkTestDurationTable 1}
+
+
+
+     -- ****************************************
+     -- acPMTrunkTestDuration TABLE
+     -- ****************************************
+     AcPMTrunkTestDurationEntry ::= SEQUENCE {
+       acPMTrunkTestDurationInterval                   Unsigned32,
+       acPMTrunkTestDurationVal                        Gauge32,
+       acPMTrunkTestDurationVolume                     Counter32,
+       acPMTrunkTestDurationAverage                    Integer32
+     }
+
+
+
+     acPMTrunkTestDurationInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMTrunkTestDurationEntry 1}
+
+
+
+     acPMTrunkTestDurationVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMTrunkTestDurationEntry 2}
+
+
+
+     acPMTrunkTestDurationVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMTrunkTestDurationEntry 3}
+
+
+
+     acPMTrunkTestDurationAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMTrunkTestDurationEntry 4}
+
+
+
+
+
+END

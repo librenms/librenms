@@ -1,0 +1,297 @@
+-- =============================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide SAVI information such
+--   as SAVI statistic and notification events.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 created by  qiuchunxia
+--     Initial version 2020-07-15
+-- =============================================================================
+HH3C-DOT11-SAVI-MIB DEFINITIONS ::=BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64, Unsigned32
+        FROM SNMPv2-SMI
+    MacAddress, TruthValue
+        FROM SNMPv2-TC
+    InetVersion, InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    hh3cDot11, Hh3cDot11ObjectIDType, Hh3cDot11RadioScopeType
+        FROM HH3C-DOT11-REF-MIB;
+
+hh3cDot11SAVI MODULE-IDENTITY
+    LAST-UPDATED "202007151800Z" --July 15, 2020 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "The MIB Module for managing SAVI objects in WLAN scenario."
+
+    REVISION "202007151800Z"        -- July 15, 2020 at 18:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cDot11 20 }
+
+hh3cDot11SAVIObjects OBJECT IDENTIFIER ::= { hh3cDot11SAVI 1 }
+
+-- Service parameters
+
+hh3cDot11SAVIServiceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11SAVIServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "The table containing SAVI running parameters
+                of each Service."
+    ::= { hh3cDot11SAVIObjects 1 }
+
+hh3cDot11SAVIServiceEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11SAVIServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "An entry containing SAVI running parameters
+                 of a Service."
+    INDEX
+        {
+            hh3cDot11SAVIServiceIPVersion,
+            hh3cDot11SAVIServiceServiceName
+        }
+    ::= { hh3cDot11SAVIServiceTable 1 }
+
+Hh3cDot11SAVIServiceEntry ::=
+    SEQUENCE {
+        hh3cDot11SAVIServiceIPVersion          InetVersion,
+        hh3cDot11SAVIServiceServiceName        OCTET STRING,
+        hh3cDot11SAVIServiceValidStatus        TruthValue
+    }
+
+hh3cDot11SAVIServiceIPVersion      OBJECT-TYPE
+    SYNTAX      InetVersion
+    MAX-ACCESS  not-accessible
+     STATUS     current
+     DESCRIPTION
+                "The IP version."
+    ::= { hh3cDot11SAVIServiceEntry 1 }
+
+hh3cDot11SAVIServiceServiceName  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..255))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "The service name."
+    ::= { hh3cDot11SAVIServiceEntry 2 }
+
+hh3cDot11SAVIServiceValidStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The validation status of the interface.
+                Setting this attribute to true,
+                the interface will check source address."
+    ::= { hh3cDot11SAVIServiceEntry 3 }
+
+-- Savi Filtering Table
+
+hh3cDot11SAVIFilteringTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11SAVIFilteringEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "The filtering table is used to filter packets."
+    ::= { hh3cDot11SAVIObjects 2 }
+
+hh3cDot11SAVIFilteringEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11SAVIFilteringEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "An entry containing the filtering parameters.
+                Entries are keyed on the anchor."
+    INDEX
+        {
+            hh3cDot11SAVIFilteringIpType,
+            hh3cDot11SAVIFilteringServName,
+            hh3cDot11SAVIFilteringIpAddress
+        }
+    ::= { hh3cDot11SAVIFilteringTable 1 }
+
+Hh3cDot11SAVIFilteringEntry ::=
+    SEQUENCE {
+        hh3cDot11SAVIFilteringIpType          InetAddressType,
+        hh3cDot11SAVIFilteringServName        OCTET STRING,
+        hh3cDot11SAVIFilteringIpAddress      InetAddress,
+        hh3cDot11SAVIFilteringMacAddr        MacAddress
+    }
+
+hh3cDot11SAVIFilteringIpType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "IP address type of the source IP."
+    ::= { hh3cDot11SAVIFilteringEntry 1 }
+
+hh3cDot11SAVIFilteringServName  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..255))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "The service name."
+    ::= { hh3cDot11SAVIFilteringEntry 2 }
+
+hh3cDot11SAVIFilteringIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "The source IP address."
+    ::= { hh3cDot11SAVIFilteringEntry 3 }
+
+hh3cDot11SAVIFilteringMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "The source MAC address."
+    ::= { hh3cDot11SAVIFilteringEntry 4 }
+
+-- count of fail packet of each Service
+
+hh3cDot11SAVICountTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11SAVICountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "The table containing count of packets dropped
+                because of validation failure."
+    ::= { hh3cDot11SAVIObjects 3 }
+
+hh3cDot11SAVICountEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11SAVICountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "An entry containing count of packets dropped
+                because of validation failure for each Service."
+    INDEX
+        {
+            hh3cDot11SAVICountIPVersion,
+            hh3cDot11SAVICountServiceString
+        }
+    ::= { hh3cDot11SAVICountTable 1 }
+
+Hh3cDot11SAVICountEntry ::=
+    SEQUENCE {
+        hh3cDot11SAVICountIPVersion          InetVersion,
+        hh3cDot11SAVICountServiceString      OCTET STRING,
+        hh3cDot11SAVICountFilterPkts         Counter64
+    }
+
+hh3cDot11SAVICountIPVersion      OBJECT-TYPE
+    SYNTAX      InetVersion
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "The IP version."
+    ::= { hh3cDot11SAVICountEntry 1 }
+
+hh3cDot11SAVICountServiceString  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..255))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "The service name."
+    ::= { hh3cDot11SAVICountEntry 2 }
+
+hh3cDot11SAVICountFilterPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "The count of dropped packets."
+    ::= { hh3cDot11SAVICountEntry 3 }
+
+-- statistic of packet of each ap
+
+hh3cDot11SAVIStatisTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11SAVIStatisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "The table containing the SAVI statistics."
+    ::= { hh3cDot11SAVIObjects 4 }
+
+hh3cDot11SAVIStatisEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11SAVIStatisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "An entry containing the SAVI statistics for each AP."
+    INDEX
+        {
+            hh3cDot11SAVIStatisAPID,
+            hh3cDot11SAVIStatisRadioID
+        }
+    ::= { hh3cDot11SAVIStatisTable 1 }
+
+Hh3cDot11SAVIStatisEntry ::=
+    SEQUENCE {
+        hh3cDot11SAVIStatisAPID          Hh3cDot11ObjectIDType,
+        hh3cDot11SAVIStatisRadioID       Hh3cDot11RadioScopeType,
+        hh3cDot11SAVIStatisCount         Counter64,
+        hh3cDot11SAVIStatisBytes         Counter64,
+        hh3cDot11SAVIBindingCount        Counter64
+    }
+
+hh3cDot11SAVIStatisAPID      OBJECT-TYPE
+    SYNTAX      Hh3cDot11ObjectIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "To uniquely identify an AP  "
+    ::= { hh3cDot11SAVIStatisEntry 1 }
+
+hh3cDot11SAVIStatisRadioID  OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioScopeType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "Represents each radio."
+::= { hh3cDot11SAVIStatisEntry 2 }
+
+hh3cDot11SAVIStatisCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "The count of Packets dropped because of
+                validation failure."
+    ::= { hh3cDot11SAVIStatisEntry 3 }
+
+hh3cDot11SAVIStatisBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "The bytes of packets dropped because of
+                validation failure."
+    ::= { hh3cDot11SAVIStatisEntry 4 }
+
+hh3cDot11SAVIBindingCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "The count of binding entries."
+    ::= { hh3cDot11SAVIStatisEntry 5 }
+
+END

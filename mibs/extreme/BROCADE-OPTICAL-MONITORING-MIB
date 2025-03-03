@@ -1,0 +1,524 @@
+-- MIB File: BROCADE-OPTICAL-MONITORING-MIB.mib
+-- *********************************************************************
+-- BROCADE-OPTICAL-MONITORING-MIB.mib: Extreme Optical Monitoring MIB
+--
+-- Copyright (c) 2018 Extreme Networks, Inc.
+-- All rights reserved.
+--
+-- *********************************************************************
+BROCADE-OPTICAL-MONITORING-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP        
+        FROM SNMPv2-CONF        
+	DisplayString, TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    ifIndex
+        FROM IF-MIB
+    bcsiModules 
+        FROM Brocade-REG-MIB
+	;
+
+brocadeOpticalMonitoringMIB  MODULE-IDENTITY
+    LAST-UPDATED "201909230000Z" -- Sep 23, 2019
+    ORGANIZATION "Extreme Networks, Inc."
+    CONTACT-INFO
+         "Postal:  Extreme Networks, Inc.
+                   6480 Via Del Oro
+                   San Jose, CA 95119 USA
+          Phone:   +1 408 579-2800
+          E-mail:  support@extremenetworks.com
+          WWW:     http://www.extremenetworks.com"
+    DESCRIPTION
+        "This MIB module supports monitoring of port optics 
+		 for parameters like, temperature, Tx Power, Rx Power,
+		 Tx Bias Current, etc.,."
+
+    REVISION            "201909230000Z" -- Sep 23, 2019
+    DESCRIPTION
+        "Added bcsiIfMediaInfoTable"
+    REVISION    	"201805291200Z" -- May 29, 2018
+    DESCRIPTION	
+        "Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+    REVISION        "201611230000Z"
+    DESCRIPTION
+        "Added support for bcsiOptMonInfoTable."
+
+    REVISION        "201609280000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcsiModules 8 }
+    
+bcsiOptMonNotifications  OBJECT IDENTIFIER ::=  { brocadeOpticalMonitoringMIB 0 }
+bcsiOptMonObjects 		 OBJECT IDENTIFIER ::=  { brocadeOpticalMonitoringMIB 1 }
+bcsiOptMonConformance 	 OBJECT IDENTIFIER ::=  { brocadeOpticalMonitoringMIB 2 }
+
+-- Optical Parameters Table per lane for a 40G SR4 and LR4, 
+-- 100G LR4 and LR10 optics.
+
+bcsiOptMonLaneTable  OBJECT-TYPE
+	 SYNTAX      SEQUENCE OF BcsiOptMonLaneEntry
+	 MAX-ACCESS  not-accessible
+	 STATUS      current
+	 DESCRIPTION
+		  "This table lists the instrumented parameters of all
+		  lanes within a 40G Optic of type SR4 and LR4,
+		  100G optic of type LR4 and LR10. LR4 and SR4 have 4 lanes
+		  per optic, LR10 has 10 lanes per optic."
+	 REFERENCE
+		  "ITU recommendations G.783, G.784, G.953"
+	::= { bcsiOptMonObjects 1 }
+
+bcsiOptMonLaneEntry  OBJECT-TYPE
+	 SYNTAX      BcsiOptMonLaneEntry
+	 MAX-ACCESS  not-accessible
+	 STATUS      current
+	 DESCRIPTION
+		  "Only the ifIndices of optical interfaces
+		  whose parameters need to be monitored will
+		  be used to index this table."
+	 INDEX       { ifIndex, bcsiOptMonLaneNum }
+	 ::= { bcsiOptMonLaneTable 1 }
+
+BcsiOptMonLaneEntry ::=
+	 SEQUENCE  {
+		 bcsiOptMonLaneNum
+				  Unsigned32,
+		 bcsiOptMonLaneTemperature
+				  SnmpAdminString,
+		 bcsiOptMonLaneTxPowerStatus
+				  INTEGER,
+		 bcsiOptMonLaneTxPower
+				  SnmpAdminString,
+		 bcsiOptMonLaneTxPowerVal
+				  Unsigned32,
+		 bcsiOptMonLaneRxPowerStatus
+				  INTEGER,
+		 bcsiOptMonLaneRxPower
+				  SnmpAdminString,
+		 bcsiOptMonLaneRxPowerVal
+				  Unsigned32,
+		 bcsiOptMonLaneTxBiasCurrent
+				  SnmpAdminString
+	 }
+
+bcsiOptMonLaneNum  OBJECT-TYPE
+	  SYNTAX    	Unsigned32
+	  MAX-ACCESS    not-accessible
+	  STATUS    	current
+	  DESCRIPTION
+		   "The lane number of this 40G or 100G optic.
+		    LR4 and SR4 have 4 lanes per optic. 
+			LR10 has 10 lanes per optic."
+	::= { bcsiOptMonLaneEntry 1 }
+
+bcsiOptMonLaneTemperature  OBJECT-TYPE
+	  SYNTAX		SnmpAdminString (SIZE(0..32))
+	  MAX-ACCESS    read-only
+	  STATUS    	current
+	  DESCRIPTION
+		   "This object holds the value of the transmitter laser
+			diode temperature for the lane in the interface. This
+			object indicates the health of the transmitter.
+
+			The format is xxx.yyyy C(elcius), followed by whether
+			the measured value is normal, high/low alarm or
+			high/low warning."
+	::= { bcsiOptMonLaneEntry 2 }
+
+bcsiOptMonLaneTxPowerStatus OBJECT-TYPE
+      SYNTAX   INTEGER { 
+	  		notSupported(1), 
+			notApplicable(2), 
+			highAlarm(3), 
+			highWarn(4), 
+			normal(5), 
+			lowWarn(6),  
+			lowAlarm(7) 
+	  }
+	  MAX-ACCESS    read-only
+	  STATUS    	current
+	  DESCRIPTION
+		   "This object holds the status of the transmitter optical
+            signal power for the lane in the interface, indicating 
+            whether this is normal or an alarm is present."
+	 ::= { bcsiOptMonLaneEntry 3 }
+
+bcsiOptMonLaneTxPower  OBJECT-TYPE
+	  SYNTAX		SnmpAdminString (SIZE(0..32))
+	  MAX-ACCESS    read-only
+	  STATUS    	current
+	  DESCRIPTION
+		   "This object holds the value of the transmitter optical
+			signal power for the lane in the interface, measured in
+			dBm, followed by whether this is a normal value, or
+			high/low warning or alarm."
+	 ::= { bcsiOptMonLaneEntry 4 }
+
+bcsiOptMonLaneTxPowerVal  OBJECT-TYPE
+	  SYNTAX		Unsigned32
+	  UNITS    		"microWatt"
+	  MAX-ACCESS    read-only
+	  STATUS    	current
+	  DESCRIPTION
+		   "This object holds the value of the transmitter optical 
+            signal power for the lane in the interface, measured in microWatt."
+	 ::= { bcsiOptMonLaneEntry 5 }
+	 
+bcsiOptMonLaneRxPowerStatus OBJECT-TYPE
+      SYNTAX   INTEGER { 
+	  		notSupported(1), 
+			notApplicable(2), 
+			highAlarm(3), 
+			highWarn(4), 
+			normal(5), 
+			lowWarn(6),  
+			lowAlarm(7)
+	  }
+	  MAX-ACCESS    read-only
+	  STATUS    	current
+	  DESCRIPTION
+		   "This object holds the status of the receiver optical signal power 
+            for the lane in the interface, indicating whether this is normal or
+            an alarm is present."
+	::= { bcsiOptMonLaneEntry 6 }
+
+bcsiOptMonLaneRxPower  OBJECT-TYPE
+	  SYNTAX		SnmpAdminString (SIZE(0..32))
+	  MAX-ACCESS    read-only
+	  STATUS    	current
+	  DESCRIPTION
+		   "This object holds the value of the receiver optical
+			signal power for the lane in the interface, measured in
+			dBm, followed by whether this is a normal value, or
+			high/low warning or alarm."
+	::= { bcsiOptMonLaneEntry 7 }
+
+bcsiOptMonLaneRxPowerVal OBJECT-TYPE
+	  SYNTAX		Unsigned32
+      UNITS   		"microWatt"	  
+	  MAX-ACCESS    read-only
+	  STATUS    	current
+	  DESCRIPTION
+		   "This object holds the value of the receiver optical signal power
+            for the lane in the interface, measured in microWatt."
+	::= { bcsiOptMonLaneEntry 8 }
+
+bcsiOptMonLaneTxBiasCurrent  OBJECT-TYPE
+	  SYNTAX		SnmpAdminString (SIZE(0..32))
+	  MAX-ACCESS    read-only
+	  STATUS    	current
+	  DESCRIPTION
+		   "Tx Bias Current.  It is measured in mA, and is followed
+		   by whether this is a normal value, or high/low warning or
+		   alarm."
+	 ::= { bcsiOptMonLaneEntry 9 }
+
+-- Optical Table for module level optical parameters like Temperature, Tx Power,
+-- Rx Power and Tx Bias Current.
+
+bcsiOptMonInfoTable  OBJECT-TYPE
+	 SYNTAX      SEQUENCE OF BcsiOptMonInfoEntry
+	 MAX-ACCESS      not-accessible
+	 STATUS      current
+	 DESCRIPTION
+		  "This table lists the instrumented parameters of all
+		  optical interfaces."
+	 REFERENCE
+		  "ITU recommendations G.783, G.784, G.953"
+	::= { bcsiOptMonObjects 2}
+
+bcsiOptMonInfoEntry  OBJECT-TYPE
+	 SYNTAX      BcsiOptMonInfoEntry
+	 MAX-ACCESS      not-accessible
+	 STATUS      current
+	 DESCRIPTION
+		  "Only the ifIndices of optical interfaces
+		  whose parameters need to be monitored will
+		  be used to index this table."
+	 INDEX       { ifIndex }
+	 ::= { bcsiOptMonInfoTable 1 }
+
+BcsiOptMonInfoEntry ::=
+	 SEQUENCE  {
+		 bcsiOptMonTemperature
+				  DisplayString,
+ 		 bcsiOptMonTxPowerStatus
+				  INTEGER,
+		 bcsiOptMonTxPower
+				  SnmpAdminString,
+		 bcsiOptMonTxPowerVal
+				  Unsigned32,
+		 bcsiOptMonRxPowerStatus
+				  INTEGER,
+		 bcsiOptMonRxPower
+				  SnmpAdminString,
+		 bcsiOptMonRxPowerVal
+				  Unsigned32,
+ 		 bcsiOptMonTxBiasCurrent
+ 				 DisplayString
+}
+
+bcsiOptMonTemperature  OBJECT-TYPE
+	  SYNTAX	DisplayString (SIZE(0..32))
+  	  MAX-ACCESS    read-only
+  	  STATUS    current
+  	  DESCRIPTION
+   		    "This object holds the value of the transmitter laser
+			diode temperature for the interface. This object
+			indicates the health of the transmitter.
+
+			The format is xxx.yyyy C(elcius), followed by whether
+			the measured value is normal, high/low alarm or
+			high/low warning.
+			For 100G and 40G optic, this returns the average
+			temperature for all lanes."
+	::= { bcsiOptMonInfoEntry 1 }
+
+bcsiOptMonTxPowerStatus  OBJECT-TYPE
+       SYNTAX   INTEGER {
+			notSupported(1), 
+			notApplicable(2), 
+			highAlarm(3), 
+			highWarn(4), 
+			normal(5), 
+			lowWarn(6), 
+			lowAlarm(7)
+		}
+       	MAX-ACCESS    read-only
+       	STATUS    current
+       	DESCRIPTION
+            "This object holds the status of the transmit optical
+			signal power for the interface, indicating whether this is normal or an alarm is present."
+     ::= { bcsiOptMonInfoEntry 2 }
+
+bcsiOptMonTxPower  OBJECT-TYPE
+	  SYNTAX	DisplayString (SIZE(0..32))
+	  MAX-ACCESS    read-only
+	  STATUS    current
+	  DESCRIPTION
+		   "This object holds the value of the transmitter optical
+			signal power for the interface, measured in dBm, followed
+			by whether this is a normal value, or high/low warning
+			or alarm. For 100G optic, this returns the aggregated
+			Tx Power for all lanes."
+	 ::= { bcsiOptMonInfoEntry 3 }
+
+bcsiOptMonTxPowerVal  OBJECT-TYPE
+       	SYNTAX   Unsigned32
+       	UNITS    "microWatt"
+       	MAX-ACCESS    read-only
+       	STATUS    current
+       	DESCRIPTION
+              		"This object holds the value of the transmitter optical
+               signal power for the interface, measured in microWatt.
+               For 100G optic, this returns the aggregated 
+    	  Tx Power for all lanes "
+     ::= { bcsiOptMonInfoEntry 4 }
+
+bcsiOptMonRxPowerStatus  OBJECT-TYPE
+       SYNTAX   INTEGER {
+			notSupported(1),
+			notApplicable(2),
+			highAlarm(3),
+			highWarn(4),
+			normal(5), 
+			lowWarn(6),
+			lowAlarm(7)
+       }
+       MAX-ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+              "This object holds the status of the receiver optical signal
+			   power for the interface, indicating whether this is normal or an alarm is present."
+     ::= { bcsiOptMonInfoEntry 5 }
+
+bcsiOptMonRxPower  OBJECT-TYPE
+	  SYNTAX	DisplayString (SIZE(0..32))
+	  MAX-ACCESS    read-only
+	  STATUS    current
+	  DESCRIPTION
+		   "This object holds the value of the receiver optical
+			signal power for the interface, measured in dBm, followed
+			by whether this is a normal value, or high/low warning
+			or alarm.
+			For 100G and 40G optic, this returns the aggregated
+			Rx Power for all lanes."
+	::= { bcsiOptMonInfoEntry 6 }
+
+bcsiOptMonRxPowerVal  OBJECT-TYPE
+       	SYNTAX   Unsigned32
+       	UNITS   "microWatt"
+       	MAX-ACCESS    read-only
+       	STATUS    current
+       	DESCRIPTION
+              		"This object holds the value of the receiver optical
+   			 signal power for the interface, measured in microWatt.
+   		 For 100G and 40G optic, this returns the aggregated 
+    Rx Power for all lanes "
+     ::= { bcsiOptMonInfoEntry 7 }
+
+bcsiOptMonTxBiasCurrent  OBJECT-TYPE
+	  SYNTAX	DisplayString (SIZE(0..32))
+	  MAX-ACCESS    read-only
+	  STATUS    current
+	  DESCRIPTION
+		   "Tx Bias Current.  It is measured in mA, and is followed
+		   by whether this is a normal value, or high/low warning or
+		   alarm.
+		     For 100G and 40G optic, this returns the aggregated
+		   Tx Bias Current for all lanes."
+	 ::= { bcsiOptMonInfoEntry 8 }
+
+bcsiIfMediaInfoTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF BcsiIfMediaInfoEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                  "This table lists the information of the media device
+		   (SFP/XFP/Copper) installed in the physical port.
+		   Only the ifIndices of Ethernet ports those are associated
+		   with the operational cards will be included in this table."
+          ::= { bcsiOptMonObjects  3 }
+
+bcsiIfMediaInfoEntry OBJECT-TYPE
+          SYNTAX      BcsiIfMediaInfoEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                  "An entry in this table. The ifIndices of ethernet interfaces 
+                   will be used to index this table."
+          INDEX  { ifIndex } 
+          ::= { bcsiIfMediaInfoTable 1 }
+
+BcsiIfMediaInfoEntry ::=
+    SEQUENCE  {
+          bcsiIfMediaType
+                    DisplayString,
+          bcsiIfMediaVendorName
+                    DisplayString,
+          bcsiIfMediaVersion
+                    DisplayString,
+          bcsiIfMediaPartNumber
+                    DisplayString,
+          bcsiIfMediaSerialNumber
+                    DisplayString
+    }
+
+bcsiIfMediaType  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "he type of the media installed in the physical port."
+    ::= { bcsiIfMediaInfoEntry  1 }
+
+bcsiIfMediaVendorName  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The media vendor name, full name of the corporation."
+    ::= { bcsiIfMediaInfoEntry  2 }
+
+bcsiIfMediaVersion  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The media vendor product version number."
+    ::= { bcsiIfMediaInfoEntry  3 }
+
+bcsiIfMediaPartNumber OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The media vendor part number."
+    ::= { bcsiIfMediaInfoEntry  4 }
+
+bcsiIfMediaSerialNumber OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..128))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The vendor serial number of the media device."
+    ::= { bcsiIfMediaInfoEntry  5 }
+--
+-- Conformance
+--
+
+bcsiOptMonCompliances OBJECT IDENTIFIER 
+                             ::= { bcsiOptMonConformance 1 }
+bcsiOptMonGroups       OBJECT IDENTIFIER 
+                             ::= { bcsiOptMonConformance 2 }
+
+bcsiOptMonCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which
+        implement BROCADE-OPTICAL-MONITORING-MIB."
+    MODULE 
+		MANDATORY-GROUPS { bcsiOptMonLaneMonGroup ,
+				   bcsiOptMonInfoMonGroup,
+                                   bcsiIfMediaGroup
+						 }
+    ::= { bcsiOptMonCompliances 1 }
+
+--
+-- Units of Conformance
+--
+   
+bcsiOptMonLaneMonGroup  OBJECT-GROUP
+    OBJECTS {
+		bcsiOptMonLaneNum,
+		bcsiOptMonLaneTemperature,
+		bcsiOptMonLaneTxPowerStatus,
+		bcsiOptMonLaneTxPower,
+		bcsiOptMonLaneTxPowerVal,
+		bcsiOptMonLaneRxPowerStatus,
+		bcsiOptMonLaneRxPower,
+		bcsiOptMonLaneRxPowerVal,
+		bcsiOptMonLaneTxBiasCurrent
+    }
+    STATUS         current  
+    DESCRIPTION
+        "A collection of objects for Optical Lane Monitoring of interface optics."
+    ::= { bcsiOptMonGroups 1 }        
+
+bcsiOptMonInfoMonGroup  OBJECT-GROUP
+    OBJECTS {
+		bcsiOptMonTemperature,
+		bcsiOptMonTxPowerStatus,
+		bcsiOptMonTxPower,
+		bcsiOptMonTxPowerVal,
+		bcsiOptMonRxPowerStatus,
+		bcsiOptMonRxPower,
+		bcsiOptMonRxPowerVal,
+		bcsiOptMonTxBiasCurrent
+    }
+    STATUS         current  
+    DESCRIPTION
+        "A collection of objects for Optical Monitoring of interface optics."
+    ::= { bcsiOptMonGroups 2 }
+
+bcsiIfMediaGroup  OBJECT-GROUP
+    OBJECTS {
+                bcsiIfMediaType,
+                bcsiIfMediaVendorName,
+                bcsiIfMediaVersion,
+                bcsiIfMediaPartNumber,
+                bcsiIfMediaSerialNumber
+    }
+    STATUS         current
+    DESCRIPTION
+        "A collection of objects for monitoring media information of interfaces."
+    ::= { bcsiOptMonGroups 3 }
+END
+
+-- ========================================================================================
+
+

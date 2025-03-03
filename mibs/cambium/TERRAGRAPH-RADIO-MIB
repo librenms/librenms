@@ -1,0 +1,103 @@
+TERRAGRAPH-RADIO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Integer32,
+      enterprises                                     FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString                 FROM SNMPv2-TC;
+
+tgRadioMIB MODULE-IDENTITY
+    LAST-UPDATED "202001080000Z"
+    ORGANIZATION "Terragraph"
+    CONTACT-INFO "fbc-terragraph@fb.com"
+    DESCRIPTION "Terragraph Radio MIB"
+    REVISION "202001080000Z"
+    DESCRIPTION "First Draft"
+    ::= { terragraph 60 }
+
+-- cnWave identifier
+terragraph   OBJECT IDENTIFIER ::= { enterprises 17713 }
+interfaces   OBJECT IDENTIFIER ::= { tgRadioMIB 1 }
+
+ObjectIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX Integer32 (-2147483648..2147483647)
+
+tgRadioInterfacesTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TgRadioStatEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Terragraph Radio Interfaces"
+    ::= { interfaces 1 }
+
+tgRadioStatEntry OBJECT-TYPE
+    SYNTAX          TgRadioStatEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Terragraph Radio Interface"
+    INDEX           { ifIndex }
+    ::= { tgRadioInterfacesTable 1 }
+
+TgRadioStatEntry ::= SEQUENCE {
+    ifIndex         ObjectIndex,
+    ifName          DisplayString,
+-- TODO: Should be MacAddress
+    macAddr         DisplayString,
+-- TODO: Should be MacAddress
+    remoteMacAddr   DisplayString,
+    mcs             Gauge32,
+    snr             Integer32,
+    rssi            Integer32
+}
+
+ifIndex OBJECT-TYPE
+    SYNTAX          ObjectIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     ""
+    ::= { tgRadioStatEntry 1 }
+
+ifName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     ""
+    ::= { tgRadioStatEntry 2 }
+
+macAddr OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     ""
+    ::= { tgRadioStatEntry 3 }
+
+remoteMacAddr OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     ""
+    ::= { tgRadioStatEntry 4 }
+
+mcs OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     ""
+    ::= { tgRadioStatEntry 5 }
+
+snr OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     ""
+    ::= { tgRadioStatEntry 6 }
+
+rssi OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     ""
+    ::= { tgRadioStatEntry 7 }
+
+END

@@ -1,0 +1,1059 @@
+    F10-Z-SERIES-CHASSIS-MIB DEFINITIONS ::= BEGIN
+    --  This module provides authoritative definitions for Z-series
+    --  Dell Networking OS Chassis MIB.
+    --
+    --  This module will be extended, as needed.
+    --  
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        Gauge32, Integer32, TimeTicks
+            FROM SNMPv2-SMI
+        DisplayString, MacAddress
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        f10Mgmt
+            FROM FORCE10-SMI
+        F10SwDate, F10ChassisType, F10ProcessorModuleType,
+        F10MfgDate, F10HundredthdB, F10SSeriesPortType,
+        F10CardOperStatus
+            FROM FORCE10-TC;                
+    
+    f10ZSerChassisMib MODULE-IDENTITY
+    LAST-UPDATED "201404161200Z"  -- Apr 16, 2014 12:00:00 GMT
+    
+    ORGANIZATION "Dell Inc."
+
+    CONTACT-INFO "http://www.force10networks.com/support"
+
+    DESCRIPTION
+       "Dell Networking OS Z-Series Chassis MIB."
+
+    REVISION     "201404161200Z"
+    DESCRIPTION
+          "Updated Contact info and Description."
+
+    REVISION     "201310101200Z"
+    DESCRIPTION
+          "Initial version of this mib."
+           ::= { f10Mgmt 25 }   
+
+
+    -- ### Groups ###
+
+    f10ZSerChassisObject OBJECT IDENTIFIER ::={ f10ZSerChassisMib 1 }
+    chObjects            OBJECT IDENTIFIER ::={ f10ZSerChassisObject 1 }
+    chSysObjects         OBJECT IDENTIFIER ::={ f10ZSerChassisObject 2 }
+
+    -- ### Chassis Information
+
+       chType    OBJECT-TYPE
+         SYNTAX        F10ChassisType
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The type of chassis."
+         ::= { chObjects 1 }
+
+       chSwVersion    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..16))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Current FTOS image version running in the system.
+              The version string will be in following format
+              major_ver.minor_ver(maintenance_ver.patch_ver)"
+         ::= { chObjects 2 }
+
+       chMacAddr    OBJECT-TYPE
+         SYNTAX        MacAddress
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "A 6-octet MAC Address assigned to this Chassis."
+         ::= { chObjects 3 }
+
+       chSerialNumber    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..14))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis's serial number."
+         ::= { chObjects 4 }
+
+       chPartNum    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..11))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis manufacturer's part number."
+         ::= { chObjects 5 }
+
+       chProductRev    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..3))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis manufacturer's product revision."
+         ::= { chObjects 6 }
+
+       chVendorId    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..3))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis manufacturer vendor's id."
+         ::= { chObjects 7 }
+
+       chMfgDate    OBJECT-TYPE
+         SYNTAX        F10MfgDate
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The date the chassis was manufactured."
+         ::= { chObjects 8 }
+
+       chCountryCode    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..2))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis manufacturer's country code."
+         ::= { chObjects 9 }
+
+       chPiecePartID    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..24))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis's piece part ID."
+         ::= { chObjects 10 }
+
+       chPPIDRevision    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..3))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis's piece part ID revision."
+         ::= { chObjects 11 }
+
+       chServiceTag    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..7))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis's service tag."
+         ::= { chObjects 12 }
+
+       chExpressServiceCode    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..14))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis's express service code."
+         ::= { chObjects 13 }
+
+       chNum10GigEtherPorts    OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The number of 10G Ethernet/802.3 interfaces
+              in the chassis."
+         ::= { chObjects 14 }
+
+       chNum40GigEtherPorts    OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The number of 40G Ethernet/802.3 interfaces
+              in the chassis."
+         ::= { chObjects 15 }
+
+       chNumLineCards    OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The number of line cards currently supported in the chassis."
+         ::= { chObjects 16 }
+
+       chNumFanTrays    OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Number of Fan trays in the chassis."
+         ::= { chObjects 17 }
+
+       chNumPowerSupplies    OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Number of Power supplies in the chassis."
+         ::= { chObjects 18 }
+
+
+    -- ### Chassis System  ###
+    
+    -- ## Processor Table
+    
+       chSysProcessorTable    OBJECT-TYPE
+         SYNTAX        SEQUENCE OF ChSysProcessorEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A list of Processors resident in the chassis.
+              The card table contains the Processor information
+              of each Processor in the chassis."
+         ::= { chSysObjects 1 }
+
+       chSysProcessorEntry    OBJECT-TYPE
+         SYNTAX        ChSysProcessorEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A list of Processor's entries containing information
+              for Processors in the system."
+         INDEX    { chSysProcessorIndex }
+         ::= { chSysProcessorTable 1 }
+
+       ChSysProcessorEntry    ::=
+         SEQUENCE {
+            chSysProcessorIndex     Integer32,
+            chSysProcessorType      F10ProcessorModuleType,
+            chSysProcessorUpTime    TimeTicks,
+            chSysProcessorMemSize   Integer32
+         }
+
+       chSysProcessorIndex    OBJECT-TYPE
+         SYNTAX        Integer32 (1..5)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A unique index for each Processor within the
+              chassis. The valid entries are 1 to the value
+              of number of processors.
+              In Z9500, Index 1 - Control Processor
+                        Index 2 - Routing Processor
+                        Index 3 - LineCard Processor 0
+                        Index 4 - LineCard Processor 1
+                        Index 5 - LineCard Processor 2"
+         ::= { chSysProcessorEntry 1 }
+
+       chSysProcessorType    OBJECT-TYPE
+         SYNTAX        F10ProcessorModuleType
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The type of module running on the Processor."
+         ::= { chSysProcessorEntry 2 }
+
+       chSysProcessorUpTime    OBJECT-TYPE
+         SYNTAX        TimeTicks
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The SysUpTime for this Processor."
+         ::= { chSysProcessorEntry 3 }
+
+       chSysProcessorMemSize    OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The size of the RAM in MB."
+         ::= { chSysProcessorEntry 4 }
+
+    -- ## Software Module Table 
+
+       chSysSwModuleTable    OBJECT-TYPE
+         SYNTAX        SEQUENCE OF ChSysSwModuleEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A list of software version information in 
+             a processor."
+         ::= { chSysObjects 2 }
+
+       chSysSwModuleEntry    OBJECT-TYPE 
+         SYNTAX        ChSysSwModuleEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A software module entry containing version 
+             number information for a particular processor."
+         INDEX    { chSysProcessorIndex }
+         ::= { chSysSwModuleTable 1 }
+
+       ChSysSwModuleEntry    ::=
+         SEQUENCE {
+            chSysSwModuleRuntimeImgVersion       DisplayString,
+            chSysSwModuleRuntimeImgDate          F10SwDate,
+            chSysSwModuleBootFlashImgVersion     DisplayString,
+            chSysSwModuleBootSelectorImgVersion  DisplayString,
+            chSysSwModuleNextRebootImage         INTEGER,
+            chSysSwModuleCurrentBootImage        INTEGER,
+            chSysSwModuleInPartitionAImgVers     DisplayString,
+            chSysSwModuleInPartitionBImgVers     DisplayString
+         }
+
+       chSysSwModuleRuntimeImgVersion    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..16))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Current FTOS image version running in the system.
+              The version string will be in following format
+              major_ver.minor_ver(maintenance_ver.patch_ver)"
+         ::= { chSysSwModuleEntry 1 }
+
+       chSysSwModuleRuntimeImgDate    OBJECT-TYPE
+         SYNTAX        F10SwDate (SIZE (0..10))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The release date of this software module."
+         ::= { chSysSwModuleEntry 2 }
+
+       chSysSwModuleBootFlashImgVersion    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..16))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "This provides the Grub image version that is currently
+              running in the processor."
+         ::= { chSysSwModuleEntry 3 }
+
+       chSysSwModuleBootSelectorImgVersion    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..16))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "This provides the BIOS image version that is currently
+              running in the processor."
+         ::= { chSysSwModuleEntry 4 }
+
+       chSysSwModuleNextRebootImage    OBJECT-TYPE
+         SYNTAX        INTEGER {
+                           partitionA(1),
+                           partitionB(2),
+                           networkBoot(3)
+                       }
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The image selection, when the chassis is rebooted.
+              partitionA - Image stored in bootflash partition A:
+              partitionB - Image stored in bootflash partition B:
+              networkBoot - will be booted via network."
+         ::= { chSysSwModuleEntry 5 }
+
+       chSysSwModuleCurrentBootImage    OBJECT-TYPE
+         SYNTAX        INTEGER {
+                           partitionA(1),
+                           partitionB(2),
+                           networkBoot(3)
+                       }
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The current image is booted from.
+              partitionA - Image stored in bootflash partition A:
+              partitionB - Image stored in bootflash partition B:
+              networkBoot - Booted via network."
+         ::= { chSysSwModuleEntry 6 }
+
+       chSysSwModuleInPartitionAImgVers    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..16))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "This provides the FTOS system image version
+              that is stored in partition A: and The version 
+              string has Major and Minor release numbers. It 
+              also denotes if the release is Maintenance, 
+              Technical, Patch, Beta, or Generally Available"
+         ::= { chSysSwModuleEntry 7 }
+
+       chSysSwModuleInPartitionBImgVers    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..16))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "This provides the FTOS system image version
+              that is stored in partition B: and  The version
+              string has Major and Minor release numbers. It
+              also denotes if the release is Maintenance,
+              Technical, Patch, Beta, or Generally Available"
+         ::= { chSysSwModuleEntry 8 }
+
+    -- ## Processor and Memory Utilization Table
+
+       chSysCpuUtilTable    OBJECT-TYPE
+         SYNTAX        SEQUENCE OF ChSysCpuUtilEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A table listing the processor and memory utilization of 
+              of each CPU in the system."
+         ::= { chSysObjects 3 }
+         
+       chSysCpuUtilEntry    OBJECT-TYPE
+         SYNTAX         ChSysCpuUtilEntry
+         MAX-ACCESS     not-accessible
+         STATUS         current
+         DESCRIPTION
+             "Processor and Memory Utilization entry for a 
+              particular CPU."
+         INDEX    { chSysProcessorIndex }
+         ::= { chSysCpuUtilTable 1 }
+
+       ChSysCpuUtilEntry   ::=
+         SEQUENCE {
+            chSysCpuUtil5Sec          Gauge32,
+            chSysCpuUtil1Min          Gauge32,
+            chSysCpuUtil5Min          Gauge32,
+            chSysCpuUtilMemUsage      Gauge32,
+            chSysCpuUtilFlashUsage    Gauge32
+         }
+
+       chSysCpuUtil5Sec    OBJECT-TYPE
+         SYNTAX        Gauge32(0..100)
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "CPU utilization in percentage for last 5 seconds."
+         ::= { chSysCpuUtilEntry 1 }
+
+       chSysCpuUtil1Min    OBJECT-TYPE
+         SYNTAX        Gauge32(0..100)
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "CPU utilization in percentage for last 1 minute."
+         ::= { chSysCpuUtilEntry 2 }
+
+       chSysCpuUtil5Min    OBJECT-TYPE
+         SYNTAX        Gauge32(0..100)
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "CPU utilization in percentage for last 5 minutes."
+         ::= { chSysCpuUtilEntry 3 }
+
+       chSysCpuUtilMemUsage    OBJECT-TYPE
+         SYNTAX        Gauge32(0..100)
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Total Memory usage in percentage."
+         ::= { chSysCpuUtilEntry 4 }
+
+       chSysCpuUtilFlashUsage  OBJECT-TYPE
+         SYNTAX        Gauge32(0..100)
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Total Flash usage in percentage."
+         ::= { chSysCpuUtilEntry 5 }
+
+    -- ## Linecard Table
+    
+       chSysLineCardTable    OBJECT-TYPE
+         SYNTAX        SEQUENCE OF ChSysLineCardEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A list of line cards resident in the chassis.
+              This table contains the information on each linecard
+              in the chassis."
+         ::= { chSysObjects 4 }
+
+       chSysLineCardEntry    OBJECT-TYPE
+         SYNTAX        ChSysLineCardEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "Entry for each line card in the chassis."
+         INDEX    { chSysLineCardIndex }
+         ::= { chSysLineCardTable 1 }
+
+       ChSysLineCardEntry    ::=
+         SEQUENCE {
+            chSysLineCardIndex                Integer32,
+            chSysLineCardType                 INTEGER,
+            chSysLineCardDescription          DisplayString,
+            chSysLineCardStatus               F10CardOperStatus,
+            chSysLineCardTemp                 Integer32,
+            chSysLineCardNum10GigEtherPorts   Integer32,
+            chSysLineCardNum40GigEtherPorts   Integer32
+         }
+
+       chSysLineCardIndex    OBJECT-TYPE
+         SYNTAX        Integer32 (1..3)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A unique index for each line card in the chassis."
+         ::= { chSysLineCardEntry 1 }
+
+       chSysLineCardType    OBJECT-TYPE
+         SYNTAX        INTEGER {
+                         z9500LC36(1),
+                         z9500LC48(2)
+                       }
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Line card's type. In Z9500, there is 36 40G port line card and
+              48 40G port line card.
+              z9500LC36 - 36 (40G) port LC
+              z9500LC48 - 48 (40G) port LC."
+         ::= { chSysLineCardEntry 2 }
+
+       chSysLineCardDescription    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..40))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "A short description of the line card."
+         ::= { chSysLineCardEntry 3 }
+
+       chSysLineCardStatus    OBJECT-TYPE
+         SYNTAX        F10CardOperStatus
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The current operational state of the line card."
+         ::= { chSysLineCardEntry 4 }
+
+       chSysLineCardTemp    OBJECT-TYPE
+         SYNTAX        Integer32
+         UNITS         "degrees Centigrade"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Temperature of the Line card."
+         ::= { chSysLineCardEntry 5 }
+
+       chSysLineCardNum10GigEtherPorts    OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The number of 10G Ethernet/802.3 interfaces
+              in the line card."
+         ::= { chSysLineCardEntry 6 }
+
+       chSysLineCardNum40GigEtherPorts    OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The number of 40G Ethernet/802.3 interfaces
+              in the line card."
+         ::= { chSysLineCardEntry 7 }
+
+    -- ## Port Table 
+
+       chSysPortTable OBJECT-TYPE
+         SYNTAX        SEQUENCE OF ChSysPortEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A list of ports in the Z-series chassis."
+         ::= { chSysObjects 5 }
+
+       chSysPortEntry  OBJECT-TYPE 
+         SYNTAX        ChSysPortEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A port entry containing objects for a
+              particular port."
+         INDEX    { chSysLineCardIndex,
+                    chSysPortIndex }
+         ::= { chSysPortTable 1 }
+
+       ChSysPortEntry    ::=
+         SEQUENCE {
+            chSysPortIndex        Integer32,
+            chSysPortType         F10SSeriesPortType,
+            chSysPortAdminStatus  INTEGER,
+            chSysPortOperStatus   INTEGER,
+            chSysPortIfIndex      Integer32,           
+            chSysPortXfpRxPower   F10HundredthdB,
+            chSysPortXfpRxTemp    Integer32,
+            chSysPortXfpTxPower   F10HundredthdB
+         }
+
+       chSysPortIndex OBJECT-TYPE
+         SYNTAX        Integer32 (1..192)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A unique index for each port within the Line Card.
+              Line card 0 will have index from 1 to 144
+              Line card 1 will have index from 1 to 192
+              Line card 2 will have index from 1 to 192."
+         ::= { chSysPortEntry 1 }
+
+       chSysPortType  OBJECT-TYPE
+         SYNTAX        F10SSeriesPortType
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The type of port in the unit."
+         ::= { chSysPortEntry 2 }
+
+       chSysPortAdminStatus    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                         up(1),
+                         down(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The admin status of the port.
+              The port admin status is Up if 
+              the user has configured it to be up 
+              otherwise, the admin status is Down."
+         ::= { chSysPortEntry 3 }
+
+       chSysPortOperStatus    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       ready(1),
+                       portDown(2),
+                       portProblem(3),
+                       cardProblem(4),
+                       cardDown(5),
+                       notPresent(6)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The operational status provides further
+              condition of the port.
+              If the chSysPortAdminStatus is 'up', the 
+              valid state is
+              'ready' - the card is present and 
+                      ready and the chSysPortAdminStatus
+                      status is 'up'.
+              'portDown'    - the port is down or not enabled.
+              'portProblem' - port hardware problems.
+              'cardProblem' - not used.  Same as cardDown.
+              'cardDown'    - the card is downed.
+              'notPresent' - the card is not present."
+         ::= { chSysPortEntry 4 }
+
+       chSysPortIfIndex    OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The index of ifIndex in the Interface Mib.
+              This index can link to the ifEntry to get
+              this interface/port information"
+         ::= { chSysPortEntry 5 }
+
+       chSysPortXfpRxPower    OBJECT-TYPE
+         SYNTAX        F10HundredthdB
+         UNITS         "dB"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The power signal strength (dB) received for
+              1G/10G/40G Ethernet/802.3 interface."
+         ::= { chSysPortEntry 6 }
+
+       chSysPortXfpRxTemp    OBJECT-TYPE
+         SYNTAX        Integer32
+         UNITS         "degrees Centigrade"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The temperature value received for the optics."
+         ::= { chSysPortEntry 7 }
+
+       chSysPortXfpTxPower    OBJECT-TYPE
+         SYNTAX        F10HundredthdB
+         UNITS         "dB"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The power signal strength (dB) Transmitted for
+              1G/10G/40G Ethernet/802.3 interface."
+
+         ::= { chSysPortEntry 8 }
+
+
+    -- ## Power Supply Table
+
+       chSysPowerSupplyTable    OBJECT-TYPE
+         SYNTAX        SEQUENCE OF ChSysPowerSupplyEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A list of power supply resident
+              in the Z-series chassis."
+         ::= { chSysObjects 6 }
+
+       chSysPowerSupplyEntry    OBJECT-TYPE
+         SYNTAX        ChSysPowerSupplyEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A power supply entry containing objects for a
+              particular power supply."
+         INDEX    { chSysPowerSupplyIndex }
+         ::= { chSysPowerSupplyTable 1 }
+
+       ChSysPowerSupplyEntry    ::=
+         SEQUENCE {
+            chSysPowerSupplyIndex              Integer32,
+            chSysPowerSupplyOperStatus         INTEGER,
+            chSysPowerSupplyType               INTEGER,
+            chSysPowerSupplyPiecePartID        DisplayString,
+            chSysPowerSupplyPPIDRevision       DisplayString,
+            chSysPowerSupplyServiceTag         DisplayString,
+            chSysPowerSupplyExpressServiceCode DisplayString,
+            chSysPowerSupplyUsage              Integer32
+         }
+
+       chSysPowerSupplyIndex    OBJECT-TYPE
+         SYNTAX        Integer32 (1..4)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "The unique index of the power supply."
+         ::= { chSysPowerSupplyEntry 1 }
+
+       chSysPowerSupplyOperStatus    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                         up(1),
+                         down(2),
+                         absent(3)
+                     }
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The status of the power supply."
+         ::= { chSysPowerSupplyEntry 2 }
+
+       chSysPowerSupplyType    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                         ac(1),
+                         dc(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The type of the power supply."
+         ::= { chSysPowerSupplyEntry 3 }
+
+       chSysPowerSupplyPiecePartID OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..24))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The power supply's piece part id."
+         ::= { chSysPowerSupplyEntry 4 }
+
+       chSysPowerSupplyPPIDRevision OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..3))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The power supply's PPID revision."
+         ::= { chSysPowerSupplyEntry 5 }
+
+       chSysPowerSupplyServiceTag OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..7))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The power supply's service tag."
+         ::= { chSysPowerSupplyEntry 6 }
+
+       chSysPowerSupplyExpressServiceCode OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..14))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The power supply's express service code."
+         ::= { chSysPowerSupplyEntry 7 }
+
+       chSysPowerSupplyUsage    OBJECT-TYPE
+         SYNTAX        Integer32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Power usage of this Power Supply in Watts."
+         ::= { chSysPowerSupplyEntry 8 }
+
+    -- ## Fan Tray Table
+
+       chSysFanTrayTable    OBJECT-TYPE
+         SYNTAX        SEQUENCE OF ChSysFanTrayEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A list of fan tray resident in the Z-series chassis."
+         ::= { chSysObjects 7 }
+
+       chSysFanTrayEntry    OBJECT-TYPE
+         SYNTAX        ChSysFanTrayEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A fan entry containing objects for a
+              particular fan tray."
+         INDEX    { chSysFanTrayIndex }
+         ::= { chSysFanTrayTable 1 }
+
+       ChSysFanTrayEntry    ::=
+         SEQUENCE {
+            chSysFanTrayIndex              Integer32,
+            chSysFanTrayOperStatus         INTEGER,
+            chSysFanTrayPiecePartID        DisplayString,
+            chSysFanTrayPPIDRevision       DisplayString,
+            chSysFanTrayServiceTag         DisplayString,
+            chSysFanTrayExpressServiceCode DisplayString
+         }
+
+       chSysFanTrayIndex    OBJECT-TYPE
+         SYNTAX        Integer32 (1..5)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "The unique index of the fan tray."
+         ::= { chSysFanTrayEntry 1 }
+
+       chSysFanTrayOperStatus    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                         up(1),
+                         down(2),
+                         absent(3)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The status of the fan tray."
+         ::= { chSysFanTrayEntry 2 }
+
+       chSysFanTrayPiecePartID OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..24))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The fan tray's piece part id."
+         ::= { chSysFanTrayEntry 3 }
+                
+       chSysFanTrayPPIDRevision OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..3))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The fan tray's PPID revision."
+         ::= { chSysFanTrayEntry 4 }
+                
+       chSysFanTrayServiceTag OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..7))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The fan tray's service tag."
+         ::= { chSysFanTrayEntry 5 }
+
+       chSysFanTrayExpressServiceCode OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..14))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The fan tray's express service code."
+         ::= { chSysFanTrayEntry 6 }
+
+
+    -- ## Software Cores Table
+
+       chSysSwCoresTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysCoresEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A table containing information about the software
+             cores that have been generated as a result of
+             system failures."
+        ::= { chSysObjects 8 }
+
+      chSysCoresEntry  OBJECT-TYPE
+        SYNTAX        ChSysCoresEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A row in the software core table representing
+             information about a core that has been generated."
+        INDEX    { chSysProcessorIndex,
+                   chSysCoresInstance  }
+        ::= { chSysSwCoresTable 1 }
+
+      ChSysCoresEntry    ::=
+        SEQUENCE {
+           chSysCoresInstance         INTEGER,
+           chSysCoresFileName         DisplayString,
+           chSysCoresTimeCreated      F10SwDate,
+           chSysCoresProcessorName    DisplayString,
+           chSysCoresProcess          DisplayString
+        }
+
+       chSysCoresInstance    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The instance of the core for the process which
+             which generated the core since the same process
+             may have generated multiple cores."
+        ::= { chSysCoresEntry 1 }
+
+       chSysCoresFileName    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of the core file including the core."
+        ::= { chSysCoresEntry 2 }
+
+       chSysCoresTimeCreated    OBJECT-TYPE
+        SYNTAX        F10SwDate
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The time at which the core file was created."
+        ::= { chSysCoresEntry 3 }
+
+       chSysCoresProcessorName  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The processor which generated the core."
+        ::= { chSysCoresEntry 4 }
+
+       chSysCoresProcess    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of the process which generated the core."
+        ::= { chSysCoresEntry 5 }
+
+
+    -- ### conformance information ###
+    f10ZSeriesChassisMibConformance    OBJECT IDENTIFIER ::= { f10ZSerChassisMib 2 }
+    f10ZSeriesChassisMibCompliances    OBJECT IDENTIFIER ::= { f10ZSeriesChassisMibConformance 1 }
+    f10ZSeriesChassisMibGroups         OBJECT IDENTIFIER ::= { f10ZSeriesChassisMibConformance 2 }
+
+    -- ## compliance statements
+    f10ZSeriesChassisMibCompliance MODULE-COMPLIANCE
+        STATUS                  current
+        DESCRIPTION
+            "The compliance statement for Dell Networking
+            product which implement the Z-Series
+            Chassis MIB."
+        MODULE    -- this module
+        MANDATORY-GROUPS {
+            f10ZSeriesComponentGroup,
+            f10ZSeriesSystemGroup
+        }
+        ::= { f10ZSeriesChassisMibCompliances 1 }
+
+    -- ## units of conformance
+
+    f10ZSeriesComponentGroup    OBJECT-GROUP
+        OBJECTS {
+        chType,
+        chSwVersion,
+        chMacAddr,
+        chSerialNumber,
+        chPartNum,
+        chProductRev,
+        chVendorId,
+        chMfgDate,
+        chCountryCode,
+        chPiecePartID,
+        chPPIDRevision,
+        chServiceTag,
+        chExpressServiceCode,
+        chNum10GigEtherPorts,
+        chNum40GigEtherPorts,
+        chNumLineCards,
+        chNumFanTrays,
+        chNumPowerSupplies
+        }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects providing the
+            overall Z-series chassis information."
+        ::= { f10ZSeriesChassisMibGroups 1 }
+
+    f10ZSeriesSystemGroup    OBJECT-GROUP
+        OBJECTS {
+	chSysProcessorType,
+	chSysProcessorUpTime,
+	chSysProcessorMemSize,
+	chSysSwModuleRuntimeImgVersion,
+	chSysSwModuleRuntimeImgDate,
+	chSysSwModuleBootFlashImgVersion,
+	chSysSwModuleBootSelectorImgVersion,
+	chSysSwModuleNextRebootImage,
+	chSysSwModuleCurrentBootImage,
+	chSysSwModuleInPartitionAImgVers,
+	chSysSwModuleInPartitionBImgVers,
+	chSysCpuUtil5Sec,
+	chSysCpuUtil1Min,
+	chSysCpuUtil5Min,
+	chSysCpuUtilMemUsage,
+        chSysCpuUtilFlashUsage,
+	chSysLineCardType,
+	chSysLineCardDescription,
+	chSysLineCardStatus,
+	chSysLineCardTemp,
+	chSysLineCardNum10GigEtherPorts,
+	chSysLineCardNum40GigEtherPorts,
+	chSysPortType,
+	chSysPortAdminStatus,
+	chSysPortOperStatus,
+	chSysPortIfIndex,
+	chSysPortXfpRxPower,
+	chSysPortXfpRxTemp,
+	chSysPortXfpTxPower,
+	chSysPowerSupplyOperStatus,
+	chSysPowerSupplyType,
+	chSysPowerSupplyPiecePartID,
+	chSysPowerSupplyPPIDRevision,
+	chSysPowerSupplyServiceTag,
+	chSysPowerSupplyExpressServiceCode,
+	chSysPowerSupplyUsage,
+	chSysFanTrayOperStatus,
+	chSysFanTrayPiecePartID,
+	chSysFanTrayPPIDRevision,
+	chSysFanTrayServiceTag,
+	chSysFanTrayExpressServiceCode,
+        chSysCoresInstance,
+        chSysCoresFileName,
+        chSysCoresTimeCreated,
+        chSysCoresProcessorName,
+        chSysCoresProcess
+	}
+	STATUS   current
+	DESCRIPTION
+            "A collection of objects providing the
+	     chassis system hardware information."
+	::= { f10ZSeriesChassisMibGroups 2 }
+
+    END

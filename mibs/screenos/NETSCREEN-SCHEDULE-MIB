@@ -1,0 +1,253 @@
+-- This module defines enterprise MIBs for Schedule
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SCHEDULE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSchedule
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenScheduleMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor all
+         scheduled entries"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSchedule 0 }
+
+NsSchOnceEntry ::= SEQUENCE
+{
+    nsSchOnceIndex     Integer32,
+    nsSchOnceName      DisplayString,
+    nsSchOnceStartTime DisplayString,
+    nsSchOnceStopTime  DisplayString,
+    nsSchOnceComments  DisplayString,
+    nsSchOnceVsys      Integer32
+}
+
+NsSchRecurEntry ::= SEQUENCE
+{
+    nsSchRecurIndex      Integer32,
+    nsSchRecurName       DisplayString,
+    nsSchRecurWeekday    INTEGER,
+    nsSchRecurStartTime1 DisplayString,
+    nsSchRecurStopTime1  DisplayString,
+    nsSchRecurStartTime2 DisplayString,
+    nsSchRecurStopTime2  DisplayString,
+    nsSchRecurComments   DisplayString,
+    nsSchRecurVsys       Integer32
+}
+
+nsSchOnceTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsSchOnceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "By associating a schedule to a NetScreen device setting, user
+         can determine when that setting is in effect. This table
+         specifies the configuration of  schedules as a one-time
+         event."
+    ::= { netscreenSchedule 1 }
+
+nsSchOnceEntry OBJECT-TYPE
+    SYNTAX        NsSchOnceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsSchOnceTable holds a set of configuration
+         parameters associated with an instance of one-time schedule."
+    INDEX
+        { nsSchOnceIndex }
+    ::= { nsSchOnceTable 1 }
+
+nsSchOnceIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for schedule.  Its value ranges between 1 and
+         65535 and may not be contiguous.  The index has no other
+         meaning but a pure index"
+    ::= { nsSchOnceEntry 1 }
+
+nsSchOnceName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "schedule's name."
+    ::= { nsSchOnceEntry 2 }
+
+nsSchOnceStartTime OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "schedule's start time."
+    ::= { nsSchOnceEntry 3 }
+
+nsSchOnceStopTime OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "schedule's stop time."
+    ::= { nsSchOnceEntry 4 }
+
+nsSchOnceComments OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Comments for this schedule."
+    ::= { nsSchOnceEntry 5 }
+
+nsSchOnceVsys OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Vsys this entry belongs to"
+    ::= { nsSchOnceEntry 6 }
+
+nsSchRecurTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsSchRecurEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "By associating a schedule to a NetScreen device setting, user
+         can determine when that setting is in effect. This table
+         specifies the configuration of  schedules on a recurring
+         basis."
+    ::= { netscreenSchedule 2 }
+
+nsSchRecurEntry OBJECT-TYPE
+    SYNTAX        NsSchRecurEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsSchOnceTable holds a set of configuration
+         parameters associated with an instance of re-occurring
+         schedule."
+    INDEX
+        { nsSchRecurIndex }
+    ::= { nsSchRecurTable 1 }
+
+nsSchRecurIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for schedule.  Its value ranges between 1 and
+         65535 and may not be contiguous.  The index has no other
+         meaning but a pure index"
+    ::= { nsSchRecurEntry 1 }
+
+nsSchRecurName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "schedule's name"
+    ::= { nsSchRecurEntry 2 }
+
+nsSchRecurWeekday OBJECT-TYPE
+    SYNTAX        INTEGER {
+        sun(0),
+        mon(1),
+        tue(2),
+        wed(3),
+        thu(4),
+        fri(5),
+        sat(6)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "schedule's starts date, using week day to determine."
+    ::= { nsSchRecurEntry 3 }
+
+nsSchRecurStartTime1 OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "schedule's start time one."
+    ::= { nsSchRecurEntry 4 }
+
+nsSchRecurStopTime1 OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "schedule's stop time one."
+    ::= { nsSchRecurEntry 5 }
+
+nsSchRecurStartTime2 OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "schedule start time two."
+    ::= { nsSchRecurEntry 6 }
+
+nsSchRecurStopTime2 OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "schedule stop time two."
+    ::= { nsSchRecurEntry 7 }
+
+nsSchRecurComments OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..64))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "comments for the schedule."
+    ::= { nsSchRecurEntry 8 }
+
+nsSchRecurVsys OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "The vsys this entry belongs to"
+    ::= { nsSchRecurEntry 9 }
+
+END
+
+

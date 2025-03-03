@@ -1,0 +1,812 @@
+HC-RMON-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32,
+        Gauge32, Counter64             FROM SNMPv2-SMI
+    RowStatus, TimeStamp               FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    rmon, OwnerString, statistics, history, hosts, hostTopN, matrix,
+    etherStatsIndex, etherHistoryIndex, etherHistorySampleIndex
+                                    FROM RMON-MIB
+    rmonConformance, ZeroBasedCounter32, probeConfig
+                                    FROM RMON2-MIB
+    ZeroBasedCounter64, CounterBasedGauge64
+                                    FROM HCNUM-TC;
+
+--  Remote Network Monitoring MIB
+
+hcRMON MODULE-IDENTITY
+    LAST-UPDATED "200205080000Z"    -- May 08, 2002
+    ORGANIZATION "Netgear Inc"
+    CONTACT-INFO ""
+    DESCRIPTION
+        "The MIB module for managing remote monitoring
+        device implementations. This MIB module
+        augments the original RMON MIB as specified in
+        RFC 2819 and RFC 1513 and RMON-2 MIB as specified in
+        RFC 2021."
+
+    REVISION "200205080000Z"    -- May 08, 2002
+    DESCRIPTION
+        "The original version of this MIB, published as RFC3273."
+    ::= { rmonConformance 5 }
+
+-- { rmon 1 } through { rmon 20 } are defined in RMON [RFC 2819] and
+-- the Token Ring RMON MIB [RFC 1513] and the RMON-2 MIB [RFC 2021].
+
+mediaIndependentStats  OBJECT IDENTIFIER ::= { rmon 21 }
+
+mediaIndependentTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MediaIndependentEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+
+        "Media independent statistics for promiscuous monitoring of
+        any media.
+
+        The following table defines media independent statistics that
+        provide information for full and/or half-duplex links as well
+        as high capacity links.
+
+        For half-duplex links, or full-duplex-capable links operating
+        in half-duplex mode, the mediaIndependentIn* objects shall be
+        used and the mediaIndependentOut* objects shall not increment.
+
+        For full-duplex links, the mediaIndependentOut* objects shall
+        be present and shall increment. Whenever possible, the probe
+        should count packets moving away from the closest terminating
+        equipment as output packets. Failing that, the probe should
+        count packets moving away from the DTE as output packets."
+    ::= { mediaIndependentStats 1 }
+
+mediaIndependentEntry OBJECT-TYPE
+    SYNTAX     MediaIndependentEntry
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Media independent statistics for promiscuous monitoring of
+        any media."
+    INDEX { mediaIndependentIndex }
+    ::= { mediaIndependentTable 1 }
+
+MediaIndependentEntry ::= SEQUENCE {
+
+    mediaIndependentIndex                       Integer32,
+    mediaIndependentDataSource                  OBJECT IDENTIFIER,
+    mediaIndependentDropEvents                  Counter32,
+    mediaIndependentDroppedFrames               Counter32,
+    mediaIndependentInPkts                      Counter32,
+    mediaIndependentInOverflowPkts              Counter32,
+    mediaIndependentInHighCapacityPkts          Counter64,
+    mediaIndependentOutPkts                     Counter32,
+    mediaIndependentOutOverflowPkts             Counter32,
+    mediaIndependentOutHighCapacityPkts         Counter64,
+    mediaIndependentInOctets                    Counter32,
+    mediaIndependentInOverflowOctets            Counter32,
+    mediaIndependentInHighCapacityOctets        Counter64,
+    mediaIndependentOutOctets                   Counter32,
+    mediaIndependentOutOverflowOctets           Counter32,
+    mediaIndependentOutHighCapacityOctets       Counter64,
+    mediaIndependentInNUCastPkts                Counter32,
+    mediaIndependentInNUCastOverflowPkts        Counter32,
+    mediaIndependentInNUCastHighCapacityPkts    Counter64,
+    mediaIndependentOutNUCastPkts               Counter32,
+    mediaIndependentOutNUCastOverflowPkts       Counter32,
+    mediaIndependentOutNUCastHighCapacityPkts   Counter64,
+    mediaIndependentInErrors                    Counter32,
+    mediaIndependentOutErrors                   Counter32,
+    mediaIndependentInputSpeed                  Gauge32,
+    mediaIndependentOutputSpeed                 Gauge32,
+    mediaIndependentDuplexMode                  INTEGER,
+    mediaIndependentDuplexChanges               Counter32,
+    mediaIndependentDuplexLastChange            TimeStamp,
+    mediaIndependentOwner                       OwnerString,
+    mediaIndependentStatus                      RowStatus
+}
+
+mediaIndependentIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The value of this object uniquely identifies this
+        mediaIndependent entry."
+    ::= { mediaIndependentEntry 1 }
+
+mediaIndependentDataSource OBJECT-TYPE
+    SYNTAX     OBJECT IDENTIFIER
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object identifies the source of the data that
+        this mediaIndependent entry is configured to analyze.  This
+        source can be any interface on this device.
+        In order to identify a particular interface, this
+        object shall identify the instance of the ifIndex
+        object, defined in RFC 1213 and RFC 2233 [16,17], for
+        the desired interface.  For example, if an entry
+        were to receive data from interface #1, this object
+        would be set to ifIndex.1.
+
+        The statistics in this group reflect all packets
+        on the local network segment attached to the
+        identified interface.
+
+        An agent may or may not be able to tell if
+        fundamental changes to the media of the interface
+        have occurred and necessitate a deletion of
+        this entry.  For example, a hot-pluggable ethernet
+        card could be pulled out and replaced by a
+        token-ring card.  In such a case, if the agent has
+        such knowledge of the change, it is recommended that
+        it delete this entry.
+
+        This object may not be modified if the associated
+        mediaIndependentStatus object is equal to active(1)."
+    ::= { mediaIndependentEntry 2 }
+
+mediaIndependentDropEvents OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Events"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of events in which packets
+        were dropped by the probe due to lack of resources.
+        Note that this number is not necessarily the number of
+        packets dropped; it is just the number of times this
+        condition has been detected."
+    ::= { mediaIndependentEntry 3 }
+
+mediaIndependentDroppedFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "The total number of frames which were received by the probe
+        and therefore not accounted for in the
+        mediaIndependentDropEvents, but for which the probe chose not
+        to count for this entry for whatever reason.  Most often, this
+        event occurs when the probe is out of some resources and
+        decides to shed load from this collection.
+
+        This count does not include packets that were not counted
+        because they had MAC-layer errors.
+
+        Note that, unlike the dropEvents counter, this number is the
+        exact number of frames dropped."
+    ::= { mediaIndependentEntry 4 }
+
+mediaIndependentInPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received
+        on a half-duplex link or on the inbound connection of a
+        full-duplex link."
+    ::= { mediaIndependentEntry 5 }
+
+mediaIndependentInOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        mediaIndependentInPkts counter has overflowed."
+    ::= { mediaIndependentEntry 6 }
+
+mediaIndependentInHighCapacityPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received
+        on a half-duplex link or on the inbound connection of a
+        full-duplex link."
+    ::= { mediaIndependentEntry 7 }
+
+mediaIndependentOutPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received on a
+        full-duplex link in the direction of the network."
+    ::= { mediaIndependentEntry 8 }
+
+mediaIndependentOutOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        mediaIndependentOutPkts counter has overflowed."
+    ::= { mediaIndependentEntry 9 }
+
+mediaIndependentOutHighCapacityPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received on a
+        full-duplex link in the direction of the network."
+    ::= { mediaIndependentEntry 10 }
+
+mediaIndependentInOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets of data (including those in bad
+        packets) received (excluding framing bits but including FCS
+        octets) on a half-duplex link or on the inbound connection of
+        a full-duplex link."
+    ::= { mediaIndependentEntry 11 }
+
+mediaIndependentInOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        mediaIndependentInOctets counter has overflowed."
+    ::= { mediaIndependentEntry 12 }
+
+mediaIndependentInHighCapacityOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets of data (including those in bad
+        packets) received (excluding framing bits but
+        including FCS octets) on a half-duplex link or on the inbound
+        connection of a full-duplex link."
+    ::= { mediaIndependentEntry 13 }
+
+mediaIndependentOutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets of data (including those in bad
+        packets) received on a full-duplex link in the direction of
+        the network (excluding framing bits but including FCS
+        octets)."
+    ::= { mediaIndependentEntry 14 }
+
+mediaIndependentOutOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        mediaIndependentOutOctets counter has overflowed."
+    ::= { mediaIndependentEntry 15 }
+
+mediaIndependentOutHighCapacityOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets of data (including those in bad
+        packets) received on a full-duplex link in the direction of
+        the network (excluding framing bits but including FCS
+        octets)."
+    ::= { mediaIndependentEntry 16 }
+
+mediaIndependentInNUCastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of non-unicast packets (including bad
+        packets) received on a half-duplex link or on the inbound
+        connection of a full-duplex link."
+    ::= { mediaIndependentEntry 17 }
+
+mediaIndependentInNUCastOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        mediaIndependentInNUCastPkts counter has overflowed."
+    ::= { mediaIndependentEntry 18 }
+
+mediaIndependentInNUCastHighCapacityPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of non-unicast packets (including bad
+        packets) received on a half-duplex link or on the inbound
+        connection of a full-duplex link."
+    ::= { mediaIndependentEntry 19 }
+
+mediaIndependentOutNUCastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of non-unicast packets (including bad
+        packets) received on a full-duplex link in the direction of
+        the network."
+    ::= { mediaIndependentEntry 20 }
+
+mediaIndependentOutNUCastOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        mediaIndependentOutNUCastPkts counter has overflowed."
+    ::= { mediaIndependentEntry 21 }
+
+mediaIndependentOutNUCastHighCapacityPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets (including bad packets)
+        received on a full-duplex link in the direction of the
+        network."
+    ::= { mediaIndependentEntry 22 }
+
+mediaIndependentInErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS       "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of bad packets received on a
+        half-duplex link or on the inbound connection of a
+        full-duplex link."
+    ::= { mediaIndependentEntry 23 }
+
+mediaIndependentOutErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS       "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of bad packets received on a full-duplex
+        link in the direction of the network."
+    ::= { mediaIndependentEntry 24 }
+
+mediaIndependentInputSpeed OBJECT-TYPE
+    SYNTAX     Gauge32
+    UNITS      "Kilobits per Second"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The nominal maximum speed in kilobits per second of this
+        half-duplex link or on the inbound connection of this
+        full-duplex link. If the speed is unknown or there is no fixed
+        maximum (e.g. a compressed link), this value shall be zero."
+    ::= { mediaIndependentEntry 25 }
+
+mediaIndependentOutputSpeed OBJECT-TYPE
+    SYNTAX     Gauge32
+    UNITS      "Kilobits per Second"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The nominal maximum speed in kilobits per second of this
+        full-duplex link in the direction of the network. If the speed
+        is unknown, the link is half-duplex, or there is no fixed
+        maximum (e.g. a compressed link), this value shall be zero."
+    ::= { mediaIndependentEntry 26 }
+
+mediaIndependentDuplexMode OBJECT-TYPE
+    SYNTAX     INTEGER {
+                    halfduplex(1),
+                    fullduplex(2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current mode of this link.
+
+        Note that if the link has full-duplex capabilities but
+        is operating in half-duplex mode, this value will be
+        halfduplex(1)."
+    ::= { mediaIndependentEntry 27 }
+
+mediaIndependentDuplexChanges OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Events"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times this link has changed from full-duplex
+        mode to half-duplex mode or from half-duplex mode to
+        full-duplex mode."
+    ::= { mediaIndependentEntry 28 }
+
+mediaIndependentDuplexLastChange OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime at the time the duplex status
+        of this link last changed."
+    ::= { mediaIndependentEntry 29 }
+
+mediaIndependentOwner OBJECT-TYPE
+    SYNTAX     OwnerString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The entity that configured this entry and is
+        therefore using the resources assigned to it."
+    ::= { mediaIndependentEntry 30 }
+
+mediaIndependentStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this media independent statistics entry."
+    ::= { mediaIndependentEntry 31 }
+
+-- High Capacity extensions for the etherStatsTable
+
+etherStatsHighCapacityTable  OBJECT-TYPE
+
+    SYNTAX     SEQUENCE OF EtherStatsHighCapacityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Contains the High Capacity RMON extensions to the RMON-1
+        etherStatsTable."
+    ::= { statistics 7 }
+
+etherStatsHighCapacityEntry  OBJECT-TYPE
+    SYNTAX     EtherStatsHighCapacityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Contains the High Capacity RMON extensions to the RMON-1
+        etherStatsEntry. These objects will be created by the agent
+        for all etherStatsEntries it deems appropriate."
+    INDEX { etherStatsIndex }
+    ::= { etherStatsHighCapacityTable 1 }
+
+EtherStatsHighCapacityEntry ::= SEQUENCE {
+    etherStatsHighCapacityOverflowPkts                 Counter32,
+    etherStatsHighCapacityPkts                         Counter64,
+    etherStatsHighCapacityOverflowOctets               Counter32,
+    etherStatsHighCapacityOctets                       Counter64,
+    etherStatsHighCapacityOverflowPkts64Octets         Counter32,
+    etherStatsHighCapacityPkts64Octets                 Counter64,
+    etherStatsHighCapacityOverflowPkts65to127Octets    Counter32,
+    etherStatsHighCapacityPkts65to127Octets            Counter64,
+    etherStatsHighCapacityOverflowPkts128to255Octets   Counter32,
+    etherStatsHighCapacityPkts128to255Octets           Counter64,
+    etherStatsHighCapacityOverflowPkts256to511Octets   Counter32,
+    etherStatsHighCapacityPkts256to511Octets           Counter64,
+    etherStatsHighCapacityOverflowPkts512to1023Octets  Counter32,
+    etherStatsHighCapacityPkts512to1023Octets          Counter64,
+    etherStatsHighCapacityOverflowPkts1024to1518Octets Counter32,
+    etherStatsHighCapacityPkts1024to1518Octets         Counter64
+}
+
+etherStatsHighCapacityOverflowPkts OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the associated etherStatsPkts
+        counter has overflowed."
+    ::= { etherStatsHighCapacityEntry 1 }
+
+etherStatsHighCapacityPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received."
+    ::= { etherStatsHighCapacityEntry 2 }
+
+etherStatsHighCapacityOverflowOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Octets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the associated etherStatsOctets
+        counter has overflowed."
+    ::= { etherStatsHighCapacityEntry 3 }
+
+etherStatsHighCapacityOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Octets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of octets of data (including
+        those in bad packets) received on the
+        network (excluding framing bits but including
+        FCS octets).
+
+        If the network is half-duplex Fast Ethernet, this
+        object can be used as a reasonable estimate of
+        utilization. If greater precision is desired, the
+        etherStatsHighCapacityPkts and
+        etherStatsHighCapacityOctets objects should be sampled
+        before and after a common interval.  The differences
+        in the sampled values are Pkts and Octets,
+        respectively, and the number of seconds in the
+        interval is Interval.  These values
+        are used to calculate the Utilization as follows:
+
+
+                        Pkts * (.96 + .64) + (Octets * .08)
+        Utilization = -------------------------------------
+                                Interval * 10,000
+
+        The result of this equation is the value Utilization
+        which is the percent utilization of the ethernet
+        segment on a scale of 0 to 100 percent.
+
+        This table is not appropriate for monitoring full-duplex
+        ethernets. If the network is a full-duplex ethernet and the
+        mediaIndependentTable is monitoring that network, the
+        utilization can be calculated as follows:
+
+        1) Determine the utilization of the inbound path by using
+           the appropriate equation (for ethernet or fast ethernet)
+           to determine the utilization, substituting
+           mediaIndependentInPkts for etherStatsHighCapacityPkts, and
+           mediaIndependentInOctets for etherStatsHighCapacityOctets.
+           Call the resulting utilization inUtilization.
+
+        2) Determine the utilization of the outbound path by using
+           the same equation to determine the utilization, substituting
+           mediaIndependentOutPkts for etherStatsHighCapacityPkts, and
+           mediaIndependentOutOctets for etherStatsHighCapacityOctets.
+           Call the resulting utilization outUtilization.
+
+        3) The utilization is the maximum of inUtilization and
+           outUtilization. This metric shows the amount of percentage
+           of bandwidth that is left before congestion will be
+           experienced on the link."
+    ::= { etherStatsHighCapacityEntry 4 }
+
+etherStatsHighCapacityOverflowPkts64Octets OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the associated etherStatsPkts64Octets
+        counter has overflowed."
+    ::= { etherStatsHighCapacityEntry 5 }
+
+etherStatsHighCapacityPkts64Octets OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets (including bad
+        packets) received that were 64 octets in length
+        (excluding framing bits but including FCS octets)."
+    ::= { etherStatsHighCapacityEntry 6 }
+
+etherStatsHighCapacityOverflowPkts65to127Octets OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the associated etherStatsPkts65to127Octets
+        counter has overflowed."
+    ::= { etherStatsHighCapacityEntry 7 }
+
+etherStatsHighCapacityPkts65to127Octets OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets (including bad
+        packets) received that were between
+        65 and 127 octets in length inclusive
+        (excluding framing bits but including FCS octets)."
+    ::= { etherStatsHighCapacityEntry 8 }
+
+etherStatsHighCapacityOverflowPkts128to255Octets OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the associated etherStatsPkts128to255Octets
+        counter has overflowed."
+    ::= { etherStatsHighCapacityEntry 9 }
+
+etherStatsHighCapacityPkts128to255Octets OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets (including bad
+        packets) received that were between
+        128 and 255 octets in length inclusive
+        (excluding framing bits but including FCS octets)."
+    ::= { etherStatsHighCapacityEntry 10 }
+
+etherStatsHighCapacityOverflowPkts256to511Octets OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the associated etherStatsPkts256to511Octets
+        counter has overflowed."
+    ::= { etherStatsHighCapacityEntry 11 }
+
+etherStatsHighCapacityPkts256to511Octets OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets (including bad
+        packets) received that were between
+        256 and 511 octets in length inclusive
+        (excluding framing bits but including FCS octets)."
+    ::= { etherStatsHighCapacityEntry 12 }
+
+etherStatsHighCapacityOverflowPkts512to1023Octets OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the associated
+         etherStatsPkts512to1023Octets counter has overflowed."
+    ::= { etherStatsHighCapacityEntry 13 }
+
+etherStatsHighCapacityPkts512to1023Octets OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets (including bad
+        packets) received that were between
+        512 and 1023 octets in length inclusive
+        (excluding framing bits but including FCS octets)."
+    ::= { etherStatsHighCapacityEntry 14 }
+
+etherStatsHighCapacityOverflowPkts1024to1518Octets OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the associated
+        etherStatsPkts1024to1518Octets counter has overflowed."
+    ::= { etherStatsHighCapacityEntry 15 }
+
+etherStatsHighCapacityPkts1024to1518Octets OBJECT-TYPE
+    SYNTAX     Counter64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets (including bad
+        packets) received that were between
+        1024 and 1518 octets in length inclusive
+        (excluding framing bits but including FCS octets)."
+    ::= { etherStatsHighCapacityEntry 16 }
+
+-- High Capacity extensions for the etherHistoryTable
+
+etherHistoryHighCapacityTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EtherHistoryHighCapacityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Contains the High Capacity RMON extensions to the RMON-1
+        etherHistoryTable."
+    ::= { history 6 }
+
+etherHistoryHighCapacityEntry  OBJECT-TYPE
+    SYNTAX     EtherHistoryHighCapacityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Contains the High Capacity RMON extensions to the RMON-1
+        etherHistoryEntry. These objects will be created by the agent
+        for all etherHistoryEntries associated with whichever
+        historyControlEntries it deems appropriate. (i.e., either all
+        etherHistoryHighCapacityEntries associated with a particular
+        historyControlEntry will be created, or none of them will
+        be.)"
+    INDEX { etherHistoryIndex, etherHistorySampleIndex }
+    ::= { etherHistoryHighCapacityTable 1 }
+
+EtherHistoryHighCapacityEntry ::= SEQUENCE {
+    etherHistoryHighCapacityOverflowPkts           Gauge32,
+    etherHistoryHighCapacityPkts                   CounterBasedGauge64,
+    etherHistoryHighCapacityOverflowOctets         Gauge32,
+    etherHistoryHighCapacityOctets                 CounterBasedGauge64
+}
+
+etherHistoryHighCapacityOverflowPkts OBJECT-TYPE
+    SYNTAX     Gauge32
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the associated etherHistoryPkts
+        Gauge overflowed during this sampling interval."
+    ::= { etherHistoryHighCapacityEntry 1 }
+
+etherHistoryHighCapacityPkts OBJECT-TYPE
+    SYNTAX     CounterBasedGauge64
+    UNITS      "Packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received during
+        this sampling interval."
+    ::= { etherHistoryHighCapacityEntry 2 }
+
+etherHistoryHighCapacityOverflowOctets OBJECT-TYPE
+    SYNTAX     Gauge32
+    UNITS      "Octets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of times the associated etherHistoryOctets
+        counter has overflowed during this sampling interval."
+    ::= { etherHistoryHighCapacityEntry 3 }
+
+etherHistoryHighCapacityOctets OBJECT-TYPE
+    SYNTAX     CounterBasedGauge64
+    UNITS      "Octets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of octets of data (including
+        those in bad packets) received on the
+        network (excluding framing bits but including
+        FCS octets) during this sampling interval."
+    ::= { etherHistoryHighCapacityEntry 4 }
+
+-- High Capacity Extensions for the hostTable
+
+END

@@ -1,0 +1,4 @@
+modules:
+    os:
+        hardware: UPS-MIB::upsIdentModel.0
+        version: UPS-MIB::upsIdentUPSSoftwareVersion.0

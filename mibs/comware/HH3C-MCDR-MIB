@@ -1,0 +1,261 @@
+-- =========================================================================
+-- Copyright (C) 2007 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Multicast Call Detail Record(CDR) MIB
+--              In IPTV application, user join in a multicast group to order
+--              video programme. Multicast CDR is implemented for record basic
+--              information that a user join in a multicast group.
+--              The information record will be sent to NMS.
+--              This new MIB is used for configured policy to send record and
+--              display online user information.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 Created by Wangxiaodong, 2007.12.15
+--        Initial version.
+-- =========================================================================
+--
+-- ==================================================================
+--
+-- Variables and types be imported
+--
+-- ==================================================================
+HH3C-MCDR-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+
+        MODULE-IDENTITY,OBJECT-TYPE,Unsigned32
+    FROM SNMPv2-SMI
+
+        TEXTUAL-CONVENTION,DateAndTime
+    FROM SNMPv2-TC
+
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+
+        ifIndex
+    FROM IF-MIB
+
+        VlanId
+    FROM Q-BRIDGE-MIB
+
+        hh3cCommon
+    FROM HH3C-OID-MIB;
+
+hh3cMultCDR MODULE-IDENTITY
+    LAST-UPDATED "200712150000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    REVISION "200712150000Z"
+    DESCRIPTION
+        "The multicast call detail record MIB."
+    ::= { hh3cCommon  86 }
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+--
+-- hh3cMultCDRCfgObject
+--
+hh3cMultCDRCfgObject OBJECT IDENTIFIER ::= { hh3cMultCDR 1 }
+
+hh3cMultCDRStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure to enable or disable multicast CDR function."
+    ::= { hh3cMultCDRCfgObject 1 }
+
+hh3cMultCDRReportInterval OBJECT-TYPE
+    SYNTAX      INTEGER(30..600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the multicast CDR report-interval. Unit: second."
+    ::= { hh3cMultCDRCfgObject 2 }
+
+hh3cMultCDRCacheLimit OBJECT-TYPE
+    SYNTAX      INTEGER(16..1024)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the multicast CDR cache-limit."
+    ::= { hh3cMultCDRCfgObject 3 }
+
+hh3cMultCDRRecordDelay OBJECT-TYPE
+    SYNTAX      INTEGER(10..600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the multicast CDR record-delay. Unit: second"
+    ::= { hh3cMultCDRCfgObject 4 }
+
+hh3cMultCDRRecordSend OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            send(1),
+            caching(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Send record at once."
+    ::= { hh3cMultCDRCfgObject 5 }
+
+
+--
+--hh3cMultUserOnlineInfoTable
+--
+
+hh3cMultUserOnlineInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMultUserOnlineInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Multicast user online information table."
+    ::= { hh3cMultCDR 2 }
+
+hh3cMultUserOnlineInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cMultUserOnlineInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of multicast user online information table."
+    INDEX
+        {
+            ifIndex,
+            hh3cMultUserRecordID
+        }
+    ::= { hh3cMultUserOnlineInfoTable 1 }
+
+Hh3cMultUserOnlineInfoEntry ::= SEQUENCE
+    {
+        hh3cMultUserRecordID         Unsigned32,
+        hh3cMultUserSubIfIndex       Unsigned32,
+        hh3cMultUserVlanID           VlanId,
+        hh3cMultUserJoinGAddrType    InetAddressType,
+        hh3cMultUserJoinGAddr        InetAddress,
+        hh3cMultUserJoinSAddrType    InetAddressType,
+        hh3cMultUserJoinSAddr        InetAddress,
+        hh3cMultUserStatus           INTEGER,
+        hh3cMultUserJoinTime         DateAndTime,
+        hh3cMultUserPreviewTimes     Unsigned32,
+        hh3cMultUserPreviewRemain    Unsigned32
+    }
+
+hh3cMultUserRecordID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of online record."
+    ::= { hh3cMultUserOnlineInfoEntry 1 }
+
+hh3cMultUserSubIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of sub-interface which is active.
+        If the value is zero, hh3cMultUserSubIfIndex should be ignored."
+    ::= { hh3cMultUserOnlineInfoEntry 2 }
+
+hh3cMultUserVlanID OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ID of VLAN in which the user joined the multicast group."
+    ::= { hh3cMultUserOnlineInfoEntry 3 }
+
+hh3cMultUserJoinGAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of the multicast group IP address."
+    ::= { hh3cMultUserOnlineInfoEntry 4 }
+
+hh3cMultUserJoinGAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The multicast group address which the user joined."
+    ::= { hh3cMultUserOnlineInfoEntry 5 }
+
+hh3cMultUserJoinSAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of the multicast source IP address."
+    ::= { hh3cMultUserOnlineInfoEntry 6 }
+
+hh3cMultUserJoinSAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The multicast source address which the user joined.
+        If the value is '0.0.0.0'(IPv4) or '::'(IPv6), hh3cMultUserJoinSAddr
+        should be ignored."
+    ::= { hh3cMultUserOnlineInfoEntry 7 }
+
+hh3cMultUserStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            permit(1),
+            preview(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of user.
+        permit - user in permit status.
+        preview - user in preview status."
+    ::= { hh3cMultUserOnlineInfoEntry 8 }
+
+hh3cMultUserJoinTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the user joined the multicast group."
+    ::= { hh3cMultUserOnlineInfoEntry 9 }
+
+hh3cMultUserPreviewTimes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The times of multicast preview which the user joined.
+        If hh3cMultUserStatus is not preview, hh3cMultUserPreviewTimes
+        should be ignored."
+    ::= { hh3cMultUserOnlineInfoEntry 10 }
+
+hh3cMultUserPreviewRemain OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remanent time slice of multicast preview which the user joined.
+        If hh3cMultUserStatus is not preview, hh3cMultUserPreviewRemain
+        should be ignored."
+    ::= { hh3cMultUserOnlineInfoEntry 11 }
+
+END

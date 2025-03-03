@@ -15,24 +15,19 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$value = snmp_get($device, 'climateHumidity', '-Oqv', 'GEIST-MIB-V3');
+use LibreNMS\Util\Number;
+
+$value = Number::cast(SnmpQuery::get('GEIST-MIB-V3::climateHumidity')->value());
 if ($value) {
     $current_oid = '.1.3.6.1.4.1.21239.2.2.1.7.1';
     $descr = 'Humidity';
-    discover_sensor($valid['sensor'], 'humidity', $device, $current_oid, 'climateHumidity', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
-}
-
-$value = snmp_get($device, 'internalHumidity.1', '-Oqv', 'GEIST-V4-MIB');
-if ($value) {
-    $current_oid = '.1.3.6.1.4.1.21239.5.1.2.1.6.1';
-    $descr = 'Internal humidity';
-    discover_sensor($valid['sensor'], 'humidity', $device, $current_oid, 'internalHumidity.1', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
+    discover_sensor(null, 'humidity', $device, $current_oid, 'climateHumidity', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value);
 }

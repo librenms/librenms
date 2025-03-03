@@ -1,0 +1,458 @@
+-- =================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:protocol vlan mib
+-- Reference:IEEE 802.1v clause 8.6.4
+-- Version: V1.4
+-- History:
+--     V1.0 Initial version 2004-08-18
+--     V1.1 Updated version 2004-08-31
+--     V1.2 2004-10-12 updated by gaolong
+--          Change value of Hh3cvProtocolVlanProtocolType from underscores to hyphens.
+--          Remove hh3cProtocolVlanVlanId, hh3cProtocolVlanProtocolIndex from hh3cProtocolVlanProtocolGroup
+--          because they are not-accessible objects.
+--          Remove hh3cProtocolVlanPortIndex, hh3cProtocolVlanPortVlanId, hh3cProtocolVlanPortProtocolId
+--          from hh3cProtocolVlanPortGroup because they are not-accessible objects.
+--     V1.3 2005-08-31 updated by jiangjun
+--          Add hh3cDifferentProtocolNumAllPort object to support the maximum
+--          number of different protocols that can be applied on all ports.
+--          Add enum value (ipv6) to Hh3cvProtocolVlanProtocolType.
+--          Update file format by gaolong.
+--     V1.4 2013-04-23 updated by yangxiaoren
+--          Add hh3cProtocolVlanPortStatus object to support the protocol VLAN
+--          status of port applied.
+--          Add enum value notConfigured(201) to hh3cvProtocolVlanProtocolType.
+-- =================================================================
+HH3C-PROTOCOL-VLAN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hh3cCommon
+            FROM HH3C-OID-MIB
+        OBJECT-GROUP, MODULE-COMPLIANCE
+            FROM SNMPv2-CONF
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        RowStatus, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC;
+
+
+    hh3cProtocolVlan MODULE-IDENTITY
+        LAST-UPDATED "200408311800Z"
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "This MIB contains the objects for managing the protocol-based
+             VLAN configurations."
+        REVISION "200408311938Z"        -- August 31, 2004 at 19:38 GMT
+        DESCRIPTION
+            "The initial revision of this MIB module ."
+        ::= { hh3cCommon 16 }
+
+--
+-- Textual conventions
+--
+
+    Hh3cvProtocolVlanProtocolType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "
+            Contains protocols both for Layer 3 and Layer 2.
+            "
+        SYNTAX INTEGER
+        {
+            -- Layer 3 protocols
+            ip(1),
+            ipx(2),
+            at(3),
+            ipv6(4),
+
+            -- Layer 2 protocols
+            mode-llc(101),
+            mode-snap(102),
+            mode-ethernetii(103),
+
+            -- Protocol no configure
+            notConfigure(201)
+        }
+
+    Hh3cvProtocolVlanProtocolSubType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "
+            combine with Hh3cvProtocolVlanProtocolType.
+
+            ethernetii(2), llc(3), raw(4), snap(5) are used when the value
+            of Hh3cvProtocolVlanProtocolType is for Layer 3 protocols.
+            etype(6) is used when the value of Hh3cvProtocolVlanProtocolType
+            is for Layer 2 protocols.
+            For detailed information, see the DESCRIPTION part of
+            hh3cProtocolVlanProtocolTypeValue.
+            "
+        SYNTAX INTEGER
+        {
+            notused(1),        -- this value indicates the object is not used.
+
+            ethernetii(2),
+            llc(3),
+            raw(4),
+            snap(5),
+
+            etype(6)
+        }
+
+--
+-- Node definitions
+--
+
+    hh3cProtocolVlanOperate OBJECT IDENTIFIER ::= { hh3cProtocolVlan 1 }
+
+
+    hh3cProtocolNumAllVlan OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum number of protocols that can be configured on all VLANs.
+            This number may vary with products."
+        ::= { hh3cProtocolVlanOperate 1 }
+
+    hh3cProtocolNumPerVlan OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum number of protocols that can be configured per VLAN.
+            This number may vary with products."
+
+        ::= { hh3cProtocolVlanOperate 2 }
+
+    hh3cProtocolNumAllPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum number of protocols that can be applied on all ports.
+            This number may vary with products."
+        ::= { hh3cProtocolVlanOperate 3 }
+
+    hh3cProtocolNumPerPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum number of protocols that can be applied to each port.
+            This number may vary with products."
+        ::= { hh3cProtocolVlanOperate 4 }
+
+    hh3cProtocolVlanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cProtocolVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Protocol-based VLAN configuration table."
+        ::= { hh3cProtocolVlanOperate 5 }
+
+    hh3cProtocolVlanEntry OBJECT-TYPE
+        SYNTAX Hh3cProtocolVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Protocol-based VLAN configuration entry."
+        INDEX { hh3cProtocolVlanVlanId, hh3cProtocolVlanProtocolIndex }
+        ::= { hh3cProtocolVlanTable 1 }
+
+    Hh3cProtocolVlanEntry ::=
+        SEQUENCE {
+            hh3cProtocolVlanVlanId
+                Integer32,
+            hh3cProtocolVlanProtocolIndex
+                Integer32,
+            hh3cProtocolVlanProtocolType
+                Hh3cvProtocolVlanProtocolType,
+            hh3cProtocolVlanProtocolSubType
+                Hh3cvProtocolVlanProtocolSubType,
+            hh3cProtocolVlanProtocolTypeValue
+                OCTET STRING,
+            hh3cProtocolVlanRowStatus
+                RowStatus
+         }
+
+    hh3cProtocolVlanVlanId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Vlan ID."
+        ::= { hh3cProtocolVlanEntry 1 }
+
+    hh3cProtocolVlanProtocolIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The protocol index value of a row in this table is in the range
+            of [0..hh3cProtocolNumPerVlan-1].
+            This object may not be provided during creation. In this case,
+            a number is assigned by system automatically."
+        ::= { hh3cProtocolVlanEntry 2 }
+
+    hh3cProtocolVlanProtocolType OBJECT-TYPE
+        SYNTAX Hh3cvProtocolVlanProtocolType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Specify protocol types supported by a protocol-based VLAN.
+            Now protocols supported on Layer 3 include ip, ipx, at, ipv6, etc.
+            Now protocols supported on Layer 2 include llc, snap, ethernetii, etc.
+
+            For detailed information, see description of
+            hh3cProtocolVlanProtocolTypeValue.
+            "
+        ::= { hh3cProtocolVlanEntry 3 }
+
+    hh3cProtocolVlanProtocolSubType OBJECT-TYPE
+        SYNTAX Hh3cvProtocolVlanProtocolSubType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            See description of hh3cProtocolVlanProtocolTypeValue.
+            "
+        ::= { hh3cProtocolVlanEntry 4 }
+
+    hh3cProtocolVlanProtocolTypeValue OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..255))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The value of the configured protocol type.
+            By default, semicolon(;) is used as a separator between different
+            parts in the content of the object.
+
+            The relationship among hh3cProtocolVlanProtocolType, hh3cProtocolVlanProtocolSubType
+            and hh3cProtocolVlanProtocolTypeValue is as follows:
+
+            |----------------------------------------------------------------------------------------------|
+            | hh3cProtocolVlan- | hh3cProtocolVlan- | hh3cProtocolVlanProtocolTypeValue                    |
+            | ProtocolType      | ProtocolSubType   |                                                      |
+            |-------------------|-------------------|------------------------------------------------------|
+            | ip                | notused           | notused for create operation                         |
+            |-------------------|-------------------|------------------------------------------------------|
+            | ipv6              | notused           | notused for create operation                         |
+            |-------------------|-------------------|------------------------------------------------------|
+            | at                | notused           | notused for create operation                         |
+            |-------------------|-------------------|------------------------------------------------------|
+            | ipx               | ethernetii        | notused for create operation
+            |                   | llc               |                                                      |
+            |                   | raw               |                                                      |
+            |                   | snap              |                                                      |
+            |-------------------|-------------------|------------------------------------------------------|
+            | mode-snap         | etype             | hex string like '600', which means 0x0600.           |
+            |                   |                   | The range is [0x600..0xffff]                         |
+            |-------------------|-------------------|------------------------------------------------------|
+            | mode-ethernetii   | etype             | hex string like '600', which means 0x0600.           |
+            |                   |                   | The range is [0x600..0xffff]                         |
+            |-------------------|-------------------|------------------------------------------------------|
+            | mode-llc          | notused           | the sequence of different parts is as follows.       |
+            |                   |                   | [dsap value][;ssap value][dsap value;ssap value]     |
+            |                   |                   | Both range is [0x00..0xff]                           |
+            |                   |                   |                                                      |
+            |                   |                   | For example. Suppose value of dsap and ssap are 0x09 |
+            |                   |                   | and 0x0a.                                            |
+            |                   |                   | If neither dsap or ssap, the string length is zero.  |
+            |                   |                   | If dsap provided, the string is '09;' or '09'        |
+            |                   |                   | If ssap provided, the value is ';0a'                 |
+            |                   |                   | If dsap and ssap provided, the value is '09;0a'      |
+            |-------------------|-------------------|------------------------------------------------------|
+            "
+        ::= { hh3cProtocolVlanEntry 5 }
+
+    hh3cProtocolVlanRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The row status of this table."
+        ::= { hh3cProtocolVlanEntry 6 }
+
+    hh3cProtocolVlanPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cProtocolVlanPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Protocol-based VLAN port information table."
+        ::= { hh3cProtocolVlanOperate 6 }
+
+    hh3cProtocolVlanPortEntry OBJECT-TYPE
+        SYNTAX Hh3cProtocolVlanPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Protocol-based VLAN port information entry."
+        INDEX { hh3cProtocolVlanPortIndex, hh3cProtocolVlanPortVlanId,
+                hh3cProtocolVlanPortProtocolId }
+        ::= { hh3cProtocolVlanPortTable 1 }
+
+    Hh3cProtocolVlanPortEntry ::=
+        SEQUENCE {
+            hh3cProtocolVlanPortIndex
+                Integer32,
+            hh3cProtocolVlanPortVlanId
+                Integer32,
+            hh3cProtocolVlanPortProtocolId
+                Integer32,
+            hh3cProtocolVlanPortProtocolType
+                Hh3cvProtocolVlanProtocolType,
+            hh3cProtocolVlanPortProtocolSubType
+                Hh3cvProtocolVlanProtocolSubType,
+            hh3cProtocolVlanPortTypeValue
+                OCTET STRING,
+            hh3cProtocolVlanPortRowStatus
+                RowStatus,
+            hh3cProtocolVlanPortStatus
+                INTEGER
+         }
+
+    hh3cProtocolVlanPortIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The maximum number is the total number of ports supported by device.
+            "
+        REFERENCE
+            "hh3cLswPortIndex in HH3C-LSW-DEV-ADM-MIB"
+        ::= { hh3cProtocolVlanPortEntry 1 }
+
+    hh3cProtocolVlanPortVlanId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The protocol-based VLAN ID."
+        ::= { hh3cProtocolVlanPortEntry 2 }
+
+    hh3cProtocolVlanPortProtocolId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The protocol index."
+        ::= { hh3cProtocolVlanPortEntry 3 }
+
+    hh3cProtocolVlanPortProtocolType OBJECT-TYPE
+        SYNTAX Hh3cvProtocolVlanProtocolType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "See the description of hh3cProtocolVlanProtocolType."
+        ::= { hh3cProtocolVlanPortEntry 4 }
+
+    hh3cProtocolVlanPortProtocolSubType OBJECT-TYPE
+        SYNTAX Hh3cvProtocolVlanProtocolSubType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "See the description of hh3cProtocolVlanProtocolSubType."
+        ::= { hh3cProtocolVlanPortEntry 5 }
+
+    hh3cProtocolVlanPortTypeValue OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "See the description of hh3cProtocolVlanProtocolTypeValue."
+        ::= { hh3cProtocolVlanPortEntry 6 }
+
+    hh3cProtocolVlanPortRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The row status of this table."
+        ::= { hh3cProtocolVlanPortEntry 7 }
+
+    hh3cProtocolVlanPortStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            active   (1),
+            inactive (2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The protocol VLAN status on the port.  The value is active only
+            when hh3cProtocolVlanPortProtocolId has the corresponding entry in
+            hh3cProtocolVlanTable, the port link type is hybrid, and the VLAN is
+            allowed by the port.
+
+            active:   protocol VLAN has been applied on the port.
+            inactive: protocol VLAN is not applied on the port."
+        ::= { hh3cProtocolVlanPortEntry 8 }
+
+    hh3cDifferentProtocolNumAllPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum number of different protocols that can be applied to all ports."
+        ::= { hh3cProtocolVlanOperate 7 }
+
+    hh3cProtocolVlanConformance OBJECT IDENTIFIER ::= { hh3cProtocolVlan 2 }
+
+
+    hh3cProtocolVlanCompliances OBJECT IDENTIFIER ::= { hh3cProtocolVlanConformance 1 }
+
+
+    hh3cProtocolVlanCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for protocol VLAN MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS {  hh3cProtocolVlanOperateGroup,
+                            hh3cProtocolVlanProtocolGroup,
+                            hh3cProtocolVlanPortGroup
+                         }
+        ::= { hh3cProtocolVlanCompliances 1 }
+
+
+    hh3cProtocolVlanGroups OBJECT IDENTIFIER ::= { hh3cProtocolVlanConformance 2 }
+
+    hh3cProtocolVlanOperateGroup OBJECT-GROUP
+        OBJECTS { hh3cProtocolNumAllVlan, hh3cProtocolNumPerVlan,
+                  hh3cProtocolNumAllPort, hh3cProtocolNumPerPort,
+                  hh3cDifferentProtocolNumAllPort
+                }
+        STATUS current
+        DESCRIPTION
+            "A group of scalar objects describing the maximum number."
+        ::= { hh3cProtocolVlanGroups 1 }
+
+    hh3cProtocolVlanProtocolGroup OBJECT-GROUP
+        OBJECTS { hh3cProtocolVlanProtocolType, hh3cProtocolVlanProtocolSubType,
+                  hh3cProtocolVlanProtocolTypeValue, hh3cProtocolVlanRowStatus
+                }
+        STATUS current
+        DESCRIPTION
+            "A group of protocol VLAN protocol."
+        ::= { hh3cProtocolVlanGroups 2 }
+
+    hh3cProtocolVlanPortGroup OBJECT-GROUP
+        OBJECTS { hh3cProtocolVlanPortProtocolType, hh3cProtocolVlanPortProtocolSubType,
+                  hh3cProtocolVlanPortTypeValue, hh3cProtocolVlanPortRowStatus
+                }
+        STATUS current
+        DESCRIPTION
+            "A group of protocol VLAN port."
+        ::= { hh3cProtocolVlanGroups 3 }
+
+END

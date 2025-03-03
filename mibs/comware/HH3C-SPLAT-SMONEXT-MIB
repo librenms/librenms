@@ -1,0 +1,96 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+-- 
+-- Description: Rmon alarm Information MIB
+-- Reference:
+-- Version: V1.1
+-- History:
+--(1) Created by Qizhenglin, 2002.8.15
+-- V1.1 2004-10-12 updated by gaolong
+--      Change MAX-ACCESS to ACCESS.
+--      Change current to mandatory.
+-- ==================================================================
+
+-- ==================================================================
+-- 
+-- Varibles and types be imported
+--
+-- ==================================================================
+
+HH3C-LswSMON-MIB DEFINITIONS ::= BEGIN
+
+              IMPORTS
+                  OBJECT-TYPE
+                      FROM RFC-1212
+                  hh3cRhw
+                      FROM HH3C-OID-MIB;
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+hh3cSmonExtend         OBJECT IDENTIFIER ::= { hh3cRhw 26 }
+
+hh3csmonExtendObject        OBJECT IDENTIFIER ::= { hh3cSmonExtend 1 }
+
+ 
+hh3cdot1qVlanStatNumber OBJECT-TYPE
+     SYNTAX  INTEGER
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+         "The number of vlans that can collect statistics of packets."
+     ::= { hh3csmonExtendObject 1 }
+     
+-- ==================================================================
+--
+-- VLAN statistics status table (for SMON)
+--
+-- ==================================================================
+ hh3cdot1qVlanStatStatusTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF Hh3cdot1qVlanStatStatusEntry
+     ACCESS     not-accessible
+     STATUS     mandatory
+     DESCRIPTION
+         "VLAN statistics status table."
+     ::= { hh3csmonExtendObject 2 }
+
+ hh3cdot1qVlanStatStatusEntry OBJECT-TYPE
+     SYNTAX     Hh3cdot1qVlanStatStatusEntry
+     ACCESS	not-accessible
+     STATUS     mandatory
+     DESCRIPTION
+         " VLAN statistics status table entry."
+     INDEX { hh3cdot1qVlanStatEnableIndex }
+     ::= { hh3cdot1qVlanStatStatusTable 1 }
+
+      
+    Hh3cdot1qVlanStatStatusEntry ::= SEQUENCE {
+        hh3cdot1qVlanStatEnableIndex                INTEGER,
+        hh3cdot1qVlanStatEnableStatus               INTEGER
+    }
+        
+        
+    hh3cdot1qVlanStatEnableIndex  OBJECT-TYPE
+        SYNTAX     INTEGER
+        ACCESS 	    read-only
+        STATUS      mandatory
+        DESCRIPTION
+        "Vlan index ."
+        ::= { hh3cdot1qVlanStatStatusEntry 1 }  
+        
+    hh3cdot1qVlanStatEnableStatus  OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+        ACCESS read-write
+        STATUS      mandatory
+        DESCRIPTION
+        "VLAN Statistics Status.It represent the current VLAN supports statistic or not."
+        ::= { hh3cdot1qVlanStatStatusEntry 2 } 
+
+   END

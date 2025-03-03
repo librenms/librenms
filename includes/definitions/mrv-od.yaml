@@ -2,8 +2,12 @@ os: mrv-od
 text: 'MRV OptiDriver'
 type: network
 icon: mrv
-mib_dir:
-    - mrv
+group: mrv
+over:
+    - { graph: device_dbm, text: 'dBm' }
+    - { graph: device_temperature, text: 'Temperature' }
+mib_dir: mrv
 discovery:
-    - sysObjectId:
-       - .1.3.6.1.4.1.629.200.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.629.200.

@@ -1,0 +1,84 @@
+-- *****************************************************************
+-- PacketLight SiteLight Network Element MIB
+--
+-- Nov 2000, Omri Viner
+--
+-- Copyright (c) 1999-2000 by PacketLight Ltd.
+-- All rights reserved.
+-- *****************************************************************
+
+SL-NE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	enterprises, NOTIFICATION-TYPE 		FROM SNMPv2-SMI
+	DisplayString, TruthValue	  		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB;
+
+
+packetlight MODULE-IDENTITY
+	LAST-UPDATED "200009260000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"The MIB module is the root of the PL extension mibs."
+	::= { enterprises 4515 }
+
+sitelight 	OBJECT IDENTIFIER ::= { packetlight 1 }
+plproduct 	OBJECT IDENTIFIER ::= { packetlight 100 }
+
+-- Values for the sysObjectId
+
+plne 		OBJECT IDENTIFIER ::= { plproduct 1 }  
+
+pl10 		OBJECT IDENTIFIER ::= { plne 10 }  		-- pl-10
+pl10H 		OBJECT IDENTIFIER ::= { pl10 1 }  		-- pl-10 half box
+pl10F 		OBJECT IDENTIFIER ::= { pl10 2 }  		-- pl-10 full box
+
+pl20 		OBJECT IDENTIFIER ::= { plne 20 }  		-- pl-20
+pl20H 		OBJECT IDENTIFIER ::= { pl20 1 }  		-- pl-20 half box
+pl20F 		OBJECT IDENTIFIER ::= { pl20 2 }  		-- pl-20 full box
+
+pl100 		OBJECT IDENTIFIER ::= { plne 100 }  	-- pl-100
+pl100E 		OBJECT IDENTIFIER ::= { pl100 1 }  		-- pl-100 12 x ESCON
+pl100F 		OBJECT IDENTIFIER ::= { pl100 2 }  		-- pl-100 4 x FC
+pl100FG 	OBJECT IDENTIFIER ::= { pl100 3 }  		-- pl-100 4 x FC or GBE
+pl100EF 	OBJECT IDENTIFIER ::= { pl100 4 }  		-- pl-100 4 x FC and 8 x ESCON
+pl100EFG	OBJECT IDENTIFIER ::= { pl100 5 }  		-- pl-100 4 x FC or GBE, and 8 x ESCON
+pl100FT		OBJECT IDENTIFIER ::= { pl100 12 }  	-- pl-100 4 x FC - GFP-T
+
+plopto 		OBJECT IDENTIFIER ::= { plne 150 }  	-- pl-opto
+ploptoXB	OBJECT IDENTIFIER ::= { plopto 1 }  	-- pl-opto booster 4 x XPDR and 1 x EDFA
+ploptoI		OBJECT IDENTIFIER ::= { plopto 2 }  	-- pl-opto inline 2 x EDFA
+ploptoX		OBJECT IDENTIFIER ::= { plopto 3 }  	-- pl-opto transponder 4 x XPDR
+
+pl200 		OBJECT IDENTIFIER ::= { plne 200 }  	-- pl-200
+
+pl400r 		OBJECT IDENTIFIER ::= { plne 400 }  	-- pl-400 Root 
+pl400 		OBJECT IDENTIFIER ::= { pl400r 1 }  	-- pl-400 
+
+pl404r 		OBJECT IDENTIFIER ::= { plne 404 }  	-- pl-400E Root
+pl400e 		OBJECT IDENTIFIER ::= { pl404r 1 }  	-- pl-400E 
+
+pl408r 		OBJECT IDENTIFIER ::= { plne 408 }  	-- pl-400X Root
+pl400x		OBJECT IDENTIFIER ::= { pl408r 1 }  	-- pl-400X 
+
+pl1000r 	OBJECT IDENTIFIER ::= { plne 1000 }  	-- pl-1000 Root
+pl1000 		OBJECT IDENTIFIER ::= { pl1000r 1 }  	-- pl-1000 
+pl1000e		OBJECT IDENTIFIER ::= { pl1000r 2 }  	-- pl-1000E (former PL-800) 
+pl1000em	OBJECT IDENTIFIER ::= { pl1000r 3 }  	-- pl-1000EM  
+pl1000ro	OBJECT IDENTIFIER ::= { pl1000r 4 }  	-- pl-1000RO  
+pl1000tn	OBJECT IDENTIFIER ::= { pl1000r 5 }  	-- pl-1000TN  
+
+pl2000r 	OBJECT IDENTIFIER ::= { plne 2000 }  	-- pl-2000 Root
+pl2000  	OBJECT IDENTIFIER ::= { pl2000r 1 }  	-- pl-2000 
+
+
+-- The root for the service mibs
+
+slService 	OBJECT IDENTIFIER ::= { sitelight 1 }
+
+END

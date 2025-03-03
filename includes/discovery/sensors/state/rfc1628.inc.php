@@ -1,80 +1,122 @@
 <?php
+/*
+ *
+ * @link       https://www.librenms.org
+ *
+ * @author     peca.nesovanovic <peca.nesovanovic@sattrakt.com>
+ */
 
 echo 'RFC1628 ';
 
 // Battery Status (Value : 1 unknown, 2 batteryNormal, 3 batteryLow, 4 batteryDepleted)
-$state = snmp_get($device, "upsBatteryStatus.0", "-Ovqe", 'UPS-MIB');
-$cur_oid = '.1.3.6.1.2.1.33.1.2.1.0';
-$index = '0';
-
+$state = snmp_get($device, 'upsBatteryStatus.0', '-Ovqe', 'UPS-MIB');
 if (is_numeric($state)) {
     //Create State Index
     $state_name = 'upsBatteryStatusState';
-    $state_index_id = create_state_index($state_name);
+    create_state_index(
+        $state_name,
+        [
+            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'],
+            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'Low'],
+            ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'Depleted'],
+        ]
+    );
 
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-            array($state_index_id,'Unknown',0,1,3) ,
-            array($state_index_id,'Normal',0,2,0) ,
-            array($state_index_id,'Low',0,3,2) ,
-            array($state_index_id,'Depleted',0,4,2) ,
-         );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
-
-    //Discover Sensors
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'Battery Status', '1', '1', null, null, null, null, $state, 'snmp', $index);
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $index);
+    $sensor_index = 0;
+    discover_sensor(
+        null,
+        'state',
+        $device,
+        '.1.3.6.1.2.1.33.1.2.1.0',
+        $sensor_index,
+        $state_name,
+        'Battery Status',
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $state,
+        'snmp',
+        0
+    );
 }
 
 // Output Source (Value : 1 other, 2 none, 3 normal, 4 bypass, 5 battery, 6 booster, 7 reducer)
-$state = snmp_get($device, "upsOutputSource.0", "-Ovqe", 'UPS-MIB');
-$cur_oid = '.1.3.6.1.2.1.33.1.4.1.0';
-$index = '0';
-
+$state = snmp_get($device, 'upsOutputSource.0', '-Ovqe', 'UPS-MIB');
 if (is_numeric($state)) {
     //Create State Index
     $state_name = 'upsOutputSourceState';
-    $state_index_id = create_state_index($state_name);
+    create_state_index(
+        $state_name,
+        [
+            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Other'],
+            ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'None'],
+            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'Normal'],
+            ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'Bypass'],
+            ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Battery'],
+            ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'Booster'],
+            ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'Reducer'],
+        ]
+    );
 
-    //Create State Translation
-    if ($state_index_id) {
-        $states = array(
-            array($state_index_id,'Other',0,1,3) ,
-            array($state_index_id,'None',0,2,3) ,
-            array($state_index_id,'Normal',0,3,0) ,
-            array($state_index_id,'Bypass',0,4,2) ,
-            array($state_index_id,'Battery',0,5,2) ,
-            array($state_index_id,'Booster',0,6,2) ,
-            array($state_index_id,'Reducer',0,7,2) ,
-         );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $sensor_index = 0;
+    discover_sensor(
+        null,
+        'state',
+        $device,
+        '.1.3.6.1.2.1.33.1.4.1.0',
+        $sensor_index,
+        $state_name,
+        'Output Source',
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $state,
+        'snmp',
+        0
+    );
+}
 
-    //Discover Sensors
-    discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $index, $state_name, 'Output Source', '1', '1', null, null, null, null, $state, 'snmp', $index);
+// UPS battery test status
+$state = SnmpQuery::get('UPS-MIB::upsTestResultsSummary.0')->value();
+if (is_numeric($state)) {
+    //Create State Index
+    $state_name = 'upsTestResult';
+    create_state_index(
+        $state_name,
+        [
+            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
+            ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Warning'],
+            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'Error'],
+            ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'Aborted'],
+            ['value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'inProgress'],
+            ['value' => 6, 'generic' => 3, 'graph' => 0, 'descr' => 'noTestInitiated'],
+        ]
+    );
 
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $index);
+    $sensor_index = 0;
+    discover_sensor(
+        null,
+        'state',
+        $device,
+        '.1.3.6.1.2.1.33.1.7.3.0',
+        $sensor_index,
+        $state_name,
+        'UPS Test',
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $state,
+        'snmp',
+        0
+    );
 }

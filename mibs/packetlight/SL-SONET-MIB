@@ -1,0 +1,883 @@
+-- *****************************************************************
+-- SONET MIB
+-- *****************************************************************
+
+SL-SONET-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, Counter64,
+	Gauge32 			     			FROM SNMPv2-SMI
+	DisplayString, TruthValue, RowStatus
+								  		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex, ifIndex            	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+	sitelight				      		FROM SL-NE-MIB;
+
+slSonetMib MODULE-IDENTITY
+	LAST-UPDATED "200008280000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the SiteLight SONET Service.
+		The mib contains the extensions required for the rfc2558."
+	::= { sitelight 6 }
+
+SignalLabel ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+       "STS path signal label -- one byte, C2, class A, is allocated to 
+       indicate the construction of the STS SPE. 
+       The following hex values of the C2 byte has been defined."
+       SYNTAX  INTEGER {
+			sigUnequipped(0),      -- Unequipped signal (no path originate equipment) 
+			sigEquipped(1),        -- Equipped signal (standard payload) 
+			sigPathFloatVt(2),     -- Floating VT mode 
+			sigPathLoackedVt(3),   -- Locked VT mode 
+			sigPathAsynchDs3(4),   -- Asynchronous mapping for DS3 
+			sigPathSyntran(5),     -- Mapping byte observable SYNTRAN 
+			sigPathAsyncDs4na(18), -- Asynchronous mapping for 139.264 Mbps 
+			sigPathAtm(19),        -- Mapping for ATM 
+			sigPathDqdb(20),       -- Mapping for DQDB 
+			sigPathFddi(21),       -- Asynchronous mapping for FDDI 
+			sigPathHdlc(22),       -- HDLC-Over-SONET Mapping 
+			sigPathGfp(27)         -- GFP Mapping
+        }
+        
+slSonetConfig       	OBJECT IDENTIFIER ::= { slSonetMib 1} 
+slSonetOh           	OBJECT IDENTIFIER ::= { slSonetMib 2 }
+-- slSonetPmMib           OBJECT IDENTIFIER ::= {slSonetMib 3}
+-- slSonetAlarmsMib       OBJECT IDENTIFIER ::= {slSonetMib 4}
+-- slSonetApsMib          OBJECT IDENTIFIER ::= {slSonetMib 5} 
+slSonetPos          	OBJECT IDENTIFIER ::= { slSonetMib 6 }
+slSonetAls          	OBJECT IDENTIFIER ::= { slSonetMib 7 }
+slSonetFs				OBJECT IDENTIFIER ::= { slSonetMib 8 }
+slSonetTraps			OBJECT IDENTIFIER ::= { slSonetMib 11 }
+   
+slSonetOhTrace			OBJECT IDENTIFIER ::= {slSonetOh 1} -- Trace Message
+slSonetOhSl				OBJECT IDENTIFIER ::= {slSonetOh 2} -- Signal Label
+slSonetOhTraps			OBJECT IDENTIFIER ::= {slSonetOh 3} -- Mismatch Traps
+
+------------------------------ 
+--
+-- Sonet Config table 
+--
+------------------------------ 
+
+slSonetConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlSonetConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "The SONET/SDH configuration table. This table has objects 
+        for configuring sonet lines."
+     ::= { slSonetConfig 1 }
+
+slSonetConfigEntry OBJECT-TYPE
+    SYNTAX SlSonetConfigEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "An entry in the table. There is an entry for each SONET line 
+        in the table. Entries are automatically created for an 
+        ifType value of sonet(39). 'ifAdminStatus' from the ifTable 
+        must be used to enable or disable a line. By default, the 
+        line state is down."
+    INDEX   { ifIndex }
+     ::= { slSonetConfigTable 1 }
+
+SlSonetConfigEntry ::=
+    SEQUENCE {
+         slSonetConfigFrameScramble       	INTEGER,
+         slSonetConfigType                	INTEGER,    -- deprecated
+         slSonetConfigDccSelection		  	INTEGER,
+		 slSonetResetAllCounters 		  	INTEGER,
+		 slSonetPortThresholdTrapEnable	  	INTEGER,
+		 slSonetConfigSdThreshold			INTEGER, 
+		 slSonetConfigSfThreshold           INTEGER,
+         slSonetCompression          		INTEGER,
+         slSonetOverheadTunneling			INTEGER,
+         slSonetLopBitmask					Counter64,  -- deprecated
+         slSonetTdmTrunk					TruthValue,
+         slSonetFsApply						INTEGER,  	-- deprecated
+         slSonetTxLte						INTEGER,
+         slSonetReceivedLte					INTEGER,
+		 slSonetResetPmThreshold	 		INTEGER,
+		 slSonetResetAlsParams	 			INTEGER,
+		 slSonetTransceiverType	 			INTEGER,
+		 slSonetTransceiverMedia	 		INTEGER
+        }
+
+slSonetConfigFrameScramble OBJECT-TYPE
+        SYNTAX INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to disable or enable the Scrambling
+             option in SONET line. Please refer to GR-253-CORE for 
+             frame scrambling."
+        REFERENCE
+            "GR-253-CORE"
+        DEFVAL { enabled }
+        ::= {slSonetConfigEntry 1}
+
+slSonetConfigType OBJECT-TYPE
+        SYNTAX INTEGER {
+                sonetSts3(1),			-- deprecated
+                sonetSts3c(2),			-- deprecated
+                sonetSts12(3),			-- deprecated
+                sonetSts12c(4),			-- deprecated
+                sonetSts48c(5),
+                sonetSts3cx4(6),		-- deprecated
+                sonetSts48(7),			-- deprecated
+                sonetSts3cx16(8),		-- deprecated
+                sonetSts3x16(9),		-- deprecated
+                sonetSts12cx4(10),		-- deprecated
+                sonetSts12x4(11),		-- deprecated
+                sonetSts192c(12),
+                sonetStsOther(13)       
+                }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION
+           "This object represents the configured line type for Trunks:
+           sonetSts48c(5)    - 1  x Sts48  (2.5GbTrunk)
+           sonetSts192c(12)  - 1  x Sts192 (10Gb Trunk)
+           sonetStsOther(13) - for OC-n interfaces see slSonetFsTable."
+        ::= {slSonetConfigEntry 2}        
+
+slSonetConfigDccSelection OBJECT-TYPE
+        SYNTAX INTEGER {
+                sonetLineDcc(1),
+                sonetSectionDcc(2),
+                sonetInband(3)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+           "This object selects the DCC type."
+        ::= {slSonetConfigEntry 3 }        
+
+slSonetResetAllCounters OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    resetCounters(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this variable to 1 will cause all of the counters
+        (performance regsters) on this SONET interface to be initialized 
+        to zero (0)."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.1."
+    ::= { slSonetConfigEntry 4 }
+        
+slSonetPortThresholdTrapEnable OBJECT-TYPE
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether threshold traps 
+        should be generated for this SONET interface."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.2."
+    DEFVAL      { disabled }
+   ::= { slSonetConfigEntry 5 }
+ 
+slSonetConfigSdThreshold  OBJECT-TYPE
+        SYNTAX    INTEGER (5..9)
+        MAX-ACCESS    read-write
+        STATUS    current
+        DESCRIPTION
+           "This object contains the Bit Error Rate threshold for
+            Signal Degrade detection on the working line. Once this
+            threshold is exceeded, an APS switch will occur.
+            This value is 10 to -n where n is between 5 and 9
+            (read-write)."
+        DEFVAL {5}
+        ::= { slSonetConfigEntry 6 }
+ 
+slSonetConfigSfThreshold OBJECT-TYPE
+     SYNTAX    INTEGER (3..5)
+     MAX-ACCESS read-write
+     STATUS    current
+     DESCRIPTION
+       "This object contains the Bit Error Rate threshold for
+        Signal Fault detection on the working line. Once this
+        threshold is exceeded, an APS switch will occur.
+        This value is 10 to the -n, where n is between 3 and 5.
+        (read-write)"
+    DEFVAL {3}
+    ::= { slSonetConfigEntry 7 }
+ 
+slSonetCompression OBJECT-TYPE
+     SYNTAX    INTEGER  {
+     	uncompress(0),
+     	posCompress32(1),
+     	posCompress16(2)     		
+     }
+     MAX-ACCESS read-write
+     STATUS    current
+     DESCRIPTION
+       "This object applies only for trunk ports.
+       It specifies if the packets should be compressed.
+       0 - Means no POS compression, 
+       1 - Means POS compression with CRC-32.
+       2 - Means POS compression with CRC-16.
+       Note that the two connected trunks should be configured
+       to the same value.
+       Note also that the BW calculation of the OC-n should
+       be changed according to this value."
+    ::= { slSonetConfigEntry 9 }
+ 
+slSonetOverheadTunneling OBJECT-TYPE
+     SYNTAX    INTEGER {
+     	none(0),
+     	lineDcc(1),
+     	k1k2(2),
+     	full(3)
+     }
+     MAX-ACCESS read-write
+     STATUS    current
+     DESCRIPTION
+       "The section and line overhead tunneling configuration:
+       none(0)     - no tunneling support
+       lineDcc(1)  - line DCC tunneling
+       k1k2(2)     - line DCC + protection k byte
+       full(3)     - all transport overhead bytes are tunneled"
+    ::= { slSonetConfigEntry 10 }
+ 
+slSonetLopBitmask OBJECT-TYPE
+     SYNTAX    Counter64
+     MAX-ACCESS read-only
+     STATUS    current      -- deprecated
+     DESCRIPTION
+       "The LOP status. Each bit of the bits represent the status
+       of the LOP alarm in corresponding STS.
+       For a path with more than a single STS, only the value of the
+       first STS in the path is relevant.
+       This object is relevant only for the OC-N cards and not
+       for the Trunk.
+       In the next future this object will be replaced with
+       an object of a new table that shall describe the OC-N
+       frame structure."
+    ::= { slSonetConfigEntry 11 }
+ 
+slSonetTdmTrunk OBJECT-TYPE
+     SYNTAX    TruthValue
+     MAX-ACCESS read-write
+     STATUS    current
+     DESCRIPTION
+       "This object is applicable only to the OC-n ports.
+       TRUE  - means that the OC-n port is used as a TDM Trunk.
+       FLASE - means normal OC-n port."
+    ::= { slSonetConfigEntry 12 }
+ 
+slSonetFsApply OBJECT-TYPE
+     SYNTAX    INTEGER
+     MAX-ACCESS read-write	-- deprecated
+     STATUS    current
+     DESCRIPTION
+       "Writing to this object activate the slSonetFsTable setting.
+       This allow the NMS to do many changes to the slSonetFsTable
+       and then APPLY them at once. This prevent from going through
+       unconsistent steps.
+       This object always returns the value 0."
+    ::= { slSonetConfigEntry 13 }
+ 
+slSonetTxLte OBJECT-TYPE
+     SYNTAX    INTEGER {
+     	ssb00(1),     -- SONET
+     	ssb10(2),     -- SDH
+     	auto(5)       -- Tx what is detected
+     }
+     MAX-ACCESS read-write
+     STATUS    current
+     DESCRIPTION
+       "The SS bits to transmit (bits 5,6 in H1,H1*)."
+    ::= { slSonetConfigEntry 14 }
+ 
+slSonetReceivedLte OBJECT-TYPE
+     SYNTAX    INTEGER {
+     	ssb00(1),     -- SONET
+     	ssb10(2),     -- SDH
+     	ssb01(3),     -- other
+     	ssb11(4),     -- other
+     	ssbinv(5)     -- invalid
+     }
+     MAX-ACCESS read-only
+     STATUS    current
+     DESCRIPTION
+       "The detected LTE type, according to the received SS bits
+       (bits 5,6 in H1,H1*)."
+    ::= { slSonetConfigEntry 15 }
+
+slSonetResetPmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    resetCounters(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this variable to 1 will reset the PM threshold 
+        parameters to the factory defaults."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.1."
+    ::= { slSonetConfigEntry 16 }
+
+slSonetResetAlsParams OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    resetCounters(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this variable to 1 will reset the ALS 
+        parameters to the factory defaults."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.1."
+    ::= { slSonetConfigEntry 17 }
+
+slSonetTransceiverType OBJECT-TYPE
+      SYNTAX      INTEGER {
+      	none(1),
+      	shortWave(2),  -- 850nm
+      	longWave(3)    -- 1310nm
+      }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The tranceiver type."
+  ::= { slSonetConfigEntry 18 }
+
+slSonetTransceiverMedia OBJECT-TYPE
+	SYNTAX      INTEGER {
+		none(1),        --
+		sm(2),  --  Single Mode 
+		mm(3)   --  Multi Mode 
+	}
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION 
+		"The tranceiver media."
+    ::= { slSonetConfigEntry 19 }
+   
+
+-- ----------------------------------------------------------------
+--
+-- Sonet Trace Table
+--
+-- ----------------------------------------------------------------
+
+slSonetTraceTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SlSonetTraceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+           "The SONET/SDH Trace table. This table contains 
+            objects for tracing the sonet section and path." 
+        ::= { slSonetOhTrace 1 }
+
+slSonetTraceEntry OBJECT-TYPE
+    SYNTAX      SlSonetTraceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the trace table. Entries exist for active sonet
+         interfaces. The objects in this table are used to verify 
+         continued connection between the two ends of the line."
+    INDEX   { ifIndex }
+    ::=     { slSonetTraceTable 1 }
+
+
+SlSonetTraceEntry ::=
+        SEQUENCE {
+                slSonetTraceMode					INTEGER,
+                slSonetTraceToTransmit              DisplayString,
+                slSonetTraceToExpect                DisplayString,
+                slSonetTraceFailure                 TruthValue,
+                slSonetTraceReceived                DisplayString
+		}
+
+slSonetTraceMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+     	enable(1),    -- notification and rdi
+     	disable(2),   -- no notification and no rdi
+     	monitoring(3) -- only notification and no rdi
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Determine the Trace Message Mode."
+     REFERENCE
+         "GR-253-CORE"
+     ::= { slSonetTraceEntry 1 }
+
+slSonetTraceToTransmit OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..62))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Sonet Trace To Transmit. This is string that
+             is transmitted to perform Sonet trace 
+             diagnostics. The trace string is  repetitively 
+             transmited so that a trace receiving terminal can 
+             verify its continued connection to the intended 
+             transmitter. The default value is a zero-length string.
+             Unless this object is set to a non-zero length string, 
+             tracing will not be performed.
+             The Agent is responsible to pad the end of the string with <CR><LF>."
+         REFERENCE 
+            "GR-253-CORE"
+         ::= { slSonetTraceEntry 2 }
+ 
+slSonetTraceToExpect OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..62))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Sonet Trace Massage To Expect. The receiving terminal 
+             verifies if the incoming string matches this string. 
+             The value of 'slSonetTraceFailure' indicates whether a 
+             trace mismatch occurred. The default value is a 
+             zero-length string.
+             The Agent is responsible to pad the end of the string with <CR><LF>."
+        REFERENCE
+              "GR-253-CORE"
+        ::= { slSonetTraceEntry 3 }
+
+slSonetTraceFailure OBJECT-TYPE
+     SYNTAX  TruthValue
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+        "The value of this object is set to 'true' when Sonet 
+         Section received trace does not match the 
+         'slSonetTraceToExpect'."
+     REFERENCE
+         "GR-253-CORE"
+     ::= { slSonetTraceEntry 4 }
+
+slSonetTraceReceived OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE(0..62))
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This object is used to view the Sonet Trace Message that 
+		is received by the receiving terminal.
+		The Agent is responsible to pad the end of the string with <CR><LF>."
+	REFERENCE
+		"GR-253-CORE"
+	::= { slSonetTraceEntry 5 }
+
+
+-- ----------------------------------------------------------------
+--
+-- Signal Label Table
+--
+-- ----------------------------------------------------------------
+ 
+slSonetSlTable OBJECT-TYPE
+     SYNTAX  SEQUENCE OF SlSonetSlEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+       "The SONET/SDH Signal Label table. This table contains 
+       signal label for the sonet path."
+     ::= { slSonetOhSl 1 }
+     
+slSonetSlEntry OBJECT-TYPE
+     SYNTAX  SlSonetSlEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+       "An entry in the SONET/SDH Signal Label table. The entries 
+        exist for active sonet lines. The objects in this table are 
+        used to verify continued connection between the two ends of
+        the line."
+     INDEX   { ifIndex }
+     ::= { slSonetSlTable 1 }
+
+
+SlSonetSlEntry ::=
+     SEQUENCE {
+         slSonetSlToTransmit              SignalLabel,
+         slSonetSlToExpect                SignalLabel,
+         slSonetSlFailure                 TruthValue,
+         slSonetSlReceived                INTEGER
+         }
+
+slSonetSlToTransmit OBJECT-TYPE
+     SYNTAX      SignalLabel
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Sonet Signal Label To Transmit."
+     REFERENCE
+         "GR-253-CORE"
+     ::= { slSonetSlEntry 2 }
+ 
+slSonetSlToExpect OBJECT-TYPE
+     SYNTAX      SignalLabel
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Sonet Signal Label To Expect."
+     REFERENCE
+         "GR-253-CORE"
+     ::= { slSonetSlEntry 3 }
+
+slSonetSlFailure OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The value of this object is set to 'true' when Sonet
+         received signal label does not match the 'slSonetSlToExpect'."     
+     REFERENCE
+         "GR-253-CORE"
+     ::= { slSonetSlEntry 4 }
+ 
+slSonetSlReceived OBJECT-TYPE
+	SYNTAX      INTEGER (0..255)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"This object is used to view the Sonet Signal Label that is
+		received by the receiving terminal."
+	REFERENCE
+		"GR-253-CORE"
+	::= { slSonetSlEntry 5 }
+
+-- ----------------------------------------------------------------
+--
+-- Packets Over Sonet/Sdh (POS) Performance Monitoring (PM) Table
+--
+-- ----------------------------------------------------------------
+ 
+slSonetPosTable OBJECT-TYPE
+     SYNTAX  SEQUENCE OF SlSonetPosEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+       "The POS PM Table."
+     ::= { slSonetPos 1 }
+     
+slSonetPosEntry OBJECT-TYPE
+	SYNTAX  SlSonetPosEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The entries exist for active Trunk sonet lines 
+		ifType = pos(171). The objects in this table are 
+		used to moitor the POS layer."
+	INDEX   { ifIndex }
+	::= { slSonetPosTable 1 }
+
+SlSonetPosEntry ::=
+	SEQUENCE {
+		slSonetPosFcs					Gauge32,
+		slSonetPosAbort					Gauge32,
+		slSonetPosMinViolation			Gauge32,
+		slSonetPosMaxViolation			Gauge32,
+		slSonetPosRxfifoDiscard			Gauge32,
+		slSonetPosPacketReceived		Counter64,
+		slSonetPosPacketReceivedOk		Counter64
+	}
+
+slSonetPosFcs OBJECT-TYPE
+     SYNTAX      Gauge32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The Number of FCS Errors."
+     ::= { slSonetPosEntry 1 }
+
+slSonetPosAbort OBJECT-TYPE
+     SYNTAX      Gauge32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The Number of Aborted packets."
+     ::= { slSonetPosEntry 2 }
+
+slSonetPosMinViolation OBJECT-TYPE
+     SYNTAX      Gauge32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The Number of Minimum length violation packets."
+     ::= { slSonetPosEntry 3 }
+
+slSonetPosMaxViolation OBJECT-TYPE
+     SYNTAX      Gauge32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The Number of Maximum length violation packets."
+     ::= { slSonetPosEntry 4 }
+
+slSonetPosRxfifoDiscard OBJECT-TYPE
+     SYNTAX      Gauge32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The Number of packets discarded due to RXFIFO error."
+     ::= { slSonetPosEntry 5 }
+
+slSonetPosPacketReceived OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The Number of packets received."
+     ::= { slSonetPosEntry 6 }
+
+slSonetPosPacketReceivedOk OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The Number of error free packets."
+     ::= { slSonetPosEntry 7 }
+
+
+-- ----------------------------------------------------------------
+--
+-- Automatic Laser Shutdown (ALS) Configuration Table
+--
+-- ----------------------------------------------------------------
+ 
+slSonetAlsTable OBJECT-TYPE
+     SYNTAX  SEQUENCE OF SlSonetAlsEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+       "The ALS configuration Table."
+     ::= { slSonetAls 1 }
+     
+slSonetAlsEntry OBJECT-TYPE
+	SYNTAX  SlSonetAlsEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The entries exist for active sonet lines 
+		ifType = sonet(39). The objects in this table are 
+		used to configure the ALS algorithm."
+	INDEX   { ifIndex }
+	::= { slSonetAlsTable 1 }
+
+SlSonetAlsEntry ::=
+	SEQUENCE {
+		slSonetAlsMode					INTEGER,
+		slSonetLosDeclareTime			INTEGER,
+		slSonetTestPulseTime			INTEGER,
+		slSonetManualPulseTime			INTEGER,
+		slSonetAutomaticPulseTime		INTEGER,
+		slSonetAutomaticDelayTime		INTEGER,
+		slSonetLaserTestActivate		INTEGER,
+		slSonetLaserManualActivate		INTEGER
+	}
+
+slSonetAlsMode OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	enable(1), 
+     	disable(2) 
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Enable/Disable the ALS algorithm.
+        Note that the if the Laser Admin Status is 'down' the
+        ALS mechanism is not operational."
+     ::= { slSonetAlsEntry 1 }
+
+slSonetLosDeclareTime OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	ms500(1), -- 500 ms
+     	ms550(2), -- 550 ms
+     	ms600(3)  -- 600 ms
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Time to declare optical LOS present or clear: 550 +- 50 msec."
+     ::= { slSonetAlsEntry 2 }
+
+slSonetTestPulseTime OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	s80(1),   -- 80 sec
+     	s90(2),   -- 90 sec
+     	s100(3)   -- 100 sec
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Manual restart for test Pulse time (in manual restart) - 90+-10 sec."
+     ::= { slSonetAlsEntry 3 }
+
+slSonetManualPulseTime OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	ms1750(1),   -- 1.75 Sec
+     	ms2000(2),   -- 2.0  sec
+     	ms2250(3)    -- 2.25 sec
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Manual restart Pulse time (in manual mode) - 2+-0.25 sec."
+     ::= { slSonetAlsEntry 4 }
+
+slSonetAutomaticPulseTime OBJECT-TYPE
+     SYNTAX      INTEGER { 
+     	ms1750(1),   -- 1.75 Sec
+     	ms2000(2),   -- 2.0  sec
+     	ms2250(3)    -- 2.25 sec
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Automatic restart Pulse time (in automatic mode) - 2+-0.25 sec."
+     ::= { slSonetAlsEntry 5 }
+
+slSonetAutomaticDelayTime OBJECT-TYPE
+     SYNTAX      INTEGER (60..300)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "In Automatic mode. The delay between two laser re-activations."
+     ::= { slSonetAlsEntry 6 }
+
+slSonetLaserTestActivate OBJECT-TYPE
+     SYNTAX      INTEGER { activate(1) }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Activate the laser for test operation."
+     ::= { slSonetAlsEntry 7 }
+
+slSonetLaserManualActivate OBJECT-TYPE
+     SYNTAX      INTEGER { activate(1) }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "Activate the laser manual operation."
+     ::= { slSonetAlsEntry 8 }
+
+-- ----------------------------------------------------------------
+--
+-- Frame Structure Configuration Table
+--
+-- ----------------------------------------------------------------
+ 
+slSonetFsTable OBJECT-TYPE
+     SYNTAX  SEQUENCE OF SlSonetFsEntry
+     MAX-ACCESS  not-accessible     -- deprecated
+     STATUS  current
+     DESCRIPTION
+       "The frame structure configuration Table.
+       In order to define a new path the NMS should create and configure
+       an entry in this table.
+       The table is also used to monitor the status of the LOP
+       alarm per path."
+     ::= { slSonetFs 1 }
+     
+slSonetFsEntry OBJECT-TYPE
+	SYNTAX  SlSonetFsEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The entries exist for sonet paths 
+		ifType = sonet(39). The objects in this table are 
+		used to configure the frame structure.
+		Each OC-N line interface shall maintain a static
+		table with number of lines equal to the N.
+		Initially the table will be initialized to STS-Nc."
+	INDEX   { slSonetFsIfIndex, 
+			  slSonetFsSts }
+	::= { slSonetFsTable 1 }
+
+SlSonetFsEntry ::=
+	SEQUENCE {
+		slSonetFsIfIndex				InterfaceIndex,
+		slSonetFsSts					INTEGER,
+		slSonetFsWidth					INTEGER,
+		slSonetFsFullPathTermination	TruthValue,
+		slSonetFsGranularity			INTEGER
+	}
+
+slSonetFsIfIndex OBJECT-TYPE
+	SYNTAX		InterfaceIndex 
+	MAX-ACCESS	read-only
+	STATUS 		current
+	DESCRIPTION
+		"The interface index."
+	::= { slSonetFsEntry 1 }        
+
+slSonetFsSts OBJECT-TYPE
+	SYNTAX		INTEGER 
+	MAX-ACCESS	read-only
+	STATUS 		current
+	DESCRIPTION
+		"The number of the first STS in the path.
+		Note that no all values are legal because there is no
+		support for combus with mixed structure"
+	::= { slSonetFsEntry 2 }        
+
+slSonetFsWidth OBJECT-TYPE
+	SYNTAX		INTEGER 
+	MAX-ACCESS	read-write
+	STATUS 		current
+	DESCRIPTION
+		"The number STS's in the path.
+		The width is only valid for the first STS in the path.
+		The other STSs of the path will have width=0."
+	::= { slSonetFsEntry 3 }        
+
+slSonetFsFullPathTermination OBJECT-TYPE
+	SYNTAX		TruthValue 
+	MAX-ACCESS	read-write
+	STATUS 		current
+	DESCRIPTION
+		"FALSE - means partial path termination (only LOP alarm).
+		 TRUE  - include full support for path Alarms and PM counters."
+	::= { slSonetFsEntry 4 }        
+
+slSonetFsGranularity OBJECT-TYPE
+	SYNTAX INTEGER {		
+		 	vc4(1),
+			vc3(2)
+		} 
+	MAX-ACCESS	read-write
+	STATUS 		current
+	DESCRIPTION
+		"This value is set by the NMS according to the configured frame structure.
+		Each VC-3 that is mapped to AUG-1 via VC-4 should have the value vc4(1).
+		Otherwise the value should be vc3(2)."
+	::= { slSonetFsEntry 5 }        
+
+-- ----------------------------------------------------------------
+--
+-- Sonet Traps
+--
+-- ----------------------------------------------------------------
+
+slSonetFsTableChange NOTIFICATION-TYPE
+    OBJECTS { slSonetFsIfIndex }
+	STATUS  current
+	DESCRIPTION
+		"A slSonetFsTableChange trap is sent when the
+		content of the slSonetFsTable is changed.
+		This trap may be used by the NMS to identify
+		the removal of path interfaces, or addition of
+		new path interfaces"
+	::= { slSonetTraps 1 }
+
+
+END
+
+
+

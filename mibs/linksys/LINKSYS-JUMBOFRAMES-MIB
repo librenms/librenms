@@ -1,0 +1,46 @@
+LINKSYS-JUMBOFRAMES-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                LINKSYS ROS
+--                       Private Jumbo Frames MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    rnd                                          FROM LINKSYS-MIB
+    OBJECT-TYPE, MODULE-IDENTITY                 FROM SNMPv2-SMI;
+
+rlJumboFrames MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Linksys LLC."
+                CONTACT-INFO
+                      "www.linksys.com/business/support"
+                DESCRIPTION
+                      "This private MIB module defines Jumbo Frames private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { rnd 91 }
+
+rlJumboFramesCurrentStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Show the current Jumbo Frames status"
+    ::= { rlJumboFrames 1 }
+
+rlJumboFramesStatusAfterReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Set the Jumbo Frames status after reset"
+    ::= { rlJumboFrames 2 }
+
+END

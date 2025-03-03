@@ -1,0 +1,198 @@
+-- =================================================================
+-- Copyright (c) 2019 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description: Multi-access Edge Computing MIB
+-- Reference: IF-MIB
+-- Version: V1.0
+-- History:
+-- V1.0 2019-06-24 created by zhanghaihong
+-- =================================================================
+HH3C-LTE-MEC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Integer32, Counter64
+        FROM SNMPv2-SMI;
+
+hh3cLTEMEC MODULE-IDENTITY
+    LAST-UPDATED
+        "201906240000Z"            -- Jun 24, 2019 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB is to provide the statistics of the MEC.
+        (Multi-access Edge Computing) system."
+    REVISION
+        "201906240000Z"            -- Jun 24, 2019 at 00:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 185 }
+
+hh3cLTEMECObjects OBJECT IDENTIFIER ::= { hh3cLTEMEC 1 }
+
+hh3cMecTables OBJECT IDENTIFIER ::= { hh3cLTEMECObjects 1 }
+
+hh3cMecIfStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cMecIfStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table contains per-interface traffic statistics that MEC processed."
+    ::= { hh3cMecTables 1 }
+
+hh3cMecIfStatsEntry OBJECT-TYPE
+    SYNTAX     Hh3cMecIfStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An interface statistics entry containing objects for a particular interface."
+    INDEX      { hh3cMecIfStatsIfIndex }
+    ::= { hh3cMecIfStatsTable 1 }
+
+Hh3cMecIfStatsEntry ::= SEQUENCE {
+    hh3cMecIfStatsIfIndex        InterfaceIndex,
+    hh3cMecIfStatsGTPUReceive    Counter64,
+    hh3cMecIfStatsGTPUSend       Counter64,
+    hh3cMecIfStatsSCTPReceive    Counter64,
+    hh3cMecIfStatsSCTPSend       Counter64,
+    hh3cMecIfStatsDecap          Counter64,
+    hh3cMecIfStatsEncap          Counter64
+}
+
+hh3cMecIfStatsIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The index value that uniquely identifies the interface to
+         which this entry is applicable.  The interface identified by
+         a particular value of this index is the same interface as
+         identified by the same value of the IF-MIB's InterfaceIndex."
+    ::= { hh3cMecIfStatsEntry 1 }
+
+hh3cMecIfStatsGTPUReceive OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of GTP-U packets the interface received."
+    ::= { hh3cMecIfStatsEntry 2 }
+
+hh3cMecIfStatsGTPUSend OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of GTP-U packets the interface sent."
+    ::= { hh3cMecIfStatsEntry 3 }
+
+hh3cMecIfStatsSCTPReceive OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of SCTP packets the interface received."
+  ::= { hh3cMecIfStatsEntry 4 }
+
+hh3cMecIfStatsSCTPSend OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of SCTP packets the interface sent."
+    ::= { hh3cMecIfStatsEntry 5 }
+
+hh3cMecIfStatsDecap OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of GTP-U packets decapsulated."
+    ::= { hh3cMecIfStatsEntry 6 }
+
+hh3cMecIfStatsEncap OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of IP packets encapsulated in GTP-U."
+    ::= { hh3cMecIfStatsEntry 7 }
+
+hh3cMecErrStatsInfo OBJECT IDENTIFIER ::= { hh3cMecTables 2 }
+
+hh3cMecErrBadFormat OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of IP packets with the bad format."
+    ::= { hh3cMecErrStatsInfo 1 }
+
+hh3cMecErrSend OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of packets discarded due to physical transmit errors."
+    ::= { hh3cMecErrStatsInfo 2 }
+
+hh3cMecErrOutInterface OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of packets discarded due to invalid outgoing interfaces."
+    ::= { hh3cMecErrStatsInfo 3 }
+
+hh3cMecErrFraglimit OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of packets discarded due to fragment queue limit."
+    ::= { hh3cMecErrStatsInfo 4 }
+
+hh3cMecErrFragAttack OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of packets discarded due to fragment attacks."
+    ::= { hh3cMecErrStatsInfo 5 }
+
+hh3cLTEMECTrapObjects OBJECT IDENTIFIER ::= { hh3cLTEMEC 2 }
+
+hh3cMecTrapInfo OBJECT IDENTIFIER ::= { hh3cLTEMECTrapObjects 1 }
+
+hh3cMecTunnelCacheNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The number of MEC tunnel tables."
+    ::= { hh3cMecTrapInfo 1 }
+
+hh3cMecTrap OBJECT IDENTIFIER ::= { hh3cLTEMECTrapObjects 0 }
+
+hh3cMecTunnelCacheFullTrap NOTIFICATION-TYPE
+    OBJECTS { hh3cMecTunnelCacheNumber }
+    STATUS current
+    DESCRIPTION
+        "Send this trap when the MEC tunnel table is full."
+    ::= { hh3cMecTrap 1 }
+
+hh3cMecTunnelCacheRecoverTrap NOTIFICATION-TYPE
+    OBJECTS { hh3cMecTunnelCacheNumber }
+    STATUS current
+    DESCRIPTION
+        "Send this trap when the MEC tunnel table entry falls below the normal value."
+    ::= { hh3cMecTrap 2 }
+
+END

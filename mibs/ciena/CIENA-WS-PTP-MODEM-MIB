@@ -1,0 +1,1684 @@
+-- This file was automatically generated from ciena-ws-ptp-modem.yang. Do not edit.
+
+CIENA-WS-PTP-MODEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    cwsPtpDiagnosticsEntry, cwsPtpTransmitterEntry
+        FROM CIENA-WS-PTP-MIB
+    ChannelsNumber, Decimal1Dig, Decimal2Dig, EnabledDisabledEnum, LineSysEnum, ModemChannel, ModemFrequency, OnOffEnum, PtpId, RecoverLinkDispersionType, StringMaxl32, StringSci, TxPowerLvl, WlSpacing
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+cienaWsPtpModemMIB MODULE-IDENTITY
+    LAST-UPDATED "201703020000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This module defines modem-transceiver PTP data for the Waveserver. It augments the ciena-ws-ptp module. 
+The PTP model is the signal carried by the modem transceiver at a line port. Automatically provisioned at system turn-up."
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver Release 1.4
+
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.
+New container 'fast-rx-recovery' created with new leafs, 
+
+Container 'performance-statistics/pre-fec-signal-degrade',
+container 'performance-statistics/pre-fec-signal-fail', and
+all sub-nodes have been changed to obsolete.
+
+New 'performance-statistics/alarms' container created.
+
+following leafs have been changed to obsolete:
+  'fast-receiver-recovery-state',
+  'q-factor average',
+  'pre-fec-ber/min',
+  'pre-fec-ber/average',
+  'post-fec-ber/min',
+  'post-fec-ber/max',
+  'post-fec-ber/average'
+
+'laser-centering-range' leaf added. 
+      
+'colourless-channel-power' renamed to 'colourless-rx-channel. 
+Added 'power' sub-container for 'colourless-rx-channel. 'power-actual' leaf removed.
+New container 'colourless-tx-channel' created with new leafs.
+
+New advanced ptp statistics leafs added to 'performance-statistics' container.
+
+New leaf 'frequency/actual' added."
+    REVISION "201606140000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.
+Major restructuring of this YANG module."
+    REVISION "201602010000Z"
+    DESCRIPTION "Waveserver Rel 1.1 revised.  
+Augmented 'ptp-adv-channel-status' container for when the XCVR type is WaveLogic 3 Extreme.  Added new leafs to the augmented container.
+Added new pre-FEC related leafs to 'adv-config' augment container.
+The tx and rx compensation dispersion related leafs have been re-named to reduce confusion."
+    REVISION "201504290000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 9 }
+
+cwsPtpAugPtpModemTransmitterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpAugPtpModemTransmitterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 3 }
+
+cwsPtpAugPtpModemTransmitterEntry OBJECT-TYPE
+    SYNTAX CwsPtpAugPtpModemTransmitterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpAugPtpModemTransmitterTable."
+    AUGMENTS { cwsPtpTransmitterEntry }
+    ::= { cwsPtpAugPtpModemTransmitterTable 1 }
+
+CwsPtpAugPtpModemTransmitterEntry ::= SEQUENCE { 
+    cwsPtpModemTransmitterLineSystemChannelNumber ModemChannel 
+}
+
+cwsPtpModemTransmitterLineSystemChannelNumber OBJECT-TYPE
+    SYNTAX ModemChannel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Line System Channel Number. Channel cannot be modified while Admin State is enabled (except when changing from zero value to another value). Channel cannot be provisioned if System Band Plan field is set to None. Channel cannot be modified in the same operation as Wavelength, Channel, and Wavelength Spacing, only one of those fields may be modified in a single operation. If Channel is modified, Wavelength and Frequency will be automatically updated to valid values. Modification to this field will be validated against the Wavelength Spacing field. Software shall automatically update existing channel number provisioning when user changes Band Plan provisioning. Channel number shall be set to 0 if provisioned wavelength/frequency is not found in the new Band Plan or the new Band Plan equals to None. "
+    ::= { cwsPtpAugPtpModemTransmitterEntry 1 }
+
+cwsPtpModemFrequencyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemFrequencyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 4 }
+
+cwsPtpModemFrequencyEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemFrequencyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemFrequencyTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemFrequencyTableSnmpKey }
+    ::= { cwsPtpModemFrequencyTable 1 }
+
+CwsPtpModemFrequencyEntry ::= SEQUENCE { 
+    cwsPtpModemFrequencyTableSnmpKey Integer32,
+    cwsPtpModemFrequencyValue ModemFrequency,
+    cwsPtpModemFrequencyMinValue Decimal1Dig,
+    cwsPtpModemFrequencyMaxValue Decimal1Dig,
+    cwsPtpModemFrequencyActual Decimal1Dig 
+}
+
+cwsPtpModemFrequencyTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemFrequency"
+    ::= { cwsPtpModemFrequencyEntry 1 }
+
+cwsPtpModemFrequencyValue OBJECT-TYPE
+    SYNTAX ModemFrequency
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Modem Frequency value (GHz). Frequency cannot be modified while Admin State is enabled (except when changing from zero value to another value). Frequency cannot be modified in the same operation as Wavelength, Channel, and Wavelength Spacing, only one of those fields may be modified in a single operation. If Frequency is modified, Wavelength and Channel will be automatically updated to valid values. Modification to this field will be validated against the Wavelength Spacing field. Attempts to change to a value outside of the range will result in failure."
+    ::= { cwsPtpModemFrequencyEntry 2 }
+
+cwsPtpModemFrequencyMinValue OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Min Frequency value, in GHz."
+    ::= { cwsPtpModemFrequencyEntry 3 }
+
+cwsPtpModemFrequencyMaxValue OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Max Frequency value, in GHz."
+    ::= { cwsPtpModemFrequencyEntry 4 }
+
+cwsPtpModemFrequencyActual OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The actual frequency value of the modem ptp. in GHz. It may or may not be equal to the configurable 'frequency/value'"
+    ::= { cwsPtpModemFrequencyEntry 5 }
+
+cwsPtpModemPowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 5 }
+
+cwsPtpModemPowerEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemPowerTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemPowerTableSnmpKey }
+    ::= { cwsPtpModemPowerTable 1 }
+
+CwsPtpModemPowerEntry ::= SEQUENCE { 
+    cwsPtpModemPowerTableSnmpKey Integer32,
+    cwsPtpModemPowerValue TxPowerLvl,
+    cwsPtpModemPowerMinValue Decimal1Dig,
+    cwsPtpModemPowerMaxValue Decimal1Dig 
+}
+
+cwsPtpModemPowerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemPower"
+    ::= { cwsPtpModemPowerEntry 1 }
+
+cwsPtpModemPowerValue OBJECT-TYPE
+    SYNTAX TxPowerLvl
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The provisioned transmit power in dBm. The range is from -16.0 (-11.0 for EDFA) to -10.0 (4.0 for EDFA). Default is -10.0"
+    ::= { cwsPtpModemPowerEntry 2 }
+
+cwsPtpModemPowerMinValue OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Min Power Level value, in dBm."
+    ::= { cwsPtpModemPowerEntry 3 }
+
+cwsPtpModemPowerMaxValue OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Max Power Level value, in dBm."
+    ::= { cwsPtpModemPowerEntry 4 }
+
+cwsPtpModemLineSystemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemLineSystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Modem line System related attributes."
+    ::= { cienaWsPtpModemMIB 6 }
+
+cwsPtpModemLineSystemEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemLineSystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemLineSystemTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemLineSystemTableSnmpKey }
+    ::= { cwsPtpModemLineSystemTable 1 }
+
+CwsPtpModemLineSystemEntry ::= SEQUENCE { 
+    cwsPtpModemLineSystemTableSnmpKey Integer32,
+    cwsPtpModemLineSystemType LineSysEnum,
+    cwsPtpModemLineSystemWavelengthSpacing WlSpacing 
+}
+
+cwsPtpModemLineSystemTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemLineSystem"
+    ::= { cwsPtpModemLineSystemEntry 1 }
+
+cwsPtpModemLineSystemType OBJECT-TYPE
+    SYNTAX LineSysEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Line system type. It can be set as coloured or colorless. Default is coloured"
+    ::= { cwsPtpModemLineSystemEntry 2 }
+
+cwsPtpModemLineSystemWavelengthSpacing OBJECT-TYPE
+    SYNTAX WlSpacing
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Wavelength Spacing cannot be modified while Admin State is enabled. Wavelength Spacing cannot be modified in the same operation as Wavelength, Frequencey, and Channel, only one of those fields may be modified in a single operation. Wavelength Spacing cannot be provisioned when System Band Plan field is set to a value other than None, Wavelength Space field will also be automatically set to Flex Grid. When PTP Wavelength Spacing is changed from FlexGrid to a fixed grid (e.g. 50GHz), or from a fixed grid to another fixed grid value, if existing Wavelength and Frequency is not valid in the selected grid, their values will be set to zero. When PTP Wavelength Spacing is changed from a fixed grid (e.g. 50GHz) to FlexGrid, existing Wavelength, Frequency and Line System Channel Number remain unchanged."
+    ::= { cwsPtpModemLineSystemEntry 3 }
+
+cwsPtpModemCmdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemCmdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 7 }
+
+cwsPtpModemCmdEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemCmdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemCmdTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemCmdTableSnmpKey }
+    ::= { cwsPtpModemCmdTable 1 }
+
+CwsPtpModemCmdEntry ::= SEQUENCE { 
+    cwsPtpModemCmdTableSnmpKey Integer32,
+    cwsPtpModemCmdSlot Unsigned32,
+    cwsPtpModemCmdPortIn Unsigned32,
+    cwsPtpModemCmdPortOut Unsigned32 
+}
+
+cwsPtpModemCmdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemCmd"
+    ::= { cwsPtpModemCmdEntry 1 }
+
+cwsPtpModemCmdSlot OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "CMD Slot. Cannot be modified currently."
+    ::= { cwsPtpModemCmdEntry 2 }
+
+cwsPtpModemCmdPortIn OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "CMD Port In. Cannot be modified."
+    ::= { cwsPtpModemCmdEntry 3 }
+
+cwsPtpModemCmdPortOut OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "CMD Port Out. Cannot be modified."
+    ::= { cwsPtpModemCmdEntry 4 }
+
+cwsPtpModemModemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemModemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 8 }
+
+cwsPtpModemModemEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemModemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemModemTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemModemTableSnmpKey }
+    ::= { cwsPtpModemModemTable 1 }
+
+CwsPtpModemModemEntry ::= SEQUENCE { 
+    cwsPtpModemModemTableSnmpKey Integer32,
+    cwsPtpModemModemChannelContentionDetectionAvoidance OnOffEnum,
+    cwsPtpModemModemPerformanceOptimizationMode INTEGER,
+    cwsPtpModemModemCarrierCenteringMode INTEGER,
+    cwsPtpModemModemInterleaverMode INTEGER,
+    cwsPtpModemModemRotation OnOffEnum,
+    cwsPtpModemModemSpectralOccupancyMode INTEGER,
+    cwsPtpModemModemTxPowerReductionState EnabledDisabledEnum,
+    cwsPtpModemModemTxReductionMode INTEGER,
+    cwsPtpModemModemTxTuningMode INTEGER,
+    cwsPtpModemModemDifferentialEncoding INTEGER,
+    cwsPtpModemModemTxCompensationDispersionMode INTEGER,
+    cwsPtpModemModemTxCompensationDispersionValue Decimal1Dig,
+    cwsPtpModemModemFastReceiverRecoveryState EnabledDisabledEnum,
+    cwsPtpModemModemLaserCenteringRange Decimal1Dig 
+}
+
+cwsPtpModemModemTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemModem"
+    ::= { cwsPtpModemModemEntry 1 }
+
+cwsPtpModemModemChannelContentionDetectionAvoidance OBJECT-TYPE
+    SYNTAX OnOffEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Turns the channel contention detection and avoidance feature on or off. This feature is used to detect the situation where the modem port turn on a wavelength (or frequency in Gridless mode) that is in use by an existing L0 connection on a colorless network. This feature will be triggered by new wavelength/frequency provisioning and will automatically detects if the provisioned wavelength/frequency is already used. If the provisioned wavelength/frequency is already used, it declares channel contention, and then it will hold the Line port TX in a low power state (<-35 dBm) and will raise a Channel Contention alarm. This feature will also provide a mechanism to allow user to manually release the Line port TX from being held in a low power state while the channel collision declared."
+    ::= { cwsPtpModemModemEntry 2 }
+
+cwsPtpModemModemPerformanceOptimizationMode OBJECT-TYPE
+    SYNTAX INTEGER { reach(0), latency(1), fasttracking(2), improvedtracking(3), mode5(4), mode6(5), mode7(6), mode8(7), mode9(8), mode10(9), mode11(10), mode12(11), mode13(12), mode14(13) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Performance Optimization. It optimizes for either reach or latency. Default is reach."
+    ::= { cwsPtpModemModemEntry 3 }
+
+cwsPtpModemModemCarrierCenteringMode OBJECT-TYPE
+    SYNTAX INTEGER { mode1(0), mode2(1), mode3(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "This parameter is used to configure which Carrier centering mode to apply to the OTM signal. Default is mode-2."
+    ::= { cwsPtpModemModemEntry 4 }
+
+cwsPtpModemModemInterleaverMode OBJECT-TYPE
+    SYNTAX INTEGER { none(0), standard(1), enhanced(2), auto(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The Interleaver Mode. It can be set as standard or enhanced. Default is enhanced."
+    ::= { cwsPtpModemModemEntry 5 }
+
+cwsPtpModemModemRotation OBJECT-TYPE
+    SYNTAX OnOffEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "To enable (on) or disable (off) Jones's rotation. Default is off"
+    ::= { cwsPtpModemModemEntry 6 }
+
+cwsPtpModemModemSpectralOccupancyMode OBJECT-TYPE
+    SYNTAX INTEGER { narrow(0), wide(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Spectral Occupancy Mode. This is the optical channel spectral Occupancy parameter which supports two different kinds of waveforms: narrow and wide. Default is narrow. Narrow: Root-Raised Cosine with Alpha of 0.14. Wide: Root-Raised Cosine 0.14 convolved with Gaussian 25GHz full-width half maximum (FWHM)."
+    ::= { cwsPtpModemModemEntry 7 }
+
+cwsPtpModemModemTxPowerReductionState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "This parameter is used to enable TX blanking functionality. Default is Off"
+    ::= { cwsPtpModemModemEntry 8 }
+
+cwsPtpModemModemTxReductionMode OBJECT-TYPE
+    SYNTAX INTEGER { positive(0), negative(1), auto(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Transmit XPM reduction. It can be set as Positive, Negative or Auto. This should always be enabled (Positive). Disabling this should be done for only interworking purposes."
+    ::= { cwsPtpModemModemEntry 9 }
+
+cwsPtpModemModemTxTuningMode OBJECT-TYPE
+    SYNTAX INTEGER { performanceoptimized(0), accelerated(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "This is the Tuning Mode, which can be set as performance-optimized (normal) or accelerated tuning mode. Default is performance-optimized"
+    ::= { cwsPtpModemModemEntry 10 }
+
+cwsPtpModemModemDifferentialEncoding OBJECT-TYPE
+    SYNTAX INTEGER { none(0), hard(1), soft(2), xd(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "This parameter is used to configure which differential encoding mode to apply to the OTM signal. It can be set as None, Hard, Soft, Xd. Default is none."
+    ::= { cwsPtpModemModemEntry 11 }
+
+cwsPtpModemModemTxCompensationDispersionMode OBJECT-TYPE
+    SYNTAX INTEGER { manual(0), automatic(1), custom1(2), off(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Tx Compensation Dispersion Mode. Default is Off."
+    ::= { cwsPtpModemModemEntry 12 }
+
+cwsPtpModemModemTxCompensationDispersionValue OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Tx compensation dispersion value range from -40000 ps/nm to 85000 ps/nm. Default is 0"
+    ::= { cwsPtpModemModemEntry 13 }
+
+cwsPtpModemModemFastReceiverRecoveryState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "Whether fast receiver recovery state is enabled or disabled. Allows modem to attempt to reacquire a signal very soon after a loss of signal by using predefined tuning values.
+This leaf is now obsolete in WS 1.3"
+    ::= { cwsPtpModemModemEntry 14 }
+
+cwsPtpModemModemLaserCenteringRange OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "This parameter is used to configure the laser centering range."
+    ::= { cwsPtpModemModemEntry 15 }
+
+cwsPtpModemPerformanceStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemPerformanceStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 9 }
+
+cwsPtpModemPerformanceStatisticsEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemPerformanceStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemPerformanceStatisticsTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemPerformanceStatisticsTableSnmpKey }
+    ::= { cwsPtpModemPerformanceStatisticsTable 1 }
+
+CwsPtpModemPerformanceStatisticsEntry ::= SEQUENCE { 
+    cwsPtpModemPerformanceStatisticsTableSnmpKey Integer32,
+    cwsPtpModemPerformanceStatisticsSecondsSinceLastClear Unsigned32,
+    cwsPtpModemPerformanceStatisticsFecUncorrectedBlockCount Unsigned32,
+    cwsPtpModemPerformanceStatisticsHighCorrectionCountSeconds Unsigned32 
+}
+
+cwsPtpModemPerformanceStatisticsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemPerformanceStatistics"
+    ::= { cwsPtpModemPerformanceStatisticsEntry 1 }
+
+cwsPtpModemPerformanceStatisticsSecondsSinceLastClear OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of seconds since last statistics clear."
+    ::= { cwsPtpModemPerformanceStatisticsEntry 2 }
+
+cwsPtpModemPerformanceStatisticsFecUncorrectedBlockCount OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Uncorrected FEC block count."
+    ::= { cwsPtpModemPerformanceStatisticsEntry 3 }
+
+cwsPtpModemPerformanceStatisticsHighCorrectionCountSeconds OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "High correction count seconds."
+    ::= { cwsPtpModemPerformanceStatisticsEntry 4 }
+
+cwsPtpModemPreFecBerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemPreFecBerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 10 }
+
+cwsPtpModemPreFecBerEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemPreFecBerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemPreFecBerTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemPreFecBerTableSnmpKey }
+    ::= { cwsPtpModemPreFecBerTable 1 }
+
+CwsPtpModemPreFecBerEntry ::= SEQUENCE { 
+    cwsPtpModemPreFecBerTableSnmpKey Integer32,
+    cwsPtpModemPreFecBerActual StringSci,
+    cwsPtpModemPreFecBerMax StringSci,
+    cwsPtpModemPreFecBerMin StringSci,
+    cwsPtpModemPreFecBerAverage StringSci 
+}
+
+cwsPtpModemPreFecBerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemPreFecBer"
+    ::= { cwsPtpModemPreFecBerEntry 1 }
+
+cwsPtpModemPreFecBerActual OBJECT-TYPE
+    SYNTAX StringSci
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Pre-FEC BER Actual Value, in scientific notation format.  If the Port is down or invalid, this field will not be present."
+    ::= { cwsPtpModemPreFecBerEntry 2 }
+
+cwsPtpModemPreFecBerMax OBJECT-TYPE
+    SYNTAX StringSci
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Max Pre-FEC BER value, in scientific notation format.  If the Port is down or invalid, this field will not be present."
+    ::= { cwsPtpModemPreFecBerEntry 3 }
+
+cwsPtpModemPreFecBerMin OBJECT-TYPE
+    SYNTAX StringSci
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "Min Pre-FEC BER value, in scientific notation format.  If the Port is down or invalid, this field will not be present.
+This attribute is obsolete in WS 1.3"
+    ::= { cwsPtpModemPreFecBerEntry 4 }
+
+cwsPtpModemPreFecBerAverage OBJECT-TYPE
+    SYNTAX StringSci
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "Average Pre-FEC BER value, in scientific notation format.  If the Port is down or invalid, this field will not be present.
+This attribute is obsolete in WS 1.3"
+    ::= { cwsPtpModemPreFecBerEntry 5 }
+
+cwsPtpModemPostFecBerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemPostFecBerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 11 }
+
+cwsPtpModemPostFecBerEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemPostFecBerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemPostFecBerTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemPostFecBerTableSnmpKey }
+    ::= { cwsPtpModemPostFecBerTable 1 }
+
+CwsPtpModemPostFecBerEntry ::= SEQUENCE { 
+    cwsPtpModemPostFecBerTableSnmpKey Integer32,
+    cwsPtpModemPostFecBerActual StringSci,
+    cwsPtpModemPostFecBerMax StringSci,
+    cwsPtpModemPostFecBerMin StringSci,
+    cwsPtpModemPostFecBerAverage StringSci 
+}
+
+cwsPtpModemPostFecBerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemPostFecBer"
+    ::= { cwsPtpModemPostFecBerEntry 1 }
+
+cwsPtpModemPostFecBerActual OBJECT-TYPE
+    SYNTAX StringSci
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Post-FEC BER Actual value, in scientific notation format.  If the Port is down or invalid, this field will not be present."
+    ::= { cwsPtpModemPostFecBerEntry 2 }
+
+cwsPtpModemPostFecBerMax OBJECT-TYPE
+    SYNTAX StringSci
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "Max Post-FEC BER value, in scientific notation format.  If the Port is down or invalid, this field will not be present.
+This attribute is obsolete in WS 1.3"
+    ::= { cwsPtpModemPostFecBerEntry 3 }
+
+cwsPtpModemPostFecBerMin OBJECT-TYPE
+    SYNTAX StringSci
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "Min Post-FEC BER value, in scientific notation format.  If the Port is down or invalid, this field will not be present.
+This attribute is obsolete in WS 1.3"
+    ::= { cwsPtpModemPostFecBerEntry 4 }
+
+cwsPtpModemPostFecBerAverage OBJECT-TYPE
+    SYNTAX StringSci
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "Average Post-FEC BER value, in scientific notation format.  If the Port is down or invalid, this field will not be present.
+This attribute is obsolete in WS 1.3"
+    ::= { cwsPtpModemPostFecBerEntry 5 }
+
+cwsPtpModemQFactorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemQFactorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 12 }
+
+cwsPtpModemQFactorEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemQFactorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemQFactorTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemQFactorTableSnmpKey }
+    ::= { cwsPtpModemQFactorTable 1 }
+
+CwsPtpModemQFactorEntry ::= SEQUENCE { 
+    cwsPtpModemQFactorTableSnmpKey Integer32,
+    cwsPtpModemQFactorActual Decimal2Dig,
+    cwsPtpModemQFactorMax Decimal2Dig,
+    cwsPtpModemQFactorMin Decimal2Dig,
+    cwsPtpModemQFactorAverage Decimal2Dig 
+}
+
+cwsPtpModemQFactorTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemQFactor"
+    ::= { cwsPtpModemQFactorEntry 1 }
+
+cwsPtpModemQFactorActual OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Q-factor actual value. If this value is invalid, this field will not be present."
+    ::= { cwsPtpModemQFactorEntry 2 }
+
+cwsPtpModemQFactorMax OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Max Q-factor value.  If this value is invalid, this field will not be present."
+    ::= { cwsPtpModemQFactorEntry 3 }
+
+cwsPtpModemQFactorMin OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Min Q-factor value.  If this value is invalid, this field will not be present."
+    ::= { cwsPtpModemQFactorEntry 4 }
+
+cwsPtpModemQFactorAverage OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "Average Q-factor value.  If this value is invalid, this field will not be present.
+This attribute is obsolete in WS 1.3"
+    ::= { cwsPtpModemQFactorEntry 5 }
+
+cwsPtpModemFecFrameErrorCountTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemFecFrameErrorCountEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 13 }
+
+cwsPtpModemFecFrameErrorCountEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemFecFrameErrorCountEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemFecFrameErrorCountTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemFecFrameErrorCountTableSnmpKey }
+    ::= { cwsPtpModemFecFrameErrorCountTable 1 }
+
+CwsPtpModemFecFrameErrorCountEntry ::= SEQUENCE { 
+    cwsPtpModemFecFrameErrorCountTableSnmpKey Integer32,
+    cwsPtpModemFecFrameErrorCountValue Unsigned32,
+    cwsPtpModemFecFrameErrorCountSeconds Unsigned32 
+}
+
+cwsPtpModemFecFrameErrorCountTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemFecFrameErrorCount"
+    ::= { cwsPtpModemFecFrameErrorCountEntry 1 }
+
+cwsPtpModemFecFrameErrorCountValue OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "FEC Frame Error Count Value."
+    ::= { cwsPtpModemFecFrameErrorCountEntry 2 }
+
+cwsPtpModemFecFrameErrorCountSeconds OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "FEC Frame Error Count Seconds."
+    ::= { cwsPtpModemFecFrameErrorCountEntry 3 }
+
+cwsPtpModemModemprefecsignalfailalarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemModemprefecsignalfailalarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 14 }
+
+cwsPtpModemModemprefecsignalfailalarmEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemModemprefecsignalfailalarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemModemprefecsignalfailalarmTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemModemprefecsignalfailalarmTableSnmpKey }
+    ::= { cwsPtpModemModemprefecsignalfailalarmTable 1 }
+
+CwsPtpModemModemprefecsignalfailalarmEntry ::= SEQUENCE { 
+    cwsPtpModemModemprefecsignalfailalarmTableSnmpKey Integer32,
+    cwsPtpModemModemprefecsignalfailalarmActive TruthValue 
+}
+
+cwsPtpModemModemprefecsignalfailalarmTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemModemprefecsignalfailalarm"
+    ::= { cwsPtpModemModemprefecsignalfailalarmEntry 1 }
+
+cwsPtpModemModemprefecsignalfailalarmActive OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "If OTU4 Pre-FEC Signal Fail alarm has been raised."
+    ::= { cwsPtpModemModemprefecsignalfailalarmEntry 2 }
+
+cwsPtpModemModemprefecsignalfailalarmthresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemModemprefecsignalfailalarmthresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 15 }
+
+cwsPtpModemModemprefecsignalfailalarmthresholdEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemModemprefecsignalfailalarmthresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemModemprefecsignalfailalarmthresholdTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemModemprefecsignalfailalarmthresholdTableSnmpKey }
+    ::= { cwsPtpModemModemprefecsignalfailalarmthresholdTable 1 }
+
+CwsPtpModemModemprefecsignalfailalarmthresholdEntry ::= SEQUENCE { 
+    cwsPtpModemModemprefecsignalfailalarmthresholdTableSnmpKey Integer32,
+    cwsPtpModemModemprefecsignalfailalarmthresholdDbq Decimal2Dig 
+}
+
+cwsPtpModemModemprefecsignalfailalarmthresholdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemModemprefecsignalfailalarmthreshold"
+    ::= { cwsPtpModemModemprefecsignalfailalarmthresholdEntry 1 }
+
+cwsPtpModemModemprefecsignalfailalarmthresholdDbq OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Pre-FEC Signal Fail Threshold, in dBQ."
+    ::= { cwsPtpModemModemprefecsignalfailalarmthresholdEntry 2 }
+
+cwsPtpModemModemprefecsignaldegradealarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemModemprefecsignaldegradealarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 16 }
+
+cwsPtpModemModemprefecsignaldegradealarmEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemModemprefecsignaldegradealarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemModemprefecsignaldegradealarmTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemModemprefecsignaldegradealarmTableSnmpKey }
+    ::= { cwsPtpModemModemprefecsignaldegradealarmTable 1 }
+
+CwsPtpModemModemprefecsignaldegradealarmEntry ::= SEQUENCE { 
+    cwsPtpModemModemprefecsignaldegradealarmTableSnmpKey Integer32,
+    cwsPtpModemModemprefecsignaldegradealarmActive TruthValue 
+}
+
+cwsPtpModemModemprefecsignaldegradealarmTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemModemprefecsignaldegradealarm"
+    ::= { cwsPtpModemModemprefecsignaldegradealarmEntry 1 }
+
+cwsPtpModemModemprefecsignaldegradealarmActive OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "If OTU4 Pre-FEC Signal Degrade alarm has been raised."
+    ::= { cwsPtpModemModemprefecsignaldegradealarmEntry 2 }
+
+cwsPtpModemModemprefecsignaldegradealarmthresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemModemprefecsignaldegradealarmthresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 17 }
+
+cwsPtpModemModemprefecsignaldegradealarmthresholdEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemModemprefecsignaldegradealarmthresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemModemprefecsignaldegradealarmthresholdTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemModemprefecsignaldegradealarmthresholdTableSnmpKey }
+    ::= { cwsPtpModemModemprefecsignaldegradealarmthresholdTable 1 }
+
+CwsPtpModemModemprefecsignaldegradealarmthresholdEntry ::= SEQUENCE { 
+    cwsPtpModemModemprefecsignaldegradealarmthresholdTableSnmpKey Integer32,
+    cwsPtpModemModemprefecsignaldegradealarmthresholdDbq Decimal2Dig 
+}
+
+cwsPtpModemModemprefecsignaldegradealarmthresholdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemModemprefecsignaldegradealarmthreshold"
+    ::= { cwsPtpModemModemprefecsignaldegradealarmthresholdEntry 1 }
+
+cwsPtpModemModemprefecsignaldegradealarmthresholdDbq OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Pre-FEC Signal Degrade Threshold, in dBQ."
+    ::= { cwsPtpModemModemprefecsignaldegradealarmthresholdEntry 2 }
+
+cwsPtpModemPreFecSignalFailTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemPreFecSignalFailEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 18 }
+
+cwsPtpModemPreFecSignalFailEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemPreFecSignalFailEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "Entry for cwsPtpModemPreFecSignalFailTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemPreFecSignalFailTableSnmpKey }
+    ::= { cwsPtpModemPreFecSignalFailTable 1 }
+
+CwsPtpModemPreFecSignalFailEntry ::= SEQUENCE { 
+    cwsPtpModemPreFecSignalFailTableSnmpKey Integer32,
+    cwsPtpModemPreFecSignalFailFailStatus TruthValue 
+}
+
+cwsPtpModemPreFecSignalFailTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemPreFecSignalFail"
+    ::= { cwsPtpModemPreFecSignalFailEntry 1 }
+
+cwsPtpModemPreFecSignalFailFailStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "If OTU4 Pre-FEC Signal Fail has been raised."
+    ::= { cwsPtpModemPreFecSignalFailEntry 2 }
+
+cwsPtpModemModemprefecsignalfailthresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemModemprefecsignalfailthresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 19 }
+
+cwsPtpModemModemprefecsignalfailthresholdEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemModemprefecsignalfailthresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "Entry for cwsPtpModemModemprefecsignalfailthresholdTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemModemprefecsignalfailthresholdTableSnmpKey }
+    ::= { cwsPtpModemModemprefecsignalfailthresholdTable 1 }
+
+CwsPtpModemModemprefecsignalfailthresholdEntry ::= SEQUENCE { 
+    cwsPtpModemModemprefecsignalfailthresholdTableSnmpKey Integer32,
+    cwsPtpModemModemprefecsignalfailthresholdDbq Decimal2Dig,
+    cwsPtpModemModemprefecsignalfailthresholdBer StringSci 
+}
+
+cwsPtpModemModemprefecsignalfailthresholdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemModemprefecsignalfailthreshold"
+    ::= { cwsPtpModemModemprefecsignalfailthresholdEntry 1 }
+
+cwsPtpModemModemprefecsignalfailthresholdDbq OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION "Pre-FEC Signal Fail Threshold, in dBQ."
+    ::= { cwsPtpModemModemprefecsignalfailthresholdEntry 2 }
+
+cwsPtpModemModemprefecsignalfailthresholdBer OBJECT-TYPE
+    SYNTAX StringSci
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION "Pre-FEC Signal Fail Threshold BER, in scientific notation format.  If the Port is down or invalid, this field will not be present."
+    ::= { cwsPtpModemModemprefecsignalfailthresholdEntry 3 }
+
+cwsPtpModemPreFecSignalDegradeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemPreFecSignalDegradeEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 20 }
+
+cwsPtpModemPreFecSignalDegradeEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemPreFecSignalDegradeEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "Entry for cwsPtpModemPreFecSignalDegradeTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemPreFecSignalDegradeTableSnmpKey }
+    ::= { cwsPtpModemPreFecSignalDegradeTable 1 }
+
+CwsPtpModemPreFecSignalDegradeEntry ::= SEQUENCE { 
+    cwsPtpModemPreFecSignalDegradeTableSnmpKey Integer32,
+    cwsPtpModemPreFecSignalDegradeDegradeStatus TruthValue 
+}
+
+cwsPtpModemPreFecSignalDegradeTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemPreFecSignalDegrade"
+    ::= { cwsPtpModemPreFecSignalDegradeEntry 1 }
+
+cwsPtpModemPreFecSignalDegradeDegradeStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION "If OTU4 Pre-FEC Signal Degrade has been raised."
+    ::= { cwsPtpModemPreFecSignalDegradeEntry 2 }
+
+cwsPtpModemModemprefecsignaldegradethresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemModemprefecsignaldegradethresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 21 }
+
+cwsPtpModemModemprefecsignaldegradethresholdEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemModemprefecsignaldegradethresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS obsolete
+    DESCRIPTION "Entry for cwsPtpModemModemprefecsignaldegradethresholdTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemModemprefecsignaldegradethresholdTableSnmpKey }
+    ::= { cwsPtpModemModemprefecsignaldegradethresholdTable 1 }
+
+CwsPtpModemModemprefecsignaldegradethresholdEntry ::= SEQUENCE { 
+    cwsPtpModemModemprefecsignaldegradethresholdTableSnmpKey Integer32,
+    cwsPtpModemModemprefecsignaldegradethresholdDbq Decimal2Dig,
+    cwsPtpModemModemprefecsignaldegradethresholdBer StringSci 
+}
+
+cwsPtpModemModemprefecsignaldegradethresholdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemModemprefecsignaldegradethreshold"
+    ::= { cwsPtpModemModemprefecsignaldegradethresholdEntry 1 }
+
+cwsPtpModemModemprefecsignaldegradethresholdDbq OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION "Pre-FEC Signal Degrade Threshold, in dBQ."
+    ::= { cwsPtpModemModemprefecsignaldegradethresholdEntry 2 }
+
+cwsPtpModemModemprefecsignaldegradethresholdBer OBJECT-TYPE
+    SYNTAX StringSci
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION "Pre-FEC Signal Degrade Threshold BER, in scientific notation format.  If the Port is down or invalid, this field will not be present."
+    ::= { cwsPtpModemModemprefecsignaldegradethresholdEntry 3 }
+
+cwsPtpModemRxlinkdispersionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemRxlinkdispersionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 22 }
+
+cwsPtpModemRxlinkdispersionEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemRxlinkdispersionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemRxlinkdispersionTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemRxlinkdispersionTableSnmpKey }
+    ::= { cwsPtpModemRxlinkdispersionTable 1 }
+
+CwsPtpModemRxlinkdispersionEntry ::= SEQUENCE { 
+    cwsPtpModemRxlinkdispersionTableSnmpKey Integer32,
+    cwsPtpModemRxlinkdispersionTotal Integer32,
+    cwsPtpModemRxlinkdispersionCompensation Integer32 
+}
+
+cwsPtpModemRxlinkdispersionTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemRxlinkdispersion"
+    ::= { cwsPtpModemRxlinkdispersionEntry 1 }
+
+cwsPtpModemRxlinkdispersionTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total Rx Link Dispersion, unit is ps/nm."
+    ::= { cwsPtpModemRxlinkdispersionEntry 2 }
+
+cwsPtpModemRxlinkdispersionCompensation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Rx Compensation Dispersion, unit is ps/nm."
+    ::= { cwsPtpModemRxlinkdispersionEntry 3 }
+
+cwsPtpModemTxlinkdispersionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemTxlinkdispersionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 23 }
+
+cwsPtpModemTxlinkdispersionEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemTxlinkdispersionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemTxlinkdispersionTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemTxlinkdispersionTableSnmpKey }
+    ::= { cwsPtpModemTxlinkdispersionTable 1 }
+
+CwsPtpModemTxlinkdispersionEntry ::= SEQUENCE { 
+    cwsPtpModemTxlinkdispersionTableSnmpKey Integer32,
+    cwsPtpModemTxlinkdispersionTotal Integer32,
+    cwsPtpModemTxlinkdispersionActual Integer32 
+}
+
+cwsPtpModemTxlinkdispersionTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemTxlinkdispersion"
+    ::= { cwsPtpModemTxlinkdispersionEntry 1 }
+
+cwsPtpModemTxlinkdispersionTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total Tx Link Dispersion, unit is ps/nm."
+    ::= { cwsPtpModemTxlinkdispersionEntry 2 }
+
+cwsPtpModemTxlinkdispersionActual OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Tx Actual Link Dispersion, unit is ps/nm."
+    ::= { cwsPtpModemTxlinkdispersionEntry 3 }
+
+cwsPtpModemDifferentialGroupDelayTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemDifferentialGroupDelayEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 24 }
+
+cwsPtpModemDifferentialGroupDelayEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemDifferentialGroupDelayEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemDifferentialGroupDelayTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemDifferentialGroupDelayTableSnmpKey }
+    ::= { cwsPtpModemDifferentialGroupDelayTable 1 }
+
+CwsPtpModemDifferentialGroupDelayEntry ::= SEQUENCE { 
+    cwsPtpModemDifferentialGroupDelayTableSnmpKey Integer32,
+    cwsPtpModemDifferentialGroupDelayMeanSupported Integer32,
+    cwsPtpModemDifferentialGroupDelayEstimatedInstance Integer32 
+}
+
+cwsPtpModemDifferentialGroupDelayTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemDifferentialGroupDelay"
+    ::= { cwsPtpModemDifferentialGroupDelayEntry 1 }
+
+cwsPtpModemDifferentialGroupDelayMeanSupported OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Mean Supported Differential Group Delay, unit is ps."
+    ::= { cwsPtpModemDifferentialGroupDelayEntry 2 }
+
+cwsPtpModemDifferentialGroupDelayEstimatedInstance OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Estimated Instance of Differential Group Delay, unit is ps."
+    ::= { cwsPtpModemDifferentialGroupDelayEntry 3 }
+
+cwsPtpModemFastRxRecoveryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemFastRxRecoveryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Fast receiver recovery related leafs and attributes."
+    ::= { cienaWsPtpModemMIB 25 }
+
+cwsPtpModemFastRxRecoveryEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemFastRxRecoveryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemFastRxRecoveryTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemFastRxRecoveryTableSnmpKey }
+    ::= { cwsPtpModemFastRxRecoveryTable 1 }
+
+CwsPtpModemFastRxRecoveryEntry ::= SEQUENCE { 
+    cwsPtpModemFastRxRecoveryTableSnmpKey Integer32,
+    cwsPtpModemFastRxRecoveryState EnabledDisabledEnum,
+    cwsPtpModemFastRxRecoveryNetworkConfiguration INTEGER,
+    cwsPtpModemFastRxRecoveryPath1Dispersion RecoverLinkDispersionType,
+    cwsPtpModemFastRxRecoveryPath2Dispersion RecoverLinkDispersionType 
+}
+
+cwsPtpModemFastRxRecoveryTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemFastRxRecovery"
+    ::= { cwsPtpModemFastRxRecoveryEntry 1 }
+
+cwsPtpModemFastRxRecoveryState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Whether fast receiver recovery state is enabled or disabled. Allows modem to attempt to reacquire a signal very soon after a loss of signal by using predefined tuning values."
+    ::= { cwsPtpModemFastRxRecoveryEntry 2 }
+
+cwsPtpModemFastRxRecoveryNetworkConfiguration OBJECT-TYPE
+    SYNTAX INTEGER { matched(0), diverse(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Fast receiver recovery network configuration value."
+    ::= { cwsPtpModemFastRxRecoveryEntry 3 }
+
+cwsPtpModemFastRxRecoveryPath1Dispersion OBJECT-TYPE
+    SYNTAX RecoverLinkDispersionType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Fast receiver recovery network path 1 dispersion value. The value must be between -80000 and +80000."
+    ::= { cwsPtpModemFastRxRecoveryEntry 4 }
+
+cwsPtpModemFastRxRecoveryPath2Dispersion OBJECT-TYPE
+    SYNTAX RecoverLinkDispersionType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Fast receiver recovery network path 2 dispersion value. The value must be between -80000 and +80000."
+    ::= { cwsPtpModemFastRxRecoveryEntry 5 }
+
+cwsPtpModemColourlessRxChannelPowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemColourlessRxChannelPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Colourless Rx Channel optical power related attributes."
+    ::= { cienaWsPtpModemMIB 26 }
+
+cwsPtpModemColourlessRxChannelPowerEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemColourlessRxChannelPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemColourlessRxChannelPowerTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpChannelChannelNumber, cwsPtpModemColourlessRxChannelPowerTableSnmpKey }
+    ::= { cwsPtpModemColourlessRxChannelPowerTable 1 }
+
+CwsPtpModemColourlessRxChannelPowerEntry ::= SEQUENCE { 
+    cwsPtpModemColourlessRxChannelPowerTableSnmpKey Integer32,
+    cwsXcvrColourlessRxChannelPowerActual Decimal1Dig,
+    cwsXcvrColourlessRxChannelPowerMaximum Decimal1Dig,
+    cwsXcvrColourlessRxChannelPowerMinimum Decimal1Dig,
+    cwsXcvrColourlessRxChannelPowerMaximumRecordedTime StringMaxl32,
+    cwsXcvrColourlessRxChannelPowerMinimumRecordedTime StringMaxl32 
+}
+
+cwsPtpModemColourlessRxChannelPowerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemColourlessRxChannelPower"
+    ::= { cwsPtpModemColourlessRxChannelPowerEntry 1 }
+
+cwsXcvrColourlessRxChannelPowerActual OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Actual Tx or Rx optical power in dBm."
+    ::= { cwsPtpModemColourlessRxChannelPowerEntry 2 }
+
+cwsXcvrColourlessRxChannelPowerMaximum OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Maximum Tx or Rx optical power in dBm."
+    ::= { cwsPtpModemColourlessRxChannelPowerEntry 3 }
+
+cwsXcvrColourlessRxChannelPowerMinimum OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Minimum Tx or Rx optical power in dBm."
+    ::= { cwsPtpModemColourlessRxChannelPowerEntry 4 }
+
+cwsXcvrColourlessRxChannelPowerMaximumRecordedTime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The exact date and time when the maximum optical power (Tx or Rx) was recorded. In the format of a date time string."
+    ::= { cwsPtpModemColourlessRxChannelPowerEntry 5 }
+
+cwsXcvrColourlessRxChannelPowerMinimumRecordedTime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The exact date and time when the minimum optical power (Tx or Rx) was recorded. In the format of a date time string."
+    ::= { cwsPtpModemColourlessRxChannelPowerEntry 6 }
+
+cwsPtpModemColourlessRxChannelStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemColourlessRxChannelStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 27 }
+
+cwsPtpModemColourlessRxChannelStatusEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemColourlessRxChannelStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemColourlessRxChannelStatusTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpChannelChannelNumber, cwsPtpModemColourlessRxChannelStatusTableSnmpKey }
+    ::= { cwsPtpModemColourlessRxChannelStatusTable 1 }
+
+CwsPtpModemColourlessRxChannelStatusEntry ::= SEQUENCE { 
+    cwsPtpModemColourlessRxChannelStatusTableSnmpKey Integer32,
+    cwsPtpModemColourlessRxChannelStatusLossOfSignal TruthValue,
+    cwsPtpModemColourlessRxChannelStatusHighAlarmStatus TruthValue,
+    cwsPtpModemColourlessRxChannelStatusLowAlarmStatus TruthValue 
+}
+
+cwsPtpModemColourlessRxChannelStatusTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemColourlessRxChannelStatus"
+    ::= { cwsPtpModemColourlessRxChannelStatusEntry 1 }
+
+cwsPtpModemColourlessRxChannelStatusLossOfSignal OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Colourless Rx power Loss of Signal."
+    ::= { cwsPtpModemColourlessRxChannelStatusEntry 2 }
+
+cwsPtpModemColourlessRxChannelStatusHighAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical Colourless Rx power high alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsPtpModemColourlessRxChannelStatusEntry 3 }
+
+cwsPtpModemColourlessRxChannelStatusLowAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical Colourless Rx power low alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsPtpModemColourlessRxChannelStatusEntry 4 }
+
+cwsPtpModemColourlessTxChannelPowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemColourlessTxChannelPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Colourless Tx Channel optical power related attributes."
+    ::= { cienaWsPtpModemMIB 28 }
+
+cwsPtpModemColourlessTxChannelPowerEntry OBJECT-TYPE
+    SYNTAX CwsPtpModemColourlessTxChannelPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemColourlessTxChannelPowerTable."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpChannelChannelNumber, cwsPtpModemColourlessTxChannelPowerTableSnmpKey }
+    ::= { cwsPtpModemColourlessTxChannelPowerTable 1 }
+
+CwsPtpModemColourlessTxChannelPowerEntry ::= SEQUENCE { 
+    cwsPtpModemColourlessTxChannelPowerTableSnmpKey Integer32,
+    cwsXcvrColourlessTxChannelPowerActual Decimal1Dig,
+    cwsXcvrColourlessTxChannelPowerMaximum Decimal1Dig,
+    cwsXcvrColourlessTxChannelPowerMinimum Decimal1Dig,
+    cwsXcvrColourlessTxChannelPowerMaximumRecordedTime StringMaxl32,
+    cwsXcvrColourlessTxChannelPowerMinimumRecordedTime StringMaxl32 
+}
+
+cwsPtpModemColourlessTxChannelPowerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemColourlessTxChannelPower"
+    ::= { cwsPtpModemColourlessTxChannelPowerEntry 1 }
+
+cwsXcvrColourlessTxChannelPowerActual OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Actual Tx or Rx optical power in dBm."
+    ::= { cwsPtpModemColourlessTxChannelPowerEntry 2 }
+
+cwsXcvrColourlessTxChannelPowerMaximum OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Maximum Tx or Rx optical power in dBm."
+    ::= { cwsPtpModemColourlessTxChannelPowerEntry 3 }
+
+cwsXcvrColourlessTxChannelPowerMinimum OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Minimum Tx or Rx optical power in dBm."
+    ::= { cwsPtpModemColourlessTxChannelPowerEntry 4 }
+
+cwsXcvrColourlessTxChannelPowerMaximumRecordedTime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The exact date and time when the maximum optical power (Tx or Rx) was recorded. In the format of a date time string."
+    ::= { cwsPtpModemColourlessTxChannelPowerEntry 5 }
+
+cwsXcvrColourlessTxChannelPowerMinimumRecordedTime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The exact date and time when the minimum optical power (Tx or Rx) was recorded. In the format of a date time string."
+    ::= { cwsPtpModemColourlessTxChannelPowerEntry 6 }
+
+cwsPtpAugPtpModemDiagnosticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpAugPtpModemDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 29 }
+
+cwsPtpAugPtpModemDiagnosticsEntry OBJECT-TYPE
+    SYNTAX CwsPtpAugPtpModemDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpAugPtpModemDiagnosticsTable."
+    AUGMENTS { cwsPtpDiagnosticsEntry }
+    ::= { cwsPtpAugPtpModemDiagnosticsTable 1 }
+
+CwsPtpAugPtpModemDiagnosticsEntry ::= SEQUENCE { 
+    cwsPtpModemDiagnosticsNumberOfOdu Unsigned32 
+}
+
+cwsPtpModemDiagnosticsNumberOfOdu OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of ODUs present."
+    ::= { cwsPtpAugPtpModemDiagnosticsEntry 1 }
+
+cwsPtpModemOtu4Table OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemOtu4Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 30 }
+
+cwsPtpModemOtu4Entry OBJECT-TYPE
+    SYNTAX CwsPtpModemOtu4Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemOtu4Table."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemOtu4TableSnmpKey }
+    ::= { cwsPtpModemOtu4Table 1 }
+
+CwsPtpModemOtu4Entry ::= SEQUENCE { 
+    cwsPtpModemOtu4TableSnmpKey Integer32,
+    cwsPtpModemOtu4LossOfClock TruthValue,
+    cwsPtpModemOtu4FrequencyOutOfRange TruthValue,
+    cwsPtpModemOtu4LossOfFrame TruthValue,
+    cwsPtpModemOtu4LossOfMultiFrame TruthValue,
+    cwsPtpModemOtu4BackwardDefectIndication TruthValue,
+    cwsPtpModemOtu4TrailTraceIdMismatch TruthValue 
+}
+
+cwsPtpModemOtu4TableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsPtpModemOtu4"
+    ::= { cwsPtpModemOtu4Entry 1 }
+
+cwsPtpModemOtu4LossOfClock OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "OTU4 Loss of Clock."
+    ::= { cwsPtpModemOtu4Entry 2 }
+
+cwsPtpModemOtu4FrequencyOutOfRange OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "OTU4 Frequency Out Of Range."
+    ::= { cwsPtpModemOtu4Entry 3 }
+
+cwsPtpModemOtu4LossOfFrame OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "OTU4 Loss of Frame."
+    ::= { cwsPtpModemOtu4Entry 4 }
+
+cwsPtpModemOtu4LossOfMultiFrame OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "OTU4 Loss of Multi-Frame."
+    ::= { cwsPtpModemOtu4Entry 5 }
+
+cwsPtpModemOtu4BackwardDefectIndication OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "OTU4 Backward Defect Indication."
+    ::= { cwsPtpModemOtu4Entry 6 }
+
+cwsPtpModemOtu4TrailTraceIdMismatch OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "OTU4 Trail Trace Identifier Mismatch."
+    ::= { cwsPtpModemOtu4Entry 7 }
+
+cwsPtpModemOdu4Table OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpModemOdu4Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpModemMIB 31 }
+
+cwsPtpModemOdu4Entry OBJECT-TYPE
+    SYNTAX CwsPtpModemOdu4Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpModemOdu4Table."
+    INDEX { cwsPtpPtpsPtpIndex, cwsPtpModemOdu4OduId }
+    ::= { cwsPtpModemOdu4Table 1 }
+
+CwsPtpModemOdu4Entry ::= SEQUENCE { 
+    cwsPtpModemOdu4OduId Integer32,
+    cwsPtpModemOdu4OpenConnectionIndication TruthValue,
+    cwsPtpModemOdu4AlarmIndicationSignal TruthValue,
+    cwsPtpModemOdu4Locked TruthValue,
+    cwsPtpModemOdu4SignalFail TruthValue,
+    cwsPtpModemOdu4SignalDegrade TruthValue,
+    cwsPtpModemOdu4TrailTraceIdMismatch TruthValue,
+    cwsPtpModemOdu4BackwardDefectIndication TruthValue,
+    cwsPtpModemOdu4PayloadLabelMismatch TruthValue,
+    cwsPtpModemOdu4ClientSignalFailure TruthValue 
+}
+
+cwsPtpModemOdu4OduId OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "ODU id, can be ODU4.1 or ODU4.2."
+    ::= { cwsPtpModemOdu4Entry 1 }
+
+cwsPtpModemOdu4OpenConnectionIndication OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Open Connection Indication (OCI)."
+    ::= { cwsPtpModemOdu4Entry 2 }
+
+cwsPtpModemOdu4AlarmIndicationSignal OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Alarm Indication Signal (AIS)."
+    ::= { cwsPtpModemOdu4Entry 3 }
+
+cwsPtpModemOdu4Locked OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Locked (LCK)."
+    ::= { cwsPtpModemOdu4Entry 4 }
+
+cwsPtpModemOdu4SignalFail OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Signal Fail."
+    ::= { cwsPtpModemOdu4Entry 5 }
+
+cwsPtpModemOdu4SignalDegrade OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Signal Degrade."
+    ::= { cwsPtpModemOdu4Entry 6 }
+
+cwsPtpModemOdu4TrailTraceIdMismatch OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Trail Trace Identifier Mismatch."
+    ::= { cwsPtpModemOdu4Entry 7 }
+
+cwsPtpModemOdu4BackwardDefectIndication OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Backward Defect Indication."
+    ::= { cwsPtpModemOdu4Entry 8 }
+
+cwsPtpModemOdu4PayloadLabelMismatch OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Payload Label Mismatch."
+    ::= { cwsPtpModemOdu4Entry 9 }
+
+cwsPtpModemOdu4ClientSignalFailure OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Client Signal Failure."
+    ::= { cwsPtpModemOdu4Entry 10 }
+
+
+
+-- Conformance statements
+cienaWsPtpModemObjects OBJECT IDENTIFIER
+    ::= { cienaWsPtpModemMIB 1 }
+
+cienaWsPtpModemConformance OBJECT IDENTIFIER
+    ::= { cienaWsPtpModemMIB 2 }
+
+cienaWsPtpModemGroups OBJECT IDENTIFIER
+    ::= { cienaWsPtpModemConformance 1 }
+
+cienaWsPtpModemGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsPtpModemTransmitterLineSystemChannelNumber,
+        cwsPtpModemFrequencyValue,
+        cwsPtpModemFrequencyMinValue,
+        cwsPtpModemFrequencyMaxValue,
+        cwsPtpModemFrequencyActual,
+        cwsPtpModemPowerValue,
+        cwsPtpModemPowerMinValue,
+        cwsPtpModemPowerMaxValue,
+        cwsPtpModemLineSystemType,
+        cwsPtpModemLineSystemWavelengthSpacing,
+        cwsPtpModemCmdSlot,
+        cwsPtpModemCmdPortIn,
+        cwsPtpModemCmdPortOut,
+        cwsPtpModemModemChannelContentionDetectionAvoidance,
+        cwsPtpModemModemPerformanceOptimizationMode,
+        cwsPtpModemModemCarrierCenteringMode,
+        cwsPtpModemModemInterleaverMode,
+        cwsPtpModemModemRotation,
+        cwsPtpModemModemSpectralOccupancyMode,
+        cwsPtpModemModemTxPowerReductionState,
+        cwsPtpModemModemTxReductionMode,
+        cwsPtpModemModemTxTuningMode,
+        cwsPtpModemModemDifferentialEncoding,
+        cwsPtpModemModemTxCompensationDispersionMode,
+        cwsPtpModemModemTxCompensationDispersionValue,
+        cwsPtpModemModemFastReceiverRecoveryState,
+        cwsPtpModemModemLaserCenteringRange,
+        cwsPtpModemPerformanceStatisticsSecondsSinceLastClear,
+        cwsPtpModemPerformanceStatisticsFecUncorrectedBlockCount,
+        cwsPtpModemPerformanceStatisticsHighCorrectionCountSeconds,
+        cwsPtpModemPreFecBerActual,
+        cwsPtpModemPreFecBerMax,
+        cwsPtpModemPreFecBerMin,
+        cwsPtpModemPreFecBerAverage,
+        cwsPtpModemPostFecBerActual,
+        cwsPtpModemPostFecBerMax,
+        cwsPtpModemPostFecBerMin,
+        cwsPtpModemPostFecBerAverage,
+        cwsPtpModemQFactorActual,
+        cwsPtpModemQFactorMax,
+        cwsPtpModemQFactorMin,
+        cwsPtpModemQFactorAverage,
+        cwsPtpModemFecFrameErrorCountValue,
+        cwsPtpModemFecFrameErrorCountSeconds,
+        cwsPtpModemModemprefecsignalfailalarmActive,
+        cwsPtpModemModemprefecsignalfailalarmthresholdDbq,
+        cwsPtpModemModemprefecsignaldegradealarmActive,
+        cwsPtpModemModemprefecsignaldegradealarmthresholdDbq,
+        cwsPtpModemPreFecSignalFailFailStatus,
+        cwsPtpModemModemprefecsignalfailthresholdDbq,
+        cwsPtpModemModemprefecsignalfailthresholdBer,
+        cwsPtpModemPreFecSignalDegradeDegradeStatus,
+        cwsPtpModemModemprefecsignaldegradethresholdDbq,
+        cwsPtpModemModemprefecsignaldegradethresholdBer,
+        cwsPtpModemRxlinkdispersionTotal,
+        cwsPtpModemRxlinkdispersionCompensation,
+        cwsPtpModemTxlinkdispersionTotal,
+        cwsPtpModemTxlinkdispersionActual,
+        cwsPtpModemDifferentialGroupDelayMeanSupported,
+        cwsPtpModemDifferentialGroupDelayEstimatedInstance,
+        cwsPtpModemFastRxRecoveryState,
+        cwsPtpModemFastRxRecoveryNetworkConfiguration,
+        cwsPtpModemFastRxRecoveryPath1Dispersion,
+        cwsPtpModemFastRxRecoveryPath2Dispersion,
+        cwsXcvrColourlessRxChannelPowerActual,
+        cwsXcvrColourlessRxChannelPowerMaximum,
+        cwsXcvrColourlessRxChannelPowerMinimum,
+        cwsXcvrColourlessRxChannelPowerMaximumRecordedTime,
+        cwsXcvrColourlessRxChannelPowerMinimumRecordedTime,
+        cwsPtpModemColourlessRxChannelStatusLossOfSignal,
+        cwsPtpModemColourlessRxChannelStatusHighAlarmStatus,
+        cwsPtpModemColourlessRxChannelStatusLowAlarmStatus,
+        cwsXcvrColourlessTxChannelPowerActual,
+        cwsXcvrColourlessTxChannelPowerMaximum,
+        cwsXcvrColourlessTxChannelPowerMinimum,
+        cwsXcvrColourlessTxChannelPowerMaximumRecordedTime,
+        cwsXcvrColourlessTxChannelPowerMinimumRecordedTime,
+        cwsPtpModemDiagnosticsNumberOfOdu,
+        cwsPtpModemOtu4LossOfClock,
+        cwsPtpModemOtu4FrequencyOutOfRange,
+        cwsPtpModemOtu4LossOfFrame,
+        cwsPtpModemOtu4LossOfMultiFrame,
+        cwsPtpModemOtu4BackwardDefectIndication,
+        cwsPtpModemOtu4TrailTraceIdMismatch,
+        cwsPtpModemOdu4OpenConnectionIndication,
+        cwsPtpModemOdu4AlarmIndicationSignal,
+        cwsPtpModemOdu4Locked,
+        cwsPtpModemOdu4SignalFail,
+        cwsPtpModemOdu4SignalDegrade,
+        cwsPtpModemOdu4TrailTraceIdMismatch,
+        cwsPtpModemOdu4BackwardDefectIndication,
+        cwsPtpModemOdu4PayloadLabelMismatch,
+        cwsPtpModemOdu4ClientSignalFailure
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsPtpModemGroups 1 }
+
+cienaWsPtpModemCompliances OBJECT IDENTIFIER
+    ::= { cienaWsPtpModemConformance 2 }
+
+cienaWsPtpModemCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsPtpModemGroup }
+    ::= { cienaWsPtpModemCompliances 1 }
+
+END -- End module

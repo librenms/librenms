@@ -1,0 +1,317 @@
+-- Port Security MIB overview:
+-- Port Security MIB falls under lb6m MIB node of the private subtree.
+
+NETGEAR-PORTSECURITY-PRIVATE-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Inc NETGEAR Port Security MIB
+-- Copyright Netgear Inc(2004-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32                          FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,RowStatus,
+    MacAddress                          FROM SNMPv2-TC
+    ifIndex                             FROM IF-MIB
+
+    DisplayString		        FROM RFC1213-MIB
+    lb6m                    FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathPortSecurity MODULE-IDENTITY
+           LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+           ORGANIZATION "Netgear Inc"
+           CONTACT-INFO ""
+ 
+     DESCRIPTION
+          "The Netgear Private MIB for NETGEAR Port Security Feature."
+
+      -- Revision history.
+      REVISION
+          "201101260000Z" -- 26 January 2011 12:00:00 GMT
+      DESCRIPTION
+          "Postal address updated."
+      REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+      DESCRIPTION
+          "Netgear branding related changes."
+
+      ::= { lb6m 20 }
+
+
+     --**************************************************************************************
+    -- agentPortSecurityGroup -> contains MIB objects displaying Port Security
+    -- and associated Functionality 
+    --
+    --**************************************************************************************
+
+agentPortSecurityGroup OBJECT IDENTIFIER ::= { fastPathPortSecurity 1}
+
+agentGlobalPortSecurityMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enable(1),
+                disable(2)
+                }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Mode showing whether at the global level, port security is enabled or not." 
+    DEFVAL { disable }
+	::={ agentPortSecurityGroup 1 }
+	
+agentPortSecurityTable OBJECT-TYPE
+	SYNTAX	     SEQUENCE OF AgentPortSecurityEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION "A table for Port Security and associated functionality."
+	::= { agentPortSecurityGroup 2 }
+
+agentPortSecurityEntry OBJECT-TYPE
+	SYNTAX AgentPortSecurityEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Represents entry for port security table"
+	INDEX       { ifIndex }
+	::={ agentPortSecurityTable 1}
+
+	AgentPortSecurityEntry ::=
+		SEQUENCE {
+		agentPortSecurityMode
+			INTEGER,
+		agentPortSecurityDynamicLimit
+			Unsigned32,
+		agentPortSecurityStaticLimit
+			Unsigned32,
+                agentPortSecurityViolationTrapMode
+                        INTEGER,
+                agentPortSecurityStaticMACs
+                        DisplayString,
+                agentPortSecurityLastDiscardedMAC
+                        DisplayString,
+                agentPortSecurityMACAddressAdd
+                        DisplayString,
+                agentPortSecurityMACAddressRemove
+                        DisplayString,
+                agentPortSecurityMACAddressMove
+                        INTEGER,
+                agentPortSecurityStickyMode
+                        INTEGER
+		}
+
+	agentPortSecurityMode OBJECT-TYPE
+          SYNTAX      INTEGER {
+                enable(1),
+                disable(2)
+                }
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+		"Mode showing whether at port level security is enabled or not." 
+          DEFVAL { disable }
+          ::={ agentPortSecurityEntry 1 }
+	
+	agentPortSecurityDynamicLimit OBJECT-TYPE
+        SYNTAX  Unsigned32(0..4096)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This variable signifies the limit of dynamically locked MAC addresses 
+			 allowed on a specific port."
+	    DEFVAL { 4096 }
+	::={ agentPortSecurityEntry 2 } 
+		
+	agentPortSecurityStaticLimit OBJECT-TYPE
+        SYNTAX  Unsigned32(0..20)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This variable signifies the limit of statically locked MAC addresses 
+			 allowed on a specific port."
+	    DEFVAL { 20 }
+		::={ agentPortSecurityEntry 3 }
+		
+		
+	agentPortSecurityViolationTrapMode OBJECT-TYPE
+		SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"This variable is used to enable or disable the sending of new violation 
+			 traps designating when a packet with a disallowed MAC address is 
+			 received on a locked port."
+		::={agentPortSecurityEntry 4 }
+		
+	agentPortSecurityStaticMACs OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This variable displays the statically locked MAC addresses for port.
+			 The list displayed in a particular fashion :
+			 2 a0:b1:c2:d1:e3:a1,11 a0:b1:c2:d3:e4:f5 
+			 (i.e., VLAN MAC pairs followed by a 1 or 0 to indicate a sticky entry, separated by commas)."
+		::={agentPortSecurityEntry 6 }
+		
+	agentPortSecurityLastDiscardedMAC OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This variable displays the vlan-id and source MAC address of the last packet that was
+			 discarded on a locked port."
+		::={agentPortSecurityEntry 7 }
+                
+        
+        agentPortSecurityMACAddressAdd OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-write 
+                STATUS current
+	        DESCRIPTION
+		"This MIB variable accepts a VLAN id, MAC address and the sticky value to be added to the list
+		 of statically locked MAC addresses on a port. The VLAN id, MAC address and sticky value combination 
+		 would be entered in a particular fashion like :- 2 a0:b0:c0:d1:e2:a1 1(the vlan-id, MAC address 
+		 and sticky value separated by blank-spaces)." 
+                ::={ agentPortSecurityEntry 8 }
+    
+        agentPortSecurityMACAddressRemove OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-write 
+	        STATUS current
+	        DESCRIPTION
+		"This MIB variable accepts a VLAN id and MAC address to be removed from the list
+		of statically locked MAC addresses on a port.. The VLAN id and MAC address combination 
+		would be entered in a particular fashion like :- 2 a0:b0:c0:d1:e2:a1(the vlan-id and
+		MAC address separated by a blank-space)."
+                ::={ agentPortSecurityEntry 9 }
+    
+        agentPortSecurityMACAddressMove OBJECT-TYPE
+                SYNTAX      INTEGER {
+                enable(1),
+                disable(2)
+                }
+                MAX-ACCESS  read-write
+	        STATUS current
+	        DESCRIPTION
+		"When this object is enabled, all the dynamically locked MAC addresses will
+                 be moved to statically locked addresses on a port. GET operation on this object will display 
+                 disable." 
+                 ::={ agentPortSecurityEntry 10 }
+
+          agentPortSecurityStickyMode OBJECT-TYPE
+              SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+          	  MAX-ACCESS read-write
+          	  STATUS current
+          	  DESCRIPTION
+          		"This object is used to configure port level security sticky mode in a port." 
+                    DEFVAL { disable }
+                    ::={ agentPortSecurityEntry 11 }
+
+ --**********************************************************************--
+
+        agentPortSecurityDynamicTable OBJECT-TYPE
+            SYNTAX       SEQUENCE OF AgentPortSecurityDynamicEntry
+            MAX-ACCESS   not-accessible
+            STATUS       current
+            DESCRIPTION "A table for Port Security Dynamic and associated functionality."
+            ::= { agentPortSecurityGroup 3 }
+
+        agentPortSecurityDynamicEntry OBJECT-TYPE
+            SYNTAX AgentPortSecurityDynamicEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "Represents entry for port MAC Locking table"
+            INDEX       { ifIndex,agentPortSecurityDynamicVLANId,agentPortSecurityDynamicMACAddress }
+            ::={ agentPortSecurityDynamicTable 1}
+
+        AgentPortSecurityDynamicEntry ::=
+                SEQUENCE {
+                agentPortSecurityDynamicVLANId
+                        Unsigned32,
+                agentPortSecurityDynamicMACAddress
+                        MacAddress
+                }
+
+        
+        agentPortSecurityDynamicVLANId OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Source VLAN id of the packet that is received on the dynamically locked port."
+                ::={agentPortSecurityDynamicEntry 1 }
+                
+        
+        agentPortSecurityDynamicMACAddress OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Source MAC address of the packet that is received on the dynamically locked port."
+            ::={ agentPortSecurityDynamicEntry 2 }
+
+
+        agentGlobalPortSecurityStickyMode OBJECT-TYPE
+            SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            	"This object is used to apply the Sticky Mode to all ports.
+                 This is write-only value. It always returns 'disable' on request" 
+            DEFVAL { disable }
+            ::={ agentPortSecurityGroup 4 }
+
+        agentGlobalPortSecurityViolationTrapMode OBJECT-TYPE
+            SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+			"This variable is used to enable or disable the sending of new violation 
+			 traps designating when a packet with a disallowed MAC address is 
+			 received on a locked port. The configuration will be done on all ports.
+                         This is write-only value. It always returns 'disable' on request"
+            DEFVAL { disable }
+            ::={ agentPortSecurityGroup 5 }
+                 
+    --**************************************************************************************
+    -- agentPortSecurity   Traps
+    --
+    --**************************************************************************************
+
+    agentPortSecurityTraps                           OBJECT IDENTIFIER ::= { fastPathPortSecurity 2 }
+
+    agentPortSecurityViolation NOTIFICATION-TYPE
+        OBJECTS {
+                 ifIndex,
+                 agentPortSecurityLastDiscardedMAC
+                }
+        STATUS  current
+        DESCRIPTION
+            "Sent when a packet is received on a locked port with a source MAC address 
+             that is not allowed."
+         ::= { agentPortSecurityTraps 1 }
+
+
+
+END

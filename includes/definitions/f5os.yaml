@@ -1,0 +1,13 @@
+os: f5os
+text: F5OS
+type: network
+icon: f5
+empty_ifdescr: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir: f5
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.12276.

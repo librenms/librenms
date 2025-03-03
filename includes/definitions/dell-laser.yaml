@@ -1,20 +1,22 @@
 os: dell-laser
 group: printer
 text: 'Dell Laser'
-ifname: 1
+ifname: true
 type: printer
 icon: dell
 over:
     - { graph: device_toner, text: Toner }
-mib_dir:
-    - dell
+mib_dir: dell
 discovery:
-    - sysDescr:
-        - 'Dell Color Laser'
-        - 'Dell Laser Printer'
-    - sysDescr_regex: '/^Dell.*(MFP|Printer|Laser)/'
+    -
+        sysDescr:
+            - 'Dell Color Laser'
+            - 'Dell Laser Printer'
+    -
+        sysDescr_regex: '/^Dell.*(MFP|Printer|Laser)/'
+    -
+        sysObjectID: .1.3.6.1.4.1.674.10898.
 discovery_modules:
-    toner: 1
+    printer-supplies:   true
 poller_modules:
-    toner: 1
-
+    printer-supplies:   true

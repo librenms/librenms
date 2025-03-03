@@ -12,16 +12,23 @@
  *
  * This module will display NTP details from various device types.
  * To display, modules must create rrd's named: ntp-%PEER%.rrd with the following DS':
- *      DS:stratum:GAUGE:'.$config['rrd']['heartbeat'].':0:U
- *      DS:offset:GAUGE:'.$config['rrd']['heartbeat'].':0:U
- *      DS:delay:GAUGE:'.$config['rrd']['heartbeat'].':0:U
- *      DS:dispersion:GAUGE:'.$config['rrd']['heartbeat'].':0:U
+ *      DS:stratum:GAUGE:'.\LibreNMS\Config::get('rrd.heartbeat').':0:U
+ *      DS:offset:GAUGE:'.\LibreNMS\Config::get('rrd.heartbeat').':0:U
+ *      DS:delay:GAUGE:'.\LibreNMS\Config::get('rrd.heartbeat').':0:U
+ *      DS:dispersion:GAUGE:'.\LibreNMS\Config::get('rrd.heartbeat').':0:U
  */
 
-if ($device['os_group'] == 'cisco') {
-    include 'includes/polling/ntp/cisco.inc.php';
+use LibreNMS\Config;
+
+if (isset($device['os_group']) && file_exists(Config::get('install_dir') . "/includes/polling/ntp/{$device['os_group']}.inc.php")) {
+    include Config::get('install_dir') . "/includes/polling/ntp/{$device['os_group']}.inc.php";
+}
+
+if ($device['os'] == 'awplus') {
+    include 'includes/polling/ntp/awplus.inc.php';
 }
 
 unset(
-    $cntpPeersVarEntry
+    $cntpPeersVarEntry,
+    $atNtpAssociationEntry
 );

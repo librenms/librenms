@@ -1,0 +1,184 @@
+BARCO-CLICKSHARE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises,
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP,
+    MODULE-COMPLIANCE
+        FROM SNMPv2-CONF;
+
+clickShare MODULE-IDENTITY
+    LAST-UPDATED "201812040900Z"    -- Dec 4, 2018 9:00:00 AM
+    ORGANIZATION "Barco ClickShare"
+    CONTACT-INFO "Barco ClickShare
+                  Beneluxpark 21
+                  8500  Kortrijk 
+                  BELGIUM
+                  Phone: +3256233211
+                  Email: clickshare@barco.com"
+    DESCRIPTION
+        "This MIB module defines a set of event triggers and actions for network management of ClickShare devices"
+    REVISION "201812040900Z"    -- Dec 4, 2018 9:00:00 AM
+    DESCRIPTION
+        "Initial version."
+    ::= { enterprises 7312 2468 }
+
+--
+-- Barco ClickShare subtree identifiers
+--
+barco      OBJECT IDENTIFIER ::= { enterprises 7312 }
+events     OBJECT IDENTIFIER ::= { clickShare 0 }
+baseUnit   OBJECT IDENTIFIER ::= { clickShare 1 }
+deviceInfo OBJECT IDENTIFIER ::= { baseUnit 1 }
+sensors    OBJECT IDENTIFIER ::= { baseUnit 2 }
+
+--
+-- Events (SNMP Traps)
+--
+alarmCpuTemperature NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION "An alarmCpuTemperature trap idicates that the CPU temperature exceeded the threshold."
+    ::= { events 1 }
+
+alarmCaseFanSpeed NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION "An alarmCaseFanSpeed trap idicates that the case fan is spinning too slow."
+    ::= { events 2 }
+
+alarmProcessNotRunning NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION "An alarmProcessNotRunning trap idicates that one of the monitored processes is not running."
+    ::= { events 3 }
+
+--
+-- Device Info
+--
+diRoomName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of the meeting room where the Base Unit is located.
+                 This string will be visible on the Base Unit's screen."
+    ::= { deviceInfo 1 }
+
+diWelcomeMessage OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A welcome message visible on the Base Unit's screen."
+    ::= { deviceInfo 2 }
+
+diLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of the location where the Base Unit is located."
+    ::= { deviceInfo 3 }
+
+diArticleCode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Base Unit article code."
+    ::= { deviceInfo 4 }
+
+diSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Base Unit serial number."
+    ::= { deviceInfo 5 }
+
+diUptime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Base Unit current uptime."
+    ::= { deviceInfo 6 }
+
+diTotalUptime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Base Unit total uptime."
+    ::= { deviceInfo 7 }
+
+--
+-- Sensors
+--
+sensorCaseFanSpeed OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the current speed of the case fan."
+    ::= { sensors 1 }
+
+sensorCpuFanSpeed OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the current speed of the CPU fan."
+    ::= { sensors 2 }
+
+sensorCpuTemperature OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the current CPU temperature."
+    ::= { sensors 3 }
+
+sensorCpuTemperatureThreshold OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The CPU temperature limit.
+                 If the current temperature exceeds this setting, the Base Unit will
+                 shut down itself"
+    ::= { sensors 4 }
+
+--
+-- Conformance Information
+--
+clickShareMIB OBJECT IDENTIFIER ::= { barco 2469 }
+
+clickShareMIBCompliances OBJECT IDENTIFIER ::= { clickShareMIB 1 }
+clickShareMIBGroups      OBJECT IDENTIFIER ::= { clickShareMIB 2 }
+
+-- compliance statements
+clickShareMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for ClickShare Base Unit devices."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS {
+            deviceInfoGroup,
+            sensorsGroup,
+            eventsGroup }
+    ::= { clickShareMIBCompliances 1 }
+
+deviceInfoGroup OBJECT-GROUP
+    OBJECTS     { diRoomName, diWelcomeMessage, diLocation, diArticleCode, diSerialNumber, diUptime, diTotalUptime }
+    STATUS       current
+    DESCRIPTION "The group of Device Info objects."
+    ::= { clickShareMIBGroups 1 }
+
+sensorsGroup OBJECT-GROUP
+    OBJECTS     { sensorCaseFanSpeed, sensorCpuFanSpeed, sensorCpuTemperature, sensorCpuTemperatureThreshold }
+    STATUS      current
+    DESCRIPTION "The group of sensor objects."
+    ::= { clickShareMIBGroups 2 }
+
+eventsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { alarmCpuTemperature, alarmCaseFanSpeed, alarmProcessNotRunning }
+    STATUS        current
+    DESCRIPTION   "The group of SNMP trap objects."
+    ::= { clickShareMIBGroups 99 }
+END

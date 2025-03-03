@@ -1,0 +1,495 @@
+--MibName=rosMgmtAlarm
+-- *****************************************************************
+-- ROSMGMT-ALARM-MGMT-MIB.mib:  ROSMGMT ALARM MIB
+--
+-- April 2011, yangguodong
+--
+-- Copyright (c) 1996-2011 by Raisecom Technology Co., Ltd. 
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+  ROSMGMT-ALARM-MGMT-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+     MODULE-IDENTITY,OBJECT-TYPE,
+     Unsigned32,Integer32
+        FROM SNMPv2-SMI                 -- [RFC2578]
+     TEXTUAL-CONVENTION,TruthValue
+        FROM SNMPv2-TC                     -- [RFC2579]   
+
+     SnmpAdminString
+       FROM SNMP-FRAMEWORK-MIB         -- [RFC3411]       
+     ifIndex             FROM IF-MIB   
+     rosMgmt
+				FROM RAISECOM-BASE-MIB;
+ 
+  rosMgmtAlarmMgmt MODULE-IDENTITY
+     LAST-UPDATED "202006180000Z"  -- 18 June 2020 00:00:00 GMT
+     ORGANIZATION "Raisecom Technology Co., Ltd."
+     CONTACT-INFO
+        "Raisecom Science & Technology Co., ltd.
+        E-mail: support@rosMgmt.com ."	 
+     DESCRIPTION
+        "This MIB module contains managed object definitions for
+         MPLS. "
+	 REVISION   "202006180000Z"  -- 18 June 2020 00:00:00 GMT
+	 DESCRIPTION
+	"Add alarm reversal mode to automatically flip state."
+	 REVISION   "201103120000Z"  -- 12 March 2011 00:00:00 GMT
+	 DESCRIPTION
+	"ROSMGMT ALARM MIB initial version."
+        ::= { rosMgmt 34 }
+	--rosMgmtAlarmMgmt 0 notification
+	rosMgmtAlarmMgmtObejcts OBJECT IDENTIFIER ::= { rosMgmtAlarmMgmt 1 } 
+	--rosMgmtAlarmMgmt 2 conformance group
+    -- User-defined types  
+	AlarmStorageMode ::= TEXTUAL-CONVENTION
+	   STATUS       current
+	   DESCRIPTION
+	            "Describes how to store alarm active table when the alarm
+	            table was full.When the storage mode is stop,the new raised
+	            alarm will be discarded.It will not insert to alarm active table.
+	            If the storage mode is loop,the oldest row in alarm active table
+	            will be deleted and the the newly raiseco alarm will be inserted 
+	            to the alarm active table."
+	            
+	   SYNTAX       INTEGER {
+	                     stop(1),       -- eh?
+	                     loop(2)    -- e.g., in RAM
+	                   } 
+
+	AlarmInverseMode ::= TEXTUAL-CONVENTION
+	   STATUS       current
+	   DESCRIPTION
+	            "Describes the mode of alarm inverse "
+	            
+	   SYNTAX       INTEGER {
+	                     none(1),       -- inverse mode is non
+	                     auto(2),       -- inverse mode is auto
+	                     manual(3),      -- inverse mode is manual 
+			             autofinish(4)      -- inverse mode is auto finish
+	                   }  	                     
+	--end user defined type                   
+
+	--start of alarm config  
+	rosMgmtAlarmMgmtScalarGroup OBJECT IDENTIFIER ::= { rosMgmtAlarmMgmtObejcts 1 }
+	rosMgmtAlarmMgmtRaiseDelay OBJECT-TYPE
+	SYNTAX            Integer32 (0..600) 
+    UNITS             "seconds"	
+	MAX-ACCESS        read-write
+	STATUS            current 
+	DESCRIPTION
+	   "The approximate period from the time a alarm was 
+	   raised to a time this alarm was reported."   
+	DEFVAL { 0 }
+	::= { rosMgmtAlarmMgmtScalarGroup 1}  
+	
+	rosMgmtAlarmMgmtClearDelay OBJECT-TYPE
+	SYNTAX            Integer32  (0..600) 
+    UNITS             "seconds"	
+	MAX-ACCESS        read-write
+	STATUS            current 
+	DESCRIPTION
+	   "The approximate period from the time a alarm was 
+	   cleared to a time this alarm report."   
+	DEFVAL { 0 }
+	::= { rosMgmtAlarmMgmtScalarGroup 2 }    
+	
+	rosMgmtAlarmMgmtActiveStoreMode OBJECT-TYPE
+	SYNTAX            AlarmStorageMode 
+	MAX-ACCESS        read-write
+	STATUS            current 
+	DESCRIPTION
+	   "The storage mode of the alarm active table"   
+	::= { rosMgmtAlarmMgmtScalarGroup 3 }   
+	
+	rosMgmtAlarmMgmtInhibitEnable OBJECT-TYPE
+	SYNTAX            TruthValue 
+	MAX-ACCESS        read-write
+	STATUS            current 
+	DESCRIPTION
+	   "Enable or Disable Alarm Inhibit"   
+	DEFVAL { true }   
+	::= { rosMgmtAlarmMgmtScalarGroup 4 }    
+	
+	rosMgmtAlarmMgmtSyslogEnable OBJECT-TYPE
+	SYNTAX            TruthValue 
+	MAX-ACCESS        read-write
+	STATUS            current 
+	DESCRIPTION
+	   "Enable or Disable write syslog when an alarm raise"   
+	DEFVAL { true }   
+	::= { rosMgmtAlarmMgmtScalarGroup 5 }  
+	
+	rosMgmtAlarmMgmtActiveClear OBJECT-TYPE
+	SYNTAX            Integer32  
+	MAX-ACCESS        read-write
+	STATUS            current 
+	DESCRIPTION
+	   "clear active alarm according to the active table third index"   
+	::= { rosMgmtAlarmMgmtScalarGroup 6 }	
+	
+	
+	rosMgmtAlarmMgmtConfigTable   OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF RosMgmtAlarmMgmtConfigEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This table specifies the information of alarm configuration."
+     ::= { rosMgmtAlarmMgmtObejcts 2 }
+     
+	rosMgmtAlarmMgmtConfigEntry   OBJECT-TYPE
+     SYNTAX        RosMgmtAlarmMgmtConfigEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+          "A row in this table represents the configuration of specified alarm."
+     INDEX  { rosMgmtAlarmMgmtId,ifIndex }
+            ::= { rosMgmtAlarmMgmtConfigTable 1 }
+            
+	RosMgmtAlarmMgmtConfigEntry ::= SEQUENCE {
+        rosMgmtAlarmMgmtId            Unsigned32,
+        rosMgmtAlarmMgmtClear         TruthValue,
+        rosMgmtAlarmMgmtReportEnable  TruthValue, 
+        rosMgmtAlarmMgmtMonitorEnable TruthValue,
+        rosMgmtAlarmMgmtInverseMode   AlarmInverseMode,  
+        rosMgmtAlarmMgmtModuleName    SnmpAdminString,
+        rosMgmtAlarmMgmtGroupName     SnmpAdminString
+        }  
+        
+	rosMgmtAlarmMgmtId OBJECT-TYPE
+	SYNTAX        Unsigned32
+	MAX-ACCESS    not-accessible
+	STATUS        current
+	DESCRIPTION
+         "First index of alarm config table which is equal to alarm group Id"
+     ::= { rosMgmtAlarmMgmtConfigEntry 1 }   
+     
+ 	rosMgmtAlarmMgmtClear OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "The swith of alarm clear,when open the swith the related
+         active alarm entry will be deleted from alarm active table" 
+    DEFVAL { false }
+     ::= { rosMgmtAlarmMgmtConfigEntry 2 }   
+     
+  	rosMgmtAlarmMgmtReportEnable OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "Enable or disable Alarm Report" 
+    DEFVAL { true }
+     ::= { rosMgmtAlarmMgmtConfigEntry 3 }
+  
+  	rosMgmtAlarmMgmtMonitorEnable OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "Enable or disable alarm monitor" 
+    DEFVAL { true }
+     ::= { rosMgmtAlarmMgmtConfigEntry 4 } 
+     
+  	rosMgmtAlarmMgmtInverseMode OBJECT-TYPE
+	SYNTAX        AlarmInverseMode
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "The mode of alarm inverse" 
+    DEFVAL { none }
+     ::= { rosMgmtAlarmMgmtConfigEntry 5 }  
+      
+    rosMgmtAlarmMgmtModuleName OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "The module name which this alarm belongs to."
+    ::= { rosMgmtAlarmMgmtConfigEntry 6 } 
+    
+    rosMgmtAlarmMgmtGroupName OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "The name of alarm group."
+    ::= { rosMgmtAlarmMgmtConfigEntry 7 }   
+ 
+ rosMgmtAlarmMgmtCfgTable     OBJECT-TYPE 
+     SYNTAX        SEQUENCE OF RosMgmtAlarmMgmtCfgEntry 
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This table specifies the information of alarm configuration."
+     ::= { rosMgmtAlarmMgmtObejcts 3 }
+     
+  rosMgmtAlarmMgmtCfgEntry   OBJECT-TYPE
+     SYNTAX        RosMgmtAlarmMgmtCfgEntry 
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+          "A row in this table represents the configuration of specified alarm."
+     INDEX  { rosMgmtAlarmMgmtCfgAlarmType,rosMgmtAlarmMgmtCfgAlarmResType,rosMgmtAlarmMgmtCfgAlarmRes}
+            ::= { rosMgmtAlarmMgmtCfgTable 1 }
+            
+	RosMgmtAlarmMgmtCfgEntry ::= SEQUENCE { 
+	    rosMgmtAlarmMgmtCfgAlarmType     Unsigned32,
+        rosMgmtAlarmMgmtCfgAlarmResType  INTEGER,
+        rosMgmtAlarmMgmtCfgAlarmRes      Unsigned32,
+        rosMgmtAlarmMgmtCfgClear         TruthValue,
+        rosMgmtAlarmMgmtCfgMonitorEnable  TruthValue,
+        rosMgmtAlarmMgmtCfgReportEnable  TruthValue,
+        rosMgmtAlarmMgmtCfgInverseMode   AlarmInverseMode 
+        }  
+                                 
+ 	rosMgmtAlarmMgmtCfgAlarmType OBJECT-TYPE
+	SYNTAX        Unsigned32
+	MAX-ACCESS    not-accessible
+	STATUS        current
+	DESCRIPTION
+         "Third index of alarm Mgmt config table.The type of Alarm."
+     ::= { rosMgmtAlarmMgmtCfgEntry 1 }  
+            
+	rosMgmtAlarmMgmtCfgAlarmResType OBJECT-TYPE
+	SYNTAX INTEGER {
+					slotindex(1),	--告警源:板卡
+					pwindex(2),	--告警源：PW
+					lspindex(3),	--告警源：LSP
+					loifindex(4),	--告警源：LOOPBACK口 
+					agifindex(5),	--告警源：AG口
+					apifindex(6),	--告警源：AP口
+					obifindex(7),	  --告警源：OUTBAND口  
+					tdmifindex(8),	--告警源：TDM口  
+					tunnelifindex(9),	--告警源：TRUNK口
+					vlanifindex(10),	--告警源：VLAN口   
+					subifindex(11),	--告警源：SUBIF口 
+					portindex(12),	--告警源：端口
+					apagsubifindex(13),	--告警源：AP,AG,子接口
+					powerindex(14), --告警源：电源
+					fanindex(15),	--告警源：风扇
+					boardindex(16),	--告警源：板卡，电源，风扇
+					cfmindex(17),	
+					erpsindex(18),	
+					apsindex(19),	
+					bfdindex(20),	
+					ldpindex(21),
+					lsaindex(22),
+					ifindex(23),
+					cpuindex(24),
+					tdmsubifindex(25),
+					tdmtdmsubifindex(26),
+					stmifindex(27),
+					stmsubifindex(28),
+					stmsubtdmtdmsubindex(29),
+					stmvcindex(30),
+					eponifindex(31),
+					eonuifindex(32),
+					eonusubifindex(33),
+					apeponifindex(34),
+					apagvlansubifindex(35)
+		        } 
+	MAX-ACCESS    not-accessible
+	STATUS        current
+	DESCRIPTION
+         "First index of alarm Mgmt config table.The type of Alarm Resoure."
+     ::= { rosMgmtAlarmMgmtCfgEntry 2 }  
+     
+	rosMgmtAlarmMgmtCfgAlarmRes OBJECT-TYPE
+	SYNTAX        Unsigned32
+	MAX-ACCESS    not-accessible
+	STATUS        current
+	DESCRIPTION
+         "Second index of alarm Mgmt config table.The value of Alarm Resoure."
+     ::= { rosMgmtAlarmMgmtCfgEntry 3 } 
+                
+  rosMgmtAlarmMgmtCfgClear OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "The swith of alarm clear,when open the swith, the related active alarm entry will be deleted from alarm active table." 
+    DEFVAL { false }
+     ::= { rosMgmtAlarmMgmtCfgEntry 4 } 
+     
+  rosMgmtAlarmMgmtCfgMonitorEnable OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "Enable or disable alarm Monitor." 
+    DEFVAL { true }
+     ::= { rosMgmtAlarmMgmtCfgEntry 5 }   
+     
+  rosMgmtAlarmMgmtCfgReportEnable  OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "Enable or disable alarm Report." 
+    DEFVAL { true }
+     ::= { rosMgmtAlarmMgmtCfgEntry 6 }    
+     
+  rosMgmtAlarmMgmtCfgInverseMode  OBJECT-TYPE
+	SYNTAX        AlarmInverseMode
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "Alarm Inverse Mode." 
+    DEFVAL { none }
+     ::= { rosMgmtAlarmMgmtCfgEntry 7 }      
+     
+    --end of alarm config  
+
+	rosMgmtAlarmMgmtMonitorLevel OBJECT-TYPE
+	SYNTAX            INTEGER {
+					clear(1),
+					indeterminate(2),
+					critical(3),     
+					major(4),        
+					minor(5),        
+					warning(6)
+	                         }
+	MAX-ACCESS        read-write
+	STATUS            current 
+	DESCRIPTION
+	   "The level of Alarm Monitor."   
+	DEFVAL { minor }
+	::= { rosMgmtAlarmMgmtScalarGroup 7} 
+	 
+	rosMgmtAlarmMgmtClearLevel OBJECT-TYPE
+	SYNTAX            INTEGER {
+								clear(1),
+								indeterminate(2),
+								critical(3),     
+								major(4),        
+								minor(5),        
+								warning(6)
+	                   }
+	MAX-ACCESS        read-write
+	STATUS            current 
+	DESCRIPTION
+	   "The level of Alarm Monitor."   
+		::= { rosMgmtAlarmMgmtScalarGroup 8}  	 
+	
+	rosMgmtAlarmMgmtMonitor OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "Enable or Disable Alarm Monitor." 
+    DEFVAL { true }
+     ::= { rosMgmtAlarmMgmtScalarGroup 9 } 
+     
+     
+  rosMgmtAlarmMgmtCorrelationInhibit OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "Enable or Disable Alarm CorrelationInhibit." 
+    DEFVAL { true }
+     ::= { rosMgmtAlarmMgmtScalarGroup 10 }  
+     
+  rosMgmtAlarmMgmtReport OBJECT-TYPE
+	SYNTAX        TruthValue
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+         "Enable or Disable Alarm Report." 
+    DEFVAL { true }
+     ::= { rosMgmtAlarmMgmtScalarGroup 11 }      
+  
+-- rosMgmtAlarmMgmtCfgOutPutTable     OBJECT-TYPE 
+--     SYNTAX        SEQUENCE OF RaisecomAlarmMgmtCfgOutPutEntry 
+--     MAX-ACCESS    not-accessible
+--     STATUS        current
+--     DESCRIPTION
+--         "This table specifies the information of alarm configuration."
+--     ::= { rosMgmtAlarmMgmtObejcts 14 }
+--     
+--  rosMgmtAlarmMgmtCfgOutPutEntry   OBJECT-TYPE
+--     SYNTAX        RaisecomAlarmMgmtCfgOutPutEntry 
+--     MAX-ACCESS    not-accessible
+--     STATUS        current
+--     DESCRIPTION
+--          "A row in this table represents the configuration of specified alarm."
+--     INDEX  { rosMgmtAlarmMgmtAlarmOutputGroupIndex, rosMgmtAlarmMgmtAlarmOutputType}
+--     ::= { rosMgmtAlarmMgmtCfgOutPutTable 1 }
+--            
+--	RaisecomAlarmMgmtCfgOutPutEntry ::= SEQUENCE { 
+--        rosMgmtAlarmMgmtAlarmOutputGroupIndex   INTEGER, 
+--        rosMgmtAlarmMgmtAlarmOutputType         Unsigned32, 
+--        rosMgmtAlarmMgmtAlarmOutputRowStatus    TruthValue      
+--        }  
+--                                 
+--  rosMgmtAlarmMgmtAlarmOutputGroupIndex OBJECT-TYPE
+--	SYNTAX            INTEGER (1..2)
+--	MAX-ACCESS        not-accessible
+--	STATUS            current 
+--	DESCRIPTION
+--	   "The index of alarm Mgmt OutputGroup table."   
+--	::= { rosMgmtAlarmMgmtCfgOutPutEntry 1}   
+--
+-- rosMgmtAlarmMgmtAlarmOutputType OBJECT-TYPE
+--	SYNTAX        Unsigned32
+--	MAX-ACCESS    not-accessible
+--	STATUS        current
+--	DESCRIPTION
+--         "Third index of alarm Mgmt config table.The type of Alarm."
+--     ::= { rosMgmtAlarmMgmtCfgOutPutEntry 2 }  
+--	
+--  rosMgmtAlarmMgmtAlarmOutputRowStatus OBJECT-TYPE
+--	SYNTAX        TruthValue						
+--	MAX-ACCESS    read-write
+--	STATUS        current
+--	DESCRIPTION
+--         "Enable or disable Alarm Output"  
+--    DEFVAL { true }                
+--	::= { rosMgmtAlarmMgmtCfgOutPutEntry 3} 	
+--
+--
+-- rosMgmtAlarmMgmtCfgOutPutGroupTable     OBJECT-TYPE 
+--     SYNTAX        SEQUENCE OF RaisecomAlarmMgmtCfgOutPutGroupEntry 
+--     MAX-ACCESS    not-accessible
+--     STATUS        current
+--     DESCRIPTION
+--         "This table specifies the information of alarm configuration."
+--     ::= { rosMgmtAlarmMgmtObejcts 15 }
+--     
+--  rosMgmtAlarmMgmtCfgOutPutGroupEntry   OBJECT-TYPE
+--     SYNTAX        RaisecomAlarmMgmtCfgOutPutGroupEntry 
+--     MAX-ACCESS    not-accessible
+--     STATUS        current
+--     DESCRIPTION
+--          "A row in this table represents the configuration of specified alarm."
+--     INDEX  { rosMgmtAlarmMgmtAlarmOutputgrpIndex}
+--     ::= { rosMgmtAlarmMgmtCfgOutPutGroupTable 1 }
+--            
+--	RaisecomAlarmMgmtCfgOutPutGroupEntry ::= SEQUENCE { 
+--        rosMgmtAlarmMgmtAlarmOutputgrpIndex   INTEGER, 
+--        rosMgmtAlarmMgmtAlarmOutputEnable     EnableVar  
+--        }  
+--                                 
+--    rosMgmtAlarmMgmtAlarmOutputgrpIndex OBJECT-TYPE
+--	SYNTAX            INTEGER (1..2)
+--	MAX-ACCESS        not-accessible
+--	STATUS            current 
+--	DESCRIPTION
+--	   "The index of alarm Mgmt OutputGroup table."   
+--	::= { rosMgmtAlarmMgmtCfgOutPutGroupEntry 1}   
+--
+-- 	rosMgmtAlarmMgmtAlarmOutputEnable OBJECT-TYPE
+--	SYNTAX        EnableVar
+--	MAX-ACCESS    read-write
+--	STATUS        current
+--	DESCRIPTION
+--         "Third index of alarm Mgmt config table.The type of Alarm."
+--     ::= { rosMgmtAlarmMgmtCfgOutPutGroupEntry 2 }  
+	
+                      
+  END

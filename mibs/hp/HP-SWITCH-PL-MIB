@@ -38,8 +38,8 @@ IMPORTS
 
 hp                                     OBJECT IDENTIFIER ::= { enterprises 11 }
 nm                                     OBJECT IDENTIFIER ::= { hp 2 }
-hpSystem                               OBJECT IDENTIFIER ::= { nm 3 }
-netElement                             OBJECT IDENTIFIER ::= { hpSystem 7 }
+system                               OBJECT IDENTIFIER ::= { nm 3 }
+netElement                             OBJECT IDENTIFIER ::= { system 7 }
 hpEtherSwitch                          OBJECT IDENTIFIER ::= { netElement 11 }
 hpSwitchProliant                       OBJECT IDENTIFIER ::= { hpEtherSwitch 33 }
 

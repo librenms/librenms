@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016
  * @author
  */
@@ -28,13 +28,12 @@ namespace LibreNMS;
 /**
  * Reursive Filter Iterator to iterate directories and locate .rrd files.
  *
- * @method boolean isDir()
+ * @method bool isDir()
  *
  **/
 class RRDRecursiveFilterIterator extends \RecursiveFilterIterator
 {
-
-    public function accept()
+    public function accept(): bool
     {
         $filename = $this->current()->getFilename();
         if ($filename[0] === '.') {
@@ -45,6 +44,7 @@ class RRDRecursiveFilterIterator extends \RecursiveFilterIterator
             // We want to search into directories
             return true;
         }
+
         // Matches files with .rrd in the filename.
         // We are only searching rrd folder, but there could be other files and we don't want to cause a stink.
         return strpos($filename, '.rrd') !== false;

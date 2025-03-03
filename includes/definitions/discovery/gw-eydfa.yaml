@@ -1,0 +1,5 @@
+modules:
+    os:
+        hardware: NSCRTV-HFCEMS-COMMON-MIB::commonDeviceModelNumber.1
+        serial: NSCRTV-HFCEMS-COMMON-MIB::commonDeviceSerialNumber.1
+        version: NSCRTV-HFCEMS-COMMON-MIB::commonDeviceVendorInfo.1

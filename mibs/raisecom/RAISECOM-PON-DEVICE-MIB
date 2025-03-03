@@ -1,0 +1,1251 @@
+-- =======================================================================
+-- Version info
+--
+-- Version 0.1 Created 2011.03.09 by wuliang
+-- Copyright(c) 2003-2007 by RAISECOM TECH, Ltd.
+-- =======================================================================
+
+-- ===========================================================================
+
+--     111
+-- RAISECOM base management objects
+--
+
+RAISECOM-PON-DEVICE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+		MODULE-IDENTITY,
+		OBJECT-TYPE,
+		NOTIFICATION-TYPE ,
+		Integer32,
+		IpAddress,
+		Unsigned32
+			FROM SNMPv2-SMI
+		DisplayString,
+		TimeStamp,
+		RowStatus,
+		TruthValue,
+		MacAddress
+			FROM SNMPv2-TC
+		EnableVar
+			FROM SWITCH-TC
+	    SlotIndex,
+	    PONDeviceType,
+	    PONDeviceCardType
+	        FROM RAISECOM-PONSERIES-TC
+		raisecomAgent
+			FROM RAISECOM-BASE-MIB;
+
+
+	raisecomdeviceMgt    MODULE-IDENTITY
+		LAST-UPDATED 	"201103091000Z"
+		ORGANIZATION 	"RAISECOM TECH, Ltd."
+		CONTACT-INFO 	"www.raisecom.com"
+		DESCRIPTION
+		    "The MIB module defining objects for device management"
+		::= { raisecomAgent  27}
+
+	--groups
+	  raisecomNEEquip			OBJECT IDENTIFIER ::= {raisecomdeviceMgt 1}
+	  raisecomShelf  			OBJECT IDENTIFIER ::= {raisecomdeviceMgt 2}
+	  raisecomSlot  			OBJECT IDENTIFIER ::= {raisecomdeviceMgt 3}
+	  raisecomPower 			OBJECT IDENTIFIER ::= {raisecomdeviceMgt 4}
+	  raisecomFan   			OBJECT IDENTIFIER ::= {raisecomdeviceMgt 5}
+--	  raisecomOutbandMgtPort	OBJECT IDENTIFIER ::= {raisecomdeviceMgt 6}
+--	  raisecomConsolePort		OBJECT IDENTIFIER ::= {raisecomdeviceMgt 7}
+	  raisecomDeviceAlarm		OBJECT IDENTIFIER ::= {raisecomdeviceMgt 8}
+	  raisecomAlarmInput		OBJECT IDENTIFIER ::= {raisecomdeviceMgt 10}
+      raisecomCardTemplate      OBJECT IDENTIFIER ::= {raisecomdeviceMgt 11}
+	  raisecomCardPower         OBJECT IDENTIFIER ::= {raisecomdeviceMgt 12}
+
+       -- raisecomNEEquip
+    raisecomNEType   OBJECT-TYPE
+        SYNTAX 		PONDeviceType
+        MAX-ACCESS 	read-only
+        STATUS current
+        DESCRIPTION  "Network element type."
+        ::= { raisecomNEEquip 1 }
+
+    raisecomNEAssetID      OBJECT-TYPE
+        SYNTAX 		OCTET STRING  (SIZE (0..64))
+        MAX-ACCESS 	read-write
+        STATUS current
+        DESCRIPTION "Asset ID of this network element for the carrier."
+        ::= { raisecomNEEquip 2 }
+
+    raisecomNEMfrVendor      OBJECT-TYPE
+        SYNTAX 		OCTET STRING  (SIZE(0..64))
+        MAX-ACCESS 	read-only
+        STATUS current
+        DESCRIPTION  "Vendor name for this network element."
+        ::= { raisecomNEEquip 3 }
+
+    raisecomNETmptAlarmThreshold      OBJECT-TYPE
+        SYNTAX 		INTEGER (0..100)
+        MAX-ACCESS 	read-write
+        STATUS current
+        DESCRIPTION  "Temperature threshold to issure the temperature alarm. The applicability depends on the device type."
+        DEFVAL { 70 }
+        ::= { raisecomNEEquip 4 }
+
+
+  --raisecomShelf
+
+   raisecomShelfTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RaisecomShelfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Shelf management table."
+    ::= { raisecomShelf 1 }
+
+    raisecomShelfEntry    OBJECT-TYPE
+	SYNTAX          RaisecomShelfEntry
+	MAX-ACCESS      not-accessible
+    STATUS          current
+	DESCRIPTION     "Shelf management table entry."
+	INDEX { raisecomShelfId }
+    ::= { raisecomShelfTable 1 }
+
+    RaisecomShelfEntry ::= SEQUENCE {
+        raisecomShelfId             		Integer32,
+        raisecomShelfDescr          		OCTET STRING (SIZE (0..64)),
+        raisecomShelfSerialNum      		OCTET STRING (SIZE (0..64)),
+        raisecomShelfHwVersion      		OCTET STRING (SIZE (0..64)),
+        raisecomShelfLevel           		INTEGER,
+        raisecomShelfType                   OCTET STRING (SIZE (0..64)),
+        raisecomShelfGenType        		INTEGER,
+        raisecomShelfMfrVendor      		OCTET STRING (SIZE (0..64)),
+        raisecomShelfAssetID        		OCTET STRING (SIZE (0..64)),
+        raisecomShelfTemperature    		INTEGER,
+        raisecomShelfSlotNum				Integer32,
+        raisecomShelfNMSSlotNum     		INTEGER,
+        raisecomShelfPrimaryNMSSlotId   	Integer32,
+        raisecomShelfSecondaryNMSSlotId     Integer32,
+        raisecomShelfMac                    MacAddress
+        }
+
+     raisecomShelfId   OBJECT-TYPE
+        SYNTAX          Integer32(0..15)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Shelf id."
+        ::= { raisecomShelfEntry 1 }
+
+     raisecomShelfDescr   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION      "Shelf description."
+        ::= { raisecomShelfEntry 2 }
+
+     raisecomShelfSerialNum   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Shelf device serial number."
+        ::= { raisecomShelfEntry 3 }
+
+     raisecomShelfHwVersion   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        		"Shelf hardware version.
+
+                For pizza-box type of device, it indicates version of the device, not of the card.
+                For other type of device, it indicates version of the shelf, mainly of the backplane."
+        ::= { raisecomShelfEntry 4 }
+
+     raisecomShelfLevel   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                              	masterShelf(1),
+								extendShelf1(2),
+								extendShelf2(3),
+								extendShelf3(4),
+								extendShelf4(5),
+								extendShelf5(6),
+								extendShelf6(7),
+								extendShelf7(8),
+								extendShelf8(9)
+								}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Shelf level."
+        ::= { raisecomShelfEntry 5 }
+
+      raisecomShelfType   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Shelf type."
+        ::= { raisecomShelfEntry 6 }
+
+      raisecomShelfGenType   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                              	other(1),
+								unknown(2),
+								chassis(3),
+								backplane(4),
+								container(5),
+								powerSupply(6),
+								fan(7),
+								sensor(8),
+								module(9),
+								port(10),
+								stack(11)
+								}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Shelf Species."
+        ::= { raisecomShelfEntry 7 }
+
+       raisecomShelfMfrVendor   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Vendor name for this shelf."
+        ::= { raisecomShelfEntry 8 }
+
+        raisecomShelfAssetID   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Asset ID of this shelf."
+        ::= { raisecomShelfEntry 9 }
+
+       raisecomShelfTemperature   OBJECT-TYPE
+        SYNTAX          INTEGER (-100..100)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Temperature of this shelf."
+        ::= { raisecomShelfEntry 10 }
+
+       raisecomShelfSlotNum   OBJECT-TYPE
+        SYNTAX          Integer32(0..15)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of slots for installing cards in this shelf."
+        ::= { raisecomShelfEntry 11 }
+
+        raisecomShelfNMSSlotNum   OBJECT-TYPE
+        SYNTAX          INTEGER (1..2)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of slots for management and control cards in this shelf."
+        ::= { raisecomShelfEntry 12 }
+
+       raisecomShelfPrimaryNMSSlotId   OBJECT-TYPE
+        SYNTAX          Integer32 (0..15)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Slot for the primary management and control card."
+        ::= { raisecomShelfEntry 13 }
+
+       raisecomShelfSecondaryNMSSlotId   OBJECT-TYPE
+        SYNTAX          Integer32 (0..15)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Slot for the secondary management and control card.
+                         Valid only when raisecomShelfNMSSlotNum equals to 2."
+        ::= { raisecomShelfEntry 14 }
+
+       raisecomShelfMac   OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The MAC address of this shelf."
+        ::= { raisecomShelfEntry 15 }
+
+
+   -- raisecomCardTemplate
+
+    raisecomCardTemplateTable    OBJECT-TYPE
+        SYNTAX                SEQUENCE OF  RaisecomCardTemplateEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Card Template table."
+    ::= { raisecomCardTemplate 1 }
+
+    raisecomCardTemplateEntry    OBJECT-TYPE
+	SYNTAX          RaisecomCardTemplateEntry
+	MAX-ACCESS      not-accessible
+    STATUS          current
+	DESCRIPTION     "Card template table entry."
+	INDEX { raisecomCardType }
+    ::= { raisecomCardTemplateTable 1 }
+
+    RaisecomCardTemplateEntry ::=
+        SEQUENCE {
+        raisecomCardType             	    PONDeviceCardType,
+        raisecomCardPanelPortNum         	Integer32(0..16),
+        raisecomCardPanelPortTypes          OCTET STRING (SIZE(0..32)),
+        raisecomCardPermitedSlots    INTEGER
+                }
+
+    raisecomCardType   OBJECT-TYPE
+        SYNTAX          PONDeviceCardType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The card type of this template."
+        ::= { raisecomCardTemplateEntry 1 }
+
+    raisecomCardPanelPortNum   OBJECT-TYPE
+        SYNTAX          Integer32(0..16)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Plane port number of this card-type template."
+        ::= { raisecomCardTemplateEntry 2 }
+
+    raisecomCardPanelPortTypes   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Plane port types  of this type card template."
+        ::= { raisecomCardTemplateEntry 3 }
+
+    raisecomCardPermitedSlots   OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "All the slot id of this type card which can be installed."
+        ::= { raisecomCardTemplateEntry 4 }
+
+   -- raisecomSlot
+
+    raisecomSlotTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RaisecomSlotEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Card slot management table."
+    ::= { raisecomSlot 1 }
+
+    raisecomSlotEntry    OBJECT-TYPE
+	SYNTAX          RaisecomSlotEntry
+	MAX-ACCESS      not-accessible
+    STATUS          current
+	DESCRIPTION     "Card slot management table entry."
+	INDEX { raisecomSlotId }
+    ::= { raisecomSlotTable 1 }
+
+    RaisecomSlotEntry ::=
+        SEQUENCE {
+        raisecomSlotId             			SlotIndex,
+        raisecomSlotDescr         			OCTET STRING (SIZE(0..64)),
+        raisecomSlotExpectCardType          PONDeviceCardType,
+        raisecomSlotExpectCardDescr         OCTET STRING (SIZE(0..64)),
+        raisecomSlotActCardType             PONDeviceCardType,
+        raisecomSlotActCardDescr            OCTET STRING (SIZE(0..64)),
+        raisecomSlotActCardSerialNum        OCTET STRING (SIZE(0..64)),
+        raisecomSlotActCardHwVersion        OCTET STRING (SIZE(0..64)),
+        raisecomSlotActCardMfrVendor        OCTET STRING (SIZE(0..64)),
+        raisecomSlotActCardAssetID        	OCTET STRING (SIZE(0..64)),
+        raisecomSlotActCardState            INTEGER,
+        raisecomSlotReboot                  INTEGER,
+        raisecomSlotSupportCardTypes         OCTET STRING (SIZE(0..128)),
+        raisecomSlotActCardSwVersion        OCTET STRING (SIZE(0..64)),
+        raisecomSlotPowerState               INTEGER
+        }
+
+
+     raisecomSlotId     OBJECT-TYPE
+        SYNTAX          SlotIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Slot id."
+        ::= { raisecomSlotEntry 1 }
+
+     raisecomSlotDescr   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION      "Slot description."
+        ::= { raisecomSlotEntry 2 }
+
+     raisecomSlotExpectCardType    OBJECT-TYPE
+        SYNTAX          PONDeviceCardType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Expected card type."
+        ::= { raisecomSlotEntry 3 }
+
+     raisecomSlotExpectCardDescr   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Description of the expected card. Currently unused."
+        ::= { raisecomSlotEntry 4 }
+
+   	raisecomSlotActCardType     OBJECT-TYPE
+        SYNTAX          PONDeviceCardType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Type of the card actually installed."
+        ::= { raisecomSlotEntry 5 }
+
+    raisecomSlotActCardDescr   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Description of the card actually installed. The applicability depends on the card type."
+        ::= { raisecomSlotEntry 6 }
+
+    raisecomSlotActCardSerialNum   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Serial number of the card actually installed."
+        ::= { raisecomSlotEntry 7 }
+
+    raisecomSlotActCardHwVersion   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Hardware version of the card actually installed."
+        ::= { raisecomSlotEntry 8 }
+
+    raisecomSlotActCardMfrVendor   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Vender name of the card actually installed."
+        ::= { raisecomSlotEntry 9 }
+
+    raisecomSlotActCardAssetID   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Asset id of the card actually installed."
+        ::= { raisecomSlotEntry 10 }
+
+    raisecomSlotActCardState    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                              	lost(1),
+                              	poweroffed(13),
+                              	offline(2),
+                              	type-identifying(11),
+                              	nonprovision(3),
+                              	typemismatched(4),
+                              	generalfault(5),
+                              	versionmismatched(6),
+                              	initialized(12),
+                              	configloading(7),
+                              	configfailed(8),
+                              	inservice(9),
+								standby(10)
+								}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Working state of the card actually installed."
+        ::= { raisecomSlotEntry 11 }
+
+    raisecomSlotReboot    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                              	cold(1),
+								warm(2)
+								}
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reboot the card. Result of reading this attribute is undefined."
+        ::= { raisecomSlotEntry 12 }
+
+    raisecomSlotSupportCardTypes    OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..128))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The slots on which the card type can be installed"
+        ::= { raisecomSlotEntry 13 }
+
+   raisecomSlotActCardSwVersion   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "softerware version of the card actually installed."
+        ::= { raisecomSlotEntry 14 }
+
+   raisecomSlotPowerState    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                              	on(1),
+                              	off(2)
+								}
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "set card power-save state on the slot."
+        ::= { raisecomSlotEntry 15 }
+
+  -- raisecomPower
+
+   raisecomPowerDeviceTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RaisecomPowerDeviceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Power device management table."
+    ::= { raisecomPower 1 }
+
+    raisecomPowerDeviceEntry    OBJECT-TYPE
+	SYNTAX          RaisecomPowerDeviceEntry
+	MAX-ACCESS      not-accessible
+    STATUS          current
+	DESCRIPTION     "Power device management table entry."
+	INDEX { raisecomPowerDeviceIndex  }
+    ::= { raisecomPowerDeviceTable 1 }
+
+    RaisecomPowerDeviceEntry  ::=
+        SEQUENCE {
+        raisecomPowerDeviceIndex           			   SlotIndex,
+        raisecomPowerDeviceInputType                   INTEGER,
+ --       raisecomPowerExpectType                        INTEGER,
+--        raisecomPowerActualType                        INTEGER,
+ --       raisecomPowerManageable                        INTEGER,
+--        raisecomPowerSwVersion                         OCTET STRING (SIZE(0..16)),
+--        raisecomPowerHwVersion                         OCTET STRING (SIZE(0..16)),
+  --      raisecomPowertemperature                       Integer32,
+        raisecomPowerInputvol                          Integer32,
+        raisecomPowerInputvolalarmState                INTEGER,
+        raisecomPowerInputvolMinlowerVolThres          Integer32,
+        raisecomPowerInputvolMinupperVolThres          Integer32,
+        raisecomPowerInputvolMajlowerVolThres          Integer32,
+        raisecomPowerInputvolMajupperVolThres          Integer32,
+        raisecomPowerInputvolCrilowerVolThres          Integer32,
+        raisecomPowerInputvolCriupperVolThres          Integer32,
+        raisecomPowerTemperatureThres                  Integer32
+--        raisecomPowerSerialNum                         OCTET STRING (SIZE(0..64))
+        }
+
+     raisecomPowerDeviceIndex      OBJECT-TYPE
+        SYNTAX          SlotIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Power device id."
+        ::= { raisecomPowerDeviceEntry 1 }
+
+     raisecomPowerDeviceInputType     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+									unknown(1),
+									ac(2),
+									dc48(3),
+									dc24(4),
+									dc12(5),
+									null(6),
+									ac220(7),
+									ac110(8)
+								  }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Input type of this power device. Null value means that this power device is plugged out."
+        ::= { raisecomPowerDeviceEntry 2 }
+
+--     raisecomPowerExpectType     OBJECT-TYPE
+--        SYNTAX          INTEGER  {
+--									any(1),
+--									subPwrmAc(2),
+--									subPwrmDc(3)
+--								  }
+ --       MAX-ACCESS      read-write
+--        STATUS          current
+--        DESCRIPTION     "Expected power type,the default type is any(1), not used in V2.0"
+--        ::= { raisecomPowerDeviceEntry 3 }
+
+ --    raisecomPowerActualType     OBJECT-TYPE
+ --       SYNTAX          INTEGER  {
+--									unknown(0),
+--									subPwrmAc(2),
+--									subPwrmDc(3),
+--									subPwriiAc(4),
+--									null(5)
+--								  }
+ --       MAX-ACCESS      read-only
+ --       STATUS          current
+ --       DESCRIPTION     "the actual power type ,Null value means that this power device is plugged out."
+--        ::= { raisecomPowerDeviceEntry 4 }
+
+
+--     raisecomPowerManageable     OBJECT-TYPE
+ --       SYNTAX          INTEGER  {
+--									yes(1),
+--									no(2)
+--								 }
+ --       MAX-ACCESS      read-only
+ --       STATUS          current
+ --       DESCRIPTION     "Whether it is manageable by the NMS of this type power, not used in V2.0."
+ --       ::= { raisecomPowerDeviceEntry 5 }
+
+ --    raisecomPowerSwVersion     OBJECT-TYPE
+ --       SYNTAX          OCTET STRING (SIZE(0..16))
+  --      MAX-ACCESS      read-only
+  --      STATUS          current
+ --       DESCRIPTION     "the software version of this type power."
+  --      ::= { raisecomPowerDeviceEntry 6 }
+
+  --   raisecomPowerHwVersion     OBJECT-TYPE
+  --      SYNTAX          OCTET STRING (SIZE(0..16))
+ --       MAX-ACCESS      read-only
+ --       STATUS          current
+ --       DESCRIPTION     "the hardware version of this type power."
+ --       ::= { raisecomPowerDeviceEntry 7 }
+
+
+--     raisecomPowertemperature     OBJECT-TYPE
+--        SYNTAX          Integer32(-100..150)
+--        MAX-ACCESS      read-only
+--        STATUS          current
+--        DESCRIPTION     "The temperature of this power device,it is only meaningful for the manageable power,
+--                         this node doesnot used in V2.0."
+ --       ::= { raisecomPowerDeviceEntry 8 }
+
+     raisecomPowerInputvol     OBJECT-TYPE
+        SYNTAX          Integer32(-100..300)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The input voltage of this power device, it is only meaningful for the manageable power."
+        ::= { raisecomPowerDeviceEntry 9 }
+
+     raisecomPowerInputvolalarmState     OBJECT-TYPE
+        SYNTAX          INTEGER {
+        						   normal(1),
+        						   lowMin(2),
+        						   lowMaj(3),
+        						   lowCri(4),
+        						   uppMin(5),
+        						   uppMaj(6),
+        						   uppCri(7)
+        						}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The input voltage alarm state of the power device, it is only meaningful for the manageable power."
+        ::= { raisecomPowerDeviceEntry 10 }
+
+     raisecomPowerInputvolMinlowerVolThres     OBJECT-TYPE
+        SYNTAX          Integer32(0..300)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The input voltage lower threshold of the Minor alarm , it is only meaningful for the manageable power."
+        ::= { raisecomPowerDeviceEntry 11 }
+
+     raisecomPowerInputvolMajlowerVolThres     OBJECT-TYPE
+        SYNTAX          Integer32(0..300)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The input voltage lower threshold of the Major alarm,
+                          it is only meaningful for the manageable power ."
+        ::= { raisecomPowerDeviceEntry 12 }
+
+     raisecomPowerInputvolCrilowerVolThres     OBJECT-TYPE
+        SYNTAX          Integer32(0..300)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The input voltage lower threshold of the Critical alarm ,
+                          it is only meaningful for the manageable power."
+        ::= { raisecomPowerDeviceEntry 13 }
+
+     raisecomPowerInputvolMinupperVolThres     OBJECT-TYPE
+        SYNTAX          Integer32(0..300)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The input voltage upper threshold of the Minor alarm ,
+                          it is only meaningful for the manageable power."
+        ::= { raisecomPowerDeviceEntry 14 }
+
+     raisecomPowerInputvolMajupperVolThres     OBJECT-TYPE
+        SYNTAX          Integer32(0..300)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The input voltage upper threshold of the Major alarm ,
+                          it is only meaningful for the manageable power."
+        ::= { raisecomPowerDeviceEntry 15 }
+
+     raisecomPowerInputvolCriupperVolThres     OBJECT-TYPE
+        SYNTAX          Integer32(0..300)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The input voltage upper threshold of the Critical alarm ,
+                          it is only meaningful for the manageable power."
+        ::= { raisecomPowerDeviceEntry 16 }
+
+     raisecomPowerTemperatureThres     OBJECT-TYPE
+        SYNTAX          Integer32(0..100)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The temperature threshold of the power device ,
+                         it is only meaningful for the manageable power, not used in V2.0."
+        DEFVAL {85}
+        ::= { raisecomPowerDeviceEntry 17 }
+
+
+--       raisecomPowerSerialNum     OBJECT-TYPE
+--        SYNTAX          OCTET STRING (SIZE(0..64))
+--        MAX-ACCESS      read-only
+--        STATUS          current
+--        DESCRIPTION     "the serial nums of  this power device."
+--        ::= { raisecomPowerDeviceEntry 18 }
+
+-- raisecomPowerOutputTable
+     raisecomPowerOutputTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RaisecomPowerOutputEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Power device output management table."
+    ::= { raisecomPower 2 }
+
+    raisecomPowerOutputEntry    OBJECT-TYPE
+	SYNTAX          RaisecomPowerOutputEntry
+	MAX-ACCESS      not-accessible
+    STATUS          current
+	DESCRIPTION     "Power device output management table entry."
+	INDEX { raisecomPowerDeviceIndex, raisecomPowerOutputType }
+    ::= { raisecomPowerOutputTable 1 }
+
+    RaisecomPowerOutputEntry ::=
+        SEQUENCE {
+        raisecomPowerOutputType             			 INTEGER,
+        raisecomPowerStatus                				 INTEGER,
+        raisecomPowerOutputvol                           Integer32,
+        raisecomPowerOutputvollowerThres                 Integer32,
+        raisecomPowerOutputvolupperThres                 Integer32
+        }
+
+     raisecomPowerOutputType     OBJECT-TYPE
+        SYNTAX          INTEGER {
+        							rcPowerOther(1),
+                                 	rcPower3v(2),
+									rcPower5v(3),
+									rcPower12v(4),
+									rcPower-48v(5)
+							    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Output type of the power device."
+        ::= { raisecomPowerOutputEntry 1 }
+
+     raisecomPowerStatus     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+									normal(1),
+									abnormal(2),
+									null(3),
+									highAlarm(4),
+									lowAlarm(5)
+								}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Output status of this power output. Null value means that this output port does not exist."
+        ::= { raisecomPowerOutputEntry 2 }
+
+     raisecomPowerOutputvol     OBJECT-TYPE
+        SYNTAX          Integer32(-1000..1000)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Output voltage of the power,it is only meaningful for the manageable power,
+        				for the 5v output voltage ,the unit is 0.01v; for the -48V output voltage, the unit is 0.1v"
+        ::= { raisecomPowerOutputEntry 3 }
+
+     raisecomPowerOutputvollowerThres     OBJECT-TYPE
+        SYNTAX          Integer32(-500..500)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The threshold of the low output voltage  alarm,it is only meaningful for the manageable power,
+        				for the 5v output voltage ,the unit is 0.01v; for the -48V output voltage, the unit is 0.1v"
+        ::= { raisecomPowerOutputEntry 4 }
+
+    raisecomPowerOutputvolupperThres     OBJECT-TYPE
+        SYNTAX          Integer32(-600..600)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The threshold of the high output voltage  alarm,it is only meaningful for the manageable power,
+        				for the 5v output voltage ,the unit is 0.01v; for the -48V output voltage, the unit is 0.1v"
+        ::= { raisecomPowerOutputEntry 5 }
+
+  -- other table define here
+  --raisecomSubFanTable
+   raisecomSubFanTable     OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  raisecomSubFanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Fan management table."
+    ::= { raisecomFan 1 }
+
+    raisecomSubFanEntry    OBJECT-TYPE
+	SYNTAX          raisecomSubFanEntry
+	MAX-ACCESS      not-accessible
+    STATUS          current
+	DESCRIPTION     "Fan management table entry."
+	INDEX { raisecomFanSlotId, raisecomSubFanId  }
+    ::= { raisecomSubFanTable 1 }
+
+    raisecomSubFanEntry ::=
+        SEQUENCE {
+        raisecomFanSlotId                   SlotIndex,
+        raisecomSubFanId           			INTEGER,
+        raisecomSubFanStatus                INTEGER,
+        raisecomSubFanSpeed					INTEGER
+       }
+
+     raisecomFanSlotId          OBJECT-TYPE
+        SYNTAX          SlotIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Slot Index."
+        ::= { raisecomSubFanEntry 1 }
+
+     raisecomSubFanId       OBJECT-TYPE
+        SYNTAX          SlotIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Sub Fan Index."
+        ::= { raisecomSubFanEntry 2 }
+
+     raisecomSubFanStatus     OBJECT-TYPE
+        SYNTAX             INTEGER  {
+									normal(1),
+									abnormal(2),
+									null(3),
+									unknown(4)
+									}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Fan status. Null value means that this fan is plugged out."
+        ::= { raisecomSubFanEntry 3 }
+
+     raisecomSubFanSpeed     OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Fan current speed."
+        ::= { raisecomSubFanEntry 4 }
+
+
+     raisecomFanMaxSpeed   OBJECT-TYPE
+        SYNTAX 		        INTEGER
+        MAX-ACCESS 	read-write
+        STATUS current
+        DESCRIPTION  "the maximum fan speed."
+        DEFVAL {3300}
+        ::= { raisecomFan 2 }
+
+     raisecomFanMinSpeed   OBJECT-TYPE
+        SYNTAX 		        INTEGER
+        MAX-ACCESS 	read-write
+        STATUS current
+        DESCRIPTION  "the minimun fan speed."
+        DEFVAL {900}
+        ::= { raisecomFan 3 }
+
+     raisecomFanSpeedMode   OBJECT-TYPE
+        SYNTAX 		        INTEGER
+        					{
+        					auto(1),
+        					manual(2)
+        					}
+        MAX-ACCESS 	read-write
+        STATUS current
+        DESCRIPTION  "the fan control mode ,auto means the fan speed is controled
+                      by the temperature automatically,the other means controled manually."
+        DEFVAL {auto}
+        ::= { raisecomFan 4 }
+
+     raisecomFanSpeedManual   OBJECT-TYPE
+        SYNTAX 		        INTEGER (0..40)
+        MAX-ACCESS 	read-write
+        STATUS current
+        DESCRIPTION  "manual control the fan speed by configurating the fan different gear."
+        DEFVAL {8}
+        ::= { raisecomFan 5 }
+
+     raisecomFanSpeedGear   OBJECT-TYPE
+        SYNTAX 		        INTEGER (1..8)
+        MAX-ACCESS 	read-only
+        STATUS current
+        DESCRIPTION  "the fan speed gear."
+
+        ::= { raisecomFan 6 }
+
+
+     --raisecomCardPower
+	 raisecomCardPowerTable     OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RaisecomCardPowerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Card power management table."
+        ::= { raisecomCardPower 1 }
+
+	 raisecomCardPowerEntry    OBJECT-TYPE
+		SYNTAX          RaisecomCardPowerEntry
+		MAX-ACCESS      not-accessible
+    	STATUS          current
+		DESCRIPTION     "card power management table entry."
+		INDEX { raisecomCardPowerSlotId, raisecomCardPowerType}
+    	::= { raisecomCardPowerTable 1 }
+
+     RaisecomCardPowerEntry ::=
+        SEQUENCE {
+        raisecomCardPowerSlotId           		SlotIndex,
+        raisecomCardPowerType                   INTEGER,
+        raisecomCardPowerVolValue			    Integer32,
+        raisecomCardPowerVolHighThres           Integer32,
+        raisecomCardPowerVolLowThres            Integer32
+       }
+
+     raisecomCardPowerSlotId          OBJECT-TYPE
+        SYNTAX          SlotIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Slot Index."
+        ::= { raisecomCardPowerEntry 1 }
+
+     raisecomCardPowerType       OBJECT-TYPE
+        SYNTAX          INTEGER
+        				{
+        				    power075v(1),
+        				    power09v(2),
+        				    power1v(3),
+        					power12v(4),
+        					power15v(5),
+        					power18v(6),
+							power25v(7),
+							power33v(8),
+							power48v(9),
+							power5v(10),
+							power52v(11),
+							power120v(12),
+							unknown(13),
+							null(14),
+							power125v(15),
+							power29v(16)
+
+        				}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "card power types."
+        ::= { raisecomCardPowerEntry 2 }
+
+     raisecomCardPowerVolValue       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "the current card voltage of the power type."
+        ::= { raisecomCardPowerEntry 3 }
+
+     raisecomCardPowerVolHighThres       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "the high voltage threshold of the power."
+        ::= { raisecomCardPowerEntry 4 }
+
+     raisecomCardPowerVolLowThres       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "the low voltage threshold of the power."
+        ::= { raisecomCardPowerEntry 5 }
+
+  --raisecomAlarmInput
+
+   raisecomAlarmInputTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF  RaisecomAlarmInputEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Alarm input management table."
+    ::= { raisecomAlarmInput 1 }
+
+    raisecomAlarmInputEntry    OBJECT-TYPE
+	SYNTAX          RaisecomAlarmInputEntry
+	MAX-ACCESS      not-accessible
+    STATUS          current
+	DESCRIPTION     "Alarm input management table entry."
+	INDEX { raisecomAlarmInputPortId }
+    ::= { raisecomAlarmInputTable 1 }
+
+    RaisecomAlarmInputEntry ::= SEQUENCE {
+        raisecomAlarmInputPortId            Integer32,
+        raisecomAlarmInputType        		INTEGER,
+        raisecomAlarmInputDescr          	OCTET STRING (SIZE (0..32)),
+        raisecomAlarmInputState        		INTEGER,
+        raisecomAlarmInputMontiorEnable     INTEGER
+        }
+
+     raisecomAlarmInputPortId   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Alarm Input port id."
+        ::= { raisecomAlarmInputEntry 1 }
+
+     raisecomAlarmInputType   OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Alarm type code. 0 means that this port is unused."
+        ::= { raisecomAlarmInputEntry 2 }
+
+    raisecomAlarmInputDescr   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION      "Alarm type description."
+        ::= { raisecomAlarmInputEntry 3 }
+
+    raisecomAlarmInputState     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+									normal(1),
+									abnormal(2),
+									null(3),
+									missing(4),
+									unknown(5)
+								  }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "State of this input port."
+        ::= { raisecomAlarmInputEntry 4 }
+
+	raisecomAlarmInputMontiorEnable     OBJECT-TYPE
+        SYNTAX          INTEGER  {
+									disable(1),
+									enable(2)
+								  }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "enable or disable the function of the port environment monitor , default is disable."
+        DEFVAL {disable}
+        ::= { raisecomAlarmInputEntry 5 }
+
+  -- raisecomDeviceAlarm
+
+	raisecomPowerMissTrap  NOTIFICATION-TYPE
+          OBJECTS {raisecomPowerDeviceIndex}
+          STATUS  current
+           DESCRIPTION "Power device missing notification."
+          ::= { raisecomDeviceAlarm 1 }
+
+	raisecomPowerFoundTrap  NOTIFICATION-TYPE
+          OBJECTS {raisecomPowerDeviceIndex}
+          STATUS  current
+          DESCRIPTION "Power device plugged-in notification."
+          ::= { raisecomDeviceAlarm 2 }
+
+   raisecomPowerFaultTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomPowerDeviceIndex,raisecomPowerOutputType}
+           STATUS  current
+           DESCRIPTION  "Power device abnormal notification."
+           ::= { raisecomDeviceAlarm 3 }
+
+   raisecomPowerFaultRecoveredTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomPowerDeviceIndex,raisecomPowerOutputType}
+           STATUS  current
+           DESCRIPTION  "Power device fault recovered notification."
+           ::= { raisecomDeviceAlarm 4 }
+   raisecomFanMissTrap  NOTIFICATION-TYPE
+            OBJECTS {raisecomFanSlotId, raisecomSubFanId}
+            STATUS  current
+            DESCRIPTION  "Fan missing notification."
+            ::= { raisecomDeviceAlarm 5 }
+
+   raisecomFanFoundTrap  NOTIFICATION-TYPE
+            OBJECTS {raisecomFanSlotId, raisecomSubFanId}
+            STATUS  current
+            DESCRIPTION   "Fan plugged-in notification."
+            ::= { raisecomDeviceAlarm 6 }
+
+	raisecomSubFanFaultTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomFanSlotId, raisecomSubFanId,
+                    raisecomSubFanStatus, raisecomSubFanSpeed}
+           STATUS  current
+           DESCRIPTION   "Sub Fan abnormal notification."
+           ::= { raisecomDeviceAlarm 7 }
+
+	raisecomSubFanFaultRecoveredTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomFanSlotId, raisecomSubFanId,
+                    raisecomSubFanStatus, raisecomSubFanSpeed}
+           STATUS  current
+           DESCRIPTION   "Sub Fan fault recovered notification."
+           ::= { raisecomDeviceAlarm 8 }
+	raisecomCardMissTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId, raisecomSlotExpectCardType}
+           STATUS  current
+           DESCRIPTION
+           		"Card missing notification. Sent when no card is detected in a slot
+           		and expected card type for this slot is configured. It will not be
+           		sent for power devices and fans."
+           ::= { raisecomDeviceAlarm 9 }
+
+    raisecomCardMissCancelledTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId}
+           STATUS  current
+           DESCRIPTION  "Card plugged-in notification. It will not be
+           		sent for power devices and fans."
+           ::= { raisecomDeviceAlarm 10 }
+
+
+	raisecomNonInstalledCardExist  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId, raisecomSlotActCardType}
+           STATUS  current
+           DESCRIPTION  "Non-installed card plugged-in notification.
+           		The binded variable 'raisecomSlotActCardType' is currently unused.
+           		It will not be sent for power devices and fans."
+           ::= { raisecomDeviceAlarm 11 }
+
+	raisecomNonInstalledCardExistCancelled  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId }
+           STATUS  current
+           DESCRIPTION   "Non-installed card plugged-out or installed notification. It will not be
+           		sent for power devices and fans."
+           ::= { raisecomDeviceAlarm 12 }
+
+     raisecomCardTypeMisMatchTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId, raisecomSlotActCardType ,
+					raisecomSlotExpectCardType }
+           STATUS  current
+           DESCRIPTION  "Actual card type and expected card type mismatched notification.
+           It will not be sent for power devices and fans."
+           ::= { raisecomDeviceAlarm 13 }
+
+     raisecomCardTypeMisMatchCancelledTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId }
+           STATUS  current
+           DESCRIPTION  "Actual card type and expected card type matched notification.
+           It will not be sent for power devices and fans."
+           ::= { raisecomDeviceAlarm 14 }
+
+     raisecomCardFaultTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId, raisecomSlotActCardState}
+           STATUS  current
+           DESCRIPTION  "Card abnormal notification. It will not be sent for power devices and fans."
+           ::= { raisecomDeviceAlarm 15 }
+
+     raisecomCardFaultRecoveredTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId }
+           STATUS  current
+           DESCRIPTION   "Card fault recovered notificaiton. It will not be sent for power devices and fans."
+           ::= { raisecomDeviceAlarm 16 }
+
+	 raisecomShelfTempertureThresholdCrossingTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomShelfId, raisecomNETmptAlarmThreshold}
+           STATUS  current
+           DESCRIPTION  "Shelf temperature threshold crossing notification."
+           ::= { raisecomDeviceAlarm 17 }
+     raisecomShelfTempertureRecoveredTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomShelfId, raisecomNETmptAlarmThreshold}
+           STATUS  current
+           DESCRIPTION  "Shelf temperature recovered notification."
+           ::= { raisecomDeviceAlarm 18 }
+
+	raisecomNonInstalledCardTypeTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId, raisecomSlotActCardType}
+           STATUS  current
+           DESCRIPTION  "Card type of a non-installed card notification."
+           ::= { raisecomDeviceAlarm 19 }
+   raisecomCardPowerFaultTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomCardPowerSlotId, raisecomSlotActCardType ,
+					raisecomSlotExpectCardType }
+           STATUS  current
+           DESCRIPTION  "Card power fault notification."
+           ::= { raisecomDeviceAlarm 20 }
+
+   raisecomCardPowerFaultRecoveredTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomCardPowerSlotId, raisecomSlotActCardType ,
+					raisecomSlotExpectCardType }
+           STATUS  current
+           DESCRIPTION  "Card power fault recovered notification."
+           ::= { raisecomDeviceAlarm 21 }
+
+	raisecomExternalAlarmTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomAlarmInputPortId, raisecomAlarmInputType,
+                    raisecomAlarmInputDescr, raisecomAlarmInputState}
+           STATUS  current
+           DESCRIPTION  "External alarm notification."
+           ::= { raisecomDeviceAlarm 22 }
+
+	raisecomExternalAlarmRecoverdTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomAlarmInputPortId, raisecomAlarmInputType,
+                    raisecomAlarmInputDescr, raisecomAlarmInputState}
+           STATUS  current
+           DESCRIPTION  "External alarm recovered notification."
+           ::= { raisecomDeviceAlarm 23 }
+
+    raisecomSubFanAgingTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomFanSlotId, raisecomSubFanId, raisecomSubFanStatus,
+                    raisecomSubFanSpeed,raisecomFanSpeedGear}
+           STATUS  current
+           DESCRIPTION  "Sub Fan aging notification."
+           ::= { raisecomDeviceAlarm 24 }
+
+    raisecomSubFanAgingRecoveredTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomFanSlotId, raisecomSubFanId, raisecomSubFanStatus,
+                    raisecomSubFanSpeed,raisecomFanSpeedGear}
+           STATUS  current
+           DESCRIPTION  "Sub Fan aging recovered notification."
+           ::= { raisecomDeviceAlarm 25 }
+
+ --   raisecomPowerTypeMismatchedTrap  NOTIFICATION-TYPE
+ --          OBJECTS {raisecomPowerDeviceIndex, raisecomPowerExpectType, raisecomPowerActualType}
+ --          STATUS  current
+ --          DESCRIPTION  "Power type mismatched notification."
+ --          ::= { raisecomDeviceAlarm 26 }
+
+ --   raisecomPowerTypeMismatchedRecoveredTrap  NOTIFICATION-TYPE
+ --          OBJECTS {raisecomPowerDeviceIndex}
+  --         STATUS  current
+  --         DESCRIPTION  "Power type mismatched recovered notification."
+  --         ::= { raisecomDeviceAlarm 27 }
+
+    raisecomPowerVoltageInputTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomPowerDeviceIndex, raisecomPowerDeviceInputType,
+                    raisecomPowerInputvol, raisecomPowerInputvolalarmState}
+           STATUS  current
+           DESCRIPTION  "Input voltage abnormal notification."
+           ::= { raisecomDeviceAlarm 28 }
+
+    raisecomPowerVoltageInputRecoveredTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomPowerDeviceIndex, raisecomPowerDeviceInputType,
+                    raisecomPowerInputvol, raisecomPowerInputvolalarmState}
+           STATUS  current
+           DESCRIPTION  "Input voltage abnormal recovered notification, it is only meaningful for the manageable power."
+           ::= { raisecomDeviceAlarm 29 }
+
+    raisecomPowerVoltageOutputTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomPowerDeviceIndex, raisecomPowerOutputType,
+                    raisecomPowerOutputvol, raisecomPowerStatus }
+           STATUS  current
+           DESCRIPTION  "output voltage abnormal notification, it is only meaningful for the manageable power."
+           ::= { raisecomDeviceAlarm 30 }
+
+    raisecomPowerVoltageOutputRecoveredTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomPowerDeviceIndex, raisecomPowerOutputType,
+                    raisecomPowerOutputvol, raisecomPowerStatus }
+           STATUS  current
+           DESCRIPTION  "output voltage abnormal recovered notification, it is only meaningful for the manageable power."
+           ::= { raisecomDeviceAlarm 31 }
+
+    raisecomPowerTemperatureTooHighTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomPowerDeviceIndex, raisecomPowertemperature,
+                    raisecomPowerTemperatureThres}
+           STATUS  current
+           DESCRIPTION  "power temperature too high notification, it is only meaningful for the manageable power."
+           ::= { raisecomDeviceAlarm 32 }
+
+    raisecomPowerTemperatureTooHighRecoveredTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomPowerDeviceIndex, raisecomPowertemperature,
+                    raisecomPowerTemperatureThres}
+           STATUS  current
+           DESCRIPTION  "power temperature too high recovered notification, it is only meaningful for the manageable power."
+           ::= { raisecomDeviceAlarm 33 }
+    raisecomCardLoadConfigFailedTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId, raisecomSlotActCardType ,
+					raisecomSlotExpectCardType}
+           STATUS  current
+           DESCRIPTION  "Card config loading failed notification."
+           ::= { raisecomDeviceAlarm 34 }
+
+    raisecomCardVersionMismatchTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId, raisecomSlotActCardType ,
+					raisecomSlotExpectCardType}
+           STATUS  current
+           DESCRIPTION  "Card version mismatched notification."
+           ::= { raisecomDeviceAlarm 35 }
+
+    raisecomCardVersionMismatchRecoveredTrap  NOTIFICATION-TYPE
+           OBJECTS {raisecomSlotId, raisecomSlotActCardType ,
+					raisecomSlotExpectCardType}
+           STATUS  current
+           DESCRIPTION  "Card version-mismatch recovered notification."
+           ::= { raisecomDeviceAlarm 36 }
+
+ END

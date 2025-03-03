@@ -1,0 +1,97 @@
+applications:
+    applications:
+        excluded_fields: [device_id, app_id, timestamp]
+    application_metrics:
+        excluded_fields: [id, app_id]
+        joins:
+            - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)', select: ['app_type'] }
+        custom_where: ''
+        order_by: metric
+arp-table:
+    ipv4_mac:
+        excluded_fields: [id, device_id, port_id]
+        order_by: ipv4_mac.context_name, ipv4_mac.ipv4_address, ipv4_mac.mac_address
+bgp-peers:
+    bgpPeers:
+        excluded_fields: [device_id, bgpPeer_id, vrf_id]
+        joins:
+        - { left: bgpPeers.device_id, right: devices.device_id, select: [devices.bgpLocalAs] }
+        - { left: bgpPeers.vrf_id, right: vrfs.vrf_id, select: [vrfs.bgpLocalAs as vrfLocalAs] }
+    bgpPeers_cbgp:
+        excluded_fields: [device_id]
+fdb-table:
+    ports_fdb:
+        excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id, created_at, updated_at]
+        joins:
+            - { left: ports_fdb.port_id, right: ports.port_id, select: [ifIndex] }
+            - { left: ports_fdb.vlan_id, right: vlans.vlan_id, select: [vlan_vlan] }
+        order_by: ports.ifIndex, vlans.vlan_vlan, ports_fdb.mac_address
+loadbalancers:
+    component: true
+ports:
+    ports:
+        excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
+        joins:
+            - { left: ports.port_id, right: ports_statistics.port_id }
+        order_by: ports.ifIndex, ports.ifDescr, ports.ifName
+cipsec-tunnels:
+    ipsec_tunnels:
+        excluded_fields: [local_addr, tunnel_id, device_id]
+        order_by: peer_addr
+cisco-pw:
+    pseudowires:
+        excluded_fields: [pseudowire_id, device_id, port_id, peer_device_id]
+        joins:
+            - { left: pseudowires.port_id, right: ports.port_id, select: [ ifIndex ] }
+        order_by: cpwVcID, ifIndex
+route:
+    route:
+        excluded_fields: [port_id, device_id, route_id, created_at, updated_at]
+        order_by: inetCidrRouteDest
+processors:
+    processors:
+        excluded_fields: [device_id, processor_id]
+sensors:
+    sensors:
+        excluded_fields: [device_id, sensor_id, state_translation_id, state_index_id, sensors_to_state_translations_id, lastupdate]
+        joins:
+            - { left: sensors.sensor_id, right: sensors_to_state_indexes.sensor_id }
+            - { left: sensors_to_state_indexes.state_index_id, right: state_indexes.state_index_id }
+        order_by: sensors.sensor_class, sensors.sensor_type, sensors.sensor_index
+    state_indexes:
+        excluded_fields: [device_id, sensor_id, state_translation_id, state_index_id, state_lastupdated]
+        joins:
+            - { left: state_indexes.state_index_id, right: state_translations.state_index_id }
+            - { custom: 'INNER JOIN ( SELECT i.state_index_id FROM `sensors_to_state_indexes` i LEFT JOIN `sensors` s ON (i.`sensor_id` = s.`sensor_id`)  WHERE `device_id`=? GROUP BY i.state_index_id) d ON d.state_index_id = state_indexes.state_index_id' }
+        order_by: state_indexes.state_name, state_translations.state_value
+        custom_where: ''
+storage:
+    storage:
+        excluded_fields: [device_id, storage_id]
+        order_by: storage_index, storage_type
+vlans:
+    vlans:
+        excluded_fields: [vlan_id, device_id]
+        order_by: vlan_domain, vlan_vlan
+    ports_vlans:
+        excluded_fields: [port_vlan_id, device_id, port_id]
+        order_by: vlan, baseport
+vrf:
+    vrfs:
+        excluded_fields: [vrf_id, device_id]
+        joins:
+            - { custom: "LEFT JOIN (SELECT ifVrf, GROUP_CONCAT(ifIndex ORDER BY ifIndex ASC SEPARATOR ',') as ifIndices FROM ports GROUP BY ifVrf) p ON p.ifVrf = vrfs.vrf_id", select: ["p.ifIndices"] }
+cisco-mac-accounting:
+    mac_accounting:
+        excluded_fields: [ma_id, port_id, poll_time, poll_prev, poll_period, cipMacHCSwitchedBytes_input_rate, cipMacHCSwitchedBytes_output_rate, cipMacHCSwitchedPkts_input_rate, cipMacHCSwitchedPkts_output_rate]
+        joins:
+            - { left: mac_accounting.port_id, right: ports.port_id, select: [ifIndex] }
+        custom_where: WHERE ports.device_id=?
+        order_by: ports.ifIndex, mac
+discovery-protocols:
+    links:
+        joins:
+            - { left: links.local_port_id, right: ports.port_id, select: [ports.ifAlias, ports.ifDescr, ports.ifName] }
+        custom_where: WHERE links.local_device_id=?
+        excluded_fields: [local_device_id, local_port_id, remote_port_id, remote_device_id, id]
+        order_by: ports.ifAlias,ports.ifDescr,ports.ifName,remote_hostname,remote_version,remote_port

@@ -1,0 +1,2011 @@
+--
+-- Copyright (c) 2011 by Ruckus Wireless, Inc.
+-- All Rights Reserved
+--
+
+RUCKUS-SZ-EVENT-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		MacAddress, DisplayString
+			FROM SNMPv2-TC
+		OBJECT-GROUP, MODULE-COMPLIANCE
+			FROM SNMPv2-CONF
+		MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, IpAddress, enterprises, NOTIFICATION-TYPE
+			FROM SNMPv2-SMI
+		ruckusEvents
+			FROM RUCKUS-ROOT-MIB;
+
+	ruckusSZEventMIB	MODULE-IDENTITY
+    	LAST-UPDATED "201712131000Z"
+    	ORGANIZATION "Ruckus Wireless, Inc."
+    	CONTACT-INFO
+        	"Ruckus Wireless, Inc.
+
+	        350 West Java Dr.
+        	Sunnyvale, CA 94089
+	        USA
+
+	        T: +1 (650) 265-4200
+    	    F: +1 (408) 738-2065
+        	EMail: info@ruckuswireless.com
+	        Web: www.ruckuswireless.com"
+	DESCRIPTION		"Ruckus SZ event objects, including trap OID and trap payload."
+		::=  {  ruckusEvents  11  }
+
+	ruckusSZEventTraps	OBJECT IDENTIFIER
+		::=  {  ruckusSZEventMIB  1  }
+
+	ruckusSZEventObjects	OBJECT IDENTIFIER
+		::=  {  ruckusSZEventMIB  2  }
+		
+	ruckusSZSystemMiscEventTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventDescription}
+     STATUS      current
+     DESCRIPTION
+        "Generic trap triggered by admin specified miscellaneous event. 
+       The event severity, event code, event type, event description is enclosed."
+		::= { ruckusSZEventTraps 1 }
+    
+  ruckusSZUpgradeSuccessTrap NOTIFICATION-TYPE
+     OBJECTS{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZEventFirmwareVersion,ruckusSZEventUpgradedFirmwareVersion}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ upgrade success event.
+       The event severity, event code, event type, node name, MAC address, management IP address, firmware version and upgraded firmware version are enclosed." 
+		::= { ruckusSZEventTraps 2 }
+      
+  ruckusSZUpgradeFailedTrap NOTIFICATION-TYPE 
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventFirmwareVersion,ruckusSZEventUpgradedFirmwareVersion}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ upgrade failed event.
+       The event severity, event code, event type, firmware version and upgraded firmware version are enclosed." 
+		::= { ruckusSZEventTraps 3 }
+    
+  ruckusSZNodeRestartedTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZEventReason}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ restarted event.
+       The event severity, event code, event type, node name, MAC address, management IP address and restart reason are enclosed." 
+		::= { ruckusSZEventTraps 4 }
+
+  ruckusSZNodeShutdownTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ shutdown event.
+       The event severity, event code, event type, node name, MAC address and management IP address are enclosed." 
+		::= { ruckusSZEventTraps 5 }
+    
+  ruckusSZCPUUsageThresholdExceededTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZCPUPerc}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ CPU threshold exceeded event.
+       The event severity, event code, event type, node name, MAC address and CPU usage percent are enclosed." 
+		::= { ruckusSZEventTraps 6 }
+        
+  ruckusSZMemoryUsageThresholdExceededTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZMemoryPerc}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ memory threshold exceeded event.
+       The event severity, event code, event type, node name, MAC address and memory usage percent are enclosed." 
+		::= { ruckusSZEventTraps 7 }
+    
+  ruckusSZDiskUsageThresholdExceededTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZDiskPerc}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ disk usage threshold exceeded event.
+       The event severity, event code, event type, node name, MAC address and disk usage percent are enclosed." 
+		::= { ruckusSZEventTraps 8 }
+    
+  ruckusSZLicenseUsageThresholdExceededTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZLicenseType,ruckusSZLicenseUsagePerc}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is SZ license usage threshold exceeded event.
+       The event severity, event code, event type, license type and license usage percent are enclosed." 
+		::= { ruckusSZEventTraps 19 }
+    
+  ruckusSZAPMiscEventTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventDescription,ruckusSZEventAPIPv6}
+     STATUS      current
+     DESCRIPTION
+        "Generic trap triggered by AP related miscellaneous event. 
+       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP GPS coordinates, event description, AP description and AP IPv6 address are enclosed."
+    ::= { ruckusSZEventTraps 20 }
+ 
+  ruckusSZAPConnectedTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventReason,ruckusSZEventAPIPv6}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is an AP connected event.
+       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, join reason and AP IPv6 address are enclosed."
+    ::= { ruckusSZEventTraps 21 }
+    
+  ruckusSZAPDeletedTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is an AP deleted event.
+       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+    ::= { ruckusSZEventTraps 22 }
+ 
+  ruckusSZAPDisconnectedTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is an AP connection lost event.
+       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+    ::= { ruckusSZEventTraps 23 }
+    
+  ruckusSZAPLostHeartbeatTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ lost AP heart beat event.
+       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+    ::= {ruckusSZEventTraps 24 }
+    
+  ruckusSZAPRebootTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventReason,ruckusSZEventAPIPv6}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is an AP reboot event.
+       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, reboot reason and AP IPv6 address are enclosed."
+    ::= {ruckusSZEventTraps 25 }
+
+  ruckusSZCriticalAPConnectedTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventReason,ruckusSZEventAPIPv6}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a critical AP connected event.
+	     The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, join reason and AP IPv6 address are enclosed."
+    ::= {ruckusSZEventTraps 26 }
+    
+  ruckusSZCriticalAPDisconnectedTrap NOTIFICATION-TYPE
+     OBJECTS      {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a critical AP connection lost event.
+	     The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+    ::= {ruckusSZEventTraps 27 }
+	     
+  ruckusSZAPRejectedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventCtrlIP,ruckusSZEventReason,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP rejected event.
+	     The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, SZ control IP address, reject reason and AP IPv6 address are enclosed."
+    ::= { ruckusSZEventTraps 28 }
+
+  ruckusSZAPConfUpdateFailedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZAPConfigID,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP configuration update failed event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, configure ID and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 29 }
+			
+  ruckusSZAPConfUpdatedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZAPConfigID,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP configuration updated event.  
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, configure ID and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 30 }
+			
+  ruckusSZAPSwapOutModelDiffTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZAPModel,ruckusSZConfigAPModel,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP model is different from imported swap AP model.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, AP model, configure AP model and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 31 }
+	
+  ruckusSZAPPreProvisionModelDiffTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZAPModel,ruckusSZConfigAPModel,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP model is different from imported pre-provision AP model.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, AP mode, configure AP model and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 32 }
+	
+  ruckusSZAPFirmwareUpdateFailedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP firmware update failed event.
+			   The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 34 }
+	
+  ruckusSZAPFirmwareUpdatedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP firmware update success event.
+			   The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 35 }
+			
+  ruckusSZAPWlanOversubscribedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP wlan oversubscribed event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description and AP GPS coordinates are enclosed."
+			::= { ruckusSZEventTraps 36 }
+	
+  ruckusSZAPFactoryResetTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP factory reset event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 37 }
+			
+  ruckusSZCableModemDownTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP cable modem down event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 38 }
+	
+  ruckusSZCableModemRebootTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is an AP cable modem reboot event.
+			   The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+			 ::= { ruckusSZEventTraps 39 }	
+  
+  ruckusSZAPManagedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventCtrlIP}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP managed event.
+	     The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and SZ control IP address are enclosed."
+    ::= { ruckusSZEventTraps 41 }
+    
+  ruckusSZCPUUsageThresholdBackToNormalTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZCPUPerc}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ CPU threshold back to normal event.
+       The event severity, event code, event type, node name, MAC address and CPU usage percent are enclosed." 
+		::= { ruckusSZEventTraps 42 }
+		
+  ruckusSZMemoryUsageThresholdBackToNormalTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZMemoryPerc}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ memory threshold back to normal event.
+       The event severity, event code, event type, node name, MAC address and memory usage percent are enclosed." 
+		::= { ruckusSZEventTraps 43 }
+    
+  ruckusSZDiskUsageThresholdBackToNormalTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZDiskPerc}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a SZ disk threshold back to normal event.
+       The event severity, event code, event type, node name, MAC address, disk usage percent are enclosed." 
+		::= { ruckusSZEventTraps 44 }	
+		
+  ruckusSZCableModemUpTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP cable modem up event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 45 }
+
+  ruckusSZAPDiscoverySuccessTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventCtrlIP,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP discovery success event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, SZ control IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 46 }
+  
+  ruckusSZCMResetByUserTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventReason,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP cable modem soft-rebooted by user event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, event reason and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 47 }
+
+  ruckusSZCMResetFactoryByUserTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventReason,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP cable modem set to factory default by user event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, event reason and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 48 }
+  
+  ruckusSZSSIDSpoofingRogueAPDetectedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventRogueMac,ruckusSZEventSSID,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is an AP detects a rogue AP event.
+			   The event severity, event code, event type, rogue AP MAC address, ssid, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+			 ::= { ruckusSZEventTraps 50 }	
+			 
+  ruckusSZMacSpoofingRogueAPDetectedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventRogueMac,ruckusSZEventSSID,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is an AP detects a rogue AP event.
+			   The event severity, event code, event type, rogue AP MAC address, ssid, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+			 ::= { ruckusSZEventTraps 51 }		 
+			
+  ruckusSZSameNetworkRogueAPDetectedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventRogueMac,ruckusSZEventSSID,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is an AP detects a rogue AP which has the same bssid with detect AP event.
+			   The event severity, event code, event type, rogue AP MAC address, ssid, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+			 ::= { ruckusSZEventTraps 52 }		 
+			 
+  ruckusSZADHocNetworkRogueAPDetectedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventRogueMac,ruckusSZEventSSID,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is an AP detects a rogue AP which has the same network detecting AP event.
+			   The event severity, event code, event type, rogue AP MAC address, ssid, AP name, AP MAC address, AP IP address, AP location, AP description and AP GPS coordinates are enclosed."
+			 ::= { ruckusSZEventTraps 53 }		
+			 
+  ruckusSZMaliciousRogueAPTimeoutTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventRogueMac,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is a rogue AP disappears event.
+			   The event severity, event code, event type, rogue AP MAC address, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and AP IPv6 address are enclosed."
+			 ::= { ruckusSZEventTraps 54 }	
+			 
+  ruckusSZAPLBSConnectSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZLBSURL,ruckusSZLBSPort,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is AP successfully connect to LS event.
+			   The event severity,event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, LBS server URL, LBS port and AP IPv6 address are enclosed."
+			 ::= { ruckusSZEventTraps 55 }	
+			 
+  ruckusSZAPLBSNoResponsesTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZLBSURL,ruckusSZLBSPort,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is an AP connect to LS no response event.
+			    The event severity,event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, LBS server URL, LBS port and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 56 }				 
+
+  ruckusSZAPLBSAuthFailedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZLBSURL,ruckusSZLBSPort,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is an AP connect LS authentication failure event.
+			   The event severity, event code, event type,AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, LBS server URL, LBS port and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 57 }					
+	
+  ruckusSZAPLBSConnectFailedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZLBSURL,ruckusSZLBSPort,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is an AP failed connect to LS event.
+			    The event severity,event code, event type,AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, LBS server URL, LBS port and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 58 }	
+
+  ruckusSZGeneralRogueAPTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventType,ruckusSZEventRogueMac,ruckusSZEventSSID,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZEventZoneName,ruckusSZEventCode,ruckusSZEventAPIPv6,ruckusSZEventRoguePolicyName,ruckusSZEventRogueRuleName,ruckusSZEventRogueType}
+     STATUS   current
+     DESCRIPTION
+			 "Trigger when there is an AP detects a rogue AP and classified by policy event.
+			   The event severity, event type, rogue AP MAC address, ssid, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, zone name, event code, policy name, rule name, rogue type and AP IPv6 address are enclosed."
+			 ::= { ruckusSZEventTraps 59 }
+				
+  ruckusSZAPTunnelBuildFailedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZDPIP,ruckusSZEventReason,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP build tunnel failed event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, SZ DP IP address, failure reason and AP IPv6 address are enclosed."
+		::= { ruckusSZEventTraps 60 }
+		
+  ruckusSZAPTunnelBuildSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZDPIP,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP build tunnel success event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, SZ DP IP address and AP IPv6 address are enclosed."
+		::= { ruckusSZEventTraps 61 }
+		
+  ruckusSZAPTunnelDisconnectedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZDPIP,ruckusSZEventReason,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP tunnel disconnected event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, SZ DP IP address, failure reason and AP IPv6 address are enclosed."
+		::= { ruckusSZEventTraps 62}
+		
+ ruckusSZAPSoftGRETunnelFailoverPtoSTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusPrimaryGRE,ruckusSecondaryGRE,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP softGRE tunnel fails over primary to secondary event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, primary GRE gateway, secondary GRE gateway and AP IPv6 address are enclosed."
+		::= { ruckusSZEventTraps 65}
+		
+  ruckusSZAPSoftGRETunnelFailoverStoPTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusPrimaryGRE,ruckusSecondaryGRE,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP softGRE tunnel fails over secondary to primary event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, primary GRE gateway, secondary GRE gateway and AP IPv6 address are enclosed."
+		::= { ruckusSZEventTraps 66}
+		
+ ruckusSZAPSoftGREGatewayNotReachableTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSoftGREGatewayList,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP softGRE gateway not reachable event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, soft GRE gateway list and AP IPv6 address are enclosed."
+		::= { ruckusSZEventTraps 67}
+		
+  ruckusSZAPSoftGREGatewayReachableTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZSoftGREGWAddress}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is an AP softGRE gateway reachable event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates and soft GRE gateway IP address are enclosed."
+		::= { ruckusSZEventTraps 68}
+		
+  ruckusSZDPConfUpdateFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZDPConfigID}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP configuration update failed event.
+       The event severity, event code, event type, DP's identifier and configuration UUID are enclosed."
+		::= { ruckusSZEventTraps 70 }
+
+  ruckusSZDPLostHeartbeatTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP lost heart beat event.
+       The event severity, event code, event type and DP's identifier are enclosed."
+		::= { ruckusSZEventTraps 71 }
+
+  ruckusSZDPDisconnectedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZEventCtrlIP}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP disconnected event.
+       The event severity, event code, event type, DP's identifier and SZ control IP address are enclosed."
+		::= { ruckusSZEventTraps 72 }
+
+  ruckusSZDPPhyInterfaceDownTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZNetworkPortID}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP physical interface down event.
+       The event severity, event code, event type, DP's identifier and network port ID are enclosed."
+		::= { ruckusSZEventTraps 73 }
+
+  ruckusSZDPStatusUpdateFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP update status failed event.
+       The event severity, event code, event type and DP's identifier are enclosed."
+		::= { ruckusSZEventTraps 74 }
+
+  ruckusSZDPStatisticUpdateFaliedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP update statistical failed event.
+       The event severity, event code, event type and DP's identifier are enclosed."
+		::= { ruckusSZEventTraps 75 }
+
+  ruckusSZDPConnectedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZEventCtrlIP}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP connected event.
+       The event severity, event code, event type, DP's identifier and SZ control IP are enclosed."
+		::= { ruckusSZEventTraps 76 }
+
+  ruckusSZDPPhyInterfaceUpTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZNetworkPortID}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP physical interface up event.
+       The event severity, event code, event type, DP's identifier and network port ID are enclosed."
+		::= { ruckusSZEventTraps 77 }
+
+  ruckusSZDPConfUpdatedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZDPConfigID}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP configuration updated event.
+       The event severity, event code, event type, DP's identifier and configuration UUID are enclosed."
+		::= { ruckusSZEventTraps 78 }
+
+  ruckusSZDPTunnelTearDownTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZEventAPMacAddr,ruckusSZEventReason}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP tear down tunnel event.
+       The event severity, event code, event type, DP's identifier, AP MAC address and event reason are enclosed."
+		::= { ruckusSZEventTraps 79 }
+		
+  ruckusSZDPAcceptTunnelRequestTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZEventAPMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is data plane accepts a tunnel request from the AP event.
+       The event severity, event code, event type, DP's identifier and AP MAC address are enclosed."
+		::= { ruckusSZEventTraps 81 }
+		
+  ruckusSZDPRejectTunnelRequestTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZEventAPMacAddr,ruckusSZEventReason}
+     STATUS  current
+     DESCRIPTION
+        "Trigger occurs where there is data plane rejects a tunnel request from the AP event.
+       The event severity, event code, event type, DP's identifier, AP MAC address and event reason are enclosed."
+		::= { ruckusSZEventTraps 82 }
+		
+  ruckusSZDPTunnelSetUpTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZEventAPMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP set up tunnel event.
+       The event severity, event code, event type, DP's identifier and AP MAC address are enclosed."
+		::= { ruckusSZEventTraps 85 }
+		
+  ruckusSZDPDiscoverySuccessTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZEventCtrlIP}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a DP discovery success event.
+       The event severity, event code, event type, DP's identifier and SZ control IP address are enclosed."
+		::= { ruckusSZEventTraps 86 }
+
+  ruckusSZDPDiscoveryFailTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey,ruckusSZEventCtrlIP}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a DP discovery failed event.
+       The event severity, event code, event type, DP's identifier and SZ control IP address are enclosed."
+		::= { ruckusSZEventTraps 87 }
+
+  ruckusSZDPDeletedTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a DP is deleted event.
+       The event severity, event code, event type and DP's identifier are enclosed."
+		::= { ruckusSZEventTraps 94 }
+  
+  ruckusSZDPUpgradeStartTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP started the upgrade process event.
+       The event severity, event code, event type and DP's identifier are enclosed."
+		::= { ruckusSZEventTraps 95}
+  
+  ruckusSZDPUpgradingTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP has started to upgrade program and configuration event.
+       The event severity, event code, event type and DP's identifier are enclosed."
+		::= { ruckusSZEventTraps 96}
+  
+  ruckusSZDPUpgradeSuccessTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP has been upgraded successfully event.
+       The event severity, event code, event type and DP's identifier are enclosed."
+		::= { ruckusSZEventTraps 97}
+  
+  ruckusSZDPUpgradeFailedTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZDPKey}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is DP failed to upgrade event.
+       The event severity, event code, event type and DP's identifier are enclosed."
+		::= { ruckusSZEventTraps 98}
+  
+  ruckusSZClientMiscEventTrap NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventClientMacAddr,ruckusSZEventDescription}
+     STATUS      current
+     DESCRIPTION
+        "Generic trap triggered by specified client related miscellaneous event. 
+         The event severity, event code, event type, client MAC address and event description are enclosed."
+    ::= { ruckusSZEventTraps 100 }
+    
+  ruckusSZNodeJoinFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is new node join failed event.
+       The event severity, event code, event type, node name, node MAC address and cluster name are enclosed."
+		::= { ruckusSZEventTraps 200 }
+
+  ruckusSZNodeRemoveFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is remove node failed event.
+       The event severity, event code, event type, node name,node MAC address and cluster name are enclosed."
+		::= { ruckusSZEventTraps 201 }
+
+  ruckusSZNodeOutOfServiceTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is node out of service event.
+       The event severity, event code, event type, node name,node MAC address and cluster name are enclosed."
+		::= { ruckusSZEventTraps 202 }
+
+  ruckusSZClusterInMaintenanceStateTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is cluster in maintenance state event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 203 }
+
+  ruckusSZClusterBackupFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is backup cluster failed event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 204 }
+
+  ruckusSZClusterRestoreFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is restore cluster failed event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 205 }
+
+  ruckusSZClusterAppStoppedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZProcessName,ruckusSZEventNodeName,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is cluster application stop event.
+       The event severity, event code, event type, application name, SZ node name and node MAC address are enclosed."
+		::= { ruckusSZEventTraps 206 }
+
+  ruckusSZNodeBondInterfaceDownTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZNetworkInterface,ruckusSZEventNodeName,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is node bond interface down event.
+       The event severity, event code, event type, network interface, SZ node name and node MAC address are enclosed."
+		::= { ruckusSZEventTraps 207 }
+
+  ruckusSZNodePhyInterfaceDownTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZNetworkInterface,ruckusSZEventNodeName,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is node physical interface down event.
+       The event severity, event code, event type, network interface, SZ node name and node MAC address are enclosed."
+		::= { ruckusSZEventTraps 208 }
+
+  ruckusSZClusterLeaderChangedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is cluster leader changed event.
+       The event severity, event code, event type, SZ node name, node MAC address and cluster name are enclosed."	
+		::= { ruckusSZEventTraps 209 }
+
+  ruckusSZClusterUpgradeSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName,ruckusSZEventFirmwareVersion,ruckusSZEventUpgradedFirmwareVersion}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is upgrade entire cluster success event.
+       The event severity, event code, event type, cluster name, firmware version and upgraded firmware version are enclosed."
+		::= { ruckusSZEventTraps 210 }
+
+  ruckusSZNodeBondInterfaceUpTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZNetworkInterface,ruckusSZEventNodeName,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is node bond interface up event.
+       The event severity, event code, event type, network interface, SZ node name and SZ MAC address are enclosed."
+		::= { ruckusSZEventTraps 211 }
+
+  ruckusSZNodePhyInterfaceUpTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZNetworkInterface,ruckusSZEventNodeName,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is node physical interface up event.
+       The event severity, event code, event type,network interface, SZ node name and SZ MAC address are enclosed."
+		::= { ruckusSZEventTraps 212 }
+
+  ruckusSZClusterBackToInServiceTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is cluster back to in service event.
+       The event severity, event code, event type and cluster name are enclosed."	
+		::= { ruckusSZEventTraps 216 }
+
+  ruckusSZBackupClusterSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is backup cluster success event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 217 }
+
+  ruckusSZNodeJoinSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is new node join success event.
+       The event severity, event code, event type, SZ node name, node MAC address and cluster name are enclosed."
+		::= { ruckusSZEventTraps 218 }
+
+  ruckusSZClusterAppStartTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZProcessName,ruckusSZEventNodeName,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is cluster application start event.
+       The event severity, event code, event type, application name, SZ node name and node MAC address are enclosed."
+		::= { ruckusSZEventTraps 219 }
+
+  ruckusSZNodeRemoveSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is remove node success event.
+       The event severity, event code, event type, SZ node name, node MAC address and cluster name are enclosed."
+		::= { ruckusSZEventTraps 220 }
+
+  ruckusSZClusterRestoreSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is restore cluster success event.
+       The event severity, event code, event type, SZ node name, node MAC address and cluster name are enclosed."
+		::= { ruckusSZEventTraps 221 }
+
+  ruckusSZNodeBackToInServiceTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is node back to in service event.
+       The event severity, event code, event type, SZ node name, node MAC address and cluster name are enclosed."
+		::= { ruckusSZEventTraps 222 }
+
+  ruckusSZSshTunnelSwitchedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZEventMacAddr,ruckusSZClusterName,ruckusSZSwitchStatus}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is SSH tunnel switched event.
+       The event severity, event code, event type, SZ node name, node MAC address, cluster name and switch status are enclosed."
+		::= { ruckusSZEventTraps 223 }
+		
+  ruckusSZClusterCfgBackupStartTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a configuration backup start event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 224 }
+		
+  ruckusSZClusterCfgBackupSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a configuration backup success event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 225 }
+		
+  ruckusSZClusterCfgBackupFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a configuration backup failed event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 226 }
+		
+  ruckusSZClusterCfgRestoreSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a configuration restore success event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 227 }
+
+  ruckusSZClusterCfgRestoreFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a configuration restore failed event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 228 }
+		
+  ruckusSZClusterUploadSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a cluster upload success event.
+       The event severity, event code, event type, cluster name are enclosed."
+		::= { ruckusSZEventTraps 229 }
+		
+  ruckusSZClusterUploadFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName,ruckusSZEventReason}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a cluster upload failed event.
+       The event severity, event code, event type, cluster name, failure reason are enclosed."
+		::= { ruckusSZEventTraps 230 }
+		
+  ruckusSZClusterOutOfServiceTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a cluster out of service event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 231 }
+		
+  ruckusSZClusterUploadVDPFirmwareStartTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a cluster upload vDP firmware process starts event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 232 }
+  
+  ruckusSZClusterUploadVDPFirmwareSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a cluster uploaded vDP firmware successfully event.
+       The event severity, event code, event type and cluster name are enclosed."
+		::= { ruckusSZEventTraps 233 }
+  
+  ruckusSZClusterUploadVDPFirmwareFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZClusterName,ruckusSZEventReason}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is a cluster failed to upload vDP firmware event.
+       The event severity, event code, event type, cluster name and failure reason are enclosed."
+		::= { ruckusSZEventTraps 234 }
+  
+  ruckusSZIpmiTempBBTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZTemperatureStatus,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is baseboard temperature event.
+       The event severity, event code, event type, temperature status and SZ node MAC address are enclosed."
+		::= { ruckusSZEventTraps 251 } 
+	
+  ruckusSZIpmiTempPTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZProcessorId,ruckusSZTemperatureStatus,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is processor temperature event.
+       The event severity, event code, event type, processor id, temperature status and SZ node MAC address are enclosed."
+		::= { ruckusSZEventTraps 256 }
+	
+  ruckusSZIpmiFanTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZFanId,ruckusSZFanStatus,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is system fan event.
+       The event severity, event code, event type, fan id, fan status and SZ node MAC address are enclosed."
+		::= { ruckusSZEventTraps 258 }
+		
+  ruckusSZIpmiFanStatusTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZFanId,ruckusSZFanStatus,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is fan module event.
+       The event severity, event code, event type, fan id, fan status and SZ node MAC address are enclosed."
+		::= { ruckusSZEventTraps 261 }
+ 
+  ruckusSZIpmiRETempBBTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZTemperatureStatus,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is baseboard temperature status recover from abnormal condition event.
+       The event severity, event code, event type, temperature status and SZ node MAC address are enclosed."
+		::= { ruckusSZEventTraps 265 }
+
+  ruckusSZIpmiRETempPTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZProcessorId,ruckusSZTemperatureStatus,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is processor temperature status recover from abnormal condition event.
+       The event severity, event code, event type, processor id, temperature status and SZ node MAC address are enclosed."
+		::= { ruckusSZEventTraps 270 }
+
+  ruckusSZIpmiREFanTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZFanId,ruckusSZFanStatus,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is system fan module status recover from abnormal condition event.
+       The event severity, event code, event type, fan id, fan status and SZ node MAC address are enclosed."
+		::= { ruckusSZEventTraps 272 }
+
+  ruckusSZIpmiREFanStatusTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZFanId,ruckusSZFanStatus,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is fan module status recover from abnormal condition event.
+       The event severity, event code, event type, fan id, fan status and SZ node MAC address are enclosed."
+		::= { ruckusSZEventTraps 275 }
+
+  ruckusSZFtpTransferErrorTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZFtpIp,ruckusSZFtpPort,ruckusSZFileName,ruckusSZEventMacAddr}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is FTP transfer error event.
+       The event severity, event code, event type, FTP server IP address, FTP server port, file name and SZ node MAC address are enclosed."
+		::= { ruckusSZEventTraps 280 }
+		
+  ruckusSZSystemLBSConnectSuccessTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZLBSURL,ruckusSZLBSPort}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is SmartZone successfully connect to LS event.
+       The event severity, event code, event type, SZ node MAC address, management IP address, LBS server URL and LBS port are enclosed."
+		::= { ruckusSZEventTraps 290 }
+
+  ruckusSZSystemLBSNoResponseTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZLBSURL,ruckusSZLBSPort}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is SmartZone connect to LS no response event.
+       The event severity,event code, event type, SZ node MAC address, management IP address, LBS server URL and LBS port are enclosed."
+		::= { ruckusSZEventTraps 291 }
+
+  ruckusSZSystemLBSAuthFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZLBSURL,ruckusSZLBSPort}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is SmartZone connect LS authentication failure event.
+       The event severity, event code, event type, SZ node MAC address, management IP address, LBS server URL and LBS port are enclosed."
+		::= { ruckusSZEventTraps 292 }
+
+  ruckusSZSystemLBSConnectFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZLBSURL,ruckusSZLBSPort}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is SmartZone failed connect to LS event.
+       The event severity, event code, event type, SZ node MAC address, management IP address, LBS server URL and LBS port are enclosed."
+		::= { ruckusSZEventTraps 293 }
+
+  ruckusSZUnsyncNTPTimeTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventType,ruckusSZClusterName,ruckusSZEventReason,ruckusSZEventCode}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when time is not sync with NTP.
+       The event severity, event type, cluster name, event reason, event code are enclosed."
+		::= { ruckusSZEventTraps 294 }
+
+  ruckusSZProcessRestartTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZProcessName,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is process restart event.
+       The event severity, event code, event type, process name, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 300 }
+
+  ruckusSZServiceUnavailableTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZProcessName,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is service unavailable event.
+       The event severity, event code, event type, process name, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 301 }
+
+  ruckusSZKeepAliveFailureTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZSrcProcess,ruckusSZProcessName,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is service keep alive failure event.
+       The event severity, event code, event type, source process name, process name, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 302 }
+
+  ruckusSZResourceUnavailableTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZSrcProcess,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZEventReason}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is resource unavailable event.
+       The event severity, event code, event type, source process name, SZ node MAC address, management IP address and reason are enclosed."
+		::= { ruckusSZEventTraps 304 }
+
+  ruckusSZSmfRegFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZSrcProcess,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is SMF registration failed event.
+       The event severity, event code, event type, source process name, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 305 }
+
+  ruckusSZHipFailoverTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZSrcProcess,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is HIP failover event.
+       The event severity, event code, event type, source process name, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 306 }
+
+  ruckusSZConfUpdFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZProcessName,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZEventReason}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is configuration update failed event.
+       The event severity, event code, event type, process name, SZ node MAC address, management IP address and failure reason are enclosed."
+		::= { ruckusSZEventTraps 307 }
+
+  ruckusSZConfRcvFailedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZEventReason}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is SZ configuration receive failed event.
+       The event severity, event code, event type, SZ node MAC address, management IP address and failure reason are enclosed."
+		::= { ruckusSZEventTraps 308 }
+
+  ruckusSZLostCnxnToDbladeTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventCtrlIP,ruckusSZDPIP,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is lost connection to DP,
+       The event severity, event code, event type, SZ control IP address, DP IP address, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 309 }
+
+  ruckusSZAuthSrvrNotReachableTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZAuthSrvrIp,ruckusSZRadProxyIp,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is authentication server not reachable event.
+       The event severity, event code, event type, authentication server IP address, radius proxy IP address, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 314 }
+
+  ruckusSZAccSrvrNotReachableTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZAccSrvrIp,ruckusSZRadProxyIp,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is accounting server not reachable event.
+       The event severity, event code, event type, accounting server IP address, radius proxy IP address, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 315 }
+
+  ruckusSZAuthFailedNonPermanentIDTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZUEImsi,ruckusSZUEMsisdn,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZEventReason}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is non-permanent ID authentication failed event.
+       The event severity, event code, event type, UE imsi, UE msisdn, SZ node MAC address, management IP address and failure reason are enclosed."
+		::= { ruckusSZEventTraps 317 }
+
+  ruckusSZAPAcctRespWhileInvalidConfigTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZSrcProcess,ruckusSZEventAPIP,ruckusSZUserName,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is SZ sends response to AP accounting message while configuration is incorrect in SZ to forward received message or to generate CDR event.
+       The event severity, event code, event type, source process name, AP IP address, user Name, SZ node MAC address, management IP address and AP IPv6 address are enclosed."
+		::= { ruckusSZEventTraps 347 }
+
+  ruckusSZAPAcctMsgDropNoAcctStartMsgTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZSrcProcess,ruckusSZEventAPIP,ruckusSZUserName,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp,ruckusSZEventAPIPv6}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is accounting message from AP dropped Acct Interim/Stop message as Account Start no received from AP event.
+       The event severity, event code, event type, source process name, AP IP address, user Name, SZ node MAC address, management IP address and AP IPv6 address are enclosed."
+		::= { ruckusSZEventTraps 348 }
+
+  ruckusSZUnauthorizedCoaDmMessageDroppedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZSrcProcess,ruckusSZRadSrvrIp,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is received COA/DM from unauthorized AAA server event.
+		 The event severity, event code, event type, source process name, AAA server IP address, SZ node MAC address and management IP address are enclosed." 
+		::= { ruckusSZEventTraps 349 }
+		
+  ruckusSZConnectedToDbladeTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventCtrlIP,ruckusSZDPIP,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is successful connection to DP event.
+       The event severity, event code, event type, SZ control IP address, DP IP address, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 350 }
+		
+  ruckusSZSessUpdatedAtDbladeTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventCtrlIP,ruckusSZDPIP,ruckusSZUEImsi,ruckusSZUEMsisdn,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is session updates the request (C-D-SESS-UPD-REQ) successfully event.
+       The event severity, event code, event type, SZ control IP address, SZ DP IP address, UE IMSI, UE msisdn, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 354 }
+		
+  ruckusSZSessUpdateErrAtDbladeTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventCtrlIP,ruckusSZDPIP,ruckusSZUEImsi,ruckusSZUEMsisdn,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is session updates the request (C-D-SESS-UPD-REQ) failed event.
+       The event severity, event code, event type, SZ control IP address, SZ DP IP address, UE IMSI, UE msisdn, SZ node MAC address, management IP address are enclosed."
+		::= { ruckusSZEventTraps 355 }
+		
+  ruckusSZSessDeletedAtDbladeTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventCtrlIP,ruckusSZDPIP,ruckusSZUEImsi,ruckusSZUEMsisdn,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is session deletes request (C-D-SESS-DEL-REQ) successfully event.
+       The event severity, event code, event type, SZ control IP address, SZ DP IP address, UE IMSI, UE msisdn, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 356 }
+		
+  ruckusSZSessDeleteErrAtDbladeTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventCtrlIP,ruckusSZDPIP,ruckusSZUEImsi,ruckusSZUEMsisdn,ruckusSZEventMacAddr,ruckusSZEventNodeMgmtIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is session deletes request (C-D-SESS-DEL-REQ) failed event.
+       The event severity, event code, event type, SZ control IP address, SZ DP IP address, UE IMSI, UE msisdn, SZ node MAC address and management IP address are enclosed."
+		::= { ruckusSZEventTraps 357 }
+		
+  ruckusSZLicenseSyncSuccessTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZLicenseServerName}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is license data syncs up with license server successfully event.
+       The event severity, event code, event type, node name, license server name are enclosed." 
+		::= { ruckusSZEventTraps 358 }
+		
+  ruckusSZLicenseSyncFailedTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName,ruckusSZLicenseServerName}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is license data syncs up with license server failed event.
+       The event severity, event code, event type, node name, license server name are enclosed." 
+		::= { ruckusSZEventTraps 359 }
+		
+  ruckusSZLicenseImportSuccessTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is license data import successfully event.
+       The event severity, event code, event type and node name are enclosed." 
+		::= { ruckusSZEventTraps 360 }
+		
+  ruckusSZLicenseImportFailedTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventNodeName}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is license data import failed event.
+       The event severity, event code, event type and node name are enclosed." 
+		::= { ruckusSZEventTraps 361 }
+		
+  ruckusSZSyslogServerReachableTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZSyslogServerAddress,ruckusSZEventMacAddr}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a syslog server reachable event.
+       The event severity, event code, event type, syslog server address and SZ node MAC address are enclosed." 
+		::= { ruckusSZEventTraps 370 }
+		
+  ruckusSZSyslogServerUnreachableTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZSyslogServerAddress,ruckusSZEventMacAddr}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a syslog server unreachable event.
+       The event severity, event code, event type, syslog server address and SZ node MAC address are enclosed." 
+		::= { ruckusSZEventTraps 371 }
+		
+  ruckusSZSyslogServerSwitchedTrap  NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZSrcSyslogServerAddress,ruckusSZDestSyslogServerAddress,ruckusSZEventMacAddr}
+     STATUS      current
+     DESCRIPTION
+        "Trigger when there is a syslog server switched event.
+       The event severity, event code, event type, source syslog server address, destination syslog server address and SZ node MAC address are enclosed."
+		::= { ruckusSZEventTraps 372 }
+		
+  ruckusSZAPRadiusServerReachableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZRadSrvrIp,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is able to reach radius server successfully event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, radius server IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 400 }
+  
+  ruckusSZAPRadiusServerUnreachableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZRadSrvrIp,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is unable to reach radius server event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, radius server IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 401 }
+  
+  ruckusSZAPLDAPServerReachableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZLDAPSrvrIp,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is able to reach LDAP server successfully event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, LDAP server IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 402 }
+  
+  ruckusSZAPLDAPServerUnreachableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZLDAPSrvrIp,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is unable to reach LDAP server event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, LDAP server IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 403 }
+  
+  ruckusSZAPADServerReachableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZADSrvrIp,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is able to reach AD server successfully event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, AD server IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 404 }
+  
+  ruckusSZAPADServerUnreachableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZADSrvrIp,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is unable to reach AD server event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, AD server IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 405 }
+  
+  ruckusSZAPUsbSoftwarePackageDownloadedTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZSoftwareName,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP downloaded its USB software package successfully event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, USB software name and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 406 }
+  
+  ruckusSZAPUsbSoftwarePackageDownloadFailedTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZSoftwareName,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP failed to download its USB software package event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, USB software name and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 407 }
+  
+  ruckusSZEspAuthServerReachableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZAuthSrvrIp,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is able to reach WeChat ESP authentication server successfully event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, authentication server IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 408 }
+  
+  ruckusSZEspAuthServerUnreachableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZAuthSrvrIp,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is unable to reach WeChat ESP authentication server event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, authentication server IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 409 }
+  
+  ruckusSZEspAuthServerResolvableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZDomainName,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is able to resolve WeChat ESP authentication server domain name successfully event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, authentication server domain name and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 410 }
+  
+  ruckusSZEspAuthServerUnResolvableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZDomainName,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is unable to resolve WeChat ESP authentication server domain name event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, authentication server domain name and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 411 }
+  
+  ruckusSZEspDNATServerReachableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZDNATIp,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is able to reach WeChat ESP DNAT server successfully event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, DNAT server IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 412 }
+ 
+  ruckusSZEspDNATServerUnreachableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZDNATIp,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is unable to reach WeChat ESP DNAT server event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, DNAT server IP address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 413 }
+  
+  ruckusSZEspDNATServerResolvableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZDomainName,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is able to resolve WeChat ESP DNAT server domain name successfully event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, authentication server domain name and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 414 }
+  
+  ruckusSZEspDNATServerUnresolvableTrap  NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZDomainName,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is unable to resolve WeChat ESP DNAT server domain name event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, authentication server domain name and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 415 }
+ 
+  ruckusSZHDDHealthDegradationTrap   NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZHDDHealthDegradationStatus,ruckusSZEventNodeName}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is HDD Health degradation event.
+       The event severity, event code, event type, HDD Health status and SZ node name are enclosed."
+        ::= { ruckusSZEventTraps 416 }
+
+ 
+  ruckusRateLimitTORSurpassedTrap	NOTIFICATION-TYPE
+     OBJECTS     {ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZRadSrvrIp}
+     STATUS  current
+     DESCRIPTION
+        "Trigger when there is received rate Limit for Total Outstanding Requests(TOR) Surpassed event.
+		 The event severity, event code, event type and AAA server IP address are enclosed." 
+		::= { ruckusSZEventTraps 500 }
+		
+
+  ruckusSZIPSecTunnelAssociatedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZIPSecGWAddress,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is able to reach secure gateway successfully event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, secure gateway address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 600 }
+
+  ruckusSZIPSecTunnelDisassociatedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZIPSecGWAddress,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is disconnected from secure gateway event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, secure gateway address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 601 }
+	
+  ruckusSZIPSecTunnelAssociateFailedTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventAPIP,ruckusSZEventAPLocation,ruckusSZEventAPDescription,ruckusSZEventAPGPSCoordinates,ruckusSZIPSecGWAddress,ruckusSZEventAPIPv6}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when there is an AP is not able to reach secure gateway successfully event.
+	       The event severity, event code, event type, AP name, AP MAC address, AP IP address, AP location, AP description, AP GPS coordinates, secure gateway address and AP IPv6 address are enclosed."
+			::= { ruckusSZEventTraps 602 }
+			
+  ruckusSZCaleaMirroringStartTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZUserName,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventSSID,ruckusSZEventClientMacAddr}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when the traffic of a client is getting mirrored event.
+	       The event severity, event code, event type, user name, AP name, AP MAC address, WLAN SSID and client MAC address are enclosed."
+			::= { ruckusSZEventTraps 712 }
+			
+  ruckusSZCaleaMirroringStopTrap	NOTIFICATION-TYPE
+     OBJECTS	{ruckusSZEventSeverity,ruckusSZEventCode,ruckusSZEventType,ruckusSZUserName,ruckusSZEventAPName,ruckusSZEventAPMacAddr,ruckusSZEventSSID,ruckusSZEventClientMacAddr,ruckusSZEventAuthType,ruckusSZUECaleaTx,ruckusSZUECaleaRx}
+     STATUS   current
+     DESCRIPTION
+        "Trigger when the traffic of a client is no longer mirror event.
+	       The event severity, event code, event type, user name, AP name, AP MAC address, WLAN SSID , WLAN auth type, client MAC address, TxBytes, and RxBytes are enclosed."
+			::= { ruckusSZEventTraps 713 }
+
+  ruckusSZEventDescription OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+             "The event's description."
+	    ::= { ruckusSZEventObjects 1 }
+
+  ruckusSZClusterName   OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+             "The SZ's cluster name."
+	    ::= { ruckusSZEventObjects 2 }
+	    
+  ruckusSZEventCode OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The event's code."
+	    ::= { ruckusSZEventObjects 10 }
+	    
+  ruckusSZProcessName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+		 "The process name."
+	 ::= { ruckusSZEventObjects 11 }
+	    
+  ruckusSZEventCtrlIP  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+		 "The SZ's node control IP address."
+	 ::= { ruckusSZEventObjects 12 }
+	  
+  ruckusSZEventSeverity OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The event's severity."
+	    ::= { ruckusSZEventObjects 13 }
+	    
+  ruckusSZEventType OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The event's type."
+	    ::= { ruckusSZEventObjects 14 }
+
+  ruckusSZEventNodeMgmtIp OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The SZ's management IP address."
+	    ::= { ruckusSZEventObjects 15 }
+    
+  ruckusSZEventNodeName OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+             "The SZ's node name."
+	    ::= { ruckusSZEventObjects 16 }
+       
+  ruckusSZCPUPerc OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+             "The SZ's CPU usage percent."
+	    ::= { ruckusSZEventObjects 17 }
+    
+  ruckusSZMemoryPerc OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+             "The SZ's memory usage percent."
+	    ::= { ruckusSZEventObjects 18 }
+    
+  ruckusSZDiskPerc OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+             "The SZ's disk usage percent."
+	    ::= { ruckusSZEventObjects 19 }
+    
+  ruckusSZEventMacAddr OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+             "The SZ's MAC address."
+	    ::= { ruckusSZEventObjects 20 }
+    
+  ruckusSZEventFirmwareVersion OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+             "The SZ's firmware version."
+	    ::= { ruckusSZEventObjects 21 }
+    
+	ruckusSZEventUpgradedFirmwareVersion OBJECT-TYPE 
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The SZ's upgrade firmware version."
+	    ::= { ruckusSZEventObjects 22 }
+	    
+  ruckusSZEventAPMacAddr OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The AP's MAC address."
+	    ::= { ruckusSZEventObjects 23 }
+    
+  ruckusSZEventReason OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The event's reason."
+	    ::= { ruckusSZEventObjects 24 }
+	
+  ruckusSZEventAPName OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The AP's name."
+	    ::= { ruckusSZEventObjects 25 }
+    
+  ruckusSZEventAPIP OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The AP's IP address."
+	    ::= { ruckusSZEventObjects 26 }
+    
+  ruckusSZEventAPLocation OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The AP's location."
+	    ::= { ruckusSZEventObjects 27 }
+    
+  ruckusSZEventAPGPSCoordinates OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The AP's GPS coordinates."
+	    ::= { ruckusSZEventObjects 28 }
+	    
+  ruckusSZEventAPDescription OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The AP's description."
+	    ::= { ruckusSZEventObjects 29 }
+
+  ruckusSZEventZoneName OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The zone name."
+	    ::= { ruckusSZEventObjects 30 }
+    
+	    
+  ruckusSZAPModel  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The AP model"
+			::= { ruckusSZEventObjects 31 }
+  
+  ruckusSZConfigAPModel  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The configured AP model"
+			::= { ruckusSZEventObjects 32 }
+			
+  ruckusSZAPConfigID  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The AP's configuration UUID"
+			::= { ruckusSZEventObjects 33 }
+			
+   ruckusSZEventAPIPv6 OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The AP's IPv6 address."
+	    ::= { ruckusSZEventObjects 35 }
+			
+   ruckusSZLBSURL  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The LBS server's URL"
+			::= { ruckusSZEventObjects 38 }
+						
+  ruckusSZLBSPort  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The LBS server's port"
+			::= { ruckusSZEventObjects 39 }
+			
+  ruckusSZEventSSID  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The WLAN ssid"
+			::= { ruckusSZEventObjects 40}
+			
+  ruckusSZEventAuthType  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The WLAN authentication type"
+			::= { ruckusSZEventObjects 41}
+			
+  ruckusSZEventRogueMac  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The rogue MAC Address"
+			::= { ruckusSZEventObjects 45}
+			
+ruckusPrimaryGRE  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The primary GRE gateway."
+			::= { ruckusSZEventObjects 46}		
+	
+  ruckusSecondaryGRE  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The secondary GRE gateway."
+			::= { ruckusSZEventObjects 47}		
+			
+  ruckusSoftGREGatewayList  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The softGRE gateway list. It could be IP address or FQDN and must have only two IPs/DNs separated by semicolon (;)."
+			::= { ruckusSZEventObjects 48}
+  
+  ruckusSZSoftGREGWAddress  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The softGRE gateway IP address."
+			::= { ruckusSZEventObjects 49}	
+			
+  ruckusSZEventClientMacAddr OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The client's MAC address."
+	    ::= { ruckusSZEventObjects 50 } 
+	    
+  ruckusSZDPKey OBJECT-TYPE
+	    SYNTAX      OCTET STRING
+	    MAX-ACCESS  accessible-for-notify
+	    STATUS      current
+	    DESCRIPTION
+	        "The DP's identifier."
+	    ::= { ruckusSZEventObjects 80 } 
+	    
+  ruckusSZDPConfigID  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The DP's configuration ID."
+			::= { ruckusSZEventObjects 81 }
+ 
+  ruckusSZDPIP  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The DP's IP address."
+			::= { ruckusSZEventObjects 82}
+				
+  ruckusSZNetworkPortID  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The network port ID."
+			::= { ruckusSZEventObjects 100 }
+			
+  ruckusSZNetworkInterface  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The network interface."
+			::= { ruckusSZEventObjects 101 }
+			
+  ruckusSZSwitchStatus  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The switch status."
+			::= { ruckusSZEventObjects 102 }
+			
+  ruckusSZTemperatureStatus  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The temperature status."
+			::= { ruckusSZEventObjects 120 }
+			
+  ruckusSZProcessorId  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The processor ID."
+			::= { ruckusSZEventObjects 121 }
+			
+  ruckusSZFanId  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The fan module ID."
+			::= { ruckusSZEventObjects 122 }
+			
+  ruckusSZFanStatus  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The fan module status."
+			::= { ruckusSZEventObjects 123 }
+				
+  ruckusSZLicenseType  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The license type"
+			::= { ruckusSZEventObjects 150 }
+			
+  ruckusSZLicenseUsagePerc  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The license usage percent."
+			::= { ruckusSZEventObjects 151 }
+			
+  ruckusSZLicenseServerName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The license server name."
+			::= { ruckusSZEventObjects 152 }
+			
+  ruckusSZIPSecGWAddress  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The secure gateway address."
+			::= { ruckusSZEventObjects 153 }
+			
+  ruckusSZSyslogServerAddress  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The syslog server address."
+			::= { ruckusSZEventObjects 154 }
+
+  ruckusSZSrcSyslogServerAddress  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The source syslog server address."
+			::= { ruckusSZEventObjects 155 }
+
+  ruckusSZDestSyslogServerAddress  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The destination syslog server address."
+			::= { ruckusSZEventObjects 156 }
+			
+  ruckusSZFtpIp  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The FTP server IP address."
+			::= { ruckusSZEventObjects 200 }
+			
+  ruckusSZFtpPort  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The FTP server port."
+			::= { ruckusSZEventObjects 201 }
+			
+  ruckusSZSrcProcess  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The source process name."
+			::= { ruckusSZEventObjects 301 }
+			
+  ruckusSZUEImsi  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The UE IMSI."
+			::= { ruckusSZEventObjects 305 }
+			
+  ruckusSZUEMsisdn  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The UE MSISDN."
+			::= { ruckusSZEventObjects 306 }
+			
+  ruckusSZAuthSrvrIp  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The authentication server IP address."
+			::= { ruckusSZEventObjects 307 }
+			
+  ruckusSZRadProxyIp  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The radius proxy IP address."
+			::= { ruckusSZEventObjects 308 }
+			
+  ruckusSZAccSrvrIp  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The accounting server IP address."
+			::= { ruckusSZEventObjects 309 }
+					
+  ruckusSZRadSrvrIp  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The radius server IP address."
+			::= { ruckusSZEventObjects 312 }
+		
+  ruckusSZUserName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The user name."
+			::= { ruckusSZEventObjects 324 }
+			
+  ruckusSZFileName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The file name."
+			::= { ruckusSZEventObjects 326 }
+			
+  ruckusSZLDAPSrvrIp  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The LDAP server IP address."
+			::= { ruckusSZEventObjects 327 }
+
+  ruckusSZADSrvrIp  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The AD server IP address."
+			::= { ruckusSZEventObjects 328 }
+ 
+  ruckusSZSoftwareName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The software name."
+			::= { ruckusSZEventObjects 329 }
+
+  ruckusSZDomainName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The domain name."
+			::= { ruckusSZEventObjects 330 }
+ 
+  ruckusSZDNATIp  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The DNAT server IP address."
+			::= { ruckusSZEventObjects 331 }
+			
+  ruckusSZUECaleaTx  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The Tx bytes of UE for CALEA."
+			::= { ruckusSZEventObjects 401 }  
+			
+  ruckusSZUECaleaRx  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The Rx bytes of UE for CALEA."
+			::= { ruckusSZEventObjects 402 }  
+
+  ruckusSZEventRoguePolicyName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The rogue classified by which policy name."
+			::= { ruckusSZEventObjects 332}
+
+  ruckusSZEventRogueRuleName  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The rogue classified by which rule name."
+			::= { ruckusSZEventObjects 333}
+
+  ruckusSZEventRogueType  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+			"The rogue classified as type."
+			::= { ruckusSZEventObjects 334}
+
+  ruckusSZHDDHealthDegradationStatus  OBJECT-TYPE
+     SYNTAX     OCTET STRING
+     MAX-ACCESS  accessible-for-notify
+     STATUS   current
+     DESCRIPTION
+            "The HDD Health degradation status."
+            ::= { ruckusSZEventObjects 335 }
+ 
+END

@@ -1,0 +1,11 @@
+os: socomec
+text: 'Socomec PDU'
+type: power
+mib_dir: socomec
+icon: socomecpdu
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.4555.2.30

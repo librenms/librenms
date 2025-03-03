@@ -1,0 +1,3966 @@
+
+-- File Name : horizon_hc_MIB_1.01.00.mib
+-- Version   : 1.01.00
+-- Date      : Jan 10, 2008
+-- Author    : DragonWave Inc.
+
+HORIZON-ODU-MIB	DEFINITIONS ::= BEGIN
+         IMPORTS
+                  Counter, Gauge,TimeTicks
+                      FROM RFC1155-SMI
+ 				  snmp
+			          FROM SNMPv2-MIB                      
+                  OBJECT-TYPE,ifIndex
+                      FROM IF-MIB
+                  horizon   
+                      FROM HORIZON-MIB;
+
+	PhysAddress ::= 		OCTET STRING
+
+	DisplayString ::= OCTET STRING
+
+-- Important!! For HP OpenView, the following OID definition for ISO must be commented out,
+-- otherwise it won't compile. HP openView has already defined ISO.
+ 
+--      iso   OBJECT IDENTIFIER  ::=  { 1 }
+
+          
+    horizonOdu 		OBJECT IDENTIFIER
+         ::= { horizon 2 }  
+      
+--
+-- Node definitions
+--
+   	
+--
+-- AIR PAIR TOP LEVEL OBJECTS
+--
+        
+
+		
+		
+	hzOduSystem 	OBJECT IDENTIFIER
+		::=  {  horizonOdu  1  }     
+		
+	hzOduAuthentication	OBJECT IDENTIFIER
+		::=  {  horizonOdu  2  } 
+		
+ 	hzOduNetworkManagement OBJECT IDENTIFIER
+		::=  {  horizonOdu  3  }
+
+	hzOduNetworkInterface	OBJECT IDENTIFIER
+		::=  {  horizonOdu  4  }  
+		
+ 	hzOduWirelessInterface	OBJECT IDENTIFIER
+		::=  {  horizonOdu  5  }
+
+	hzOduFrequencies	OBJECT IDENTIFIER
+		::=  {  horizonOdu  6  }
+
+
+	hzOduCalendar	OBJECT IDENTIFIER
+		::=  {  horizonOdu  7 }
+
+
+	hzOduAlarms	OBJECT IDENTIFIER
+		::=  {  horizonOdu  8  } 
+
+	hzOduTraps	OBJECT IDENTIFIER
+		::=  {  horizonOdu  9  }
+
+	hzOduSnmp	OBJECT IDENTIFIER
+		::=  {  horizonOdu  10  }
+
+        	
+    hzOduManagementSessions	OBJECT IDENTIFIER
+		::=  {  horizonOdu  11  }
+ 
+ 	hzOduHttp	OBJECT IDENTIFIER
+		::=   {  horizonOdu  12  }
+   
+    hzOduQos   OBJECT IDENTIFIER
+		::=  {  horizonOdu  13  } 
+ 
+    hzOduRapidLinkShutdown   OBJECT IDENTIFIER
+		::=  {  horizonOdu  14  } 
+
+    hzOduSntp OBJECT IDENTIFIER
+		::=  {  horizonOdu  15  }
+             
+    hzOduLogs OBJECT IDENTIFIER
+		::=  {  horizonOdu  16  }
+
+	hzOduRadius OBJECT IDENTIFIER
+		::=  {  horizonOdu  17  }
+
+
+-- -------------
+--   hzOduSystem
+-- -------------
+      
+    hzOduSysGeneral 	OBJECT IDENTIFIER
+		::=  {  hzOduSystem  1  }    
+    hzOduSysSpeed 	OBJECT IDENTIFIER
+		::=  {  hzOduSystem  2  }     
+  
+   	hzOduInventory 	OBJECT IDENTIFIER
+		::=  {  hzOduSystem  3  }     
+    hzOduAtpc 	OBJECT IDENTIFIER
+		::=  {  hzOduSystem  4  }     
+    hzOduAam 	OBJECT IDENTIFIER
+		::=  {  hzOduSystem  5  }     
+    hzOduPeerSysInfo 	OBJECT IDENTIFIER
+		::=  {  hzOduSystem  6  }     		 
+    hzOduSysRedundancy 	OBJECT IDENTIFIER
+		::=  {  hzOduSystem  7  }     
+		 
+		 
+-- ----------------------------
+--   hzOduInventory
+-- ----------------------------  
+
+   	hzOduHwInventory 	OBJECT IDENTIFIER
+		::=  {  hzOduInventory  1  }    
+    hzOduSwInventory 	OBJECT IDENTIFIER
+		::=  {  hzOduInventory  2  } 
+		
+-- ----------------------------
+--   hzOduGeneral
+-- ----------------------------   
+
+ 	hzOduResetSystem	OBJECT-TYPE	
+		SYNTAX			INTEGER  ( 0 .. 1  ) 
+		ACCESS			write-only
+		STATUS			mandatory
+		DESCRIPTION		"Writing '1' to this object resets the NIC, Modem, and radio."
+		::=  {  hzOduSysGeneral  1  }
+
+	hzOduSaveMIB	OBJECT-TYPE	
+		SYNTAX			INTEGER  { save ( 1 )  }
+		ACCESS			write-only
+		STATUS			mandatory
+		DESCRIPTION		"Writing '1' to this object save all MIB values. Note: If the horizon type is 
+                                        'apng120' or 'apng170' and the radio band doesn't match the horizon type,
+                                         Mib can't be saved."
+                                         
+		::=  {  hzOduSysGeneral  2  }
+
+
+
+	hzOduOperStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { up ( 1 ) , down ( 2 ) , testing ( 3 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current operational state of the system. 
+						Testing indicates that no operational packets can be passed."
+		::=  {  hzOduSysGeneral  3  }
+
+	hzOduAirInterfaceEncryption	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory 
+		DESCRIPTION		"OBSOLETE. This enables encryption on the air interface. "
+		DEFVAL			{ disabled }
+		::=  {  hzOduSysGeneral  4  }
+
+	hzOduSystemRedundancy	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory 
+		DESCRIPTION		"Sets system redundancy on/off. If there are any radio failures then the system will automatically switch
+					 to redundant system."
+		DEFVAL			{ disabled }
+		::=  {  hzOduSysGeneral  5  }   
+		
+--- ----------------------------
+--   hzOduSysSpeed
+-- ----------------------------   
+
+ 	hzOduSystemCurrentSpeed	OBJECT-TYPE	
+		SYNTAX			INTEGER  ( 0..1000 ) 
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"Changes the working speed of the horizon. 
+                        Writes are only valid if system is a FLEX. Due to backwards compatibility issue, 0 value should
+					be treated as 0 Mbps."
+		::=  {  hzOduSysSpeed  1 }
+
+	hzOduSystemLicensedSpeed	OBJECT-TYPE	
+		SYNTAX			INTEGER  ( 0..1000 ) 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the maximum speed that this system can operate at. Due to backwards compatibility issue, 0 value should
+					be treated as 0 Mbps."
+		::=  {  hzOduSysSpeed  2  } 
+		
+ 	hzOduSystemMode	OBJECT-TYPE	
+		SYNTAX			INTEGER  {cw-test( 1 ), hc50-67-qpsk ( 5 ) , hc50-110-16qam ( 6 ) , 
+		                         hc50-171-32qam ( 7 ) , hc50-215-64QAM ( 8 ), hc50-271-128qam ( 9 ),
+		                         hc50-322-256qam ( 10 ),  hc50-371-256qam ( 11 ) ,
+		                         hc56-65-qpsk(12), hc56-111-16qam(13), hc56-216-32qam(14), hc56-290-128qam(15), 
+					 hc56-385-256qam(16), hc28-37-qpsk(17), hc28-48-qpsk(18), hc28-71-16qam(19), 
+					 hc28-100-32qam(20), hc28-144-128qam(21), hc28-190-256qam(22), hc14-23-qpsk(23), 
+					 hc14-36-16qam(24), hc14-47-32qam(25), hc14-70-128qam(26), hc14-95-256qam(27)
+					 hc40-57-qpsk(28), hc40-111-16qam(29), hc30-107-32qam(30), hc40-110-32qam(31), 
+					 hc40-142-32qam(32), hc40-181-64qam(33), hc30-165-128qam(34), hc40-200-128qam(35),
+					 hc40-212-128qam(36), hc30-212-256qam(37), hc40-277-256qam(38), hc40-58-qpsk(39),
+					 hc25-33-qpsk(40), hc25-53-16qam(41), hc25-80-32qam(42), hc25-107-128qam(43),
+					 hc25-174-256qam(44), hc50-364-256qam(45)} 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the specific type of system this is."
+		::=  { hzOduSysSpeed   3  } 
+
+	hzOduUpgradeLicensedSpeed	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			write-only
+		STATUS			mandatory
+		DESCRIPTION		"Enter your apngFLEX key here along with the maximum speed for 
+						 that key to upgrade the FLEX system.
+						 
+						 Format: [speed] [key]
+						 Example: 50 abc123"
+		::=  {  hzOduSysSpeed  4  }      
+
+ 			
+--- ----------------------------
+--   hzOduSysRedundancy
+-- ----------------------------   
+ 
+ 	hzOduSystemRedundancyMode	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ), primary-hsb-1wire ( 2 ), secondary-hsb-1wire ( 3 ), 
+                                                   primary-hsb-2wire ( 4 ), secondary-hsb-2wire ( 5 ) }
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"allows the user to set system redundancy mode:
+                                        [ off | primary-hsb-1wire | secondary-hsb-1wire | primary-hsb-2wire | secondary-hsb-2wire ]"
+		::=  {  hzOduSysRedundancy  1 }
+
+	hzOduSystemRedundancyOverride	OBJECT-TYPE	
+		SYNTAX			INTEGER  { primary ( 1 ), secondary ( 2 ), auto ( 3 ), manual ( 4 ) }
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"Allows the user to override the active link. User can forces
+                                         the link to stay on either primary or secondary link."
+		::=  {  hzOduSysRedundancy  2  } 
+		
+ 	hzOduSystemRedundancyLinkStatus	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the redundancy link status."
+		::=  { hzOduSysRedundancy   3  } 
+ 		
+ 	hzOduSystemRedundancyStandbyEnetState	OBJECT-TYPE	
+		SYNTAX			INTEGER  { on ( 1 ), off ( 2 ), pulse ( 3 ) }
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"Allows the user to set standby enet(port1) state."
+		::=  {  hzOduSysRedundancy  4  } 
+		
+ 	hzOduSystemRedundancyStateSwitch  OBJECT-TYPE	
+		SYNTAX			INTEGER  { on ( 1 ) }
+		ACCESS			write-only
+		STATUS			mandatory  
+		DESCRIPTION		"Allows the user to switch redundancy state."
+		::=  { hzOduSysRedundancy   5  } 
+
+--- ----------------------------
+--   hzOduHwInventory
+-- -------------
+   
+	hzOduUnitSerialNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A textual string containing Serial no of the Unit."
+		::=  {  hzOduHwInventory  1  }
+		
+	hzOduUnitAssemblylNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A textual string containing assembly no of the Unit."
+		::=  {  hzOduHwInventory  2  }
+		
+	hzOduIfSerialNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A textual string containing Serial no of the IF."
+		::=  {  hzOduHwInventory  3  }
+		
+	hzOduIfAssemblylNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A textual string containing assembly no of the IF."
+		::=  {  hzOduHwInventory  4  }   
+		
+	hzOduRfSerialNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A textual string containing Serial no of the RF."
+		::=  {  hzOduHwInventory  5  }
+		
+	hzOduRfAssemblylNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A textual string containing assembly no of the RF."
+		::=  {  hzOduHwInventory  6  }
+	hzOduNccSerialNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A textual string containing Serial no of the NCC."
+		::=  {  hzOduHwInventory  7  }
+		
+	hzOduNccAssemblylNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A textual string containing assembly no of the NCC."
+		::=  {  hzOduHwInventory  8  }
+
+	hzOduDiplexerSerialNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A textual string containing Serial no of the Diplexer."
+		::=  {  hzOduHwInventory  9  }
+		
+	hzOduDiplexerAssemblylNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A textual string containing assembly no of the Diplexer."
+		::=  {  hzOduHwInventory  10  }
+		
+		
+-- ----------------------------
+--   hzOduSwInventory
+-- -------------
+
+
+	hzOduSystemOmniVersionNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The version number of the Omni."
+		::=  {  hzOduSwInventory  1  } 
+		
+	hzOduModemOmniVersionNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The version number of the Modem FPGA."
+		::=  {  hzOduSwInventory  2  }
+		
+ 	hzOduFrequencyFileVersionNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The version number of the FrequencyFile."
+		::=  {  hzOduSwInventory  3  }
+
+
+	hzOduMibVersionNo	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The version number of the MIB."
+		::=  {  hzOduSwInventory  4  }		
+		
+
+		
+-- ----------------------------
+--   hzOduAtpc
+-- ----------------------------  		    
+     hzOduAtpcEnable     OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether Automatic Transmit Power Control (ATPC) is enabled."
+		DEFVAL			{ disabled }
+		::=  {  hzOduAtpc  1 }
+     hzOduAtpcCoordinatedPowerDbm	OBJECT-TYPE	
+		SYNTAX			INTEGER 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"This defines the coordinated power level. 
+					The value is multiplied by 10. e.g. A display
+                                                 of 133 is actually 13.3 dBm.
+"                                                 
+		DEFVAL  		{ 0 }
+		::=  {  hzOduAtpc  2  }
+
+
+
+-- ----------------------------
+--   hzOduAam
+-- ----------------------------   
+     hzOduAamEnable     OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether Automatic Adaptive Modulation(AAM) is enabled."
+		DEFVAL			{ disabled }
+		::=  {  hzOduAam  1 }
+
+-- ----------------------
+--  hzOduPeerSysInfo
+-- ---------------------
+	hzOduPeerMacAddress	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The MAC Address of the peer network interface card."
+		::=  {  hzOduPeerSysInfo  1  }
+
+	hzOduPeerIpAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The IP Address of the peer network interface card."
+		::=  {  hzOduPeerSysInfo  2  }
+
+	hzOduPeerSubnetMask	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The subnet mask for the peer network interface card."
+		::=  {  hzOduPeerSysInfo  3  }
+
+--- ----------------------------
+--   hzOduAuthentication
+-- ----------------------------   
+	hzOduUniquePeerAuthenticationKey	OBJECT-TYPE	
+		SYNTAX			DisplayString ( SIZE ( 0 .. 34  ) ) 
+		ACCESS			read-write
+		STATUS			mandatory 
+		DESCRIPTION		"The serial number of the peer node that this node will communicate with. 
+						 This is only used when authentication mode is set to unique."
+		::=  {  hzOduAuthentication  1  }
+
+	hzOduPeerDetectedSerialNumber	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The serial number of the peer node that the system is presently communicating 
+					     with. This is only used when authentication is set to unique."
+		::=  {  hzOduAuthentication  2  }
+
+	hzOduAuthenticationMode	OBJECT-TYPE	
+		SYNTAX			INTEGER  { none ( 1 ) , unique ( 2 ) , group ( 3 ) } 
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"This sets the authentication mode for the system.If configured for unique 
+					     authentication, an horizon node only exchanges user traffic with one other 
+					     horizon node. The serial number is used in this case.
+					     
+					     If configured for group authentication, an horizon node exchanges user 
+					     traffic with another horizon node of the same group and uses the 
+					     authentication keys."
+		DEFVAL			{ none }
+		::=  {  hzOduAuthentication  3  }
+
+	hzOduAuthenticationFailureAction	OBJECT-TYPE	
+		SYNTAX			INTEGER  { blockTraffic ( 1 ) , passTraffic ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory 
+		DESCRIPTION		"This sets the authentication failure action for the system. 
+		
+						 Block traffic will block all user traffic including remote 
+						 management access.  Pass traffic will allow all user traffic
+						 to be sent and recieved"
+		DEFVAL			{ blockTraffic }                             
+		::=  {  hzOduAuthentication  4  }
+
+	hzOduPeerAuthenticationStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  {  notAuthenticated ( 1 ) , authenticated ( 2 ) ,explicitAuthenticationFailure ( 3 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Specifies the current authentication status of the system.
+		
+						 Authenticated means authentication is on and the system
+						 has been authenticated, notAuthenticated means authentication
+						 is off or the system has not communicated yet with the other node,
+						 explicit authentication failure means authentication is on and 
+						 authentication has failed"
+		::=  {  hzOduAuthentication  5  }
+--
+-- NetworkManagement 
+--   
+	hzOduMacAddress	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The MAC Address of the network interface card."
+		::=  {  hzOduNetworkManagement  1  }   
+		
+	hzOduNetworkManagementInterface	OBJECT-TYPE	
+		SYNTAX			INTEGER  { port1 ( 1 ) , port2 ( 2 ), port2Extended(3) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Describes the network management interface connection options."
+		::=  {  hzOduNetworkManagement  2  }   
+		
+
+	hzOduIpAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The IP Address of the network interface card."
+		::=  {  hzOduNetworkManagement  3  }
+
+	hzOduSubnetMask	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The subnet mask for the network interface card."
+		::=  {  hzOduNetworkManagement  4  }
+
+	hzOduDefaultGateway	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The default gateway for the network interface card"
+		::=  {  hzOduNetworkManagement  5  }
+   
+	hzOduTelnetAccessMode	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether Telnet access is allowed."
+		DEFVAL			{ enabled }
+		::=  {  hzOduNetworkManagement  6  }
+
+ 	hzOduSshAccessMode	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether ssh access is allowed."
+		DEFVAL			{ enabled }
+		::=  {  hzOduNetworkManagement  7  }
+
+	hzOduVlanTagEnable	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether VLAN tagging is enabled."
+		DEFVAL			{ disabled }
+		::=  {  hzOduNetworkManagement  8  }
+
+	hzOduVlanTagId	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		""
+		DEFVAL			{ 0 }
+		::=  {  hzOduNetworkManagement  9  }
+		   
+	hzOduVlanTagPriority	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		""
+		DEFVAL			{ 0 }
+		::=  {  hzOduNetworkManagement  10  }   
+		
+		
+--
+-- NETWORK CARD INFORMATION
+--
+
+
+		
+	hzOduEnetPort1	OBJECT IDENTIFIER
+		::=  {  hzOduNetworkInterface  1  }
+	hzOduEnetPort2	OBJECT IDENTIFIER
+		::=  {  hzOduNetworkInterface  2  }
+
+ 	hzOduEnetPort2Description	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Describes the functionality of the port2"
+		DEFVAL			{ on }
+		::=  {  hzOduEnetPort2  1  }  
+
+		
+  	hzOduEnetPort2Config	OBJECT IDENTIFIER
+		::=  {  hzOduEnetPort2  2  }
+  	hzOduEnetPort2Status	OBJECT IDENTIFIER
+		::=  {  hzOduEnetPort2  3  }
+  	hzOduEnetPort2Stats	OBJECT IDENTIFIER
+		::=  {  hzOduEnetPort2  4  }    
+
+ 	hzOduEnetPort1Description	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Describes the functionality of the port1"
+		DEFVAL			{ on }
+		::=  {  hzOduEnetPort1  1  }  
+
+				
+  	hzOduEnetPort1Config	OBJECT IDENTIFIER
+		::=  {  hzOduEnetPort1  2  }
+  	hzOduEnetPort1Status	OBJECT IDENTIFIER
+		::=  {  hzOduEnetPort1  3  }
+  	hzOduEnetPort1Stats	OBJECT IDENTIFIER
+		::=  {  hzOduEnetPort1  4  }   
+		
+--
+-- hzOduEnetPort2Config
+--   
+   
+ 	hzOduEnetPort2AutoNegotiation	OBJECT-TYPE	
+		SYNTAX			INTEGER  { on ( 1 ) , off ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"port1 Turns auto-negotiation on or off. Turning off results in 
+						 the interface defaulting to 100BaseT, Full Duplex. "
+		DEFVAL			{ on }
+		::=  {  hzOduEnetPort2Config  1  }  
+		
+	hzOduEnetPort2Speed	OBJECT-TYPE	
+		SYNTAX			INTEGER  { x10M( 1 ) , x100M( 2 ), x1000M( 3 ), auto(4) } 
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"Configure the port1 interface speed ."
+		::=  {  hzOduEnetPort2Config   2}     
+		
+	hzOduEnetPort2Duplex	OBJECT-TYPE	
+		SYNTAX			INTEGER  { full( 1 ) , half( 2 ), auto( 3 ) } 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Configure the port1 interface duplex."
+		::=  {  hzOduEnetPort2Config   3} 
+
+		
+	hzOduEnetPort2AdminState	OBJECT-TYPE	
+		SYNTAX			INTEGER  {  on( 1 ) , off( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Configure the port2 shutdown media."
+		::=  {  hzOduEnetPort2Config   4} 
+		
+--
+-- Port2 STATUS
+--   
+	    
+	hzOduEnetPort2LinkStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { down ( 1 ) , up( 2 ) , invalid( 3 ) } 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the Port2 link status."
+		::=  {  hzOduEnetPort2Status   1} 
+
+
+
+	hzOduEnetPort2AutoNegotiationStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { on( 1 ) , off( 2 ) ,invalid(3) } 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the Port2 AutoNegotiation status."
+		::=  {  hzOduEnetPort2Status   2} 
+
+
+	hzOduEnetPort2SpeedStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { x10M( 1 ) , x100M( 2 ), x1000M( 3 ), auto(4) ,invalid(5)} 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the Port2 interface speed status."
+		::=  {  hzOduEnetPort2Status   3} 
+
+
+	hzOduEnetPort2DuplexStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  {  full( 1 ) , half( 2 ), auto( 3 ), invalid(4) } 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the Port2 interface duplex status."
+		::=  {  hzOduEnetPort2Status   4} 
+		
+	hzOduEnetPort2MediaStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { copper( 1 ) , fiber( 2 ), auto( 3 ) ,invalid(4)} 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the port1 interface media status."
+		::=  {  hzOduEnetPort2Status   5} 
+		
+--
+-- Port2 STATISTICS
+--   
+	
+   hzOduEnetPort2TxFrames 	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Port2 frames sent."
+		::=  {  hzOduEnetPort2Stats  1  } 
+		  
+   hzOduEnetPort2TxBytes	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Port2 bytes sent."
+		::=  {  hzOduEnetPort2Stats  2  }
+		
+   hzOduEnetPort2RxFrames	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Port2 frames received."
+		::=  {  hzOduEnetPort2Stats  3  }  
+		
+   hzOduEnetPort2RxBytes	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Port2 bytes received."
+		::=  {  hzOduEnetPort2Stats  4  }
+
+   hzOduEnetPort2RxFramesInError	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Port2 frames received in error."
+		::=  {  hzOduEnetPort2Stats  5  }
+
+   hzOduEnetPort2RxFramesCrcError	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of CRC error frames received for Port2."
+		::=  {  hzOduEnetPort2Stats  6  }
+		
+
+--
+-- PORT1 CONFIG
+--   
+   
+ 	hzOduEnetPort1AutoNegotiation	OBJECT-TYPE	
+		SYNTAX			INTEGER  { on( 1 ) , off ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"port1 Turns auto-negotiation on or off. Turning off results in 
+						 the interface defaulting to 100BaseT, Full Duplex. "
+		DEFVAL			{ on }
+		::=  {  hzOduEnetPort1Config  1  }  
+		
+	hzOduEnetPort1Speed	OBJECT-TYPE	
+		SYNTAX			INTEGER  { x10M( 1 ) , x100M( 2 ), x1000M( 3 ), auto(4) } 
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"Configure the port1 interface speed ."
+		::=  {  hzOduEnetPort1Config   2} 
+
+
+	hzOduEnetPort1Duplex	OBJECT-TYPE	
+		SYNTAX			INTEGER  { full( 1 ) , half( 2 ), auto( 3 ) } 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Configure the port1 interface duplex."
+		::=  {  hzOduEnetPort1Config   3} 
+
+	hzOduEnetPort1Media	OBJECT-TYPE	
+		SYNTAX			INTEGER  { copper( 1 ) , fiber( 2 ), auto( 3 ) } 
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"Configure the port1 interface media."
+		::=  {  hzOduEnetPort1Config   4}     
+		
+	hzOduEnetPort1AdminState	OBJECT-TYPE	
+		SYNTAX			INTEGER  {  on( 1 ) , off( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Configure the port1 interface media."
+		::=  {  hzOduEnetPort1Config   5} 
+		
+    hzOduEnetPort1OpticalTransceiverState	        OBJECT-TYPE	
+		SYNTAX			INTEGER  { on ( 1 ) , off ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"When it is on, optical transmitter for port1 is enabled. Otherwise
+                                        optical transmitter is disabled."
+		DEFVAL			{ off }
+		::=  {  hzOduEnetPort1Config 6 }  
+     
+	hzOduEnetPort1PauseFrameEnable	        OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"When PAUSE is enabled, port1 pause frames can be generated by the 
+                                         system and the pause frames will flow toward the link partner 
+                                         on the network. When PAUSE is not enabled,
+                                         no pause frames will be generated by the system. " 
+		DEFVAL			{ disabled }
+		::=  {  hzOduEnetPort1Config  7 }
+
+   
+ 	hzOduEnetPort1MaxFrameSize	                OBJECT-TYPE	
+		SYNTAX			INTEGER  ( 1600..9600 ) 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"For port1 the default maximum frame size is 1600 bytes. The settable 
+                                         maximum frame size must be a multiple of 128. If the chosen
+                                         maximum frame size is not a multiple of 128, its closest 
+                                         number which is a multiple of 128 is actually used. The 
+                                         settable lowest maximum frame size is 1664, and the settable
+                                         highest maximum frame size is 9600. If the chosen maximum 
+                                         frame size is out of this range, the default maximum frame 
+                                         size of 1600 is used. "
+		DEFVAL			{ 1600 }
+		::=  {  hzOduEnetPort1Config  8  }   
+		
+	hzOduEnetPort1DroppedEnetFramesThresholdParameters	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"A read-write string: The threshold, in percent, and the number of seconds that it must exceed this threshold are programmed by the user. An example of the format of the string is as follows: '70 10'. The first parameter is the percentage of frames that are dropped, the second is the time in seconds that the threshold must be exceeded. The single quote marks i.e. ' ' are not used in the command."
+		::=  {  hzOduEnetPort1Config	9  }
+
+	hzOduEnetPort1BandwidthUtilizationThresholdParameters	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"A read-write string: The percentage of available bandwidth threshold and the number of seconds that it must exceed this threshold are programmed by the user. An example of the format of the string is as follows: '70 10'. The first parameter is the threshold point in percent, the number of seconds that the threshold must be exceeded. The single quote marks i.e. ' ' are not used in the command."
+		::=  {  hzOduEnetPort1Config	10  }
+
+--
+-- PORT1 STATUS
+--   
+	    
+	hzOduEnetPort1LinkStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { down ( 1 ) , up( 2 ) , invalid( 3 ) } 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the port1 link status."
+		::=  {  hzOduEnetPort1Status   1} 
+
+
+
+	hzOduEnetPort1AutoNegotiationStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { on( 1 ) , off( 2 ),invalid(3)  } 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the port1 AutoNegotiation status."
+		::=  {  hzOduEnetPort1Status   2} 
+
+
+	hzOduEnetPort1SpeedStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { x10M( 1 ) , x100M( 2 ), x1000M( 3 ), auto(4) ,invalid(5)} 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the port1 interface speed status."
+		::=  {  hzOduEnetPort1Status   3} 
+
+
+	hzOduEnetPort1DuplexStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { full( 1 ) , half( 2 ), auto( 3 ) ,invalid(4)} 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the port1 interface duplex status."
+		::=  {  hzOduEnetPort1Status   4} 
+
+	hzOduEnetPort1MediaStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { copper( 1 ) , fiber( 2 ), auto( 3 ),invalid(4) } 
+		ACCESS			read-only
+		STATUS			mandatory  
+		DESCRIPTION		"Indicates the port1 interface media status."
+		::=  {  hzOduEnetPort1Status   5} 
+
+--
+-- PORT1 STATISTICS
+--   
+	
+	hzOduEnetPort1TxFrames 	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of port1 frames sent."
+		::=  {  hzOduEnetPort1Stats  1  } 
+		  
+   hzOduEnetPort1TxBytes	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of port1 bytes sent."
+		::=  {  hzOduEnetPort1Stats  2  }
+		
+   hzOduEnetPort1RxFrames	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of port1 frames received."
+		::=  {  hzOduEnetPort1Stats  3  }  
+		
+   hzOduEnetPort1RxBytes	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of port1 bytes received."
+		::=  {  hzOduEnetPort1Stats  4  }
+
+	hzOduEnetPort1RxFramesInError	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of port1 frames received in error."
+		::=  {  hzOduEnetPort1Stats  5  }
+
+	hzOduEnetPort1RxFramesCRCError	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of CRC error frames received for port1."
+		::=  {  hzOduEnetPort1Stats  6  }
+		
+	hzOduEnetPort1BWUtilization	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The carried load over link capacity for port1."
+		::=  {  hzOduEnetPort1Stats 7  }
+
+	hzOduEnetPort1IngressDataRate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The data rate coming into the ethernet for port1.
+					 The data rate you see is multiplied by 100. e.g. A display
+                                                 of 1530 is actually 15.30 Mpbs"
+		::=  {  hzOduEnetPort1Stats 8  }
+
+	hzOduEnetPort1EgressDataRate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The data rate going out of the ethernet for port1.
+					 The data rate you see is multiplied by 100. e.g. A display
+                                                 of 1530 is actually 15.30 Mpbs."
+		::=  {  hzOduEnetPort1Stats 9  }
+
+
+
+	hzOduEnetPort1FramesInQueue1	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of port1 frames passed through queue 1."
+		::=  {  hzOduEnetPort1Stats  10  }
+	
+	hzOduEnetPort1FramesInQueue2	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of port1 frames passed through queue 2."
+		::=  {  hzOduEnetPort1Stats  11  }
+   
+	hzOduEnetPort1FramesInQueue3	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of NIC frames passed through queue 3."
+		::=  {  hzOduEnetPort1Stats  12  }
+   
+	hzOduEnetPort1FramesInQueue4	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of NIC frames passed through queue 4."
+		::=  {  hzOduEnetPort1Stats  13  }  
+		
+	hzOduEnetPort1FramesInQueue1Discarded	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of NIC frames received in queue 2 that  
+						 were discarded, but due to an error. One possible reason  
+						 is lack of buffer space."
+		::=  {  hzOduEnetPort1Stats  14  }
+
+	hzOduEnetPort1FramesInQueue2Discarded	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of port1 frames received in queue 2 that 
+						 were discarded, but due to an error. One possible reason  
+						 is lack of buffer space."
+		::=  {  hzOduEnetPort1Stats  15  }
+   
+	hzOduEnetPort1FramesInQueue3Discarded	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of port1 frames received in queue 3 that 
+						 were discarded, but due to an error. One possible reason  
+						 is lack of buffer space."
+		::=  {  hzOduEnetPort1Stats  16  }
+
+	hzOduEnetPort1FramesInQueue4Discarded	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of port1 frames received in queue 4 that 
+						 were discarded, but due to an error. One possible reason  
+						 is lack of buffer space."
+		::=  {  hzOduEnetPort1Stats  17  }
+		
+--
+-- FREQENCY INFORMATION
+--
+	hzOduRadioBand	OBJECT-TYPE	
+		SYNTAX			INTEGER  { freqNone ( 1 ), fcc23-3-50 (2), etsi23-3-14 ( 3 ),fcc18-1-50 ( 4 ),ic18-1-50 ( 5 ),
+						   brazil18-1-27p5 ( 6 ),brazil18-1-55 ( 7 ) ,etsi23-3-28(8) ,etsi23-3-56(9) ,uk23-3-56(10) ,
+						   itu23-3-14(11) ,itu23-3-28(12) ,itu23-3-56(13) ,etsi18-2-13p75(14) ,etsi18-2-27p5(15) ,
+						   etsi18-2-55(16) ,french18-2-13p75(17) ,french18-2-27p5(18) ,fcc23-2-50(19) ,mex23-2-28(20) ,
+						   itu23-2-28(21), itu23-2-14(22) ,etsi23-2-14(23) ,etsi23-2-28(24), etsi23-2-56(25) ,uk23-2-56(26) ,
+						   itu23-2-56(27) ,fcc23-1-50(28) ,mex23-1-28(29), itu23-1-28(30) ,itu23-1-14(31) ,itu23-1-56(32) ,
+						   etsi18-3-13p75(33) ,etsi18-3-27p5(34) ,etsi18-3-55(35),france18-3-13p75(36), france18-3-27p5(37), 
+						   france23-3-56(38), france23-3-28(39), france23-3-14(40), france23-3-ext-28(41), france23-2-14(42),
+						   france23-2-28(43), france23-2-56(44), brazil23-2-14(45), brazil23-2-28(46), brazil23-2-56(47),
+						   brazil18-1-13p75(48), fcc-ic-18-1-40(49), fcc11-1-40(50), nz11-1-40(51), fcc11-1-30a(52),
+						   fcc11-1-30b(53), ic11-1-30(54), itu11-1-40(55), fcc11-2-40(56), nz11-2-40(57), fcc11-2-30a(58),
+						   fcc11-2-30b(59), ic11-2-30(60), itu11-2-40(61), etsi11-1-40(62), etsi11-2-40(63), ul24-1-50(64),
+						   mvdds12-1-50(65), etsi13-1-14(66), etsi13-1-28(67), etsi13-2-14(68), etsi13-2-28(69), fcc28-1-50(70),
+						   fcc28-1-25(71), fcc28-2-50(72), fcc28-2-25(73), etsi28-3-56(74), etsi28-3-28(75), etsi28-3-14(76),
+						   etsi28-4-56(77), etsi28-4-28(78), etsi28-4-14(79), etsi15-4-7(80), etsi15-4-14(81), etsi15-4-28(82),
+						   etsi15-4-56(83), mex15-4-7(84), mex15-4-14(85), nz-aus15-4-7(86), nz-aus15-4-14(87), nz-aus15-4-28(88),
+						   fcc23-1-40(89), fcc23-2-40(90), fcc23-3-40(91)}
+										
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"The radio frequency standard used in the system.
+		
+						 Frequency bands are divided into sub bands.
+						 
+						 ie FCC 23 Ghz Band is comprised of fcc23a, fcc23b, fcc23c and 
+						 fcc23d which make up the entire FCC23 band"
+		DEFVAL			{ freqNone }
+		::=  {  hzOduFrequencies  1  }
+
+
+	hzOduFreqGroupSelected	OBJECT-TYPE	
+		SYNTAX			INTEGER  { txLow ( 1 ) , txHigh ( 2 )  } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"The frequency group selected for the system.
+		
+						 The frequency subbands are divided into frequency groups txHigh
+						 and txLow.  An horizon system must have one node configured to
+						 txLow and the other node configure to txHigh"
+		::=  {  hzOduFrequencies  2  }
+
+	hzOduTxHighFreqTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  HzOduTxHighFreqEntry
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"A table of txHigh frequency settings for the system"
+		::=  { hzOduFrequencies  3 }
+
+	hzOduTxHighFreqEntry	OBJECT-TYPE
+		SYNTAX		HzOduTxHighFreqEntry
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"A txHighFrequency entry containing all the frequency values"      
+		INDEX		{  hzOduTxHighFreqIndex  }
+		::=  { hzOduTxHighFreqTable 1 }
+
+	HzOduTxHighFreqEntry  ::=  SEQUENCE {
+		hzOduTxHighFreqIndex  INTEGER,
+		hzOduTxHighFreqChannelIndex  DisplayString,
+		hzOduTxHighFreqTransmitRfFrequency  INTEGER,
+		hzOduTxHighFreqReceiveRfFrequency  INTEGER,
+		hzOduTxHighFreqProgrammed  INTEGER
+		}
+
+
+	hzOduTxHighFreqIndex	OBJECT-TYPE	
+		SYNTAX			INTEGER  
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A unique value for each frequency channel. "
+		::=  {  hzOduTxHighFreqEntry  1  }
+
+
+	hzOduTxHighFreqChannelIndex	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The channel index for the frequency."
+		::=  {  hzOduTxHighFreqEntry  2  }
+
+
+
+
+	hzOduTxHighFreqTransmitRfFrequency	OBJECT-TYPE	
+		SYNTAX			INTEGER   
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The RF TX frequency in MHz."
+		::=  {  hzOduTxHighFreqEntry  3  }
+
+
+	hzOduTxHighFreqReceiveRfFrequency	OBJECT-TYPE	
+		SYNTAX			INTEGER   
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The RF RX frequency in MHz."
+		::=  {  hzOduTxHighFreqEntry  4  }
+
+
+	hzOduTxHighFreqProgrammed	OBJECT-TYPE	
+		SYNTAX			INTEGER  { active ( 1 ) , notActive ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies the operating frequency channel for the modem.
+		
+						 ***Only 1 index may be selected in a 1 modem system." 
+		DEFVAL 			{ notActive }
+		::=  {  hzOduTxHighFreqEntry  5  }
+
+	hzOduTxLowFreqTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  HzOduTxLowFreqEntry
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"A table of txLow frequency settings for the system"
+		::=  { hzOduFrequencies  4 }
+
+	hzOduTxLowFreqEntry	OBJECT-TYPE
+		SYNTAX		HzOduTxLowFreqEntry
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"A hzOduTxLowFrequeny entry containing the frequency values
+					 for a specific index"
+		INDEX		{  hzOduTxLowFreqIndex  }
+		::=  { hzOduTxLowFreqTable 1 }
+
+	HzOduTxLowFreqEntry  ::=  SEQUENCE {
+		hzOduTxLowFreqIndex  INTEGER,
+		hzOduTxLowFreqChannelIndex  DisplayString,
+		hzOduTxLowFreqTransmitRfFrequency  INTEGER,
+		hzOduTxLowFreqReceiveRfFrequency  INTEGER,
+		hzOduTxLowFreqProgrammed  INTEGER
+		}
+
+
+	hzOduTxLowFreqIndex	OBJECT-TYPE	
+		SYNTAX			INTEGER   
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A unique value for each frequency channel. "
+		::=  {  hzOduTxLowFreqEntry  1  }
+
+
+	hzOduTxLowFreqChannelIndex	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The channel index for the frequency. "
+		::=  {  hzOduTxLowFreqEntry  2  }
+
+
+
+
+	hzOduTxLowFreqTransmitRfFrequency	OBJECT-TYPE	
+		SYNTAX			INTEGER   
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The RF TX frequency in MHz."
+		::=  {  hzOduTxLowFreqEntry  3  }
+
+
+	hzOduTxLowFreqReceiveRfFrequency	OBJECT-TYPE	
+		SYNTAX			INTEGER   
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The RF RX frequency in MHz."
+		::=  {  hzOduTxLowFreqEntry  4  }
+
+
+	hzOduTxLowFreqProgrammed	OBJECT-TYPE	
+		SYNTAX			INTEGER  { active ( 1 ) , notActive ( 2 ) } 
+		ACCESS			read-write
+
+		STATUS			mandatory
+		DESCRIPTION		"Specifies the operating frequency channel for the modem.
+		
+						 ***Only 1 index may be selected in a 1 modem system. "
+		DEFVAL			{ notActive }
+		::=  {  hzOduTxLowFreqEntry  5  }
+ 
+
+	hzOduProgrammedFrequency	OBJECT IDENTIFIER
+		::=  {  hzOduFrequencies  5  }  
+		
+	hzOduProgrammedFrequencyChannel	OBJECT-TYPE	
+		SYNTAX			DisplayString  
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The channel that has been programmed into the system."
+		::=  {  hzOduProgrammedFrequency  1  }		
+
+
+	hzOduProgrammedFrequencyTxRf	OBJECT-TYPE	
+		SYNTAX			INTEGER   
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The programmed RF TX frequency in MHz."
+		::=  {  hzOduProgrammedFrequency  2  }
+
+
+	hzOduProgrammedFrequencyRxRf	OBJECT-TYPE	
+		SYNTAX			INTEGER   
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The RF RX frequency in MHz."
+		::=  {  hzOduProgrammedFrequency  3  } 
+		
+-- ----------------------------
+--   hzOduWirelessInterface
+-- ----------------------------      
+
+ 	hzOduWirelessPort1	OBJECT IDENTIFIER
+		::=  {  hzOduWirelessInterface  1  }
+
+ 	hzOduWirelessPort1Description	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Describes the functionality of the Wireless Interface1"
+		DEFVAL			{ on }
+		::=  {  hzOduWirelessPort1  1  }  
+
+
+	hzOduModem1	OBJECT IDENTIFIER
+		::=  {  hzOduWirelessPort1  2  }
+
+	hzOduRadio1	OBJECT IDENTIFIER
+		::=  {  hzOduWirelessPort1  3  }
+
+
+ --
+-- MODEM CARD INFORMATION
+--  
+ 	hzOduModem1AdminStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { up ( 1 ) , down ( 2 ) , testing ( 3 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current admin state of the interface. Testing 
+						 indicates that no operational packets can be passed."
+		::=  {  hzOduModem1  1  }
+
+
+	hzOduModem1OperStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { up ( 1 ) , down ( 2 ) , testing ( 3 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current operational state of the interface. Testing 
+						 indicates that no operational packets can be passed."
+		::=  {  hzOduModem1  2  }
+  
+  	hzOduModem1Reset	OBJECT-TYPE	
+		SYNTAX			INTEGER ( 0 .. 1  )
+		ACCESS			write-only
+		STATUS			mandatory
+		DESCRIPTION		"Writing 1 to this object causes the modem card to be reset. 
+						 All other values are not recognized. This variable always 
+						 reads back as 0. mdmOperStatus should be polled by the 
+						 user after this object is written to, to verify that the 
+						 modem card has been reset. Not applicable in this release" 
+		::=  {  hzOduModem1  3  }  
+		
+    hzOduModem1ChannelizedRSL  OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"An estimate of the modem's channelized RSL. Divide the value by 10 to get the actual RSL value"
+		::=  {  hzOduModem1  4  }
+
+	hzOduModem1ModulationType	OBJECT-TYPE	
+		SYNTAX			INTEGER  { qpsk ( 1 ) , qam ( 2 ) , qam16 ( 3 ) , qam32 ( 4 ) , qam64 ( 5 ) , qam128 ( 6 ) , qam256 ( 7 ) , x8psk ( 8 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The modulation type of the modem, distinguished according 
+						 to the physical/link protocol."
+		::=  {  hzOduModem1  5  }
+
+	hzOduModem1CurrentRxSpeed	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"An estimate of the modem's current Rx bandwidth in bits per 
+						 second. Divide the value by 10000 to get the actual data rate in Mbps"
+		::=  {  hzOduModem1  6  }
+
+	hzOduModem1CurrentTxSpeed	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"An estimate of the modem's current Tx bandwidth in bits per 
+					 second. Divide the value by 10000 to get the actual data rate in Mbps"
+		::=  {  hzOduModem1  7  }
+
+
+	hzOduModem1SNR          	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"SNR value in dB. Divide the value by 10 to get the actual SNR."
+		::=  {  hzOduModem1  8  }
+
+	hzOduModem1EbToNoiseRatio	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The ratio of the modem Estimated Energy per information bit to Noise power spectral density.
+                                        Divide the value by 10 to get the actual EbToNoiseRatio"
+		::=  {  hzOduModem1  9  }
+
+	hzOduModem1EqualizerStress	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the average magnitude of all the equalizer taps to provide a measure of how hard the equalizer is working."
+		::=  {  hzOduModem1  10  }
+
+ 	hzOduModem1SNRThresholdParameters	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"A read-write string "
+		::=  {  hzOduModem1  11  } 
+		
+
+   	hzOduModem1ChannelizedRslBelowThresholdParameters	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"A read-write string: The threshold in dBm  and the number of seconds threshold are programmed by the user. An example of the format of the string is as follows: '-75 10'. The first parameter power level in dBm, the second is the time in seconds that the threshold must be exceeded. In this example the threshold -75 dBm and the time is set to 10 seconds. The single quote marks i.e. ' ' are not used in the command."
+		::=  {  hzOduModem1  12  }
+
+
+	hzOduModem1LastChange	OBJECT-TYPE	
+		SYNTAX			TimeTicks
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The value of sysUpTime at the time the modem entered its 
+						 current operational state. If the current state was 
+						 entered prior to the last re-initialization of the local 
+						 network management subsystem, then this object contains 
+						 a zero value."
+		::=  {  hzOduModem1  13  }
+
+	
+        hzOduModem1ChannelizedRSLUnsignedInt  OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"An estimate of the modem's channelized RSL in dBm. The number is divided by 10. e.g. -432 is actually -43.2dBm.
+						Object provided mainly to accomodate plotting of negative RSL values which is not supported in some EMS (Ex: CastleRock). 
+						Please use 'hzOduModem1ChannelizedRSL' object if your EMS supports plotting of -ve integer."
+		::=  {  hzOduModem1  14  }		
+
+		
+--
+-- MODEM CARD STATISTICS
+--
+	hzOduModem1Statistics	OBJECT IDENTIFIER
+		::=  {  hzOduModem1  15  }
+		
+	hzOduModem1TxFrames	  OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Modem frames sent."
+		::=  {  hzOduModem1Statistics 1  }
+
+	hzOduModem1RxFramesOK	  OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Modem frames received."
+		::=  {  hzOduModem1Statistics 2 }
+
+	hzOduModem1RxFramesError	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Modem frames received in error."
+		::=  {  hzOduModem1Statistics 3  }  
+		
+	hzOduModem1RxFramesQueueDiscarded	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Modem frames in the queue that were discarded."
+		::=  {  hzOduModem1Statistics 4  }
+
+	hzOduModem1TxBlocks	  OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Modem blocks transmitted."
+		::=  {  hzOduModem1Statistics 5  }  
+		
+	hzOduModem1RxBlocksOK	  OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Modem blocks received."
+		::=  {  hzOduModem1Statistics 6  }
+
+	hzOduModem1RxBlocksError	  OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current count of Modem blocks received in error."
+		::=  {  hzOduModem1Statistics 7  }
+
+--
+-- RADIO INFORMATION
+--
+
+
+	hzOduRadio1OperStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { up ( 1 ) , down ( 2 ) , testing ( 3 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current operational state of the interface. Testing 
+						 indicates that no operational packets can be passed. Testing
+						 also indicates that a firmware upgrade may be in progress"
+		::=  {  hzOduRadio1  1  }       
+		
+
+	hzOduRadio1TransmitPowerDbm	OBJECT-TYPE	
+		SYNTAX			INTEGER 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"This defines the transmit level of the radio.
+                                                 If ATPC is enabled, you can't change the transmit power.
+
+                                                 The power you see is divided by 10. e.g. A display
+                                                 of 133 is actually 13.3 dBm.
+                                                 
+                                                 If the radio is operational and not muted, it is the 
+                                                 current transmitting power.
+                                                 
+                                                 If the radio is operational and muted, it is the 
+                                                 programmed transmitting power, and will transmit at 
+                                                 this level when the radio is un-muted.
+                                                 						 
+                                                 If the radio is not operational it is the programmed 
+                                                 transmitting power, and will transmit at this level 
+                                                 when the radio is operational and not muted.
+						 
+                                                 If the radio does not have transmit calibration tables 
+                                                 programmed into its EEPROM, this transmit power level 
+                                                 cannot be used as it is not possible to accurately 
+                                                 calculate the actual transmit level. In this case this 
+                                                 object will return -99." 
+		DEFVAL  		{ 0 }
+		::=  {  hzOduRadio1  2  }
+		
+	hzOduRadio1ProgrammedAntennaDiameter	OBJECT-TYPE	
+		SYNTAX			INTEGER  { antenna12 ( 1 ) , antenna24 ( 2 ) , antenna36 ( 3 ) }
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"This defines the diameter of the antenna used by the system represented in inches."
+		DEFVAL  		{ 0 }
+		::=  {  hzOduRadio1  3  }
+		
+
+	hzOduRadio1PowerOption	                OBJECT-TYPE	
+		SYNTAX			INTEGER  { normal ( 1 ) , highPower ( 2 ) }
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"This indicates the power option of the radio: normal or high power."
+		DEFVAL  		{ 0 }
+		::=  {  hzOduRadio1  4  }   
+		
+
+	hzOduRadio1TxState	                OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"This indicates the power option of the radio: normal or high power."
+		DEFVAL  		{ 0 }
+		::=  {  hzOduRadio1  5  }
+
+		
+
+	hzOduRadio1Temperature	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The Radio temperature in degree Centigrade. The actual temperature is got by dividing the number by 10. e.g. -432 is actually -43.2 degree centigrade."
+						
+		::=  {  hzOduRadio1 6  }    
+			
+		
+--
+-- hzOduCalendar
+--
+
+	hzOduDate	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A string in the format as follows:		
+                                                XX/YY/ZZ 
+                                                Where XX = day of month (range 01 to  31)	 
+                                                YY = month of year(range 01 to 12)	 
+                                                ZZ = year (range 01 - 99)"
+		::=  {  hzOduCalendar  1  }
+
+	hzOduTime	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A string in the format as follows:
+                                                 aa:bb:cc:dd
+                                                 Where aa = hour of day ( range 00 to 23 )	 
+                                                       bb = minute of hour ( range 00 to 59 )	 
+                                                       cc = second of minute( range 00 to 59 )	 
+                                                       dd = hundredths of second (range 00 to 99)"
+		::=  {  hzOduCalendar  2  }
+
+--
+-- ALARM FOLDER
+--
+	
+        hzOduClearAlarmCounters	OBJECT-TYPE	
+		SYNTAX			INTEGER  { nicCounters ( 1 ) , modemCounters ( 2 ) , radioCounters ( 3 ) ,  allCounters ( 4 ), otherCounters (5) } 
+		ACCESS			write-only
+		STATUS			mandatory
+		DESCRIPTION		"Clears the alarm counters for the specified group"
+		::=  {  hzOduAlarms  1  }	
+
+	hzOduSystemAlarms	OBJECT IDENTIFIER
+		::=  {  hzOduAlarms  2  } 
+
+    
+        hzOduNetworkInterfaceAlarms	OBJECT IDENTIFIER
+		::=  {  hzOduAlarms  3  } 
+        hzOduEnetPort1Alarms	OBJECT IDENTIFIER
+		::=  {  hzOduNetworkInterfaceAlarms	1  } 
+        hzOduEnetPort2Alarms	OBJECT IDENTIFIER
+		::=  {  hzOduNetworkInterfaceAlarms	2  } 
+
+        hzOduWirelessInterfaceAlarms	OBJECT IDENTIFIER
+		::=  {  hzOduAlarms  4  } 
+        hzOduModem1Alarms	OBJECT IDENTIFIER
+		::=  {  hzOduWirelessInterfaceAlarms  4  } 
+
+        hzOduRadio1Alarms	OBJECT IDENTIFIER
+		::=  {  hzOduWirelessInterfaceAlarms  5  } 
+                                                          
+ 
+  
+--
+-- FREQUENCY FILE ALARMS
+--
+       
+	hzOduExplicitAuthenticationFailure	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Authentication of the peer horizon node has failed. The severity is critical, the probable cause is an incorrect authentication configuration on horizon faulty cable between the modem and radio, and recommended course of action is to check both ends of the link."
+		::=  {  hzOduSystemAlarms  1  }
+
+	hzOduExplicitAuthenticationFailureCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the number of times explicit authentication has failed."
+		::=  {  hzOduSystemAlarms  2  }
+
+    hzOduAamConfigMismatch		OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }  
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"In the near end Automatic Adaptive Modulation(AAM) feature set to on and in peer it is set to off"
+		::=  {  hzOduSystemAlarms  3  }
+
+	hzOduAamConfigMismatchCount	OBJECT-TYPE	
+		SYNTAX			Counter 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate number of seconds AAMConfigMismatch alarm has been active."
+		::=  {  hzOduSystemAlarms  4  }
+
+	hzOduAamActive		OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }  
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates aam is active and system running on lowest modulation"
+		::=  {  hzOduSystemAlarms  5  }
+
+     hzOduAamActiveCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate number of seconds AAMActive alarm has been active."
+		::=  {  hzOduSystemAlarms  6  }
+            
+     hzOduAtpcConfigMismatch	        OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"In the near end Automatic Transmit Power Control(ATPC) feature set to on and in peer it is set to off"
+		::=  {  hzOduSystemAlarms 7  }
+
+
+      hzOduAtpcConfigMismatchCount	        OBJECT-TYPE	
+		SYNTAX			Counter  
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate number of seconds AtpcConfigMismatch alarm has been active"
+		::=  {  hzOduSystemAlarms  8  }
+
+
+
+     hzOduSntpServerUnavailableAlarm       OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"All of the SNTP servers are not available. "
+		::=  {  hzOduSystemAlarms  9  }
+
+
+      hzOduSntpServerUnavailableAlarmCount       OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates how long in seconds all of the SNTP servers are not available."
+		::=  {  hzOduSystemAlarms  10  }
+
+ 	  hzOduFrequencyFileInvalid	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Executing frequency file is valid or not"
+		::=  {  hzOduSystemAlarms 11  }
+
+	  hzOduFrequencyFileInvalidCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the time (in secs) since this alarm exist."
+		::=  {  hzOduSystemAlarms 12  }
+
+	hzOduAtpcAutoDisabled	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the ATPC set to off and system transmit at coordinated power."
+		::=  {  hzOduSystemAlarms 13  }
+
+
+	hzOduAtpcAutoDisabledCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the time (in secs) since this alarm exist."
+		::=  {  hzOduSystemAlarms 14  }
+
+        hzOduPartnerRedundancyModeMismatch	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates partner redundancy mode mismatches."
+		::=  {  hzOduSystemAlarms 15  }
+
+	hzOduPartnerRedundancyModeMismatchCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the time (in secs) since this alarm exist."
+		::=  {  hzOduSystemAlarms 16  }
+
+        hzOduPartnerConfigurationMismatch	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates partner configuration mismatches."
+		::=  {  hzOduSystemAlarms 17  }
+
+	hzOduPartnerConfigurationMismatchCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the time (in secs) since this alarm exist."
+		::=  {  hzOduSystemAlarms 18  }
+
+	hzOduHsbActiveOnSecondary	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the hsb active link is on secondary."
+		::=  {  hzOduSystemAlarms 19  }
+
+	hzOduHsbActiveOnSecondaryCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the time (in secs) since this alarm exist."
+		::=  {  hzOduSystemAlarms 20  }
+
+
+	hzOduHsbOverrideByUser	        OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the hsb mode is overrided by user."
+		::=  {  hzOduSystemAlarms 21  }
+
+
+	hzOduHsbOverrideByUserCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the time (in secs) since this alarm exist."
+		::=  {  hzOduSystemAlarms 22  }
+
+	hzOduHsbCrossLinkActive	        OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the hsb cross link is active."
+		::=  {  hzOduSystemAlarms 23  }
+
+	hzOduHsbCrossLinkActiveCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Indicates the time (in secs) since this alarm exist."
+		::=  {  hzOduSystemAlarms 24  }
+    
+--
+-- NETWORK INTERFACE PORT1 ALARMS 
+--	
+                
+	hzOduEnetPort1DroppedEnetFramesThresholdExceeded	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The threshold for number of frames dropped has been exceeded. The threshold and the number of seconds that it must exceed this threshold are programmed by the user."
+		::=  {  hzOduEnetPort1Alarms	1  }
+                
+
+	hzOduEnetPort1DroppedEnetFramesThresholdCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate time, in seconds, that this alarm has been in the active state"
+		::=  {  hzOduEnetPort1Alarms	2  }
+	
+        hzOduEnetPort1BandwidthUtilizationThresholdExceeded	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The threshold for the percentage of available bandwidth has been exceeded. The threshold and the number of seconds that it must exceed this threshold are programmed by the user."
+		::=  {  hzOduEnetPort1Alarms	3  }
+                
+
+	hzOduEnetPort1BandwidthUtilizationThresholdCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate time, in seconds, that this alarm has been in the active state"
+		::=  {  hzOduEnetPort1Alarms	4  }
+
+        hzOduEnetPort1RlsMismatch	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"RLS configurations on the pair of systems are mismatched."
+		::=  {  hzOduEnetPort1Alarms	5  }
+ 
+	hzOduEnetPort1RlsMismatchCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate time, in seconds, that this alarm has been in the active state"
+		::=  {  hzOduEnetPort1Alarms	6  }
+
+
+        hzOduEnetPort1RLSShutdownActivated	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"RLS shutdown is activated."
+		::=  {  hzOduEnetPort1Alarms	7  }
+ 
+	hzOduEnetPort1RLSShutdownActivatedCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate time, in seconds, that this alarm has been in the active state"
+		::=  {  hzOduEnetPort1Alarms	8  }
+                
+        hzOduEnetPort1EthernetLinkDown  OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether the Ethernet link is down or not. The severity is major, the probable cause is an incorrect configuration of the switch or router connected to horizon. The recommended course of action is to check the connection."
+		::=  {  hzOduEnetPort1Alarms	9  }
+ 
+	hzOduEnetPort1EthernetLinkDownActivatedCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate time, in seconds, that this alarm has been in the active state"
+		::=  {  hzOduEnetPort1Alarms	10  }
+      
+--
+-- NETWORK INTERFACE Port2 ALARMS 
+--	
+                
+    hzOduEnetPort2EthernetLinkDown  OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether the Ethernet link is down or not. The severity is major, the probable cause is an incorrect configuration of the switch or router connected to horizon. The recommended course of action is to check the connection."
+		::=  {  hzOduEnetPort2Alarms	1  }
+ 
+	hzOduEnetPort2EthernetLinkDownActivatedCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate time, in seconds, that this alarm has been in the active state"
+		::=  {  hzOduEnetPort2Alarms	2  }
+      
+
+--
+-- MODEM ALARMS
+--
+
+	hzOduModem1RxLossOfSignal	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Loss of signal lock from the demodulator. The severity is critical, the probable cause is lost synchronization with the far end, and recommended course of action is to check the operational state of both ends of the link."
+		::=  {  hzOduModem1Alarms	1  }
+
+	hzOduModem1RxLossOfSignalCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate number of seconds that this alarm has been active."
+		::=  {  hzOduModem1Alarms  2  } 
+		
+	hzOduModem1TxLossOfSync	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Loss of sync bytes at the input of the modulator. The severity is critical, the probable cause is physical interference in the air link, and recommended course of action is to check the line of site between the horizon nodes."
+		::=  {  hzOduModem1Alarms  3  }  
+		
+	hzOduModem1TxLossOfSyncCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate number of seconds that this alarm has been active."
+		::=  {  hzOduModem1Alarms  4  }     
+
+	hzOduModem1SnrBelowThreshold	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"The demodulator SNR performance worse than programmed levels. The severity is major, the probable cause is physical interference in the air link path or misalignment of the radios or severe weather conditions, and recommended course of action is to check the line of site between the horizon nodes."
+		::=  {  hzOduModem1Alarms  5  }
+
+	hzOduModem1SnrBelowThresholdCount	OBJECT-TYPE	
+		SYNTAX			Counter 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate number of seconds that this alarm has been active."
+		::=  {  hzOduModem1Alarms  6  }  
+		
+	hzOduModem1EqualizerStressExceedThreshold	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Equalizer Stress measured within the demodulator exceeds the threshold value."
+		::=  {  hzOduModem1Alarms  7  }
+
+
+	hzOduModem1EquilizerStressExceedThresholdCount	OBJECT-TYPE	
+		SYNTAX			Counter 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate number of seconds that this alarm has been active."
+		::=  {  hzOduModem1Alarms  8  }         
+		
+	hzOduModem1HardwareFault	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		""
+		::=  {  hzOduModem1Alarms  9  }  
+		
+	hzOduModem1HardwareFaultCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate number of seconds that this alarm has been active."
+		::=  {  hzOduModem1Alarms  10  }  
+		   
+	hzOduModem1ProgrammingError	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Encountered some problem while programming the modem."
+		::=  {  hzOduModem1Alarms  11  }  
+		
+	hzOduModem1ProgrammingErrorCount	OBJECT-TYPE	
+		SYNTAX			Counter
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the approximate number of seconds that this alarm has been active."
+		::=  {  hzOduModem1Alarms  12  }     
+
+
+--
+-- RADIO ALARMS
+--
+	
+		
+   hzOduRadio1SynthLostLock	OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Loss of signal lock from IF Synthesizer."
+		::=  {  hzOduRadio1Alarms  1  }
+		
+   hzOduRadio1SynthLostLockCount	        OBJECT-TYPE	
+		SYNTAX			Counter  
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the number of seconds that Loss of signal lock from IF Synthesizer."
+		::=  {  hzOduRadio1Alarms  2  }
+
+		   
+   hzOduRadio1TempCompCalTableNotAvail OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+        	DESCRIPTION		"Temp comp table not available."
+		::=  {  hzOduRadio1Alarms  3  }  
+		
+    hzOduRadio1TempCompCalTableNotAvailCount	        OBJECT-TYPE	
+		SYNTAX			Counter  
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the number of seconds that Temp comp table not available."
+		::=  {  hzOduRadio1Alarms  4  } 
+		
+ 	hzOduRadio1TxDetectorPwrBelowThresh	OBJECT-TYPE	
+       	SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }
+       	ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Tx power detector below threshold 1."
+		::=  {  hzOduRadio1Alarms  5 }
+
+	hzOduRadio1TxDetectorPwrBelowThreshCount	OBJECT-TYPE	
+		SYNTAX			Counter  
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the number of seconds that Tx power detector below threshold 1."
+		::=  {  hzOduRadio1Alarms  6 }  
+		
+
+	hzOduRadio1DrainCurrentOutOfLimit	OBJECT-TYPE	
+       	SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }
+      	ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Radio current1 out of limits."
+				::=  {  hzOduRadio1Alarms  7 }
+
+	hzOduRadio1DrainCurrentOutOfLimitCount	OBJECT-TYPE	
+		SYNTAX			Counter  
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the number of seconds that Radio current1 out of limits."
+		::=  {  hzOduRadio1Alarms  8 }
+
+
+	hzOduRadio1TemperatureOutOfLimit	OBJECT-TYPE	
+       	SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) }
+      	ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Radio temperature out of limits."
+				::=  {  hzOduRadio1Alarms  9 }
+
+	hzOduRadio1TemperatureOutOfLimitCount	OBJECT-TYPE	
+		SYNTAX			Counter  
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the number of seconds that Radio temperature out of limits."
+		::=  {  hzOduRadio1Alarms  10 }
+
+--
+-- TRAP INFORMATION HOSTS, ENABLE/DISABLE
+--	
+	hzOduSnmpTrapHostTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  HzOduSnmpTrapHostEntry	
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Table containing SNMP trap host entries."
+		::=  { hzOduTraps  1 }
+
+	hzOduSnmpTrapHostEntry	OBJECT-TYPE
+		SYNTAX		HzOduSnmpTrapHostEntry	
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"The snmp trap host entry containing all the trap host information"
+		INDEX		{  hzOduSnmpTrapHostIndex  }
+		::=  { hzOduSnmpTrapHostTable 1 }
+
+	HzOduSnmpTrapHostEntry	::=  SEQUENCE {
+		hzOduSnmpTrapHostIndex  INTEGER,
+		hzOduSnmpTrapHostMode  INTEGER,
+		hzOduSnmpTrapHostIpAddress  IpAddress,
+		hzOduSnmpTrapHostCommunityName  DisplayString,
+		hzOduSnmpTrapHostActivated  INTEGER
+		}
+
+
+	hzOduSnmpTrapHostIndex	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A unique value for each trap host. "
+		::=  {  hzOduSnmpTrapHostEntry  1  }
+
+
+	hzOduSnmpTrapHostMode	OBJECT-TYPE	
+		SYNTAX			INTEGER  { static ( 1 ) , dns ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates how the snmp trap host is obtained for the system."   
+		DEFVAL			{ static }
+		::=  {  hzOduSnmpTrapHostEntry  2  }
+
+
+	hzOduSnmpTrapHostIpAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates snmp trap host IP address. "
+		::=  {  hzOduSnmpTrapHostEntry  3  }
+
+
+
+	hzOduSnmpTrapHostCommunityName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The community string name used in Traps."
+		::=  {  hzOduSnmpTrapHostEntry  4  }
+
+
+	hzOduSnmpTrapHostActivated	OBJECT-TYPE	
+		SYNTAX			INTEGER  { notActive ( 1 ) , active ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether traps are to be sent to this specific host or not"      
+		DEFVAL 			{ notActive }
+		::=  {  hzOduSnmpTrapHostEntry  5  }
+  
+  
+  
+  --
+-- SNMP V3 TRAP HOST TABLE
+--
+
+	hzOduSnmpV3TrapHostsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  HzOduSnmpV3TrapHostsEntry	
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Table containing snmp V3 trap host entries"
+		::=  { hzOduTraps 2 }
+
+	hzOduSnmpV3TrapHostsEntry	OBJECT-TYPE
+		SYNTAX		HzOduSnmpV3TrapHostsEntry	
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Contains the snmp v3 trap host information"
+		INDEX		{  hzOduSnmpV3TrapHostsIndex  }
+		::=  { hzOduSnmpV3TrapHostsTable 1 }
+
+	HzOduSnmpV3TrapHostsEntry	::=  SEQUENCE {
+		hzOduSnmpV3TrapHostsIndex  INTEGER,
+		snmpV3TrapHostIpAddress  IpAddress,
+		snmpV3TrapHostUserName  DisplayString,
+		snmpV3TrapHostAuthProtocol  INTEGER,
+		snmpV3TrapHostAuthPassword  DisplayString,
+		snmpV3TrapHostPrivProtocol  INTEGER,
+		snmpV3TrapHostPrivPassword  DisplayString,		
+		snmpV3TrapHostActivated  INTEGER
+		}
+		
+	hzOduSnmpV3TrapHostsIndex	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A unique value for each v3 trap host."
+		::=  {  hzOduSnmpV3TrapHostsEntry  1  }
+
+	snmpV3TrapHostIpAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates snmp trap host IP address. "
+		::=  {  hzOduSnmpV3TrapHostsEntry  2  }
+
+	snmpV3TrapHostUserName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The user name of the v3 trap host."
+		::=  {  hzOduSnmpV3TrapHostsEntry  3  }
+
+
+	snmpV3TrapHostAuthProtocol 	OBJECT-TYPE	
+		SYNTAX			INTEGER  { noAuth ( 1 ) , md5 ( 2 ), sha(3) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The authentication alogorithm used by the v3 trap host."
+		::=  {  hzOduSnmpV3TrapHostsEntry  4  }
+
+	snmpV3TrapHostAuthPassword	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The authentication password of the v3 trap host."
+		::=  {  hzOduSnmpV3TrapHostsEntry  5  }
+	
+	snmpV3TrapHostPrivProtocol 	OBJECT-TYPE	
+		SYNTAX			INTEGER  { noPriv ( 1 ) , des ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The privacy encryiption alogorithm used by the v3 trap host."
+		::=  {  hzOduSnmpV3TrapHostsEntry  6  }
+
+	snmpV3TrapHostPrivPassword	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The privacy password of the v3 trap host."
+		::=  {  hzOduSnmpV3TrapHostsEntry  7  }
+
+	snmpV3TrapHostActivated	OBJECT-TYPE	
+		SYNTAX			INTEGER  { notActive ( 1 ) , active ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether a specific v3 trap host is allowed to access the system" 
+		DEFVAL			{ notActive }
+		::=  {  hzOduSnmpV3TrapHostsEntry  8  }
+
+
+
+-- ----------------------------
+-- TRAP DEFN
+-- ----------------------------
+
+
+	hzOduColdStartTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  3  }
+
+	hzOduLinkDownTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  4  }
+
+	hzOduLinkUpTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  5  }
+
+	hzOduExplicitAuthenticationFailureTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  6  }    
+		
+		
+	hzOduAamConfigMismatchTrap          OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the aamConfigMismatch trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  7  }
+
+		
+	hzOduAamActiveTrap          OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the aamActive trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  8  }
+
+		
+    hzOduAtpcConfigMismatchTrap	        OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  9  }  
+		
+
+    hzOduSntpServersUnreachableTrap        OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  10  }
+
+    hzOduFrequencyFileInvalidTrap	        OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  11  }       
+		
+		
+    hzOduEnetPort1DroppedFramesThresholdExceedTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the trap. This trap, if enabled, will be sent when the dropped ethernet frames threshold is exceeded. If enabled, the system will send this trap to all trap hosts programmed in the system by the user."  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  12  }
+                
+	hzOduEnetPort1BandwidthUtilizationThresholdExceedTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the trap. This trap, if enabled, will be sent when the ethernet bandwidth utilization threshold is exceeded. If enabled, the system will send this trap to all trap hosts programmed in the system by the user."  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  13  }
+                
+
+
+
+     hzOduEnetPort1RlsMismatchTrap                   OBJECT-TYPE	
+		SYNTAX		        INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  14  }
+
+
+    hzOduEnetPort1RLSShutdownActivatedTrap          OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  15  }
+
+	hzOduModem1RxLossOfSignalLockTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  16  }
+
+	hzOduModem1TxLossOfSyncTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  17  }
+
+	hzOduModem1SnrBelowThresholdTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  18  }
+
+	hzOduModem1EqualizerStressExceedThresholdTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  19  }  
+		
+ 	hzOduModem1ChannelizedRslBelowThresholdTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the trap. This trap, if enabled, will be sent when the radio receive signal level threshold is exceeded. If enabled, the system will send this trap to all trap hosts programmed in the system by the user."  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  20  }
+	
+	hzOduModem1HardwareFaultTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  21  } 
+		
+ 	hzOduModem1ProgrammingErrorTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  22  }
+
+		
+  	hzOduRadio1SynthLostLockTrap          OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the ifSythLostLock trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  23  }   
+		
+		
+ 	hzOduRadio1TempCompCalTableNotAvailTrap          OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the tempCompCalTableNotAvailable trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  24  }   
+		
+ 	hzOduRadio1TxDetectorPwrBelowThreshTrap          OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the txDetectorPwrBelowThresh trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  25  }
+		   
+  	hzOduRadio1DrainCurrentOutOfLimitTrap          OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the radioCurrentOutOfLimitTrap trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  26  }      
+		 
+  	hzOduRadio1TemperatureOutOfLimitTrap          OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Enables or disables the radioTemperatureOutOfLimitTrap trap. "  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  27  }  
+
+
+	hzOduTtyManagementSessionCommencedTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  28  }
+
+	hzOduTtyManagementSessionTerminatedTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  29  }
+
+	hzOduAtpcAutoDisabledTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  30  }
+
+	hzOduPartnerRedundancyModeMismatchTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  31  }
+                
+	hzOduPartnerConfigurationMismatchTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  32  }
+                        
+	hzOduHsbActiveOnSecondaryTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  33  }
+                                
+	hzOduHsbOverrideByUserTrap	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  34  }		
+
+        hzOduHsbCrossLinkTrap	        OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  35  }	
+
+        hzOduHsbActiveOnPrimaryTrap	        OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether this trap is to be sent or not"  
+		DEFVAL  		{ disabled }
+		::=  {  hzOduTraps  36  }
+                	
+--
+
+--
+-- SNMP MANAGERS
+--
+
+
+	hzOduSnmpUserAccess	OBJECT-TYPE	
+		SYNTAX			INTEGER  { explicitManagers ( 1 ) , any ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Specifies the user access to the system.If access is set to managers then only managers with there ip addresses set in snmpManagersTable will be able to gain snmp access to the system.  If access is set to any then any manager will be able to gain snmp access to the system"
+		::=  {  hzOduSnmp  1  }
+
+	hzOduSnmpManagerAnyCommunityName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The community string name used by the 'any' manager."
+		::=  {  hzOduSnmp  2  }   
+		
+	hzOduSnmpSetRequests	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether SNMP SET requests are allowed."
+		DEFVAL			{ disabled }
+		::=  {  hzOduSnmp  3  }
+
+		
+
+	hzOduSnmpManagersTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  HzOduSnmpManagersEntry	
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Table containing snmp manager entries"
+		::=  { hzOduSnmp  4 }
+
+	hzOduSnmpManagersEntry	OBJECT-TYPE
+		SYNTAX		HzOduSnmpManagersEntry	
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Contains the snmp manager information"
+		INDEX		{  hzOduSnmpManagersIndex  }
+		::=  { hzOduSnmpManagersTable 1 }
+
+	HzOduSnmpManagersEntry	::=  SEQUENCE {
+		hzOduSnmpManagersIndex  INTEGER,
+		hzOduSnmpManagerIpAddress  IpAddress,
+		hzOduSnmpManagerCommunityName  DisplayString,
+		hzOduSnmpManagerActivated  INTEGER
+		}
+		
+	hzOduSnmpManagersIndex	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A unique value for each manager."
+		::=  {  hzOduSnmpManagersEntry  1  }
+
+
+	hzOduSnmpManagerIpAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The IP address of the Manager."
+		::=  {  hzOduSnmpManagersEntry  2  }
+
+
+	hzOduSnmpManagerCommunityName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The community string name used by the manager."
+		::=  {  hzOduSnmpManagersEntry  3  }
+
+
+	hzOduSnmpManagerActivated	OBJECT-TYPE	
+		SYNTAX			INTEGER  { notActive ( 1 ) , active ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether a specific manager is allowed to access the system" 
+		DEFVAL			{ notActive }
+		::=  {  hzOduSnmpManagersEntry  4  }
+	hzOduSnmpV3ManagersTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  HzOduSnmpV3ManagersEntry	
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Table containing snmp V3 manager entries"
+		::=  { hzOduSnmp  5 }
+
+	hzOduSnmpV3ManagersEntry	OBJECT-TYPE
+		SYNTAX		HzOduSnmpV3ManagersEntry	
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Contains the snmp v3 manager information"
+		INDEX		{  hzOduSnmpV3ManagersIndex  }
+		::=  { hzOduSnmpV3ManagersTable 1 }
+
+	HzOduSnmpV3ManagersEntry	::=  SEQUENCE {
+		hzOduSnmpV3ManagersIndex  INTEGER,
+		hzOduSnmpV3ManagerUserName  DisplayString,
+		hzOduSnmpV3ManagerAuthProtocol  INTEGER,
+		hzOduSnmpV3ManagerAuthPassword  DisplayString,
+		hzOduSnmpV3ManagerPrivProtocol  INTEGER,
+		hzOduSnmpV3ManagerPrivPassword  DisplayString,		
+		hzOduSnmpV3ManagerActivated  INTEGER
+		}
+		
+	hzOduSnmpV3ManagersIndex	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A unique value for each v3 manager."
+		::=  {  hzOduSnmpV3ManagersEntry  1  }
+
+
+	hzOduSnmpV3ManagerUserName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The user name of the v3 Manager."
+		::=  {  hzOduSnmpV3ManagersEntry  2  }
+
+
+	hzOduSnmpV3ManagerAuthProtocol 	OBJECT-TYPE	
+		SYNTAX			INTEGER  { noAuth ( 1 ) , md5 ( 2 ), sha(3) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The authentication alogorithm used by the v3 manager."
+		::=  {  hzOduSnmpV3ManagersEntry  3  }
+
+	hzOduSnmpV3ManagerAuthPassword	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The authentication password of the v3 Manager."
+		::=  {  hzOduSnmpV3ManagersEntry  4  }
+	
+	hzOduSnmpV3ManagerPrivProtocol 	OBJECT-TYPE	
+		SYNTAX			INTEGER  { noPriv ( 1 ) , des ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The privacy encryiption alogorithm used by the v3 manager."
+		::=  {  hzOduSnmpV3ManagersEntry  5  }
+
+	hzOduSnmpV3ManagerPrivPassword	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) ) 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The privacy password of the v3 Manager."
+		::=  {  hzOduSnmpV3ManagersEntry  6  }
+
+	hzOduSnmpV3ManagerActivated	OBJECT-TYPE	
+		SYNTAX			INTEGER  { notActive ( 1 ) , active ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Specifies whether a specific v3 manager is allowed to access the system" 
+		DEFVAL			{ notActive }
+		::=  {  hzOduSnmpV3ManagersEntry  7  }
+
+
+--
+-- User Login information       
+-- 
+	
+        
+        hzOduTtySessionUser1	OBJECT IDENTIFIER
+		::=  {  hzOduManagementSessions 1  }
+                
+                hzOduTtySessionUser1Name		OBJECT-TYPE	
+		        SYNTAX			DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The username of a management session using Telnet or HTTP. The session state variable must be checked to determine if the management session is currently in progress."
+		        ::=  {  hzOduTtySessionUser1  1  }
+
+	
+	        hzOduTtySessionUser1ConnectionType		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , serialPort ( 2 ) , enetPort2 ( 3 ) , enetPort1 ( 4 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The physical port used to log in to the system. The serial port is always local to the equipment. The 10BaseT connector may be local, or remote, depending on if the configuration of network management port. The inband connection is the port carrying customer traffic."
+		        ::=  {  hzOduTtySessionUser1  2  }
+        
+	        hzOduTtySessionUser1State		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , sessionTerminated ( 2 ) , sessionInProgress ( 3 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The state of the session. The session is inProgress if the user is currently logged into the system. The session is terminated if the user has logged out of the system."
+		        ::=  {  hzOduTtySessionUser1  3  }
+        
+        hzOduTtySessionUser2	OBJECT IDENTIFIER
+		::=  {  hzOduManagementSessions 2  }
+                
+                hzOduTtySessionUser2Name		OBJECT-TYPE	
+		        SYNTAX			DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The username of a person currently logged in to the system using Telnet or HTTP. This can be in-band or the side 10BT channel, if supported on this system."
+		        ::=  {  hzOduTtySessionUser2  1  }
+
+	
+	        hzOduTtySessionUser2ConnectionType		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , serialPort ( 2 ) ,  enetPort2 ( 3 ) , enetPort1 ( 4 )} 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The physical port used to log in to the system. The serial port is always local to the equipment. The 10BaseT connector may be local, or remote, depending on if the configuration of network management port. The inband connection is the port carrying customer traffic."
+		        ::=  {  hzOduTtySessionUser2  2  }
+
+	        hzOduTtySessionUser2State		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , sessionTerminated ( 2 ) , sessionInProgress ( 3 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The state of the session. The session is inProgress if the user is currently logged into the system. The session is terminated if the user has logged out of the system."
+		        ::=  {  hzOduTtySessionUser2  3  }
+
+        hzOduTtySessionUser3	OBJECT IDENTIFIER
+		::=  {  hzOduManagementSessions 3  }
+                
+                hzOduTtySessionUser3Name		OBJECT-TYPE	
+		        SYNTAX			DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The username of a person currently logged in to the system using Telnet or HTTP. This can be in-band or the side 10BT channel, if supported on this system."
+		        ::=  {  hzOduTtySessionUser3  1  }
+
+	
+	        hzOduTtySessionUser3ConnectionType		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , serialPort ( 2 ) ,  enetPort2 ( 3 ) , enetPort1 ( 4 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The physical port used to log in to the system. The serial port is always local to the equipment. The 10BaseT connector may be local, or remote, depending on if the configuration of network management port. The inband connection is the port carrying customer traffic."
+		        ::=  {  hzOduTtySessionUser3  2  }
+
+
+	        hzOduTtySessionUser3State		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , sessionTerminated ( 2 ) , sessionInProgress ( 3 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The state of the session. The session is inProgress if the user is currently logged into the system. The session is terminated if the user has logged out of the system."
+		        ::=  {  hzOduTtySessionUser3  3  }
+
+        hzOduTtySessionUser4	OBJECT IDENTIFIER
+		::=  {  hzOduManagementSessions 4  }
+                
+                hzOduTtySessionUser4Name		OBJECT-TYPE	
+		        SYNTAX			DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The username of a person currently logged in to the system using Telnet or HTTP. This can be in-band or the side 10BT channel, if supported on this system."
+		        ::=  {  hzOduTtySessionUser4  1  }
+
+	
+	        hzOduTtySessionUser4ConnectionType		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , serialPort ( 2 ) ,  enetPort2 ( 3 ) , enetPort1 ( 4 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The physical port used to log in to the system. The serial port is always local to the equipment. The 10BaseT connector may be local, or remote, depending on if the configuration of network management port. The inband connection is the port carrying customer traffic."
+		        ::=  {  hzOduTtySessionUser4  2  }
+
+	        hzOduTtySessionUser4State		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , sessionTerminated ( 2 ) , sessionInProgress ( 3 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The state of the session. The session is inProgress if the user is currently logged into the system. The session is terminated if the user has logged out of the system."
+		        ::=  {  hzOduTtySessionUser4  3  }
+
+        hzOduTtySessionUser5	OBJECT IDENTIFIER
+		::=  {  hzOduManagementSessions 5  }
+                
+                hzOduTtySessionUser5Name		OBJECT-TYPE	
+		        SYNTAX			DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The username of a person currently logged in to the system using Telnet or HTTP. This can be in-band or the side 10BT channel, if supported on this system."
+		        ::=  {  hzOduTtySessionUser5  1  }
+
+	
+	        hzOduTtySessionUser5ConnectionType		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , serialPort ( 2 ) , enetPort2 ( 3 ) , enetPort1 ( 4 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The physical port used to log in to the system. The serial port is always local to the equipment. The 10BaseT connector may be local, or remote, depending on if the configuration of network management port. The inband connection is the port carrying customer traffic."
+		        ::=  {  hzOduTtySessionUser5  2  }
+
+
+	        hzOduTtySessionUser5State		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , sessionTerminated ( 2 ) , sessionInProgress ( 3 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The state of the session. The session is inProgress if the user is currently logged into the system. The session is terminated if the user has logged out of the system."
+		        ::=  {  hzOduTtySessionUser5  3  }
+        
+        hzOduTtySessionUser6	OBJECT IDENTIFIER
+		::=  {  hzOduManagementSessions 6  }
+                
+                hzOduTtySessionUser6Name		OBJECT-TYPE	
+		        SYNTAX			DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The username of a person currently logged in to the system using Telnet or HTTP. This can be in-band or the side 10BT channel, if supported on this system."
+		        ::=  {  hzOduTtySessionUser6  1  }
+
+	
+	        hzOduTtySessionUser6ConnectionType		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , serialPort ( 2 ) , enetPort2 ( 3 ) , enetPort1 ( 4 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The physical port used to log in to the system. The serial port is always local to the equipment. The 10BaseT connector may be local, or remote, depending on if the configuration of network management port. The inband connection is the port carrying customer traffic."
+		        ::=  {  hzOduTtySessionUser6  2  }
+
+
+	        hzOduTtySessionUser6State		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , sessionTerminated ( 2 ) , sessionInProgress ( 3 ) } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"The state of the session. The session is inProgress if the user is currently logged into the system. The session is terminated if the user has logged out of the system."
+		        ::=  {  hzOduTtySessionUser6  3  }
+          
+
+        hzOduSessionUserInformation               OBJECT IDENTIFIER
+		::=  {  hzOduManagementSessions 7  }
+                
+                hzOduTtySessionUserName		OBJECT-TYPE	
+		        SYNTAX			DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"NOT IMPLEMENTED. Object type placeholder for username string for SNMP traps. The username of a person currently logged in to the system using Telnet or HTTP. This can be in-band or the side 10BT channel, if supported on this system."
+		        ::=  {  hzOduSessionUserInformation  1  }
+
+	
+	        hzOduTtySessionUserConnectionType		OBJECT-TYPE	
+		        SYNTAX			INTEGER  { informationNotAvailable ( 1 ) , serialPort ( 2 ) , enetPort2 ( 3 ) , enetPort1 ( 4 )  } 
+		        ACCESS			read-only
+		        STATUS			mandatory
+		        DESCRIPTION		"NOT IMPLEMENTED. Object type placeholder for connection type for SNMP traps. The physical port used to log in to the system. The serial port is always local to the equipment. The 10BaseT connector may be local, or remote, depending on if the configuration of network management port. The inband connection is the port carrying customer traffic."
+		        ::=  {  hzOduSessionUserInformation  2  }
+
+
+ --
+-- HTTPS group
+-- 
+
+    hzOduHttpEnable     OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether HTTP is enabled."
+		DEFVAL			{ disabled }
+		::=  {  hzOduHttp  1 } 
+   
+   	hzOduHttpSecure	OBJECT IDENTIFIER
+		::=   {  hzOduHttp  2  }
+
+    
+	hzOduHttpSecureCertificateStatus OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 100  ) )
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Returns the HTTPS certificate status"						 
+		::=  {  hzOduHttpSecure  1  }
+
+
+	hzOduHttpSecureAccessForAdminUsers	OBJECT-TYPE	
+		SYNTAX			INTEGER {  off( 1 ), on ( 2 ) }
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"the HTTPS access requirement for Admin user group."
+		::=  {  hzOduHttpSecure  2  }
+
+	hzOduHttpSecureAccessForNocUsers	OBJECT-TYPE	
+		SYNTAX			INTEGER {  off( 1 ), on ( 2 ) }
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"the HTTPS access requirement for Noc user group."
+		::=  {  hzOduHttpSecure  3  }
+
+	hzOduHttpSecureAccessForSuperUsers	OBJECT-TYPE	
+		SYNTAX			INTEGER {  off( 1 ), on ( 2 ) }
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"the HTTPS access requirement for Super user group."
+		::=  {  hzOduHttpSecure  4  }
+
+ 		
+--
+-- Giga Ethernet Qos
+--
+	hzOduQosEnable     OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether QOS is enabled."
+		DEFVAL			{ disabled }
+		::=  {  hzOduQos  1 }   
+		
+	hzOduCosType     OBJECT-TYPE	
+		SYNTAX			INTEGER  { cosVlan ( 1 ) , 
+		                           cosQinQiTag ( 2 ), 
+		                           cosQinQoTag ( 3 ), 
+		                           cosDscp ( 4 )} 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates the class of service tag type.  Based on the setting
+                                Horizon will use the CoS value in the VLAN tag, or Q-in-Q inner
+                                VLAN tag, Q-in-Q outer VLAN tag, or DSCP tag."
+		DEFVAL			{ cosVlan }
+		::=  {  hzOduQos  2 }
+
+
+--
+-- 802.1p priorities assignment.
+--
+	hzOduCoSQinQiTag     OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Sets the value of the Q-in-Q inner tag. This
+                               tag is also used to classify the non-Q-in-Q VLAN. Default value is 0x8100."
+		DEFVAL			{ 0 }
+		::=  {  hzOduQos  3 }
+
+ 	hzOduCoSQinQoTag     OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Sets the value of the Q-in-Q outer VLAN tag.  Default value is 0x8100."
+		DEFVAL			{ 0 }
+		::=  {  hzOduQos  4 }
+ 
+    hzOduCosQueueMapping      OBJECT-TYPE	
+		SYNTAX			 DisplayString ( SIZE ( 15 .. 32 ) ) 
+		ACCESS			 read-write
+		STATUS			 mandatory 
+		DESCRIPTION		 "User queue assignments for CoS values 0 to 7.
+                                         There are 4 coS queues. Their corresponding 
+                                         queue numbers are 1,2, 3, where 1 is the lowest priority queue and 
+                                         4 is the highest priority queue. 
+                                         CoS to queue mapping example: 1 1 2 2 3 3 4 4."
+		::=  {  hzOduQos 5  }
+
+   
+
+--
+-- Queue operation mode
+--
+	hzOduCosExpediteQueue	        OBJECT-TYPE	
+		SYNTAX		        INTEGER  { disabled  ( 1 ), enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"This sets the user queue operation mode. (a) In expedite mode,
+                                        any Queue can be assigned 100% of CIR. Queue 4 is serviced first
+                                        and queue 1 is servcied last.(b) In non expedite mode, the sum of all CIRs 
+                                        must be equal to 100%. In this mode higher priority queues
+                                        will be serviced first until that queue is emptied or
+                                        the defined CIR is reached."
+		DEFVAL			{ 1 }
+		::=  {  hzOduQos  6  }
+
+--
+-- user queues configuration.
+--
+
+        hzOduCosQueueCIR	        OBJECT-TYPE
+		SYNTAX			DisplayString ( SIZE ( 0 .. 32 ) ) 
+		ACCESS			read-write
+		STATUS			mandatory 
+		DESCRIPTION		"Committeed Information Rate (CIR) assignments for CoS queues
+                                         1 to 4. CIR is assigned as the percentage of system current speed.
+                                         When expedite queue is enabled any queue can be assigned 100% bandwidth.
+                                         When expedite queue is disabled the sum of CIR of all queues should be 100."
+
+		::=  {  hzOduQos  7  }
+
+
+        hzOduCosQueueCBS	        OBJECT-TYPE
+		SYNTAX			DisplayString ( SIZE ( 0 .. 32 ) ) 
+		ACCESS			read-write
+		STATUS			mandatory 
+		DESCRIPTION		"Comitted Burst Size (CBS) for CoS queues 1 to 4. CBS is the percentage 
+                                         of total packet buffer size. The sum of CBS's of all 4
+                                         queues must be equal to 100. Minimum CBS assignable to any queue
+                                         is 1."
+
+		::=  {  hzOduQos  8  }
+
+
+	hzOduCosDefaultValue	                OBJECT-TYPE	
+		SYNTAX		        INTEGER  (0 .. 7) 
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"Default CoS value assigned to the ethernet 
+                                         frames that don't have VLAN or Q-in-Q tag."
+		DEFVAL			{ 0 }
+		::=  {  hzOduQos  9  }
+
+     hzOduCutThroughProcessing	OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) }
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Sets cut through processing on/off."
+		::=  {  hzOduQos 10  }
+
+--
+-- hzOduRapidLinkShutdown
+--
+    hzOduRapidLinkShutdownVer1 OBJECT IDENTIFIER
+		::=  {  hzOduRapidLinkShutdown  1  }
+
+	hzOduRlsEnable     OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"<deprecated> The Rapid Link Shutdown feature: enabled or disabled.
+                                         Changing this option requires a system reset."
+		DEFVAL			{ disabled }
+		::=  {  hzOduRapidLinkShutdownVer1  1 }
+
+	hzOduAutomaticLinkReestablish     OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"<deprecated> If this feature is enabled, the link will be automatically reestablished.
+                                         If this feature is disabled, the user must explicitly use the manualReestablish object
+                                         to bring the link back up"
+		DEFVAL			{ disabled }
+		::=  {  hzOduRapidLinkShutdownVer1  2 }
+
+
+	hzOduManualLinkReestablish     OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"<deprecated> This object is writeable ONLY if automaticLinkReestablish is set to disabled.
+                                         The user explicitly brings the link back up by setting this object to enabled. 
+                                         The user explicitly brings the link down by setting this object to disabled. 
+                                         to bring the link back up"
+		DEFVAL			{ disabled }
+		::=  {  hzOduRapidLinkShutdownVer1  3 }
+
+
+	hzOduHysterisisErredFramesPerMilliSecond        
+                                        OBJECT-TYPE	
+		SYNTAX		        INTEGER   
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"<deprecated> The link will be automatically shut down when this number of erred
+                                         modem frames threshold is exceeded during the time set in the 
+                                         hysterisisErredMilliSeconds object.
+                                         **NOTE: You must SET the writeRlsMonitorParametersToSystem object
+                                                 to write this paramater to RAM. If you write and immediately
+                                                 read this object, the previous value will be displayed.
+                                                 You should SET all parameters in this folder first, and then write
+                                                 to a '1' to the writeRlsMonitorParametersToSystem object.
+                                                 You must also save the MIB via the writing the apSaveMIB object,
+                                                 and then reset the system."
+		DEFVAL			{ 0 }
+		::=  {  hzOduRapidLinkShutdownVer1  4  }
+  
+	hzOduHysterisisErredMilliSeconds        
+                                        OBJECT-TYPE	
+		SYNTAX		        INTEGER   
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"<deprecated> The time to determine a link that has excessive errors.
+                                         The link will be automatically shut down when this number of milliseconds
+                                         experiences the number of erred frames specified in the 
+                                         hysterisisErredFramesPerMilliSecond object.
+                                         **NOTE: You must SET the writeRlsMonitorParametersToSystem object
+                                                 to write this paramater to RAM. If you write and immediately
+                                                 read this object, the previous value will be displayed.
+                                                 You should SET all parameters in this folder first, and then write
+                                                 to a '1' to the writeRlsMonitorParametersToSystem object.
+                                                 You must also save the MIB via the writing the apSaveMIB object,
+                                                 and then reset the system."
+		
+                DEFVAL			{ 0 }
+		::=  {  hzOduRapidLinkShutdownVer1  5  }
+  
+
+	hzOduHysterisisUnerredFramesPerMilliSecond        
+                                        OBJECT-TYPE	
+		SYNTAX		        INTEGER   
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"<deprecated> The link will be automatically brought back up when the number of erred
+                                         modem frames is less than this value ( only if automaticLinkReestablish 
+                                         is set to enabled). 
+                                         This threshold value cannot be crossed for the duration of time specified in the  
+                                         hysterisisUnerredMilliSeconds object.
+                                         **NOTE: You must SET the writeRlsMonitorParametersToSystem object
+                                                 to write this paramater to RAM. If you write and immediately
+                                                 read this object, the previous value will be displayed.
+                                                 You should SET all parameters in this folder first, and then write
+                                                 to a '1' to the writeRlsMonitorParametersToSystem object.
+                                                 You must also save the MIB via the writing the apSaveMIB object,
+                                                 and then reset the system."
+
+		DEFVAL			{ 0 }
+		::=  {  hzOduRapidLinkShutdownVer1  6  }
+  
+	hzOduHysterisisUnerredMilliSeconds        
+                                        OBJECT-TYPE	
+		SYNTAX		        INTEGER   
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"<deprecated> The time block to use to determine if the link is error free enough to 
+                                         warrant it to automatically reestablish itself ( only if automaticLinkReestablish 
+                                         is set to enabled).
+                                         The link will be brought back up automatically when this number of milliseconds
+                                         experiences less the number of acceptable erred frames specified in the 
+                                         hysterisisUnerredFramesPerMilliSecond object.
+                                         **NOTE: You must SET the writeRlsMonitorParametersToSystem object
+                                                 to write this paramater to RAM. If you write and immediately
+                                                 read this object, the previous value will be displayed.
+                                                 You should SET all parameters in this folder first, and then write
+                                                 to a '1' to the writeRlsMonitorParametersToSystem object.
+                                                 You must also save the MIB via the writing the apSaveMIB object,
+                                                 and then reset the system."
+
+		DEFVAL			{ 0 }
+		::=  {  hzOduRapidLinkShutdownVer1  7  }
+  
+	hzOduWriteRlsMonitorParametersToSystem        
+                                        OBJECT-TYPE	
+		SYNTAX		        INTEGER   
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"<deprecated> This writes the following parameters to RAM:
+                                         hysterisisErredFramesPerMilliSecond,
+                                         hysterisisErredMilliSeconds,
+                                         hysterisisUnerredFramesPerMilliSecond,
+                                         hysterisisUnerredMilliSeconds.
+                                         Reading this object returns '1'."
+		DEFVAL			{ 0 }
+		::=  {  hzOduRapidLinkShutdownVer1  8  }
+
+
+
+ 	hzOduRlsSampleTimeInMilliSeconds        
+                                        OBJECT-TYPE	
+		SYNTAX		        INTEGER   
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"<deprecated> "
+
+		DEFVAL			{ 0 }
+		::=  {  hzOduRapidLinkShutdownVer1  9  }
+
+
+    hzOduRapidLinkShutdownVer2 OBJECT IDENTIFIER
+		::=  {  hzOduRapidLinkShutdown  2  }
+
+	hzOduPrimaryRlsEnable     OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"The Rapid Link Shutdown feature: enabled or disabled.
+                                         Changing this option requires a system reset."
+		DEFVAL			{ disabled }
+		::=  {  hzOduRapidLinkShutdownVer2  1 }
+
+	hzOduPrimaryRlsHardFaultMonitor                 OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"This object has changed - Enable the rlsHardFaultMonitor for rapid detection of severely degrade link. When disabled the
+                                         only the RLS Link Degrade Monitor is used."
+		DEFVAL			{ off }
+		::=  {  hzOduRapidLinkShutdownVer2 2  }
+
+	hzOduPrimaryAutomaticLinkReestablish     OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"If this feature is enabled, the link will be automatically reestablished 
+                                         If this feature is disabled, the user must explicitly use the manualReestablish object
+                                         to bring the link back up"
+		DEFVAL			{ disabled }
+		::=  {  hzOduRapidLinkShutdownVer2  3 }
+
+
+	hzOduPrimaryManualLinkReestablish     OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"This object is writeable ONLY if automaticLinkReestablish is set to disabled.
+                                         The user explicitly brings the link back up by setting this object to enabled. 
+                                         The user explicitly brings the link down by setting this object to disabled. 
+                                         to bring the link back up"
+		DEFVAL			{ disabled }
+		::=  {  hzOduRapidLinkShutdownVer2  4 }
+    
+    hzOduWritePrimaryRlsMonitorParametersToSystem        
+                                        OBJECT-TYPE	
+		SYNTAX		        INTEGER   
+		ACCESS			read-write
+		STATUS			mandatory  
+		DESCRIPTION		"This object has changed - This writes RLS soft and hard fault monitor parameters to RAM
+		                                         Reading this object returns '1'."
+		DEFVAL			{ 0 }
+		::=  {  hzOduRapidLinkShutdownVer2  5  }
+
+
+    hzOduPrimarySoftFaultMonitor OBJECT IDENTIFIER
+		::=  {  hzOduRapidLinkShutdownVer2  6  }
+
+    hzOduPrimaryHardFaultMonitor OBJECT IDENTIFIER
+		::=  {  hzOduRapidLinkShutdownVer2  7  }
+
+    hzOduPrimaryReceiveSignalLevelMonitor OBJECT IDENTIFIER
+		::=  {  hzOduRapidLinkShutdownVer2  8  }   
+
+    hzOduPrimaryRlsStatus OBJECT IDENTIFIER
+		::=  {  hzOduRapidLinkShutdownVer2  9  }
+		
+		
+		 
+	hzOduPrimaryEstablishErredFrameThreshold  OBJECT-TYPE 	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Maximum erred blocks, per sample, allowed for link establishment."
+		::=  {  hzOduPrimarySoftFaultMonitor  1  }        
+		
+	hzOduPrimaryShutdownErredFrameThreshold  OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Minimum erred blocks, per sample, allowed before link shutdown."
+		::=  {  hzOduPrimarySoftFaultMonitor  2  }      		
+
+	hzOduPrimaryEstablishNumberOfSamples  OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Minimum number of consecutive good samples required before link is established."
+		::=  {  hzOduPrimarySoftFaultMonitor  3  }
+		
+	hzOduPrimaryShutdownNumberOfSamples  OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Minimum number of consecutive erred samples before link is shutdown."
+		::=  {  hzOduPrimarySoftFaultMonitor  4  }
+		
+	hzOduPrimaryEstablishSamplePeriod  OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Period of Time, in milliseconds, for monitoring Establish Erred Frame Threshold."
+		::=  {  hzOduPrimarySoftFaultMonitor  5  }
+		
+	hzOduPrimaryShutdownSamplePeriod  OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Period of Time, in milliseconds, for monitoring Shutdown Erred Frame Threshold."
+		::=  {  hzOduPrimarySoftFaultMonitor  6  }
+		
+	hzOduPrimaryQuickShutdownSamplePeriod  OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Minimum number of milliseconds required to classify samples as erred."
+		::=  {  hzOduPrimarySoftFaultMonitor  7  }		
+
+
+	hzOduPrimaryFaultSamplePeriod     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"The period of time, in milliseconds, for which the
+                                         rlsFaultThreshold is applied."
+		::=  {  hzOduPrimaryHardFaultMonitor  1  }
+
+	hzOduPrimaryFaultThreshold                    OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"The percentage of the rlsFaultSamplePeriodMilliSeconds period
+                                         which must be degraded before the link is
+                                         set to the 'impaired' state."
+		::=  {  hzOduPrimaryHardFaultMonitor  2  }
+		
+ 	hzOduPrimaryRlsMakeRslMonitorRslValue  OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 24  ) )
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"The RSL threshold, in dBm. When Link is inactive and if RSL
+										is higher than this threshold for a desired
+										period, the link will become active."
+		::=  {  hzOduPrimaryReceiveSignalLevelMonitor  1  }        
+
+	hzOduPrimaryRlsMakeRslMonitorPeriod  OBJECT-TYPE	
+		SYNTAX			INTEGER  
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"The desired period, in seconds. When Link is inactive and if RSL
+										is higher than the desired	threshold for this 
+										period, the link will become active."
+		::=  {  hzOduPrimaryReceiveSignalLevelMonitor  2  }  
+
+
+--
+-- rlsStatus
+--
+ 	hzOduPrimaryRlsOption                      		OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"RLS Option. On Basic: RLS enabled with base degrade monitoring;
+								 On Advanced: RLS enabled with hard fault monitoring;
+								 Off: Entire RLS feature disabled."
+	::=  {  hzOduPrimaryRlsStatus  1 }
+
+
+
+	hzOduPrimaryRlsState                      		OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Rapid Link Shutdown State. If the state is activated, that means 
+						link is down; If the state is inactivated, that means that
+						link is up."
+	::=  {  hzOduPrimaryRlsStatus  2 }
+
+	hzOduPrimaryRlsMismatchState     				OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"RLS Mismatch State. If the state is activated, that means RLS 
+						configuration is mismatched with peer. If the state is OK,
+						that means RLS configuration is matched with peer."
+	::=  {  hzOduPrimaryRlsStatus  3 }      
+
+	hzOduPrimaryDegradeMonitorState      			OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Degrade Monitor State. If the state is activated, that means
+						the RLS Degrade Monitor is asserting the link down. If the
+						state is OK, that means the RLS Degrade Monitor is asserting
+						the link up."
+	::=  {  hzOduPrimaryRlsStatus  4 }
+	
+	hzOduPrimaryHardFaultMonitorState        		OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Hard Fault Monitor State. If the state is activated, that means
+						the Hard Fault Monitor is asserting the link down. If the state
+						is OK, that means the RLS Hard Fault Monitor is asserting the
+						link up."
+	::=  {  hzOduPrimaryRlsStatus  5 }
+	                        
+	hzOduPrimaryMakeRslThresholdState	     		OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Make RSL Threshold State. If the state is not met, that means the 
+						RLS signal level is below the threshold value. If the state is OK,
+						that means the RLS signal level is above the threshold value."
+	::=  {  hzOduPrimaryRlsStatus  6 }
+			
+ 	hzOduPrimaryPeerRslState               			OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Peer RSL State. If the state is activated, that means the peer has
+						activated RLS. If the state is OK, that means the Peer hasn't
+						activated RLS."
+	::=  {  hzOduPrimaryRlsStatus  7 }
+ 	
+	hzOduPrimaryRadioInterfaceState 	     		OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Radio Interface State. If the state is down, that means The radio 
+						interface is not operational(muted,disconnected, not configured).
+						If the state is up, that means the radio interface is operational."
+	::=  {  hzOduPrimaryRlsStatus  8 }
+	
+	hzOduPrimaryNetworkInterfaceState 	            OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Network Interface State. If the state is down, that means the network 
+						interface (Ethernet/PHY) is not operational(disconnected, not 
+						configured). If the state is up, that means the network interface
+						(Ethernet/PHY) is operational."
+	::=  {  hzOduPrimaryRlsStatus  9 }
+
+	hzOduPrimaryUserConfiguredEstablishFer          OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"User Configured Establish Frame Error Ratio required for the 
+						link to be restored to service, set by the user. An example
+						value being '1.0E-7'."
+	::=  {  hzOduPrimaryRlsStatus  10  }
+
+ 	hzOduPrimaryMinimumAchievableEstablishFer       OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Minimum achievable Frame Error Ratio required for the link to be 
+						restored to service. An example value being '1.0E-7'."
+	::=  {  hzOduPrimaryRlsStatus  11  }
+
+ 	hzOduPrimaryUserConfiguredShutdownFer          OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"User Configured Shutdown Frame Error Ratio required for the 
+						link to remain in-service, set by the user. An example value
+						being '1.0E-7'."
+	::=  {  hzOduPrimaryRlsStatus  12  }
+
+   	hzOduPrimaryMinimumAchievableShutdownFer          OBJECT-TYPE	
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Minimum achievable Frame Error Ratio required for the link to 
+						remain in-service. An example value being '1.0E-7'."
+	::=  {  hzOduPrimaryRlsStatus  13  }
+
+	hzOduPrimaryUserConfiguredEstablishMonitorTime    OBJECT-TYPE
+	SYNTAX			INTEGER
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"User Configured Establish Monitor Time, in milliseconds, for 
+						which the 'User Configured Establish FER' must be achieved
+						to bring link into service, set by user"
+	::=  {  hzOduPrimaryRlsStatus 14  }
+
+	hzOduPrimaryActualEstablishMonitorTime            OBJECT-TYPE
+	SYNTAX			INTEGER
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Actual Establish Monitor Time, in milliseconds, for which the 
+						'User Configured Establish FER'	must be achieved to bring 
+						link into service, it's a multiple of the establish sample 
+						period required to observe the FER"
+	::=  {  hzOduPrimaryRlsStatus 15  }
+	
+	hzOduPrimaryUserConfiguredShutdownMonitorTime      OBJECT-TYPE
+	SYNTAX			INTEGER
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"User Configured Shutdown Monitor Time, in milliseconds, for which
+						the 'User Configured Shutdown FER' must be met for the link to
+						remain in-service, set by user."
+	::=  {  hzOduPrimaryRlsStatus 16  }
+
+	hzOduPrimaryActualShutdownMonitorTime             OBJECT-TYPE
+	SYNTAX			INTEGER
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Actual Shutdown Monitor Time, in milliseconds, for which the 'User
+						Configured Shutdown FER' must be met for the link to remain 
+						in-service, it's a multiple of the shutdown sample period required
+						to  observe the FER"
+	::=  {  hzOduPrimaryRlsStatus 17  }
+		
+
+
+--
+-- hzOduSntp
+--
+
+	hzOduSntpEnable	                OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether SNTP feature is enabled."
+		DEFVAL			{ enabled }
+		::=  {  hzOduSntp  1 }
+
+	hzOduSntpOffset	                OBJECT-TYPE	
+-- This value is 10 times the actual value.
+		SYNTAX			INTEGER  ( -140 .. 140  ) 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"System time offset from GMT."
+		DEFVAL 			{ -40 }
+		::=  {  hzOduSntp  2  }
+
+
+	hzOduSntpServerTable	        OBJECT-TYPE
+		SYNTAX		SEQUENCE OF HzOduSntpServerEntry
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Table containing sntp server entries"
+		::=  { hzOduSntp  3 }
+
+	hzOduSntpServerEntry	        OBJECT-TYPE
+		SYNTAX		HzOduSntpServerEntry	        
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Contains the sntp server information"
+		INDEX		{  hzOduSntpServerIndex  }
+		::=  { hzOduSntpServerTable 1 }
+
+	HzOduSntpServerEntry   ::=  SEQUENCE {
+		hzOduSntpServerIndex       INTEGER,
+		hzOduSntpServerIpAddress   IpAddress,
+		hzOduSntpServerStatus      INTEGER,
+		hzOduSntpServerStratum     INTEGER
+		}
+		
+	hzOduSntpServerIndex    	        OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A unique value for each server."
+		::=  {  hzOduSntpServerEntry  1  }
+
+
+	hzOduSntpServerIpAddress	        OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"The IP address of the server."
+		::=  {  hzOduSntpServerEntry  2  }
+
+
+	hzOduSntpServerStatus	        OBJECT-TYPE	
+		SYNTAX			INTEGER  { good (1) , failed (2) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The status of the sntp server."
+		::=  {  hzOduSntpServerEntry  3  }
+
+
+	hzOduSntpServerStratum	OBJECT-TYPE	
+		SYNTAX			INTEGER   
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"Specifies the stratum of a server, 0 for failed server" 
+		::=  {  hzOduSntpServerEntry  4  }
+                
+--
+-- hzOduLogs
+--
+
+	hzOduEventLogEnable	                OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether event log is enabled."
+		DEFVAL			{ enabled }
+		::=  {  hzOduLogs  1 }
+                
+        hzOduPerfmLogEnable	                OBJECT-TYPE	
+		SYNTAX			INTEGER  { disabled ( 1 ) , enabled ( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Indicates whether performance log is enabled."
+		DEFVAL			{ enabled }
+		::=  {  hzOduLogs  2 }
+
+        hzOduPerfmLogInterval	        OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 10  ) ) 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"Performance statistics are logged periodically by this interval."
+		::=  {  hzOduLogs  3 }
+
+--
+-- hzOduRadius
+--
+	hzOduRadiusSuperUserAuthentication	                OBJECT-TYPE	
+		SYNTAX			INTEGER  { off ( 1 ) , on( 2 ) } 
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		" The set strict mode on or off"
+		DEFVAL			{ off }
+		::=  {  hzOduRadius 1 }
+
+	hzOduRadiusServerTimeOut	                OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		" Timeout period for authentication requests"
+		DEFVAL			{ 0 }
+		::=  {  hzOduRadius 2 }
+
+
+	hzOduRadiusServerDeadTime	                OBJECT-TYPE	
+		SYNTAX			INTEGER 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		" Time to declare an unresponsive server 'dead'"
+		DEFVAL			{ 0 }
+		::=  {  hzOduRadius 3 }
+
+ 	hzOduRadiusServerReTransmit		                OBJECT-TYPE	
+		SYNTAX			INTEGER  { strict ( 1 ) , notstrict ( 2 ) } 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		" Maximum number of retransmits to an unresponsive server"
+		DEFVAL			{ enabled }
+		::=  {  hzOduRadius 4 }
+
+
+
+	hzOduRadiusServerTable	        OBJECT-TYPE
+		SYNTAX		SEQUENCE OF HzOduRadiusServerEntry	        
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Table containing radius server entries"
+		::=  { hzOduRadius 5 }
+
+	hzOduRadiusServerEntry	        OBJECT-TYPE
+		SYNTAX		HzOduRadiusServerEntry	        
+		ACCESS		not-accessible
+		STATUS		mandatory
+		DESCRIPTION	"Contains the sntp server information"
+		INDEX		{  hzOduRadiusServerIndex }
+		::=  { hzOduRadiusServerTable 1 }
+
+	HzOduRadiusServerEntry	        ::=  SEQUENCE {
+		hzOduRadiusServerIndex       INTEGER,
+		hzOduRadiusCfgdHostIpAddress       IpAddress,
+		hzOduRadiusActiveHostIpAddress     IpAddress
+		}
+		
+	hzOduRadiusServerIndex    	        OBJECT-TYPE	
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"A unique value for each server."
+		::=  {  hzOduRadiusServerEntry 1  }
+
+
+	hzOduRadiusCfgdHostIpAddress       OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-write
+		STATUS			mandatory
+		DESCRIPTION		"The IP address of the configured radius server."
+		::=  {  hzOduRadiusServerEntry 2  }
+
+
+	hzOduRadiusActiveHostIpAddress     OBJECT-TYPE	
+		SYNTAX			IpAddress
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The IP address of the active radius server."
+		::=  {  hzOduRadiusServerEntry 3  }
+
+--
+-- TRAP DEFINITIONS
+--                   		
+
+	coldStart	TRAP-TYPE
+        	ENTERPRISE  snmp  
+        	DESCRIPTION		
+                        "A coldStart trap signifies that the sending protocol entity is reinitializing itself such that the agent's configuration or the protocol entity implementation may be altered."
+        ::= 0
+
+-- for generic traps real trap value of linkDwon is 2.
+	linkDown	TRAP-TYPE
+        	ENTERPRISE  snmp  
+                VARIABLES {ifIndex}
+        	DESCRIPTION		
+        	        "A linkDown trap signifies that the sending protocol entity recognizes a failure in one of the communication links represented in the agent's configuration."
+        ::= 1
+
+-- for generic traps real trap value of linkup is 3.
+
+	linkUp	TRAP-TYPE
+        	ENTERPRISE  snmp  
+                VARIABLES {ifIndex}
+        	DESCRIPTION		 
+        		"A linkUp trap signifies that the sending protocol entity recognizes that one of the communication links represented in the agent's configuration has come up."		 
+        ::= 2
+
+
+       hzOduExplicitAuthenticationFailureV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps  
+        	DESCRIPTION		"Authentication of the peer horizon node has failed. The severity is critical, the probable cause is an incorrect authentication configuration on horizon faulty cable between the modem and radio, and recommended course of action is to check both ends of the link."
+        ::= 3 
+        
+       hzOduExplicitAuthenticationFailureClearedV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"The condition has cleared. The peer node is now authenticated."
+        ::= 4
+
+     			 		
+      hzOduAamConfigMisMatchV1Trap					TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        	DESCRIPTION               "Adaptive modulation configuration mismatch"
+        ::= 5	
+
+      hzOduAamConfigMisMatchClearV1Trap					TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        	DESCRIPTION               "Adaptive modulation configuration mismatch cleared"
+        ::= 6	
+
+      hzOduAamActiveV1Trap					TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        	DESCRIPTION               "Adaptive modulation on and system running on lowest modulation"
+        ::= 7	
+
+      hzOduAamActiveClearedV1Trap					TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        	DESCRIPTION               "Adaptive modulation on  system running on higher modulation"
+        ::= 8        
+        
+      hzOduAtpcConfigMismatchV1Trap      TRAP-TYPE
+        	ENTERPRISE         hzOduTraps
+        	DESCRIPTION        "ATPC is set to on at near end however in the far end it is set to off."
+        ::= 9
+
+      hzOduAtpcConfigMismatchClearedV1Trap        TRAP-TYPE
+        	ENTERPRISE         hzOduTraps
+        	DESCRIPTION        "ATPC configuration mismatch is cleared"
+        ::= 10  
+        
+      hzOduSntpServersUnreachableV1Trap       TRAP-TYPE
+        	ENTERPRISE           hzOduTraps
+        	DESCRIPTION          "Can't reach any of the sntp servers"
+        ::= 11
+
+      hzOduSntpServersUnreachableClearedV1Trap     TRAP-TYPE
+        	ENTERPRISE                hzOduTraps
+        	DESCRIPTION               "At least one of SNTP servers is reachable"
+        ::= 12
+      
+             		
+     hzOduFrequencyFileInvalidV1Trap	        TRAP-TYPE
+		ENTERPRISE              hzOduTraps
+        	DESCRIPTION             "When the executing frequency file is invalid, 
+					this trap is generated."
+        ::= 13
+
+ 
+          
+     hzOduEnetPort1DroppedFramesThresholdExceededV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION     "The ethernet dropped frames threshold has been detected above its threshold value."
+        ::= 14
+        
+     hzOduEnetPort1DroppedFramesThresholdExceededClearedV1Trap        TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION     "The condition has cleared.The ethernet dropped frames threshold is now below its threshold value."
+        ::= 15
+                
+	
+     hzOduEnetPort1BwUtilizationThresholdExceededV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION     "The ethernet bandwidth threshold has been detected above its threshold value."
+        ::= 16
+        
+     hzOduEnetPort1BwUtilizationThresholdExceededClearedV1Trap        TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION     "The condition has cleared. The ethernet bandwidth threshold is now below its threshold value."
+        ::= 17    
+        
+        
+    		
+     hzOduEnetPort1RlsMismatchV1Trap       TRAP-TYPE
+        	ENTERPRISE                hzOduTraps
+        	DESCRIPTION               "RLS mismatch"
+        ::= 18    
+        
+     hzOduEnetPort1RlsMismatchClearedV1Trap              TRAP-TYPE
+        	ENTERPRISE                hzOduTraps
+        	DESCRIPTION               "RLS mismatch cleared"
+        ::= 19    
+        
+     hzOduEnetPort1RlsShutdownActivatedv1Trap            TRAP-TYPE
+        	ENTERPRISE                hzOduTraps
+        	DESCRIPTION               "RLS shutdown is activated"
+        ::= 20
+
+     hzOduEnetPort1RlsShutdownActivatedClearedV1Trap              TRAP-TYPE
+        	ENTERPRISE                hzOduTraps
+        	DESCRIPTION               "RLS shutdown is not activated"
+        ::= 21
+       
+     
+      
+      
+	 hzOduModem1RxLossOfSignalLockV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Loss of signal lock from the demodulator. The severity is critical, the probable cause is lost synchronization with the far end, and recommended course of action is to check the operational state of both ends of the link."
+        ::= 22 
+        
+	 hzOduModem1RxLossOfSignalLockClearedV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"The condition has cleared. The demodulator is synchronized."
+        ::= 23
+
+	 hzOduModem1TxLossOfSyncV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Loss of sync bytes at the input of the modulator. The severity is critical, the probable cause is physical
+	       interference in the air link, and recommended course of action is to check the line of site between the horizon nodes."
+        ::= 24  
+        
+	 hzOduModem1TxLossOfSyncClearedV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Tx Loss of sync bytes cleared."
+        ::= 25
+
+          
+	 hzOduModem1SnrBelowThresholdV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"The demodulator SNR performance worse than programmed levels. The severity is major, the probable cause 
+	       is physical interference in the air link path or misalignment of the radios or severe weather conditions, and recommended course 
+	      of action is to check the line of site between the horizon nodes."
+        ::= 26
+
+	 hzOduModem1SnrBelowThresholdClearedV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"SNR performance back to normal."
+        ::= 27
+
+	 hzOduModem1EqualizerStressExceedThresholdV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Equalizer Stress measured within the demodulator exceeds the threshold value."
+        ::= 28
+
+	 hzOduModem1EqualizerStressExceedThresholdClearedV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Equalizer Stress measured within the demodulator is within the threshold value."
+        ::= 29
+      hzOduEnetPort1ChannelizedRslBelowThresholdV1Trap	        TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION     "The RSL has been detected below its minimum threshold."
+        ::= 30           
+        
+     hzOduEnetPort1ChannelizedRslBelowThresholdClearedV1Trap        TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION     "The condition has cleared. RSL is now above its minimum threshold."
+        ::= 31
+
+       
+	hzOduModem1HardwareFaultV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Power supply circuitry failed. Should be sent for diagnosis."
+        ::= 32
+               
+	hzOduModem1HardwareFaultClearedV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Power supply circuitry  is in good condition."
+        ::= 33
+        
+	hzOduModem1ProgrammingErrorV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Encountered problem while programming modem."
+        ::= 34
+
+	hzOduModem1ProgrammingErrorClearedrV1Trap	TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Problem encountered while programming modem is gone."
+        ::= 35
+ 	
+    hzOduRadio1SynthLostLockV1Trap  	  TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        DESCRIPTION               "IF synth Lock is lost."
+        ::= 36
+        
+    hzOduRadio1SynthLostLockClearedV1Trap  	  TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        DESCRIPTION               "IF synth Lock is lost cleared."
+        ::= 37	
+
+ 
+    hzOduRadio1TempCompCalTableNotAvailableV1Trap	  TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        DESCRIPTION               "Temp comp table not available."
+        ::= 38	
+
+    hzOduRadio1TempCompCalTableNotAvailableClearedV1Trap					TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        DESCRIPTION               "Temp comp table not available cleared."
+        ::= 39	
+    hzOduRadio1TxDetectorPwrBelowThreshV1Trap	  TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        DESCRIPTION               "Tx power detector below threshold."
+        ::= 40
+
+    hzOduRadio1TxDetectorPwrBelowThreshClearedV1Trap					TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        DESCRIPTION               "Tx power detector below threshold cleared."
+        ::= 41
+
+    hzOduRadio1DrainCurrentOutOfLimitV1Trap	  TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        DESCRIPTION               "Radio current out of limits."
+        ::= 42
+
+    hzOduRadio1DrainCurrentOutOfLimitClearedV1Trap					TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        DESCRIPTION               "Radio current out of limits cleared."
+        ::= 43
+
+    hzOduRadio1TemperatureOutOfLimitV1Trap	  TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        DESCRIPTION               "Radio temperature out of limits."
+        ::= 44
+
+    hzOduRadio1TemperatureOutOfLimitClearedV1Trap					TRAP-TYPE				
+		ENTERPRISE                hzOduTraps
+        DESCRIPTION               "Radio temperature out of limits cleared."
+        ::= 45
+
+       
+ 	
+    hzOduTtySessionCommencedV1Trap							TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+		VARIABLES   { hzOduTtySessionUserName,
+			      hzOduTtySessionUserConnectionType }
+        	
+                DESCRIPTION		"A person has successfully gained access to the ascii management port (telnet, local management port, or HTTP). The username is included in the Trap."
+        ::= 46
+
+	hzOduTtySessionTerminatedV1Trap						TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+		VARIABLES   { hzOduTtySessionUserName,
+			      hzOduTtySessionUserConnectionType }
+        	DESCRIPTION		"A person has logged out of an ascii management port (telnet, local management port, or HTTP). The username is included in the Trap."
+        ::= 47
+
+hzOduAtpcTxAtCoordinatedPwrV1Trap							TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Atpc is enabled in the system and it is transmitting at maximum power."
+        ::= 48
+
+hzOduAtpcTxAtCoordinatedPwrClearedV1Trap							TRAP-TYPE
+        	ENTERPRISE  hzOduTraps
+        	DESCRIPTION		"Atpc is enabled in the system and it is back to regular power."
+        ::= 49
+
+
+   hzOduPartnerRedundancyModeMismatchV1Trap	TRAP-TYPE				
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb partner redundancy mode mismatch."
+        ::= 50
+
+
+   hzOduPartnerRedundancyModeMismatchClearedV1Trap	TRAP-TYPE				
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb partner redundancy mode mismatch is cleared."
+        ::= 51
+
+
+   hzOduPartnerConfigurationMismatchV1Trap	TRAP-TYPE				
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb partner configuration mismatch."
+        ::= 52
+
+
+   hzOduPartnerConfigurationMismatchClearedV1Trap	TRAP-TYPE				
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb partner configuration mismatch is cleared."
+        ::= 53
+
+
+   hzOduHsbActiveOnSecondaryV1Trap	TRAP-TYPE				
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb active on secondary."
+        ::= 54
+
+
+   hzOduHsbActiveOnSecondaryClearedV1Trap	TRAP-TYPE				
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb active on secondary is cleared."
+        ::= 55
+
+
+   hzOduHsbOverrideByUserV1Trap	TRAP-TYPE			
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb override by user."
+        ::= 56
+
+
+   hzOduHsbOverrideByUserClearedV1Trap	TRAP-TYPE				
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb active on secondary is cleared."
+        ::= 57
+
+
+   hzOduHsbCrossLinkV1Trap	TRAP-TYPE			
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb cross link by user."
+        ::= 58
+
+
+   hzOduHsbCrossLinkClearedV1Trap	TRAP-TYPE				
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb cross link is cleared."
+        ::= 59
+
+
+   hzOduHsbActiveOnPrimaryV1Trap	TRAP-TYPE			
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb active on primary."
+        ::= 60
+
+
+   hzOduHsbActiveOnPrimaryClearedV1Trap	TRAP-TYPE				
+		ENTERPRISE  hzOduTraps
+                DESCRIPTION     "Hsb active on primary is cleared."
+        ::= 61
+     
+END

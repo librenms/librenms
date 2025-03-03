@@ -1,0 +1,680 @@
+F3-OTN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64, Integer32
+             FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, TruthValue, VariablePointer
+             FROM SNMPv2-TC
+    cmEthernetNetPortEntry 
+             FROM CM-FACILITY-MIB
+    PerfCounter64, CmPmIntervalType
+             FROM CM-COMMON-MIB
+    cmEthernetNetPortStatsEntry, cmEthernetNetPortHistoryEntry
+             FROM CM-PERFORMANCE-MIB
+    fsp150cm
+             FROM ADVA-MIB;
+
+f3OtnMIB MODULE-IDENTITY
+    LAST-UPDATED        "201407150000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Michal Pawlowski
+                     ADVA Optical Networking, Inc.
+                Tel: +48 58 7716 416
+             E-mail: mpawlowski@advaoptical.com
+             Postal: ul. Slaska 35/37
+                     81-310 Gdynia, Poland"
+    DESCRIPTION
+            "This module defines the OTN MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201407150000Z"
+    DESCRIPTION
+        "
+         Notes from release 201407150000Z,
+         (1) MIB version ready for release FSP150CC 6.5.CC." 
+
+    ::= {fsp150cm 34}
+
+-- 
+-- OID definitions
+-- 
+
+f3OtnConfigObjects            OBJECT IDENTIFIER ::= {f3OtnMIB 1}
+f3OtnPerfObjects              OBJECT IDENTIFIER ::= {f3OtnMIB 2}
+f3OtnConformance              OBJECT IDENTIFIER ::= {f3OtnMIB 3}
+
+--
+-- Textual Conventions 
+-- 
+
+OtnFacilityType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "OTN Facility Type."
+    SYNTAX      INTEGER {
+                  otu2e-eth(1)
+                }
+
+OtnFecType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "OTN Forward Error Correction (FEC) Type."
+    SYNTAX      INTEGER {
+                  nofec(1),
+                  gfec(2),
+                  efec-1(3),
+                  efec-2(4)
+                }
+
+TimDetectMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Trace Identifier Mismatch (TIM) Detect Mode."
+    SYNTAX      INTEGER {
+                  off(1),
+                  sapi(2),
+                  dapi(3),
+                  sapi-dapi(4)
+                }
+
+--
+--  Ethernet Network Port Ext Table
+--
+
+f3OtnNetPortExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3OtnNetPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Ethernet Network Port
+             Facilities for the OTN attributes configuration purposes."
+    ::= { f3OtnConfigObjects 1 }
+
+
+f3OtnNetPortEntry OBJECT-TYPE
+    SYNTAX      F3OtnNetPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3OtnNetPortEntry."
+    AUGMENTS { cmEthernetNetPortEntry }
+    ::= { f3OtnNetPortExtTable 1 }
+
+F3OtnNetPortEntry ::= SEQUENCE {
+    f3OtnNetPortPayloadType                   Unsigned32,
+    f3OtnNetPortFacilityType                  OtnFacilityType,
+    f3OtnNetPortFec                           OtnFecType,
+    f3OtnNetPortTimDetectModeOtu              TimDetectMode,
+    f3OtnNetPortTimAisInsertOtuEnabled        TruthValue,
+    f3OtnNetPortTtiActualRxHexOtu             OCTET STRING,
+    f3OtnNetPortTtiSapiActualRxOtu            DisplayString,
+    f3OtnNetPortTtiDapiActualRxOtu            DisplayString,
+    f3OtnNetPortTtiOpSpActualRxOtu            DisplayString,
+    f3OtnNetPortTtiSapiExpectedRxOtu          DisplayString,
+    f3OtnNetPortTtiSapiTxOtu                  DisplayString,
+    f3OtnNetPortTtiDapiTxOtu                  DisplayString,
+    f3OtnNetPortTtiOpSpTxOtu                  DisplayString,
+    f3OtnNetPortTimDetectModeOdu              TimDetectMode,
+    f3OtnNetPortTimAisInsertOduEnabled        TruthValue,
+    f3OtnNetPortTtiActualRxHexOdu             OCTET STRING,
+    f3OtnNetPortTtiSapiActualRxOdu            DisplayString,
+    f3OtnNetPortTtiDapiActualRxOdu            DisplayString,
+    f3OtnNetPortTtiOpSpActualRxOdu            DisplayString,
+    f3OtnNetPortTtiSapiExpectedRxOdu          DisplayString,
+    f3OtnNetPortTtiSapiTxOdu                  DisplayString,
+    f3OtnNetPortTtiDapiTxOdu                  DisplayString,
+    f3OtnNetPortTtiOpSpTxOdu                  DisplayString
+}
+
+f3OtnNetPortPayloadType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the value to be transmitted in the PT signal of
+             the OPU Payload Structure Identifier (PSI) overhead.
+             The value is also used for detection of Payload Label Mismatch of
+             the PT signal in the received ODU PSI overhead."
+    ::= { f3OtnNetPortEntry 1 }
+
+f3OtnNetPortFacilityType OBJECT-TYPE
+    SYNTAX      OtnFacilityType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the OTN transport wrapper and payload."
+    ::= { f3OtnNetPortEntry 2 }
+
+f3OtnNetPortFec OBJECT-TYPE
+    SYNTAX      OtnFecType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the Forward Error Correction (FEC) for the
+             OTN transport frame."
+    ::= { f3OtnNetPortEntry 3 }
+
+f3OtnNetPortTimDetectModeOtu OBJECT-TYPE
+    SYNTAX      TimDetectMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the support for Trace Identifier Mismatch (TIM)
+             detection in the OTU overhead."
+    ::= { f3OtnNetPortEntry 4 }
+
+f3OtnNetPortTimAisInsertOtuEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the support for downstream AIS insertion when OTU
+             Trace Identifier Mismatch (TIM) is detected." 
+    ::= { f3OtnNetPortEntry 5 }
+
+f3OtnNetPortTtiActualRxHexOtu OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Represents the value of the Trail Trace Identifier (TTI)
+             in the OTU overhead."
+    ::= { f3OtnNetPortEntry 6 }
+
+f3OtnNetPortTtiSapiActualRxOtu OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Represents the SAPI value of the Trail Trace Identifier (TTI)
+             in the OTU overhead."
+    ::= { f3OtnNetPortEntry 7 }
+
+f3OtnNetPortTtiDapiActualRxOtu OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Represents the DAPI value of the Trail Trace Identifier (TTI)
+             in the OTU overhead."
+    ::= { f3OtnNetPortEntry 8 }
+
+f3OtnNetPortTtiOpSpActualRxOtu OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Represents the Operator Specific (OpSp) value of the
+             Trail Trace Identifier (TTI) in the OTU overhead."
+    ::= { f3OtnNetPortEntry 9 }
+
+f3OtnNetPortTtiSapiExpectedRxOtu OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the expected SAPI value in the received OTU overhead."
+    ::= { f3OtnNetPortEntry 10 }
+
+f3OtnNetPortTtiSapiTxOtu OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the SAPI value in the transmitted OTU overhead."
+    ::= { f3OtnNetPortEntry 11 }
+
+f3OtnNetPortTtiDapiTxOtu OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the DAPI value in the transmitted OTU overhead."
+    ::= { f3OtnNetPortEntry 12 }
+
+f3OtnNetPortTtiOpSpTxOtu OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the Operator Specific (OpSp) value in the transmitted
+             OTU overhead."
+    ::= { f3OtnNetPortEntry 13 }
+
+f3OtnNetPortTimDetectModeOdu OBJECT-TYPE
+    SYNTAX      TimDetectMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the support for Trace Identifier Mismatch (TIM)
+             detection in the ODU overhead."
+    ::= { f3OtnNetPortEntry 14 }
+
+f3OtnNetPortTimAisInsertOduEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the support for downstream AIS insertion when ODU
+             Trace Identifier Mismatch (TIM) is detected." 
+    ::= { f3OtnNetPortEntry 15 }
+
+f3OtnNetPortTtiActualRxHexOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Represents the value of the Trail Trace Identifier (TTI)
+             in the ODU overhead."
+    ::= { f3OtnNetPortEntry 16 }
+
+f3OtnNetPortTtiSapiActualRxOdu OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Represents the SAPI value of the Trail Trace Identifier (TTI)
+             in the ODU overhead."
+    ::= { f3OtnNetPortEntry 17 }
+
+f3OtnNetPortTtiDapiActualRxOdu OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Represents the DAPI value of the Trail Trace Identifier (TTI)
+             in the ODU overhead."
+    ::= { f3OtnNetPortEntry 18 }
+
+f3OtnNetPortTtiOpSpActualRxOdu OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Represents the Operator Specific (OpSp) value of
+             the Trail Trace Identifier (TTI) in the ODU overhead."
+    ::= { f3OtnNetPortEntry 19 }
+
+f3OtnNetPortTtiSapiExpectedRxOdu OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the expected SAPI value in the received ODU overhead."
+    ::= { f3OtnNetPortEntry 20 }
+
+f3OtnNetPortTtiSapiTxOdu OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the SAPI value in the transmitted ODU overhead."
+    ::= { f3OtnNetPortEntry 21 }
+
+f3OtnNetPortTtiDapiTxOdu OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the DAPI value in the transmitted ODU overhead."
+    ::= { f3OtnNetPortEntry 22 }
+
+f3OtnNetPortTtiOpSpTxOdu OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Represents the Operator Specific (OpSp) value in the transmitted ODU overhead."
+    ::= { f3OtnNetPortEntry 23 }
+
+--
+--  Ethernet Network Port Stats Ext Table
+--
+
+f3OtnNetPortStatsExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3OtnNetPortStatsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Ethernet Network Port OTN attributes 
+             related statistics. These reflect the current data."
+    ::= { f3OtnPerfObjects 1 }
+
+f3OtnNetPortStatsExtEntry OBJECT-TYPE
+    SYNTAX      F3OtnNetPortStatsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3OtnNetPortStatsExtEntry."
+    AUGMENTS { cmEthernetNetPortStatsEntry }
+    ::= { f3OtnNetPortStatsExtTable 1 }
+
+F3OtnNetPortStatsExtEntry ::= SEQUENCE {
+    f3OtnNetPortStatsExtBerBeforeCorr          PerfCounter64,
+    f3OtnNetPortStatsExtFecErrSec              Integer32,
+    f3OtnNetPortStatsExtFecSES                 Integer32,
+    f3OtnNetPortStatsExtFecCorrErr             PerfCounter64,
+    f3OtnNetPortStatsExtFecUncorrBlockErr      PerfCounter64,
+    f3OtnNetPortStatsExtOtuErrSec              Integer32,
+    f3OtnNetPortStatsExtOtuSES                 Integer32,
+    f3OtnNetPortStatsExtOtuBBE                 PerfCounter64,
+    f3OtnNetPortStatsExtOtuUAS                 Integer32,
+    f3OtnNetPortStatsExtOduErrSec              Integer32,
+    f3OtnNetPortStatsExtOduSES                 Integer32,
+    f3OtnNetPortStatsExtOduBBE                 PerfCounter64,
+    f3OtnNetPortStatsExtOduUAS                 Integer32
+}
+
+f3OtnNetPortStatsExtBerBeforeCorr OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Ber Before Correction.
+          Lower 32 bits represent the value in a Decimal32 interchange format.
+          For details on encoding please refer to Decimal32's description,
+          defined in fsp150cm-common.mib."
+     ::= { f3OtnNetPortStatsExtEntry 1 }
+
+f3OtnNetPortStatsExtFecErrSec OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "FEC Errored Seconds."
+     ::= { f3OtnNetPortStatsExtEntry 2 }
+
+f3OtnNetPortStatsExtFecSES OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "FEC SES."
+     ::= { f3OtnNetPortStatsExtEntry 3 }
+
+f3OtnNetPortStatsExtFecCorrErr OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "FEC Corrected Seconds."
+     ::= { f3OtnNetPortStatsExtEntry 4 }
+
+f3OtnNetPortStatsExtFecUncorrBlockErr OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "FEC Uncorrected Block Errors."
+     ::= { f3OtnNetPortStatsExtEntry 5 }
+
+f3OtnNetPortStatsExtOtuErrSec OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "OTU Errored Seconds."
+     ::= { f3OtnNetPortStatsExtEntry 6 }
+
+f3OtnNetPortStatsExtOtuSES OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "OTU SES."
+     ::= { f3OtnNetPortStatsExtEntry 7 }
+
+f3OtnNetPortStatsExtOtuBBE OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "OTU BBE."
+     ::= { f3OtnNetPortStatsExtEntry 8 }
+
+f3OtnNetPortStatsExtOtuUAS OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "OTU UAS."
+     ::= { f3OtnNetPortStatsExtEntry 9 }
+
+f3OtnNetPortStatsExtOduErrSec OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "ODU Errored Seconds."
+     ::= { f3OtnNetPortStatsExtEntry 10 }
+
+f3OtnNetPortStatsExtOduSES OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "ODU SES."
+     ::= { f3OtnNetPortStatsExtEntry 11 }
+
+f3OtnNetPortStatsExtOduBBE OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "ODU BBE."
+     ::= { f3OtnNetPortStatsExtEntry 12 }
+
+f3OtnNetPortStatsExtOduUAS OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "ODU UAS."
+     ::= { f3OtnNetPortStatsExtEntry 13 }
+
+--
+--  Ethernet Network Port History Ext Table
+--
+
+f3OtnNetPortHistoryExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3OtnNetPortHistoryExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Ethernet Network Port OTN attributes 
+             related statistics. These reflect the history data."
+    ::= { f3OtnPerfObjects 2 }
+
+f3OtnNetPortHistoryExtEntry OBJECT-TYPE
+    SYNTAX      F3OtnNetPortHistoryExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3OtnNetPortHistoryExtEntry."
+    AUGMENTS { cmEthernetNetPortHistoryEntry }
+    ::= { f3OtnNetPortHistoryExtTable 1 }
+
+F3OtnNetPortHistoryExtEntry ::= SEQUENCE {
+    f3OtnNetPortHistoryExtBerBeforeCorr          PerfCounter64,
+    f3OtnNetPortHistoryExtFecErrSec              Integer32,
+    f3OtnNetPortHistoryExtFecSES                 Integer32,
+    f3OtnNetPortHistoryExtFecCorrErr             PerfCounter64,
+    f3OtnNetPortHistoryExtFecUncorrBlockErr      PerfCounter64,
+    f3OtnNetPortHistoryExtOtuErrSec              Integer32,
+    f3OtnNetPortHistoryExtOtuSES                 Integer32,
+    f3OtnNetPortHistoryExtOtuBBE                 PerfCounter64,
+    f3OtnNetPortHistoryExtOtuUAS                 Integer32,
+    f3OtnNetPortHistoryExtOduErrSec              Integer32,
+    f3OtnNetPortHistoryExtOduSES                 Integer32,
+    f3OtnNetPortHistoryExtOduBBE                 PerfCounter64,
+    f3OtnNetPortHistoryExtOduUAS                 Integer32
+}
+
+f3OtnNetPortHistoryExtBerBeforeCorr OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Ber Before Correction."
+     ::= { f3OtnNetPortHistoryExtEntry 1 }
+
+f3OtnNetPortHistoryExtFecErrSec OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "FEC Errored Seconds."
+     ::= { f3OtnNetPortHistoryExtEntry 2 }
+
+f3OtnNetPortHistoryExtFecSES OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "FEC SES."
+     ::= { f3OtnNetPortHistoryExtEntry 3 }
+
+f3OtnNetPortHistoryExtFecCorrErr OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "FEC Corrected Seconds."
+     ::= { f3OtnNetPortHistoryExtEntry 4 }
+
+f3OtnNetPortHistoryExtFecUncorrBlockErr OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "FEC Uncorrected Block Errors."
+     ::= { f3OtnNetPortHistoryExtEntry 5 }
+
+f3OtnNetPortHistoryExtOtuErrSec OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "OTU Errored Seconds."
+     ::= { f3OtnNetPortHistoryExtEntry 6 }
+
+f3OtnNetPortHistoryExtOtuSES OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "OTU SES."
+     ::= { f3OtnNetPortHistoryExtEntry 7 }
+
+f3OtnNetPortHistoryExtOtuBBE OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "OTU BBE."
+     ::= { f3OtnNetPortHistoryExtEntry 8 }
+
+f3OtnNetPortHistoryExtOtuUAS OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "OTU UAS."
+     ::= { f3OtnNetPortHistoryExtEntry 9 }
+
+f3OtnNetPortHistoryExtOduErrSec OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "ODU Errored Seconds."
+     ::= { f3OtnNetPortHistoryExtEntry 10 }
+
+f3OtnNetPortHistoryExtOduSES OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "ODU SES."
+     ::= { f3OtnNetPortHistoryExtEntry 11 }
+
+f3OtnNetPortHistoryExtOduBBE OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "ODU BBE."
+     ::= { f3OtnNetPortHistoryExtEntry 12 }
+
+f3OtnNetPortHistoryExtOduUAS OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "ODU UAS."
+     ::= { f3OtnNetPortHistoryExtEntry 13 }
+
+--
+-- Conformance
+--
+
+f3OtnCompliances OBJECT IDENTIFIER ::= {f3OtnConformance 1}
+f3OtnGroups      OBJECT IDENTIFIER ::= {f3OtnConformance 2}
+
+f3OtnCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-OTN-MIB compliance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3OtnConfigGroup,
+              f3OtnPerfGroup
+        }
+    ::= { f3OtnCompliances 1 }
+
+f3OtnConfigGroup OBJECT-GROUP
+    OBJECTS {
+       f3OtnNetPortPayloadType, f3OtnNetPortFacilityType,
+       f3OtnNetPortFec, f3OtnNetPortTimDetectModeOtu,
+       f3OtnNetPortTimAisInsertOtuEnabled, f3OtnNetPortTtiActualRxHexOtu,
+       f3OtnNetPortTtiSapiActualRxOtu, f3OtnNetPortTtiDapiActualRxOtu,
+       f3OtnNetPortTtiOpSpActualRxOtu, f3OtnNetPortTtiSapiExpectedRxOtu,
+       f3OtnNetPortTtiSapiTxOtu, f3OtnNetPortTtiDapiTxOtu,
+       f3OtnNetPortTtiOpSpTxOtu, f3OtnNetPortTimDetectModeOdu,
+       f3OtnNetPortTimAisInsertOduEnabled, f3OtnNetPortTtiActualRxHexOdu,
+       f3OtnNetPortTtiSapiActualRxOdu, f3OtnNetPortTtiDapiActualRxOdu,
+       f3OtnNetPortTtiOpSpActualRxOdu, f3OtnNetPortTtiSapiExpectedRxOdu,
+       f3OtnNetPortTtiSapiTxOdu, f3OtnNetPortTtiDapiTxOdu,
+       f3OtnNetPortTtiOpSpTxOdu
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the OTN."
+    ::= { f3OtnGroups 1 }
+
+f3OtnPerfGroup OBJECT-GROUP
+    OBJECTS {
+       f3OtnNetPortStatsExtBerBeforeCorr, f3OtnNetPortStatsExtFecErrSec,
+       f3OtnNetPortStatsExtFecSES, f3OtnNetPortStatsExtFecCorrErr,
+       f3OtnNetPortStatsExtFecUncorrBlockErr, f3OtnNetPortStatsExtOtuErrSec,
+       f3OtnNetPortStatsExtOtuSES, f3OtnNetPortStatsExtOtuBBE,
+       f3OtnNetPortStatsExtOtuUAS, f3OtnNetPortStatsExtOduErrSec,
+       f3OtnNetPortStatsExtOduSES, f3OtnNetPortStatsExtOduBBE,
+       f3OtnNetPortStatsExtOduUAS,
+       f3OtnNetPortHistoryExtBerBeforeCorr, f3OtnNetPortHistoryExtFecErrSec,
+       f3OtnNetPortHistoryExtFecSES, f3OtnNetPortHistoryExtFecCorrErr,
+       f3OtnNetPortHistoryExtFecUncorrBlockErr, f3OtnNetPortHistoryExtOtuErrSec,
+       f3OtnNetPortHistoryExtOtuSES, f3OtnNetPortHistoryExtOtuBBE,
+       f3OtnNetPortHistoryExtOtuUAS, f3OtnNetPortHistoryExtOduErrSec,
+       f3OtnNetPortHistoryExtOduSES, f3OtnNetPortHistoryExtOduBBE,
+       f3OtnNetPortHistoryExtOduUAS
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the OTN PM."
+    ::= { f3OtnGroups 2 }
+
+END

@@ -1,0 +1,439 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-SWITCH-EV-PROP-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systemsproducts, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-SWITCH-EV-PROP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI                  -- RFC2578
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF                 -- RFC2580
+    RowStatus, TruthValue, DisplayString
+        FROM SNMPv2-TC                   -- RFC2579
+    switch
+        FROM PRVT-SWITCH-MIB;
+
+prvtEventPropagation MODULE-IDENTITY
+LAST-UPDATED "201101260000Z"         
+ORGANIZATION "BATM Advanced Communication"       
+CONTACT-INFO
+"BATM/Telco Systems Support team
+Email: 
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"This MIB provides control over the Event Propagation feature"
+-- revision history
+        REVISION       "201101260000Z"
+        DESCRIPTION
+        "Add Event Propagation traps. Curate MIB descriptions. Correct MIB conformance."
+-- revision history
+        REVISION       "201101170000Z"
+        DESCRIPTION
+        "Add more profile event types and profile remote peer types."
+-- revision history
+        REVISION       "201008090000Z"
+        DESCRIPTION
+        "Fix limits for hold-off timer and wait-to-restore timer."
+-- revision history
+        REVISION       "201005200000Z"
+        DESCRIPTION
+        "Add support for hold-off timer and wait-to-restore timer."
+-- revision history
+        REVISION       "200909250000Z"
+        DESCRIPTION
+        "Initial version."
+
+::= { switch 166 }
+
+-- ***********************************************
+-- ************ Top level structure of the MIB****
+-- ***********************************************
+ prvtEvPropNotifications           OBJECT IDENTIFIER ::= { prvtEventPropagation 0 }
+ prvtEvPropObjects                 OBJECT IDENTIFIER ::= { prvtEventPropagation 1 }
+ prvtEvPropConformance             OBJECT IDENTIFIER ::= { prvtEventPropagation 2 }
+
+-- ***********************************************
+-- ************* global scalar objects ***********
+-- ***********************************************
+prvtEventPropagationProfile OBJECT IDENTIFIER ::= { prvtEvPropObjects 1 }
+prvtEventPropagationSession OBJECT IDENTIFIER ::= { prvtEvPropObjects 2 }
+
+prvtEventPropagationProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PrvtEventPropagationProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Profile table that holds the settings for the 
+        Event Propagation"
+    ::= { prvtEventPropagationProfile 1 }
+
+prvtEventPropagationProfileEntry OBJECT-TYPE
+        SYNTAX PrvtEventPropagationProfileEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "NONE"
+        INDEX { prvtEventPropagationProfileIndex }
+        ::= { prvtEventPropagationProfileTable 1 }
+
+PrvtEventPropagationProfileEntry ::= SEQUENCE {
+        prvtEventPropagationProfileIndex                Unsigned32,
+        prvtEventPropagationEvent                               INTEGER,
+        prvtEventPropagationRemotePeerType              INTEGER,
+        prvtEventPropagationRemotePeerID                DisplayString,
+        prvtEventPropagationActionID                    INTEGER,
+        prvtEventPropagationRevertiveActionID   INTEGER,
+        prvtEventPropagationProfileRowStatus    RowStatus,
+        prvtEventPropagationHoldTimer                   Unsigned32,
+        prvtEventPropagationWaitRestoreTimer    Unsigned32
+    }
+
+prvtEventPropagationProfileIndex OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "This is an unique identifier of the 
+        Event Propagation profile table."
+        ::= { prvtEventPropagationProfileEntry 1 }
+
+prvtEventPropagationEvent OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                notSpecified ( 1 ),
+                lossOfConnectivity ( 2 ),
+                receivedAIS ( 3 ),
+                receivedRDI ( 4 ),
+                interfaceDown ( 5 ),
+                testing ( 6 )
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "This leaf defines the type of event that will be monitored."
+        ::= { prvtEventPropagationProfileEntry 2 }
+
+prvtEventPropagationRemotePeerType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                notSpecified ( 1 ),
+                macAddress ( 2 ),
+                remoteMep ( 3 ),
+                interfaceID ( 4 ),
+                ipv4Address ( 5 ),
+                localMep ( 6 ),
+                lagID ( 7 )
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The peer type onto which the event is generated."
+        ::= { prvtEventPropagationProfileEntry 3 }
+
+prvtEventPropagationRemotePeerID OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Remote peer ID"
+        ::= { prvtEventPropagationProfileEntry 4 }
+
+prvtEventPropagationActionID OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                notSpecified ( 1 ),
+                dropLink ( 2 )
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Defines the action to be take in case of an event. "
+        ::= { prvtEventPropagationProfileEntry 5 }
+
+prvtEventPropagationRevertiveActionID OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                notSpecified ( 1 ),
+                restoreLink ( 2 )
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Defines the revertive action to be take in case of
+        an event. "
+        ::= { prvtEventPropagationProfileEntry 6 }
+
+prvtEventPropagationProfileRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Creation/delete/edit of the Event Propagation profile. "
+        ::= { prvtEventPropagationProfileEntry 7 }
+        
+prvtEventPropagationHoldTimer OBJECT-TYPE
+        SYNTAX Unsigned32 (0..600000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The action is performed after a period defined by the hold-off timer. 
+         The value is represented in milliseconds. 
+         A value of '0' depicts no wait period before performing the set action."
+        DEFVAL { 0 }
+        ::= { prvtEventPropagationProfileEntry 8 }
+        
+prvtEventPropagationWaitRestoreTimer OBJECT-TYPE
+        SYNTAX Unsigned32 (0..600)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The revertive action is performed after a period defined by the wait-to-restore timer. 
+         The value is represented in seconds.
+         A value of '0' depicts no wait period before a revertive action is performed."
+        DEFVAL { 0 }
+        ::= { prvtEventPropagationProfileEntry 9 }
+
+-- ***********************************************
+-- ************* global scalar objects ***********
+-- ***********************************************
+
+prvtEventPropagationSessionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PrvtEventPropagationSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Session table that holds the settings for the 
+        Event Propagation"
+    ::= { prvtEventPropagationSession 1 }
+
+prvtEventPropagationSessionEntry OBJECT-TYPE
+        SYNTAX PrvtEventPropagationSessionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "NONE"
+        INDEX { prvtEventPropagationProfileIndex, prvtEventPropagationSessionIndex }
+        ::= { prvtEventPropagationSessionTable 1 }
+
+PrvtEventPropagationSessionEntry ::= SEQUENCE {
+        prvtEventPropagationSessionIndex                                Unsigned32,
+        prvtEventPropagationSessionTargetType                   INTEGER,
+        prvtEventPropagationSessionTargetID                             DisplayString,
+        prvtEventPropagationLastActionCounter                   Counter32,
+        prvtEventPropagationLastRevertiveActionCounter  Counter32,
+        prvtEventPropagationSessionRowStatus                    RowStatus
+        }
+
+prvtEventPropagationSessionIndex OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "This is an unique identifier of the 
+        Event Propagation Session table."
+        ::= { prvtEventPropagationSessionEntry 1 }
+
+prvtEventPropagationSessionTargetType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                notSpecified ( 1 ),
+                interfacePort ( 2 ),
+                interfaceSAP ( 3 )
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The type of target this session affects."
+        ::= { prvtEventPropagationSessionEntry 2 }
+
+prvtEventPropagationSessionTargetID OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(4..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The targetID of this session.
+         It is held in a string that is represented as follows:
+                port - UUSSPP
+                SAP  - ServiceID/UUSSPP:c-vlan:s-vlan
+                        
+         e.g.:   port -  1101, 1207, 1310
+                         SAP  -  1/1101:1:22, 23/1112:24-26, 2756/1112:utag"
+        ::= { prvtEventPropagationSessionEntry 3 }
+
+
+prvtEventPropagationLastActionCounter OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Counts the number of actions that occured."
+        ::= { prvtEventPropagationSessionEntry 4 }
+
+prvtEventPropagationLastRevertiveActionCounter OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Counts the number of revertive actions that occured."
+        ::= { prvtEventPropagationSessionEntry 5 }
+
+prvtEventPropagationSessionRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Creation/delete/edit of the Event Propagation session. "
+        ::= { prvtEventPropagationSessionEntry 6 }
+
+-- ***********************************************
+-- **************** Notification *****************
+-- ***********************************************
+
+prvtEvPropAction NOTIFICATION-TYPE
+          OBJECTS {
+                  prvtEventPropagationEvent,
+                  prvtEventPropagationRemotePeerType,
+                  prvtEventPropagationRemotePeerID,
+                  prvtEventPropagationActionID
+          }
+          STATUS current
+          DESCRIPTION
+            "This trap should be sent whenever an action is
+                        performed."
+          ::= { prvtEvPropNotifications 1 }
+
+prvtEvPropRevert NOTIFICATION-TYPE
+          OBJECTS {
+                  prvtEventPropagationEvent,
+                  prvtEventPropagationRemotePeerType,
+                  prvtEventPropagationRemotePeerID,
+                  prvtEventPropagationRevertiveActionID
+          }
+          STATUS current
+          DESCRIPTION
+            "This trap should be sent whenever a revert action is
+                        performed."
+          ::= { prvtEvPropNotifications 2 }
+
+        
+        
+-- ******************************************************************
+-- PRVT-SWITCH-EV-PROP MIB Module - Conformance Information
+-- ******************************************************************
+
+prvtEvPropCompliances OBJECT IDENTIFIER ::= { prvtEvPropConformance 1 }
+prvtEvPropGroups      OBJECT IDENTIFIER ::= { prvtEvPropConformance 2 }
+
+-- ******************************************************************
+-- Units of conformance
+-- ******************************************************************
+
+prvtEvPropProfileGroup OBJECT-GROUP
+    OBJECTS {
+            prvtEventPropagationEvent,
+            prvtEventPropagationRemotePeerType,
+            prvtEventPropagationRemotePeerID,
+            prvtEventPropagationActionID,
+            prvtEventPropagationRevertiveActionID,
+            prvtEventPropagationProfileRowStatus,
+            prvtEventPropagationHoldTimer,
+            prvtEventPropagationWaitRestoreTimer
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Event Propagation profiles group."
+    ::= { prvtEvPropGroups 1 }
+    
+prvtEvPropSessionGroup OBJECT-GROUP
+    OBJECTS {
+        prvtEventPropagationSessionTargetType,        
+        prvtEventPropagationSessionTargetID,        
+        prvtEventPropagationLastActionCounter,        
+        prvtEventPropagationLastRevertiveActionCounter,        
+        prvtEventPropagationSessionRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Event Propagation sessions group."
+    ::= { prvtEvPropGroups 2 }
+    
+prvtEvPropNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+      prvtEvPropAction,
+      prvtEvPropRevert
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Event Propagation notifications group."
+    ::= { prvtEvPropGroups 3 }
+    
+-- ******************************************************************
+-- MIB Module Compliance statements
+-- ******************************************************************
+
+prvtEvPropCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the Event Propagation MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+            prvtEvPropProfileGroup,
+            prvtEvPropSessionGroup,
+            prvtEvPropNotificationsGroup
+            }
+
+    OBJECT prvtEventPropagationProfileRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2), notReady(3) }
+      WRITE-SYNTAX RowStatus { active(1), notInService(2), notReady(3),
+                               createAndWait(5), destroy(6) }
+      DESCRIPTION "Support for createAndWait is required."
+
+    OBJECT prvtEventPropagationSessionRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2), notReady(3) }
+      WRITE-SYNTAX RowStatus { active(1), notInService(2), notReady(3),
+                               createAndWait(5), destroy(6) }
+      DESCRIPTION "Support for createAndWait is required."
+
+    ::= { prvtEvPropCompliances 1 }
+
+
+END

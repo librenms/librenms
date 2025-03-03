@@ -1,0 +1,2364 @@
+-- *****************************************************************
+-- *** Warning *** This MIB module has been deprecated.
+-- *** Warning *** CERENT-HC-RMON MIB replaces this MIB
+-- *** Warning *** from R5.00 onwards.
+-- *****************************************************************
+
+-- *****************************************************************
+-- CERENT-FC-MIB.mib  
+-- Cerent Fibre Channel MIB
+--
+-- Copyright (c) 2003 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CERENT-FC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Counter32,
+    Counter64,
+    Integer32,
+    MODULE-IDENTITY,
+    OBJECT-TYPE                         FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP                        FROM SNMPv2-CONF
+    ifIndex                             FROM IF-MIB
+    CerentPeriod                        FROM CERENT-TC
+    cerentModules,
+    cerentRequirements,
+    cerentGeneric                       FROM CERENT-GLOBAL-REGISTRY
+;
+
+
+cerentFcMIB MODULE-IDENTITY
+    LAST-UPDATED   "0302110000Z" -- 2003/Feb/11  
+    ORGANIZATION   "Cisco Systems, Inc."
+    CONTACT-INFO   "support@Cisco.com
+
+                    Postal:
+                    Cisco Systems
+                    1450 N. McDowell Blvd.
+                    Petaluma, CA 94954
+
+                    Tel: +1-877-323-7368"
+    DESCRIPTION
+        "This MIB module defines the managed objects for performance  
+        monitoring of supported Fibre Channel interfaces."
+
+        
+    REVISION   "0302110000Z" -- 2003/Feb/11  
+    DESCRIPTION
+        "The initial revision of this MIB."
+    ::= { cerentModules 100 }  
+
+
+    
+-- MIB Object Definitions
+
+cerentFcMIBObjects    OBJECT IDENTIFIER ::= { cerentGeneric 60 }
+
+-- groups in this MIB module
+
+cerentFc            OBJECT IDENTIFIER  
+                       ::= { cerentFcMIBObjects 1 }
+
+
+-- cerentFc                        
+-- This group deals with FC statistics on the Fibre Channel 
+-- interfaces
+
+cFcStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CFcStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table reports the current values of the Fibre channel
+         stats on the supported interfaces."
+    ::= { cerentFc 1 }
+
+cFcStatsEntry OBJECT-TYPE
+    SYNTAX        CFcStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A collection of Fibre Channel statisctics on an interface."
+    INDEX         { ifIndex }
+    ::= { cFcStatsTable 1 }
+
+CFcStatsEntry ::= SEQUENCE {
+    cFcStatsInvalidOrdSets             Counter32,
+    cFcStatsInvalidOrdSetsHigh         Counter32,
+    cFcStatsEncodingDispErr            Counter32,
+    cFcStatsEncodingDispErrHigh        Counter32,
+    cFcStatsInTotalErr                 Counter32,
+    cFcStatsInTotalErrHigh             Counter32,
+    cFcStatsInFramesTrunc              Counter32,
+    cFcStatsInFramesTruncHigh          Counter32,
+    cFcStatsInFramesTooLong            Counter32,
+    cFcStatsInFramesTooLongHigh        Counter32,
+    cFcStatsInFramesBadCRC             Counter32,
+    cFcStatsInFramesBadCRCHigh         Counter32,
+    cFcStatsInFrames                   Counter32,
+    cFcStatsInFramesHigh               Counter32,
+    cFcStatsInElements                 Counter32,
+    cFcStatsInElementsHigh             Counter32,
+    cFcStatsInDiscards                 Counter32,
+    cFcStatsInDiscardsHigh             Counter32,
+    cFcStatsOutFramesBadCRC            Counter32,
+    cFcStatsOutFramesBadCRCHigh        Counter32,
+    cFcStatsOutFrames                  Counter32,
+    cFcStatsOutFramesHigh              Counter32,
+    cFcStatsOutElements                Counter32,
+    cFcStatsOutElementsHigh            Counter32,
+    cFcStatsOutDiscards                Counter32,
+    cFcStatsOutDiscardsHigh            Counter32,
+    cFcStatsLinkResets                 Counter32,
+    cFcStatsLinkResetsHigh             Counter32,
+    cFcStatsGfpInSBitErr               Counter32,
+    cFcStatsGfpInSBitErrHigh           Counter32,
+    cFcStatsGfpInMBitErr               Counter32,
+    cFcStatsGfpInMBitErrHigh           Counter32,
+    cFcStatsGfpInTypeInvalid           Counter32,
+    cFcStatsGfpInTypeInvalidHigh       Counter32,
+    cFcStatsGfpInSBlkCRCErr            Counter32,
+    cFcStatsGfpInSBlkCRCErrHigh        Counter32
+}
+
+cFcStatsInvalidOrdSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of invalid 
+         ordered sets encountered on this interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsInvalidOrdSetsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInvalidOrdSetsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 10 }
+
+cFcStatsInvalidOrdSetsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         invalid ordered sets on the particular interface. 
+         
+         If the value of cFcStatsInvalidOrdSets
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInvalidOrdSetsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 20 }
+
+cFcStatsEncodingDispErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of encoding
+         disparity errors encountered on this interface.
+
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsEncodingDispErrHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsEncodingDispErrHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 30 }
+
+cFcStatsEncodingDispErrHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         encoding disparity errors on the particular interface. 
+         
+         If the value of cFcStatsEncodingDispErr
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsEncodingDispErrHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 40 }
+
+cFcStatsInTotalErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the total number of 
+         errors encountered on the particular interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsInTotalErrHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInTotalErrHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 50 }
+
+cFcStatsInTotalErrHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the total number 
+         of errors encountered on the particular interface. 
+         
+         If the value of cFcStatsInTotalErr
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInTotalErrHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 60 }
+    
+
+cFcStatsInFramesTrunc OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of fibre 
+         channel truncated frames received on this interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsInFramesTruncHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInFramesTruncHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 70 }
+
+cFcStatsInFramesTruncHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         fibre channel truncated frames received on this interface. 
+         
+         If the value of cFcStatsInFramesTrunc
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInFramesTruncHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 80 }
+
+cFcStatsInFramesTooLong OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of 
+         fibre channel frames received on this interface
+         with a length greater than what was agreed to.
+
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsInFramesTooLongHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInFramesTooLongHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 90 }
+
+cFcStatsInFramesTooLongHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         fibre channel frames received on this interface
+         with a length greater than what was agreed to.
+         
+         If the value of cFcStatsInFramesTooLong
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInFramesTooLongHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 100 }
+
+cFcStatsInFramesBadCRC OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of frames received 
+         with invalid CRC, on this interface.  
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsInFramesBadCRCHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInFramesBadCRCHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 110 }
+
+cFcStatsInFramesBadCRCHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value of the number of 
+         frames received with invalid CRC, on this interface.
+         
+         If the value of cFcStatsInFramesBadCRC
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInFramesBadCRCHigh, which is a 64 bit counter."
+    ::= { cFcStatsEntry 120 }
+
+cFcStatsInFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         fibre channel frames received on this interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsInFramesHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInFramesHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 130 }
+
+cFcStatsInFramesHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         fibre channel frames received on this interface. 
+         
+         If the value of cFcStatsInFrames
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInFramesHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 140 }
+
+cFcStatsInElements OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         received bytes on the particular interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsInElementsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInElementsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 150 }
+
+cFcStatsInElementsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         received bytes on the particular interface. 
+         
+         If the value of cFcStatsInElements
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInElementsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 160 }
+
+cFcStatsInDiscards OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         received frames on this interface that were 
+         discarded.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsInDiscardsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInDiscardsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 170 }
+
+cFcStatsInDiscardsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         received frames discarded on the particular interface. 
+         
+         If the value of cFcStatsInDiscards
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsInDiscardsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 180 }
+
+cFcStatsOutFramesBadCRC OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of frames
+         transmitted with invalid CRC, on this interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsOutFramesBadCRCHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsOutFramesBadCRCHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 190 }
+
+cFcStatsOutFramesBadCRCHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         frames transmitted with invalid CRC, on this interface.
+         
+         If the value of cFcStatsOutFramesBadCRC
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsOutFramesBadCRCHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 200 }
+
+cFcStatsOutFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of 
+         fibre channel frames transmitted on this interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsOutFramesHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsOutFramesHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 210 }
+
+cFcStatsOutFramesHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value of the number 
+         of fibre channel frames transmitted on this interface. 
+         
+         If the value of cFcStatsOutFrames
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsOutFramesHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 220 }
+
+cFcStatsOutElements OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         trasmitted bytes on the particular interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsOutElementsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsOutElementsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 230 }
+
+cFcStatsOutElementsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         transmitted bytes on the particular interface. 
+         
+         If the value of cFcStatsOutElements
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsOutElementsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 240 }
+
+cFcStatsOutDiscards OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of transmitted 
+         frames on this interface that were discarded.
+
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsOutDiscardsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsOutDiscardsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 250 }
+
+cFcStatsOutDiscardsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value of 
+         the number of transmitted 
+         frames on this interface that were discarded.
+         
+         If the value of cFcStatsOutDiscards
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsOutDiscardsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 260 }
+
+cFcStatsLinkResets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         link resets detected on this particular interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsLinkResetsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsLinkResetsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 270 }
+
+cFcStatsLinkResetsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         link resets detected on the particular interface. 
+         
+         If the value of cFcStatsLinkResets
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsLinkResetsHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 280 }
+
+cFcStatsGfpInSBitErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         single bit GFP errors received on this interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsGfpInSBitErrHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsGfpInSBitErrHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 290 }
+
+cFcStatsGfpInSBitErrHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         single bit GFP errors received on this interface. 
+         
+         If the value of cFcStatsGfpInSBitErr
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsGfpInSBitErrHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 300 }
+
+cFcStatsGfpInMBitErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of  
+         multi bit GFP errors received on this interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsGfpInMBitErrHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsGfpInMBitErrHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 310 }
+
+cFcStatsGfpInMBitErrHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         multi bit GFP errors received on this interface. 
+         
+         If the value of cFcStatsGfpInMBitErr
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsGfpInMBitErrHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 320 }
+
+cFcStatsGfpInTypeInvalid OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of GFP frames
+         received on this interface with an invalid type.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsGfpInTypeInvalidHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsGfpInTypeInvalidHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 330 }
+
+cFcStatsGfpInTypeInvalidHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value of the number
+         of GFP frames received on this interface with an invalid
+         type. 
+         
+         If the value of cFcStatsGfpInTypeInvalid
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsGfpInTypeInvalidHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 340 }
+
+cFcStatsGfpInSBlkCRCErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         GFP super block CRC errors received on this interface.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcStatsGfpInSblkCRCErrHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsGfpInSblkCRCErrHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 350 }
+
+cFcStatsGfpInSBlkCRCErrHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         GFP super block CRC errors received on the particular
+         interface. 
+         
+         If the value of cFcStatsGfpInSblkCRCErr
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcStatsGfpInSblkCRCErrHC, which is a 64 bit counter."
+    ::= { cFcStatsEntry 360 }
+
+
+-- Fibre Channel HC table (High Capacity 64 bit counters)
+
+cFcStatsHCTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CFcStatsHCEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table reports GFP stats on supported Fibre Channel
+         interfaces."
+    ::= { cerentFc 2 }
+
+cFcStatsHCEntry OBJECT-TYPE
+    SYNTAX        CFcStatsHCEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A collection of Fibre channel statisctics on an interface.
+         All the counters in this table are 64 bits counters and 
+         are useful only to SNMP v2 and v3 managers."
+    INDEX         { ifIndex }
+    ::= { cFcStatsHCTable 1 }
+
+CFcStatsHCEntry ::= SEQUENCE {
+    cFcStatsInvalidOrdSetsHC           Counter64,
+    cFcStatsEncodingDispErrHC          Counter64,
+    cFcStatsInTotalErrHC               Counter64,
+    cFcStatsInFramesTruncHC            Counter64,
+    cFcStatsInFramesTooLongHC          Counter64,
+    cFcStatsInFramesBadCRCHC           Counter64,
+    cFcStatsInFramesHC                 Counter64,
+    cFcStatsInElementsHC               Counter64,
+    cFcStatsInDiscardsHC               Counter64,
+    cFcStatsOutFramesBadCRCHC          Counter64,
+    cFcStatsOutFramesHC                Counter64,
+    cFcStatsOutElementsHC              Counter64,
+    cFcStatsOutDiscardsHC              Counter64,
+    cFcStatsLinkResetsHC               Counter64,
+    cFcStatsGfpInSBitErrHC             Counter64,
+    cFcStatsGfpInMBitErrHC             Counter64,
+    cFcStatsGfpInTypeInvalidHC         Counter64,
+    cFcStatsGfpInSBlkCRCErrHC          Counter64
+}
+
+cFcStatsInvalidOrdSetsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of invalid ordered 
+         sets encountered on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 10 }
+
+cFcStatsEncodingDispErrHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of encoding 
+         disparity errors encountered on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 20 }
+
+cFcStatsInTotalErrHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the total number of 
+         errors encountered on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 30 }
+
+cFcStatsInFramesTruncHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of fibre channel
+         truncated frames received on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 40 }
+
+cFcStatsInFramesTooLongHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of fibre channel 
+         frames received with a length greater than what was agreed
+         to on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 50 }
+
+cFcStatsInFramesBadCRCHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of frames received 
+         with invalid CRC, on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 60 }
+    
+cFcStatsInFramesHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         fibre channel frames received on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 70 }
+    
+cFcStatsInElementsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         bytes received on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 80 }
+
+cFcStatsInDiscardsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         received frames discarded on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 90 }
+
+cFcStatsOutFramesBadCRCHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of transmitted
+         frames with invalid CRC, on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 100 }
+    
+cFcStatsOutFramesHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         fibre channel frames transmitted on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 110 }
+    
+cFcStatsOutElementsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         bytes transmitted on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 120 }
+
+cFcStatsOutDiscardsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of transmitted 
+         frames on this interface that were discarded.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 130 }
+
+cFcStatsLinkResetsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         link resets detected on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 140 }
+
+cFcStatsGfpInSBitErrHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of single bit 
+         GFP errors received on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 150 }
+
+cFcStatsGfpInMBitErrHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of multi bit 
+         GFP errors received on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 160 }
+
+cFcStatsGfpInTypeInvalidHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of GFP frames received 
+         on this interface with an invalid type. 
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 170 }
+
+cFcStatsGfpInSBlkCRCErrHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of GFP super block 
+         CRC errors received on this interface.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcStatsHCEntry 180 }
+
+
+-- cFcHistTable
+    
+cFcHistTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CFcHistEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table reports fibre channel stats on supported 
+         interfaces for previous intervals."
+    ::= { cerentFc 3 }
+
+cFcHistEntry OBJECT-TYPE
+    SYNTAX        CFcHistEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A collection of Fibre Channel stats history on an
+         interface."
+    INDEX         { ifIndex, cFcHistIntervalType,
+                    cFcHistIntervalNum }
+    ::= { cFcHistTable 1 }
+
+CFcHistEntry ::= SEQUENCE {
+    cFcHistIntervalType               CerentPeriod,
+    cFcHistIntervalNum                INTEGER,
+    cFcHistInvalidOrdSets             Counter32,
+    cFcHistInvalidOrdSetsHigh         Counter32,
+    cFcHistEncodingDispErr            Counter32,
+    cFcHistEncodingDispErrHigh        Counter32,
+    cFcHistInTotalErr                 Counter32,
+    cFcHistInTotalErrHigh             Counter32,
+    cFcHistInFramesTrunc              Counter32,
+    cFcHistInFramesTruncHigh          Counter32,
+    cFcHistInFramesTooLong            Counter32,
+    cFcHistInFramesTooLongHigh        Counter32,
+    cFcHistInFramesBadCRC             Counter32,
+    cFcHistInFramesBadCRCHigh         Counter32,
+    cFcHistInFrames                   Counter32,
+    cFcHistInFramesHigh               Counter32,
+    cFcHistInElements                 Counter32,
+    cFcHistInElementsHigh             Counter32,
+    cFcHistInDiscards                 Counter32,
+    cFcHistInDiscardsHigh             Counter32,
+    cFcHistOutFramesBadCRC            Counter32,
+    cFcHistOutFramesBadCRCHigh        Counter32,
+    cFcHistOutFrames                  Counter32,
+    cFcHistOutFramesHigh              Counter32,
+    cFcHistOutElements                Counter32,
+    cFcHistOutElementsHigh            Counter32,
+    cFcHistOutDiscards                Counter32,
+    cFcHistOutDiscardsHigh            Counter32,
+    cFcHistLinkResets                 Counter32,
+    cFcHistLinkResetsHigh             Counter32,
+    cFcHistGfpInSBitErr               Counter32,
+    cFcHistGfpInSBitErrHigh           Counter32,
+    cFcHistGfpInMBitErr               Counter32,
+    cFcHistGfpInMBitErrHigh           Counter32,
+    cFcHistGfpInTypeInvalid           Counter32,
+    cFcHistGfpInTypeInvalidHigh       Counter32,
+    cFcHistGfpInSBlkCRCErr            Counter32,
+    cFcHistGfpInSBlkCRCErrHigh        Counter32
+  
+}
+
+cFcHistIntervalType OBJECT-TYPE
+    SYNTAX        CerentPeriod
+    MAX-ACCESS    not-accessible        
+    STATUS        current
+    DESCRIPTION
+        "This object specifies the type of interval for which the
+         data is being obtained."
+    ::= { cFcHistEntry 10 }
+
+cFcHistIntervalNum OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    not-accessible        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of the particular interval
+        for which the data is being obtained."
+        
+    ::= { cFcHistEntry 20 }
+
+cFcHistInvalidOrdSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of invalid 
+         ordered sets on the particular interface during this
+         sampling interval.
+         
+         This object only shows the lower word value of 
+         the counter. The high word value is given by
+         cFcHistInvalidOrdSetsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInvalidOrdSetsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 30 }
+
+cFcHistInvalidOrdSetsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         invalid ordered sets on the particular interface during
+         this sampling interval. 
+         
+         If the value of cFcHistInvalidOrdSets
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInvalidOrdSetsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 40 }
+
+cFcHistEncodingDispErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of encoding
+         disparity errors on the particular interface during
+         this sampling interval.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistEncodingDispErrHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistEncodingDispErrHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 50 }
+
+cFcHistEncodingDispErrHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         encoding disparity errors on the particular interface
+         during this sampling interval. 
+         
+         If the value of cFcHistEncodingDispErr
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistEncodingDispErrHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 60 }
+
+cFcHistInTotalErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the total number of
+         errors encountered on this interface during 
+         this sampling interval.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistInTotalErrHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInTotalErrHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 70 }
+
+cFcHistInTotalErrHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value of the total
+         number of errors encountered on this interface
+         during this sampling interval. 
+         
+         If the value of cFcHistInTotalErr
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInTotalErrHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 80 }
+    
+
+cFcHistInFramesTrunc OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of fibre channel 
+         truncated frames received on the particular interface
+         during this sampling interval.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistInFramesTruncHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInFramesTruncHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 90 }
+
+cFcHistInFramesTruncHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         fibre channel truncated frames received on this interface
+         during this sampling interval. 
+         
+         If the value of cFcHistInFramesTrunc
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInFramesTruncHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 100 }
+
+cFcHistInFramesTooLong OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of fibre
+         channel frames received on this interface
+         during this sampling interval with a length greater
+         than what was agreed to.
+                  
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistInFramesTooLongHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInFramesTooLongHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 110 }
+
+cFcHistInFramesTooLongHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         fibre channel frames received on this interface 
+         during this sampling interval with a length greater 
+         than what was agreed to.
+
+         If the value of cFcHistInFramesTooLong
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInFramesTooLongHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 120 }
+
+cFcHistInFramesBadCRC OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of  
+         frames received with invalid CRC, on this interface
+         during this sampling interval.
+
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistInFramesBadCRCHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInFramesBadCRCHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 130 }
+
+cFcHistInFramesBadCRCHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         frames received with invalid CRC, on this interface
+         during this sampling interval.
+         
+         If the value of cFcHistInFramesBadCRC
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInFramesBadCRCHigh, which is a 64 bit counter."
+    ::= { cFcHistEntry 140 }
+
+cFcHistInFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         fibre channel frames received on this interface
+         during this sampling interval.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistInFramesHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInFramesHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 150 }
+
+cFcHistInFramesHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         fibre channel frames received on this interface
+         during this sampling interval.
+         
+         If the value of cFcHistInFrames
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInFramesHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 160 }
+
+cFcHistInElements OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         received bytes on the particular interface
+         during this sampling interval.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistInElementsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInElementsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 170 }
+
+cFcHistInElementsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         received bytes on the particular interface
+         during this sampling interval.
+
+         If the value of cFcHistInElements
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInElementsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 180 }
+
+cFcHistInDiscards OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the the number of 
+         received frames discarded on this interface
+         during this sampling interval.
+
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistInDiscardsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInDiscardsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 190 }
+
+cFcHistInDiscardsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value of the number 
+         of received frames discarded on this interface
+         during this sampling interval.
+
+         If the value of cFcHistInDiscards
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistInDiscardsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 200 }
+
+cFcHistOutFramesBadCRC OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the the number of  
+         frames transmitted with invalid CRC, on this
+         interface, during this sampling interval.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistOutFramesBadCRCHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistOutFramesBadCRCHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 210 }
+
+cFcHistOutFramesBadCRCHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         frames transmitted with invalid CRC, on this
+         interface, during this sampling interval.
+         
+         If the value of cFcHistOutFramesBadCRC
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistOutFramesBadCRCHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 220 }
+    
+cFcHistOutFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         frames transmitted on the particular interface
+         during this sampling interval.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistOutFramesHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistOutFramesHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 230 }
+
+cFcHistOutFramesHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         frames transmitted on the particular interface
+         during this sampling interval. 
+
+         If the value of cFcHistOutFrames
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistOutFramesHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 240 }
+
+cFcHistOutElements OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         trasmitted bytes on the particular interface
+         during this sampling interval.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistOutElementsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistOutElementsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 250 }
+
+cFcHistOutElementsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value of the number
+         of transmitted bytes on the particular interface
+         during this sampling interval.
+
+         If the value of cFcHistOutElements
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistOutElementsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 260 }
+
+cFcHistOutDiscards OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of 
+         transmitted frames discarded on this interface
+         during this sampling interval.
+
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistOutDiscardsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistOutDiscardsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 270 }
+
+cFcHistOutDiscardsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         transmitted frames discarded on this interface
+         during this sampling interval.
+
+         If the value of cFcHistOutDiscards
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistOutDiscardsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 280 }
+
+cFcHistLinkResets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         link resets detected on the particular interface
+         during this sampling interval.
+
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistLinkResetsHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistLinkResetsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 290 }
+
+cFcHistLinkResetsHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         link resets detected on the particular interface
+         during this interval.
+         
+         If the value of cFcHistLinkResets
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistLinkResetsHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 300 }
+
+cFcHistGfpInSBitErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of 
+         single bit GFP errors received on this interface
+         during this sampling interval.
+
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistGfpInSBitErrHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistGfpInSBitErrHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 310 }
+
+cFcHistGfpInSBitErrHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value of the number of 
+         single bit GFP errors received on this interface
+         during this sampling interval.
+
+         If the value of cFcHistGfpInSBitErr
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistGfpInSBitErrHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 320 }
+
+cFcHistGfpInMBitErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of  
+         multi bit GFP errors received on this interface
+         during this sampling interval.
+
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistGfpInMBitErrHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistGfpInMBitErrHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 330 }
+
+cFcHistGfpInMBitErrHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         multi bit GFP errors received on this interface
+         during this sampling interval. 
+
+         If the value of cFcHistGfpInMBitErr
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistGfpInMBitErrHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 340 }
+
+cFcHistGfpInTypeInvalid OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of received 
+         GFP frames with an invalid type on this interface
+         during this sampling interval.
+         
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistGfpInTypeInvalidHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistGfpInTypeInvalidHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 350 }
+
+cFcHistGfpInTypeInvalidHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value of the number
+         of received GFP frames with an invalid type on this
+         interface, during this sampling interval.
+         
+         If the value of cFcHistGfpInTypeInvalid
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistGfpInTypeInvalidHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 360 }
+
+cFcHistGfpInSBlkCRCErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 
+         super block CRC GFP errors received on this interface
+         during this sampling interval.
+
+         This object only shows the lower word value of 
+         the counter.The high word value is given by
+         cFcHistGfpInSblkCRCErrHigh.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistGfpInSBlkCRCErrHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 370 }
+
+cFcHistGfpInSBlkCRCErrHigh OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         super block CRC GFP errors received on this interface
+         during this sampling interval. 
+
+         If the value of cFcHistGfpInSblkCRCErr
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         cFcHistGfpInSBlkCRCErrHC, which is a 64 bit counter."
+    ::= { cFcHistEntry 380 }
+
+
+-- Fibre Channel HC table (High Capacity 64 bit counters)
+
+cFcHistHCTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CFcHistHCEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table reports history of fibre channel stats on 
+        supported Fibre Channel interfaces."
+    ::= { cerentFc 4 }
+
+cFcHistHCEntry OBJECT-TYPE
+    SYNTAX        CFcHistHCEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A collection of history of Fibre channel statisctics
+        on an interface.
+        All the counters in this table are 64 bits counters and 
+        are useful only to SNMP v2 and v3 managers."
+    INDEX         { ifIndex, cFcHistIntervalType,cFcHistIntervalNum}
+    ::= { cFcHistHCTable 1 }
+
+CFcHistHCEntry ::= SEQUENCE {
+    cFcHistInvalidOrdSetsHC           Counter64,
+    cFcHistEncodingDispErrHC          Counter64,
+    cFcHistInTotalErrHC               Counter64,
+    cFcHistInFramesTruncHC            Counter64,
+    cFcHistInFramesTooLongHC          Counter64,
+    cFcHistInFramesBadCRCHC           Counter64,
+    cFcHistInFramesHC                 Counter64,
+    cFcHistInElementsHC               Counter64,
+    cFcHistInDiscardsHC               Counter64,
+    cFcHistOutFramesBadCRCHC          Counter64,
+    cFcHistOutFramesHC                Counter64,
+    cFcHistOutElementsHC              Counter64,
+    cFcHistOutDiscardsHC              Counter64,
+    cFcHistLinkResetsHC               Counter64,
+    cFcHistGfpInSBitErrHC             Counter64,
+    cFcHistGfpInMBitErrHC             Counter64,
+    cFcHistGfpInTypeInvalidHC         Counter64,
+    cFcHistGfpInSBlkCRCErrHC          Counter64
+}
+
+cFcHistInvalidOrdSetsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of invalid ordered 
+         sets encountered on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 10 }
+
+cFcHistEncodingDispErrHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of encoding 
+         disparity errors encountered on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 20 }
+
+cFcHistInTotalErrHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the total number of 
+         errors encountered on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 30 }
+    
+
+cFcHistInFramesTruncHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of fibre channel
+         truncated frames received on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 40 }
+
+cFcHistInFramesTooLongHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of fibre channel 
+         frames received on this interface during this sampling 
+         interval, with a length greater than what was 
+         agreed to.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 50 }
+
+cFcHistInFramesBadCRCHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of frames
+         received with an invalid CRC, on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 60 }
+    
+cFcHistInFramesHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         frames received on this interface, during this
+         sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 70 }
+    
+cFcHistInElementsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         bytes received on this interface during this
+         sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 80 }
+
+cFcHistInDiscardsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         received frames discarded on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 90 }
+
+cFcHistOutFramesBadCRCHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         frames transmitted with an invalid CRC, 
+         on this interface during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 100 }
+        
+cFcHistOutFramesHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         fibre channel frames transmitted on this interface 
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 110 }
+    
+cFcHistOutElementsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         bytes received on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 120 }
+
+cFcHistOutDiscardsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         transmitted frames discarded on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 130 }
+
+cFcHistLinkResetsHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         link resets detected on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 140 }
+
+cFcHistGfpInSBitErrHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of single bit 
+         GFP errors received on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 150 }
+
+cFcHistGfpInMBitErrHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of multi bit 
+         GFP errors received on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 160 }
+
+cFcHistGfpInTypeInvalidHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of  
+         GFP frames with invalid type received on this 
+         interface, during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 170 }
+
+cFcHistGfpInSBlkCRCErrHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of GFP super 
+         block CRC errors received on this interface
+         during this sampling interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { cFcHistHCEntry 180 }
+
+
+-- The cFcAlarm Table
+
+cFcAlarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CFcAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "A list of cFcAlarm entries."
+    ::= { cerentFc 5 }
+
+cFcAlarmEntry OBJECT-TYPE
+     SYNTAX CFcAlarmEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+          "A list of parameters that set up a periodic checking
+           for cFcAlarm conditions."
+     INDEX { cFcAlarmIndex }
+     ::= { cFcAlarmTable 1 }
+
+CFcAlarmEntry ::= SEQUENCE {
+              cFcAlarmIndex                    INTEGER,
+              cFcAlarmInterval                 INTEGER,
+              cFcAlarmVariable                 OBJECT IDENTIFIER,
+              cFcAlarmSampleType               INTEGER,
+              cFcAlarmValue                    Counter32,
+              cFcAlarmValueHigh                Counter32,
+              cFcAlarmStartupAlarm             INTEGER,
+              cFcAlarmRisingThreshold          Integer32,
+              cFcAlarmRisingThresholdHigh      Integer32,
+              cFcAlarmFallingThreshold         Integer32,
+              cFcAlarmFallingThresholdHigh     Integer32,
+              cFcAlarmStatus                   INTEGER
+          }
+
+cFcAlarmIndex OBJECT-TYPE
+     SYNTAX INTEGER (1..65535)
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+           "An index that uniquely identifies an entry in the
+            cFcAlarm table.  Each such entry defines a
+            diagnostic sample at a particular interval
+            for an object on the device."
+     ::= { cFcAlarmEntry 10 }
+
+cFcAlarmInterval OBJECT-TYPE
+      SYNTAX INTEGER(1..8000)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+            "The interval in seconds over which the data is
+             sampled and compared with the rising and falling
+             thresholds.  When setting this variable, care
+             should be taken in the case of deltaValue
+             sampling - the interval should be set short enough
+             that the sampled variable is very unlikely to
+             increase or decrease by more than 2^31 - 1 during
+             a single sampling interval."
+      ::= { cFcAlarmEntry 20 }
+
+cFcAlarmVariable OBJECT-TYPE
+      SYNTAX OBJECT IDENTIFIER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The object identifier of the particular variable to
+              be sampled."  
+     ::= { cFcAlarmEntry 30 }
+
+cFcAlarmSampleType OBJECT-TYPE
+      SYNTAX INTEGER {
+          absoluteValue(1),
+          deltaValue(2)
+              }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "The method of sampling the selected variable and
+               calculating the value to be compared against the
+               thresholds.  If the value of this object is
+               absoluteValue(1), the value of the selected variable
+               will be compared directly with the thresholds at the
+               end of the sampling interval.  If the value of this
+               object is deltaValue(2), the value of the selected
+               variable at the last sample will be subtracted from
+               the current value, and the difference compared with
+               the thresholds."
+      ::= { cFcAlarmEntry 40 }
+
+cFcAlarmValue OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+              "The value of the statistic during the last sampling
+               period.  For example, if the sample type is
+               deltaValue, this value will be the difference
+               between the samples at the beginning and end of the
+               period.  If the sample type is absoluteValue, this
+               value will be the sampled value at the end of the
+               period. This is the value that is compared with the
+               rising and falling thresholds.
+
+               This object only shows the lower word value.
+               The high word value is given by cFcAlarmValueHigh.
+
+               The value during the current sampling period is not
+               made available until the period is completed and will
+               remain available until the next period completes."
+      ::= { cFcAlarmEntry 50 }
+
+cFcAlarmValueHigh OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+               "The higher word value of the statistic during the
+               last sampling period.
+
+               If the value of cFcAlarmValue
+               is greater than 4,294,967,295, the higher word 
+               value will be stored in this object."
+      ::= { cFcAlarmEntry 60 }
+
+cFcAlarmStartupAlarm OBJECT-TYPE
+        SYNTAX INTEGER {
+               risingcFcAlarm(1),
+               fallingcFcAlarm(2),
+               risingOrFallingcFcAlarm(3)
+              }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+               "The cFcAlarm that may be sent when this entry is
+                set to valid.  
+
+                If the first sample after this entry
+                becomes valid is greater than or equal to the
+                risingThreshold and cFcAlarmStartupAlarm is equal to
+                risingcFcAlarm(1) or risingOrFallingAlarm(3), then a
+                single rising cFcAlarm will be generated. If the
+                sample after this entry becomes valid is less than
+                or equal to the fallingThreshold and
+                cFcAlarmStartupAlarm is equal to fallingAlarm(2) or
+                risingOrFallingcFcAlarm(3), then a single falling 
+                alarm will be generated."
+        ::= { cFcAlarmEntry 70 }
+
+cFcAlarmRisingThreshold OBJECT-TYPE
+         SYNTAX Integer32
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION
+                "A threshold for the sampled statistic.  When the
+                 current sampled value is greater than or equal to
+                 this threshold, and the value at the last sampling
+                 interval was less than this threshold, a single
+                 event will be generated.  A single event will also
+                 be generated if the first sample after this entry
+                 becomes valid is greater than or equal to this
+                 threshold and the associated cFcAlarmStartupAlarm is
+                 equal to risingcFcAlarm(1) or risingOrFallingAlarm(3).
+
+                 After a rising event is generated, another such event
+                 will not be generated until the sampled value
+                 falls below this threshold and reaches the
+                 cFcAlarmFallingThreshold.
+
+                 This object can only be used to set the lower
+                 word value of the threshold. If the threshold
+                 to be set is greater than 4,294,967,295 then
+                 cFcAlarmRisingThresholdHigh should be used to
+                 set the upper word value of the threshold."
+        ::= { cFcAlarmEntry 80 }
+
+cFcAlarmRisingThresholdHigh OBJECT-TYPE
+         SYNTAX Integer32
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION
+                  "The upper word value of the rising threshold for
+                  the sampled statistic.
+
+                  If the value of threshold to be set in 
+                  cFcAlarmRisingThreshold is greater than
+                  4,294,967,295, then this object 
+                  should be used to set the upper word value of the
+                  threshold."
+        ::= { cFcAlarmEntry 90 }
+        
+cFcAlarmFallingThreshold OBJECT-TYPE
+         SYNTAX Integer32
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION
+                  "A threshold for the sampled statistic.  When the
+                  current sampled value is less than or equal to this
+                  threshold, and the value at the last sampling
+                  interval was greater than this threshold, a single
+                  event will be generated.  A single event will also
+                  be generated if the first sample after this entry
+                  becomes valid is less than or equal to this
+                  threshold and the associated cFcAlarmStartupAlarm is
+                  equal to fallingcFcAlarm(2) or risingOrFallingAlarm(3).
+
+                  After a falling event is generated, another such event
+                  will not be generated until the sampled value
+                  rises above this threshold and reaches the
+                  cFcAlarmRisingThreshold.
+                  
+                  This object can only be used to set the lower
+                  word value of the threshold. If the threshold
+                  to be set is greater than 4,294,967,295, then
+                  cFcAlarmFallingThresholdHigh should be used to
+                  set the upper word value of the threshold."
+        ::= { cFcAlarmEntry 100 }
+
+cFcAlarmFallingThresholdHigh OBJECT-TYPE
+         SYNTAX Integer32
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION
+                 "The upper word value of the falling threshold for
+                  the sampled statistic.
+
+                  If the value of threshold to be set in 
+                  cFcAlarmFallingThreshold is greater than
+                  4,294,967,295, then this object 
+                  should be used to set the upper word value of the
+                  threshold."
+        ::= { cFcAlarmEntry 110 }
+
+cFcAlarmStatus OBJECT-TYPE
+        SYNTAX INTEGER
+                  { valid(1),
+                    createRequest(2),
+                    underCreation(3),
+                    invalid(4)
+                  }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                  "The status of this cFcAlarm entry."
+        ::= { cFcAlarmEntry 120 }
+
+-- MIB Conformance Statements
+
+cerentFcMIBConformance OBJECT IDENTIFIER ::=
+    { cerentRequirements 40 }
+
+cerentFcMIBCompliances OBJECT IDENTIFIER ::=
+    { cerentFcMIBConformance 1 }
+
+cerentFcMIBGroups OBJECT IDENTIFIER ::=
+    { cerentFcMIBConformance 2 }
+
+cerentFcMIBCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for platforms that monitor the  
+        Fibre channel interfaces with respect to error
+        counters, for the physical layer."
+    MODULE -- this module
+        MANDATORY-GROUPS {
+            cerentFcStatsGroup
+        }
+
+    ::= { cerentFcMIBCompliances 1 }
+
+--
+-- units of conformance
+--
+cerentFcStatsGroup OBJECT-GROUP
+    OBJECTS {
+    cFcStatsInvalidOrdSets,
+    cFcStatsInvalidOrdSetsHigh,
+    cFcStatsEncodingDispErr,
+    cFcStatsEncodingDispErrHigh,
+    cFcStatsInTotalErr,
+    cFcStatsInTotalErrHigh,
+    cFcStatsInFramesTrunc,
+    cFcStatsInFramesTruncHigh,
+    cFcStatsInFramesTooLong,
+    cFcStatsInFramesTooLongHigh,
+    cFcStatsInFramesBadCRC,
+    cFcStatsInFramesBadCRCHigh,
+    cFcStatsInFrames,
+    cFcStatsInFramesHigh,
+    cFcStatsInElements,
+    cFcStatsInElementsHigh,
+    cFcStatsInDiscards,
+    cFcStatsInDiscardsHigh,
+    cFcStatsOutFramesBadCRC,
+    cFcStatsOutFramesBadCRCHigh,
+    cFcStatsOutFrames,
+    cFcStatsOutFramesHigh,
+    cFcStatsOutElements,
+    cFcStatsOutElementsHigh,
+    cFcStatsOutDiscards,
+    cFcStatsOutDiscardsHigh,
+    cFcStatsLinkResets,
+    cFcStatsLinkResetsHigh,
+    cFcStatsGfpInSBitErr,
+    cFcStatsGfpInSBitErrHigh,
+    cFcStatsGfpInMBitErr,
+    cFcStatsGfpInMBitErrHigh,
+    cFcStatsGfpInTypeInvalid,
+    cFcStatsGfpInTypeInvalidHigh,
+    cFcStatsGfpInSBlkCRCErr,
+    cFcStatsGfpInSBlkCRCErrHigh
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects to give
+        stats related to the performance
+        of an fibre channel interface."
+    ::= { cerentFcMIBGroups 1 }
+    
+    cerentFcHistGroup OBJECT-GROUP
+    OBJECTS {
+
+    cFcHistInvalidOrdSets,
+    cFcHistInvalidOrdSetsHigh,
+    cFcHistEncodingDispErr,
+    cFcHistEncodingDispErrHigh,
+    cFcHistInTotalErr,
+    cFcHistInTotalErrHigh,
+    cFcHistInFramesTrunc,
+    cFcHistInFramesTruncHigh,
+    cFcHistInFramesTooLong,
+    cFcHistInFramesTooLongHigh,
+    cFcHistInFramesBadCRC,
+    cFcHistInFramesBadCRCHigh,
+    cFcHistInFrames,
+    cFcHistInFramesHigh,
+    cFcHistInElements,
+    cFcHistInElementsHigh,
+    cFcHistInDiscards,
+    cFcHistInDiscardsHigh,
+    cFcHistOutFramesBadCRC,
+    cFcHistOutFramesBadCRCHigh,
+    cFcHistOutFrames,
+    cFcHistOutFramesHigh,
+    cFcHistOutElements,
+    cFcHistOutElementsHigh,
+    cFcHistOutDiscards,
+    cFcHistOutDiscardsHigh,
+    cFcHistLinkResets,
+    cFcHistLinkResetsHigh,
+    cFcHistGfpInSBitErr,
+    cFcHistGfpInSBitErrHigh,
+    cFcHistGfpInMBitErr,
+    cFcHistGfpInMBitErrHigh,
+    cFcHistGfpInTypeInvalid,
+    cFcHistGfpInTypeInvalidHigh,
+    cFcHistGfpInSBlkCRCErr,
+    cFcHistGfpInSBlkCRCErrHigh
+      
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects to give
+        previous stats related to the performance
+        of an fibre channel interface."
+    ::= { cerentFcMIBGroups 2 }
+
+    
+    cerentFcStatsHCGroup OBJECT-GROUP
+    OBJECTS {
+    cFcStatsInvalidOrdSetsHC,
+    cFcStatsEncodingDispErrHC,
+    cFcStatsInTotalErrHC,
+    cFcStatsInFramesTruncHC,
+    cFcStatsInFramesTooLongHC,
+    cFcStatsInFramesBadCRCHC,
+    cFcStatsInFramesHC,
+    cFcStatsInElementsHC,
+    cFcStatsInDiscardsHC,
+    cFcStatsOutFramesBadCRCHC,
+    cFcStatsOutFramesHC,
+    cFcStatsOutElementsHC,
+    cFcStatsOutDiscardsHC,
+    cFcStatsLinkResetsHC,
+    cFcStatsGfpInSBitErrHC,
+    cFcStatsGfpInMBitErrHC,
+    cFcStatsGfpInTypeInvalidHC,
+    cFcStatsGfpInSBlkCRCErrHC
+
+          }
+    STATUS  current
+    DESCRIPTION
+        "The collection of 64 bit objects to give
+        stats related to the performance
+        of an fibre channel interface."
+    ::= { cerentFcMIBGroups 3 }
+
+
+      cerentFcHistHCGroup OBJECT-GROUP
+    OBJECTS {
+    cFcHistInvalidOrdSetsHC,
+    cFcHistEncodingDispErrHC,
+    cFcHistInTotalErrHC,
+    cFcHistInFramesTruncHC,
+    cFcHistInFramesTooLongHC,
+    cFcHistInFramesBadCRCHC,
+    cFcHistInFramesHC,
+    cFcHistInElementsHC,
+    cFcHistInDiscardsHC,
+    cFcHistOutFramesBadCRCHC,
+    cFcHistOutFramesHC,
+    cFcHistOutElementsHC,
+    cFcHistOutDiscardsHC,
+    cFcHistLinkResetsHC,
+    cFcHistGfpInSBitErrHC,
+    cFcHistGfpInMBitErrHC,
+    cFcHistGfpInTypeInvalidHC,
+    cFcHistGfpInSBlkCRCErrHC
+
+          }
+    STATUS  current
+    DESCRIPTION
+        "The collection of 64 bit objects to give
+        previous stats related to the performance
+        of an fibre channel interface."
+    ::= { cerentFcMIBGroups 4 }
+
+   cerentFcAlarmGroup OBJECT-GROUP
+    OBJECTS {
+     cFcAlarmInterval,
+     cFcAlarmVariable,
+     cFcAlarmSampleType,
+     cFcAlarmValue,
+     cFcAlarmValueHigh,
+     cFcAlarmStartupAlarm,
+     cFcAlarmRisingThreshold,
+     cFcAlarmRisingThresholdHigh,
+     cFcAlarmFallingThreshold,
+     cFcAlarmFallingThresholdHigh,
+     cFcAlarmStatus
+          }
+    STATUS  current
+    DESCRIPTION
+        "The collection of alarm thresholds configured
+        on fibre channel interfaces."
+    ::= { cerentFcMIBGroups 5 }
+
+    
+END    

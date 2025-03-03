@@ -1,0 +1,29 @@
+BTI8xx-MIB
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises         FROM SNMPv2-SMI;
+
+
+    bti8xx       MODULE-IDENTITY
+    LAST-UPDATED "201312261200Z"  -- Thursday, Dec 26, 12:00:00 KST 2013
+    ORGANIZATION "Actus Networks Inc."
+    CONTACT-INFO "Technical Support
+		 "
+    DESCRIPTION  "This is a top-level MIB for BTI800 whose purpose is to lay out
+                  the top-level objects in the OID hierarchy from which
+                  BTI MIB OIDs descend."
+    REVISION     "201312261200Z"  -- Thursday, Dec 26, 12:00:00 KST 2013
+    DESCRIPTION  "Initial version of MIB."
+
+        ::= { btiProducts 7 }
+
+btiSystems      OBJECT IDENTIFIER   ::= { enterprises 30005 }
+
+btiProducts     OBJECT IDENTIFIER   ::= { btiSystems 1 }
+
+
+END

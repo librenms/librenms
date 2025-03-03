@@ -1,0 +1,182 @@
+-- *****************************************************************
+-- CISCO-IETF-PW-TC-MIB.my
+--
+-- February 2003, Tim Swanson
+--
+-- Copyright (c) 2003, 2006 by cisco Systems, Inc.
+-- All rights reserved.
+--
+-- Made Cisco Proprietary based on IETF draft:
+-- draft-ietf-pwe3-pw-tc-mib-00.txt
+-- *****************************************************************
+
+CISCO-IETF-PW-TC-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS 
+     MODULE-IDENTITY, Unsigned32, Integer32
+        FROM SNMPv2-SMI 
+
+     TEXTUAL-CONVENTION 
+        FROM SNMPv2-TC
+        
+     ciscoExperiment
+        FROM CISCO-SMI
+  ; 
+
+  cpwTCMIB MODULE-IDENTITY 
+     LAST-UPDATED "200607211200Z"  -- 21 July 2006 10:30:00 GMT 
+     ORGANIZATION  
+        "Cisco Systems, Inc."
+     CONTACT-INFO 
+     " 
+       Thomas D. Nadeau 
+       Postal: Cisco Systems, Inc. 
+               250 Apollo Drive 
+               Chelmsford, MA 01824 
+       Tel:    +1-978-497-3051 
+       Email:  tnadeau@cisco.com 
+
+       MPLS MIB Development Team
+       Postal: Cisco Systems, Inc.
+               250 Apollo Drive
+               Chelmsford, MA 01924
+       Tel:    +1-978-497-3989
+       Email:  ch-mpls-mib-dev@cisco.com
+     "
+
+     DESCRIPTION 
+         "This MIB Module provides Textual Conventions 
+          and OBJECT-IDENTITY Objects to be used PW services." 
+
+     -- Revision history.
+     REVISION "200607211200Z"  -- 21 July 2006 10:30:00 GMT 
+     DESCRIPTION
+           "Added following enumerations to cpwVcType TC:
+           e1Satop(12), t1Satop(13), e3Satop(14), t3Satop(15), 
+           basicCesPsn(16), basicTdmIp(17), tdmCasCesPsn(18),
+           tdmCasTdmIp(19). The above enumerations are based 
+           on IANAPwTypeTC TC in draft-ietf-pwe3-pw-mib-08.txt"
+
+ 
+     REVISION "200302261200Z"  -- 26 Feb 2003 12:00:00 GMT 
+     DESCRIPTION
+           "Made Cisco proprietary based on the PW-TC-MIB.my file
+            extracted from draft-ietf-pwe3-pw-tc-mib-00.txt
+           "
+
+     REVISION "200205281200Z"  -- 28 May 2002 12:00:00 GMT 
+     DESCRIPTION "Adding PwVcType, and enhance some descriptions." 
+
+     REVISION "200201301200Z"  -- 30 January 2002 12:00:00 GMT 
+     DESCRIPTION "Adding PwVcVlanCfg, PwAddressType and  
+                  PwOperStatus." 
+
+     REVISION "200112201200Z"  -- 20 Dec 2001 12:00:00 GMT 
+     DESCRIPTION "Remove PwVcInstance" 
+
+     REVISION "200107121200Z"  -- 12 July 2001 12:00:00 GMT 
+     DESCRIPTION "Initial version." 
+
+     ::= { cpwMIB 1 } -- cpwMIB To Be Assigned by IANA 
+
+  cpwMIB OBJECT IDENTIFIER 
+         ::= { ciscoExperiment 20000 } -- To be assigned by CANA 
+
+  -- Textual Conventions defined below are organized alphabetically 
+
+  CpwGroupID ::= TEXTUAL-CONVENTION 
+     STATUS      current 
+     DESCRIPTION 
+          "An administrative identification mechanism for grouping a 
+           set of service-specific pseudo-wire services. May only 
+           have local significance." 
+     SYNTAX  Unsigned32 
+
+  CpwVcIDType ::= TEXTUAL-CONVENTION 
+     STATUS      current 
+     DESCRIPTION 
+          "Virtual Circuit Identifier. Used to identify the VC  
+           (together with some other fields) in the signaling  
+           session. Zero if the VC is set-up manually." 
+     SYNTAX  Unsigned32 
+
+  CpwVcIndexType ::= TEXTUAL-CONVENTION 
+     STATUS      current 
+     DESCRIPTION 
+          "Virtual Circuit Index. Locally unique index for indexing 
+           several MIB tables associated with a particular VC." 
+     SYNTAX  Unsigned32 
+
+  CpwVcVlanCfg ::= TEXTUAL-CONVENTION 
+     STATUS      current 
+     DESCRIPTION 
+          "VLAN configuration for Ethernet PW.  
+           Values between 0 to 4095 indicate the actual VLAN field 
+           value.  
+           A value of 4096 indicates that the object refer to  
+           untagged frames, i.e. frames without 802.1Q field. 
+           A value of 4097 indicates that the object is not  
+           relevant." 
+     SYNTAX  Integer32 (0..4097) 
+
+   CpwOperStatus ::= TEXTUAL-CONVENTION 
+     STATUS      current 
+     DESCRIPTION 
+        "Indicate the operational status of the PW VC. 
+
+        - up:             Ready to pass packets.  
+        - down:           If PW signaling has not yet finished, or 
+                          indications available at the service  
+                          level indicate that the VC is not  
+                          passing packets. 
+        - testing:        If AdminStatus at the VC level is set to  
+                          test. 
+        - dormant:        The VC is not available because of the 
+                          required resources are occupied VC with  
+                          higher priority VCs . 
+        - notPresent:     Some component is missing to accomplish  
+                          the set up of the VC. 
+        - lowerLayerDown: The underlying PSN or outer tunnel is not 
+                          in OperStatus 'up'.  
+        " 
+   SYNTAX   INTEGER { 
+       up(1), 
+       down(2), 
+       testing(3), 
+       unknown(4), 
+       dormant(5), 
+       notPresent(6), 
+       lowerLayerDown(7) 
+       }       
+
+   CpwVcType ::= TEXTUAL-CONVENTION 
+     STATUS      current 
+     DESCRIPTION 
+        "Indicate the VC type (i.e. the carried service). 
+         Note: the exact set of VC types is yet to be worked  
+         out by the WG. 
+        " 
+   SYNTAX   INTEGER { 
+      other(0), 
+      frameRelay(1), 
+      atmAal5Vcc(2), 
+      atmTransparent(3), 
+      ethernetVLAN(4), 
+      ethernet(5), 
+      hdlc(6), 
+      ppp(7), 
+      cep(8),   
+      atmVccCell(9), 
+      atmVpcCell(10), 
+      ethernetVPLS (11),
+      e1Satop(12), 
+      t1Satop(13),
+      e3Satop(14), 
+      t3Satop(15),
+      basicCesPsn(16),
+      basicTdmIp(17),  
+      tdmCasCesPsn(18),
+      tdmCasTdmIp(19) 
+       }       
+
+END

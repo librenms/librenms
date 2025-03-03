@@ -1,0 +1,53 @@
+-- MIB File: SWBase.mib
+--
+-- Title: Switch Base MIB.
+--
+-- This is specified based on SMIv2, mainly to ensure that the specification
+-- can be parsed easily by off-the-shelf network management product in
+-- the market.
+--
+-- The goal of this mib is to access the switch of
+-- Extreme's family 
+-- NOTE: Load BRCD.mib file before loading this mib file.
+--
+
+SWBASE-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+	DisplayString, TEXTUAL-CONVENTION
+      FROM SNMPv2-TC
+    Counter32, Integer32, IpAddress,
+    OBJECT-TYPE, OBJECT-IDENTITY,
+	MODULE-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+    fcSwitch, bcsiModules
+      FROM Brocade-REG-MIB;
+
+  swMibModule MODULE-IDENTITY
+    LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+    ORGANIZATION "Extreme Networks, Inc."
+    CONTACT-INFO
+         "Postal:  Extreme Networks, Inc.
+                   6480 Via Del Oro
+                   San Jose, CA 95119 USA
+          Phone:   +1 408 579-2800
+          E-mail:  support@extremenetworks.com
+          WWW:     http://www.extremenetworks.com"
+
+    DESCRIPTION	"The MIB module	is for Extreme's Switch.
+                 Copyright (c) 2018 Extreme Networks, Inc.
+  				 All rights reserved."
+    REVISION	"201805291200Z" -- May 29, 2018 12:00pm
+    DESCRIPTION	"Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+    REVISION	"1104151830Z" -- Apr 15, 20i11 6:30pm
+    DESCRIPTION	"The initial version of this module."
+	::=	{ bcsiModules 3 }
+	
+    sw		    OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for Extreme's Silkworm Series of Switches."
+     ::= { fcSwitch 1 }
+
+   
+END
+
+

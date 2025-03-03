@@ -1,0 +1,68 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.2349",
+                    "sysDescr": "Cisco IOS XR Software (NCS-5500), Version 7.0.1  Copyright (c) 2013-2019 by Cisco Systems, Inc.",
+                    "sysContact": "<private>",
+                    "version": "7.0.1",
+                    "hardware": "NCS-5508",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "iosxr",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "entity-physical": {
+        "discovery": {
+            "entPhysical": [
+                {
+                    "entPhysicalIndex": 8384513,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": null,
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "NCS-5508",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                },
+                {
+                    "entPhysicalIndex": 8384518,
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
+                    "entPhysicalName": null,
+                    "entPhysicalHardwareRev": null,
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": "NCS-5508",
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
+                    "entPhysicalContainedIn": 0,
+                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalMfgName": null,
+                    "ifIndex": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

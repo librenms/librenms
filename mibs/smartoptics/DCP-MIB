@@ -1,0 +1,98 @@
+--
+-- DCP-MIB.mib
+-- Smartoptics DCP Enterprise Specific MIB.
+--
+-- Copyright (c) 2018, Smartoptics
+-- All rights reserved
+--
+
+DCP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    smartoptics
+        FROM SO-MIB;
+
+-- 1.3.6.1.4.1.1.2.1.1.1
+dcpGlobalModule MODULE-IDENTITY 
+    LAST-UPDATED "201810081444Z"
+    ORGANIZATION "Smartoptics."
+    CONTACT-INFO "http://www.smartoptics.com"
+    DESCRIPTION "This is the enterprise specific DCP MIB for Smartoptics"
+    REVISION "201810081444Z"
+    DESCRIPTION "The initial revision"
+::= { dcpModules 1 }
+
+--
+-- Node definitions
+--
+
+-- 1.3.6.1.4.1.1.2
+dcp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION 
+    "The root OID for the DCP platform."
+::= { smartoptics 2 }
+
+
+-- 1.3.6.1.4.1.1.2.1
+dcpReg OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION 
+    "Sub-tree for registrations"
+::= { dcp 1 }
+
+
+-- 1.3.6.1.4.1.1.2.1.1
+dcpModules OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION 
+    "Sub-tree to register the values assigned to modules with the MODULE-IDENTITY construct"
+::= { dcpReg 1 }
+
+
+-- 1.3.6.1.4.1.1.2.2
+dcpGeneric OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION 
+    "Sub-tree for common object and event definitions"
+::= { dcp 2 }
+
+
+-- 1.3.6.1.4.1.1.2.3
+dcpProducts OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION 
+    "Sub-tree for specific object and event definitions"
+::= { dcp 3 }
+
+
+-- 1.3.6.1.4.1.1.2.4
+dcpCaps OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION 
+    "Sub-tree for agent profiles"
+::= { dcp 4 }
+
+
+-- 1.3.6.1.4.1.1.2.5
+dcpReqs OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION 
+    "Sub-tree for management application requirements"
+::= { dcp 5 }
+
+
+-- 1.3.6.1.4.1.1.2.6
+dcpExpr OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION 
+    "Sub-tree for experimental definitions"
+::= { dcp 6 }
+
+
+END
+
+--
+-- DCP-MIB.mib
+--

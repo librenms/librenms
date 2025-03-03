@@ -1,0 +1,62 @@
+modules:
+  sensors:
+    dbm:
+      data:
+        -
+          oid: SO-MUX-MIB::preEdfaSeqTable.2
+          value: SO-MUX-MIB::preEdfaSeqTable
+          num_oid: '.1.3.6.1.4.1.51628.1.2.{{ $index }}'
+          index: 'prePowerGainValue.{{ $index }}'
+          descr: Gain Value
+          group: Pre
+        -
+          oid: SO-MUX-MIB::preEdfaSeqTable.3
+          value: SO-MUX-MIB::preEdfaSeqTable
+          num_oid: '.1.3.6.1.4.1.51628.1.2.{{ $index }}'
+          index: 'prePowerIn.{{ $index }}'
+          descr: Power In
+          group: Pre
+        -
+          oid: SO-MUX-MIB::preEdfaSeqTable.4
+          value: SO-MUX-MIB::preEdfaSeqTable
+          num_oid: '.1.3.6.1.4.1.51628.1.2.{{ $index }}'
+          index: 'prePowerOut.{{ $index }}'
+          descr: Power Out
+          group: Pre
+        -
+          oid: SO-MUX-MIB::postEdfaSeqTable.2
+          value: SO-MUX-MIB::postEdfaSeqTable
+          num_oid: '.1.3.6.1.4.1.51628.1.3.{{ $index }}'
+          index: 'postPowerGainValue.{{ $index }}'
+          descr: Gain Value
+          group: Post
+        -
+          oid: SO-MUX-MIB::postEdfaSeqTable.3
+          value: SO-MUX-MIB::postEdfaSeqTable
+          num_oid: '.1.3.6.1.4.1.51628.1.3.{{ $index }}'
+          index: 'postPowerIn.{{ $index }}'
+          descr: Power In
+          group: Post
+        -
+          oid: SO-MUX-MIB::postEdfaSeqTable.4
+          value: SO-MUX-MIB::postEdfaSeqTable
+          num_oid: '.1.3.6.1.4.1.51628.1.3.{{ $index }}'
+          index: 'postPowerOut.{{ $index }}'
+          descr: Power Out
+          group: Post
+    temperature:
+      data:
+        -
+          oid: SO-MUX-MIB::preEdfaSeqTable.5
+          value: SO-MUX-MIB::preEdfaSeqTable
+          num_oid: '.1.3.6.1.4.1.51628.1.2.{{ $index }}'
+          index: 'preTemperature.{{ $index }}'
+          descr: Temperature
+          group: Pre
+        -
+          oid: SO-MUX-MIB::postEdfaSeqTable.5
+          value: SO-MUX-MIB::postEdfaSeqTable
+          num_oid: '.1.3.6.1.4.1.51628.1.3.{{ $index }}'
+          index: 'postTemperature.{{ $index }}'
+          descr: Temperature
+          group: Post

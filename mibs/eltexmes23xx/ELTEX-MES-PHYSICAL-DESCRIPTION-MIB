@@ -1,0 +1,564 @@
+ELTEX-MES-PHYSICAL-DESCRIPTION-MIB DEFINITIONS ::= BEGIN
+-- Version:              2.3
+-- Date:                 04-Aug-2021
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, TimeTicks,
+    NOTIFICATION-TYPE, Integer32                            FROM SNMPv2-SMI
+    DisplayString, PhysAddress, RowStatus, TruthValue       FROM SNMPv2-TC
+    JackType                                                FROM MAU-MIB
+    InterfaceIndexOrZero,ifIndex,InterfaceIndex             FROM IF-MIB
+    eltMes                                                  FROM ELTEX-MES
+    rlPhdUnitGenParamEntry, rlCascadeEntry, rlCascadeAdminEntry
+                                                            FROM RADLAN-Physicaldescription-MIB
+    ;
+
+eltMesPhysicalDescription  MODULE-IDENTITY
+                       LAST-UPDATED "202108040000Z"
+                       ORGANIZATION "Eltex Ltd."
+                       CONTACT-INFO
+                            "eltex.nsk.ru"
+                       DESCRIPTION
+                            "The private MIB module definition for physical
+                             device configuration and information."
+
+                       REVISION "202108040000Z"
+                       DESCRIPTION
+                            "Added eltCascadeAdminTable, added field eltCascadeFecOperMode
+                            to eltCascadeEntry."
+
+                       REVISION "201804240000Z"
+                       DESCRIPTION
+                            "Added eltPhdTransceiverThresholdTable."
+
+                       REVISION "201711110000Z"
+                       DESCRIPTION
+                            "Added fields eltPhdTransceiverInfoPartNumber and
+                            eltPhdTransceiverInfoVendorRev to eltPhdTransceiverInfoTable"
+
+                       REVISION "201509140000Z"
+                       DESCRIPTION
+                            "Added eltPhdUnitGenParamTable."
+
+                       REVISION "201303210000Z"
+                       DESCRIPTION
+                            "Initial revision."
+                       ::= { eltMes 53 }
+
+eltMesPhdTransceiver OBJECT IDENTIFIER ::= { eltMesPhysicalDescription 1 }
+
+eltPhdTransceiverInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EltPhdTransceiverInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table show the information of transceiver on interface."
+    ::= { eltMesPhdTransceiver 1 }
+
+eltPhdTransceiverInfoEntry OBJECT-TYPE
+    SYNTAX EltPhdTransceiverInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of the eltPhdTransceiverInfoTable."
+    INDEX { ifIndex }
+    ::= { eltPhdTransceiverInfoTable 1 }
+
+EltPhdTransceiverInfoEntry ::=
+    SEQUENCE {
+        eltPhdTransceiverInfoConnectorType         INTEGER,
+        eltPhdTransceiverInfoType                  INTEGER,
+        eltPhdTransceiverInfoComplianceCode        OCTET STRING,
+        eltPhdTransceiverInfoWaveLength            Integer32,
+        eltPhdTransceiverInfoVendorName            OCTET STRING,
+        eltPhdTransceiverInfoSerialNumber          OCTET STRING,
+        eltPhdTransceiverInfoFiberDiameterType     INTEGER,
+        eltPhdTransceiverInfoTransferDistance      Integer32,
+        eltPhdTransceiverInfoDiagnostic            TruthValue,
+        eltPhdTransceiverInfoPartNumber            OCTET STRING,
+        eltPhdTransceiverInfoVendorRev             OCTET STRING
+    }
+
+eltPhdTransceiverInfoConnectorType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            unknown(0),
+            sc(1),
+            fibre-ch-st1(2),
+            fibre-ch-st2(3),
+            bnc-tnc(4),
+            fibre-ch-coaxial-headers(5),
+            fibrejack(6),
+            lc(7),
+            mt-rj(8),
+            mu(9),
+            sg(10),
+            optical-pigtail(11),
+            mpo-parallel-optic(12),
+            hssdc-ii(32),
+            copper-pigtail(33),
+            rj45(34),
+            no-separable-connector(35),
+            unallocated(127),
+            vendorspec(255)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Connector type of the interface."
+    ::= { eltPhdTransceiverInfoEntry 1 }
+
+eltPhdTransceiverInfoType OBJECT-TYPE
+    SYNTAX INTEGER
+            {
+            unknown(0),
+            gbic(1),
+            sff(2),
+            sfp-sfpplus(3),
+            xbi-300-pin(4),
+            xenpak(5),
+            xfp(6),
+            xff(7),
+            xfp-e(8),
+            xpak(9),
+            x2(10),
+            dwdm-sfp(11),
+            qsfp(12),
+            qsfpplus(13),
+            reserved(127),
+            vendorspec(255)
+            }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Type of the interface, such as SFP/XFP/GBIC."
+    ::= { eltPhdTransceiverInfoEntry 2 }
+
+eltPhdTransceiverInfoComplianceCode OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Compliance code read from the transceiver."
+    ::= { eltPhdTransceiverInfoEntry 3 }
+
+eltPhdTransceiverInfoWaveLength OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Wave length of the interface, measured in nanometer."
+    ::= { eltPhdTransceiverInfoEntry 4 }
+
+eltPhdTransceiverInfoVendorName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Vendor name of the interface."
+    ::= { eltPhdTransceiverInfoEntry 5 }
+
+eltPhdTransceiverInfoSerialNumber OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number of the interface."
+    ::= { eltPhdTransceiverInfoEntry 6 }
+
+eltPhdTransceiverInfoFiberDiameterType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+          fiber9(1),
+          fiber50(2),
+          fiber625(3),
+          copper(4),
+          unknown(65535)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The diameter of the fiber, measured in micron.
+        fiber9 - 9 micron multi-mode fiber
+        fiber50 - 50 micron multi-mode fiber
+        fiber625 - 62.5 micron multi-mode fiber
+        copper - copper cable."
+    ::= { eltPhdTransceiverInfoEntry 7 }
+
+eltPhdTransceiverInfoTransferDistance OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximal distance which the interface could transmit,
+        measured in meter."
+    ::= { eltPhdTransceiverInfoEntry 8 }
+
+eltPhdTransceiverInfoDiagnostic OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicating whether the digital diagnostic monitoring function is supported or not."
+    ::= { eltPhdTransceiverInfoEntry 9 }
+
+eltPhdTransceiverInfoPartNumber OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Part number provided by SFP vendor."
+    ::= { eltPhdTransceiverInfoEntry 10 }
+
+eltPhdTransceiverInfoVendorRev OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Revision level for part number provided by vendor."
+    ::= { eltPhdTransceiverInfoEntry 11 }
+
+--
+-- eltPhdUnitGenParamTable
+--
+
+eltPhdUnitGenParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EltPhdUnitGenParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "For each module (board) there is an entry describing it in this
+         module"
+    ::= { eltMesPhysicalDescription 2 }
+
+eltPhdUnitGenParamEntry OBJECT-TYPE
+    SYNTAX      EltPhdUnitGenParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table augments existing RADLAN table rlPhdUnitGenParamTable"
+    AUGMENTS { rlPhdUnitGenParamEntry }
+    ::= { eltPhdUnitGenParamTable 1 }
+
+EltPhdUnitGenParamEntry ::= SEQUENCE {
+    eltPhdUnitGenParamCommitHash			   DisplayString,
+    eltPhdUnitGenParamBuildTag				   DisplayString,
+    eltPhdUnitGenParamBuildNumber			   DisplayString
+}
+
+eltPhdUnitGenParamCommitHash OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Hash of current commit."
+       ::= { eltPhdUnitGenParamEntry 1 }
+
+eltPhdUnitGenParamBuildTag OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Build branch."
+       ::= { eltPhdUnitGenParamEntry 2 }
+
+eltPhdUnitGenParamBuildNumber OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Build describe number."
+       ::= { eltPhdUnitGenParamEntry 3 }
+
+--
+-- eltCascadeTable
+--
+
+eltCascadeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EltCascadeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table augments existing RADLAN table rlCascadeTable."
+    ::= { eltMesPhysicalDescription 3 }
+
+eltCascadeEntry OBJECT-TYPE
+    SYNTAX      EltCascadeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of this table specifies a cascaded link information in a unit"
+    AUGMENTS { rlCascadeEntry }
+    ::= { eltCascadeTable 1 }
+
+EltCascadeEntry ::= SEQUENCE {
+    eltCascadeLastChange                        TimeTicks,
+    eltCascadeOperStatus                        INTEGER,
+    eltCascadeDuplexOperMode                    INTEGER,
+    eltCascadeOperSpeedDuplexAutoNegotiation    INTEGER,
+    eltCascadeOperMdix                          INTEGER,
+    eltCascadeTransceiverType                   INTEGER,
+    eltCascadeIfType                            INTEGER,
+    eltCascadeFecOperMode                       INTEGER
+}
+
+eltCascadeLastChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime at the time the cascade interface 
+         entered its current operational state."
+    ::= { eltCascadeEntry 1 }
+
+eltCascadeOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        up(1),
+        down(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the state of this interface."
+    ::= { eltCascadeEntry 2 }
+    
+eltCascadeDuplexOperMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        half(1),
+        full(2),
+        hybrid(3),
+        unknown(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether this interface operates in half
+         duplex or full duplex mode."
+    ::= { eltCascadeEntry 3 }
+    
+eltCascadeOperSpeedDuplexAutoNegotiation OBJECT-TYPE
+   SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2),
+        hybrid(3),
+        unknown(4)
+   }
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+       "If enabled the speed and duplex are determined by the device through
+        the autonegotiation process."
+  ::= { eltCascadeEntry 4 }
+
+eltCascadeOperMdix OBJECT-TYPE
+   SYNTAX  INTEGER {
+      normal(1),
+      cross(2),
+      auto(3),
+      unknown(4)
+   }
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+       "cross  - The interface is in crossover mode.
+        normal - The interface is not in crossover mode.
+        unknown - Only for port that its operative status is not present
+                  or down."
+   ::= { eltCascadeEntry 5 }
+
+eltCascadeTransceiverType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        regular(1),
+        fiberOptics(2),
+        comboRegular(3),
+        comboFiberOptics(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the transceiver type of this interface."
+    ::= {  eltCascadeEntry 6  }
+
+eltCascadeIfType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        eth10M(1),
+        eth100M(2),
+        eth1000M(3),
+        eth10G(4),
+        eth20G(5),
+        eth40G(6),
+        eth100G(7),
+        unknown(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies the type of interface."
+    ::= {  eltCascadeEntry 7 }
+
+eltCascadeFecOperMode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(0),
+        auto(1),
+        cl74(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This variable indicates the actual Forward Error Correction (FEC) mode 
+        that currently in use on the port."
+    ::= {  eltCascadeEntry 8 }
+
+--
+-- eltPhdTransceiverThresholdTable
+--
+
+eltPhdTransceiverThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EltPhdTransceiverThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains the threshold information of transceiver."
+    ::= { eltMesPhdTransceiver 2 }
+
+eltPhdTransceiverThresholdEntry OBJECT-TYPE
+    SYNTAX EltPhdTransceiverThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of the eltPhdTransceiverThresholdTable."
+    INDEX { ifIndex, eltPhdTransceiverThresholdType }
+    ::= { eltPhdTransceiverThresholdTable 1 }
+
+EltPhdTransceiverThresholdEntry ::=
+    SEQUENCE {
+        eltPhdTransceiverThresholdType             INTEGER,
+        eltPhdTransceiverThresholdAction           INTEGER,
+        eltPhdTransceiverThresholdHighAlarm        INTEGER,
+        eltPhdTransceiverThresholdHighWarning      INTEGER,
+        eltPhdTransceiverThresholdLowWarning       INTEGER,
+        eltPhdTransceiverThresholdLowAlarm         INTEGER
+    }
+
+eltPhdTransceiverThresholdType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        temperature(0),
+        supply(1),
+        txBias(2),
+        txOutput(3),
+        rxOpticalPower(4)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A value indicating the threshold to configure.
+        temperature - degree (Celsius) -127-127, voltage - microVolt 0-6550000,
+	    current - microAmper 0-131000, output power or input power - microWatt 0-6553"
+    ::= { eltPhdTransceiverThresholdEntry 1 }
+
+eltPhdTransceiverThresholdAction OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        log(1),
+        send-trap(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "What action to perform when value is bad."
+    ::= { eltPhdTransceiverThresholdEntry 2 }
+
+eltPhdTransceiverThresholdHighAlarm OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "See eltPhdTransceiverThresholdType for details"
+    ::= { eltPhdTransceiverThresholdEntry 3 }
+
+eltPhdTransceiverThresholdHighWarning OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "See eltPhdTransceiverThresholdType for details"
+    ::= { eltPhdTransceiverThresholdEntry 4 }
+
+eltPhdTransceiverThresholdLowWarning OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "See eltPhdTransceiverThresholdType for details"
+    ::= { eltPhdTransceiverThresholdEntry 5 }
+
+eltPhdTransceiverThresholdLowAlarm OBJECT-TYPE
+    SYNTAX   INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "See eltPhdTransceiverThresholdType for details"
+    ::= { eltPhdTransceiverThresholdEntry 6 }
+
+--
+-- eltMesPhdNsf
+--
+
+eltMesPhdNsf OBJECT IDENTIFIER ::= { eltMesPhysicalDescription 4 }
+
+eltPhdNsfEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable Non-Stop Forwarding during the stack master switchover."
+    DEFVAL  { false }
+    ::= { eltMesPhdNsf 1 }
+    
+eltPhdNsfTime OBJECT-TYPE
+    SYNTAX      INTEGER (60..600)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Set the time period in which protocols wait for the new master to complete initialization.
+         The port states set by the former master is preserved during this time."
+    DEFVAL {120}
+    ::= { eltMesPhdNsf 2 }
+    
+--
+-- eltCascadeAdminTable
+--
+
+eltCascadeAdminTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EltCascadeAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table augments existing RADLAN table rlCascadeAdminTable."
+    ::= { eltMesPhysicalDescription 6 }
+
+eltCascadeAdminEntry OBJECT-TYPE
+    SYNTAX      EltCascadeAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of this table specifies a cascaded information in a unit after reset"
+    AUGMENTS { rlCascadeAdminEntry }
+    ::= { eltCascadeAdminTable 1 }
+
+EltCascadeAdminEntry ::= SEQUENCE {
+    eltCascadeAdminFec                          INTEGER
+}
+
+eltCascadeAdminFec OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disabled(0),
+        auto(1),
+        cl74(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This variable controls the Forward Error Correction (FEC) mode on the port."
+    ::= { eltCascadeAdminEntry 1 }
+
+END

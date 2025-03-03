@@ -1,0 +1,467 @@
+-- =================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The MIB of data and configuration on control plane.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 Created by huanglei
+--     Initial version 2020-09-10
+-- =================================================================
+HH3C-CUPM-CP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+        Integer32
+    FROM SNMPv2-SMI
+        RowStatus
+    FROM SNMPv2-TC;
+
+hh3cCupmCp MODULE-IDENTITY
+    LAST-UPDATED "202009110000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB provides config information of CP(Control Plane)."
+    REVISION "202009110000Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 194 }
+
+--
+-- Node definitions
+--
+
+-- Traps are defined below.
+hh3cCupmCpNotifications OBJECT IDENTIFIER ::= { hh3cCupmCp 0 }
+
+hh3cCupmCpProtoTnlUp NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCupmCpVbUpID,
+            hh3cCupmCpVbVxlanID,
+            hh3cCupmCpVbSrcAddrType,
+            hh3cCupmCpVbSrcAddr,
+            hh3cCupmCpVbDestAddrType,
+            hh3cCupmCpVbDestAddr,
+            hh3cCupmCpVbVpnName,
+            hh3cCupmCpVbVxlanState
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when
+         CP device connects to VXLAN tunnel."
+    ::= { hh3cCupmCpNotifications 1 }
+
+hh3cCupmCpProtoTnlDown NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCupmCpVbUpID,
+            hh3cCupmCpVbVxlanID,
+            hh3cCupmCpVbSrcAddrType,
+            hh3cCupmCpVbSrcAddr,
+            hh3cCupmCpVbDestAddrType,
+            hh3cCupmCpVbDestAddr,
+            hh3cCupmCpVbVpnName,
+            hh3cCupmCpVbVxlanState
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when
+         CP device disconnects to VXLAN tunnel."
+    ::= { hh3cCupmCpNotifications 2 }
+
+-- =================================================================
+hh3cCupmCpNotifyVarObjects OBJECT IDENTIFIER ::= { hh3cCupmCp 1 }
+
+hh3cCupmCpVbUpID OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The number of UP device."
+    ::= { hh3cCupmCpNotifyVarObjects 1 }
+
+hh3cCupmCpVbVxlanID OBJECT-TYPE
+    SYNTAX      Integer32 (1..16777215)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Part of the index for this table, this value
+         identifies the VXLAN protocol tunnel."
+    ::= { hh3cCupmCpNotifyVarObjects 2 }
+
+hh3cCupmCpVbSrcAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of local address to be used at a remote
+         host for connecting VXLAN protocol tunnel."
+    ::= { hh3cCupmCpNotifyVarObjects 3 }
+
+hh3cCupmCpVbSrcAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Specifies the local address to be used at a remote
+         host for connecting VXLAN protocol tunnel.  The host
+         address type is determined by the object value of corresponding
+         hh3cCupmCpProtoTnlSrcAddrType."
+    ::= { hh3cCupmCpNotifyVarObjects 4 }
+
+hh3cCupmCpVbDestAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of remote host for connecting the VXLAN
+         protocol tunnel."
+    ::= { hh3cCupmCpNotifyVarObjects 5 }
+
+hh3cCupmCpVbDestAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Specifies the remote host for connecting the VXLAN
+         protocol tunnel."
+    ::= { hh3cCupmCpNotifyVarObjects 6 }
+
+
+hh3cCupmCpVbVpnName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "The VPN name, to which the rule will be applied.
+         Default value is zero-length."
+    ::= { hh3cCupmCpNotifyVarObjects 7 }
+
+hh3cCupmCpVbVxlanState OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        unknown  (0),
+        up  (1),
+        down  (2)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The state of VXLAN protocol tunnel.
+         0 (unknown) The VXLAN protocol tunnel is in unknown state.
+         1 (up) The VXLAN protocol tunnel is in connected state.
+         2 (down) The VXLAN protocol tunnel is in disconnected state."
+    ::= { hh3cCupmCpNotifyVarObjects 8 }
+
+-- =================================================================
+-- Scalar MIB objects, which are considered as global variables.
+hh3cCupmCpScalarObjects OBJECT IDENTIFIER ::= { hh3cCupmCp 2 }
+
+hh3cCupmUpNum OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of UP device."
+    ::= { hh3cCupmCpScalarObjects 1 }
+
+-- =================================================================
+-- All table objects are defined below.
+
+hh3cCupmCpTableObjects OBJECT IDENTIFIER ::= { hh3cCupmCp 3 }
+
+hh3cCupmUpListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cCupmUpListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of UP management information."
+    ::= { hh3cCupmCpTableObjects 1 }
+
+hh3cCupmUpListEntry OBJECT-TYPE
+    SYNTAX      Hh3cCupmUpListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry items."
+    INDEX
+        {
+            hh3cCupmUpID
+        }
+    ::= { hh3cCupmUpListTable 1 }
+
+Hh3cCupmUpListEntry ::= SEQUENCE
+    {
+        hh3cCupmUpID               Integer32,
+        hh3cCupmUpDescr            OCTET STRING,
+        hh3cCupmUpListRowStatus    RowStatus
+    }
+
+hh3cCupmUpID OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The index value used to identify the UP device."
+    ::= { hh3cCupmUpListEntry 1 }
+
+hh3cCupmUpDescr OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A textual description of the entity.  This value could
+         include the full name and status of UP device."
+    DEFVAL  { "" }
+    ::= { hh3cCupmUpListEntry 2 }
+
+hh3cCupmUpListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Three status columns are supported, including 'active',
+         'createAndGo' and 'destroy'.  The column of 'active' is used
+         for modifying value of hh3cCupmUpDescr."
+    ::= { hh3cCupmUpListEntry 3 }
+
+-- =================================================================
+hh3cCupmCpProtoTnlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cCupmCpProtoTnlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table that controls configuration of VXLAN tunnel on CP device."
+    ::= { hh3cCupmCpTableObjects 2 }
+
+hh3cCupmCpProtoTnlEntry OBJECT-TYPE
+    SYNTAX      Hh3cCupmCpProtoTnlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry items."
+    INDEX
+        {
+            hh3cCupmUpID,
+            hh3cCupmCpProtoTnlVxlanID,
+            hh3cCupmCpProtoTnlSrcAddrType,
+            hh3cCupmCpProtoTnlSrcAddr,
+            hh3cCupmCpProtoTnlDstAddrType,
+            hh3cCupmCpProtoTnlDstAddr
+        }
+    ::= { hh3cCupmCpProtoTnlTable 1 }
+
+Hh3cCupmCpProtoTnlEntry ::= SEQUENCE
+    {
+        hh3cCupmCpProtoTnlVxlanID        Integer32,
+        hh3cCupmCpProtoTnlSrcAddrType    InetAddressType,
+        hh3cCupmCpProtoTnlSrcAddr        InetAddress,
+        hh3cCupmCpProtoTnlDstAddrType    InetAddressType,
+        hh3cCupmCpProtoTnlDstAddr        InetAddress,
+        hh3cCupmCpProtoTnlVpnName        OCTET STRING,
+        hh3cCupmCpProtoTnlState          INTEGER,
+        hh3cCupmCpProtoTnlRowStatus      RowStatus
+    }
+
+hh3cCupmCpProtoTnlVxlanID OBJECT-TYPE
+    SYNTAX      Integer32 (1..16777215)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Part of the index for this table, this value
+         identifies the VXLAN protocol tunnel."
+    ::= { hh3cCupmCpProtoTnlEntry 1 }
+
+hh3cCupmCpProtoTnlSrcAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of local address to be used at a remote
+         host for connecting VXLAN protocol tunnel."
+    ::= { hh3cCupmCpProtoTnlEntry 2 }
+
+hh3cCupmCpProtoTnlSrcAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the local address to be used at a remote
+         host for connecting VXLAN protocol tunnel.  The host
+         address type is determined by the object value of corresponding
+         hh3cCupmCpProtoTnlSrcAddrType."
+    ::= { hh3cCupmCpProtoTnlEntry 3 }
+
+hh3cCupmCpProtoTnlDstAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of remote host for connecting the VXLAN
+         protocol tunnel."
+    ::= { hh3cCupmCpProtoTnlEntry 4 }
+
+hh3cCupmCpProtoTnlDstAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the remote host for connecting the VXLAN
+         protocol tunnel."
+    ::= { hh3cCupmCpProtoTnlEntry 5 }
+
+hh3cCupmCpProtoTnlVpnName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VPN name, to which the rule will be applied.
+         Default value is zero-length."
+    DEFVAL { "" }
+    ::= { hh3cCupmCpProtoTnlEntry 6 }
+
+hh3cCupmCpProtoTnlState OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        unknown  (0),
+        up  (1),
+        down  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of VXLAN protocol tunnel.
+         0 (unknown) The VXLAN protocol tunnel is in unknown state.
+         1 (up) The VXLAN protocol tunnel is in connected state.
+         2 (down) The VXLAN protocol tunnel is in disconnected state."
+    ::= { hh3cCupmCpProtoTnlEntry 7 }
+
+hh3cCupmCpProtoTnlRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo,
+        Destroy operation.  To create a new row, hh3cCupmUpID must be specified."
+
+    ::= { hh3cCupmCpProtoTnlEntry 8 }
+
+-- =================================================================
+hh3cCupmAgtProtoTnlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cCupmAgtProtoTnlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Thie table provides VXLAN tunnel configuration of UP
+         device which under control of CP device.  This protocol tunnel
+         allows to make configuration of UP device."
+    ::= { hh3cCupmCpTableObjects 3 }
+
+hh3cCupmAgtProtoTnlEntry OBJECT-TYPE
+    SYNTAX      Hh3cCupmAgtProtoTnlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry items."
+    INDEX
+        {
+            hh3cCupmUpID,
+            hh3cCupmAgtProtoTnlVxlanID,
+            hh3cCupmAgtProtoTnlSrcAddrType,
+            hh3cCupmAgtProtoTnlSrcAddr,
+            hh3cCupmAgtProtoTnlDstAddrType,
+            hh3cCupmAgtProtoTnlDstAddr
+        }
+    ::= { hh3cCupmAgtProtoTnlTable 1 }
+
+Hh3cCupmAgtProtoTnlEntry ::= SEQUENCE
+    {
+        hh3cCupmAgtProtoTnlVxlanID           Integer32,
+        hh3cCupmAgtProtoTnlSrcAddrType       InetAddressType,
+        hh3cCupmAgtProtoTnlSrcAddr           InetAddress,
+        hh3cCupmAgtProtoTnlDstAddrType       InetAddressType,
+        hh3cCupmAgtProtoTnlDstAddr           InetAddress,
+        hh3cCupmAgtProtoTnlVpnName           OCTET STRING,
+        hh3cCupmAgtProtoTnlRowStatus         RowStatus
+    }
+
+hh3cCupmAgtProtoTnlVxlanID OBJECT-TYPE
+    SYNTAX      Integer32 (1..16777215)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Part of the index for this table, this value
+         identifies the VXLAN protocol tunnel."
+    ::= { hh3cCupmAgtProtoTnlEntry 1 }
+
+hh3cCupmAgtProtoTnlSrcAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of local address to be used at a remote
+         host for connecting VXLAN protocol tunnel."
+    ::= { hh3cCupmAgtProtoTnlEntry 2 }
+
+hh3cCupmAgtProtoTnlSrcAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the local address to be used at a remote
+         host for connecting VXLAN protocol tunnel.  The host
+         address type is determined by the object value of corresponding
+         hh3cCupmCpProtoTnlSrcAddrType."
+    ::= { hh3cCupmAgtProtoTnlEntry 3 }
+
+hh3cCupmAgtProtoTnlDstAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of remote host for connecting the VXLAN
+         protocol tunnel."
+    ::= { hh3cCupmAgtProtoTnlEntry 4 }
+
+hh3cCupmAgtProtoTnlDstAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the remote host for connecting the VXLAN
+         protocol tunnel."
+    ::= { hh3cCupmAgtProtoTnlEntry 5 }
+
+hh3cCupmAgtProtoTnlVpnName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VPN name, to which the rule will be applied.
+         Default value is zero-length."
+    DEFVAL { "" }
+    ::= { hh3cCupmAgtProtoTnlEntry 6 }
+
+hh3cCupmAgtProtoTnlRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo,
+        Destroy operation.  To create a new row, hh3cCupmUpID must be specified."
+    ::= { hh3cCupmAgtProtoTnlEntry 7 }
+
+END

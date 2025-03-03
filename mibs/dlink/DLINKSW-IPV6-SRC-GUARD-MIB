@@ -1,0 +1,503 @@
+-- *****************************************************************
+-- DLINKSW-IPV6-SRC-GUARD-MIB: IPv6 Source Guard MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-IPV6-SRC-GUARD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Unsigned32,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    TruthValue,
+    RowStatus,
+    MacAddress,
+    DisplayString
+        FROM SNMPv2-TC
+    InetAddressIPv6
+        FROM INET-ADDRESS-MIB
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    VlanId
+        FROM Q-BRIDGE-MIB
+    dlinkIndustrialCommon
+        FROM DLINK-ID-REC-MIB;
+
+dlinkSwIpv6SourceGuardMIB MODULE-IDENTITY
+    LAST-UPDATED "201307180000Z"
+    ORGANIZATION "D-Link Corp."
+    CONTACT-INFO
+        "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+        "
+    DESCRIPTION
+        "This MIB module defines objects for IPv6 Source Guard."
+    REVISION    "201307180000Z"
+    DESCRIPTION
+         "This is the first version of the MIB file.
+         "
+    ::= { dlinkIndustrialCommon 145 }
+
+--
+-- Textual Conventions
+--
+
+
+-- -----------------------------------------------------------------------------
+dIpv6sgNotifications     OBJECT IDENTIFIER ::= { dlinkSwIpv6SourceGuardMIB 0 }
+dIpv6sgObjects           OBJECT IDENTIFIER ::= { dlinkSwIpv6SourceGuardMIB 1 }
+dIpv6sgConformance       OBJECT IDENTIFIER ::= { dlinkSwIpv6SourceGuardMIB 2 }
+
+dIpv6sgPolicy            OBJECT IDENTIFIER ::= { dIpv6sgObjects 1 }
+dIpv6sgInterface         OBJECT IDENTIFIER ::= { dIpv6sgObjects 2 }
+dIpv6sgBindings          OBJECT IDENTIFIER ::= { dIpv6sgObjects 3 }
+-- -----------------------------------------------------------------------------
+    dIpv6sgPolicyNumber  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in IPv6 source-guard policy
+             table."
+        ::= { dIpv6sgPolicy 1 }
+
+    dIpv6sgPolicyTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpv6sgPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains information about IPv6 source-guard policies."
+        ::= { dIpv6sgPolicy 2 }
+
+    dIpv6sgPolicyEntry OBJECT-TYPE
+        SYNTAX          DIpv6sgPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defined in dIpv6sgPolicyTable. An entry is 
+            created/removed when an IPv6 source-guard policy is created/deleted."
+        INDEX { dIpv6sgPolicyName }
+        ::= { dIpv6sgPolicyTable 1 }
+
+    DIpv6sgPolicyEntry ::= SEQUENCE {
+        dIpv6sgPolicyName              DisplayString,
+        dIpv6sgPolicyDenyAutoConfig    TruthValue,
+        dIpv6sgPolicyPermitLinkLocal   TruthValue,
+        dIpv6sgPolicyRowStatus         RowStatus
+    }
+
+    dIpv6sgPolicyName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of the IPv6 source-guard policy."
+        ::= { dIpv6sgPolicyEntry 1 }
+
+    dIpv6sgPolicyDenyAutoConfig OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether deny data traffic from auto-configured global address.
+            It is useful when all global addresses on a link are assigned 
+            by DHCP and the administrator wants to block hosts 
+            with self-configured addresses sending traffic.
+            "
+        DEFVAL { false }
+        ::= { dIpv6sgPolicyEntry 2 }
+        
+    dIpv6sgPolicyPermitLinkLocal OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether allow hardware permit data traffic sent by link-local address.
+            "
+        DEFVAL { false }
+        ::= { dIpv6sgPolicyEntry 3 }
+        
+    dIpv6sgPolicyRowStatus  OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object allows the dynamic creation and deletion of a policy."
+        ::= { dIpv6sgPolicyEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dIpv6sgIfConfigTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpv6sgIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to configure the IPv6 source-guard
+            state at every interface capable of this feature.
+            "
+        ::= { dIpv6sgInterface 1 }
+
+    dIpv6sgIfConfigEntry OBJECT-TYPE
+        SYNTAX          DIpv6sgIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains the configuration to enable or
+            disable IPv6 source-guard on an interface.
+            "
+        INDEX { ifIndex }
+        ::= { dIpv6sgIfConfigTable 1 }
+
+    DIpv6sgIfConfigEntry ::= SEQUENCE {
+        dIpv6sgIfEnabled       TruthValue
+    }
+
+    dIpv6sgIfEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables IPv6 source-guard on the interface, if set this 
+            object to 'true'. 
+            Setting this object to 'false' disables the IPv6 source-guard on the
+            interface.
+            "
+        ::= { dIpv6sgIfConfigEntry 1 }
+
+-- -----------------------------------------------------------------------------
+    dIpv6sgIfAttachTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpv6sgIfAttachEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to attach an IPv6 source-guard policy 
+            at each interface capable of this feature.
+            "
+        ::= { dIpv6sgInterface 2 }
+
+    dIpv6sgIfAttachEntry OBJECT-TYPE
+        SYNTAX          DIpv6sgIfAttachEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains the configuration of attaching IPv6 source-guard 
+            policy on the interface. 
+            "
+        INDEX { ifIndex }
+        ::= { dIpv6sgIfAttachTable 1 }
+
+    DIpv6sgIfAttachEntry ::= SEQUENCE {
+        dIpv6sgIfAttachPolicy       DisplayString,
+        dIpv6sgIfAttachRowStatus    RowStatus
+    }
+
+    dIpv6sgIfAttachPolicy OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the attached IPv6 source-guard policy.
+            "
+        ::= { dIpv6sgIfAttachEntry 1 }
+
+    dIpv6sgIfAttachRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows."
+        ::= { dIpv6sgIfAttachEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dIpv6sgStaticBindingsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpv6sgStaticBindingsEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the manual bindings information.
+            e.g.
+            VLAN MAC Address       IP Address Interface
+            ---- ----------------- ---------- ---------
+            2000 00.01.02.03.04.05 2000::1    8
+            3000 00.05.06.07.08.09 3000::2    3
+            4094 00.10.20.30.40.55 2134::7    5
+            4094 00.10.20.30.40.55 2134::8    6
+            4094 00.10.20.30.40.55 2134::9    8
+            "
+        ::= { dIpv6sgBindings 1 }
+
+    dIpv6sgStaticBindingsEntry OBJECT-TYPE
+        SYNTAX          DIpv6sgStaticBindingsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "An entry defines a manual binding.
+           "
+        INDEX           {
+            dIpv6sgStaticBindingsVlan,
+            dIpv6sgStaticBindingsMacAddress,
+            dIpv6sgStaticBindingsIpAddress,
+            dIpv6sgStaticBindingsInterface
+        } 
+        ::= { dIpv6sgStaticBindingsTable 1 }
+
+    DIpv6sgStaticBindingsEntry ::= SEQUENCE {
+        dIpv6sgStaticBindingsVlan           VlanId,
+        dIpv6sgStaticBindingsMacAddress     MacAddress,
+        dIpv6sgStaticBindingsIpAddress      InetAddressIPv6,
+        dIpv6sgStaticBindingsInterface      InterfaceIndex,
+        dIpv6sgStaticBindingsRowStatus         RowStatus
+    } 
+
+    dIpv6sgStaticBindingsVlan OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN to which a host belongs." 
+        ::= { dIpv6sgStaticBindingsEntry 1 }
+
+    dIpv6sgStaticBindingsMacAddress OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MAC address of the entry." 
+        ::= { dIpv6sgStaticBindingsEntry 2 }
+
+    dIpv6sgStaticBindingsIpAddress OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the allocated IPv6 address of the entry." 
+        ::= { dIpv6sgStaticBindingsEntry 3 }
+
+    dIpv6sgStaticBindingsInterface OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex value of the interface
+            where the host connects to." 
+       ::= { dIpv6sgStaticBindingsEntry 4 }
+
+    dIpv6sgStaticBindingsRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is used to manage the creation and deletion
+            of rows in this table.
+            " 
+        ::= { dIpv6sgStaticBindingsEntry 99 }
+
+-- ----------------------------------------------------------------------------- 
+    dIpv6sgBindingsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpv6sgBindingsEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the bindings information regarding IPv6 Snooping.
+            e.g.
+            Onwer IPv6 Address              MAC Address      Interface VLAN TimeLeft
+            ----- ------------------------- ---------------- --------- ---- --------
+            NDP   FE80::A8BB:CCFF:FE01:F500 AABB.CC01.F500   1         100  8850
+            Static FE80::21D:71FF:FE99:4900 001D.7199.4900   2         100  0
+            NDP   2001:600::1               AABB.CC01.F500   1         100  3181
+            DHCP  2001:300::1               AABB.CC01.F500   1         100  9559
+            DHCP  2001:100::2               AABB.CC01.F600   1         200  9196
+            DHCP  2001:400::1               001D.7199.4900   2         100  1568
+            Static 2001:500::1              000A.000B.000C   13        300  0
+            "
+        ::= { dIpv6sgBindings 2 }
+
+    dIpv6sgBindingsEntry OBJECT-TYPE
+        SYNTAX          DIpv6sgBindingsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "An entry contains information of a binding instance.
+           "
+        INDEX           {
+            dIpv6sgBindingsOwner,
+            dIpv6sgBindingsIpAddress,
+            dIpv6sgBindingsMacAddress,
+            dIpv6sgBindingsInterface,
+            dIpv6sgBindingsVlan
+        } 
+        ::= { dIpv6sgBindingsTable 1 }
+
+    DIpv6sgBindingsEntry ::= SEQUENCE {
+        dIpv6sgBindingsOwner          INTEGER,
+        dIpv6sgBindingsIpAddress      InetAddressIPv6,
+        dIpv6sgBindingsMacAddress     MacAddress,
+        dIpv6sgBindingsInterface      InterfaceIndex,
+        dIpv6sgBindingsVlan           VlanId,
+        dIpv6sgBindingsTimeleft       Unsigned32
+    } 
+
+    dIpv6sgBindingsOwner OBJECT-TYPE
+        SYNTAX          INTEGER {
+            static(1),
+            ndp(2),
+            dhcp(3)
+        }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IPv6 snooping owner." 
+        ::= { dIpv6sgBindingsEntry 1 }
+
+    dIpv6sgBindingsIpAddress OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IPv6 address of the entry." 
+        ::= { dIpv6sgBindingsEntry 2 }
+
+    dIpv6sgBindingsMacAddress OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MAC address of the entry." 
+        ::= { dIpv6sgBindingsEntry 3 }
+
+    dIpv6sgBindingsInterface OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex value of the interface
+            where a host connects to." 
+       ::= { dIpv6sgBindingsEntry 4 }
+
+    dIpv6sgBindingsVlan OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN to which the host belongs." 
+        ::= { dIpv6sgBindingsEntry 5 }
+
+    dIpv6sgBindingsTimeleft OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the time left for the dynamic hosts.
+            It is meaningless when dIpv6sgBindingsOwner is 'static',
+            it is always be zero." 
+        ::= { dIpv6sgBindingsEntry 6 }
+ 
+-- Conformance
+
+dIpv6sgMIBCompliances    OBJECT IDENTIFIER ::= { dIpv6sgConformance 1 }
+
+dIpv6sgMIBGroups         OBJECT IDENTIFIER ::= { dIpv6sgConformance 2 }
+
+dIpv6sgMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for DLINKSW-IPV6-SRC-GUARD-MIB"
+    MODULE
+    MANDATORY-GROUPS {
+        dIpv6sgIfConfigGroup
+    }
+
+    GROUP dIpv6sgPolicyGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which provides the
+        configuration of IPv6 source-guard policy."
+
+    GROUP dIpv6sgIfAttachGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+        interface-specific configuration of attaching IPv6 source-guard policy."
+
+    GROUP dIpv6sgStaticBindingsGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        configuring the static bindings."
+
+    ::= { dIpv6sgMIBCompliances 1 }
+
+-- Units of Conformance
+
+-- IPv6 Source Guard Group
+
+    dIpv6sgIfConfigGroup OBJECT-GROUP
+        OBJECTS {
+            dIpv6sgIfEnabled
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects which are used to configure as
+            well as show information regarding the IPv6 Source Guard feature
+            per interface."
+        ::= { dIpv6sgMIBGroups 1 }
+
+    dIpv6sgBindingsGroup OBJECT-GROUP
+        OBJECTS         {
+            dIpv6sgBindingsTimeleft
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects which are used to show information
+            regarding the IPv6 Snooping binding data."
+       ::= { dIpv6sgMIBGroups 2 }
+
+    dIpv6sgPolicyGroup OBJECT-GROUP
+        OBJECTS {
+            dIpv6sgPolicyNumber,
+            dIpv6sgPolicyDenyAutoConfig,
+            dIpv6sgPolicyPermitLinkLocal,
+            dIpv6sgPolicyRowStatus
+       }
+       STATUS current
+       DESCRIPTION
+            "A collection of object which are used to configure as
+            well as show information regarding the IPv6 source-guard policy."
+       ::= { dIpv6sgMIBGroups 3 }
+
+    dIpv6sgIfAttachGroup OBJECT-GROUP
+        OBJECTS {
+            dIpv6sgIfAttachPolicy,
+            dIpv6sgIfAttachRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+           "A collection of object which are used to configure as
+           well as show information regarding the attaching policy 
+           per interface."
+        ::= { dIpv6sgMIBGroups 4 }
+
+    dIpv6sgStaticBindingsGroup OBJECT-GROUP
+        OBJECTS         {
+            dIpv6sgStaticBindingsRowStatus
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects which are used to configure
+            as well as show information regarding the static binding data
+            for IPv6 Source Guard."
+        ::= { dIpv6sgMIBGroups 5 }
+
+END
+
+

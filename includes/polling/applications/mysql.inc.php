@@ -4,119 +4,126 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'mysql';
-$app_id = $app['app_id'];
-if (!empty($agent_data['app'][$name])) {
+
+if (! empty($agent_data['app'][$name])) {
     $mysql = $agent_data['app'][$name];
 } else {
     // Polls MySQL  statistics from script via SNMP
     $mysql = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.121.115.113.108', '-Ovq');
 }
 
-update_application($app, $mysql);
-echo ' mysql';
+$metrics = [];
 
 // General Stats
-$mapping = array(
+$mapping = [
     'IDBLBSe' => 'cr',
-    'IBLFh'   => 'ct',
-    'IBLWn'   => 'cu',
-    'SRows'   => 'ck',
-    'SRange'  => 'cj',
-    'SMPs'    => 'ci',
-    'SScan'   => 'cl',
-    'IBIRd'   => 'ai',
-    'IBIWr'   => 'aj',
-    'IBILg'   => 'ak',
-    'IBIFSc'  => 'ah',
-    'IDBRDd'  => 'b2',
-    'IDBRId'  => 'b0',
-    'IDBRRd'  => 'b3',
-    'IDBRUd'  => 'b1',
-    'IBRd'    => 'ae',
-    'IBCd'    => 'af',
-    'IBWr'    => 'ag',
-    'TLIe'    => 'b5',
-    'TLWd'    => 'b4',
-    'IBPse'   => 'aa',
-    'IBPDBp'  => 'ac',
-    'IBPFe'   => 'ab',
-    'IBPMps'  => 'ad',
-    'TOC'     => 'bc',
-    'OFs'     => 'b7',
-    'OTs'     => 'b8',
-    'OdTs'    => 'b9',
-    'IBSRs'   => 'ay',
-    'IBSWs'   => 'ax',
-    'IBOWs'   => 'az',
-    'QCs'     => 'c1',
-    'QCeFy'   => 'bu',
-    'MaCs'    => 'bl',
-    'MUCs'    => 'bf',
-    'ACs'     => 'bd',
-    'AdCs'    => 'be',
-    'TCd'     => 'bi',
-    'Cs'      => 'bn',
-    'IBTNx'   => 'a5',
-    'KRRs'    => 'a0',
-    'KRs'     => 'a1',
-    'KWR'     => 'a2',
-    'KWs'     => 'a3',
-    'QCQICe'  => 'bz',
-    'QCHs'    => 'bv',
-    'QCIs'    => 'bw',
-    'QCNCd'   => 'by',
-    'QCLMPs'  => 'bx',
+    'IBLFh' => 'ct',
+    'IBLWn' => 'cu',
+    'SRows' => 'ck',
+    'SRange' => 'cj',
+    'SMPs' => 'ci',
+    'SScan' => 'cl',
+    'IBIRd' => 'ai',
+    'IBIWr' => 'aj',
+    'IBILg' => 'ak',
+    'IBIFSc' => 'ah',
+    'IDBRDd' => 'b2',
+    'IDBRId' => 'b0',
+    'IDBRRd' => 'b3',
+    'IDBRUd' => 'b1',
+    'IBRd' => 'ae',
+    'IBCd' => 'af',
+    'IBWr' => 'ag',
+    'TLIe' => 'b5',
+    'TLWd' => 'b4',
+    'IBPse' => 'aa',
+    'IBPDBp' => 'ac',
+    'IBPFe' => 'ab',
+    'IBPMps' => 'ad',
+    'TOC' => 'bc',
+    'OFs' => 'b7',
+    'OTs' => 'b8',
+    'OdTs' => 'b9',
+    'IBSRs' => 'ay',
+    'IBSWs' => 'ax',
+    'IBOWs' => 'az',
+    'QCs' => 'c1',
+    'QCeFy' => 'bu',
+    'MaCs' => 'bl',
+    'MUCs' => 'bf',
+    'ACs' => 'bd',
+    'AdCs' => 'be',
+    'TCd' => 'bi',
+    'Cs' => 'bn',
+    'IBTNx' => 'a5',
+    'KRRs' => 'a0',
+    'KRs' => 'a1',
+    'KWR' => 'a2',
+    'KWs' => 'a3',
+    'QCQICe' => 'bz',
+    'QCHs' => 'bv',
+    'QCIs' => 'bw',
+    'QCNCd' => 'by',
+    'QCLMPs' => 'bx',
     'CTMPDTs' => 'cn',
-    'CTMPTs'  => 'cm',
-    'CTMPFs'  => 'co',
-    'IBIIs'   => 'au',
-    'IBIMRd'  => 'av',
-    'IBIMs'   => 'aw',
-    'IBILog'  => 'al',
-    'IBISc'   => 'am',
-    'IBIFLg'  => 'an',
-    'IBFBl'   => 'aq',
-    'IBIIAo'  => 'ap',
-    'IBIAd'   => 'as',
-    'IBIAe'   => 'at',
-    'SFJn'    => 'cd',
-    'SFRJn'   => 'ce',
-    'SRe'     => 'cf',
-    'SRCk'    => 'cg',
-    'SSn'     => 'ch',
-    'SQs'     => 'b6',
-    'BRd'     => 'cq',
-    'BSt'     => 'cp',
-    'CDe'     => 'c6',
-    'CIt'     => 'c4',
-    'CISt'    => 'ca',
-    'CLd'     => 'c8',
-    'CRe'     => 'c7',
-    'CRSt'    => 'cc',
-    'CSt'     => 'c5',
-    'CUe'     => 'c3',
-    'CUMi'    => 'c9',
-);
+    'CTMPTs' => 'cm',
+    'CTMPFs' => 'co',
+    'IBIIs' => 'au',
+    'IBIMRd' => 'av',
+    'IBIMs' => 'aw',
+    'IBILog' => 'al',
+    'IBISc' => 'am',
+    'IBIFLg' => 'an',
+    'IBFBl' => 'aq',
+    'IBIIAo' => 'ap',
+    'IBIAd' => 'as',
+    'IBIAe' => 'at',
+    'SFJn' => 'cd',
+    'SFRJn' => 'ce',
+    'SRe' => 'cf',
+    'SRCk' => 'cg',
+    'SSn' => 'ch',
+    'SQs' => 'b6',
+    'BRd' => 'cq',
+    'BSt' => 'cp',
+    'CDe' => 'c6',
+    'CIt' => 'c4',
+    'CISt' => 'ca',
+    'CLd' => 'c8',
+    'CRe' => 'c7',
+    'CRSt' => 'cc',
+    'CSt' => 'c5',
+    'CUe' => 'c3',
+    'CUMi' => 'c9',
+    'SlLa' => 'br',
+];
 
 $data = explode("\n", $mysql);
 
-$map = array();
-foreach ($data as $str) {
-    list($key, $value) = explode(':', $str);
-    $map[$key]         = (float) trim($value);
+if (count($data) < 80) {
+    echo " Incorrect number of datapoints returned from device, skipping\n";
+
+    return;
 }
 
-$fields = array();
+$map = [];
+foreach ($data as $str) {
+    [$key, $value] = explode(':', $str);
+    $map[$key] = (float) trim($value);
+}
+
+$fields = [];
 foreach ($mapping as $k => $v) {
     $fields[$k] = (isset($map[$v]) && $map[$v] >= 0) ? $map[$v] : 'U';
 }
+$metrics = $fields;
 
-$rrd_name = array('app', $name, $app_id);
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('IDBLBSe', 'GAUGE', 0, 125000000000)
     ->addDataset('IBLFh', 'DERIVE', 0, 125000000000)
     ->addDataset('IBLWn', 'DERIVE', 0, 125000000000)
-    ->addDataset('SRows', 'DERIVE', 0, 125000000000)
+    ->addDataset('SRows', 'COUNTER', 0, 125000000000)
     ->addDataset('SRange', 'DERIVE', 0, 125000000000)
     ->addDataset('SMPs', 'DERIVE', 0, 125000000000)
     ->addDataset('SScan', 'DERIVE', 0, 125000000000)
@@ -191,39 +198,53 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('CRSt', 'DERIVE', 0, 125000000000)
     ->addDataset('CSt', 'DERIVE', 0, 125000000000)
     ->addDataset('CUe', 'DERIVE', 0, 125000000000)
-    ->addDataset('CUMi', 'DERIVE', 0, 125000000000);
+    ->addDataset('CUMi', 'DERIVE', 0, 125000000000)
+    ->addDataset('SlLa', 'GAUGE', 0, 125000000000);
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => $rrd_name,
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 // Process state statistics
-$mapping_status = array(
-    'State_closing_tables'       => 'd2',
+$mapping_status = [
+    'State_closing_tables' => 'd2',
     'State_copying_to_tmp_table' => 'd3',
-    'State_end'                  => 'd4',
-    'State_freeing_items'        => 'd5',
-    'State_init'                 => 'd6',
-    'State_locked'               => 'd7',
-    'State_login'                => 'd8',
-    'State_preparing'            => 'd9',
-    'State_reading_from_net'     => 'da',
-    'State_sending_data'         => 'db',
-    'State_sorting_result'       => 'dc',
-    'State_statistics'           => 'dd',
-    'State_updating'             => 'de',
-    'State_writing_to_net'       => 'df',
-    'State_none'                 => 'dg',
-    'State_other'                => 'dh',
-);
+    'State_end' => 'd4',
+    'State_freeing_items' => 'd5',
+    'State_init' => 'd6',
+    'State_locked' => 'd7',
+    'State_login' => 'd8',
+    'State_preparing' => 'd9',
+    'State_reading_from_net' => 'da',
+    'State_sending_data' => 'db',
+    'State_sorting_result' => 'dc',
+    'State_statistics' => 'dd',
+    'State_updating' => 'de',
+    'State_writing_to_net' => 'df',
+    'State_none' => 'dg',
+    'State_other' => 'dh',
+];
 
-$rrd_name = array('app', $name, $app_id, 'status');
 $rrd_def = new RrdDefinition();
-unset($fields);
-$fields = array();
+// because this sends different names for rrd and compared to other datastores, disable $fields name checks
+$rrd_def->disableNameChecking();
+
+$fields = [];
 foreach ($mapping_status as $desc => $id) {
     $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
     $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);
 }
-$status = true;
-$tags = compact('name', 'app_id', 'status', 'rrd_name', 'rrd_def');
+$metrics += $fields;
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'status' => true,
+    'rrd_name' => ['app', $name, $app->app_id, 'status'],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
+update_application($app, $mysql, $metrics);

@@ -11,16 +11,18 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Util\IP;
+
 $module = 'ntp';
 
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], array('type'=>$module));
+$components = $component->getComponents($device['device_id'], ['type' => $module]);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
 // Begin our master array, all other values will be processed into this array.
-$tblComponents = array();
+$tblComponents = [];
 
 // Let's gather some data..
 // For Reference:
@@ -40,14 +42,14 @@ if (is_null($cntpPeersVarEntry)) {
     d_echo("Objects Found:\n");
 
     // Let's grab the index for each NTP peer
-    foreach ($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][2] as $index => $value) {
-        $result = array();
-        $result['UID'] = (string)$index;    // This is cast as a string so it can be compared with the database value.
+    foreach ((array) $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][2] as $index => $value) {
+        $result = [];
+        $result['UID'] = (string) $index;    // This is cast as a string so it can be compared with the database value.
         $result['peer'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][3][$index];
         $result['port'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][4][$index];
         $result['stratum'] = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][9][$index];
-        $result['peerref'] = hex_to_ip($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][15][$index]);
-        $result['label'] = $result['peer'].":".$result['port'];
+        $result['peerref'] = IP::fromHexString($cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][15][$index], true);
+        $result['label'] = $result['peer'] . ':' . $result['port'];
 
         // Set the status, 16 = Bad
         if ($result['stratum'] == 16) {
@@ -58,7 +60,7 @@ if (is_null($cntpPeersVarEntry)) {
             $result['error'] = '';
         }
 
-        d_echo("NTP Peer found: ");
+        d_echo('NTP Peer found: ');
         d_echo($result);
         $tblComponents[] = $result;
     }
@@ -79,23 +81,23 @@ if (is_null($cntpPeersVarEntry)) {
             }
         }
 
-        if (!$component_key) {
+        if (! $component_key) {
             // The component doesn't exist, we need to ADD it - ADD.
             $new_component = $component->createComponent($device['device_id'], $module);
             $component_key = key($new_component);
             $components[$component_key] = array_merge($new_component[$component_key], $array);
-            echo "+";
+            echo '+';
         } else {
             // The component does exist, merge the details in - UPDATE.
             $components[$component_key] = array_merge($components[$component_key], $array);
-            echo ".";
+            echo '.';
         }
     }
 
     /*
      * Loop over the Component data to see if we need to DELETE any components.
      */
-    foreach ($components as $key => $array) {
+    foreach ((array) $components as $key => $array) {
         // Guilty until proven innocent
         $found = false;
 
@@ -108,7 +110,7 @@ if (is_null($cntpPeersVarEntry)) {
 
         if ($found === false) {
             // The component has not been found. we should delete it.
-            echo "-";
+            echo '-';
             $component->deleteComponent($key);
         }
     }
@@ -119,10 +121,10 @@ if (is_null($cntpPeersVarEntry)) {
 } // End if not error
 
 $module = strtolower($module);
-if (count($components) > 0) {
-    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', array($device['device_id'], $module)) == '0') {
-        dbInsert(array('device_id' => $device['device_id'], 'app_type' => $module), 'applications');
+if (! empty($components)) {
+    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', [$device['device_id'], $module]) == '0') {
+        dbInsert(['device_id' => $device['device_id'], 'app_type' => $module, 'app_status' => '', 'app_instance' => ''], 'applications');
     }
 } else {
-    dbDelete('applications', '`device_id` = ? AND `app_type` = ?', array($device['device_id'], $module));
+    dbDelete('applications', '`device_id` = ? AND `app_type` = ?', [$device['device_id'], $module]);
 }

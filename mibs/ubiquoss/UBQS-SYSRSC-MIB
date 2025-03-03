@@ -1,0 +1,271 @@
+--***************************************************************
+-- UBQS-SYSRSC-MIB:  Ubiquoss System Resource MIB file
+--
+-- June 2009, Hyung Eun Park
+--
+-- Copyright (c) 2009 by Ubiquoss, Corp.
+-- All rights reserved.   
+-- 
+-- *****************************************************************
+--
+
+UBQS-SYSRSC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE
+		FROM RFC-1212    
+	TruthValue
+        FROM SNMPv2-TC
+ 	ubiSystemMIB
+ 		FROM UBQS-SYSTEM-MIB;
+
+
+
+-- ***********************************************************
+-- ubiSysMIBObjects
+-- ***********************************************************
+ 
+ubiSystemMIBObjects  	OBJECT IDENTIFIER  		::= { ubiSystemMIB 1 }      
+
+ubiSysRscCpu   		OBJECT IDENTIFIER 		::= { ubiSystemMIBObjects 3 }
+ubiSysRscMemory   	OBJECT IDENTIFIER 		::= { ubiSystemMIBObjects 4 }
+
+
+-- ***********************************************************
+-- ubiSysRscCpu
+-- ***********************************************************
+    ubiCpuFiveSec  OBJECT-TYPE
+       SYNTAX      Counter32
+       UNITS        "%"
+       ACCESS      read-only
+       STATUS      mandatory 
+       DESCRIPTION
+          "CPU busy percentage in the last 5 second
+           period."
+       ::= { ubiSysRscCpu 1 }
+
+    ubiCpuOneMin  OBJECT-TYPE
+       SYNTAX      Counter32
+       UNITS        "%"       
+       ACCESS      read-only
+       STATUS      mandatory 
+       DESCRIPTION
+          "CPU busy percentage in the last 1 minute
+           period."
+       ::= { ubiSysRscCpu 2 }
+	
+	ubiCpuFiveMin  OBJECT-TYPE
+       SYNTAX      Counter32
+       UNITS        "%"
+       ACCESS      read-only
+       STATUS      mandatory 
+       DESCRIPTION
+          "CPU busy percentage in the last 5 minute
+           period."
+       ::= { ubiSysRscCpu 3 }       
+
+	ubiCpuRisingThreshold  OBJECT-TYPE
+       SYNTAX      Counter32 
+     UNITS        "%"
+       ACCESS      read-write
+       STATUS      mandatory 
+       DESCRIPTION
+          "Rising threshold of CPU Usage."
+       ::= { ubiSysRscCpu 4 }
+
+    ubiCpuFallingThreshold  OBJECT-TYPE
+       SYNTAX      Counter32
+       UNITS        "%"
+       ACCESS      read-write
+       STATUS      mandatory 
+       DESCRIPTION
+          "Falling threshold of CPU Usage."
+       ::= { ubiSysRscCpu 5 }  
+                             
+   	ubiCpuLoadTimePeriod  OBJECT-TYPE
+       SYNTAX      INTEGER
+       {
+       		fiveSec(1),
+       		oneMin(2),
+       		fiveMin(3)
+       }
+       ACCESS      read-write
+       STATUS      mandatory 
+       DESCRIPTION
+          "CPU Load Time Period for notification."
+       ::= { ubiSysRscCpu 6 }
+      
+       
+ 
+-- ***********************************************************
+-- ubiSysRscMemory
+-- ***********************************************************   
+
+    ubiMemoryAlloc  OBJECT-TYPE
+       SYNTAX      Counter32
+       UNITS        "kbyte"
+       ACCESS      read-only
+       STATUS      mandatory 
+       DESCRIPTION
+          "Memory allocation usage."
+       ::= { ubiSysRscMemory 1 }
+
+    ubiMemoryFree  OBJECT-TYPE
+       SYNTAX      Counter32
+       UNITS        "kbyte"
+       ACCESS  	   read-only
+       STATUS      mandatory 
+       DESCRIPTION
+          "Memory free usage."
+       ::= { ubiSysRscMemory 2 }
+
+    ubiMemoryTotal  OBJECT-TYPE
+       SYNTAX      Counter32
+       UNITS        "kbyte"
+       ACCESS      read-only
+       STATUS      mandatory 
+       DESCRIPTION
+          "Total memory."
+       ::= { ubiSysRscMemory 3 }  
+
+    ubiMemoryFreePercentage  OBJECT-TYPE
+       SYNTAX      Counter32
+       UNITS        "%"
+       ACCESS  	   read-only
+       STATUS      mandatory 
+       DESCRIPTION
+          "memoryUsageFreePercentage indicates available memory 
+           allocation space in percentage."
+       ::= { ubiSysRscMemory 4 }
+
+    ubiMemoryThreshold  OBJECT-TYPE
+       SYNTAX      Counter32
+       UNITS        "%"  
+       ACCESS  	   read-write
+       STATUS      mandatory 
+       DESCRIPTION
+          "Threshold of the memory usage."
+       ::= { ubiSysRscMemory 5 } 
+ 
+
+-- ***********************************************************
+-- ubiSysRscCpu
+-- ***********************************************************
+
+ubiSysRscNotificationEnables OBJECT IDENTIFIER ::= { ubiSystemMIBObjects 5 }       
+           
+	ubiSysRscEnableCpuNotification  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the notification of cpu."
+        DEFVAL { false }
+        ::= { ubiSysRscNotificationEnables 1 }           
+        
+	ubiSysRscEnableMemoryNotification  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the notification of memory."
+        DEFVAL { false }
+        ::= { ubiSysRscNotificationEnables 2 }
+ 
+
+ 
+-- ***********************************************************
+-- ubiSysRscMIBNotificationPrefix
+-- ***********************************************************
+ 
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ubiSystemMIBNotificationPrefix 	OBJECT IDENTIFIER 	::= { ubiSystemMIB 2 }
+ubiSystemMIBNotifications 		OBJECT IDENTIFIER 	::= { ubiSystemMIBNotificationPrefix 0 }
+ubiSysRscMIBNotificationObjects OBJECT IDENTIFIER 	::= { ubiSystemMIBNotificationPrefix 1 }
+
+
+	ubiSysRscCpuRisingNotification NOTIFICATION-TYPE      
+     	OBJECTS {            
+     			ubiCpuLoadTimePeriod,
+                ubiCpuAlarmValue,
+                ubiCpuRisingThreshold,
+                ubiCpuAlarmState
+             }
+
+     	STATUS  current
+     	DESCRIPTION     
+                "A ubiSysRscCpuRisingNotification is sent if the 
+                cpu utilization measured at a given testpoint is outside 
+                the configured range for high threshold."
+		::= { ubiSystemMIBNotifications 1 }
+
+	ubiSysRscCpuFallingNotification NOTIFICATION-TYPE   
+     	OBJECTS {        
+     			ubiCpuLoadTimePeriod,
+                ubiCpuAlarmValue,
+                ubiCpuFallingThreshold,
+                ubiCpuAlarmState
+             }
+     	STATUS  current
+     	DESCRIPTION     
+                "A ubiSysRscCpuFallingNotification is sent if the 
+                cpu utilization measured at a given testpoint is outside 
+                the configured range for low threshold."
+		::= { ubiSystemMIBNotifications 2 }
+
+	ubiSysRscMemoryRisingNotification NOTIFICATION-TYPE
+     	OBJECTS {
+                ubiMemoryFreePercentage,
+                ubiMemoryThreshold
+             }
+     	STATUS  current
+     	DESCRIPTION     
+                "A ubiSysRscMemoryRisingNotification is sent if the 
+                memory utilization measured at a given testpoint is outside 
+                the configured range for threshold."
+		::= { ubiSystemMIBNotifications 3 }
+
+	ubiSysRscMemoryFallingNotification NOTIFICATION-TYPE
+     	OBJECTS {
+                ubiMemoryFreePercentage,
+                ubiMemoryThreshold
+             }
+     	STATUS  current
+     	DESCRIPTION     
+                "A ubiSysRscMemoryFallingNotification is sent if the 
+                memory utilization measured at a given testpoint is outside 
+                the configured range for threshold."
+		::= { ubiSystemMIBNotifications 4 }     
+	
+ 
+-- ***********************************************************
+-- ubiSysRscMIBNotificationObjects
+-- ***********************************************************
+      
+    ubiCpuAlarmValue       OBJECT-TYPE    
+        SYNTAX      Counter32
+       	UNITS        "%"
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "CPU usage for cpuLoadTimePeriod"
+        ::= { ubiSysRscMIBNotificationObjects 1 } 
+
+       
+    ubiCpuAlarmState       OBJECT-TYPE
+        SYNTAX      INTEGER
+        {      
+        	none(0),
+           	high(1),
+        	low(2)
+        }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "Alarm Severity: 
+                 none(0), high(1), low(2)"
+        ::= { ubiSysRscMIBNotificationObjects 2 } 
+ END

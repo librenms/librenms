@@ -1,0 +1,605 @@
+PRVT-EPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Unsigned32               FROM SNMPv2-SMI    -- [RFC2578]
+	TEXTUAL-CONVENTION,
+	RowStatus,
+	TruthValue               FROM SNMPv2-TC
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP       FROM SNMPv2-CONF   -- [RFC2580]
+	switch                   FROM PRVT-SWITCH-MIB
+	Dot1agCfmMepIdOrZero,
+	Dot1agCfmMDLevelOrNone   FROM IEEE8021-CFM-MIB
+	sdpInfoEntry						 FROM PRVT-SERV-MIB
+	;
+
+prvtEpsMib MODULE-IDENTITY
+	LAST-UPDATED "201004170000Z"
+	ORGANIZATION "BATM Advanced Communication"
+	CONTACT-INFO
+	" BATM/Telco Systems Support team
+	Email:
+	For North America: techsupport@telco.com
+	For North Europe: support@batm.de, info@batm.de
+	For the rest of the world: techsupport@telco.com"
+	DESCRIPTION
+	"Private MIB supporting Linear Ethernet Protection Switching (ITU-T G.8031)"
+
+-- revision history
+	REVISION       "201103230000Z"
+	DESCRIPTION
+	"Added Protection Counter"
+	REVISION       "201004170000Z"
+	DESCRIPTION
+	"Add protection failure trap. Add recovery traps."
+	REVISION       "200907150000Z"
+	DESCRIPTION
+	"Updates for 9.4 release"
+	REVISION       "200903240000Z"
+	DESCRIPTION
+	"Initial"
+	::= { switch 132 }
+
+prvtEpsMibNotifications   OBJECT IDENTIFIER ::= { prvtEpsMib 0 }
+prvtEpsMibObjects         OBJECT IDENTIFIER ::= { prvtEpsMib 1 }
+
+PrvtEpsRequestStateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       ""
+    REFERENCE
+       "G.8031 clause 11.3"
+    SYNTAX      INTEGER {
+                  rsNone                       (-1),
+                  rsNoRequest                  (0),
+                  rsDoNotRevert                (1),
+                  rsReverseRequest             (2),
+                  rsExercise                   (4),
+                  rsWaitToRestore              (5),
+                  rsClear                      (6),
+                  rsManualSwitch               (7),
+                  rsSignalDegrade              (9),
+                  rsSignalFail                 (11),
+                  rsForcedSwitch               (13),
+                  rsSignalFailForProtection    (14),
+                  rsLockoutOfProtection        (15)
+                }
+
+PrvtEpsProtectionType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       ""
+    REFERENCE
+       "G.8031 clause 11.4"
+    SYNTAX      INTEGER {
+                  pt1Plus1               (0),
+                  pt1To1                 (1)
+                }
+
+PrvtEpsDirectionType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       ""
+    REFERENCE
+       "G.8031 clause 11.4"
+    SYNTAX      INTEGER {
+                  dtUnidirectional        (0),
+                  dtBidirectional         (1)
+                }
+
+PrvtEpsActivePathType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       ""
+    REFERENCE
+       "G.8031 clause 11.6"
+    SYNTAX      INTEGER {
+                  working            (0),
+                  protection         (1)
+                }
+
+PrvtEpsMonitoringType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       ""
+    SYNTAX      INTEGER {
+                  none        (0),
+                  cfmPM       (1),
+                  saa         (2)
+                }
+
+PrvtEpsDefectFopType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       ""
+    REFERENCE
+       "G.8031 clause 11.15"
+    SYNTAX      BITS {
+                  fullyIncompatibleProvisioning    (0),
+                  protectionSwitchingIncomplete    (1),
+                  protectionConfigurationMismatch  (2),
+                  epsConfigurationMismatch         (3)
+                }
+
+PrvtEpsPathStatusType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Status of the primary or backup links"
+    SYNTAX      INTEGER {
+                  psOk         (0),
+                  psFailed     (1)
+                }
+
+prvtEpsService OBJECT IDENTIFIER ::= { prvtEpsMibObjects 1 }
+
+prvtEpsServiceTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PrvtEpsServiceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"The table contains Ethernet Protection Switching services information."
+	::= { prvtEpsService 1 }
+
+prvtEpsServiceEntry OBJECT-TYPE
+	SYNTAX PrvtEpsServiceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Ethernet Protection Switching information about a specific service."
+	INDEX           { prvtEpsSvcId }
+	::= { prvtEpsServiceTable 1 }
+
+PrvtEpsServiceEntry ::= SEQUENCE {
+  prvtEpsSvcId						Unsigned32,
+	prvtEpsServiceCfmMdLevel            Dot1agCfmMDLevelOrNone,
+	prvtEpsServicePrimaryLocalCfmMep    Dot1agCfmMepIdOrZero,
+	prvtEpsServicePrimaryRemoteCfmMep   Dot1agCfmMepIdOrZero,
+	prvtEpsServiceSecondaryLocalCfmMep  Dot1agCfmMepIdOrZero,
+	prvtEpsServiceSecondaryRemoteCfmMep Dot1agCfmMepIdOrZero,
+	prvtEpsServiceLocalState            PrvtEpsRequestStateType,
+	prvtEpsServiceHoldOffTimer          Unsigned32,
+	prvtEpsServiceWaitToRestoreTimer    Unsigned32,
+	prvtEpsServiceApsChannel            TruthValue,
+	prvtEpsServiceProtection            PrvtEpsProtectionType,
+	prvtEpsServiceDirection             PrvtEpsDirectionType,
+	prvtEpsServiceRevertive             TruthValue,
+	prvtEpsServiceActivePath            PrvtEpsActivePathType,
+	prvtEpsServiceDegradeTestType       PrvtEpsMonitoringType,
+    prvtEpsServiceDegradeTestOwner      OCTET STRING,
+	prvtEpsServiceDegradeTestName       OCTET STRING,
+	prvtEpsServiceDegradeTestEnable     TruthValue,
+	prvtEpsServiceDefectFop             PrvtEpsDefectFopType,
+	prvtEpsServiceOperationalStatus     TruthValue,
+	prvtEpsServicePrimaryStatus         PrvtEpsPathStatusType,
+	prvtEpsServiceSecondaryStatus       PrvtEpsPathStatusType,
+	prvtEpsServiceRemoteState           PrvtEpsRequestStateType,
+	prvtEpsServiceRemoteApsChannel      TruthValue,
+	prvtEpsServiceRemoteProtection      PrvtEpsProtectionType,
+	prvtEpsServiceRemoteDirection       PrvtEpsDirectionType,
+	prvtEpsServiceRemoteRevertive       TruthValue,
+	prvtEpsServiceAdminFreeze           TruthValue,
+	prvtEpsServiceAdminStatus			INTEGER,
+	prvtEpsServiceRowStatus             RowStatus,
+	prvtEpsServiceProtectionCounter     Unsigned32
+}
+
+prvtEpsSvcId OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..4294967295)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The service ID."
+    ::= { prvtEpsServiceEntry 1 }
+
+prvtEpsServiceCfmMdLevel OBJECT-TYPE
+	SYNTAX Dot1agCfmMDLevelOrNone
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Value of the CFM MD level where the protected domain is situated."
+	DEFVAL { -1 }
+	::= { prvtEpsServiceEntry 2 }
+
+prvtEpsServicePrimaryLocalCfmMep OBJECT-TYPE
+	SYNTAX Dot1agCfmMepIdOrZero
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Primary local CFM MEP Id."
+	DEFVAL { 0 }
+	::= { prvtEpsServiceEntry 3 }
+
+prvtEpsServicePrimaryRemoteCfmMep OBJECT-TYPE
+	SYNTAX Dot1agCfmMepIdOrZero
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Primary remote CFM MEP Id."
+	DEFVAL { 0 }
+	::= { prvtEpsServiceEntry 4 }
+
+prvtEpsServiceSecondaryLocalCfmMep OBJECT-TYPE
+	SYNTAX Dot1agCfmMepIdOrZero
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Backup local CFM MEP Id."
+	DEFVAL { 0 }
+	::= { prvtEpsServiceEntry 5 }
+
+prvtEpsServiceSecondaryRemoteCfmMep OBJECT-TYPE
+	SYNTAX Dot1agCfmMepIdOrZero
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Backup remote CFM MEP Id."
+	DEFVAL { 0 }
+	::= { prvtEpsServiceEntry 6 }
+
+prvtEpsServiceLocalState OBJECT-TYPE
+	SYNTAX PrvtEpsRequestStateType
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Protection state of the local side. The values can be set:
+	 rsManualSwitch(7), rsClear(6) or rsLockoutOfProtection(15).
+	 The values can be get:
+	 rsNoRequest                     (0),
+	 rsDoNotRevert                   (1),
+	 rsReverseRequest                (2),
+	 rsExercise                      (4),
+	 rsWaitToRestore                 (5),
+	 rsClear                         (6),
+	 rsManualSwitch                  (7),
+	 rsSignalDegrade                 (9),
+	 rsSignalFail                   (11),
+	 rsForcedSwitch                 (13),
+	 rsSignalFailForProtection      (14),
+	 rsLockoutOfProtection          (15)."
+	::= { prvtEpsServiceEntry 7 }
+
+prvtEpsServiceHoldOffTimer OBJECT-TYPE
+	SYNTAX Unsigned32 (0..10000)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Value of the Hold Off timer in msec (increments of 100msec)."
+	REFERENCE "G.8031 clause 11.12"
+	DEFVAL { 0 }
+	::= { prvtEpsServiceEntry 8 }
+
+prvtEpsServiceWaitToRestoreTimer OBJECT-TYPE
+	SYNTAX Unsigned32 (0|5..12)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Value of the Wait To Restore timer in seconds (0 to disable it)."
+	REFERENCE "G.8031 clause 11.13"
+	DEFVAL { 5 }
+	::= { prvtEpsServiceEntry 9 }
+
+prvtEpsServiceApsChannel OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Active APS communication."
+	::= { prvtEpsServiceEntry 10 }
+
+prvtEpsServiceProtection OBJECT-TYPE
+	SYNTAX PrvtEpsProtectionType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Type of protection (1+1 or 1:1)."
+	::= { prvtEpsServiceEntry 11 }
+
+prvtEpsServiceDirection OBJECT-TYPE
+	SYNTAX PrvtEpsDirectionType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Type of protection (unidirectional or bidirectional)."
+	::= { prvtEpsServiceEntry 12 }
+
+prvtEpsServiceRevertive OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Protection type (revertive or non-revertive)."
+	::= { prvtEpsServiceEntry 13 }
+
+prvtEpsServiceActivePath OBJECT-TYPE
+	SYNTAX PrvtEpsActivePathType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Protected service active path."
+	DEFVAL { working }
+	::= { prvtEpsServiceEntry 14 }
+
+prvtEpsServiceDegradeTestType OBJECT-TYPE
+	SYNTAX PrvtEpsMonitoringType
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Type of test used for monitoring signal degrade situations."
+	DEFVAL { 0 }
+	::= { prvtEpsServiceEntry 15 }
+
+prvtEpsServiceDegradeTestOwner OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+    "Owner of the SAA test used for monitoring."
+    DEFVAL { '00'H }
+    ::= { prvtEpsServiceEntry 16 }
+
+prvtEpsServiceDegradeTestName OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(0..32))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Name of the CFM or SAA test used for monitoring."
+	DEFVAL { '00'H }
+	::= { prvtEpsServiceEntry 17 }
+
+prvtEpsServiceDegradeTestEnable OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Start/stop CFM or SAA test for performance monitoring."
+	DEFVAL { false }
+	::= { prvtEpsServiceEntry 18 }
+
+prvtEpsServiceDefectFop OBJECT-TYPE
+	SYNTAX PrvtEpsDefectFopType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Defects noticed by APS protocol could be either none or a composition of the bits (0-3):
+	 fullyIncompatibleProvisioning(0)   - occures by the reception of three APS frames with the
+	  incompatible 'B' bit value during the period of 22.5 seconds;
+	 protectionSwitchingIncomplete(1)   - occures if the transmitted 'Requested Signal' and the
+	  received 'Bridged Signal' do not match for a period of 50ms or longer;
+	 protectionConfigurationMismatch(2) - working/protection configuration mismatch, occures by
+	  the reception of three APS frames from the working transport entity during the period of
+	  22.5 seconds;
+	 epsConfigurationMismatch(3)        - provisioning mismatch - for example the local side is
+	  set in revertive mode, the remote side is set in non revertive mode."
+	::= { prvtEpsServiceEntry 19 }
+
+prvtEpsServiceOperationalStatus OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The purpose of this status is to identify to the User whether
+	 this service is ready for running. The operational status can
+	 be up or down. When creating the service the operational
+	 status will be down. Receiving CCMs from both transport
+	 entities and establishment of APS on the protection transport
+	 entity will bring the operational status to up."
+	::= { prvtEpsServiceEntry 20 }
+
+prvtEpsServicePrimaryStatus OBJECT-TYPE
+	SYNTAX PrvtEpsPathStatusType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Primary path state (psOk(0) or psFailed(1))."
+	::= { prvtEpsServiceEntry 21 }
+
+prvtEpsServiceSecondaryStatus OBJECT-TYPE
+	SYNTAX PrvtEpsPathStatusType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Secondary path state (psOk(0) or psFailed(1))."
+	::= { prvtEpsServiceEntry 22 }
+
+prvtEpsServiceRemoteState OBJECT-TYPE
+	SYNTAX PrvtEpsRequestStateType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Protection state of the remote side.
+	 The values can be get:
+	 rsNoRequest                     (0),
+	 rsDoNotRevert                   (1),
+	 rsReverseRequest                (2),
+	 rsExercise                      (4),
+	 rsWaitToRestore                 (5),
+	 rsClear                         (6),
+	 rsManualSwitch                  (7),
+	 rsSignalDegrade                 (9),
+	 rsSignalFail                   (11),
+	 rsForcedSwitch                 (13),
+	 rsSignalFailForProtection      (14),
+	 rsLockoutOfProtection          (15)."
+	::= { prvtEpsServiceEntry 23 }
+
+prvtEpsServiceRemoteApsChannel OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Active APS communication reported by the remote."
+	::= { prvtEpsServiceEntry 24 }
+
+prvtEpsServiceRemoteProtection OBJECT-TYPE
+	SYNTAX PrvtEpsProtectionType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Type of protection (1+1 or 1:1) reported by the remote."
+	::= { prvtEpsServiceEntry 25 }
+
+prvtEpsServiceRemoteDirection OBJECT-TYPE
+	SYNTAX PrvtEpsDirectionType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Type of protection (unidirectional or bidirectional) reported by the remote."
+	::= { prvtEpsServiceEntry 26 }
+
+prvtEpsServiceRemoteRevertive OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Protection type (revertive or non-revertive) reported by the remote."
+	::= { prvtEpsServiceEntry 27 }
+
+
+prvtEpsServiceAdminFreeze OBJECT-TYPE
+		SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Used to freeze the state of the protection service."
+	   DEFVAL          { false }
+	::= { prvtEpsServiceEntry 28 }
+
+
+prvtEpsServiceAdminStatus OBJECT-TYPE
+		SYNTAX INTEGER  {
+	                up ( 1 ),
+	                down ( 2 )
+					}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Administrative status of the protection."
+	   DEFVAL          { 2 }
+	::= { prvtEpsServiceEntry 29 }
+
+prvtEpsServiceRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"The status of the row.
+	 The writable columns in a row can not be changed if the row
+	 is active. All columns must have a valid value before a row
+	 can be activated."
+	::= { prvtEpsServiceEntry 30 }
+
+prvtEpsServiceProtectionCounter OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Counts how many times the service has gone to Protection."
+::= { prvtEpsServiceEntry 31 }
+
+
+
+
+prvtEpsDefectAlarm NOTIFICATION-TYPE
+    OBJECTS     { prvtEpsServiceOperationalStatus,
+                  prvtEpsServiceDefectFop
+                }
+    STATUS      current
+    DESCRIPTION
+       "1. EPS service is either operational or not operational;
+        2. Failure of protocol defects."
+    ::= { prvtEpsMibNotifications 1 }
+
+prvtEpsSwitchoverAlarm NOTIFICATION-TYPE
+    OBJECTS     { prvtEpsServiceActivePath
+                }
+    STATUS      current
+    DESCRIPTION
+       "The alarm is issued if the active link is changed,
+        pointing to the path where the switchover occured."
+    ::= { prvtEpsMibNotifications 2 }
+
+
+prvtEpsLostCommunication NOTIFICATION-TYPE
+    OBJECTS     { prvtEpsSvcId
+                }
+    STATUS      current
+    DESCRIPTION
+       "The alarm is issued in case of non reception of APS frames
+        in three consecutive intervals each representing 5 seconds."
+    ::= { prvtEpsMibNotifications 3 }
+
+prvtEpsRestoredCommunication NOTIFICATION-TYPE
+    OBJECTS     { prvtEpsSvcId
+                }
+    STATUS      current
+    DESCRIPTION
+       "APS frames are received normally after APS communication failure."
+    ::= { prvtEpsMibNotifications 4 }
+
+
+prvtEpsSignalFailDetected NOTIFICATION-TYPE
+    OBJECTS     { prvtEpsSvcId
+                }
+    STATUS      current
+    DESCRIPTION
+       "The alarm is issued in case of CCMs are not received
+        and (3.5 * CCMtime(CCMinterval)) has expired."
+    ::= { prvtEpsMibNotifications 5 }
+
+prvtEpsSignalDegradeDetected NOTIFICATION-TYPE
+    OBJECTS     { prvtEpsSvcId
+                }
+    STATUS      current
+    DESCRIPTION
+       "The alarm is issued in case of monitored error threshold is crossed:
+        1W Jitter error,
+        2W Jitter error,
+        Latency error,
+        Frame loss error."
+    ::= { prvtEpsMibNotifications 6 }
+
+prvtEpsProtctSignalFailDetected NOTIFICATION-TYPE
+    OBJECTS     { prvtEpsSvcId
+                }
+    STATUS      current
+    DESCRIPTION
+       "The alarm is issued in case of CCMs are not received on the protected link
+        and (3.5 * CCMtime(CCMinterval)) has expired or the protected link is down."
+    ::= { prvtEpsMibNotifications 7 }
+
+prvtEpsSignalFailRecovery NOTIFICATION-TYPE
+    OBJECTS     { prvtEpsSvcId
+                }
+    STATUS      current
+    DESCRIPTION
+       "The alarm is issued in case of CCMs start to be received
+	    correctly again after a prvtEpsSignalFailDetected alarm occured
+        and (3.5 * CCMtime(CCMinterval)) timer no longer expires or the link is up ."
+    ::= { prvtEpsMibNotifications 8 }
+
+prvtEpsSignalDegradeRecovery NOTIFICATION-TYPE
+    OBJECTS     { prvtEpsSvcId
+                }
+    STATUS      current
+    DESCRIPTION
+       "The alarm is issued in case of monitored error threshold is crossed bellow limis:
+        1W Jitter error,
+        2W Jitter error,
+        Latency error,
+        Frame loss error."
+    ::= { prvtEpsMibNotifications 9 }
+
+prvtEpsProtctSignalFailRecovery NOTIFICATION-TYPE
+    OBJECTS     { prvtEpsSvcId
+                }
+    STATUS      current
+    DESCRIPTION
+       "The alarm is issued in case of CCMs start to be received correctly again 
+        on the protected link after a prvtEpsProtctSignalFailDetected alarm occured
+        and (3.5 * CCMtime(CCMinterval)) timer no longer expires or the link is up ."
+    ::= { prvtEpsMibNotifications 10 }
+
+END

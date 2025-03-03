@@ -1,0 +1,191 @@
+-- DHCP Client MIB overview:
+-- DHCP Client MIB falls under lb6m MIB node of the private subtree.
+
+
+
+NETGEAR-DHCPCLIENT-PRIVATE-MIB DEFINITIONS ::= BEGIN
+
+-- NETGEAR NETGEAR DHCP Server MIB
+-- Copyright Netgear Inc (2002-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress,
+    Integer32, Unsigned32, Counter32, TimeTicks
+                                        FROM SNMPv2-SMI
+    InterfaceIndex                      FROM IF-MIB    
+    DisplayString                       FROM RFC1213-MIB
+    lb6m                            FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathDHCPClientPrivate MODULE-IDENTITY
+           LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+           ORGANIZATION "Netgear Inc"
+           CONTACT-INFO ""
+      DESCRIPTION
+          "The Netgear Private MIB for NETGEAR DHCP Client"
+
+      -- Revision history.
+      REVISION
+          "201101260000Z" -- 26 January 2011 12:00:00 GMT
+      DESCRIPTION
+          "Postal address updated."
+      REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+      DESCRIPTION
+          "Netgear branding related changes."
+
+      ::= { lb6m 100 }
+
+
+    --**************************************************************************************
+    agentdhcp4ClientLeaseParameters                      OBJECT IDENTIFIER ::= { fastPathDHCPClientPrivate 1 }
+    
+    agentdhcp4ClientLeaseParametersTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF Agentdhcp4ClientLeaseParametersEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Displays DHCP Client Lease Information."
+         ::= { agentdhcp4ClientLeaseParameters 1 }
+    
+    agentdhcp4ClientLeaseParametersEntry OBJECT-TYPE
+         SYNTAX      Agentdhcp4ClientLeaseParametersEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION 
+                     "Information about a table entry."
+         INDEX       { agentdhcp4ClientInterfaceIndex }
+         ::= { agentdhcp4ClientLeaseParametersTable 1 }
+         
+    Agentdhcp4ClientLeaseParametersEntry ::= SEQUENCE {
+         agentdhcp4ClientInterfaceIndex
+              InterfaceIndex,
+         agentdhcp4ClientIpAddress
+              IpAddress,
+         agentdhcp4ClientSubnetMask
+              IpAddress,
+         agentdhcp4ClientDhcpServerAddress
+              IpAddress,
+         agentdhcp4ClientState
+              INTEGER,          
+         agentdhcp4ClientTransactionID
+              DisplayString, 
+         agentdhcp4ClientLeaseTime
+              TimeTicks,
+         agentdhcp4ClientRenewTime
+              TimeTicks,
+         agentdhcp4ClientRebindTime
+              TimeTicks,
+         agentdhcp4ClientRetryCount
+              Counter32
+         }
+         
+    agentdhcp4ClientInterfaceIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The Interface index on which the IP address was leased by the DHCP Server."
+         ::= { agentdhcp4ClientLeaseParametersEntry 1 }
+
+    agentdhcp4ClientIpAddress      OBJECT-TYPE
+         SYNTAX      IpAddress 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The IP Address leased by the DHCP Server ."
+         ::= { agentdhcp4ClientLeaseParametersEntry 2 }
+
+    agentdhcp4ClientSubnetMask     OBJECT-TYPE
+         SYNTAX      IpAddress 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The Subnet mask of the IP Address leased by the DHCP Server ."
+         ::= { agentdhcp4ClientLeaseParametersEntry 3 }
+
+    agentdhcp4ClientDhcpServerAddress OBJECT-TYPE
+         SYNTAX      IpAddress 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The IP Address of the DHCP Server that leased the IP Address ."
+         ::= { agentdhcp4ClientLeaseParametersEntry 4 }
+
+    agentdhcp4ClientState          OBJECT-TYPE
+         SYNTAX      INTEGER{
+                     init(1),
+                     selecting(2),
+                     requesting(3),
+                     request-recv(4),
+                     bound(5),
+                     renewing(6),
+                     renew-recv(7),
+                     rebinding(8),
+                     rebind-recv(9),
+                     bootp-fallback(10),
+                     not-bound(11),
+                     failed(12),
+                     do-release(13)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The State of the DHCP Client on this interface ."
+         ::= { agentdhcp4ClientLeaseParametersEntry 5 }
+
+    agentdhcp4ClientTransactionID  OBJECT-TYPE
+         SYNTAX      DisplayString 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The transaction ID of the DHCP Client ."
+         ::= { agentdhcp4ClientLeaseParametersEntry 6 }
+  
+    agentdhcp4ClientLeaseTime      OBJECT-TYPE
+         SYNTAX      TimeTicks
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The time remaining since the IP address is leased by the DHCP Server.It is displayed
+                     in days, hours, minutes and seconds."
+         ::= { agentdhcp4ClientLeaseParametersEntry 7 }
+ 
+    agentdhcp4ClientRenewTime      OBJECT-TYPE
+         SYNTAX      TimeTicks 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The time remaining to send  the next DHCP Renew Request by DHCP Client to renew the leased IP address. It is displayed
+                     in days, hours, minutes and seconds."
+         ::= { agentdhcp4ClientLeaseParametersEntry 8 }
+
+    agentdhcp4ClientRebindTime     OBJECT-TYPE
+         SYNTAX      TimeTicks 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The time remaining to start the DHCP Rebind process. It is displayed
+                     in days, hours, minutes and seconds."
+         ::= { agentdhcp4ClientLeaseParametersEntry 9 }
+
+    agentdhcp4ClientRetryCount     OBJECT-TYPE
+         SYNTAX      Counter32 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of times the DHCP Client sends a DHCP REQUEST message before the server responds ."
+         ::= { agentdhcp4ClientLeaseParametersEntry 10 }
+
+END

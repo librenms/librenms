@@ -1,0 +1,5 @@
+modules:
+    os:
+        serial: BWS-MIB::systemSerialNumber.0
+        version: BWS-MIB::currentFirmwareVersion.0
+        version_regex: '/(?<version>\S+)/'

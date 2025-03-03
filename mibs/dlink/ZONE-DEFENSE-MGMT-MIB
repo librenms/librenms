@@ -1,0 +1,268 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : ZONE-DEFENSE-MGMT-MIB
+-- FILE NAME: ZoneDefense.mib
+-- DATE     : 2013/08/22
+-- VERSION  : 1.06
+-- PURPOSE  : To construct the MIB structure of Zone Defense function for
+--            proprietary enterprise
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:
+--  [New Object]
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Revision 1.06, 2013/08/22 by Tom Jin
+-- For swZoneDefenseRemains,swZoneDefenseIpRemains,
+-- swZoneDefenseMacRemains change the SYNTAX from Unsigned32 to Integer32
+--
+-- Revision 1.05, 2013/08/19 by Yedda Liao
+-- update description of swZoneDefenseRemains,swZoneDefenseIpRemains,
+-- swZoneDefenseMacRemains
+--
+-- Revision 1.04, 2013/08/7 by Yedda Liao
+-- 1. For swZoneDefenseProtocol, swZoneDefenseMacProtocol
+--    change the MAX-ACCESS from read-write to read-create
+--
+-- Revision 1.03, 2013/05/24 by Yedda Liao 
+--  1. Add swZoneDefenseProtocol, swZoneDefenseDstPort, swZoneDefenseMacProtocol, 
+--         swZoneDefenseMacDstPort, swZoneDefenseStatus, swZoneDefenseRemains, 
+--         swZoneDefenseIpRemains, swZoneDefenseMacRemains
+--  2. Remove swZoneDefenseRemainingEntries   
+--
+-- Revision 1.02, 2013/05/07 by Yedda Liao 
+-- [New Object]
+--  Add swZoneDefenseProtocol, swZoneDefenseDstPort, swZoneDefenseMacProtocol,
+--      swZoneDefenseMacDstPort for filter TCP/UDP/ICMP protocol packet
+--  Add swZoneDefenseAclCapacity, swZoneDefenseIpRemaining, 
+--      swZoneDefenseMacRemaining   
+--  Modify OID and name of swZoneDefenseRemainingEntries on designing phase
+--
+-- Revision 1.01, 2013/03/27 by Yedda Liao
+-- [New Object]
+-- Add swZoneDefenseMacTable for blocking illegal host by MAC.
+-- Add swZoneDefenseRemainingEntries.
+--
+-- Version 1.00, 2010/04/12
+-- This is the first formal version for universal MIB definition.
+-- -----------------------------------------------------------------------------
+
+ZONE-DEFENSE-MGMT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Unsigned32,
+        IpAddress
+                                        FROM SNMPv2-SMI
+        RowStatus,
+        MacAddress
+                                        FROM SNMPv2-TC
+        dlink-common-mgmt               FROM DLINK-ID-REC-MIB;
+
+    swZoneDefenseMIB MODULE-IDENTITY
+          LAST-UPDATED "201308220000Z"
+          ORGANIZATION "D-Link Corp."
+          CONTACT-INFO
+                       "http://support.dlink.com"
+          DESCRIPTION
+                    "The Structure of Zone Defense management for the proprietary enterprise."
+        ::= { dlink-common-mgmt 92 }
+
+	swZoneDefenseMIBObjects		OBJECT IDENTIFIER ::= { swZoneDefenseMIB 1 }
+-- -----------------------------------------------------------------------------
+-- swZoneDefenseTable
+-- -----------------------------------------------------------------------------
+    swZoneDefenseTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwZoneDefenseEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table is used to create or delete Zone Defense ACL rules.
+             The rules for Zone Defense should have the highest priority of all
+             ACL rules."
+        ::= { swZoneDefenseMIBObjects 1 }
+
+    swZoneDefenseEntry OBJECT-TYPE
+        SYNTAX  SwZoneDefenseEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Information about the Zone Defense ACL rule."
+        INDEX  { swZoneDefenseAddress }
+        ::= { swZoneDefenseTable 1 }
+
+    SwZoneDefenseEntry ::=
+        SEQUENCE {
+            swZoneDefenseAddress
+                IpAddress,
+            swZoneDefenseRowStatus
+                RowStatus,
+            swZoneDefenseProtocol
+                INTEGER,
+            swZoneDefenseDstPort
+                Integer32      
+        }
+
+    swZoneDefenseAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The IP address which will be blocked by the ACL."
+        ::= { swZoneDefenseEntry 1 }
+
+    swZoneDefenseRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the status of this entry."
+        ::= { swZoneDefenseEntry 2 }
+            
+    swZoneDefenseProtocol OBJECT-TYPE
+        SYNTAX  INTEGER {
+               all(1),
+               icmp(2),
+               tcp(3),
+               udp(4)
+               }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Specifies the IP protocol that needs to be filtered.
+
+             all(1) - Packet that matches the IP address of this entry will be dropped.
+             icmp(2) - Filter the ICMP protocol packet. 
+                      All ICMP packets that match the IP address of this entry will be dropped.
+             tcp(3) - Specify the TCP protocol packet.                     
+             udp(4) - Specify the UDP protocol packet."
+        ::= { swZoneDefenseEntry 3 }
+
+    swZoneDefenseDstPort OBJECT-TYPE
+        SYNTAX  Integer32 (-1 | 0..65535)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Specifies the TCP/UDP destination port.
+             A value of -1 indicates that this node is not actively used."
+        ::= { swZoneDefenseEntry 4 }                 
+
+-- -------------------------------------------------------------
+    swZoneDefenseMacTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwZoneDefenseMacEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table is used to create or delete Zone Defense ACL rules 
+             according to MAC address.
+             The rules for Zone Defense should have the highest priority of all
+             ACL rules."
+        ::= { swZoneDefenseMIBObjects 2 }
+
+    swZoneDefenseMacEntry OBJECT-TYPE
+        SYNTAX  SwZoneDefenseMacEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Information about the Zone Defense ACL rule."
+        INDEX  { swZoneDefenseMacAddress }
+        ::= { swZoneDefenseMacTable 1 }
+
+    SwZoneDefenseMacEntry ::=
+        SEQUENCE {
+            swZoneDefenseMacAddress
+                MacAddress,
+            swZoneDefenseMacRowStatus
+                RowStatus,
+            swZoneDefenseMacProtocol
+                INTEGER,
+            swZoneDefenseMacDstPort
+                Integer32     
+        }
+
+    swZoneDefenseMacAddress OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The MAC address which will be blocked by the ACL."
+        ::= { swZoneDefenseMacEntry 1 }
+
+    swZoneDefenseMacRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the status of this entry."
+        ::= { swZoneDefenseMacEntry 2 }
+        
+    swZoneDefenseMacProtocol OBJECT-TYPE
+        SYNTAX  INTEGER {
+               all(1),
+               icmp(2),
+               tcp(3),
+               udp(4)
+               }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Specifies the IP protocol that needs to be filtered.
+
+             all(1) - Packet that matches the MAC address of this entry will be dropped.
+             icmp(2) - Filter the ICMP protocol packet. 
+                      All ICMP packets that match the MAC address of this entry will be dropped.
+             tcp(3) - Specify the TCP protocol packet.                     
+             udp(4) - Specify the UDP protocol packet."
+        ::= { swZoneDefenseMacEntry 3 }
+
+   swZoneDefenseMacDstPort OBJECT-TYPE
+        SYNTAX  Integer32 (-1 | 0..65535)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Specifies the TCP/UDP destination port.
+             A value of -1 indicates that this node is not actively used."
+        ::= { swZoneDefenseMacEntry 4 }        
+                
+-- -------------------------------------------------------------        
+    swZoneDefenseStatus OBJECT-TYPE
+        SYNTAX     INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "The enabled/disabled status of zone defense function."
+        ::= { swZoneDefenseMIBObjects 3 }
+
+    swZoneDefenseRemains OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The remaining entries that can be used by Zone Defense function.
+             It always returns -1 when swZoneDefenseStatus is disabled."
+        ::= { swZoneDefenseMIBObjects 4 }
+        
+    swZoneDefenseIpRemains OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The remaining entries that can be used by swZoneDefenseTable.
+             It always returns -1 when swZoneDefenseStatus is disabled."
+        ::= { swZoneDefenseMIBObjects 5 }
+        
+    swZoneDefenseMacRemains OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The remaining entries that can be used by swZoneDefenseMacTable.
+             It always returns -1 when swZoneDefenseStatus is disabled."
+        ::= { swZoneDefenseMIBObjects 6 }
+        
+                             
+END

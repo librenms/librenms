@@ -1,0 +1,3024 @@
+-- **************************************************************
+-- TRELLIX CONFIDENTIAL
+-- TRELLIX-SENSOR-PERF-MIB:  
+-- Trellix Sensor Performance MIB
+--
+-- Copyright (c) 2022 MUSARUBRA US, LLC
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+TRELLIX-SENSOR-PERF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, Gauge32, 
+	TimeTicks, IpAddress, Counter32, Counter64, Integer32
+		FROM SNMPv2-SMI
+	DisplayString, TruthValue
+		FROM SNMPv2-TC
+	ivSensorPerformance, intfPortIndex, npIndex, 
+	processorIndex, slotIndex, rateLimitQueueIndex
+		FROM TRELLIX-SENSOR-SMI;
+
+ivSensorPerformanceMIB MODULE-IDENTITY
+LAST-UPDATED "200707090000Z"
+ORGANIZATION 
+"MUSARUBRA US LLC"
+CONTACT-INFO 
+"Trellix Customer Service Department
+
+Postal: 6220 American Center Drive
+        San Jose CA 95002-2563
+        
+
+Tel: +1-800-338-8754
+
+E-mail: support@mcafee.com"
+DESCRIPTION 
+"The Performance MIB for the Trellix Sensor product."
+
+REVISION "200707090000Z"
+DESCRIPTION 
+"Initial version of this MIB module."
+::= { ivSensorPerformance 1 }
+
+sensorCardPerfGrp  OBJECT IDENTIFIER ::= { ivSensorPerformanceMIB 1 }
+
+--
+-- TCP Perf Table
+tcpPerfTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF TcpPerfEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		""
+	::= { sensorCardPerfGrp 1 }
+
+tcpPerfEntry  OBJECT-TYPE
+	SYNTAX 	TcpPerfEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"This entry is indexed by a fixed value chassis slotIndex of 2 (two) for all models."
+	INDEX { slotIndex }
+	::= { tcpPerfTable 1 }
+
+TcpPerfEntry ::= SEQUENCE {
+	tcpMaxFlowsSupported
+		Integer32,
+	tcpActiveTCPFlowsCount
+		Counter32,
+	tcpActiveUDPFlowsCount
+		Counter32,
+	tcpFlowsCreatedCount
+		Counter32,
+	tcpFlowsTimedOutCount
+		Counter32,
+	tcpFlowsInTimewaitCount
+		Counter32,
+	tcpFlowsInSYNStateCount
+		Counter32,
+	tcpInactiveTCPFlowsCount
+		Counter32,
+	tcpFreeTCBCount
+		Counter32,
+	tcpSynCookieInbStatus
+       		 INTEGER,
+	tcpSynCookieOutbStatus
+		 INTEGER,
+	tcpSynCookieProxiedConnCount
+		Counter32
+}
+
+tcpMaxFlowsSupported OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Number of flows supported in the sensor."
+	::= { tcpPerfEntry 1 }
+
+tcpActiveTCPFlowsCount  OBJECT-TYPE
+	SYNTAX 	Counter32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Number of TCP flows currently active ( similar to tcpCurrEstablished)"
+	::= { tcpPerfEntry 2 }
+
+tcpActiveUDPFlowsCount  OBJECT-TYPE
+	SYNTAX 	Counter32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Number of UDP flows currently active"
+	::= { tcpPerfEntry 3 }
+
+tcpFlowsCreatedCount  OBJECT-TYPE
+	SYNTAX 	Counter32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Number of connections established through successful 3-way handshakes"
+	::= { tcpPerfEntry 4 }
+
+tcpFlowsTimedOutCount  OBJECT-TYPE
+	SYNTAX 	Counter32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Number of unsuccessful connection completions"
+	::= { tcpPerfEntry 5 }
+
+tcpFlowsInTimewaitCount  OBJECT-TYPE
+	SYNTAX 	Counter32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Number of TCP flows currently in timewait state "
+	::= { tcpPerfEntry 6 }
+
+tcpFlowsInSYNStateCount  OBJECT-TYPE
+	SYNTAX 	Counter32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Number of TCP flows currently in SYN state "
+	::= { tcpPerfEntry 7 }
+
+tcpInactiveTCPFlowsCount  OBJECT-TYPE
+	SYNTAX 	Counter32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Number of TCP flows currently inactive "
+	::= { tcpPerfEntry 8 }
+
+tcpFreeTCBCount  OBJECT-TYPE
+	SYNTAX 	Counter32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total number of free TCBs"
+	::= { tcpPerfEntry 9 }
+
+tcpSynCookieInbStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		enable(1),
+		disable(2)
+	}
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Status of syn cookie for inbound TCP connections"
+	::= { tcpPerfEntry 10 }
+
+tcpSynCookieOutbStatus  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		enable(1),
+		disable(2)
+	}
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Status of syn cookie for outbound TCP connections"
+	::= { tcpPerfEntry 11 }
+
+tcpSynCookieProxiedConnCount OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Number of syn cookie proxied TCP connections"
+	::= { tcpPerfEntry 12 }
+
+--The ifTable contains information on the entity's
+--interfaces. 
+--
+
+intfPortIfTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF IntfPortIfEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		""
+	::= { sensorCardPerfGrp 3 }
+
+intfPortIfEntry  OBJECT-TYPE
+	SYNTAX 	IntfPortIfEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"An interface entry containing objects at the
+		subnetwork layer and below for a particular interface."
+	INDEX { slotIndex, 
+		intfPortIndex }
+	::= { intfPortIfTable 1 }
+
+IntfPortIfEntry ::= SEQUENCE {
+	intfPortTotalPktsRecv
+		Counter32,
+	intfPortTotalUnicastPktsRecv
+		Counter32,
+	intfPortTotalMulticastPktsRecv
+		Counter32,
+	intfPortTotalBroadcastPktsRecv
+		Counter32,
+	intfPortTotalBytesRecv
+		Counter32,
+	intfPortTotalCRCErrorsRecv
+		Counter32,
+	intfPortTotalPktsSent
+		Counter32,
+	intfPortTotalUnicastPktsSent
+		Counter32,
+	intfPortTotalMulticastPktsSent
+		Counter32,
+	intfPortTotalBroadcastPktsSent
+		Counter32,
+	intfPortTotalBytesSent
+		Counter32,
+	intfPortTotalCRCErrorsSent
+		Counter32,
+	intfPortResetCounters
+		INTEGER,
+	intfPortNbadFlowRecordCount
+		Counter32
+}
+
+intfPortTotalPktsRecv  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of packets that this interface port has 
+		recieved."
+	::= { intfPortIfEntry 1 }
+
+intfPortTotalUnicastPktsRecv  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of unicast packets that this interface port has 
+		recieved."
+	::= { intfPortIfEntry 2 }
+
+intfPortTotalMulticastPktsRecv  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of multicast packets that this interface port 
+		has recieved."
+	::= { intfPortIfEntry 3 }
+
+intfPortTotalBroadcastPktsRecv  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of unicast packets that this interface port has 
+		recieved."
+	::= { intfPortIfEntry 4 }
+
+intfPortTotalBytesRecv  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of bytes that this interface port has recieved."
+	::= { intfPortIfEntry 5 }
+
+intfPortTotalCRCErrorsRecv  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of packets received with bad CRC and bad
+		alignment."
+	::= { intfPortIfEntry 6 }
+
+intfPortTotalPktsSent  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of packets that have been sent on this 
+		interface."
+	::= { intfPortIfEntry 7 }
+
+intfPortTotalUnicastPktsSent  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of unicast packets that have been sent on
+		this interface."
+	::= { intfPortIfEntry 8 }
+
+intfPortTotalMulticastPktsSent  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of multicast packets that have been sent on
+		this interface."
+	::= { intfPortIfEntry 9 }
+
+intfPortTotalBroadcastPktsSent  OBJECT-TYPE
+	SYNTAX 	Counter32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of broadcast packets that have been sent on
+		this interface."
+	::= { intfPortIfEntry 10 }
+
+intfPortTotalBytesSent  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of bytes that have been sent on this interface."
+	::= { intfPortIfEntry 11 }
+
+intfPortTotalCRCErrorsSent  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of packets that have been sent with bad CRC."
+	::= { intfPortIfEntry 12 }
+
+intfPortResetCounters  OBJECT-TYPE
+        SYNTAX  INTEGER {
+		reset (0)
+	}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Reset all the above (only intfPortIfEntry 1 - 13) counters"
+        ::= { intfPortIfEntry 13 }
+
+intfPortNbadFlowRecordCount  OBJECT-TYPE
+	SYNTAX 	Counter32 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total count of flow records generated from this monitoring port."
+	::= { intfPortIfEntry 14 }
+	
+--The ipSpoofTable contains information on the entity's
+--ip spoof stats on the interfaces.
+--
+
+intfPortIpSpoofTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF IntfPortIpSpoofEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { sensorCardPerfGrp 4 }
+
+intfPortIpSpoofEntry  OBJECT-TYPE
+        SYNTAX  IntfPortIpSpoofEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "An interface entry containing objects that
+                indicate specific IP Spoof Pkt statistics.
+                "
+        INDEX { slotIndex,
+                intfPortIndex }
+        ::= { intfPortIpSpoofTable 1 }
+
+IntfPortIpSpoofEntry ::= SEQUENCE {
+        intfPortClrSpoofCounts
+                INTEGER,
+        intfPortGetInSpoofCount
+                Counter32,
+        intfPortGetOutSpoofCount
+                Counter32
+}
+
+intfPortClrSpoofCounts  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                reset (0)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Reset clears all the spoof counters in this table."
+        ::= { intfPortIpSpoofEntry 1 }
+
+intfPortGetInSpoofCount  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Get the (inside) spoof pkt count."
+        ::= { intfPortIpSpoofEntry 2 }
+
+intfPortGetOutSpoofCount  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Get the (outside) spoof pkt count."
+        ::= { intfPortIpSpoofEntry 3 }
+		
+--
+-- Sensor Perfomance Table
+--
+sensorPerfTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF SensorPerfEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		""
+	::= { sensorCardPerfGrp 5 }
+
+sensorPerfEntry  OBJECT-TYPE
+	SYNTAX 	SensorPerfEntry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"This table give the sensor performance related information.
+		This entry is indexed by a fixed value chassis slotIndex of 2 (two) for all models."
+	INDEX { slotIndex }
+	::= { sensorPerfTable 1 }
+
+SensorPerfEntry ::= SEQUENCE {
+	sensorAvgLoad
+		Integer32,
+	sensorHighestLoad
+		Integer32,
+	pendingIPFragReassemblyCount
+		Integer32,
+	totalPacketsLoggedCount
+		Integer32,
+	totalAlertsSentCount
+		Integer32,
+	sensorLoadIndicatorConfig
+		Integer32,
+	sensorMaxTrafficCapacity
+		Integer32,
+	sensorTotalBytesProcessed
+		Counter64,
+    sensorTotalL2FCount
+        Counter64
+
+}
+
+sensorAvgLoad OBJECT-TYPE
+	SYNTAX 	Integer32 (0..100)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Average percentage utilisation of the sensor processors"
+	::= { sensorPerfEntry 1 }
+
+sensorHighestLoad OBJECT-TYPE
+	SYNTAX 	Integer32 (0..100)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Percentage utilization of the most loaded sensor processor"
+	::= { sensorPerfEntry 2 }
+
+pendingIPFragReassemblyCount  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..2147483647)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Number of IP fragment lists currently being reassembled"
+	::= { sensorPerfEntry 5 }
+
+totalPacketsLoggedCount  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total number of packets logged sent to ISM."
+	::= { sensorPerfEntry 6 }
+
+totalAlertsSentCount  OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total number of alerts sent to ISM"
+	::= { sensorPerfEntry 7 }
+
+sensorLoadIndicatorConfig  OBJECT-TYPE
+        SYNTAX  Integer32 {
+                off (0),
+		on  (1)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Option to switch off/on the sensor load indicator. This value is not persisted across sensor reboots.
+		Default : off"
+	::= { sensorPerfEntry 8 }
+
+sensorMaxTrafficCapacity OBJECT-TYPE
+	SYNTAX 	Integer32
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION
+		"This object provides the maximum traffic processing capacity (in Mbps) of the sensor over the given slot."
+	::= { sensorPerfEntry 9 }
+
+sensorTotalBytesProcessed OBJECT-TYPE
+	SYNTAX 	Counter64
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION
+		"This object provides the sum of total bytes of data received over all the monitoring ports."
+	::= { sensorPerfEntry 10 }
+
+sensorTotalL2FCount OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This counter gives total number of packets on all ports that
+                 were sent out without going through the sensor due to layer2 forward."
+        ::= { sensorPerfEntry 11 }
+
+--
+-- Statistics that gives information about the sensor memory utilization
+--
+
+sensorMemUsageTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF SensorMemUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { sensorCardPerfGrp 6 }
+
+sensorMemUsageEntry OBJECT-TYPE
+        SYNTAX  SensorMemUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "This entry gives information about the sensor memory utilized.
+		This entry is indexed by a fixed value chassis slotIndex of 2 (two) for all models."
+        INDEX { slotIndex }
+        ::= { sensorMemUsageTable 1 }
+
+SensorMemUsageEntry ::= SEQUENCE {
+        sensorAvgTcpUdpFlows
+                Integer32,
+        sensorMaxTcpUdpFlows
+                Integer32,
+        sensorAvgIpFragFlows
+                Integer32,
+        sensorMaxIpFragFlows
+                Integer32,
+        sensorAvgIcmpFlows
+                Integer32,
+        sensorMaxIcmpFlows
+                Integer32,
+        sensorAvgSslFlows
+                Integer32,
+        sensorMaxSslFlows
+                Integer32,
+        sensorAvgFragReassemblyBuffers
+                Integer32,
+        sensorMaxFragReassemblyBuffers
+                Integer32,
+        sensorAvgPacketBuffers
+                Integer32,
+        sensorMaxPacketBuffers
+                Integer32,
+        sensorAvgAttackMarkerNodes
+                Integer32,
+        sensorMaxAttackMarkerNodes
+                Integer32,
+        sensorAvgShellMarkerNodes
+                Integer32,
+        sensorMaxShellMarkerNodes
+                Integer32,
+        sensorAvgL7DcapAlertBuffers 
+                Integer32,
+        sensorMaxL7DcapAlertBuffers 
+                Integer32,
+        sensorAvgL7DcapFlows 
+                Integer32,
+        sensorMaxL7DcapFlows
+                Integer32
+}
+
+sensorAvgTcpUdpFlows OBJECT-TYPE
+        SYNTAX  Integer32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the average percentage of the used TCP and UDP flows across all PEs’."
+        	::= { sensorMemUsageEntry 1 }
+
+sensorMaxTcpUdpFlows OBJECT-TYPE
+        SYNTAX  Integer32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the maximum percentage of the used TCP and UDP flows on a single PE."
+        	::= { sensorMemUsageEntry 2 }
+
+sensorAvgIpFragFlows OBJECT-TYPE
+        SYNTAX  Integer32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the average percentage of the used IP Fragment flows across all PEs’."
+        ::= { sensorMemUsageEntry 3 }
+
+sensorMaxIpFragFlows OBJECT-TYPE
+        SYNTAX  Integer32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the maximum percentage of the used IP Fragment flows on a single PE."
+        ::= { sensorMemUsageEntry 4 }
+
+sensorAvgIcmpFlows OBJECT-TYPE
+        SYNTAX  Integer32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the average percentage of the used ICMP flows across all PEs’."
+        ::= { sensorMemUsageEntry 5 }
+
+sensorMaxIcmpFlows OBJECT-TYPE
+        SYNTAX  Integer32 (0..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the maximum percentage of the used ICMP flows on a single PE."
+        ::= { sensorMemUsageEntry 6 }
+
+sensorAvgSslFlows OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the average percentage of the used SSL flows across all PEs’."
+        ::= { sensorMemUsageEntry 7 }
+
+sensorMaxSslFlows OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the maximum percentage of the used SSL flows on a single PE."
+        ::= { sensorMemUsageEntry 8 }
+
+sensorAvgFragReassemblyBuffers OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the average percentage of the used fragment reassembly buffers across all PEs’."
+        ::= { sensorMemUsageEntry 9 }
+
+sensorMaxFragReassemblyBuffers OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the maximum percentage of the used fragment reassembly buffers on a single PE."
+        ::= { sensorMemUsageEntry 10 }
+
+sensorAvgPacketBuffers OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the average percentage of the used packet buffers across all PEs’."
+        ::= { sensorMemUsageEntry 11 }
+
+sensorMaxPacketBuffers OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the maximum percentage of the used packet buffers on a single PE."
+        ::= { sensorMemUsageEntry 12 }
+
+sensorAvgAttackMarkerNodes OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the average percentage of the used attack marker nodes across all PEs’."
+        ::= { sensorMemUsageEntry 13 }
+
+sensorMaxAttackMarkerNodes OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the maximum percentage of the used attack marker nodes on a single PE."
+        ::= { sensorMemUsageEntry 14 }
+
+sensorAvgShellMarkerNodes OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the average percentage of the used shell marker nodes across all PEs’."
+        ::= { sensorMemUsageEntry 15 }
+
+sensorMaxShellMarkerNodes OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the maximum percentage of the used shell marker nodes on a single PE."
+        ::= { sensorMemUsageEntry 16 }
+
+sensorAvgL7DcapAlertBuffers OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the average percentage of the layer7Dcap buffers across all PEs."
+        ::= { sensorMemUsageEntry 17 }
+
+sensorMaxL7DcapAlertBuffers OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+               "This gives the maximum percentage of the layer7Dcap buffers on a single PE."
+        ::= { sensorMemUsageEntry 18 }
+
+sensorAvgL7DcapFlows OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the average percentage of the layer7Dcap flows across all PEs."
+        ::= { sensorMemUsageEntry 19 }
+
+sensorMaxL7DcapFlows OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This gives the maximum percentage of layer7Dcap flows on a single PE."
+        ::= { sensorMemUsageEntry 20 }
+
+--The intfPortIf64Table contains 64bit counter information on the entity's
+--interfaces. It's the 64 bit equivalent of 32bit based intfPortIfTable
+--
+
+intfPortIf64Table  OBJECT-TYPE
+	SYNTAX SEQUENCE OF IntfPortIf64Entry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		""
+	::= { sensorCardPerfGrp 7 }
+
+intfPortIf64Entry  OBJECT-TYPE
+	SYNTAX 	IntfPortIf64Entry
+	MAX-ACCESS  not-accessible
+	STATUS	current
+	DESCRIPTION 
+		"An interface entry containing 64bit counter objects at the
+		subnetwork layer and below for a particular
+		interface."
+	INDEX { slotIndex, 
+		intfPortIndex }
+	::= { intfPortIf64Table 1 }
+
+IntfPortIf64Entry ::= SEQUENCE {
+	intfPortTotalPktsRecv64
+		Counter64,
+	intfPortTotalUnicastPktsRecv64
+		Counter64,
+	intfPortTotalMulticastPktsRecv64
+		Counter64,
+	intfPortTotalBroadcastPktsRecv64
+		Counter64,
+	intfPortTotalBytesRecv64
+		Counter64,
+	intfPortTotalCRCErrorsRecv64
+		Counter64,
+	intfPortTotalPktsSent64
+		Counter64,
+	intfPortTotalUnicastPktsSent64
+		Counter64,
+	intfPortTotalMulticastPktsSent64
+		Counter64,
+	intfPortTotalBroadcastPktsSent64
+		Counter64,
+	intfPortTotalBytesSent64
+		Counter64,
+	intfPortTotalCRCErrorsSent64
+		Counter64,
+	intfPortResetCounters64
+		INTEGER
+}
+
+intfPortTotalPktsRecv64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of packets that this interface port has 
+		recieved."
+	::= { intfPortIf64Entry 1 }
+
+intfPortTotalUnicastPktsRecv64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of unicast packets that this interface port has 
+		recieved."
+	::= { intfPortIf64Entry 2 }
+
+intfPortTotalMulticastPktsRecv64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of multicast packets that this interface port 
+		has recieved."
+	::= { intfPortIf64Entry 3 }
+
+intfPortTotalBroadcastPktsRecv64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of unicast packets that this interface port has 
+		recieved."
+	::= { intfPortIf64Entry 4 }
+
+intfPortTotalBytesRecv64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of bytes that this interface port has recieved."
+	::= { intfPortIf64Entry 5 }
+
+intfPortTotalCRCErrorsRecv64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of packets received with bad CRC and bad
+		alignment."
+	::= { intfPortIf64Entry 6 }
+
+intfPortTotalPktsSent64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of packets that have been sent on this 
+		interface."
+	::= { intfPortIf64Entry 7 }
+
+intfPortTotalUnicastPktsSent64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of unicast packets that have been sent on
+		this interface."
+	::= { intfPortIf64Entry 8 }
+
+intfPortTotalMulticastPktsSent64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of multicast packets that have been sent on
+		this interface."
+	::= { intfPortIf64Entry 9 }
+
+intfPortTotalBroadcastPktsSent64  OBJECT-TYPE
+	SYNTAX 	Counter64
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of broadcast packets that have been sent on
+		this interface."
+	::= { intfPortIf64Entry 10 }
+
+intfPortTotalBytesSent64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of bytes that have been sent on this interface."
+	::= { intfPortIf64Entry 11 }
+
+intfPortTotalCRCErrorsSent64  OBJECT-TYPE
+	SYNTAX 	Counter64 
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Total 64bit count of packets that have been sent with bad CRC."
+	::= { intfPortIf64Entry 12 }
+
+intfPortResetCounters64  OBJECT-TYPE
+        SYNTAX  INTEGER {
+		reset (0)
+	}
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Reset all the above (only intfPortIf64Entry 1 - 12) counters"
+        ::= { intfPortIf64Entry 13 }
+
+--
+-- This group contains Malware related stats. These are applicable to
+-- all M-series except NAC-only appliances.
+
+
+malwareCounterTable   OBJECT-TYPE
+        SYNTAX SEQUENCE OF MalwareCounterEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { sensorCardPerfGrp 8 }
+
+malwareCounterEntry   OBJECT-TYPE
+        SYNTAX MalwareCounterEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                 "Entry containing malware specific statistics.
+                This entry is indexed by a fixed value chassis slotIndex of 2 (two) for all models."
+        INDEX { slotIndex }
+        ::= { malwareCounterTable 1 }
+
+
+MalwareCounterEntry ::= SEQUENCE {
+                malwareTotalQueriesSent
+                        Counter32,
+                malwareUnresolvedQueriesQ
+                        Counter32,
+                malwareTotalQueryResBelowMalTh
+                        Counter32,
+                malwareTotalQueryResAboveMalTh
+                        Counter32,
+                malwareBlocked
+                        Counter32,
+                malwareTotalUDQueries
+                        Counter32,
+                malwareUDDetected
+                        Counter32,
+                malwareUDBlocked
+                         Counter32,
+                 malwareTempError
+                         Counter32,
+                 malwareProtocolError
+                         Counter32,
+                 malwareNoDomainError
+                         Counter32,
+                 malwareNoDataError
+                         Counter32,
+                 malwareOutOfMemoryError
+                         Counter32,
+                 malwareBadQueryError
+                         Counter32,
+                 malwareUnknownError
+                         Counter32,
+                 malwareFFPLastIncrTimeStamp
+                         Counter32
+}
+
+
+malwareTotalQueriesSent OBJECT-TYPE
+                        SYNTAX          Counter32
+                        MAX-ACCESS      read-only
+                        STATUS          current
+                        DESCRIPTION
+                                "Total number of queries sent."
+                        ::= { malwareCounterEntry 1 }
+
+malwareUnresolvedQueriesQ OBJECT-TYPE
+                        SYNTAX          Counter32
+                        MAX-ACCESS      read-only
+                        STATUS          current
+                        DESCRIPTION
+                                "Number of unresolved queries(currently in queue)."
+                        ::= { malwareCounterEntry 2 }
+
+malwareTotalQueryResBelowMalTh  OBJECT-TYPE
+                        SYNTAX          Counter32
+                        MAX-ACCESS      read-only
+                        STATUS          current
+                        DESCRIPTION
+                                "Number of query responses received below malware threshold(dirty)."
+                        ::= { malwareCounterEntry 3 }
+
+malwareTotalQueryResAboveMalTh  OBJECT-TYPE
+                        SYNTAX          Counter32
+                        MAX-ACCESS      read-only
+                        STATUS          current
+                        DESCRIPTION
+                                "Number of query responses received above malware threshold(clean)."
+                        ::= { malwareCounterEntry 4 }
+
+malwareBlocked          OBJECT-TYPE
+                        SYNTAX          Counter32
+                        MAX-ACCESS      read-only
+                        STATUS          current
+                        DESCRIPTION
+                                "Number of malwares blocked."
+                        ::= { malwareCounterEntry 5 }
+
+malwareTotalUDQueries   OBJECT-TYPE
+                        SYNTAX          Counter32
+                        MAX-ACCESS      read-only
+                        STATUS          current
+                        DESCRIPTION
+                                "Total number of user-defined malware queries."
+                        ::= { malwareCounterEntry 6 }
+
+malwareUDDetected       OBJECT-TYPE
+                        SYNTAX          Counter32
+                        MAX-ACCESS      read-only
+                        STATUS          current
+                        DESCRIPTION
+                                "Total number of user-defined malware detected."
+                        ::= { malwareCounterEntry 7 }
+
+malwareUDBlocked        OBJECT-TYPE
+                        SYNTAX          Counter32
+                        MAX-ACCESS      read-only
+                        STATUS          current
+                        DESCRIPTION
+                                "Total number of user-defined malware blocked."
+                        ::= { malwareCounterEntry 8 }
+
+malwareTempError         OBJECT-TYPE
+                         SYNTAX          Counter32
+                         MAX-ACCESS      read-only
+                         STATUS          current
+                         DESCRIPTION
+                                 "temporary error, the resolver nameserver was not able to process our query or timed out."
+                         ::= { malwareCounterEntry 9 }
+
+malwareProtocolError     OBJECT-TYPE
+                         SYNTAX          Counter32
+                         MAX-ACCESS      read-only
+                         STATUS          current
+                         DESCRIPTION
+                                 "protocol error, a nameserver returned malformed reply."
+                         ::= { malwareCounterEntry 10 }
+
+malwareNoDomainError     OBJECT-TYPE
+                         SYNTAX          Counter32
+                         MAX-ACCESS      read-only
+                         STATUS          current
+                         DESCRIPTION
+                                 "the domain name(implying md5 + mcafee.com) does not exist ."
+                         ::= { malwareCounterEntry 11 }
+
+malwareNoDataError       OBJECT-TYPE
+                         SYNTAX          Counter32
+                         MAX-ACCESS      read-only
+                         STATUS          current
+                         DESCRIPTION
+                                 "there is no data of requested type found. ."
+                         ::= { malwareCounterEntry 12 }
+
+malwareOutOfMemoryError  OBJECT-TYPE
+                         SYNTAX          Counter32
+                         MAX-ACCESS      read-only
+                         STATUS          current
+                         DESCRIPTION
+                                 "out of memory while processing request ."
+                         ::= { malwareCounterEntry 13 }
+
+malwareBadQueryError	 OBJECT-TYPE
+                         SYNTAX          Counter32
+                         MAX-ACCESS      read-only
+                         STATUS          current
+                         DESCRIPTION
+                                 "some aspect of the query (most common is the domain name in question) is invalid, and the library can't even start a query."
+                         ::= { malwareCounterEntry 14 }
+
+malwareUnknownError      OBJECT-TYPE
+                         SYNTAX          Counter32
+                         MAX-ACCESS      read-only
+                         STATUS          current
+                         DESCRIPTION
+                                 "unknown error."
+                         ::= { malwareCounterEntry 15 }
+
+malwareFFPLastIncrTimeStamp   OBJECT-TYPE
+                         SYNTAX          Counter32
+                         MAX-ACCESS      read-only
+                         STATUS          current
+                         DESCRIPTION
+                                 "Malware FFP Last Successful Incremental Update Timestamp."
+                         ::= { malwareCounterEntry 16 }
+
+
+--The layer2FwdStatsTable contains l2f counter information on the entity's
+--interfaces.
+--
+
+layer2FwdStatsTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Layer2FwdStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                ""
+        ::= { sensorCardPerfGrp 9 }
+
+layer2FwdStatsEntry OBJECT-TYPE
+        SYNTAX Layer2FwdStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "An interface entry containing layer2 forward statistics for each
+                object at their respective interface."
+        INDEX { slotIndex,
+                intfPortIndex }
+        ::= { layer2FwdStatsTable 1 }
+
+Layer2FwdStatsEntry ::= SEQUENCE {
+        layer2FwdCounter
+                Counter64
+}
+
+layer2FwdCounter OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This counter gives the number of packets that were sent out without
+                going through the sensor due to layer2 forward."
+        ::= { layer2FwdStatsEntry 1 }
+
+--
+-- Sensor Pkt Count Table
+--
+sensorPktCountTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF SensorPktCountEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { sensorCardPerfGrp 10 }
+
+sensorPktCountEntry  OBJECT-TYPE
+        SYNTAX  SensorPktCountEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "This table give the sensor packet count related information.
+                This entry is indexed by a fixed value chassis slotIndex of 2 (two) for all models."
+        INDEX { slotIndex }
+        ::= { sensorPktCountTable 1 }
+
+SensorPktCountEntry ::= SEQUENCE {
+        unknownProtoPktsFwdCount
+                Counter64,
+        unknownProtoPktsFwdPercent
+                OCTET STRING,
+    	unknownProtoPktsFwdLastTimestamp
+        	INTEGER,
+		latencyPktsFwdPercent
+                OCTET STRING
+}
+
+unknownProtoPktsFwdCount  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of unknown protocol packets forwarded by the sensor without processing."
+        ::= { sensorPktCountEntry 1 }
+
+unknownProtoPktsFwdPercent  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(256))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Percentage of number of unknown protocol packets forwarded by the sensor without processing to total packets."
+        ::= { sensorPktCountEntry 2 }
+
+unknownProtoPktsFwdLastTimestamp  OBJECT-TYPE
+    SYNTAX  INTEGER (0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "UTC Time at the sensor when the last unknown protocol packet was forwarded by the sensor without processing."
+        ::= { sensorPktCountEntry 3 }
+
+latencyPktsFwdPercent  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(256))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Percentage of number of latency packets forwarded by the sensor to total packets."
+        ::= { sensorPktCountEntry 4 }
+		
+malwareStatsGrp  OBJECT IDENTIFIER ::= { sensorCardPerfGrp 11 }
+
+malwareEngineStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MalwareEngineStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "
+
+        "
+    ::= { malwareStatsGrp 1 }
+
+malwareEngineStatsEntry  OBJECT-TYPE
+    SYNTAX  MalwareEngineStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Each entry specified is indexed by <malware engine Id>.
+        Additonaly it contains the
+        "
+    INDEX { malwareEngineIndex }
+    ::= { malwareEngineStatsTable 1 }
+
+MalwareEngineStatsEntry ::= SEQUENCE {
+        malwareEngineIndex
+            INTEGER,
+        malwareStatsEngineName
+            DisplayString,
+        totalMalwareFilesProcessed
+            INTEGER,
+        numMalwareScoreClean
+            INTEGER,
+        numMalwareScoreVLow
+            INTEGER,
+        numMalwareScoreLow
+            INTEGER,
+        numMalwareScoreMedium
+            INTEGER,
+        numMalwareScoreHigh
+            INTEGER,
+        numMalwareScoreVHigh
+            INTEGER,
+        numMalwareAlertsSent
+            INTEGER,
+        numMalwareAttacksBlocked
+            INTEGER,
+        numMalwareTcpResetSent
+            INTEGER,
+        numMalwareScoreUnknown
+            INTEGER,
+        numMalwareFileSubmitted
+	    INTEGER,
+	numMalwareFileIgnored
+	    INTEGER,
+	numMalwareCacheReferences
+	    INTEGER,
+	numMalwareStaticResponse
+	    INTEGER,
+	numMalwareDynamicResponse
+	    INTEGER,
+	numMalwareDropUnderLoad
+	    INTEGER
+}
+
+malwareEngineIndex  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Malware engine index"
+    ::= { malwareEngineStatsEntry 1 }
+
+malwareStatsEngineName  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the malware engine name string."
+    ::= { malwareEngineStatsEntry 2 }
+
+totalMalwareFilesProcessed  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the total number of malware files processed by the specific malware engine. "
+    ::= { malwareEngineStatsEntry 3 }
+
+numMalwareScoreClean  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of clean malware files processed by the specific malware engine."
+    ::= { malwareEngineStatsEntry 4 }
+
+numMalwareScoreVLow  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware alerts generated by the specific malware engine and having malware score as very low."
+    ::= { malwareEngineStatsEntry 5 }
+
+numMalwareScoreLow  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware alerts generated by the specific malware engine and having malware score as low."
+    ::= { malwareEngineStatsEntry 6 }
+
+numMalwareScoreMedium  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware alerts generated by the specific malware engine and having malware score as medium. "
+    ::= { malwareEngineStatsEntry 7 }
+
+numMalwareScoreHigh  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware alerts generated by the specific malware engine and having malware score as high."
+    ::= { malwareEngineStatsEntry 8 }
+
+numMalwareScoreVHigh  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware alerts generated by the specific malware engine and having malware score as very high."
+    ::= { malwareEngineStatsEntry 9 }
+
+numMalwareAlertsSent  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware alerts sent to NSM, by the sensor for the specific malware engine."
+    ::= { malwareEngineStatsEntry 10 }
+
+numMalwareAttacksBlocked  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware attacks blocked by the sensor for the specific malware engine. "
+    ::= { malwareEngineStatsEntry 11 }
+
+numMalwareTcpResetSent  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware TCP Resets sent  by the sensor for the specific malware engine."
+    ::= { malwareEngineStatsEntry 12 }
+
+numMalwareScoreUnknown  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware alerts generated by the specific malware engine and having malware score as unknown."
+    ::= { malwareEngineStatsEntry 13 }
+
+numMalwareFileSubmitted  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware files submitted to any of the malware engine."
+    ::= { malwareEngineStatsEntry 14 }
+
+numMalwareFileIgnored  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware files submitted to the malware engine but not being processed by that malware engine."
+    ::= { malwareEngineStatsEntry 15 }
+
+numMalwareCacheReferences  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware results obtained from cache."
+    ::= { malwareEngineStatsEntry 16 }
+
+numMalwareStaticResponse  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware responses obtained from ATD using static analysis" 
+    ::= { malwareEngineStatsEntry 17 }
+
+numMalwareDynamicResponse  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware responses obtained from ATD based on dynamic analysis within ATD"
+    ::= { malwareEngineStatsEntry 18 }
+
+numMalwareDropUnderLoad  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of malware files dropped i.e not being inspected because of load."
+    ::= { malwareEngineStatsEntry 19 }
+
+malwareFileStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MalwareFileStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "
+
+        "
+    ::= { malwareStatsGrp 2 }
+
+malwareFileStatsEntry  OBJECT-TYPE
+    SYNTAX  MalwareFileStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Each entry specified is indexed by <malware file type index>.
+        "
+    INDEX { malwareFileTypeIndex }
+    ::= { malwareFileStatsTable 1 }
+
+MalwareFileStatsEntry ::= SEQUENCE {
+        malwareFileTypeIndex
+            INTEGER,
+        malwareFileTypeName
+            DisplayString,
+        numMalwareFilesProcessed
+            INTEGER
+}
+
+malwareFileTypeIndex  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "malware file type index."
+    ::= { malwareFileStatsEntry 1 }
+
+malwareFileTypeName  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the file type name string."
+    ::= { malwareFileStatsEntry 2 }
+
+numMalwareFilesProcessed  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the  number of malware file processed of the specific file type."
+    ::= { malwareFileStatsEntry 3 }
+
+malwareStatsClearCounters  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Configuration option to reset malware statistics counters through SNMP. Default: false (2)"
+
+    ::= { malwareStatsGrp 3 }
+
+malwareRESTStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MalwareRESTStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "
+        Error Counters of GTI File Reputation REST feature
+        "
+    ::= { malwareStatsGrp 4 }
+
+malwareRESTStatsEntry OBJECT-TYPE
+    SYNTAX  MalwareRESTStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "
+        Error Counters of GTI File Reputation REST feature
+        "
+    INDEX { malwareEngineIndex }
+    ::= { malwareRESTStatsTable 1 }
+
+MalwareRESTStatsEntry ::= SEQUENCE {
+        malwareRESTEngineName
+            DisplayString,
+        numMalwareInternalServerError
+            INTEGER,
+        numMalwareInvalidJSON
+            INTEGER,
+        numMalwareUnsupportedOperation
+            INTEGER,
+        numMalwareMissingMandatoryParam
+            INTEGER,
+        numMalwareIncorrectProtocalFormat
+            INTEGER,
+        numMalwareMaxOperationExceeded
+            INTEGER,
+        numMalwareInvalidProtocalVersion
+            INTEGER,
+        numMalwareDuplicateParameter
+            INTEGER,
+        numMalwareMissingCIInfo
+            INTEGER,
+        numMalwareMandatoryParamEmpty
+            INTEGER,
+        numMalwareInvalidMandatoryParamFormat
+            INTEGER,
+        numMalwareFailedToConnect
+            INTEGER,
+        numMalwareEmptyInput
+            INTEGER,
+        numMalwareEmptyCIParam
+            INTEGER,
+        numMalwareInvalidCIParamFormat
+            INTEGER,
+        numMalwareDuplicateCIParam
+            INTEGER,
+        numMalwareGenericServerError
+            INTEGER,
+        numMalwareOtherError
+            INTEGER,
+        numMalwarePreSubmitError
+            INTEGER,
+        numMalwareCurlFailed
+            INTEGER,
+        numMalwareHttpBadRequest
+            INTEGER,
+        numMalwareHttpUnauthorized
+            INTEGER,
+        numMalwareHttpUnsupportedMedia
+            INTEGER,
+        numMalwareHttpUnknownError
+            INTEGER,
+        numMalwareJsonParseError
+            INTEGER,
+        numMalwareHashNotFound
+            INTEGER
+}
+
+malwareRESTEngineName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the indexed malware engine name"
+    ::= { malwareRESTStatsEntry 1 }
+
+numMalwareInternalServerError OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Internal GTI Server error"
+    ::= { malwareRESTStatsEntry 2 }
+
+numMalwareInvalidJSON OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Invalid JSON format Error"
+    ::= { malwareRESTStatsEntry 3 }
+
+numMalwareUnsupportedOperation OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Unsupported Operation Error"
+    ::= { malwareRESTStatsEntry 4 }
+
+numMalwareMissingMandatoryParam OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Missing mandatory parameter Error"
+    ::= { malwareRESTStatsEntry 5 }
+
+numMalwareIncorrectProtocalFormat OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Incorrect GTI protocol format Error"
+    ::= { malwareRESTStatsEntry 6 }
+
+numMalwareMaxOperationExceeded OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Max number of operations exceeded"
+    ::= { malwareRESTStatsEntry 7 }
+
+numMalwareInvalidProtocalVersion OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Invalid protocol version Error"
+    ::= { malwareRESTStatsEntry 8 }
+
+numMalwareDuplicateParameter OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Duplicate parameter Error"
+    ::= { malwareRESTStatsEntry 9 }
+
+numMalwareMissingCIInfo OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Missing mandatory client information parameter Error"
+    ::= { malwareRESTStatsEntry 10 }
+
+numMalwareMandatoryParamEmpty OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Empty mandatory parameter Error"
+    ::= { malwareRESTStatsEntry 11 }
+
+numMalwareInvalidMandatoryParamFormat OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Invalid mandatory parameter format Error"
+    ::= { malwareRESTStatsEntry 12 }
+
+numMalwareFailedToConnect OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Failed to obtain a Connection Error"
+    ::= { malwareRESTStatsEntry 13 }
+
+numMalwareEmptyInput OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Empty Input Error"
+    ::= { malwareRESTStatsEntry 14 }
+
+numMalwareEmptyCIParam OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Empty client information parameter Error"
+    ::= { malwareRESTStatsEntry 15 }
+
+numMalwareInvalidCIParamFormat OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Invalid client information parameter format Error"
+    ::= { malwareRESTStatsEntry 16 }
+
+numMalwareDuplicateCIParam OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Duplicate client information parameter Error"
+    ::= { malwareRESTStatsEntry 17 }
+
+numMalwareGenericServerError OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Generic GTI Server error"
+    ::= { malwareRESTStatsEntry 18 }
+
+numMalwareOtherError OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of other GTI Server Error"
+    ::= { malwareRESTStatsEntry 19 }
+
+numMalwarePreSubmitError OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of error while creating REST query"
+    ::= { malwareRESTStatsEntry 20 }
+
+numMalwareCurlFailed OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of CURL perform failed"
+    ::= { malwareRESTStatsEntry 21 }
+
+numMalwareHttpBadRequest OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of HTTP 400 Errors"
+    ::= { malwareRESTStatsEntry 22 }
+
+numMalwareHttpUnauthorized OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of HTTP 401 Errors"
+    ::= { malwareRESTStatsEntry 23 }
+
+numMalwareHttpUnsupportedMedia OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of HTTP 415 Errors"
+    ::= { malwareRESTStatsEntry 24 }
+
+numMalwareHttpUnknownError OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of other HTTP Errors"
+    ::= { malwareRESTStatsEntry 25 }
+
+numMalwareJsonParseError OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Errors while parsing JSON response object"
+    ::= { malwareRESTStatsEntry 26 }
+
+numMalwareHashNotFound OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Total Number of Hash is not found in GTI server"
+    ::= { malwareRESTStatsEntry 27 }
+
+advancedBotnetStatsGrp  OBJECT IDENTIFIER ::= { sensorCardPerfGrp 12 }
+             
+callBackDetected  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This objects returns the number alerts pertaining to callback detector matches."
+    ::= { advancedBotnetStatsGrp 1 }
+
+dgaZombieDetected  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of alerts with respect to DGA zombies detected."
+    ::= { advancedBotnetStatsGrp 2 }
+
+dgaCnCServerDetected  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the  number of alert pertaining to the CnC(command and control) server suspect detected."
+    ::= { advancedBotnetStatsGrp 3 }
+
+dgaConectionToCnCServerDetected  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the  number of alert pertaining to the CnC(command and control) and DGA zombie callback detected"
+    ::= { advancedBotnetStatsGrp 4 }
+
+fastFluxDnsDetected  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the number of alerts pertaining to IP flux botnet activity detected."
+    ::= { advancedBotnetStatsGrp 5 }
+
+fastFluxAgentConnectionDetected  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the  number of alerts pertaining to IP flux agent call back detected"
+    ::= { advancedBotnetStatsGrp 6 }
+
+
+zeroDayBotnetDetected  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the  number of alerts pertaining to Other zero day botnet detected"
+    ::= { advancedBotnetStatsGrp 7 }
+
+knownBotnetDetected  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the  number of alerts pertaining to known botnets detected."
+    ::= { advancedBotnetStatsGrp 8 }
+	
+	
+sensorIntfStatGrp  OBJECT IDENTIFIER ::= { sensorCardPerfGrp 13 }
+
+sensorTotalPktsRecv  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of packets that sensor has
+        recieved."
+
+    ::= { sensorIntfStatGrp 1 }
+
+
+sensorTotalUnicastPktsRecv  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of unicast packets that sensor has
+        recieved."
+    ::= { sensorIntfStatGrp 2 }
+    
+
+sensorTotalMulticastPktsRecv  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of multicast packets that sensor
+        has recieved."
+
+    ::= { sensorIntfStatGrp 3 }
+    
+sensorTotalBroadcastPktsRecv  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of unicast packets that sensor has
+        recieved."
+    ::= { sensorIntfStatGrp 4 }
+    
+sensorTotalBytesRecv  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of bytes that sensor has recieved."
+    ::= { sensorIntfStatGrp 5 }
+    
+sensorTotalCRCErrorsRecv  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of packets received with bad CRC and bad
+        alignment in sensor."
+    ::= { sensorIntfStatGrp 6 }
+
+sensorTotalPktsSent  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of packets that have been sent on sensor."
+    ::= { sensorIntfStatGrp 7 }
+
+sensorTotalUnicastPktsSent  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of unicast packets that have been sent on
+        sensor."
+    ::= { sensorIntfStatGrp 8 }
+
+sensorTotalMulticastPktsSent  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of multicast packets that have been sent on
+        sensor."
+    ::= { sensorIntfStatGrp 9 }
+
+sensorTotalBroadcastPktsSent  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of broadcast packets that have been sent on
+        sensor."
+    ::= { sensorIntfStatGrp 10 }
+
+sensorTotalBytesSent  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of bytes that have been sent on sensor."
+    ::= { sensorIntfStatGrp 11 }
+
+sensorTotalCRCErrorsSent  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of packets that have been sent with bad CRC on sensor."
+    ::= { sensorIntfStatGrp 12 }
+    
+sensorIntfResetCounters OBJECT-TYPE
+	SYNTAX INTEGER {
+		reset(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Resets the counters in sensor interface stats table"
+	::= { sensorIntfStatGrp 13 }
+
+sensorNbadFlowRecordCount  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total count of flow records generated by the sensor."
+    ::= { sensorIntfStatGrp 14 }
+
+
+--
+-- This group contains MIB objects applicable for SSL statistics
+--
+sslStatisticsGrp  OBJECT IDENTIFIER ::= { sensorCardPerfGrp 14}
+
+-- This group consists of scalar for ssl statistics
+sslCounterGrp  OBJECT IDENTIFIER ::= { sslStatisticsGrp 1}
+
+outboundsslConnectionAttemptsClientToSensor OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of ssl connections attempt from client to sensor in outbound direction"
+        ::= { sslCounterGrp 1 }
+
+outboundsslConnectionAttemptsSensorToServer OBJECT-TYPE
+       SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of ssl connections attempt from sensor to external server in outbound direction"
+        ::= { sslCounterGrp 2 }
+
+outboundsslEndToEndSslHandshakeInProgress OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of ssl handshake in progress for outbound direction"
+        ::= { sslCounterGrp 3 }
+
+outboundsslEndToEndSslFlowsEstablished OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of ssl flows established for outbound direction"
+        ::= { sslCounterGrp 4 }
+
+outboundsslWhitelistedFlows OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of ssl flows being whitelisted for outbound direction"
+        ::= { sslCounterGrp 5 }
+
+outboundsslAttacksDetected OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of attacks detected in ssl packets in outbound direction"
+        ::= { sslCounterGrp 6 }
+
+outboundsslTotalRSAFlows OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of flows seen with RSA key exchange in outbound direction"
+        ::= { sslCounterGrp 7 }
+
+outboundsslTotalDHFlows OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of flows seen with Diffie Hellman key exchange in outbound direction"
+        ::= { sslCounterGrp 8 }
+
+outboundsslTotalNonSslFlows OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of non ssl flows seen in outbound direction"
+        ::= { sslCounterGrp 9 }
+
+outboundsslUntrustedCertCounts OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of untrusted certificates seen in outbound direction"
+        ::= { sslCounterGrp 10 }
+
+outboundsslUntrustedCertFlowsBlockOrSkipped OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of ssl flows blocked or skipped due to untrusted certificates seen in outbound direction"
+        ::= { sslCounterGrp 11 }
+
+outboundsslUnknownCertCounts OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of unknown certificates seen in outbound direction"
+        ::= { sslCounterGrp 12 }
+
+outboundsslUnknownCertFlowsBlockOrSkipped OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of ssl flows blocked or skipped due to unknown validity of certificates seen in outbound direction"
+        ::= { sslCounterGrp 13 }
+
+outboundsslUnsupportedCipherSuiteFlowsBlockedOrSkipped OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of ssl flows blocked or skipped due to unsupported cipher suite in outbound direction"
+        ::= { sslCounterGrp 14 }
+
+outboundsslGeneralDecryptionFailureFlowsBlockOrSkipped OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of ssl flows blocked or skipped due to general decryption failure in outbound direction"
+        ::= { sslCounterGrp 15 }
+
+sslEventConnectionRecycled OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of connections ran out of ssl connection structure but was able to prematurely retire one that has not been recently used. To prevent this increase SSL connection count in the NSM."
+        ::= { sslCounterGrp 16 }
+
+sslEventConnectionExhausted OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of connection for which the sensor could not allocate a new SSL connection structure because all SSL connection structures were in use. To resolve this increase SSL connection count in the NSM."
+        ::= { sslCounterGrp 17 }
+
+sslEventPacketsWithNoConnection OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total number of SSL packets received that did not have a corresponding SSL structure."
+        ::= { sslCounterGrp 18 }
+
+sslEventSessionAllocationError OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Sensor could not allocate new SSL session structure because all SSL session resource were in use. This indicates more simultaneous SSL sessions were in use than the sensor was configured to processs. To resolve this, increase the SSL connection count or decrease the SSL cache time on the NSM"
+        ::= { sslCounterGrp 19 }
+
+sslEventUnsupportedDiffieHellmanCipherSuite OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "A cipher suite that uses Diffie-Hellman was negotiated. The sensor will not be able to detect attacks in this SSL connection. Configure the server to only allow cipher suites that use RSA"
+        ::= { sslCounterGrp 20 }
+
+sslEventUnsupportedExportCipher OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total connection that used SSLv3/TLS export cipher was negotiated, which the sensor cannot decrypt due to the use of ephemeral RSA"
+        ::= { sslCounterGrp 21 }
+
+sslEventUnsupportedOrUnknownCipher OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total connection where cipher was negotiated that the Sensor cannot decrypt."
+        ::= { sslCounterGrp 22 }
+
+sslMisMatchedCertCount OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This object specifies the total number of certificates seen in the traffic which did not matched any of the server certificate"
+        ::= { sslCounterGrp 23 }
+
+sslStatsResetCounters  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                reset (0)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Reset all the ssl statistics counters"
+        ::= { sslCounterGrp 24 }
+
+sslEventConnectionKeyMatched OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total connection where cipher was negotiated and the Master Secret lookup returned a match"
+        ::= { sslCounterGrp 28 }
+
+
+
+-- This table contains entries for certs matches
+sslCertsCounterTable  OBJECT-TYPE
+                      SYNTAX SEQUENCE OF SslCertsCounterEntry
+                      MAX-ACCESS  not-accessible
+                      STATUS  current
+                      DESCRIPTION
+                         "Table containing cert match details"
+                      ::= { sslStatisticsGrp 2}
+
+sslCertsCounterEntry  OBJECT-TYPE
+                      SYNTAX SslCertsCounterEntry
+                      MAX-ACCESS  not-accessible
+                      STATUS  current
+                      DESCRIPTION
+                         "This MIB object contains all the attributes that are specific to the L2 fwd entry for TCP table. Indexed by intfPortLinearIndex and entry number."
+                      INDEX { certEntryIndex }
+                      ::= { sslCertsCounterTable 1 }
+
+SslCertsCounterEntry ::= SEQUENCE {
+                     certEntryIndex
+                          INTEGER,
+                     sslCertId
+                          INTEGER,
+                     sslCertAlias
+                          DisplayString,
+                     sslCertMatchCount
+                          Counter32
+                   }
+
+certEntryIndex   OBJECT-TYPE
+                     SYNTAX INTEGER
+                     MAX-ACCESS not-accessible
+                     STATUS     current
+                     DESCRIPTION
+                        "This is certificate entry index"
+                     ::= { sslCertsCounterEntry 1 }
+
+sslCertId   OBJECT-TYPE
+                     SYNTAX INTEGER
+                     MAX-ACCESS read-only
+                     STATUS     current
+                     DESCRIPTION
+                        "This is certificate Id"
+                     ::= { sslCertsCounterEntry 2 }
+
+sslCertAlias OBJECT-TYPE
+                     SYNTAX DisplayString(SIZE(0..64))
+                     MAX-ACCESS read-only
+                     STATUS     current
+                     DESCRIPTION
+                        "This is certificate alias name"
+                     ::= { sslCertsCounterEntry 3 }
+
+sslCertMatchCount OBJECT-TYPE
+                     SYNTAX Counter32
+                     MAX-ACCESS read-only
+                     STATUS     current
+                     DESCRIPTION
+                        "This is total number of flows matching the certificate"
+                     ::= { sslCertsCounterEntry 4 }
+
+
+sensorPacketDropGrp OBJECT IDENTIFIER ::= { ivSensorPerformanceMIB 2 }
+
+sensorPktDropTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SensorPktDropEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table containing packets dropped at sensor level under various categories"
+    ::= { sensorPacketDropGrp 1 }
+    
+sensorPktDropEntry OBJECT-TYPE
+	SYNTAX SensorPktDropEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This entry is indexed by a fixed value chassis slotIndex of 2 (two) for all models."
+	INDEX { slotIndex }
+	::= { sensorPktDropTable 1 }
+
+SensorPktDropEntry ::= SEQUENCE {
+	rateLimitPktDrop
+		Counter32,
+	ipPktSanityChkDrop
+		Counter32,
+	ipv6PktSanityChkDrop
+		Counter32,
+	sensorPktDropResetCounters
+		INTEGER
+}
+
+rateLimitPktDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to sensor rate limiting"
+	::= { sensorPktDropEntry 1 }
+
+ipPktSanityChkDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to IPV4 sanity check failure"
+	::= { sensorPktDropEntry 2 }
+	
+ipv6PktSanityChkDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to IPV6 sanity check failure"
+	::= { sensorPktDropEntry 3 }
+	
+sensorPktDropResetCounters OBJECT-TYPE
+	SYNTAX INTEGER {
+		reset(0)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Resets the counters in sensor packet drop table"
+	::= { sensorPktDropEntry 4 }
+
+intfPortPktDropTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IntfPortPktDropEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table to maintain sensor interface level packet drop statistics"
+    ::= { sensorPacketDropGrp 2 }
+    
+   
+intfPortPktDropEntry OBJECT-TYPE
+	SYNTAX  IntfPortPktDropEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An interface entry that maintains the dropped packet statistics for various categories"
+    INDEX { slotIndex,
+			intfPortIndex }
+    ::= { intfPortPktDropTable 1 }
+    
+IntfPortPktDropEntry ::= SEQUENCE {
+
+	intfPortIpChksumErrorDrop
+		Counter32,
+	intfPortTcpChksumErrorDrop
+		Counter32,
+	intfPortUdpChksumErrorDrop
+		Counter32,
+	intfPortIcmpChksumErrorDrop
+		Counter32,
+	intfPortIcmpv6ChksumErrorDrop
+		Counter32,
+	intfPortAclDrop
+		Counter32,
+	intfPortBadPacketDrop
+		Counter32,
+	intfPortColdStartPacketDrop
+		Counter32,
+	intfPortAttackPacketDrop
+		Counter32,
+	intfPortIpReassemTimeoutDrop
+		Counter32,
+	intfPortIpv6ReassemTimeoutDrop
+		Counter32,
+	intfPortTcpOutOfOrderTimeoutDrop
+		Counter32,
+	intfPortTcpProtoErrorDrop
+		Counter32,
+	intfPortUdpProtoErrorDrop
+		Counter32,
+	intfPortIcmpProtoErrorDrop
+		Counter32,
+	intfPortIcmpv6ProtoErrorDrop
+		Counter32,
+	intfPortIpProtoErrorDrop
+		Counter32,
+	intfPortIpv6ProtoErrorDrop
+		Counter32,
+	intfPortCRCErrorDrop
+		Counter32,
+	intfPortOtherLayer2ErrorDrop
+		Counter32,
+	intfPortOffHdrLenErrorDrop
+		Counter32,
+	intfPortSysOutOfResourceDrop
+		Counter32,
+	intfPortPktDropResetCounters
+		INTEGER,
+	intfPortHostIsolationv4Drop
+		Counter32,
+	intfPortHostIsolationv6Drop
+		Counter32,
+    intfPortLayer2MiscDrop
+        Counter32
+}
+
+intfPortIpChksumErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to incorrect IP checksum"
+	::= { intfPortPktDropEntry 1 }
+
+intfPortTcpChksumErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to incorrect TCP checksum"
+	::= { intfPortPktDropEntry 2 }
+	
+intfPortUdpChksumErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to incorrect UDP checksum"
+	::= { intfPortPktDropEntry 3 }
+
+intfPortIcmpChksumErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to incorrect ICMP v4 checksum"
+	::= { intfPortPktDropEntry 4 }
+
+intfPortIcmpv6ChksumErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to incorrect ICMP v6 checksum"
+	::= { intfPortPktDropEntry 5 }
+
+intfPortAclDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to configured ACL Rules"
+	::= { intfPortPktDropEntry 6 }
+
+intfPortBadPacketDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to non-existence of a valid flow"
+	::= { intfPortPktDropEntry 7 }
+
+intfPortColdStartPacketDrop  OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to cold start packet drop action"
+	::= { intfPortPktDropEntry 8 }
+
+intfPortAttackPacketDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number packets dropped due to recommended/configured attack response action"
+	::= { intfPortPktDropEntry 9 }
+
+intfPortIpReassemTimeoutDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to IPV4 fragment reassembly timeout"
+	::= { intfPortPktDropEntry 10 }
+
+intfPortIpv6ReassemTimeoutDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to IPV6 fragment reassembly timeout"
+	::= { intfPortPktDropEntry 11 }
+
+intfPortTcpOutOfOrderTimeoutDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to TCP out of order reassembly timeout"
+	::= { intfPortPktDropEntry 12 }
+
+intfPortTcpProtoErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to errors in TCP Protocol"
+	::= { intfPortPktDropEntry 13 }
+
+intfPortUdpProtoErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to errors in UDP Protocol"
+	::= { intfPortPktDropEntry 14 }
+
+intfPortIcmpProtoErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to errors in ICMP v4 Protocol"
+	::= { intfPortPktDropEntry 15 }
+
+intfPortIcmpv6ProtoErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to errors in ICMP v6 Protocol"
+	::= { intfPortPktDropEntry 16 }
+	
+
+intfPortIpProtoErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to errors in IPv4 protocol"
+	::= { intfPortPktDropEntry 17 }
+
+intfPortIpv6ProtoErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to errors in IPv6 protocol"
+	::= { intfPortPktDropEntry 18 }
+	
+intfPortCRCErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number packets dropped to CRC check failures"
+	::= { intfPortPktDropEntry 19 }
+	
+intfPortOtherLayer2ErrorDrop  OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to other Layer2 errors"
+	::= { intfPortPktDropEntry 20 }
+
+intfPortOffHdrLenErrorDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to offset index length errors"
+	::= { intfPortPktDropEntry 21 }
+
+intfPortSysOutOfResourceDrop  OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of packets dropped due to sensor running out of resource"
+	::= { intfPortPktDropEntry 22 }
+
+intfPortPktDropResetCounters OBJECT-TYPE
+	SYNTAX INTEGER {
+		reset(0),
+		reset-ratelimit-stats(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"For a value reset(0), resets the counters in this interface port level table.
+		 For a value reset-ratelimit-stats(1), resets all the queue-level ratelimit 
+		 counters over this port."
+	::= { intfPortPktDropEntry 23 }
+
+intfPortHostIsolationv4Drop  OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of IPv4 packets dropped due to host isolation configuration"
+	::= { intfPortPktDropEntry 24 }
+
+intfPortHostIsolationv6Drop  OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total number of IPv6 packets dropped due to host isolation configuration"
+	::= { intfPortPktDropEntry 25 }
+
+intfPortLayer2MiscDrop  OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Total number of non-error packets received on monitoring ports dropped in the layer2 switch because of other reasons"
+        ::= { intfPortPktDropEntry 26 }
+		
+intfPortQRateLimitDropTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IntfPortQRateLimitDropEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table to maintain sensor interface and queue level rate-limit drop statistics"
+    ::= { sensorPacketDropGrp 3 }
+   
+intfPortQRateLimitDropEntry OBJECT-TYPE
+	SYNTAX  IntfPortQRateLimitDropEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An interface queue entry that maintains the dropped packet statistics for various categories"
+    INDEX { 	slotIndex, 
+		intfPortIndex,
+		rateLimitQueueIndex }
+    ::= { intfPortQRateLimitDropTable 1 }
+    
+IntfPortQRateLimitDropEntry ::= SEQUENCE {
+
+	intfPortQRateLimitBandwidth
+		Counter32,
+	intfPortQRateLimitBytesDrop
+		Counter32,
+	intfPortQRateLimitPktsDrop
+		Counter32,
+	intfPortQRateLimitDropResetCounters
+		INTEGER
+}
+
+intfPortQRateLimitBandwidth OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This counter gives the configured ratelimit bandwidth in bytes, for the specified port and queue indicies."
+	::= { intfPortQRateLimitDropEntry 1 }
+
+intfPortQRateLimitBytesDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This counter gives the actual ratelimit bytes dropped for the specified port and queue indicies."
+	::= { intfPortQRateLimitDropEntry 2 }
+
+intfPortQRateLimitPktsDrop OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This counter gives the actual ratelimit packets dropped for the specified port and queue indicies."
+	::= { intfPortQRateLimitDropEntry 3 }
+
+intfPortQRateLimitDropResetCounters OBJECT-TYPE
+	SYNTAX INTEGER {
+		reset(0)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This counter resets the rateLimit drop counter of the specified port and queue indicies."
+	::= { intfPortQRateLimitDropEntry 4 }
+
+
+sensorPacketDropStatGrp  OBJECT IDENTIFIER ::= { sensorPacketDropGrp 4}
+
+sensorIpChksumErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to incorrect IP checksum by the sensor."
+    ::= { sensorPacketDropStatGrp  1 }
+
+sensorTcpChksumErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to incorrect TCP checksum by the sensor."
+    ::= { sensorPacketDropStatGrp  2 }
+
+sensorUdpChksumErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to incorrect UDP checksum by the sensor."
+    ::= { sensorPacketDropStatGrp  3 }
+
+sensorIcmpChksumErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to incorrect ICMP v4 checksum by the sensor."
+    ::= { sensorPacketDropStatGrp  4 }
+
+sensorIcmpv6ChksumErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to incorrect ICMP v6 checksum by the sensor."
+    ::= { sensorPacketDropStatGrp  5 }
+
+sensorAclDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to configured ACL Rules by the sensor."
+    ::= { sensorPacketDropStatGrp  6 }
+
+sensorBadPacketDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to non-existence of a valid flow by the sensor."
+    ::= { sensorPacketDropStatGrp  7 }
+
+sensorColdStartPacketDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to cold start packet drop action by the sensor."
+    ::= { sensorPacketDropStatGrp  8 }
+
+sensorAttackPacketDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number packets dropped due to recommended/configured attack response action by the sensor."
+    ::= { sensorPacketDropStatGrp  9 }
+
+sensorIpReassemTimeoutDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to IPV4 fragment reassembly timeout by the sensor."
+    ::= { sensorPacketDropStatGrp  10 }
+
+sensorIpv6ReassemTimeoutDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to IPV6 fragment reassembly timeout by the sensor."
+    ::= { sensorPacketDropStatGrp  11 }
+
+sensorTcpOutOfOrderTimeoutDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to TCP out of order reassembly timeout by the sensor."
+    ::= { sensorPacketDropStatGrp  12 }
+
+sensorTcpProtoErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to errors in TCP Protocol by the sensor."
+    ::= { sensorPacketDropStatGrp  13 }
+
+sensorUdpProtoErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to errors in UDP Protocol by the sensor."
+    ::= { sensorPacketDropStatGrp  14 }
+
+sensorIcmpProtoErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to errors in ICMP v4 Protocol by the sensor."
+    ::= { sensorPacketDropStatGrp  15 }
+
+sensorIcmpv6ProtoErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to errors in ICMP v6 Protocol by the sensor."
+    ::= { sensorPacketDropStatGrp  16 }
+
+sensorIpProtoErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to errors in IPv4 protocol by the sensor."
+    ::= { sensorPacketDropStatGrp  17 }
+
+sensorIpv6ProtoErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to errors in IPv6 protocol by the sensor."
+    ::= { sensorPacketDropStatGrp  18 }
+
+sensorCRCErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number packets dropped to CRC check failures by the sensor."
+    ::= { sensorPacketDropStatGrp  19 }
+
+sensorOtherLayer2ErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to other Layer2 errors by the sensor."
+    ::= { sensorPacketDropStatGrp  20 }
+
+sensorOffHdrLenErrorDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to offset index length errors by the sensor."
+    ::= { sensorPacketDropStatGrp  21 }
+
+sensorSysOutOfResourceDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of packets dropped due to sensor running out of resource by the sensor."
+    ::= { sensorPacketDropStatGrp  22 }
+
+sensorPktDropStatResetCounters  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Resets the counters in sensor packet drop table"
+    ::= { sensorPacketDropStatGrp 23 }
+
+sensorHostIsolationv4Drop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of IPv4 packets dropped due to host isolation configuration by the sensor."
+    ::= { sensorPacketDropStatGrp  24 }
+
+sensorHostIsolationv6Drop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total number of IPv6 packets dropped due to host isolation configuration by the sensor."
+    ::= { sensorPacketDropStatGrp  25 }
+
+sensorLayer2BackplaneDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "Total number of packets dropped on the uplink ports of layer2 switch"
+    ::= { sensorPacketDropStatGrp  26 }
+
+sensorLayer2MiscDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "Total number of non-error packets received on all monitoring ports dropped in the layer2 switch because of other reasons"
+    ::= { sensorPacketDropStatGrp  27 }
+
+sensorNICDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "Total number of packet dropped at NIC level"
+    ::= { sensorPacketDropStatGrp  28 }
+
+sensorFrontEndMiscDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "Total number of packet dropped at Frontend level"
+    ::= { sensorPacketDropStatGrp  29 }
+
+sensorBackEndMiscDrop  OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "Total number of Misc packet dropped at Backend level"
+    ::= { sensorPacketDropStatGrp  30 }
+	
+
+pktCapStatGrp  OBJECT IDENTIFIER ::= { ivSensorPerformanceMIB 3 }
+
+pktCapTotal     OBJECT-TYPE
+                SYNTAX Counter64 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Total number of Packet Capture"
+               ::= {pktCapStatGrp 1 }
+
+pktCapDropTotal     OBJECT-TYPE
+                SYNTAX Counter64 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of Packet drops due to sensor load/port load."
+               ::= {pktCapStatGrp 2 }
+
+
+controlPathPerfGrp  OBJECT IDENTIFIER ::= { ivSensorPerformanceMIB 4 }
+
+controlPathMemUsageTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF ControlPathMemUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { controlPathPerfGrp 1 }
+
+controlPathMemUsageEntry OBJECT-TYPE
+        SYNTAX  ControlPathMemUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "This entry gives information about the Control path memory utilized.
+		This entry is indexed by a fixed value chassis slotIndex of 1 (one) for all models."
+        INDEX { slotIndex }
+        ::= { controlPathMemUsageTable 1 }
+
+ControlPathMemUsageEntry ::= SEQUENCE {
+        sysMemFree
+                Counter,
+        sysMemCached
+                Counter,
+        sysMemBuffers
+                Counter,
+        sysMemUtilisation
+                Counter
+}
+
+sysMemFree      OBJECT-TYPE
+                SYNTAX Counter
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Total Control Path system free memory available in MB"
+               ::= {controlPathMemUsageEntry 1 }
+
+sysMemCached    OBJECT-TYPE
+                SYNTAX Counter
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Total Control Path system cached memory in MB"
+               ::= {controlPathMemUsageEntry 2 }
+
+sysMemBuffers   OBJECT-TYPE
+                SYNTAX Counter
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Total Control Path system buffer memory in MB"
+               ::= {controlPathMemUsageEntry 3 }
+
+sysMemUtilisation  OBJECT-TYPE
+                SYNTAX Counter
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Total Control Path system memory utilisation in percentage"
+               ::= {controlPathMemUsageEntry 4 }
+
+
+
+
+END

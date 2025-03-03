@@ -1,0 +1,284 @@
+-- ==========================================================================
+-- Copyright (C) 2008 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The purpose of this MIB file is to provide the definition of
+--              voice call record.
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2008-02-17 Initial version, created by Tian Xiaoqiang, Qu Jin
+-- ==========================================================================
+HH3C-VOICE-CALL-ACTIVE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32, Gauge32
+    FROM SNMPv2-SMI
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+        Hh3cCodecType
+    FROM HH3C-VOICE-DIAL-CONTROL-MIB
+        callActiveSetupTime, callActiveIndex
+    FROM DIAL-CONTROL-MIB
+        TEXTUAL-CONVENTION
+    FROM SNMPv2-TC
+        hh3cVoice
+    FROM HH3C-OID-MIB;
+
+hh3cVoCallActive MODULE-IDENTITY
+    LAST-UPDATED "200802170000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB file is to provide the definition of voice call
+         active record information."
+    REVISION "200802170000Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cVoice 15 }
+
+-- ======================================
+--          Type declaration
+-- ======================================
+
+Hh3cGUid ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Represents a global call identifier. The global call identifier is
+         used as an unique identifier for an end-to-end call. A zero length
+         Hh3cGUid indicates no value for the global call identifier."
+    SYNTAX       OCTET STRING(SIZE(0..16))
+
+
+hh3cVoiceCallActiveObjects OBJECT IDENTIFIER ::= { hh3cVoCallActive 1 }
+
+-- ===========================================================================
+--                        hh3cVoiceCallActiveTable
+-- ===========================================================================
+hh3cVoiceCallActiveTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cVoiceCallActiveEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is the voice extension to the call active table
+         of DIAL-CONTROL-MIB. It contains voice encapsulation call
+         leg information that is derived from the statistics
+         of lower layer telephony interface."
+    ::= { hh3cVoiceCallActiveObjects 1 }
+
+hh3cVoiceCallActiveEntry OBJECT-TYPE
+    SYNTAX Hh3cVoiceCallActiveEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The information regarding a single voice encapsulation
+         call leg.
+         The call leg entry is identified by using the same index
+         objects that are used by call active table of
+         DIAL-CONTROL-MIB to identify the call.
+         An entry of this table is created when its associated call
+         active entry in the DIAL-CONTROL-MIB is created and
+         call active entry contains the call establishment to a
+         voice over telephony network peer.
+         The entry is deleted when its associated call active entry
+         in the DIAL-CONTROL-MIB is deleted."
+    INDEX { callActiveSetupTime, callActiveIndex }
+    ::= { hh3cVoiceCallActiveTable 1 }
+
+Hh3cVoiceCallActiveEntry ::= SEQUENCE {
+        hh3cVoCallActiveConnectionId Hh3cGUid,
+        hh3cVoCallActiveTxDuration Gauge32,
+        hh3cVoCallActiveVoiceTxDuration Gauge32,
+        hh3cVoCallActiveFaxTxDuration Gauge32,
+        hh3cVoCallActiveCoderType Hh3cCodecType,
+        hh3cVoCallActiveImgPageCount Gauge32
+    }
+
+hh3cVoCallActiveConnectionId OBJECT-TYPE
+    SYNTAX Hh3cGUid
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The global call identifier for the gateway call."
+    ::= { hh3cVoiceCallActiveEntry 1 }
+
+hh3cVoCallActiveTxDuration OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Duration of transmit path open from this peer to the
+         voice gateway for the call. The units is milliseconds."
+    ::= { hh3cVoiceCallActiveEntry 2 }
+
+hh3cVoCallActiveVoiceTxDuration OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Duration of voice transmitted from this peer to voice
+         gateway for this call. The voice utilization rate can be
+         obtained by dividing this by hh3cVoCallActiveTXDuration object.
+         The units is milliseconds."
+    ::= { hh3cVoiceCallActiveEntry 3 }
+
+hh3cVoCallActiveFaxTxDuration OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Duration of fax transmitted from this peer to voice gateway
+         for this call. The fax utilization rate can be obtained by
+         dividing this by hh3cVoCallActiveTXDuration object. The units
+         is milliseconds."
+    ::= { hh3cVoiceCallActiveEntry 4 }
+
+hh3cVoCallActiveCoderType OBJECT-TYPE
+    SYNTAX Hh3cCodecType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The negotiated coder type. It specifies the encode type to
+         the PSTN leg of a call."
+    ::= { hh3cVoiceCallActiveEntry 5 }
+
+hh3cVoCallActiveImgPageCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of fax related image pages are received or
+         transmitted via the peer for the call. The units is pages."
+    ::= { hh3cVoiceCallActiveEntry 6 }
+
+
+-- ===========================================================================
+--                        hh3cVoiceVoIPCallActiveTable
+-- ===========================================================================
+hh3cVoiceVoIPCallActiveTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cVoiceVoIPCallActiveEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is the VoIP extension to the call active table of
+         DIAL-CONTROL-MIB. It contains VoIP call leg
+         information about specific VoIP call destination."
+    ::= { hh3cVoiceCallActiveObjects 2 }
+
+hh3cVoiceVoIPCallActiveEntry OBJECT-TYPE
+    SYNTAX Hh3cVoiceVoIPCallActiveEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The information regarding a single VoIP call leg.
+         The call leg entry is identified by using the same index
+         objects that are used by call active table of DIAL-CONTROL-MIB
+         to identify the call.
+         An entry of this table is created when its associated call
+         active entry in the DIAL-CONTROL-MIB is created and the
+         call active entry contains information for the call
+         establishment to the peer on the IP backbone via a voice
+         over IP peer.
+         The entry is deleted when its associated call active entry
+         in the DIAL-CONTROL-MIB is deleted."
+    INDEX { callActiveSetupTime, callActiveIndex }
+    ::= { hh3cVoiceVoIPCallActiveTable 1 }
+
+Hh3cVoiceVoIPCallActiveEntry ::= SEQUENCE {
+    hh3cVoVoIPCallActiveConnectionId Hh3cGUid,
+    hh3cVoVoIPCallActiveRemSigIPType InetAddressType,
+    hh3cVoVoIPCallActiveRemSigIPAddr InetAddress,
+    hh3cVoVoIPCallActiveRemSigPort Integer32,
+    hh3cVoVoIPCallActiveRemMedIPType InetAddressType,
+    hh3cVoVoIPCallActiveRemMedIPAddr InetAddress,
+    hh3cVoVoIPCallActiveRemMedPort Integer32,
+    hh3cVoVoIPCallActiveSessProtocol INTEGER,
+    hh3cVoVoIPCallActiveCoderType Hh3cCodecType
+    }
+
+hh3cVoVoIPCallActiveConnectionId OBJECT-TYPE
+    SYNTAX Hh3cGUid
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The global call identifier for the gateway call."
+    ::= { hh3cVoiceVoIPCallActiveEntry 1 }
+
+hh3cVoVoIPCallActiveRemSigIPType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of remote system signalling IP address for the VoIP call."
+    ::= { hh3cVoiceVoIPCallActiveEntry 2 }
+
+hh3cVoVoIPCallActiveRemSigIPAddr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Remote system signalling IP address for the VoIP call."
+    ::= { hh3cVoiceVoIPCallActiveEntry 3 }
+
+hh3cVoVoIPCallActiveRemSigPort OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Remote system UDP listener signalling port to which to transmit voice
+         packets."
+    ::= { hh3cVoiceVoIPCallActiveEntry 4 }
+
+hh3cVoVoIPCallActiveRemMedIPType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of remote system media IP address for the VoIP call."
+    ::= { hh3cVoiceVoIPCallActiveEntry 5 }
+
+hh3cVoVoIPCallActiveRemMedIPAddr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Remote system media IP address for the VoIP call."
+    ::= { hh3cVoiceVoIPCallActiveEntry 6 }
+
+hh3cVoVoIPCallActiveRemMedPort OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Remote system UDP listener media port to which to transmit voice
+         packets."
+    ::= { hh3cVoiceVoIPCallActiveEntry 7 }
+
+hh3cVoVoIPCallActiveSessProtocol OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(1),
+        h323(2),
+        sip(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The object specifies the session protocol to be used
+         for internet call between local and remote router via
+         IP backbone."
+    ::= { hh3cVoiceVoIPCallActiveEntry 8 }
+
+hh3cVoVoIPCallActiveCoderType OBJECT-TYPE
+    SYNTAX Hh3cCodecType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The negotiated coder type. It specifies the encode type to
+         the VoIP leg of a call."
+    ::= { hh3cVoiceVoIPCallActiveEntry 9 }
+
+
+END

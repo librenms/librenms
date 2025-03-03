@@ -1,0 +1,246 @@
+-- *****************************************************************
+-- MY-SYSTEM-MIB.mib:  My System MIB file
+--
+-- $Copyright$
+-- 
+-- *****************************************************************
+--
+
+MY-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Counter32
+                FROM SNMPv2-SMI
+        TruthValue,
+        DisplayString,
+        RowStatus
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        myMgmt
+                FROM MY-SMI;
+
+mySystemMIB MODULE-IDENTITY
+        LAST-UPDATED "200203200000Z"
+        ORGANIZATION "$Company$"
+        CONTACT-INFO
+                " 
+                Tel: $Telephone$ 
+
+                E-mail: $E-mail$"
+        DESCRIPTION
+                "This module defines my system mibs."
+        REVISION      "200203200000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { myMgmt 1}
+
+mySystemMIBObjects OBJECT IDENTIFIER ::= { mySystemMIB 1 }
+
+mySystemHwVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the Revision number of hardware resides
+          on the FastSwitch."
+        ::= { mySystemMIBObjects 1 }
+
+mySystemSwVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the Revision number of software resides
+          on the FastSwitch."
+        ::= { mySystemMIBObjects 2 }
+        
+mySystemBootVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the Revision number of BOOT software resides
+          on the FastSwitch."
+        ::= { mySystemMIBObjects 3 }
+        
+mySystemSysCtrlVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the Revision number of CTRL software resides
+          on the FastSwitch."
+        ::= { mySystemMIBObjects 4 }       
+
+mySystemParametersSave OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Save all parameters changed in configuration by setting 
+            this object to any value but 0, set its value to 0 will
+            cause no action of agent, otherwise all changes of 
+            prarameters will be saved for retrive when system is 
+            reset, if parameter is changed but not saved all changes
+            will come to their original value when system down and up
+            again, when query always return value 0."
+        ::= { mySystemMIBObjects 5 }
+
+mySystemOutBandRate OBJECT-TYPE
+   	  SYNTAX  INTEGER {
+                baud9600  (1),
+                baud19200 (2),
+                baud38400 (3),
+                baud57600 (4)
+             }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+   		"Determine the console(OutBand) baud rate :
+                9600 - 1,19200 - 2, 38300 - 3, 57600 - 4 "
+   	     ::=  { mySystemMIBObjects 6 }
+        
+mySystemReset OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This Object allow perform soft reset of system by setting its
+            value to none zero. if a soft resetis performed, after this 
+            having completed a warm start trap will send to declare the state
+            and when queried will always return 0."
+        ::= { mySystemMIBObjects 7 }
+
+mySwitchLayer OBJECT-TYPE
+   	  SYNTAX  INTEGER {
+                layer2 (1), -- Layer 2 Switch
+                layer3 (2)  -- Layer 3 Switch
+             }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+   		"Which layer's device the switch in system "
+   	     ::=  { mySystemMIBObjects 8 }
+
+mySystemHwPower OBJECT-TYPE
+        SYNTAX INTEGER{
+        	rpsNoLink(1),
+        	rpsLinkAndNoPower(2),
+        	rpsLinkAndReadyForPower(3),
+        	rpsLinkAndPower(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "The state of power."
+        ::= { mySystemMIBObjects 9 }
+
+mySystemHwFan OBJECT-TYPE
+        SYNTAX INTEGER{
+        	work(1),
+        	stop(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "The state of fan."
+        ::= { mySystemMIBObjects 10 }
+
+--The mySystemOutBandTimeout is obsoleted after 2007.9
+mySystemOutBandTimeout OBJECT-TYPE
+        SYNTAX     Integer32(0..3600)
+        UNITS      "seconds"
+        MAX-ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+          "The timeout of console.0 indicate that timeout function is disabled."
+        ::= { mySystemMIBObjects 11 }
+
+--The mySystemTelnetTimeout is obsoleted after 2007.9
+mySystemTelnetTimeout OBJECT-TYPE
+        SYNTAX     Integer32(0..3600)
+        UNITS      "seconds"
+        MAX-ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+          "The timeout of telnet.0 indicate that timeout function is disabled."
+        ::= { mySystemMIBObjects 12 }
+        
+        	     
+mySystemMIBTraps OBJECT IDENTIFIER ::= { mySystemMIB 2 }
+
+mySystemHardChangeDesc OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of hard change"
+        ::= { mySystemMIBTraps 1 }       
+        
+mySystemHardChangeDetected NOTIFICATION-TYPE
+        OBJECTS   {mySystemHardChangeDesc}
+        STATUS     current
+        DESCRIPTION
+                "System hardware has changed include number of devices or number of modules 
+                 or the place or type of the module is change."
+        ::= { mySystemMIBTraps 2 }
+        
+mySystemPowerStateChange NOTIFICATION-TYPE
+        OBJECTS   {mySystemHwPower}
+        STATUS     current
+        DESCRIPTION
+                "while the state of power changed, then this trap will be sent."
+        ::= { mySystemMIBTraps 3 }
+        
+mySystemFanStateChange NOTIFICATION-TYPE
+        OBJECTS   {mySystemHwFan}
+        STATUS     current
+        DESCRIPTION
+                "while the state of fan changed, then this trap will be sent."
+        ::= { mySystemMIBTraps 4 }                
+
+
+mySystemMIBConformance OBJECT IDENTIFIER ::= { mySystemMIB 3 }
+mySystemMIBCompliances OBJECT IDENTIFIER ::= { mySystemMIBConformance 1 }
+mySystemMIBGroups      OBJECT IDENTIFIER ::= { mySystemMIBConformance 2 }
+
+
+-- compliance statements
+
+mySystemMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the My System MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { mySystemMIBGroup
+                 }
+        ::= { mySystemMIBCompliances 1 }
+                
+-- units of conformance
+
+mySystemMIBGroup OBJECT-GROUP
+        OBJECTS {
+               mySystemHwVersion, 
+               mySystemSwVersion,
+               mySystemBootVersion,
+               mySystemSysCtrlVersion,
+               mySystemParametersSave,
+               mySystemReset,
+               mySystemOutBandRate,
+               mySwitchLayer 
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing system information and
+                opertion to a My agent."
+        ::= { mySystemMIBGroups 1 } 
+  
+END

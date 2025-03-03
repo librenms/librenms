@@ -1,0 +1,723 @@
+-- *****************************************************************
+-- UBIQUOSS-EPON-ONTMANAGER-GROUP-MIB.my
+--
+-- Jun 2008, Hyungeun Park   
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+	UBIQUOSS-EPON-ONTMANAGER-GROUP-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			BridgeId			
+				FROM BRIDGE-MIB			
+			ifIndex			
+				FROM RFC1213-MIB			
+			Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			DisplayString, RowStatus			
+				FROM SNMPv2-TC
+			ubiEponGroupMIB		                 
+				FROM UBQS-SMI 			
+			ubiPortIndex
+				FROM UBQS-INTERFACE-MIB;  
+	
+	
+		ubiOntSwitchMIB MODULE-IDENTITY 
+			LAST-UPDATED "200806171703Z"		-- Jun 17, 2008 at 17:03 GMT
+			ORGANIZATION 
+				"Ubiquoss Corp."
+			CONTACT-INFO 
+				"Chair		: Hyungeun Park
+							  Ubiquoss Corp.
+				 Postal:	: 24F Milennium B/D,
+				 			  467-12, Dogok-Dong,
+							  GangNam-Gu, Seoul 135-270
+							  Korea
+				 EMail: 	: phe618@ubiquoss.com
+				 Phone		: +82-2-2190-3166"
+			DESCRIPTION 
+				"This MIB module defines epon ont switch information."
+			::= { ubiEponGroupMIB  3 }      		
+	
+	
+	
+--
+-- Node definitions
+--  
+
+	   ubiOntSwitchMIBObjects	OBJECT IDENTIFIER ::= { ubiOntSwitchMIB 1 } 
+
+-- ***********************************************************
+-- ontSwitchPortTable
+-- ***********************************************************	
+		ontSwitchPortTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OntSwitchPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiOntSwitchMIBObjects 1 }
+		
+		ontSwitchPortEntry OBJECT-TYPE
+			SYNTAX OntSwitchPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onuId, subsPortIndex }
+			::= { ontSwitchPortTable 1 }
+		
+		OntSwitchPortEntry ::=
+			SEQUENCE { 
+				ontSwitchPortName
+					DisplayString,
+				ontSwitchPortOperStatus
+					INTEGER,
+				ontSwitchPortAdminStatus
+					INTEGER,
+				ontSwitchPortAutoNegotiation
+					INTEGER,
+				ontSwitchPortSpeed
+					INTEGER,
+				ontSwitchPortDuplex
+					INTEGER,
+				ontSwitchPortFlowControl
+					INTEGER,
+				ontSwitchPortMacLimit
+					INTEGER
+			 }
+
+		ontSwitchPortName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ontSwitchPortEntry 1 }
+		
+		ontSwitchPortOperStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(0),
+				enabled(1)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ontSwitchPortEntry 2 }
+		
+		ontSwitchPortAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				locked(0),
+				unlocked(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ontSwitchPortEntry 3 }
+		
+		ontSwitchPortAutoNegotiation OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				on(1),
+				off(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ontSwitchPortEntry 4 }
+		
+		ontSwitchPortSpeed OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				speed10(1),
+				speed100(2),
+				speed1000(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ontSwitchPortEntry 5 }
+		
+		ontSwitchPortDuplex OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				halfDuplex(0),
+				fullDuplex(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ontSwitchPortEntry 6 }
+		
+		ontSwitchPortFlowControl OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				on(1),
+				off(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ontSwitchPortEntry 7 }
+		
+		ontSwitchPortMacLimit OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				unlimit(64)
+			}(1..16)				
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"mac-limit range <1-16>.
+				 64 : no mac limit"
+			::= { ontSwitchPortEntry 8 }
+	
+-- ***********************************************************
+--  vlanConfig
+-- ***********************************************************
+		vlanConfig OBJECT IDENTIFIER ::= { ubiOntSwitchMIBObjects 2 }
+		
+-- ***********************************************************
+-- vlanTable
+-- ***********************************************************
+	
+		vlanTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF VlanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { vlanConfig 1 }
+		
+		vlanEntry OBJECT-TYPE
+			SYNTAX VlanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onuId, vlanIndex }
+			::= { vlanTable 1 }
+		
+		VlanEntry ::=
+			SEQUENCE { 
+				vlanId
+					Integer32,
+				vlanRowStatus
+					RowStatus
+			 }
+
+		vlanId OBJECT-TYPE
+			SYNTAX Integer32 (2..4093)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { vlanEntry 1 }
+		
+		vlanRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { vlanEntry 2 }         
+			
+-- ***********************************************************
+-- vlanPortAdaptaionTable
+-- ***********************************************************		
+		vlanPortAdaptaionTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF VlanPortAdaptaionEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { vlanConfig 2 }
+		
+		vlanPortAdaptaionEntry OBJECT-TYPE
+			SYNTAX VlanPortAdaptaionEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onuId, subsPortIndex, vlanId }
+			::= { vlanPortAdaptaionTable 1 }
+		
+		VlanPortAdaptaionEntry ::=
+			SEQUENCE { 
+				vlanMode
+					INTEGER,
+				vlanMember
+					INTEGER
+			 }
+
+		vlanMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				trunk(0),
+				access(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { vlanPortAdaptaionEntry 1 }
+		
+		vlanMember OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				add(1),
+				remove(2),
+				setNative(3),
+				resetNative(4),
+				untaggedVlan(5),
+				taggedVlan(6),
+				notExist(7)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"SET value : add, remove, setNative, resetNative.
+				 GET value : untaggedVlan, taggedVlan, notExist."
+			::= { vlanPortAdaptaionEntry 2 }
+		
+-- ***********************************************************
+--  stpConfig
+-- ***********************************************************		
+		stpConfig OBJECT IDENTIFIER ::= { ubiOntSwitchMIBObjects 3 }
+
+-- ***********************************************************
+--  stpGlobalTable 
+-- **********************************************************
+		stpGlobalTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF StpGlobalEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpConfig 1 }
+		
+		stpGlobalEntry OBJECT-TYPE
+			SYNTAX StpGlobalEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Index : ONT Physical Index."
+			INDEX { ubiPortIndex, onuId }
+			::= { stpGlobalTable 1 }
+		
+		StpGlobalEntry ::=
+			SEQUENCE { 
+				bridgeStpStatus
+					INTEGER,
+				bridgeStpAgeingTime
+					INTEGER,
+				bridgeStpRootPathCost
+					Integer32,
+				bridgeStpPriority
+					Integer32,
+				bridgeStpForwardTime
+					INTEGER,
+				bridgeStpHelloTime
+					INTEGER,
+				bridgeStpMaxAge
+					INTEGER,
+				bridgeStpRootPort
+					Integer32,
+				bridgeStpRootId
+					BridgeId
+			 }
+
+		bridgeStpStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpGlobalEntry 1 }
+		
+		bridgeStpAgeingTime OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				unset(0)
+			}(10..286) 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Ageing-time is translated to other value : 
+				
+				--------------------------------------------
+				input value			|	translated value
+				--------------------------------------------
+				10 - 13				|	8
+				--------------------------------------------
+				14 - 26				|	17
+				--------------------------------------------
+				27 - 52				|	35
+				--------------------------------------------
+				53 - 106			|	70
+				--------------------------------------------
+				107 - 214			|	142
+				--------------------------------------------
+				215 - 286			|	286
+				--------------------------------------------"
+			::= { stpGlobalEntry 2 }
+		
+		bridgeStpRootPathCost OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpGlobalEntry 3 }
+		
+		bridgeStpPriority OBJECT-TYPE
+			SYNTAX Integer32 (0..61440)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpGlobalEntry 4 }
+
+		bridgeStpForwardTime OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				unset(0)
+			}(4..30) 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpGlobalEntry 5 }
+		
+		bridgeStpHelloTime OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				unset(0)
+			}(1..10) 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpGlobalEntry 6 }
+		
+		bridgeStpMaxAge OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+				unset(0)
+			}(6..40) 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpGlobalEntry 7 }
+		
+		bridgeStpRootPort OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpGlobalEntry 8 }
+		
+		bridgeStpRootId OBJECT-TYPE
+			SYNTAX BridgeId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpGlobalEntry 9 }
+		
+-- ***********************************************************
+--  stpPortTable
+-- ***********************************************************
+		stpPortTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF StpPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpConfig 2 }
+		
+		stpPortEntry OBJECT-TYPE
+			SYNTAX StpPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Index : ONT Physical Port Index."
+			INDEX { ubiPortIndex, onuId, subsPortIndex }
+			::= { stpPortTable 1 }
+		
+		StpPortEntry ::=
+			SEQUENCE { 
+				stpPort
+					Integer32,
+				stpPortPriority
+					Integer32,
+				stpPortState
+					INTEGER,
+				stpPortPathCost
+					Integer32,
+				stpPortDesignatedRoot
+					BridgeId,
+				stpPortDesignatedCost
+					Integer32,
+				stpPortDesignatedBridge
+					BridgeId,
+				stpPortDesignatedPort
+					OCTET STRING,
+				stpPortDesignatedForwardTransitions
+					Counter32
+			 }
+
+		stpPort OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpPortEntry 1 }
+		
+		stpPortPriority OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpPortEntry 2 }
+		
+		stpPortState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(1),
+				blocking(2),
+				listening(3),
+				learning(4),
+				forwarding(5),
+				broken(6)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpPortEntry 3 }
+		
+		stpPortPathCost OBJECT-TYPE
+		SYNTAX Integer32 (1..65535)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpPortEntry 4 }
+		
+		stpPortDesignatedRoot OBJECT-TYPE
+			SYNTAX BridgeId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpPortEntry 5 }
+		
+		stpPortDesignatedCost OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpPortEntry 6 }
+		
+		stpPortDesignatedBridge OBJECT-TYPE
+			SYNTAX BridgeId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpPortEntry 7 }
+		
+		stpPortDesignatedPort OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (2))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpPortEntry 8 }
+		
+		stpPortDesignatedForwardTransitions OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpPortEntry 9 }
+		
+-- ***********************************************************
+--  igmpConfig
+-- ***********************************************************
+		igmpConfig OBJECT IDENTIFIER ::= { ubiOntSwitchMIBObjects 4 }
+		
+-- ***********************************************************
+--  igmpGlobalTable
+-- ***********************************************************
+		igmpGlobalTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpGlobalEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpConfig 1 }
+		
+		igmpGlobalEntry OBJECT-TYPE
+			SYNTAX IgmpGlobalEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Index : ONT Physical Index."
+			INDEX { ubiPortIndex, onuId }
+			::= { igmpGlobalTable 1 }
+		
+		IgmpGlobalEntry ::=
+			SEQUENCE { 
+				igmpGlobalStatus
+					INTEGER,
+				igmpGlobalLastMemberQueryCount
+					Integer32,
+				igmpGlobalRobustnessCount
+					Integer32
+			 }
+
+		igmpGlobalStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpGlobalEntry 1 }
+		
+		igmpGlobalLastMemberQueryCount OBJECT-TYPE
+			SYNTAX Integer32 (0..12)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpGlobalEntry 2 }
+		
+		igmpGlobalRobustnessCount OBJECT-TYPE
+			SYNTAX Integer32 (0..12)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpGlobalEntry 3 }   
+			
+-- ***********************************************************
+-- igmpPortTable
+-- ***********************************************************		
+		igmpPortTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IgmpPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpConfig 2 }
+		
+		igmpPortEntry OBJECT-TYPE
+			SYNTAX IgmpPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Index : ONT Physical Port Index."
+			INDEX { ubiPortIndex, onuId, subsPortIndex }
+			::= { igmpPortTable 1 }
+		
+		IgmpPortEntry ::=
+			SEQUENCE { 
+				igmpPortMaxGroup
+					Integer32
+			 }
+
+		igmpPortMaxGroup OBJECT-TYPE
+			SYNTAX Integer32 (10..35)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { igmpPortEntry 1 }
+		
+-- ***********************************************************
+--  ubiOntSwitchMIBNotificationPrefix
+-- ***********************************************************
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+	ubiOntSwitchMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiOntSwitchMIB 2 }
+	ubiOntSwitchMIBNotifications OBJECT IDENTIFIER ::= { ubiOntSwitchMIBNotificationPrefix 0 }
+                                    
+    -- TODO        
+    
+-- ***********************************************************
+--  ubiPonMacGroupMIBNotificationPrefix
+-- ***********************************************************
+-- conformance information
+	ubiOntSwitchMIBConformance OBJECT IDENTIFIER ::= { ubiOntSwitchMIB 3 }
+	ubiOntSwitchMIBCompliances OBJECT IDENTIFIER ::= { ubiOntSwitchMIBConformance 1 }
+	ubiOntSwitchMIBGroups      OBJECT IDENTIFIER ::= { ubiOntSwitchMIBConformance 2 }
+  
+-- compliance statements
+    ubiOntSwitchMIBCompliance MODULE-COMPLIANCE
+		STATUS  current
+        DESCRIPTION
+		    "Description"
+		MODULE  -- this module
+        MANDATORY-GROUPS { ubiOntSwitchMIBGroup,
+                		   ubiOntSwitchMIBNotificationGroup	
+                         }
+	   GROUP  ubiOntSwitchMIBGroup
+	   DESCRIPTION  
+            "Description"
+       GROUP ubiOntSwitchMIBNotificationGroup   
+       DESCRIPTION
+            "Description"
+
+       ::= { ubiOntSwitchMIBCompliances 1 }
+	                            
+-- compliance statements
+   	ubiOntSwitchMIBGroup  OBJECT-GROUP
+		OBJECTS {     
+			-- TODO 
+               }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss ont switch information MIB"
+        ::= { ubiOntSwitchMIBGroups 1 }
+     
+     ubiOntSwitchMIBNotificationGroup    OBJECT-GROUP
+      	OBJECTS {     
+			-- TODO 
+               }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss ont switch information Notifications"
+        ::= { ubiOntSwitchMIBGroups 2 }
+	
+	END
+
+--
+-- UBIQUOSS-EPON-ONTMANAGER-MIB.my
+--

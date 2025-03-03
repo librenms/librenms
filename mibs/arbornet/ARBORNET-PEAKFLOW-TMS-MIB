@@ -1,0 +1,1056 @@
+--
+--
+-- ARBOR NETWORKS
+--
+--
+--
+--   File:              arbornet-tms.mib
+--   Created:           April 27, 2007
+--   Purpose:           Peakflow TMS MIB
+--              describe any data which we provide
+--              describe any traps which we send
+--
+--
+
+PEAKFLOW-TMS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        IpAddress,
+        TimeTicks,
+        Integer32,
+        Unsigned32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+        DisplayString
+                FROM SNMPv2-TC
+        sysName
+                FROM SNMPv2-MIB
+        ifName
+                FROM IF-MIB
+        Ipv6Address,
+        Ipv6AddressPrefix
+                FROM IPV6-TC
+        arbornetworksProducts
+                FROM ARBOR-SMI;
+
+-- =============================================================================
+
+peakflowTmsMIB MODULE-IDENTITY
+        LAST-UPDATED "201403120000Z" -- March 12, 2014
+        ORGANIZATION "Arbor Networks, Inc."
+        CONTACT-INFO
+                "       Arbor Networks, Inc.
+                        Arbor Technical Assistance Center
+
+                        Postal: 76 Blanchard Road
+                                Burlington, MA 01803
+                                USA
+
+                        Tel: +1 866 212 7267 (toll free)
+                             +1 781 362 4300
+                        Email: support@arbor.net "
+
+        DESCRIPTION
+                "Peakflow TMS MIB"
+
+        -- Revision log, reverse chrono
+        REVISION    "201403120000Z" -- March 12, 2014
+        DESCRIPTION "Added entry for tmsTrapGreName field"
+
+        REVISION    "201309190000Z" -- September 19, 2013
+        DESCRIPTION "Added entry for tmsSpCommunicationDegraded trap"
+
+        REVISION    "201308190000Z" -- August 19, 2013
+        DESCRIPTION "Updated contact information"
+
+        REVISION    "201203291200Z" -- March 29, 2012
+        DESCRIPTION "Bug#50908: Fix reversed tmsSpCommunication enumerations."
+
+        REVISION    "201201121200Z" -- January 12, 2012
+        DESCRIPTION "Added tmsSystemPrefixesOk and tmsSystemPrefixesMissing
+                    traps."
+
+        REVISION    "201106141600Z" -- June 14, 2011
+        DESCRIPTION "Fix stray quote that was causing a syntax error."
+
+        REVISION    "201106031600Z" -- June 03, 2011
+        DESCRIPTION "Added performnace traps."
+
+        REVISION    "201106030000Z" -- June 03, 2011
+        DESCRIPTION "Fixed some typos and grammar problems."
+
+        REVISION    "201105230000Z" -- May 23, 2011
+        DESCRIPTION "Added IPv6 versions of existing IPv4 objects."
+
+        REVISION    "201101210000Z" -- January 21, 2011
+        DESCRIPTION "Added new traps (tmsAutomitigationBgp
+                    {Enabled/Disabled/Suspended}) for traffic-triggered
+                    automitigation BGP announcements."
+
+        REVISION    "201010280000Z" -- October 28, 2010
+        DESCRIPTION "Added new traps (tmsSpCommunicationDown and
+                    tmsSpCommunicationUp) for alerting about failed
+                    communication with Peakflow SP."
+
+        REVISION    "201009070000Z" -- September 7, 2010
+        DESCRIPTION "Added new traps (tmsFilesystemCritical and
+                    tmsFilesystemNominal) for new filesystem monitoring
+                    feature."
+
+        REVISION    "200905270000Z" -- May 27, 2009
+        DESCRIPTION "The March 11 2009 revision had accidentally obsoleted the
+                    tmsHostFault OID, rather than the hostFault trap. This
+                    is now fixed. The tmsHostFault OID is restored to current
+                    status and the hostFault trap is marked obsolete."
+
+        REVISION    "200905080000Z" -- May 08, 2009
+        DESCRIPTION "Update contact group name and company address."
+
+        REVISION    "200903110000Z" -- March 11, 2009
+        DESCRIPTION "Obsoleted the tmsHostFault trap."
+
+        REVISION    "200902130000Z" -- February 13, 2009
+        DESCRIPTION "Added new objects to support TMS 5.0"
+
+        REVISION    "200811130000Z" -- November 13, 2008
+        DESCRIPTION "Update contact info."
+
+        REVISION    "200804070000Z" -- April 07, 2008
+        DESCRIPTION "Prefixed Textual Conventions with 'Tms' for uniqueness"
+
+        REVISION    "200711200000Z" -- November 20, 2007
+        DESCRIPTION "Removed unused Textual Conventions, added display hints"
+
+        REVISION    "200704270000Z" -- April 27, 2007
+        DESCRIPTION "Initial revision"
+
+        ::= { arbornetworksProducts 5 }
+
+-- =============================================================================
+-- Textual Conventions
+-- =============================================================================
+TmsTableIndex ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d"
+        STATUS          current
+        DESCRIPTION
+                "Used for an index into a table"
+        SYNTAX          Integer32 (1..2147483647)
+
+TmsTableIndexOrZero ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d"
+        STATUS          current
+        DESCRIPTION
+                "The number of items in a table.
+                May be zero if the table is empty."
+        SYNTAX          Integer32 (0..2147483647)
+
+TmsPercentage      ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d"
+        STATUS          current
+        DESCRIPTION
+                "A percentage value (0% - 100%)"
+        SYNTAX          Integer32 (0..100)
+
+TmsHundredths      ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d-2"
+        STATUS          current
+        DESCRIPTION
+                "An integer representing hundredths of a unit"
+        SYNTAX          Integer32
+
+-- =============================================================================
+-- peakflowTmsMgr
+-- =============================================================================
+peakflowTmsMgr          OBJECT IDENTIFIER ::= { peakflowTmsMIB 2 }
+
+tmsHostFault         OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "state of faults within a TMS device"
+        ::= { peakflowTmsMgr 1 }
+
+tmsHostUpTime        OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "uptime of this host"
+        ::= { peakflowTmsMgr 2 }
+
+deviceCpuLoadAvg1min OBJECT-TYPE
+        SYNTAX          TmsHundredths
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Average number of processes in run queue during last 1 min."
+        ::= { peakflowTmsMgr 3 }
+
+deviceCpuLoadAvg5min OBJECT-TYPE
+        SYNTAX          TmsHundredths
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Average number of processes in run queue during last 5 min."
+        ::= { peakflowTmsMgr 4 }
+
+deviceCpuLoadAvg15min OBJECT-TYPE
+        SYNTAX          TmsHundredths
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Average number of processes in run queue during last 15 min."
+        ::= { peakflowTmsMgr 5 }
+
+deviceDiskUsage         OBJECT-TYPE
+        SYNTAX          TmsPercentage
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Percentage of primary data partition used."
+        ::= { peakflowTmsMgr 6 }
+
+devicePhysicalMemoryUsage OBJECT-TYPE
+        SYNTAX          TmsPercentage
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Percentage of physical memory used."
+        ::= { peakflowTmsMgr 7 }
+
+deviceSwapSpaceUsage    OBJECT-TYPE
+        SYNTAX          TmsPercentage
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Percentage of swap space used."
+        ::= { peakflowTmsMgr 8 }
+
+tmsTrapString           OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Temporary string for reporting information in traps"
+        ::= { peakflowTmsMgr 9 }
+
+tmsTrapDetail           OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Temporary string for reporting additional detail (if any)
+                about a trap"
+        ::= { peakflowTmsMgr 10 }
+
+tmsTrapSubhostName      OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Temporary string for reporting the name of a subhost"
+        ::= { peakflowTmsMgr 11 }
+
+tmsTrapComponentName    OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Temporary string for reporting the name of a program or device"
+        ::= { peakflowTmsMgr 12 }
+
+tmsTrapBgpPeer          OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "IP address of a BGP peer"
+        ::= { peakflowTmsMgr 13 }
+
+tmsTrapGreSource        OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "GRE source IP address"
+        ::= { peakflowTmsMgr 14 }
+
+tmsTrapGreDestination   OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "GRE destination IP address"
+        ::= { peakflowTmsMgr 15 }
+
+tmsTrapNexthop          OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Nexthop IP address"
+        ::= { peakflowTmsMgr 16 }
+
+tmsTrapIpv6BgpPeer      OBJECT-TYPE
+        SYNTAX          Ipv6Address
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "IPv6 address of a BGP peer"
+        ::= { peakflowTmsMgr 17 }
+
+tmsTrapIpv6GreSource    OBJECT-TYPE
+        SYNTAX          Ipv6Address
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "GRE source IPv6 address"
+        ::= { peakflowTmsMgr 18 }
+
+tmsTrapIpv6GreDestination   OBJECT-TYPE
+        SYNTAX          Ipv6Address
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "GRE destination IPv6 address"
+        ::= { peakflowTmsMgr 19 }
+
+tmsTrapIpv6Nexthop      OBJECT-TYPE
+        SYNTAX          Ipv6Address
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Nexthop IPv6 address"
+        ::= { peakflowTmsMgr 20 }
+
+tmsTrapGreName          OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "User-defined tunnel name"
+        ::= { peakflowTmsMgr 21 }
+
+-- =============================================================================
+-- peakflowTmsTraps
+-- =============================================================================
+peakflowTmsTraps                OBJECT IDENTIFIER ::= { peakflowTmsMIB 3 }
+peakflowTmsTrapsEnumerate       OBJECT IDENTIFIER ::= { peakflowTmsTraps 0 }
+
+hostFault           NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsHostFault
+        }
+        STATUS  obsolete
+        DESCRIPTION
+                "Obsolete; replaced by a number of more specific traps."
+        ::= { peakflowTmsTrapsEnumerate 1 }
+
+greTunnelDown       NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapGreSource,
+            tmsTrapGreDestination
+        }
+        STATUS  current
+        DESCRIPTION
+                "The greTunnelDown/greTunnelUp traps are generated when a GRE
+                tunnel changes state."
+        ::= { peakflowTmsTrapsEnumerate 2 }
+
+greTunnelUp         NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapGreSource,
+            tmsTrapGreDestination
+        }
+        STATUS  current
+        DESCRIPTION
+                "The greTunnelDown/greTunnelUp traps are generated when a GRE
+                tunnel changes state."
+        ::= { peakflowTmsTrapsEnumerate 3 }
+
+tmsLinkUp           NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString
+        }
+        STATUS  obsolete
+        DESCRIPTION
+                "Obsolete; IF-MIB::linkUp is now used instead"
+        ::= { peakflowTmsTrapsEnumerate 4 }
+
+tmsLinkDown         NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString
+        }
+        STATUS  obsolete
+        DESCRIPTION
+                "Obsolete; IF-MIB::linkDown is now used instead"
+        ::= { peakflowTmsTrapsEnumerate 5 }
+
+subHostUp           NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapSubhostName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when a subhost transitions to active"
+        ::= { peakflowTmsTrapsEnumerate 6 }
+
+subHostDown         NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapSubhostName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when a subhost transitions to inactive"
+        ::= { peakflowTmsTrapsEnumerate 7 }
+
+tmsBgpNeighborDown  NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapBgpPeer
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when a BGP neighbor transitions out of
+                the ESTABLISHED state"
+        ::= { peakflowTmsTrapsEnumerate 8 }
+
+tmsBgpNeighborUp    NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapBgpPeer
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when a BGP neighbor transitions into
+                the ESTABLISHED state"
+        ::= { peakflowTmsTrapsEnumerate 9 }
+
+tmsNexthopDown      NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapNexthop,
+            ifName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when the nexthop host cannot be contacted"
+        ::= { peakflowTmsTrapsEnumerate 10 }
+
+tmsNexthopUp     NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapNexthop,
+            ifName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when the nexthop host cannot be contacted"
+        ::= { peakflowTmsTrapsEnumerate 11 }
+
+tmsMitigationError          NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsMitigationIndex,
+            tmsMitigationName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A mitigation cannot run because of a configuration error"
+        ::= { peakflowTmsTrapsEnumerate 12 }
+
+tmsMitigationSuspended      NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsMitigationIndex,
+            tmsMitigationName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A mitigation has been suspended due to some external problem
+                (nexthop not reachable, BGP down, etc.)"
+        ::= { peakflowTmsTrapsEnumerate 13 }
+
+tmsMitigationRunning        NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsMitigationIndex,
+            tmsMitigationName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A previously-detected mitigation problem has been cleared and
+                the mitigation is now running"
+        ::= { peakflowTmsTrapsEnumerate 14 }
+
+tmsConfigMissing        NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when a TMS configuration file cannot be found."
+        ::= { peakflowTmsTrapsEnumerate 15 }
+
+tmsConfigError          NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when an error in a TMS configuration file
+                is detected."
+        ::= { peakflowTmsTrapsEnumerate 16 }
+
+tmsConfigOk             NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "All configuration problems have been corrected."
+        ::= { peakflowTmsTrapsEnumerate 17 }
+
+tmsHwDeviceDown  NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A hardware device has failed."
+        ::= { peakflowTmsTrapsEnumerate 18 }
+
+tmsHwDeviceUp    NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A hardware device failure has been corrected."
+        ::= { peakflowTmsTrapsEnumerate 19 }
+
+tmsHwSensorCritical NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A hardware sensor is reading an alarm condition."
+        ::= { peakflowTmsTrapsEnumerate 20 }
+
+tmsHwSensorOk       NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A hardware sensor is no longer reading an alarm condition."
+        ::= { peakflowTmsTrapsEnumerate 21 }
+
+tmsSwComponentDown  NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapSubhostName,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A software program has failed."
+        ::= { peakflowTmsTrapsEnumerate 22 }
+
+tmsSwComponentUp    NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapSubhostName,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A software program failure has been corrected."
+        ::= { peakflowTmsTrapsEnumerate 23 }
+
+tmsSystemStatusCritical NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "The TMS system is experiencing a critical failure."
+        ::= { peakflowTmsTrapsEnumerate 24 }
+
+tmsSystemStatusDegraded NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "The TMS system is experiencing degraded performance."
+        ::= { peakflowTmsTrapsEnumerate 25 }
+
+tmsSystemStatusNominal NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "The TMS system has returned to normal behavior."
+        ::= { peakflowTmsTrapsEnumerate 26 }
+
+tmsFilesystemCritical NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A filesystem is near capacity."
+        ::= { peakflowTmsTrapsEnumerate 27 }
+
+tmsFilesystemNominal NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A filesystem is back below capacity alarm threshold."
+        ::= { peakflowTmsTrapsEnumerate 28 }
+
+tmsHwSensorUnknown NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A hardware sensor is in an unknown state."
+        ::= { peakflowTmsTrapsEnumerate 29 }
+
+tmsSpCommunicationUp NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Communication with SP host is up."
+        ::= { peakflowTmsTrapsEnumerate 30 }
+
+tmsSpCommunicationDown NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Communication with SP host is down."
+        ::= { peakflowTmsTrapsEnumerate 31 }
+
+tmsSystemStatusError NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "The TMS system is experiencing an error."
+        ::= { peakflowTmsTrapsEnumerate 32 }
+
+tmsAutomitigationBgpEnabled NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "A previously-detected automitigation problem has been cleared
+                and the automitigation BGP announcements have resumed."
+        ::= { peakflowTmsTrapsEnumerate 33 }
+
+tmsAutomitigationBgpDisabled NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Automitigation BGP announcements have been administratively
+                disabled."
+        ::= { peakflowTmsTrapsEnumerate 34 }
+
+tmsAutomitigationBgpSuspended NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Automitigation BGP announcements have been suspended due to
+                some external problem (nexthop not reachable, BGP down, etc.)"
+        ::= { peakflowTmsTrapsEnumerate 35 }
+
+tmsIpv6GreTunnelDown    NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapIpv6GreSource,
+            tmsTrapIpv6GreDestination
+        }
+        STATUS  current
+        DESCRIPTION
+                "The greTunnelDown/greTunnelUp traps are generated when a GRE
+                tunnel changes state."
+        ::= { peakflowTmsTrapsEnumerate 36 }
+
+tmsIpv6GreTunnelUp      NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapIpv6GreSource,
+            tmsTrapIpv6GreDestination
+        }
+        STATUS  current
+        DESCRIPTION
+                "The greTunnelDown/greTunnelUp traps are generated when a GRE
+                tunnel changes state."
+        ::= { peakflowTmsTrapsEnumerate 37 }
+
+tmsIpv6BgpNeighborDown  NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapIpv6BgpPeer
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when a BGP neighbor transitions out of
+                the ESTABLISHED state."
+        ::= { peakflowTmsTrapsEnumerate 38 }
+
+tmsIpv6BgpNeighborUp    NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapIpv6BgpPeer
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when a BGP neighbor transitions into
+                the ESTABLISHED state."
+        ::= { peakflowTmsTrapsEnumerate 39 }
+
+tmsIpv6NexthopDown      NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapIpv6Nexthop,
+            ifName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when the nexthop host becomes unreachable."
+        ::= { peakflowTmsTrapsEnumerate 40 }
+
+tmsIpv6NexthopUp        NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapIpv6Nexthop,
+            ifName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when the nexthop host becomes reachable."
+        ::= { peakflowTmsTrapsEnumerate 41 }
+
+tmsPerformanceOk        NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when the processed traffic rate matches the offered
+                traffic rate."
+        ::= { peakflowTmsTrapsEnumerate 42 }
+
+tmsPerformanceLossy     NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Generated when the processed traffic rate is lower than the
+                offered traffic rate."
+        ::= { peakflowTmsTrapsEnumerate 43 }
+
+tmsSystemPrefixesOk NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "BGP is currently advertising all mitigation prefixes."
+        ::= { peakflowTmsTrapsEnumerate 44 }
+
+tmsSystemPrefixesMissing    NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "BGP is not currently advertising all mitigation prefixes."
+        ::= { peakflowTmsTrapsEnumerate 45 }
+
+tmsSpCommunicationDegraded NOTIFICATION-TYPE
+        OBJECTS {
+            sysName,
+            tmsTrapString,
+            tmsTrapDetail,
+            tmsTrapComponentName
+        }
+        STATUS  current
+        DESCRIPTION
+                "Communication with SP host is degraded."
+        ::= { peakflowTmsTrapsEnumerate 46 }
+
+-- =============================================================================
+-- peakflowTmsObj
+-- =============================================================================
+peakflowTmsObj          OBJECT IDENTIFIER ::= { peakflowTmsMIB 5 }
+
+-- DPI Config
+-- Read from /etc/peakflow/dpi.conf
+tmsDpiConfig    OBJECT IDENTIFIER ::= { peakflowTmsObj 1 }
+
+tmsVersion      OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "TMS software version"
+        ::= { tmsDpiConfig 1 }
+
+tmsLastUpdate   OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Time of the last configuration change"
+        ::= { tmsDpiConfig 2 }
+
+-- Mitigation Config
+-- Read from /etc/peakflow/mitigation/mitigation.conf
+tmsMitigationConfig     OBJECT IDENTIFIER ::= { peakflowTmsObj 2 }
+
+tmsMitigationLastUpdate  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Last time Mitigation configuration was updated"
+        ::= { tmsMitigationConfig 1 }
+
+tmsMitigationNumber       OBJECT-TYPE
+        SYNTAX          TmsTableIndexOrZero
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Number of entries in the tmsMitigation table"
+        ::= { tmsMitigationConfig 2 }
+
+tmsMitigationTable        OBJECT-TYPE
+        SYNTAX          SEQUENCE OF TmsMitigationEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Table of all mitigations in the TMS system"
+        ::= { tmsMitigationConfig 3 }
+
+tmsMitigationEntry        OBJECT-TYPE
+        SYNTAX          TmsMitigationEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Information about a single mitigation"
+        INDEX   { tmsMitigationIndex }
+        ::= { tmsMitigationTable 1 }
+
+TmsMitigationEntry ::=
+        SEQUENCE {
+                tmsMitigationIndex              TmsTableIndex,
+                tmsMitigationId                 Unsigned32,
+                tmsDestinationPrefix            IpAddress,
+                tmsDestinationPrefixMask        Unsigned32,
+                tmsMitigationName               DisplayString,
+                tmsIpv6DestinationPrefix        Ipv6AddressPrefix,
+                tmsIpv6DestinationPrefixMask    Unsigned32
+        }
+
+tmsMitigationIndex      OBJECT-TYPE
+        SYNTAX          TmsTableIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Index in the tmsMitigation table. As of release 5.0 this is
+                the same as the tmsMitigationId."
+        ::= { tmsMitigationEntry 1 }
+
+tmsMitigationId         OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "ID number of this mitigation"
+        ::= { tmsMitigationEntry 2 }
+
+tmsDestinationPrefix    OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Destination IPv4 prefix to which this mitigation applies. The
+                value 0.0.0.0/32 indicates that the mitigation has no IPv4
+                prefix."
+        ::= { tmsMitigationEntry 3 }
+
+tmsDestinationPrefixMask        OBJECT-TYPE
+        SYNTAX          Unsigned32(0..32)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Destination IPv4 prefix to which this mitigation applies. The
+                value 0.0.0.0/32 indicates that the mitigation has no IPv4
+                prefix."
+        ::= { tmsMitigationEntry 4 }
+
+tmsMitigationName       OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Name of this mitigation"
+        ::= { tmsMitigationEntry 5 }
+
+tmsIpv6DestinationPrefix    OBJECT-TYPE
+        SYNTAX          Ipv6AddressPrefix
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Destination IPv6 prefix to which this mitigation applies. The
+                value 0::/128 indicates that the mitigation has no IPv6 prefix."
+        ::= { tmsMitigationEntry 6 }
+
+tmsIpv6DestinationPrefixMask    OBJECT-TYPE
+        SYNTAX          Unsigned32(0..128)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Destination IPv6 prefix to which this mitigation applies. The
+                value 0::/128 indicates that the mitigation has no IPv6 prefix."
+        ::= { tmsMitigationEntry 7 }
+
+END

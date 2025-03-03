@@ -1,0 +1,11 @@
+os: chatsworth-pdu
+text: 'Chatsworth PDU'
+type: power
+icon: chatsworth
+snmp_bulk: false
+mib_dir: chatsworth
+discovery:
+    -
+        sysObjectID:
+            - .0.10.43.6.1.4.1
+            - .1.3.6.1.4.1.30932

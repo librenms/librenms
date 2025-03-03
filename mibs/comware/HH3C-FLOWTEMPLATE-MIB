@@ -1,0 +1,414 @@
+-- ============================================================================
+-- Copyright (C) 2004 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Flowtemplate Management Information Base.
+-- Reference: 
+-- Version: 1.0
+-- History:
+-- V1.0 created by tangshun.
+-- ============================================================================
+HH3C-FLOWTEMPLATE-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hh3cCommon
+                FROM HH3C-OID-MIB
+            ifIndex
+                FROM RFC1213-MIB
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            RowStatus, MacAddress
+                FROM SNMPv2-TC;
+
+--
+-- Nodes definitions
+--
+        hh3cFlowTemplate MODULE-IDENTITY 
+            LAST-UPDATED "200511241320Z"    -- Nov 24, 2005 at 13:20 GMT
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION 
+                "Flow template management information base."
+            ::= { hh3cCommon 64 }
+
+        hh3cFlowTemplateMibObject OBJECT IDENTIFIER ::= { hh3cFlowTemplate 1 }
+
+        hh3cFTConfigGroup OBJECT IDENTIFIER ::= { hh3cFlowTemplateMibObject 1 }
+
+        hh3cFTGroupNextIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object contains an appropriate value to be used for hh3cFTGroupIndex 
+                 when creating rows in the hh3cFTGroupTable.  If it is 2147483647, 
+                 it denotes that hh3cFTGroupTable can't create any instance. 
+                "
+            ::= { hh3cFTConfigGroup 1 }    
+
+        hh3cFTGroupTable OBJECT-TYPE   
+            SYNTAX SEQUENCE OF Hh3cFTGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of flow template group.
+                 A flow template group, which is applied to interface,
+                 must use hh3cFTGroupTable to create a instance 
+                 and hh3cFTBasicGroupTable or hh3cFTExtendGroupTable 
+                 to configure flow template's need item.
+                 A basic flow template must use hh3cFTBasicGroupTable 
+                 to configure some basic flow template's need item, 
+                 such as: address, protocol, priority.
+                 A extend flow template must use hh3cFTExtendGroupTable
+                 to configure packet's type and offset and length.
+                "
+            ::= { hh3cFTConfigGroup 2 }
+
+        hh3cFTGroupEntry OBJECT-TYPE
+            SYNTAX Hh3cFTGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Flow template group information."
+            INDEX { hh3cFTGroupIndex }
+            ::= { hh3cFTGroupTable 1 }
+
+        Hh3cFTGroupEntry ::=
+            SEQUENCE
+            {
+                hh3cFTGroupIndex
+                    Integer32,
+                hh3cFTGroupName
+                    OCTET STRING,
+                hh3cFTGroupType
+                    INTEGER,
+                hh3cFTGroupRowStatus
+                    RowStatus
+            }
+
+        hh3cFTGroupIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Flow template group index."
+            ::= { hh3cFTGroupEntry 1 }
+
+        hh3cFTGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Flow template group name."
+            ::= { hh3cFTGroupEntry 2 }
+
+        hh3cFTGroupType OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+                basic(1),
+                extend(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Type of flow template."
+            ::= { hh3cFTGroupEntry 3 }
+
+        hh3cFTGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cFTGroupEntry 4 }
+--
+--nodes of hh3cFTBasicGroupTable
+--
+        hh3cFTBasicGroupTable OBJECT-TYPE   
+            SYNTAX SEQUENCE OF Hh3cFTBasicGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of basic flow template group."
+            ::= { hh3cFTConfigGroup 3 }
+
+        hh3cFTBasicGroupEntry OBJECT-TYPE
+            SYNTAX Hh3cFTBasicGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Basic flow template group information."
+            INDEX { hh3cFTGroupIndex }
+            ::= { hh3cFTBasicGroupTable 1 }
+
+        Hh3cFTBasicGroupEntry ::=
+            SEQUENCE
+            {
+                hh3cFTBasicGroupAddressType
+                    BITS,
+                hh3cFTBasicGroupPriorityType
+                    BITS,
+                hh3cFTBasicGroupProtocolType
+                    BITS,
+                hh3cFTBasicGroupSMacWildCard
+                    MacAddress,
+                hh3cFTBasicGroupDMacWildCard
+                    MacAddress,
+                hh3cFTBasicGroupRowStatus
+                    RowStatus
+            }
+
+        hh3cFTBasicGroupAddressType OBJECT-TYPE
+            SYNTAX BITS
+            {
+                sourceIpv4Address(0),
+                destIPv4Address(1),
+                sourceIPv6Address(2),
+                destIPv6Address(3),
+                sourceMacAddress(4),
+                destMacAddress(5)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Type of MAC and IP address.
+                 This is a bit-map of possible conditions.
+                 The various bit positions are:
+                 sourceIpv4Address    source IPv4's address    
+                 destIPv4Address      destination IPv4's address
+                 sourceIPv6Address    source IPv6 address
+                 destIPv6Address      destination IPv6 address
+                 sourceMacAddress     source MAC address
+                 destMacAddress       destination MAC address
+                "
+            ::= { hh3cFTBasicGroupEntry 1 }
+
+        hh3cFTBasicGroupPriorityType OBJECT-TYPE
+            SYNTAX BITS
+            {
+                vlanID(0),
+                cos(1),
+                topVlanID(2),
+                topCos(3),
+                fragment(4),
+                tcpFlag(5),
+                tos(6),
+                dscp(7),
+                ipprecedence(8)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Type of priority.
+                 This is a bit-map of possible conditions.
+                 The various bit positions are:
+                 vlanID         VlanID
+                 cos            802.1p priority
+                 topVlanID      VlanID of top layer
+                 topCos         802.1p priority of top layer
+                 fragment       fragment
+                 tcpFlag        TCP flag
+                 tos            type of service
+                 dscp           DSCP
+                 ipprecedence   IP precedence
+                "
+            ::= { hh3cFTBasicGroupEntry 2 }
+
+        hh3cFTBasicGroupProtocolType OBJECT-TYPE
+            SYNTAX BITS
+            {
+                l2Potocol(0),
+                ipv4L3Protocol(1),
+                ipv6L3Protocol(2),
+                icmpProtocolType(3),
+                icmpProtocolCode(4),
+                icmpv6ProtocolType(5),
+                icmpv6ProtocolCode(6),
+                sourceL4Port(7),
+                destL4Port(8)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Type of protocol.
+                 This is a bit-map of possible conditions.
+                 The various bit positions are:
+                 l2Potocol               layer 2 protocol
+                 ipv4L3Protocol          layer 3 protocol of IPv4 
+                 ipv6L3Protocol          layer 3 protocol of IPv6
+                 icmpProtocolType        Type of ICMP protocol of IPv4
+                 icmpProtocolCode        Code of ICMP protocol of IPv4
+                 icmpv6ProtocolType      Type of ICMP protocol of IPv6
+                 icmpv6ProtocolCode      Code of ICMP protocol of IPv6
+                 sourceL4Port            port of layer 4 of source
+                 destL4Port              port of layer 4 of destination
+                "
+            ::= { hh3cFTBasicGroupEntry 3 }
+
+        hh3cFTBasicGroupSMacWildCard OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Source MAC address field in Ethernet packet head."
+            ::= { hh3cFTBasicGroupEntry 4 }
+
+        hh3cFTBasicGroupDMacWildCard OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Destination MAC address field in Ethernet packet head."
+            ::= { hh3cFTBasicGroupEntry 5 }
+
+        hh3cFTBasicGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cFTBasicGroupEntry 6 }
+--
+--nodes of hh3cFTExtendGroupTable
+--
+        hh3cFTExtendGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cFTExtendGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of extend flow template group information."
+            ::= { hh3cFTConfigGroup 4 }
+
+        hh3cFTExtendGroupEntry OBJECT-TYPE
+            SYNTAX Hh3cFTExtendGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Extend flow template group information entry."
+            INDEX { hh3cFTGroupIndex, hh3cFTExtendGroupOffsetType }
+            ::= { hh3cFTExtendGroupTable 1 }
+
+        Hh3cFTExtendGroupEntry ::=
+            SEQUENCE
+            {
+                hh3cFTExtendGroupOffsetType
+                    INTEGER,
+                hh3cFTExtendGroupOffsetMaxValue
+                    Integer32,
+                hh3cFTExtendGroupLengthMaxValue
+                    Integer32,
+                hh3cFTExtendGroupRowStatus
+                    RowStatus
+            }
+
+        hh3cFTExtendGroupOffsetType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                start(1),
+                mpls(2),
+                l2(3),
+                l4(4),
+                l5(5),
+                ipv4(6),
+                ipv6(7)
+            }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Offset type of the packet.
+                 start    Offset from the start of the packet
+                 mpls     Offset from the head of MPLS
+                 l2       Offset from the head of the L2 frame
+                 l4       Offset from the head of L4 packet
+                 l5       Offset from the head of the L5 packet
+                 ipv4     Offset from the head of the IPv4 packet
+                 ipv6     Offset from the head of the IPv6 packet
+                "
+            ::= { hh3cFTExtendGroupEntry 1 }
+
+        hh3cFTExtendGroupOffsetMaxValue OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The max value of offset."
+            ::= { hh3cFTExtendGroupEntry 2 }    
+
+        hh3cFTExtendGroupLengthMaxValue OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The max value of length."
+            ::= { hh3cFTExtendGroupEntry 3 }
+
+        hh3cFTExtendGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cFTExtendGroupEntry 4 }
+
+--
+--nodes of hh3cFTApplyGroup
+--
+        hh3cFTApplyGroup OBJECT IDENTIFIER ::= { hh3cFlowTemplateMibObject 2 }
+
+        hh3cFTIfApplyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cFTIfApplyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of any interface with flowtemplate.
+                 A flow template, which will be applied interface,
+                 is an instance at hh3cFTGroupTable 
+                 and hh3cFTBasicGroupTable or hh3cFTExtendGroupTable.
+                 A basic flow template is an instance at hh3cFTGroupTable 
+                 and hh3cFTBasicGroupTable, and the instance's RowStatus 
+                 must be 'active' at each table.
+                 A extend flow template is an instance at hh3cFTGroupTable
+                 and hh3cFTExtendGroupTable, and the instance's RowStatus 
+                 must be 'active' at each table.  
+                "
+            ::= { hh3cFTApplyGroup 1 }
+
+        hh3cFTIfApplyEntry OBJECT-TYPE
+            SYNTAX Hh3cFTIfApplyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Any interface with flowtemplate information." 
+            INDEX { ifIndex, hh3cFTGroupIndex }
+            ::= { hh3cFTIfApplyTable 1 } 
+
+        Hh3cFTIfApplyEntry ::=
+            SEQUENCE
+            {
+                hh3cFTIfApplyGroupName
+                    OCTET STRING,
+                hh3cFTIfApplyRowStatus
+                    RowStatus
+            }
+
+        hh3cFTIfApplyGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of flow template."
+            ::= { hh3cFTIfApplyEntry 1 }
+
+        hh3cFTIfApplyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hh3cFTIfApplyEntry 2 }
+END 

@@ -1,83 +1,68 @@
-hide_toc: true
-<div class="row">
-    <div class="col-md-4">
-        <div class="well">
-            <div class="home-header">
-                <i class="fa fa-download fa-2x"></i>
-                <span> Installing</span>
-            </div>
-            <br />
-            <a href="/Installation/Installation-Ubuntu-1604-Nginx/">Ubuntu 16.04 + Nginx</a><br />
-            <a href="/Installation/Installation-CentOS-7-Nginx/">CentOS 7 + Nginx</a><br />
-            <a href="/Installation/Migrating-from-Observium/">Migrating from Observium</a><br />
-            <a href="/Installation/Installing-LibreNMS/"><strong>More...</strong></a>
+<div class="home-container">
+    <div class="home-box">
+        <div class="home-header">
+          <a href="/Installation/">
+            <i class="fas fa-download"></i>
+            <span>Installing</span>
+          </a>
         </div>
+        <a href="/Installation/Install-LibreNMS/">Install LibreNMS Now</a><br />
+        <a href="/Installation/Docker/">Install Using Docker</a>
     </div>
-    <div class="col-md-4">
-        <div class="well">
-            <div class="home-header">
-                <i class="fa fa-plug fa-2x"></i>
-                <span> Extensions</span>
-            </div>
-            <br />
-            <a href="/Extensions/Auto-Discovery/">Auto Discovery</a><br />
-            <a href="/Extensions/Oxidized/">Oxidized</a><br />
-            <a href="/Extensions/RRDCached/">RRDCached</a><br />
-            <strong>More...</strong>
+    <div class="home-box">
+        <div class="home-header">
+            <i class="fas fa-plug"></i>
+            <span>Setup</span>
         </div>
+        <a href="/Extensions/Applications/">Applications</a><br />
+        <a href="/Extensions/Auto-Discovery/">Auto Discovery</a><br />
+        <a href="/Extensions/Oxidized/">Oxidized</a><br />
+        <a href="/Extensions/RRDCached/">RRDCached</a><br />
     </div>
-    <div class="col-md-4">
-        <div class="well">
-            <div class="home-header">
-                <i class="fa fa-bell fa-2x"></i>
-                <span> Alerting</span>
-            </div>
-            <br />
-            <a href="/Extensions/Alerting/#rules">Rules</a><br />
-            <a href="/Extensions/Alerting/#templates">Templates</a><br />
-            <a href="/Extensions/Alerting/#transports">Transports</a><br />
-            <a href="/Extensions/Alerting/"><strong>More...</strong></a>
+    <div class="home-box">
+        <div class="home-header">
+          <a href="/Alerting/">
+            <i class="fas fa-bell"></i>
+            <span>Alerting</span>
+          </a>
         </div>
+        <a href="/Alerting/Rules/#rules">Rules</a><br />
+        <a href="/Alerting/Templates/">Templates</a><br />
+        <a href="/Alerting/Transports/">Transports</a><br />
+        <a href="/Alerting/"><strong>More...</strong></a>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <div class="well">
-            <div class="home-header">
-                <i class="fa fa-connectdevelop fa-2x"></i>
-                <span> API</span>
-            </div>
-            <br />
-            <a href="/API/API-Docs/">API Docs</a><br />
-            <a href="/API/API-Docs/#api-structure">API Structure</a><br />
-            <a href="/API/API-Docs/#api-endpoints">API Endpoints</a><br />
-            <a href="/API/API-Docs/"><strong>More...</strong></a>
+    <div class="home-box">
+        <div class="home-header">
+          <a href="/API/">
+            <i class="fab fa-connectdevelop"></i>
+            <span>API</span>
+          </a>
         </div>
+        <a href="/API/">Using the API</a><br />
+        <a href="/API/#endpoint-categories">API Endpoints</a><br />
+        <br />
+        <br />
     </div>
-    <div class="col-md-4">
-        <div class="well">
-            <div class="home-header">
-                <i class="fa fa-ambulance fa-2x"></i>
-                <span> Support</span>
-            </div>
-            <br />
-            <a href="/Support/FAQ/">FAQ</a><br />
-            <a href="/Support/Install%20Validation/">Install validation</a><br />
-            <a href="/Support/Performance/">Performance tweaks</a><br />
-            <strong>More...</strong>
+    <div class="home-box">
+        <div class="home-header">
+          <a href="/Support/">
+            <i class="fas fa-ambulance"></i>
+            <span>Support</span>
+          </a>
         </div>
+        <a href="/Support/FAQ/">FAQ</a><br />
+        <a href="/Support/Install%20Validation/">Install validation</a><br />
+        <a href="/Support/Performance/">Performance tweaks</a><br />
+        <a href="/Support/"><strong>More...</strong></a>
     </div>
-    <div class="col-md-4">
-        <div class="well">
-            <div class="home-header">
-                <i class="fa fa-code-fork fa-2x"></i>
-                <span> Developing</span>
-            </div>
-            <br />
-            <a href="/Developing/Code-Guidelines/">Code Guidelines</a><br />
-            <a href="/Developing/Validating-Code/">Validating Code</a><br />
-            <a href="/Developing/Using-Git/">Using Git</a><br />
-            <strong>More...</strong>
+    <div class="home-box">
+        <div class="home-header">
+          <a href="/Developing/">
+            <i class="fas fa-code-branch"></i>
+            <span>Developing</span>
+          </a>
         </div>
+        <a href="/Developing/Getting-Started/">Getting Started</a><br />
+        <a href="/Developing/Support-New-OS/">Support for a new OS</a><br />
     </div>
 </div>

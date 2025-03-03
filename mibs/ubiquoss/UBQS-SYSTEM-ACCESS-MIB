@@ -1,0 +1,536 @@
+-- *****************************************************************
+-- UBQS-SYSTEM-ACCESS-MIB
+--
+-- July 2011,  Park Hyung Eun
+--
+-- Copyright (c) 2011 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+UBQS-SYSTEM-ACCESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS	
+	DisplayString 
+		FROM RFC1213-MIB  
+	IANAifType                               
+		FROM IANAifType-MIB 
+	IpAddress
+		FROM SNMPv2-SMI  
+    RowStatus,
+    TruthValue
+        FROM SNMPv2-TC   
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,
+    	FROM INET-ADDRESS-MIB    
+    ubiMgmtv2
+        FROM UBQS-SMI;		          
+        
+ubiSystemAccessMIB  MODULE-IDENTITY
+	LAST-UPDATED "201103280000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100" 
+    DESCRIPTION
+        "The UBQS-SYSTEM-ACCESS-MIB is used for getting 
+ 		 the access information of the system"
+	::= { ubiMgmtv2  26 }	
+                                  
+
+-- ***********************************************************
+-- Textual Conventions
+-- ***********************************************************   
+                
+-- ***************************************************************
+--   ubiSystemAccessMIB
+-- ***************************************************************
+ubiSystemAccessMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiSystemAccessMIB 0 } 
+ubiSystemAccessMIBObjects  				OBJECT IDENTIFIER		::= { ubiSystemAccessMIB 1 }     
+ubiSystemAccessMIBConformance  			OBJECT IDENTIFIER		::= { ubiSystemAccessMIB 2 }
+                                  
+ 
+ubiUserManagement			OBJECT IDENTIFIER		::= { ubiSystemAccessMIBObjects 1 }   
+ubiAAAServer				OBJECT IDENTIFIER		::= { ubiSystemAccessMIBObjects 2 } 
+ubiAAAConfig				OBJECT IDENTIFIER		::= { ubiSystemAccessMIBObjects 3 }
+ubiCommandPrivilege			OBJECT IDENTIFIER		::= { ubiSystemAccessMIBObjects 4 }
+ubiEnableAuthenPasswd 		OBJECT IDENTIFIER		::= { ubiSystemAccessMIBObjects 5 } 
+ubiSystemRemoteConnect 		OBJECT IDENTIFIER		::= { ubiSystemAccessMIBObjects 6 } 
+                                  
+-- *****************************************************************
+-- ubiSystemAccessNotifications
+-- *****************************************************************
+	ubiSystemRemoteConnectStateChange NOTIFICATION-TYPE         
+    	OBJECTS         {  
+    					   ubiSystemRemoteConnectUserName,
+    					   ubiSystemRemoteConnectAddress,
+    					   ubiSystemRemoteConnectCompleted  
+    			    	}
+    	STATUS          current
+    	DESCRIPTION    
+    		"Notification of System remote connect State Change."
+    ::= { ubiSystemAccessMIBNotificationPrefix 1 }
+  
+-- ***********************************************************
+-- ubiUserManagement
+-- ***********************************************************
+
+    ubiUserTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiUserEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "This table contains objects which provide
+          the information about the user management."
+		::= { ubiUserManagement 1 }
+
+    ubiUserEntry  OBJECT-TYPE
+       SYNTAX      UbiUserEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "An entry containing information about a user."
+       INDEX       { ubiUserName }
+       ::= { ubiUserTable 1 }
+
+    UbiUserEntry ::= SEQUENCE {
+       ubiUserName						DisplayString,  
+       ubiUserPasswordEncryption		INTEGER,   
+       ubiUserPassword					DisplayString,   
+       ubiUserPrivilegedLevel			Integer32,
+       ubiUserAclName					DisplayString,
+       -- more
+       ubiUserRowStatus					RowStatus 
+    }
+                             
+    ubiUserName  OBJECT-TYPE
+       SYNTAX      DisplayString 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           ""
+       ::= { ubiUserEntry 1 }      
+
+    ubiUserPasswordEncryption  OBJECT-TYPE
+       SYNTAX		INTEGER {  
+       		none(0),
+    		passwd_cleartext(1),       	-- passwd
+       		secret_cleartext(2),       	-- secret	    
+       		des(3),                    	-- passwd
+       		md5(4) 	       				-- secret
+       	}            
+       MAX-ACCESS  	read-create
+       STATUS      	current
+       DESCRIPTION
+           ""
+       ::= { ubiUserEntry 2 }      
+
+    ubiUserPassword  OBJECT-TYPE
+       SYNTAX	   DisplayString
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           ""
+       ::= { ubiUserEntry 3 }     
+
+    ubiUserPrivilegedLevel  OBJECT-TYPE
+       SYNTAX		Integer32 (0..15)
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           ""
+       ::= { ubiUserEntry 4 } 
+
+    ubiUserAclName  OBJECT-TYPE
+       SYNTAX		DisplayString
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           ""
+       ::= { ubiUserEntry 5 } 
+            
+--reserved 6,7 
+
+	ubiUserRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            ""
+        ::= { ubiUserEntry 8 }
+                      		                      
+                      
+                      
+-- ***********************************************************
+-- ubiAAAServer
+-- ***********************************************************
+
+    ubiAAAServerTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiAAAServerEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "This table contains objects which provide
+          the information about the AAA server."
+		::= { ubiAAAServer 1 }
+
+    ubiAAAServerEntry  OBJECT-TYPE
+       SYNTAX      UbiAAAServerEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "An entry containing information about a AAA server."
+       INDEX       { ubiAAAServerProtocol, ubiAAAServerAddress }
+       ::= { ubiAAAServerTable 1 }
+
+    UbiAAAServerEntry ::= SEQUENCE {
+       ubiAAAServerProtocol				INTEGER,  
+       ubiAAAServerAddress				IpAddress,   
+       ubiAAAServerPort					Integer32,   
+       ubiAAAServerKeyEncrType			INTEGER,
+       ubiAAAServerKey					DisplayString,
+       ubiAAAServerTimeOut              Integer32,
+       ubiAAAServerRowStatus			RowStatus 
+    }
+
+    ubiAAAServerProtocol  OBJECT-TYPE
+       SYNTAX		INTEGER {  
+       		other(0), 					-- Other protocols
+			tacacsplus(1), 				-- TACACS+
+			radius(2)  					-- RADIUS
+       	}            
+       MAX-ACCESS  	read-only
+       STATUS      	current
+       DESCRIPTION
+           "Protocol used with this server."
+       ::= { ubiAAAServerEntry 1 }  
+       
+       
+     ubiAAAServerAddress  OBJECT-TYPE
+       SYNTAX		IpAddress
+       MAX-ACCESS  	read-only
+       STATUS      	current
+       DESCRIPTION
+           "The IP address of the server."
+       ::= { ubiAAAServerEntry 2 } 
+       
+     ubiAAAServerPort  OBJECT-TYPE
+	   SYNTAX		Integer32 (0..65535)
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           "The port number of authentication server."   
+       DEFVAL	   { 1812 }
+       ::= { ubiAAAServerEntry 3 }
+       
+     ubiAAAServerKeyEncrType  OBJECT-TYPE
+	   SYNTAX		INTEGER {  
+			plain(1), 				    -- Plain Text
+			encrypted(2)  				-- Encrypted
+       	}            
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           "Encryption type used for the AAA Server key."
+       ::= { ubiAAAServerEntry 4 } 
+  
+     ubiAAAServerKey  OBJECT-TYPE
+	   SYNTAX		DisplayString
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           "The server key  to be used with this server."
+       ::= { ubiAAAServerEntry 5 }
+       
+     ubiAAAServerTimeOut  OBJECT-TYPE
+	   SYNTAX		Integer32 (0..1000)
+	   UNITS		"seconds"
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           "The time in seconds between retransmissions to the AAA server."
+       DEFVAL	   { 5 }
+       ::= { ubiAAAServerEntry 6 }    
+       
+	 ubiAAAServerRowStatus  OBJECT-TYPE
+	   SYNTAX		RowStatus
+       MAX-ACCESS  	read-create
+       STATUS      	current
+       DESCRIPTION
+           "This object is used to create a new row or 
+           modify or delete an existing row in this table."
+       ::= { ubiAAAServerEntry 7 }
+   
+   
+   
+-- ***********************************************************
+-- ubiAAAConfig
+-- ***********************************************************
+ 
+    ubiAAAConfigTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiAAAConfigEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          ""
+		::= { ubiAAAConfig 1 }
+
+    ubiAAAConfigEntry  OBJECT-TYPE
+       SYNTAX      UbiAAAConfigEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          ""
+       INDEX       { ubiAAAConfigType, ubiAAAConfigAction, ubiAAAConfigMethodPriority }
+       ::= { ubiAAAConfigTable 1 }
+
+    UbiAAAConfigEntry ::= SEQUENCE {
+       ubiAAAConfigType					INTEGER,  
+       ubiAAAConfigAction				INTEGER,   
+       ubiAAAConfigMethodPriority		Integer32,   
+       ubiAAAConfigMethod				INTEGER,
+       ubiAAAConfigCommandLevel			Integer32,
+       ubiAAAConfigRecordType           INTEGER,
+       ubiAAAConfigRowStatus			RowStatus 
+    }
+
+    ubiAAAConfigType  OBJECT-TYPE
+       SYNTAX		INTEGER {  
+       		authentication(1), 			-- Authentication
+			authorization(2), 			-- Authorzation
+			accounting(3) 				-- Accounting
+       	}            
+       MAX-ACCESS  	read-only
+       STATUS      	current
+       DESCRIPTION
+           "The Type of AAA."
+       ::= { ubiAAAConfigEntry 1 }  
+       
+       
+     ubiAAAConfigAction  OBJECT-TYPE
+       SYNTAX		INTEGER {  
+       		login(1), 					-- Login
+			enable(2),					-- Enable
+			exec(3), 					-- Exec
+			command(4) 					-- Commands     
+		}            
+       MAX-ACCESS  	read-only
+       STATUS      	current
+       DESCRIPTION
+           "Represents AAA Action."
+       ::= { ubiAAAConfigEntry 2 } 
+       
+     ubiAAAConfigMethodPriority  OBJECT-TYPE
+	   SYNTAX		Integer32
+       MAX-ACCESS  	not-accessible
+       STATUS      	current
+       DESCRIPTION
+           "The Priority number of AAA Method."   
+       ::= { ubiAAAConfigEntry 3 }
+       
+     ubiAAAConfigMethod  OBJECT-TYPE
+	   SYNTAX		INTEGER {   
+	   		other(0), 					-- Other Method
+			local(1), 					-- Local
+			radius(2),					-- RADIUS
+			tacacsplus(3) 				-- TACACS+
+       	}            
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           "AAA Method List."
+       ::= { ubiAAAConfigEntry 4 } 
+  
+     ubiAAAConfigCommandLevel  OBJECT-TYPE
+	   SYNTAX		Integer32 (0..15)
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           "Privilege Level."
+       ::= { ubiAAAConfigEntry 5 }
+       
+     ubiAAAConfigRecordType  OBJECT-TYPE
+	   SYNTAX		INTEGER { 
+	   		start_stop(1), 				-- Start or Stop
+			stop_only(2) 				-- Stop Only  
+       	}            
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           "Record type."
+       DEFVAL	   { 5 }
+       ::= { ubiAAAConfigEntry 6 }    
+       
+	 ubiAAAConfigRowStatus  OBJECT-TYPE
+	   SYNTAX		RowStatus
+       MAX-ACCESS  	read-create
+       STATUS      	current
+       DESCRIPTION
+           "This object is used to create a new row or 
+           modify or delete an existing row in this table."
+       ::= { ubiAAAConfigEntry 7 }
+  
+
+-- ***********************************************************
+-- ubiCommandPrivilege
+-- ***********************************************************
+
+    ubiCommandPrivilegeTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiCommandPrivilegeEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          ""
+		::= { ubiCommandPrivilege 1 }
+
+    ubiCommandPrivilegeEntry  OBJECT-TYPE
+       SYNTAX      UbiCommandPrivilegeEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          ""
+       INDEX       { ubiCommandPrivilegeMode, ubiCommandPrivilegeLevel, ubiCommandPrivilegeString }
+       ::= { ubiCommandPrivilegeTable 1 }
+
+    UbiCommandPrivilegeEntry ::= SEQUENCE {
+       ubiCommandPrivilegeMode				DisplayString,  
+       ubiCommandPrivilegeLevel				Integer32,   
+       ubiCommandPrivilegeString			DisplayString,   
+       ubiCommandPrivilegeRowStatus			RowStatus 
+    }
+
+    ubiCommandPrivilegeMode  OBJECT-TYPE
+       SYNTAX		DisplayString 
+       MAX-ACCESS  	read-only
+       STATUS      	current
+       DESCRIPTION
+           "The Command Mode of Privilege."
+       ::= { ubiCommandPrivilegeEntry 1 }  
+       
+       
+     ubiCommandPrivilegeLevel  OBJECT-TYPE
+       SYNTAX		Integer32 (0..15)
+       MAX-ACCESS  	read-only
+       STATUS      	current
+       DESCRIPTION
+           "Privilege Level."
+       ::= { ubiCommandPrivilegeEntry 2 } 
+       
+     ubiCommandPrivilegeString  OBJECT-TYPE
+	   SYNTAX		DisplayString
+       MAX-ACCESS  	not-accessible
+       STATUS      	current
+       DESCRIPTION
+           "Mode Command."   
+       ::= { ubiCommandPrivilegeEntry 3 } 
+       
+	 ubiCommandPrivilegeRowStatus  OBJECT-TYPE
+	   SYNTAX		RowStatus
+       MAX-ACCESS  	read-create
+       STATUS      	current
+       DESCRIPTION
+           "This object is used to create a new row or 
+           modify or delete an existing row in this table."
+       ::= { ubiCommandPrivilegeEntry 4 }
+  
+
+-- ***********************************************************
+-- ubiEnableAuthenPasswd
+-- ***********************************************************  
+
+	ubiEnablePasswordEncrType OBJECT-TYPE
+		SYNTAX		INTEGER { 
+       		none(0),
+    		passwd_cleartext(1),       	-- passwd
+       		secret_cleartext(2),       	-- secret	    
+       		des(3),                    	-- passwd
+       		md5(4) 	       				-- secret  
+       	}         
+       	MAX-ACCESS    read-write
+		STATUS        current
+		DESCRIPTION   "Encryption type."
+		::= { ubiEnableAuthenPasswd 1 }  
+		
+	ubiEnablePassword OBJECT-TYPE
+		SYNTAX        DisplayString
+		MAX-ACCESS    read-write
+		STATUS        current
+		DESCRIPTION   "The Password of Encryption type."
+		::= { ubiEnableAuthenPasswd 2 }   
+		
+
+-- ***********************************************************
+-- ubiSystemRemoteConnect
+-- ***********************************************************
+	
+	ubiSystemRemoteConnectUserName	OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION 
+        	""   
+        ::= { ubiSystemRemoteConnect 1 }
+     
+    ubiSystemRemoteConnectAddress	OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION 
+        	""   
+        ::= { ubiSystemRemoteConnect 2 } 
+                                 
+    ubiSystemRemoteConnectCompleted  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION 
+        	""   
+        ::= { ubiSystemRemoteConnect 3 } 
+                           		
+-- ***********************************************************
+-- ubiSystemAccessMIBConformance
+-- ***********************************************************
+ubiSystemAccessMIBCompliances OBJECT IDENTIFIER ::= { ubiSystemAccessMIBConformance 1 }
+ubiSystemAccessMIBGroups      OBJECT IDENTIFIER ::= { ubiSystemAccessMIBConformance 2 }
+
+
+-- compliance statements
+ubiSystemAccessMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss system access management MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { 
+                	ubiUserManagementGroup 
+                }
+
+        GROUP   ubiUserManagementGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for system access."
+                        
+        ::= { ubiSystemAccessMIBCompliances 1 }
+                          
+                          
+                          
+-- units of conformance
+ubiUserManagementGroup OBJECT-GROUP
+        OBJECTS {       
+    	}
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects containing
+        		 information about user."
+        ::= { ubiSystemAccessMIBGroups 1 }
+          
+ END
+ 

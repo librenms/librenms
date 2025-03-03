@@ -1,0 +1,1711 @@
+-- ==================================================================
+-- Copyright (C) 2005 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:  HGMP Information MIB for LAN Switch
+-- Reference:
+-- Version: V1.8
+-- History:
+--   V1.0 2001.5.15 Created Ye dalu
+--   V1.1 2004/7/20 Modify Object Name from Hh3cNDPNbEntry
+--        to Hh3cNDPPortNbEntry
+--   V1.2 2004/8/09 add notification hh3chgmpNetTopChange
+--   V1.3 2004-09-24 modify value of STATUS clause from 'mandatory' to 'current' by gaolong
+--   V1.4 2004-10-12 updated by gaolong
+--        Import NOTIFICATION-TYPE.
+--   V1.5 2004-11-02 updated by gaolong
+--        Import Counter32.
+--   V1.6 2005-12-9  added by zhanglin KF0176
+--        add hh3chgmpClusterProtocolMac
+--        add hh3chgmpWhitelistNbTable
+--        add hh3chgmpWhitelistTable
+--        add hh3chgmpBlacklistTable
+--        2005-12-20 added by zushuzhi 03030
+--        add hh3chgmpMemberPriPortTable
+--        add hh3chgmpNTDPTopLinkStatus
+--   V1.7 2006-04-30 modified by gaolong
+--        relocate hh3chgmpProtocolMac, hh3chgmpTopologyManagement, hh3chgmpMemberPriPortTable
+--        and the objects below them.
+--        relocate hh3chgmpNTDPTopLinkStatus in hh3chgmpNTDPTopLinkStatus.
+--   V1.8 2006-05-08 modify the description of hh3chgmpNTDPCollectTopTime by shanfeng
+-- ==================================================================
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+HH3C-HGMP-MIB  DEFINITIONS ::= BEGIN
+    IMPORTS
+        hh3cRhw
+            FROM HH3C-OID-MIB
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY,
+        NOTIFICATION-TYPE, Counter32, Unsigned32
+            FROM SNMPv2-SMI
+        RowStatus, MacAddress, TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC;
+
+    hh3cHgmp MODULE-IDENTITY
+        LAST-UPDATED "200512061452Z"
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "This MIB contains objects to manage the hh3chgmp operations,
+            which are used on lanswitch products."
+        ::= { hh3cRhw 7 }
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+--
+-- cluster definitions
+--
+
+    hh3cClusterObject OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This MIB contains objects to manage the cluster operations, which
+            are used on lanswitch products."
+        ::= { hh3cHgmp 1 }
+
+    hh3chgmpSetVLANSecurity OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                noSecurity(0),
+                security(1)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Configure whether to perform the VLAN check inside the cluster."
+        DEFVAL { security }
+        ::= { hh3cClusterObject 1 }
+
+    hh3chgmpHandShakeInterval OBJECT-TYPE
+        SYNTAX      Integer32(1..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Handshaking interval of the cluster member switches."
+        DEFVAL { 10 }
+        ::= { hh3cClusterObject 2 }
+
+    hh3chgmpHandShakeHoldtime OBJECT-TYPE
+        SYNTAX      Integer32(1..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Holdtime of administrator switch and member switch in the cluster."
+        DEFVAL { 60 }
+        ::= { hh3cClusterObject 3 }
+
+    hh3chgmpGrpMemberTableChange OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Add 1 to the member list after it changes. The administrator checks if
+            the value has changed. If not, he will not read the list once more."
+        DEFVAL { 0 }
+        ::= { hh3cClusterObject 4 }
+
+    hh3chgmpMemberDisconRate OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Disconnection times of the member and administrator switches divided by
+            member number times 1000."
+        DEFVAL { 0 }
+        ::= { hh3cClusterObject 5 }
+
+    hh3chgmpCmdLanswitchFlag OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                false(0),
+                true(1)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Administrator switch flag"
+        DEFVAL { false }
+        ::= { hh3cClusterObject 6 }
+
+    hh3chgmpCmdClusterName OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE (0..8))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cluster name of the administrator switch"
+        ::= { hh3cClusterObject 7 }
+
+    hh3chgmpMngPriIpSegCMIP OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The private management IP address of the administrator switch,
+            which can not be modified after the cluster has been created."
+        ::= { hh3cClusterObject 8 }
+
+    hh3chgmpMngPriIpMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The private management IP address mask assigned by the administrator
+            switch, which cannot be modified after the cluster has been created."
+        ::= { hh3cClusterObject 9 }
+
+    hh3chgmpFtpServer OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The cluster members can access the Ftp Server through the administrator
+            switch, which can only be configured and accessed on the administrator
+            switch."
+        ::= { hh3cClusterObject 10 }
+
+    hh3chgmpTftpServer OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The cluster members can access the Tftp Server through the administrator
+             switch, which can only be configured and accessed on the administrator
+             switch."
+        ::= { hh3cClusterObject 11 }
+
+    hh3chgmpSnmpHost OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The Snmp Host to send the cluster trap packets, which can only be
+            configured and accessed on the administrator switch."
+        ::= { hh3cClusterObject 12 }
+
+    hh3chgmpLogHost OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Log host of the cluster, which can only be configured and accessed on
+            the administrator switch."
+        ::= { hh3cClusterObject 13 }
+
+--
+-- TABLE: Group member table
+--
+
+    hh3chgmpGrpMemberTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cHgmpGrpMemberEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table of cluster member switches"
+        ::= { hh3cClusterObject 14 }
+
+    hh3chgmpGrpMemberEntry OBJECT-TYPE
+        SYNTAX      Hh3cHgmpGrpMemberEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX
+            {
+                hh3chgmpGrpMemberDeviceId
+            }
+        ::= { hh3chgmpGrpMemberTable 1 }
+
+    Hh3cHgmpGrpMemberEntry ::=
+        SEQUENCE
+            {
+                hh3chgmpGrpMemberDeviceId       OCTET STRING,
+                hh3chgmpGrpMemberSerial         Integer32,
+                hh3chgmpGrpMemberIpAddr         IpAddress,
+                hh3chgmpGrpMemberName           OCTET STRING,
+                hh3chgmpGrpMemberPassword       OCTET STRING,
+                hh3chgmpGrpMemberPlatform       OCTET STRING,
+                hh3chgmpGrpMemberStatus         INTEGER,
+                hh3chgmpGrpMemberDisconCount    Integer32,
+                hh3chgmpGrpMemberEnrollTime     Integer32,
+                hh3chgmpGrpMemberOperate        RowStatus
+            }
+
+    hh3chgmpGrpMemberDeviceId OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "4 bytes reserved as 0x0 + 6 bytes of MAC address, expressed as 
+            a character string of the hexadecimal number."
+        ::= { hh3chgmpGrpMemberEntry 1 }
+
+    hh3chgmpGrpMemberSerial OBJECT-TYPE
+        SYNTAX      Integer32(0..2047)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "When adding member switch to the cluster, the administrator switch
+            will assign an unique integer to identify it."
+        ::= { hh3chgmpGrpMemberEntry 2 }
+
+    hh3chgmpGrpMemberIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The private IP addresses of the member switches for the communication
+            inside the cluster."
+        ::= { hh3chgmpGrpMemberEntry 3 }
+
+    hh3chgmpGrpMemberName OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Hostname of the member switch"
+        ::= { hh3chgmpGrpMemberEntry 4 }
+
+    hh3chgmpGrpMemberPassword OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Member password for joining a cluster"
+        ::= { hh3chgmpGrpMemberEntry 5 }
+
+    hh3chgmpGrpMemberPlatform OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Set the hardware platform. A null string indicates the information
+            does not exist in the device adjacency table."
+        ::= { hh3chgmpGrpMemberEntry 6 }
+
+    hh3chgmpGrpMemberStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                normal(0),
+                fault(1)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Member status on the administrator switch, use for displaying the
+            network management status."
+        DEFVAL { fault }
+        ::= { hh3chgmpGrpMemberEntry 7 }
+
+    hh3chgmpGrpMemberDisconCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Count of inside communication disconnection between the member switch
+            and the administrator switch."
+        ::= { hh3chgmpGrpMemberEntry 8 }
+
+    hh3chgmpGrpMemberEnrollTime OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Enrollment time of the member, measured in seconds."
+        ::= { hh3chgmpGrpMemberEntry 9 }
+
+    hh3chgmpGrpMemberOperate OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Operation indication field, indicates the operation of adding/removing
+            a member by the network management agent."
+        ::= { hh3chgmpGrpMemberEntry 10 }
+
+--
+-- TABLE: Member reset table
+--
+
+    hh3chgmpMemberResetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cHgmpMemberResetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Reset a member switch in the cluster."
+        ::= { hh3cClusterObject 15 }
+
+    hh3chgmpMemberResetEntry OBJECT-TYPE
+        SYNTAX      Hh3cHgmpMemberResetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX
+            {
+                hh3chgmpMemberResetMAC
+            }
+        ::= { hh3chgmpMemberResetTable 1 }
+
+    Hh3cHgmpMemberResetEntry ::=
+        SEQUENCE
+            {
+                hh3chgmpMemberResetMAC      OCTET STRING,
+                hh3chgmpMemberEraseflash    INTEGER
+            }
+
+    hh3chgmpMemberResetMAC OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The management MAC address of the switch to be reset, which is the
+            unique identifier of the switch."
+        ::= { hh3chgmpMemberResetEntry  1 }
+
+    hh3chgmpMemberEraseflash OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                noErase(0),
+                erase(1),
+                cannotget(65535)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Whether to erase the configuration file from the flash after
+            resetting the switch. Read this node, cannotget(65535) will be
+            returned."
+        ::= { hh3chgmpMemberResetEntry  2 }
+
+    hh3chgmpEventsV2 OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "Definition point for cluster notifications."
+        ::= { hh3cClusterObject 0 }
+
+    hh3chgmpMemberfailure NOTIFICATION-TYPE
+        OBJECTS
+            {
+                hh3chgmpGrpMemberDeviceId
+            }
+        STATUS      current
+        DESCRIPTION
+            "When a cluster member failure, send a snmp trap to the network
+            management."
+        ::= { hh3chgmpEventsV2 1 }
+
+    hh3chgmpMemberRecover NOTIFICATION-TYPE
+        OBJECTS
+            {
+                hh3chgmpGrpMemberDeviceId
+            }
+        STATUS      current
+        DESCRIPTION
+            "When a cluster member recover, send a snmp trap to the network
+            management."
+        ::= { hh3chgmpEventsV2 2 }
+
+    hh3chgmpMemberStatusChange NOTIFICATION-TYPE
+        OBJECTS
+            {
+                hh3chgmpGrpMemberDeviceId,
+                hh3chgmpNTDPCacheClusterRole
+            }
+        STATUS      current
+        DESCRIPTION
+            "When a cluster member status change, send a snmp trap to the
+            network management."
+        ::= { hh3chgmpEventsV2 3 }
+
+    hh3chgmpNetTopChange NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION
+            "When net topology of this cluster change, send a snmp trap
+            to the network management."
+        ::= { hh3chgmpEventsV2 4 }
+
+    hh3chgmpClusterRole OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                roleCMDSW(1),
+                roleMEMBERSW(2),
+                roleBAKSW(3),
+                roleCASW(16),
+                roleUNISW(17)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This switch's role in cluster."
+        DEFVAL { roleUNISW }
+        ::= { hh3cClusterObject 16 }
+
+    hh3chgmpClusterMaxPoolNum OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Max switch members that the cluster can support(include
+            administrator switch)."
+        ::= { hh3cClusterObject 17 }
+
+    hh3chgmpClusterCmdSwMac OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The MAC address of administrator switch. It will be filled with
+            zero when not be a member of cluster."
+        ::= { hh3cClusterObject 18 }
+
+    hh3chgmpRun OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                false(0),
+                true(1)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable cluster on this switch."
+        DEFVAL { true }
+        ::= { hh3cClusterObject 19 }
+
+--
+-- cluster protocol MAC
+--
+
+    hh3chgmpProtocolMac OBJECT IDENTIFIER ::= { hh3cClusterObject 22 }
+
+    hh3chgmpClusterProtocolMac OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Protocol MAC of HGMP protocol family. All multicast packets of this
+            protocol family use this MAC as destination MAC."
+        DEFVAL { '0180C200000A'H }
+        ::= { hh3chgmpProtocolMac 1 }
+
+--
+-- hh3chgmp topology management
+--
+
+    hh3chgmpTopologyManagement OBJECT IDENTIFIER ::= { hh3cClusterObject 23 }
+
+--
+-- TABLE: Whitelist Table
+--
+
+    hh3chgmpWhitelistTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cHgmpWhitelistEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Cluster switches white list table. White list topology is the
+            topology which has been affirmed by network administrator in a
+            cluster, and all devices in white list topology are recorded in this
+            table. Against to white list table, black list table records the
+            devices which are denied to join in cluster. Adding a black list
+            device to white list table will cause a failure."
+        ::= { hh3chgmpTopologyManagement 1 }
+
+    hh3chgmpWhitelistEntry OBJECT-TYPE
+        SYNTAX      Hh3cHgmpWhitelistEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry items"
+        INDEX
+            {
+                hh3chgmpWhitelistDeviceId
+            }
+        ::= { hh3chgmpWhitelistTable 1 }
+
+    Hh3cHgmpWhitelistEntry ::=
+        SEQUENCE
+            {
+                hh3chgmpWhitelistDeviceId     OCTET STRING,
+                hh3chgmpWhitelistSerial       Integer32,
+                hh3chgmpWhitelistRowStatus    RowStatus
+            }
+
+    hh3chgmpWhitelistDeviceId OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(10))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Unique identifier indicating a white list switch. Value format of the
+            this object is 'XXXXYYYYYY', in which 'XXXX' is reserved as 4 bytes of
+            0x0, 'YYYYYY' is a MAC address.
+            For example, if the MAC is 000f-e459-000a, the value of this object is
+            an octet string: '00' '00' '00' '00' '00' '0f' 'e4' '59' '00' '0a'."
+        ::= { hh3chgmpWhitelistEntry  1 }
+
+    hh3chgmpWhitelistSerial OBJECT-TYPE
+        SYNTAX      Integer32(0..2047 | 65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "When adding member switch to the cluster, the administrator switch
+            will assign an unique integer to identify it. 0xffff means invalid
+            value for this object."
+        ::= { hh3chgmpWhitelistEntry  2 }
+
+    hh3chgmpWhitelistRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The row status of this table."
+        ::= { hh3chgmpWhitelistEntry 3 }
+
+--
+-- TABLE: Whitelist neighbor table
+--
+
+    hh3chgmpWhitelistNbTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cHgmpWhitelistNbEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Cluster switches white list neighboring information table. White
+            list neighbor table records all neighbor devices for every white
+            list device. In fact, white list neighbor table displays the whole
+            white list topology."
+        ::= { hh3chgmpTopologyManagement 2 }
+
+    hh3chgmpWhitelistNbEntry OBJECT-TYPE
+        SYNTAX      Hh3cHgmpWhitelistNbEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry items"
+        INDEX
+            {
+                hh3chgmpWhitelistDeviceId,
+                hh3chgmpWhitelistNbIndex
+            }
+        ::= { hh3chgmpWhitelistNbTable 1 }
+
+    Hh3cHgmpWhitelistNbEntry ::=
+        SEQUENCE
+            {
+                hh3chgmpWhitelistNbIndex       Integer32,
+                hh3chgmpWhitelistNbDeviceId    OCTET STRING,
+                hh3chgmpWhitelistPortName      OCTET STRING,
+                hh3chgmpWhitelistNbPortName    OCTET STRING
+            }
+
+    hh3chgmpWhitelistNbIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index of a switch which is the neighbor of a white list switch
+            identified by 'hgmpWhitelistDeviceId'."
+        ::= { hh3chgmpWhitelistNbEntry  1 }
+
+    hh3chgmpWhitelistNbDeviceId OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unique identifier indicating a neighbor switch of a white list
+            switch. Value format of the this object is 'XXXXYYYYYY', in which
+            'XXXX' is reserved as 4 bytes of 0x0, 'YYYYYY' is a MAC address.
+            For example, if the MAC is 000f-e459-000a, the value of this object
+            is an octet string: '00' '00' '00' '00' '00' '0f' 'e4' '59' '00' '0a'."
+        ::= { hh3chgmpWhitelistNbEntry  2 }
+
+    hh3chgmpWhitelistPortName OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..47))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the port which a white list switch connects to the
+            neighbor specified by 'hgmpWhitelistNbIndex'."
+        ::= { hh3chgmpWhitelistNbEntry  3 }
+
+    hh3chgmpWhitelistNbPortName OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..47))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the port which a neighbor device connects to the white
+            list switch specified by 'hgmpWhitelistDeviceId'."
+        ::= { hh3chgmpWhitelistNbEntry  4 }
+
+--
+-- TABLE: Blacklist table
+--
+
+    hh3chgmpBlacklistTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cHgmpBlacklistEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Cluster switches black list table. The black list table records all
+            black list devices, and a device in black list is not permitted to
+            join in any cluster."
+        ::= { hh3chgmpTopologyManagement 3 }
+
+    hh3chgmpBlacklistEntry OBJECT-TYPE
+        SYNTAX      Hh3cHgmpBlacklistEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry items"
+        INDEX
+            {
+                hh3chgmpBlacklistDeviceId
+            }
+        ::= { hh3chgmpBlacklistTable 1 }
+
+    Hh3cHgmpBlacklistEntry ::=
+        SEQUENCE
+            {
+                hh3chgmpBlacklistDeviceId         OCTET STRING,
+                hh3chgmpBlacklistAccessDeviceId   OCTET STRING,
+                hh3chgmpBlacklistAccessPortName   OCTET STRING,
+                hh3chgmpBlacklistRowStatus        RowStatus
+            }
+
+    hh3chgmpBlacklistDeviceId OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(10))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Unique identifier indicating a black list switch. Value format of the
+            this object is 'XXXXYYYYYY', in which 'XXXX' is reserved as 4 bytes
+            of 0x0, 'YYYYYY' is a MAC address.
+            For example, if the MAC is 000f-e459-000a, the value of this object is
+            an octet string: '00' '00' '00' '00' '00' '0f' 'e4' '59' '00' '0a'."
+        ::= { hh3chgmpBlacklistEntry  1 }
+
+    hh3chgmpBlacklistAccessDeviceId OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unique identifier indicating the access device of a black list switch.
+            Tracing from a black list device to the cluster commander switch, the
+            device which the black list switch directly connects to is the access
+            device.
+            Value format of the this object is 'XXXXYYYYYY', in which 'XXXX' is
+            reserved as 4 bytes of 0x0, 'YYYYYY' is a MAC address. 10 bytes of 0xff
+            means invalid value for this object.
+            For example, if the MAC is 000f-e459-000a, the value of this object is
+            an octet string: '00' '00' '00' '00' '00' '0f' 'e4' '59' '00' '0a'."
+        ::= { hh3chgmpBlacklistEntry  2 }
+
+    hh3chgmpBlacklistAccessPortName OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..47))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The port which the access device connecting to the black list switch
+            is named access port, the object returns the access port name.
+            An empty string means invalid value for this object."
+        ::= { hh3chgmpBlacklistEntry  3 }
+
+    hh3chgmpBlacklistRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The row status of this table."
+        ::= { hh3chgmpBlacklistEntry 4 }
+
+--
+-- TABLE: Member private port number table
+--
+
+    hh3chgmpMemberPriPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cHgmpMemberPriPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains port number for different network protocols
+            on each member switch. The port number can be used to access
+            a specified member switch with specified protocol and private
+            IP address."
+        ::= { hh3cClusterObject 24 }
+
+    hh3chgmpMemberPriPortEntry OBJECT-TYPE
+        SYNTAX      Hh3cHgmpMemberPriPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Information about a specified member private port entry. The
+            indexes of the entry are hh3chgmpGrpMemberDevId and
+            hh3chgmpMemberPriPortProto, which indicate entries in the table."
+        INDEX
+            {
+                hh3chgmpMemberDevId,
+                hh3chgmpMemberPriPortProto
+            }
+        ::= { hh3chgmpMemberPriPortTable 1 }
+
+    Hh3cHgmpMemberPriPortEntry ::=
+        SEQUENCE
+            {
+                hh3chgmpMemberDevId                OCTET STRING,
+                hh3chgmpMemberPriPortProto         Unsigned32,
+                hh3chgmpMemberPriPortProtoDescr    DisplayString,
+                hh3chgmpMemberPriPortNum           Unsigned32
+            }
+
+    hh3chgmpMemberDevId OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unique identifier indicating the switch in cluster.
+            Value format of the this object is 'XXXXYYYYYY', in which 'XXXX' is 
+            is reserved as 4 bytes of 0x0, 'YYYYYY' is a MAC address."
+        ::= { hh3chgmpMemberPriPortEntry 1 }
+
+    hh3chgmpMemberPriPortProto OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index of this table. Each instance value of this object
+            corresponds to a different protocol."
+        ::= { hh3chgmpMemberPriPortEntry 2 }
+
+    hh3chgmpMemberPriPortProtoDescr OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It describes the hh3chgmpMemberPriPortProtocol object value.
+            For example, it is 'SNMP' when hh3chgmpMemberPriPortProtocol value
+            is 1."
+        ::= { hh3chgmpMemberPriPortEntry 3 }
+
+    hh3chgmpMemberPriPortNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The private port number of member switch, used by specified
+            hh3chgmpMemberPriPortProto. By using the private IP address,
+            specified protocol and port number, other devices outside
+            cluster can access member switch. The private IP address
+            can be acquired by reading hh3chgmpGrpMemberIpAddr."
+        ::= { hh3chgmpMemberPriPortEntry 4 }
+
+--
+-- stack definitions
+--
+
+    hh3cStackObject OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This MIB contains objects to manage the stack operations, which is
+            used on lanswitch products."
+        ::= { hh3cHgmp 2 }
+
+    hh3chgmpStackMemberTableChange OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Change identifier of the stack member table."
+        DEFVAL { 0 }
+        ::= { hh3cStackObject 1 }
+
+    hh3chgmpStackMemberDisconRate OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Disconnection rate of the stack member switches."
+        DEFVAL { 0 }
+        ::= { hh3cStackObject 2 }
+
+    hh3chgmpMainLanswitchFlag OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                false(0),
+                true(1)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The status of the local switch in the stack."
+        DEFVAL { false }
+        ::= { hh3cStackObject 3 }
+
+    hh3chgmpStackIpPoolStartIP OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The first address of the management IP network segment assigned by
+            the master switch, which cannot be modified in the case that there
+            is IP address assignment."
+        ::= { hh3cStackObject 4 }
+
+    hh3chgmpStackIpPoolLength OBJECT-TYPE
+        SYNTAX      INTEGER(1..200)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The length of the management IP segment assigned by the master
+            switch, which cannot be modified in the case that there is IP
+            address assignment."
+        ::= { hh3cStackObject 5 }
+
+    hh3chgmpStackIpPoolMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The mask of the management IP segment assigned by the master switch,
+            which cannot be modified in the case that there is IP address assignment."
+        DEFVAL { 'FFFF0000'H }
+        ::= { hh3cStackObject 10 }
+
+--
+-- TABLE: Stack member table
+--
+
+    hh3chgmpStackMemberTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cHgmpStackMemberEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Stack member table."
+        ::= { hh3cStackObject 6 }
+
+    hh3chgmpStackMemberEntry OBJECT-TYPE
+        SYNTAX      Hh3cHgmpStackMemberEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX
+            {
+                hh3chgmpStackMemberDeviceId
+            }
+        ::= { hh3chgmpStackMemberTable 1 }
+
+    Hh3cHgmpStackMemberEntry ::=
+        SEQUENCE
+        {
+            hh3chgmpStackMemberDeviceId       OCTET STRING,
+            hh3chgmpStackMemberSerial         Integer32,
+            hh3chgmpStackMemberIpAddr         IpAddress,
+            hh3chgmpStackMemberName           OCTET STRING,
+            hh3chgmpStackMemberPassword       OCTET STRING,
+            hh3chgmpStackMemberPlatform       OCTET STRING,
+            hh3chgmpStackMemberStatus         INTEGER,
+            hh3chgmpStackMemberDisconCount    Integer32,
+            hh3chgmpStackMemberEnrollTime     Integer32
+        }
+
+    hh3chgmpStackMemberDeviceId OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "2 bytes address type of the switch + 2 bytes zero + MAC address,
+            expressed as a hexadecimal number string."
+        ::= { hh3chgmpStackMemberEntry 1 }
+
+    hh3chgmpStackMemberSerial OBJECT-TYPE
+        SYNTAX      Integer32(0..2047)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "When adding a member switch to the stack, the master switch will
+            assign an unique integer to identify it."
+        ::= { hh3chgmpStackMemberEntry 2 }
+
+    hh3chgmpStackMemberIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The private member IP address for the communication inside the stack."
+        ::= { hh3chgmpStackMemberEntry 3 }
+
+    hh3chgmpStackMemberName OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Hostname of the member switch."
+        ::= { hh3chgmpStackMemberEntry 4 }
+
+    hh3chgmpStackMemberPassword OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Member password for joining a stack."
+        ::= { hh3chgmpStackMemberEntry 5 }
+
+    hh3chgmpStackMemberPlatform OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Set the hardware platform. A null string indicates the information
+            does not exist in the device adjacency table."
+        ::= { hh3chgmpStackMemberEntry 6 }
+
+    hh3chgmpStackMemberStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                normal(0),
+                fault(1)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Member status on the master switch, use for displaying the network
+            management status."
+        DEFVAL { fault }
+        ::= { hh3chgmpStackMemberEntry 7 }
+
+    hh3chgmpStackMemberDisconCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Count of inside communication disconnection between the member switch
+            and the master switch."
+        ::= { hh3chgmpStackMemberEntry 8 }
+
+    hh3chgmpStackMemberEnrollTime OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Enrollment time of the member, measured in seconds."
+        ::= { hh3chgmpStackMemberEntry 9 }
+
+    hh3chgmpStackRole OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                roleCMDSW(1),
+                roleMEMBERSW(2),
+                roleBAKSW(3),
+                roleCASW(16),
+                roleUNISW(17)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This switch's role status in stack."
+        DEFVAL { roleUNISW }
+        ::= { hh3cStackObject 7 }
+
+    hh3chgmpStackMaxPoolNum OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Max switch members in one stack that the switch support (include
+            main switch)."
+        ::= { hh3cStackObject 8 }
+
+    hh3chgmpStackMainSwMac OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The MAC address of main switch. It will be 00.00.00 when not be a
+            member of stack."
+        ::= { hh3cStackObject 9 }
+
+--
+-- Neighbor protocol objects
+--
+
+    hh3cNDPObject OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This MIB contains objects to manage the ndp operations, which are
+            used on lanswitch products."
+        ::= { hh3cHgmp 5 }
+
+    hh3cNDPStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                disable(0),
+                enable(1)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "NDP protocol module enable flag"
+        DEFVAL { enable }
+        ::= { hh3cNDPObject 1 }
+
+    hh3cNDPHelloTimer OBJECT-TYPE
+        SYNTAX      Integer32 (5..254)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "NDP packet transmission interval, measured in seconds."
+        DEFVAL { 60 }
+        ::= { hh3cNDPObject 2 }
+
+    hh3cNDPAgingTime OBJECT-TYPE
+        SYNTAX      Integer32(5..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "How long the NDP information of the local switch can be hold in
+            the adjacent switch, measured in seconds."
+        DEFVAL { 180 }
+        ::= { hh3cNDPObject 3 }
+
+    hh3cNDPChange OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Change identifier of the Neighbor table"
+        DEFVAL { 0 }
+        ::= { hh3cNDPObject 4 }
+
+    hh3cNDPPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cNDPPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configure to enable/disable the interface NDP of the switch."
+        ::= { hh3cNDPObject 5 }
+
+    hh3cNDPPortEntry OBJECT-TYPE
+        SYNTAX      Hh3cNDPPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX
+            {
+                hh3cNDPIfIndex
+            }
+        ::= { hh3cNDPPortTable 1 }
+
+    Hh3cNDPPortEntry ::=
+        SEQUENCE
+            {
+                hh3cNDPIfIndex       Integer32,
+                hh3cNDPPortStatus    INTEGER
+            }
+
+    hh3cNDPIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unique identifier of an interface of the device."
+        ::= { hh3cNDPPortEntry 1 }
+
+    hh3cNDPPortStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                disable(0),
+                enable(1)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "If it is enable, the device will send and receive the NDP
+            packets via the interface. To disable the NDP function on the
+            interface, set the entry as false."
+        DEFVAL { enable }
+        ::= { hh3cNDPPortEntry 2 }
+
+    hh3cNDPPortNbTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cNDPPortNbEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "NDP neighbor information on the switch."
+        ::= { hh3cNDPObject 6 }
+
+    hh3cNDPPortNbEntry OBJECT-TYPE
+        SYNTAX      Hh3cNDPPortNbEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX
+            {
+                hh3cNDPIfIndex,
+                hh3cNDPPortNbDeviceId,
+                hh3cNDPPortNbPortName
+            }
+        ::= { hh3cNDPPortNbTable 1 }
+
+    Hh3cNDPPortNbEntry ::=
+        SEQUENCE
+            {
+                hh3cNDPPortNbDeviceId      OCTET STRING,
+                hh3cNDPPortNbPortName      OCTET STRING,
+                hh3cNDPPortNbDeviceName    OCTET STRING,
+                hh3cNDPPortNbPortMode      INTEGER,
+                hh3cNDPPortNbProductVer    OCTET STRING,
+                hh3cNDPPortNbHardVer       OCTET STRING,
+                hh3cNDPPortNbBootromVer    OCTET STRING,
+                hh3cNDPPortNbSoftVer       OCTET STRING,
+                hh3cNDPPortNbAgingtime     Integer32
+            }
+
+    hh3cNDPPortNbDeviceId OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "2 bytes address type of the member switch + 2 bytes zero + MAC
+            address, expressed as a character string of the hexadecimal
+            number."
+        ::= { hh3cNDPPortNbEntry 1 }
+
+    hh3cNDPPortNbPortName OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..47))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unique identifier of a port. A null string indicates that the
+            field was not included in in the latest NDP packet. Interface
+            type + card number / slot number / sequence number."
+        ::= { hh3cNDPPortNbEntry 2 }
+
+    hh3cNDPPortNbDeviceName OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Device name. A null string indicates that the field was not
+            included in the latest NDP packet."
+        ::= { hh3cNDPPortNbEntry 3 }
+
+    hh3cNDPPortNbPortMode OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                full(1),
+                half(2),
+                auto(3)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The neighbor port duplex mode."
+        ::= { hh3cNDPPortNbEntry 4 }
+
+    hh3cNDPPortNbProductVer OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Product version. A null string indicates that the field was
+            not included in the latest NDP packet."
+        ::= { hh3cNDPPortNbEntry 5 }
+
+    hh3cNDPPortNbHardVer OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Hardware version. A null string indicates that the field was
+            not included in the latest NDP packet."
+        ::= { hh3cNDPPortNbEntry 6 }
+
+    hh3cNDPPortNbBootromVer OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Bootrom version. A null string indicates that the field was
+            not included in the latest NDP packet."
+        ::= { hh3cNDPPortNbEntry 7 }
+
+    hh3cNDPPortNbSoftVer OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Software version. A null string indicates that the field was
+            not included in the latest NDP packet."
+        ::= { hh3cNDPPortNbEntry 8 }
+
+    hh3cNDPPortNbAgingtime OBJECT-TYPE
+        SYNTAX      Integer32 (5..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "How long the NDP information of the local switch can be hold
+            in the adjacent switch, measured in seconds."
+        ::= { hh3cNDPPortNbEntry 9 }
+
+--
+-- NTDP management objects
+--
+
+    hh3cNTDPObject OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This MIB contains objects to manage the ntdp operations, which
+            are used on lanswitch products."
+        ::= { hh3cHgmp 4 }
+
+    hh3chgmpNTDPCollectTopTime OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Topology collection interval of the administrator switch of
+            the cluster, measured in minutes."
+        DEFVAL { 0 }
+        ::= { hh3cNTDPObject 1 }
+
+    hh3chgmpNTDPHopRange OBJECT-TYPE
+        SYNTAX      Integer32 (1..16)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Range of the topology collection of the administrator switch"
+        DEFVAL { 3 }
+        ::= { hh3cNTDPObject 2 }
+
+    hh3chgmpNTDPRun OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                false(0),
+                true(1)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/Disable the NTDP function on the switch."
+        DEFVAL { true }
+        ::= { hh3cNTDPObject 3 }
+
+    hh3chgmpNTDPPortDelay OBJECT-TYPE
+        SYNTAX      Integer32 (1..100)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Set the delay to forward the topology request via the ports,
+            measured in milliseconds."
+        DEFVAL { 20 }
+        ::= { hh3cNTDPObject 4 }
+
+    hh3chgmpNTDPHopDelay OBJECT-TYPE
+        SYNTAX      Integer32 (1..1000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Set the delay to forward the topology request from every hop,
+            measured in milliseconds."
+        DEFVAL { 200 }
+        ::= { hh3cNTDPObject 5 }
+
+    hh3chgmpNTDPLastTopCollectDuration OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Duration of the latest overall topology collection, a
+            performance count measured in seconds."
+        DEFVAL { 0 }
+        ::= { hh3cNTDPObject 6 }
+
+    hh3chgmpNTDPCacheChange OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Add 1 when the device table changes. The network administrator
+            will check if it has changed before accessing the table. If it
+            has not changed, he will not access again."
+        DEFVAL { 0 }
+        ::= { hh3cNTDPObject 7 }
+
+    hh3chgmpNTDPTOPTableChange OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Add 1 when the topology table changes. The network
+            administrator will check if it has changed before accessing
+            the table. If it has not changed, he will not access again."
+        DEFVAL { 0 }
+        ::= { hh3cNTDPObject 8 }
+
+    hh3chgmpNTDPInterfaceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cHgmpNTDPInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Enable/Disable the NTDP on the switch port."
+        ::= { hh3cNTDPObject 9 }
+
+    hh3chgmpNTDPInterfaceEntry OBJECT-TYPE
+        SYNTAX      Hh3cHgmpNTDPInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX
+            {
+                hh3chgmpNTDPInterfaceIfIndex
+            }
+        ::= { hh3chgmpNTDPInterfaceTable 1 }
+
+    Hh3cHgmpNTDPInterfaceEntry ::=
+        SEQUENCE
+            {
+                hh3chgmpNTDPInterfaceIfIndex    Integer32,
+                hh3chgmpNTDPInterfaceEnable     INTEGER
+            }
+
+    hh3chgmpNTDPInterfaceIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unique identifier an interface of the device."
+        ::= { hh3chgmpNTDPInterfaceEntry 1 }
+
+    hh3chgmpNTDPInterfaceEnable OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                false(0),
+                true(1)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "If it is true, the device will send and receive the NTDP
+            packets via the interface. To disable the NTDP function on the
+            interface, set the entry as false."
+        DEFVAL { true }
+        ::= { hh3chgmpNTDPInterfaceEntry 2 }
+
+    hh3chgmpNTDPCacheTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cHgmpNTDPCacheEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Access the information about the switch from the topology table."
+        ::= { hh3cNTDPObject 10 }
+
+    hh3chgmpNTDPCacheEntry OBJECT-TYPE
+        SYNTAX      Hh3cHgmpNTDPCacheEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX
+            {
+                hh3chgmpNTDPCacheHashIndex,
+                hh3chgmpNTDPCacheDeviceID
+            }
+        ::= { hh3chgmpNTDPCacheTable 1 }
+
+    Hh3cHgmpNTDPCacheEntry ::=
+        SEQUENCE
+            {
+                hh3chgmpNTDPCacheHashIndex       Integer32,
+                hh3chgmpNTDPCacheDeviceID        OCTET STRING,
+                hh3chgmpNTDPCacheClusterName     OCTET STRING,
+                hh3chgmpNTDPCacheClusterRole     INTEGER,
+                hh3chgmpNTDPCacheCapabilities    INTEGER,
+                hh3chgmpNTDPCacheVersion         OCTET STRING,
+                hh3chgmpNTDPCachePlatform        OCTET STRING,
+                hh3chgmpNTDPCacheMngVLAN         INTEGER,
+                hh3chgmpNTDPCacheHop             INTEGER
+            }
+
+    hh3chgmpNTDPCacheHashIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Our NTDP information is saved in the HASH table on the
+            administrator switch. Using DeviceID as index will lead to the
+            comparison of a large amount of character strings, which puts
+            too many burdens on the administrator switch. A HAHSIndex is
+            added to reduce the character string comparison to the
+            least range."
+        ::= { hh3chgmpNTDPCacheEntry 1 }
+
+    hh3chgmpNTDPCacheDeviceID OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "2 bytes address type of the member switch + 2 bytes zero + MAC
+            address, expressed as a character string of the
+            hexadecimal number."
+        ::= { hh3chgmpNTDPCacheEntry 2 }
+
+    hh3chgmpNTDPCacheClusterName OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Name of the cluster including the device."
+        ::= { hh3chgmpNTDPCacheEntry 3 }
+
+    hh3chgmpNTDPCacheClusterRole OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                roleCOSW(1),
+                roleMSW(2),
+                roleBKSW(3),
+                roleCASW(16),
+                roleUNISW(17)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Cluster role of the current device, which can be a
+            administrator switch (0x01), member switch(0x02), backup
+            switch(0x03), candidate switch(0x10) or an independent
+            switch (incapable of cluster member) (0x11)."
+        DEFVAL { 17 }
+        ::= { hh3chgmpNTDPCacheEntry 4 }
+
+    hh3chgmpNTDPCacheCapabilities OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The capabilities of the device. FF indicates that the field
+            was not included in in the latest NTDP packet."
+        DEFVAL { 255 }
+        ::= { hh3chgmpNTDPCacheEntry 5 }
+
+    hh3chgmpNTDPCacheVersion OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The version information of the corresponding device. A null
+            string indicates that the field was not included in in the
+            latest NTDP packet."
+        ::= { hh3chgmpNTDPCacheEntry 6 }
+
+    hh3chgmpNTDPCachePlatform OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Hardware platform. A null string indicates that the field
+            was not included in the latest NTDP packet."
+        ::= { hh3chgmpNTDPCacheEntry 7 }
+
+    hh3chgmpNTDPCacheMngVLAN OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The management VLAN ID of the device."
+        DEFVAL { 1 }
+        ::= { hh3chgmpNTDPCacheEntry 8 }
+
+    hh3chgmpNTDPCacheHop OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Hops to this switch."
+        ::= { hh3chgmpNTDPCacheEntry 9 }
+
+    hh3chgmpNTDPTopTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cHgmpNTDPTopEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Access the topology structure collected by the NTDP."
+        ::= { hh3cNTDPObject 11 }
+
+    hh3chgmpNTDPTopEntry OBJECT-TYPE
+        SYNTAX      Hh3cHgmpNTDPTopEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX
+            {
+                hh3chgmpNTDPTopHashIndex,
+                hh3chgmpNTDPTopEdgeStartDevID,
+                hh3chgmpNTDPTopEdgeIndex
+            }
+        ::= { hh3chgmpNTDPTopTable 1 }
+
+    Hh3cHgmpNTDPTopEntry ::=
+        SEQUENCE
+            {
+                hh3chgmpNTDPTopHashIndex                  Integer32,
+                hh3chgmpNTDPTopEdgeStartDevID             OCTET STRING,
+                hh3chgmpNTDPTopEdgeIndex                  Integer32,
+                hh3chgmpNTDPTopEdgeEndDevID               OCTET STRING,
+                hh3chgmpNTDPTopEdgeStartPort              OCTET STRING,
+                hh3chgmpNTDPTopEdgeStartPortFullDuplex    INTEGER,
+                hh3chgmpNTDPTopEdgeStartPortSpeed         Integer32,
+                hh3chgmpNTDPTopEdgeEndPort                OCTET STRING,
+                hh3chgmpNTDPTopLinkStatus                 INTEGER
+            }
+
+    hh3chgmpNTDPTopHashIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Our NTDP information is saved in the HASH table on the
+            administrator switch. Using DeviceID as index will lead to the
+            comparison of a large amount of character strings, which puts
+            too many burdens on the administrator switch. A HAHSIndex is
+            added to reduce the character string comparison to the
+            least range."
+        ::= { hh3chgmpNTDPTopEntry 1 }
+
+    hh3chgmpNTDPTopEdgeStartDevID OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "2 bytes address type of the member switch + 2 bytes zero + MAC
+            address, expressed as a character string of the hexadecimal number."
+        ::= { hh3chgmpNTDPTopEntry 2 }
+
+    hh3chgmpNTDPTopEdgeIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Edge index of this entry in the data structure."
+        ::= { hh3chgmpNTDPTopEntry 3 }
+
+    hh3chgmpNTDPTopEdgeEndDevID OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "2 bytes address type of the member switch + 2 bytes zero + MAC
+            address, expressed as a character string of the hexadecimal number."
+        ::= { hh3chgmpNTDPTopEntry 4 }
+
+    hh3chgmpNTDPTopEdgeStartPort OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..47))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of the first port of a topology edge. Interface
+            type + card number / slot number / sequence number."
+        ::= { hh3chgmpNTDPTopEntry 5 }
+
+    hh3chgmpNTDPTopEdgeStartPortFullDuplex OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                half(0),
+                full(1)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The full-duplex status of the first port on a topology edge."
+        DEFVAL { half }
+        ::= { hh3chgmpNTDPTopEntry 6 }
+
+    hh3chgmpNTDPTopEdgeStartPortSpeed OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The speed of the first port on a topology edge."
+        DEFVAL { 0 }
+        ::= { hh3chgmpNTDPTopEntry 7 }
+
+    hh3chgmpNTDPTopEdgeEndPort OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..47))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of the last port of a topology edge. Interface
+            type + card number / slot number / sequence number."
+        ::= { hh3chgmpNTDPTopEntry 8 }
+
+    hh3chgmpNTDPTopLinkStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+                forwarding(1),
+                blocking(2)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "In STP or RSTP, it describes link status according to port STP
+            steady status. In MSTP it describes STP steady status of the
+            instance which management VLAN belongs to. Either
+            'hgmpNTDPTopEdgeStartPort' or 'hgmpNTDPTopEdgeEndPort' STP
+            steady status is 'blocking', this object is 'blocking',
+            otherwise is 'forwarding'.
+            If STP or MSTP is disabled, this object is 'forwarding'."
+        ::= { hh3chgmpNTDPTopEntry 11 }
+
+    hh3chgmpStackEventsV2 OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "Definition point for Stack notifications."
+        ::= { hh3cStackObject 0 }
+
+    hh3chgmpStackMemberfailure NOTIFICATION-TYPE
+        OBJECTS
+            {
+                hh3chgmpStackMemberDeviceId
+            }
+        STATUS      current
+        DESCRIPTION
+            "When a stack member failure, send a snmp trap to the network
+            management."
+        ::= { hh3chgmpStackEventsV2 1 }
+
+    hh3chgmpStackMemberRecover NOTIFICATION-TYPE
+        OBJECTS
+            {
+                hh3chgmpStackMemberDeviceId
+            }
+        STATUS      current
+        DESCRIPTION
+            "When a stack member Recover, send a snmp trap to the network
+            management."
+        ::= { hh3chgmpStackEventsV2 2 }
+
+    hh3chgmpStackMemberStatusChange NOTIFICATION-TYPE
+        OBJECTS
+            {
+                hh3chgmpStackMemberDeviceId,
+                hh3chgmpNTDPCacheClusterRole
+            }
+        STATUS      current
+        DESCRIPTION
+            "When a stack member status change, send a snmp trap to the network
+            management."
+        ::= { hh3chgmpStackEventsV2 3 }
+END

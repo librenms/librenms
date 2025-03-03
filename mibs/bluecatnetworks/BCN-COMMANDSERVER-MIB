@@ -1,0 +1,179 @@
+-- Copyright 2017 BlueCat Networks. All rights reserved.
+-- *****************************************************************
+-- BCN-COMMANDSERVER-MIB.mib:  BlueCat Networks COMMANDSERVER services
+--
+--
+-- December 2010, Fabian Ischia
+--
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+BCN-COMMANDSERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    BcnAlarmSeverity
+        FROM BCN-TC-MIB
+    bcnServices
+        FROM BCN-SMI-MIB;
+
+bcnCommandServerMIB MODULE-IDENTITY
+    LAST-UPDATED	"201106301200Z"
+    ORGANIZATION	"BlueCat Networks"
+    CONTACT-INFO
+        "BlueCat Networks. Customer Care.
+
+        North America
+        Call: +1.866.491.2228
+        Europe
+        Call: +44.8081.011.306
+        Other
+        Call: +1.416.646.8433
+        
+        Email: support@bluecatnetworks.com"
+    DESCRIPTION
+        "This module provides status as well as statistical information
+        about the COMMANDSERVER service."
+    REVISION "201106301200Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcnCommandServer 1 }
+
+bcnCommandServer OBJECT IDENTIFIER  ::= { bcnServices 7 }
+
+-- Organization
+
+bcnCommandServerObjects OBJECT IDENTIFIER 
+    ::= { bcnCommandServer 2 }
+
+bcnCommandServerNotification OBJECT IDENTIFIER 
+    ::= { bcnCommandServer 3 }
+
+bcnCommandServerConformance OBJECT IDENTIFIER 
+    ::= { bcnCommandServer 4 }
+
+
+-- Data objects
+
+bcnCommandServerServiceStatus OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "General state of the COMMANDSERVER Service."
+    ::= { bcnCommandServerObjects 1 }
+
+bcnCommandServerSerOperState OBJECT-TYPE
+    SYNTAX      INTEGER {
+      running(1),
+      notRunning(2),
+      starting(3),
+      stopping(4),
+      fault(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational state of the Service. The possible states are:
+        running(1)    The service is running normally.
+        notRunning(2) The service is stopped either intentionally (i.e.:
+                      the service is not supposed to run on this node) or
+                      unintentionally (a problem has occurred).
+        starting(3)   The service is in the process of starting, either
+                      for the first time of after an event occurred.
+        stopping(4)   The service is in the process of stopping. Stopping
+                      a service might be necessary after a configuration
+                      change.
+        fault(5)      An error has been detected and the state is undefined.
+        "
+    ::= { bcnCommandServerServiceStatus 1 }
+
+-- Notification definitions
+
+bcnCommandServerNotificationEvents OBJECT IDENTIFIER 
+    ::= { bcnCommandServerNotification 0 }
+
+bcnCommandServerNotificationData OBJECT IDENTIFIER 
+    ::= { bcnCommandServerNotification 1 }
+
+-- Notification data
+
+bcnCommandServerAlarmSeverity OBJECT-TYPE
+    SYNTAX          BcnAlarmSeverity
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Severity classification for the alarm."
+    ::= { bcnCommandServerNotificationData 1 }
+
+bcnCommandServerAlarmInfo OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Descriptive information about the alarm event."
+    ::= { bcnCommandServerNotificationData 2 }
+
+-- Notification events
+
+bcnCommandServerAlarmNotif NOTIFICATION-TYPE
+    OBJECTS {   
+                bcnCommandServerSerOperState,
+                bcnCommandServerAlarmSeverity,
+                bcnCommandServerAlarmInfo
+            }
+    STATUS          current
+    DESCRIPTION
+        "A bcnCommandServerAlarmNotif signifies that the COMMANDSERVER service has transitioned
+        state or a particular event has been detected on the service."
+   ::= { bcnCommandServerNotificationEvents 1 }
+
+-- Conformance
+
+bcnCommandServerServiceCompliances OBJECT IDENTIFIER 
+    ::= { bcnCommandServerConformance 1 }
+
+bcnCommandServerServiceGroups OBJECT IDENTIFIER 
+    ::= { bcnCommandServerConformance 2 }
+
+
+bcnCommandServerServiceStatusGroup OBJECT-GROUP
+    OBJECTS { bcnCommandServerSerOperState }
+    STATUS current
+    DESCRIPTION "Status conformance."
+    ::= { bcnCommandServerServiceGroups 1 }
+
+bcnCommandServerNotificationEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { bcnCommandServerAlarmNotif
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnCommandServerServiceGroups 2 }
+
+bcnCommandServerNotificationDataGroup OBJECT-GROUP
+    OBJECTS { bcnCommandServerAlarmSeverity, bcnCommandServerAlarmInfo
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnCommandServerServiceGroups 3 }
+
+
+bcnCommandServerStatusCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Basic conformance"
+    MODULE -- This module
+    MANDATORY-GROUPS {
+        bcnCommandServerServiceStatusGroup, bcnCommandServerNotificationEventGroup, 
+	bcnCommandServerNotificationDataGroup }
+-- GROUP CCC
+    ::= {bcnCommandServerServiceCompliances 1 }
+
+
+
+
+END

@@ -1,0 +1,8 @@
+modules:
+    os:
+        hardware:
+            - PowerNet-MIB::emsIdentProductNumber.0
+            - PowerNet-MIB::emsIdentHardwareRev.0
+        hardware_template: '{{ PowerNet-MIB::emsIdentProductNumber.0 }} {{ PowerNet-MIB::emsIdentHardwareRev.0 }}'
+        serial: PowerNet-MIB::emsIdentSerialNumber.0
+        version: PowerNet-MIB::emsIdentFirmwareRev.0

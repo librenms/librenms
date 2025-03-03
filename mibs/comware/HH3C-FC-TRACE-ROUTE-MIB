@@ -1,0 +1,297 @@
+-- =====================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--      This MIB module is for the management of the Fibre Channel
+--      Trace Route functionality.
+-- Reference:
+-- Version: V1.0
+-- History:
+--      V1.0 Initial version created by liuyanchao 2013-02-27
+-- =====================================================================
+HH3C-FC-TRACE-ROUTE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC
+    Hh3cFcVsanIndex, Hh3cFcAddressType, Hh3cFcAddress, Hh3cFcNameId,
+    Hh3cFcStartOper
+        FROM HH3C-FC-TC-MIB
+    hh3cSan
+        FROM HH3C-VSAN-MIB;
+
+
+hh3cFcTraceRoute  MODULE-IDENTITY
+    LAST-UPDATED "201302270000Z"
+    ORGANIZATION "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB module is for the management of the Fibre Channel
+         Trace Route functionality."
+    REVISION "201302270000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cSan 4 }
+
+hh3cFcTraceRouteObjects             OBJECT IDENTIFIER
+    ::= { hh3cFcTraceRoute 1 }
+hh3cFcTraceRouteConfigurations      OBJECT IDENTIFIER
+    ::= { hh3cFcTraceRouteObjects 1 }
+hh3cFcTraceRouteResults             OBJECT IDENTIFIER
+    ::= { hh3cFcTraceRouteObjects 2 }
+hh3cFcTraceRouteNotifications       OBJECT IDENTIFIER
+    ::= { hh3cFcTraceRouteObjects 3 }
+hh3cFcTraceRouteNotifyPrefix        OBJECT IDENTIFIER
+    ::= { hh3cFcTraceRouteNotifications 0 }
+
+-- Trace Route table.
+
+hh3cFcTraceRouteTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF Hh3cFcTraceRouteEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of trace route entries containing a group
+         of trace route requests that need to be executed
+         at the agent."
+    ::= { hh3cFcTraceRouteConfigurations 1 }
+
+hh3cFcTraceRouteEntry OBJECT-TYPE
+    SYNTAX        Hh3cFcTraceRouteEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A trace route request entry that needs to be executed
+         at the agent."
+    INDEX         { hh3cFcTraceRouteIndex }
+    ::= { hh3cFcTraceRouteTable 1 }
+
+
+Hh3cFcTraceRouteEntry ::= SEQUENCE {
+    hh3cFcTraceRouteIndex              Unsigned32,
+    hh3cFcTraceRouteVsan               Hh3cFcVsanIndex,
+    hh3cFcTraceRouteAddressType        Hh3cFcAddressType,
+    hh3cFcTraceRouteAddress            Hh3cFcAddress,
+    hh3cFcTraceRouteTimeout            Unsigned32,
+    hh3cFcTraceRouteAdminStatus        Hh3cFcStartOper,
+    hh3cFcTraceRouteOperStatus         INTEGER,
+    hh3cFcTraceRouteAgeInterval        Unsigned32,
+    hh3cFcTraceRouteTrapOnCompletion   TruthValue,
+    hh3cFcTraceRouteRowStatus          RowStatus
+}
+
+hh3cFcTraceRouteIndex OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..65535)
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "The index of the current trace route entry.  This object
+         uniquely identifies a trace route request entry in a
+         specified VSAN (Virtual Storage Area Network)."
+    ::= { hh3cFcTraceRouteEntry 1 }
+
+hh3cFcTraceRouteVsan OBJECT-TYPE
+    SYNTAX        Hh3cFcVsanIndex
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The VSAN on which the trace route request will be
+         executed.  If the corresponding instance value of
+         hh3cFcTraceRouteOperStatus is 'inProgress', the
+         object cannot be modified."
+    ::= { hh3cFcTraceRouteEntry 2 }
+
+hh3cFcTraceRouteAddressType OBJECT-TYPE
+    SYNTAX        Hh3cFcAddressType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The type of the corresponding instance of
+         hh3cFcTraceRouteAddress object."
+    DEFVAL        { fcid }
+    ::= { hh3cFcTraceRouteEntry 3 }
+
+hh3cFcTraceRouteAddress OBJECT-TYPE
+    SYNTAX        Hh3cFcAddress
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The address to which the route will be traced.
+         This object will contain an 8-octet WWN (World Wide Name),
+         if the value of the associated instance of
+         hh3cFcTraceRouteAddressType object is 'wwn'.
+         This object will contain a 3-octet Fibre Channel ID,
+         if the value of the associated instance of
+         hh3cFcTraceRouteAddressType object is 'fcid'."
+    ::= { hh3cFcTraceRouteEntry 4 }
+
+hh3cFcTraceRouteTimeout OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..10)
+    UNITS         "seconds"
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The value of timeout for this trace route request.
+         If the corresponding instance value of
+         hh3cFcTraceRouteOperStatus object is 'inProgress',
+         this object cannot be modified."
+    DEFVAL        { 5 }
+    ::= { hh3cFcTraceRouteEntry 5 }
+
+hh3cFcTraceRouteAdminStatus OBJECT-TYPE
+    SYNTAX        Hh3cFcStartOper
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The administrative status of each hh3cFcTraceRouteEntry.
+
+         The object has two values:
+         enable   -  Activate the entry.
+         disable  -  Deactivate the entry.
+
+         When the trace route entry is being executed, this object
+         cannot be modified.  If this object is being read, a value
+         of 'enable' will be returned.  When the execution finishes,
+         the value of this object will be set to 'disable'."
+    DEFVAL        { disable }
+    ::= { hh3cFcTraceRouteEntry 6 }
+
+hh3cFcTraceRouteOperStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+      inProgress(1),     -- trace route in progress
+      success(2),        -- trace route success
+      partialSuccess(3), -- trace route partial success
+      failure(4),        -- trace route failure
+      disabled(5)        -- trace route is disabled
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object indicates the operational status
+         of this hh3cFcTraceRouteEntry.
+
+         The value specifications are listed as follows:
+         inProgress     - Trace route is in progress.
+         success        - Trace route has succeeded.
+         partialSuccess - Trace route has partially succeeded.
+         failure        - Trace route has failed due to resource limitations.
+         disabled       - Trace route is disabled."
+    ::= { hh3cFcTraceRouteEntry 7 }
+
+hh3cFcTraceRouteAgeInterval OBJECT-TYPE
+    SYNTAX        Unsigned32 (500..900)
+    UNITS         "seconds"
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The interval time for an entry to age out
+         after a trace route test is completed."
+    DEFVAL        { 500 }
+    ::= { hh3cFcTraceRouteEntry 8 }
+
+hh3cFcTraceRouteTrapOnCompletion OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "This object indicates whether a hh3cFcTraceRouteCompletionNotify
+         notification should be generated when this trace route test
+         completes."
+    DEFVAL        { false }
+    ::= { hh3cFcTraceRouteEntry 9 }
+
+hh3cFcTraceRouteRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The status of this conceptual row."
+    ::= { hh3cFcTraceRouteEntry 10 }
+
+
+-- Trace Route Hops Table
+-- The hh3cFcTraceRouteHopsTable contains the hop-by-hop result
+-- of a trace route test performed for an entry in the
+-- hh3cFcTraceRouteTable.
+
+hh3cFcTraceRouteHopsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF Hh3cFcTraceRouteHopsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of trace route hop results.
+         This table indicates the hop-by-hop result of a trace route test
+         associated with an entry in the hh3cFcTraceRouteTable."
+    ::= { hh3cFcTraceRouteResults 1 }
+
+hh3cFcTraceRouteHopsEntry OBJECT-TYPE
+    SYNTAX        Hh3cFcTraceRouteHopsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A trace route hop entry.
+
+         The first index member specifies the hh3cFcTraceRouteEntry
+         that an hh3cFcTraceRouteHopsEntry is associated with.  The
+         second index element identifies a hop in a trace route path.
+
+         In the case of a complete path being traced, entries
+         corresponding to an hh3cFcTraceRouteEntry are created
+         automatically in this table.
+
+         Each hop in the complete path will be listed in this table.
+
+         When an hh3cFcTraceRouteEntry is deleted or aged out, the
+         entries corresponding to the hh3cFcTraceRouteEntry in this
+         table are also deleted."
+    INDEX         { hh3cFcTraceRouteIndex, hh3cFcTraceRouteHopsIndex }
+    ::= { hh3cFcTraceRouteHopsTable 1 }
+
+Hh3cFcTraceRouteHopsEntry ::= SEQUENCE {
+    hh3cFcTraceRouteHopsIndex           Unsigned32,
+    hh3cFcTraceRouteHopsAddr            Hh3cFcNameId
+}
+
+hh3cFcTraceRouteHopsIndex OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..65535)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This object indicates the hop index for a trace route hop.
+
+         Values for this object associated with the same
+         hh3cFcTraceRouteIndex MUST begin with 1 and
+         automatically increase by 1."
+    ::= { hh3cFcTraceRouteHopsEntry 1 }
+
+hh3cFcTraceRouteHopsAddr OBJECT-TYPE
+    SYNTAX        Hh3cFcNameId
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object specifies the WWN of the device associated
+         with this hop."
+    ::= { hh3cFcTraceRouteHopsEntry 2 }
+
+-- Notifications
+
+hh3cFcTraceRouteCompletionNotify NOTIFICATION-TYPE
+    OBJECTS       { hh3cFcTraceRouteIndex,
+                    hh3cFcTraceRouteVsan,
+                    hh3cFcTraceRouteAddressType,
+                    hh3cFcTraceRouteAddress,
+                    hh3cFcTraceRouteOperStatus }
+    STATUS        current
+    DESCRIPTION
+        "When a trace route test is finished and the instance of
+         hh3cFcTraceRouteTrapOnCompletion associated with the test
+         is set to 'true', this notification occurred."
+    ::= { hh3cFcTraceRouteNotifyPrefix 1 }
+
+END

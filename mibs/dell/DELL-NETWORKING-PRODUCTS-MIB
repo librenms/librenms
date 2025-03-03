@@ -1,0 +1,364 @@
+	DELL-NETWORKING-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+        	MODULE-IDENTITY,
+        	OBJECT-IDENTITY
+           	FROM SNMPv2-SMI
+        	dellNetModules, dellNetProducts
+          	FROM DELL-NETWORKING-SMI;
+
+	dellNetFamilyMIB MODULE-IDENTITY   
+    	LAST-UPDATED "201310221200Z"   -- October 22, 2013 12:00:00 GMT
+   	ORGANIZATION "Dell Inc"
+    	CONTACT-INFO
+    	"http://www.dell.com/support"
+
+     	DESCRIPTION
+            "This mib module defines system Object Identifier values for sysObjectID.0 for 
+	     network elements manufactured and sold by Dell Inc
+             http://www.dell.com"
+	
+	-- Revision history.
+        REVISION     "201310221200Z"   -- October 22, 2013 12:00:00 GMT
+        DESCRIPTION
+        "Added Z-Series Family of product object IDs"
+
+        REVISION     "201112151200Z"   -- December 15, 2011 12:00:00 GMT
+        DESCRIPTION
+        "Added M-Series Family of product object IDs"
+
+	REVISION     "200706151200Z"   -- June 15, 2007 12:00:00 GMT
+    	DESCRIPTION
+             "- Added objects to provide grouping for Dell Networking OS product series.
+              - Added C Series.
+              - Added S Series."
+         
+    	REVISION     "200201310000Z"
+    	DESCRIPTION
+      	"Dell Networking OS E-Series Family of products object IDs added."
+	 ::= { dellNetModules 1 }  
+
+-- *****************************************************************************
+-- Top-level Dell Networking OS Product OBJECT IDENTIFIER assignments.
+-- *****************************************************************************
+
+	dellNetESeriesProducts  OBJECT-IDENTITY
+   		STATUS         current
+   		DESCRIPTION
+      		"This object identifier roots Dell Networking OS E-Series product
+      		 object identifiers."
+   		::= { dellNetProducts 1 }
+   		
+	dellNetCSeriesProducts  OBJECT-IDENTITY
+   		STATUS         current
+   		DESCRIPTION
+      		"This object identifier roots Dell Networking OS C-Series product
+      		 object identifiers."
+   		::= { dellNetProducts 2 }
+   		
+	dellNetSSeriesProducts  OBJECT-IDENTITY
+   		STATUS         current
+   		DESCRIPTION
+      		"This object identifier roots Dell Networking OS S-Series product
+      		 object identifiers."
+   		::= { dellNetProducts 3 }
+
+    dellNetMSeriesProducts  OBJECT-IDENTITY
+        STATUS         current
+        DESCRIPTION
+            "This object identifier roots Dell Networking OS M-Series
+            product object identifiers."
+        ::= {dellNetProducts 4 }
+
+	dellNetZSeriesProducts  OBJECT-IDENTITY
+   		STATUS         current
+   		DESCRIPTION
+      		"This object identifier roots Dell Networking OS Z-Series product
+      		 object identifiers."
+   		::= { dellNetProducts 5 }
+
+-- *****************************************************************************
+-- Dell Networking OS E-Series Product Line
+-- *****************************************************************************   		   		
+ 
+	e1200  	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS E1200 16-slot switch/router."           
+        	::= { dellNetESeriesProducts 1 }
+
+	e600   	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS E600 9-slot switch/router."           
+        	::= { dellNetESeriesProducts 2 }
+
+	e300   	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS E300 8-slot switch/router."           
+        	::= { dellNetESeriesProducts 3 }
+
+	e610   	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS E610 9-slot switch/router."           
+        	::= { dellNetESeriesProducts 4 }
+
+	e1200i 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS E1200i 16-slot switch/router."           
+        	::= { dellNetESeriesProducts 5 }
+
+-- *****************************************************************************
+-- Dell Networking OS C-Series Product Line
+-- *****************************************************************************   		   		
+
+	c300   	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS C300 10-slot switch/router."           
+        	::= { dellNetCSeriesProducts 1 }
+
+	c150   	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS C150 6-slot switch/router."           
+        	::= { dellNetCSeriesProducts 2 }
+
+	c9010  	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS C9010 switch/router."                 
+         	::= { dellNetCSeriesProducts 3 }
+
+-- *****************************************************************************
+-- Dell Networking OS S-Series Product Line
+-- *****************************************************************************  
+
+	s50   	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S50 access switch."           
+        	::= { dellNetSSeriesProducts 1 }
+        	
+	s50e   	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S50E access switch."           
+        	::= { dellNetSSeriesProducts 2 }
+        	
+	s50v   	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S50V access switch."           
+        	::= { dellNetSSeriesProducts 3 }
+        	
+	s25pac 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S25P-AC access switch."           
+        	::= { dellNetSSeriesProducts 4 }
+        	
+	s2410cp	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S2410CP access switch."           
+        	::= { dellNetSSeriesProducts 5 }
+        	
+	s2410p 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S2410P access switch."           
+        	::= { dellNetSSeriesProducts 6 }
+        	
+	s50nac  OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S50N-AC access switch."           
+        	::= { dellNetSSeriesProducts 7 }
+        	
+	s50ndc  OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S50N-DC access switch."           
+        	::= { dellNetSSeriesProducts 8 }
+        	
+	s25pdc 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S25P-DC access switch."           
+        	::= { dellNetSSeriesProducts 9 }
+        	
+	s25v 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S25V access switch."           
+        	::= { dellNetSSeriesProducts 10 }
+        	
+	s25n 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S25N access switch."           
+        	::= { dellNetSSeriesProducts 11 }
+
+	s60 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S60 access switch."           
+        	::= { dellNetSSeriesProducts 12 }
+
+	s55 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S55 access switch."           
+        	::= { dellNetSSeriesProducts 13 }
+
+	s4810 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S4810 access switch."           
+        	::= { dellNetSSeriesProducts 14 }
+
+	z9000 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS Z9000 switch/router."
+        	::= { dellNetSSeriesProducts 15 }
+
+	s4820 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S4820 access switch."
+        	::= { dellNetSSeriesProducts 17 }
+
+	s6000 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S6000 access switch."
+        	::= { dellNetSSeriesProducts 18 }
+
+	s5000 	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+            	"Dell Networking OS S5000 access switch."
+        	::= { dellNetSSeriesProducts 19 }
+
+	s4810on	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S4810 ON access switch."
+        	::= { dellNetSSeriesProducts 20 }
+
+	s6000on OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S6000 ON access switch."
+        	::= { dellNetSSeriesProducts 21 }
+
+	s4048on	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S4048 ON access switch."
+        	::= { dellNetSSeriesProducts 22 }
+
+	s3048on	OBJECT-IDENTITY
+            	STATUS  current
+            	DESCRIPTION
+                "Dell Networking OS S3048 ON access switch."
+        	::= { dellNetSSeriesProducts 23 }
+
+	s3148p	OBJECT-IDENTITY
+           	STATUS  current
+           	DESCRIPTION
+                "Dell Networking OS S3148P access switch."
+        	::= { dellNetSSeriesProducts 24 }
+
+	s3124p	OBJECT-IDENTITY
+           	STATUS  current
+           	DESCRIPTION
+                "Dell Networking OS S3124P access switch."
+        	::= { dellNetSSeriesProducts 25 }
+
+	s3124f	OBJECT-IDENTITY
+           	STATUS  current
+           	DESCRIPTION
+                "Dell Networking OS S3124F access switch."
+        	::= { dellNetSSeriesProducts 26 }
+
+	s3124	OBJECT-IDENTITY
+          	STATUS  current
+          	DESCRIPTION
+                "Dell Networking OS S3124 access switch."
+        	::= { dellNetSSeriesProducts 27 }
+
+	s6100	OBJECT-IDENTITY
+          	STATUS  current
+          	DESCRIPTION
+                "Dell Networking OS S6100 access switch."
+        	::= { dellNetSSeriesProducts 28 }
+
+    s6010   OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "Dell Networking 0S S6010 access switch."
+            ::= { dellNetSSeriesProducts 29 }
+
+    s4048t  OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "Dell Networking OS S4048T-ON access switch."
+            ::= { dellNetSSeriesProducts 30 }
+
+	s3148	OBJECT-IDENTITY
+          	STATUS  current
+          	DESCRIPTION
+                "Dell Networking OS S3148 access switch."
+        	::= { dellNetSSeriesProducts 31 }
+    
+    s5048f  OBJECT-IDENTITY
+               STATUS  current
+               DESCRIPTION
+               "Dell Networking OS S5048F switch/router."
+            ::= { dellNetSSeriesProducts 32 }
+
+-- *****************************************************************************
+-- Dell Networking OS M-Series Product Line
+-- *****************************************************************************
+
+	m-MXL  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                "Dell Networking OS MXL 10/40GbE switch/router."
+            ::= { dellNetMSeriesProducts 1 }
+
+	m-IOA  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                " Dell PE M I/O Aggregator."
+            ::= { dellNetMSeriesProducts 2 }
+
+	s-IOA  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                " Dell PE FN I/O Aggregator."
+            ::= { dellNetMSeriesProducts 3 }
+
+-- *****************************************************************************
+-- Dell Networking OS Z-Series Product Line
+-- *****************************************************************************
+
+	z9500  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                "Dell Networking OS Z9500 switch/router."
+            ::= { dellNetZSeriesProducts 1 }
+
+	z9100  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                "Dell Networking OS Z9100 switch/router."
+            ::= { dellNetZSeriesProducts 2 }
+
+END

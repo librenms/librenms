@@ -13,6 +13,7 @@ transportAddressMIB MODULE-IDENTITY
          TU Braunschweig
          Bueltenweg 74/75
          38106 Braunschweig, Germany
+
          Phone: +49 531 391-3289
          EMail: schoenw@ibr.cs.tu-bs.de
 
@@ -31,7 +32,6 @@ transportAddressMIB MODULE-IDENTITY
     DESCRIPTION
         "Initial version, published as RFC 3419."
     ::= { mib-2 100 }
-
 
 transportDomains OBJECT IDENTIFIER ::= { transportAddressMIB 1 }
 
@@ -205,6 +205,7 @@ TransportAddressType ::= TEXTUAL-CONVENTION
          tcpIpv4(5)     transportDomainTcpIpv4
          tcpIpv6(6)     transportDomainTcpIpv6
          tcpIpv4z(7)    transportDomainTcpIpv4z
+
          tcpIpv6z(8)    transportDomainTcpIpv6z
          sctpIpv4(9)    transportDomainSctpIpv4
          sctpIpv6(10)   transportDomainSctpIpv6
@@ -253,6 +254,7 @@ TransportAddress ::= TEXTUAL-CONVENTION
          A TransportAddress value is always interpreted within the
          context of a TransportAddressType or TransportDomain value.
          Every usage of the TransportAddress textual convention MUST
+
          specify the TransportAddressType or TransportDomain object
          which provides the context. Furthermore, MIB authors SHOULD
          define a separate TransportAddressType or TransportDomain
@@ -349,6 +351,7 @@ TransportAddressIPv6z ::= TEXTUAL-CONVENTION
 
          This textual convention SHOULD NOT be used directly in object
          definitions since it restricts addresses to a specific format.
+
          However, if it is used, it MAY be used either on its own or
          in conjunction with TransportAddressType or TransportDomain
          as a pair."
@@ -397,6 +400,7 @@ TransportAddressDns ::= TEXTUAL-CONVENTION
          time of the management operation).
 
          The DESCRIPTION clause of TransportAddress objects that may
+
          have TransportAddressDns values must fully describe how (and
          when) such names are to be resolved to IP addresses and vice
          versa.

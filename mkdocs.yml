@@ -1,121 +1,304 @@
 site_name: LibreNMS Docs
 docs_dir: doc
-theme_dir: 'librenms_theme'
-theme: null
+theme:
+  name: material
+  logo: img/librenms.svg
+  language: en
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/lightbulb
+        name: Switch to light mode
+
+  features:
+    - navigation.footer
+    - navigation.instant
+    - navigation.tracking
+    - navigation.top
+    - navigation.path
+    - content.tabs.link
+    - content.action.edit
+    - content.code.copy
 site_dir: out
-site_url: http://docs.librenms.org
+site_url: https://docs.librenms.org
 markdown_extensions:
-    - pymdownx.tasklist
-    - mdx_del_ins
+  - tables
+  - admonition
+  - pymdownx.snippets
+  - pymdownx.tasklist
+  - pymdownx.tilde
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+plugins:
+  - macros:
+      j2_variable_start_string: '@='
+      j2_variable_end_string: '=@'
+  - search
+  - include_dir_to_nav
+  - exclude:
+      glob:
+        - "Dockerfile"
+  - redirects:
+      redirect_maps:
+        'Alerting/Introduction.md': 'Alerting/index.md'
+        'API/API-Docs.md': 'API/index.md'
+        'Extensions/Alerting.md': 'Alerting/index.md'
+        'Extensions/Email-Alerting.md': 'Alerting/Transports.md'
+        'Extensions/Graphite.md': 'Extensions/metrics/Graphite.md'
+        'Extensions/InfluxDB.md': 'Extensions/metrics/InfluxDB.md'
+        'Extensions/InfluxDBv2.md': 'Extensions/metrics/InfluxDBv2.md'
+        'Extensions/OpenTSDB.md': 'Extensions/metrics/OpenTSDB.md'
+        'Extensions/Poller-Service.md': 'Extensions/Dispatcher-Service.md'
+        'Extensions/Port-Description-Parser.md': 'Extensions/Interface-Description-Parsing.md'
+        'Extensions/Prometheus.md': 'Extensions/metrics/Prometheus.md'
+        'General/Contributing.md': 'Developing/Getting-Started.md'
+        'Installation/CentOS-image.md': 'Installation/Install-LibreNMS.md'
+        'Installation/index.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-CentOS-6-Apache-Nginx.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-CentOS-7-Apache.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-CentOS-7-Nginx.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-Debian-11-Nginx.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-Ubuntu-1604-Apache.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-Ubuntu-1604-Nginx.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-Ubuntu-1804-Apache.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-Ubuntu-1804-Nginx.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installing-LibreNMS.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Ubuntu-image.md': 'Installation/Images.md'
+        'Support/Support-New-OS.md': 'Developing/Support-New-OS.md'
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+          remove_comments: true
+      js_files:
+          - js/docs-settings-links.js
+      css_files:
+          - librenms.css
 extra_css:
-    - librenms.css
-include_next_prev: false
+  - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css
+  - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css
+  - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css
+  - librenms.css
+extra_javascript:
+  - js/docs-settings-links.js
+extra:
+  analytics:
+    provider: google
+    property: G-K0B7KB9765
+  article_nav_top: false
+  article_nav_bottom: true
+  php:
+    version_min: 8.2
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/librenms/
+      name: GitHub
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/librenms/librenms
+      name: Docker
+    - icon: fontawesome/brands/discord
+      link: https://discord.com/invite/librenms
+      name: Discord
+    - icon: fontawesome/brands/reddit
+      link: https://www.reddit.com/r/LibreNMS/
+      name: Reddit
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/librenms
+      name: Twitter
+    - icon: fontawesome/brands/facebook
+      link: https://www.facebook.com/LibreNMS
+      name: Facebook
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/librenms/
+      name: LinkedIn
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
-repo_url: https://github.com/librenms/librenms
+repo_url: https://github.com/librenms/librenms/
+edit_uri: edit/master/doc
 repo_name: GitHub
-google_analytics: ['UA-79149977-2', 'docs.librenms.org']
-pages:
-- Home: index.md
-- Installation:
-    - Installing LibreNMS: Installation/Installing-LibreNMS.md
-    - Ubuntu VM Image: Installation/Ubuntu-image.md
-    - CentOS VM Image: Installation/CentOS-image.md
-    - Ubuntu 16.04 (Nginx): Installation/Installation-Ubuntu-1604-Nginx.md
-    - Ubuntu 16.04 (Apache): Installation/Installation-Ubuntu-1604-Apache.md
-    - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
-    - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
-    - Older Docs: Installation/Installing-LibreNMS.md
-    - Migrating from Observium: Installation/Migrating-from-Observium.md
-- General:
-    - General/Acknowledgement.md
-    - General/Callback-Stats-and-Privacy.md
-    - General/Changelog.md
-    - General/CODE_OF_CONDUCT.md
-    - General/Contributing.md
-    - General/Credits.md
-    - General/Updating.md
-    - General/Releases.md
-    - General/Security.md
-    - General/Welcome-to-Observium-users.md
-- Extensions:
-    - Extensions/Alerting.md
-    - Extensions/Applications.md
-    - Extensions/Authentication.md
-    - Extensions/Auto-Discovery.md
-    - Extensions/Billing-Module.md
-    - Extensions/Component.md
-    - Extensions/Dell-OpenManage.md
-    - Extensions/Device-Groups.md
-    - Extensions/Distributed-Poller.md
-    - Extensions/Email-Alerting.md
-    - Extensions/Globe-Frontpage.md
-    - Extensions/Graylog.md
-    - Extensions/Graphite.md
-    - Extensions/IRC-Bot.md
-    - Extensions/IRC-Bot-Extensions.md
-    - Extensions/InfluxDB.md
-    - Extensions/Interface-Description-Parsing.md
-    - Extensions/MIB-based-polling.md
-    - Extensions/Memcached.md
-    - Extensions/Network-Map.md
-    - Extensions/NFSen.md
-    - Extensions/Oxidized.md
-    - Extensions/PeeringDB.md
-    - Extensions/Plugin-System.md
-    - Extensions/Poller-Service.md
-    - Extensions/Port-Description-Parser.md
-    - Extensions/Proxmox.md
-    - Extensions/RRDCached.md
-    - Extensions/RRDTune.md
-    - Extensions/SNMP-Proxy.md
-    - Extensions/SNMP-Trap-Handler.md
-    - Extensions/Services.md
-    - Extensions/Smokeping.md
-    - Extensions/Sub-Directory.md
-    - Extensions/Syslog.md
-    - Extensions/Two-Factor-Auth.md
-    - Extensions/Varnish.md
-- Developing:
-    - Developing/Using-Git.md
-    - Developing/Code-Guidelines.md
-    - Developing/Style-Guidelines.md
-    - Developing/Validating-Code.md
-    - Developing/Code-Structure.md
+nav:
+  - General:
+    - Home: index.md
+    - Features: Support/Features.md
+    - Changelog:
+      - Current Changelog: General/Changelog.md
+      - Historical: General/Changelogs
+    - Welcome to Observium users: General/Welcome-to-Observium-users.md
+    - 3rd Party Libraries: General/Acknowledgement.md
 
-    - Developing/Creating-Documentation.md
-    - Adding support for a new OS: Developing/Support-New-OS.md
-    - Developing/Dynamic-Config.md
-    - Developing/Sensor-State-Support.md
+  - Installation:
+    - Installing LibreNMS: Installation/Install-LibreNMS.md
+    - Other Methods:
+      - Docker: Installation/Docker.md
+      - Virtual machines: Installation/Images.md
+    - Choosing a release: General/Releases.md
+    - Updating: General/Updating.md
+    - First steps:
+      - Adding a device: Support/Adding-a-Device.md
+      - Grouping Devices: Extensions/Device-Groups.md
+      - Submitting stats: General/Callback-Stats-and-Privacy.md
+      - Migrating from Observium: Installation/Migrating-from-Observium.md
 
-    - Developing/Merging-Pull-Requests.md
-    - Developing/Creating-Release.md
-- API: API/API-Docs.md
-- Support:
-    - Support/1-Minute-Polling.md
-    - Support/Configuration.md
-    - Support/Discovery Support.md
-    - Support/Example-Hardware-Setup.md
-    - Support/FAQ.md
-    - Support/Features.md
-    - Support/Install Validation.md
-    - Support/Performance.md
-    - Support/Poller Support.md
-    - Support/Remote-Monitoring-VPN.md
-    - Support/SNMP-Configuration-Examples.md
-- hidden:
-    - Ubuntu 14.04 (Nginx): Installation/Installation-Ubuntu-1404-Nginx.md
-    - Ubuntu 14.04 (Apache): Installation/Installation-Ubuntu-1404-Apache.md
-    - Ubuntu 14.04 (Lighttpd): Installation/Installation-Ubuntu-1404-Lighttpd.md
-    - CentOS 6 (Apache/Nginx): Installation/Installation-CentOS-6-Apache-Nginx.md
-    - Installation/Installation-(Debian-Ubuntu).md
-    - Installation/Installation-(RHEL-CentOS).md
-    - Support/Support-New-OS.md
-    - Extensions/Agent-Setup.md
-    - Extensions/RRDCached-Security.md
-    - Developing/os/Initial-Detection.md
-    - Developing/os/Mem-CPU-Information.md
-    - Developing/os/Test-Units.md
-    - Developing/os/Health-Information.md
-    - Developing/os/Wireless-Sensors.md
-    - Developing/os/Custom-Graphs.md
+  - Setup:
+    - Application overview: Extensions/Applications.md
+      # Uses plugin include_dir_to_nav
+    - Applications: Extensions/Applications
+    - Billing Module: Extensions/Billing-Module.md
+    - Dashboards: Extensions/Dashboards.md
+    - Interface Description Parsing: Extensions/Interface-Description-Parsing.md
+    - Network Maps:
+      - Availability Map: Extensions/Availability-Map.md
+      - Dependency Map: Extensions/Dependency-Map.md
+      - Network Map: Extensions/Network-Map.md
+      - Custom Map: Extensions/Custom-Map.md
+      - World Map: Extensions/World-Map.md
+      - VisJS Config: Extensions/VisJS-Config.md
+    - Syslog: Extensions/Syslog.md
+    - Advanced Setup:
+      - 1 Minute Polling: Support/1-Minute-Polling.md
+      - Authentication Options: Extensions/Authentication.md
+      - Auto-discovery Setup: Extensions/Auto-Discovery.md
+      - Bare Dashboard: Support/Bare-Dashboard.md
+      - Cleanup Options: Support/Cleanup-options.md
+      - Configuration Docs: Support/Configuration.md
+      - Customizing the Web UI: Extensions/Customizing-the-Web-UI.md
+      - Dispatcher Service (RC): Extensions/Dispatcher-Service.md
+      - Environment Variables: Support/Environment-Variables.md
+      - Fast Ping Checking: Extensions/Fast-Ping-Check.md
+      - Galera Database Cluster: Extensions/Galera-Cluster.md
+      - IRC Bot Extensions: Extensions/IRC-Bot-Extensions.md
+      - IRC Bot: Extensions/IRC-Bot.md
+      - Oauth/SAML support: Extensions/OAuth-SAML.md
+      - RRDCached: Extensions/RRDCached.md
+      - RRDTune: Extensions/RRDTune.md
+      - Scaling LibreNMS: Extensions/Distributed-Poller.md
+      - SNMP Proxy: Extensions/SNMP-Proxy.md
+      - SNMP Trap Handler: Extensions/SNMP-Trap-Handler.md
+      - Sub-directory Support: Extensions/Sub-Directory.md
+      - Two-Factor Auth: Extensions/Two-Factor-Auth.md
+      - Varnish: Extensions/Varnish.md
+  - 3rd Party Integration:
+    - Integrations:
+      - Check_MK Setup: Extensions/Agent-Setup.md
+      - Gateone: Extensions/Gateone.md
+      - Graylog: Extensions/Graylog.md
+      - Nagios Plugins: Extensions/Services.md
+      - NFSen: Extensions/NFSen.md
+      - Oxidized: Extensions/Oxidized.md
+      - PeeringDB: Extensions/PeeringDB.md
+      - Proxmox: Extensions/Proxmox.md
+      - Rancid: Extensions/Rancid.md
+      - Smokeping: Extensions/Smokeping.md
+      - Weathermap: Extensions/Weathermap.md
+      - Storing Metrics:
+        - Intro: Extensions/Metric-Storage.md
+        - Graphite: Extensions/metrics/Graphite.md
+        - InfluxDB: Extensions/metrics/InfluxDB.md
+        - InfluxDBv2: Extensions/metrics/InfluxDBv2.md
+        - OpenTSDB: Extensions/metrics/OpenTSDB.md
+        - Prometheus: Extensions/metrics/Prometheus.md
+
+  - Alerting:
+    - Introduction: Alerting/index.md
+    - Setup:
+      - Rules: Alerting/Rules.md
+      - Templates: Alerting/Templates.md
+      - Transports: Alerting/Transports.md
+      - Creating Transports: Alerting/Creating-Transport.md
+      - Entities: Alerting/Entities.md
+      - Macros: Alerting/Macros.md
+      - Testing: Alerting/Testing.md
+      - Device Dependencies: Alerting/Device-Dependencies.md
+
+  - API:
+    - Using the API: API/index.md
+    - Endpoints:
+      - Alerts: API/Alerts.md
+      - ARP: API/ARP.md
+      - Bills: API/Bills.md
+      - DeviceGroups: API/DeviceGroups.md
+      - Devices: API/Devices.md
+      - Inventory: API/Inventory.md
+      - Locations: API/Locations.md
+      - Logs: API/Logs.md
+      - PollerGroups: API/PollerGroups.md
+      - Port_Groups: API/Port_Groups.md
+      - PortGroups: API/PortGroups.md
+      - Ports: API/Ports.md
+      - Routing: API/Routing.md
+      - Services: API/Services.md
+      - Switching: API/Switching.md
+      - System: API/System.md
+
+  - Getting help:
+    - How to get help: Support/index.md
+    - FAQ: Support/FAQ.md
+    - Install Validation: Support/Install Validation.md
+    - Performance: Support/Performance.md
+    - Discovery Support: Support/Discovery Support.md
+    - Poller Support: Support/Poller Support.md
+    - Example Hardware Setups: Support/Example-Hardware-Setup.md
+    - Remote Monitoring VPN: Support/Remote-Monitoring-VPN.md
+    - SNMP Configuration Examples: Support/SNMP-Configuration-Examples.md
+    - Device Troubleshooting: Support/Device-Troubleshooting.md
+    - Device Sensors: Support/Device-Sensors.md
+
+  - Contributing + Developing:
+    - Contributing:
+      - Getting Started: Developing/Getting-Started.md
+      - Using Git: Developing/Using-Git.md
+      - Validating Code: Developing/Validating-Code.md
+      - Code Structure: Developing/Code-Structure.md
+      - Creating Documentation: Developing/Creating-Documentation.md
+      - Component: Extensions/Component.md
+    - Support for a new OS:
+      - Intro: Developing/Support-New-OS.md
+      - Initial Detection: Developing/os/Initial-Detection.md
+      - Mem/CPU Information: Developing/os/Mem-CPU-Information.md
+      - Test Units: Developing/os/Test-Units.md
+      - Health Information: Developing/os/Health-Information.md
+      - Wireless Sensors: Developing/os/Wireless-Sensors.md
+      - Custom Graphs: Developing/os/Custom-Graphs.md
+      - Settings: Developing/os/Settings.md
+      - Sensor State Support: Developing/Sensor-State-Support.md
+    - SNMP Traps: Developing/SNMP-Traps.md
+    - Dynamic Config: Developing/Dynamic-Config.md
+    - Plugin System: Extensions/Plugin-System.md
+    - Developer notes:
+      - Merging Pull Requests: Developing/Merging-Pull-Requests.md
+      - Creating Release: Developing/Creating-Release.md
+      - Applications: Developing/Application-Notes.md
+
+  - Miscellaneous:
+    - Security information: General/Security.md
+    - CLI Scripts: Support/CLI-Tools.md
+    - Device Notes:
+      - Asuswrt-Merlin: Support/Device-Notes/AsuswrtMerlin.md
+      - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
+      - Dell OpenManage: Extensions/Dell-OpenManage.md
+      - Fortigate: Support/Device-Notes/Fortigate.md
+      - OpenWRT: Support/Device-Notes/Openwrt.md
+      - RouterOS: Support/Device-Notes/Routeros.md
+      - Supermicro: Extensions/Supermicro.md

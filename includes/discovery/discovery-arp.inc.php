@@ -1,4 +1,5 @@
 <?php
+
 //
 // LibreNMS module to do device discovery by ARP table contents.
 //
@@ -12,6 +13,10 @@
 // Author:  Paul Gear <librenms@libertysys.com.au>
 // License: GPLv3
 //
+
+use App\Models\Eventlog;
+use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 
 $hostname = $device['hostname'];
 $deviceid = $device['device_id'];
@@ -32,42 +37,38 @@ $sql = '
     ';
 
 // FIXME: Observium now uses ip_mac.ip_address in place of ipv4_mac.ipv4_address - why?
-$names = array();
-$ips   = array();
+$names = [];
+$ips = [];
 
-foreach (dbFetchRows($sql, array($deviceid)) as $entry) {
-    global $config;
-
-    $ip    = $entry['ipv4_address'];
-    $mac   = $entry['mac_address'];
-    $if    = $entry['port_id'];
-    $int   = cleanPort($if);
-    $label = $int['label'];
+foreach (dbFetchRows($sql, [$deviceid]) as $entry) {
+    $ip = $entry['ipv4_address'];
+    $mac = $entry['mac_address'];
+    $if = $entry['port_id'];
 
     // Even though match_network is done inside discover_new_device, we do it here
     // as well in order to skip unnecessary reverse DNS lookups on discovered IPs.
-    if (match_network($config['autodiscovery']['nets-exclude'], $ip)) {
+    if (match_network(Config::get('autodiscovery.nets-exclude'), $ip)) {
         echo 'x';
         continue;
     }
 
-    if (!match_network($config['nets'], $ip)) {
+    if (! match_network(Config::get('nets'), $ip)) {
         echo 'i';
-        log_event("Ignored $ip", $deviceid, 'interface', 3, $if);
+        Eventlog::log("Ignored $ip", $deviceid, 'interface', Severity::Notice, $if);
         continue;
     }
 
     // Attempt discovery of each IP only once per run.
-    if (object_is_cached('arp_discovery', $ip)) {
+    if (Cache::get('arp_discovery:' . $ip)) {
         echo '.';
         continue;
     }
 
-    object_add_cache('arp_discovery', $ip);
+    Cache::put('arp_discovery:' . $ip, true, 3600);
 
     $name = gethostbyaddr($ip);
     echo '+';
-    $names[]    = $name;
+    $names[] = $name;
     $ips[$name] = $ip;
 }
 

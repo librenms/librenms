@@ -1,0 +1,4 @@
+modules:
+    os:
+        hardware: CPQRACK-MIB::cpqRackCommonEnclosureModel.1
+        version: CPQRACK-MIB::cpqRackCommonEnclosureFWRev.1

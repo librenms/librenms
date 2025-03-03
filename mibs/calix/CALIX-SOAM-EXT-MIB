@@ -1,0 +1,1783 @@
+CALIX-EOAM-EXT-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, enterprises, IpAddress, Counter32
+      FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION, RowStatus, DisplayString, TruthValue, MacAddress, TDomain, TAddress
+     FROM SNMPv2-TC
+   MODULE-COMPLIANCE, OBJECT-GROUP
+     FROM SNMPv2-CONF
+   InterfaceIndex, InterfaceIndexOrZero     
+   	 FROM IF-MIB        -- [RFC2863]
+   VlanIdOrNone, VlanId
+     FROM Q-BRIDGE-MIB  -- [RFC4363]
+   LldpChassisId, LldpChassisIdSubtype, LldpPortId, LldpPortIdSubtype
+     FROM LLDP-MIB      -- [IEEE802.1AB]
+   Dot1agCfmPbbComponentIdentifier,
+   Dot1agCfmMDLevel, Dot1agCfmCcmInterval, Dot1agCfmMepId, Dot1agCfmIdPermission, Dot1agCfmMepIdOrZero,
+   dot1agCfmMdIndex, dot1agCfmMaIndex, dot1agCfmMepIdentifier, dot1agCfmMepDbRMepIdentifier,
+   dot1agCfmLtrSeqNumber, dot1agCfmLtrReceiveOrder,	dot1agCfmMaComponentId, dot1agCfmMaMepListIdentifier,
+   Dot1agCfmMpDirection
+     FROM IEEE8021-CFM-MIB;
+
+calixEoamExtMIB MODULE-IDENTITY
+    LAST-UPDATED "201101240000Z"
+    ORGANIZATION "CALIX, Inc"
+    CONTACT-INFO
+        "Technical Support
+
+		 Calix Networks
+		 1035 North McDowell Blvd.
+		 Petaluma CA 94954
+ 		 UNITED STATES
+         Tel: +1 707-766-3100
+
+         E-mail:
+        "
+    DESCRIPTION
+      "A MIB module that extends the support of Ethernet OAM standards.
+       Extensions are made to IEEE 802.3ah MIB for Link OAM or EFM (Ethernet
+       First Mile) functionality, IEEE 802.1ag MIB for Service OAM 
+       or CFM (Connection Fault Management) functionality, including 
+       ITU-T Y.1731 entities.  This version is compatible with Interport 
+       SOAM release 3.0.
+      "
+    ::= { iso(1) org(3) dod(6)
+          internet(1) private(4) enterprises(1) calix (6321) calixMibs (1) 99 }
+
+calixEoamExtConfig OBJECT IDENTIFIER ::= { calixEoamExtMIB 1 }
+
+CalixEoamEnableType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable state."
+    SYNTAX      INTEGER {
+        enable  (1),
+        disable (2)
+    }
+
+CalixSoamLmType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Single/Dual Frame Loss Measurement Type."
+    SYNTAX      INTEGER {
+        single  (1),
+        dual (2)
+    }
+
+-- ******************************************************************
+--    ITU-T Y.1731 MEG Object
+-- ******************************************************************
+
+calixSoamExtMegTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CalixSoamExtMegEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains all ITU-T Y.1731 MEG entries in the system."
+    ::= { calixEoamExtConfig 1 }
+
+calixSoamExtMegEntry OBJECT-TYPE
+    SYNTAX      CalixSoamExtMegEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ITU-T Y.1731 MEG entry."
+    INDEX { calixSoamExtMegIdentifier }
+    ::= { calixSoamExtMegTable 1}
+
+CalixSoamExtMegEntry ::= SEQUENCE {
+    calixSoamExtMegIdentifier           Unsigned32,
+    calixSoamExtMegName                 OCTET STRING,
+    calixSoamExtMegLevel                Dot1agCfmMDLevel,
+    calixSoamExtMegCcmInterval          Dot1agCfmCcmInterval,
+    calixSoamExtMegVid           		Unsigned32,
+    calixSoamExtMegAutoDiscovery        CalixEoamEnableType,
+    calixSoamExtMegAutoDiscoveryTimeout Unsigned32,
+    calixSoamExtMegCciInterworking      CalixEoamEnableType,
+    calixSoamExtMegIdPermission         Dot1agCfmIdPermission,
+    calixSoamExtMegRowStatus            RowStatus
+    }
+
+calixSoamExtMegIdentifier OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of the MEG entry in the MEG table. There is a common
+         indexing space shared between MAs (IEEE 802.1ag) and MEGs(ITU-T Y.1731).
+        "
+    ::= { calixSoamExtMegEntry 1 }
+
+calixSoamExtMegName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..44))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Textual name of the MEG."
+    ::= { calixSoamExtMegEntry 2 }
+
+calixSoamExtMegLevel OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Level for the MEG."
+    DEFVAL { 0 }
+    ::= { calixSoamExtMegEntry 3 }
+
+calixSoamExtMegCcmInterval OBJECT-TYPE
+    SYNTAX      Dot1agCfmCcmInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Interval between CCM transmissions to be used by all MEPs
+         in the MEG.
+        "
+    DEFVAL { interval1s }
+    ::= { calixSoamExtMegEntry 4 }
+
+calixSoamExtMegVid OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Primary VLAN ID with which the MEG is
+         associated, or 0 if the MEG is not attached to any VID.  If
+         the MEG is associated with more than one VID, the
+         dot1agCfmVlanTable lists them.
+        "
+    ::= { calixSoamExtMegEntry 5 }
+
+calixSoamExtMegAutoDiscovery OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies if MEP autodiscovery feature is enabled or not
+         for this particular MEG.
+        "
+    ::= { calixSoamExtMegEntry 6 }
+
+calixSoamExtMegAutoDiscoveryTimeout   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The timeout value for removal of peer MEPs added through autodetection
+         if no CCM frames are received from that peer MEP.
+        "
+    ::= { calixSoamExtMegEntry 7 }
+
+ calixSoamExtMegCciInterworking   OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies if IEEE 802.1ag compatibility mode is enabled on
+         this MEG.
+        "
+    ::= { calixSoamExtMegEntry 8 }
+
+calixSoamExtMegIdPermission OBJECT-TYPE
+    SYNTAX      Dot1agCfmIdPermission
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enumerated value indicating what, if anything, is to be
+         included in the Sender ID TLV transmitted by MPs
+         configured in this MEG. The value sendIdDefer is not allowed.
+        "
+    DEFVAL { sendIdNone }
+    ::= { calixSoamExtMegEntry 9 }
+
+calixSoamExtMegRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of the row.
+         This field should be used to create or remove a MEG from the system.
+        "
+    ::= { calixSoamExtMegEntry 10 }
+
+-- ******************************************************************
+-- MIP configuration
+-- ******************************************************************
+
+calixSoamExtMipTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF CalixSoamExtMipEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "This table contains all MIPs configured in the system."
+    ::=  { calixEoamExtConfig 2 }
+
+calixSoamExtMipEntry OBJECT-TYPE
+    SYNTAX         CalixSoamExtMipEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Each MIP in the system shall have an entry in this table."
+    INDEX {  calixSoamExtMegIdentifier,
+    		 calixSoamExtMipIdentifier  }
+    ::=  { calixSoamExtMipTable 1 }
+
+CalixSoamExtMipEntry ::=  SEQUENCE {
+    calixSoamExtMipIdentifier          Unsigned32,
+    calixSoamExtMipIfIndex      	   InterfaceIndex,
+    calixSoamExtMipAdminState          CalixEoamEnableType,
+    calixSoamExtMipMacAddress          MacAddress,
+    calixSoamExtMipResetStat           TruthValue,
+    calixSoamExtMipRowStatus           RowStatus
+    }
+
+calixSoamExtMipIdentifier OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique numerical identifier for the MIP."
+    ::= { calixSoamExtMipEntry 1 }
+
+calixSoamExtMipIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This attributes specifies the interface index for the port
+         on which the MIP is attached.
+        "
+    ::= { calixSoamExtMipEntry 3 }
+
+calixSoamExtMipAdminState  OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Administrative state of the MIP."
+    ::= { calixSoamExtMipEntry 4 }
+
+calixSoamExtMipMacAddress  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MAC address of the MIP."
+    ::= { calixSoamExtMipEntry 5 }
+
+calixSoamExtMipResetStat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "True indicates MIPs statistics should be cleared."
+    ::= { calixSoamExtMipEntry 6 }
+
+calixSoamExtMipRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of the row.
+         This attribute is used to create and delete a MIP in the system.
+        "
+    ::= { calixSoamExtMipEntry 7 }
+
+-- ******************************************************************
+-- MIP statistics
+-- ******************************************************************
+
+calixSoamExtMipStatsTable   OBJECT-TYPE
+    SYNTAX         SEQUENCE OF CalixSoamExtMipStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "This table contains Stats for all MIPs configured in the system."
+    ::=  { calixEoamExtConfig 3 }
+
+calixSoamExtMipStatsEntry OBJECT-TYPE
+    SYNTAX         CalixSoamExtMipStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Stats for a MIP entity."
+    INDEX {  calixSoamExtMegIdentifier,
+    		 calixSoamExtMipIdentifier  }
+    ::=  { calixSoamExtMipStatsTable 1 }
+
+CalixSoamExtMipStatsEntry ::=  SEQUENCE {
+	calixSoamExtMipStatsDirection		Dot1agCfmMpDirection,
+    calixSoamExtMipStatsLbmIn        	Counter32,
+    calixSoamExtMipStatsLbrOut      	Counter32,
+    calixSoamExtMipStatsLtmIn        	Counter32,
+    calixSoamExtMipStatsLtmForwarded 	Counter32,
+    calixSoamExtMipStatsLtrOut       	Counter32,
+    calixSoamExtMipStatsLbmInvalidSenderId	Counter32,
+    calixSoamExtMipStatsDiscards		Counter32,
+    calixSoamExtMipStatsResetStat		TruthValue
+    }
+
+calixSoamExtMipStatsDirection OBJECT-TYPE
+    SYNTAX      Dot1agCfmMpDirection
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The direction in which the MHF faces for statistics."
+    ::= { calixSoamExtMipStatsEntry 1 }
+
+calixSoamExtMipStatsLbmIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of LBMs received by this MIP."
+    ::= { calixSoamExtMipStatsEntry 2 }
+
+calixSoamExtMipStatsLbrOut OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of LBRs sent by this MIP."
+    ::= { calixSoamExtMipStatsEntry 3 }
+
+calixSoamExtMipStatsLtmIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of LTMs received by this MIP."
+    ::= { calixSoamExtMipStatsEntry 4 }
+
+calixSoamExtMipStatsLtmForwarded OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of LTM messages forwarded by MIP."
+    ::= { calixSoamExtMipStatsEntry 5 }
+
+calixSoamExtMipStatsLtrOut OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of LTR responses sent by this MIP."
+    ::= { calixSoamExtMipStatsEntry 6 }
+
+calixSoamExtMipStatsLbmInvalidSenderId
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of received LBM with a bad Sender ID.
+        "
+    ::= { calixSoamExtMipStatsEntry 7 }
+
+calixSoamExtMipStatsDiscards
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of discarded OAM frames.
+        "
+    ::= { calixSoamExtMipStatsEntry 8 }
+
+calixSoamExtMipStatsResetStat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "True indicates MEP statistics should be cleared."
+    ::= { calixSoamExtMipStatsEntry 9 }
+
+
+-- ******************************************************************
+--    MEP extension for Delay Measurement and DVM
+-- ******************************************************************
+
+calixSoamExtMepDmExtTable   OBJECT-TYPE
+    SYNTAX         SEQUENCE OF CalixSoamExtMepDmExtEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "This table contains extended attributes and counters for the standard
+         MEP table dot1agCfmMepTable, in order to support Delay Measurement and
+         Delay Variation Measurment functionality.
+        "
+    ::=  { calixEoamExtConfig 4 }
+
+calixSoamExtMepDmExtEntry OBJECT-TYPE
+    SYNTAX         CalixSoamExtMepDmExtEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "MEP Extension (DM and DVM) table for a given MEP object."
+    INDEX { dot1agCfmMdIndex,
+            dot1agCfmMaIndex,
+            dot1agCfmMepIdentifier }
+    ::=  { calixSoamExtMepDmExtTable   1 }
+
+CalixSoamExtMepDmExtEntry ::=  SEQUENCE {
+	calixSoamExtMepDmExtActive						CalixEoamEnableType,
+    calixSoamExtMepDmExtDestMacAddress              MacAddress,
+    calixSoamExtMepDmExtDestMepId                   Dot1agCfmMepIdOrZero,
+    calixSoamExtMepDmExtDestIsMepId                 TruthValue,
+    calixSoamExtMepDmExtClassOfService              Unsigned32,
+    calixSoamExtMepDmExtDmPeriod                    INTEGER,
+    calixSoamExtMepDmExtMaxRtdThrSet  				Unsigned32,
+    calixSoamExtMepDmExtMaxRtdThrClr				Unsigned32,
+    calixSoamExtMepDmExtAvgRtdThrSet  				Unsigned32,
+    calixSoamExtMepDmExtAvgRtdThrClr				Unsigned32,
+    calixSoamExtMepDmExtMaxRtdVarThrSet  			Unsigned32,
+    calixSoamExtMepDmExtMaxRtdVarThrClr				Unsigned32,
+    calixSoamExtMepDmExtAvgRtdVarThrSet  			Unsigned32,
+    calixSoamExtMepDmExtAvgRtdVarThrClr				Unsigned32,
+    calixSoamExtMepDmExtAvgRoundTripDelay           Unsigned32,
+    calixSoamExtMepDmExtMinRoundTripDelay           Unsigned32,
+    calixSoamExtMepDmExtMaxRoundTripDelay           Unsigned32,
+    calixSoamExtMepDmExtAvgRoundTripDelayVariation  Unsigned32,
+    calixSoamExtMepDmExtMinRoundTripDelayVariation  Unsigned32,
+    calixSoamExtMepDmExtMaxRoundTripDelayVariation  Unsigned32,
+    calixSoamExtMepDmExtAvgRoundTripProcessingDelay Unsigned32,
+    calixSoamExtMepDmExtMinRoundTripProcessingDelay Unsigned32,
+    calixSoamExtMepDmExtMaxRoundTripProcessingDelay Unsigned32,
+    calixSoamExtMepDmExtDataLength					Unsigned32,
+    calixSoamExtMepDmExtDataPattern					Unsigned32
+    }
+
+calixSoamExtMepDmExtActive OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Use to enable delay measurement."
+    ::= { calixSoamExtMepDmExtEntry 1 }
+    
+calixSoamExtMepDmExtDestMacAddress    OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Target MAC Address field to be transmitted: A unicast
+         destination MAC address.
+         This address will be used if the value of the column
+         calixSoamExtMepDmExtDestIsMepId is 'False'.
+        "
+    ::= { calixSoamExtMepDmExtEntry  2 }
+
+calixSoamExtMepDmExtDestMepId    OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MEP ID of remote MEP to which the DM is to be sent.
+         This address will be used if the value of the column
+         calixSoamExtMepDmExtDestIsMepId is 'True'.
+        "
+    ::= { calixSoamExtMepDmExtEntry  3 }
+
+calixSoamExtMepDmExtDestIsMepId    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "True indicates that MEP ID of the target MEP is used for
+         DM transmission.
+         False indicates that unicast destination MAC address of the
+         target MEP is used for DM transmission.
+        "
+    ::= { calixSoamExtMepDmExtEntry  4 }
+
+calixSoamExtMepDmExtClassOfService OBJECT-TYPE
+    SYNTAX      Unsigned32(0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the class of service for which the DMM is requested.
+         A value of 8 indicates a full MEP level (CoS agnostic) request.
+        "
+    ::= { calixSoamExtMepDmExtEntry  5 }
+
+calixSoamExtMepDmExtDmPeriod    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        dm1sec(3),
+        dm10sec(4)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the delay between two consecutive DM messages."
+    ::= { calixSoamExtMepDmExtEntry   6 }
+
+	calixSoamExtMepDmExtMaxRtdThrSet    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum round trip delay threshold upon which an alarm is to be raised.
+        "
+    ::= { calixSoamExtMepDmExtEntry   7 }
+
+	calixSoamExtMepDmExtMaxRtdThrClr    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum round trip delay threshold upon which an alarm is to be cleared.
+        "
+    ::= { calixSoamExtMepDmExtEntry   8 }
+
+	calixSoamExtMepDmExtAvgRtdThrSet    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The average round trip delay threshold upon which an alarm is to be raised.
+        "
+    ::= { calixSoamExtMepDmExtEntry   9 }
+
+	calixSoamExtMepDmExtAvgRtdThrClr    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The average round trip delay threshold upon which an alarm is to be cleared.
+        "
+    ::= { calixSoamExtMepDmExtEntry   10 }
+
+	calixSoamExtMepDmExtMaxRtdVarThrSet    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum round trip delay variation threshold upon which an alarm is to be raised.
+        "
+    ::= { calixSoamExtMepDmExtEntry   11 }
+
+	calixSoamExtMepDmExtMaxRtdVarThrClr    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum round trip delay variation threshold upon which an alarm is to be cleared.
+        "
+    ::= { calixSoamExtMepDmExtEntry   12 }
+
+	calixSoamExtMepDmExtAvgRtdVarThrSet    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The average round trip delay variation threshold upon which an alarm is to be raised.
+        "
+    ::= { calixSoamExtMepDmExtEntry   13 }
+
+	calixSoamExtMepDmExtAvgRtdVarThrClr    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..100000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The average round trip delay variation threshold upon which an alarm is to be cleared.
+        "
+    ::= { calixSoamExtMepDmExtEntry   14 }
+
+calixSoamExtMepDmExtAvgRoundTripDelay    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average round trip delay for the session, expressed in 1/100th of
+         miliseconds.
+        "
+    ::= { calixSoamExtMepDmExtEntry   15 }
+
+calixSoamExtMepDmExtMinRoundTripDelay    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum round trip delay for the session, expressed in 1/100th of
+         miliseconds."
+    ::= { calixSoamExtMepDmExtEntry   16 }
+
+calixSoamExtMepDmExtMaxRoundTripDelay    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum round trip delay for the session, expressed in 1/100th of
+         miliseconds.
+        "
+    ::= { calixSoamExtMepDmExtEntry   17 }
+
+calixSoamExtMepDmExtAvgRoundTripDelayVariation    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average round trip delay variation for the session,
+         expressed in 1/100th of miliseconds."
+    ::= { calixSoamExtMepDmExtEntry   18 }
+
+calixSoamExtMepDmExtMinRoundTripDelayVariation    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum round trip delay variation for the session,
+         expressed in 1/100th of miliseconds."
+    ::= { calixSoamExtMepDmExtEntry   19 }
+
+calixSoamExtMepDmExtMaxRoundTripDelayVariation    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum round trip delay variation for the session,
+         expressed in 1/100th of miliseconds."
+    ::= { calixSoamExtMepDmExtEntry   20 }
+
+calixSoamExtMepDmExtAvgRoundTripProcessingDelay    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average processing delay for the session,
+         expressed in 1/100th of miliseconds.
+        "
+    ::= { calixSoamExtMepDmExtEntry   21 }
+
+calixSoamExtMepDmExtMinRoundTripProcessingDelay    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum round trip delay variation for the session,
+         expressed in 1/100th of miliseconds.
+        "
+    ::= { calixSoamExtMepDmExtEntry   22 }
+
+calixSoamExtMepDmExtMaxRoundTripProcessingDelay    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum round trip delay variation for the session,
+         expressed in 1/100th of miliseconds.
+        "
+    ::= { calixSoamExtMepDmExtEntry   23}
+
+calixSoamExtMepDmExtDataLength    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Length of data TLV in delay measurement frame.
+        "
+    ::= { calixSoamExtMepDmExtEntry   24 }
+
+calixSoamExtMepDmExtDataPattern    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Data pattern copied into data TLV.
+        "
+    ::= { calixSoamExtMepDmExtEntry   25 }
+
+
+-- ******************************************************************
+--    MEP extension for Frame Loss Measurement
+-- ******************************************************************
+
+calixSoamExtMepLmExtTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF CalixSoamExtMepLmExtEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "This table contains extended attributes and counters for the standard
+         MEP table dot1agCfmMepTable, in order to support FLM on demand functionality.
+        "
+    ::=  { calixEoamExtConfig 5 }
+
+calixSoamExtMepLmExtEntry OBJECT-TYPE
+    SYNTAX         CalixSoamExtMepLmExtEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "MEP Extension (FLM) table for a given MEP object"
+    INDEX { dot1agCfmMdIndex,
+            dot1agCfmMaIndex,
+            dot1agCfmMepIdentifier }
+    ::=  { calixSoamExtMepLmExtTable   1 }
+
+CalixSoamExtMepLmExtEntry   ::=  SEQUENCE {
+	calixSoamExtMepLmExtActive				  CalixEoamEnableType,
+    calixSoamExtMepLmExtDestMacAddress        MacAddress,
+    calixSoamExtMepLmExtDestMepId             Dot1agCfmMepIdOrZero,
+    calixSoamExtMepLmExtDestIsMepId           TruthValue,
+    calixSoamExtMepLmExtLmType			      CalixSoamLmType,
+    calixSoamExtMepLmExtClassOfService        Unsigned32,
+    calixSoamExtMepLmExtLmPeriod              INTEGER,
+    calixSoamExtMepLmExtMaxNearEndLossThrSet  Unsigned32,
+    calixSoamExtMepLmExtMaxNearEndLossThrClr  Unsigned32,
+    calixSoamExtMepLmExtAvgNearEndLossThrSet  Unsigned32,
+    calixSoamExtMepLmExtAvgNearEndLossThrClr  Unsigned32,
+    calixSoamExtMepLmExtMaxFarEndLossThrSet   Unsigned32,
+    calixSoamExtMepLmExtMaxFarEndLossThrClr   Unsigned32,
+    calixSoamExtMepLmExtAvgFarEndLossThrSet   Unsigned32,
+    calixSoamExtMepLmExtAvgFarEndLossThrClr   Unsigned32,
+    calixSoamExtMepLmExtNearEndLostPkts       Counter32,
+    calixSoamExtMepLmExtNearEndLossRatio      Unsigned32,
+    calixSoamExtMepLmExtMaxNearEndLossRatio   Unsigned32,
+    calixSoamExtMepLmExtMinNearEndLossRatio   Unsigned32,
+    calixSoamExtMepLmExtAvgNearEndLossRatio   Unsigned32,
+    calixSoamExtMepLmExtFarEndLostPkts   	  Counter32,
+    calixSoamExtMepLmExtFarEndLossRatio       Unsigned32,
+    calixSoamExtMepLmExtMaxFarEndLossRatio    Unsigned32,
+    calixSoamExtMepLmExtMinFarEndLossRatio    Unsigned32,
+    calixSoamExtMepLmExtAvgFarEndLossRatio    Unsigned32
+    }
+
+calixSoamExtMepLmExtActive OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Use to enable frame delay measurement."
+    ::= { calixSoamExtMepLmExtEntry 1 }
+    
+calixSoamExtMepLmExtDestMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Target MAC Address Field to be transmitted: A unicast
+         destination MAC address.
+         This address will be used if the value of the column
+         calixSoamExtMepLmExtDestIsMepId is 'False'.
+        "
+    ::= { calixSoamExtMepLmExtEntry 2 }
+
+calixSoamExtMepLmExtDestMepId OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MEP ID of remote MEP to which the FLM is to be sent.
+         This address will be used if the value of the column
+         calixSoamExtMepLmExtDestIsMepId is 'True'.
+        "
+    ::= { calixSoamExtMepLmExtEntry 3 }
+
+calixSoamExtMepLmExtDestIsMepId OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "True indicates that MEPID is used for FLM transmission.
+         False indicates that unicast destination MAC address is used for FLM transmission.
+        "
+    ::= { calixSoamExtMepLmExtEntry 4}
+
+calixSoamExtMepLmExtLmType OBJECT-TYPE
+    SYNTAX      CalixSoamLmType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of Frame Loss Measurement: Single or Dual.
+        "
+    ::= { calixSoamExtMepLmExtEntry  5 }
+
+calixSoamExtMepLmExtClassOfService OBJECT-TYPE
+    SYNTAX      Unsigned32(0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the class of service for which the FLM is requested.
+         A value of 8 indicates a full MEP level (CoS agnostic) request.
+        "
+    ::= { calixSoamExtMepLmExtEntry  6 }
+
+calixSoamExtMepLmExtLmPeriod OBJECT-TYPE
+    SYNTAX INTEGER {
+              lm100ms(1),
+              lm1sec(2),
+              lm10sec(3)
+              }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the delay between two consecutive FLM messages"
+    ::= { calixSoamExtMepLmExtEntry   7 }
+
+
+	calixSoamExtMepLmExtMaxNearEndLossThrSet    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum near end frame loss threshold upon which an alarm is to be raised.
+        "
+    ::= { calixSoamExtMepLmExtEntry   8 }
+
+	calixSoamExtMepLmExtMaxNearEndLossThrClr    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum near end frame loss threshold upon which an alarm is to be cleared.
+        "
+    ::= { calixSoamExtMepLmExtEntry   9 }
+
+	calixSoamExtMepLmExtAvgNearEndLossThrSet    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The average near end frame loss threshold upon which an alarm is to be raised.
+        "
+    ::= { calixSoamExtMepLmExtEntry   10 }
+
+	calixSoamExtMepLmExtAvgNearEndLossThrClr    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The average near end frame loss threshold upon which an alarm is to be cleared.
+        "
+    ::= { calixSoamExtMepLmExtEntry   11 }
+
+	calixSoamExtMepLmExtMaxFarEndLossThrSet    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum far end loss threshold upon which an alarm is to be raised.
+        "
+    ::= { calixSoamExtMepLmExtEntry   12 }
+
+	calixSoamExtMepLmExtMaxFarEndLossThrClr    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum far end loss threshold upon which an alarm is to be cleared.
+        "
+    ::= { calixSoamExtMepLmExtEntry   13 }
+
+	calixSoamExtMepLmExtAvgFarEndLossThrSet    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The average far end loss threshold upon which an alarm is to be raised.
+        "
+    ::= { calixSoamExtMepLmExtEntry   14 }
+
+	calixSoamExtMepLmExtAvgFarEndLossThrClr    OBJECT-TYPE
+    SYNTAX      Unsigned32(0..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The average far end loss threshold upon which an alarm is to be cleared.
+        "
+    ::= { calixSoamExtMepLmExtEntry   15 }
+
+calixSoamExtMepLmExtNearEndLostPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of frames lost at the near end."
+    ::= { calixSoamExtMepLmExtEntry   16 }
+
+calixSoamExtMepLmExtNearEndLossRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Frame loss ratio at near end, in 1/1000000th of percentage points.
+         A value of 10000 means 1% loss ratio.
+        "
+    ::= { calixSoamExtMepLmExtEntry   17 }
+
+calixSoamExtMepLmExtMaxNearEndLossRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum frame loss ratio at near end, in 1/1000000th of percentage 
+         points. A value of 10000 means 1% loss ratio.
+        "
+    ::= { calixSoamExtMepLmExtEntry   18 }
+
+calixSoamExtMepLmExtMinNearEndLossRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum frame loss ratio at near end, in 1/1000000th of percentage 
+         points. A value of 10000 means 1% loss ratio.
+        "
+    ::= { calixSoamExtMepLmExtEntry   19 }
+
+calixSoamExtMepLmExtAvgNearEndLossRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average frame loss ratio at near end, in 1/1000000th of percentage 
+         points. A value of 10000 means 1% loss ratio.
+        "
+    ::= { calixSoamExtMepLmExtEntry   20 }
+
+calixSoamExtMepLmExtFarEndLostPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of frames lost at the far end."
+    ::= { calixSoamExtMepLmExtEntry   21 }
+
+calixSoamExtMepLmExtFarEndLossRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Frame loss ratio at far end, in 1/1000000th of percentage points.
+         A value of 10000 means 1% loss ratio.
+        "
+    ::= { calixSoamExtMepLmExtEntry   22 }
+
+calixSoamExtMepLmExtMaxFarEndLossRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum frame loss ratio at far end, in 1/1000000th of percentage 
+         points. A value of 10000 means 1% loss ratio.
+        "
+    ::= { calixSoamExtMepLmExtEntry   23 }
+
+calixSoamExtMepLmExtMinFarEndLossRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum frame loss ratio at far end, in 1/1000000th of percentage 
+         points. A value of 10000 means 1% loss ratio.
+        "
+    ::= { calixSoamExtMepLmExtEntry   24 }
+
+calixSoamExtMepLmExtAvgFarEndLossRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average frame loss ratio at far end, in 1/1000000th of percentage 
+         points. A value of 10000 means 1% loss ratio.
+        "
+    ::= { calixSoamExtMepLmExtEntry   25 }
+
+
+-- ******************************************************************
+--    MEP extension for Multicast Loopback
+-- ******************************************************************
+
+calixSoamExtMepMcastLoopbackSessionTable   OBJECT-TYPE
+    SYNTAX         SEQUENCE OF CalixSoamExtMepMcastLoopbackSessionEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "This table is used to initiate a multicast loopback request for 
+        a given MEP.
+        "
+    ::=  { calixEoamExtConfig 6 }
+
+calixSoamExtMepMcastLoopbackSessionEntry  OBJECT-TYPE
+    SYNTAX         CalixSoamExtMepMcastLoopbackSessionEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Each MEP can have only one active Multicast Loopback Request
+         at a given time.
+        "
+    INDEX { dot1agCfmMdIndex,
+            dot1agCfmMaIndex,
+            dot1agCfmMepIdentifier }
+    ::=  { calixSoamExtMepMcastLoopbackSessionTable 1 }
+
+CalixSoamExtMepMcastLoopbackSessionEntry ::= SEQUENCE {
+    calixSoamExtMepMcastLoopbackSessionStatus      INTEGER,
+    calixSoamExtMepMcastLoopbackSessionReplies     Unsigned32
+    }
+
+calixSoamExtMepMcastLoopbackSessionStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none(1),
+        inProgress(2),
+        completed(3),
+        activate(4),
+        failed(5)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the status of the Multicast Loopback request
+         for the particular ITU-T Y.1731 MEP. In order to activate a new
+         session, write 'activate' in this variable.
+        "
+    ::= { calixSoamExtMepMcastLoopbackSessionEntry 1 }
+
+calixSoamExtMepMcastLoopbackSessionReplies OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the number of replies received for this multicast loopback
+         session.
+        "
+    ::= { calixSoamExtMepMcastLoopbackSessionEntry 2 }
+
+-- ******************************************************************
+--  Multicast Loopback Results table
+-- ******************************************************************
+
+calixSoamExtMepMcastLoopbackResultsTable   OBJECT-TYPE
+    SYNTAX         SEQUENCE OF CalixSoamExtMepMcastLoopbackResultsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "This table is used to read the results of a multicast
+         loopback request for a given MEP.
+        "
+    ::=  { calixEoamExtConfig 7 }
+
+calixSoamExtMepMcastLoopbackResultsEntry  OBJECT-TYPE
+    SYNTAX         CalixSoamExtMepMcastLoopbackResultsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Each MEP can have only one active Multicast Loopback Request
+         at a given time. This table presents the results of the last request
+         indexed by the reply order.
+        "
+    INDEX { dot1agCfmMdIndex,
+            dot1agCfmMaIndex,
+            dot1agCfmMepIdentifier,
+            calixSoamExtMepMcastLoopbackResultsIndex }
+    ::=  { calixSoamExtMepMcastLoopbackResultsTable 1 }
+
+CalixSoamExtMepMcastLoopbackResultsEntry ::= SEQUENCE {
+    calixSoamExtMepMcastLoopbackResultsIndex      Unsigned32,
+    calixSoamExtMepMcastLoopbackResultsMacAddress MacAddress
+    }
+
+calixSoamExtMepMcastLoopbackResultsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Specifies the index of the multicast loopback result."
+    ::= { calixSoamExtMepMcastLoopbackResultsEntry 1 }
+
+calixSoamExtMepMcastLoopbackResultsMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MAC address for the received reply."
+    ::= { calixSoamExtMepMcastLoopbackResultsEntry 2 }
+
+-- ******************************************************************
+--  MEP extension for Statistics
+-- ******************************************************************
+
+calixSoamExtMepStatsExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CalixSoamExtMepStatsExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains extensions of the dot1agCfmMepTable for MEP Statistics."
+    ::= { calixEoamExtConfig 8 }
+
+calixSoamExtMepStatsExtEntry OBJECT-TYPE
+    SYNTAX      CalixSoamExtMepStatsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Extended counters and attributes for MEP configuration."
+    INDEX { dot1agCfmMdIndex,
+            dot1agCfmMaIndex,
+            dot1agCfmMepIdentifier
+          }
+    ::= { calixSoamExtMepStatsExtTable 1}
+
+CalixSoamExtMepStatsExtEntry ::= SEQUENCE {
+    calixSoamExtMepStatsExtCcmRdiSent           Counter32,
+    calixSoamExtMepStatsExtCcmReceived          Counter32,
+    calixSoamExtMepStatsExtCcmInvalidSenderId   Counter32,
+    calixSoamExtMepStatsExtCcmInvalidPortStatus Counter32,
+    calixSoamExtMepStatsExtCcmInvalidIfStatus   Counter32,
+    calixSoamExtMepStatsExtCcmRdiReceived       Counter32,
+    calixSoamExtMepStatsExtLbmReceived		  	Counter32,
+    calixSoamExtMepStatsExtLbmSent			  	Counter32,
+    calixSoamExtMepStatsExtLbmInvalidSenderId   Counter32,
+    calixSoamExtMepStatsExtLbrInvalidSenderId   Counter32,
+    calixSoamExtMepStatsExtLtmReceived		  	Counter32,
+    calixSoamExtMepStatsExtLtmSent			  	Counter32,
+    calixSoamExtMepStatsExtLtrInvalidMac		Counter32,
+    calixSoamExtMepStatsExtLtrReceived		  	Counter32,
+    calixSoamExtMepStatsExtLtrSent			  	Counter32,
+    calixSoamExtMepStatsExtLmmReceived		  	Counter32,
+    calixSoamExtMepStatsExtLmmSent			  	Counter32,
+    calixSoamExtMepStatsExtLmrReceived		  	Counter32,
+    calixSoamExtMepStatsExtLmrSent			 	Counter32,
+    calixSoamExtMepStatsExtDmmReceived		  	Counter32,
+    calixSoamExtMepStatsExtDmmSent			  	Counter32,
+    calixSoamExtMepStatsExtDmrReceived		  	Counter32,
+    calixSoamExtMepStatsExtDmrSent			  	Counter32,
+    calixSoamExtMepStatsExtResetStat			TruthValue
+    }
+
+calixSoamExtMepStatsExtCcmRdiSent
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of sent CCMs with RDI bit set."
+    ::= { calixSoamExtMepStatsExtEntry 1 }
+
+calixSoamExtMepStatsExtCcmReceived
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of CCMs received from all remote MEPs."
+    ::= { calixSoamExtMepStatsExtEntry 2 }
+
+calixSoamExtMepStatsExtCcmInvalidSenderId
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of CCMs with invalid Sender ID TLV received from all
+         remote MEPs.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 3 }
+
+calixSoamExtMepStatsExtCcmInvalidPortStatus
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of CCMs with invalid Port Status TLV received from all
+         remote MEPs.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 4 }
+
+calixSoamExtMepStatsExtCcmInvalidIfStatus
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of CCMs with invalid Interface Status TLV received from all
+         remote MEPs.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 5 }
+
+calixSoamExtMepStatsExtCcmRdiReceived
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of CCMs with RDI bit set received from all
+         remote MEPs.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 6 }
+
+calixSoamExtMepStatsExtLbmReceived
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LBM messages received.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 7 }
+
+calixSoamExtMepStatsExtLbmSent
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LBM messages sent.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 8 }
+
+
+calixSoamExtMepStatsExtLbmInvalidSenderId
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LBM messages received with
+         a bad sender ID.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 9 }
+
+
+calixSoamExtMepStatsExtLbrInvalidSenderId
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LBR messages received with
+         a bad sender ID.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 10 }
+
+
+calixSoamExtMepStatsExtLtmReceived
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LTM messages received.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 11 }
+
+
+calixSoamExtMepStatsExtLtmSent
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LTM messages sent.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 12 }
+
+
+calixSoamExtMepStatsExtLtrInvalidMac
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LTR messages received with
+         a bad MAC address.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 13 }
+
+
+calixSoamExtMepStatsExtLtrReceived
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LTR messages received.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 14 }
+
+
+calixSoamExtMepStatsExtLtrSent
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LTR messages sent.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 15 }
+
+
+calixSoamExtMepStatsExtLmmReceived
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LMM messages received.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 16 }
+
+
+calixSoamExtMepStatsExtLmmSent
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LMM messages sent.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 17 }
+
+calixSoamExtMepStatsExtLmrReceived
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LMR messages received.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 18 }
+
+
+calixSoamExtMepStatsExtLmrSent
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of LMR messages sent.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 19 }
+
+calixSoamExtMepStatsExtDmmReceived
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of DMM messages received.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 20 }
+
+
+calixSoamExtMepStatsExtDmmSent
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of DMM messages sent.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 21 }
+
+calixSoamExtMepStatsExtDmrReceived
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of DMR messages received.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 22 }
+
+
+calixSoamExtMepStatsExtDmrSent
+    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of DMR messages sent.
+        "
+    ::= { calixSoamExtMepStatsExtEntry 23 }
+
+calixSoamExtMepStatsExtResetStat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "True indicates MEP statistics should be cleared."
+    ::= { calixSoamExtMepStatsExtEntry 24 }
+
+
+-- ******************************************************************
+-- MEP Extension for Unicast Loopback Result Table
+-- ******************************************************************
+
+calixSoamExtMepUcastLoopbackResultsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CalixSoamExtMepUcastLoopbackResultsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains Unicast Loopback protocol results for corresponding MEP."
+    ::= { calixEoamExtConfig 9 }
+
+calixSoamExtMepUcastLoopbackResultsEntry OBJECT-TYPE
+    SYNTAX      CalixSoamExtMepUcastLoopbackResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unicast Loopback result for corresponding MEP."
+    INDEX { dot1agCfmMdIndex,
+            dot1agCfmMaIndex,
+            dot1agCfmMepIdentifier
+          }
+    ::= { calixSoamExtMepUcastLoopbackResultsTable 1}
+
+CalixSoamExtMepUcastLoopbackResultsEntry ::= SEQUENCE {
+    calixSoamExtMepUcastLoopbackResultsLbmFirstSeqNumber Unsigned32,
+    calixSoamExtMepUcastLoopbackResultsDestMacAddress    MacAddress,
+    calixSoamExtMepUcastLoopbackResultsStatus            INTEGER,
+    calixSoamExtMepUcastLoopbackResultsLbmOut            Counter32,
+    calixSoamExtMepUcastLoopbackResultsLbrIn             Counter32
+    }
+
+calixSoamExtMepUcastLoopbackResultsLbmFirstSeqNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Loopback Transaction Identifier of the first LBM sent. This value can be obtained
+         from dot1agCfmMepTransmitLbmSeqNumber of dot1agCfmMepTable table after Loopback transmitting.
+        "
+    ::= { calixSoamExtMepUcastLoopbackResultsEntry 1 }
+
+calixSoamExtMepUcastLoopbackResultsDestMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC Address of destination MP."
+    ::= { calixSoamExtMepUcastLoopbackResultsEntry 2 }
+
+calixSoamExtMepUcastLoopbackResultsStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+      none(0),
+      inProgress(1),
+      failed(2),
+      succeeded(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the state of the current Loopback request."
+    ::= { calixSoamExtMepUcastLoopbackResultsEntry 3 }
+
+calixSoamExtMepUcastLoopbackResultsLbmOut OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Loopback Messages sent."
+    ::= { calixSoamExtMepUcastLoopbackResultsEntry 4 }
+
+calixSoamExtMepUcastLoopbackResultsLbrIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Loopback replies received."
+    ::= { calixSoamExtMepUcastLoopbackResultsEntry 5 }
+
+-- ******************************************************************
+-- System Level MIB extensions for SOAM
+-- ******************************************************************
+
+-- ******************************************************************
+-- SOAM Configration Extension 
+-- ******************************************************************
+
+calixSoamExtCfgTable OBJECT-TYPE
+    SYNTAX 		SEQUENCE  OF  CalixSoamExtCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains Unicast Loopback protocol results for corresponding MEP."
+    ::= { calixEoamExtConfig 10 }
+
+calixSoamExtCfgEntry OBJECT-TYPE
+    SYNTAX      CalixSoamExtCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "General Service OAM Configuration Table."
+    INDEX { calixSoamExtCfgIndex
+          }
+    ::= { calixSoamExtCfgTable 1}
+
+CalixSoamExtCfgEntry ::= SEQUENCE {
+	calixSoamExtCfgIndex				Unsigned32, 
+    calixSoamExtCfgAdminState			CalixEoamEnableType,
+    calixSoamExtCfgPermission			Dot1agCfmIdPermission,
+    calixSoamExtCfgChassisIdSubtype     LldpChassisIdSubtype,
+    calixSoamExtCfgChassisId			LldpChassisId,
+    calixSoamExtCfgManAddressDomain     TDomain,
+    calixSoamExtCfgManAddress         	TAddress,
+    calixSoamExtCfgCcmOptTlvSenderId	CalixEoamEnableType,
+    calixSoamExtCfgCcmOptTlvPortStatus	CalixEoamEnableType,
+    calixSoamExtCfgCcmOptTlvIfStatus	CalixEoamEnableType,
+    calixSoamExtCfgLtmOptTlvSenderId	CalixEoamEnableType,
+    calixSoamExtCfgLbmOptTlvSenderId	CalixEoamEnableType,
+    calixSoamExtCfgLbmOptTlvIfStatus	CalixEoamEnableType,
+    calixSoamExtCfgLbmOptTlvData		CalixEoamEnableType,
+    calixSoamExtCfgDmmOptTlvData		CalixEoamEnableType
+    }
+
+calixSoamExtCfgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Index of auto instantited configuration MIB.  Must be 1.
+        "
+    ::= { calixSoamExtCfgEntry 1 }
+
+
+calixSoamExtCfgAdminState OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "State of Service level Ethernet OAM.  Set this to enable to begin transmitting Ethernet OAM
+         frames from configures MEG/MEPs.
+        "
+    ::= { calixSoamExtCfgEntry 2 }
+
+calixSoamExtCfgPermission OBJECT-TYPE
+    SYNTAX      Dot1agCfmIdPermission
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Default permission level determining which optional TLVs to include.
+        "
+    ::= { calixSoamExtCfgEntry 3 }
+
+calixSoamExtCfgChassisIdSubtype OBJECT-TYPE
+    SYNTAX      LldpChassisIdSubtype
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Chassis ID Subtype.
+        "
+    ::= { calixSoamExtCfgEntry 4 }
+
+calixSoamExtCfgChassisId OBJECT-TYPE
+    SYNTAX      LldpChassisId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Chassis ID.
+        "
+    ::= { calixSoamExtCfgEntry 5 }
+
+calixSoamExtCfgManAddressDomain OBJECT-TYPE
+    SYNTAX      TDomain
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Management Domain.
+        "
+    ::= { calixSoamExtCfgEntry 6 }
+
+calixSoamExtCfgManAddress OBJECT-TYPE
+    SYNTAX      TAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Management Address.
+        "
+    ::= { calixSoamExtCfgEntry 7 }
+
+calixSoamExtCfgCcmOptTlvSenderId OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable to include sender ID TLV in CCM messages.
+        "
+    ::= { calixSoamExtCfgEntry 8 }
+
+calixSoamExtCfgCcmOptTlvPortStatus OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable to include Port Status TLV in CCM messages.
+        "
+    ::= { calixSoamExtCfgEntry 9 }
+
+calixSoamExtCfgCcmOptTlvIfStatus OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable to include Interface Status TLV in CCM messages.
+        "
+    ::= { calixSoamExtCfgEntry 10 }
+
+calixSoamExtCfgLtmOptTlvSenderId OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable to include Sender ID TLV in LTM messages.
+        "
+    ::= { calixSoamExtCfgEntry 11 }
+
+calixSoamExtCfgLbmOptTlvSenderId OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable to include Sender ID TLV in LBM messages.
+        "
+    ::= { calixSoamExtCfgEntry 12 }
+
+calixSoamExtCfgLbmOptTlvIfStatus OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable to include Interface Status TLV in LBM messages.
+        "
+    ::= { calixSoamExtCfgEntry 13 }
+
+calixSoamExtCfgLbmOptTlvData OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable to include Data TLV in LBM messages.
+        "
+    ::= { calixSoamExtCfgEntry 14 }
+
+calixSoamExtCfgDmmOptTlvData OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable to include Data TLV in DMM messages.
+        "
+    ::= { calixSoamExtCfgEntry 15 }
+
+-- ******************************************************************
+-- LOAM Configration Extension 
+-- ******************************************************************
+
+calixLoamExtCfgTable OBJECT-TYPE
+    SYNTAX 		SEQUENCE  OF  CalixLoamExtCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table contains settings for enabling/disabling the Link OAM feature."
+    ::= { calixEoamExtConfig 11 }
+
+calixLoamExtCfgEntry OBJECT-TYPE
+    SYNTAX      CalixLoamExtCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "General Link OAM Configuration Table."
+    INDEX { calixLoamExtCfgIndex
+          }
+    ::= { calixLoamExtCfgTable 1}
+
+CalixLoamExtCfgEntry ::= SEQUENCE {
+	calixLoamExtCfgIndex				Unsigned32, 
+    calixLoamExtCfgAdminState			CalixEoamEnableType
+    }
+
+calixLoamExtCfgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Index of auto instantiated configuration MIB.  Must be 1.
+        "
+    ::= { calixLoamExtCfgEntry 1 }
+
+calixLoamExtCfgAdminState OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "State of Service level Ethernet OAM.  Set this to enable to begin transmitting Ethernet OAM
+         frames from configures MEG/MEPs.
+        "
+    ::= { calixLoamExtCfgEntry 2 }
+
+-- ******************************************************************
+-- RFC 2544 configuration
+-- ******************************************************************
+
+calixRfc2544CfgTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF CalixRfc2544CfgEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "This table places a port in RFC2544 Reflector Mode."
+    ::=  { calixEoamExtConfig 12 }
+
+calixRfc2544CfgEntry OBJECT-TYPE
+    SYNTAX         CalixRfc2544CfgEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+        "Only one port can be in RFC 2544 Reflector Mode at any given time."
+    INDEX {  calixRfc2544CfgIndex }
+    ::=  { calixRfc2544CfgTable 1 }
+
+CalixRfc2544CfgEntry ::=  SEQUENCE {
+	calixRfc2544CfgIndex  			   Unsigned32, 
+    calixRfc2544CfgIfIndex      	   InterfaceIndex,
+    calixRfc2544CfgAdminState          CalixEoamEnableType,
+    calixRfc2544CfgVlanId			   VlanId,
+    calixRfc2544CfgMacAddress          MacAddress
+    }
+
+calixRfc2544CfgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Index of auto instantiated RFC 2544 configuration MIB.  Must be 1.
+        "
+    ::= { calixRfc2544CfgEntry 1 }
+
+calixRfc2544CfgAdminState  OBJECT-TYPE
+    SYNTAX      CalixEoamEnableType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Administrative state of the RFC 2544 Reflector."
+    ::= { calixRfc2544CfgEntry 2 }
+
+calixRfc2544CfgIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This attributes specifies the interface index for the port
+         in RFC 2544 Reflector Mode.
+        "
+    ::= { calixRfc2544CfgEntry 3 }
+
+calixRfc2544CfgVlanId  OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID of Service."
+    ::= { calixRfc2544CfgEntry 4 }
+
+calixRfc2544CfgMacAddress  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination MAC address of frames to reflect."
+    ::= { calixRfc2544CfgEntry 5 }
+
+END

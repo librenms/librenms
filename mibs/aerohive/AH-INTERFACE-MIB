@@ -1,0 +1,964 @@
+--
+-- Copyright (c) 2006-2013. Aerohive Netowrks, Inc
+-- All rights reserved.
+
+AH-INTERFACE-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Imports
+--
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, IpAddress
+		FROM SNMPv2-SMI
+	TruthValue 
+	        FROM SNMPv2-TC
+	ahAPInterface, AhString, AhNodeID, AhInterfaceMode, AhInterfaceType, AhMACProtocol
+		FROM AH-SMI-MIB
+	ifIndex, ifEntry
+		FROM IF-MIB;
+
+ahInterface MODULE-IDENTITY
+         LAST-UPDATED  "201608310000Z"  --  Aug 31, 2016
+         ORGANIZATION  "Aerohive Networks, Inc"
+         CONTACT-INFO  "info@aerohive.com
+                        1011 McCarthy Boulevard                                                Milpitas, CA 95035"
+         DESCRIPTION   "This module contains the MIB definition of 
+			interface related information."
+	 
+	 ::=  {  ahAPInterface  1  }
+
+
+
+AhAuthenticationMethod ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "Authentication method supported within Aerohive AP"
+   SYNTAX        INTEGER {
+   	                   cwp          (0), 
+	                   open         (1), 
+	                   wep-open     (2),                   
+	                   wep-shared   (3),  
+	                   wpa-psk      (4),
+	                   wpa2-psk     (5),
+	                   wpa-8021x    (6),
+	                   wpa2-8021X   (7),                  
+	                   wpa-auto-psk   (8),
+	                   wpa-auto-8021x (9),
+	                   dynamic-wep	(10)                
+                 }
+
+AhEncrytionMethod ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "Encryption method supported within Aerohive AP"
+   SYNTAX        INTEGER {
+                   AES        (0), 
+                   TKIP       (1),
+                   WEP        (2),
+                   Non        (3)
+                 }
+
+
+--
+-- Aerohive Extension to ifTable
+--         interfaceName
+--         SSIDName
+--         interfaceMode
+-- 
+
+ahXIfTable	OBJECT-TYPE
+	SYNTAX      SEQUENCE  OF  AhXIfEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "Table of all the Interface/SSID info 
+			not covered by the rfc 2863"
+	::=  {  ahInterface  1  }
+
+ahXIfEntry	OBJECT-TYPE
+	SYNTAX		AhXIfEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Individual entry of Interface/SSID table"
+	AUGMENTS	{ ifEntry }
+	::=  {  ahXIfTable  1  }
+
+AhXIfEntry  ::=  SEQUENCE {
+	ahIfName	AhString,
+	ahSSIDName      AhString,
+	ahIfPromiscuous TruthValue,
+	ahIfType	AhInterfaceType,
+	ahIfMode	AhInterfaceMode,
+	ahIfConfMode	AhInterfaceMode
+	}
+
+
+ahIfName OBJECT-TYPE	
+        SYNTAX	    AhString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Name - uniquely identifies an AP Interface."
+	::=  {  ahXIfEntry  1  }
+
+
+ahSSIDName OBJECT-TYPE	
+        SYNTAX	    AhString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Name - identifies a wireless interface with Access mode.
+			If the interface is not a wireless interface with Access mode, the 
+			SSIDName should be set N/A"
+	::=  {  ahXIfEntry  2  }
+
+ahIfPromiscuous OBJECT-TYPE	
+        SYNTAX	    TruthValue
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Indicates whether an interface is in promiscuous 
+			mode or not."
+	::=  {  ahXIfEntry  3  }
+
+ahIfType OBJECT-TYPE	
+        SYNTAX	    AhInterfaceType
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Indicates whether an interface is a physical 
+			or virtual one."
+	::=  {  ahXIfEntry  4  }
+
+ahIfMode OBJECT-TYPE	
+        SYNTAX	    AhInterfaceMode
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Indicates whether an interface is used for Access
+			or Backhaul currently."
+	::=  {  ahXIfEntry  5  }
+
+ahIfConfMode OBJECT-TYPE	
+        SYNTAX	    AhInterfaceMode
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Indicates whether an interface is configured for Access
+			or Backhaul."
+	::=  {  ahXIfEntry  6  }
+
+--
+-- AssociationTable
+--         ClientMac
+--         RSSI
+--         linkUpTime
+--
+-- Association are attached to wireless interface with Access mode only
+--
+
+ahAssociationTable	OBJECT-TYPE
+	SYNTAX      SEQUENCE  OF  AhAssociationEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "Table of directly connected APs"
+	::=  {  ahInterface  2  }
+
+ahAssociationEntry	OBJECT-TYPE
+	SYNTAX		AhAssociationEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Individual entry of client table"
+	INDEX		{  ifIndex, ahClientMac }
+	::=  {  ahAssociationTable  1  }
+
+AhAssociationEntry  ::=  SEQUENCE {
+	ahClientMac						AhNodeID,
+	ahClientIP						IpAddress,
+	ahClientHostname				AhString,
+	ahClientRSSI					Integer32,
+	ahClientLinkUptime				Counter32,
+	ahClientCWPUsed					TruthValue,
+   	ahClientAuthMethod      		AhAuthenticationMethod,
+  	ahClientEncryptionMethod 		AhEncrytionMethod,
+  	ahClientMACProtocol     		AhMACProtocol,
+  	ahClientSSID            		AhString,
+  	ahClientVLAN            		Integer32,
+  	ahClientUserProfId      		Integer32,
+  	ahClientChannel         		Integer32,
+ 	ahClientLastTxRate      		Integer32,
+	ahClientUsername				AhString,
+ 	ahClientRxDataFrames    		Counter32,
+ 	ahClientRxDataOctets    		Counter32,
+ 	ahClientRxMgtFrames				Counter32,
+  	ahClientRxUnicastFrames			Counter32,
+  	ahClientRxMICFailures			Counter32,
+  	ahClientLastRxRate      		Integer32,        
+  	ahClientTxDataFrames			Counter32,
+  	ahClientTxBeDataFrames			Counter32,
+  	ahClientTxBgDataFrames			Counter32,
+  	ahClientTxViDataFrames			Counter32,
+  	ahClientTxVoDataFrames			Counter32,
+  	ahClientTxMgtFrames				Counter32,
+  	ahClientTxDataOctets			Counter32,
+  	ahClientTxUnicastFrames			Counter32,
+  	ahClientTxMulticastFrames		Counter32,
+  	ahClientTxBroadcastFrames		Counter32,
+  	ahClientTxAirtime               Counter64,
+  	ahClientRxAirtime			 	Counter64,
+  	ahClientAssociationTime			Counter32,
+  	ahClientBSSID					AhNodeID
+}
+
+ahClientMac OBJECT-TYPE	
+        SYNTAX	    AhNodeID
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Uniquely identifies a client."
+	::=  {  ahAssociationEntry  1  }
+
+ahClientIP OBJECT-TYPE	
+        SYNTAX	    IpAddress
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The IP address of the client if known. Otherwise, this
+			field should be 0"
+	::=  {  ahAssociationEntry  2  }
+
+ahClientHostname OBJECT-TYPE	
+        SYNTAX	    AhString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The host name of the client if known. Otherwise, this
+			field should be empty"
+	::=  {  ahAssociationEntry  3  }
+
+ahClientRSSI OBJECT-TYPE	
+        SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "An indicator for the RSSI of the client 
+			derived from last communication"
+	::=  {  ahAssociationEntry  4  }
+
+ahClientLinkUptime OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Link up time in second"
+	::=  {  ahAssociationEntry  5  }
+	
+ahClientCWPUsed OBJECT-TYPE	
+    SYNTAX	    TruthValue
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The boolean indicating whether Captive Web Portal
+			is used."
+	::=  {  ahAssociationEntry  6 }
+
+ahClientAuthMethod OBJECT-TYPE	
+        SYNTAX	    AhAuthenticationMethod
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The authentication method the client uses to communicated
+			with AP"
+	::=  {  ahAssociationEntry  7  }
+
+ahClientEncryptionMethod OBJECT-TYPE	
+        SYNTAX	    AhEncrytionMethod
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The encryption method the client uses to communicated
+			with AP"
+	::=  {  ahAssociationEntry  8  }
+
+ahClientMACProtocol OBJECT-TYPE	
+        SYNTAX	    AhMACProtocol
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The radio mode the client uses to communicated
+			with AP"
+	::=  {  ahAssociationEntry  9  }
+
+ahClientSSID OBJECT-TYPE	
+        SYNTAX	    AhString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The SSID used by client to communicated
+			with AP"
+	::=  {  ahAssociationEntry  10 }
+
+ahClientVLAN OBJECT-TYPE	
+        SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The VLAN used by client to communicated
+			with AP"
+	::=  {  ahAssociationEntry  11 }
+
+
+ahClientUserProfId OBJECT-TYPE	
+        SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The user profile id used by client to communicated
+			with AP"
+	::=  {  ahAssociationEntry  12 }
+
+ahClientChannel OBJECT-TYPE	
+        SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The radio channel used by client to communicated
+			with AP"
+	::=  {  ahAssociationEntry  13 }
+
+ahClientLastTxRate OBJECT-TYPE	
+        SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The rate (KBPS) of last transmitting frame to the client."
+	::=  {  ahAssociationEntry  14 }
+
+ahClientUsername OBJECT-TYPE	
+        SYNTAX	    AhString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The client user name to login to the network.
+			It contain empty string if the authentication
+			method is other than EAP (802.1x)."
+	::=  {  ahAssociationEntry  15 }
+
+ahClientRxDataFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of data frames received from client
+			to AP"
+	::=  {  ahAssociationEntry  16 }
+
+ahClientRxDataOctets OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of data octets received from client
+			to AP"
+	::=  {  ahAssociationEntry  17 }
+
+ahClientRxMgtFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of mgt frames received from client
+			to AP"
+	::=  {  ahAssociationEntry  18 }
+
+ahClientRxUnicastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of unitcast frames received from client
+			to AP"
+	::=  {  ahAssociationEntry  19 }
+
+ahClientRxMulticastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of multicast frames received
+			from client to AP."
+	::=  {  ahAssociationEntry  20 }
+
+ahClientRxBroadcastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of broadcast frames received
+			from client to AP."
+	::=  {  ahAssociationEntry  21 }
+
+ahClientRxMICFailures OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of frames dropped due to Message
+			Integrity Check failure from client to AP."
+	::=  {  ahAssociationEntry  22 }
+
+ahClientTxDataFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted data frames
+			from ."
+	::=  {  ahAssociationEntry  23 }
+
+ahClientTxMgtFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted management frames
+			from ."
+	::=  {  ahAssociationEntry  24 }
+
+ahClientTxDataOctets OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted data in octets
+			from ."
+	::=  {  ahAssociationEntry  25 }
+
+ahClientTxUnicastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of unitcast frames transmitted from client
+			to AP"
+	::=  {  ahAssociationEntry  26 }
+
+ahClientTxMulticastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of multicast frames transmitted from client
+			to AP"
+	::=  {  ahAssociationEntry  27 }
+
+ahClientTxBroadcastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of broadcast frames transmitted from client
+			to AP"
+	::=  {  ahAssociationEntry  28 }
+
+ahClientLastRxRate OBJECT-TYPE	
+        SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The rate (KBPS) of last received frame from client."
+	::=  {  ahAssociationEntry  29 }
+
+ahClientTxBeDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted best effort priority data frames
+			from AP to client."
+	::=  {  ahAssociationEntry  30 }
+	
+ahClientTxBgDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted back ground priority data frames
+			from AP to client."
+	::=  {  ahAssociationEntry  31 }
+	
+ahClientTxViDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted video priority data frames
+			from AP to client."
+	::=  {  ahAssociationEntry  32 }
+	
+ahClientTxVoDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted voice priority data frames
+			from AP to client."
+	::=  {  ahAssociationEntry  33 }
+
+ahClientTxAirtime OBJECT-TYPE	
+    SYNTAX	    Counter64
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The accumulative transmit time in microseconds ()
+			from AP to client."
+	::=  {  ahAssociationEntry  34 }
+
+ahClientRxAirtime OBJECT-TYPE	
+    SYNTAX	    Counter64
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The accumulative receive time in microseconds (us)
+			from client to AP."
+	::=  {  ahAssociationEntry  35 }
+	
+ahClientAssociationTime OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The association time(s) of client connect to AP."
+	::=  {  ahAssociationEntry  36 }
+	
+ahClientBSSID OBJECT-TYPE	
+	    SYNTAX	    AhNodeID
+		MAX-ACCESS  read-only
+		STATUS	    current
+		DESCRIPTION "It is the basic service set identifier of the client."
+		::=  {  ahAssociationEntry  37 }
+--
+-- ahIfRadioStatsTable
+--
+-- Statistics for Aerohive HiveAP Radio interfaces.
+--
+
+ahRadioStatsTable	OBJECT-TYPE
+	SYNTAX      SEQUENCE  OF  AhRadioStatsEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "Table of radio interface statistics."
+	::=  {  ahInterface  3  }
+
+ahRadioStatsEntry	OBJECT-TYPE
+	SYNTAX		AhRadioStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Individual entry of client table"
+	INDEX		{  ifIndex }
+	::=  {  ahRadioStatsTable 1  }
+
+AhRadioStatsEntry ::=  SEQUENCE {
+	ahRadioTxDataFrames						Counter32,
+	ahRadioTxBeDataFrames					Counter32,
+  	ahRadioTxBgDataFrames					Counter32,
+  	ahRadioTxViDataFrames					Counter32,
+  	ahRadioTxVoDataFrames					Counter32,
+	ahRadioTxUnicastDataFrames 				Counter32,
+	ahRadioTxMulticastDataFrames 			Counter32,
+	ahRadioTxBroadcastDataFrames 			Counter32,
+	ahRadioTxNonBeaconMgtFrames				Counter32,	
+	ahRadioTxBeaconFrames					Counter32,
+	ahRadioTxTotalRetries					Counter32,	
+	ahRadioTxTotalFramesDropped				Counter32,	
+	ahRadioTxTotalFrameErrors				Counter32,
+	ahRadioTxFEForExcessiveHWRetries		Counter32,
+	ahRadioTXRTSFailures					Counter32,	
+	ahRadioRxTotalDataFrames				Counter32,
+	ahRadioRxUnicastDataFrames  			Counter32,
+	ahRadioRxMulticastDataFrames  			Counter32,
+	ahRadioRxBroadcastDataFrames  			Counter32,
+	ahRadioRxMgtFrames						Counter32,	
+	ahRadioRxTotalFrameDropped				Counter32,
+	ahRadioTxAirtime						Counter64,
+	ahRadioRxAirtime						Counter64
+}
+
+ahRadioTxDataFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmit data frames for the given
+			interface."
+	::=  {  ahRadioStatsEntry 1 }
+	
+ahRadioTxUnicastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted unicast frames   
+			 for the given interface."
+	::=  {  ahRadioStatsEntry 2 }
+	
+ahRadioTxMulticastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted multicast frames   
+			 for the given interface."
+	::=  {  ahRadioStatsEntry 3 }
+	
+ahRadioTxBroadcastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted broadcast frames   
+			 for the given interface."
+	::=  {  ahRadioStatsEntry 4 }
+
+ahRadioTxNonBeaconMgtFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmit management frames
+			other than beacon for the given interface."
+	::=  {  ahRadioStatsEntry 5 }
+
+ahRadioTxBeaconFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmit beacon frames for the given 
+			interface."
+	::=  {  ahRadioStatsEntry 6 }
+
+ahRadioTxTotalRetries OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The total number of transmit retries for the given 
+			interface."
+	::=  {  ahRadioStatsEntry 7 }
+	
+ahRadioTxTotalFramesDropped  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmit frames dropped
+			for the given interface."
+	::=  {  ahRadioStatsEntry 8 }
+	
+ahRadioTxTotalFrameErrors  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The total number of transmit frames in error
+			 for the given interface."
+	::=  {  ahRadioStatsEntry 9 }
+
+ahRadioTxFEForExcessiveHWRetries  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmit frames in error due to 
+			excessive hardware retries for the given interface."
+	::=  {  ahRadioStatsEntry 10 }
+
+ahRadioRxTotalDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The total number of received data frames 
+			for the given interface."
+	::=  {  ahRadioStatsEntry 11 }
+	
+ahRadioRxUnicastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of received unicast frames   
+			 for the given interface."
+	::=  {  ahRadioStatsEntry 12 }
+	
+ahRadioRxMulticastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of received multicast frames   
+			 for the given interface."
+	::=  {  ahRadioStatsEntry 13 }
+	
+ahRadioRxBroadcastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of received broadcast frames   
+			 for the given interface."
+	::=  {  ahRadioStatsEntry 14 }
+	
+ahRadioRxMgtFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of received management frames 
+			for the given interface."
+	::=  {  ahRadioStatsEntry 15 }
+	
+ahRadioRxTotalFrameDropped  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The total number of dropped received frames   
+			for the given interface."
+	::=  {  ahRadioStatsEntry 16 }
+
+ahRadioTxBeDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted best effort priority data frames
+			from the radio."
+	::=  {  ahRadioStatsEntry  17 }
+	
+ahRadioTxBgDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted back ground priority data frames
+			from the radio."
+	::=  {  ahRadioStatsEntry  18 }
+	
+ahRadioTxViDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted video priority data frames
+			from the radio."
+	::=  {  ahRadioStatsEntry  19 }
+	
+ahRadioTxVoDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted voice priority data frames
+			from the radio."
+	::=  {  ahRadioStatsEntry  20 }
+
+ahRadioTXRTSFailures OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted RTS failures
+			from the Radio."
+	::=  {  ahRadioStatsEntry  21 }
+
+ahRadioTxAirtime OBJECT-TYPE	
+    SYNTAX	    Counter64
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The accumulative transmit time in microseconds (us)
+			from the given Radio."
+	::=  {  ahRadioStatsEntry  22 }
+
+ahRadioRxAirtime OBJECT-TYPE	
+    SYNTAX	    Counter64
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The accumulative receive time in microseconds (us)
+			to the given radio."
+	::=  {  ahRadioStatsEntry  23 }
+	
+--
+-- ahVIfStatsTable
+--
+-- Statistics for Aerohive HiveAP Virtual Interfaces (VIf).
+--
+
+ahVIfStatsTable	OBJECT-TYPE
+	SYNTAX      SEQUENCE  OF  AhVIfStatsEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "Table of virtual interface (vif) statistics."
+	::=  {  ahInterface  4  }
+
+ahVIfStatsEntry	OBJECT-TYPE
+	SYNTAX		AhVIfStatsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Individual entry of VIf statistics"
+	INDEX		{  ifIndex }
+	::=  {  ahVIfStatsTable 1  }
+
+AhVIfStatsEntry ::=  SEQUENCE {
+	ahVIfRxDataFrames				Counter32,
+	ahVIfRxUnicastDataFrames		Counter32,
+	ahVIfRxMulticastDataFrames		Counter32,
+	ahVIfRxBroadcastDataFrames		Counter32,
+	ahVIfRxErrorFrames				Counter32,
+	ahVIfRxDroppedFrames			Counter32,
+	ahVIfTxDataFrames				Counter32,
+	ahVIfTxBeDataFrames				Counter32,
+  	ahVIfTxBgDataFrames				Counter32,
+  	ahVIfTxViDataFrames				Counter32,
+  	ahVIfTxVoDataFrames				Counter32,
+	ahVIfTxUnicastDataFrames		Counter32,
+	ahVIfTxMulticastDataFrames		Counter32,
+	ahVIfTxBroadcastDataFrames		Counter32,
+	ahVIfTxErrorFrames				Counter32,
+	ahVIfTxDroppedFrames			Counter32,
+	ahVifTxAirtime					Counter64,
+	ahVifRxAirtime					Counter64
+}
+
+ahVIfRxDataFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of received data frames for the given
+			virtual interface."
+	::=  {  ahVIfStatsEntry 1 }
+	
+ahVIfRxUnicastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of received unicast data frames   
+			 for the given virtual interface."
+	::=  {  ahVIfStatsEntry 2 }
+	
+ahVIfRxMulticastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of received multicast data frames   
+			 for the given virtual interface."
+	::=  {  ahVIfStatsEntry 3 }
+	
+ahVIfRxBroadcastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of received broadcast data frames   
+			 for the given virtual interface."
+	::=  {  ahVIfStatsEntry 4 }
+	
+ahVIfRxErrorFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of received error frames for the given
+			virtual interface."
+	::=  {  ahVIfStatsEntry 5 }
+
+ahVIfRxDroppedFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of received dropped frames for the given
+			virtual interface."
+	::=  {  ahVIfStatsEntry 6 }
+	
+ahVIfTxDataFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of trasmitted data frames 
+			for the given virtual interface."
+	::=  {  ahVIfStatsEntry 7 }
+
+ahVIfTxUnicastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted unicast data frames   
+			 for the given virtual interface."
+	::=  {  ahVIfStatsEntry 8 }
+	
+ahVIfTxMulticastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted multicast data frames   
+			 for the given virtual interface."
+	::=  {  ahVIfStatsEntry 9 }
+	
+ahVIfTxBroadcastDataFrames  OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted broadcast data frames   
+			 for the given virtual interface."
+	::=  {  ahVIfStatsEntry 10 }
+	
+ahVIfTxErrorFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of trasmitted frames encontered error 
+			for the given virtual interface."
+	::=  {  ahVIfStatsEntry 11 }
+	
+ahVIfTxDroppedFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of trasmitted frames dropped due to error  
+			condition for the given virtual interface."
+	::=  {  ahVIfStatsEntry 12 }
+
+ahVIfTxBeDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted best effort priority data frames
+			from the virtual interface."
+	::=  {  ahVIfStatsEntry  13 }
+	
+ahVIfTxBgDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted back ground priority data frames
+			from the virtual interface."
+	::=  {  ahVIfStatsEntry  14 }
+	
+ahVIfTxViDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted video priority data frames
+			from the virtual interface."
+	::=  {  ahVIfStatsEntry  15 }
+	
+ahVIfTxVoDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted voice priority data frames
+			from the virtual interface."
+	::=  {  ahVIfStatsEntry  16 }
+
+ahVifTxAirtime OBJECT-TYPE	
+    SYNTAX	    Counter64
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The accumulative transmit time in microseconds (us)
+			from the given SSID."
+	::=  {  ahVIfStatsEntry  17 }
+
+ahVifRxAirtime OBJECT-TYPE	
+    SYNTAX	    Counter64
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The accumulative receive time in microseconds (us)
+			to the given SSID."
+	::=  {  ahVIfStatsEntry  18 }
+	
+--
+-- ahIfRadioAttributeTable
+--
+-- Attribute for Aerohive HiveAP Radio interfaces.
+--
+
+ahRadioAttributeTable	OBJECT-TYPE
+	SYNTAX      SEQUENCE  OF  AhRadioAttributeEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "Table of radio interface statistics."
+	::=  {  ahInterface  5  }
+
+ahRadioAttributeEntry	OBJECT-TYPE
+	SYNTAX		AhRadioAttributeEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Individual entry for each Radio"
+	INDEX		{  ifIndex }
+	::=  {  ahRadioAttributeTable 1  }
+
+AhRadioAttributeEntry ::=  SEQUENCE {
+	ahRadioChannel			Integer32,
+	ahRadioTxPower  	    Integer32,
+	ahRadioNoiseFloor        Integer32
+	}
+	
+ahRadioChannel  OBJECT-TYPE	
+    SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The channel number currently in use for this radio."
+	::=  {  ahRadioAttributeEntry 1 }
+	
+ahRadioTxPower  OBJECT-TYPE	
+    SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The transmit power currently for the radio in dbm. The range 
+				is 0 to 20 dBm"
+	::=  {  ahRadioAttributeEntry 2 }
+
+ahRadioNoiseFloor  OBJECT-TYPE	
+    SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The noise floor for the radio dbm. The range is 0 to 256 dBm.
+				The value of this variable is the actual value plus 256 dBm."
+	::=  {  ahRadioAttributeEntry 3 }
+		
+END
+

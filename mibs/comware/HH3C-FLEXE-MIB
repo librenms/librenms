@@ -1,0 +1,618 @@
+-- =============================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: flexe interface mib
+-- Reference: Extension of RFC 1213 and RFC 2233
+-- Version: V1.1
+-- History:
+--   V1.0 2018-08-06
+--        Initial Version by mazhixing
+--   V1.1 2019-4-3
+--        Modify nodename by mazhixing
+-- =============================================================
+HH3C-FLEXE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        ifIndex, ifDescr
+    FROM IF-MIB
+        Integer32,
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        RowStatus
+    FROM SNMPv2-TC;
+
+
+hh3cFlexE  MODULE-IDENTITY
+        LAST-UPDATED    "201904031936Z"
+        ORGANIZATION
+            "New H3C Technologies Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Technologies Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+             "This MIB provides FlexE interface information that is
+             excluded by RFC 1213 and RFC 2233"
+        REVISION        "201904031936Z"
+        DESCRIPTION
+                "Modify trapnode name"
+        REVISION        "201808031436Z"
+        DESCRIPTION
+                "Initial version of this MIB module,
+                 including hh3cFlexEGroupTable,hh3cFlexESubTimeSlotGranularTable,
+                 hh3cFlexEPhyIfTable,hh3cFlexEIfTable,hh3cFlexETrap"
+        ::= { hh3cCommon 177 }
+
+-- hh3cFlexESubSlotInfo:
+
+hh3cFlexESubSlotInfo OBJECT IDENTIFIER ::= { hh3cFlexE 1 }
+
+hh3cFlexESubSlotTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  Hh3cFlexESubSlotEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+         "A list of FlexE subslot entries."
+        ::= { hh3cFlexESubSlotInfo 1 }
+
+hh3cFlexESubSlotEntry     OBJECT-TYPE
+        SYNTAX         Hh3cFlexESubSlotEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+         "This entry contains FlexE subslot information."
+        INDEX {
+                hh3cFlexEFrameIndex,
+                hh3cFlexESlotIndex,
+                hh3cFlexESubslotIndex
+        }
+        ::= { hh3cFlexESubSlotTable 1 }
+
+Hh3cFlexESubSlotEntry ::= SEQUENCE  {
+        hh3cFlexEFrameIndex                   Integer32,
+        hh3cFlexESlotIndex                    Integer32,
+        hh3cFlexESubslotIndex                 Integer32,
+        hh3cFlexESubTimeSlotGranular          Integer32
+        }
+
+hh3cFlexEFrameIndex       OBJECT-TYPE
+        SYNTAX          Integer32 (0..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+         "Frame index."
+        ::= { hh3cFlexESubSlotEntry 1 }
+
+hh3cFlexESlotIndex       OBJECT-TYPE
+        SYNTAX          Integer32 (0..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+         "Slot index."
+        ::= { hh3cFlexESubSlotEntry 2 }
+
+hh3cFlexESubslotIndex       OBJECT-TYPE
+        SYNTAX          Integer32 (0..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+         "Subslot index."
+        ::= { hh3cFlexESubSlotEntry 3 }
+
+hh3cFlexESubTimeSlotGranular     OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+         "Specify the sub-time-slot granularity of the FlexE subslot."
+        ::= { hh3cFlexESubSlotEntry 4 }
+
+-- hh3cFlexEGroupTable:
+
+hh3cFlexEGroupTable     OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cFlexEGroupEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+         "A list of FlexE groups."
+        ::= { hh3cFlexESubSlotInfo 2 }
+
+hh3cFlexEGroupEntry     OBJECT-TYPE
+        SYNTAX         Hh3cFlexEGroupEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+         "This entry contains the FlexE group information."
+        INDEX {
+                hh3cFlexEFrameIndex,
+                hh3cFlexESlotIndex,
+                hh3cFlexESubslotIndex,
+                hh3cFlexEGroupID
+        }
+        ::= { hh3cFlexEGroupTable 1 }
+
+Hh3cFlexEGroupEntry ::= SEQUENCE  {
+        hh3cFlexEGroupID                   Integer32,
+        hh3cFlexEGroupRowStatus            RowStatus
+        }
+
+hh3cFlexEGroupID      OBJECT-TYPE
+        SYNTAX          Integer32 (1..1048574)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+         "Specify the group ID of the FlexE interface."
+        ::= { hh3cFlexEGroupEntry 1 }
+
+hh3cFlexEGroupRowStatus       OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+         "Only active, createAndGo and destroy are supported."
+        ::= { hh3cFlexEGroupEntry 2 }
+
+-- hh3cFlexEPhyIfTable:
+
+hh3cFlexEPhyIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cFlexEPhyIfEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+         "A list of FlexE interface entries."
+        ::= { hh3cFlexE 2 }
+
+hh3cFlexEPhyIfEntry     OBJECT-TYPE
+        SYNTAX         Hh3cFlexEPhyIfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+         "This entry contains the information of FlexE physical interface management."
+        INDEX { ifIndex }
+        ::= { hh3cFlexEPhyIfTable 1 }
+
+Hh3cFlexEPhyIfEntry ::= SEQUENCE  {
+        hh3cFlexEPhyGroupID             Integer32,
+        hh3cFlexEPhyNumber            Integer32,
+        hh3cFlexEClockPort             OCTET STRING
+        }
+
+hh3cFlexEPhyGroupID             OBJECT-TYPE
+        SYNTAX          Integer32 (1..1048574)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+         "Specify the group ID of the FlexE physical interface."
+        ::= { hh3cFlexEPhyIfEntry 1 }
+
+hh3cFlexEPhyNumber       OBJECT-TYPE
+        SYNTAX          Integer32 (0|1..254)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+         "Specify the physical number of the FlexE physical interface."
+        ::= { hh3cFlexEPhyIfEntry 2 }
+
+hh3cFlexEClockPort          OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..48))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+         "Specify the clock FlexE interface."
+        ::= { hh3cFlexEPhyIfEntry 3 }
+
+-- hh3cFlexEIfTable:
+
+hh3cFlexEIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cFlexEIfEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+         "A list of FlexE interface entries."
+        ::= { hh3cFlexE 3 }
+
+hh3cFlexEIfEntry OBJECT-TYPE
+        SYNTAX         Hh3cFlexEIfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+         "This entry contains the information of FlexE interface management."
+        INDEX { ifIndex }
+        ::= { hh3cFlexEIfTable 1 }
+
+Hh3cFlexEIfEntry ::= SEQUENCE  {
+        hh3cFlexEIfGroupID               Integer32,
+        hh3cFlexEBandwidth               Integer32,
+        hh3cFlexEClientID                Integer32,
+        hh3cFlexEMinAvailableBandwidth   Integer32
+        }
+
+hh3cFlexEIfGroupID        OBJECT-TYPE
+        SYNTAX                Integer32 (1..1048574)
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+         "Specify the group ID of the FlexE interface."
+        ::= { hh3cFlexEIfEntry 1 }
+
+hh3cFlexEBandwidth      OBJECT-TYPE
+        SYNTAX                Integer32
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+         "Specify the bandwidth of the FlexE interface."
+        ::= { hh3cFlexEIfEntry 2 }
+
+hh3cFlexEClientID      OBJECT-TYPE
+        SYNTAX                Integer32 (1..65534)
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+         "Specify the client ID of the FlexE interface."
+        ::= { hh3cFlexEIfEntry 3 }
+
+hh3cFlexEMinAvailableBandwidth      OBJECT-TYPE
+        SYNTAX                Integer32 (0|1..100)
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+         "Specifies the minimum available bandwidth of the FlexE interface."
+        ::= { hh3cFlexEIfEntry 4 }
+
+-- Notification definitions
+-- =================================================================
+-- Traps are defined below.
+
+-- Nodes of hh3cFlexETrapObjects
+
+hh3cFlexETrapObjects OBJECT IDENTIFIER ::= { hh3cFlexE 4 }
+
+hh3cFlexERemotePhyNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS             accessible-for-notify
+    STATUS                 current
+    DESCRIPTION
+        "The physical number of Remote FLEXPhyIf."
+    ::= { hh3cFlexETrapObjects 1 }
+
+hh3cFlexERemotePhyGroupID OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The physical group ID of Remote FLEXPhyIf."
+    ::= { hh3cFlexETrapObjects 2 }
+
+hh3cFlexEGroupMemberCount OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The number of group members."
+    ::= { hh3cFlexETrapObjects 3 }
+
+hh3cFlexEPortList OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The interface list."
+    ::= { hh3cFlexETrapObjects 4 }
+
+
+
+-- Nodes of hh3cFlexETrap
+
+hh3cFlexETrap OBJECT IDENTIFIER ::= { hh3cFlexE 5 }
+hh3cFlexETrapPrex OBJECT IDENTIFIER ::= { hh3cFlexETrap 0 }
+-- All trap definitions should be placed under this object.
+
+hh3cFlexEPhyNumberMismatch NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cFlexEPhyNumber,
+            hh3cFlexERemotePhyNumber
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the physical number of the FlexE interface doesn't
+         match the other."
+    ::= { hh3cFlexETrapPrex 1 }
+
+hh3cFlexEPhyNumberMismatchRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cFlexEPhyNumber,
+            hh3cFlexERemotePhyNumber
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the physical number of the FlexE interface
+        matches the other."
+    ::= { hh3cFlexETrapPrex 2 }
+
+hh3cFlexEPhyGroupMismatch NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cFlexEPhyGroupID,
+            hh3cFlexERemotePhyGroupID
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the group ID of the FlexE interface doesn't
+         matches the other."
+    ::= { hh3cFlexETrapPrex 3 }
+
+hh3cFlexEPhyGroupMismatchRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cFlexEPhyGroupID,
+            hh3cFlexERemotePhyGroupID
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the group ID of the FlexE interface
+        matches the other."
+    ::= { hh3cFlexETrapPrex 4 }
+
+hh3cFlexEClientIDMismatch NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the client ID of the FlexE interface doesn't
+         match the other."
+    ::= { hh3cFlexETrapPrex 5 }
+
+hh3cFlexEClientIDMismatchRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the client ID of the FlexE interface
+        matches the other."
+    ::= { hh3cFlexETrapPrex 6 }
+
+hh3cFlexEBandwidthReduce NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cFlexEBandwidth
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the bandwidth of the FlexE interface becomes
+         smaller."
+    ::= { hh3cFlexETrapPrex 7 }
+
+hh3cFlexEBandwidthReduceRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cFlexEBandwidth
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the bandwidth of the FlexE interface recovers."
+    ::= { hh3cFlexETrapPrex 8 }
+
+hh3cFlexEPhyFcsSdAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the error code fault happens."
+    ::= { hh3cFlexETrapPrex 9 }
+
+hh3cFlexEPhyFcsSdAlarmRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the error code fault recovers."
+    ::= { hh3cFlexETrapPrex 10 }
+
+hh3cFlexEPhyLocalFault NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the fault happens in the near_end."
+    ::= { hh3cFlexETrapPrex 11 }
+
+hh3cFlexEPhyLocalFaultRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the fault in the near_end recovers."
+    ::= { hh3cFlexETrapPrex 12 }
+
+hh3cFlexEPhyRemoteFault NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the fault happens in the far_end"
+    ::= { hh3cFlexETrapPrex 13 }
+
+hh3cFlexEPhyRemoteFaultRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the fault in the far_end recovers."
+    ::= { hh3cFlexETrapPrex 14 }
+
+hh3cFlexEBandwidthMismatch NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the bandwidth of the FlexE interface
+        doesn't match the other."
+    ::= { hh3cFlexETrapPrex 15 }
+
+hh3cFlexEBandwidthMismatchRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the bandwidth of the FlexE interface
+        matches the other."
+    ::= { hh3cFlexETrapPrex 16 }
+
+hh3cFlexEPhyDelayOverAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cFlexEPortList
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the TimeDelay is oversize."
+    ::= { hh3cFlexETrapPrex 17 }
+
+hh3cFlexEPhyDelayOverAlarmRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cFlexEPortList
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the TimeDelay becomes normal."
+    ::= { hh3cFlexETrapPrex 18 }
+
+hh3cFlexESTSGMismatch NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cFlexESubTimeSlotGranular
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the granularity of the FlexE interface
+        doesn't match the other."
+    ::= { hh3cFlexETrapPrex 19 }
+
+hh3cFlexESTSGMismatchRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cFlexESubTimeSlotGranular
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the granularity of the FlexE interface
+        matches the other."
+    ::= { hh3cFlexETrapPrex 20 }
+
+
+hh3cFlexEGroupMemberFault NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFlexEFrameIndex,
+            hh3cFlexESlotIndex,
+            hh3cFlexESubslotIndex,
+            hh3cFlexEGroupID,
+            hh3cFlexEGroupMemberCount,
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the fault happens on group members."
+    ::= { hh3cFlexETrapPrex 21 }
+
+hh3cFlexEGroupMemberFaultRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFlexEFrameIndex,
+            hh3cFlexESlotIndex,
+            hh3cFlexESubslotIndex,
+            hh3cFlexEGroupID,
+            hh3cFlexEGroupMemberCount,
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the fault on group members recovers."
+    ::= { hh3cFlexETrapPrex 22 }
+
+hh3cFlexEGroupFaultAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFlexEFrameIndex,
+            hh3cFlexESlotIndex,
+            hh3cFlexESubslotIndex,
+            hh3cFlexEGroupID
+        }
+      STATUS current
+    DESCRIPTION
+        "The notification is generated when the fault happens on the last group member."
+    ::= { hh3cFlexETrapPrex 23 }
+
+hh3cFlexEGroupFaultAlarmRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFlexEFrameIndex,
+            hh3cFlexESlotIndex,
+            hh3cFlexESubslotIndex,
+            hh3cFlexEGroupID
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the fault on the first group member recovers."
+    ::= { hh3cFlexETrapPrex 24 }
+
+END

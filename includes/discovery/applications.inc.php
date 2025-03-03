@@ -15,23 +15,29 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use App\Models\Application;
+use App\Models\Eventlog;
+use App\Observers\ModuleModelObserver;
+use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
+
 echo "\nApplications: ";
 
 // fetch applications from the client
-$results = snmpwalk_cache_oid($device, 'nsExtendStatus', array(), 'NET-SNMP-EXTEND-MIB');
+$results = snmpwalk_cache_oid($device, 'nsExtendStatus', [], 'NET-SNMP-EXTEND-MIB');
 
 // Load our list of available applications
-$applications = array();
+$applications = [];
 if ($results) {
-    foreach (glob($config['install_dir'] . '/includes/polling/applications/*.inc.php') as $file) {
+    foreach (glob(Config::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
         $name = basename($file, '.inc.php');
         $applications[$name] = $name;
     }
@@ -40,68 +46,62 @@ if ($results) {
     $applications['dhcpstats'] = 'dhcp-stats';
     $applications['fbsdnfsclient'] = 'fbsd-nfs-client';
     $applications['fbsdnfsserver'] = 'fbsd-nfs-server';
+    $applications['hv-monitor'] = 'hv-monitor';
     $applications['mailq'] = 'postfix';
     $applications['osupdate'] = 'os-updates';
     $applications['phpfpmsp'] = 'php-fpm';
     $applications['postfixdetailed'] = 'postfix';
+    $applications['suricata-stats'] = 'suricata';
+    $applications['sagan-stats'] = 'sagan';
 }
 
 d_echo(PHP_EOL . 'Available: ' . implode(', ', array_keys($applications)) . PHP_EOL);
 d_echo('Checking for: ' . implode(', ', array_keys($results)) . PHP_EOL);
 
 // Generate a list of enabled apps and a list of all discovered apps from the db
-list($enabled_apps, $discovered_apps) = array_reduce(dbFetchRows(
-    'SELECT `app_type`,`discovered` FROM `applications` WHERE `device_id`=? ORDER BY `app_type`',
-    array($device['device_id'])
+[$enabled_apps, $discovered_apps] = array_reduce(dbFetchRows(
+    'SELECT `app_type`,`discovered` FROM `applications` WHERE `device_id`=? AND deleted_at IS NULL ORDER BY `app_type`',
+    [$device['device_id']]
 ), function ($result, $app) {
     $result[0][] = $app['app_type'];
     if ($app['discovered']) {
         $result[1][] = $app['app_type'];
     }
-    return $result;
-}, array(array(), array()));
 
+    return $result;
+}, [[], []]);
+
+// enable observer for printing changes
+ModuleModelObserver::observe(\App\Models\Application::class);
 
 // Enable applications
-$current_apps = array();
+$current_apps = [];
 foreach ($results as $extend => $result) {
     if (isset($applications[$extend])) {
         $app = $applications[$extend];
         $current_apps[] = $app;
 
-        if (in_array($app, $enabled_apps)) {
-            echo '.';
-        } else {
-            dbInsert(array(
-                'device_id' => $device['device_id'],
-                'app_type' => $app,
-                'discovered' => 1,
-                'app_status' => '',
-                'app_instance' => ''
-            ), 'applications');
-
-            echo '+';
-            log_event("Application enabled by discovery: $app", $device, 'application', 1);
+        if (! in_array($app, $enabled_apps)) {
+            $app_obj = Application::withTrashed()->firstOrNew(['device_id' => $device['device_id'], 'app_type' => $app]);
+            if ($app_obj->trashed()) {
+                $app_obj->restore();
+            }
+            $app_obj->discovered = 1;
+            $app_obj->save();
+            Eventlog::log("Application enabled by discovery: $app", $device['device_id'], 'application', Severity::Ok);
         }
     }
 }
 
 // remove non-existing apps
 $apps_to_remove = array_diff($discovered_apps, $current_apps);
-$num = count($apps_to_remove);
-if ($num > 0) {
-    echo str_repeat('-', $num);
-    $vars = $apps_to_remove;
-    array_unshift($vars, $device['device_id']);
-    dbDelete(
-        'applications',
-        '`device_id`=? AND `app_type` IN (' . implode(',', array_fill(0, $num, '?')) . ')',
-        $vars
-    );
-    foreach ($apps_to_remove as $app) {
-        log_event("Application disabled by discovery: $app", $device, 'application', 3);
-    }
-}
+DeviceCache::getPrimary()->applications()->whereIn('app_type', $apps_to_remove)->get()->each(function (Application $app) {
+    $app->delete();
+    \App\Models\Eventlog::log("Application disabled by discovery: $app->app_type", DeviceCache::getPrimary(), 'application', \LibreNMS\Enum\Severity::Notice);
+});
+
+// clean application_metrics
+dbDeleteOrphans('application_metrics', ['applications.app_id']);
 
 echo PHP_EOL;
 

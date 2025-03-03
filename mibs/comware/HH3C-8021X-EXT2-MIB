@@ -1,0 +1,236 @@
+-- ========================================================================
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved
+-- Description: Private 802.1X MIB
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 2014-03-27 wuqiang regenerated from 8021x-ext
+-- V1.1 2017-10-10 Modified the range of hh3c8021XExt2AuthTxPeriod by yuhua
+-- ========================================================================
+HH3C-8021X-EXT2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE,Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    dot1xPaePortNumber
+        FROM IEEE8021-PAE-MIB;
+
+hh3c8021XExt2 MODULE-IDENTITY
+    LAST-UPDATED "201710100000Z"
+    ORGANIZATION
+    "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+    "Platform Team New H3C Tech. Co., Ltd.
+    Hai-Dian District Beijing P.R. China
+    http://www.h3c.com
+    Zip:100085
+    "
+    DESCRIPTION
+    "This file is regenerated from 8021x-ext which extends IEEE8021-PAE-MIB(802.1X)"
+    REVISION "201710100000Z"
+    DESCRIPTION
+    "Modified the range of hh3c8021XExt2AuthTxPeriod"
+    REVISION "201403270000Z"
+    DESCRIPTION
+    "First Version of this tree"
+    ::= { hh3cCommon 153 }
+-- ============================================================
+-- Groups in the 8021X-EXT2-MIB
+-- ============================================================
+
+hh3c8021XExt2MibObjects        OBJECT IDENTIFIER ::= { hh3c8021XExt2 1 }
+hh3c8021XExt2System            OBJECT IDENTIFIER ::= { hh3c8021XExt2MibObjects 1 }
+hh3c8021XExt2Authenticator     OBJECT IDENTIFIER ::= { hh3c8021XExt2MibObjects 2 }
+
+-- ============================================================
+
+hh3c8021XExt2AuthQuietPeriod OBJECT-TYPE
+    SYNTAX             Unsigned32(10..120)
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION
+            "The value, in seconds, of the quietPeriod constant
+            currently in use by the Authenticator PAE state
+            machine."
+    REFERENCE
+            "9.4.1, quietPeriod"
+    DEFVAL { 60 }
+    ::= { hh3c8021XExt2System 1 }
+
+hh3c8021XExt2AuthTxPeriod OBJECT-TYPE
+    SYNTAX             Unsigned32(1..120)
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION
+            "The value, in seconds, of the txPeriod constant
+            currently in use by the Authenticator PAE state
+            machine."
+    REFERENCE
+            "9.4.1, txPeriod"
+    DEFVAL { 30 }
+    ::= { hh3c8021XExt2System 2 }
+
+hh3c8021XExt2AuthSuppTimeout OBJECT-TYPE
+    SYNTAX             Unsigned32(1..120)
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION
+           "The value, in seconds, of the suppTimeout constant
+           currently in use by the Backend Authentication state
+           machine."
+    REFERENCE
+           "9.4.1, suppTimeout"
+    DEFVAL { 30 }
+    ::= { hh3c8021XExt2System 3 }
+
+hh3c8021XExt2AuthServerTimeout OBJECT-TYPE
+    SYNTAX             Unsigned32(100..300)
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION
+           "The value, in seconds, of the serverTimeout constant
+           currently in use by the Backend Authentication state
+           machine."
+    REFERENCE
+           "9.4.1, serverTimeout"
+    DEFVAL { 100 }
+    ::= { hh3c8021XExt2System 4 }
+
+hh3c8021XExt2AuthMaxReq OBJECT-TYPE
+    SYNTAX             Unsigned32(1..10)
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION
+           "The value of the maxReq constant currently in use by
+           the Backend Authentication state machine."
+    REFERENCE
+           "9.4.1, maxReq"
+    DEFVAL { 2 }
+    ::= { hh3c8021XExt2System 5 }
+
+hh3c8021XExt2AuthReAuthPeriod OBJECT-TYPE
+    SYNTAX             Unsigned32(60..7200)
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION
+           "The value, in seconds, of the reAuthPeriod constant
+           currently in use by the Reauthentication Timer state
+           machine."
+    REFERENCE
+           "9.4.1, reAuthPeriod"
+    DEFVAL  { 3600 }
+    ::= { hh3c8021XExt2System 6 }
+
+hh3c8021XExt2AuthMethod OBJECT-TYPE
+    SYNTAX         INTEGER { chap(1), pap(2), eap(3) }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+           "The value defines the 802.1X authentication method."
+    DEFVAL  { chap }
+    ::= { hh3c8021XExt2System 7 }
+
+-- ============================================================
+-- The Authenticator Configuration Extension Table
+-- ============================================================
+
+hh3c8021XExt2AuthConfigExtTable OBJECT-TYPE
+    SYNTAX             SEQUENCE OF Hh3c8021XExt2AuthConfigExtEntry
+    MAX-ACCESS         not-accessible
+    STATUS             current
+    DESCRIPTION
+           "Table that extends dot1xAuthConfigTable"
+    REFERENCE
+            "9.4.1 Authenticator Configuration"
+    ::= { hh3c8021XExt2Authenticator 1 }
+
+hh3c8021XExt2AuthConfigExtEntry OBJECT-TYPE
+    SYNTAX             Hh3c8021XExt2AuthConfigExtEntry
+    MAX-ACCESS         not-accessible
+    STATUS             current
+    DESCRIPTION
+            "The configuration information for an Authenticator PAE."
+    INDEX { dot1xPaePortNumber }
+    ::= { hh3c8021XExt2AuthConfigExtTable 1 }
+
+Hh3c8021XExt2AuthConfigExtEntry   ::= SEQUENCE
+    {
+        hh3c8021XExt2PaePortAuthAdminStatus   TruthValue,
+        hh3c8021XExt2PaePortControlledType    INTEGER,
+        hh3c8021XExt2PaePortMaxUserNum        Unsigned32,
+        hh3c8021XExt2PaePortUserNumNow        Unsigned32,
+        hh3c8021XExt2PaePortClearStatistics   INTEGER,
+        hh3c8021XExt2PaePortMcastTrigStatus   TruthValue,
+        hh3c8021XExt2PaePortHandshakeStatus   TruthValue
+    }
+
+hh3c8021XExt2PaePortAuthAdminStatus  OBJECT-TYPE
+    SYNTAX             TruthValue
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION
+           "The administrative enable/disable state for Port Access Control of a port."
+    DEFVAL  { false }
+    ::= { hh3c8021XExt2AuthConfigExtEntry 1 }
+
+hh3c8021XExt2PaePortControlledType  OBJECT-TYPE
+    SYNTAX             INTEGER { portbased(1), macbased(2) }
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION
+           "Port Access Control type, e.g. port-based access or MAC-based access control."
+    DEFVAL  { macbased }
+    ::= { hh3c8021XExt2AuthConfigExtEntry 2 }
+
+hh3c8021XExt2PaePortMaxUserNum  OBJECT-TYPE
+    SYNTAX             Unsigned32(1..4294967295)
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION
+           "The maximum number of online user associated with each port."
+    ::= { hh3c8021XExt2AuthConfigExtEntry 3 }
+
+hh3c8021XExt2PaePortUserNumNow  OBJECT-TYPE
+    SYNTAX             Unsigned32
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION
+         "The number of current online user associated with each port."
+    ::= { hh3c8021XExt2AuthConfigExtEntry 4 }
+
+hh3c8021XExt2PaePortClearStatistics  OBJECT-TYPE
+    SYNTAX             INTEGER {noClear(0),clear(1)}
+    MAX-ACCESS         read-write
+    STATUS             current
+    DESCRIPTION
+           "Clear all authentication statistics of a port."
+    DEFVAL  { noClear }
+    ::= { hh3c8021XExt2AuthConfigExtEntry 5 }
+
+hh3c8021XExt2PaePortMcastTrigStatus  OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+           "The administrative enabled/disabled status of sending
+           multicast EAP_REQ/ID packet."
+    DEFVAL  { true }
+    ::= { hh3c8021XExt2AuthConfigExtEntry 6 }
+
+hh3c8021XExt2PaePortHandshakeStatus  OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+           "The administrative enabled/disabled status of sending
+           handshake EAP_REQ/ID packet."
+    DEFVAL  { true }
+    ::= { hh3c8021XExt2AuthConfigExtEntry 7 }
+
+END

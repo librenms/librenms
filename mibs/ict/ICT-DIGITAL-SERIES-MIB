@@ -4,8 +4,9 @@
 -- =============================
 -- 10/4/12	v1.00
 --
+--  Renamed from ICT-MIB to ICT-DIGITAL-SERIES-MIB
 
-ICT-MIB DEFINITIONS ::= BEGIN
+ICT-DIGITAL-SERIES-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 	enterprises, IpAddress	FROM RFC1155-SMI

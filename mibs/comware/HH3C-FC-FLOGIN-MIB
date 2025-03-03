@@ -1,0 +1,210 @@
+-- =====================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--      This MIB module is used for representing fabric login information.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 Initial version
+--        created by qiaoxinghua 2013-02-27
+-- =====================================================================
+HH3C-FC-FLOGIN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    Hh3cFcNameId, Hh3cFcAddressId, Hh3cFcBbCredit,
+    Hh3cFcClassOfServices, Hh3cFcRxMTU
+        FROM HH3C-FC-TC-MIB
+    hh3cSan, hh3cVsanIndex
+        FROM HH3C-VSAN-MIB
+    ifIndex
+        FROM IF-MIB;
+
+hh3cFcFLogin MODULE-IDENTITY
+    LAST-UPDATED   "201302271100Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085
+        "
+    DESCRIPTION
+        "This MIB module is for representing fabric login information."
+    REVISION       "201302271100Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cSan 3 }
+
+--
+-- Node definitions
+--
+hh3cFcFLoginMibObjects OBJECT IDENTIFIER ::= { hh3cFcFLogin 1 }
+
+hh3cFcFLoginTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cFcFLoginEntry
+    MAX-ACCESS         not-accessible
+    STATUS             current
+    DESCRIPTION
+        "A table of Fibre Channel related service parameters
+         used to represent the fabric login information in accord
+         with each Nx_Port attached to a particular Fibre Channel
+         port in a particular VSAN (Virtual Storage Area Network).
+
+         Each entry is created by a fabric switch when an Nx_Port
+         successfully logged in to it explicitly or implicitly,
+         and is deleted when the port logged out."
+    ::= { hh3cFcFLoginMibObjects 1 }
+
+hh3cFcFLoginEntry OBJECT-TYPE
+    SYNTAX      Hh3cFcFLoginEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A group of Fibre Channel related service parameters
+         used to represent fabric login information of a specific
+         Nx_Port."
+    INDEX { ifIndex,
+            hh3cVsanIndex,
+            hh3cFcFLoginIndex }
+    ::= { hh3cFcFLoginTable 1 }
+
+Hh3cFcFLoginEntry ::=
+    SEQUENCE {
+        hh3cFcFLoginIndex
+            Hh3cFcAddressId,
+        hh3cFcFLoginPortNodeWWN
+            Hh3cFcNameId,
+        hh3cFcFLoginPortWWN
+            Hh3cFcNameId,
+        hh3cFcFLoginPortFcId
+            Hh3cFcAddressId,
+        hh3cFcFLoginRxBbCredit
+            Hh3cFcBbCredit,
+        hh3cFcFLoginTxBbCredit
+            Hh3cFcBbCredit,
+        hh3cFcFLoginClass2RxMTU
+            Hh3cFcRxMTU,
+        hh3cFcFLoginClass3RxMTU
+            Hh3cFcRxMTU,
+        hh3cFcFLoginSuppClassRequested
+            Hh3cFcClassOfServices,
+        hh3cFcFLoginClass2ReqAgreed
+            TruthValue,
+        hh3cFcFLoginClass3ReqAgreed
+            TruthValue
+       }
+
+hh3cFcFLoginIndex OBJECT-TYPE
+    SYNTAX      Hh3cFcAddressId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of current fabric login entry.  The Fibre Channel
+         address identifier is used to identify the associated Nx_Port
+         of this entry."
+    ::= { hh3cFcFLoginEntry 1 }
+
+hh3cFcFLoginPortNodeWWN OBJECT-TYPE
+    SYNTAX      Hh3cFcNameId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The world wide name of the Remote Node to which the
+         logged-in Nx_Port belongs."
+    ::= { hh3cFcFLoginEntry 2 }
+
+hh3cFcFLoginPortWWN OBJECT-TYPE
+    SYNTAX      Hh3cFcNameId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The world wide name of the logged-in Nx_Port."
+    ::= { hh3cFcFLoginEntry 3 }
+
+hh3cFcFLoginPortFcId OBJECT-TYPE
+    SYNTAX      Hh3cFcAddressId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Fibre Channel address identifier that has been
+         assigned by the fabric to the logged-in Nx_Port."
+    ::= { hh3cFcFLoginEntry 4 }
+
+hh3cFcFLoginRxBbCredit OBJECT-TYPE
+    SYNTAX      Hh3cFcBbCredit
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of buffers available for a recipient to
+         receive frames from the logged-in Nx_Port in Class2, Class3.
+         The object is used in the buffer-to-buffer flow control from
+         the logged-in Nx_Port to Fx_Port."
+    ::= { hh3cFcFLoginEntry 5 }
+
+hh3cFcFLoginTxBbCredit OBJECT-TYPE
+    SYNTAX      Hh3cFcBbCredit
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of buffers available for a sender to transmit
+        frames to the logged-in Nx_Port in Class2, Class3.
+        The object is used in the buffer-to-buffer flow control from
+        Fx_Port to the logged-in Nx_Port."
+    ::= { hh3cFcFLoginEntry 6 }
+
+hh3cFcFLoginClass2RxMTU OBJECT-TYPE
+    SYNTAX      Hh3cFcRxMTU
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object specifies the Maximum Transmission Unit of an
+         Fibre Channel frame that can be received by the logged-in
+         Nx_Port in Class 2 service."
+    ::= { hh3cFcFLoginEntry 7 }
+
+hh3cFcFLoginClass3RxMTU OBJECT-TYPE
+    SYNTAX      Hh3cFcRxMTU
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object specifies the Maximum Transmission Unit of an
+         Fibre Channel frame that can be received by the logged-in
+         Nx_Port in Class 3 service."
+    ::= { hh3cFcFLoginEntry 8 }
+
+hh3cFcFLoginSuppClassRequested OBJECT-TYPE
+    SYNTAX      Hh3cFcClassOfServices
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object indicating the supported Classes that the logged-in
+         Nx_Port has requested."
+    ::= { hh3cFcFLoginEntry 9 }
+
+hh3cFcFLoginClass2ReqAgreed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object indicating whether the Fx_Port has agreed to support
+         Class 2 delivery that the logged-in Nx_Port requested.  It's
+         meaningful only when the Class 2 delivery has been requested."
+    ::= { hh3cFcFLoginEntry 10 }
+
+hh3cFcFLoginClass3ReqAgreed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object indicating whether the Fx_Port has agreed to support
+         Class 3 delivery that the logged-in Nx_Port requested.  It's
+         meaningful only when the Class 3 delivery has been requested."
+    ::= { hh3cFcFLoginEntry 11 }
+
+END

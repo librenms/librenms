@@ -1,0 +1,122 @@
+WAYSTREAM-SMI DEFINITIONS ::= BEGIN
+--
+-- This is the Waystream Management Information Base SMI definitions
+-- to be used together with Waystream products.
+--
+-- Copyright (c) 2017 Waystream AB, All rights reserved
+
+IMPORTS
+  MODULE-IDENTITY,
+  OBJECT-IDENTITY,
+  enterprises
+    FROM SNMPv2-SMI;
+
+--
+-- Waystream Enterprise SMI
+--
+waystream MODULE-IDENTITY
+    LAST-UPDATED "201702101100Z"	-- February 10, 2017
+    ORGANIZATION "Waystream AB"
+    CONTACT-INFO
+        "Waystream AB
+         Customer Service
+
+         Mail : Farogatan 33
+                SE-164 51 Kista
+                Sweden
+
+         Tel  : +46 8 5626 9450
+
+         E-mail: info@waystream.com
+         Web   : http://www.waystream.com"
+    DESCRIPTION
+        "The Waystream management information base SMI definitions"
+
+    REVISION "201702101100Z"	-- February 10, 2017
+    DESCRIPTION
+        "Company name change:
+	 In October 2015 PacketFront Network Products was renamed Waystream.
+	 In this update all PacketFront were changed to Waystream and all
+	 pf* to ws*."
+    REVISION "201101111801Z"	-- January 11, 2011
+    DESCRIPTION
+        "Updated company name"
+    REVISION "200903231039Z"
+    DESCRIPTION
+        "Updated telephone number in contact-info"
+    REVISION "200801171405Z"
+    DESCRIPTION
+        "Correct warnings in imports"
+    REVISION "200705111228Z"
+    DESCRIPTION
+        "Created from PACKETFRONT-MIB.mib"
+
+    ::= { enterprises 9303 }  -- assigned by IANA
+
+--
+-- Product information
+--
+wsProduct	OBJECT-IDENTITY 
+		STATUS current
+		DESCRIPTION
+		"The product group from which sysObjectID values are set."
+		::= { waystream 1 }
+
+--
+-- Configuration
+--
+wsConfig	OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+		"The configuration subtree"
+		::= { waystream 2 }
+
+ipdConfig       OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                "The configuration subtree"
+                ::= { wsConfig 1 }
+
+--
+-- Experimental
+--
+wsExperiment	OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+		"The root object for experimental objects.
+		Experimental objects are used during
+		development before a permanent assignment
+		to the waystream mib has been determined.
+ 
+		Objects in this tree will come and go. No guarantees for 
+		their existance or accuracy is ever provided."
+        	::= { waystream 3 }
+
+
+-- 
+-- Management
+--
+wsMgmt		OBJECT-IDENTITY	
+		STATUS current
+                DESCRIPTION
+		"The root object for all Waystream management objects"
+                ::= { waystream 4 }
+
+
+wsModules	OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+		"wsModules provides a root object identifier from which the 
+		MODULE-IDENTITY values may be assigned"
+		::= { waystream 5 }
+
+pfSW		OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+		"pfSW provides a root object identifier for all PacketFront 
+		Software Solutions objects"
+		::= { waystream 6 }
+
+
+END
+

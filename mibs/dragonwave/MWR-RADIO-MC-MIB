@@ -1,0 +1,663 @@
+
+-- File Name : MwrRadio-MC-MIB.mib
+-- Version   : 1.0.0
+-- Date      : October 6, 2014
+-- Author    : DragonWave Inc.
+
+MWR-RADIO-MC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+	Counter32, Counter64, Integer32
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC
+	mwr
+		FROM DWI-HARMONY-PRIVATE-MIB
+	equipmentTrapInfo, equipmentOutTrapsCounter, equipmentAlarmActiveConditionId, EnableType
+		FROM EQUIPMENT-COMMON-MIB
+	mwrEventConfigSeverity, RadioInstanceType
+		FROM MWR-ETHERNET-MIB;
+
+mwrRadioMcModIdentity MODULE-IDENTITY
+	LAST-UPDATED "201406101023Z"
+	ORGANIZATION 
+		"Dragonwave Inc."
+	CONTACT-INFO 
+		"http://www.dragonwaveinc.com
+		600-411 Legget Drive
+		Ottawa, Ontario
+		Canada, K2K 3C9
+		
+		Tel : 613-599-9991
+		Fax: 613-599-4265
+		Support: 613-271-7010"
+	DESCRIPTION 
+		"This specifies the contact information and the revision tracking information for the MIB module version."
+
+	REVISION "201406231109Z"
+	DESCRIPTION 
+		"First release of the Dragonwave Harmony radio Enhanced-multicarrier MIB."
+
+	REVISION "201409231722Z"
+	DESCRIPTION 
+		"Updated some OIDs Descriptions."
+::= { mwr 1003 }
+
+mwrRadio             OBJECT IDENTIFIER ::= { mwr 12 }
+mwrEmcRadioConfigurations  OBJECT IDENTIFIER ::= { mwrRadio 201 }
+mwrEmcRadioStatus    OBJECT IDENTIFIER ::= { mwrRadio 202 }
+mwrEmcRadioPerformance  OBJECT IDENTIFIER ::= { mwrRadio 203 }
+mwrEmcRadioNotifications  OBJECT IDENTIFIER ::= { mwrRadio 204 }
+
+mwrEmcRadioConfigurationsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEmcRadioConfigurationsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing radio configurations."
+	::= { mwrEmcRadioConfigurations 1 }
+
+mwrEmcRadioConfigurationsEntry  OBJECT-TYPE
+	SYNTAX 	MwrEmcRadioConfigurationsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table entry containing radio channel configurations."
+	INDEX { mwrEmcRadioConfigIndex }
+	::= { mwrEmcRadioConfigurationsTable 1 }
+
+MwrEmcRadioConfigurationsEntry ::= SEQUENCE {
+	mwrEmcRadioConfigIndex
+		RadioInstanceType,
+	mwrEmcRadioTxState
+		EnableType,
+	mwrEmcRadioTxPower
+		Integer32,
+	mwrEmcRadioTxDownTime
+		Integer32,
+	mwrEmcRadioRxFrequency
+		Integer32,
+	mwrEmcRadioTxFrequency
+		Integer32
+}
+
+mwrEmcRadioConfigIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each radio channel if applicable."
+	::= { mwrEmcRadioConfigurationsEntry 1 }
+
+mwrEmcRadioTxState  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Represents the transmit state of the radio channel."
+	::= { mwrEmcRadioConfigurationsEntry 2 }
+
+mwrEmcRadioTxPower  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"dB"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This defines the programmed transmit level of the radio channel.
+		The power you see is divided by 10. e.g. A display of 133 is actually 13.3 dB.
+		Notes: 
+		- Programmed and Actual transmit power may differ - see mwrEmcRadioActualTxPower."
+	::= { mwrEmcRadioConfigurationsEntry 3 }
+
+mwrEmcRadioTxDownTime  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"sec"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The amount of time in seconds the radio transmitter is disabled when the mwrEmcRadioTxState is turned off. 
+		- Make sure this is set before the mwrEmcRadioTxState is disabled.
+		- If the down time is set to 0, the radio will stay disabled until it is re-enabled again."
+	::= { mwrEmcRadioConfigurationsEntry 4 }
+
+mwrEmcRadioRxFrequency  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"kHz"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Represents the receive Radio frequency in kHz."
+	::= { mwrEmcRadioConfigurationsEntry 5 }
+
+mwrEmcRadioTxFrequency  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"kHz"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Represents the transmit Radio frequency in kHz."
+	::= { mwrEmcRadioConfigurationsEntry 6 }
+
+mwrEmcRadioProfileTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEmcRadioProfileEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing the radio profile configurations."
+	::= { mwrEmcRadioConfigurations 2 }
+
+mwrEmcRadioProfileEntry  OBJECT-TYPE
+	SYNTAX 	MwrEmcRadioProfileEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table entry containing the radio profile configurations."
+	INDEX { mwrEmcRadioStandardMode, 
+		mwrEmcRadioChannelBw, 
+		mwrEmcRadioStaticTxProfile }
+	::= { mwrEmcRadioProfileTable 1 }
+
+MwrEmcRadioProfileEntry ::= SEQUENCE {
+	mwrEmcRadioStandardMode
+		DisplayString,
+	mwrEmcRadioChannelBw
+		DisplayString,
+	mwrEmcRadioStaticTxProfile
+		DisplayString,
+	mwrEmcRadioProgrammedProfile
+		EnableType
+}
+
+mwrEmcRadioStandardMode  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An index representing the available standard mode of the radio channel."
+	::= { mwrEmcRadioProfileEntry 1 }
+
+mwrEmcRadioChannelBw  OBJECT-TYPE
+	SYNTAX     DisplayString
+	UNITS 	"MHz"
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An index representing the available channel bandwidth of the radio channel."
+	::= { mwrEmcRadioProfileEntry 2 }
+
+mwrEmcRadioStaticTxProfile  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An index representing the available static tx profile of the radio channel."
+	::= { mwrEmcRadioProfileEntry 3 }
+
+mwrEmcRadioProgrammedProfile  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Represents the configured standard mode, channel BW and the TX profile of the radio channel."
+	::= { mwrEmcRadioProfileEntry 4 }
+
+mwrEmcRadioThresholdAlarmTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEmcRadioThresholdAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing the threshold alarm configurations of the radio channel."
+	::= { mwrEmcRadioConfigurations 3 }
+
+mwrEmcRadioThresholdAlarmEntry  OBJECT-TYPE
+	SYNTAX 	MwrEmcRadioThresholdAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table entry containing the threshold alarm configurations of the radio channel."
+	INDEX { mwrEmcRadioThresholdIndex }
+	::= { mwrEmcRadioThresholdAlarmTable 1 }
+
+MwrEmcRadioThresholdAlarmEntry ::= SEQUENCE {
+	mwrEmcRadioThresholdIndex
+		RadioInstanceType,
+	mwrEmcRadioRslBelowThresholdParams
+		DisplayString,
+	mwrEmcRadioTxAboveThresholdParams
+		DisplayString
+}
+
+mwrEmcRadioThresholdIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each radio channel if applicable."
+	::= { mwrEmcRadioThresholdAlarmEntry 1 }
+
+mwrEmcRadioRslBelowThresholdParams  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Represents the RSL threshold in dB and the number of seconds the RSL should be below the threshold. 
+		 An example of the format of the string is as follows: '-75 10'. The first parameter power level in dB, the second is the time in seconds. In this example the threshold -75 dB and the time is set to 10 seconds. The single quote marks are not used in the command."
+	::= { mwrEmcRadioThresholdAlarmEntry 2 }
+
+mwrEmcRadioTxAboveThresholdParams  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Represents the radio transmit power threshold in dB and the number of seconds threshold must be exceeded. 
+		 An example of the format of the string is as follows: '-75 10'. The first parameter power level in dB, the second is the time in seconds. In this example the threshold -75 dB and the time is set to 10 seconds. The single quote marks are not used in the command."
+	::= { mwrEmcRadioThresholdAlarmEntry 3 }
+
+mwrEmcRadioChCfgSynchEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object enables or disables synchronization of the radio configuration on multiple carriers."
+	::= { mwrEmcRadioConfigurations 4 }
+
+-- 
+-- RADIO INFORMATION
+-- 
+
+mwrEmcRadioStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEmcRadioStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing the status of the radio channel."
+	::= { mwrEmcRadioStatus 1 }
+
+mwrEmcRadioStatusEntry  OBJECT-TYPE
+	SYNTAX 	MwrEmcRadioStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table entry containing the status of the radio channel."
+	INDEX { mwrEmcRadioStatusIndex }
+	::= { mwrEmcRadioStatusTable 1 }
+
+MwrEmcRadioStatusEntry ::= SEQUENCE {
+	mwrEmcRadioStatusIndex
+		RadioInstanceType,
+	mwrEmcRadioOperStatus
+		INTEGER,
+	mwrEmcRadioTRSpacing
+		Integer32,
+	mwrEmcRadioActualTxStatus
+		EnableType,
+	mwrEmcRadioRxFreqMin
+		Integer32,
+	mwrEmcRadioRxFreqMax
+		Integer32,
+	mwrEmcRadioTxFreqMin
+		Integer32,
+	mwrEmcRadioTxFreqMax
+		Integer32,
+	mwrEmcRadioTxPowerMin
+		Integer32,
+	mwrEmcRadioTxPowerMax
+		Integer32,
+	mwrEmcRadioLinkStatus
+		INTEGER
+}
+
+mwrEmcRadioStatusIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each radio channel if applicable."
+	::= { mwrEmcRadioStatusEntry 1 }
+
+mwrEmcRadioOperStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		up (1),
+		down (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current operational state of the Radio. When radio is fully configured and ready to operate the status will be up."
+	::= { mwrEmcRadioStatusEntry 2 }
+
+mwrEmcRadioTRSpacing  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"kHz"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Represents the difference between the configured TX/RX center frequency of the radio channel."
+	::= { mwrEmcRadioStatusEntry 3 }
+
+mwrEmcRadioActualTxStatus  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object defines the actual transmit state of the radio channel."
+	::= { mwrEmcRadioStatusEntry 4 }
+
+mwrEmcRadioRxFreqMin  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"kHz"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Represents the minimum radio RX frequency allowed."
+	::= { mwrEmcRadioStatusEntry 5 }
+
+mwrEmcRadioRxFreqMax  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"kHz"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Represents the maximum radio RX frequency allowed."
+	::= { mwrEmcRadioStatusEntry 6 }
+
+mwrEmcRadioTxFreqMin  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"kHz"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Represents the minimum radio TX frequency allowed."
+	::= { mwrEmcRadioStatusEntry 7 }
+
+mwrEmcRadioTxFreqMax  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"kHz"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Represents the maximum radio TX frequency allowed."
+	::= { mwrEmcRadioStatusEntry 8 }
+
+mwrEmcRadioTxPowerMin  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"dB"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Represents the minimum radio Transmit Power allowed."
+	::= { mwrEmcRadioStatusEntry 9 }
+
+mwrEmcRadioTxPowerMax  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"dB"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Represents the maximum radio Transmit Power allowed."
+	::= { mwrEmcRadioStatusEntry 10 }
+
+mwrEmcRadioLinkStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		up (1),
+		down (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current operational status of the radio link."
+	::= { mwrEmcRadioStatusEntry 11 }
+
+mwrEmcRadioPerfStatsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEmcRadioPerfStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing the performance of the radio channel."
+	::= { mwrEmcRadioPerformance 1 }
+
+mwrEmcRadioPerfStatsEntry  OBJECT-TYPE
+	SYNTAX 	MwrEmcRadioPerfStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table entry containing the performance of the radio channel."
+	INDEX { mwrEmcRadioStatsIndex }
+	::= { mwrEmcRadioPerfStatsTable 1 }
+
+MwrEmcRadioPerfStatsEntry ::= SEQUENCE {
+	mwrEmcRadioStatsIndex
+		RadioInstanceType,
+	mwrEmcRadioTxFrames
+		Counter64,
+	mwrEmcRadioRxGoodFrames
+		Counter64,
+	mwrEmcRadioRxErrsFrames
+		Counter64,
+	mwrEmcRadioRSL
+		Integer32,
+	mwrEmcRadioEqualizerStress
+		Integer32,
+	mwrEmcRadioSNR
+		Integer32,
+	mwrEmcRadioLinkAvailability
+		Counter32,
+	mwrEmcRadioActualTxPower
+		Integer32,
+	mwrEmcRadioActualTxProfile
+		DisplayString
+}
+
+mwrEmcRadioStatsIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each radio channel if applicable."
+	::= { mwrEmcRadioPerfStatsEntry 1 }
+
+mwrEmcRadioTxFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current count of radio frames transmitted."
+	::= { mwrEmcRadioPerfStatsEntry 2 }
+
+mwrEmcRadioRxGoodFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current count of good radio frames received."
+	::= { mwrEmcRadioPerfStatsEntry 3 }
+
+mwrEmcRadioRxErrsFrames  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current count of radio frames received in error."
+	::= { mwrEmcRadioPerfStatsEntry 4 }
+
+mwrEmcRadioRSL  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An estimate of the radio RSL. Divide the value by 10 to get the actual RSL value. Once this number is divided by 10 the units are dB.  For example -352 is actually -35.2dB"
+	::= { mwrEmcRadioPerfStatsEntry 5 }
+
+mwrEmcRadioEqualizerStress  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Indicates the average magnitude of all the equalizer taps to provide a measure of how hard the equalizer is working."
+	::= { mwrEmcRadioPerfStatsEntry 6 }
+
+mwrEmcRadioSNR  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"dB"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The absolute value of the estimate of the radio SNR. Divide the value by 10 to get the actual SNR."
+	::= { mwrEmcRadioPerfStatsEntry 7 }
+
+mwrEmcRadioLinkAvailability  OBJECT-TYPE
+	SYNTAX     Counter32
+	UNITS 	"sec"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The amount of time the radio link is up."
+	::= { mwrEmcRadioPerfStatsEntry 8 }
+
+mwrEmcRadioActualTxPower  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the running configuration for tx power."
+	::= { mwrEmcRadioPerfStatsEntry 9 }
+
+mwrEmcRadioActualTxProfile  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A read-only string specifying the actual value for the TX profile."
+	::= { mwrEmcRadioPerfStatsEntry 10 }
+
+mwrEmcRadioPerfStats32BitTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEmcRadioPerfStats32BitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing 32-bit counters of the radio channel. This table is provided to satisfy snmp v1 users where they can't access 64-bit counters."
+	::= { mwrEmcRadioPerformance 2 }
+
+mwrEmcRadioPerfStats32BitEntry  OBJECT-TYPE
+	SYNTAX 	MwrEmcRadioPerfStats32BitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table entry containing 32-bit counters of the radio channel."
+	INDEX { mwrEmcRadioStats32BitIndex }
+	::= { mwrEmcRadioPerfStats32BitTable 1 }
+
+MwrEmcRadioPerfStats32BitEntry ::= SEQUENCE {
+	mwrEmcRadioStats32BitIndex
+		RadioInstanceType,
+	mwrEmcRadioTxFrames32Bit
+		Counter32,
+	mwrEmcRadioRxGoodFrames32Bit
+		Counter32,
+	mwrEmcRadioRxErrsFrames32Bit
+		Counter32
+}
+
+mwrEmcRadioStats32BitIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each radio channel if applicable."
+	::= { mwrEmcRadioPerfStats32BitEntry 1 }
+
+mwrEmcRadioTxFrames32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A low capacity 32-bit counter representing the current count of radio frames transmitted."
+	::= { mwrEmcRadioPerfStats32BitEntry 2 }
+
+mwrEmcRadioRxGoodFrames32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A low capacity 32-bit counter representing the current count of radio frames received."
+	::= { mwrEmcRadioPerfStats32BitEntry 3 }
+
+mwrEmcRadioRxErrsFrames32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A low capacity 32-bit counter representing the current count of radio frames received in error."
+	::= { mwrEmcRadioPerfStats32BitEntry 4 }
+
+-- 
+-- RADIO NOTIFICATIONS
+-- 
+
+mwrEmcRadioRxLossOfSync  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrEmcRadioStatusIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo, 
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when radio link loses synchronization on its receiver. The mwrEmcRadioStatusIndex indicates each radio channel."
+	::= { mwrEmcRadioNotifications 1 }
+
+mwrEmcRadioFailure  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrEmcRadioStatusIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo, 
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when fault is detected in radio. The reason could be faulty components or invalid configuration. The mwrEmcRadioStatusIndex indicates each radio channel."
+	::= { mwrEmcRadioNotifications 2 }
+
+mwrEmcRadioCalUnavailable  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo, 
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when the calibration information is not available in the system."
+	::= { mwrEmcRadioNotifications 3 }
+
+mwrEmcRadioRslBelowThreshold  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrEmcRadioStatusIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo, 
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when the receive signal level of the radio link is below the user configured limit. The mwrEmcRadioStatusIndex indicates each radio channel."
+	::= { mwrEmcRadioNotifications 4 }
+
+mwrEmcRadioTxlAboveThreshold  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrEmcRadioStatusIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo, 
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when the radio transmit power level exceeds the user set limit.  The mwrEmcRadioStatusIndex indicates each radio channel."
+	::= { mwrEmcRadioNotifications 5 }
+
+mwrEmcRadioConfigMismatch  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrEmcRadioStatusIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo, 
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when the radio configuration between the peers is mismatched."
+	::= { mwrEmcRadioNotifications 6 }
+END
+

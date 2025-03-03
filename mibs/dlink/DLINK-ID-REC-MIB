@@ -1,0 +1,56 @@
+-- D-Link Common MIBs
+-- DLINK-ID-REC
+-- -----------------------------------------------------------------------------
+-- Version 1.4
+-- 2012/6/19
+-- Add dlinkIndustrialCommon
+-- by Jane Peng
+-- -----------------------------------------------------------------------------
+-- Version 1.3
+-- 2009/1/15
+-- Modify syntax of AgentNotifyLevel
+-- for support 8 notification levels.
+-- by Green Zhu
+-- -----------------------------------------------------------------------------
+-- Version 1.2       
+-- 2008/8/11
+-- Add dlink-broadband-products and dlink-broadband-mgmt.
+-- by Green Zhu
+-- -----------------------------------------------------------------------------
+-- Version 1.1       
+-- 2004/7/6
+-- Modify syntax of AgentNotifyLevel
+-- by Karen
+-- ----------------------------------------------------------------------------- 
+-- Version 1.0.12  01-29-2002
+-- ----------------------------------------------------------------------------- 
+DLINK-ID-REC-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS
+        enterprises    FROM RFC1155-SMI;
+        
+        
+    AgentNotifyLevel ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+        	"Notification  leveling."
+        SYNTAX  INTEGER {
+        	critical(0),
+        	warning(1),
+        	information(2),
+        	emergency(3),
+        	alert(4),                        	
+        	error(5),
+        	notice(6),
+            	debug(7)                               	
+     }	         
+
+    dlink    				  OBJECT IDENTIFIER ::= { enterprises 171 }
+    dlink-products    		  OBJECT IDENTIFIER ::= { dlink 10 }
+    dlink-mgmt    		   	  OBJECT IDENTIFIER ::= { dlink 11 }
+    dlink-common-mgmt    	  OBJECT IDENTIFIER ::= { dlink 12 }    
+    dlinkIndustrialCommon     OBJECT IDENTIFIER ::= { dlink 14 }        
+    dlink-broadband-products  OBJECT IDENTIFIER ::= { dlink 30 }   
+    dlink-broadband-mgmt 	  OBJECT IDENTIFIER ::= { dlink 31 }  
+
+
+END

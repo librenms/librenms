@@ -1,0 +1,96 @@
+mib: OA-SFP-MIB:DEV-CFG-MIB
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>.+) Ver\. (?<version>[^)]+\))/'
+        serial: '.1.3.6.1.4.1.629.1.50.16.4.3.2.0'
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid: 
+                        - oaSfpInfoInstalledStatus   
+        dbm:
+            data:
+                -
+                    oid: oaSfpDiagnosticTxPower
+                    num_oid: '.1.3.6.1.4.1.6926.1.18.1.1.3.1.6.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 100
+                    descr: 'Port {{ $subindex1 }} Tx Power'
+                    index: 'oaSfpDiagnosticTxPower.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: oaSfpInfoInstalledStatus
+                            op: '!='
+                            value: '3'
+                -
+                    oid: oaSfpDiagnosticRxPower
+                    num_oid: '.1.3.6.1.4.1.6926.1.18.1.1.3.1.7.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 100
+                    descr: 'Port {{ $subindex1 }} Rx Power'
+                    index: 'oaSfpDiagnosticRxPower.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: oaSfpInfoInstalledStatus
+                            op: '!='
+                            value: '3'
+        temperature:
+            data:
+                -
+                    oid: nbsDevPhParamDevAmbientTempC
+                    num_oid: '.1.3.6.1.4.1.629.1.50.11.1.13.1.{{ $index }}'
+                    descr: 'Ambient Temp'
+                    index: 'nbsDevPhParamDevAmbientTempC.{{ $index }}'
+                    low_limit: '0'
+                    high_limit: '50'
+                -
+                    oid: nbsDevPhParamPackProcTempC
+                    num_oid: '.1.3.6.1.4.1.629.1.50.11.1.13.2.{{ $index }}'
+                    descr: 'Packet Processor Temp'
+                    index: 'nbsDevPhParamPackProcTempC.{{ $index }}'
+                -
+                    oid: oaSfpDiagnosticTemperature
+                    num_oid: '.1.3.6.1.4.1.6926.1.18.1.1.3.1.3.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 10
+                    descr: 'Port {{ $subindex1 }} Temp'
+                    index: 'oaSfpDiagnosticTemperature.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: oaSfpInfoInstalledStatus
+                            op: '!='
+                            value: '3'
+        voltage:
+            data:
+                -
+                    oid: oaSfpDiagnosticVcc
+                    num_oid: '.1.3.6.1.4.1.6926.1.18.1.1.3.1.4.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 10000
+                    descr: 'Port {{ $subindex1 }} Voltage'
+                    index: 'oaSfpDiagnosticVcc.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: oaSfpInfoInstalledStatus
+                            op: '!='
+                            value: '3'
+        current:
+            data:
+                -
+                    oid: oaSfpDiagnosticTxBias
+                    num_oid: '.1.3.6.1.4.1.6926.1.18.1.1.3.1.5.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 1000000
+                    descr: 'Port {{ $subindex1 }} Tx Bias'
+                    index: 'oaSfpDiagnosticTxBias.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: oaSfpInfoInstalledStatus
+                            op: '!='
+                            value: '3'

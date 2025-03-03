@@ -6,7 +6,8 @@ over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_wireless_clients, text: Clients }
 discovery:
-    - sysDescr:
-        - Apple AirPort
-        - Apple Base Station
-        - Base Station V3.84
+    -
+        sysDescr:
+            - Apple AirPort
+            - Apple Base Station
+            - Base Station V3.84

@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
+
 /*
  * Try to discover any MEF Links
  */
@@ -8,7 +11,7 @@
  * Variable to hold the discovered MEF Links.
  */
 
-$mef_list = array();
+$mef_list = [];
 
 /*
  * Fetch information about MEF Links.
@@ -16,11 +19,11 @@ $mef_list = array();
 
 $oids = snmpwalk_cache_multi_oid($device, 'MefServiceEvcCfgEntry', $oids, 'MEF-UNI-EVC-MIB');
 
-echo "MEF : ";
+echo 'MEF : ';
 foreach ($oids as $index => $entry) {
-    $mefIdent    = $entry['mefServiceEvcCfgIdentifier'];
-    $mefType     = $entry['mefServiceEvcCfgServiceType'];
-    $mefMtu      = $entry['mefServiceEvcCfgMtuSize'];
+    $mefIdent = $entry['mefServiceEvcCfgIdentifier'];
+    $mefType = $entry['mefServiceEvcCfgServiceType'];
+    $mefMtu = $entry['mefServiceEvcCfgMtuSize'];
     $mefAdmState = $entry['mefServiceEvcCfgAdminState'];
     $mefRowState = $entry['mefServiceEvcCfgRowStatus'];
 
@@ -35,9 +38,9 @@ foreach ($oids as $index => $entry) {
     /*
      * Check if the MEF is already known for this host
      */
-    if (dbFetchCell("SELECT COUNT(id) FROM `mefinfo` WHERE `device_id` = ? AND `mefID` = ?", array($device['device_id'], $index)) == 0) {
-        $mefid = dbInsert(array('device_id' => $device['device_id'], 'mefID' => $index, 'mefType' => mres($mefType), 'mefIdent' => mres($mefIdent), 'mefMTU' => mres($mefMtu), 'mefAdmState' => mres($mefAdmState), 'mefRowState' => mres($mefRowState)), 'mefinfo');
-        log_event("MEF link: ". mres($mefIdent) . " (" . $index . ") Discovered", $device, 'system', 2);
+    if (dbFetchCell('SELECT COUNT(id) FROM `mefinfo` WHERE `device_id` = ? AND `mefID` = ?', [$device['device_id'], $index]) == 0) {
+        $mefid = dbInsert(['device_id' => $device['device_id'], 'mefID' => $index, 'mefType' => $mefType, 'mefIdent' => $mefIdent, 'mefMTU' => $mefMtu, 'mefAdmState' => $mefAdmState, 'mefRowState' => $mefRowState], 'mefinfo');
+        Eventlog::log('MEF link: ' . $mefIdent . ' (' . $index . ') Discovered', $device['device_id'], 'system', Severity::Info);
         echo '+';
     } else {
         echo '.';
@@ -52,14 +55,14 @@ foreach ($oids as $index => $entry) {
  * Get a list of all the known MEF Links for this host
  */
 
-$sql = "SELECT id, mefID, mefIdent FROM mefinfo WHERE device_id = '".$device['device_id']."'";
+$sql = "SELECT id, mefID, mefIdent FROM mefinfo WHERE device_id = '" . $device['device_id'] . "'";
 foreach (dbFetchRows($sql) as $db_mef) {
     /*
      * Delete the MEF Link that are removed from the host.
      */
-    if (!in_array($db_mef['mefID'], $mef_list)) {
-        dbDelete('mefinfo', '`id` = ?', array($db_mef['id']));
-        log_event("MEF link: ".mres($db_mef['mefIdent']).' Removed', $device, 'system', 3);
+    if (! in_array($db_mef['mefID'], $mef_list)) {
+        dbDelete('mefinfo', '`id` = ?', [$db_mef['id']]);
+        Eventlog::log('MEF link: ' . $db_mef['mefIdent'] . ' Removed', $device['device_id'], 'system', Severity::Notice);
         echo '-';
     }
 }

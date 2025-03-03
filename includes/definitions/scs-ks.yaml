@@ -1,0 +1,42 @@
+os: scs-ks
+text: 'SCS KS'
+type: environment
+icon: carel
+mib_dir: carel
+over:
+    - { graph: device_humidity, text: 'Humidity' }
+    - { graph: device_temperature, text: 'Temperature' }
+discovery:
+    -
+        sysDescr:
+            - 'CAREL cpCO controller'
+        sysObjectID:
+            - .1.3.6.1.4.1.9839
+
+poller_modules:
+    entity-physical: true
+    hr-mib: true
+    ipSystemStats: true
+    netstats: true
+    ospf: false
+    ucd-mib: true
+    ports: true
+    stp: false
+discovery_modules:
+    ports-stack: true
+    entity-physical: true
+    processors: true
+    mempools: true
+    cisco-vrf-lite: false
+    ipv4-addresses: true
+    ipv6-addresses: true
+    storage: false
+    hr-device: true
+    discovery-protocols: true
+    arp-table: true
+    bgp-peers: false
+    ucd-diskio: false
+    fdb-table: true
+    stp: false
+    vlans: true
+    ports: true

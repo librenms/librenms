@@ -1,4 +1,3 @@
--- This file was included in WWP MIB release 04-16-00-0047
 --
 -- CIENA-SMI.my
 --
@@ -11,17 +10,29 @@
 				FROM SNMPv2-SMI;
 	
 		ciena MODULE-IDENTITY
-			LAST-UPDATED "201304220000Z"
-			ORGANIZATION "Ciena, Inc"
+			LAST-UPDATED "202011240000Z"
+			ORGANIZATION "Ciena Corp."
 			CONTACT-INFO
-				"  Mib Meister
-				115 North Sullivan Road
-				Spokane Valley, WA 99037
-				USA            
-				Phone:  +1 509 242 9000
-				Email:  support@ciena.com"
+			"   Mib Meister
+			    7035 Ridge Road
+			    Hanover, Maryland 21076
+			    USA
+			    Phone:  +1 800 921 1144
+			    Email:  support@ciena.com"
 			DESCRIPTION
 				"MIB Version: MIBS-CIENA-CES-XX-XX-XX-XXX."
+
+			REVISION "202011240000Z"
+			DESCRIPTION  
+				"Updated for cienaRls and cienaPro."
+
+			REVISION "201706070000Z"
+			DESCRIPTION
+				"Updated contact info."
+
+			REVISION "201507150000Z"
+			DESCRIPTION
+				"Updated for cienaGenericMIBs and cienaOpterametro."
 
 			REVISION "201304220000Z"
 			DESCRIPTION
@@ -34,7 +45,6 @@
 			REVISION "201009272317Z"
 			DESCRIPTION
 				"Initial creation of MIB file structure for Ciena Packet Networking Products."
-
 			::= { enterprises 1271 }
 	
 --
@@ -45,22 +55,22 @@
 			STATUS current
 			DESCRIPTION
 				"cienaCes provides a root object identifier that can be
-				used to define MIBs pertaining to Ciena Packet Networking Products."
+				 used to define MIBs pertaining to Ciena Packet Networking Products."
 			::= { ciena 2 }
 
 		cienaCommon OBJECT-IDENTITY
 			STATUS current
 			DESCRIPTION
 				"cienaCes provides a root object identifier that can be
-				used to define common MIBs pertaining to Ciena Packet Networking Products."
+				 used to define common MIBs pertaining to Ciena Packet Networking Products."
 			::= { ciena 1 }
 
 		cienaProducts OBJECT-IDENTITY
 			STATUS current
 			DESCRIPTION
 				"cienaProducts is the root OBJECT-IDENTIFIER for all Ciena products.  
-				sysObjectID values will be assigned the OID representing the product specified in 
-				CIENA-PRODUCTS-MIB.my."
+				 sysObjectID values will be assigned the OID representing the product specified in 
+				 CIENA-PRODUCTS-MIB.my."
 			::= { cienaCommon 2 }
 
 			                                         
@@ -87,6 +97,33 @@
 			DESCRIPTION
 				"Provides a root object identifier for all the Trap MIBs."
 			::= { cienaCes 1 }			                                    
+
+		cienaRls OBJECT-IDENTITY
+			STATUS  current
+			DESCRIPTION
+				"cienaRls provides a root object identifier that is used to define MIBs
+				 pertaining to Ciena's 6500 Reconfigurable Line System product."
+			::= { ciena 4 }
+
+		cienaGenericMIBs OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION
+				"This module represents the top-level MIB branch for some of the generic MIBs that are common to Ciena
+				 products."
+			::= { ciena 29 }			                                    
+
+		cienaPro  OBJECT-IDENTITY
+			STATUS  current
+			DESCRIPTION
+				"This module represents the top-level MIB branch for some of the PRO (Portable Resource Object) MIBs
+				 which are platform independent and are used in a variety of Ciena products."
+			::= { ciena 30 }
+
+		cienaOpterametro OBJECT-IDENTITY
+			STATUS	current
+			DESCRIPTION
+				"This module represents the top-level MIB branch for Optical MIBs."
+			::= { ciena 68 }			                                    
 
 END
 			

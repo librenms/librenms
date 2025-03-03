@@ -1,0 +1,676 @@
+-- *****************************************************************
+-- TN-DHCP-MIB
+--
+-- Copyright (c) 2012, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+TN-DHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Integer32   FROM SNMPv2-SMI
+    NOTIFICATION-GROUP  FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, TimeStamp,
+    RowStatus, TruthValue  FROM SNMPv2-TC
+    InetAddressType, InetAddress FROM INET-ADDRESS-MIB
+    entPhysicalIndex  FROM ENTITY-MIB
+    tnProducts FROM TRANSITION-SMI
+    ifIndex, InterfaceIndex FROM IF-MIB;
+
+tnDhcpMIB MODULE-IDENTITY
+        LAST-UPDATED "201210080000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for DHCP settings."
+
+        REVISION "201210080000Z"
+        DESCRIPTION
+        "Initial Revision of this module"
+
+    ::= { tnProducts 33 }
+
+tnDhcpMIBObjects
+        OBJECT IDENTIFIER ::= { tnDhcpMIB 1 }
+
+tnDhcpMIBNotifications
+        OBJECT IDENTIFIER ::= { tnDhcpMIB 2 }
+
+--
+-- Textual Conventions
+--
+
+
+
+--
+-- MIB variables
+--
+
+tnDhcpSnoopingMgmt
+    OBJECT IDENTIFIER ::= { tnDhcpMIBObjects 1 }
+
+
+tnDhcpSnoopingTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnDhcpSnoopingEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table is for user to configure the global settings of DHCP Snooping."
+    ::= { tnDhcpSnoopingMgmt 1 }
+
+tnDhcpSnoopingEntry OBJECT-TYPE
+    SYNTAX        TnDhcpSnoopingEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry represents a global configuration of DHCP Snooping."
+    INDEX { entPhysicalIndex  }
+    ::= { tnDhcpSnoopingTable 1 }
+
+TnDhcpSnoopingEntry ::= SEQUENCE {
+    tnDhcpSnoopingMode             TruthValue
+    }
+
+tnDhcpSnoopingMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DHCP snooping mode operation. Possible modes are:
+        True: Enable DHCP snooping mode operation.
+        When DHCP snooping mode operation is enabled, the DHCP request messages
+        will be forwarded to trusted ports and only allow reply packets from
+        trusted ports.
+        False: Disable DHCP snooping mode operation. "
+    DEFVAL { false }
+    ::= { tnDhcpSnoopingEntry 1 }
+
+--
+-- tnDhcpSnoopingIfTable
+--
+
+tnDhcpSnoopingIfTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnDhcpSnoopingIfEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table lets user to configure the DHCP Snooping for each port."
+    ::= { tnDhcpSnoopingMgmt 2 }
+
+tnDhcpSnoopingIfEntry OBJECT-TYPE
+    SYNTAX        TnDhcpSnoopingIfEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry represents a DHCP Snooping setting on a port."
+    INDEX { ifIndex }
+    ::= { tnDhcpSnoopingIfTable 1 }
+
+TnDhcpSnoopingIfEntry ::= SEQUENCE {
+    tnDhcpSnoopingIfMode                 INTEGER
+    }
+
+tnDhcpSnoopingIfMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            trusted      (1), -- Configures the port as trusted source of the DHCP messages.
+            untrusted    (2), -- Configures the port as untrusted source of the DHCP messages.
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the DHCP Snooping port mode."
+    DEFVAL { untrusted }
+    ::= { tnDhcpSnoopingIfEntry 1 }
+
+
+--
+-- tnDhcpSnoopingStatisticsTable
+--
+
+tnDhcpSnoopingStatisticsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnDhcpSnoopingStatisticsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table provides statistics for DHCP Snooping on ports"
+    ::= { tnDhcpSnoopingMgmt 3 }
+
+tnDhcpSnoopingStatisticsEntry OBJECT-TYPE
+    SYNTAX        TnDhcpSnoopingStatisticsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry represents a DHCP Snooping statistics on a port."
+    INDEX { ifIndex }
+    ::= { tnDhcpSnoopingStatisticsTable 1 }
+
+TnDhcpSnoopingStatisticsEntry ::= SEQUENCE {
+    tnDhcpSnoopingStatisticsClear              TruthValue,
+    tnDhcpSnoopingStatisticsRxDiscover         INTEGER,
+    tnDhcpSnoopingStatisticsTxDiscover         INTEGER,
+    tnDhcpSnoopingStatisticsRxOffer            INTEGER,
+    tnDhcpSnoopingStatisticsTxOffer            INTEGER,
+    tnDhcpSnoopingStatisticsRxRequest          INTEGER,
+    tnDhcpSnoopingStatisticsTxRequest          INTEGER,
+    tnDhcpSnoopingStatisticsRxDecline          INTEGER,
+    tnDhcpSnoopingStatisticsTxDecline          INTEGER,
+    tnDhcpSnoopingStatisticsRxACK              INTEGER,
+    tnDhcpSnoopingStatisticsTxACK              INTEGER,
+    tnDhcpSnoopingStatisticsRxNAK              INTEGER,
+    tnDhcpSnoopingStatisticsTxNAK              INTEGER,
+    tnDhcpSnoopingStatisticsRxRelease          INTEGER,
+    tnDhcpSnoopingStatisticsTxRelease          INTEGER,
+    tnDhcpSnoopingStatisticsRxInform           INTEGER,
+    tnDhcpSnoopingStatisticsTxInform           INTEGER,
+    tnDhcpSnoopingStatisticsRxLeaseQuery       INTEGER,
+    tnDhcpSnoopingStatisticsTxLeaseQuery       INTEGER,
+    tnDhcpSnoopingStatisticsRxLeaseUnassigned  INTEGER,
+    tnDhcpSnoopingStatisticsTxLeaseUnassigned  INTEGER,
+    tnDhcpSnoopingStatisticsRxLeaseUnknown     INTEGER,
+    tnDhcpSnoopingStatisticsTxLeaseUnknown     INTEGER,
+    tnDhcpSnoopingStatisticsRxLeaseActive      INTEGER,
+    tnDhcpSnoopingStatisticsTxLeaseActive      INTEGER
+    }
+
+tnDhcpSnoopingStatisticsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear the counters for the selected port."
+    DEFVAL { false }
+    ::= { tnDhcpSnoopingStatisticsEntry 1 }
+
+tnDhcpSnoopingStatisticsRxDiscover OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discover packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 2 }
+
+tnDhcpSnoopingStatisticsTxDiscover OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discover packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 3 }
+
+tnDhcpSnoopingStatisticsRxOffer OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of offer packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 4 }
+
+tnDhcpSnoopingStatisticsTxOffer OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of offer packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 5 }
+
+tnDhcpSnoopingStatisticsRxRequest OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of request packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 6 }
+
+tnDhcpSnoopingStatisticsTxRequest OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of request packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 7 }
+
+tnDhcpSnoopingStatisticsRxDecline OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of decline packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 8 }
+
+tnDhcpSnoopingStatisticsTxDecline OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of decline packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 9 }
+
+tnDhcpSnoopingStatisticsRxACK OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of ACK packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 10 }
+
+tnDhcpSnoopingStatisticsTxACK OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of ACK packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 11 }
+
+tnDhcpSnoopingStatisticsRxNAK OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of NAK packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 12 }
+
+tnDhcpSnoopingStatisticsTxNAK OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of NAK packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 13 }
+
+tnDhcpSnoopingStatisticsRxRelease OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of release packets received. "
+    ::= { tnDhcpSnoopingStatisticsEntry 14 }
+
+tnDhcpSnoopingStatisticsTxRelease OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of release packets transmitted."
+    ::= { tnDhcpSnoopingStatisticsEntry 15 }
+
+tnDhcpSnoopingStatisticsRxInform OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inform packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 16 }
+
+tnDhcpSnoopingStatisticsTxInform OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inform packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 17 }
+
+tnDhcpSnoopingStatisticsRxLeaseQuery OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease query packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 18 }
+
+tnDhcpSnoopingStatisticsTxLeaseQuery OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease query packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 19 }
+
+tnDhcpSnoopingStatisticsRxLeaseUnassigned OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease unassigned packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 20 }
+
+tnDhcpSnoopingStatisticsTxLeaseUnassigned OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease unassigned packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 21 }
+
+tnDhcpSnoopingStatisticsRxLeaseUnknown OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease unknown packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 22 }
+
+tnDhcpSnoopingStatisticsTxLeaseUnknown OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease unknown packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 23 }
+
+tnDhcpSnoopingStatisticsRxLeaseActive OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease active packets received on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 24 }
+
+tnDhcpSnoopingStatisticsTxLeaseActive OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lease active packets transmitted on the port."
+    ::= { tnDhcpSnoopingStatisticsEntry 25 }
+
+
+
+--
+-- MIB variables
+--
+
+
+tnDhcpRelayMgmt
+    OBJECT IDENTIFIER ::= { tnDhcpMIBObjects 2 }
+
+
+tnDhcpRelayTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnDhcpRelayEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table is for user to configure the DHCP Relay."
+    ::= { tnDhcpRelayMgmt 1 }
+
+tnDhcpRelayEntry OBJECT-TYPE
+    SYNTAX        TnDhcpRelayEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry represents a global configuration of DHCP Relay."
+    INDEX { entPhysicalIndex  }
+    ::= { tnDhcpRelayTable 1 }
+
+TnDhcpRelayEntry ::= SEQUENCE {
+    tnDhcpRelayMode             TruthValue,
+    tnDhcpRelayServerAddrType   InetAddressType,
+    tnDhcpRelayServerAddr       InetAddress,
+    tnDhcpRelayInfoMode         TruthValue,
+    tnDhcpRelayInfoPolicy       INTEGER
+    }
+
+tnDhcpRelayMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DHCP relay mode operation. Possible modes are:
+        True: Enable DHCP relay mode operation. When DHCP relay mode operation
+        is enabled, the agent forwards and transfers DHCP messages between the
+        clients and the server when they are not in the same subnet domain.
+        And the DHCP broadcast message won't be flooded for security considerations.
+        False: Disable DHCP relay mode operation."
+    DEFVAL { false }
+    ::= { tnDhcpRelayEntry 1 }
+
+tnDhcpRelayServerAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The type of the DHCP Relay server address."
+    ::= { tnDhcpRelayEntry 2 }
+
+tnDhcpRelayServerAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DHCP relay server IP address.
+        A DHCP relay agent is used to forward and to transfer DHCP messages
+        between the clients and the server when they are not in the same subnet
+        domain."
+    ::= { tnDhcpRelayEntry 3 }
+
+
+tnDhcpRelayInfoMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DHCP relay information mode option operation.
+        Possible modes are:
+        True: Enable DHCP relay information mode operation. When DHCP relay
+        information mode operation is enabled, the agent inserts specific information
+        into a DHCP message when forwarding to DHCP server and removes it from
+        a DHCP message when transferring to DHCP client. It only works when DHCP
+        relay operation mode is enabled.
+        False: Disable DHCP relay information mode operation."
+    DEFVAL { false }
+    ::= { tnDhcpRelayEntry 4 }
+
+
+tnDhcpRelayInfoPolicy OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            replace (0),  -- Replace the original relay information when a DHCP
+                          -- message that already contains it is received.
+            keep    (1),  -- Keep the original relay information when a DHCP
+                          -- message that already contains it is received.
+            drop    (2),  -- Drop the package when a DHCP message that already
+                          -- contains relay information is received.
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DHCP relay information option policy.
+        When DHCP relay information mode operation is enabled, if agent receives
+        a DHCP message that already contains relay agent information, it will
+        enforce the policy.
+        The 'Replace' option is invalid when relay information mode is disabled.
+        Possible policies are: replace, keep and drop."
+    DEFVAL { replace }
+    ::= { tnDhcpRelayEntry 5 }
+
+
+
+--
+-- tnDhcpRelayStatisticsTable
+--
+
+tnDhcpRelayStatisticsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnDhcpRelayStatisticsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table provides statistics for DHCP Relay."
+    ::= { tnDhcpRelayMgmt 2 }
+
+tnDhcpRelayStatisticsEntry OBJECT-TYPE
+    SYNTAX        TnDhcpRelayStatisticsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry represents a DHCP Relay statistics."
+    INDEX { entPhysicalIndex }
+    ::= { tnDhcpRelayStatisticsTable 1 }
+
+TnDhcpRelayStatisticsEntry ::= SEQUENCE {
+    tnDhcpRelayStatisticsClear                             INTEGER,
+    tnDhcpRelayStatisticsServerTransmitToServer            INTEGER,
+    tnDhcpRelayStatisticsServerTransmitError               INTEGER,
+    tnDhcpRelayStatisticsServerReceiveFromServer           INTEGER,
+    tnDhcpRelayStatisticsServerReceiveMissingAgentOption   INTEGER,
+    tnDhcpRelayStatisticsServerReceiveMissingCircuitID     INTEGER,
+    tnDhcpRelayStatisticsServerReceiveMissingRemoteID      INTEGER,
+    tnDhcpRelayStatisticsServerReceiveBadCircuitID         INTEGER,
+    tnDhcpRelayStatisticsServerReceiveBadRemoteID          INTEGER,
+    tnDhcpRelayStatisticsClientTransmitToClient            INTEGER,
+    tnDhcpRelayStatisticsClientTransmitError               INTEGER,
+    tnDhcpRelayStatisticsClientReceiveFromClient           INTEGER,
+    tnDhcpRelayStatisticsClientReceiveAgentOption          INTEGER,
+    tnDhcpRelayStatisticsClientReplaceAgentOption          INTEGER,
+    tnDhcpRelayStatisticsClientKeepAgentOption             INTEGER,
+    tnDhcpRelayStatisticsClientDropAgentOption             INTEGER
+    }
+
+tnDhcpRelayStatisticsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear the counters of the entry."
+    DEFVAL { false }
+    ::= { tnDhcpRelayStatisticsEntry 1 }
+
+tnDhcpRelayStatisticsServerTransmitToServer OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that are relayed from client to server."
+    ::= { tnDhcpRelayStatisticsEntry 2 }
+
+tnDhcpRelayStatisticsServerTransmitError OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that resulted in errors while being sent to clients."
+    ::= { tnDhcpRelayStatisticsEntry 3 }
+
+tnDhcpRelayStatisticsServerReceiveFromServer OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received from server."
+    ::= { tnDhcpRelayStatisticsEntry 4 }
+
+tnDhcpRelayStatisticsServerReceiveMissingAgentOption OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received without agent information options."
+    ::= { tnDhcpRelayStatisticsEntry 5 }
+
+tnDhcpRelayStatisticsServerReceiveMissingCircuitID OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received with the Circuit ID option missing."
+    ::= { tnDhcpRelayStatisticsEntry 6 }
+
+tnDhcpRelayStatisticsServerReceiveMissingRemoteID OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received with the Remote ID option missing."
+    ::= { tnDhcpRelayStatisticsEntry 7 }
+
+tnDhcpRelayStatisticsServerReceiveBadCircuitID OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets whose Circuit ID option did not match known
+        circuit ID. "
+    ::= { tnDhcpRelayStatisticsEntry 8 }
+
+tnDhcpRelayStatisticsServerReceiveBadRemoteID OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets whose Remote ID option did not match known Remote ID."
+    ::= { tnDhcpRelayStatisticsEntry 9 }
+
+
+tnDhcpRelayStatisticsClientTransmitToClient OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of relayed packets from server to client. "
+    ::= { tnDhcpRelayStatisticsEntry 10 }
+
+tnDhcpRelayStatisticsClientTransmitError OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that resulted in error while being sent to servers."
+    ::= { tnDhcpRelayStatisticsEntry 11 }
+
+tnDhcpRelayStatisticsClientReceiveFromClient OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received packets from server. "
+    ::= { tnDhcpRelayStatisticsEntry 12 }
+
+tnDhcpRelayStatisticsClientReceiveAgentOption OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received packets with relay agent information option. "
+    ::= { tnDhcpRelayStatisticsEntry 13 }
+
+tnDhcpRelayStatisticsClientReplaceAgentOption OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets which were replaced with relay agent information
+        option."
+    ::= { tnDhcpRelayStatisticsEntry 14 }
+
+tnDhcpRelayStatisticsClientKeepAgentOption OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets whose relay agent information was retained. "
+    ::= { tnDhcpRelayStatisticsEntry 15 }
+
+tnDhcpRelayStatisticsClientDropAgentOption OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that were dropped which were received with relay
+        agent information. "
+    ::= { tnDhcpRelayStatisticsEntry 16 }
+
+--
+-- Notifications
+--
+
+END

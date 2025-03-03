@@ -15,46 +15,59 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Device;
 
-use LibreNMS\OS;
+use LibreNMS\Modules\Wireless;
 
-class WirelessSensor extends Sensor
+class WirelessSensor
 {
-    protected static $name = 'Wireless Sensor';
-    protected static $table = 'wireless_sensors';
-    protected static $data_name = 'wireless-sensor';
-
-    private $access_point_ip;
+    protected $type;
+    protected $device_id;
+    protected $oids;
+    protected $subtype;
+    protected $index;
+    protected $description;
+    protected $current;
+    protected $multiplier;
+    protected $divisor;
+    protected $aggregator;
+    protected $high_limit;
+    protected $low_limit;
+    protected $high_warn;
+    protected $low_warn;
+    protected $entPhysicalIndex;
+    protected $entPhysicalMeasured;
+    protected string $rrd_type = 'GAUGE';
+    protected $access_point_ip;
 
     /**
      * Sensor constructor. Create a new sensor to be discovered.
      *
-     * @param string $type Class of this sensor, must be a supported class
-     * @param int $device_id the device_id of the device that owns this sensor
-     * @param array|string $oids an array or single oid that contains the data for this sensor
-     * @param string $subtype the type of sensor an additional identifier to separate out sensors of the same class, generally this is the os name
-     * @param int|string $index the index of this sensor, must be stable, generally the index of the oid
-     * @param string $description A user visible description of this sensor, may be truncated in some places (like graphs)
-     * @param int|float $current The current value of this sensor, will seed the db and may be used to guess limits
-     * @param int $multiplier a number to multiply the value(s) by
-     * @param int $divisor a number to divide the value(s) by
-     * @param string $aggregator an operation to combine multiple numbers. Supported: sum, avg
-     * @param int $access_point_id The id of the AP in the access_points sensor this belongs to (generally used for controllers)
-     * @param int|float $high_limit Alerting: Maximum value
-     * @param int|float $low_limit Alerting: Minimum value
-     * @param int|float $high_warn Alerting: High warning value
-     * @param int|float $low_warn Alerting: Low warning value
-     * @param int|float $entPhysicalIndex The entPhysicalIndex this sensor is associated, often a port
-     * @param int|float $entPhysicalMeasured the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
+     * @param  string  $type  Class of this sensor, must be a supported class
+     * @param  int  $device_id  the device_id of the device that owns this sensor
+     * @param  array|string  $oids  an array or single oid that contains the data for this sensor
+     * @param  string  $subtype  the type of sensor an additional identifier to separate out sensors of the same class, generally this is the os name
+     * @param  int|string  $index  the index of this sensor, must be stable, generally the index of the oid
+     * @param  string  $description  A user visible description of this sensor, may be truncated in some places (like graphs)
+     * @param  int|float|null  $current  The current value of this sensor, will seed the db and may be used to guess limits
+     * @param  int  $multiplier  a number to multiply the value(s) by
+     * @param  int  $divisor  a number to divide the value(s) by
+     * @param  string  $aggregator  an operation to combine multiple numbers. Supported: sum, avg
+     * @param  int  $access_point_id  The id of the AP in the access_points sensor this belongs to (generally used for controllers)
+     * @param  int|float  $high_limit  Alerting: Maximum value
+     * @param  int|float  $low_limit  Alerting: Minimum value
+     * @param  int|float  $high_warn  Alerting: High warning value
+     * @param  int|float  $low_warn  Alerting: Low warning value
+     * @param  int|float  $entPhysicalIndex  The entPhysicalIndex this sensor is associated, often a port
+     * @param  int|float  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
      */
     public function __construct(
         $type,
@@ -76,38 +89,46 @@ class WirelessSensor extends Sensor
         $entPhysicalMeasured = null
     ) {
         $this->access_point_ip = $access_point_id;
-        parent::__construct(
-            $type,
-            $device_id,
-            $oids,
-            $subtype,
-            $index,
-            $description,
-            $current,
-            $multiplier,
-            $divisor,
-            $aggregator,
-            $high_limit,
-            $low_limit,
-            $high_warn,
-            $low_warn,
-            $entPhysicalIndex,
-            $entPhysicalMeasured
-        );
+        $this->type = $type;
+        $this->device_id = $device_id;
+        $this->oids = (array) $oids;
+        $this->subtype = $subtype;
+        $this->index = $index;
+        $this->description = $description;
+        $this->current = $current;
+        $this->multiplier = $multiplier;
+        $this->divisor = $divisor;
+        $this->aggregator = $aggregator;
+        $this->entPhysicalIndex = $entPhysicalIndex;
+        $this->entPhysicalMeasured = $entPhysicalMeasured;
+        $this->high_limit = $high_limit;
+        $this->low_limit = $low_limit;
+        $this->high_warn = $high_warn;
+        $this->low_warn = $low_warn;
+        $this->rrd_type = $this->type == 'errors' ? 'COUNTER' : 'GAUGE';
     }
 
-    protected function toArray()
+    public function toModel(): \App\Models\WirelessSensor
     {
-        $sensor = parent::toArray();
-        $sensor['access_point_id'] = $this->access_point_ip;
-        return $sensor;
-    }
-
-    public static function discover(OS $os)
-    {
-        foreach (self::getTypes() as $type => $descr) {
-            static::discoverType($os, $type);
-        }
+        return new \App\Models\WirelessSensor([
+            'sensor_class' => $this->type,
+            'sensor_type' => $this->subtype,
+            'sensor_index' => $this->index,
+            'sensor_descr' => $this->description,
+            'sensor_current' => $this->current,
+            'sensor_multiplier' => $this->multiplier,
+            'sensor_divisor' => $this->divisor,
+            'sensor_aggregator' => $this->aggregator,
+            'sensor_limit' => $this->high_limit,
+            'sensor_limit_warn' => $this->high_warn,
+            'sensor_limit_low' => $this->low_limit,
+            'sensor_limit_low_warn' => $this->low_warn,
+            'entPhysicalIndex' => $this->entPhysicalIndex,
+            'entPhysicalMeasured' => $this->entPhysicalMeasured,
+            'sensor_oids' => $this->oids,
+            'access_point_ip' => $this->access_point_ip,
+            'rrd_type' => $this->rrd_type,
+        ]);
     }
 
     /**
@@ -118,195 +139,112 @@ class WirelessSensor extends Sensor
      *  'unit'  - units used by this class 'dBm' for example
      *  'icon'  - font awesome icon used by this class
      * )
-     * @param bool $valid filter this list by valid types in the database
-     * @param int $device_id when filtering, only return types valid for this device_id
+     *
+     * @param  bool  $valid  filter this list by valid types in the database
+     * @param  int  $device_id  when filtering, only return types valid for this device_id
      * @return array
      */
-    public static function getTypes($valid = false, $device_id = null)
+    public static function getTypes($valid = false, $device_id = null): array
     {
-        // Add new types here
+        // Add new types here translations/descriptions/units in lang/<lang>/wireless.php
         // FIXME I'm really bad with icons, someone please help!
-        static $types = array(
-            'ap-count' => array(
-                'short' => 'APs',
-                'long' => 'AP Count',
-                'unit' => '',
+        static $types = [
+            'ap-count' => [
                 'icon' => 'wifi',
-            ),
-            'clients' => array(
-                'short' => 'Clients',
-                'long' => 'Client Count',
-                'unit' => '',
+            ],
+            'clients' => [
                 'icon' => 'tablet',
-            ),
-            'quality' => array(
-                'short' => 'Quality',
-                'long' => 'Quality',
-                'unit' => '%',
+            ],
+            'quality' => [
                 'icon' => 'feed',
-            ),
-            'capacity' => array(
-                'short' => 'Capacity',
-                'long' => 'Capacity',
-                'unit' => '%',
+            ],
+            'capacity' => [
                 'icon' => 'feed',
-            ),
-            'utilization' => array(
-                'short' => 'Utilization',
-                'long' => 'utilization',
-                'unit' => '%',
+            ],
+            'utilization' => [
                 'icon' => 'percent',
-            ),
-            'rate' => array(
-                'short' => 'Rate',
-                'long' => 'TX/RX Rate',
-                'unit' => 'bps',
+            ],
+            'rate' => [
                 'icon' => 'tachometer',
-            ),
-            'ccq' => array(
-                'short' => 'CCQ',
-                'long' => 'Client Connection Quality',
-                'unit' => '%',
+            ],
+            'ccq' => [
                 'icon' => 'wifi',
-            ),
-            'snr' => array(
-                'short' => 'SNR',
-                'long' => 'Signal-to-Noise Ratio',
-                'unit' => 'dB',
+            ],
+            'snr' => [
                 'icon' => 'signal',
-            ),
-            'rssi' => array(
-                'short' => 'RSSI',
-                'long' => 'Received Signal Strength Indicator',
-                'unit' => 'dBm',
+            ],
+            'sinr' => [
                 'icon' => 'signal',
-            ),
-            'power' => array(
-                'short' => 'Power/Signal',
-                'long' => 'TX/RX Power or Signal',
-                'unit' => 'dBm',
+            ],
+            'rsrp' => [
+                'icon' => 'signal',
+            ],
+            'rsrq' => [
+                'icon' => 'signal',
+            ],
+            'ssr' => [
+                'icon' => 'signal',
+            ],
+            'mse' => [
+                'icon' => 'signal',
+            ],
+            'xpi' => [
+                'icon' => 'signal',
+            ],
+            'rssi' => [
+                'icon' => 'signal',
+            ],
+            'power' => [
                 'icon' => 'bolt',
-            ),
-            'noise-floor' => array(
-                'short' => 'Noise Floor',
-                'long' => 'Noise Floor',
-                'unit' => 'dBm/Hz',
+            ],
+            'noise-floor' => [
                 'icon' => 'signal',
-            ),
-            'error-ratio' => array(
-                'short' => 'Error Ratio',
-                'long' => 'Bit/Packet Error Ratio',
-                'unit' => '%',
+            ],
+            'errors' => [
                 'icon' => 'exclamation-triangle',
-            ),
-            'error-rate' => array(
-                'short' => 'BER',
-                'long' => 'Bit Error Rate',
-                'unit' => 'bps',
+                'type' => 'counter',
+            ],
+            'error-ratio' => [
                 'icon' => 'exclamation-triangle',
-            ),
-            'frequency' => array(
-                'short' => 'Frequency',
-                'long' => 'Frequency',
-                'unit' => 'MHz',
+            ],
+            'error-rate' => [
+                'icon' => 'exclamation-triangle',
+            ],
+            'frequency' => [
                 'icon' => 'line-chart',
-            ),
-            'distance' => array(
-                'short' => 'Distance',
-                'long' => 'Distance',
-                'unit' => 'km',
+            ],
+            'distance' => [
                 'icon' => 'space-shuttle',
-            ),
-        );
+            ],
+            'cell' => [
+                'icon' => 'line-chart',
+            ],
+            'channel' => [
+                'icon' => 'line-chart',
+            ],
+        ];
 
         if ($valid) {
-            $sql = 'SELECT `sensor_class` FROM `wireless_sensors`';
-            $params = array();
-            if (isset($device_id)) {
-                $sql .= ' WHERE `device_id`=?';
-                $params[] = $device_id;
-            }
-            $sql .= ' GROUP BY `sensor_class`';
+            $sensors = \App\Models\WirelessSensor::query()
+                ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
+                ->groupBy('sensor_class')
+                ->pluck('sensor_class');
 
-            $sensors = dbFetchColumn($sql, $params);
-            return array_intersect_key($types, array_flip($sensors));
+            return array_intersect_key($types, $sensors->flip()->all());
         }
 
         return $types;
     }
 
-    protected static function getDiscoveryInterface($type)
-    {
-        return str_to_class($type, 'LibreNMS\\Interfaces\\Discovery\\Sensors\\Wireless') . 'Discovery';
-    }
-
-    protected static function getDiscoveryMethod($type)
-    {
-        return 'discoverWireless' . str_to_class($type);
-    }
-
-    protected static function getPollingInterface($type)
-    {
-        return str_to_class($type, 'LibreNMS\\Interfaces\\Polling\\Sensors\\Wireless') . 'Polling';
-    }
-
-    protected static function getPollingMethod($type)
-    {
-        return 'pollWireless' . str_to_class($type);
-    }
-
     /**
      * Convert a WiFi channel to a Frequency in MHz
+     * Legacy compat, use \LibreNMS\Modules\Wireless::channelToFrequency()
      *
-     * @param $channel
+     * @param  int  $channel
      * @return int
      */
-    public static function channelToFrequency($channel)
+    public static function channelToFrequency($channel): int
     {
-        $channels = array(
-            1 => 2412,
-            2 => 2417,
-            3 => 2422,
-            4 => 2427,
-            5 => 2432,
-            6 => 2437,
-            7 => 2442,
-            8 => 2447,
-            9 => 2452,
-            10 => 2457,
-            11 => 2462,
-            12 => 2467,
-            13 => 2472,
-            14 => 2484,
-            34 => 5170,
-            36 => 5180,
-            38 => 5190,
-            40 => 5200,
-            42 => 5210,
-            44 => 5220,
-            46 => 5230,
-            48 => 5240,
-            52 => 5260,
-            56 => 5280,
-            60 => 5300,
-            64 => 5320,
-            100 => 5500,
-            104 => 5520,
-            108 => 5540,
-            112 => 5560,
-            116 => 5580,
-            120 => 5600,
-            124 => 5620,
-            128 => 5640,
-            132 => 5660,
-            136 => 5680,
-            140 => 5700,
-            149 => 5745,
-            153 => 5765,
-            157 => 5785,
-            161 => 5805,
-        );
-
-        return $channels[$channel];
+        return Wireless::channelToFrequency((int) $channel);
     }
 }

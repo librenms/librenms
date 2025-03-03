@@ -1,0 +1,570 @@
+-- *****************************************************************
+-- MY-SMP-MIB.mib:  My SMP MIB file
+--
+-- $Copyright$
+-- 
+-- *****************************************************************
+--
+
+MY-SMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        IpAddress
+                FROM SNMPv2-SMI
+        RowStatus,
+        DisplayString,
+        MacAddress,
+        TruthValue
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        IfIndex,
+        ConfigStatus
+                FROM MY-TC
+        ifIndex        
+                FROM IF-MIB
+        myMgmt
+                FROM MY-SMI
+        Community
+        				FROM MY-SNMP-AGENT-MIB
+        VlanId
+                FROM Q-BRIDGE-MIB;        				
+
+mySMPMIB MODULE-IDENTITY
+        LAST-UPDATED "200409090000Z"
+        ORGANIZATION "$Company$"
+        CONTACT-INFO
+                " 
+                Tel: $Telephone$ 
+
+                E-mail: $E-mail$"
+        DESCRIPTION
+                ""
+        REVISION      "200409090000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { myMgmt 39}
+
+mySMPMIBObjects OBJECT IDENTIFIER ::= { mySMPMIB 1 }
+
+--
+--  user management
+--
+
+mySMPServer OBJECT-TYPE
+		SYNTAX IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { mySMPMIBObjects 1 }
+    
+mySMPServerKey OBJECT-TYPE
+		SYNTAX Community
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { mySMPMIBObjects 2 }    
+    
+mySMPEventSendSlice OBJECT-TYPE
+		SYNTAX Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { mySMPMIBObjects 3 }    
+    
+mySMPPolicyDelete OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS      current    
+    DESCRIPTION
+            ""
+    ::= { mySMPMIBObjects 4 }  
+        
+mySMPPolicyChecksum OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(16))
+    MAX-ACCESS read-only
+    STATUS      current    
+    DESCRIPTION
+            ""
+    ::= { mySMPMIBObjects 5 }     
+
+mySMPPolicyTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS      current    
+    DESCRIPTION
+            ""
+    ::= { mySMPMIBObjects 6 }    
+    
+mySMPPolicyGroupTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MySMPPolicyGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              ""
+    ::= { mySMPMIBObjects 9}
+
+mySMPPolicyGroupEntry OBJECT-TYPE
+        SYNTAX  MySMPPolicyGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              ""
+        INDEX   {mySMPPolicyGroupIndex}
+    ::= { mySMPPolicyGroupTable 1 }
+ 
+    MySMPPolicyGroupEntry ::=
+        SEQUENCE {
+                mySMPPolicyGroupIndex
+                       Unsigned32,        
+                mySMPPolicyGroupCount
+                       Unsigned32,
+                mySMPPolicyGroupChecksum
+                       OCTET STRING(SIZE(16)),           
+                mySMPPolicyGroupStatus
+                       RowStatus
+      }
+
+mySMPPolicyGroupIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "" 
+    ::= { mySMPPolicyGroupEntry 1 }
+
+mySMPPolicyGroupCount OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            ""
+    ::= { mySMPPolicyGroupEntry 2 }
+    
+mySMPPolicyGroupChecksum OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(16))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            ""
+    ::= { mySMPPolicyGroupEntry 3 }
+
+mySMPPolicyGroupStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "The status of this conceptual row."
+    ::= { mySMPPolicyGroupEntry 4 }
+    
+mySMPPolicyTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MySMPPolicyEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              ""
+    ::= { mySMPMIBObjects 8}
+
+mySMPPolicyEntry OBJECT-TYPE
+        SYNTAX  MySMPPolicyEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              ""
+        INDEX   {mySMPGroupIndex,mySMPPolicyIndex}
+    ::= { mySMPPolicyTable 1 }
+
+    MySMPPolicyEntry ::=
+        SEQUENCE {
+                mySMPGroupIndex
+                       Unsigned32,
+                mySMPPolicyIndex
+                       Unsigned32,        
+                mySMPPolicyStatus
+                       ConfigStatus,
+                mySMPPolicyNumber
+                       Unsigned32,
+                mySMPPolicyInstallPort
+                       IfIndex,           
+                mySMPPolicyType
+                       INTEGER,  
+                mySMPPolicyContent
+                       OCTET STRING,
+                mySMPPolicyMask
+                       OCTET STRING,
+                mySMPPolicyName
+                       DisplayString
+      }
+
+mySMPGroupIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "" 
+    ::= { mySMPPolicyEntry 1 }
+
+mySMPPolicyIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "" 
+    ::= { mySMPPolicyEntry 2 }
+
+mySMPPolicyStatus OBJECT-TYPE
+        SYNTAX       ConfigStatus
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            ""
+    ::= { mySMPPolicyEntry 3 }
+  
+mySMPPolicyNumber OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+              "" 
+    ::= { mySMPPolicyEntry 4 }
+    
+mySMPPolicyInstallPort OBJECT-TYPE
+        SYNTAX  IfIndex
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+              "" 
+    ::= { mySMPPolicyEntry 5 }
+    
+mySMPPolicyType OBJECT-TYPE
+        SYNTAX INTEGER{
+        	hi-isolate(1),
+        	isolate(2),
+        	bolcked(3),
+        	addrBind(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { mySMPPolicyEntry 6 }
+        
+mySMPPolicyContent OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(80))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { mySMPPolicyEntry 7 }
+        
+mySMPPolicyMask OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(80))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { mySMPPolicyEntry 8 }    
+        
+mySMPPolicyName OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE (0..32))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            ""
+    ::= { mySMPPolicyEntry 9 }
+    
+mySMPFrameRelayTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF MySMPFrameRelayEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              ""
+    ::= { mySMPMIBObjects 7}
+
+mySMPFrameRelayEntry OBJECT-TYPE
+        SYNTAX  MySMPFrameRelayEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              ""
+        INDEX   {mySMPFrameRelayIndex}
+    ::= { mySMPFrameRelayTable 1 }
+
+    MySMPFrameRelayEntry ::=
+        SEQUENCE {
+                mySMPFrameRelayIndex
+                       Unsigned32,        
+                mySMPFrameRelayContent
+                       OCTET STRING,
+                mySMPFrameRelayLength
+                       Unsigned32,           
+                mySMPFrameRelayDestPort
+                		   IfIndex,
+                mySMPFrameRelayDestVlan
+                		   VlanId                                       		   
+      }
+
+mySMPFrameRelayIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "" 
+    ::= { mySMPFrameRelayEntry 1 }
+    
+mySMPFrameRelayContent OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(0..1024))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            ""
+    ::= { mySMPFrameRelayEntry 2 }
+    
+mySMPFrameRelayLength OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS      current    
+    DESCRIPTION
+            ""
+    ::= { mySMPFrameRelayEntry 3 } 
+
+mySMPFrameRelayDestPort OBJECT-TYPE
+        SYNTAX  IfIndex
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+              "" 
+    ::= { mySMPFrameRelayEntry 4 }
+    
+mySMPFrameRelayDestVlan OBJECT-TYPE
+        SYNTAX  VlanId
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+              "VLAN ID" 
+    ::= { mySMPFrameRelayEntry 5 }    
+      
+
+-- 
+  mySMPTraps      OBJECT IDENTIFIER ::= { mySMPMIB 65535}
+        
+  mySMPSwitchIP OBJECT-TYPE
+          SYNTAX IpAddress
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 1 }          
+        
+  mySMPSwitchInterfaceID OBJECT-TYPE
+          SYNTAX IfIndex
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 2 }    
+  
+  mySMPSwitchInterfaceVLANID OBJECT-TYPE
+          SYNTAX VlanId
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            "VLAN ID"
+          ::= { mySMPTraps 3 }  
+
+  mySMPFrameContentLength OBJECT-TYPE
+          SYNTAX Unsigned32
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 4 }      
+        
+  mySMPFrameContent OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE(0..1024))
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 5 }      
+        
+  mySMPFrameRelayTrap NOTIFICATION-TYPE
+      OBJECTS  {mySMPSwitchIP,mySMPSwitchInterfaceID,mySMPSwitchInterfaceVLANID,
+      			  mySMPFrameContentLength,mySMPFrameContent}
+      STATUS  current
+      DESCRIPTION
+              "Trap"
+      ::= { mySMPTraps 6 }
+
+
+  mySMPArpAttackSubnetIP OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE(0..40))
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 7 }          
+        
+  mySMPArpAttackSubnetIPNum OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 8 }          
+
+  mySMPArpAttackInterfaceSlot OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 9 }    
+  
+  mySMPArpAttackInterfacePort OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 10}  
+
+  mySMPArpAttackInterfaceVlanID OBJECT-TYPE
+          SYNTAX VlanId
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            "VLAN ID"
+          ::= { mySMPTraps 11 }      
+        
+  mySMPArpAttackFrameContent OBJECT-TYPE
+          SYNTAX OCTET STRING(SIZE(0..64))
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 12 }      
+
+  mySMPArpAttackStatus OBJECT-TYPE
+          SYNTAX TruthValue
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 13 }
+
+  mySMPArpAttackCriticalStatus OBJECT-TYPE
+          SYNTAX INTEGER{
+             critical(1),
+             emergencies(2) 
+          }
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            "
+             critical(1),         
+             emergencies(2)"
+          ::= { mySMPTraps 14 }
+
+  mySMPArpAttackMac OBJECT-TYPE
+          SYNTAX MacAddress
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 15 }      
+
+  mySMPArpAttackInterfaceIndex OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS accessible-for-notify
+          STATUS current
+          DESCRIPTION
+            ""
+          ::= { mySMPTraps 16 }      
+        
+  mySMPArpAttackTrap NOTIFICATION-TYPE
+      OBJECTS  {mySMPArpAttackSubnetIP, mySMPArpAttackSubnetIPNum, mySMPArpAttackInterfaceSlot,
+               mySMPArpAttackInterfacePort, mySMPArpAttackInterfaceVlanID, mySMPArpAttackFrameContent,
+               mySMPArpAttackStatus, mySMPArpAttackCriticalStatus, mySMPArpAttackMac, 
+               mySMPArpAttackInterfaceIndex}
+      STATUS  current
+      DESCRIPTION
+              ""
+      ::= { mySMPTraps 17 }        
+
+mySMPMIBConformance OBJECT IDENTIFIER ::= { mySMPMIB 3 }
+mySMPMIBCompliances OBJECT IDENTIFIER ::= { mySMPMIBConformance 1 }
+mySMPMIBGroups      OBJECT IDENTIFIER ::= { mySMPMIBConformance 2 }
+
+-- compliance statements
+myDeviceMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the My SMP MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { mySMPServerMibGroup,
+                                   mySMPClientMibGroup,
+                                   mySMPPolicyMibGroup,
+                                   mySMPFrameRelayMibGroup}
+        ::= { mySMPMIBCompliances 1 }
+        
+mySMPServerMibGroup    OBJECT-GROUP
+    OBJECTS {
+    					mySMPServer,
+    					mySMPServerKey
+            }
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { mySMPMIBGroups 1 }
+    
+mySMPClientMibGroup    OBJECT-GROUP
+    OBJECTS {
+    					mySMPEventSendSlice
+            }
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { mySMPMIBGroups 2 }    
+    
+mySMPPolicyMibGroup    OBJECT-GROUP
+    OBJECTS {
+    					mySMPPolicyDelete,
+    					mySMPPolicyChecksum,
+              mySMPPolicyIndex,
+              mySMPPolicyStatus,
+              mySMPPolicyInstallPort,
+              mySMPPolicyType,
+              mySMPPolicyContent,
+              mySMPPolicyMask,
+              mySMPPolicyName
+            }
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { mySMPMIBGroups 3 }       
+    
+mySMPFrameRelayMibGroup    OBJECT-GROUP
+    OBJECTS {
+              mySMPFrameRelayIndex,
+              mySMPFrameRelayContent,
+              mySMPFrameRelayLength,
+              mySMPFrameRelayDestPort,
+              mySMPFrameRelayDestVlan
+            }
+    STATUS  current
+    DESCRIPTION
+            ""
+    ::= { mySMPMIBGroups 4 }         
+
+
+END

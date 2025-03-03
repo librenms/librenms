@@ -1,0 +1,12 @@
+os: wti-power
+text: 'WTI POWER'
+type: power
+icon: wti
+group: wti
+mib_dir: wti
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_power, text: Power }      
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.2634.6

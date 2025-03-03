@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux lbhost 4.9.182-lb1 #1 SMP Wed Jun 19 13:36:05 BST 2019 x86_64",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": "<private>",
+                    "os": "loadbalancer",
+                    "type": "loadbalancer",
+                    "serial": null,
+                    "icon": "loadbalancer.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

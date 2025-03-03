@@ -5,21 +5,23 @@ unset($port_ifAlias);
 
 echo $this_port['ifAlias'];
 
-list($type,$descr) = preg_split('/[\:\[\]\{\}\(\)]/', $this_port['ifAlias']);
-list(,$circuit)    = preg_split('/[\{\}]/', $this_port['ifAlias']);
-list(,$notes)      = preg_split('/[\(\)]/', $this_port['ifAlias']);
-list(,$speed)      = preg_split('/[\[\]]/', $this_port['ifAlias']);
-$descr             = trim($descr);
+$split = preg_split('/[:\[\]{}()]/', $this_port['ifAlias']);
+$type = isset($split[0]) ? trim($split[0]) : null;
+$descr = isset($split[1]) ? trim($split[1]) : null;
+
+$circuit = trim(preg_split('/[{}]/', $this_port['ifAlias'])[1] ?? '');
+$notes = trim(preg_split('/[()]/', $this_port['ifAlias'])[1] ?? '');
+$speed = trim(preg_split('/[\[\]]/', $this_port['ifAlias'])[1] ?? '');
 
 if ($type && $descr) {
-    $type                    = strtolower($type);
-    $port_ifAlias['type']    = $type;
-    $port_ifAlias['descr']   = $descr;
+    $type = strtolower($type);
+    $port_ifAlias['type'] = $type;
+    $port_ifAlias['descr'] = $descr;
     $port_ifAlias['circuit'] = $circuit;
-    $port_ifAlias['speed']   = $speed;
-    $port_ifAlias['notes']   = $notes;
+    $port_ifAlias['speed'] = substr($speed, 0, 32);
+    $port_ifAlias['notes'] = $notes;
 
     d_echo($port_ifAlias);
 }
 
-unset($port_type, $port_descr, $port_circuit, $port_notes, $port_speed);
+unset($type, $descr, $circuit, $notes, $speed, $split);

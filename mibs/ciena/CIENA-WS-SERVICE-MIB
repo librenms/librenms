@@ -1,0 +1,323 @@
+-- This file was automatically generated from ciena-ws-service.yang. Do not edit.
+
+CIENA-WS-SERVICE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    DescriptionString, EnabledDisabledEnum, PortId, ServiceDomainIdx, ServiceIdx
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaWsServiceMIB MODULE-IDENTITY
+    LAST-UPDATED "201707180000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "An Ethernet Private Line service that carries traffic across the network via a client port. Automatically created at client port provisioning. By default, a service is automatically mapped to a service domain."
+    REVISION "201707180000Z"
+    DESCRIPTION "Waveserver Release 1.5
+Removed 'Read only attribute' from 'protection-state' description.
+Removed 'Read only attribute' from 'mac-learning' description.
+Changed 'max-number-of-port' to read-only.
+Removed 'config true' from all entries.
+Removed obsolete status from 'link-state-forwarding'."
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver Release 1.4
+
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.
+Added RPCs: ws-service-attach-port, ws-service-detach-port.
+'link-state-forwarding' status changed to obsolete.
+"
+    REVISION "201606170000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.  
+Restructuring of the module."
+    REVISION "201502250000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 1 }
+
+ServiceId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX Unsigned32
+
+ServiceMaxPort ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX Unsigned32
+
+ServiceNameStr ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "64a"
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX OCTET STRING(SIZE(1..64))
+
+cwsServiceServicesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsServiceServicesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsServiceMIB 3 }
+
+cwsServiceServicesEntry OBJECT-TYPE
+    SYNTAX CwsServiceServicesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsServiceServicesTable."
+    INDEX { cwsServiceServicesServiceIndex }
+    ::= { cwsServiceServicesTable 1 }
+
+CwsServiceServicesEntry ::= SEQUENCE { 
+    cwsServiceServicesServiceIndex Integer32 
+}
+
+cwsServiceServicesServiceIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Service Index, unique for all SAOS DB tables. Key value for the Service List."
+    ::= { cwsServiceServicesEntry 1 }
+
+cwsServiceIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsServiceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Service identification."
+    ::= { cienaWsServiceMIB 4 }
+
+cwsServiceIdEntry OBJECT-TYPE
+    SYNTAX CwsServiceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsServiceIdTable."
+    INDEX { cwsServiceServicesServiceIndex, cwsServiceIdTableSnmpKey }
+    ::= { cwsServiceIdTable 1 }
+
+CwsServiceIdEntry ::= SEQUENCE { 
+    cwsServiceIdTableSnmpKey Integer32,
+    cwsServiceIdServiceId ServiceId,
+    cwsServiceIdName ServiceNameStr,
+    cwsServiceIdDescription DescriptionString 
+}
+
+cwsServiceIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsServiceId"
+    ::= { cwsServiceIdEntry 1 }
+
+cwsServiceIdServiceId OBJECT-TYPE
+    SYNTAX ServiceId
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Service ID value, min 1, max 4095."
+    ::= { cwsServiceIdEntry 2 }
+
+cwsServiceIdName OBJECT-TYPE
+    SYNTAX ServiceNameStr
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Name of the Service. Each name must be unique."
+    ::= { cwsServiceIdEntry 3 }
+
+cwsServiceIdDescription OBJECT-TYPE
+    SYNTAX DescriptionString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Description of the Service."
+    ::= { cwsServiceIdEntry 4 }
+
+cwsServiceStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsServiceStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Service state."
+    ::= { cienaWsServiceMIB 5 }
+
+cwsServiceStateEntry OBJECT-TYPE
+    SYNTAX CwsServiceStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsServiceStateTable."
+    INDEX { cwsServiceServicesServiceIndex, cwsServiceStateTableSnmpKey }
+    ::= { cwsServiceStateTable 1 }
+
+CwsServiceStateEntry ::= SEQUENCE { 
+    cwsServiceStateTableSnmpKey Integer32,
+    cwsServiceStateAdminState EnabledDisabledEnum 
+}
+
+cwsServiceStateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsServiceState"
+    ::= { cwsServiceStateEntry 1 }
+
+cwsServiceStateAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the service is enabled or disabled. Read only attribute."
+    ::= { cwsServiceStateEntry 2 }
+
+cwsServicePropertiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsServicePropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Service properties."
+    ::= { cienaWsServiceMIB 6 }
+
+cwsServicePropertiesEntry OBJECT-TYPE
+    SYNTAX CwsServicePropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsServicePropertiesTable."
+    INDEX { cwsServiceServicesServiceIndex, cwsServicePropertiesTableSnmpKey }
+    ::= { cwsServicePropertiesTable 1 }
+
+CwsServicePropertiesEntry ::= SEQUENCE { 
+    cwsServicePropertiesTableSnmpKey Integer32,
+    cwsServicePropertiesType INTEGER,
+    cwsServicePropertiesMaxNumberOfPort ServiceMaxPort,
+    cwsServicePropertiesProtectionState INTEGER,
+    cwsServicePropertiesLinkStateForwarding EnabledDisabledEnum,
+    cwsServicePropertiesMacLearning EnabledDisabledEnum,
+    cwsServicePropertiesParentSvcDomainIdxReference ServiceDomainIdx 
+}
+
+cwsServicePropertiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsServiceProperties"
+    ::= { cwsServicePropertiesEntry 1 }
+
+cwsServicePropertiesType OBJECT-TYPE
+    SYNTAX INTEGER { epl(0), evpl(1), etree(2), elan(3), eepl(4) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Service type."
+    ::= { cwsServicePropertiesEntry 2 }
+
+cwsServicePropertiesMaxNumberOfPort OBJECT-TYPE
+    SYNTAX ServiceMaxPort
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Max number of ports this service allows. Between 2 and 65535. Read only attribute."
+    ::= { cwsServicePropertiesEntry 3 }
+
+cwsServicePropertiesProtectionState OBJECT-TYPE
+    SYNTAX INTEGER { protected(0), unprotected(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Service protection state."
+    ::= { cwsServicePropertiesEntry 4 }
+
+cwsServicePropertiesLinkStateForwarding OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "If link state forwarding is enabled or disabled."
+    ::= { cwsServicePropertiesEntry 5 }
+
+cwsServicePropertiesMacLearning OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Indicates if service MAC learning turned on or off."
+    ::= { cwsServicePropertiesEntry 6 }
+
+cwsServicePropertiesParentSvcDomainIdxReference OBJECT-TYPE
+    SYNTAX ServiceDomainIdx
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The Service Domain Index which this service belongs to. The parent of this service."
+    ::= { cwsServicePropertiesEntry 7 }
+
+cwsServicePortMembersReferenceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsServicePortMembersReferenceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Service Operational Data: Each entry identifies the port id of a parent port."
+    ::= { cienaWsServiceMIB 7 }
+
+cwsServicePortMembersReferenceEntry OBJECT-TYPE
+    SYNTAX CwsServicePortMembersReferenceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsServicePortMembersReferenceTable."
+    INDEX { cwsServiceServicesServiceIndex, cwsServicePropertiesTableSnmpKey, cwsServicePortMembersReferenceTableSnmpKey }
+    ::= { cwsServicePortMembersReferenceTable 1 }
+
+CwsServicePortMembersReferenceEntry ::= SEQUENCE { 
+    cwsServicePortMembersReferenceTableSnmpKey Integer32,
+    cwsServicePortMembersReference PortId 
+}
+
+cwsServicePortMembersReferenceTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsServicePortMembersReference"
+    ::= { cwsServicePortMembersReferenceEntry 1 }
+
+cwsServicePortMembersReference OBJECT-TYPE
+    SYNTAX PortId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Service Operational Data: Each entry identifies the port id of a parent port."
+    ::= { cwsServicePortMembersReferenceEntry 2 }
+
+
+
+-- Conformance statements
+cienaWsServiceObjects OBJECT IDENTIFIER
+    ::= { cienaWsServiceMIB 1 }
+
+cienaWsServiceConformance OBJECT IDENTIFIER
+    ::= { cienaWsServiceMIB 2 }
+
+cienaWsServiceGroups OBJECT IDENTIFIER
+    ::= { cienaWsServiceConformance 1 }
+
+cienaWsServiceGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsServiceServicesServiceIndex,
+        cwsServiceIdServiceId,
+        cwsServiceIdName,
+        cwsServiceIdDescription,
+        cwsServiceStateAdminState,
+        cwsServicePropertiesType,
+        cwsServicePropertiesMaxNumberOfPort,
+        cwsServicePropertiesProtectionState,
+        cwsServicePropertiesLinkStateForwarding,
+        cwsServicePropertiesMacLearning,
+        cwsServicePropertiesParentSvcDomainIdxReference
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsServiceGroups 1 }
+
+cienaWsServiceCompliances OBJECT IDENTIFIER
+    ::= { cienaWsServiceConformance 2 }
+
+cienaWsServiceCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsServiceGroup }
+    ::= { cienaWsServiceCompliances 1 }
+
+END -- End module

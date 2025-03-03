@@ -1,0 +1,447 @@
+ALCATEL-IND1-DHCPV6-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        IpAddress, Integer32, Unsigned32, Counter32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, PhysAddress, DisplayString,RowStatus, TimeStamp, TruthValue, DateAndTime
+                FROM SNMPv2-TC
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        Ipv6Address, Ipv6IfIndexOrZero
+                FROM IPV6-TC
+        softentIND1Ipv6
+                FROM ALCATEL-IND1-BASE
+        ipv6IfIndex
+                FROM IPV6-MIB
+	InetAddress, InetAddressType
+		FROM INET-ADDRESS-MIB;
+
+
+alcatelIND1DHCPv6MIB MODULE-IDENTITY
+    LAST-UPDATED "201303220000Z"
+    ORGANIZATION "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             Propietary DHCPv6 MIB definitions
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special,
+         or consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 2013 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "201303220000Z"
+    DESCRIPTION
+        "The first version of this MIB Module."
+
+    ::= { softentIND1Ipv6 2 }
+
+
+alcatelIND1DHCPv6MIBObjects OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIB 1 }
+
+--
+-- Alcatel DHCPv6 configuration
+--
+
+alaDHCPv6RelayConfig OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBObjects 1 }
+
+alaDHCPv6RelayAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global DHCPv6 administrative status.  This object provides a
+         means to globally enable or disable the DHCPv6 relay feature.
+         DHCPv6 Relay must still be enabled on individual interfaces
+         in order for relay operation to occur."
+    ::= { alaDHCPv6RelayConfig 1 }
+
+alaDHCPv6SrvConfig OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBObjects 2 }
+
+alaDHCPv6SrvGlobalConfigStatus OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  enable(1),
+                  disable(2)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to enable(1) or disable(2) DHCPv6 Server on the switch."
+        DEFVAL { disable }
+    ::= { alaDHCPv6SrvConfig 1  }
+
+alaDHCPv6SrvGlobalRestart OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  inactive(1),
+                  restart(2)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to restart(2) the DHCPv6 Server on the switch. Default value is
+            inactive(1) which user can not set."
+        DEFVAL { inactive }
+    ::= { alaDHCPv6SrvConfig 2 }
+
+alaDHCPv6SrvGlobalClearStat OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  default(1),
+                  reset(2)
+                }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Defines the global clear statistics control for DHCPv6 Server.
+                default(1) - default value for this object,
+                reset(2)   - indicates that all statistic related to DHCPv6
+                             server in the system should get cleared."
+        DEFVAL  { default }
+    ::= { alaDHCPv6SrvConfig 3 }
+
+--
+-- Alcatel DHCPv6 Relay Interface Table
+--
+
+alaDHCPv6RelayInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6RelayInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table controlling DHCPv6 Relay on IPv6 interfaces.
+
+        This table extends the corresponding IPv6 interface
+        entry in alaIPv6InterfaceTable."
+    ::= { alcatelIND1DHCPv6MIBObjects 3 }
+
+alaDHCPv6RelayInterfaceEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6RelayInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An DHCPv6 relay interface entry."
+    INDEX       { ipv6IfIndex }
+    ::= { alaDHCPv6RelayInterfaceTable 1 }
+
+AlaDHCPv6RelayInterfaceEntry ::= SEQUENCE {
+    alaDHCPv6RelayInterfaceAdminStatus                   INTEGER
+}
+
+alaDHCPv6RelayInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 administrative status on the interface."
+    ::= { alaDHCPv6RelayInterfaceEntry 1 }
+
+
+--
+-- Alcatel DHCPv6 Relay Destination Table
+--
+
+alaDHCPv6RelayDestinationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDHCPv6RelayDestinationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table allowing the creation and removal of DHCPv6
+        Relay destinations for an interface."
+    ::= { alcatelIND1DHCPv6MIBObjects 4 }
+
+alaDHCPv6RelayDestinationEntry OBJECT-TYPE
+    SYNTAX      AlaDHCPv6RelayDestinationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A DHCPv6 relay destination entry."
+    INDEX       { 
+	          ipv6IfIndex, 
+	          alaDHCPv6RelayDestinationAddressType,
+	          alaDHCPv6RelayDestinationAddress 
+                }
+    ::= { alaDHCPv6RelayDestinationTable 1 }
+
+AlaDHCPv6RelayDestinationEntry ::= SEQUENCE {
+    alaDHCPv6RelayDestinationAddressType InetAddressType,
+    alaDHCPv6RelayDestinationAddress     InetAddress,
+    alaDHCPv6RelayDestinationRowStatus   RowStatus
+}
+
+alaDHCPv6RelayDestinationAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The address type of a DHCPv6 relay destination.
+	 Only ipv6(2) or ipv6z(4) are allowed."
+    ::= { alaDHCPv6RelayDestinationEntry 1 }
+
+alaDHCPv6RelayDestinationAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IPv6 address of a DHCPv6 relay destination."
+    ::= { alaDHCPv6RelayDestinationEntry 2 }
+
+alaDHCPv6RelayDestinationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to control the addition and removal of DHCPv6
+        relay destinations."
+    ::= { alaDHCPv6RelayDestinationEntry 3 }
+
+--
+-- Alcatel DHCPv6 Server Lease Table
+--
+
+alaDHCPv6SrvLease OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBObjects 5 }
+
+alaDHCPv6SrvLeaseTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF AlaDHCPv6SrvLeaseEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "DHCPv6 server lease table."
+    ::= { alaDHCPv6SrvLease 1 }
+
+alaDHCPv6SrvLeaseEntry OBJECT-TYPE
+        SYNTAX       AlaDHCPv6SrvLeaseEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "DHCPv6 server lease entry."
+        INDEX { alaDHCPv6SrvLeaseIpv6Address }
+    ::= { alaDHCPv6SrvLeaseTable 1 }
+
+AlaDHCPv6SrvLeaseEntry ::= SEQUENCE {
+                alaDHCPv6SrvLeaseIpv6Address        Ipv6Address,
+                alaDHCPv6SrvLeaseLeaseGrant         DateAndTime,
+                alaDHCPv6SrvLeasePrefLeaseExpiry    DateAndTime,
+                alaDHCPv6SrvLeaseValidLeaseExpiry   DateAndTime,
+                alaDHCPv6SrvLeaseType             INTEGER
+        }
+
+alaDHCPv6SrvLeaseIpv6Address OBJECT-TYPE
+        SYNTAX          Ipv6Address
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "IPv6 address assigned to the client"
+    ::= { alaDHCPv6SrvLeaseEntry 1 }
+
+alaDHCPv6SrvLeaseLeaseGrant OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Lease granted time for the client."
+    ::= { alaDHCPv6SrvLeaseEntry 2 }
+
+alaDHCPv6SrvLeasePrefLeaseExpiry OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Preferred Lease expiry of the client."
+    ::= { alaDHCPv6SrvLeaseEntry 3 }
+
+alaDHCPv6SrvLeaseValidLeaseExpiry OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Valid Lease expiry of the client."
+    ::= { alaDHCPv6SrvLeaseEntry 4 }
+
+alaDHCPv6SrvLeaseType OBJECT-TYPE
+        SYNTAX          INTEGER
+                          {
+                            unavailable(1),
+                            dynamic(2),
+                            manual(3)
+                          }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Type of the lease."
+    ::= { alaDHCPv6SrvLeaseEntry 5 }
+
+--
+-- Notifications
+--
+
+alcatelIND1DHCPv6MIBNotifications  OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIB 0 }
+
+-- --------------------------------------------------------------
+-- Trap Description
+-- --------------------------------------------------------------
+alaDHCPv6SrvTrapsObj OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBObjects 6 }
+
+
+alaDHCPv6SrvLeaseUtilizationThresholdTrap NOTIFICATION-TYPE
+        OBJECTS  {
+                    alaDHCPv6SrvLeaseThresholdStatus,
+                    alaDHCPv6SrvSubnetDescriptor
+                 }
+        STATUS   current
+        DESCRIPTION
+                "When the lease utilization in a subnet exceeds or deceeds threshold
+                value set by the application, a notification is sent to the Management Entity,
+                with the DHCPv6 Server lease utilization information."
+        ::= { alcatelIND1DHCPv6MIBNotifications 1 }
+
+alaDHCPv6SrvLeaseThresholdStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                    crossedBelow80Threshold(1),
+                    crossedAbove80Threshold(2),
+                    reached100Threshold(3)
+                }
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "This object specifies the threshold status of subnet utilization."
+        ::= { alaDHCPv6SrvTrapsObj 1 }
+
+alaDHCPv6SrvSubnetDescriptor OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "This object specifies the subnet Descriptor. Denotes the IPv6 address"
+        ::= { alaDHCPv6SrvTrapsObj 2 }
+
+--
+-- conformance information
+--
+
+alcatelIND1DHCPv6MIBConformance OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIB 2 }
+alcatelIND1DHCPv6MIBCompliances OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBConformance 1 }
+alcatelIND1DHCPv6MIBGroups OBJECT IDENTIFIER ::= { alcatelIND1DHCPv6MIBConformance 2 }
+
+alaDHCPv6Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for switches implementing ALCATEL-IND1-DHCPV6-MIB."
+    MODULE
+    GROUP      alaDHCPv6RelayGroup
+    DESCRIPTION
+               "The alaDHCPv6RelayGroup is mandatory when the managed entity
+ 		supports DHCPv6 relay."
+    GROUP      alaDHCPv6SrvGroup
+    DESCRIPTION
+               "The alaDHCPv6SrvGroup is mandatory when the managed entity
+ 		supports DHCPv6 server."
+    GROUP      alaDHCPv6SrvNotificationsGroup
+    DESCRIPTION
+               "The alaDHCPv6SrvNotificationsGroup is mandatory when the managed entity
+ 		supports DHCPv6 server."
+    GROUP     alaDHCPv6SrvLeaseUtilizationThresholdGroup
+    DESCRIPTION 
+               " The alaDHCPv6SrvLeaseUtilizationThresholdGroup is mandatory when the
+                 managed entity supports DHCPv6 server."
+    ::= { alcatelIND1DHCPv6MIBCompliances 1 }
+
+
+--
+-- units of conformance
+--
+
+alaDHCPv6RelayGroup OBJECT-GROUP
+    OBJECTS     {
+                  alaDHCPv6RelayAdminStatus,
+                  alaDHCPv6RelayInterfaceAdminStatus,
+                  -- alaDHCPv6RelayDestinationAddressType,
+                  -- alaDHCPv6RelayDestinationAddress,
+                  alaDHCPv6RelayDestinationRowStatus
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of DHCPv6 Relay."
+    ::= { alcatelIND1DHCPv6MIBGroups 1 }
+
+alaDHCPv6SrvGroup OBJECT-GROUP
+    OBJECTS     {
+		  alaDHCPv6SrvGlobalConfigStatus,
+		  alaDHCPv6SrvGlobalRestart,
+		  alaDHCPv6SrvGlobalClearStat,
+                  -- alaDHCPv6SrvLeaseIpv6Address,
+                  alaDHCPv6SrvLeaseLeaseGrant,
+                  alaDHCPv6SrvLeasePrefLeaseExpiry,
+                  alaDHCPv6SrvLeaseValidLeaseExpiry,
+                  alaDHCPv6SrvLeaseType
+                }
+    STATUS     current
+    DESCRIPTION
+        "A collection of objects to support management of DHCPv6 server."
+    ::= { alcatelIND1DHCPv6MIBGroups 2 }
+
+alaDHCPv6SrvNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { alaDHCPv6SrvLeaseUtilizationThresholdTrap }
+    STATUS     current
+    DESCRIPTION
+        "Notifications for DHCPv6 server."
+    ::= { alcatelIND1DHCPv6MIBGroups 3 }
+
+alaDHCPv6SrvLeaseUtilizationThresholdGroup OBJECT-GROUP
+        OBJECTS
+        {
+           alaDHCPv6SrvLeaseThresholdStatus,
+           alaDHCPv6SrvSubnetDescriptor
+        }
+        STATUS  current
+        DESCRIPTION
+            "When the lease utilization in a subnet exceeds or deceeds threshold
+                value set by the application, a notification is sent to the Management Entity,
+                with the DHCPv6 Server lease utilization information."
+::= { alcatelIND1DHCPv6MIBGroups 4 } 
+
+END
+
+

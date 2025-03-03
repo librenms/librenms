@@ -15,39 +15,49 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Tests;
 
+use Illuminate\Support\Str;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
 
-class SVGTest extends \PHPUnit_Framework_TestCase
+/**
+ * Class SVGTest
+ *
+ * @group os
+ */
+class SVGTest extends TestCase
 {
-    public function testSVGContainsPNG()
+    public function testSVGContainsPNG(): void
     {
         foreach ($this->getSvgFiles() as $file => $_unused) {
             $svg = file_get_contents($file);
 
             $this->assertFalse(
-                str_contains($svg, 'data:image/'),
+                Str::contains($svg, 'data:image/'),
                 "$file contains a bitmap image, please use a regular png or valid svg"
             );
         }
     }
 
-    public function testSVGHasLengthWidth()
+    public function testSVGHasLengthWidth(): void
     {
         foreach ($this->getSvgFiles() as $file => $_unused) {
             if ($file == 'html/images/safari-pinned-tab.svg') {
+                continue;
+            }
+
+            if (str_starts_with($file, 'html/images/custommap/background/')) {
                 continue;
             }
 
@@ -61,21 +71,22 @@ class SVGTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testSVGHasViewBox()
+    public function testSVGHasViewBox(): void
     {
         foreach ($this->getSvgFiles() as $file => $_unused) {
             $svg = file_get_contents($file);
 
             $this->assertTrue(
-                str_contains($svg, 'viewBox'),
+                Str::contains($svg, 'viewBox'),
                 "$file: SVG files must have the viewBox attribute set"
             );
         }
     }
 
-    private function getSvgFiles()
+    private function getSvgFiles(): RegexIterator
     {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('html/images'));
+
         return new RegexIterator($iterator, '/^.+\.svg$/i', RecursiveRegexIterator::GET_MATCH);
     }
 }

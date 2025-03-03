@@ -1,0 +1,936 @@
+-- ****************************************************
+-- CISCO-ERR-DISABLE-MIB.my
+-- MIB support for the Error Disable feature
+--   
+-- Copyright (c) 2006, 2008-2013, 2016 by Cisco Systems Inc.
+-- All rights reserved.
+--   
+-- ****************************************************
+
+CISCO-ERR-DISABLE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    ifIndex
+        FROM IF-MIB
+    TEXTUAL-CONVENTION,
+    TruthValue
+        FROM SNMPv2-TC
+    TimeIntervalSec
+        FROM CISCO-TC
+    VlanIndexOrZero
+        FROM CISCO-PRIVATE-VLAN-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoErrDisableMIB MODULE-IDENTITY
+    LAST-UPDATED    "201606020000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-lan-switch-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB module provides the ability for a Network
+        Management Station (NMS) to configure and monitor the
+        error-disable feature via SNMP.
+
+        The error-disable feature allows other software
+        features running in a system to operationally disable a
+        system entity upon detecting abnormal conditions. 
+
+        Examples of such a system entity include interfaces, a
+        vlan configured in the system, or a VLAN allowed on
+        specific layer 2 multi-vlan interface.
+
+        More specific examples:
+
+            a) When BPDU guard is enabled on an interface
+            it is expected that no BPDU packets are received by
+            the interface. If a BPDU packet is received, then the
+            BPDU guard will operationally disable the
+            interface. 
+
+            b) Users can configure a particular threshold of
+            broadcast packets received on an interface. If the
+            number of packets received exceeds the threshold, then
+            storm-control will disable the interface. 
+
+            c) When unidirectional Link Detection (UDLD) detects a
+            unidirectional link on an interface, it can disable
+            the interface.
+
+            d) On a trunk or a multi-vlan layer 2 port, if
+            port-security detects violation on a particular vlan,
+            then it can operationally disable that vlan on that
+            port.
+
+        The definition of 'abnormal condition' is under the
+        control of features that make use of the error-disable
+        feature to disable system entities.
+
+        The error-disable feature supports the following
+        configuration:
+
+            1) Whether software features can in fact use the
+            error-disable feature upon detecting abnormal
+            conditions.
+               NOTE: Some software features will ALWAYS use the
+               error-disable feature to disable entities upon
+               detection of error.
+
+            2) Whether the system can attempt to automatically
+            recover after a system entity has been disabled (e.g., 
+            A system can attempt to bring up a physical interface
+            which had been disabled earlier)
+
+            3) If error recovery is possible, then the time
+            interval to wait before the system starts the recovery
+            attempt."
+    REVISION        "201606020000Z"
+    DESCRIPTION
+        "Added the following new enumerations in
+        CErrDisableFeatureID:
+        other(36), portReinitLimitReached(37),
+        adminRxBBCreditPerfBufIncomp(38), ficonNotEnabled(39),
+        adminModeIncomp(40), adminSpeedIncomp(41), ncompAdminRxBBCredit(42),
+        adminRxBufSizeIncomp(43), eppFailure(44), osmEPortUp(45),
+        osmNonEPortUp(46), udldUniDir(47), udldTxRxLoop(48),
+        udldNeighbourMismatch(49), udldEmptyEcho(50),
+        udldAggrasiveModeLinkFailed(51), excessivePortInterrupts(52),
+        channelErrDisabled(53), hwProgFailed(54),
+        internalHandshakeFailed(55), stpInconsistencyOnVpcPeerLink(56),
+        stpPortStateFailure(57), ipConflict(58),
+        multipleMSapIdsRcvd(59), oneHundredPdusWithoutAck(60),
+        and ipQosCompatCheckFailure(61)."
+    REVISION        "201304230000Z"
+    DESCRIPTION
+        "Added ciscoErrDisableFeatureFlapGroup and
+        a new enumeration flapControl(4) in 
+        cErrDisableFeatureConfigurable."
+    REVISION        "201010190000Z"
+    DESCRIPTION
+        "Added a new enumeration in CErrDisableFeatureID:
+        tranceiverIncomp(35)."
+    REVISION        "200903230000Z"
+    DESCRIPTION
+        "Added the following new enumerations in
+        CErrDisableFeatureID:
+        sfpConfigMismatch(24), communityLimit(25), invalidPolicy(26),
+        lsGroup(27), ekey(28), portModeFailure(29), 
+        pppoeIaRateLimit(30), oamRemoteCriticalEvent(31),
+        oamRemoteDyingGasp(32), oamRemoteLinkFault(33),
+        and mvrp(34). 
+
+        Added the new enumeration detectShutdownVlan(3) 
+        to cErrDisableFeatureConfigurable.
+
+        Added ciscoErrDisableShutdownVlanGroup."
+    REVISION        "200804070000Z"
+    DESCRIPTION
+        "Added the following new enumerations in
+        CErrDisableFeatureID:
+        packetBuffer(18), macLimit(19), linkMonitorFailure(20),
+        oamRemoteFailure(21), dot1adIncompEtype(22), and
+        dot1adIncompTunnel(23).
+
+        cErrDisableInterfaceEvent notification is deprecated 
+        and replaced by a new notification 
+        cErrDisableInterfaceEventRev1.
+
+        Modified the description of cErrDisableNotifEnable
+        to add control for cErrDisableInterfaceEventRev1
+        notification."
+    REVISION        "200605310000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 548 }
+
+
+ciscoErrDisableMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoErrDisableMIB 0 }
+
+ciscoErrDisableMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoErrDisableMIB 1 }
+
+ciscoErrDisableMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoErrDisableMIB 2 }
+
+cErrDisableGlobalObjects  OBJECT IDENTIFIER
+    ::= { ciscoErrDisableMIBObjects 1 }
+
+cErrDisableFeatureObjects  OBJECT IDENTIFIER
+    ::= { ciscoErrDisableMIBObjects 2 }
+
+cErrDisableIfObjects  OBJECT IDENTIFIER
+    ::= { ciscoErrDisableMIBObjects 3 }
+
+
+-- Textual Conventions
+
+CErrDisableFeatureID ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An integer-value assigned to various features/events
+        that can error disable a system entity
+
+        udld: Unidirectional Link Detection
+
+        bpduGuard: Spanning Tree BPDU Guard feature that prevents
+        processing BPDU packets on an access interface
+
+        channelMisconfig: General Link Aggregation mis-configuration
+
+        pagpFlap: Cisco's PAGP Link Aggregation protocol errors
+
+        dtpFlap: Dynamic Trunking Protocol errors
+
+        linkFlap: Link State flapping
+
+        l2ptGuard: L2 Protocol Tunnel errors
+
+        dot1xSecurityViolation: 802.1x authentication violations
+
+        portSecurity: Port Security violations
+
+        gbicInvalid: Invalid GBIC errors (examples include
+        unsupported GBIC being inserted)
+
+        dhcpRateLimit: DHCP snooping rate limit violation
+
+        unicastFlood: Unicast Flooding threshold violations
+
+        vmps: VLAN Membership Policy Server feature related errors
+
+        stormControl: storm control (broadcast/multicast/unicast)
+        threshold violations
+
+        inlinePower: Errors in inline power
+
+        arpInspection: Errors detected by Dynamic Arp Inspection
+        (DAI) feature
+
+        portLoopback: Interface Loopback Error
+
+        packetBuffer: Packet Buffer Error
+
+        macLimit: Errors detected by Mac Address Limit feature
+
+        linkMonitorFailure: Link Monitoring failure
+
+        oamRemoteFailure: Remote Failure detected by Ethernet OAM
+        (Operations, Administration, and Maintenance) feature   
+
+        dot1adIncompEtype: 802.1ad Ether-type Incompatible errors
+
+        dot1adIncompTunnel: 802.1ad Pdu Tunnel Incompatible errors
+
+        sfpConfigMismatch: Mismatch on SFP configuration
+
+        communityLimit: Vlan Community Limit violations
+
+        invalidPolicy: QoS Policy violation
+
+        lsGroup: Errors detected by Link State Group Tracking feature
+
+        ekey: Errors detected by Error Key Mechanism
+
+        portModeFailure: Port mode change failure
+
+        pppoeIaRateLimit: Errors detected by PPPoE Intermediate Agent 
+        Rate Limit feature
+
+        oamRemoteCriticalEvent: Ethernet OAM Remote Critical Event 
+        Failure  
+
+        oamRemoteDyingGasp: Ethernet OAM Remote Dying Gasp Failure
+
+        oamRemoteLinkFault: Ethernet OAM Remote Link Fault Failure
+
+        mvrp: Errors detected by Multiple VLAN Registration Protocol
+
+        tranceiverIncomp: Tranceiver incompatible errors
+
+        other: Any other feature not covered by enumerations listed here
+
+        portReinitLimitReached: Port reinitialization limit reached
+
+        adminRxBBCreditPerfBufIncomp: Incompatible admin port rxbbcredit performance buffers
+
+        ficonNotEnabled: Ficon not enabled
+
+        adminModeIncomp: Incompatible port admin mode
+
+        adminSpeedIncomp: Incompatible port admin speed
+
+        adminRxBBCreditIncomp: Incompatible admin port rxbbcredit
+
+        adminRxBufSizeIncomp: Incompatible admin port rxbufsize
+
+        eppFailure: EPP Failure
+
+        osmEPortUp: First interface in this group is E
+
+        osmNonEPortUp: Other interfaces in this group are not shut
+
+        udldUniDir: Unidirectional UDLD detected
+
+        udldTxRxLoop: UDLD Tx-Rx loop
+
+        udldNeighbourMismatch: UDLD neighbor mismatch
+
+        udldEmptyEcho: UDLD empty echo
+
+        udldAggrasiveModeLinkFailed: UDLD detected link failure in aggressive mode
+
+        excessivePortInterrupts: Error disabled due to excessive port interrupts
+
+        channelErrDisabled: Channel error-disabled
+
+        hwProgFailed: hardware programming failed
+
+        internalHandshakeFailed: Internal handshake failure
+
+        stpInconsistencyOnVpcPeerLink: STP inconsistency on VPC peer-link
+
+        stpPortStateFailure: STP has set port state to failure
+
+        ipConflict: Error disabled due to IP address conflict
+
+        multipleMSapIdsRcvd: DCX Multiple MSAP IDs recieved for the port
+
+        oneHundredPdusWithoutAck: DCX Recieved 100 PDUs without ACK
+
+        ipQosCompatCheckFailure: IP Qos DCBXP compat check failed"
+    SYNTAX          INTEGER  {
+                        udld(1),
+                        bpduGuard(2),
+                        channelMisconfig(3),
+                        pagpFlap(4),
+                        dtpFlap(5),
+                        linkFlap(6),
+                        l2ptGuard(7),
+                        dot1xSecurityViolation(8),
+                        portSecurityViolation(9),
+                        gbicInvalid(10),
+                        dhcpRateLimit(11),
+                        unicastFlood(12),
+                        vmps(13),
+                        stormControl(14),
+                        inlinePower(15),
+                        arpInspection(16),
+                        portLoopback(17),
+                        packetBuffer(18),
+                        macLimit(19),
+                        linkMonitorFailure(20),
+                        oamRemoteFailure(21),
+                        dot1adIncompEtype(22),
+                        dot1adIncompTunnel(23),
+                        sfpConfigMismatch(24),
+                        communityLimit(25),
+                        invalidPolicy(26),
+                        lsGroup(27),
+                        ekey(28),
+                        portModeFailure(29),
+                        pppoeIaRateLimit(30),
+                        oamRemoteCriticalEvent(31),
+                        oamRemoteDyingGasp(32),
+                        oamRemoteLinkFault(33),
+                        mvrp(34),
+                        tranceiverIncomp(35),
+                        other(36),
+                        portReinitLimitReached(37),
+                        adminRxBBCreditPerfBufIncomp(38),
+                        ficonNotEnabled(39),
+                        adminModeIncomp(40),
+                        adminSpeedIncomp(41),
+                        adminRxBBCreditIncomp(42),
+                        adminRxBufSizeIncomp(43),
+                        eppFailure(44),
+                        osmEPortUp(45),
+                        osmNonEPortUp(46),
+                        udldUniDir(47),
+                        udldTxRxLoop(48),
+                        udldNeighbourMismatch(49),
+                        udldEmptyEcho(50),
+                        udldAggrasiveModeLinkFailed(51),
+                        excessivePortInterrupts(52),
+                        channelErrDisabled(53),
+                        hwProgFailed(54),
+                        internalHandshakeFailed(55),
+                        stpInconsistencyOnVpcPeerLink(56),
+                        stpPortStateFailure(57),
+                        ipConflict(58),
+                        multipleMSapIdsRcvd(59),
+                        oneHundredPdusWithoutAck(60),
+                        ipQosCompatCheckFailure(61)
+                    }
+
+-- Global configuration objects
+
+cErrDisableRecoveryInterval OBJECT-TYPE
+    SYNTAX          TimeIntervalSec
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the error-disable recovery time
+        interval.
+        When a system entity is operationally disabled upon
+        detecting abnormal condition by a particular feature,
+        the system waits for a period equal to this time interval,
+        and then re-enable the entity if automatic recovery is
+        enabled for the feature." 
+    ::= { cErrDisableGlobalObjects 1 }
+
+cErrDisableNotifEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether cErrDisableInterfaceEvent
+        and cErrDisableInterfaceEventRev1
+        notifications should be generated when a system entity is
+        error-disabled." 
+    ::= { cErrDisableGlobalObjects 2 }
+
+cErrDisableNotifRate OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Notification/Minute"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The value of this object specifies the maximum number of
+        error-disable notifications the device will generate per
+        minute. 
+
+        A value of '0' specifies no limit and the device
+        will generate a notification for each error-disable
+        event." 
+    ::= { cErrDisableGlobalObjects 3 }
+
+cErrDisableFeatureTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CErrDisableFeatureEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the error-disable related info
+        for each feature employing the error-disable
+        feature."
+    ::= { cErrDisableFeatureObjects 1 }
+
+cErrDisableFeatureEntry OBJECT-TYPE
+    SYNTAX          CErrDisableFeatureEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry is created for each feature that employs the
+        error-disable feature."
+    INDEX           { cErrDisableFeatureIndex } 
+    ::= { cErrDisableFeatureTable 1 }
+
+CErrDisableFeatureEntry ::= SEQUENCE {
+        cErrDisableFeatureIndex              CErrDisableFeatureID,
+        cErrDisableFeatureConfigurable       BITS,
+        cErrDisableFeatureDetectEnable       TruthValue,
+        cErrDisableFeatureRecoveryEnable     TruthValue,
+        cErrDisableFeatureRecoveryInterval   TimeIntervalSec,
+        cErrDisableFeatureDetectShutdownVlan TruthValue,
+        cErrDisableFeatureMaxFlapCount       Unsigned32,
+        cErrDisableFeatureFlapTimePeriod     Unsigned32
+}
+
+cErrDisableFeatureIndex OBJECT-TYPE
+    SYNTAX          CErrDisableFeatureID
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object uniquely identifies a feature that makes
+        use of the error-disable feature." 
+    ::= { cErrDisableFeatureEntry 1 }
+
+cErrDisableFeatureConfigurable OBJECT-TYPE
+    SYNTAX          BITS {
+                        detectionEnable(0),
+                        recoveryEnable(1),
+                        recoveryInterval(2),
+                        detectShutdownVlan(3),
+                        flapControl(4)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates whether the error-disable related
+        configuration is configurable for this feature. If a bit
+        is set to 1, then the corresponding error-disable
+        configuration can be configured.
+
+        'detectionEnable'    - indicates the error-disable detection
+                               can be enabled/disabled for this feature
+                               via cErrDisableFeatureDetectEnable.
+        'recoveryEnable'     - indicates the error-disable recovery
+                               can be enabled/disabled for this feature
+                               via cErrDisableFeatureRecoveryEnable.
+        'recoveryInterval'   - indicates the error-disable recovery
+                               Interval can be configured via
+                               cErrDisableFeatureRecoveryInterval.
+        'detectShutdownVlan' - indicates the error-disable detection
+                               shutdown vlan mode can be configured for
+                               this feature via 
+                               cErrDisableFeatureDetectShutdownVlan. 
+        'flapControl'        - indicates the error-disable flap control
+                               can be configured via 
+                               cErrDisableFeatureMaxFlapCount and
+                               cErrDisableFeatureFlapTimePeriod." 
+    ::= { cErrDisableFeatureEntry 2 }
+
+cErrDisableFeatureDetectEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the error-disable detection
+        is enabled for the feature.
+
+        Note:
+           This object is read-write only for those features
+           that are configurable, meaning:
+           cErrDisableFeatureConfigurable.<featureIndex> has the
+           first bit set to 1." 
+    ::= { cErrDisableFeatureEntry 3 }
+
+cErrDisableFeatureRecoveryEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the system can
+        automatically recover a system entity that has been
+        disabled by the feature." 
+    ::= { cErrDisableFeatureEntry 4 }
+
+cErrDisableFeatureRecoveryInterval OBJECT-TYPE
+    SYNTAX          TimeIntervalSec
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the error-recovery time interval
+        that will be used by the system for any system entity that
+        is error-disabled by this particular feature.
+
+        If the value of this object is '0', then the device will
+        use the value specified by the global configuration object
+        cErrDisableRecoveryInterval." 
+    ::= { cErrDisableFeatureEntry 5 }
+
+cErrDisableFeatureDetectShutdownVlan OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether shutting down the violating
+        VLAN on an interface is enabled or not. The value of 'true'
+        indicates that shutting down the violating VLAN on an 
+        interface is enabled. The value of 'false' indicates that 
+        shutting down the violating VLAN on an interface is 
+        disabled." 
+    ::= { cErrDisableFeatureEntry 6 }
+
+cErrDisableFeatureMaxFlapCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the maximum number of flaps that
+        are allowed to occur before setting to error disable state.
+        A read-only value of zero indicates that no flap control
+        is present." 
+    ::= { cErrDisableFeatureEntry 7 }
+
+cErrDisableFeatureFlapTimePeriod OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the period of time counting the number of
+        flaps that are allowed before setting to error disable state.
+        A read-only value of zero indicates that no flap control
+        is present." 
+    ::= { cErrDisableFeatureEntry 8 }
+ 
+
+
+cErrDisableIfStatusTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CErrDisableIfStatusEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides interface (port) specific
+        error-disable status information. Each conceptual row
+        provides status information about a {interface, vlan}
+        disabled by a feature.
+
+        On a trunk or multi-vlan access interface, a given vlan on
+        the interface can be error-disabled. In this case, the row is
+        indexed by the ifIndex for the interface and the vlan
+        index corresponding to the vlan in question.
+
+        If the interface is carrying only 1 vlan or the entire
+        trunk interface is error-disabled (due to link flaps, for
+        example) then the vlan index portion of the row index is
+        0."
+    ::= { cErrDisableIfObjects 1 }
+
+cErrDisableIfStatusEntry OBJECT-TYPE
+    SYNTAX          CErrDisableIfStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects that specify the status of an
+        error-disabled Interface or {interface, vlan}."
+    INDEX           {
+                        ifIndex,
+                        cErrDisableIfStatusVlanIndex
+                    } 
+    ::= { cErrDisableIfStatusTable 1 }
+
+CErrDisableIfStatusEntry ::= SEQUENCE {
+        cErrDisableIfStatusVlanIndex     VlanIndexOrZero,
+        cErrDisableIfStatusCause         CErrDisableFeatureID,
+        cErrDisableIfStatusTimeToRecover TimeIntervalSec
+}
+
+cErrDisableIfStatusVlanIndex OBJECT-TYPE
+    SYNTAX          VlanIndexOrZero
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the vlan of the given interface
+        that has been error-disabled. If the physical interface is
+        error-disabled then the value of this object is 0." 
+    ::= { cErrDisableIfStatusEntry 1 }
+
+cErrDisableIfStatusCause OBJECT-TYPE
+    SYNTAX          CErrDisableFeatureID
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the feature/event that caused the
+        {interface, vlan} (or the entire interface) to be
+        error-disabled." 
+    ::= { cErrDisableIfStatusEntry 2 }
+
+cErrDisableIfStatusTimeToRecover OBJECT-TYPE
+    SYNTAX          TimeIntervalSec
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Time left before the system attempts an automatic
+        recovery of the interface or the vlan of the given 
+        interface. If no recovery is scheduled, then the value 
+        of this object is '0'." 
+    ::= { cErrDisableIfStatusEntry 3 }
+ 
+
+-- Notifications
+
+cErrDisableNotificationsPrefix  OBJECT IDENTIFIER
+    ::= { ciscoErrDisableMIBNotifs 1 }
+
+
+cErrDisableInterfaceEvent NOTIFICATION-TYPE
+    OBJECTS         { cErrDisableIfStatusCause }
+    STATUS          deprecated
+    DESCRIPTION
+        "The cErrDisableInterfaceEvent is generated when an interface
+        or {interface, vlan} is error-disabled by the feature
+        specified in cErrDisableIfStatusCause.
+
+        cErrDisableInterfaceEvent is deprecated and replaced by 
+        cErrDisableInterfaceEventRev1."
+   ::= { cErrDisableNotificationsPrefix 1 }
+
+cErrDisableInterfaceEventRev1 NOTIFICATION-TYPE
+    OBJECTS         { cErrDisableIfStatusCause }
+    STATUS          current
+    DESCRIPTION
+        "The cErrDisableInterfaceEventRev1 is generated when an
+        interface or {interface, vlan} is error-disabled by the 
+        feature specified in cErrDisableIfStatusCause.
+
+        cErrDisableInterfaceEventRev1 deprecates 
+        cErrDisableInterfaceEvent to make it RFC 2578 compliant. 
+        According to section 8.5 of RFC 2578, the next
+        to last sub-identifier in the name of any newly-defined
+        notification must have the value zero."
+   ::= { ciscoErrDisableMIBNotifs 2 }
+-- MIB Conformance statements
+
+ciscoErrDisableMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoErrDisableMIBConform 1 }
+
+ciscoErrDisableMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoErrDisableMIBConform 2 }
+
+
+ciscoErrDisableMIBCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the cisco errdisable MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoErrDisableGlobalCfgGroup,
+                        ciscoErrDisableFeatureCfgGroup,
+                        ciscoErrDisableIfStatusGroup
+                    }
+
+    GROUP           ciscoErrDisableNotifCfgGroup
+    DESCRIPTION
+        "This group is mandatory if the managed system
+        supports notifications for error-disable events."
+
+    GROUP           ciscoErrDisableNotifGroup
+    DESCRIPTION
+        "This group is mandatory if the managed system
+        supports notifications for error-disable events."
+    ::= { ciscoErrDisableMIBCompliances 1 }
+
+ciscoErrDisableMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the cisco errdisable MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoErrDisableGlobalCfgGroup,
+                        ciscoErrDisableFeatureCfgGroup,
+                        ciscoErrDisableIfStatusGroup
+                    }
+
+    GROUP           ciscoErrDisableNotifCfgGroup
+    DESCRIPTION
+        "This group is mandatory if the managed system
+        supports notifications for error-disable events."
+
+    GROUP           ciscoErrDisableNotifGroupRev1
+    DESCRIPTION
+        "This group is mandatory if the managed system
+        supports notifications for error-disable events."
+
+    GROUP           ciscoErrDisableShutdownVlanGroup
+    DESCRIPTION
+        "This group is mandatory if the managed system
+        supports the configuration on error-disable 
+        detection shutdown vlan mode."
+
+    OBJECT          cErrDisableRecoveryInterval
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableNotifEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableNotifRate
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableFeatureDetectEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableFeatureRecoveryEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableFeatureRecoveryInterval
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableFeatureDetectShutdownVlan
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { ciscoErrDisableMIBCompliances 2 }
+
+ciscoErrDisableMIBComplianceRev2 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the cisco errdisable MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoErrDisableGlobalCfgGroup,
+                        ciscoErrDisableFeatureCfgGroup,
+                        ciscoErrDisableIfStatusGroup
+                    }
+
+    GROUP           ciscoErrDisableNotifCfgGroup
+    DESCRIPTION
+        "This group is mandatory if the managed system
+        supports notifications for error-disable events."
+
+    GROUP           ciscoErrDisableNotifGroupRev1
+    DESCRIPTION
+        "This group is mandatory if the managed system
+        supports notifications for error-disable events."
+
+    GROUP           ciscoErrDisableShutdownVlanGroup
+    DESCRIPTION
+        "This group is mandatory if the managed system
+        supports the configuration on error-disable 
+        detection shutdown vlan mode."
+
+    GROUP           ciscoErrDisableFeatureFlapGroup
+    DESCRIPTION
+        "This group is mandatory if the managed system
+        supports the configuration on error-disable 
+        flap control."
+
+    OBJECT          cErrDisableRecoveryInterval
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableNotifEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableNotifRate
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableFeatureDetectEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableFeatureRecoveryEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableFeatureRecoveryInterval
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableFeatureDetectShutdownVlan
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableFeatureMaxFlapCount
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cErrDisableFeatureFlapTimePeriod
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { ciscoErrDisableMIBCompliances 3 }
+
+-- Object groups
+
+ciscoErrDisableGlobalCfgGroup OBJECT-GROUP
+    OBJECTS         { cErrDisableRecoveryInterval }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to configure error-disable
+        functionality."
+    ::= { ciscoErrDisableMIBGroups 1 }
+
+ciscoErrDisableFeatureCfgGroup OBJECT-GROUP
+    OBJECTS         {
+                        cErrDisableFeatureConfigurable,
+                        cErrDisableFeatureDetectEnable,
+                        cErrDisableFeatureRecoveryEnable,
+                        cErrDisableFeatureRecoveryInterval
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to manage the configuration of
+        the error-disable feature."
+    ::= { ciscoErrDisableMIBGroups 2 }
+
+ciscoErrDisableIfStatusGroup OBJECT-GROUP
+    OBJECTS         {
+                        cErrDisableIfStatusCause,
+                        cErrDisableIfStatusTimeToRecover
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of error-disable interface status objects."
+    ::= { ciscoErrDisableMIBGroups 3 }
+
+ciscoErrDisableNotifCfgGroup OBJECT-GROUP
+    OBJECTS         {
+                        cErrDisableNotifEnable,
+                        cErrDisableNotifRate
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to configure error-disable
+        notifications."
+    ::= { ciscoErrDisableMIBGroups 4 }
+
+ciscoErrDisableNotifGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    { cErrDisableInterfaceEvent }
+    STATUS          deprecated
+    DESCRIPTION
+        "A collection of error-disable notification objects."
+    ::= { ciscoErrDisableMIBGroups 5 }
+
+ciscoErrDisableNotifGroupRev1 NOTIFICATION-GROUP
+   NOTIFICATIONS    { cErrDisableInterfaceEventRev1 }
+    STATUS          current
+    DESCRIPTION
+        "A collection of error-disable notification objects."
+    ::= { ciscoErrDisableMIBGroups 6 }
+
+ciscoErrDisableShutdownVlanGroup OBJECT-GROUP
+    OBJECTS         { cErrDisableFeatureDetectShutdownVlan }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to manage the configuration of
+        error-disable detection shutdown vlan mode."
+    ::= { ciscoErrDisableMIBGroups 7 }
+
+ciscoErrDisableFeatureFlapGroup OBJECT-GROUP
+    OBJECTS         {
+                        cErrDisableFeatureMaxFlapCount,
+                        cErrDisableFeatureFlapTimePeriod
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects to manage the configuration of
+        the error-disable flap control."
+    ::= { ciscoErrDisableMIBGroups 8 }
+
+END
+
+
+
+

@@ -1,0 +1,3660 @@
+------------------------------------------------------------
+-- $$Version 1.00 (Change history)
+-- 1.00 (2013/7/30)
+		-- File created
+------------------------------------------------------------
+
+IES5206-TRAPS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+
+	OBJECT-TYPE, IpAddress, Unsigned32, NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, ifIndex
+	  	FROM RFC1213-MIB
+	ifAdminStatus, ifOperStatus
+	  	FROM IF-MIB
+	IANAItuProbableCause, IANAItuEventType
+		FROM IANA-ITU-ALARM-TC-MIB
+	ies5206,
+	slotModuleId,
+	voltageConfIndex,
+	voltageCurValue,
+	temperatureConfIndex,
+	temperatureCurValue,
+	coaConfIssueThreshold,
+	coaConfAnalyticMethod,
+--	sysCmSyncUrl,
+--	sysCmSyncStatus,
+--	sysPmSyncUrl,
+--	sysPmSyncStatus,
+--	sysFwUpgradeUrl,
+	sysFwUpgradeStatus,
+--	sysFwUpgradeVersion,
+--	sysCmSyncRefCounter,
+	sysBootupFwVersion,
+	transceiverDdmInfoEntryType,
+	transceiverDdmInfoEntryAlarmMax,
+	transceiverDdmInfoEntryAlarmMin,
+	transceiverDdmInfoEntryWarnMax,
+	transceiverDdmInfoEntryWarnMin,
+	transceiverDdmInfoEntryCurrent,
+	transceiverPerOntRxPower
+		FROM IES5206-MIB;
+
+	trap			OBJECT IDENTIFIER ::= { ies5206 19 }
+
+----------------------------------------
+-- trap
+----------------------------------------
+
+	object			OBJECT IDENTIFIER ::= { trap 1 }
+	dsltrap			OBJECT IDENTIFIER ::= { trap 2 }
+	equipment		OBJECT IDENTIFIER ::= { trap 3 }
+	systrap			OBJECT IDENTIFIER ::= { trap 4 }
+	getrap			OBJECT IDENTIFIER ::= { trap 5 }
+	gbondtrap		OBJECT IDENTIFIER ::= { trap 7 }
+	gpontrap		OBJECT IDENTIFIER ::= { trap 8 }
+
+--------------------
+-- object
+--------------------
+
+	loopguardSenderIfIndex OBJECT-TYPE
+    	SYNTAX      INTEGER
+    	MAX-ACCESS  not-accessible
+   		STATUS      current
+    	DESCRIPTION
+			"A unique value, greater than zero, for each interface.
+	        The index of sender interface which sends detected loop guard probe packet."
+    	::= { object 1 }
+
+    sysProblemCause OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        	"It describes the problem occurred in the system, e.g. maintenance
+            operation failures, system reboot, error log, ...etc.
+            1: cold start by power cycle, HW_WDG, overheat, maintenance button, ...
+            2: operatos reboots the system"
+        ::= { object 2 }
+
+	sysMacAntiSpoofOrig OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The Original ifIndex of Mac-AntiSpoofing."
+		::= { object 3 }
+
+	sysMacAntiSpoofNew OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The New ifIndex of Mac-AntiSpoofing."
+		::= { object 4 }
+
+	sysMacAntiSpoofMAC OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The MAC of Mac-AntiSpoofing."
+		::= { object 5 }
+
+	sysCoaIssuedLoad OBJECT-TYPE
+		SYNTAX      Unsigned32
+    	MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"CPU analyzed utilization when CPU overload alarm is issued."
+		::= { object 6 }
+
+	xdslDevId OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The device ID of DSP device on board."
+		::= { object 13 }
+
+	timerefSource OBJECT-TYPE
+		SYNTAX INTEGER {
+			freerun(0),
+			gps(1),
+			ieee1588(2),
+			synce(3)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The system receive timing reference signal correctly.
+			The varable in the binding list is current reference,
+			0: freerun,
+			1: GPS module,
+			2: IEEE 1588,
+			3: SyncE"
+		::= { object 18 }
+
+	dhcpServerIpv4Address OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"IPv4 address of DHCP server address.
+			Note: if an IPv4 address is a.b.c.d then it converts to be (a<<24 + b<<16 + c<<8 + d)"
+		::= { object 19 }
+
+	dhcpLeasedIpv4Address OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The leased IPv4 address from a DHCP server
+			Note: if an IPv4 address is a.b.c.d then it converts to be (a<<24 + b<<16 + c<<8 + d)"
+		::= { object 20 }
+
+	dhcpIfIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The DHCP client inteface"
+		::= { object 21 }
+
+	currBondingIfIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The current bonding ifIndex which a DSL port joined.
+			Value starts from DSL max port plus 1"
+		::= { object 22 }
+
+	lastBondingIfIndex OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The last bonding ifIndex which a DSL port joined.
+			Value starts from DSL max port plus 1"
+		::= { object 23 }
+
+    sysRestartEventType OBJECT-TYPE	-- IANAItuEventType
+        SYNTAX  IANAItuEventType
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        	"The variable describes the event that caused system restart."
+        ::= { object 24 }
+
+    sysRestartProbableCause OBJECT-TYPE	-- IANAItuProbableCause
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        	"The variable describes the probable cause that caused system restart.
+        	Below probable cause shall be implemented accordingly.
+        	sysResetCause is '1' (hardware related) and if sysRestartErrorCode is
+        		1: power input missing - powerProblem  (58)
+        		2: hardware watchdog triggered - processorProblems (535)
+        		3: overheat triggered - highTemperature  (123)
+        		4: maintenance button pressed > 8 seconds - maunal (1025)
+        	sysResetCause is '2' (software related) and if sysRestartCode is
+        		1: triggered by software watchdog - softwareProgramError (546)
+        		2: restart caused by program exception (additional context stored for reference) - softwareError (163)
+        		3: restart caused by software program intentionally - softwareError (163).
+        	sysResetCause is '3' (operation related) and if sysRestartErrorCode is
+        		1: operator press maintenance button 7 seconds - maintenance (1026)
+        		2: operator reset manually (either by SNMP or CLI command) - manual (1025)
+        		3: firmware upgrade - sfwrDownloadFailure  (156)"
+        ::= { object 25 }
+
+--    sysRestartAdditionalInfo OBJECT-TYPE
+--        SYNTAX  DisplayString
+--        MAX-ACCESS  not-accessible
+--        STATUS  current
+--        DESCRIPTION "This a string to indicate what meaning could be for cause and error code."
+--        ::= { object 26 }
+
+	slotModuleId OBJECT-TYPE
+		SYNTAX INTEGER (0..0)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot ID"
+		::= { object 27 }
+
+	iesIANAEventType OBJECT-TYPE
+		SYNTAX IANAItuEventType
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"An object to indicate that trap belongs to which IANA event type."
+		::= { object 28 }
+
+	iesIANAProbableCause OBJECT-TYPE
+		SYNTAX IANAItuProbableCause
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"An object to indicate that trap belongs to which IANA problem cause.
+			Below probable causes shall be supported:
+        		1: power input missing - powerProblem  (58)
+        		2: hardware watchdog triggered - processorProblems (535)
+        		3: overheat triggered - highTemperature  (123)
+        		4: maintenance button pressed > 8 seconds - maunal (1025)
+        		5: triggered by software watchdog - softwareProgramError (546)
+        		6: restart caused by program exception (additional context stored for reference) - softwareError (163)
+        		7: restart caused by software program intentionally - softwareError (163).
+        		8: operator press HW reset button - maintenance (1026)
+        		9: operator reset manually (either by SNMP or CLI command) - manual (1025)
+        		10: firmware upgrade - sfwrDownloadFailure  (156)"
+		::= { object 29 }
+
+	sysMoaIssuedLoad OBJECT-TYPE
+		SYNTAX      Unsigned32
+    	MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+			"Memory analyzed utilization when memory overload alarm is issued."
+		::= { object 30 }
+
+	gponOntId OBJECT-TYPE
+		SYNTAX INTEGER (1..128)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"gpon ont ID"
+		::= { object 31 }
+
+	gponOntCardId OBJECT-TYPE
+		SYNTAX INTEGER (1..16)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"gpon ont card ID"
+		::= { object 32 }
+
+	gponOntCardPortId OBJECT-TYPE
+		SYNTAX INTEGER (1..128)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"gpon ont card port ID"
+		::= { object 33 }
+
+	gponMeClassId OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"gpon managed entity class value"
+		::= { object 34 }
+
+	gponRogueOntDetectStatus OBJECT-TYPE
+		SYNTAX INTEGER (1..5)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Below is the status of rouge ont detection:
+			1: start rogue detection
+			2: stop rogue detection
+			3: detect rogue exist
+			4: rogue ont does not exist
+			5: discover rogue ont"
+		::= { object 35 }
+
+	gponOntSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The serial number of ont"
+		::= { object 36 }
+
+	gponOntPassword OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The password of ont"
+		::= { object 37 }
+
+	gponUserName OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"User name"
+		::= { object 38 }
+
+	gponMacSubSlotId OBJECT-TYPE
+		SYNTAX INTEGER (1..4)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"gpon MAC subslot ID"
+		::= { object 39 }
+
+	mstpInstanceId OBJECT-TYPE
+		SYNTAX INTEGER (0..16)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"mstp instance number"
+		::= { object 40 }
+
+	gponOntMacAntiSpoofOrig OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The original gpon ont ID of Mac-AntiSpoofing."
+		::= { object 41 }
+
+	gponOntMacAntiSpoofNew OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The new gpon ont ID of Mac-AntiSpoofing."
+		::= { object 42 }
+
+	gponOntMacAntiSpoofMAC OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The gpon ont MAC of Mac-AntiSpoofing."
+		::= { object 43 }
+
+--------------------
+-- dsltrap
+--------------------
+	xdslLinkDown	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifAdminStatus, ifOperStatus }
+				STATUS  current
+				DESCRIPTION	"The trap signifies one dsl port is linked down."
+				::= { dsltrap 1 }
+
+	xdslLinkUp NOTIFICATION-TYPE
+	    		OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifAdminStatus, ifOperStatus }
+	    		STATUS  current
+	    		DESCRIPTION	"The trap signifies one dsl port is linked up."
+	    		::= { dsltrap 2 }
+
+	xdslXtucLof	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies XTU-C Loss of Framing."
+				::= { dsltrap 3 }
+
+	xdslXtucLos	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies XTU-C Loss of Signal."
+				::= { dsltrap 4 }
+
+	xdslXturLof	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies XTU-R Loss of Framing."
+				::= { dsltrap 5 }
+
+	xdslXturLos	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies XTU-R Loss of Signal."
+				::= { dsltrap 6 }
+
+	xdslXturLpr	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies XTU-R Loss of Power."
+				::= { dsltrap 7 }
+
+	xdslXtucLofClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies XTU-C Loss of Framing is cleared."
+				::= { dsltrap 8 }
+
+	xdslXtucLosClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies XTU-C Loss of Signal is cleared."
+				::= { dsltrap 9 }
+
+	xdslXturLofClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies XTU-R Loss of Framing is cleared."
+				::= { dsltrap 10 }
+
+	xdslXturLosClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies XTU-R Loss of Signal is cleared."
+				::= { dsltrap 11 }
+
+	xdslXturLprClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies XTU-R Loss of Power is cleared."
+				::= { dsltrap 12 }
+
+	xdslDspDownloadFail	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId, xdslDevId
+				}
+				STATUS  current
+				DESCRIPTION	"The trap signifies DSL modem code download failed."
+				::= { dsltrap 15 }
+
+	xdslDspDownloadFailClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId, xdslDevId
+				}
+				STATUS  current
+				DESCRIPTION	"The trap signifies DSL modem code download fail is cleared."
+				::= { dsltrap 16 }
+
+	xdslDspInoperable	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId, xdslDevId
+				}
+				STATUS  current
+				DESCRIPTION	"The trap signifies a DSL chip failure due to
+				             modem code download faied for 10 times."
+				::= { dsltrap 17 }
+
+
+--------------------
+-- equipment
+--------------------
+
+	hwMonitorFail 	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId }
+				STATUS current
+				DESCRIPTION
+					"Hardware monitor itself diagnosis is failed."
+				::= { equipment 1 }
+
+	voltageOutOfRange	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId, voltageConfIndex, voltageCurValue }
+				STATUS  current
+				DESCRIPTION	"Send a message to notify the manager that the voltage of the system is out of range.
+				             The variable in the binding list is the current voltage in volt of the system."
+				::= { equipment 2 }
+
+	voltageNormal	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId, voltageConfIndex, voltageCurValue }
+				STATUS  current
+				DESCRIPTION	"Send a message to notify the manager that the low-voltage condition is over.
+				             The variable in the binding list is the current voltage in volt
+				             of the system."
+				::= { equipment 3 }
+
+	temperatureOutOfRange		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId, temperatureConfIndex, temperatureCurValue }
+				STATUS  current
+				DESCRIPTION	"Send a message to notify the manager that the temperature of the system is out of range.
+				             The variable in the binding list is the current temperature in Celsius
+				             of the system."
+				::= { equipment 4 }
+
+	temperatureNormal	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId, temperatureConfIndex, temperatureCurValue }
+				STATUS  current
+				DESCRIPTION	"Send a message to notify the manager that temperature is back to normal (temperature_out_of_range condition disappeared).
+				             The variable in the binding list is the current temperature in Celsius
+				             of the system."
+				::= { equipment 5 }
+
+	fanRpmOutOfRange		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, fanConfIndex, fanRpmCurValue }
+				STATUS  current
+				DESCRIPTION	"Send a message to notify the manager that the rpm of the fan is out of range.
+				             The variable in the binding list is the current rpm of the fan."
+				::= { equipment 6 }
+
+	fanRpmNormal		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, fanConfIndex, fanRpmCurValue }
+				STATUS  current
+				DESCRIPTION	"Send a message to notify the manager that the out-of-range condition of the fan is over.
+				             The variable in the binding list is the current rpm of the fan."
+				::= { equipment 7 }
+
+	hwRtcFail		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"Send a message to notify the manager that the hardware RTC is failed."
+				::= { equipment 8 }
+
+	extAlarmInput1Trigger	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 1 of MSC card
+				             is triggered."
+				::= { equipment 9 }
+
+	extAlarmInput1Release	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 1 of MSC card
+				             is released."
+				::= { equipment 10 }
+
+	extAlarmInput2Trigger	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 2 of MSC card
+				             is triggered."
+				::= { equipment 11 }
+
+	extAlarmInput2Release	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 2 of MSC card
+				             is released."
+				::= { equipment 12 }
+
+	extAlarmInput3Trigger	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 3 of MSC card
+				             is triggered."
+				::= { equipment 13 }
+
+	extAlarmInput3Release	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 3 of MSC card
+				             is released."
+				::= { equipment 14 }
+
+	extAlarmInput4Trigger	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 4 of MSC card
+				             is triggered."
+				::= { equipment 15 }
+
+	extAlarmInput4Release	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 4 of MSC card
+				             is released."
+				::= { equipment 16 }
+
+	extAlarmInput5Trigger	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 5 of MSC card
+				             is triggered."
+				::= { equipment 17 }
+
+	extAlarmInput5Release	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 5 of MSC card
+				             is released."
+				::= { equipment 18 }
+
+	extAlarmInput6Trigger	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 6 of MSC card
+				             is triggered."
+				::= { equipment 19 }
+
+	extAlarmInput6Release	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 6 of MSC card
+				             is released."
+				::= { equipment 20 }
+
+	extAlarmInput7Trigger	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 7 of MSC card
+				             is triggered."
+				::= { equipment 21 }
+
+	extAlarmInput7Release	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 7 of MSC card
+				             is released."
+				::= { equipment 22 }
+
+	extAlarmInput8Trigger	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 8 of MSC card
+				             is triggered."
+				::= { equipment 23 }
+
+	extAlarmInput8Release	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, externalAlarmName }
+				STATUS  current
+				DESCRIPTION	"The trap signifies that the external alarm input 8 of MSC card
+				             is released."
+				::= { equipment 24 }
+
+	power1NotExist		NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 1 not detected."
+				::= { equipment 29 }
+
+	power1NotExistClear	NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 1 detected."
+				::= { equipment 30 }
+
+	power2NotExist		NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 2 not detected."
+				::= { equipment 31 }
+
+	power2NotExistClear	NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 2 detected."
+				::= { equipment 32 }
+
+	power1VoltageFail		NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 1 voltage fail."
+				::= { equipment 33 }
+
+	power1VoltageFailClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 1 voltage is cleared."
+				::= { equipment 34 }
+
+	power2VoltageFail		NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 2 voltage fail."
+				::= { equipment 35 }
+
+	power2VoltageFailClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 2 voltage is cleared."
+				::= { equipment 36 }
+
+	modulePlugIn		NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"A modulePlugIn trap signifies that the sending
+				             protocol entity recognizes that one module is
+				             plugged into the device."
+				::= { equipment 37 }
+
+	modulePullOut		NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"A modulePullOut trap signifies that the sending
+				             protocol entity recognizes one module is pulled out
+				             from the device."
+				::= { equipment 38 }
+
+	moduleUp		NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"A moduleUp trap signifies that the sending
+			                	protocol entity recognizes that one of the
+			                	modules represented in the agent's
+			                	configuration has come up."
+				::= { equipment 39 }
+
+	moduleDown		NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"A moduleDown trap signifies that the sending
+			                	protocol entity recognizes a failure in one of
+			                	the modules represented in the agent's
+			                	configuration."
+				::= { equipment 40 }
+
+	moduleDisable		NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"The trap signifies user disables one module."
+				::= { equipment 41 }
+
+-- use reboot&sysRestart alarm
+--	moduleReset		NOTIFICATION-TYPE
+--				OBJECTS { slotModuleId }
+--				STATUS  current
+--				DESCRIPTION	"The trap signifies one module is reset."
+--				::= { equipment 42 }
+
+	moduleInvalid	NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"The trap signifies invalid modlue detected."
+				::= { equipment 43 }
+
+	moduleInvalidClear	NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"The trap signifies invalid modlue is cleared."
+				::= { equipment 44 }
+
+
+	timerefSync	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, timerefSource }
+				STATUS  current
+				DESCRIPTION	"The system receive timing reference signal correctly.
+							The varable in the binding list is current reference."
+				::= { equipment 45 }
+
+	timerefNoSync	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, timerefSource }
+				STATUS  current
+				DESCRIPTION	"The system receive timing reference signal incorrectly.
+							The varable in the binding list is last reference."
+				::= { equipment 46 }
+
+	timerefPresent	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"The system received timing reference signal."
+				::= { equipment 47 }
+
+	timerefNoPresent	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"The system does not receive timing reference signal."
+				::= { equipment 48 }
+
+	timerefToDSync	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"The system receives ToD sentence correctly."
+				::= { equipment 49 }
+
+	timerefToDNoSync	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"The system does not receive ToD sentence correctly."
+				::= { equipment 50 }
+
+	timerefChipFail	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"The system can not access clock synchronize chip correctly."
+				::= { equipment 51 }
+
+	moduleWrongFwVer	NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"rddn-msc wrong fwVersion,skip provision"
+				::= { equipment 52 }
+
+	moduleSwitchOver	NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION	"rddn-msc switch over"
+				::= { equipment 53 }
+
+	equipmentCpuOverload	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, sysCoaIssuedLoad, coaConfIssueThreshold, coaConfAnalyticMethod }
+				STATUS  current
+				DESCRIPTION	"Signifies equipment cpu is overload."
+				::= { equipment 54 }
+
+	equipmentCpuOverloadClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, sysCoaIssuedLoad, coaConfClearThreshold, coaConfAnalyticMethod }
+				STATUS  current
+				DESCRIPTION	"Signifies equipment cpu overload is cleared."
+				::= { equipment 55 }
+
+	acDown	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies AC power is down."
+				::= { equipment 56 }
+
+	acDownClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies AC down alarm is cleared."
+				::= { equipment 57 }
+
+	battTempOutOfRange	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies battery temperature is out of range."
+				::= { equipment 58 }
+
+	battTempOutOfRangeClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies battery temperature out of range alarm is cleared."
+				::= { equipment 59 }
+
+	battVoltageLow	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies battery voltage is under the threshold."
+				::= { equipment 60 }
+
+	battVoltageLowClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies battery voltage low alarm is cleared."
+				::= { equipment 61 }
+
+	battVoltageCritic	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies battery voltage is under the threshold."
+				::= { equipment 62 }
+
+	battVoltageCriticClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies battery voltage critical alarm is cleared."
+				::= { equipment 63 }
+
+	battVoltageError	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies the battery voltage is too low to be charged."
+				::= { equipment 64 }
+
+	battVoltageErrorClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies battery voltage error alarm is cleared."
+				::= { equipment 65 }
+
+	battAbsent	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies no battery is detected."
+				::= { equipment 66 }
+
+	battAbsentClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies battery absent alarm is cleared."
+				::= { equipment 67}
+
+	currentFault	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies charge current exceed the threshold."
+				::= { equipment 68 }
+
+	currentFaultClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies charge current fault alarm is cleared."
+				::= { equipment 69 }
+
+	chargeOvertime	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies charge overtime."
+				::= { equipment 70 }
+
+	chargeOvertimeClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies charge overtime is cleared."
+				::= { equipment 71 }
+
+	battInfoInvalid	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies battery capacity invalid."
+				::= { equipment 72 }
+
+	battInfoInvalidClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies battery capacity invalid is cleared."
+				::= { equipment 73 }
+
+	noThermal	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies no thermal sensor connected."
+				::= { equipment 74 }
+
+	noThermalClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies no thermal sensor connected is cleared."
+				::= { equipment 75 }
+
+	power1Overheat	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 1 overheat."
+				::= { equipment 76 }
+
+	power1OverheatClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 1 overheat is cleared."
+				::= { equipment 77 }
+
+	power2Overheat	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 2 overheat."
+				::= { equipment 78 }
+
+	power2OverheatClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 2 overheat is cleared."
+				::= { equipment 79 }
+
+	power1LmSensorFault	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 1 LM5064 senseor fault."
+				::= { equipment 80 }
+
+	power1LmSensorFaultClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 1 LM5064 senseor fault is cleared."
+				::= { equipment 81 }
+
+	power2LmSensorFault	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 2 LM5064 senseor fault."
+				::= { equipment 82 }
+
+	power2LmSensorFaultClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies power 2 LM5064 senseor fault is cleared."
+				::= { equipment 83 }
+	dcDown	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies DC power is down."
+				::= { equipment 84 }
+
+	dcDownClear	NOTIFICATION-TYPE
+				STATUS  current
+				DESCRIPTION	"The trap signifies DC down alarm is cleared."
+				::= { equipment 85 }
+
+--------------------
+-- systrap
+--------------------
+
+	sysMacAntiSpoofing NOTIFICATION-TYPE
+				OBJECTS {
+				    iesIANAEventType,
+				    iesIANAProbableCause,
+					sysMacAntiSpoofOrig,
+					sysMacAntiSpoofNew,
+					sysMacAntiSpoofMAC
+				}
+				STATUS current
+				DESCRIPTION
+					"MAC anti-spoofing happened."
+				::= { systrap 1 }
+
+	sysAlarmClearEnable NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS current
+				DESCRIPTION
+					"Alarm clear is activated."
+				::= { systrap 2 }
+
+	sysLoginFailure NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS current
+				DESCRIPTION
+					"User login is failed."
+				::= { systrap 3 }
+
+	reboot		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"Send a message to the manager that the system is going to shutdown.
+				             The variable is the reason that causes the system to shutdown.
+				             Note: this notification should be sent before rebooting."
+				::= { systrap 4 }
+
+	cpuOverload		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, sysCoaIssuedLoad, coaConfIssueThreshold, coaConfAnalyticMethod }
+				STATUS  current
+				DESCRIPTION	"Signifies cpu is overload."
+				::= { systrap 5 }
+
+	cpuOverloadClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, sysCoaIssuedLoad, coaConfClearThreshold, coaConfAnalyticMethod }
+				STATUS  current
+				DESCRIPTION	"Signifies cpu overload is cleared."
+				::= { systrap 6 }
+
+	cfgUploadFail		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"Signifies configuration file uploading to EMS failed."
+				::= { systrap 7 }
+
+	cfgReloadFail		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"Signifies configuration file reload from FLASH failed."
+				::= { systrap 8 }
+
+	writeFlashFail		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"Signifies writing to flash failed."
+				::= { systrap 9 }
+
+	mfgDataFail		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"Signifies invalid manufacturing data."
+				::= { systrap 10 }
+
+--	cmUpDownloadNotification		NOTIFICATION-TYPE
+--				OBJECTS { iesIANAEventType, iesIANAProbableCause, sysCmSyncUrl, sysCmSyncStatus }
+--				STATUS  current
+--				DESCRIPTION
+--				"Signifies configuration file uploading/downloading and applying status."
+--				::= { systrap 16 }
+
+--	pmUploadNotification		NOTIFICATION-TYPE
+--				OBJECTS { iesIANAEventType, iesIANAProbableCause, sysPmSyncUrl, sysPmSyncStatus }
+--				STATUS  current
+--				DESCRIPTION	"Signifies PM file uploading status."
+--				::= { systrap 17 }
+
+	swDownloadNotification		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, sysFwUpgradeStatus }
+				STATUS  current
+				DESCRIPTION	"Signifies SW image downloading/installing/restoring/reverting status."
+				::= { systrap 18 }
+
+	cfgChangeNotification		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS  current
+				DESCRIPTION	"Signifies configuration change from CLI command."
+				::= { systrap 19 }
+
+	dhcpLeasedNotification		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, dhcpIfIndex, dhcpServerIpv4Address, dhcpLeasedIpv4Address }
+				STATUS  current
+				DESCRIPTION	"To indicate the system complete DHCP lease process.
+							The variable bindings are:
+							1) 1: inband management interface; 2: reserved management interface(unused).
+							2) the IP address of DHCP server.
+							3) the IP address leased from DHCP server."
+				::= { systrap 20 }
+
+	sysRestartNotification		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, sysBootupFwVersion}
+				STATUS  current
+				DESCRIPTION	"This is a trap to unify system restart trap definition.
+							The standard ones ('warm start' and 'cold start') are no longer supported.
+							1) sysBootupFwVersion: the system happened restart with booting up firmware version.
+							2) sysRestartCause: what reason caused system restart.
+							3) sysRestartErrorCode: if this is a restart caused by software problem then error code is specified.
+							   '0': is specified is not related to software."
+				::= { systrap 21 }
+
+	dhcpLeasedFailNotification		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, dhcpIfIndex}
+				STATUS  current
+				DESCRIPTION	"To indicate the system failed to complete DHCP lease process on management interface.
+							The variable bindings are:
+							1) 1: inband management interface; 2: reserved management interface(unused)."
+				::= { systrap 22 }
+
+	dhcpLeasedFailNotificationClear		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, dhcpIfIndex}
+				STATUS  current
+				DESCRIPTION	"Clear dhcpLeasedFailNotification.
+							The variable bindings are:
+							1) 1: inband management interface; 2: reserved management interface(unused)."
+				::= { systrap 23 }
+
+	loopguard		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, loopguardSenderIfIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies loop is detected by ifIndex.
+				             The detected loop is between ifIndex and loopguardSenderIfIndex."
+				::= { systrap 24 }
+
+	loopguardClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies loop in ifIndex is cleared."
+				::= { systrap 25 }
+
+	htPortPolicer	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+				STATUS  current
+				DESCRIPTION	"The trap signifies host termination attack is detected in ifIndex."
+				::= { systrap 26 }
+
+	sysAlarmCutoffEnable NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS current
+				DESCRIPTION
+					"Alarm cutoff is activated."
+				::= { systrap 27 }
+
+	memoryOverload		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, sysCoaIssuedLoad, coaConfIssueThreshold, coaConfAnalyticMethod }
+				STATUS  current
+				DESCRIPTION	"Signifies memory is overload."
+				::= { systrap 28 }
+
+	memoryOverloadClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, sysCoaIssuedLoad, coaConfIssueThreshold, coaConfAnalyticMethod }
+				STATUS  current
+				DESCRIPTION	"Signifies memory overload is cleared."
+				::= { systrap 29 }
+
+	macTableFull		NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId }
+				STATUS  current
+				DESCRIPTION	"Signifies MAC forwarding table full."
+				::= { systrap 30 }
+
+	macTableFullClear	NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId }
+				STATUS  current
+				DESCRIPTION	"Signifies MAC forwarding table full is cleared."
+				::= { systrap 31 }
+
+	mstpNewRoot         NOTIFICATION-TYPE
+         	    OBJECTS { mstpInstanceId }
+             	STATUS  current
+             	DESCRIPTION "The newRoot trap indicates that the sending agent has become the new root of the Spanning Tree;
+             	the trap is sent by a bridge soon after its election as the new root, e.g., upon expiration of the
+             	Topology Change Timer, immediately subsequent to its election.  Implementation of this trap is optional."
+             	::= { systrap 32 }
+
+    mstpTopologyChange NOTIFICATION-TYPE
+               	OBJECTS { mstpInstanceId }
+             	STATUS  current
+             	DESCRIPTION "A topologyChange is sent if the topology changed of MSTP has detected."
+         	    ::= { systrap 33 }
+
+	fwChange NOTIFICATION-TYPE
+				OBJECTS { slotModuleId }
+				STATUS  current
+				DESCRIPTION "A fw_change is sent if the firmware changed of system has detected."
+				::= { systrap 34 }
+
+	reloadCfg NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType }
+				STATUS  current
+				DESCRIPTION "Signifies configuration reload from CLI command."
+				::= { systrap 35 }
+
+	sysLoginSuccess NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause }
+				STATUS current
+				DESCRIPTION
+					"User login is OK."
+				::= { systrap 36 }
+
+	protectSwitchSuccess NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifIndex }
+				STATUS current
+				DESCRIPTION
+					"Protect switch success."
+				::= { systrap 37 }
+
+	protectSwitchFailed NOTIFICATION-TYPE
+				OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifIndex }
+				STATUS current
+				DESCRIPTION
+					"Protect switch failed."
+				::= { systrap 38 }
+
+--------------------
+-- getrap
+--------------------
+
+	geLinkDown NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifAdminStatus, ifOperStatus }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies one ethernet port is linked down."
+	    ::= { getrap 1 }
+
+	geLinkUp NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifAdminStatus, ifOperStatus }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies one ethernet port is linked up."
+	    ::= { getrap 2 }
+
+--	geSfpWhitelist NOTIFICATION-TYPE
+--	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+--	    STATUS  current
+--	    DESCRIPTION
+--	            "The trap signifies SFP module is not in listed whitelist."
+--	    ::= { getrap 3 }
+
+	geSfpCurrentTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies SFP module is over current threshold."
+	    ::= { getrap 4 }
+
+	geSfpVoltageTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies SFP module is over voltage threshold."
+	    ::= { getrap 5 }
+
+	geSfpTemperatureTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies SFP module is over temperature threshold."
+	    ::= { getrap 6 }
+
+	geSfpTxPowerTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies SFP module is over TX power threshold."
+	    ::= { getrap 7 }
+
+	geSfpRxPowerTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies SFP module is over RX power threshold."
+	    ::= { getrap 8 }
+
+	geSfpCurrentTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies SFP module is over current threshold cleared."
+	    ::= { getrap 9 }
+
+	geSfpVoltageTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies SFP module is over voltage threshold cleared."
+	    ::= { getrap 10 }
+
+	geSfpTemperatureTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies SFP module is over temperature threshold cleared."
+	    ::= { getrap 11 }
+
+	geSfpTxPowerTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies SFP module is over TX power threshold cleared."
+	    ::= { getrap 12 }
+
+	geSfpRxPowerTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies SFP module is over RX power threshold cleared."
+	    ::= { getrap 13 }
+
+--------------------
+-- gbondtrap
+--------------------
+
+	gbondLinkDown NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifAdminStatus }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies one gbond interface port link down.
+	    	The 'ifIndex' is bonding interface index."
+	    ::= { gbondtrap 1 }
+
+	gbondLinkUp NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifAdminStatus }
+	    STATUS  current
+	    DESCRIPTION
+	        "The trap signifies one gbond interface port linked up.
+	        The 'ifIndex' is bonding interface index."
+	    ::= { gbondtrap 2 }
+
+--	gbondGroupChange NOTIFICATION-TYPE
+--	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifIndex, ifIndex }
+--	    STATUS  current
+--		DESCRIPTION
+--			"The trap signifies bonding group membership is changed,
+--			DSL line moves from one bonding group to another one.
+--			The 1st 'ifIndex' (current gbond IfIndex) indicates current bonding interface ;
+--			The 2nd 'ifIndex' indicates the DSL port happens to change gbond group membership ;
+--			The 3rd 'ifIndex' (last gbond IfIndex) indicates last gbond interface, '0' is assigned if previous is none."
+--	    ::= { gbondtrap 3 }
+
+--------------------
+-- gpontrap
+--------------------
+
+	gponOntLos NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of signal."
+	    ::= { gpontrap 1 }
+
+	gponOntLosClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of signal cleared."
+	    ::= { gpontrap 2 }
+
+	gponOntLof NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of frame."
+	    ::= { gpontrap 3 }
+
+	gponOntLofClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of frame cleared."
+	    ::= { gpontrap 4 }
+
+	gponOntPloam NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of PLOAM."
+	    ::= { gpontrap 5 }
+
+	gponOntPloamClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of PLOAM cleared."
+	    ::= { gpontrap 6 }
+
+	gponOntLcdg NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of GEM channel delineation."
+	    ::= { gpontrap 7 }
+
+	gponOntLcdgClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of GEM channel delineation cleared."
+	    ::= { gpontrap 8 }
+
+	gponOntRdi NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is remote defect indication."
+	    ::= { gpontrap 9 }
+
+	gponOntRdiClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is remote defect indication cleared."
+	    ::= { gpontrap 10 }
+
+	gponOntSuf NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is startup failure."
+	    ::= { gpontrap 11 }
+
+	gponOntSufClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is startup failure cleared."
+	    ::= { gpontrap 12 }
+
+	gponOntLoa NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of acknowledge."
+	    ::= { gpontrap 13 }
+
+	gponOntLoaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of acknowledge cleared."
+	    ::= { gpontrap 14 }
+
+	gponOntDg NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont receives dying-gasp."
+	    ::= { gpontrap 15 }
+
+	gponOntDgClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont receives dying-gasp cleared."
+	    ::= { gpontrap 16 }
+
+	gponOntDf NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont deactivates failure."
+	    ::= { gpontrap 17 }
+
+	gponOntDfClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont deactivates failure cleared."
+	    ::= { gpontrap 18 }
+
+	gponOntDow NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is drift of window."
+	    ::= { gpontrap 19 }
+
+	gponOntDowClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is drift of window cleared."
+	    ::= { gpontrap 20 }
+
+	gponOntTiw NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is transmission interference warning."
+	    ::= { gpontrap 21 }
+
+	gponOntTiwClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is transmission interference warning cleared."
+	    ::= { gpontrap 22 }
+
+	gponOntSf NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is signal fail."
+	    ::= { gpontrap 23 }
+
+	gponOntSfClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is signal fail cleared."
+	    ::= { gpontrap 24 }
+
+	gponOntSd NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is signal degraded."
+	    ::= { gpontrap 25 }
+
+	gponOntSdClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is signal degraded cleared."
+	    ::= { gpontrap 26 }
+
+	gponOntLok NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of key synch."
+	    ::= { gpontrap 27 }
+
+	gponOntLokClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is loss of key synch cleared."
+	    ::= { gpontrap 28 }
+
+	gponOntFecCorrByte NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is FEC corrected byte."
+	    ::= { gpontrap 29 }
+
+	gponOntFecCorrByteClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is FEC corrected byte cleared."
+	    ::= { gpontrap 30 }
+
+	gponOntFecCorrCw NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is FEC corrected code word."
+	    ::= { gpontrap 31 }
+
+	gponOntFecCorrCwClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is FEC corrected code word cleared."
+	    ::= { gpontrap 32 }
+
+	gponOntFecUnCorrCw NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is FEC uncorrected code word."
+	    ::= { gpontrap 33 }
+
+	gponOntFecUnCorrCwClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is FEC uncorrected code word cleared."
+	    ::= { gpontrap 34 }
+
+	gponOntTcaBip NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is bit interleaved parity."
+	    ::= { gpontrap 35 }
+
+	gponOntTcaBipClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is bit interleaved parity cleared."
+	    ::= { gpontrap 36 }
+
+	gponOntTcaRei NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is remote error indication."
+	    ::= { gpontrap 37 }
+
+	gponOntTcaReiClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is remote error indication cleared."
+	    ::= { gpontrap 38 }
+
+	omciBatteryFailure NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Battery is provisioned and present but cannot recharge."
+	    ::= { gpontrap 67 }
+
+	omciBatteryFailureClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Battery is provisioned and present but cannot recharge cleared."
+	    ::= { gpontrap 68 }
+
+	omciBatteryLow NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Battery is provisioned and present but its voltage is too low."
+	    ::= { gpontrap 69 }
+
+	omciBatteryLowClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Battery is provisioned and present but its voltage is too low cleared."
+	    ::= { gpontrap 70 }
+
+	omciBatteryMissing NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Battery is provisioned but missing."
+	    ::= { gpontrap 71 }
+
+	omciBatteryMissingClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Battery is provisioned but missing cleared."
+	    ::= { gpontrap 72 }
+
+	omciBlockLoss NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Content loss in excess of threshold."
+	    ::= { gpontrap 73 }
+
+	omciBlockLossClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Content loss in excess of threshold cleared."
+	    ::= { gpontrap 74 }
+
+	omciCardAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Card in alarm."
+	    ::= { gpontrap 75 }
+
+	omciCardAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Card in alarm cleared."
+	    ::= { gpontrap 76 }
+
+	omciConFuncFail NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Indicates a failure of the connecting function."
+	    ::= { gpontrap 87 }
+
+	omciConFuncFailClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Indicates a failure of the connecting function cleared."
+	    ::= { gpontrap 88 }
+
+	omciDataRateThrDownShift NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Data rate threshold downshift."
+	    ::= { gpontrap 89 }
+
+	omciDataRateThrDownShiftClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Data rate threshold downshift cleared."
+	    ::= { gpontrap 90 }
+
+	omciDataRateThrUpShift NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Data rate threshold upshift."
+	    ::= { gpontrap 91 }
+
+	omciDataRateThrUpShiftClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Data rate threshold upshift cleared."
+	    ::= { gpontrap 92 }
+
+	omciDeprecated NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"GEM interworking termination point."
+	    ::= { gpontrap 93 }
+
+	omciDeprecatedClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"GEM interworking termination point cleared."
+	    ::= { gpontrap 94 }
+
+	omciDyingGasp NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU is powering off imminently."
+	    ::= { gpontrap 97 }
+
+	omciDyingGaspClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU is powering off imminently cleared."
+	    ::= { gpontrap 98 }
+
+	omciEndToEndLossOfContinuity NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Loss of continuity can be detected when the GEM port network CTP supports a GEM interworking termination point."
+	    ::= { gpontrap 99 }
+
+	omciEndToEndLossOfContinuityClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Loss of continuity can be detected when the GEM port network CTP supports a GEM interworking termination point cleared."
+	    ::= { gpontrap 100 }
+
+	omciEqptAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"A failure on an internal interface or failed self-test."
+	    ::= { gpontrap 101 }
+
+	omciEqptAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"A failure on an internal interface or failed self-test cleared."
+	    ::= { gpontrap 102 }
+
+	omciFeLossOfFraming NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Far-end loss of frame."
+	    ::= { gpontrap 103 }
+
+	omciFeLossOfFramingClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Far-end loss of frame cleared."
+	    ::= { gpontrap 104 }
+
+	omciFeLossOfLink NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Far-end loss of link."
+	    ::= { gpontrap 105 }
+
+	omciFeLossOfLinkClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Far-end loss of link cleared."
+	    ::= { gpontrap 106 }
+
+	omciFeLossOfPower NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Far-end loss of power."
+	    ::= { gpontrap 107 }
+
+	omciFeLossOfPowerClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Far-end loss of power cleared."
+	    ::= { gpontrap 108 }
+
+	omciFeLossOfSignal NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Far-end loss of signal."
+	    ::= { gpontrap 109 }
+
+	omciFeLossOfSignalClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Far-end loss of signal cleared."
+	    ::= { gpontrap 110 }
+
+	omciGfsa NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"GEM frame starvation alarm."
+	    ::= { gpontrap 113 }
+
+	omciGfsaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"GEM frame starvation alarm cleared."
+	    ::= { gpontrap 114 }
+
+	omciHighRxOpticalPower NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received downstream optical power above threshold."
+	    ::= { gpontrap 115 }
+
+	omciHighRxOpticalPowerClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received downstream optical power above threshold cleared."
+	    ::= { gpontrap 116 }
+
+	omciHighTxOpticalPower NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Transmit optical power above upper threshold."
+	    ::= { gpontrap 117 }
+
+	omciHighTxOpticalPowerClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Transmit optical power above upper threshold cleared."
+	    ::= { gpontrap 118 }
+
+	omciImproperCardRemoval NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Card has been removed without being deprovisioned."
+	    ::= { gpontrap 119 }
+
+	omciImproperCardRemovalClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Card has been removed without being deprovisioned cleared."
+	    ::= { gpontrap 120 }
+
+	omciLanLos NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"No carrier at the Ethernet UNI."
+	    ::= { gpontrap 123 }
+
+	omciLanLosClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"No carrier at the Ethernet UNI cleared."
+	    ::= { gpontrap 124 }
+
+	omciLaserBiasCur NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Laser bias current above threshold determined by vendor; laser end of life pending."
+	    ::= { gpontrap 125 }
+
+	omciLaserBiasCurClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Laser bias current above threshold determined by vendor; laser end of life pending cleared."
+	    ::= { gpontrap 126 }
+
+	omciLaserEndOfLife NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Failure of transmit laser imminent."
+	    ::= { gpontrap 127 }
+
+	omciLaserEndOfLifeClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Failure of transmit laser imminent cleared."
+	    ::= { gpontrap 128 }
+
+	omciLineConfigFailure NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Line configuration failure."
+	    ::= { gpontrap 129 }
+
+	omciLineConfigFailureClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Line configuration failure cleared."
+	    ::= { gpontrap 130 }
+
+	omciLineInitializationFailure NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Line initialization failure."
+	    ::= { gpontrap 131 }
+
+	omciLineInitializationFailureClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Line initialization failure cleared."
+	    ::= { gpontrap 132 }
+
+	omciLowLaserBiasCur NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the laser bias current is less than the configured threshold."
+	    ::= { gpontrap 139 }
+
+	omciLowLaserBiasCurClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the laser bias current is less than the configured threshold cleared."
+	    ::= { gpontrap 140 }
+
+	omciLowPowerFeedVoltage NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the power feed voltage is less than the configured threshold."
+	    ::= { gpontrap 141 }
+
+	omciLowPowerFeedVoltageClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the power feed voltage is less than the configured threshold cleared."
+	    ::= { gpontrap 142 }
+
+	omciLowRxOpticalPower NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received downstream optical power below threshold."
+	    ::= { gpontrap 143 }
+
+	omciLowRxOpticalPowerClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received downstream optical power below threshold cleared."
+	    ::= { gpontrap 144 }
+
+	omciLowTemperature NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the temperature is under the configured threshold."
+	    ::= { gpontrap 145 }
+
+	omciLowTemperatureClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the temperature is under the configured threshold cleared."
+	    ::= { gpontrap 146 }
+
+	omciLowTxOpticalPower NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Transmit optical power below lower threshold."
+	    ::= { gpontrap 147 }
+
+	omciLowTxOpticalPowerClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Transmit optical power below lower threshold cleared."
+	    ::= { gpontrap 148 }
+
+	omciNeLossOfFraming NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Near-end loss of frame."
+	    ::= { gpontrap 149 }
+
+	omciNeLossOfFramingClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Near-end loss of frame cleared."
+	    ::= { gpontrap 150 }
+
+	omciNeLossOfLink NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Near-end loss of link."
+	    ::= { gpontrap 151 }
+
+	omciNeLossOfLinkClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Near-end loss of link cleared."
+	    ::= { gpontrap 152 }
+
+	omciNeLossOfPower NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Near-end loss of power."
+	    ::= { gpontrap 153 }
+
+	omciNeLossOfPowerClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Near-end loss of power cleared."
+	    ::= { gpontrap 154 }
+
+	omciNeLossOfSignal NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Near-end loss of signal."
+	    ::= { gpontrap 155 }
+
+	omciNeLossOfSignalClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Near-end loss of signal cleared."
+	    ::= { gpontrap 156 }
+
+	omciOntGTemperatureRed NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Some services have been shut down to avoid equipment damage."
+	    ::= { gpontrap 157 }
+
+	omciOntGTemperatureRedClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Some services have been shut down to avoid equipment damage cleared."
+	    ::= { gpontrap 158 }
+
+	omciOntGTemperatureYellow NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"No service shutdown at present, but the circuit pack is operating beyond its recommended range."
+	    ::= { gpontrap 159 }
+
+	omciOntGTemperatureYellowClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"No service shutdown at present, but the circuit pack is operating beyond its recommended range cleared."
+	    ::= { gpontrap 160 }
+
+	omciOntSelfTestFailure NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has failed autonomous self-test."
+	    ::= { gpontrap 161 }
+
+	omciOntSelfTestFailureClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has failed autonomous self-test cleared."
+	    ::= { gpontrap 162 }
+
+	omciOnuManualPowerOff NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The ONU is shutting down because the subscriber has turned off its power switch."
+	    ::= { gpontrap 163 }
+
+	omciOnuManualPowerOffClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The ONU is shutting down because the subscriber has turned off its power switch cleared."
+	    ::= { gpontrap 164 }
+
+	omciPhysicalIntrusionAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Applies if the ONU supports detection such as door or box open ."
+	    ::= { gpontrap 167 }
+
+	omciPhysicalIntrusionAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Applies if the ONU supports detection such as door or box open  cleared."
+	    ::= { gpontrap 168 }
+
+	omciPlugInEqptIdMismatchAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Applies if the ONU supports detection such as door or box open ."
+	    ::= { gpontrap 169 }
+
+	omciPlugInEqptIdMismatchAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Applies if the ONU supports detection such as door or box open cleared."
+	    ::= { gpontrap 170 }
+
+	omciPlugInLimMissingAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Configured Plug-in LIM is not present."
+	    ::= { gpontrap 171 }
+
+	omciPlugInLimMissingAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Configured Plug-in LIM is not present cleared."
+	    ::= { gpontrap 172 }
+
+	omciPlugInTypeMismatchAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Inserted Plug-in LIM is wrong type."
+	    ::= { gpontrap 173 }
+
+	omciPlugInTypeMismatchAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Inserted Plug-in LIM is wrong type cleared."
+	    ::= { gpontrap 174 }
+
+	omciPoweringAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Fuse failure or failure of DC/DC converter."
+	    ::= { gpontrap 175 }
+
+	omciPoweringAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Fuse failure or failure of DC/DC converter cleared."
+	    ::= { gpontrap 176 }
+
+	omciProtectionSwitch NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"An autonomous equipment protection switch has occurred."
+	    ::= { gpontrap 177 }
+
+	omciProtectionSwitchClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"An autonomous equipment protection switch has occurred cleared."
+	    ::= { gpontrap 178 }
+
+	omciSd NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Bit error-based signal degrade."
+	    ::= { gpontrap 185 }
+
+	omciSdClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Bit error-based signal degrade cleared."
+	    ::= { gpontrap 186 }
+
+	omciSelfTestFailure NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Failure of circuit pack autonomous self-test."
+	    ::= { gpontrap 187 }
+
+	omciSelfTestFailureClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Failure of circuit pack autonomous self-test cleared."
+	    ::= { gpontrap 188 }
+
+	omciSf NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Bit error-based signal fail."
+	    ::= { gpontrap 189 }
+
+	omciSfClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Bit error-based signal fail cleared."
+	    ::= { gpontrap 190 }
+
+	omciSipUdRegAuth NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Cannot authenticate a registration session."
+	    ::= { gpontrap 205 }
+
+	omciSipUdRegAuthClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Cannot authenticate a registration session cleared."
+	    ::= { gpontrap 206 }
+
+	omciSipUdRegFail NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Failure response received from a registration server."
+	    ::= { gpontrap 207 }
+
+	omciSipUdRegFailClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Failure response received from a registration server cleared."
+	    ::= { gpontrap 208 }
+
+	omciSipUdRegTimeout NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Timeout waiting for response from a registration server."
+	    ::= { gpontrap 209 }
+
+	omciSipUdRegTimeoutClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Timeout waiting for response from a registration server cleared."
+	    ::= { gpontrap 210 }
+
+	omciTcaAlignErrorCount NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received frames that were not an integral number of octets in length and did not pass the FCS check."
+	    ::= { gpontrap 213 }
+
+	omciTcaAlignErrorCountClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received frames that were not an integral number of octets in length and did not pass the FCS check cleared."
+	    ::= { gpontrap 214 }
+
+	omciTcaBridgeLearningEntryDiscard NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Forwarding database entries that have been or would have been learned but were discarded or replaced due to a lack of space in the database table."
+	    ::= { gpontrap 217 }
+
+	omciTcaBridgeLearningEntryDiscardClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Forwarding database entries that have been or would have been learned but were discarded or replaced due to a lack of space in the database table cleared."
+	    ::= { gpontrap 218 }
+
+	omciTcaBufOverflowsRx NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The number of times that the receive buffer overflowed."
+	    ::= { gpontrap 221 }
+
+	omciTcaBufOverflowsRxClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The number of times that the receive buffer overflowed cleared."
+	    ::= { gpontrap 222 }
+
+	omciTcaBufOverflowsTx NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The number of times that the transmit buffer overflowed."
+	    ::= { gpontrap 223 }
+
+	omciTcaBufOverflowsTxClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The number of times that the transmit buffer overflowed cleared."
+	    ::= { gpontrap 224 }
+
+	omciTcaCarrierSenseErrorCount NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The number of times that carrier sense was lost or never asserted when attempting to transmit a frame."
+	    ::= { gpontrap 227 }
+
+	omciTcaCarrierSenseErrorCountClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The number of times that carrier sense was lost or never asserted when attempting to transmit a frame cleared."
+	    ::= { gpontrap 228 }
+
+	omciTcaDeferredTx NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"First transmission attempt was delayed because the medium was busy."
+	    ::= { gpontrap 239 }
+
+	omciTcaDeferredTxClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"First transmission attempt was delayed because the medium was busy cleared."
+	    ::= { gpontrap 240 }
+
+	omciTcaDelayExceededDiscard NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Frames discarded on this port because transmission was delayed."
+	    ::= { gpontrap 241 }
+
+	omciTcaDelayExceededDiscardClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Frames discarded on this port because transmission was delayed cleared."
+	    ::= { gpontrap 242 }
+
+	omciTcaDropEvents NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of events in which packets were dropped due to a lack of resources."
+	    ::= { gpontrap 245 }
+
+	omciTcaDropEventsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of events in which packets were dropped due to a lack of resources cleared."
+	    ::= { gpontrap 246 }
+
+	omciTcaEncryptionKeyErrors NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"GEM frames with erroneous encryption key indexes."
+	    ::= { gpontrap 249 }
+
+	omciTcaEncryptionKeyErrorsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"GEM frames with erroneous encryption key indexes cleared."
+	    ::= { gpontrap 250 }
+
+	omciTcaEthFrameDsCrcErroredPackets NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of error packets received on downstream."
+	    ::= { gpontrap 255 }
+
+	omciTcaEthFrameDsCrcErroredPacketsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of error packets received on downstream cleared."
+	    ::= { gpontrap 256 }
+
+	omciTcaEthFrameDsDropEvents NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of events in which frames were dropped due to a lack of resources on downstream."
+	    ::= { gpontrap 257 }
+
+	omciTcaEthFrameDsDropEventsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of events in which frames were dropped due to a lack of resources on downstream cleared."
+	    ::= { gpontrap 258 }
+
+	omciTcaEthFrameDsOversizePackets NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were longer than 1518 octets on downstream."
+	    ::= { gpontrap 259 }
+
+	omciTcaEthFrameDsOversizePacketsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were longer than 1518 octets on downstream cleared."
+	    ::= { gpontrap 260 }
+
+	omciTcaEthFrameDsUndersizePackets NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were less than 64 octets long on downstream."
+	    ::= { gpontrap 261 }
+
+	omciTcaEthFrameDsUndersizePacketsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were less than 64 octets long on downstream cleared."
+	    ::= { gpontrap 262 }
+
+	omciTcaEthFrameUsCrcErroredPackets NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of error packets received on upstream."
+	    ::= { gpontrap 263 }
+
+	omciTcaEthFrameUsCrcErroredPacketsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of error packets received on upstream cleared."
+	    ::= { gpontrap 264 }
+
+	omciTcaEthFrameUsDropEvents NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of events in which frames were dropped due to a lack of resources on upstream."
+	    ::= { gpontrap 265 }
+
+	omciTcaEthFrameUsDropEventsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of events in which frames were dropped due to a lack of resources on upstream cleared."
+	    ::= { gpontrap 266 }
+
+	omciTcaEthFrameUsOversizePackets NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were longer than 1518 octets long on upstream."
+	    ::= { gpontrap 267 }
+
+	omciTcaEthFrameUsOversizePacketsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were longer than 1518 octets long on upstream cleared."
+	    ::= { gpontrap 268 }
+
+	omciTcaEthFrameUsUndersizePackets NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were less than 64 octets long on upstream."
+	    ::= { gpontrap 269 }
+
+	omciTcaEthFrameUsUndersizePacketsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were less than 64 octets long on upstream cleared."
+	    ::= { gpontrap 270 }
+
+	omciTcaExcessCollision NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Transmission failed due to excessive collisions."
+	    ::= { gpontrap 271 }
+
+	omciTcaExcessCollisionClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Transmission failed due to excessive collisions cleared."
+	    ::= { gpontrap 272 }
+
+	omciTcaFcsErrors NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts frames received on a particular interface that were an integral number of octets in length."
+	    ::= { gpontrap 273 }
+
+	omciTcaFcsErrorsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts frames received on a particular interface that were an integral number of octets in length cleared."
+	    ::= { gpontrap 274 }
+
+	omciTcaFragments NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were less than 64 octets long."
+	    ::= { gpontrap 277 }
+
+	omciTcaFragmentsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were less than 64 octets long cleared."
+	    ::= { gpontrap 278 }
+
+	omciTcaFrameTooLongs NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts received frames that exceeded the maximum permitted frame size."
+	    ::= { gpontrap 279 }
+
+	omciTcaFrameTooLongsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts received frames that exceeded the maximum permitted frame size cleared."
+	    ::= { gpontrap 280 }
+
+	omciTcaIntMacRx NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts frames whose reception failed due to an internal MAC sublayer receive error."
+	    ::= { gpontrap 283 }
+
+	omciTcaIntMacRxClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts frames whose reception failed due to an internal MAC sublayer receive error cleared."
+	    ::= { gpontrap 284 }
+
+	omciTcaIntMacTx NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts frames whose transmission failed due to an internal MAC sublayer transmit error."
+	    ::= { gpontrap 285 }
+
+	omciTcaIntMacTxClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts frames whose transmission failed due to an internal MAC sublayer transmit error cleared."
+	    ::= { gpontrap 286 }
+
+	omciTcaIpnpmDnsError NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts DNS errors received."
+	    ::= { gpontrap 287 }
+
+	omciTcaIpnpmDnsErrorClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts DNS errors received cleared."
+	    ::= { gpontrap 288 }
+
+	omciTcaIpnpmIcmpError NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts ICMP errors received."
+	    ::= { gpontrap 289 }
+
+	omciTcaIpnpmIcmpErrorClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts ICMP errors received cleared."
+	    ::= { gpontrap 290 }
+
+	omciTcaJabbers NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were longer than 1518 octets."
+	    ::= { gpontrap 291 }
+
+	omciTcaJabbersClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were longer than 1518 octets cleared."
+	    ::= { gpontrap 292 }
+
+	omciTcaLateCollision NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"A collision was detected later than 512 bit times into the transmission of a packet."
+	    ::= { gpontrap 293 }
+
+	omciTcaLateCollisionClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"A collision was detected later than 512 bit times into the transmission of a packet cleared."
+	    ::= { gpontrap 294 }
+
+	omciTcaMtuExceededDiscard NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts frames discarded on this port because the MTU was exceeded."
+	    ::= { gpontrap 297 }
+
+	omciTcaMtuExceededDiscardClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts frames discarded on this port because the MTU was exceeded cleared."
+	    ::= { gpontrap 298 }
+
+	omciTcaMultiCollisions NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts successfully transmitted frames whose transmission was delayed by more than one collision."
+	    ::= { gpontrap 299 }
+
+	omciTcaMultiCollisionsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts successfully transmitted frames whose transmission was delayed by more than one collision cleared."
+	    ::= { gpontrap 300 }
+
+	omciTcaPppoeFilteredFrameCount NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts the number of frames discarded due to PPPoE filtering."
+	    ::= { gpontrap 301 }
+
+	omciTcaPppoeFilteredFrameCountClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts the number of frames discarded due to PPPoE filtering cleared."
+	    ::= { gpontrap 302 }
+
+	omciTcaRxAndDiscarded NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts frames received on this port that were discarded due to errors."
+	    ::= { gpontrap 315 }
+
+	omciTcaRxAndDiscardedClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts frames received on this port that were discarded due to errors cleared."
+	    ::= { gpontrap 316 }
+
+	omciTcaSingleCollisionFrame NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts successfully transmitted frames whose transmission was delayed by exactly one collision."
+	    ::= { gpontrap 339 }
+
+	omciTcaSingleCollisionFrameClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Counts successfully transmitted frames whose transmission was delayed by exactly one collision cleared."
+	    ::= { gpontrap 340 }
+
+	omciTcaSqeCount NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The number of times that the SQE test error message was generated by the PLS sublayer."
+	    ::= { gpontrap 363 }
+
+	omciTcaSqeCountClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The number of times that the SQE test error message was generated by the PLS sublayer cleared."
+	    ::= { gpontrap 364 }
+
+	omciTcaUndersizePackets NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were less than 64 octets long."
+	    ::= { gpontrap 369 }
+
+	omciTcaUndersizePacketsClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The total number of packets received that were less than 64 octets long cleared."
+	    ::= { gpontrap 370 }
+
+	omciTemperatureRed NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Service has been shut down to avoid equipment damage."
+	    ::= { gpontrap 373 }
+
+	omciTemperatureRedClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Service has been shut down to avoid equipment damage cleared."
+	    ::= { gpontrap 374 }
+
+	omciTemperatureYellow NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"No service shutdown at present, but the circuit pack is operating beyond its recommended range."
+	    ::= { gpontrap 375 }
+
+	omciTemperatureYellowClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"No service shutdown at present, but the circuit pack is operating beyond its recommended range cleared."
+	    ::= { gpontrap 376 }
+
+	omciVideoLos NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"No signal at the video UNI."
+	    ::= { gpontrap 411 }
+
+	omciVideoLosClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"No signal at the video UNI cleared."
+	    ::= { gpontrap 412 }
+
+	omciVoltageRed NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Some services have been shut down to avoid power collapse."
+	    ::= { gpontrap 417 }
+
+	omciVoltageRedClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Some services have been shut down to avoid power collapse cleared."
+	    ::= { gpontrap 418 }
+
+	omciVoltageYellowomci NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"No service shutdown at present, but the line power voltage is below its recommended minimum."
+	    ::= { gpontrap 419 }
+
+	omciVoltageYellowClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"No service shutdown at present, but the line power voltage is below its recommended minimum cleared."
+	    ::= { gpontrap 420 }
+
+	omciXtucEsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Errored seconds threshold crossing."
+	    ::= { gpontrap 421 }
+
+	omciXtucEsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Errored seconds threshold crossing cleared."
+	    ::= { gpontrap 422 }
+
+	omciXtucFailedLineInitializationsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Failure of line initializations threshold crossing."
+	    ::= { gpontrap 423 }
+
+	omciXtucFailedLineInitializationsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Failure of line initializations threshold crossing cleared."
+	    ::= { gpontrap 424 }
+
+	omciXtucFailedShortInitializationsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Failure of short Initializations threshold crossing."
+	    ::= { gpontrap 425 }
+
+	omciXtucFailedShortInitializationsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Failure of short Initializations threshold crossing cleared."
+	    ::= { gpontrap 426 }
+
+	omciXtucFecSecondsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C FEC seconds threshold crossing."
+	    ::= { gpontrap 427 }
+
+	omciXtucFecSecondsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C FEC seconds threshold crossing cleared."
+	    ::= { gpontrap 428 }
+
+	omciXtucLineInitializationsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Line initializations threshold crossing."
+	    ::= { gpontrap 429 }
+
+	omciXtucLineInitializationsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Line initializations threshold crossing cleared."
+	    ::= { gpontrap 430 }
+
+	omciXtucLossOfFrameSecondsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Loss of frame seconds."
+	    ::= { gpontrap 431 }
+
+	omciXtucLossOfFrameSecondsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Loss of frame seconds cleared."
+	    ::= { gpontrap 432 }
+
+	omciXtucLossOfLinkSecondsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Loss of link seconds."
+	    ::= { gpontrap 433 }
+
+	omciXtucLossOfLinkSecondsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Loss of link seconds cleared."
+	    ::= { gpontrap 434 }
+
+	omciXtucLossOfPowerSecondsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Loss of power seconds."
+	    ::= { gpontrap 435 }
+
+	omciXtucLossOfPowerSecondsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Loss of power seconds cleared."
+	    ::= { gpontrap 436 }
+
+	omciXtucLossOfSignalSecondsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Loss of signal seconds."
+	    ::= { gpontrap 437 }
+
+	omciXtucLossOfSignalSecondsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Loss of signal seconds cleared."
+	    ::= { gpontrap 438 }
+
+	omciXtucSesTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Severely errored seconds threshold crossing."
+	    ::= { gpontrap 439 }
+
+	omciXtucSesTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Severely errored seconds threshold crossing cleared."
+	    ::= { gpontrap 440 }
+
+	omciXtucShortInitializationsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Short initializations threshold crossing."
+	    ::= { gpontrap 441 }
+
+	omciXtucShortInitializationsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Short initializations threshold crossing cleared."
+	    ::= { gpontrap 442 }
+
+	omciXtucUasTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Unavailable seconds threshold crossing."
+	    ::= { gpontrap 443 }
+
+	omciXtucUasTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-C Unavailable seconds threshold crossing cleared."
+	    ::= { gpontrap 444 }
+
+	omciXturEsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Errored seconds threshold crossing."
+	    ::= { gpontrap 445 }
+
+	omciXturEsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Errored seconds threshold crossing cleared."
+	    ::= { gpontrap 446 }
+
+	omciXturFecSecondsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Forward error correction anomaly."
+	    ::= { gpontrap 447 }
+
+	omciXturFecSecondsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Forward error correction anomaly cleared."
+	    ::= { gpontrap 448 }
+
+	omciXturLossOfFrameSecondsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Loss of frame seconds."
+	    ::= { gpontrap 449 }
+
+	omciXturLossOfFrameSecondsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Loss of frame seconds cleared."
+	    ::= { gpontrap 450 }
+
+	omciXturLossOfPowerSecondsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Loss of power seconds."
+	    ::= { gpontrap 451 }
+
+	omciXturLossOfPowerSecondsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Loss of power seconds cleared."
+	    ::= { gpontrap 452 }
+
+	omciXturLossOfSignalSecondsTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Loss of signal seconds."
+	    ::= { gpontrap 453 }
+
+	omciXturLossOfSignalSecondsTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Loss of signal seconds cleared."
+	    ::= { gpontrap 454 }
+
+	omciXturSesTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R severely errored seconds."
+	    ::= { gpontrap 455 }
+
+	omciXturSesTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R severely errored seconds cleared."
+	    ::= { gpontrap 456 }
+
+	omciXturUasTca NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Unavailable seconds threshold crossing."
+	    ::= { gpontrap 457 }
+
+	omciXturUasTcaClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"XTU-R Unavailable seconds threshold crossing cleared."
+	    ::= { gpontrap 458 }
+
+	omciHighPowerFeedVoltage NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the power feed voltage is higher than the configured threshold."
+	    ::= { gpontrap 459 }
+
+	omciHighPowerFeedVoltageClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the power feed voltage is higher than the configured threshold cleared."
+	    ::= { gpontrap 460 }
+
+	omciHighLaserBiasCur NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the laser bias current is higher than the configured threshold."
+	    ::= { gpontrap 461 }
+
+	omciHighLaserBiasCurClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the laser bias current is higher than the configured threshold cleared."
+	    ::= { gpontrap 462 }
+
+	omciHighTemperature NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the temperature is above the configured threshold."
+	    ::= { gpontrap 463 }
+
+	omciHighTemperatureClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU has detected that the temperature is above the configured threshold cleared."
+	    ::= { gpontrap 464 }
+
+	omciOntgEqptAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Functional failure on an internal interface."
+	    ::= { gpontrap 465 }
+
+	omciOntgEqptAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Functional failure on an internal interface cleared."
+	    ::= { gpontrap 466 }
+
+	omciOntgPoweringAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Loss of external power to battery backup unit."
+	    ::= { gpontrap 467 }
+
+	omciOntgPoweringAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Loss of external power to battery backup unit cleared."
+	    ::= { gpontrap 468 }
+
+	rogueOntDetect NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponRogueOntDetectStatus, gponOntSerialNumber, gponOntPassword }
+	    STATUS  current
+	    DESCRIPTION
+			"Rogue ont detection. The values of rouge ont detection status are shown as below:
+			1: start rogue detection
+			2: stop rogue detection
+			3: detect rogue exist
+			4: rogue ont does not exist
+			5: discover rogue ont
+			Only detection status equals to 5, the serial number and password of rogue ont would be meaningful.
+			Otherwise, the string of serial number and password of ont would be displayed to N/A."
+	    ::= { gpontrap 501 }
+
+	newOntDetect NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntSerialNumber, gponOntPassword }
+	    STATUS  current
+	    DESCRIPTION
+	    	"New ont detect."
+	    ::= { gpontrap 502 }
+
+	ontSwDlStart NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Software download start."
+	    ::= { gpontrap 503 }
+
+	ontSwDlStartClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Software download start cleared."
+	    ::= { gpontrap 504 }
+
+	ontSwDlSuccess NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Software download success."
+	    ::= { gpontrap 505 }
+
+	ontSwDlFail NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Software download fail."
+	    ::= { gpontrap 506 }
+
+	ponLos NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Pon loss of signal."
+	    ::= { gpontrap 507 }
+
+	ponLosClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Pon loss of signal cleared."
+	    ::= { gpontrap 508 }
+
+	omciWanPppoeLinkUp NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, ifAdminStatus, ifOperStatus }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Ont wan port PPPoE link up."
+	    ::= { gpontrap 509 }
+
+	omciWanPppoeLinkDown NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, ifAdminStatus, ifOperStatus }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Ont wan port PPPoE link down."
+	    ::= { gpontrap 510 }
+
+	gponMacReset NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId, gponMacSubSlotId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Gpon mac reset."
+	    ::= { gpontrap 511 }
+
+	ontDdmiRxPowerFail NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, transceiverPerOntRxPower, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU DDMI Rx Power out of range."
+	    ::= { gpontrap 512 }
+
+	ontDdmiRxPowerFailClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, transceiverPerOntRxPower, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin }
+	    STATUS  current
+	    DESCRIPTION
+	    	"ONU DDMI Rx Power out of range cleared."
+	    ::= { gpontrap 513 }
+
+	ponUnableGetOnuPw NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntSerialNumber }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Unable to get password."
+	    ::= { gpontrap 514 }
+
+	ponOutOfId NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	    	"This PON port is out of register id for ONU."
+	    ::= { gpontrap 515 }
+
+	ddmiTempOutOfRange NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, transceiverDdmInfoEntryType, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin, transceiverDdmInfoEntryCurrent }
+	    STATUS  current
+	    DESCRIPTION
+	    	"DDMI temperature out of range."
+	    ::= { gpontrap 551 }
+
+	ddmiTempOutOfRangeClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, transceiverDdmInfoEntryType, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin, transceiverDdmInfoEntryCurrent }
+	    STATUS  current
+	    DESCRIPTION
+	    	"DDMI temperature out of range cleared."
+	    ::= { gpontrap 552 }
+
+	ddmiTxPwrOutOfRange NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, transceiverDdmInfoEntryType, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin, transceiverDdmInfoEntryCurrent }
+	    STATUS  current
+	    DESCRIPTION
+	    	"DDMI TxPower out of range."
+	    ::= { gpontrap 553 }
+
+	ddmiTxPwrOutOfRangeClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, transceiverDdmInfoEntryType, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin, transceiverDdmInfoEntryCurrent }
+	    STATUS  current
+	    DESCRIPTION
+	    	"DDMI TxPower out of range cleared."
+	    ::= { gpontrap 554 }
+
+	ddmiRxPwrOutOfRange NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, transceiverDdmInfoEntryType, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin, transceiverDdmInfoEntryCurrent }
+	    STATUS  current
+	    DESCRIPTION
+	    	"DDMI RxPower out of range."
+	    ::= { gpontrap 555 }
+
+	ddmiRxPwrOutOfRangeClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, transceiverDdmInfoEntryType, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin, transceiverDdmInfoEntryCurrent }
+	    STATUS  current
+	    DESCRIPTION
+	    	"DDMI RxPower out of range cleared."
+	    ::= { gpontrap 556 }
+
+	ddmiVoltageOutOfRange NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, transceiverDdmInfoEntryType, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin, transceiverDdmInfoEntryCurrent }
+	    STATUS  current
+	    DESCRIPTION
+	    	"DDMI voltage out of range."
+	    ::= { gpontrap 557 }
+
+	ddmiVoltageOutOfRangeClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, transceiverDdmInfoEntryType, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin, transceiverDdmInfoEntryCurrent }
+	    STATUS  current
+	    DESCRIPTION
+	    	"DDMI voltage out of range cleared."
+	    ::= { gpontrap 558 }
+
+	ddmiBiasOutOfRange NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, transceiverDdmInfoEntryType, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin, transceiverDdmInfoEntryCurrent }
+	    STATUS  current
+	    DESCRIPTION
+	    	"DDMI bias out of range."
+	    ::= { gpontrap 559 }
+
+	ddmiBiasOutOfRangeClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, transceiverDdmInfoEntryType, transceiverDdmInfoEntryAlarmMax, transceiverDdmInfoEntryAlarmMin, transceiverDdmInfoEntryWarnMax, transceiverDdmInfoEntryWarnMin, transceiverDdmInfoEntryCurrent }
+	    STATUS  current
+	    DESCRIPTION
+	    	"DDMI bias out of range cleared."
+	    ::= { gpontrap 560 }
+
+	gponLinkDown NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifAdminStatus, ifOperStatus }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies one gpon port is linked down."
+	    ::= { gpontrap 561 }
+
+	gponLinkUp NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, ifAdminStatus, ifOperStatus }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies one gpon port is linked up."
+	    ::= { gpontrap 562 }
+
+	cpuProtectionAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies that CPU may become overloaded and be unable to handle regular tasks property due to receiving large numbers of control packets."
+	    ::= { gpontrap 563 }
+
+	cpuProtectionAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies that disable port(s) become active or start receiving the packets again with error-disable recovery."
+	    ::= { gpontrap 564 }
+
+	authorizationFailure NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, slotModuleId, gponUserName }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies that 802.1x authorization failure."
+	    ::= { gpontrap 565 }
+
+	highIngressRateAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies that ingress rate is higher than configured threshold rate."
+	    ::= { gpontrap 566 }
+
+	highIngressRateAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies that ingress rate is higher than configured threshold rate cleared."
+	    ::= { gpontrap 567 }
+
+	highEgressRateAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies that egress rate is higher than configured threshold rate."
+	    ::= { gpontrap 568 }
+
+	highEgressRateAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies that egress rate is higher than configured threshold rate cleared."
+	    ::= { gpontrap 569 }
+
+	discoverUnregisterOntAlarm NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntSerialNumber, gponOntPassword }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies that system discovers unregistered ont."
+	    ::= { gpontrap 570 }
+
+	discoverUnregisterOntAlarmClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntSerialNumber, gponOntPassword }
+	    STATUS  current
+	    DESCRIPTION
+	            "The trap signifies that system discovers unregistered ont cleared."
+	    ::= { gpontrap 571 }
+
+	omciTcaEthFrameUsCrcErroredFrames NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	        "The total number of error frames received on upstream."
+	    ::= { gpontrap 572 }
+
+	omciTcaEthFrameUsCrcErroredFramesClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	        "The total number of error frames received on upstream cleared."
+	    ::= { gpontrap 573 }
+
+	omciTcaEthFrameUsOversizeFrames NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	        "The total number of frames received that were longer than 1518 octets long on upstream."
+	    ::= { gpontrap 574 }
+
+	omciTcaEthFrameUsOversizeFramesClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	        "The total number of packets received that were longer than 1518 octets long on upstream cleared."
+	    ::= { gpontrap 575 }
+
+	omciTcaEthFrameUsUndersizeFrames NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	        "The total number of frames received that were less than 64 octets long on upstream."
+	    ::= { gpontrap 576 }
+
+	omciTcaEthFrameUsUndersizeFramesClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId, gponOntCardId, gponOntCardPortId, gponMeClassId }
+	    STATUS  current
+	    DESCRIPTION
+	        "The total number of frames received that were less than 64 octets long on upstream cleared."
+	    ::= { gpontrap 577 }
+
+	ontMacAntiSpoofing NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntMacAntiSpoofOrig, gponOntMacAntiSpoofNew, gponOntMacAntiSpoofMAC }
+	    STATUS current
+	    DESCRIPTION
+	        "The gpon ont MAC anti-spoofing happened."
+	    ::= { gpontrap 578 }
+
+	gponOntTcaFecCodeword NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is FEC codeword."
+	    ::= { gpontrap 579 }
+
+	gponOntTcaFecCodewordClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is FEC codeword cleared."
+	    ::= { gpontrap 580 }
+	gponOntTcaBipByte NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is bip byte."
+	    ::= { gpontrap 581 }
+
+	gponOntTcaBipByteClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"The trap signifies ont is bip byte cleared."
+	    ::= { gpontrap 582 }
+
+	gponOntTcaRxPloamCrc NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received PLOAMS with CRC errors."
+	    ::= { gpontrap 583 }
+
+	gponOntTcaRxPloamCrcClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received PLOAMS with CRC errors cleared."
+	    ::= { gpontrap 584 }
+
+	gponOntTcaRxPloamNonidle NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received non-idle PLOAMS."
+	    ::= { gpontrap 585 }
+
+	gponOntTcaRxPloamNonidleClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received non-idle PLOAMS cleared."
+	    ::= { gpontrap 586 }
+
+	gponOntTcaPositiveDrift NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Accumulated positive drift in bits."
+	    ::= { gpontrap 587 }
+
+	gponOntTcaPositiveDriftClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Accumulated positive drift in bits cleared."
+	    ::= { gpontrap 588 }
+
+	gponOntTcaNegativeDrift NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Accumulated negative drift in bits."
+	    ::= { gpontrap 589 }
+
+	gponOntTcaNegativeDriftClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Accumulated negative drift in bits cleared."
+	    ::= { gpontrap 590 }
+
+	gponOntTcaRxOmciPktCrc NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received OMCI packets with CRC errors."
+	    ::= { gpontrap 591 }
+
+	gponOntTcaRxOmciPktCrcClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received OMCI packets with CRC errors cleared."
+	    ::= { gpontrap 592 }
+
+	gponOntTcaUnreceivedBurst NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Un-received Burst allocated to the ONU."
+	    ::= { gpontrap 593 }
+
+	gponOntTcaUnreceivedBurstClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Un-received Burst allocated to the ONU cleared."
+	    ::= { gpontrap 594}
+
+	gponOntTcaLcdgi NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"LCDGi errors."
+	    ::= { gpontrap 595 }
+
+	gponOntTcaLcdgiClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"LCDGi errors cleared."
+	    ::= { gpontrap 596}
+
+	gponOntTcaRdi NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"RDi errors."
+	    ::= { gpontrap 597 }
+
+	gponOntTcaRdiClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"RDi errors cleared."
+	    ::= { gpontrap 598}
+
+	gponOntOmciSuppress NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"OMCI suppress."
+	    ::= { gpontrap 599}
+
+	gponOntTcaRxOmciPkt NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received OMCI packets."
+	    ::= { gpontrap 600 }
+
+	gponOntTcaRxOmciPktClear NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex, gponOntId }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Received OMCI packets cleared."
+	    ::= { gpontrap 601 }
+
+	gponRogueOntDetection NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Detect suspected rogue onu."
+	    ::= { gpontrap 602 }
+
+	gponRogueOntElimination NOTIFICATION-TYPE
+	    OBJECTS { iesIANAEventType, iesIANAProbableCause, ifIndex }
+	    STATUS  current
+	    DESCRIPTION
+	    	"Eliminate suspected rogue onu."
+	    ::= { gpontrap 603 }
+END

@@ -1,0 +1,178 @@
+ARRIS-D5-VIDEO-IP-BUNDLE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        arrisD5UEQam
+            FROM ARRIS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32
+                FROM SNMPv2-SMI
+        RowStatus,
+        TruthValue
+                FROM SNMPv2-TC
+        InterfaceIndex
+                FROM IF-MIB;
+
+
+    arrisD5UEQamIpBundleMib MODULE-IDENTITY
+		LAST-UPDATED "201005270000Z" -- 27th MAY 2010
+		ORGANIZATION "Arris Group"
+		CONTACT-INFO
+				"       Software Development
+						Postal: ARRIS Group
+										3871 Lakefield Drive
+										Suwanee, GA 30024
+										USA
+						Tel:    800-469-6569
+						Fax:    678-473-8770"
+
+		DESCRIPTION
+				"This MIB manages the ip-bundles on the
+				 ARRIS D5 product"
+		::= { arrisD5UEQam 16 }
+
+    d5UEQamIpBundlePolicy OBJECT-TYPE
+        SYNTAX       INTEGER { 
+                        revertive(1),
+                        nonrevertive(2)
+                    }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "Configure the ip bundle policy to be revertive or non-revertive."
+        ::= { arrisD5UEQamIpBundleMib 1 }
+
+    d5UEQamIpBundlePolicyRevertiveTimeout OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "Configure the ip bundle policy to be revertive timeout interval in seconds.
+             Setting this object to non zero will also turn on the revertive policy.
+             Setting this to a zero value will not turn off revertive policy if on."
+        ::= { arrisD5UEQamIpBundleMib 2 }
+
+    d5UEQamIpBundleRevertTo OBJECT-TYPE
+        SYNTAX       INTEGER { 
+                        none(0),
+                        gig1(1),
+                        gig2(2),
+                        gig3(3),
+                        gig4(4)
+                    }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "Control for administratively reverting to the backup port from the 
+             primary port identified by the ifIndex."
+        ::= { arrisD5UEQamIpBundleMib 3 }
+
+    d5UEQamIpBundleRevertFrom OBJECT-TYPE
+        SYNTAX       INTEGER { 
+                        none(0),
+                        gig1(1),
+                        gig2(2),
+                        gig3(3),
+                        gig4(4)
+                    }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "Control for administratively reverting from the backup port to the 
+             primary port identified by the ifIndex."
+        ::= { arrisD5UEQamIpBundleMib 4 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+-- IP-BUNDLE TABLE
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5UEQamIpBundleTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF D5UEQamIpBundleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Arris UEQ Proprietry Ip Bundle Table"
+        ::= { arrisD5UEQamIpBundleMib 5 }
+    
+    d5UEQamIpBundleEntry OBJECT-TYPE
+        SYNTAX      D5UEQamIpBundleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A row in the d5UEQamIpBundleTable.
+            An entry in this table exists for each gigabit
+		    port that is backed up by another gigabit port" 
+        INDEX {d5UEQamIpBundlePrimaryPort}
+        ::= { d5UEQamIpBundleTable 1 }
+    
+    D5UEQamIpBundleEntry ::= SEQUENCE {
+		d5UEQamIpBundlePrimaryPort                  INTEGER,
+		d5UEQamIpBundleBackUpPort                   INTEGER,
+		d5UEQamIpBundlePrimaryFailedOver            TruthValue,
+		d5UEQamIpBundlePrimaryLinkUp                TruthValue,
+		d5UEQamIpBundleBackupLinkUp                 TruthValue,
+        d5UEQamIpBundleStatus                       RowStatus
+    }
+
+    d5UEQamIpBundlePrimaryPort OBJECT-TYPE
+        SYNTAX       INTEGER { 
+                        gig1(1),
+                        gig2(2),
+                        gig3(3),
+                        gig4(4)
+                    }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "ifIndex of a primary port in the ip bundle"
+        ::= { d5UEQamIpBundleEntry 1 }
+
+    d5UEQamIpBundleBackUpPort OBJECT-TYPE
+        SYNTAX       INTEGER { 
+                        gig1(1),
+                        gig2(2),
+                        gig3(3),
+                        gig4(4),
+                        fe1(5)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "ifIndex of the backup port in the ip bundle"
+        ::= { d5UEQamIpBundleEntry 2 }
+
+    d5UEQamIpBundlePrimaryFailedOver OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	        "states if the primary port is currently being backed up
+             by the backup port"
+        ::= { d5UEQamIpBundleEntry 3 }
+
+    d5UEQamIpBundlePrimaryLinkUp OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	        "states if the primary port's line protocol is currently up"
+        ::= { d5UEQamIpBundleEntry 4 }
+
+    d5UEQamIpBundleBackupLinkUp OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	        "states if the primary port's line protocol is currently up"
+        ::= { d5UEQamIpBundleEntry 5 }
+
+    d5UEQamIpBundleStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS	read-create
+        STATUS	current
+        DESCRIPTION
+            "Controls and reflects the status of rows in this table." 
+        ::= { d5UEQamIpBundleEntry 6 }
+
+
+
+END

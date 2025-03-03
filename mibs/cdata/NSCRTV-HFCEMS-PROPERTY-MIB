@@ -1,0 +1,246 @@
+NSCRTV-HFCEMS-PROPERTY-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    OBJECT-TYPE
+         FROM RFC-1212
+    propertyIdent
+         FROM NSCRTV-ROOT
+    ;
+
+analogPropertyTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF AnalogPropertyEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { propertyIdent 1 }
+
+analogPropertyEntry  OBJECT-TYPE
+	SYNTAX 	AnalogPropertyEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	INDEX	{ analogParameterOID }
+	::= { analogPropertyTable 1 }
+
+AnalogPropertyEntry ::= SEQUENCE {
+	analogParameterOID
+		OBJECT IDENTIFIER,
+	alarmEnable
+		OCTET STRING,
+	analogAlarmState
+		INTEGER,
+	analogAlarmHIHI
+		INTEGER,
+	analogAlarmHI
+		INTEGER,
+	analogAlarmLO
+		INTEGER,
+	analogAlarmLOLO
+		INTEGER,
+	analogAlarmDeadband
+		INTEGER
+}
+
+analogParameterOID  OBJECT-TYPE
+	SYNTAX 	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+-- 
+	::= { analogPropertyEntry 1 }
+
+alarmEnable  OBJECT-TYPE
+	SYNTAX 	OCTET STRING (SIZE(1))
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { analogPropertyEntry 2 }
+
+analogAlarmState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		aasNominal (1),
+		aasHIHI (2),
+		aasHI (3),
+		aasLO (4),
+		aasLOLO (5)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { analogPropertyEntry 3 }
+
+analogAlarmHIHI  OBJECT-TYPE
+	SYNTAX 	INTEGER 
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { analogPropertyEntry 4 }
+
+analogAlarmHI  OBJECT-TYPE
+	SYNTAX 	INTEGER 
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { analogPropertyEntry 5 }
+
+analogAlarmLO  OBJECT-TYPE
+	SYNTAX 	INTEGER 
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { analogPropertyEntry 6 }
+
+analogAlarmLOLO  OBJECT-TYPE
+	SYNTAX 	INTEGER 
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { analogPropertyEntry 7 }
+
+analogAlarmDeadband  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { analogPropertyEntry 8 }
+
+
+discretePropertyTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF DiscretePropertyEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { propertyIdent 2 }
+
+discretePropertyEntry  OBJECT-TYPE
+	SYNTAX 	DiscretePropertyEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	INDEX	{ discreteParameterOID, discreteAlarmValue }
+	::= { discretePropertyTable 1 }
+
+DiscretePropertyEntry ::= SEQUENCE {
+	discreteParameterOID
+		OBJECT IDENTIFIER,
+	discreteAlarmValue
+		INTEGER,
+	discreteAlarmEnable
+		INTEGER,
+	discreteAlarmState
+		INTEGER
+}
+
+discreteParameterOID  OBJECT-TYPE
+	SYNTAX 	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { discretePropertyEntry 1 }
+
+discreteAlarmValue  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { discretePropertyEntry 2 }
+
+
+discreteAlarmEnable  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		disable (1),
+		enableMajor (2),
+		enableMinor (3)
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { discretePropertyEntry 3 }
+
+discreteAlarmState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		dasNominal(1),
+		dasDiscreteMajor(6),
+		dasDiscreteMinor(7)
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { discretePropertyEntry 4 }
+
+
+currentAlarmTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CurrentAlarmEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { propertyIdent 3 }
+
+currentAlarmEntry  OBJECT-TYPE
+	SYNTAX 	CurrentAlarmEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	INDEX	{ currentAlarmOID }
+	::= { currentAlarmTable 1 }
+
+CurrentAlarmEntry ::= SEQUENCE {
+	currentAlarmOID
+		OBJECT IDENTIFIER,
+	currentAlarmState
+		INTEGER,
+	currentAlarmValue
+		INTEGER
+		
+}
+
+currentAlarmOID  OBJECT-TYPE
+	SYNTAX 	OBJECT IDENTIFIER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { currentAlarmEntry 1 }
+
+currentAlarmState  OBJECT-TYPE
+	SYNTAX 	INTEGER {
+		caasHIHI (2),
+		caasHI (3),
+		caasLO (4),
+		caasLOLO (5),
+		caasDiscreteMajor (6),
+		caasDiscreteMinor (7)
+		
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { currentAlarmEntry 2 }
+             
+currentAlarmValue  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { currentAlarmEntry 3 }
+
+END

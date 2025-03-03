@@ -1,0 +1,139 @@
+-- =================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: Huawei Ethernet ARP MIB
+-- Reference: HUAWEI Enterprise MIB
+-- Version: V1.01
+-- History: 
+-- =================================================================
+
+    HUAWEI-DHCPV6-SERVER-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS        
+            hwDhcp            
+                FROM HUAWEI-MIB   
+            OBJECT-TYPE, MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Counter32, Integer32, Unsigned32, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            PhysAddress, DisplayString, RowStatus            
+                FROM SNMPv2-TC   
+            NOTIFICATION-GROUP, OBJECT-GROUP, MODULE-COMPLIANCE
+                FROM SNMPv2-CONF;        
+            
+        hwDHCPv6Server MODULE-IDENTITY 
+            LAST-UPDATED "201708171600Z"        
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+                   Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                  "
+            DESCRIPTION 
+                "The MIB is used for defining Huawei's DHCPv6 server attribute."
+            REVISION    "201708171600Z"   
+            DESCRIPTION "Modify the description of hwAllocatedIpLimitResumeAlarm."
+
+			REVISION    "201703081600Z"   
+            DESCRIPTION "V1.00, initial version."
+			
+            ::= { hwDhcp 4 }
+            
+	hwDHCPv6ServerObjects OBJECT IDENTIFIER ::= { hwDHCPv6Server 1 } 
+ 
+-- =================================================================
+-- The number of allocated IP alarm
+-- =================================================================            
+
+	hwAllocatedIpLimitValue  OBJECT-TYPE
+		SYNTAX Unsigned32(0..4294967294)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"This object indicates the maximum number of assignable IPv6 addresses."
+	::= { hwDHCPv6ServerObjects 1 }   
+	
+	hwAllocatedIpThresholdValue  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"This object indicates the threshold for the number of assignable IPv6 addresses."
+	::= { hwDHCPv6ServerObjects 2 }  
+                                                                                          
+--  Notifications(trap) Definitions
+
+    hwDHCPv6ServerNotifications OBJECT IDENTIFIER ::= { hwDHCPv6Server 2 } 	
+            
+    hwAllocatedIpLimitReachAlarm NOTIFICATION-TYPE
+            OBJECTS { hwAllocatedIpLimitValue } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when the number of assigned IPv6 addresses reaches the allowed maximum number."
+            ::= { hwDHCPv6ServerNotifications 1 }    
+			
+    hwAllocatedIpLimitResumeAlarm NOTIFICATION-TYPE
+            OBJECTS { hwAllocatedIpLimitValue } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when the number of assigned IPv6 addresses reaches the specified threshold."
+            ::= { hwDHCPv6ServerNotifications 2 }    
+			
+    hwAllocatedIpThresholdReachAlarm NOTIFICATION-TYPE
+            OBJECTS { hwAllocatedIpThresholdValue } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that a clear alarm is generated when the number of assigned IPv6 addresses reaches the allowed maximum number."
+            ::= { hwDHCPv6ServerNotifications 3 }    
+            
+    hwAllocatedIpThresholdResumeAlarm NOTIFICATION-TYPE
+            OBJECTS { hwAllocatedIpThresholdValue } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that a clear alarm is generated when the number of assigned IPv6 addresses reaches the specified threshold."
+            ::= { hwDHCPv6ServerNotifications 4 } 
+ 
+-- Conformance information
+
+  hwDHCPv6ServerConformance OBJECT IDENTIFIER ::= { hwDHCPv6Server 3 }
+  
+  hwDHCPv6ServerGroups OBJECT IDENTIFIER ::= { hwDHCPv6ServerConformance 1 }
+  
+  hwDHCPv6ServerCompliances OBJECT IDENTIFIER ::= { hwDHCPv6ServerConformance 2 }
+
+   hwDHCPv6ServerAllocatedIpGroup OBJECT-GROUP
+    OBJECTS {
+		hwAllocatedIpLimitValue,
+		hwAllocatedIpThresholdValue	
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for DHCPv6 server allocated IP alarm."
+    ::= { hwDHCPv6ServerGroups 1 }		    		
+
+    hwDHCPv6ServerNotificationsGroup NOTIFICATION-GROUP   
+        NOTIFICATIONS{ hwAllocatedIpLimitReachAlarm, hwAllocatedIpLimitResumeAlarm, hwAllocatedIpThresholdReachAlarm, hwAllocatedIpThresholdResumeAlarm}
+        STATUS current
+        DESCRIPTION
+            "A collection of notification for DHCPv6 server allocated IP alarm."   
+     ::= { hwDHCPv6ServerGroups 2 }	
+		
+    hwDHCPv6ServerCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for DHCPv6 server."
+    MODULE
+        MANDATORY-GROUPS {
+            hwDHCPv6ServerAllocatedIpGroup
+        }  
+      
+   ::= { hwDHCPv6ServerCompliances 1 }                                   
+
+-- =================================================================
+-- units of conformance
+-- ================================================================= 
+     
+            
+END

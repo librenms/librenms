@@ -1,0 +1,1605 @@
+-- Toshiba MIB
+-- MIB for Toshiba G9000 Uninterruptible Power Supply
+--
+--{iso(1) org(3) dod(6) internet(1) private(4) enterprises(1)
+-- toshiba(186) equ(1) equups(19) ticups(2) rmti4 (5) upsG9000-G2020(1)}
+--=============================================================================
+
+TIC-RMTI4-G9000-G2020-MIB DEFINITIONS ::= BEGIN
+
+--=============================================================================
+-- Update : September 28, 2016
+-- By     : Edwin Rubio, Toshiba International Corp.
+-- Revised: renamed MIB file from upsG9000 to upsG9000-G2020
+--=============================================================================
+-- Update : May 28, 2015
+-- By     : Edwin Rubio, Toshiba International Corp.
+-- Revised: Added in description warning for upsTrapBatteryLow, upsTrapBatteryLowClear and upsAlarmBatteryLow.
+--		    : Added in description warning for upsTrapBatteryDepleted, upsTrapBatteryDepletedClear and upsAlarmBatteryDepleted.
+--		    : Added in description warning for upsTrapAsyncOperation, upsTrapAsyncOperationClear and upsAlarmAsyncOperation.
+--		    : Added in description warning for upsTrapRemotEyeCommError, upsTrapRemotEyeCommErrorClear and upsAlarmRemotEyeCommError.
+--		    : Added in description warning for upsTrapOnBypass, upsTrapOnBypassClear and upsAlarmOnBypass.
+-- 		    : Added in description info for upsTrapPowerFailure, upsTrapPowerFailureClear, and upsAlarmPowerFailure
+--=============================================================================
+-- Update : March 19, 2015
+-- By     : Edwin Rubio, Toshiba International Corp.
+-- Revised: renamed upsConfigInputRatedFrequency to upsConfigRatedInputFrequency
+--		    : Added upsAlarmUserDefinedOverload
+--		    : Added upsConfigUserDefinedOverloadSetPoint
+--		    : Added upsTrapUserDefinedOverload
+--		    : Added upsTrapUserDefinedOverloadClear
+--=============================================================================
+-- Update : February 3, 2015
+-- By     : Edwin Rubio, Toshiba International Corp.
+-- Revised: renamed upsConfigInputRatedFrequency to upsConfigRatedInputFrequency
+--=============================================================================
+-- Update : January 30, 2015
+-- By     : Edwin Rubio, Toshiba International Corp.
+-- Revised: Changed Access Level for upsConfigBatteryInstallationDate to R/W
+--        : Changed Access Level for upsConfigPassword to R/W
+--=============================================================================
+-- Update: November 13, 2014
+-- By    : Edwin Rubio, Toshiba International Corp.
+-- Revised: Changed upsOutputCurrentPhaseA units to "RMS Amps"
+--        : Changed upsOutputCurrentPhaseB units to "RMS Amps"
+--        : Changed upsOutputCurrentPhaseC units to "RMS Amps"
+--=============================================================================
+-- Update : October 29, 2014
+-- By     : Edwin Rubio, Toshiba International Corp.
+-- Revised: Changed upsInputCurrentPhaseA units to "0.1 RMS Amps"    
+--        : Changed upsInputCurrentPhaseB units to "0.1 RMS Amps"
+--        : Changed upsInputCurrentPhaseC units to "0.1 RMS Amps"
+--        : Changed upsOutputCurrentPhaseA units to "0.1 RMS Amps"
+--        : Changed upsOutputCurrentPhaseB units to "0.1 RMS Amps"
+--        : Changed upsOutputCurrentPhaseC units to "0.1 RMS Amps"
+--=============================================================================
+-- Update : June 18, 2014
+-- By     : Edwin Rubio, Toshiba International Corp.
+-- Revised: Changed upsInputCurrentPhaseA units to "RMS Amps"    
+--        : Changed upsInputCurrentPhaseB units to "RMS Amps"
+--        : Changed upsInputCurrentPhaseC units to "RMS Amps"
+--        : Changed upsOutputCurrentPhaseA units to "RMS Amps"
+--        : Changed upsOutputCurrentPhaseB units to "RMS Amps"
+--        : Changed upsOutputCurrentPhaseC units to "RMS Amps"
+--=============================================================================
+-- Update : January 13, 2014
+-- By     : Edwin Rubio, Toshiba International Corp.
+-- Revised:   
+--        : upsBattery 14: upsBatteryInstalledDate SYNTAX DisplayString from size 8 to 10
+--        : upsIdent 4: upsIdentName changed to upsIdentSysName
+--        : upsInput 1: upsInputNumLines changed to upsInputNumOfPhases
+--        : upsInput 5: upsInputLLVoltagePercentAB added to MIB
+--        : upsInput 6: upsInputLLVoltagePercentBC added to MIB
+--        : upsInput 7: upsInputLLVoltagePercentCA added to MIB
+--        : upsInput 16: upsInputRatedLLVoltage added to MIB
+--        : upsOutput 2: upsOutputNumLines changed to upsOutputNumOfPhases
+--        : upsOutput 6: upsOutputPhaseCurrentA changed to upsOutputCurrentPhaseA
+--        : upsOutput 7: upsOutputPhaseCurrentB changed to upsOutputCurrentPhaseB
+--        : upsOutput 8: upsOutputPhaseCurrentC changed to upsOutputCurrentPhaseC
+--        : upsOutput 13: upsOutputActivePower changed to upsOutputTotalAcitvePower
+--        : upsOutput 14: upsOutputActivePowerPercent changed to upsOutputTotalActivePowerPercent
+--        : upsOutput 16: upsOutputRatedActivePower added to MIB
+--        : upsOutput 17: upsOutputApparentPower changed to upsOutputRatedApparentPower
+--        : upsOutput 18: upsOutputRatedLLVoltage added to MIB
+--        : upsBypass 1: upsBypassNumLines changed to upsBypassNumOfPhases
+--        : upsBattery 2: upsSecondsOnBattery changed to upsElapsedTimeOnBatteryPower
+--        : upsBattery 3: upsEstimatedMinutesRemaining changed to upsEstimatedBatteryRuntime
+--        : upsBattery 6: upsBatteryEstimatedChargeRemaining changed to upsBatteryEstimatedCharge
+--        : upsBattery 10: upsBatteryInSeries added to MIB
+--        : upsBattery 11: upsBatteryNumStrings added to MIB
+--        : upsBattery 12: upsBatteryRatedAmpereHour added to MIB
+--        : upsBattery 14: upsBatteryInstalledDate changed to upsBatteryInstallationDate
+--        : upsWellKnownAlarms 1/upsTrap 1 & 2: upsAlarmFaultStatus changed to upsAlarmFault
+--        : upsWellKnownAlarms 3/upsTrap 5 & 6: upsAlarmLowBattery changed to upsAlarmBatteryLow
+--        : upsWellKnownAlarms 4/upsTrap 7 7 & 8: upsAlarmDepletedBattery changed to upsAlarmBatteryDepleted
+--        : upsAlarmInputVoltageAbnormal removed from MIB
+--        : upsAlarmOutputBad removed from MIB
+--        : upsWellKnownAlarms 8/upsTrap 15 & 16: upsAlarmPowerFailure added to MIB
+--        : upsWellKnownAlarms 11/upsTrap 21 & 22: upsAlarmUpsOutputOff changed to upsAlarmOutputOff
+--        : upsAlarmRE4UPSCommError removed from MIB
+--        : upsAlarmInverterSynchronous removed from MIB
+--        : upsWellKnownAlarms 12/upsTrap 23 & 24: upsAlarmAsyncOperation added to MIB
+--        : upsWellKnownAlarms 13/upsTrap 25 & 26: upsAlarmDCOverCurrent changed to upsAlarmDCBusOverCurrent
+--        : upsWellKnownAlarms 14/upsTrap 27 & 28: upsAlarmDCOverVoltage changed to upsAlarmDCBusOverVoltage
+--        : upsWellKnownAlarms 15/upsTrap 29 & 30: upsAlarmDCUnderVoltage changed to upsAlarmDCBusUnderVoltage
+--        : upsWellKnownAlarms 16/upsTrap 31 & 32: upsAlarmDCUnbalanced changed to upsAlarmDCBusImbalance
+--        : upsWellKnownAlarms 20/upsTrap 39 & 40: upsAlarmOutputOverCurrent changed to upsAlarmInverterOvercurrent
+--        : upsWellKnownAlarms 21/upsTrap 41 & 42: upsAlarmRemotEyeCommError added to MIB
+--        : upsConfig 2: upsConfigUPSSoftwareVersion changed to upsConfigUPSFirmwareVersion
+--        : upsConfig 3: upsConfigInputNumLines changed to upsConfigInputNumOfPhases
+--        : upsConfig 4: upsConfigInputFreq changed to upsConfigRatedInputFrequency
+--        : upsConfig 5: upsConfigInputVoltage changed to upsConfigRatedInputLLVoltage
+--        : upsConfig 6: upsConfigInputPF changed to upsConfigRatedInputPowerFactor
+--        : upsConfig 7: upsConfigOutputNumLines changed to upsConfigOutputNumOfPhases
+--        : upsConfig 8: upsConfigOutputFreq changed to upsConfigRatedOutputFrequency
+--        : upsConfig 9: upsConfigOutputVoltage changed to upsConfigRatedOutputLLVoltage
+--        : upsConfig 10: upsConfigOutputVA changed to upsConfigRatedOutputApperentPower
+--        : upsConfig 11: upsConfigOutputActivePower changed to upsConfigRatedOuputActivePower
+--        : upsConfig 12: upsConfigOutputPF changed to upsConfigRatedOutputPowerFactor
+--        : upsConfig 13: upsConfigBypassNumOfPhases added to MIB
+--        : upsConfig 16: upsConfigNumBattSeries changed to upsConfigBatteryInSeries
+--        : upsConfig 17: upsConfigNumBattStrings changed to upsConfigBatterNumStrings
+--        : upsConfig 18: upsConfig1BattVoltage changed to upsConfigRatedBatteryVoltage
+--        : upsConfig 19: upsConfigBatteryRatedAmpereHour changed to upsConfigRatedBatteryAmpereHour
+--        : upsConfig 20: upsConfigBattModel changed to upsConfigBatteryModel
+--        : upsConfig 21: upsConfigBattRatedHoldingTime changed to upsConfigBatteryRatedBackupTime
+--        : upsConfig 22: upsConfigBatteryInstalledDate changed to upsConfigBatteryInstallationDate
+--        : upsConfig 23: upsConfigSysName added to MIB
+--        : upsConfig 24: upsConfigAttachedDevices added to MIB
+--        : upsConfig 25: upsConfigPassword added to MIB
+--        : upsTrap 1 & 2: upsTrapFaultStatus changed to upsTrapFault
+--        : upsTrap 5 & 6: upsTrapBatteryLowVoltage changed to upsTrapBatteryLow
+--        : upsTrap 7 & 8: upsTrapDepletedBattery changed to upsTrapBatteryDepleted
+--        : upsTrap 15 & 16: upsTrapPowerFailure added to MIB
+--        : upsTrap 19 & 20: upsTrapOnBypass added to MIB
+--        : upsTrap 21 & 22: upsTrapUpsOutputOff changed to upsTrapOutputOff
+--        : upsTrapInverterSynchronous removed from MIB
+--        : upsTrap 23 & 24: upsTrapAsyncOperation added to MIB
+--        : upsTrap 25 & 26: upsTrapDCOvercurrent changed to upsTrapsDCBusOverCurrent
+--        : upsTrap 27 & 28: upsTrapDCOvervoltage changed to upsTrapDCBusOverVoltage
+--        : upsTrap 29 & 30: upsTrapDCUndervoltage changed to upsTrapDCBusUnderVoltage
+--        : upsTrap 31 & 32: upsTrapDCUnbalance changed to upsTrapDCBusImbalance
+--        : upsTrap 33 & 34: upsTrapOutputUndervoltage changed to upsTrapOutputUnderVoltage
+--        : upsTrap 35 & 36: upsTrapOutputOvervoltage changed to upsTrapOutputOverVoltage
+--        : upsTrap 41 & 42: upsTrapRemotEyeCommError added to MIB
+--        : upsTrapOutputBad removed from MIB
+--        : upsTrapBypassSourceSupply removed from MIB
+--        : upsTrapInputVoltageAbnormal removed from MIB
+--=============================================================================
+-- Update : December 22, 2013
+-- By     : Tiffany Tye, Toshiba International Corp.
+-- Revised:upsOutputCurrentPercentA, B & C syntax change from nonnegativeinteger to Integer (1..200)   
+--        : upsBatteryInstalledDate SYNTAX DisplayString from size 8 to 10
+--        : Remove EMD Alarm and Traps
+--        : upsConfigBatteryInstalledDate SYNTAX DisplayString from size 8 to 10 upsConfigBatteryInstalledDate Add unit
+--        : Remove TrapRE4UPSComm & TrapLoginError
+--        : Change upsBatteryRatedHoldingTime to upsBatteryRatedBackupTime  
+--=============================================================================
+-- Update: July 30, 2013
+-- By    : Edwin Rubio, Toshiba International Corp.
+-- For   : G9000 First Draft MIB for RemotEye 4
+--==============================================================================
+
+IMPORTS
+ DisplayString, TimeStamp, TimeInterval, TestAndIncr, AutonomousType
+ FROM SNMPv2-TC
+ enterprises
+ FROM RFC1155-SMI
+ OBJECT-TYPE
+ FROM RFC-1212
+ TRAP-TYPE
+ FROM RFC-1215;
+       
+ PositiveInteger    ::= INTEGER (0..2147483647)
+ NonNegativeInteger ::= INTEGER (0..2147483647)
+
+
+toshiba     OBJECT IDENTIFIER ::= { enterprises 186 }
+equ         OBJECT IDENTIFIER ::= { toshiba 1 }
+equUPS      OBJECT IDENTIFIER ::= { equ 19 }
+ticUPS      OBJECT IDENTIFIER ::= { equUPS 2 }
+rmti4       OBJECT IDENTIFIER ::= { ticUPS 5 }
+upsG9000-G2020    OBJECT IDENTIFIER ::= { rmti4 1 }
+
+upsIdent    OBJECT IDENTIFIER ::= { upsG9000-G2020 1 }
+upsInput    OBJECT IDENTIFIER ::= { upsG9000-G2020 2 }
+upsOutput   OBJECT IDENTIFIER ::= { upsG9000-G2020 3 }
+upsBypass   OBJECT IDENTIFIER ::= { upsG9000-G2020 4 }
+upsBattery  OBJECT IDENTIFIER ::= { upsG9000-G2020 5 }
+upsAlarm    OBJECT IDENTIFIER ::= { upsG9000-G2020 6 }
+upsConfig   OBJECT IDENTIFIER ::= { upsG9000-G2020 7 }
+upsTime     OBJECT IDENTIFIER ::= { upsG9000-G2020 8 }
+upsTrap     OBJECT IDENTIFIER ::= { upsG9000-G2020 9 }
+
+-- ===========================================================================
+-- upsIdentification – Group 1
+-- Device Identification group
+-- All objects in this group are set at device initialization and remain static.
+--===========================================================================
+
+
+upsIdentManufacturer OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..31))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The name of the UPS manufacturer."
+      ::= { upsIdent 1 }
+
+upsIdentTypeform OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..127))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS Model designation."
+      ::= { upsIdent 2 }
+
+upsIdentUPSFirmwareVersion OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS firmware version."
+      ::= { upsIdent 3 }
+
+upsIdentSysName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "A string identifying the UPS.  This object is
+           set by the administrator."
+      ::= { upsIdent 4 }
+
+upsIdentAttachedDevices OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "A string identifying the devices attached to the
+           output(s) of the UPS.  This object is set by
+           the administrator."
+      ::= { upsIdent 5 }
+
+--===========================================================================
+-- upsInput – Group 2
+--
+-- Input group.
+-- ===========================================================================
+
+upsInputNumOfPhases OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+           "Number of input lines.  This data is used by upsInputNumLines."
+     ::= { upsInput 1 }
+
+upsInputLLVoltageAB OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input line to line voltage for AB in RMS volts."
+     ::= { upsInput 2 }
+
+upsInputLLVoltageBC OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input line to line voltage for BC in RMS volts."
+     ::= { upsInput 3 }
+
+upsInputLLVoltageCA OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input line to line voltage for CA in RMS volts."
+     ::= { upsInput 4 }
+
+upsInputLLVoltagePercentAB OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "Percentage"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input line to line voltage percent for AB."
+     ::= { upsInput 5 }
+
+upsInputLLVoltagePercentBC OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "Percentage"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input line to line voltage percent for BC."
+     ::= { upsInput 6 }
+
+upsInputLLVoltagePercentCA OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "Percentage"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input line to line voltage percent for CA."
+     ::= { upsInput 7 }
+
+upsInputCurrentPhaseA OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "0.1 RMS Amps"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input phase current for Phase A."
+     ::= { upsInput 8 }
+
+upsInputCurrentPhaseB OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "0.1 RMS Amps"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input phase current unit for Phase B."
+     ::= { upsInput 9 }
+
+upsInputCurrentPhaseC OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "0.1 RMS Amps"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input phase current unit for Phase C."
+     ::= { upsInput 10 }
+
+upsInputFrequency OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "0.1 Hertz"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input frequency unit 0.1 Hertz."
+     ::= { upsInput 11 }
+
+upsInputActivePowerA OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "Watts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The magnitude of the present input true power for phase A."
+     ::= { upsInput 12 }
+
+upsInputActivePowerB OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "Watts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The magnitude of the present input true power for phase B."
+     ::= { upsInput 13 }
+
+upsInputActivePowerC OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "Watts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The magnitude of the present input true power for phase C."
+     ::= { upsInput 14 }
+
+upsInputTotalActivePower OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    UNITS "Watts"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the total input true power."
+    ::= { upsInput  15 }
+
+upsInputRatedLLVoltage OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input line to line rated voltage in RMS volts."
+     ::= { upsInput 16 }
+
+-- ===========================================================================
+-- upsOutput – Group 3
+--
+-- Output group
+-- ===========================================================================
+
+upsOutputSource OBJECT-TYPE
+     SYNTAX     INTEGER {
+           other(1),
+           none(2),
+           normal(3),
+           bypass(4),
+           battery(5)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present source of output power.  The enumeration
+             none(2) indicates that there is no source of output
+             power (and therefore no output power), for example,
+             the system has opened the output breaker."
+     ::= { upsOutput 1 }
+
+upsOutputNumOfPhases OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The number of output lines utilized in this device."
+     ::= { upsOutput 2 }
+
+
+upsOutputLLVoltageAB OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output line to line voltage for AB in RMS volts."
+     ::= { upsOutput 3 }
+
+upsOutputLLVoltageBC OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output line to line voltage for BC in RMS volts."
+     ::= { upsOutput 4 }
+
+upsOutputLLVoltageCA OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output line to line voltage for CA in RMS volts."
+     ::= { upsOutput 5 }
+
+upsOutputCurrentPhaseA OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Amps"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The Output phase current for phase A in amps."
+     ::= { upsOutput 6 }
+
+upsOutputCurrentPhaseB OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Amps"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The Output phase current for phase B in amps."
+     ::= { upsOutput 7 }
+
+upsOutputCurrentPhaseC OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Amps"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The Output phase current for phase C in amps."
+     ::= { upsOutput 8 }
+
+upsOutputFrequency OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "0.1 Hertz"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The Output Frequency for phase A in 1/10 of HZ."
+     ::= { upsOutput 9 }
+
+upsOutputCurrentPercentA OBJECT-TYPE
+     SYNTAX INTEGER
+     UNITS  "PERCENT"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output current for phase A in percent."
+     ::= { upsOutput 10 }
+
+upsOutputCurrentPercentB OBJECT-TYPE
+     SYNTAX INTEGER
+     UNITS  "PERCENT"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output current for phase B in percent."
+     ::= { upsOutput 11 }
+
+upsOutputCurrentPercentC OBJECT-TYPE
+     SYNTAX INTEGER
+     UNITS  "PERCENT"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output current for phase C in percent."
+     ::= { upsOutput 12 }
+
+upsOutputTotalActivePower OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "kWatts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output active power."
+     ::= { upsOutput 13 }
+
+upsOutputTotalActivePowerPercent OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "percentage"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output active power in percent."
+     ::= { upsOutput 14 }
+
+upsOutputPowerFactor OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "0.01"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The UPS output power factor."
+     ::= { upsOutput 15 }
+
+upsOutputRatedActivePower OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "Watts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output rated active power for the UPS."
+     ::= { upsOutput 16 }
+
+upsOutputRatedApparentPower OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "VA"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output rated apparent power for the UPS."
+     ::= { upsOutput 17 }
+
+upsOutputRatedLLVoltage OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output rated line to line voltage for the UPS."
+     ::= { upsOutput 18 }
+
+-- ===========================================================================
+-- upsBypass – Group 4
+-- ===========================================================================
+
+upsBypassNumOfPhases OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The number of bypass lines utilized."
+     ::= { upsBypass 1 }
+
+upsBypassLLVoltageAB OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The Bypass line to line voltage for AB in RMS volts."
+     ::= { upsBypass 2 }
+
+upsBypassLLVoltageBC OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The Bypass line to line voltage for BC in RMS volts."
+     ::= { upsBypass 3 }
+
+upsBypassLLVoltageCA OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "RMS Volts"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The Bypass line to line voltage for CA in RMS volts."
+     ::= { upsBypass 4 }
+
+upsBypassFrequency OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "0.1 Hertz"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The Bypass frequency in 0.1 Hertz."
+     ::= { upsBypass 5 }
+
+
+--===========================================================================
+-- upsBattery – Group 5
+--
+-- The Battery group.
+-- ===========================================================================
+
+upsBatteryStatus OBJECT-TYPE
+ SYNTAX    INTEGER {
+           unknown(1),
+           batteryNormal(2),
+           batteryLow(3),
+           batteryDepleted(4),
+           batteryDischarging(5),
+           batteryFailure(6)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The indication of the capacity remaining in the UPS system's batteries.  A value of batteryNormal indicates that the remaining run time  sufficient to handle the load.  A value of batteryLow indicates the battery level is low.  Continued operation in battery mode will deplate batteries.  A value of batteryDepleted indicates that the UPS will be unable to sustain the present load when and if the utility power is lost (including the possibility that the utility power is currently absent and the UPS is unable to sustain the output). A value of batteryDischarging indicates UPS system is in Battery power. "
+     ::= { upsBattery 1 }
+
+upsElapsedTimeOnBatteryPower OBJECT-TYPE
+       SYNTAX  NonNegativeInteger
+       UNITS      "seconds"
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "If the unit is on battery power, the elapsed time
+               since the UPS on battery power, or the
+               time since the network management subsystem was last
+               restarted, whichever is less.  Zero shall be returned
+               if the unit is not on battery power."
+       ::= { upsBattery 2 }
+
+upsEstimatedBatteryRuntime OBJECT-TYPE
+     SYNTAX PositiveInteger
+     UNITS "minutes"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "An estimate of the time to battery charge depletion
+          under the present load conditions if the utility power
+          is off and remains off, or if it were to be lost and
+          remain off."
+     ::= { upsBattery 3 }
+
+upsBatteryVoltage OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "Volt DC"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The battery voltage DC."
+     ::= { upsBattery 4 }
+
+upsBatteryVoltagePercent OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "percentage"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Battery voltage in percent."
+     ::= { upsBattery 5 }
+
+upsBatteryEstimatedCharge OBJECT-TYPE
+     SYNTAX INTEGER(0..100)
+     UNITS "percentage"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "An estimate of the charge to battery charge depletion
+           under the present load conditions if the utility power
+           is off and remains off, or if it were to be lost and
+           remain off."
+     ::= { upsBattery 6 }
+
+upsBatteryDischargeCurrent OBJECT-TYPE
+     SYNTAX Integer32
+     UNITS "percentage"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present battery discharge Current in percent."
+     ::= { upsBattery 7 }
+
+upsBatteryChargeCurrent OBJECT-TYPE
+     SYNTAX Integer32
+     UNITS "percentage"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present battery charge Current in percent."
+     ::= { upsBattery 8 }
+
+upsBatteryModel OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..15))
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "The Battery manufacturer."
+     ::= { upsBattery 9 }
+
+upsBatteryInSeries OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "The Battery rated holding time in minutes."
+     ::= { upsBattery 10 }
+
+upsBatteryNumStrings OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "The Battery rated holding time in minutes."
+     ::= { upsBattery 11 }
+
+upsBatteryRatedAmpereHour OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "Ampere Hour"
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "The Battery rated holding time in minutes."
+     ::= { upsBattery 12 }
+
+upsBatteryRatedBackupTime OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..8))
+     UNITS "minutes"
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "The Battery rated holding time in minutes."
+     ::= { upsBattery 13 }
+
+upsBatteryInstallationDate OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(10))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The battery install date."
+    ::= { upsBattery 14 }
+
+-- ===========================================================================
+-- upsAlarm – Group 6
+-- ===========================================================================
+
+upsAlarmsPresent OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The present number of active alarm conditions."
+    ::= { upsAlarm 1 }
+
+upsAlarmTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsAlarmEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of alarm table entries.  The table contains
+               zero, one, or many rows at any moment, depending upon
+               the number of alarm conditions in effect.  The table
+               is initially empty at agent startup.  The agent
+               creates a row in the table each time a condition is
+               detected and deletes that row when that condition no
+               longer pertains.  The agent creates the first row with
+               upsAlarmId equal to 1, and increments the value of
+               upsAlarmId each time a new row is created, wrapping to
+               the first free value greater than or equal to 1 when
+               the maximum value of upsAlarmId would otherwise be
+               exceeded.  Consequently, after multiple operations,
+               the table may become sparse, e.g., containing entries
+               for rows 95, 100, 101, and 203 and the entries should
+               not be assumed to be in chronological order because
+               upsAlarmId might have wrapped.
+
+               Alarms are named by an OBJECT IDENTIFIER,
+               upsAlarmDescr, to allow a single table to
+               reflect well known alarms plus alarms defined by a
+               particular implementation, i.e., as documented in the
+               private enterprise MIB definition for the device.  No
+               two rows will have the same value of upsAlarmDescr,
+               since alarms define conditions.  In order to meet this
+               requirement, care should be taken in the definition of
+               alarm conditions to insure that a system cannot enter
+               the same condition multiple times simultaneously.
+
+               The number of rows in the table at any given time is
+               reflected by the value of upsAlarmsPresent."
+    ::= { upsAlarm  2 }
+
+upsAlarmEntry OBJECT-TYPE
+    SYNTAX  UpsAlarmEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "An entry containing information applicable to a
+         particular alarm."
+    INDEX { upsAlarmId }
+    ::= { upsAlarmTable  1 }
+
+UpsAlarmEntry ::=
+    SEQUENCE {
+             upsAlarmId            PositiveInteger,
+             upsAlarmDescr         AutonomousType,
+             upsAlarmTime          TimeStamp
+         }
+
+-- ===========================================================================
+-- upsAlarmTable/upsAlarmEntry/upsAlarmId
+-- ===========================================================================
+
+upsAlarmId OBJECT-TYPE
+     SYNTAX PositiveInteger
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+         "A unique identifier for an alarm condition.  This
+          value must remain constant."
+     ::= { upsAlarmEntry 1 }
+
+upsAlarmDescr OBJECT-TYPE
+     SYNTAX  AutonomousType
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "A reference to an alarm description object.  The
+             object referenced should not be accessible, but rather
+             be used to provide a unique description of the alarm
+             condition."
+     ::= { upsAlarmEntry 2 }
+
+-- ===========================================================================
+-- .../upsAlarmTime
+-- ===========================================================================
+
+upsAlarmTime OBJECT-TYPE
+     SYNTAX TimeStamp
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The value of sysUpTime when the alarm condition was
+          detected.  If the alarm condition was detected at the
+          time of agent startup and presumably existed before
+          agent startup, the value of upsAlarmTime shall equal 0."
+     ::= { upsAlarmEntry 3 }
+
+
+upsWellKnownAlarms OBJECT IDENTIFIER ::= { upsAlarm  3 }
+
+upsAlarmFault OBJECT-TYPE 
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: A UPS fault/Alarm condition exists."
+     ::= { upsWellKnownAlarms 1 }
+
+
+upsAlarmOnBattery OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Info: The UPS is on Battery mode; it is supplying output power from its batteries."
+     ::= { upsWellKnownAlarms 2 }
+
+upsAlarmBatteryLow OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+          "Warning: The battery level is low.  It has dropped to less than 90% of its nominal value. Continued operation in Battery Mode will deplete Batteries and result in UPS output shut down.  Reduce critical load to increase battery runtime."
+     ::= { upsWellKnownAlarms 3 }
+
+upsAlarmBatteryDepleted OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Warning: UPS contains depleted batteries, it will be unable to support critical loads.  Shut down excess equipment to reduce Load."
+     ::= { upsWellKnownAlarms 4 }
+
+upsAlarmBatteryOverheat OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: Detection of over temperature at the batteries."
+     ::= { upsWellKnownAlarms 5 }
+
+upsAlarmBatteryVoltageAbnormal OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: Battery voltage is abnormality."
+     ::= { upsWellKnownAlarms 6 }
+
+
+upsAlarmUPSOverheat OBJECT-TYPE 
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: The UPS is overheating (warning is given when the internal temperature reaches and exceeds 50?C rise @ 40?C ambient).  Check   to see if the ambient temperature is abnormally high (40?C or   more). If so, turn on air conditioning. Also, check ventilation fan   at the back of the UPS for operation or obstructions. Otherwise,  shut down the UPS and contact your Toshiba authorized service   center."
+     ::= { upsWellKnownAlarms 7 }
+
+upsAlarmPowerFailure OBJECT-TYPE 
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Info: Power Failure."
+     ::= { upsWellKnownAlarms 8 }
+
+upsAlarmUPSOverload OBJECT-TYPE 
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: The UPS is overloaded. UPS will switch to bypass operation or shut down if no action is taken. Shut down excess equipment to reduce Load."
+     ::= { upsWellKnownAlarms 9 }
+	 
+upsAlarmUserDefinedOverloadWarning OBJECT-TYPE 
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Warning: The inverter output load % is greater than the user defined overload set point (default: 110%)."
+    ::= { upsWellKnownAlarms 10 }
+
+upsAlarmOnBypass OBJECT-TYPE 
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Warning: The UPS is in Stop (Bypass) mode."
+     ::= { upsWellKnownAlarms 11 }
+
+upsAlarmOutputOff OBJECT-TYPE 
+SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Info: The UPS output is off."
+     ::= { upsWellKnownAlarms 12 }
+
+upsAlarmAsyncOperation OBJECT-TYPE 
+SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Warning: Async Operation"
+     ::= { upsWellKnownAlarms 13 }
+
+upsAlarmDCBusOverCurrent OBJECT-TYPE 
+SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: UPS is reporting a DC bus overcurrent condition.  Contact your Toshiba authorized service center for examination of a DCOC fault."
+     ::= { upsWellKnownAlarms 14 }
+
+upsAlarmDCBusOverVoltage OBJECT-TYPE 
+SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: UPS is reporting a DC bus overvoltage condition.  Contact your Toshiba authorized service center for examination of a DCOV fault."
+     ::= { upsWellKnownAlarms 15 }
+
+upsAlarmDCBusUnderVoltage OBJECT-TYPE 
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: UPS is reporting a DC bus undervoltage condition.  Contact your 
+          Toshiba authorized service center for examination of a DCUV fault."
+     ::= { upsWellKnownAlarms 16 }
+
+upsAlarmDCBusImbalanced OBJECT-TYPE 
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: The DC imbalanced alarm detection."
+      ::= { upsWellKnownAlarms 17 }
+
+upsAlarmOutputUnderVoltage OBJECT-TYPE 
+ SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: UPS is reporting an output undervoltage condition.  Contact your Toshiba authorized service center for examination of a INVUV fault."
+     ::= { upsWellKnownAlarms 18 }
+
+upsAlarmOutputOverVoltage OBJECT-TYPE 
+ SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: UPS is reporting an output overvoltage condition.  Contact your 
+          Toshiba authorized service center for examination of a INVOV fault."
+     ::= { upsWellKnownAlarms 19 }
+
+upsAlarmInverterOverload OBJECT-TYPE 
+ SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: Short time over-current has been detected."
+     ::= { upsWellKnownAlarms 20 }
+
+upsAlarmInverterOvercurrent OBJECT-TYPE 
+ SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fault: Detection of inverter overcurrent."
+     ::= { upsWellKnownAlarms 21 }
+
+upsAlarmRemotEyeCommError OBJECT-TYPE 
+ SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Warning: Communication error between the RemotEye 4 and the UPS."
+     ::= { upsWellKnownAlarms 22 }
+
+-- ===========================================================================
+-- upsConfig – Group 7 
+-- Config data
+-- 1) All 'upsConfig' data is to be stored in NV-RAM inside the agent   device.
+-- 2) All 'upsConfig' data is to be checked at each agent startup
+-- 3) If initial values present at startup, replace with default values
+--    unless specified otherwise.
+-- ===========================================================================
+
+upsConfigModelIDString OBJECT-TYPE
+     SYNTAX DisplayString (SIZE (0..63))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+        "UPS Model ID string.  This string contains codes for the UPS series,input voltage, output voltage, output VA, and addition option."
+     ::= { upsConfig 1 }
+
+upsConfigUPSFirmwareVersion OBJECT-TYPE
+     SYNTAX DisplayString (SIZE (0..63))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The G9000 software version."
+     ::= { upsConfig 2 }
+
+upsConfigInputNumOfPhases OBJECT-TYPE
+    SYNTAX NonNegativeInteger 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of input lines.  This data is used by upsInputNumLines."
+    ::= { upsConfig 3 }
+
+upsConfigRatedInputFrequency OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    UNITS "0.1 Hertz"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The nominal input frequency.  On those systems which
+         support read-write access to this object, if there is
+         an attempt to set this variable to a value that is not
+         supported, the request must be rejected and the agent
+         shall respond with an appropriate error message, i.e.,
+         badValue for SNMPv1, or inconsistentValue for SNMPv2."
+     ::= { upsConfig 4 }
+
+upsConfigRatedInputLLVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    UNITS "RMS Volts"
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal input voltage.  On those
+         systems which support read-write access to this
+         object, if there is an attempt to set this variable to
+         a value that is not supported, the request must be
+         rejected and the agent shall respond with an
+         appropriate error message, i.e., badValue for SNMPv1,
+         or inconsistentValue for SNMPv2."
+     ::= { upsConfig 5 }
+
+upsConfigRatedInputPowerFactor OBJECT-TYPE
+    SYNTAX PositiveInteger
+    UNITS "0.01"
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "UNITS are in hundredths.  For 0.95 = 95."
+    ::= { upsConfig 6 }
+
+upsConfigOutputNumOfPhases OBJECT-TYPE
+    SYNTAX NonNegativeInteger
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of output lines.  This data is used by upsOutputNumLines."
+    ::= { upsConfig 7 }
+
+upsConfigRatedOutputFrequency OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    UNITS "0.1 Hertz"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The nominal output frequency.  On those systems which
+         support read-write access to this object, if there is
+         an attempt to set this variable to a value that is not
+         supported, the request must be rejected and the agent
+         shall respond with an appropriate error message, i.e.,
+         bad Value for SNMPv1, or inconsistent Value for SNMPv2."
+     ::= { upsConfig 8 }
+
+upsConfigRatedOutputLLVoltage OBJECT-TYPE
+    SYNTAX NonNegativeInteger 
+    UNITS "RMS Volts"
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal output voltage.  On
+         those systems which support read-write access to this
+         object, if there is an attempt to set this variable to
+         a value that is not supported, the request must be
+         rejected and the agent shall respond with an
+         appropriate error message, i.e., bad Value for SNMPv1,
+         or inconsistent Value for SNMPv2."
+     ::= { upsConfig 9 }
+
+upsConfigRatedOutputApperentPower OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    UNITS "Volt-Amps"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal Volt-Amp rating."
+    ::= { upsConfig 10 }
+
+upsConfigRatedOutputActivePower OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    UNITS "KWatts"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal true power rating."
+    ::= { upsConfig 11 }
+
+upsConfigRatedOutputPowerFactor OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "0.01"
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "UNITS are in hundredths.  For 0.70 = 70."
+     ::= { upsConfig 12 }
+
+upsConfigBypassNumOfPhases OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The number of bypass lines utilized."
+     ::= { upsConfig 13 }
+
+upsConfigLowVoltageTransferPoint OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "percentage"
+     ACCESS  read-write
+     STATUS  mandatory
+     DESCRIPTION
+         "The minimum input line voltage allowed before the UPS
+          system transfers to battery backup."
+     ::= { upsConfig 14 }
+
+upsConfigHighVoltageTransferPoint OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "percentage"
+     ACCESS  read-write
+     STATUS  mandatory
+     DESCRIPTION
+         "The maximum line voltage allowed before the UPS
+          system transfers to battery backup."
+     ::= { upsConfig 15 }
+
+upsConfigBatteryInSeries OBJECT-TYPE
+     SYNTAX NonNegativeInteger 
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "The number of batteries in each string connected in series."
+     ::= { upsConfig 16 }
+
+upsConfigBatteryNumStrings OBJECT-TYPE
+     SYNTAX NonNegativeInteger 
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "The number of parallel battery strings."
+     ::= { upsConfig 17 }
+
+upsConfigRatedBatteryVoltage OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "Volts DC"
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "Rated voltage of a single battery."
+     ::= { upsConfig 18 }
+
+upsConfigRatedBatteryAmpereHour OBJECT-TYPE
+    SYNTAX INTEGER
+    UNITS "Ahr"
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The rated battery in ampere hour."
+    ::= { upsConfig 19 }
+
+
+upsConfigBatteryModel OBJECT-TYPE
+     SYNTAX DisplayString (SIZE (0..31))
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "The manufacturer of the battery."
+     ::= { upsConfig 20 }
+
+
+upsConfigBatteryRatedBackupTime OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     UNITS "minutes"
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "The rated duration batteries can hold when unit is in backup mode with full load."
+     ::= { upsConfig 21 }
+
+upsConfigUserDefinedOverloadSetPoint OBJECT-TYPE
+    SYNTAX INTEGER
+	UNITS "%"
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION 
+        "The maximum output load % defined by the user."
+    ::= { upsConfig 22 }
+
+upsConfigBatteryInstallationDate OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(10))
+    UNITS "mm/dd/yyyy"
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The battery install date."
+    ::= { upsConfig 23 }
+
+upsConfigSysName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..31))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "A string identifying the UPS.  This object is
+           set by the administrator."
+      ::= { upsConfig 24 }
+
+upsConfigAttachedDevices OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..31))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "A string identifying the devices attached to the
+           output(s) of the UPS.  This object is set by
+           the administrator."
+      ::= { upsConfig 25 }
+
+upsConfigPassword OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..31))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Password."
+    ::= { upsConfig 26 }
+
+-- ===========================================================================
+-- upsTime – Group 8
+--
+-- Time group
+-- ===========================================================================
+
+upsTimeRealDate OBJECT-TYPE
+     SYNTAX DisplayString (SIZE (0..31))
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+        "Present date: year-month-date-day of the week."
+     ::= { upsTime 1  }
+
+upsTimeRealTime OBJECT-TYPE
+     SYNTAX DisplayString (SIZE (0..31))
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "Present time (military format): hour-minute-second.  For example,2:00pm would be 14:00:00."
+     ::= { upsTime 2  }
+
+--
+--=======================================================================
+-- upsTraps – Group 9
+--
+-- Traps group
+-- 
+--=======================================================================
+
+upsTrapFault TRAP-TYPE
+    ENTERPRISE upsG9000-G2020
+    DESCRIPTION
+        "Alarm: One or more fault/status alarm(s) reported."
+    ::= 1
+
+upsTrapFaultClear TRAP-TYPE
+    ENTERPRISE upsG9000-G2020  
+    DESCRIPTION
+        "Alarm Clear: One or more fault/status reported."
+    ::= 2
+
+upsTrapOnBattery TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Info: The UPS is on Battery Mode."
+      ::= 3  
+
+upsTrapOnBatteryClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Info Clear: The UPS is on Battery Mode."
+      ::= 4 
+
+upsTrapBatteryLow TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Warning: Battery Low Voltage."
+      ::= 5
+
+upsTrapBatteryLowClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Warning Clear: Battery Low Voltage."
+      ::= 6
+
+upsTrapBatteryDepleted TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Warning: UPS contains depleted batteries, it will be unable to support critical loads. Shutdown excess equipment to reduce load."
+      ::= 7 
+
+upsTrapBatteryDepletedClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Warning Clear: UPS contains depleted batteries, it will be unable to support critical loads. Shutdown excess equipment to reduce load.."
+      ::= 8 
+
+upsTrapBatteryOverheat TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: Battery Overheat."
+      ::= 9
+
+upsTrapBatteryOverheatClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: Battery Overheat."
+      ::= 10
+
+upsTrapBatteryVoltageAbnormal TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: Battery Voltage Abnormal. Contact your Toshiba authorized service center for examination."
+      ::= 11
+
+upsTrapBatteryVoltageAbnormalClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: Battery Voltage Abnormal. Contact your Toshiba authorized service center for examination."
+      ::= 12
+
+upsTrapUPSOverheat TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: UPS Overheat, heatsinks temperature exceeds thermal settings. Contact your Toshiba authorized service center for examination."
+      ::= 13
+
+upsTrapUPSOverheatClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: UPS Overheat, heatsinks temperature exceeds thermal settings. Contact your Toshiba authorized service center for examination."
+      ::= 14
+
+upsTrapPowerFailure TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Info: Power Failure."
+      ::= 15
+
+upsTrapPowerFailureClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Info Clear: PowerFailure."
+      ::= 16
+
+upsTrapUPSOverload TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: UPS Overload (OL), the output load exceeds the rated current. Decrease load."
+      ::= 17
+
+upsTrapUPSOverloadClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: UPS Overload (OL), the output load exceeds the rated current. Decrease load."
+      ::= 18
+	  
+upsTrapUserDefinedOverloadWarning TRAP-TYPE 
+    ENTERPRISE upsG9000-G2020
+    DESCRIPTION
+        "Warning: The inverter output load % is greater than the user defined overload set point (default: 110%)."
+	  ::= 19
+	
+upsTrapUserDefinedOverloadWarningClear TRAP-TYPE 
+    ENTERPRISE upsG9000-G2020
+    DESCRIPTION
+        "Warning Clear: The inverter output load % is greater than the user defined overload set point (default: 110%)."
+      ::= 20
+
+upsTrapOnBypass TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Warning:On Bypass."
+      ::= 21
+
+upsTrapOnBypassClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Warning Clear: On Bypass."
+      ::= 22
+
+upsTrapOutputOff TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Info: The UPS output is off."
+      ::= 23 
+
+upsTrapOutputOffClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Info Clear: The UPS output is off."
+      ::= 24 
+
+upsTrapAsyncOperation TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Warning: Inverter Synchronous."
+      ::= 25  
+
+upsTrapAsyncOperationClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Warning Clear: Inverter Synchronous."
+      ::= 26
+
+upsTrapDCBusOverCurrent TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: DC Overcurrent (DCOC). Contact your Toshiba authorized service center for examination."
+      ::= 27
+
+upsTrapDCBusOverCurrentClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: DC Overcurrent (DCOC). Contact your Toshiba authorized service center for examination."
+      ::= 28
+
+upsTrapDCBusOverVoltage TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: DC Overvoltage (DCOV). Contact your Toshiba authorized service center for examination."
+      ::= 29
+
+upsTrapDCBusOverVoltageClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: DC Overvoltage (DCOV). Contact your Toshiba authorized service center for examination."
+      ::= 30
+
+upsTrapDCBusUnderVoltage TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: DC Undervoltage (DCUV). Contact your Toshiba authorized service center for examination."
+      ::= 31
+
+upsTrapDCBusUnderVoltageClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: DC Undervoltage (DCUV). Contact your Toshiba authorized service center for examination."
+      ::= 32
+
+upsTrapDCBusImbalance TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: DC Unbalance. Contact your Toshiba authorized service center for examination."
+      ::= 33
+
+upsTrapDCBusImbalanceClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: DC Unbalance. Contact your Toshiba authorized service center for examination."
+      ::= 34
+
+upsTrapOutputUnderVoltage TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: Output Undervoltage. Contact your Toshiba authorized service center for examination."
+      ::= 35
+
+upsTrapOutputUnderVoltageClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: Output Undervoltage. Contact your Toshiba authorized service center for examination."
+      ::= 36
+
+upsTrapOutputOverVoltage TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: Output Overvoltage (VLOV). Contact your Toshiba authorized service center for examination."
+      ::= 37
+
+upsTrapOutputOverVoltageClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: Output Overvoltage (VLOV). Contact your Toshiba authorized service center for examination."
+      ::= 38
+
+upsTrapInverterOverload TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: UPS Overload, short time over-current has been detected during On-Line operation. Decrease Load."
+      ::= 39
+
+upsTrapInverterOverloadClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: UPS Overload, short time over-current has been detected during On-Line operation. Decrease Load."
+      ::= 40
+
+upsTrapInverterOvercurrent TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault: Inverter Overcurrent. Contact your Toshiba authorized service center for examination."
+      ::= 41
+
+upsTrapInverterOvercurrentClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Fault Clear: Inverter Overcurrent. Contact your Toshiba authorized service center for examination."
+      ::= 42
+
+upsTrapRemotEyeCommError TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Warning: RemotEye UPS communication error."
+      ::= 43
+
+upsTrapRemotEyeCommErrorClear TRAP-TYPE
+      ENTERPRISE upsG9000-G2020
+      DESCRIPTION
+          "Warning Clear:RemotEye UPS communication error."
+      ::= 44
+
+END

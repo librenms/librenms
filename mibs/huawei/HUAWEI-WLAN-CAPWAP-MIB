@@ -1,0 +1,739 @@
+-- ============================================================================
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  The mib is used for capwap configuration.
+-- Reference: 
+-- Version: V1.21
+-- ============================================================================
+-- Module definition
+
+	HUAWEI-WLAN-CAPWAP-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			hwWlan
+				FROM HUAWEI-WLAN-MIB
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+				FROM SNMPv2-CONF
+			IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,
+			MODULE-IDENTITY, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+			MacAddress, RowStatus, DateAndTime
+				FROM SNMPv2-TC;
+		--1.3.6.1.4.1.2011.6.139.9
+		hwWlanCapwap MODULE-IDENTITY
+			LAST-UPDATED "202206220930Z"		-- Jun 22, 2022 at 09:30 GMT
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+                                  "Huawei Industrial Base
+				   Bantian, Longgang
+				   Shenzhen 518129
+				   People's Republic of China
+				   Website: http://www.huawei.com
+				   Email: support@huawei.com
+				  "
+		    DESCRIPTION
+				"AddhwWlanCapwapDtlsVersion1Dot0Switch and hwWlanCapwapDtlsCbcSwitch." 
+		    REVISION "202206220930Z"		-- Jun 22, 2022 at 09:30 GMT
+		    DESCRIPTION
+				"Modify hwCapwapEchoInterval." 
+		    REVISION "202205191800Z"		-- May 19, 2022 at 18:00 GMT
+		    DESCRIPTION
+				"Add hwWlanCapwapWceSyncPskApSn." 
+		    REVISION "202201271800Z"		-- Mon 27, 2022 at 18:00 GMT
+			DESCRIPTION
+				"Add hwWlanCapwapControlMtu." 
+		    REVISION "202112211800Z"		-- Dec 21, 2021 at 18:00 GMT
+		    DESCRIPTION
+				"Add hwWlanCapwapControlMtu." 
+		    REVISION "202111251600Z"		-- Nov 25, 2021 at 16:00 GMT
+		    DESCRIPTION
+				"Add hwCapwapSecurityParaNotSetTrap and hwCapwapSecurityParaNotSetTrapRestore." 
+		    REVISION "202107071600Z"		-- Jul 7, 2021 at 16:00 GMT
+		    DESCRIPTION
+				"Modify dtls psk description." 
+		    REVISION "202106170950Z"		-- Jun 17, 2021 at 09:50 GMT
+            DESCRIPTION
+				"Modify default-cert and no auth enum." 
+		    REVISION "202104142100Z"		-- Apr 14, 2021 at 21:00 GMT
+
+		    DESCRIPTION
+				"Add capwap dtls default-cert and no auth, Add early dtls link trap, Del dtls method." 
+		    REVISION "202103151600Z"		-- Mar 15, 2021 at 16:00 GMT
+			
+			DESCRIPTION
+				"Add capwap dtls method and auto encrypt." 
+		    REVISION "202012111228Z"		-- Dec 11, 2020 at 15:22 GMT
+				  
+			DESCRIPTION
+				"Add sensitive info psk mismatch alarm at the WMPV1R20C10 of WMP version." 				
+		    REVISION "202011191522Z"		-- Nov 19, 2020 at 15:22 GMT
+				  
+			DESCRIPTION
+				"Modify the description of hwCapwapEchoInterval and hwCapwapEchoTimes at the WMPV1R19C10 of WMP version." 
+		    REVISION "202001191445Z"		-- January 19, 2020 at 14:45 GMT
+				  
+			DESCRIPTION
+				"Modify the description of hwCapwapEchoInterval and hwCapwapEchoTimes at the WMPV1R19C10 of WMP version." 
+		    REVISION "201910291713Z"		-- Oct 29, 2019 at 17:13 GMT
+			DESCRIPTION
+				"Modify the enumerated values and property of the node hwWlanCapwapIpv6Enable at the WMPV1R19C00 of WMP version." 
+		    REVISION "201904230912Z"		-- Apr 23, 2019 at 09:12 GMT
+		    DESCRIPTION 
+				"Add the description of the ipv4Address and ipv6Address." 
+		    REVISION "201812281652Z"		-- Dec 28, 2018 at 16:52 GMT
+		    DESCRIPTION 
+				"The MIB module defines the ap capwap operation." 
+		    REVISION "201812212132Z"		-- Dec 21, 2018 at 21:23 GMT
+			DESCRIPTION 
+				"Add capwap ipv4 address and ipv6 address."
+		    REVISION "201702061708Z"		-- Feb 06, 2017 at 17:08 GMT
+			DESCRIPTION 
+				"Add capwap data-link dtls switch."
+		    REVISION "201610121406Z"		-- Oct 12, 2016 at 14:06 GMT
+			DESCRIPTION 
+				"Add capwap message-integrity psk switch."
+		    REVISION "201602151709Z"		-- Feb 15, 2016 at 17:09 GMT
+			DESCRIPTION 
+				"Add capwap message-integrity psk and sensitive-info psk."
+			REVISION "201511302009Z"		-- Nov 30, 2015 at 20:09 GMT
+			DESCRIPTION 
+				"Add capwap multi-source operation."
+			REVISION "201505111452Z"		-- May 11, 2015 at 14:52 GMT
+			DESCRIPTION 
+				"Add the description of mib nodes."
+			REVISION "201502021452Z"		-- February 2, 2015 at 14:52 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			::= { hwWlan 9 }
+
+--
+--Node definitions
+--
+
+		--1.3.6.1.4.1.2011.6.139.9.1
+		hwWlanCapwapSourceInterface OBJECT IDENTIFIER ::= { hwWlanCapwap 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.1.1
+		hwWlanCapwapSourceInterfaceValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the interface number when hwWlanCapwapSourceInterfaceMethod is set to vlanif(2) or loopback(3)."
+			::= { hwWlanCapwapSourceInterface 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.1.2
+		hwWlanCapwapSourceInterfaceMethod OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				default(1),
+				vlanif(2),
+				loopback(3),
+				ipaddress(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"operation method of capwap source interface.It can be set
+				default(1): use default setting 
+				vlanif(2): use vlanif interface
+				loopback(3): use loopback interface
+				ipaddress(4):user ip address
+				"
+			::= { hwWlanCapwapSourceInterface 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.1.3
+		hwWlanCapwapSourceIPv4Address OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"If hwWlanCapwapSourceInterfaceMethod is set to ipaddress(4), this object is used to identify the IP address of the source port."
+			::= { hwWlanCapwapSourceInterface 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.1.4
+		hwWlanCapwapSourceIPv6Address OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"If hwWlanCapwapSourceInterfaceMethod is set to ipaddress(6), this object is used to identify the IP address of the source port."
+			::= { hwWlanCapwapSourceInterface 4 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.9.2
+		hwWlanCapwapSysPara OBJECT IDENTIFIER ::= { hwWlanCapwap 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.1
+		hwWlanCapwapDtlsSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1) ,
+				disable(2),
+				auto(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the status of the global DTLS function. The default value is 3:auto 1: enable 2: disable."
+			::= { hwWlanCapwapSysPara 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.2
+		hwWlanCapwapDtlsPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the global DTLS PSK value. In V200R021C00SPC100 and later version, the size range changes to 8~32."
+			::= { hwWlanCapwapSysPara 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.3
+		hwWlanCapwapDtlsDefaultPskSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1) ,
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates whether the global DtlsDefaultPsk function is enabled. The default value is 2."
+			::= { hwWlanCapwapSysPara 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.4
+		hwWlanCapwapIpv6Enable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ipv4(1) ,
+				ipv6(2) ,
+				doubleStack(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"Work mode of capwap source. It can be set 
+				 ipv4(1): capwap source just can be configed to ipv4 source.
+				 ipv6(2): capwap source just can be configed to ipv6 source.
+				 doubleStack(3): capwap source can be configed to ipv4 and ipv6 source at the same time."
+			::= { hwWlanCapwapSysPara 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.5
+		hwWlanCapwapInterControllerDtlsEncrpyt OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2),
+				auto(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates whether the DTLS function is enabled between ACs. The default value is 3."
+			::= { hwWlanCapwapSysPara 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.6
+		hwWlanCapwapInterControllerDtlsPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the DTLS PSK used between ACs. In V200R021C00SPC100 and later version, the size range changes to 8~32."
+			::= { hwWlanCapwapSysPara 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.7
+		hwCapwapEchoInterval OBJECT-TYPE
+			SYNTAX Integer32 (2..300)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the interval for sending Echo packets in a CAPWAP tunnel."
+			::= { hwWlanCapwapSysPara 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.8
+		hwCapwapEchoTimes OBJECT-TYPE
+			SYNTAX Integer32 (2..120)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the maximum number of Echo packet timeouts in a CAPWAP tunnel."
+			::= { hwWlanCapwapSysPara 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.9
+		hwWlanCapwapControlPriorityLocal OBJECT-TYPE
+			SYNTAX Integer32 (0..7)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the priority of CAPWAP control packets sent by ACs to APs."
+			::= { hwWlanCapwapSysPara 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.10
+		hwWlanCapwapControlPriorityRemote OBJECT-TYPE
+			SYNTAX Integer32 (0..7)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the priority of CAPWAP control packets sent by APs to ACs."
+			::= { hwWlanCapwapSysPara 10 }
+        
+         --1.3.6.1.4.1.2011.6.139.9.2.11
+		hwWlanCapwapSensitiveInfoPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the PSK used for encrypting sensitive information between ACs and APs."
+			::= { hwWlanCapwapSysPara 11 }  
+		
+		 --1.3.6.1.4.1.2011.6.139.9.2.12
+		hwWlanCapwapInterControllerSensitiveInfoPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the PSK used for encrypting sensitive information between ACs."
+			::= { hwWlanCapwapSysPara 12 } 
+		
+		 --1.3.6.1.4.1.2011.6.139.9.2.13
+		hwWlanCapwapMessageIntegrityPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the PSK for checking integrity of CAPWAP packets between ACs and APs."
+			::= { hwWlanCapwapSysPara 13 }  
+		
+		 --1.3.6.1.4.1.2011.6.139.9.2.14
+		hwWlanCapwapInterControllerMessageIntegrityPsk OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (6..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 14 }  
+		
+		 --1.3.6.1.4.1.2011.6.139.9.2.15
+		hwWlanCapwapMessageIntegrityPskMandatoryMatchSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1) ,
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 15 }  
+			
+		 --1.3.6.1.4.1.2011.6.139.9.2.16
+		hwWlanCapwapMsgCheckSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates whether the CAPWAP packet check function is enabled between ACs and APs. The value 1 indicates that this function is disabled, and the value 2 indicates that this function is enabled."
+			::= { hwWlanCapwapSysPara 16 }  
+			
+         --1.3.6.1.4.1.2011.6.139.9.2.17
+		hwWlanCapwapInterControllerMsgCheckSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"The functions corresponding to the following objects are not supported on the device. Do not use these MIB objects to maintain the device."
+			::= { hwWlanCapwapSysPara 17 }  
+			
+		 --1.3.6.1.4.1.2011.6.139.9.2.18
+		hwWlanCapwapDtlsDataSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the status of the global DTLS function of data-link. The default value is 1: disable."
+			::= { hwWlanCapwapSysPara 18 }
+        
+         --1.3.6.1.4.1.2011.6.139.9.2.19
+		hwWlanCapwapInterControllerDtlsDataSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1) ,
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the status of the inter-controller DTLS function of data-link. The default value is 1: disable."
+			::= { hwWlanCapwapSysPara 19 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.20
+		hwWlanCapwapDtlsDefaultCertSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates whether the global default cert function for CAPWAP DTLS is enabled. The default value is 2."
+			::= { hwWlanCapwapSysPara 20 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.21
+		hwWlanCapwapDtlsNoAuthSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates whether the no auth function for CAPWAP DTLS is enabled. The default value is 1."
+			::= { hwWlanCapwapSysPara 21 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.22
+		hwWlanCapwapDtlsVersion1Dot0Switch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates whether the version1.0 of CAPWAP DTLS is enabled. The default value is 1."
+			::= { hwWlanCapwapSysPara 22 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.23
+		hwWlanCapwapDtlsCbcSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates whether cbc support for CAPWAP DTLS is enabled. The default value is 1."
+			::= { hwWlanCapwapSysPara 23 }
+
+		 --1.3.6.1.4.1.2011.6.139.9.2.24
+		hwWlanCapwapControlMtu OBJECT-TYPE
+			SYNTAX Integer32 (1000..1700)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MTU for sending control packets in a CAPWAP tunnel. The default value is 1500."
+			::= { hwWlanCapwapSysPara 24 }
+
+              --  1.3.6.1.4.1.2011.6.139.9.3
+		hwWlanCapwapSource OBJECT IDENTIFIER ::= { hwWlanCapwap 3 }
+		hwWlanCapwapSourceTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanCapwapSourceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanCapwapSource 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1
+		hwWlanCapwapSourceEntry OBJECT-TYPE
+			SYNTAX HwWlanCapwapSourceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwWlanCapwapSourceIndex }
+			::= { hwWlanCapwapSourceTable 1 }
+
+		
+		HwWlanCapwapSourceEntry ::=
+			SEQUENCE { 
+				hwWlanCapwapSourceIndex
+					Integer32,
+				hwWlanCapwapSourceMethod
+					INTEGER,
+				hwWlanCapwapSourceValue
+					Integer32,
+				hwWlanCapwapSourceRowStatus
+					RowStatus,
+				hwWlanCapwapSourceIPv4
+					IpAddress,
+				hwWlanCapwapSourceIPv6
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.1
+		hwWlanCapwapSourceIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"the index of capwap source interface."
+			::= { hwWlanCapwapSourceEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.2
+		hwWlanCapwapSourceMethod OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				vlanif(2),
+				loopback(3),
+				ipv4Address(4),
+				ipv6Address(5)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Operation method of capwap source interface.It can be set 
+				 vlanif(2): use vlanif interface
+				 loopback(3): use loopback interface
+				 ipv4Address(4): use ipv4 adddress
+				 ipv6Address(5): use ipv6 address."
+			::= { hwWlanCapwapSourceEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.3
+		hwWlanCapwapSourceValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"the value of capwap source interface."
+			::= { hwWlanCapwapSourceEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.4
+		hwWlanCapwapSourceRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Row status: mainly to support to add or delete the relationship of the interface and the capwap-source.
+				 createAndGo(4): add a relationship.
+		                 destroy(6): delete the relationship."
+
+			::= { hwWlanCapwapSourceEntry 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.5
+		hwWlanCapwapSourceIPv4 OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the value of capwap source ipv4 address."
+			::= { hwWlanCapwapSourceEntry 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.3.1.1.6
+		hwWlanCapwapSourceIPv6 OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the value of capwap source ipv6 address."
+			::= { hwWlanCapwapSourceEntry 6 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.4
+		hwWlanCapwapConformance OBJECT IDENTIFIER ::= { hwWlanCapwap 4 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.4.1
+		hwWlanCapwapCompliances OBJECT IDENTIFIER ::= { hwWlanCapwapConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.4.1.1
+		hwWlanCapwapCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE
+					MANDATORY-GROUPS { hwWlanCapwapSourceInterfaceGroup, hwWlanCapwapSysParaGroup }
+			::= { hwWlanCapwapCompliances 1 }
+
+                -- 1.3.6.1.4.1.2011.6.139.9.4.2
+		hwWlanCapwapObjectGroups OBJECT IDENTIFIER ::= { hwWlanCapwapConformance 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.4.2.1
+		hwWlanCapwapSourceInterfaceGroup OBJECT-GROUP
+			OBJECTS { hwWlanCapwapSourceInterfaceValue, hwWlanCapwapSourceInterfaceMethod, hwWlanCapwapSourceIPv4Address }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanCapwapObjectGroups 1 }
+
+                -- 1.3.6.1.4.1.2011.6.139.9.4.2.2
+		hwWlanCapwapSysParaGroup OBJECT-GROUP
+			OBJECTS { hwWlanCapwapDtlsSwitch, hwWlanCapwapDtlsPsk, hwWlanCapwapDtlsDefaultPskSwitch, hwWlanCapwapIpv6Enable, hwWlanCapwapInterControllerDtlsEncrpyt, 
+			hwWlanCapwapInterControllerDtlsPsk, hwCapwapEchoInterval, hwCapwapEchoTimes, hwWlanCapwapControlPriorityLocal, hwWlanCapwapControlPriorityRemote,
+			hwWlanCapwapSensitiveInfoPsk, hwWlanCapwapInterControllerSensitiveInfoPsk, hwWlanCapwapMessageIntegrityPsk, hwWlanCapwapInterControllerMessageIntegrityPsk,
+			hwWlanCapwapMessageIntegrityPskMandatoryMatchSwitch, hwWlanCapwapMsgCheckSwitch, hwWlanCapwapInterControllerMsgCheckSwitch,
+			hwWlanCapwapDtlsDataSwitch, hwWlanCapwapInterControllerDtlsDataSwitch, hwWlanCapwapDtlsDefaultCertSwitch, hwWlanCapwapDtlsNoAuthSwitch,
+			hwWlanCapwapDtlsVersion1Dot0Switch, hwWlanCapwapDtlsCbcSwitch, hwWlanCapwapControlMtu}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanCapwapObjectGroups 2 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.4.2.3
+		hwWlanCapwapSourceGroup OBJECT-GROUP
+			OBJECTS {hwWlanCapwapSourceMethod,  hwWlanCapwapSourceValue, hwWlanCapwapSourceRowStatus}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanCapwapObjectGroups 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.5
+		hwWlanCapwapTrapInfo OBJECT IDENTIFIER ::= { hwWlanCapwap 5 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.5.1
+		hwWlanCapwapTrap OBJECT IDENTIFIER ::= { hwWlanCapwapTrapInfo 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.5.1.1
+		hwCapwapSensitiveInfoPskHsbMismatchTrap NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"PSKs for encrypting CAPWAP sensitive information are inconsistent on the active and standby ACs."
+			::= { hwWlanCapwapTrap 1 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.5.1.2
+		hwCapwapSensitiveInfoPskHsbMismatchRestoreTrap NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"PSKs for encrypting CAPWAP sensitive information become consistent on the active and standby ACs."
+			::= { hwWlanCapwapTrap 2 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.9.5.1.3
+		hwCapwapInterControllerSensitiveInfoPskHsbMismatchTrap NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"PSKs for encrypting inter-AC CAPWAP sensitive information are inconsistent on the active and standby ACs."
+			::= { hwWlanCapwapTrap 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.5.1.4
+		hwCapwapInterControllerSensitiveInfoPskHsbMismatchRestoreTrap NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"PSKs for encrypting inter-AC CAPWAP sensitive information become consistent on the active and standby ACs."
+			::= { hwWlanCapwapTrap 4 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.5.1.5
+		hwCapwapExistEarlyVersionDtlsLinkTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanCapwapLinkPeerIP, hwWlanCapwapLinkPeerPort, hwWlanCapwapLinkLocalIP, hwWlanCapwapLinkLocalPort }
+			STATUS current
+			DESCRIPTION 
+				"The DTLS link of an earlier version exists."
+			::= { hwWlanCapwapTrap 5 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.5.1.6
+		hwCapwapExistEarlyVersionDtlsLinkTrapRestore NOTIFICATION-TYPE
+			OBJECTS { hwWlanCapwapLinkPeerIP, hwWlanCapwapLinkPeerPort, hwWlanCapwapLinkLocalIP, hwWlanCapwapLinkLocalPort }
+			STATUS current
+			DESCRIPTION 
+				"The alarm of early version dtls link is cleared."
+			::= { hwWlanCapwapTrap 6 }
+
+        -- 1.3.6.1.4.1.2011.6.139.9.5.1.7
+        hwCapwapSecurityParaNotSetTrap NOTIFICATION-TYPE
+            OBJECTS { hwWlanCapwapSecurityPara }
+            STATUS current
+            DESCRIPTION 
+                "CAPWAP security parameters are not set."
+            ::= { hwWlanCapwapTrap 7 } 
+
+        -- 1.3.6.1.4.1.2011.6.139.9.5.1.8
+        hwCapwapSecurityParaNotSetTrapRestore NOTIFICATION-TYPE
+            OBJECTS { hwWlanCapwapSecurityPara }
+            STATUS current
+            DESCRIPTION 
+                "The alarm indicating no CAPWAP security parameter setting is cleared."
+            ::= { hwWlanCapwapTrap 8 } 
+
+		-- 1.3.6.1.4.1.2011.6.139.9.5.2
+		hwWlanCapwapTrapObjects OBJECT IDENTIFIER ::= { hwWlanCapwapTrapInfo 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.5.2.1
+		hwWlanCapwapLinkPeerIP OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the peer IP address of capwap link."
+			::= { hwWlanCapwapTrapObjects 1 }
+
+        -- 1.3.6.1.4.1.2011.6.139.9.5.2.2
+		hwWlanCapwapLinkPeerPort OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the peer port of capwap link."
+			::= { hwWlanCapwapTrapObjects 2 }
+
+		-- 1.3.6.1.4.1.2011.6.139.9.5.2.3
+		hwWlanCapwapLinkLocalIP OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the local IP address of capwap link."
+			::= { hwWlanCapwapTrapObjects 3 }
+
+        -- 1.3.6.1.4.1.2011.6.139.9.5.2.4
+		hwWlanCapwapLinkLocalPort OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the local port of capwap link."
+			::= { hwWlanCapwapTrapObjects 4 }
+
+        -- 1.3.6.1.4.1.2011.6.139.9.5.2.5
+        hwWlanCapwapSecurityPara OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the info of CAPWAP security parameter."
+            ::= { hwWlanCapwapTrapObjects 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.6
+		hwWlanCapwapWceSyncPsk OBJECT IDENTIFIER ::= { hwWlanCapwap 6 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.9.6.1
+		hwWlanCapwapWceSyncPskApSn OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates Synchronize PSK by Serial Number or other ap identifier."
+			::= { hwWlanCapwapWceSyncPsk 1 }
+	END
+--
+-- HUAWEI-WLAN-CAPWAP-MIB.mib
+--
+
+
+
+
+
+
+
+
+
+
+
+
+

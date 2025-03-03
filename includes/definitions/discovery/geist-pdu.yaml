@@ -1,0 +1,4 @@
+modules:
+  os:
+    hardware: GEIST-MIB-V3::productHardware.0
+    version: GEIST-MIB-V3::productVersion.0

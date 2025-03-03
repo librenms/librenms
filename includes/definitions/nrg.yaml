@@ -6,10 +6,10 @@ icon: nrg
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysDescr:
-        - NRG Network Printer
+    -
+        sysDescr:
+            - 'NRG Network Printer'
 discovery_modules:
-    toner: 1
+    printer-supplies:   true
 poller_modules:
-    toner: 1
-
+    printer-supplies:   true

@@ -1,0 +1,408 @@
+-- MIB File: HA.mib
+HA-MIB DEFINITIONS ::= BEGIN 
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, IpAddress
+        FROM SNMPv2-SMI
+    fibrechannel  FROM Brocade-REG-MIB
+	swID, swSsn FROM SYSTEM-MIB
+    entPhysicalIndex, entPhysicalName FROM ENTITY-MIB
+    DisplayString
+        FROM SNMPv2-TC;
+
+
+	haMIB	MODULE-IDENTITY
+        LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+        ORGANIZATION "Extreme Networks, Inc."
+        CONTACT-INFO
+             "Postal:  Extreme Networks, Inc.
+                       6480 Via Del Oro
+                       San Jose, CA 95119 USA
+              Phone:   +1 408 579-2800
+              E-mail:  support@extremenetworks.com
+              WWW:     http://www.extremenetworks.com"
+
+		DESCRIPTION
+		"The MIB module High Availability MIB.
+		Copyright (c) 2018 Extreme Networks, Inc.
+				All rights reserved."
+
+
+        REVISION "201805291200Z" -- May 29, 2018 12:00pm
+        DESCRIPTION	
+        "Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+		REVISION "200208160000Z"    -- Aug. 16, 2002
+		DESCRIPTION
+		"The initial revision for the High Availability MIB."
+
+		REVISION "200402251530Z"    -- Feb 25, 2004 5:30pm
+		DESCRIPTION
+		"Added mib objects fruSupplierId, fruSupplierPartNum,
+         fruSupplierSerialNum and fruSupplierRevCode to fruTable."
+
+        REVISION "200902090000Z"    -- Feb 9th, 2009
+        DESCRIPTION
+        "Added new value coreblade and ap blade for fru table."
+
+		REVISION "200904060000Z"    -- Apr 6th, 2009
+		DESCRIPTION
+		"Added textual convention for FruClass."
+		
+		REVISION    "200906251200Z" -- Jun 25, 2009 12:00pm
+		DESCRIPTION "Removed the version information from Brocade's proprietary MIB file name."   
+		
+		REVISION	"201007221000Z" -- Jul 22, 2010 10:00am
+		DESCRIPTION	"Added frutype and frunum to the existing frustatuschange trap."
+
+		REVISION "201202061130Z" -- Feb 6, 2012 11:30am
+		DESCRIPTION "Changed all CP terms in the description as control card."
+		::= { fibrechannel 2 }
+
+	highAvailability OBJECT IDENTIFIER ::= { haMIB 1 }
+
+	haStatus 	OBJECT-TYPE
+			SYNTAX	INTEGER
+				{
+					redundant (0),
+					nonredundant (1)
+				}
+			MAX-ACCESS		read-only
+			STATUS	current
+			DESCRIPTION
+			"Whether the system is redundant or not."
+		::= { highAvailability 1 } 
+
+	FruClass		::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "The type of the FRU object."
+     SYNTAX  INTEGER {
+				other(1),
+				unknown(2),
+				chassis (3),
+				cp (4),
+				other-CP(5),  
+				switchblade (6),
+				wwn (7),
+				powerSupply(8),
+				fan(9),
+				coreblade(10),
+                applicationblade(11)
+            }
+
+	fruTable	OBJECT-TYPE
+			SYNTAX	SEQUENCE OF FRUEntry
+			MAX-ACCESS	not-accessible
+			STATUS	current
+			DESCRIPTION
+			"This table inventories the field replaceable units (FRUs)
+			slots available. There is entry in this table for each entry
+			in the entPhysicalTable that has entPhysicalClass set to
+			'Container (5)' and has a child entry having entPhysicalIsFRU
+			field to be true"
+		::= {highAvailability 5}
+
+	fRUEntry 	OBJECT-TYPE
+			SYNTAX	FRUEntry
+			MAX-ACCESS	not-accessible
+			STATUS	current
+			DESCRIPTION
+			"An entry for FRU slot in the fruTable"
+			INDEX { entPhysicalIndex }
+		::= {fruTable 1}
+
+	FRUEntry ::= SEQUENCE {
+		fruClass	FruClass,
+		fruStatus	INTEGER,
+		fruObjectNum	Integer32,
+		fruSupplierId	        DisplayString,
+		fruSupplierPartNum	    DisplayString,
+		fruSupplierSerialNum	DisplayString,
+		fruSupplierRevCode	    DisplayString,
+		fruPowerConsumption	    DisplayString
+		}
+
+	fruClass 	OBJECT-TYPE
+			SYNTAX  FruClass
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"The type of the FRU object that these slot can hold"
+		::= { fRUEntry 1 }
+
+	fruStatus	OBJECT-TYPE
+			SYNTAX INTEGER {
+				other (1),
+        			unknown (2),
+				on (3),
+				off (4),
+				faulty (5)
+				}
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+				"The current status of the FRU object in the slot"
+		::= {fRUEntry 2}
+
+	fruObjectNum	OBJECT-TYPE
+			SYNTAX 	Integer32
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"Gives the slot number of the blade and unit number for
+			everything else"
+		::= { fRUEntry 3 }
+	
+	fruSupplierId	OBJECT-TYPE
+			SYNTAX			DisplayString
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION		"The supplier id."
+		::= { fRUEntry 4 }
+
+	fruSupplierPartNum	OBJECT-TYPE
+			SYNTAX			DisplayString
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION		"The supplier part number."
+		::= { fRUEntry 5 }
+
+	fruSupplierSerialNum	OBJECT-TYPE
+			SYNTAX			DisplayString(SIZE (0..128))
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION		"The supplier serial number."
+		::= { fRUEntry 6 }
+
+	fruSupplierRevCode	OBJECT-TYPE
+			SYNTAX			DisplayString
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION		"The supplier revision code."
+		::= { fRUEntry 7 }
+
+	fruPowerConsumption		OBJECT-TYPE
+			SYNTAX			DisplayString
+			UNITS           "watt"
+			MAX-ACCESS		read-only
+			STATUS			current
+			DESCRIPTION		"This represents power consumption of blades. 
+							 This will have values only for core/switch blades
+							 and for other FRUs, it will be 0" 
+		::= { fRUEntry 8 }
+
+
+	fruHistoryTable  OBJECT-TYPE
+			SYNTAX	SEQUENCE OF FruHistoryEntry
+			MAX-ACCESS	not-accessible
+			STATUS	current
+			DESCRIPTION
+			"This table gives the contents of the entire history
+			log of the FRU events"
+		::= {highAvailability 6}
+
+	fruHistoryEntry	OBJECT-TYPE
+			SYNTAX	FruHistoryEntry
+			MAX-ACCESS	not-accessible
+			STATUS	current
+			DESCRIPTION
+			"An entry in this table represents a particular FRU event"
+			INDEX { fruHistoryIndex }
+		::= {fruHistoryTable 1}
+
+	FruHistoryEntry ::= SEQUENCE {
+		fruHistoryIndex		Integer32,
+		fruHistoryClass		FruClass,
+		fruHistoryObjectNum	Integer32,
+		fruHistoryEvent		INTEGER,
+		fruHistoryTime		DisplayString,
+		fruHistoryFactoryPartNum DisplayString,
+		fruHistoryFactorySerialNum DisplayString
+		}
+
+	fruHistoryIndex  OBJECT-TYPE
+			SYNTAX  Integer32
+			MAX-ACCESS read-only
+			STATUS	current
+			DESCRIPTION 
+			"Index of the FRU event in the history table"
+		::= {fruHistoryEntry 1}
+	
+
+	fruHistoryClass	OBJECT-TYPE
+			SYNTAX  FruClass
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"The type of the FRU object related to the event"
+		::= { fruHistoryEntry 2 }
+
+
+
+	fruHistoryObjectNum OBJECT-TYPE
+			SYNTAX 	Integer32
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"Gives the slot number of the blade and unit number for
+			everything else"
+		::= { fruHistoryEntry 3 }
+	
+	fruHistoryEvent	OBJECT-TYPE
+			SYNTAX
+			INTEGER {
+				added (1),
+				removed (2),
+				invalid (3)
+				}
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"The type of the FRU event"
+		::= { fruHistoryEntry 4}
+
+	fruHistoryTime	OBJECT-TYPE
+			SYNTAX 	DisplayString
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"Gives the time at which this event happened"
+		::= { fruHistoryEntry 5 }
+
+	fruHistoryFactoryPartNum	OBJECT-TYPE
+			SYNTAX 	DisplayString
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"Gives the factory part num of the FRU object"
+		::= { fruHistoryEntry 6 }
+
+	fruHistoryFactorySerialNum	OBJECT-TYPE
+			SYNTAX 	DisplayString
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"Gives the factory serial num of the FRU object"
+		::= { fruHistoryEntry 7 }
+
+ --
+ -- Control Processor (aka MM) table
+ --
+	cpTable   	OBJECT-TYPE
+			SYNTAX	SEQUENCE OF CPEntry
+			MAX-ACCESS	not-accessible
+			STATUS	current
+			DESCRIPTION
+			"This table lists all the control cards in the system"
+		::= {highAvailability 7}
+
+	cpEntry  	OBJECT-TYPE
+			SYNTAX	CPEntry
+			MAX-ACCESS	not-accessible
+			STATUS	current
+			DESCRIPTION
+			"An entry represents a single control card in the system"
+			INDEX { entPhysicalIndex }
+		::= {cpTable 1}
+
+	CPEntry ::= SEQUENCE {
+			cpStatus	INTEGER,
+			cpIpAddress	IpAddress,
+			cpIpMask	IpAddress,
+			cpIpGateway	IpAddress,
+			cpLastEvent	INTEGER
+			}
+
+	cpStatus	OBJECT-TYPE
+			SYNTAX 	INTEGER {
+				other (1),
+				unknown (2),
+				active (3),
+				standby (4),  -- Ready to takeover
+				failed (5)  -- Not ready to takeover
+				}
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"Gives the current status of the control card"
+		::= { cpEntry 1 }
+
+	cpIpAddress 	OBJECT-TYPE
+			SYNTAX	IpAddress
+			MAX-ACCESS read-only
+			STATUS	current
+			DESCRIPTION
+			"The IP Address of the Ethernet interface of this control card."
+		::= { cpEntry 2 }
+
+	cpIpMask	OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"The IP Mask of the Ethernet interface of this control card."
+		::= { cpEntry 3 }
+
+	cpIpGateway 	OBJECT-TYPE
+			SYNTAX	IpAddress
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"The IP Address of the IP Gateway for this control card."
+		::= { cpEntry 4 }
+
+	cpLastEvent	OBJECT-TYPE
+			SYNTAX INTEGER {
+				other (1),
+				unknown (2),
+				haSync (3),
+				haOutSync (4),
+				cpFaulty (5),
+				cpHealthy (6),
+				cpActive (7),
+				configChange (8),
+				failOverStart (9),
+				failOverDone (10),
+				firmwareCommit (11),
+				firmwareUpgrade (12)
+				}
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"The last event related to this control card"
+		::= { cpEntry 5 }
+
+ --
+ -- Blade Processor (aka LC) table
+ --
+ --
+ -- Notifications
+ --
+
+	haMIBTraps	OBJECT IDENTIFIER ::= { haMIB 2 }
+	haMIBTrapPrefix OBJECT IDENTIFIER ::= { haMIBTraps 0 }
+
+	fruStatusChanged NOTIFICATION-TYPE
+			OBJECTS { entPhysicalName, fruStatus, fruClass, fruObjectNum}
+			STATUS	current
+			DESCRIPTION
+			"This trap is sent when status of any FRU object is changed"
+		::= { haMIBTrapPrefix 1 }
+
+	cpStatusChanged NOTIFICATION-TYPE
+			OBJECTS { cpStatus, cpLastEvent, swID, swSsn} 
+			STATUS	current
+			DESCRIPTION
+			"This trap is sent when status of any control card object is changed"
+		::= { haMIBTrapPrefix 2 }
+
+	fruHistoryTrap NOTIFICATION-TYPE
+		       OBJECTS { fruHistoryClass, fruHistoryObjectNum,
+		       fruHistoryEvent, fruHistoryTime, fruHistoryFactoryPartNum,
+		        fruHistoryFactorySerialNum }
+			STATUS current
+			DESCRIPTION
+			"This trap is sent when a FRU is added or removed"
+		::= { haMIBTrapPrefix 3 }
+END
+
+

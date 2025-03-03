@@ -1,0 +1,1583 @@
+-- DELL-NETWORKING-FIPSNOOPING-MIB.my: FIP Snooping mib
+
+-- Dell Networking OS FIP Snooping Proprietary MIB Definition
+
+-- This SNMP Management Information Specification
+-- explains the proprietary MIB implemented for the FIP Snooping Feature.
+
+DELL-NETWORKING-FIPSNOOPING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32, Counter32, Integer32                  FROM SNMPv2-SMI
+    MacAddress, DateAndTime			      FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE, 
+    NOTIFICATION-GROUP				      FROM SNMPv2-CONF
+    ifIndex					      FROM IF-MIB
+    dot1qVlanIndex		                      FROM Q-BRIDGE-MIB
+    dellNetMgmt					      FROM DELL-NETWORKING-SMI;
+
+    dellNetFipSnooping MODULE-IDENTITY
+        LAST-UPDATED    "201112080000Z" -- Dec 8, 2011
+        ORGANIZATION    "Dell Inc."
+        CONTACT-INFO    "http://www.dell.com/support"
+        DESCRIPTION
+          "The Dell Networking OS Private MIB for FIP Snooping feature.
+
+           This MIB module is for configuring FIP snooping related objects
+		   and monitoring related FCoE sessions. 
+        
+           Terminologies used in this MIB are defined by the T11 FCoE
+           standard. Refer to www.t11.org.
+
+           This MIB also supports configuration of the following objects:
+           - Port role configuration to identify FCF facing or FCF   
+		     connected interface
+           - FC-MAP value used by the FCF operating in FPMA mode
+           "
+    REVISION        "201112080000Z" -- Dec 8, 2011
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { dellNetMgmt 22 }
+
+--*********************************************************************
+-- FIP Snooping related objects used to configure FIP Snooping
+-- objects on Ethernet bridges connected to ENodes
+--*********************************************************************
+
+--*********************************************************************
+--   dellNetFIPSCfgGroup
+--*********************************************************************
+dellNetFIPSCfgGroup OBJECT IDENTIFIER ::= { dellNetFipSnooping 1 }
+
+dellNetFIPSAdminMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     disable(0),
+                     enable(1)
+                  }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+               "This enables or disables FIP Snooping on the system."
+    DEFVAL { disable }
+    ::= { dellNetFIPSCfgGroup 1 }
+
+dellNetFIPSFCMAP OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (3))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+               "This object configures the FC-MAP value on the system.
+		Default value is 0x0EFC00."
+    DEFVAL { "0x0EFC00" }
+    ::= { dellNetFIPSCfgGroup 2 }
+
+dellNetFIPSStatsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     clear(0),
+                     ignore(1)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Clear all FIP Snooping statistics in the system. 
+                     This is write-only value. It always returns '0' on request."
+		 
+         ::= { dellNetFIPSCfgGroup 5 }
+		 
+--*********************************************************************
+--   dellNetFIPSVlanCfgTable
+--   FIP Snooping VLAN Configuration table
+--   Configure FC-MAP, enable/disable
+--*********************************************************************
+    dellNetFIPSVlanCfgTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF DellNetFIPSVlanCfgEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the FIP Snooping Vlan configuration 
+					 entries."
+         ::= { dellNetFIPSCfgGroup 3 }
+
+    dellNetFIPSVlanCfgEntry OBJECT-TYPE
+         SYNTAX      DellNetFIPSVlanCfgEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Represents entry for a FIP Snooping Vlan."
+         INDEX       { dot1qVlanIndex }
+         ::= { dellNetFIPSVlanCfgTable 1 }
+
+    DellNetFIPSVlanCfgEntry ::= SEQUENCE {
+          dellNetFIPSVlanAdminMode
+              INTEGER,
+          dellNetFIPSVlanFCMAP
+              OCTET STRING,
+          dellNetFIPSVlanStatsClear
+              INTEGER
+          }
+
+    dellNetFIPSVlanAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     disable(0),
+                     enable(1)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables FIP Snooping on a selected Vlan interface."
+         DEFVAL { disable }
+         ::= { dellNetFIPSVlanCfgEntry 1 }
+
+    dellNetFIPSVlanFCMAP OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (3))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "This object configures the FC-MAP value associated with the 
+                        FIP snooping Vlan. Default value is 0x0EFC00."
+        DEFVAL          { "0x0EFC00" } 
+
+        ::= { dellNetFIPSVlanCfgEntry 2 }
+
+     dellNetFIPSVlanStatsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     clear(0),
+                     ignore(1)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Clear FIP Snooping statistics on this Vlan.
+                     This is write-only value. It always returns '0' on request"
+
+		 
+         ::= { dellNetFIPSVlanCfgEntry 3 }
+
+--*********************************************************************
+--   dellNetFIPSIntfTable
+--   FIP Snooping Interface Configuration table
+--   Configure trusted FCF interface mode
+--*********************************************************************
+    dellNetFIPSIntfTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF DellNetFIPSIntfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table providing configuration for trusted FCF 
+                     interface mode."
+
+         ::= { dellNetFIPSCfgGroup 4 }
+
+    dellNetFIPSIntfEntry OBJECT-TYPE
+         SYNTAX      DellNetFIPSIntfEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "FCF trust mode configuration for an interface."
+         INDEX   { ifIndex }
+         ::= { dellNetFIPSIntfTable 1 }
+
+    DellNetFIPSIntfEntry::=
+         SEQUENCE {
+            dellNetFIPSIntfPortModeFcf 
+                INTEGER,
+            dellNetFIPSIntfStatsClear 
+                INTEGER
+         }
+
+    dellNetFIPSIntfPortModeFcf OBJECT-TYPE
+         SYNTAX      INTEGER {
+                       disable(0),
+                       fcf(1),
+                       fcoetrusted(2)
+                       }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets/disables FCF port mode on an interface."
+         DEFVAL { disable }
+
+         ::= { dellNetFIPSIntfEntry 2 }
+
+     dellNetFIPSIntfStatsClear OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     clear(0),
+                     ignore(1)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Clear FIP Snooping statistics on this interface.
+                     This is write-only value. It always returns '0' on request"
+
+		 
+	 ::= { dellNetFIPSIntfEntry 3 }
+
+--*********************************************************************
+-- FIP Snooping related objects used to monitor FIP Snooping
+-- sessions, ENodes and FCFs on Ethernet bridges connected to ENodes
+--*********************************************************************
+
+--*********************************************************************
+--   dellNetFIPSStatusGroup
+--*********************************************************************
+dellNetFIPSStatusGroup OBJECT IDENTIFIER ::= { dellNetFipSnooping 2 }
+----------------------------------------------------------------------------
+--      FIP Snooping Sesh Table
+----------------------------------------------------------------------------
+        dellNetFIPSSessionTable OBJECT-TYPE
+            SYNTAX       SEQUENCE OF DellNetFIPSSessionEntry
+            MAX-ACCESS   not-accessible
+            STATUS       current
+            DESCRIPTION "A table for FIP Snooping Session entries."
+            ::= { dellNetFIPSStatusGroup 1 }
+
+        dellNetFIPSSessionEntry OBJECT-TYPE
+            SYNTAX DellNetFIPSSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "Represents an entry in FIP Snooping session table."
+            INDEX       { dellNetFIPSSessionVlanIndex, dellNetFIPSSessionFCFMacAddr, 
+                          dellNetFIPSSessionENodeMacAddr, dellNetFIPSSessionLoginType,
+                          dellNetFIPSFCoEMacAddr, dellNetFIPSSessionTentativeIndex,
+                          dellNetFIPSSessionFCID}
+            ::={ dellNetFIPSSessionTable 1}
+
+        DellNetFIPSSessionEntry ::=
+                SEQUENCE {
+                dellNetFIPSSessionVlanIndex
+                        Unsigned32,
+                dellNetFIPSSessionFCFMacAddr
+                        MacAddress,
+                dellNetFIPSSessionENodeMacAddr
+                        MacAddress,
+                dellNetFIPSSessionLoginType
+                        INTEGER,
+	        dellNetFIPSFCoEMacAddr
+			MacAddress,
+		dellNetFIPSSessionTentativeIndex
+			Unsigned32,
+		dellNetFIPSSessionFCID
+			OCTET STRING,
+                dellNetFIPSSessionENodeIntf
+                        Unsigned32,
+                dellNetFIPSSessionFCFIntf
+                        Unsigned32,
+                dellNetFIPSSessionTime
+                        DateAndTime,
+		dellNetFIPSSessionExpiryTime
+		        Integer32,
+                dellNetFIPSSessionState
+                        OCTET STRING
+                }
+
+        dellNetFIPSSessionVlanIndex OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "FCoE Vlan in which the session is established."
+                ::={dellNetFIPSSessionEntry 1 }
+
+        dellNetFIPSSessionFCFMacAddr OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "MAC address of the FCF to which the session is established."
+            ::={ dellNetFIPSSessionEntry 2 }
+
+        dellNetFIPSSessionENodeMacAddr OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "MAC address of the ENode from which the session originated."
+            ::={ dellNetFIPSSessionEntry 3 }
+
+	dellNetFIPSSessionLoginType OBJECT-TYPE
+              SYNTAX  INTEGER {
+                         flogi(0),
+                         fdisc(1)
+                      }
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "Type of login requested by ENode."
+              ::= { dellNetFIPSSessionEntry 4 }
+
+	dellNetFIPSFCoEMacAddr OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "MAC address assigned to the VN_Port on the ENode."
+            ::={ dellNetFIPSSessionEntry 5 }
+				
+	dellNetFIPSSessionTentativeIndex OBJECT-TYPE
+                SYNTAX  Unsigned32
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Index to the tentavtive session."
+            ::={ dellNetFIPSSessionEntry 6 }
+						
+        dellNetFIPSSessionFCID OBJECT-TYPE
+                SYNTAX  OCTET STRING (SIZE(3)) -- (00:ee:dd)
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "FCID created by FCF for this virtual session."
+            ::={ dellNetFIPSSessionEntry 7 }
+
+        dellNetFIPSSessionENodeIntf OBJECT-TYPE
+                SYNTAX  Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Interface to which the ENode is connected."
+            ::={ dellNetFIPSSessionEntry 8 }
+
+        dellNetFIPSSessionFCFIntf OBJECT-TYPE
+                SYNTAX  Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Interface on which the FCF is discovered."
+            ::={ dellNetFIPSSessionEntry 9 }
+
+        dellNetFIPSSessionTime OBJECT-TYPE
+                SYNTAX  DateAndTime
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Time elapsed after this successful virtual session is
+                        established by ENode with FCF."
+            ::={ dellNetFIPSSessionEntry 10 }
+
+        dellNetFIPSSessionExpiryTime OBJECT-TYPE
+                SYNTAX  Integer32 (0..450)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This is virtual connection/session expiry interval.
+			This is used to monitor the status of the session.
+			Session entry is removed when the value reaches 0.
+			This value is reset to 450 secs	(5*90secs) every
+			time an associated VN_Port FKA is received from the
+			ENode. This is ignored (marked as NA) if the
+			D-bit is set to one in the FCF Discovery
+			Advertisements."
+						
+            ::={ dellNetFIPSSessionEntry 11 }
+
+        dellNetFIPSSessionState OBJECT-TYPE
+                SYNTAX  OCTET STRING 
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This is the state of the virtual session. The
+			state is displayed as TENTATIVE during the
+			process of ENode login to FCF (using FLOGI or
+			FDESC). It displays ACTIVE after ENode and FCF
+			establish a successful virtual connection."
+						
+            ::={ dellNetFIPSSessionEntry 12 }
+			
+----------------------------------------------------------------------------
+--      FIP Snooping Enode Information
+----------------------------------------------------------------------------
+        dellNetFIPSENodeTable OBJECT-TYPE
+            SYNTAX       SEQUENCE OF DellNetFIPSENodeEntry
+            MAX-ACCESS   not-accessible
+            STATUS       current
+            DESCRIPTION "A table for FIP Snooping discovered ENode entries."
+            ::= { dellNetFIPSStatusGroup 2 }
+			
+        dellNetFIPSENodeEntry OBJECT-TYPE
+            SYNTAX DellNetFIPSENodeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "Represents an entry in FIP Snooping ENodes table."
+            INDEX       { dellNetFIPSENodeVlanIndex, dellNetFIPSENodeMacAddr }
+            ::={ dellNetFIPSENodeTable 1}
+
+        DellNetFIPSENodeEntry ::=
+                SEQUENCE {
+                dellNetFIPSENodeVlanIndex
+                        Unsigned32,
+                dellNetFIPSENodeMacAddr
+                        MacAddress,
+                dellNetFIPSENodeIntf
+                        Unsigned32,
+	        dellNetFIPSENodeNameID
+			OCTET STRING,
+                dellNetFIPSENodeMaxFCoESize
+                        Unsigned32,
+                dellNetFIPSENodeConnectedFCFsCount
+                        Unsigned32,
+                dellNetFIPSENodeActiveSessions
+                        Unsigned32,
+                dellNetFIPSENodeWaitingSessions
+                        Unsigned32,
+		dellNetFIPSENodeRejectedSessions
+			Unsigned32,
+		dellNetFIPSENodeTimeSinceDiscovered
+			DateAndTime
+                }
+
+        dellNetFIPSENodeVlanIndex OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "FCoE Vlan in which the enode is present."
+                ::={dellNetFIPSENodeEntry 1 }
+
+        dellNetFIPSENodeMacAddr OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "MAC address of the ENode."
+                ::={dellNetFIPSENodeEntry 2 }
+
+        dellNetFIPSENodeIntf OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Interface to which the ENode is connected."
+                ::={dellNetFIPSENodeEntry 3 }
+				
+        dellNetFIPSENodeNameID OBJECT-TYPE
+                SYNTAX     OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Name ID of the ENode."
+                ::={dellNetFIPSENodeEntry 4 }
+				
+        dellNetFIPSENodeMaxFCoESize OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Maximum FCoE PDU size the ENode MAC intends to use
+			for FCoE traffic. This is equivalent to the maximum
+			Ethernet frame payload the ENode intends to send."
+                ::={dellNetFIPSENodeEntry 5 }
+				
+        dellNetFIPSENodeConnectedFCFsCount OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of FCFs to which this ENode has FCoE
+			virtual connections established."
+                ::={dellNetFIPSENodeEntry 6 }
+
+	dellNetFIPSENodeActiveSessions OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of FCoE virtual connections successfully 
+			established by the ENode with FCFs."
+                ::={dellNetFIPSENodeEntry 7 }
+				
+        dellNetFIPSENodeWaitingSessions OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of FCoE virtual connections initiated by ENode
+                        and waiting for FCF acceptance."
+                ::={dellNetFIPSENodeEntry 8 }
+				
+        dellNetFIPSENodeRejectedSessions OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of virtual connections originted from ENode 
+                        which are rejected by FCFs."
+                ::={dellNetFIPSENodeEntry 9 }
+				
+        dellNetFIPSENodeTimeSinceDiscovered OBJECT-TYPE
+                SYNTAX     DateAndTime
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Time elapsed since the ENode is discovered."
+                ::={dellNetFIPSENodeEntry 10 }
+				
+------------------------------------------------------------------------------
+--        FCF {Key: Vlan, FCF-MAC only}
+----------------------------------------------------------------------------
+        dellNetFIPSFCFTable OBJECT-TYPE
+            SYNTAX       SEQUENCE OF DellNetFIPSFCFEntry
+            MAX-ACCESS   not-accessible
+            STATUS       current
+            DESCRIPTION "A table for FIP Snooping discovered FCF entries."
+            ::= { dellNetFIPSStatusGroup 3 }
+
+        dellNetFIPSFCFEntry OBJECT-TYPE
+            SYNTAX DellNetFIPSFCFEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION "Represents an entry in FIP Snooping FCFs table."
+            INDEX       { dellNetFIPSFCFVlanIndex, dellNetFIPSFCFMacAddr }
+            ::={ dellNetFIPSFCFTable 1}
+
+        DellNetFIPSFCFEntry ::=
+                SEQUENCE {
+                dellNetFIPSFCFVlanIndex
+                        Unsigned32,
+                dellNetFIPSFCFMacAddr
+                        MacAddress,
+                dellNetFIPSFCFIntf
+                        Unsigned32,
+		dellNetFIPSFCFNameID
+			OCTET STRING,
+		dellNetFIPSFCFFabricName
+			OCTET STRING,
+                dellNetFIPSFCFAddressingMode
+                        INTEGER,
+		dellNetFIPSFCFPriority
+			Integer32,
+		dellNetFIPSFCFDbit
+			Integer32,
+		dellNetFIPSFCFIsAvailableForLogin
+			Integer32,
+		dellNetFIPSFCFConfiguredFKA
+			Integer32,
+		dellNetFIPSFCFTimeSinceDiscovered
+			DateAndTime,
+                dellNetFIPSFCFConnectedENodesCount
+                        Unsigned32,
+                dellNetFIPSFCFSessions
+                        Unsigned32,
+                dellNetFIPSFCFExpiryTime
+                        Unsigned32
+                }
+
+        dellNetFIPSFCFVlanIndex OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "FCoE Vlan in which the FCF is present."
+                ::={dellNetFIPSFCFEntry 1 }
+
+        dellNetFIPSFCFMacAddr OBJECT-TYPE
+                SYNTAX  MacAddress
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "MAC address of the FCF."
+                ::={ dellNetFIPSFCFEntry 2 }
+
+        dellNetFIPSFCFIntf OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Inteface on which FCF is discovered."
+                ::={ dellNetFIPSFCFEntry 3 }
+				
+        dellNetFIPSFCFNameID OBJECT-TYPE
+                SYNTAX     OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Name Identifer of the FCF."
+                ::={ dellNetFIPSFCFEntry 4 }
+				
+        dellNetFIPSFCFFabricName OBJECT-TYPE
+                SYNTAX     OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Fabric Name identifying the Fabric."
+                ::={ dellNetFIPSFCFEntry 5 }
+				
+        dellNetFIPSFCFAddressingMode OBJECT-TYPE
+                SYNTAX     INTEGER {
+                                     fpma(1),
+                                     spma(2),
+                                     both(3)   -- FPMA and SPMA
+                                   }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Addressing mode(s) supported by the FCF."
+                ::={dellNetFIPSFCFEntry 6 }
+				
+        dellNetFIPSFCFPriority OBJECT-TYPE
+                SYNTAX     Integer32 (0..255)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This is the priority assigned to FCF. The highest priority
+                         value is 0 and the lowest priority value is 255."
+                ::={ dellNetFIPSFCFEntry 7 }
+
+	dellNetFIPSFCFDbit OBJECT-TYPE
+                SYNTAX     Integer32 (0..1)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This reflects the value of D bit value provided by 
+                        the most recently received Discovery Advertisement 
+                        from the FCF."
+                ::={dellNetFIPSFCFEntry 8 }
+
+	dellNetFIPSFCFIsAvailableForLogin OBJECT-TYPE
+                SYNTAX     Integer32 (0..1)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This reflects the value of the A bit provided by the
+			most recently received Discovery Advertisement from
+			the FCF. This provides the information that the
+			transmitting FCF is available for FIP FLOGI/FDISC
+			from ENodes. This is informational and shall have no
+			effect on existing logins."
+                ::={dellNetFIPSFCFEntry 9 }
+
+	dellNetFIPSFCFConfiguredFKA OBJECT-TYPE
+                SYNTAX     Integer32 (1..450)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "FIP keepalive interval (FKA_ADV_PERIOD) in seconds
+			configured on the FCF multiplied by five. For
+			example, if the FKA_ADV period configured on the FCF
+			is 80 seconds, the value of this field is 400 seconds."
+                ::={ dellNetFIPSFCFEntry 10 }			
+				
+	dellNetFIPSFCFTimeSinceDiscovered OBJECT-TYPE
+                SYNTAX     DateAndTime
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Time elapsed since the FCF is discovered."
+                ::={ dellNetFIPSFCFEntry 11 }
+
+	dellNetFIPSFCFConnectedENodesCount OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Number of ENodes to which FCF has FCoE
+			virtual connections established."
+                ::={ dellNetFIPSFCFEntry 12 }			
+
+	dellNetFIPSFCFSessions OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Total number of FCoE virtual connections successfully
+                        established by the ENodes with this FCF."
+                ::={ dellNetFIPSFCFEntry 13 }
+				
+	dellNetFIPSFCFExpiryTime OBJECT-TYPE
+                SYNTAX     Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "This indicates the timer value in seconds to monitor
+                        the status of the FCF. FCF entry and all its associated
+                        virtual sessions will be removed when the value reaches
+                        0.  This value is reset to 'Configured FKA-ADV' every
+                        time a Discovery Advertisement is received from the 
+                        FCF-MAC."
+                ::={ dellNetFIPSFCFEntry 14 }
+		
+--*********************************************************************
+-- FIP Snooping related objects used to monitor FIP Snooping
+-- statistics on Ethernet bridges connected to ENodes
+--*********************************************************************
+
+--*********************************************************************
+-- dellNetFIPSStatisticsGroup
+--*********************************************************************
+dellNetFIPSStatisticsGroup OBJECT IDENTIFIER ::= { dellNetFipSnooping 3 }
+
+-- -------------------------------------------------------------
+-- Per FCoE VLAN Statistics Table
+-- -------------------------------------------------------------
+dellNetFIPSVlanStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DellNetFIPSVlanStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per-port, per-VLAN statistics for
+        traffic received. Separate objects are provided for both the
+        most-significant and least-significant bits of statistics
+        counters for ports that are associated with this transparent
+        bridge. The most-significant bit objects are only required on
+        high capacity interfaces, as defined in the conformance clauses
+        for these objects. This mechanism is provided as a way to read
+        64-bit counters for agents which support only SNMPv1.
+
+        Note that the reporting of most-significant and least-
+        significant counter bits separately runs the risk of missing
+        an overflow of the lower bits in the interval between sampling.
+        The manager must be aware of this possibility, even within the
+        same varbindlist, when interpreting the results of a request or
+        asynchronous notification."
+    ::= { dellNetFIPSStatisticsGroup 1 }
+
+dellNetFIPSVlanStatsEntry OBJECT-TYPE
+    SYNTAX      DellNetFIPSVlanStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "FIP Snooping control traffic statistics of a VLAN."
+    INDEX   { dot1qVlanIndex }
+    ::= { dellNetFIPSVlanStatsTable 1 }
+
+DellNetFIPSVlanStatsEntry ::=
+    SEQUENCE {
+    dellNetFIPSVlanVlanRequests
+            Counter32,
+    dellNetFIPSVlanVlanNotifications
+            Counter32,
+    dellNetFIPSVlanMCDiscSolicits 
+            Counter32,
+    dellNetFIPSVlanUnicastDiscSolicits 
+            Counter32,
+    dellNetFIPSVlanFLogis 
+            Counter32,
+    dellNetFIPSVlanFDiscs 
+            Counter32,
+    dellNetFIPSVlanFLogouts 
+            Counter32,
+    dellNetFIPSVlanVnPortKeepAlives 
+            Counter32,
+    dellNetFIPSVlanMCDiscAdverts 
+            Counter32,
+    dellNetFIPSVlanUnicastDiscAdverts 
+            Counter32,
+    dellNetFIPSVlanFLogiAccepts 
+            Counter32,
+    dellNetFIPSVlanFLogiRejects 
+            Counter32,
+    dellNetFIPSVlanFDiscAccepts 
+            Counter32,
+    dellNetFIPSVlanFDiscRejects 
+            Counter32,
+    dellNetFIPSVlanFLogoutAccepts 
+            Counter32,
+    dellNetFIPSVlanFLogoutRejects 
+            Counter32,
+    dellNetFIPSVlanClearVirtLinks 
+            Counter32,
+    dellNetFIPSVlanVnPortSeshTimeouts 
+            Counter32,
+    dellNetFIPSVlanFcfDiscAdvTimeouts 
+            Counter32,
+    dellNetFIPSVlanSeshFailsDueToHwCfg
+            Counter32,
+    dellNetFIPSVlanSeshDenyFcfLmtRch
+            Counter32,
+    dellNetFIPSVlanSeshDenyENodeLmtRch 
+            Counter32,
+    dellNetFIPSVlanSeshDenySysLmtRch 
+            Counter32
+    }
+
+    dellNetFIPSVlanVlanRequests OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION    
+                        "Number of VLAN Request messages received on the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 1 }
+ 
+    dellNetFIPSVlanVlanNotifications OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+                        "Number of VLAN Notification messages received on the VLAN."
+       
+         ::={ dellNetFIPSVlanStatsEntry 2 }
+
+    dellNetFIPSVlanMCDiscSolicits OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Multicast Discovery Solicitation messages snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 3 }
+
+    dellNetFIPSVlanUnicastDiscSolicits OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Unicast Discovery Solicitation messages snooped in the VLAN." 
+
+        ::={ dellNetFIPSVlanStatsEntry 4 }
+
+    dellNetFIPSVlanFLogis OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Login messages snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 5 }
+
+    dellNetFIPSVlanFDiscs OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery Login messages snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 6 }
+
+    dellNetFIPSVlanFLogouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logout messages snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 7 }
+
+    dellNetFIPSVlanVnPortKeepAlives OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of VN_Port keep alive messages snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 8 }
+
+    dellNetFIPSVlanMCDiscAdverts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Multicast Discovery Advertisement messages snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 9 }
+
+    dellNetFIPSVlanUnicastDiscAdverts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Unicast Discovery Advertisement packets snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 10 }
+
+    dellNetFIPSVlanFLogiAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Login accept packets snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 11 }
+
+    dellNetFIPSVlanFLogiRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Login reject packets snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 12 }
+
+    dellNetFIPSVlanFDiscAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery accept packets snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 13 }
+
+    dellNetFIPSVlanFDiscRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery reject packets snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 14 }
+
+    dellNetFIPSVlanFLogoutAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logouts accept packets snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 15 }
+
+    dellNetFIPSVlanFLogoutRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logouts reject packets snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 16 }
+
+    dellNetFIPSVlanClearVirtLinks OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Clear Virtual Link request packets snooped in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 17 }
+
+    dellNetFIPSVlanVnPortSeshTimeouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of virtual sessions removed due to session timer expiry in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 18 }
+
+    dellNetFIPSVlanFcfDiscAdvTimeouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of ACTIVE sessions timed out due to Discovery Advertisements timer expiry from FCFs in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 19 }
+
+    dellNetFIPSVlanSeshFailsDueToHwCfg OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions in the VLAN that failed while configuring the hardware."
+
+        ::={ dellNetFIPSVlanStatsEntry 20 }
+
+    dellNetFIPSVlanSeshDenyFcfLmtRch OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions that are denied to be created for the new FCF as the number of FCFs reached the maximum allowed limit supported in the VLAN."
+
+        ::={ dellNetFIPSVlanStatsEntry 21 }
+
+    dellNetFIPSVlanSeshDenyENodeLmtRch OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions that are denied to be created for the new ENode as the number of ENodes reached the maximum allowed limit supported by the system."
+
+        ::={ dellNetFIPSVlanStatsEntry 22 }
+
+    dellNetFIPSVlanSeshDenySysLmtRch OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of session create requests denied as the number of sessions reached the maximum allowed limit supported by the system."
+
+        ::={ dellNetFIPSVlanStatsEntry 23 }
+
+	
+-- -------------------------------------------------------------
+-- Per Interface Statistics Table
+-- -------------------------------------------------------------
+dellNetFIPSIntfStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DellNetFIPSIntfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing per-port, per-VLAN statistics for
+        traffic received. Separate objects are provided for both the
+        most-significant and least-significant bits of statistics
+        counters for ports that are associated with this transparent
+        bridge. The most-significant bit objects are only required on
+        high capacity interfaces, as defined in the conformance clauses
+        for these objects. This mechanism is provided as a way to read
+        64-bit counters for agents which support only SNMPv1.
+
+        Note that the reporting of most-significant and least-
+        significant counter bits separately runs the risk of missing
+        an overflow of the lower bits in the interval between sampling.
+        The manager must be aware of this possibility, even within the
+        same varbindlist, when interpreting the results of a request or
+        asynchronous notification."
+    ::= { dellNetFIPSStatisticsGroup 2 }
+
+dellNetFIPSIntfStatsEntry OBJECT-TYPE
+    SYNTAX      DellNetFIPSIntfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "FIP Snooping control traffic statistics on this interface."
+    INDEX   { ifIndex }
+    ::= { dellNetFIPSIntfStatsTable 1 }
+
+DellNetFIPSIntfStatsEntry ::=
+    SEQUENCE {
+        dellNetFIPSIntfVlanRequests
+            Counter32,
+        dellNetFIPSIntfVlanNotifications
+            Counter32,
+        dellNetFIPSIntfMCDiscSolicits
+            Counter32,
+        dellNetFIPSIntfUnicastDiscSolicits
+            Counter32,
+        dellNetFIPSIntfFLogis
+            Counter32,
+        dellNetFIPSIntfFDiscs
+            Counter32,
+        dellNetFIPSIntfFLogouts
+            Counter32,
+        dellNetFIPSIntfVnPortKeepAlives
+            Counter32,
+        dellNetFIPSIntfMCDiscAdverts
+            Counter32,
+        dellNetFIPSIntfUnicastDiscAdverts
+            Counter32,
+        dellNetFIPSIntfFLogiAccepts
+            Counter32,
+        dellNetFIPSIntfFLogiRejects
+            Counter32,
+        dellNetFIPSIntfFDiscAccepts
+            Counter32,
+        dellNetFIPSIntfFDiscRejects
+            Counter32,
+        dellNetFIPSIntfFLogoutAccepts
+            Counter32,
+        dellNetFIPSIntfFLogoutRejects
+            Counter32,
+        dellNetFIPSIntfClearVirtLinks
+            Counter32,
+        dellNetFIPSIntfVnPortSeshTimeouts
+            Counter32,
+        dellNetFIPSIntfFcfDiscAdvTimeouts
+            Counter32,
+        dellNetFIPSIntfSeshFailsDueToHwCfg
+            Counter32,
+        dellNetFIPSIntfSeshDenyFcfLmtRch
+            Counter32,
+        dellNetFIPSIntfSeshDenyENodeLmtRch
+            Counter32,
+        dellNetFIPSIntfSeshDenySysLmtRch
+            Counter32
+    }
+
+    dellNetFIPSIntfVlanRequests OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+                        "Number of VLAN Request messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 1 }
+
+    dellNetFIPSIntfVlanNotifications OBJECT-TYPE
+         SYNTAX         Counter32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+                        "Number of VLAN Notification messages received on the interface."
+
+         ::={ dellNetFIPSIntfStatsEntry 2 }
+
+    dellNetFIPSIntfMCDiscSolicits OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Multicast Discovery Solicitation messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 3 }
+
+    dellNetFIPSIntfUnicastDiscSolicits OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Unicast Discovery Solicitation messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 4 }
+
+    dellNetFIPSIntfFLogis OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logins received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 5 }
+
+    dellNetFIPSIntfFDiscs OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery logins received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 6 }
+
+    dellNetFIPSIntfFLogouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logouts received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 7 }
+
+    dellNetFIPSIntfVnPortKeepAlives OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of VN_Port keepalive messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 8 }
+
+    dellNetFIPSIntfMCDiscAdverts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Multicast Discovery Advertisement messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 9 }
+
+    dellNetFIPSIntfUnicastDiscAdverts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Unicast Discovery Advertisement messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 10 }
+
+    dellNetFIPSIntfFLogiAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Login accept messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 11 }
+
+    dellNetFIPSIntfFLogiRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Login reject messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 12 }
+
+    dellNetFIPSIntfFDiscAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery accept messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 13 }
+
+    dellNetFIPSIntfFDiscRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Discovery reject messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 14 }
+
+    dellNetFIPSIntfFLogoutAccepts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logout accept messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 15 }
+
+    dellNetFIPSIntfFLogoutRejects OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Fabric Logout reject messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 16 }
+
+    dellNetFIPSIntfClearVirtLinks OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Clear Virtual Links messages received on the interface."
+
+        ::={ dellNetFIPSIntfStatsEntry 17 }
+
+    dellNetFIPSIntfVnPortSeshTimeouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of Virtual sessions removed due to session timer expiry."
+
+        ::={ dellNetFIPSIntfStatsEntry 18 }
+
+    dellNetFIPSIntfFcfDiscAdvTimeouts OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of ACTIVE sessions timed out due to Discovery Advertisements timer expiry from FCFs on this interface."
+
+
+        ::={ dellNetFIPSIntfStatsEntry 19 }
+
+    dellNetFIPSIntfSeshFailsDueToHwCfg OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions on this interface that failed while configuring the hardware."
+
+        ::={ dellNetFIPSIntfStatsEntry 20 }
+
+    dellNetFIPSIntfSeshDenyFcfLmtRch OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions that are denied to be created on this interface form a new FCF as the number of FCFs count reached the maximum allowed limit in the system."
+
+        ::={ dellNetFIPSIntfStatsEntry 21 }
+
+    dellNetFIPSIntfSeshDenyENodeLmtRch OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions that are denied to be created on this interface form a new ENode/host as the number of ENodes/hosts count reached the maximum allowed limit in the system."
+
+        ::={ dellNetFIPSIntfStatsEntry 22 }
+
+    dellNetFIPSIntfSeshDenySysLmtRch OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Number of sessions that are denied to be created as the number of sessions count reached the maximum allowed limit supported in the system. This is a global counter."
+
+        ::={ dellNetFIPSIntfStatsEntry 23 }
+
+--*************************************************************************************
+--   Traps
+--**************************************************************************************
+
+dellNetFIPSNotifications OBJECT IDENTIFIER ::= { dellNetFipSnooping 4 }
+dellNetFIPSTraps         OBJECT IDENTIFIER ::= { dellNetFIPSNotifications 0 }
+dellNetFIPSTrapObjects   OBJECT IDENTIFIER ::= { dellNetFIPSNotifications 1 }
+
+    dellNetFIPSTrapVlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object refers to the Vlan Index for which the FIP Snooping
+	trap is being sent."
+    ::= { dellNetFIPSTrapObjects 1 }
+
+    dellNetFIPSTrapMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object refers to the FCF or Enode MAC Address for which 
+	the FIP Snooping trap is being sent."
+    ::= { dellNetFIPSTrapObjects 2 }
+
+    dellNetMaxFcfsInVlanLmtRchTrap NOTIFICATION-TYPE
+        OBJECTS         {dellNetFIPSTrapVlanIndex} 
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when number of FCFs reached maximum allowed limit in VLAN."
+        ::= { dellNetFIPSTraps 1 }
+
+    dellNetMaxENodesLmtRchTrap NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when number of ENodes reached maximum allowed limit in the system."
+        ::= { dellNetFIPSTraps 2 }
+
+    dellNetMaxSessionLmtRchTrap NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when number of sessions reached maximum allowed limit in the system."
+        ::= { dellNetFIPSTraps 3 }
+
+    dellNetFcfDroppedTrap NOTIFICATION-TYPE
+        OBJECTS         {dellNetFIPSTrapVlanIndex, dellNetFIPSFCFIntf,
+                         dellNetFIPSTrapMacAddr}
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when a new FCF discovered (Discovery Advertisement is received from FCF) is dropped, 
+                         as the maximum allowed FCFs limit in a VLAN is already reached."
+        ::= { dellNetFIPSTraps 4 }
+
+    dellNetENodeDroppedTrap NOTIFICATION-TYPE
+        OBJECTS         {dellNetFIPSTrapVlanIndex, dellNetFIPSENodeIntf,
+                         dellNetFIPSTrapMacAddr}
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when a new ENode discovered is dropped, 
+                         as the maximum allowed ENodes limit in the system is already reached."
+        ::= { dellNetFIPSTraps 5 }
+
+    dellNetSessionRequestDroppedTrap NOTIFICATION-TYPE
+        OBJECTS         {dellNetFIPSTrapVlanIndex, dellNetFIPSENodeIntf,
+                         dellNetFIPSTrapMacAddr}
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when a new session request received is dropped,
+                         as the maximum allowed session limit in system is already reached."
+        ::= { dellNetFIPSTraps 6 }
+
+    dellNetAclInstallationFailureTrap NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when there is a problem in installing the ACL entries 
+                        due to no space or hardware failure"
+        ::= { dellNetFIPSTraps 7 }
+
+
+--******************************************************************************
+--   Conformance information
+--******************************************************************************
+
+dellNetFIPSMibConformance OBJECT IDENTIFIER ::= { dellNetFipSnooping 5 }
+dellNetFIPSMibCompliances OBJECT IDENTIFIER ::= { dellNetFIPSMibConformance 1 }
+dellNetFIPSMibGroups      OBJECT IDENTIFIER ::= { dellNetFIPSMibConformance 2 }
+
+dellNetFIPSMibCompliance  MODULE-COMPLIANCE
+  STATUS               current
+  DESCRIPTION
+      "The compliance statement for Dell Networking OS product which implement the
+      Dell Networking OS FIP Snooping MIB. "
+  MODULE
+  MANDATORY-GROUPS {
+      dellNetFIPSCfgObjectGroup,
+      dellNetFIPSVlanCfgObjectGroup,
+      dellNetFIPSIntfObjectGroup,
+      dellNetFIPSSessionObjectGroup,
+      dellNetFIPSENodeObjectGroup,
+      dellNetFIPSFCFObjectGroup,
+      dellNetFIPSVlanStatsObjectGroup,
+      dellNetFIPSIntfStatsObjectGroup,
+      dellNetFIPSTrapsObjectGroup,
+      dellNetFIPSTrapObjectsGroup
+  }
+  ::= { dellNetFIPSMibCompliances 1 }
+
+dellNetFIPSCfgObjectGroup OBJECT-GROUP
+   OBJECTS {
+                dellNetFIPSAdminMode,
+                dellNetFIPSFCMAP,
+	        dellNetFIPSStatsClear
+           }
+   STATUS  current
+   DESCRIPTION
+       "This group represents a collection of objects providing the
+       FIPS system information."
+   ::= { dellNetFIPSMibGroups 1 }
+
+dellNetFIPSVlanCfgObjectGroup OBJECT-GROUP
+   OBJECTS {
+                dellNetFIPSVlanAdminMode,
+                dellNetFIPSVlanFCMAP,
+                dellNetFIPSVlanStatsClear
+           }
+   STATUS  current
+   DESCRIPTION
+       "This group represents a collection of objects providing the
+       FIPS vlan information."
+   ::= { dellNetFIPSMibGroups 2 }
+
+dellNetFIPSIntfObjectGroup OBJECT-GROUP
+   OBJECTS {
+                dellNetFIPSIntfPortModeFcf,
+                dellNetFIPSIntfStatsClear
+           }
+   STATUS  current
+   DESCRIPTION
+       "This group represents a collection of objects providing the
+       FIPS interface information."
+   ::= { dellNetFIPSMibGroups 3 }
+
+dellNetFIPSSessionObjectGroup OBJECT-GROUP
+   OBJECTS {
+                dellNetFIPSSessionENodeIntf,
+                dellNetFIPSSessionFCFIntf,
+                dellNetFIPSSessionTime,
+                dellNetFIPSSessionExpiryTime,
+                dellNetFIPSSessionState,
+                dellNetFIPSIntfStatsClear
+           }
+   STATUS  current
+   DESCRIPTION
+       "This group represents a collection of objects providing the
+       FIPS Session information."
+   ::= { dellNetFIPSMibGroups 4 }
+
+dellNetFIPSENodeObjectGroup OBJECT-GROUP
+   OBJECTS {
+                dellNetFIPSENodeIntf,
+                dellNetFIPSENodeNameID,
+                dellNetFIPSENodeMaxFCoESize,
+                dellNetFIPSENodeConnectedFCFsCount,
+                dellNetFIPSENodeActiveSessions,
+                dellNetFIPSENodeWaitingSessions,
+                dellNetFIPSENodeRejectedSessions,
+                dellNetFIPSENodeTimeSinceDiscovered
+           }
+   STATUS  current
+   DESCRIPTION
+       "This group represents a collection of objects providing the
+       FIPS ENode information."
+   ::= { dellNetFIPSMibGroups 5 }
+
+dellNetFIPSFCFObjectGroup OBJECT-GROUP
+   OBJECTS {
+                dellNetFIPSFCFIntf,
+                dellNetFIPSFCFNameID,
+                dellNetFIPSFCFFabricName,
+                dellNetFIPSFCFAddressingMode,
+                dellNetFIPSFCFPriority,
+                dellNetFIPSFCFDbit,
+                dellNetFIPSFCFIsAvailableForLogin,
+                dellNetFIPSFCFConfiguredFKA,
+                dellNetFIPSFCFTimeSinceDiscovered,
+                dellNetFIPSFCFConnectedENodesCount,
+                dellNetFIPSFCFSessions,
+                dellNetFIPSFCFExpiryTime
+           }
+   STATUS  current
+   DESCRIPTION
+       "This group represents a collection of objects providing the
+       FIPS FCF information."
+   ::= { dellNetFIPSMibGroups 6 }
+
+dellNetFIPSVlanStatsObjectGroup OBJECT-GROUP
+   OBJECTS {
+                dellNetFIPSVlanVlanRequests,
+                dellNetFIPSVlanVlanNotifications,
+                dellNetFIPSVlanMCDiscSolicits,
+                dellNetFIPSVlanUnicastDiscSolicits,
+                dellNetFIPSVlanFLogis,
+                dellNetFIPSVlanFDiscs,
+                dellNetFIPSVlanFLogouts,
+                dellNetFIPSVlanVnPortKeepAlives,
+                dellNetFIPSVlanMCDiscAdverts,
+                dellNetFIPSVlanUnicastDiscAdverts,
+                dellNetFIPSVlanFLogiAccepts,
+                dellNetFIPSVlanFLogiRejects,
+                dellNetFIPSVlanFDiscAccepts,
+                dellNetFIPSVlanFDiscRejects,
+                dellNetFIPSVlanFLogoutAccepts,
+                dellNetFIPSVlanFLogoutRejects,
+                dellNetFIPSVlanClearVirtLinks,
+                dellNetFIPSVlanVnPortSeshTimeouts,
+                dellNetFIPSVlanFcfDiscAdvTimeouts,
+                dellNetFIPSVlanSeshFailsDueToHwCfg,
+                dellNetFIPSVlanSeshDenyFcfLmtRch,
+                dellNetFIPSVlanSeshDenyENodeLmtRch,
+                dellNetFIPSVlanSeshDenySysLmtRch
+           }
+   STATUS  current
+   DESCRIPTION
+       "This group represents a collection of objects providing the
+       FIPS Vlan Statistics information."
+   ::= { dellNetFIPSMibGroups 7 }
+
+dellNetFIPSIntfStatsObjectGroup OBJECT-GROUP
+   OBJECTS {
+                dellNetFIPSIntfVlanRequests,
+                dellNetFIPSIntfVlanNotifications,
+                dellNetFIPSIntfMCDiscSolicits,
+                dellNetFIPSIntfUnicastDiscSolicits,
+                dellNetFIPSIntfFLogis,
+                dellNetFIPSIntfFDiscs,
+                dellNetFIPSIntfFLogouts,
+                dellNetFIPSIntfVnPortKeepAlives,
+                dellNetFIPSIntfMCDiscAdverts,
+                dellNetFIPSIntfUnicastDiscAdverts,
+                dellNetFIPSIntfFLogiAccepts,
+                dellNetFIPSIntfFLogiRejects,
+                dellNetFIPSIntfFDiscAccepts,
+                dellNetFIPSIntfFDiscRejects,
+                dellNetFIPSIntfFLogoutAccepts,
+                dellNetFIPSIntfFLogoutRejects,
+                dellNetFIPSIntfClearVirtLinks,
+                dellNetFIPSIntfVnPortSeshTimeouts,
+                dellNetFIPSIntfFcfDiscAdvTimeouts,
+                dellNetFIPSIntfSeshFailsDueToHwCfg,
+                dellNetFIPSIntfSeshDenyFcfLmtRch,
+                dellNetFIPSIntfSeshDenyENodeLmtRch,
+                dellNetFIPSIntfSeshDenySysLmtRch
+           }
+   STATUS  current
+   DESCRIPTION
+       "This group represents a collection of objects providing the
+       FIPS Interface Statistics information."
+   ::= { dellNetFIPSMibGroups 8 }
+
+dellNetFIPSTrapsObjectGroup NOTIFICATION-GROUP
+   NOTIFICATIONS 
+	   {
+                dellNetMaxFcfsInVlanLmtRchTrap,
+                dellNetMaxENodesLmtRchTrap,
+                dellNetMaxSessionLmtRchTrap,
+                dellNetFcfDroppedTrap,
+                dellNetENodeDroppedTrap,
+                dellNetSessionRequestDroppedTrap,
+                dellNetAclInstallationFailureTrap
+           }
+   STATUS  current
+   DESCRIPTION
+       "This group represents a collection of objects providing the
+       FIPS Trap information."
+   ::= { dellNetFIPSMibGroups 9 }
+
+dellNetFIPSTrapObjectsGroup OBJECT-GROUP
+   OBJECTS {
+                dellNetFIPSTrapVlanIndex,
+                dellNetFIPSTrapMacAddr
+           }
+   STATUS  current
+   DESCRIPTION
+       "This group represents a collection of objects providing the
+       FIPS Trap object information."
+   ::= { dellNetFIPSMibGroups 10 }
+
+END
+

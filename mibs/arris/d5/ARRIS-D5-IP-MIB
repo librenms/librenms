@@ -1,0 +1,257 @@
+ARRIS-D5-IP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        arrisD5UEQam
+            FROM ARRIS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32,
+        TimeTicks
+                FROM SNMPv2-SMI
+        TruthValue
+                FROM SNMPv2-TC
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        InetAddress
+                FROM INET-ADDRESS-MIB
+        SnmpAdminString 
+                FROM SNMP-FRAMEWORK-MIB
+        igmpCacheEntry,
+        igmpInterfaceEntry
+                FROM IGMP-STD-MIB;
+
+arrisD5UEQamIpMib MODULE-IDENTITY
+		LAST-UPDATED "200801040000Z" -- 04th January 2008
+		ORGANIZATION "Arris Group"
+		CONTACT-INFO
+				"           Software Development
+						Postal: ARRIS Group
+										3871 Lakefield Drive
+										Suwanee, GA 30024
+										USA
+						Tel:    800-469-6569
+						Fax:    678-473-8770"
+
+		DESCRIPTION
+				"This MIB manages the proprietary IP configuration of the D5"
+		::= { arrisD5UEQam 15 }
+
+
+arrisD5UEQamIpGroup OBJECT-GROUP
+	OBJECTS {
+		d5IpDefaultRoute,
+		d5IpGratuitousArpEnabled,
+		d5IpGratuitousArpPeriod
+  }
+  STATUS current
+   DESCRIPTION
+"A collection of objects providing system IP configuration."
+ ::= { arrisD5UEQamIpMib 1 }
+   
+
+d5IpDefaultRoute OBJECT-TYPE
+   SYNTAX       InetAddress
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Sets default route."
+   ::= { arrisD5UEQamIpGroup 1 }
+
+d5IpGratuitousArpEnabled OBJECT-TYPE
+   SYNTAX       TruthValue
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Enable or Disable the gratuitous arp feature."
+   ::= { arrisD5UEQamIpGroup 2 }
+
+d5IpGratuitousArpPeriod OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "Configure the frequency of gratuitous arp transmission."
+   ::= { arrisD5UEQamIpGroup 3 }
+
+
+
+   --
+   --   Extension to the igmpCacheTable
+   --
+   --
+
+   d5IpIgmpCacheExtTable        OBJECT-TYPE
+       SYNTAX      SEQUENCE OF D5IpIgmpCacheExtEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A list of source ips for a given multicast group"
+       ::= { arrisD5UEQamIpGroup 4 }
+
+   d5IpIgmpCacheExtEntry        OBJECT-TYPE
+       SYNTAX      D5IpIgmpCacheExtEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An entry containing additional information, mainly source
+                ip addresses for an entry in the igmpCacheTable"
+       AUGMENTS    { igmpCacheEntry }
+       ::= { d5IpIgmpCacheExtTable 1 }
+
+    D5IpIgmpCacheExtEntry ::=
+       SEQUENCE {
+            igmpCacheSource1             IpAddress,
+            igmpCacheSource1Status       INTEGER,
+            igmpCacheSource1Type         INTEGER,
+            igmpCacheSource2             IpAddress,
+            igmpCacheSource2Status       INTEGER,
+            igmpCacheSource2Type         INTEGER,
+            igmpCacheSource3             IpAddress,
+            igmpCacheSource3Status       INTEGER,
+            igmpCacheSource3Type         INTEGER
+       }
+
+    igmpCacheSource1 OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group source address"
+    ::= { d5IpIgmpCacheExtEntry 1 }
+
+    igmpCacheSource1Status OBJECT-TYPE
+       SYNTAX  INTEGER {
+                    ifDown(1),
+                    candidate(2),
+                    streaming(3), 
+                    waiting(4),
+                    undefined(5)
+               }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "The current state of the source address, whether the interface is down, video is stremaing, is waiting for a stream
+             or is a candidate in the case of loss of current stream"
+       ::= { d5IpIgmpCacheExtEntry 2 }
+
+    igmpCacheSource1Type OBJECT-TYPE
+       SYNTAX  INTEGER {
+                    undefined(0),
+                    static(1),
+                    dynamic(2)
+               }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "States if the source address is statically or dynamically configured"
+       ::= { d5IpIgmpCacheExtEntry 3 }
+
+    igmpCacheSource2 OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group source address"
+    ::= { d5IpIgmpCacheExtEntry 4 }
+
+    igmpCacheSource2Status OBJECT-TYPE
+       SYNTAX  INTEGER {
+                    ifDown(1),
+                    candidate(2),
+                    streaming(3), 
+                    waiting(4),
+                    undefined(5)
+               }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "The current state of the source address, whether the interface is down, video is stremaing, is waiting for a stream
+             or is a candidate in the case of loss of current stream"
+       ::= { d5IpIgmpCacheExtEntry 5 }
+
+    igmpCacheSource2Type OBJECT-TYPE
+       SYNTAX  INTEGER {
+                    undefined(0),
+                    static(1),
+                    dynamic(2)
+               }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "States if the source address is statically or dynamically configured"
+       ::= { d5IpIgmpCacheExtEntry 6 }
+
+    igmpCacheSource3 OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group source address"
+    ::= { d5IpIgmpCacheExtEntry 7 }
+
+    igmpCacheSource3Status OBJECT-TYPE
+       SYNTAX  INTEGER {
+                    ifDown(1),
+                    candidate(2),
+                    streaming(3), 
+                    waiting(4),
+                    undefined(5)
+               }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "The current state of the source address, whether the interface is down, video is stremaing, is waiting for a stream
+             or is a candidate in the case of loss of current stream"
+       ::= { d5IpIgmpCacheExtEntry 8 }
+
+    igmpCacheSource3Type OBJECT-TYPE
+       SYNTAX  INTEGER {
+                    undefined(0),
+                    static(1),
+                    dynamic(2)
+               }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "States if the source address is statically or dynamically configured"
+       ::= { d5IpIgmpCacheExtEntry 9 }
+
+
+   --
+   --   Extension to the igmpInterfaceTable
+   --
+   --
+
+   d5IpIgmpInterfaceExtTable        OBJECT-TYPE
+       SYNTAX      SEQUENCE OF D5IpIgmpInterfaceExtEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A list of additional fields to the v2 igmp mib entry"
+       ::= { arrisD5UEQamIpGroup 5 }
+
+   d5IpIgmpInterfaceExtEntry        OBJECT-TYPE
+       SYNTAX      D5IpIgmpInterfaceExtEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An entry containing additional information to the v2 igmp mib entry"
+       AUGMENTS    { igmpInterfaceEntry }
+       ::= { d5IpIgmpInterfaceExtTable 1 }
+
+    D5IpIgmpInterfaceExtEntry ::=
+       SEQUENCE {
+            igmpInterfaceExtVersion2QuerierTimer  TimeTicks
+       }
+
+    igmpInterfaceExtVersion2QuerierTimer OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The time remaining until the host assumes that there are no
+            IGMPv2 routers present on the interface.  While this is non-
+            zero, the host will reply to all queries with version 1
+            membership reports."
+        ::= { d5IpIgmpInterfaceExtEntry 1 }
+END

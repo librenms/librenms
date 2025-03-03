@@ -1,0 +1,15 @@
+os: aloha
+text: HAProxy ALOHA
+over:
+    - { graph: device_bits, text: Traffic }
+type: loadbalancer
+group: linux
+mib_dir: haproxy
+icon: haproxy
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: EXCELIANCE-MIB::alProductName
+            op: '='
+            value: 'aloha'

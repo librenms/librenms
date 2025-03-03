@@ -1,0 +1,32 @@
+mib: SCHLEIFENBAUER-DATABUS-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: sdbMgmtStsRingState
+                    num_oid: '.1.3.6.1.4.1.31034.12.1.1.1.1.5.{{ $index }}'
+                    entPhysicalIndex: 2
+                    descr: 'Databus Ring State'
+                    index: 'sdbMgmtStsRingState.{{ $index }}'
+                    state_name: sdbMgmtStsRingState
+                    states:
+                        - { value: 0, generic: 2, graph: 0, descr: open }
+                        - { value: 1, generic: 0, graph: 1, descr: closed }
+        count:
+            data:
+                -
+                    oid: sdbMgmtStsDuplicateDevices
+                    num_oid: '.1.3.6.1.4.1.31034.12.1.1.1.1.4.{{ $index }}'
+                    high_limit: '1'
+                    entPhysicalIndex: 3
+                    descr: 'Duplicate Device Addresses'
+                    index: 'sdbMgmtStsDuplicateDevices.{{ $index }}'
+                -
+                    oid: sdbMgmtStsNewDevices
+                    num_oid: '.1.3.6.1.4.1.31034.12.1.1.1.1.3.{{ $index }}'
+                    warn_limit: 1
+                    high_limit: 2
+                    entPhysicalIndex: 4
+                    descr: 'New Devices'
+                    index: 'sdbMgmtStsNewDevices.{{ $index }}'

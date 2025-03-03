@@ -1,0 +1,13 @@
+os: tait-tnadmin
+text: 'Tait TN Admin OS'
+type: network
+icon: tait
+mib_dir: tait
+snmp_max_oid: 1
+over:
+    - { graph: device_temperature, text: 'Temperature' }
+discovery:
+    -
+        sysObjectID:
+            - '.1.3.6.1.4.1.3570.3.15'
+

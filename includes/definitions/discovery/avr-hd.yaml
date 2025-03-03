@@ -1,0 +1,4 @@
+modules:
+    os:
+        sysDescr_regex: '/avr-hd \[(?<version>.*?)\]/'
+        hardware: .1.3.6.1.4.1.28194.1.37.0

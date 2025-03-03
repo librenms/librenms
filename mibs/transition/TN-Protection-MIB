@@ -1,0 +1,50 @@
+-- *****************************************************************
+-- TN-PROTECTION-MIB.my : TN Ethernet Protection MIB
+--
+-- april 2012, Tony Lei
+--
+-- Copyright (c) 2012 by TN, Inc.
+--
+-- All rights reserved.
+-- *****************************************************************
+
+TN-PROTECTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    TruthValue,
+    RowStatus,
+    DisplayString
+        FROM SNMPv2-TC
+    tnProducts
+        FROM TRANSITION-SMI;
+    
+tnProtectionMIB MODULE-IDENTITY
+    LAST-UPDATED    "201207061930Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+                  Technical Support
+
+                  10900 Red Circle Drive
+                  Minnetonka, MN 55343 USA
+                  Tel: +1-800-526-9267
+
+                  E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "TBD"
+    REVISION        "201204200000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tnProducts 109 }
+
+END

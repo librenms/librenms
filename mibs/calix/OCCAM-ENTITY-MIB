@@ -1,0 +1,386 @@
+
+--This MIB has been extracted from RFC 2737
+OCCAM-ENTITY-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, mib-2, NOTIFICATION-TYPE, 
+		enterprises, OBJECT-IDENTITY, Integer32
+			FROM SNMPv2-SMI
+		TDomain, TAddress, TEXTUAL-CONVENTION, AutonomousType, 
+		RowPointer, TimeStamp, TruthValue, MacAddress, DateAndTime, 
+		PhysAddress
+			FROM SNMPv2-TC
+		SnmpAdminString
+			FROM SNMP-FRAMEWORK-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+			FROM SNMPv2-CONF
+		occamGenericHardwareModules
+			FROM OCCAM-REG-MODULE;
+
+	entityMIB	MODULE-IDENTITY
+		LAST-UPDATED	"200710020000Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		
+		DESCRIPTION		
+				"The MIB module for representing multiple 
+                                logical entities supported by a single 
+                                SNMP agent."
+		
+		REVISION	"200909100000Z"
+		DESCRIPTION	"Realigned objects and indices ordering"
+		
+		REVISION	"200710020000Z"
+		DESCRIPTION	"modified entitySoftwareRevExt object OID"
+				
+		REVISION	"200709200000Z"
+		DESCRIPTION	"added entitySoftwareRevExt object"
+
+		REVISION	"9912070000Z"
+		DESCRIPTION	"Initial Version of Entity MIB (Version 2).
+				This revision obsoletes RFC 2037."
+		
+		::=  {  occamGenericHardwareModules  1  }
+
+-- TEXTUAL-CONVENTIONS --
+	PhysicalIndex ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	"d"
+		STATUS		current
+		DESCRIPTION	"An arbitrary value which uniquely 
+                                identifies the physical entity.  The 
+                                value should be a small non-negative 
+                                integer; index values for different 
+                                physical entities are not necessarily
+                                contiguous."
+		SYNTAX 		Integer32  ( 0 .. 2147483647  ) 
+
+	org	OBJECT IDENTIFIER
+		::=  {  iso  3  }
+
+	dod	OBJECT IDENTIFIER
+		::=  {  org  6  }
+
+
+-- MIB variables
+
+	internet	OBJECT IDENTIFIER
+		::=  {  dod  1  }
+
+	mgmt	OBJECT IDENTIFIER
+		::=  {  internet  2  }
+
+
+
+--identifiers
+
+	entityMIBObjects	OBJECT IDENTIFIER
+		::=  {  entityMIB  1  }
+
+
+-- Entity MIB Trap Definitions
+
+	entityMIBTraps	OBJECT IDENTIFIER
+		::=  {  entityMIB  2  }
+
+--scalar Objects
+
+	entityCompanyName	OBJECT-TYPE	
+		SYNTAX		SnmpAdminString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"The name of the Company which built the
+                                product. In our case it is Occam 
+                                Networks Inc."
+		::=  {  entityMIBObjects 1 }
+
+	entityMacAddress	OBJECT-TYPE	
+		SYNTAX          MacAddress 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"This object contains the MAC Address of
+				an ethernet interface. For other physical
+				entities it is an octet string of length 0"
+		::=  {  entityMIBObjects 2  }
+
+	entityBoardName		OBJECT-TYPE	
+		SYNTAX		SnmpAdminString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"The textual name of the Board."
+		::=  {  entityMIBObjects 3 }
+
+	entityBoardAssembly	OBJECT-TYPE	
+		SYNTAX		SnmpAdminString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"An in-house classification of the board."
+		::=  {  entityMIBObjects 4 }
+
+	entityBoardType		OBJECT-TYPE	
+		SYNTAX		SnmpAdminString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"The type of board that is present."
+		::=  {  entityMIBObjects 5 }
+
+	entitySerialNum		OBJECT-TYPE	
+		SYNTAX		SnmpAdminString (SIZE(0 .. 32)) 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"The vendor-specific serial number 
+                                 string for the physical entity."
+				
+		::=  {  entityMIBObjects  6  }
+
+	entityHardwareRev	OBJECT-TYPE	
+		SYNTAX		SnmpAdminString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"The vendor-specific hardware revision 
+                                string for the physical entity.  The 
+                                preferred value is the hardware revision 
+                                identifier actually printed on the 
+                                component itself (if present).
+				
+				Note that if revision information is 
+                                stored internally in a non-printable 
+                                (e.g., binary) format, then the agent 
+                                must convert such information to a 
+                                printable format, in an implementation-
+                                specific manner.
+				
+				If no specific hardware revision string 
+                                is associated with the physical component,
+                                or this information is unknown to the 
+                                agent, then this object will contain a 
+                                zero-length string."
+		::=  {  entityMIBObjects  7  }
+
+
+	entityFirmwareRev	OBJECT-TYPE	
+		SYNTAX		SnmpAdminString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"The vendor-specific firmware revision 
+                                string for the
+				physical entity.
+				
+				Note that if revision information is 
+                                stored internally in a non-printable 
+                                (e.g., binary) format, then the agent 
+                                must convert such information to a 
+                                printable format, in an implementation-
+                                specific manner.
+				
+				If no specific firmware programs are 
+                                associated with the physical component, 
+                                or this information is unknown to the
+				agent, then this object will contain a 
+                                zero-length string."
+		::=  {  entityMIBObjects 8  }
+
+
+	entitySoftwareRev	OBJECT-TYPE	
+		SYNTAX		SnmpAdminString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"The vendor-specific software revision 
+                                string for the physical entity.
+				
+				Note that if revision information is 
+                                stored internally in a non-printable 
+                                (e.g., binary) format, then the agent 
+                                must convert such information to a 
+                                printable format, in an implementation-
+                                specific manner.
+				
+				If no specific software programs are 
+                                associated with the physical component, 
+                                or this information is unknown to the
+				agent, then this object will contain a 
+                                zero-length string."
+		::=  {  entityMIBObjects 9 }
+
+	entityMfgDate		OBJECT-TYPE	
+		SYNTAX		SnmpAdminString	
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"The date when this physical component 
+                                was manufactured. The preferred value is
+                                the manufacturer date printed on the 
+                                component itself(if present). If the 
+                                manufacturer date  associated with the 
+                                physical component is unknown to the 
+                                agent, then this object will contain a
+				zero-length string."
+		::=  {  entityMIBObjects  10 }
+		
+	entitySoftwareRevExt	OBJECT-TYPE	
+		SYNTAX		SnmpAdminString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"The Occam software revision extension in
+                                'TagTagrev_SuffixSuffixrev' format 
+                                (i.e. R3_P1). In this example the Tag is 
+                                R, the Tagrev is 3, the Suffix is P, and 
+                                the Suffixrev is 1."
+		::=  {  entityMIBObjects 13 }	
+
+	entityOntSlotId		OBJECT-TYPE
+                SYNTAX		SnmpAdminString
+                MAX-ACCESS	read-only
+                STATUS		current
+                DESCRIPTION
+			        "The slot identifier configured on this 
+                                entity, intended for within a daisy 
+                                chained application.  This object is 
+                                applicable to active ONTs."
+                ::=  {  entityMIBObjects  14 }
+
+
+	
+--           The Port Table
+	entityPortTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  EntityPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			        "This table contains one row per port 
+                                entity."
+		::=  { entityMIBObjects 11 }
+
+	entityPortEntry		OBJECT-TYPE
+		SYNTAX		EntityPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			        "Information about a particular port."
+		INDEX		{  entityPortShelfIndex, 
+                                entityPortSlotIndex, entityPortIndex }
+		::=  { entityPortTable 1 }
+
+	EntityPortEntry  ::=  SEQUENCE {
+	        entityPortShelfIndex PhysicalIndex,
+		entityPortSlotIndex PhysicalIndex,
+		entityPortIndex  PhysicalIndex,
+		entityPortName SnmpAdminString
+		}
+
+	entityPortShelfIndex	OBJECT-TYPE	
+		SYNTAX		PhysicalIndex
+		MAX-ACCESS	read-only	
+		STATUS		current
+		DESCRIPTION		
+				"The shelf number which contains the slot
+                                 that contains this port."
+		::=  {  entityPortEntry  1  }
+
+	entityPortSlotIndex	OBJECT-TYPE	
+		SYNTAX		PhysicalIndex
+		MAX-ACCESS      read-only	
+		STATUS		current
+		DESCRIPTION		
+				"The slot number associated with this 
+                                port." 
+		::=  {  entityPortEntry  2  }
+
+	entityPortIndex		OBJECT-TYPE	
+		SYNTAX		PhysicalIndex
+		MAX-ACCESS      read-only	
+		STATUS		current
+		DESCRIPTION		
+				"The number of the port in the slot 
+                                specified by entitySlotIndex, and the 
+                                shelf specified by entityShelfIndex."
+		::=  {  entityPortEntry  3  }
+
+	entityPortName		OBJECT-TYPE	
+		SYNTAX		SnmpAdminString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+				"The textual name of the port. The value
+                                of this object should be the name as 
+                                assigned by the local device and should
+                                be suitable for usein commands entered at
+                                the device's console."
+		::=  {  entityPortEntry  4  }
+
+--conformance statements
+
+	entityMIBConformance	OBJECT IDENTIFIER
+		::=  { entityMIB 3  }
+
+	entityMIBGroups	OBJECT IDENTIFIER
+		::=  { entityMIBConformance 1	}
+
+	entityMIBCompliances	OBJECT IDENTIFIER
+		::=  {  entityMIBConformance  2  }
+
+	entityMIBObjGroups	OBJECT IDENTIFIER
+		::=  {  entityMIBGroups  1  }
+
+	entityMIBEventGroups	OBJECT IDENTIFIER
+		::=  {  entityMIBGroups  2  }
+
+
+
+
+	entityCompliance	MODULE-COMPLIANCE
+		STATUS		current
+		DESCRIPTION		
+				"The compliance statement for SNMP 
+                                entities which implement the Entity MIB."
+
+		MODULE 	
+		MANDATORY-GROUPS	{ entityPhysicalGroup}
+		OBJECT          	entitySerialNum
+		MIN-ACCESS		not-accessible
+		DESCRIPTION
+                		"Read and write access is not required 
+                                for agents which cannot identify serial 
+                                number information for physical entities,
+                                and/or cannot provide non-volatile 
+                                storage for NMS-assigned serial numbers.
+						
+				Write access is not required for agents
+                                which can identify serial number 
+                                information,but can provide non-volatile 
+                                storage for NMS-assigned serial numbers."
+						
+		::=  {  entityMIBCompliances  1  }
+
+
+-- MIB groupings
+
+	entityPhysicalGroup	OBJECT-GROUP
+           	OBJECTS	        {  entityCompanyName,
+                                   entityMacAddress, 
+                                   entityBoardName,
+                                   entityBoardAssembly,
+                                   entityBoardType ,
+                                   entitySerialNum,
+                                   entityHardwareRev,
+                                   entityFirmwareRev,
+                                   entitySoftwareRev,
+                                   entityMfgDate 
+				}                 
+		STATUS		current
+		DESCRIPTION		
+				"The collection of objects which are used
+                                to represent the physical system for which
+                                a single agent provides management 
+                                information."
+		::=  {  entityMIBObjGroups  1  }
+
+END

@@ -1,0 +1,91 @@
+--  *****************************************************************
+--  DLINKSW-GENMGMT-MIB : D-Link General Management MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-GENMGMT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Unsigned32
+            FROM SNMPv2-SMI
+        DisplayString   
+            FROM SNMPv2-TC
+        dlinkIndustrialCommon                     
+            FROM DLINK-ID-REC-MIB;              
+
+                                       
+    dlinkSwGenMgmtMIB MODULE-IDENTITY
+        LAST-UPDATED "201309130000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This is the first version of the MIB file."
+
+        ::= { dlinkIndustrialCommon 165 }
+            
+-- -----------------------------------------------------------------------------
+    dGenMgmtMIBNotifications   OBJECT IDENTIFIER ::= { dlinkSwGenMgmtMIB 0 }
+    dGenMgmtMIBObjects         OBJECT IDENTIFIER ::= { dlinkSwGenMgmtMIB 1 }
+    dGenMgmtMIBConformance     OBJECT IDENTIFIER ::= { dlinkSwGenMgmtMIB 2 }
+
+-- -----------------------------------------------------------------------------
+-- MIB Objects statements
+-- -----------------------------------------------------------------------------
+
+
+-- -----------------------------------------------------------------------------
+-- MIB Notifications statements
+-- -----------------------------------------------------------------------------
+
+    dGenMgmtLoginFail    NOTIFICATION-TYPE
+        OBJECTS   {
+            dGenMgmtNotifyInfoLoginType,
+            dGenMgmtNotifyInfoUserName
+        }
+        STATUS    current
+        DESCRIPTION
+            "Generated when the user login failed to the switch."
+        ::= { dGenMgmtMIBNotifications 1 }
+
+-- -----------------------------------------------------------------------------
+    dGenMgmtNotifyInfos    OBJECT IDENTIFIER ::= { dGenMgmtMIBObjects 1 }
+
+    dGenMgmtNotifyInfoLoginType OBJECT-TYPE
+        SYNTAX          INTEGER {
+            console(1),
+            telnet(2),
+            ssh(3),
+            web(4)
+        }
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "The type is the user login method type."
+       ::= { dGenMgmtNotifyInfos 1 }
+
+    dGenMgmtNotifyInfoUserName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "This object is the name of the user that login to the switch."
+        ::= { dGenMgmtNotifyInfos 2 }
+                
+-- -----------------------------------------------------------------------------
+-- MIB Conformance statements
+-- -----------------------------------------------------------------------------
+
+
+END
+

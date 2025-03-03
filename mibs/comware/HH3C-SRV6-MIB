@@ -1,0 +1,92 @@
+-- =================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Segment Routing over IPv6 (SRv6) MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2020-08-31 The initial version, created by Chen ZiChao
+-- =================================================================
+HH3C-SRV6-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    InetAddressIPv6, InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cSrv6 MODULE-IDENTITY
+    LAST-UPDATED "202008310000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+
+    DESCRIPTION
+        "This MIB file provides information about Segment Routing over IPv6 (SRv6)."
+    REVISION "202008310000Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 197 }
+
+-- Top-level structure of MIB
+hh3cSrv6Notifications  OBJECT IDENTIFIER ::= { hh3cSrv6 0 }
+hh3cSrv6Objects    OBJECT IDENTIFIER ::= { hh3cSrv6 1 }
+
+-- The SRv6 Notification Table
+
+-- The SRv6 Notification Table records fields that are
+-- required for notifications.
+
+hh3cSrv6NotificationEntry OBJECT IDENTIFIER
+    ::= { hh3cSrv6Objects 1 }
+
+hh3cSrv6NotificationSid OBJECT-TYPE
+    SYNTAX       InetAddressIPv6
+    MAX-ACCESS   accessible-for-notify
+    STATUS   current
+    DESCRIPTION
+    "The local SRv6 SID."
+    ::= { hh3cSrv6NotificationEntry 1 }
+
+hh3cSrv6NotificationSidPrefixLen OBJECT-TYPE
+    SYNTAX       InetAddressPrefixLength
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+    "The prefix length of the local SRv6 SID."
+    ::= { hh3cSrv6NotificationEntry 2 }
+
+-- Notification Definitions
+
+-- The notifications need to be throttled so as to not overwhelm the
+-- management agent in case of rapid changes to the SRv6 module.
+
+hh3cSrv6SidRouteConflict NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6NotificationSid,
+        hh3cSrv6NotificationSidPrefixLen
+        }
+    STATUS       current
+    DESCRIPTION
+    "A hh3cSrv6SidRouteConflict notification signifies that an
+    local SRv6 SID is conflicted with routes in routing table."
+    ::= { hh3cSrv6Notifications 1 }
+
+hh3cSrv6SidRouteConflictClear NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6NotificationSid,
+        hh3cSrv6NotificationSidPrefixLen
+        }
+    STATUS       current
+    DESCRIPTION
+    "A hh3cSrv6SidRouteConflictClear notification signifies that
+    the conflict between the local SRv6 SID and routes in routing table
+    has been resolved."
+    ::= { hh3cSrv6Notifications 2 }
+
+END

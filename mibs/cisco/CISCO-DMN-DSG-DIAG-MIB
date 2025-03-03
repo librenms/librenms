@@ -1,0 +1,401 @@
+--****************************************************************
+-- CISCO_DMN_DSG_DIAG.mib : Mib file for Detailed Diagnostics.
+--
+-- October 2010, Tel MIB Team
+--
+-- Copyright (c) 1999-2012 Cisco Systems, Inc. All rights reserved.
+--****************************************************************
+
+    CISCO-DMN-DSG-DIAG-MIB
+
+ DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE, Integer32, Counter32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    ciscoDSGUtilities
+        FROM CISCO-DMN-DSG-ROOT-MIB;
+
+
+ciscoDSGDiag  MODULE-IDENTITY
+    LAST-UPDATED  "201203200800Z" --  March 20 2012 08:00:00 GMT
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+       "Cisco Systems, Inc.
+        Customer Service
+        Postal: 170 W Tasman Drive
+        San Jose, CA 95134
+        USA
+        Tel: +1 800 553 NETS
+
+        E-mail: cs-ipsla@cisco.com"
+    DESCRIPTION   "Cisco Detailed Diagnostics MIB."
+
+    REVISION       "201203200800Z"
+    DESCRIPTION    "V01.00.05 2012-03-20
+                    Updated for D9854 R4 Release."
+
+    REVISION        "201010130800Z"
+    DESCRIPTION     "V01.00.04 2010-10-13
+                    Type of diagFanRPMValue is changed to DisplayString."
+
+                    REVISION        "201008031000Z"
+    DESCRIPTION     "V01.00.03 2010-08-03
+                    Health Monitor Table and Fan RPM Table are added."
+
+    REVISION        "201004120900Z"
+    DESCRIPTION     "V01.00.02 2010-04-12
+                    powerOnFactoryResetCount and powerOnCurrentDateTime
+                    MIB objects are added."
+
+    REVISION        "201002121200Z"
+    DESCRIPTION     "V01.00.01 2010-02-12
+                    The Syntax of read-only objects is updated to
+                    DisplayString."
+
+    REVISION        "200912071200Z"
+    DESCRIPTION     "V01.00.00 2009-12-07
+                    Initial Version."
+
+    ::= { ciscoDSGUtilities 18 }
+
+
+powerOn                   OBJECT IDENTIFIER ::= { ciscoDSGDiag 1  }
+diagTable                 OBJECT IDENTIFIER ::= { ciscoDSGDiag 2  }
+
+-- *************************************
+-- powerOn Branch
+-- *************************************
+
+powerOnCreationDate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..30))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Build Date of Product."
+    ::= { powerOn 1 }
+
+powerOnDate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..30))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Last Power-On Date."
+    ::= { powerOn 2 }
+
+powerOnTotalHours OBJECT-TYPE
+    SYNTAX   DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total Hours Running.The range is from 0 to
+        4294967295 hrs in steps of 1 hr."
+    ::= { powerOn 3 }
+
+powerOnHrsSinceLastPowerOff OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Hours Since Last Power Reset.The range is from 0 to
+        4294967295 hrs in steps of 1 hr."
+    ::= { powerOn 4 }
+
+powerOnTotResetCount OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total Reset Counter.The range is from 0 to 4294967295."
+    ::= { powerOn 5 }
+
+powerOnClrableResetCount OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "User Clearable Reset Counter.The range is from 0 to
+        4294967295."
+    ::= { powerOn 6 }
+
+powerOnReasonLastReset OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Reason for the Last Reset."
+    ::= { powerOn 7 }
+
+powerOnClearResetCounter OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        writeOnly(1),
+                        yes(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Set this object to yes(2) to clear Power On Reset counter."
+    ::= { powerOn 8 }
+
+powerOnFactoryResetCount OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32 ))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total Factory Resets."
+    ::= { powerOn 9 }
+
+powerOnCurrentDateTime OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32 ))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Displays the Current date and time."
+    ::= { powerOn 10 }
+
+--************************************
+-- Diagnostics Table Group
+--************************************
+
+--************************************
+-- Health Monitor Table Group
+--************************************
+diagHealthMonitorTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DIAGHealthMonitorEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Health Monitor Table."
+    ::= { diagTable 1 }
+
+diagHealthMonitorEntry OBJECT-TYPE
+    SYNTAX  DIAGHealthMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Health Monitor table."
+    INDEX   { diagHealthMonitorIndex }
+    ::= { diagHealthMonitorTable 1 }
+
+DIAGHealthMonitorEntry ::=  SEQUENCE
+{
+    diagHealthMonitorIndex         Integer32,
+    diagHealthMonitorName          DisplayString,
+    diagHealthMonitorValue         DisplayString
+}
+
+diagHealthMonitorIndex  OBJECT-TYPE
+    SYNTAX  Integer32 (0..1000)
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        " Health Monitor index."
+    ::= { diagHealthMonitorEntry 1 }
+
+diagHealthMonitorName  OBJECT-TYPE
+    SYNTAX  DisplayString( SIZE(0..8) )
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "Health Monitor Item Name -
+        Gives Board Current temperature if monitor index is CURTEMP
+        Gives Board Maximum tempearture if monitor index is MAXTEMP
+        Gives Board Average temperature if monitor index is AVGTEMP
+        Gives Board Temperature at intake 1/intake 2 if monitor
+        index is IN1VAL/INVAL2
+        Gives Board FPGA Vicinity if monitor index is FPGAVIC
+        Gives Board FPGA Value if monitor index is FPGAVAL."
+    ::= { diagHealthMonitorEntry 2 }
+
+diagHealthMonitorValue  OBJECT-TYPE
+    SYNTAX  DisplayString ( SIZE(0..8) )
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "Health monitor Item Value."
+    ::= { diagHealthMonitorEntry 3 }
+
+--************************************
+-- Fan RPM Table Group
+--************************************
+diagFanRPMTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DIAGFanRPMEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Fan RPM Table."
+    ::= { diagTable 2 }
+
+diagFanRPMEntry OBJECT-TYPE
+    SYNTAX  DIAGFanRPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Fan RPM table."
+    INDEX   { diagFanRPMIndex }
+    ::= { diagFanRPMTable 1 }
+
+DIAGFanRPMEntry ::=  SEQUENCE
+{
+    diagFanRPMIndex                Integer32,
+    diagFanRPMName                 DisplayString,
+    diagFanRPMValue                DisplayString
+}
+
+diagFanRPMIndex  OBJECT-TYPE
+    SYNTAX  Integer32 (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        " Fan RPM index."
+    ::= { diagFanRPMEntry 1 }
+
+diagFanRPMName  OBJECT-TYPE
+    SYNTAX  DisplayString( SIZE(0..8))
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "Fan RPM Item Name :
+        Gives Fan 1 speed in rpm if Fan RPM index is FAN1
+        Gives Fan 2 speed in rpm if Fan RPM index is FAN2
+        Gives Fan 3 speed in rpm if Fan RPM index is FAN3
+        Gives Fan 4 speed in rpm if Fan RPM index is FAN4
+        Gives Fan 5 speed in rpm if Fan RPM index is FAN5
+        Gives Fan 6 speed in rpm if Fan RPM index is FAN6
+        Gives Fan 7 speed in rpm if Fan RPM index is FAN7."
+    ::= { diagFanRPMEntry 2 }
+
+diagFanRPMValue  OBJECT-TYPE
+    SYNTAX  DisplayString( SIZE(0..8))
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        " Health monitor Item Value."
+    ::= { diagFanRPMEntry 3 }
+
+--************************************
+-- ECC Readings Table Group
+--************************************
+diagECCReadingsTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DIAGECCReadingsEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "ECC Readings Table."
+    ::= { diagTable 3 }
+
+diagECCReadingsEntry OBJECT-TYPE
+    SYNTAX  DIAGECCReadingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for ECC Readings table."
+    INDEX   { diagECCReadingsIndex }
+    ::= { diagECCReadingsTable 1 }
+
+DIAGECCReadingsEntry ::=  SEQUENCE
+{
+    diagECCReadingsIndex             INTEGER,
+    diagECCReadingsLocat             DisplayString,
+    diagECCReadingsType              DisplayString,
+    diagECCReadingsVal               DisplayString,
+    diagECCReadingsApplicability     DisplayString
+}
+
+diagECCReadingsIndex  OBJECT-TYPE
+    SYNTAX  INTEGER (1..15)
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "ECC Readings index."
+    ::= { diagECCReadingsEntry 1 }
+
+diagECCReadingsLocat  OBJECT-TYPE
+    SYNTAX  DisplayString( SIZE(0..64))
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "ECC Reading Location."
+    ::= { diagECCReadingsEntry 2 }
+
+diagECCReadingsType  OBJECT-TYPE
+    SYNTAX  DisplayString( SIZE(0..64))
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "ECC Reading Type."
+    ::= { diagECCReadingsEntry 3 }
+
+diagECCReadingsVal  OBJECT-TYPE
+    SYNTAX  DisplayString( SIZE(0..64))
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "ECC Reading Value."
+    ::= { diagECCReadingsEntry 4 }
+
+diagECCReadingsApplicability  OBJECT-TYPE
+    SYNTAX  DisplayString( SIZE(0..64))
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "ECC Reading Applicibility for this device."
+    ::= { diagECCReadingsEntry 5 }
+
+--************************************
+-- Control History Table Group
+--************************************
+diagCtrlHistoryTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DIAGCtrlHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Control History Table."
+    ::= { diagTable 4 }
+
+diagCtrlHistoryEntry OBJECT-TYPE
+    SYNTAX  DIAGCtrlHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Control History table."
+    INDEX   { diagCtrlHistoryIndex }
+    ::= { diagCtrlHistoryTable 1 }
+
+DIAGCtrlHistoryEntry ::=  SEQUENCE
+{
+    diagCtrlHistoryIndex             Counter32,
+    diagCtrlHistoryHistory           DisplayString,
+    diagCtrlHistoryDateTime          DisplayString
+}
+
+diagCtrlHistoryIndex  OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "Control History Table Index."
+    ::= { diagCtrlHistoryEntry 1 }
+
+diagCtrlHistoryHistory  OBJECT-TYPE
+    SYNTAX  DisplayString( SIZE(0..64))
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "Control History Text."
+    ::= { diagCtrlHistoryEntry 2 }
+
+diagCtrlHistoryDateTime  OBJECT-TYPE
+    SYNTAX  DisplayString( SIZE(0..30))
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "Control History Date and Time."
+    ::= { diagCtrlHistoryEntry 3 }
+
+END

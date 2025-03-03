@@ -1,0 +1,683 @@
+--  *****************************************************************
+--  DLINKSW-ERPS-MIB.mib : Ethernet Ring Protection Switching MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-ERPS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+            FROM SNMPv2-SMI
+        RowStatus,MacAddress,TruthValue,DisplayString
+            FROM SNMPv2-TC
+        NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+		    FROM SNMPv2-CONF 
+        InterfaceIndexOrZero
+            FROM IF-MIB  
+        VlanIdOrNone
+            FROM Q-BRIDGE-MIB              
+        Dlink2kVlanList                 
+            FROM DLINKSW-TC-MIB    
+        dlinkIndustrialCommon			
+			FROM DLINK-ID-REC-MIB;
+
+    dlinkSwErpsMIB	MODULE-IDENTITY
+   		LAST-UPDATED "201301180000Z"
+   		ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "The MIB module for managing Ethernet Ring Protection Switching."
+            
+        REVISION "201301180000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'ERPS'
+            functionality."
+		::= { dlinkIndustrialCommon 78 }
+
+-- -----------------------------------------------------------------------------
+    dErpsMIBNotification		OBJECT IDENTIFIER ::= { dlinkSwErpsMIB 0 }
+    dErpsMIBObjects      		OBJECT IDENTIFIER ::= { dlinkSwErpsMIB 1 }
+    dErpsMIBConformance	        OBJECT IDENTIFIER ::= { dlinkSwErpsMIB 2 }
+    
+-- -----------------------------------------------------------------------------   
+    dErpsGenCtrl                OBJECT IDENTIFIER ::= { dErpsMIBObjects 1 }
+    
+    dErpsNotificationEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether sending notification for ERPS
+            state change or RPL owner conflict event."
+        ::= { dErpsGenCtrl 3 }    
+              
+-- -----------------------------------------------------------------------------   
+    dErpsProfileTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DErpsProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of G8032 profiles."
+        ::= { dErpsMIBObjects 2 }
+
+    dErpsProfileEntry OBJECT-TYPE
+        SYNTAX          DErpsProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains information about a G8032 profile.
+            An entry is created/removed when a G8032 profile is defined
+            or deleted."
+        INDEX    { dErpsProfName }
+        ::= { dErpsProfileTable 1 }
+
+    DErpsProfileEntry ::= SEQUENCE {
+        dErpsProfName		            DisplayString,
+        dErpsProfRowStatus              RowStatus,
+        dErpsProfTcnPropagationEnabled  TruthValue, 
+        dErpsProfRevertiveEnabled       TruthValue,
+        dErpsProfGuardTimer			    Unsigned32,
+        dErpsProfHoldOffTimer		    Unsigned32,
+        dErpsProfWtrTimer  			    Unsigned32            
+    }
+           
+    dErpsProfName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the G8032 profile."
+        ::= { dErpsProfileEntry 1 }        
+    
+    dErpsProfRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of the conceptual row."
+        ::= { dErpsProfileEntry 2 }  
+        
+    dErpsProfTcnPropagationEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the propagation of topology change
+            notification from sub ERP instance to major instance is enabled or
+            not for the G8032 profile."
+        DEFVAL { false }    
+        ::= { dErpsProfileEntry 3 }           
+     
+     dErpsProfRevertiveEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether restoring to the working transport entity,
+            i.e. blocked on the RPL of the entry.
+            In non-revertive operation, the traffic channel continues to use the RPL,
+            if it is not failed, after a switch link defect condition has cleared."
+        DEFVAL { true }    
+        ::= { dErpsProfileEntry 4 }
+        
+     dErpsProfGuardTimer OBJECT-TYPE
+        SYNTAX          Unsigned32 ( 10..2000 )
+        UNITS           "milliseconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object configures the guard timer in milliseconds for an ERP domain.
+             The valid range is 10 to 2000. The value should be multiple of 10."
+        DEFVAL { 500 }
+        ::= { dErpsProfileEntry 5 }
+
+    dErpsProfHoldOffTimer OBJECT-TYPE
+       	SYNTAX          Unsigned32 ( 0..10 )
+        UNITS			"seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object configures the hold-off timer in seconds for an ERP domain.           
+             The valid range is 0 to 10."
+        DEFVAL { 0 }
+        ::= { dErpsProfileEntry 6 }
+        
+    dErpsProfWtrTimer OBJECT-TYPE
+        SYNTAX          Unsigned32 ( 1..12 )
+        UNITS			"minutes"          
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object configures the WTR timer in minutes for an ERP domain.                       
+              The valid range is 1 to 12."
+        DEFVAL { 5 }
+        ::= { dErpsProfileEntry 7 } 
+
+-- -----------------------------------------------------------------------------                         	
+	dErpsEtherRingTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DErpsEtherRingEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains configuration of the G8032 physical rings."
+        ::= { dErpsMIBObjects 3 }
+
+    dErpsEtherRingEntry OBJECT-TYPE
+        SYNTAX          DErpsEtherRingEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains G8032 physical ring inforamtion.
+            An	entry is created/removed when a	G8032 physical ring is defined
+            or deleted.
+            "
+        INDEX    { dErpsEtherRingName }
+        ::= { dErpsEtherRingTable 1 }
+
+    DErpsEtherRingEntry ::= SEQUENCE {
+        dErpsEtherRingName		        DisplayString,
+        dErpsEtherRingRowStatus         RowStatus,
+        dErpsEtherRingAdminPort0IfIdx   InterfaceIndexOrZero,        
+        dErpsEtherRingAdminPort1IfIdx   InterfaceIndexOrZero       
+    }
+                 
+    dErpsEtherRingName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the G8032 ring."
+        ::= { dErpsEtherRingEntry 1 }
+    
+     dErpsEtherRingRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of the conceptual row."
+        ::= { dErpsEtherRingEntry 2 }                               
+
+    dErpsEtherRingAdminPort0IfIdx OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface which is the
+            configured first ring port of the physical ring.
+            The interface can be physical port or port-channel interface.
+            The special value of zero indicates the first ring port is not 
+            specified.
+            " 
+        DEFVAL { 0 }           
+        ::= { dErpsEtherRingEntry 3 }
+                  
+     dErpsEtherRingAdminPort1IfIdx OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface which is the
+            configured second ring port of the physical ring.
+            The interface can be physical port or port-channel interface.
+            Setting this object to 0xFFFFFFFF(4294967295) indicates that the
+            interconnect node is a local node endpoint of an open ring.
+                
+            The special value of zero indicates the second ring port is not 
+            specified." 
+        DEFVAL { 0 }           
+        ::= { dErpsEtherRingEntry 4 }   
+                            
+-- ----------------------------------------------------------------------------- 
+    dErpsEtherSubRingTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DErpsEtherSubRingEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains sub ring configuration of the G8032 physical rings."
+        ::= { dErpsMIBObjects 4 }
+
+    dErpsEtherSubRingEntry OBJECT-TYPE
+        SYNTAX          DErpsEtherSubRingEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains a sub ring setting of a physical ring. 
+            An	entry is created/removed when a sub ring is specified or removed.
+            "
+        INDEX    { 
+            dErpsEtherRingName,
+            dErpsEtherSubRingName
+        }
+        ::= { dErpsEtherSubRingTable 1 }
+
+    DErpsEtherSubRingEntry ::= SEQUENCE {        
+        dErpsEtherSubRingName           DisplayString,
+        dErpsEtherSubRingRowStatus      RowStatus
+    }
+   
+    dErpsEtherSubRingName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the sub ring.           
+            "         
+        ::= { dErpsEtherSubRingEntry 1 }      
+    
+     dErpsEtherSubRingRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of the conceptual row."
+        ::= { dErpsEtherSubRingEntry 2 }                
+            
+-- -----------------------------------------------------------------------------     
+   dErpsInstTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DErpsInstEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of ERP instance configuration and 
+            status information."
+        ::= { dErpsMIBObjects 5 }
+
+    dErpsInstEntry OBJECT-TYPE
+        SYNTAX          DErpsInstEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains information about an ERP instance.
+            The first instance identifier index value (dErpsEtherRingName)
+            identifies the dErpsEtherRingEntry that an ERP instance (dErpsInstEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dErpsEtherRingEntry is deleted.
+            An	entry is created/removed when an ERP instance is defined
+            or deleted."
+        INDEX    { 
+            dErpsEtherRingName, 
+            dErpsInstInstanceId 
+        }
+        ::= { dErpsInstTable 1 }
+
+    DErpsInstEntry ::= SEQUENCE {
+        dErpsInstInstanceId             Unsigned32,
+        dErpsInstRowStatus              RowStatus,
+        dErpsInstDescription            DisplayString,        
+        dErpsInstMel                    Unsigned32,
+        dErpsInstProfile                DisplayString,
+        dErpsInstApsChannelVlanId       VlanIdOrNone,
+        dErpsInstIncludeVlansFirst2K    Dlink2kVlanList,     
+        dErpsInstIncludeVlansSecond2K   Dlink2kVlanList,          
+        dErpsInstAdminRplPort		    INTEGER,
+        dErpsInstOperRplPort            INTEGER,
+        dErpsInstAdminRplNodeRole	    INTEGER,
+        dErpsInstOperRplNodeRole        INTEGER,                                 
+        dErpsInstOperPort0IfIdx         InterfaceIndexOrZero,
+        dErpsInstOperPort0State         INTEGER,
+        dErpsInstOperPort1IfIdx         InterfaceIndexOrZero,
+        dErpsInstOperPort1State         INTEGER,          
+        dErpsInstAdminActivate          TruthValue,
+        dErpsInstInstanceState          INTEGER 
+    }
+           
+    dErpsInstInstanceId OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..32)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the ERP instance."
+        ::= { dErpsInstEntry 1 }        
+    
+    dErpsInstRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of the conceptual row."
+        ::= { dErpsInstEntry 2 }       
+                    
+    dErpsInstDescription OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..64))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates a description for the ERP instance.
+            A zero length string indicates the description is not specified."
+        ::= { dErpsInstEntry 3 }   
+                                
+    dErpsInstMel OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..7)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ring MEL value of the ERP instance."
+        ::= { dErpsInstEntry 4 }    
+    
+     dErpsInstProfile OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the G8032 profile to be
+            associated with the ERP instance.
+            A zero length string indicates the associated profile is
+            not specified."
+        ::= { dErpsInstEntry 5 }  
+                        
+    dErpsInstApsChannelVlanId OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the APS channel VLAN for the ERP instance.
+            A special value of 0 indicates the APS channel VLAN is not 
+            specified."            
+        ::= { dErpsInstEntry 6 }   
+    
+    dErpsInstIncludeVlansFirst2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the service protected VLANs of ERP instance
+            in a string of octets containing one bit per VLAN for VLANs 1 to
+            2048. 
+            If the bit is set to '1', then the VLAN is configured to be
+            protected by the Ethernet ring protection mechanism."     
+        ::= { dErpsInstEntry 7 }    
+                                                              
+    dErpsInstIncludeVlansSecond2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the service protected VLANs of ERP instance
+            in a string of octets containing one bit per VLAN for VLANs 2049 to
+            4094. 
+            If the bit is set to '1', then the VLAN is configured to be
+            protected by the Ethernet ring protection mechanism."     
+        ::= { dErpsInstEntry 8 }    
+        
+    dErpsInstAdminRplPort OBJECT-TYPE
+        SYNTAX          INTEGER{             
+        	 port0(0),
+        	 port1(1),
+        	 none(2)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the administratively configured RPL port of
+             the entry.
+             port0(0) - Specify port0 as the RPL port.
+             port1(1) - Specify port1 as the RPL port. 
+             none(2)  - The RPL port is not specified.
+            "
+        ::= { dErpsInstEntry 9 }
+            
+    dErpsInstOperRplPort OBJECT-TYPE
+        SYNTAX          INTEGER {             
+        	 port0(0),
+        	 port1(1),
+        	 none(2)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current 
+        DESCRIPTION
+            "This object indicates the operational RPL port of the entry."
+        ::= { dErpsInstEntry 10 }
+            
+    dErpsInstAdminRplNodeRole OBJECT-TYPE
+        SYNTAX          INTEGER{
+            none(0),
+        	owner(1),
+        	neighbor(2)        	
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the administratively configured node role.
+            This object has to be none(0) if administrative RPL port is
+            not specified."            
+        ::= { dErpsInstEntry 11 }
+   
+    dErpsInstOperRplNodeRole OBJECT-TYPE
+        SYNTAX          INTEGER{
+            none(0),
+        	owner(1),
+        	neighbor(2)        	
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current ring node role."                       
+        ::= { dErpsInstEntry 12 }
+                       
+     dErpsInstOperPort0IfIdx OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the operational first ring 
+            port of the physical ring.            
+            The value of administrative port0 inherits dErpsEtherRingAdminPort0IfIdx
+            of physical ring to which the instance belongs.
+            The special value of zero indicates the operational port0 is not 
+            available."           
+        ::= { dErpsInstEntry 13 }   
+
+     dErpsInstOperPort0State OBJECT-TYPE                
+        SYNTAX          INTEGER {
+            notApplicable(1),
+        	forwarding(2),
+        	blocked(3),
+        	virtualChannel(4)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the operational state of port0."
+        ::= { dErpsInstEntry 14 }
+     
+    dErpsInstOperPort1IfIdx OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the operational second ring 
+            port of the physical ring.       
+            The value of administrative port1 inherits dErpsEtherRingAdminPort1IfIdx
+            of physical ring to which the instance belongs.     
+            The special value of zero indicates the operational port1 is not 
+            available."           
+        ::= { dErpsInstEntry 15 }
+      
+     dErpsInstOperPort1State OBJECT-TYPE                
+        SYNTAX          INTEGER {
+        	notApplicable(1),
+        	forwarding(2),
+        	blocked(3),
+        	virtualChannel(4)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the operational state of port1."
+        ::= { dErpsInstEntry 16 }    
+     
+     dErpsInstAdminActivate OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the administrative state of the ERP instance.
+            Setting this object to 'true' activates the ERP instance.
+            Setting this object to 'false' deactivates the ERP instance."
+        DEFVAL { false }
+        ::= { dErpsInstEntry 17 }   
+    
+    dErpsInstInstanceState OBJECT-TYPE
+        SYNTAX          INTEGER {
+        	deactivated(0),
+        	nonOperational(1),
+            init(2),
+        	idle(3),
+        	protection(4)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current ring node state of the ERP instance. 
+             The state could be: 
+             deactivated(0)		: The ERP instance is deactivated.
+			 nonOperational(1)	: The ERP instance is enabled but is not activated
+			                      due to inconsistent setting.
+			 init(2)			: The instance is initializing.
+			 idle(3)			: The instance is in normal state. The RPL port
+			                      is blocked.
+			 protection(4)		: The instance detects failure at some ring port.
+			                      The RPL port is restored to protect the port."
+        ::= { dErpsInstEntry 18 }
+
+                
+-- -----------------------------------------------------------------------------   
+    dErpsEventInfo                OBJECT IDENTIFIER ::= { dErpsMIBObjects 6 }
+    
+    dErpsEventNodeId OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The MAC address included in the notification currently being
+            sent, indicating the ring node that is involved the ERPS event." 
+        ::= { dErpsEventInfo 1 }
+
+--  ***************************************************************************	
+--  Notifications
+--  ***************************************************************************  
+    dErpsFailuredetectedNotif    NOTIFICATION-TYPE
+        OBJECTS     {dErpsEventNodeId }
+        STATUS      current
+        DESCRIPTION
+            "A dErpsFailureNotification is sent when dErpsNotificationEnabled
+            is 'true' and a signal failure is detected."
+        ::= { dErpsMIBNotification 1 }
+
+    dErpsFailureClearedNotif NOTIFICATION-TYPE
+        OBJECTS     {dErpsEventNodeId }
+        STATUS          current
+        DESCRIPTION
+             "A dErpsFailureClearedNotif is sent when dErpsNotificationEnabled
+              is 'true' and a signal failure is cleared."
+        ::= { dErpsMIBNotification 2 }
+
+    dErpsRPLOwnerConflictNotif   NOTIFICATION-TYPE
+        OBJECTS     {dErpsEventNodeId }
+        STATUS          current
+        DESCRIPTION
+            "A dErpsOwnerConflictNotif is sent when dErpsNotificationEnabled
+              is 'true' and RPL owner conflict is detected."
+        ::= { dErpsMIBNotification 3 }
+        
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************			   		
+	dErpsCompliances OBJECT IDENTIFIER ::= { dErpsMIBConformance 1 }
+		
+	dErpsCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-ERPS-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 			
+			dErpsInstanceGroup,
+			dErpsProfileCfgGroup,
+			dErpsNotifyCfgGroup,
+			dErpsNotificationGroup
+		}
+		::= { dErpsCompliances 1 }
+		
+	dErpsGroups OBJECT IDENTIFIER ::= { dErpsMIBConformance 2 }
+		
+	    
+    dErpsInstanceGroup OBJECT-GROUP
+		OBJECTS { 
+		    dErpsEtherRingRowStatus,
+            dErpsEtherRingAdminPort0IfIdx,        
+            dErpsEtherRingAdminPort1IfIdx,               
+            dErpsEtherSubRingRowStatus,
+            dErpsInstRowStatus,              
+            dErpsInstInstanceState, 
+            dErpsInstDescription,        
+            dErpsInstMel,
+            dErpsInstProfile,
+            dErpsInstApsChannelVlanId,
+            dErpsInstIncludeVlansFirst2K,     
+            dErpsInstIncludeVlansSecond2K,  
+            dErpsInstAdminRplPort,
+            dErpsInstOperRplPort,
+            dErpsInstAdminRplNodeRole,
+            dErpsInstOperRplNodeRole,       
+            dErpsInstOperPort0IfIdx,
+            dErpsInstOperPort0State,
+            dErpsInstOperPort1IfIdx,
+            dErpsInstOperPort1State,
+            dErpsInstAdminActivate     			
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides the RPS instance configuration and
+			status information."
+		::= { dErpsGroups 1 }
+		
+	dErpsProfileCfgGroup OBJECT-GROUP
+		OBJECTS { 
+   			dErpsProfRowStatus,
+            dErpsProfTcnPropagationEnabled, 
+            dErpsProfRevertiveEnabled,
+            dErpsProfGuardTimer,
+            dErpsProfHoldOffTimer,
+            dErpsProfWtrTimer      
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides the profile configuration for ERPS."
+		::= { dErpsGroups 2 }
+
+
+    dErpsNotifyCfgGroup OBJECT-GROUP
+		OBJECTS 
+		    {   dErpsNotificationEnabled,
+		        dErpsEventNodeId
+		    }
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects about the information for ERPS notification. 
+			"
+		::= { dErpsGroups 3 }
+		
+    dErpsNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            dErpsFailuredetectedNotif,
+            dErpsFailureClearedNotif,
+            dErpsRPLOwnerConflictNotif
+        }
+        STATUS current
+        DESCRIPTION
+            "The collection of notifications used for monitoring ERPS status"
+        ::= { dErpsGroups 4 }   
+
+END
+

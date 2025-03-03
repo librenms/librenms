@@ -1,0 +1,675 @@
+--MibName=raisecomSystem
+-- =======================================================================
+-- Version info
+--
+-- Version 0.1 Created 2003.12.17 by GONGGUIDONG
+-- This version of MIB is created just for the use of Network Management Systems
+-- display the  memory and cpu.
+--
+-- Copyright(c) 2002-2005 by RAISECOM TECH, Ltd.
+-- modify history
+-- 01, 20131012, huxiangfeng, Add two traps.
+-- 01, 20090915, qiyun, Add CPU monitor MIBs.
+--
+-- =======================================================================
+
+
+
+ROSMGMT-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY ,
+        NOTIFICATION-TYPE,
+        Integer32,
+        OBJECT-TYPE
+                    FROM SNMPv2-SMI
+        rosMgmt
+                    FROM RAISECOM-BASE-MIB
+
+        EnableVar
+                    FROM SWITCH-TC
+        TimeStamp,TEXTUAL-CONVENTION
+                    FROM SNMPv2-TC;
+
+    rosMgmtSystem MODULE-IDENTITY
+                LAST-UPDATED     "202004120000Z"
+                ORGANIZATION     "RAISECOM TECH, Ltd."
+                CONTACT-INFO     "www.raisecom.com"
+                DESCRIPTION
+                        "raisecom System objects: objects common to all platforms."
+        REVISION        "202004120000Z"
+        DESCRIPTION     "MIB file check and modification"
+            ::= { rosMgmt 1 }
+--
+-- Textual Conventions
+--
+
+    ProcessStatus ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+                   "Status of the process."
+        SYNTAX   INTEGER
+                {
+                rrunning(1),
+                dinterruptiblesleep(2),
+                suninterruptiblesleep(3),
+                tstopped(4),
+                zzombie(5),
+                xdead(6),
+                wpaging(7)
+                }
+
+    CPUTimeStamp ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "4d.4d.4d.4d"
+        STATUS       current
+        DESCRIPTION
+                "The time in seconds that could represent signed
+                quantities like time delay with respect to some
+                source. The signed integer part is in the first
+                32 bits and the fraction part is in the last 32 bits."
+        REFERENCE
+                "D.L. Mills, 'Network Time Protocol (Version 3)',
+                RFC-1305, March 1992, Sections 2,  3.2.1"
+        SYNTAX     OCTET STRING (SIZE (16))
+
+
+--
+-- RAISECOM CPU objects
+--
+
+
+    rosMgmtCpu    OBJECT IDENTIFIER ::= { rosMgmtSystem 1 }
+
+--rosMgmtCpuTrapGroup
+
+    rosMgmtCpuNotifications    OBJECT IDENTIFIER ::= { rosMgmtCpu 0 }
+    rosMgmtCpuObjects          OBJECT IDENTIFIER ::= { rosMgmtCpu 1 }
+    rosMgmtCpuConformance      OBJECT IDENTIFIER ::= { rosMgmtCpu 2 }
+
+--rosMgmtCpuNotifications
+     rosMgmtCpuRisingThreshold NOTIFICATION-TYPE
+            OBJECTS { rosMgmtProcessIndex, rosMgmtProcessUtilization,rosMgmtCpuUtilizationCpuIdx, rosMgmtCpuUtilization }
+            STATUS  current
+            DESCRIPTION
+                 "CPU utilization rising threshold trap transfer."
+            ::= { rosMgmtCpuNotifications 1 }
+
+     rosMgmtCpuRisingThresholdRecover NOTIFICATION-TYPE
+            OBJECTS {rosMgmtCpuUtilizationCpuIdx, rosMgmtCpuUtilization }
+            STATUS  current
+            DESCRIPTION
+                 "CPU utilization rising threshold return to normal trap transfer."
+            ::= { rosMgmtCpuNotifications 2 }
+
+
+--rosMgmtCpuScalarGroup
+
+
+       rosMgmtCpuScalarGroup  OBJECT IDENTIFIER
+                   ::= { rosMgmtCpuObjects 1}
+
+        rosMgmtCpuTotalProcNum OBJECT-TYPE
+                   SYNTAX  Integer32   (1..2000)
+                   MAX-ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                          "Total number of processes."
+                   ::= { rosMgmtCpuScalarGroup 1}
+
+
+       rosMgmtCpuHistoryTableSize OBJECT-TYPE
+                   SYNTAX  Integer32
+                   MAX-ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                          "A value configured by the user which specifies
+                          the number of reports in the history table."
+                   DEFVAL { 60 }
+                   ::= { rosMgmtCpuScalarGroup 2}
+
+       rosMgmtCpuThresholdTrapEnable OBJECT-TYPE
+                   SYNTAX  EnableVar
+                   MAX-ACCESS  read-write
+                   STATUS  deprecated
+                   DESCRIPTION
+                          "The administration status of the CPU utilization threshold trap."
+                   ::= { rosMgmtCpuScalarGroup 3}
+
+       rosMgmtCpuRisingThresholdValue OBJECT-TYPE
+                   SYNTAX  Integer32  (2..99)
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                          "The percentage rising threshold value configured by the user.
+                          The value indicates, if the CPU utilization which rise from
+                          rosMgmtCpuFallingThresholdValue is equal to or above this value
+                          for rosMgmtCpuThresholdInterval duration then send
+                          a rosMgmtCpuRisingThreshold notification to the NMS."
+                   DEFVAL { 99 }
+                   ::= { rosMgmtCpuScalarGroup 4}
+
+       rosMgmtCpuRecoverThresholdValue OBJECT-TYPE
+                   SYNTAX  Integer32  (0..98)
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                          "The percentage falling threshold value configured by the user.
+                          The value indicates, if the CPU utilization which fell from
+                          rosMgmtCpuRecoverThresholdValue is equal to or below this value
+                          for rosMgmtCpuThresholdInterval duration then send
+                          a rosMgmtCpuFallingThreshold notification to the NMS."
+                   DEFVAL { 79 }
+                   ::= { rosMgmtCpuScalarGroup 5}
+
+       rosMgmtCpuThresholdInterval OBJECT-TYPE
+                   SYNTAX  Integer32  (5..36000)
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                          "This is an observation interval.
+                          The value of this object indicates that the CPU utilization
+                          should be above rosMgmtCpuRisingThresholdValue for this
+                          duration to send a rosMgmtCpuRisingThreshold notification
+                          to the NMS or below rosMgmtCpuFallingThresholdValue for
+                          this duration to send a rosMgmtCpuFallingThreshold."
+                   DEFVAL { 60 }
+                   ::= { rosMgmtCpuScalarGroup 6}
+
+        rosMgmtCpuNum OBJECT-TYPE
+                   SYNTAX  Integer32
+                   MAX-ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                          "Total number of cpu."
+                   ::= { rosMgmtCpuScalarGroup 7}
+
+
+
+--rosMgmtCpuTableGroup
+
+
+       rosMgmtCpuTableGroup  OBJECT IDENTIFIER
+                   ::= { rosMgmtCpuObjects 2}
+
+
+--rosMgmtCpuUtilizationGroup
+
+
+       rosMgmtCpuUtilizationGroup  OBJECT IDENTIFIER
+                   ::= { rosMgmtCpuTableGroup 1 }
+
+
+--rosMgmtCpuUtilizationTable
+
+       rosMgmtCpuUtilizationTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF RosMgmtCpuUtilizationEntry
+                   MAX-ACCESS  not-accessible
+                   STATUS  current
+                   DESCRIPTION
+                            "This table contains information about multi-core CPU utilization."
+                   ::= { rosMgmtCpuUtilizationGroup 1 }
+
+       rosMgmtCpuUtilizationEntry OBJECT-TYPE
+                    SYNTAX  RosMgmtCpuUtilizationEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                            "Information about the CPU utilization."
+                    INDEX           { rosMgmtCpuUtilizationPeriod,rosMgmtCpuUtilizationCpuIdx }
+                    ::= { rosMgmtCpuUtilizationTable 1 }
+
+       RosMgmtCpuUtilizationEntry ::= SEQUENCE {
+                    rosMgmtCpuUtilizationPeriod    INTEGER,
+                    rosMgmtCpuUtilizationCpuIdx    Integer32,
+                    rosMgmtCpuUtilization          Integer32
+                    }
+
+       rosMgmtCpuUtilizationPeriod OBJECT-TYPE
+                    SYNTAX    INTEGER {
+                                        oneSec(1),
+                                        fiveSec(2),
+                                        oneMin(3),
+                                        tenMin(4),
+                                        twoHour(5)
+                                    }
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "Periods for computing CPU utilization."
+                    ::= { rosMgmtCpuUtilizationEntry 1 }
+
+       rosMgmtCpuUtilizationCpuIdx OBJECT-TYPE
+                    SYNTAX Integer32 (0..16)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "The cpu core index"
+                    ::= { rosMgmtCpuUtilizationEntry 2 }
+
+
+       rosMgmtCpuUtilization OBJECT-TYPE
+                    SYNTAX  Integer32
+                    UNITS    "percent"
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "CPU busy percentage in the last specified period."
+                    ::= { rosMgmtCpuUtilizationEntry 3 }
+
+--rosMgmtTotalCPUUtilizationTable
+
+
+       rosMgmtTotalCPUUtilizationTable OBJECT-TYPE
+                    SYNTAX SEQUENCE OF RosMgmtTotalCPUUtilizationEntry
+                    MAX-ACCESS not-accessible
+                    STATUS current
+                    DESCRIPTION
+                        "This table contains information about total CPU utilization."
+                    ::= { rosMgmtCpuUtilizationGroup 2 }
+
+        rosMgmtTotalCPUUtilizationEntry OBJECT-TYPE
+                    SYNTAX RosMgmtTotalCPUUtilizationEntry
+                    MAX-ACCESS not-accessible
+                    STATUS current
+                    DESCRIPTION
+                        "Description."
+                    INDEX { rosMgmtTotalCPUPeriod }
+                    ::= { rosMgmtTotalCPUUtilizationTable 1 }
+
+        RosMgmtTotalCPUUtilizationEntry ::= SEQUENCE {
+                    rosMgmtTotalCPUPeriod          INTEGER,
+                    rosMgmtTotalCPUUtilization     Integer32
+                    }
+
+        rosMgmtTotalCPUPeriod OBJECT-TYPE
+                    SYNTAX INTEGER  {
+                                        oneSec(1),
+                                        fiveSec(2),
+                                        oneMin(3),
+                                        tenMin(4),
+                                        twoHour(5)
+                                    }
+                    MAX-ACCESS not-accessible
+                    STATUS current
+                    DESCRIPTION
+                        "Periods for computing CPU utilization."
+                    ::= { rosMgmtTotalCPUUtilizationEntry 1 }
+
+
+        rosMgmtTotalCPUUtilization OBJECT-TYPE
+                    SYNTAX Integer32 (0..10000)
+                    UNITS "percent"
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "CPU busy percentage in the last specified period."
+                    ::= { rosMgmtTotalCPUUtilizationEntry 2 }
+
+
+
+
+--rosMgmtCpuHistoryTable
+
+       rosMgmtCpuHistoryTable OBJECT-TYPE
+                   SYNTAX   SEQUENCE OF RosMgmtCpuHistoryEntry
+                   MAX-ACCESS   not-accessible
+                   STATUS   current
+                   DESCRIPTION
+                            "This table contains CPU hsitory utilization records."
+                   ::= { rosMgmtCpuUtilizationGroup 3}
+
+       rosMgmtCpuHistoryEntry OBJECT-TYPE
+                    SYNTAX  RosMgmtCpuHistoryEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                            "CPU history utilization record."
+                    INDEX           { rosMgmtCpuHistoryPeriod, rosMgmtCpuHistoryIndex,rosMgmtCpuHistoryCpuIdx }
+                    ::= { rosMgmtCpuHistoryTable 1 }
+
+       RosMgmtCpuHistoryEntry ::= SEQUENCE {
+                       rosMgmtCpuHistoryPeriod     INTEGER,
+                    rosMgmtCpuHistoryIndex      Integer32,
+                    rosMgmtCpuHistoryCpuIdx     Integer32,
+                    rosMgmtCpuHistoryUtil  Integer32
+                    }
+
+       rosMgmtCpuHistoryPeriod OBJECT-TYPE
+                    SYNTAX    INTEGER {
+                                        fiveSec(1),
+                                        oneMin(2),
+                                        tenMin(3),
+                                        twoHour(4)
+                                    }
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "Periods for computing CPU history utilization, the first index of CPU history utilization table."
+                    ::= { rosMgmtCpuHistoryEntry 1 }
+
+       rosMgmtCpuHistoryIndex OBJECT-TYPE
+                    SYNTAX    Integer32   (1..60)
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "Process sequence number,the second index of CPU history utilization table."
+                    ::= { rosMgmtCpuHistoryEntry 2 }
+
+       rosMgmtCpuHistoryCpuIdx OBJECT-TYPE
+                    SYNTAX Integer32 (0..16)
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "The cpu core index"
+                    ::= { rosMgmtCpuHistoryEntry 3 }
+
+       rosMgmtCpuHistoryUtil OBJECT-TYPE
+                    SYNTAX    Integer32
+                    UNITS    "percent"
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "History record of CPU utilization in the specified period. "
+                    ::= { rosMgmtCpuHistoryEntry 4 }
+
+--rosMgmtTotalCPUHistoryTable
+
+       rosMgmtTotalCPUHistoryTable OBJECT-TYPE
+                   SYNTAX   SEQUENCE OF RosMgmtTotalCPUHistoryEntry
+                   MAX-ACCESS   not-accessible
+                   STATUS   current
+                   DESCRIPTION
+                            "This table contains CPU hsitory utilization records."
+                   ::= { rosMgmtCpuUtilizationGroup 4}
+
+       rosMgmtTotalCPUHistoryEntry OBJECT-TYPE
+                    SYNTAX  RosMgmtTotalCPUHistoryEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                            "CPU history utilization record."
+                    INDEX           { rosMgmtTotalCPUHistoryPeriod, rosMgmtTotalCPUHistoryIndex }
+                    ::= { rosMgmtTotalCPUHistoryTable 1 }
+
+       RosMgmtTotalCPUHistoryEntry ::= SEQUENCE {
+                       rosMgmtTotalCPUHistoryPeriod     INTEGER,
+                    rosMgmtTotalCPUHistoryIndex      Integer32,
+                    rosMgmtTotalCPUHistoryUtil  Integer32
+                    }
+
+       rosMgmtTotalCPUHistoryPeriod OBJECT-TYPE
+                    SYNTAX    INTEGER {
+                                        fiveSec(1),
+                                        oneMin(2),
+                                        tenMin(3),
+                                        twoHour(4)
+                                    }
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "Periods for computing CPU history utilization, the first index of CPU history utilization table."
+                    ::= { rosMgmtTotalCPUHistoryEntry 1 }
+
+       rosMgmtTotalCPUHistoryIndex OBJECT-TYPE
+                    SYNTAX    Integer32  (1..60)
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "Process sequence number,the second index of CPU history utilization table."
+                    ::= { rosMgmtTotalCPUHistoryEntry 2 }
+
+       rosMgmtTotalCPUHistoryUtil OBJECT-TYPE
+                    SYNTAX    Integer32
+                    UNITS    "percent"
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "History record of CPU utilization in the specified period. "
+                    ::= { rosMgmtTotalCPUHistoryEntry 3 }
+
+
+--rosMgmtCpuProcessesGroup
+
+
+       rosMgmtCpuProcessesGroup  OBJECT IDENTIFIER
+                   ::= { rosMgmtCpuTableGroup 2 }
+
+
+--rosMgmtProcessesTable
+
+       rosMgmtProcessesTable OBJECT-TYPE
+                   SYNTAX   SEQUENCE OF RosMgmtProcessesEntry
+                   MAX-ACCESS   not-accessible
+                   STATUS   current
+                   DESCRIPTION
+                            "This table contains information about processes."
+                   ::= { rosMgmtCpuProcessesGroup 1 }
+
+       rosMgmtProcessesEntry OBJECT-TYPE
+                    SYNTAX  RosMgmtProcessesEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                            "Information about processes."
+                    INDEX           { rosMgmtProcessIndex }
+                    ::= { rosMgmtProcessesTable 1 }
+
+       RosMgmtProcessesEntry ::= SEQUENCE {
+                    rosMgmtProcessIndex            Integer32,
+                    rosMgmtProcessPID              Integer32,
+                    rosMgmtProcessName             OCTET STRING,
+                    rosMgmtProcessRunTimeTotal     CPUTimeStamp,
+                    rosMgmtProcessInvokedTotal        Integer32,
+                    rosMgmtProcessTimeCreated      TimeStamp,
+                    rosMgmtProcessCurrentPriority  Integer32,
+                    rosMgmtProcessStatus           ProcessStatus
+                    }
+
+       rosMgmtProcessIndex OBJECT-TYPE
+                    SYNTAX  Integer32   (1..2147483647)
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "This object index of processes table. This index is PID."
+                    ::= { rosMgmtProcessesEntry 1 }
+
+       rosMgmtProcessPID OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "This object contains the process ID."
+                    ::= { rosMgmtProcessesEntry 2 }
+
+       rosMgmtProcessName OBJECT-TYPE
+                    SYNTAX  OCTET STRING (SIZE(1..32))
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The name associated with this process."
+                    ::= { rosMgmtProcessesEntry 3 }
+
+       rosMgmtProcessRunTimeTotal OBJECT-TYPE
+                    SYNTAX  CPUTimeStamp
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The amount of time the process occupied, in microseconds."
+                    ::= { rosMgmtProcessesEntry 4 }
+
+       rosMgmtProcessInvokedTotal OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The number of times since rosMgmtProcessTimeCreated
+                    that the process has been invoked."
+                    ::= { rosMgmtProcessesEntry 5 }
+
+       rosMgmtProcessTimeCreated OBJECT-TYPE
+                    SYNTAX  TimeStamp
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The time when the process was created.
+                    The process sequence number and the time
+                    when the process was created, uniquely identifies a process."
+                    ::= { rosMgmtProcessesEntry 6 }
+
+       rosMgmtProcessCurrentPriority OBJECT-TYPE
+                    SYNTAX  Integer32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The current priority at which the process is running."
+                    ::= { rosMgmtProcessesEntry 7 }
+
+       rosMgmtProcessStatus OBJECT-TYPE
+                    SYNTAX  ProcessStatus
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The current status of the process."
+                    ::= { rosMgmtProcessesEntry 8 }
+
+
+
+--rosMgmtProcessStatisticsTable
+
+       rosMgmtProcessStatisticsTable OBJECT-TYPE
+                   SYNTAX   SEQUENCE OF RosMgmtProcessStatisticsEntry
+                   MAX-ACCESS   not-accessible
+                   STATUS   current
+                   DESCRIPTION
+                            "This table contains statistics information for processes.
+                            The first index is rosMgmtProcessIndex,
+                            the second index is rosMgmtProcessStatisticsPeriod"
+                   ::= { rosMgmtCpuProcessesGroup 2 }
+
+       rosMgmtProcessStatisticsEntry OBJECT-TYPE
+                    SYNTAX  RosMgmtProcessStatisticsEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                            "Statistics information for processes."
+                    INDEX           { rosMgmtProcessIndex, rosMgmtProcessStatisticsPeriod }
+                    ::= { rosMgmtProcessStatisticsTable 1 }
+
+       RosMgmtProcessStatisticsEntry ::= SEQUENCE {
+                    rosMgmtProcessStatisticsPeriod    INTEGER,
+                    rosMgmtProcessRunTime             CPUTimeStamp,
+                    rosMgmtProcessUtilization         Integer32
+                    }
+
+       rosMgmtProcessStatisticsPeriod OBJECT-TYPE
+                    SYNTAX    INTEGER {
+                                        fiveSec(1),
+                                        oneMin(2),
+                                        tenMin(3)
+                                    }
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "Periods for process statistics,
+                    the second index of process statistics table."
+                    ::= { rosMgmtProcessStatisticsEntry 1 }
+
+       rosMgmtProcessRunTime OBJECT-TYPE
+                    SYNTAX    CPUTimeStamp
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "Time of the process occupied in the specified period."
+                    ::= { rosMgmtProcessStatisticsEntry 2 }
+
+       rosMgmtProcessUtilization OBJECT-TYPE
+                    SYNTAX    Integer32
+                    UNITS    "percent"
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "This object provides a general idea of how busy
+                    a process caused the processor to be over a specified period."
+                    ::= { rosMgmtProcessStatisticsEntry 3 }
+
+
+--rosMgmtDeadProcessesTable
+
+       rosMgmtDeadProcessesTable OBJECT-TYPE
+                   SYNTAX   SEQUENCE OF RosMgmtDeadProcessesEntry
+                   MAX-ACCESS   not-accessible
+                   STATUS   current
+                   DESCRIPTION
+                            "This table contains dead processes information."
+                   ::= { rosMgmtCpuProcessesGroup 3 }
+
+       rosMgmtDeadProcessesEntry OBJECT-TYPE
+                    SYNTAX  RosMgmtDeadProcessesEntry
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                            "Dead processes information."
+                    INDEX           { rosMgmtDeadProcessIndex }
+                    ::= { rosMgmtDeadProcessesTable 1 }
+
+       RosMgmtDeadProcessesEntry ::= SEQUENCE {
+                    rosMgmtDeadProcessIndex        Integer32 ,
+                    rosMgmtDeadProcessName         OCTET STRING,
+                    rosMgmtDeadProcessPriority     Integer32,
+                    rosMgmtDeadProcessTimeDelete   TimeStamp,
+                    rosMgmtDeadProcessDeadTimes    Integer32,
+                    rosMgmtDeadProcessStatus       ProcessStatus
+                    }
+
+       rosMgmtDeadProcessIndex OBJECT-TYPE
+                    SYNTAX    Integer32   (1..2147483647)
+                    MAX-ACCESS  not-accessible
+                    STATUS  current
+                    DESCRIPTION
+                    "Process sequence number,the index of dead processes table. The index is PID."
+                    ::= { rosMgmtDeadProcessesEntry 1 }
+
+       rosMgmtDeadProcessName OBJECT-TYPE
+                    SYNTAX    OCTET STRING (SIZE(1..32))
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The name associated with this dead process."
+                    ::= { rosMgmtDeadProcessesEntry 2 }
+
+       rosMgmtDeadProcessPriority OBJECT-TYPE
+                    SYNTAX    Integer32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The priority at which the dead process."
+                    ::= { rosMgmtDeadProcessesEntry 3 }
+
+
+       rosMgmtDeadProcessTimeDelete OBJECT-TYPE
+                    SYNTAX    TimeStamp
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The time when the process was deleted."
+                    ::= { rosMgmtDeadProcessesEntry 4}
+
+       rosMgmtDeadProcessDeadTimes OBJECT-TYPE
+                    SYNTAX    Integer32
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "Times of the process dead."
+                    ::= { rosMgmtDeadProcessesEntry 5 }
+
+       rosMgmtDeadProcessStatus OBJECT-TYPE
+                    SYNTAX    ProcessStatus
+                    MAX-ACCESS  read-only
+                    STATUS  current
+                    DESCRIPTION
+                    "The status of the dead process."
+                    ::= { rosMgmtDeadProcessesEntry 6}
+
+
+
+END

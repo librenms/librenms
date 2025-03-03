@@ -3,15 +3,15 @@ SYNOLOGY-RAID-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 	OBJECT-GROUP, MODULE-COMPLIANCE
 				FROM SNMPv2-CONF
-	enterprises, MODULE-IDENTITY, OBJECT-TYPE, Integer32
+	enterprises, MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64
 				FROM SNMPv2-SMI;
 
 synoRaid MODULE-IDENTITY
     LAST-UPDATED "201309110000Z"
     ORGANIZATION "www.synology.com"
     CONTACT-INFO
-         "postal:   Jay Pan
-          email:    jaypan@synology.com"
+         "Synology Inc.
+          Email: snmp@synology.com"
     DESCRIPTION
         "Characteristics of the raid information"
     REVISION     "201309110000Z"
@@ -42,12 +42,15 @@ raidEntry	  OBJECT-TYPE
 RaidEntry ::= SEQUENCE {
     raidIndex		Integer32,
     raidName		OCTET STRING,
-	raidStatus		Integer32
+	raidStatus		Integer32,
+	raidFreeSize	Counter64,
+	raidTotalSize	Counter64,
+	raidHotspareCnt Integer32
 }
 
 raidIndex OBJECT-TYPE
     SYNTAX	   Integer32(0..2147483647)
-    MAX-ACCESS	  not-accessible
+    MAX-ACCESS	  read-only
     STATUS	   current
     DESCRIPTION
     "The index of raid table"
@@ -79,6 +82,37 @@ raidStatus OBJECT-TYPE
 	"
     ::= { raidEntry 3 }
 
+raidFreeSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Synology raid freesize
+	 Free space in bytes.
+	"
+    ::= { raidEntry 4 }
+
+raidTotalSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Synology raid totalsize
+	 Total space in bytes.
+	"
+    ::= { raidEntry 5 }
+
+raidHotspareCnt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Synology raid hotspare
+	 Total hotspare disks count.
+	 Each meaning of values described as below.
+	 Normal(>=0): Total number of hotspare disks in this pool.
+	"
+    ::= { raidEntry 6 }
 
 raidConformance OBJECT IDENTIFIER ::= { synoRaid 2 }
 raidCompliances OBJECT IDENTIFIER ::= { raidConformance 1 }
@@ -95,8 +129,12 @@ raidCompliance MODULE-COMPLIANCE
     ::= { raidCompliances 1 }
 
 raidGroup OBJECT-GROUP
-    OBJECTS { raidName,
-              raidStatus}
+    OBJECTS { raidIndex,
+              raidName,
+              raidStatus,
+              raidFreeSize,
+              raidTotalSize,
+              raidHotspareCnt}
     STATUS  current
     DESCRIPTION
             "A collection of objects providing basic instrumentation and

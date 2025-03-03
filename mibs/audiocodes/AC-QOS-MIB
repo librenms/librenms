@@ -1,0 +1,934 @@
+
+AC-QOS-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        RowPointer				    FROM SNMPv2-TC
+        Unsigned32,
+		Integer32,
+        enterprises                                 FROM SNMPv2-SMI
+		RowStatus      								FROM SNMPv2-TC
+		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+		audioCodes,       
+		acRegistrations,
+		acGeneric, 
+		acProducts,acBoardMibs						FROM AUDIOCODES-TYPES-MIB
+		InetAddress, InetAddressType				FROM INET-ADDRESS-MIB;
+
+       
+acQoS  MODULE-IDENTITY       
+    LAST-UPDATED "201211131703Z"          --Tuesday, November 13 2012
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+	     AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+	     Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+
+    DESCRIPTION       
+    ""
+
+
+
+    ::= {acBoardMibs 14}  
+
+
+
+
+
+
+
+
+     acQoSConfiguration OBJECT IDENTIFIER ::= {acQoS 1}
+
+
+     -- ****************************************
+     -- acQoSMatchMap table declaration
+     -- ****************************************
+     acQoSMatchMapTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcQoSMatchMapEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acQoSConfiguration 1}
+
+
+
+     -- ****************************************
+     -- acQoSMatchMap table entry
+     -- ****************************************
+     acQoSMatchMapEntry OBJECT-TYPE
+       SYNTAX AcQoSMatchMapEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acQoSMatchMapIndex}
+       ::= {acQoSMatchMapTable 1}
+
+
+
+     -- ****************************************
+     -- acQoSMatchMap TABLE
+     -- ****************************************
+     AcQoSMatchMapEntry ::= SEQUENCE {
+       acQoSMatchMapIndex                              Unsigned32,
+       acQoSMatchMapName                               SnmpAdminString,
+       acQoSMatchMapDirection                          INTEGER,
+       acQoSMatchMapInterface                          SnmpAdminString
+     }
+
+
+
+     acQoSMatchMapIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (1000000..2069099)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSMatchMapEntry 1}
+
+
+
+     acQoSMatchMapName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Name of the Match Map.
+AC INI-Param: N/A"
+       ::= {acQoSMatchMapEntry 2}
+
+
+
+     acQoSMatchMapDirection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  input(1)
+,
+                  output(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Direction of the traffic for which this Match Map is applied.
+AC INI-Param: N/A"
+       ::= {acQoSMatchMapEntry 3}
+
+
+
+     acQoSMatchMapInterface OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Interface to which this Match Map is attached.
+AC INI-Param: N/A"
+       ::= {acQoSMatchMapEntry 4}
+
+
+
+     -- ****************************************
+     -- acQoSMatch table declaration
+     -- ****************************************
+     acQoSMatchTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcQoSMatchEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acQoSConfiguration 2}
+
+
+
+     -- ****************************************
+     -- acQoSMatch table entry
+     -- ****************************************
+     acQoSMatchEntry OBJECT-TYPE
+       SYNTAX AcQoSMatchEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acQoSMatchMatchMapIndex,acQoSMatchIndex}
+       ::= {acQoSMatchTable 1}
+
+
+
+     -- ****************************************
+     -- acQoSMatch TABLE
+     -- ****************************************
+     AcQoSMatchEntry ::= SEQUENCE {
+       acQoSMatchMatchMapIndex                         Unsigned32,
+       acQoSMatchIndex                                 Unsigned32,
+       acQoSMatchType                                  INTEGER,
+       acQoSMatchAccessMap                             SnmpAdminString,
+       acQoSMatchDscpValue                             Unsigned32,
+       acQoSMatchMinLength                             Unsigned32,
+       acQoSMatchMaxLength                             Unsigned32,
+       acQoSMatchPrecedenceValue                       INTEGER,
+       acQoSMatchPriorityValue                         Unsigned32
+     }
+
+
+
+     acQoSMatchMatchMapIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (1000000..2069099)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSMatchEntry 1}
+
+
+
+     acQoSMatchIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..6)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSMatchEntry 2}
+
+
+
+     acQoSMatchType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  any (1)
+,
+                  accessMap (2)
+,
+                  dscp (3)
+,
+                  dataLength (4)
+,
+                  packetLength (5)
+,
+                  precedence (6)
+,
+                  priority (7)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Type of the Match statement.
+AC INI-Param: N/A"
+       ::= {acQoSMatchEntry 3}
+
+
+
+     acQoSMatchAccessMap OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Name of the access list.
+AC INI-Param: N/A"
+       ::= {acQoSMatchEntry 4}
+
+
+
+     acQoSMatchDscpValue OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Diffentiated services codepoint value.
+AC INI-Param: N/A"
+       ::= {acQoSMatchEntry 5}
+
+
+
+     acQoSMatchMinLength OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum length to match.
+AC INI-Param: N/A"
+       ::= {acQoSMatchEntry 6}
+
+
+
+     acQoSMatchMaxLength OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum length to match.
+AC INI-Param: N/A"
+       ::= {acQoSMatchEntry 7}
+
+
+
+     acQoSMatchPrecedenceValue OBJECT-TYPE
+       SYNTAX INTEGER {
+                  routine(0)
+,
+                  priority(1)
+,
+                  immediate(2)
+,
+                  flash(3)
+,
+                  flash-override(4)
+,
+                  critical(5)
+,
+                  internet(6)
+,
+                  network(7)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Precedence value.
+AC INI-Param: N/A"
+       ::= {acQoSMatchEntry 8}
+
+
+
+     acQoSMatchPriorityValue OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Priority value.
+AC INI-Param: N/A"
+       ::= {acQoSMatchEntry 9}
+
+
+
+     -- ****************************************
+     -- acQoSSet table declaration
+     -- ****************************************
+     acQoSSetTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcQoSSetEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acQoSConfiguration 3}
+
+
+
+     -- ****************************************
+     -- acQoSSet table entry
+     -- ****************************************
+     acQoSSetEntry OBJECT-TYPE
+       SYNTAX AcQoSSetEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acQoSSetMatchMapIndex,acQoSSetIndex}
+       ::= {acQoSSetTable 1}
+
+
+
+     -- ****************************************
+     -- acQoSSet TABLE
+     -- ****************************************
+     AcQoSSetEntry ::= SEQUENCE {
+       acQoSSetMatchMapIndex                           Unsigned32,
+       acQoSSetIndex                                   Unsigned32,
+       acQoSSetType                                    INTEGER,
+       acQoSSetQueueName                               SnmpAdminString,
+       acQoSSetDscpValue                               Unsigned32,
+       acQoSSetPrecedenceValue                         INTEGER,
+       acQoSSetPriorityValue                           Unsigned32
+     }
+
+
+
+     acQoSSetMatchMapIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (1000000..2069099)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSSetEntry 1}
+
+
+
+     acQoSSetIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..3)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSSetEntry 2}
+
+
+
+     acQoSSetType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  queue(1)
+,
+                  dscp(2)
+,
+                  precedence(3)
+,
+                  priority(4)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Type of the Set statement.
+AC INI-Param: N/A"
+       ::= {acQoSSetEntry 3}
+
+
+
+     acQoSSetQueueName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Name of the corresponding queue.
+AC INI-Param: N/A"
+       ::= {acQoSSetEntry 4}
+
+
+
+     acQoSSetDscpValue OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Diffentiated services codepoint value.
+AC INI-Param: N/A"
+       ::= {acQoSSetEntry 5}
+
+
+
+     acQoSSetPrecedenceValue OBJECT-TYPE
+       SYNTAX INTEGER {
+                  routine(0)
+,
+                  priority(1)
+,
+                  immediate(2)
+,
+                  flash(3)
+,
+                  flash-override(4)
+,
+                  critical(5)
+,
+                  internet(6)
+,
+                  network(7)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Precedence value.
+AC INI-Param: N/A"
+       ::= {acQoSSetEntry 6}
+
+
+
+     acQoSSetPriorityValue OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Priority value.
+AC INI-Param: N/A"
+       ::= {acQoSSetEntry 7}
+
+
+
+     -- ****************************************
+     -- acQoSServiceMap table declaration
+     -- ****************************************
+     acQoSServiceMapTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcQoSServiceMapEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acQoSConfiguration 4}
+
+
+
+     -- ****************************************
+     -- acQoSServiceMap table entry
+     -- ****************************************
+     acQoSServiceMapEntry OBJECT-TYPE
+       SYNTAX AcQoSServiceMapEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acQoSServiceMapIndex}
+       ::= {acQoSServiceMapTable 1}
+
+
+
+     -- ****************************************
+     -- acQoSServiceMap TABLE
+     -- ****************************************
+     AcQoSServiceMapEntry ::= SEQUENCE {
+       acQoSServiceMapIndex                            Unsigned32,
+       acQoSServiceMapInterface                        SnmpAdminString,
+       acQoSServiceMapDirection                        INTEGER,
+       acQoSServiceMapBandwidthLimit                   INTEGER,
+       acQoSServiceMapMaxBandwidth                     Unsigned32
+     }
+
+
+
+     acQoSServiceMapIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..69)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSServiceMapEntry 1}
+
+
+
+     acQoSServiceMapInterface OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Interface to which this Match Map is attached.
+AC INI-Param: N/A"
+       ::= {acQoSServiceMapEntry 2}
+
+
+
+     acQoSServiceMapDirection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  input(1)
+,
+                  output(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Direction of the traffic for which this Service Map is applied.
+AC INI-Param: N/A"
+       ::= {acQoSServiceMapEntry 3}
+
+
+
+     acQoSServiceMapBandwidthLimit OBJECT-TYPE
+       SYNTAX INTEGER {
+                  unlimited(1)
+,
+                  limited(2)
+,
+                  automatic(3)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSServiceMapEntry 4}
+
+
+
+     acQoSServiceMapMaxBandwidth OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum bandwidth (in kbps).
+AC INI-Param: N/A"
+       ::= {acQoSServiceMapEntry 5}
+
+
+
+     -- ****************************************
+     -- acQoSQueue table declaration
+     -- ****************************************
+     acQoSQueueTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcQoSQueueEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acQoSConfiguration 5}
+
+
+
+     -- ****************************************
+     -- acQoSQueue table entry
+     -- ****************************************
+     acQoSQueueEntry OBJECT-TYPE
+       SYNTAX AcQoSQueueEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acQoSQueueServiceMapIndex,acQoSQueueIndex}
+       ::= {acQoSQueueTable 1}
+
+
+
+     -- ****************************************
+     -- acQoSQueue TABLE
+     -- ****************************************
+     AcQoSQueueEntry ::= SEQUENCE {
+       acQoSQueueServiceMapIndex                       Unsigned32,
+       acQoSQueueIndex                                 Unsigned32,
+       acQoSQueueName                                  SnmpAdminString
+     }
+
+
+
+     acQoSQueueServiceMapIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..69)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSQueueEntry 1}
+
+
+
+     acQoSQueueIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..99)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSQueueEntry 2}
+
+
+
+     acQoSQueueName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Name of the queue.
+AC INI-Param: N/A"
+       ::= {acQoSQueueEntry 3}
+
+
+
+     -- ****************************************
+     -- acQoSQueueAction table declaration
+     -- ****************************************
+     acQoSQueueActionTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcQoSQueueActionEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acQoSConfiguration 6}
+
+
+
+     -- ****************************************
+     -- acQoSQueueAction table entry
+     -- ****************************************
+     acQoSQueueActionEntry OBJECT-TYPE
+       SYNTAX AcQoSQueueActionEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acQoSQueueActionServiceMapIndex,acQoSQueueActionQueueIndex,acQoSQueueActionIndex}
+       ::= {acQoSQueueActionTable 1}
+
+
+
+     -- ****************************************
+     -- acQoSQueueAction TABLE
+     -- ****************************************
+     AcQoSQueueActionEntry ::= SEQUENCE {
+       acQoSQueueActionServiceMapIndex                 Unsigned32,
+       acQoSQueueActionQueueIndex                      Unsigned32,
+       acQoSQueueActionIndex                           Unsigned32,
+       acQoSQueueActionType                            INTEGER,
+       acQoSQueueActionMinBandwidth                    Unsigned32,
+       acQoSQueueActionMaxBandwidth                    Unsigned32,
+       acQoSQueueActionPolicyValue                     INTEGER,
+       acQoSQueueActionPriorityValue                   Unsigned32
+     }
+
+
+
+     acQoSQueueActionServiceMapIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..69)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSQueueActionEntry 1}
+
+
+
+     acQoSQueueActionQueueIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..99)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSQueueActionEntry 2}
+
+
+
+     acQoSQueueActionIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..3)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSQueueActionEntry 3}
+
+
+
+     acQoSQueueActionType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  bandwidth(1)
+,
+                  bandwidth-percent(2)
+,
+                  policy(3)
+,
+                  priority(4)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Type of the action.
+AC INI-Param: N/A"
+       ::= {acQoSQueueActionEntry 4}
+
+
+
+     acQoSQueueActionMinBandwidth OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum bandwidth (in kbps or percents - according to the type).
+AC INI-Param: N/A"
+       ::= {acQoSQueueActionEntry 5}
+
+
+
+     acQoSQueueActionMaxBandwidth OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum bandwidth (in kbps or percents - according to the type).
+AC INI-Param: N/A"
+       ::= {acQoSQueueActionEntry 6}
+
+
+
+     acQoSQueueActionPolicyValue OBJECT-TYPE
+       SYNTAX INTEGER {
+                  unknown(0)
+,
+                  fairness(1)
+,
+                  fifo(2)
+,
+                  random-detect(3)
+,
+                  strict-priority(4)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "fairness - fairness policy
+fifo - first in first out policy
+random-detect - random early detection policy
+strict-priority - strict scheduling priority policy.
+AC INI-Param: N/A"
+       ::= {acQoSQueueActionEntry 7}
+
+
+
+     acQoSQueueActionPriorityValue OBJECT-TYPE
+       SYNTAX Unsigned32 (0..7)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Priority value.
+AC INI-Param: N/A"
+       ::= {acQoSQueueActionEntry 8}
+
+
+
+     acQoSStatus OBJECT IDENTIFIER ::= {acQoS 2}
+
+
+     -- ****************************************
+     -- acQoSQueueStats table declaration
+     -- ****************************************
+     acQoSQueueStatsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcQoSQueueStatsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "QoS Queue Status information"
+       ::= {acQoSStatus 1}
+
+
+
+     -- ****************************************
+     -- acQoSQueueStats table entry
+     -- ****************************************
+     acQoSQueueStatsEntry OBJECT-TYPE
+       SYNTAX AcQoSQueueStatsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acQoSQueueStatsServiceMapIndex,acQoSQueueStatsQueueIndex}
+       ::= {acQoSQueueStatsTable 1}
+
+
+
+     -- ****************************************
+     -- acQoSQueueStats TABLE
+     -- ****************************************
+     AcQoSQueueStatsEntry ::= SEQUENCE {
+       acQoSQueueStatsServiceMapIndex                  Unsigned32,
+       acQoSQueueStatsQueueIndex                       Unsigned32,
+       acQoSQueueStatsPacketSent                       Counter32,
+       acQoSQueueStatsBytesSent                        Counter32,
+       acQoSQueueStatsPacketsRate                      Counter32,
+       acQoSQueueStatsBytesRate                        Counter32,
+       acQoSQueueStatsPacketsDelayed                   Counter32,
+       acQoSQueueStatsPacketsDropped                   Counter32
+     }
+
+
+
+     acQoSQueueStatsServiceMapIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..69)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSQueueStatsEntry 1}
+
+
+
+     acQoSQueueStatsQueueIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..99)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acQoSQueueStatsEntry 2}
+
+
+
+     acQoSQueueStatsPacketSent OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of packets sent.
+AC INI-Param: N/A"
+       ::= {acQoSQueueStatsEntry 3}
+
+
+
+     acQoSQueueStatsBytesSent OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of bytes sent.
+AC INI-Param: N/A"
+       ::= {acQoSQueueStatsEntry 4}
+
+
+
+     acQoSQueueStatsPacketsRate OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Packets send rate (packets per second).
+AC INI-Param: N/A"
+       ::= {acQoSQueueStatsEntry 5}
+
+
+
+     acQoSQueueStatsBytesRate OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Bytes send rate (bytes per second).
+AC INI-Param: N/A"
+       ::= {acQoSQueueStatsEntry 6}
+
+
+
+     acQoSQueueStatsPacketsDelayed OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of packets delayed.
+AC INI-Param: N/A"
+       ::= {acQoSQueueStatsEntry 7}
+
+
+
+     acQoSQueueStatsPacketsDropped OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Number of packets dropped.
+AC INI-Param: N/A"
+       ::= {acQoSQueueStatsEntry 8}
+
+
+
+
+
+END

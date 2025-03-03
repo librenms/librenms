@@ -1,0 +1,579 @@
+--  *****************************************************************
+--  DLINKSW-PACKET-MONITOR-MIB.mib : Packet Monitoring MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-PACKET-MONITOR-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    Integer32
+            FROM SNMPv2-SMI
+    DisplayString, RowStatus 
+            FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+		    FROM SNMPv2-CONF
+    ifIndex, InterfaceIndexOrZero
+            FROM IF-MIB
+    VlanId       
+        FROM Q-BRIDGE-MIB            
+    
+    dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+    dlinkSwPktMonitorMIB MODULE-IDENTITY
+        LAST-UPDATED "201407210000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "         D-Link Corporation
+            
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:    +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "        
+        DESCRIPTION
+            "This MIB module defines objects for configuring Monitoring Traffic.
+            Acronyms and terminology:
+            SPAN (Switched Port Analyzer): Mirror network traffic for analysis 
+                by a network analyzer. 
+            Local-SPAN: The SPAN feature is local when the monitored ports are 
+                all located on the same switch as the destination port. 
+            RSPAN (Remote SPAN):  Source ports and destination ports that are 
+                distributed across multiple switches, allowing one to monitor 
+                any destination port located on the RSPAN VLAN."
+
+        REVISION "201407210000Z"
+        DESCRIPTION 
+            "Added the dPktMonSessionSrcTxIfStgState for dPktMonSessionSrcTxIfTable." 
+
+        REVISION "201309270000Z"
+        DESCRIPTION 
+            "Added the dPktMonSessionRowStatus for dPktMonSessionTable.
+             Modified the MAX-ACCESS(read-write to read-create) for
+             dPktMonSessionDestRemoteVlanId, dPktMonSessionSourceRemoteVlanId
+             and dPktMonSessionDestInterface in dPktMonSessionTable.
+             Added the dPktMonSessionDestRemoteReplaceVlanTable for supporting
+             egress per flow RSPAN VLAN replacement on a RSPAN source switch."   
+                   
+        REVISION "201303040000Z"
+        DESCRIPTION 
+            "This is the first version of the MIB file."           
+         
+    ::= { dlinkIndustrialCommon 12 }
+
+-- -----------------------------------------------------------------------------
+    dPktMonMIBNotifications    OBJECT IDENTIFIER ::= { dlinkSwPktMonitorMIB 0 }
+    dPktMonMIBObjects          OBJECT IDENTIFIER ::= { dlinkSwPktMonitorMIB 1 }
+    dPktMonMIBConformance      OBJECT IDENTIFIER ::= { dlinkSwPktMonitorMIB 2 }
+
+-- -----------------------------------------------------------------------------
+-- Monitor Session Management
+-- -----------------------------------------------------------------------------
+    dPktMonSessionTableCurrEntries  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in the dPktMonSessionTable."
+        ::= { dPktMonMIBObjects 1 }                        
+
+    dPktMonSessionTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DPktMonSessionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table to create a packet monitoring session, allowing 
+            packets on source ports or VLAN to be monitored via a 
+            destination port."            
+        ::= { dPktMonMIBObjects 2 }
+
+    dPktMonSessionEntry OBJECT-TYPE
+        SYNTAX          DPktMonSessionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry in the dPktMonSessionTable describes configuration 
+            information about Packet Monitoring."             
+        INDEX { dPktMonSessionID }
+        ::= { dPktMonSessionTable 1 }
+
+    DPktMonSessionEntry ::= SEQUENCE {
+        dPktMonSessionID                        Integer32,
+        dPktMonSessionSessionType               INTEGER,
+        dPktMonSessionDestRemoteVlanId          Integer32,
+        dPktMonSessionSourceRemoteVlanId        Integer32,
+        dPktMonSessionDestInterface             InterfaceIndexOrZero,
+        dPktMonSessionRowStatus                 RowStatus
+    }
+
+    dPktMonSessionID OBJECT-TYPE
+        SYNTAX          Integer32 (1..80)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An index value that uniquely identifies the the packet 
+            monitoring session associated with this information."
+        ::= { dPktMonSessionEntry 1 }
+        
+    dPktMonSessionSessionType OBJECT-TYPE
+        SYNTAX          INTEGER { 
+            none(0), 
+            localSession(1),
+            remoteSourceSession(2),
+            remoteDestinationSession(3) 
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            " Indicates the session type of the entry.      
+            none (0):
+                Indicates the entry is inactive.
+            localSession (1):
+                Indicates the entry is operating as Local-SPAN.
+            remoteSourceSession (2):
+                Indicates the entry is operating as an RSPAN source session, which
+                associates SPAN source ports or VLANs with a destination RSPAN VLAN.                
+            remoteDestinationSession (3):
+                Indicates the entry is operating as an RSPAN destination session.
+                An RSPAN destination session associates an RSPAN VLAN with a 
+                destination port."                           
+        ::= { dPktMonSessionEntry 2 }  
+          
+    dPktMonSessionDestRemoteVlanId OBJECT-TYPE
+        SYNTAX          Integer32 (0 | 2..4094)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Indicates the RSPAN VLAN ID on the RSPAN source session. 
+            This object should be considered in conjunction with the 
+            dPktMonSessionDestInterface. 
+            When this object is set with valid VLAN ID (2 to 4094), the mirrored 
+            packets are transmitted with an RSPAN VLAN tag from the destination 
+            port. 
+            If this object is set to 0, the destination RSPAN VLAN becomes 
+            unspecified, then the mirrored traffic will be transmitted without
+            additional RSPAN VLAN tag."                               
+        ::= { dPktMonSessionEntry 3 }
+        
+    dPktMonSessionSourceRemoteVlanId OBJECT-TYPE
+        SYNTAX          Integer32 (0 | 2..4094)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Set this object with valid VLAN ID (2 to 4094) for an RSPAN destination
+            session.                        
+            If this object is set to 0, the source RSPAN VLAN becomes 
+            unspecified."
+        ::= { dPktMonSessionEntry 4 }        
+        
+    dPktMonSessionDestInterface OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Indicates the destination interface of the packet monitoring 
+            session. Both physical ports and port channel are valid as 
+            destination interfaces of monitor sessions.
+            A value of zero indicates that no interface is associated with
+            this monitoring session."
+        ::= { dPktMonSessionEntry 5 }
+        
+    dPktMonSessionRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dPktMonSessionEntry 6 }
+    
+-- -----------------------------------------------------------------------------     
+    dPktMonSessionSrcIfObjects OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION
+            "This object identifier represents the objects that are configured
+            the source interfaces for monitor sessions."   
+        ::= { dPktMonMIBObjects 3 }
+
+    dPktMonSessionSrcRxIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DPktMonSessionSrcRxIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of source interface on which the packets
+            received for packet monitor sessions.
+            The first index element identifies the dPktMonSessionEntry that a 
+            source interface (indicated by second index element) for monitoring 
+            receiving packets (dPktMonSessionSrcRxIfEntry) belongs to. An entry
+            is removed from this table when its corresponding dPktMonSessionEntry
+            is deleted.
+            For a monitor session, to add or delete a source receiving interface
+            by creating or removing an entry in this table.  
+            The valid interface includes: physical port/port channel/vlan and cpu.                       
+            "            
+        ::= { dPktMonSessionSrcIfObjects 1 }
+
+    dPktMonSessionSrcRxIfEntry OBJECT-TYPE
+        SYNTAX          DPktMonSessionSrcRxIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry in the dPktMonSessionSrcRxIfTable describes  
+            the source interface on which the packets received for a monitor session."                      
+        INDEX { dPktMonSessionID, ifIndex }
+        ::= { dPktMonSessionSrcRxIfTable 1 }
+
+    DPktMonSessionSrcRxIfEntry ::= SEQUENCE {              
+        dPktMonSessionSrcRxIfRowStatus      RowStatus
+    } 
+              
+    dPktMonSessionSrcRxIfRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row. Use this object to add/remove
+            an interface for a monitor session."
+        ::= { dPktMonSessionSrcRxIfEntry 1 }
+
+-- -----------------------------------------------------------------------------    
+    dPktMonSessionSrcTxIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DPktMonSessionSrcTxIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION                 
+            "This table consists of a list of source interface on which the packets
+            transmitted for packet monitor sessions.
+            The first index element identifies the dPktMonSessionEntry that a 
+            source interface (indicated by second index element) for monitoring 
+            transmitting packets (dPktMonSessionSrcTxIfEntry) belongs to. An entry
+            is removed from this table when its corresponding dPktMonSessionEntry is
+            deleted.
+            For a monitor session, to add or delete a source transmitting interface
+            by creating or removing an entry in this table.  
+            "      
+        ::= { dPktMonSessionSrcIfObjects 2 }
+
+    dPktMonSessionSrcTxIfEntry OBJECT-TYPE
+        SYNTAX          DPktMonSessionSrcTxIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry in the dPktMonSessionSrcTxIfTable describes  
+            the source interface on which the packets transmitted for a monitor session."                      
+        INDEX { dPktMonSessionID, ifIndex }
+        ::= { dPktMonSessionSrcTxIfTable 1 }
+
+    DPktMonSessionSrcTxIfEntry ::= SEQUENCE {             
+        dPktMonSessionSrcTxIfRowStatus      RowStatus,
+        dPktMonSessionSrcTxIfStgState       INTEGER
+    } 
+            
+    dPktMonSessionSrcTxIfRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row. Use this object to add/remove
+            an interface for a monitor session."
+        ::= { dPktMonSessionSrcTxIfEntry 1 }
+        
+    dPktMonSessionSrcTxIfStgState OBJECT-TYPE
+        SYNTAX INTEGER {
+			    no-care(1),
+			    forwarding(2)
+		    }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates if the monitoring of the packets transmitted 
+            on the interface will be affected by the interface's STG status.
+            'no-care' -  monitor the packets transmitted on the interface regardless 
+                         of the interface¡¯s STG status.
+            'forwarding' - monitor the packets transmitted on the interface only when 
+                          the interface¡¯s all STGs status are forwarding."
+        DEFVAL { no-care }
+        ::= { dPktMonSessionSrcTxIfEntry 2 }
+
+-- -----------------------------------------------------------------------------    
+    dPktMonSessionSrcDropIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DPktMonSessionSrcDropIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION                 
+            "This table consists of a list of source interface to monitor the
+            packets which dropped on received port.
+            The first index element identifies the dPktMonSessionEntry that a 
+            source interface (indicated by second index element) for monitoring
+            dropped packets (dPktMonSessionSrcDropIfTable) belongs to. An entry
+            is removed from this table when its corresponding dPktMonSessionEntry
+            is deleted.
+            For a monitor session, to add or delete a source interface 
+            for monitoring dropped packets by creating or removing an entry in
+            this table.        
+            "
+        ::= { dPktMonSessionSrcIfObjects 3 }
+
+    dPktMonSessionSrcDropIfEntry OBJECT-TYPE
+        SYNTAX          DPktMonSessionSrcDropIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry in the dPktMonSessionSrcDropIfTable describes  
+            the source interface to monitor the packets which dropped on received port
+            for a monitor session."                      
+        INDEX { dPktMonSessionID, ifIndex }
+        ::= { dPktMonSessionSrcDropIfTable 1 }
+
+    DPktMonSessionSrcDropIfEntry ::= SEQUENCE {             
+        dPktMonSessionSrcDropIfRowStatus      RowStatus
+    } 
+            
+    dPktMonSessionSrcDropIfRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row. Use this object to add/remove
+            an interface for a port monitor session."
+        ::= { dPktMonSessionSrcDropIfEntry 1 }  
+        
+-- -----------------------------------------------------------------------------
+-- Configuring ACL for Monitor Session
+-- -----------------------------------------------------------------------------
+    dPktMonSessionSrcAclTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DPktMonSessionSrcAclEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "A table containing associations between ACL and monitor session."             
+        ::= { dPktMonMIBObjects 4 }
+            
+    dPktMonSessionSrcAclEntry OBJECT-TYPE
+        SYNTAX          DPktMonSessionSrcAclEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table entry representing an access list association to 
+            a monitor session."
+        INDEX {  dPktMonSessionID, dPktMonSessionSrcAclName }
+        ::= { dPktMonSessionSrcAclTable 1 }   
+        
+    DPktMonSessionSrcAclEntry ::= SEQUENCE {
+        dPktMonSessionSrcAclName        DisplayString,
+        dPktMonSessionSrcAclRowStatus   RowStatus    
+    }          
+    dPktMonSessionSrcAclName	OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION           
+            "Indicates the name of an access list for flow based monitoring.             
+            Multiple access lists can be monitored on a session at a time. "
+        ::= {dPktMonSessionSrcAclEntry 1} 
+        
+    dPktMonSessionSrcAclRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dPktMonSessionSrcAclEntry 2 }
+
+-- -----------------------------------------------------------------------------
+-- Configuring global RSPAN VLAN
+-- -----------------------------------------------------------------------------                    
+    dPktMonRspanVlanTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DPktMonRspanVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "A table containing RSPAN VLAN information on the 
+            VLANs which currently configured as RSPAN VLAN."
+        ::= { dPktMonMIBObjects 5 }
+        
+    dPktMonRspanVlanEntry OBJECT-TYPE
+        SYNTAX          DPktMonRspanVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry in the dPktMonRspanVlanTable indicates  
+            the VLAN is configured as RSPAN VLAN.
+            An entry is created/removed when RSPAN VLAN is enabled
+            or disabled at the VLAN via CLI or by issuing appropriate 
+			sets to this table using snmp."                                  
+        INDEX { dPktMonRspanVlanId }
+        ::= { dPktMonRspanVlanTable 1 }
+
+    DPktMonRspanVlanEntry ::= SEQUENCE {
+        dPktMonRspanVlanId          VlanId,
+        dPktMonRspanVlanRowStatus   RowStatus    
+    }
+    
+    dPktMonRspanVlanId OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION                        
+            "The VLAN number.
+            When a VLAN is specified as an RSPAN VLAN, the MAC address 
+            learning on the RSPAN VLAN is disabled."           
+        ::= { dPktMonRspanVlanEntry 1 }
+
+    dPktMonRspanVlanRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dPktMonRspanVlanEntry 2 }
+        
+-- -----------------------------------------------------------------------------
+-- Configuring Egress Replace RSPAN VLAN for Monitor Session
+-- -----------------------------------------------------------------------------
+    dPktMonSessionDestRemoteReplaceVlanTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DPktMonSessionDestRemoteReplaceVlanEntry 	
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "A table containing associations between replace RSPAN VLAN egress
+            per flow and monitor session.
+            For a RSPAN source session, multiple flows of VLAN replacement can
+            be configured."
+        ::= { dPktMonMIBObjects 6 }
+            
+    dPktMonSessionDestRemoteReplaceVlanEntry OBJECT-TYPE
+        SYNTAX          DPktMonSessionDestRemoteReplaceVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table entry representing an access list and replace VLAN
+            association to a monitor session."
+        INDEX {  dPktMonSessionID, dPktMonSessionDestRemoteAccessListName,dPktMonSessionDestRemoteReplaceVlanId }
+        ::= { dPktMonSessionDestRemoteReplaceVlanTable 1 }   
+        
+    DPktMonSessionDestRemoteReplaceVlanEntry ::= SEQUENCE {
+    	dPktMonSessionDestRemoteAccessListName        DisplayString,
+        dPktMonSessionDestRemoteReplaceVlanId        VlanId,
+        dPktMonSessionDestRemoteReplaceVlanRowStatus   RowStatus    
+    } 
+    
+    dPktMonSessionDestRemoteAccessListName	OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION           
+            "Indicates the name of an access list for egress per flow RSPAN VLAN
+            replacement."
+        ::= {dPktMonSessionDestRemoteReplaceVlanEntry 1} 
+        
+    dPktMonSessionDestRemoteReplaceVlanId	OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION           
+            "Indicates the VLAN ID used to replace RSPAN VLAN ID for the matched
+            flow of packets transmitted out from the destination interface on a
+            RSPAN source switch."           
+        ::= {dPktMonSessionDestRemoteReplaceVlanEntry 2} 
+        
+    dPktMonSessionDestRemoteReplaceVlanRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dPktMonSessionDestRemoteReplaceVlanEntry 3 }
+        
+-- -----------------------------------------------------------------------------
+-- MIB Conformance statements
+-- -----------------------------------------------------------------------------   
+    dPktMonMIBCompliances  OBJECT IDENTIFIER
+        ::= { dPktMonMIBConformance 1 }
+
+    dPktMonMIBGroups  OBJECT IDENTIFIER
+        ::= { dPktMonMIBConformance 2 } 
+    
+    dPktMonMIBCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+			DLINKSW-PACKET-MONITOR-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS  { dPktMonBasicGroup }
+                    
+        GROUP   dPktMonRspanGroup
+        DESCRIPTION
+            "The group is required when the RSPAN is supported."
+            
+        GROUP   dPktMonFlowBasedMirrorGroup
+        DESCRIPTION
+            "The group is required when the flow based mirror is supported."    
+
+        GROUP   dPktMonMonitorDropPktGroup
+        DESCRIPTION
+            "The group is required when the monitoring dropped packets is supported."    
+             
+ 	GROUP   dPktMonDestRemoteReplaceVlanGroup
+        DESCRIPTION
+            "The group is required when the egress per flow RSPAN VLAN replacement is supported."
+             
+        ::= { dPktMonMIBCompliances 1 }
+            
+    dPktMonBasicGroup OBJECT-GROUP
+		OBJECTS {    
+		    dPktMonSessionTableCurrEntries, 
+		    dPktMonSessionDestInterface, 
+		    dPktMonSessionRowStatus, 
+		    dPktMonSessionSrcRxIfRowStatus, 
+		    dPktMonSessionSrcTxIfRowStatus            
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing basic packet monitoring 
+			configuration."
+		::= { dPktMonMIBGroups 1 }
+		
+	dPktMonRspanGroup OBJECT-GROUP
+		OBJECTS {   
+			dPktMonSessionSessionType, 
+			dPktMonSessionDestRemoteVlanId, 
+			dPktMonSessionSourceRemoteVlanId,
+			dPktMonRspanVlanRowStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing RSPAN configuration."
+		::= { dPktMonMIBGroups 2 }
+		
+	dPktMonFlowBasedMirrorGroup OBJECT-GROUP
+		OBJECTS { dPktMonSessionSrcAclRowStatus }
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing flow based mirroring 
+			configuration."
+		::= { dPktMonMIBGroups 3 }
+    
+    	dPktMonMonitorDropPktGroup OBJECT-GROUP
+		OBJECTS { dPktMonSessionSrcDropIfRowStatus }
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides the configuration for monitoring
+            dropped packets on source interfaces. 
+			"
+		::= { dPktMonMIBGroups 4 }    
+		
+	dPktMonDestRemoteReplaceVlanGroup OBJECT-GROUP
+		OBJECTS { dPktMonSessionDestRemoteReplaceVlanRowStatus }
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides the configuration for
+			performing egress per flow RSPAN VLAN replacement on a
+			RSPAN source switch."
+		::= { dPktMonMIBGroups 5 }    
+END
+
+

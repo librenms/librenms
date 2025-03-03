@@ -49,7 +49,7 @@ netSnmpPassIpAddress OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "Example IP Address object."
-    DEFVAL { c'7f000001'H }  -- 127.0.0.1
+    DEFVAL { '7f000001'H }  -- 127.0.0.1
     ::= { netSnmpPassExamples 4 }
 
 netSnmpPassCounter OBJECT-TYPE
@@ -67,6 +67,20 @@ netSnmpPassGauge OBJECT-TYPE
     DESCRIPTION "Example Gauge object."
     DEFVAL { 42 }
     ::= { netSnmpPassExamples 6 }
+
+netSnmpPassCounter64 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Example Counter64 object."
+    ::= { netSnmpPassExamples 7 }
+
+netSnmpPassInteger64 OBJECT-TYPE
+    SYNTAX      Opaque
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Example Opaque Integer64 object."
+    ::= { netSnmpPassExamples 8 }
 
 
 netSnmpPassOIDValue OBJECT IDENTIFIER

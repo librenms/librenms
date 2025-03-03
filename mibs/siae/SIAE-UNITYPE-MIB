@@ -1,0 +1,333 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-UNITYPE-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+             siaeMib
+        FROM SIAE-TREE-MIB;
+
+    unitTypeMib MODULE-IDENTITY
+        LAST-UPDATED "201607190000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: help@siaemic.com
+            "
+        DESCRIPTION
+            "Types of SIAE equipment units.
+            "
+
+        REVISION "201610140000Z"
+        DESCRIPTION 
+            " Added unitTypeALFOplus1(229),
+              unitTypeAGS20ARI2E(260), unitTypeAGS20ARI2ETDM2(261),
+              unitTypeAGS20ARI2ETDM3(262),
+              unitTypeAGS20ARI2EXG(263), unitTypeAGS20ARI2ETDM2XG(264),
+              unitTypeAGS20ARI2ETDM3XG(265).
+              Modified unitTypeALFO80HDx(280)
+            "
+        REVISION "201607190000Z"
+        DESCRIPTION 
+            " Added unitTypeALFO80HDx(270)
+            "
+        REVISION "201604050000Z"
+        DESCRIPTION 
+            " Added unitTypeAGS20ARI2XG(250), unitTypeAGS20ARI2TDM2XG(251),
+              unitTypeAGS20ARI2TDM3XG(252), unitTypeAGS20ARI4XG(253),
+              unitTypeAGS20ARI4TDM2XG(254) and unitTypeAGS20ARI4TDM3XG(255)
+            "
+        REVISION "201503040000Z"
+        DESCRIPTION 
+            " Added unitTypeAGS20ARI1DP(223) and unitTypeAGS20ARI1TDM2DP(224)
+              and unitTypeAGS20ARI1TDM3DP(225)
+            "
+        REVISION "201412010000Z"
+        DESCRIPTION 
+            " Added unitTypeAGS20ODU(231)
+            "
+        REVISION "201403190000Z"
+        DESCRIPTION 
+            " Added unitTypeAGS20CORE(222)
+            "
+        REVISION "201402070000Z"
+        DESCRIPTION 
+            "- Removed types unitTypeCore, unitTypeAri1, unitTypeAri2 and
+               unitTypeDri2
+             - Added types unitTypeODU and unitTypeAGS20
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 506 }
+
+--------------------------------------------------------------------------------
+--  object identifier inside the module
+--------------------------------------------------------------------------------
+
+     unitType OBJECT IDENTIFIER ::= { siaeMib unit(6) 3 }
+
+--------------------------------------------------------------------------------
+--  unit types
+--------------------------------------------------------------------------------
+
+     -- OBJECT IDENTITIES for UNIT types
+
+     --  (see unitExpectedType and unitActuaslType of SM-UNIT-MIB for usage)
+
+     -- Card/Unit identifiers 
+
+     unitTypeUnequipped OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "Unequipped unit"
+       REFERENCE   "None"
+       ::= { unitType 1 }
+
+     unitTypeODU OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "Out Door Unit"
+       REFERENCE   "None"
+       ::= { unitType 5 }
+
+     -- Equipment/Product identifiers 
+
+     unitTypeALFO80HD OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "ALFO 80GHz HD"
+       REFERENCE   "None"
+       ::= { unitType 200 }
+
+     unitTypeALFO80HDelectrical OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "ALFO 80GHz HD (electrical ethernet inferface)"
+       REFERENCE   "None"
+       ::= { unitType 201 }
+
+     unitTypeALFO80HDelectricalOptical OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "ALFO 80GHz HD (electrical and optical ethernet inferface)"
+       REFERENCE   "None"
+       ::= { unitType 202 }
+
+     unitTypeALFO80HDoptical OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "ALFO 80GHz HD (optical ethernet inferface)"
+       REFERENCE   "None"
+       ::= { unitType 203 }
+
+     unitTypeAGS20ARI1 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI1"
+       REFERENCE   "None"
+       ::= { unitType 210 }
+
+     unitTypeAGS20ARI2 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2"
+       REFERENCE   "None"
+       ::= { unitType 211 }
+
+     unitTypeAGS20ARI4 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-4"
+       REFERENCE   "None"
+       ::= { unitType 212 }
+
+     unitTypeAGS20DRI4 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 DRI-4"
+       REFERENCE   "None"
+       ::= { unitType 213 }
+
+     unitTypeAGS20ARI1TDM2 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-1 TDM-2"
+       REFERENCE   "None"
+       ::= { unitType 214 }
+
+     unitTypeAGS20ARI1TDM3 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-1 TDM-3"
+       REFERENCE   "None"
+       ::= { unitType 215 }
+
+     unitTypeAGS20ARI2TDM2 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 TDM-2"
+       REFERENCE   "None"
+       ::= { unitType 216 }
+
+     unitTypeAGS20ARI2TDM3 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 TDM-3"
+       REFERENCE   "None"
+       ::= { unitType 217 }
+
+     unitTypeAGS20ARI4TDM2 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-4 TDM-2"
+       REFERENCE   "None"
+       ::= { unitType 218 }
+
+     unitTypeAGS20ARI4TDM3 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-4 TDM-3"
+       REFERENCE   "None"
+       ::= { unitType 219 }
+
+     unitTypeAGS20DRI4TDM2 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 DRI-4 TDM-2"
+       REFERENCE   "None"
+       ::= { unitType 220 }
+
+     unitTypeAGS20DRI4TDM3 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 DRI-4 TDM-3"
+       REFERENCE   "None"
+       ::= { unitType 221 }
+
+     unitTypeAGS20CORE OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 CORE"
+       REFERENCE   "None"
+       ::= { unitType 222 }
+
+     unitTypeAGS20ARI1DP OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI1 Dual Power"
+       REFERENCE   "None"
+       ::= { unitType 223 }
+
+     unitTypeAGS20ARI1TDM2DP OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-1 TDM-2 Dual Power"
+       REFERENCE   "None"
+       ::= { unitType 224 }
+
+     unitTypeAGS20ARI1TDM3DP OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-1 TDM-3 Dual Power"
+       REFERENCE   "None"
+       ::= { unitType 225 }
+
+     unitTypeALFOplus1 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "ALFOplus1"
+       REFERENCE   "None"
+       ::= { unitType 229 }
+
+     unitTypeALFOplus2 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "ALFOplus2"
+       REFERENCE   "None"
+       ::= { unitType 230 }
+
+     unitTypeAGS20ODU OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ODU"
+       REFERENCE   "None"
+       ::= { unitType 231 }
+       
+     unitTypeAGS20ARI1TDM2LC OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-1 TDM-2 Low Cost"
+       REFERENCE   "None"
+       ::= { unitType 240 }
+       
+     unitTypeAGS20ARI2XG OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 with 10G ports"
+       REFERENCE   "None"
+       ::= { unitType 250 }
+       
+     unitTypeAGS20ARI2TDM2XG OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 TDM-2 with 10G ports"
+       REFERENCE   "None"
+       ::= { unitType 251 }
+       
+     unitTypeAGS20ARI2TDM3XG OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 TDM-3 with 10G ports"
+       REFERENCE   "None"
+       ::= { unitType 252 }
+       
+     unitTypeAGS20ARI4XG OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-4 with 10G ports"
+       REFERENCE   "None"
+       ::= { unitType 253 }
+       
+     unitTypeAGS20ARI4TDM2XG OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-4 TDM-2 with 10G ports"
+       REFERENCE   "None"
+       ::= { unitType 254 }
+       
+     unitTypeAGS20ARI4TDM3XG OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-4 TDM-3 with 10G ports"
+       REFERENCE   "None"
+       ::= { unitType 255 }
+       
+     unitTypeAGS20ARI2E OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 Enhanced"
+       REFERENCE   "None"
+       ::= { unitType 260 }
+       
+     unitTypeAGS20ARI2ETDM2 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 Enhanced TDM-2"
+       REFERENCE   "None"
+       ::= { unitType 261 }
+       
+     unitTypeAGS20ARI2ETDM3 OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 Enhanced TDM-3"
+       REFERENCE   "None"
+       ::= { unitType 262 }
+
+     unitTypeAGS20ARI2EXG OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 Enhanced with 10G ports"
+       REFERENCE   "None"
+       ::= { unitType 263 }
+       
+     unitTypeAGS20ARI2ETDM2XG OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 Enhanced TDM-2 with 10G ports"
+       REFERENCE   "None"
+       ::= { unitType 264 }
+       
+     unitTypeAGS20ARI2ETDM3XG OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "AGS-20 ARI-2 Enhanced TDM-3 with 10G ports"
+       REFERENCE   "None"
+       ::= { unitType 265 }
+
+     unitTypeALFO80HDx OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "ALFO 80GHz HD with 10G ports"
+       REFERENCE   "None"
+       ::= { unitType 280 }
+END
+

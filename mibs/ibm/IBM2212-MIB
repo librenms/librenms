@@ -1,0 +1,291 @@
+IBM2212-MIB DEFINITIONS ::= BEGIN
+
+------------------------------------------------------------------
+-- IBM 2212 Enterprise MIB (SNMP Version 1 Format)
+------------------------------------------------------------------
+--
+--    This MIB defines the enterprise specific management
+--    objects for the 2212 family of products.
+--
+--    This MIB is defined in the SNMP version 1 SMI format.
+--
+--    May 18, 1998
+--
+--    Contact Information:
+--
+--            Randy Worzella
+--            IBM Corp.
+--            G420/664
+--            Research Triangle Park, NC 27709
+--
+--            phone:    919-254-2202
+--            email:    worzella@us.ibm.com
+--
+------------------------------------------------------------------
+
+IMPORTS
+         enterprises
+                  FROM RFC1155-SMI
+         OBJECT-TYPE
+                  FROM RFC-1212;
+
+-- Path to ibm2212 product
+
+ibm      OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd  OBJECT IDENTIFIER ::= { ibm 6 }
+ibm2212  OBJECT IDENTIFIER ::= { ibmProd 149 }
+
+------------------------------------------------------------------
+-- IBM 2212 Anchor
+------------------------------------------------------------------
+ibm2212admin     OBJECT IDENTIFIER ::= { ibm2212 1 }
+ibm2212system    OBJECT IDENTIFIER ::= { ibm2212 2 }
+ibm2212hardware  OBJECT IDENTIFIER ::= { ibm2212 3 }
+ibm2212routing   OBJECT IDENTIFIER ::= { ibm2212 4 }
+ibm2212switching OBJECT IDENTIFIER ::= { ibm2212 5 }
+
+------------------------------------------------------------------
+-- IBM 2212 Administrative
+------------------------------------------------------------------
+ibm2212adminproducts   OBJECT IDENTIFIER ::= { ibm2212admin 1 }
+
+ibm2212adminOID   OBJECT IDENTIFIER ::= { ibm2212admin 2 }
+
+ibm2212adminDebug OBJECT IDENTIFIER ::= { ibm2212admin 3 }
+
+------------------------------------------------------------------
+-- IBM 2212 System
+------------------------------------------------------------------
+ibm2212systemInfo    OBJECT IDENTIFIER ::= { ibm2212system 1 }
+ibm2212cfgInfo       OBJECT IDENTIFIER ::= { ibm2212system 2 }
+
+------------------------------------------------------------------
+-- IBM 2212 Hardware
+------------------------------------------------------------------
+ibm2212hardwareGeneral     OBJECT IDENTIFIER ::= { ibm2212hardware 1 }
+
+------------------------------------------------------------------
+-- IBM 2212 Routing
+------------------------------------------------------------------
+
+-- Nothing defined yet !!
+
+------------------------------------------------------------------
+-- IBM 2212 Switching
+------------------------------------------------------------------
+
+-- Nothing defined yet !!
+
+------------------------------------------------------------------
+-- Hardware Information
+------------------------------------------------------------------
+------------------------------------------------------------------
+-- Hardware Chip Set Information
+------------------------------------------------------------------
+
+ibm2212EnetChipSet  OBJECT IDENTIFIER ::= { ibm2212adminOID 1 }
+
+------------------------------------------------------------------
+--
+-- The 2212 10/100 Megabit Fast Ethernet LAN adapters use an
+-- Ethernet chipset comprised of the following:
+--
+--   Controller            AM79C971          Advanced Micro Devices
+--
+--   Physical Layer        DP83840A          National Semi
+--
+--   Content Addressable   MU9C2480A         Music Semi
+--   Memory
+--
+--   TB Filter PLA         Xilinx PLA        Xilinx
+--
+-- For the Ethernet MIB, however, the OID identifying the chipset
+-- will simply be enetChipSetAMD.
+--
+------------------------------------------------------------------
+enetChipSetUnknown  OBJECT IDENTIFIER ::= { ibm2212EnetChipSet 1 }
+enetChipSetAMD      OBJECT IDENTIFIER ::= { ibm2212EnetChipSet 2 }
+
+
+------------------------------------------------------------------
+-- Hardware Adapter Information
+------------------------------------------------------------------
+
+ibm2212AdapTable  OBJECT-TYPE
+   SYNTAX  SEQUENCE OF Ibm2212AdapEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "A table of information about adapters in this box."
+   ::= { ibm2212hardwareGeneral 1 }
+
+ibm2212AdapEntry  OBJECT-TYPE
+   SYNTAX  Ibm2212AdapEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "An entry containing objects to describe the adapter
+         in a given slot."
+   INDEX  { ibm2212AdapSlotNum }
+   ::= { ibm2212AdapTable 1 }
+
+Ibm2212AdapEntry  ::=
+   SEQUENCE {
+        ibm2212AdapSlotNum
+           INTEGER,
+        ibm2212AdapType
+           INTEGER,
+        ibm2212AdapOperStatus
+           INTEGER
+   }
+
+ibm2212AdapSlotNum  OBJECT-TYPE
+   SYNTAX  INTEGER (0..65535)
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The number identifying a slot location where an adapter
+         can be inserted.
+
+         The 2212 has four fixed serial ports on the system card
+         that are designated by slot 0."
+   ::= { ibm2212AdapEntry 1 }
+
+ibm2212AdapType  OBJECT-TYPE
+   SYNTAX  INTEGER {
+           unknown                       (1),
+           not-present                   (2),
+           eth-fast-1port                (3),
+           token-ring-1port              (4),
+           eth-fast-2port                (5),
+           token-ring-2port              (6),
+           serial-4port-shallow          (7),
+           isdn-bri-u-2port              (8),
+           isdn-bri-st-2port             (9),
+           isdn-pri-t1j1-1port           (10),
+           isdn-pri-e1-1port             (11),
+           compression-encryption        (12),
+           serial-4port-deep             (13),
+           isdn-pri-t1j1-2port           (14),
+           isdn-pri-e1-2port             (15)}
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The type of adapter that is inserted into this slot. Not all
+         of the adapter types listed above are necessarily currently
+         available and supported.
+
+         The four fixed serial ports on the system card are identified
+         by the serial-4port-shallow(7) enumeration.
+
+         If no adapter is present, the variable will take the value
+         not-present(2)."
+   ::= { ibm2212AdapEntry 2 }
+
+ibm2212AdapOperStatus  OBJECT-TYPE
+   SYNTAX  INTEGER {
+           unknown         (1),
+           not-present     (2),
+           enable-pending  (3),
+           enabled         (4),
+           unknown-device  (5),
+           hardware-error  (6),
+           not-powered     (7)}
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The operational status of this adapter.
+
+         unknown (1) : If there was problem determining the operational
+                       status of the adapter.
+
+         not-present (2) : If no adapter is currently inserted.
+
+         enable-pending (3) : Adapter has been identified, but not
+                              yet enabled.
+
+         enabled (4) : Adapter has been identified in valid slot and
+                       has been powered on and enabled.
+
+         unknown-device (5) : Adapter is powered off because it is in
+                              the wrong slot or of unknown type.
+
+         config-error (6) : Adapter has been identified, powered on and
+                            enabled, but failed to read its configuration
+                            data.
+
+         not-powered (7) : Adapter has been identified in valid slot
+                           but is not currently powered on."
+
+   ::= { ibm2212AdapEntry 3 }
+
+
+
+------------------------------------------------------------------
+-- Management application graphic accelerator table
+------------------------------------------------------------------
+
+ibm2212GraphicTable  OBJECT-TYPE
+   SYNTAX  SEQUENCE OF Ibm2212GraphicEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "A table of information mapping a slot and port to
+         an interface table ifIndex. An entry exists
+         in this table only if the ifConnectorPresent
+         object is true"
+   ::= { ibm2212hardwareGeneral 2 }
+
+ibm2212GraphicEntry  OBJECT-TYPE
+   SYNTAX  Ibm2212GraphicEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "An entry mapping slot and port to an interface
+         table ifIndex."
+   INDEX  { ibm2212GraphicSlotNum, ibm2212GraphicPortNum }
+   ::= { ibm2212GraphicTable 1 }
+
+Ibm2212GraphicEntry  ::=
+   SEQUENCE {
+        ibm2212GraphicSlotNum
+           INTEGER,
+        ibm2212GraphicPortNum
+           INTEGER,
+        ibm2212GraphicifIndex
+           INTEGER
+   }
+
+ibm2212GraphicSlotNum  OBJECT-TYPE
+   SYNTAX  INTEGER (0..2147483647)
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The number identifying a slot location where an adapter
+         can be inserted.
+
+         The 2212 has four fixed serial ports on the system card
+         that are designated by slot 0."
+   ::= { ibm2212GraphicEntry 1 }
+
+ibm2212GraphicPortNum  OBJECT-TYPE
+   SYNTAX  INTEGER (0..2147483647)
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The number identifying a port on a given adapter. A port
+         implies a physical connector is associated with it."
+   ::= { ibm2212GraphicEntry 2 }
+
+ibm2212GraphicifIndex  OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The ifIndex of the interface table entry associated with this
+         port on an adapter. By definition, the ifEntry has
+         ifConnectorPresent = true."
+   ::= { ibm2212GraphicEntry 3 }
+
+
+END

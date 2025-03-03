@@ -1,0 +1,8 @@
+1.3.6.1.2.1.1.1.0|4|Linux time.theswissbay.ch 5.4.83-v7+ #1379 SMP Mon Dec 14 13:08:57 GMT 2020 armv7l
+1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.8072.3.2.10
+1.3.6.1.2.1.1.3.0|67|45899334
+1.3.6.1.2.1.1.4.0|4|<private>
+1.3.6.1.2.1.1.5.0|4|<private>
+1.3.6.1.4.1.8072.1.3.2.2.1.21.7.99.104.114.111.110.121.100|2|1
+1.3.6.1.4.1.8072.1.3.2.3.1.2.7.99.104.114.111.110.121.100|4|{"data": {"tracking": {"reference_name": "50505300", "reference_type": "PPS", "stratum": "1", "reference_time": "1613135374.765364947", "system_time": "-0.000000016", "last_offset": "0.000000015", "rms_offset": "0.000000095", "frequency": "-9.845", "residual_frequency": "0.000", "skew": "0.006", "root_delay": "0.000000001", "root_dispersion": "0.000008054", "update_interval": "8.0", "leap_status": "Normal"}, "sources": [{"source_mode": "#", "source_state": "*", "source_name": "PPS", "stratum": "0", "polling_rate": "3", "reachability": "377", "last_rx": "7", "adjusted_offset": "0.000000045", "measured_offset": "0.000000058", "estimated_error": "0.000000232", "number_samplepoints": "19", "number_runs": "10", "span": "144", "frequency": "0.000", "frequency_skew": "0.006", "offset": "0.000000000", "stddev": "0.000000271"}, {"source_mode": "#", "source_state": "-", "source_name": "GPS", "stratum": "0", "polling_rate": "3", "reachability": "377", "last_rx": "7", "adjusted_offset": "-0.012771881", "measured_offset": "-0.012771881", "estimated_error": "0.003427120", "number_samplepoints": "15", "number_runs": "9", "span": "113", "frequency": "-81.117", "frequency_skew": "218.921", "offset": "-0.005838305", "stddev": "0.006443196"}]}, "error": false, "errorString": "", "version": 1}
+1.3.6.1.6.3.10.2.1.3.0|2|458993

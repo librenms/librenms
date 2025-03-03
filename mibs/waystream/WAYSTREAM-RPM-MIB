@@ -1,0 +1,1548 @@
+WAYSTREAM-RPM-MIB DEFINITIONS ::= BEGIN
+--
+-- This is the Waystream MIB for Realtime Performance Monitoring. 
+--
+-- Copyright (c) 2017 Waystream AB, All rights reserved
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress, 
+    TimeTicks
+    FROM SNMPv2-SMI
+	
+    wsMgmt
+    FROM WAYSTREAM-SMI;
+
+--
+-- Waystream RPM 
+--
+wsRpm MODULE-IDENTITY
+    LAST-UPDATED "201702101100Z"	-- February 10, 2017
+    ORGANIZATION "Waystream AB"
+    CONTACT-INFO
+        "Waystream AB
+
+         Mail : Farogatan 33
+                SE-164 51 Kista
+                Sweden
+
+         Tel  : +46 8 56 26 94 50
+    
+         E-mail: info@waystream.com
+         Web   : http://www.waystream.com"
+    DESCRIPTION
+        "MIB describing the Realtime Performance Monitoring function of ASRs.
+	 This allow operators to determine the quality of IPTV streams being
+	 delivered to end customers"
+
+    REVISION "201702101100Z"	-- February 10, 2017
+    DESCRIPTION
+        "Company name change:
+	 In October 2015 PacketFront Network Products was renamed Waystream.
+	 In this update all PacketFront were changed to Waystream and all
+	 pf* to ws*."
+    REVISION "201101111759Z"	-- January 11, 2011
+    DESCRIPTION
+        "Updated company name"
+    REVISION "201001270541Z"
+    DESCRIPTION
+        "Add RPM event-error-check related nodes, this allow to config the
+         detecting period/threshold of 4 type of multicast MPEG stream
+         quality error, and receive the trap from the corresponding trap node."
+    REVISION "200904291352Z"
+    DESCRIPTION
+        "Move pfRpm from pfExperimental to pfMgmt. Corrected spelling of 
+	 pfRpmTSMpegMisalignments object, added descriptions for audio elementary 
+	 stream objects."
+    REVISION "200903271213Z"
+    DESCRIPTION
+        "Add total-error-num for each RPM table, this shows total number of 
+         error packet per type, src/dest IP address, src/dest port tuple."
+    REVISION "200903231056Z"
+    DESCRIPTION
+        "Update telephone information in contact-info"
+    REVISION "200804301340Z"
+    DESCRIPTION
+        "Initial implementation of RPM from PACKETFRONT-MIB"
+
+    ::= { wsMgmt 14 }
+
+--
+-- Realtime Performance Monitoring
+--
+wsRpmGrp OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"RPM multicast groups."
+    ::= { wsRpm 2 }
+
+wsRpmGrpRtp OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"RPM rtp multicast groups."
+    ::= { wsRpmGrp 1 }
+
+wsRpmGrpRtpTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsRpmGrpRtpEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Table containing an entry for each RTP multicast group
+	that is	measured by RPM."
+    ::= { wsRpmGrpRtp 1 }
+
+wsRpmGrpRtpEntry OBJECT-TYPE
+    SYNTAX	WsRpmGrpRtpEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entry in wsRpmGrpRtpTable."
+    INDEX	{ wsRpmGrpRtpSrcAddr, wsRpmGrpRtpDestAddr,
+                  wsRpmGrpRtpSrcPort, wsRpmGrpRtpDestPort}
+    ::= { wsRpmGrpRtpTable 1 }
+
+WsRpmGrpRtpEntry ::= SEQUENCE {
+    wsRpmGrpRtpSrcAddr	IpAddress,
+    wsRpmGrpRtpDestAddr	IpAddress,
+    wsRpmGrpRtpSrcPort	Unsigned32,
+    wsRpmGrpRtpDestPort	Unsigned32,
+    wsRpmGrpRtpBps	Unsigned32,
+    wsRpmGrpRtpAge	TimeTicks,
+    wsRpmGrpRtpBytes	Counter32,
+    wsRpmGrpRtpUnknownVersion	Counter32,
+    wsRpmGrpRtpIpFragments	Counter32,
+    wsRpmGrpRtpSeqErrors	Counter32,
+    wsRpmGrpRtpJitter	Unsigned32,
+    wsRpmGrpRtpErrSum   Counter32,
+    wsRpmGrpRtpPeriodSeqErrors	Counter32,
+    wsRpmGrpRtpPeriodMaxJitter	Unsigned32
+}
+
+wsRpmGrpRtpSrcAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group source address."
+    ::= { wsRpmGrpRtpEntry 1}
+
+wsRpmGrpRtpDestAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group destination address."
+    ::= { wsRpmGrpRtpEntry 2 }
+
+wsRpmGrpRtpSrcPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group source port."
+    ::= { wsRpmGrpRtpEntry 3 }
+
+wsRpmGrpRtpDestPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group destination port."
+    ::= { wsRpmGrpRtpEntry 4 }
+
+wsRpmGrpRtpBps OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of bytes per second received from the multicast group."
+    ::= { wsRpmGrpRtpEntry 5 }
+
+wsRpmGrpRtpAge OBJECT-TYPE
+    SYNTAX	TimeTicks
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Duration of time since last seen data of the rtp flow."
+    ::= { wsRpmGrpRtpEntry 6 }
+
+wsRpmGrpRtpBytes OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Number of bytes received from multicast group."
+    ::= { wsRpmGrpRtpEntry 7 }
+
+wsRpmGrpRtpUnknownVersion OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of occurrences of RTP's version that differs 2."
+    ::= { wsRpmGrpRtpEntry 8 }
+
+wsRpmGrpRtpIpFragments OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of RTP packets carried by fragmented IP packets."
+    ::= { wsRpmGrpRtpEntry 9 }
+
+wsRpmGrpRtpSeqErrors OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of RTP packets that have unexpected sequence number,
+	 indicating RTP packet loss happened."
+    ::= { wsRpmGrpRtpEntry 10 }
+
+wsRpmGrpRtpJitter OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Jitter calculated using RTP packets' timestamps."
+    ::= { wsRpmGrpRtpEntry 11 }
+
+wsRpmGrpRtpErrSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Error sum (wsRpmGrpRtpUnknownVersion + wsRpmGrpRtpIpFragments
+        + wsRpmGrpRtpSeqErrors)."
+    ::= { wsRpmGrpRtpEntry 12 }
+
+wsRpmGrpRtpPeriodSeqErrors OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of RTP packets that have unexpected sequence number in current
+	 detecting period(configged by wsRpmRtpSeqErrPeriod), indicating RTP
+	 packet loss happened in current detecting period."
+    ::= { wsRpmGrpRtpEntry 13 }
+
+wsRpmGrpRtpPeriodMaxJitter OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Max Jitter(in micro seconds) calculated using RTP packets' timestamps
+	 in current detecting period(configged by wsRpmRtpJitterPeriod),
+	 indicating max RTP packet jitter in current detecting period."
+    ::= { wsRpmGrpRtpEntry 14 }
+
+wsRpmGrpRtpMdiTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsRpmGrpRtpMdiEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Table contains RFC 4445 metrics for IPTV QoS."
+    ::= { wsRpmGrpRtp 2 }
+
+wsRpmGrpRtpMdiEntry OBJECT-TYPE
+    SYNTAX	WsRpmGrpRtpMdiEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entry in wsRpmGrpRtpMdiTable."
+    INDEX	{ wsRpmGrpRtpMdiSrcAddr, wsRpmGrpRtpMdiDestAddr,
+                  wsRpmGrpRtpMdiSrcPort, wsRpmGrpRtpMdiDestPort}
+    ::= { wsRpmGrpRtpMdiTable 1 }
+
+WsRpmGrpRtpMdiEntry ::= SEQUENCE {
+    wsRpmGrpRtpMdiSrcAddr	IpAddress,
+    wsRpmGrpRtpMdiDestAddr	IpAddress,
+    wsRpmGrpRtpMdiSrcPort	Unsigned32,
+    wsRpmGrpRtpMdiDestPort	Unsigned32,
+    wsRpmGrpRtpMdiDLFactor	Unsigned32,
+    wsRpmGrpRtpMdiMLRFactor	Unsigned32,
+    wsRpmGrpRtpMdiDFThreshold	Unsigned32,
+    wsRpmGrpRtpMdiMLRThreshold	Unsigned32,
+    wsRpmGrpRtpMdiDFErrorIntervals	Unsigned32,
+    wsRpmGrpRtpMdiMLRErrorIntervals	Unsigned32
+
+}
+
+wsRpmGrpRtpMdiSrcAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group source address."
+    ::= { wsRpmGrpRtpMdiEntry 1}
+
+wsRpmGrpRtpMdiDestAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group destination address."
+    ::= { wsRpmGrpRtpMdiEntry 2 }
+
+wsRpmGrpRtpMdiSrcPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group source port."
+    ::= { wsRpmGrpRtpMdiEntry 3 }
+
+wsRpmGrpRtpMdiDestPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group destination port."
+    ::= { wsRpmGrpRtpMdiEntry 4 }
+
+wsRpmGrpRtpMdiDLFactor OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The delay factor indicates how long (miliseconds) an IP data
+ 	 flow must be buffered at its nominal bit rate to prevent 
+	 packet loss."
+    ::= { wsRpmGrpRtpMdiEntry 5 }
+
+wsRpmGrpRtpMdiMLRFactor OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The Media Loss Rate factor indicates the rate of packet loss
+	 in seconds, including disordered packets and duplicated packets."
+    ::= { wsRpmGrpRtpMdiEntry 6 }
+
+wsRpmGrpRtpMdiDFThreshold OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The threshold for Delay factor in miliseconds."
+    ::= { wsRpmGrpRtpMdiEntry 7 }
+
+wsRpmGrpRtpMdiMLRThreshold OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The threshold for Media Loss Rate factor in packets/second."
+    ::= { wsRpmGrpRtpMdiEntry 8 }
+
+wsRpmGrpRtpMdiDFErrorIntervals OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of times that Delay factor value is greater than
+	 the Delay factor threshold."
+    ::= { wsRpmGrpRtpMdiEntry 9 }
+
+wsRpmGrpRtpMdiMLRErrorIntervals OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of times that the Media Loss Rate value is greater
+	 than the Media Loss Rate threshold."
+    ::= { wsRpmGrpRtpMdiEntry 10 }
+
+
+wsRpmTS OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"Rpm transport stream groups."
+    ::= { wsRpm 3 }
+
+wsRpmTSMpeg OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"Rpm MPEG transport stream groups."
+    ::= { wsRpmTS 1 }
+
+wsRpmTSMpegTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsRpmTSMpegEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Table containing an entry for each multicast group
+	that is	measured by RPM."
+    ::= { wsRpmTSMpeg 1 }
+
+wsRpmTSMpegEntry OBJECT-TYPE
+    SYNTAX	WsRpmTSMpegEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entry in wsRpmTSMpegTable."
+    INDEX	{ wsRpmTSMpegSrcAddr, wsRpmTSMpegDestAddr,
+                  wsRpmTSMpegSrcPort, wsRpmTSMpegDestPort}
+    ::= { wsRpmTSMpegTable 1 }
+
+WsRpmTSMpegEntry ::= SEQUENCE {
+    wsRpmTSMpegSrcAddr	IpAddress,
+    wsRpmTSMpegDestAddr	IpAddress,
+    wsRpmTSMpegSrcPort	Unsigned32,
+    wsRpmTSMpegDestPort	Unsigned32,
+    wsRpmTSMpegBps	Unsigned32,
+    wsRpmTSMpegAge	TimeTicks,
+    wsRpmTSMpegBytes	Counter32,
+    wsRpmTSMpegMissingSync	Counter32,
+    wsRpmTSMpegIpFragments	Counter32,
+    wsRpmTSMpegMisalignments	Counter32,
+    wsRpmTSMpegFlowAge	TimeTicks,
+    wsRpmTSMpegIngressIf	Unsigned32,
+    wsRpmTSMpegErrSum           Counter32,
+    wsRpmTSMpegPeriodMissingSync Counter32,
+    wsRpmTSMpegPeriodMisalignments Counter32
+}
+
+wsRpmTSMpegSrcAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group source address."
+    ::= { wsRpmTSMpegEntry 1}
+
+wsRpmTSMpegDestAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group destination address."
+    ::= { wsRpmTSMpegEntry 2 }
+
+wsRpmTSMpegSrcPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group source port."
+    ::= { wsRpmTSMpegEntry 3 }
+
+wsRpmTSMpegDestPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Multicast group destination port."
+    ::= { wsRpmTSMpegEntry 4 }
+
+
+wsRpmTSMpegBps OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of bytes per second received from the multicast group."
+    ::= { wsRpmTSMpegEntry 5 }
+
+wsRpmTSMpegAge OBJECT-TYPE
+    SYNTAX	TimeTicks
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Duration of time since last seen data of MPEG transport stream."
+    ::= { wsRpmTSMpegEntry 6 }
+
+wsRpmTSMpegBytes OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Number of bytes received from multicast group."
+    ::= { wsRpmTSMpegEntry 7 }
+
+wsRpmTSMpegMissingSync OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of MPEG TS packets that have sync byte differed than 0x47."
+    ::= { wsRpmTSMpegEntry 8 }
+
+wsRpmTSMpegIpFragments OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of fragmented IP packets that carries MPEG transport
+	 stream packet."
+    ::= { wsRpmTSMpegEntry 9 }
+
+wsRpmTSMpegMisalignments OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Each IP packet should carry 7 MPEG TS packets. If not, the counter 
+	 will be incremented."
+    ::= { wsRpmTSMpegEntry 10 }
+
+wsRpmTSMpegFlowAge OBJECT-TYPE
+    SYNTAX	TimeTicks
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The duration since the RPM entries for an IPTV group have 
+	 been created."
+    ::= { wsRpmTSMpegEntry 11 }
+
+wsRpmTSMpegIngressIf OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The interface on which this transport stream ingressed."
+    ::= { wsRpmTSMpegEntry 12 }
+
+wsRpmTSMpegErrSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Error sum (wsRpmTSMpegMissingSync + wsRpmTSMpegIpFragments
+        + wsRpmTSMpegMisalignments)."
+    ::= { wsRpmTSMpegEntry 13 }
+
+wsRpmTSMpegPeriodMissingSync OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of MPEG TS packets that have sync byte differed than 0x47 in
+	 current detecting period(configged by wsRpmTSMpegMissSyncPeriod),
+	 indicating MPEG TS packet missing syncronization happened in current
+	 detecting period."
+    ::= { wsRpmTSMpegEntry 14 }
+
+wsRpmTSMpegPeriodMisalignments OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of MPEG TS packets that mis-aligned in current detecting period
+	 (configged by wsRpmTSMpegMisalignPeriod), indicating MPEG TS packets
+	 having alignment error happened in current detecting period."
+    ::= { wsRpmTSMpegEntry 15 }
+
+wsRpmES OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"Groups for elementary streams."
+    ::= { wsRpm 4 }
+
+wsRpmESPat OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"Group of PAT sections."
+    ::= { wsRpmES 1 }
+
+
+wsRpmESPatTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsRpmESPatEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The table contains PAT section's statistics for every IPTV group."
+    ::= { wsRpmESPat 1 }
+
+wsRpmESPatEntry OBJECT-TYPE
+    SYNTAX	WsRpmESPatEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entries for each PAT section's statistics."
+    INDEX	{ wsRpmESPatSrcAddr, wsRpmESPatDestAddr,
+                  wsRpmESPatSrcPort, wsRpmESPatDestPort }
+    ::= { wsRpmESPatTable 1 }
+
+WsRpmESPatEntry ::= SEQUENCE { 
+    wsRpmESPatSrcAddr	IpAddress,
+    wsRpmESPatDestAddr	IpAddress,
+    wsRpmESPatSrcPort	Unsigned32,
+    wsRpmESPatDestPort	Unsigned32,
+    wsRpmESPatBps	Unsigned32,
+    wsRpmESPatAge	TimeTicks,
+    wsRpmESPatBytes	Counter32,
+    wsRpmESPatInterCcErr	Counter32,
+    wsRpmESPatIntraCcErr	Counter32,
+    wsRpmESPatCcErrSum          Counter32
+}
+
+wsRpmESPatSrcAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source IP address of a IPTV multicast group."
+    ::= { wsRpmESPatEntry 1 }
+
+wsRpmESPatDestAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination IP address of a IPTV multicast group."
+    ::= { wsRpmESPatEntry 2 }
+
+wsRpmESPatSrcPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source port of a IPTV multicast group."
+    ::= { wsRpmESPatEntry 3 }
+
+wsRpmESPatDestPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination port of a IPTV multicast group."
+    ::= { wsRpmESPatEntry 4 }
+
+wsRpmESPatBps OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The transport rate in bits/second of a PAT section."
+    ::= { wsRpmESPatEntry 5 }
+
+wsRpmESPatAge OBJECT-TYPE
+    SYNTAX	TimeTicks
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The duration of time since last seen data of PAT section."
+    ::= { wsRpmESPatEntry 6 }
+
+wsRpmESPatBytes OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Number of bytes of PAT section has been received."
+    ::= { wsRpmESPatEntry 7 }
+
+wsRpmESPatInterCcErr OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of discontinuities of continuity_counter field for a
+	 particular PAT elementary stream, which is happened between two
+ 	 different IP packets."
+    ::= { wsRpmESPatEntry 8 }
+
+wsRpmESPatIntraCcErr	OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of discontinuities of continuity_counter field for a
+	 particular PAT elementary stream, which is happened within one
+ 	 IP packet."
+    ::= { wsRpmESPatEntry 9 }
+
+wsRpmESPatCcErrSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Error sum (wsRpmESPatInterCcErr + wsRpmESPatIntraCcErr)." 
+    ::= { wsRpmESPatEntry 10 }
+
+wsRpmESPatTr290Table OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsRpmESPatTr290Entry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Table contains other Qos metrics for PAT defined by the Tr 290."
+    ::= { wsRpmESPat 2 }
+
+wsRpmESPatTr290Entry OBJECT-TYPE
+    SYNTAX	WsRpmESPatTr290Entry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entries for other Qos metrics for PAT defined by the Tr 290."
+    INDEX	{ wsRpmESPatTr290SrcAddr, wsRpmESPatTr290DestAddr,
+                  wsRpmESPatTr290SrcPort, wsRpmESPatTr290DestPort }
+    ::= { wsRpmESPatTr290Table 1 }
+
+WsRpmESPatTr290Entry ::= SEQUENCE { 
+    wsRpmESPatTr290SrcAddr	IpAddress,
+    wsRpmESPatTr290DestAddr	IpAddress,
+    wsRpmESPatTr290SrcPort     	Unsigned32,
+    wsRpmESPatTr290DestPort	Unsigned32,
+    wsRpmESPatTr290PatErr	Counter32,
+    wsRpmESPatTr290CrcErr	Counter32
+}
+
+wsRpmESPatTr290SrcAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source IP address of a IPTV multicast group."
+    ::= { wsRpmESPatTr290Entry 1 }
+
+wsRpmESPatTr290DestAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination IP address of a IPTV multicast group."
+    ::= { wsRpmESPatTr290Entry 2 }
+
+wsRpmESPatTr290SrcPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source port of a IPTV multicast group."
+    ::= { wsRpmESPatTr290Entry 3 }
+
+wsRpmESPatTr290DestPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination port of a IPTV multicast group."
+    ::= { wsRpmESPatTr290Entry 4 }
+
+wsRpmESPatTr290PatErr OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of occurrences of sections with table_id 0x00 do not 
+	 occur at least every 0,5 second on PID 0x0000, or section with 
+	 table_id other than 0x00 found on PID 0x0000, or
+	 scrambling_control_field is not 00 for PID 0x0000."
+    ::= { wsRpmESPatTr290Entry 5 }
+
+wsRpmESPatTr290CrcErr OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The CRC check for the PAT indicates whether the content of the
+	 corresponding table is corrupted. In this case no further error
+	 indication should be derived from the content of the 
+	 corresponding table."
+    ::= { wsRpmESPatTr290Entry 6 }
+
+wsRpmESPmt OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"Group of PMT sections."
+    ::= { wsRpmES 2 }
+
+wsRpmESPmtTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsRpmESPmtEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The table contains PMT section's statistics for every IPTV group."
+    ::= { wsRpmESPmt 1 }
+
+wsRpmESPmtEntry OBJECT-TYPE
+    SYNTAX	WsRpmESPmtEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entries for each PAT section's statistics."
+    INDEX	{ wsRpmESPmtSrcAddr, wsRpmESPmtDestAddr,
+                  wsRpmESPmtSrcPort, wsRpmESPmtDestPort,
+		  wsRpmESPmtPid }
+    ::= { wsRpmESPmtTable 1 }
+
+WsRpmESPmtEntry ::= SEQUENCE { 
+    wsRpmESPmtSrcAddr	IpAddress,
+    wsRpmESPmtDestAddr	IpAddress,
+    wsRpmESPmtSrcPort	Unsigned32,
+    wsRpmESPmtDestPort	Unsigned32,
+    wsRpmESPmtPid 	Unsigned32,
+    wsRpmESPmtBps	Unsigned32,
+    wsRpmESPmtAge	TimeTicks,
+    wsRpmESPmtBytes	Counter32,
+    wsRpmESPmtInterCcErr	Counter32,
+    wsRpmESPmtIntraCcErr	Counter32,
+    wsRpmESPmtCcErrSum          Counter32
+}
+
+wsRpmESPmtSrcAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source IP address of a IPTV multicast group."
+    ::= { wsRpmESPmtEntry 1 }
+
+wsRpmESPmtDestAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination IP address of a IPTV multicast group."
+    ::= { wsRpmESPmtEntry 2 }
+
+wsRpmESPmtSrcPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source port of a IPTV multicast group."
+    ::= { wsRpmESPmtEntry 3 }
+
+wsRpmESPmtDestPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination port of a IPTV multicast group."
+    ::= { wsRpmESPmtEntry 4 }
+
+wsRpmESPmtPid OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..8191)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"PID number of the PMT section's elementary stream."
+    ::= { wsRpmESPmtEntry 5 }
+
+wsRpmESPmtBps OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The transport rate in bits/second of a PMT section."
+    ::= { wsRpmESPmtEntry 6 }
+
+wsRpmESPmtAge OBJECT-TYPE
+    SYNTAX	TimeTicks
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The duration of time since last seen data of PMT section."
+    ::= { wsRpmESPmtEntry 7 }
+
+wsRpmESPmtBytes OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"Number of bytes of PMT section has been received."
+    ::= { wsRpmESPmtEntry 8 }
+
+wsRpmESPmtInterCcErr OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of discontinuities of continuity_counter field for a
+	 particular PMT elementary stream, which is happened between two
+ 	 different IP packets."
+    ::= { wsRpmESPmtEntry 9 }
+
+wsRpmESPmtIntraCcErr	OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of discontinuities of continuity_counter field for a
+	 particular PMT elementary stream, which is happened within one
+ 	 IP packet."
+    ::= { wsRpmESPmtEntry 10 }
+
+wsRpmESPmtCcErrSum  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Error sum (wsRpmESPmtInterCcErr + wsRpmESPmtIntraCcErr)."
+    ::= { wsRpmESPmtEntry 11 }
+
+wsRpmESPmtTr290Table OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsRpmESPmtTr290Entry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Table contains other Qos metrics for PMT defined by the Tr 290."
+    ::= { wsRpmESPmt 2 }
+
+wsRpmESPmtTr290Entry OBJECT-TYPE
+    SYNTAX	WsRpmESPmtTr290Entry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entries for other Qos metrics for PMT defined by the Tr 290."
+    INDEX	{ wsRpmESPmtTr290SrcAddr, wsRpmESPmtTr290DestAddr,
+                  wsRpmESPmtTr290SrcPort, wsRpmESPmtTr290DestPort,
+		  wsRpmESPmtTr290Pid }
+    ::= { wsRpmESPmtTr290Table 1 }
+
+WsRpmESPmtTr290Entry ::= SEQUENCE { 
+    wsRpmESPmtTr290SrcAddr	IpAddress,
+    wsRpmESPmtTr290DestAddr	IpAddress,
+    wsRpmESPmtTr290SrcPort	Unsigned32,
+    wsRpmESPmtTr290DestPort	Unsigned32,
+    wsRpmESPmtTr290Pid 		Unsigned32,
+    wsRpmESPmtTr290PmtErr Counter32,
+    wsRpmESPmtTr290CrcErr Counter32
+}
+
+wsRpmESPmtTr290SrcAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source IP address of a IPTV multicast group."
+    ::= { wsRpmESPmtTr290Entry 1 }
+
+wsRpmESPmtTr290DestAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination IP address of a IPTV multicast group."
+    ::= { wsRpmESPmtTr290Entry 2 }
+
+wsRpmESPmtTr290SrcPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source port of a IPTV multicast group."
+    ::= { wsRpmESPmtTr290Entry 3 }
+
+wsRpmESPmtTr290DestPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination port of a IPTV multicast group."
+    ::= { wsRpmESPmtTr290Entry 4 }
+
+wsRpmESPmtTr290Pid OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..8191)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"PID number for PMT section's elementary stream."
+--    INDEX	{ wsRpmGrpPmtEntry 1 }
+    ::= { wsRpmESPmtTr290Entry 5 }
+
+wsRpmESPmtTr290PmtErr OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of occurrences of PMT sections with table_id 0x00 do not 
+	 occur at least every 0,5 second on PID 0x0000, or section with 
+	 table_id other than 0x00 found on PID 0x0000, or
+	 scrambling_control_field is not 00 for PID 0x0000."
+    ::= { wsRpmESPmtTr290Entry 6 }
+
+wsRpmESPmtTr290CrcErr OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The CRC check for the PMT indicates whether the content of the
+	 corresponding table is corrupted. In this case no further error
+	 indication should be derived from the content of the 
+	 corresponding table."
+    ::= { wsRpmESPmtTr290Entry 7 }
+
+wsRpmESVideo OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"Groups for video elementary streams for all RPM multicast groups."
+    ::= { wsRpmES 3 }
+
+wsRpmESVideoTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsRpmESVideoEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Table contains Qos metrics for all video elementary streams."
+    ::= { wsRpmESVideo 1 }
+
+wsRpmESVideoEntry OBJECT-TYPE
+    SYNTAX	WsRpmESVideoEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entries for all video elementary streams."
+    INDEX	{ wsRpmESVideoSrcAddr, wsRpmESVideoDestAddr,
+                  wsRpmESVideoSrcPort, wsRpmESVideoDestPort,
+		  wsRpmESVideoPid }
+    ::= { wsRpmESVideoTable 1 }
+
+WsRpmESVideoEntry ::= SEQUENCE { 
+    wsRpmESVideoSrcAddr		IpAddress,
+    wsRpmESVideoDestAddr	IpAddress,
+    wsRpmESVideoSrcPort		Unsigned32,
+    wsRpmESVideoDestPort	Unsigned32,
+    wsRpmESVideoPid 		Unsigned32,
+    wsRpmESVideoBps		Unsigned32,
+    wsRpmESVideoAge		TimeTicks,
+    wsRpmESVideoBytes		Counter32,
+    wsRpmESVideoInterCcErr	Counter32,
+    wsRpmESVideoIntraCcErr	Counter32,
+    wsRpmESVideoPCRJitter	Unsigned32,
+    wsRpmESVideoCcErrSum        Counter32
+}
+
+wsRpmESVideoSrcAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source IP address of a IPTV multicast group."
+    ::= { wsRpmESVideoEntry 1 }
+
+wsRpmESVideoDestAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination IP address of a IPTV multicast group."
+    ::= { wsRpmESVideoEntry 2 }
+
+wsRpmESVideoSrcPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source port of a IPTV multicast group."
+    ::= { wsRpmESVideoEntry 3 }
+
+wsRpmESVideoDestPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination port of a IPTV multicast group."
+    ::= { wsRpmESVideoEntry 4 }
+
+wsRpmESVideoPid OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..8191)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"PID number of a video elementary stream."
+    ::= { wsRpmESVideoEntry 5 }
+
+wsRpmESVideoBps OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Tranport rate in bytes per second of a video elementary stream."
+    ::= { wsRpmESVideoEntry 6 }
+
+wsRpmESVideoAge OBJECT-TYPE
+    SYNTAX	TimeTicks
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Duration of time since last seen data of a video elementary stream."
+    ::= { wsRpmESVideoEntry 7 }
+
+wsRpmESVideoBytes OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"The number of bytes of a video elementary stream that has been 
+	 received."
+    ::= { wsRpmESVideoEntry 8 }
+
+wsRpmESVideoInterCcErr OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of discontinuities of continuity_counter field for a
+	 particular video elementary stream, which is happened between two
+ 	 different IP packets."
+    ::= { wsRpmESVideoEntry 9 }
+
+wsRpmESVideoIntraCcErr	OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of discontinuities of continuity_counter field for a
+	 particular video elementary stream, which is happened within a 
+ 	 single IP packet."
+    ::= { wsRpmESVideoEntry 10 }
+
+wsRpmESVideoPCRJitter OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The jitter calculated using the PCR timestamp built in a video 
+	 elementary stream."
+    ::= { wsRpmESVideoEntry 11 }
+
+wsRpmESVideoCcErrSum  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Error sum (wsRpmESVideoInterCcErr + wsRpmESVideoIntraCcErr)."
+    ::= { wsRpmESVideoEntry 12 }
+
+wsRpmESVideoPicTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsRpmESVideoPicEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The tables contains other Qos metrics for video pictures."
+    ::= { wsRpmESVideo 2 }
+
+wsRpmESVideoPicEntry OBJECT-TYPE
+    SYNTAX	WsRpmESVideoPicEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entries for Qos metrics for video pictures."
+    INDEX	{ wsRpmESVideoPicSrcAddr, wsRpmESVideoPicDestAddr,
+                  wsRpmESVideoPicSrcPort, wsRpmESVideoPicDestPort,
+		  wsRpmESVideoPicPid }
+    ::= { wsRpmESVideoPicTable 1 }
+
+WsRpmESVideoPicEntry ::= SEQUENCE { 
+    wsRpmESVideoPicSrcAddr	IpAddress,
+    wsRpmESVideoPicDestAddr	IpAddress,
+    wsRpmESVideoPicSrcPort	Unsigned32,
+    wsRpmESVideoPicDestPort	Unsigned32,
+    wsRpmESVideoPicPid 		Unsigned32,
+    wsRpmESVideoPicTsLossInIframe	Counter32,
+    wsRpmESVideoPicImpairedIframe	Counter32,
+    wsRpmESVideoPicGoodIframe	Counter32,
+    wsRpmESVideoPicTsLossInPframe	Counter32,
+    wsRpmESVideoPicImpairedPframe	Counter32,
+    wsRpmESVideoPicGoodPframe	Counter32,
+    wsRpmESVideoPicTsLossInBframe	Counter32,
+    wsRpmESVideoPicImpairedBframe	Counter32,
+    wsRpmESVideoPicGoodBframe	Counter32
+} 
+
+wsRpmESVideoPicSrcAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source IP address of a IPTV multicast group."
+    ::= { wsRpmESVideoPicEntry 1 }
+
+wsRpmESVideoPicDestAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination IP address of a IPTV multicast group."
+    ::= { wsRpmESVideoPicEntry 2 }
+
+wsRpmESVideoPicSrcPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source port of a IPTV multicast group."
+    ::= { wsRpmESVideoPicEntry 3 }
+
+wsRpmESVideoPicDestPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination port of a IPTV multicast group."
+    ::= { wsRpmESVideoPicEntry 4 }
+
+wsRpmESVideoPicPid OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..8191)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"PID number of the video elementary stream."
+    ::= { wsRpmESVideoPicEntry 5 }
+
+wsRpmESVideoPicTsLossInIframe OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of times that transport stream packet losses happened in 
+	 I-frames."
+    ::= { wsRpmESVideoPicEntry 6 }
+
+wsRpmESVideoPicImpairedIframe OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of I-frames that have transport stream packet losses."
+    ::= { wsRpmESVideoPicEntry 7 }
+
+wsRpmESVideoPicGoodIframe OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of I-frames that don't have any loss."
+    ::= { wsRpmESVideoPicEntry 8 }
+
+wsRpmESVideoPicTsLossInPframe OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of times that transport stream packet losses happened in 
+	 P-frames."
+    ::= { wsRpmESVideoPicEntry 9 }
+
+wsRpmESVideoPicImpairedPframe OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of P-frames that have transport stream packet losses."
+    ::= { wsRpmESVideoPicEntry 10 }
+
+wsRpmESVideoPicGoodPframe OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of P-frames that don't have any transport stream packet loss."
+    ::= { wsRpmESVideoPicEntry 11 }
+
+wsRpmESVideoPicTsLossInBframe OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of times that transport stream packet losses happened in 
+	 B-frames."
+    ::= { wsRpmESVideoPicEntry 12 }
+
+wsRpmESVideoPicImpairedBframe OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of B-frames that have transport stream packet losses."
+    ::= { wsRpmESVideoPicEntry 13 }
+
+wsRpmESVideoPicGoodBframe OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of B-frames that don't have any transport stream packet loss."
+    ::= { wsRpmESVideoPicEntry 14 }
+
+wsRpmESAudio OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"Groups for audio elementary streams for all RPM multicast groups."
+    ::= { wsRpmES 4 }
+
+wsRpmESAudioTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsRpmESAudioEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Table containing QoS metrics for all audio elementary streams."
+    ::= { wsRpmESAudio 1 }
+
+wsRpmESAudioEntry OBJECT-TYPE
+    SYNTAX	WsRpmESAudioEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entries for all audio elementary streams."
+    INDEX	{ wsRpmESAudioSrcAddr, wsRpmESAudioDestAddr,
+                  wsRpmESAudioSrcPort, wsRpmESAudioDestPort,
+		  wsRpmESAudioPid }
+    ::= { wsRpmESAudioTable 1 }
+
+WsRpmESAudioEntry ::= SEQUENCE { 
+    wsRpmESAudioSrcAddr		IpAddress,
+    wsRpmESAudioDestAddr	IpAddress,
+    wsRpmESAudioSrcPort		Unsigned32,
+    wsRpmESAudioDestPort	Unsigned32,
+    wsRpmESAudioPid 		Unsigned32,
+    wsRpmESAudioBps		Unsigned32,
+    wsRpmESAudioAge		TimeTicks,
+    wsRpmESAudioBytes		Counter32,
+    wsRpmESAudioInterCcErr	Counter32,
+    wsRpmESAudioIntraCcErr	Counter32,
+    wsRpmESAudioCcErrSum        Counter32
+}
+
+wsRpmESAudioSrcAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source IP address of an IPTV audio multicast group."
+    ::= { wsRpmESAudioEntry 1 }
+
+wsRpmESAudioDestAddr OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination IP address of an IPTV audio multicast group."
+    ::= { wsRpmESAudioEntry 2 }
+
+wsRpmESAudioSrcPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Source port of an IPTV audio multicast group."
+    ::= { wsRpmESAudioEntry 3 }
+
+wsRpmESAudioDestPort OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Destination port of an IPTV audio multicast group."
+    ::= { wsRpmESAudioEntry 4 }
+
+wsRpmESAudioPid OBJECT-TYPE
+    SYNTAX	Unsigned32 (0..8191)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"PID number of the audio elementary stream."
+    ::= { wsRpmESAudioEntry 5 }
+
+wsRpmESAudioBps OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Tranport rate in bytes per second of an audio elementary stream."
+    ::= { wsRpmESAudioEntry 6 }
+
+wsRpmESAudioAge OBJECT-TYPE
+    SYNTAX	TimeTicks
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Elapsed time since last occurence of data from this audio elementary stream."
+    ::= { wsRpmESAudioEntry 7 }
+
+wsRpmESAudioBytes OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	
+	"The amount of data in bytes of this audio elementary stream that have been received."
+    ::= { wsRpmESAudioEntry 8 }
+
+wsRpmESAudioInterCcErr OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of discontinuities in the continuity_counter field for this
+	 audio elementary stream, which has occurred between two subsequent IP packets."
+    ::= { wsRpmESAudioEntry 9 }
+
+wsRpmESAudioIntraCcErr	OBJECT-TYPE
+    SYNTAX	Counter32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of discontinuities in the continuity_counter field for this
+	 audio elementary stream, which has occurred within a single IP packet."
+    ::= { wsRpmESAudioEntry 10 }
+
+wsRpmESAudioCcErrSum   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Error sum (wsRpmESAudioInterCcErr + wsRpmESAudioIntraCcErr)."
+    ::= { wsRpmESAudioEntry 11 }
+
+--
+-- RPM related configuration
+--
+wsRpmConfig OBJECT IDENTIFIER ::= { wsRpm 5 }
+
+wsRpmTrapEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS	current
+    DESCRIPTION
+	"Provides control over if send rpm related traps, by default it is
+	 disabled."
+    ::= { wsRpmConfig 1 }
+
+wsRpmLogEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS	current
+    DESCRIPTION
+	"Provides control over if send rpm related log, by default it is
+	 disabled."
+    ::= { wsRpmConfig 2 }
+
+wsRpmThresholdConfig OBJECT IDENTIFIER ::= { wsRpmConfig 3 }
+
+wsRpmRtpSeqErrThreshold       OBJECT-TYPE
+        SYNTAX  Integer32 (0..2147483647)
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "RTP sequence error packet event threshold(in packets)."
+        ::= { wsRpmThresholdConfig 1 }
+
+wsRpmRtpJitterThreshold       OBJECT-TYPE
+        SYNTAX  Integer32 (0..2147483647)
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "RTP packet jitter threshold (in micro seconds)."
+        ::= { wsRpmThresholdConfig 2 }
+
+wsRpmTSMpegMissSyncThreshold    OBJECT-TYPE
+        SYNTAX  Integer32 (0..2147483647)
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "Transport stream missing-sync packet event threshold (in packets)."
+        ::= { wsRpmThresholdConfig 3 }
+
+wsRpmTSMpegMisalignThreshold    OBJECT-TYPE
+        SYNTAX  Integer32 (0..2147483647)
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "Transport stream misalign packet event threshold (in packets)."
+        ::= { wsRpmThresholdConfig 4 }
+
+
+wsRpmPeriodConfig OBJECT IDENTIFIER ::= { wsRpmConfig 4 }
+
+wsRpmRtpSeqErrPeriod       OBJECT-TYPE
+        SYNTAX  Integer32 (0..604800)
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "RTP sequence error packet event detect period(in seconds), set a
+	     value of 0 will stop sequence error event detection."
+        ::= { wsRpmPeriodConfig 1 }
+
+wsRpmRtpJitterPeriod       OBJECT-TYPE
+        SYNTAX  Integer32 (0..604800)
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "RTP packet jitter event detect period(in seconds), set a value of 0
+	     will stop packet jitter event detection."
+        ::= { wsRpmPeriodConfig 2 }
+
+wsRpmTSMpegMissSyncPeriod       OBJECT-TYPE
+        SYNTAX  Integer32 (0..604800)
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "Transport stream missing-sync packet event detect period (in
+	     seconds), set a value of 0 will stop missing-sync packet event
+	     detection."
+        ::= { wsRpmPeriodConfig 3 }
+
+wsRpmTSMpegMisalignPeriod       OBJECT-TYPE
+        SYNTAX  Integer32 (0..604800)
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "Transport stream misalign packet event detect period (in seconds),
+	     set a value of 0 will stop misalign packet event detection."
+        ::= { wsRpmPeriodConfig 4 }
+
+--
+-- RPM related notifications
+--
+wsRpmNotifications OBJECT IDENTIFIER ::= { wsRpm 0 }
+
+notifyWsRpmRtpSeqError      NOTIFICATION-TYPE
+        OBJECTS { wsRpmGrpRtpPeriodSeqErrors, wsRpmRtpSeqErrThreshold,
+                wsRpmRtpSeqErrPeriod
+        }
+        STATUS current
+        DESCRIPTION
+                "RTP packet sequence error trap, which is sent when RTP packet
+		 drops of a specific group reaches wsRpmRtpSeqErrThreshold in
+		 period wsRpmRtpSeqErrPeriod."
+        ::= { wsRpmNotifications 1 }
+
+notifyWsRpmRtpJitter    NOTIFICATION-TYPE
+        OBJECTS { wsRpmGrpRtpPeriodMaxJitter, wsRpmRtpJitterThreshold,
+                wsRpmRtpJitterPeriod
+        }
+        STATUS current
+        DESCRIPTION
+                "RTP packet jitter trap, which is sent when max packet jitter of
+		 a specific multicast group reaches wsRpmRtpJitterThreshold in
+                 period wsRpmRtpJitterPeriod."
+        ::= { wsRpmNotifications 2 }
+
+notifyWsRpmTSMpegMissSync     NOTIFICATION-TYPE
+        OBJECTS { wsRpmTSMpegPeriodMissingSync, wsRpmTSMpegMissSyncThreshold,
+                wsRpmTSMpegMissSyncPeriod
+        }
+        STATUS current
+        DESCRIPTION
+                "Transport stream missing-sync trap, which is sent when the
+                 numbers of missing-sync packet of a specific multicast group
+                 reaches wsRpmTSMpegMissSyncThreshold in period
+                 wsRpmTSMpegMissSyncPeriod."
+        ::= { wsRpmNotifications 3 }
+
+notifyWsRpmTSMpegMisalign     NOTIFICATION-TYPE
+        OBJECTS { wsRpmTSMpegPeriodMisalignments, wsRpmTSMpegMisalignThreshold,
+                wsRpmTSMpegMisalignPeriod
+        }
+        STATUS current
+        DESCRIPTION
+                "Transport stream misalign trap, which is sent when the numbers
+                 of misalign packet of a specific multicast group reaches
+                 wsRpmTSMpegMisalignThreshold in period wsRpmTSMpegMisalignPeriod."
+        ::= { wsRpmNotifications 4 }
+END

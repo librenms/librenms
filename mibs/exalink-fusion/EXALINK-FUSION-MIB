@@ -1,0 +1,679 @@
+EXALINK-FUSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    NOTIFICATION-TYPE, enterprises              FROM SNMPv2-SMI
+    TruthValue                                  FROM SNMPv2-TC
+    SnmpAdminString                             FROM SNMP-FRAMEWORK-MIB
+;
+
+exaFusion MODULE-IDENTITY
+    LAST-UPDATED "201703160000Z"
+    ORGANIZATION "Exablaze"
+    CONTACT-INFO
+        "email:    info@exablaze.com"
+    DESCRIPTION
+        "Added port statistics"
+    REVISION     "201703160000Z"
+    DESCRIPTION
+        "Added fusion sysinfo"
+    REVISION     "201510200000Z"
+    DESCRIPTION
+        "MIB for the Exalink-FUSION."
+    REVISION     "201507300000Z"
+    DESCRIPTION
+        "Added initial traps."
+    REVISION     "201504130000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { enterprises 43296 3 }
+
+--
+-- MIB is based on tables, defined as "SEQUENCE of"
+-- see RFC2578. This should allow some extensibility
+-- in terms of adding features to the data without
+-- invalidating existing usage of the MIB.
+-- (i.e. avoid hardcoded indicies in the names of objects).
+--
+
+fusionInfo OBJECT IDENTIFIER ::= { exaFusion 1 }
+
+fusionInfoSerial OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Serial number"
+    ::= { fusionInfo 1 }
+
+fusionInfoVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Software version number"
+    ::= { fusionInfo 2 }
+
+fusionInfoBoard OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hardware type"
+    ::= { fusionInfo 3 }
+
+fusionInfoSoftware OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Software date stamp"
+    ::= { fusionInfo 4 }
+
+fusionLineCardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FusionLineCard
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of line card information"
+    ::= { fusionInfo 5 }
+
+fusionLineCard OBJECT-TYPE
+    SYNTAX          FusionLineCard
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Line card information"
+    INDEX           { fusionLineCardIndex }
+    ::= { fusionLineCardTable 1 }
+
+FusionLineCard ::=
+    SEQUENCE {
+        fusionLineCardIndex       Integer32,
+        fusionLineCardName        SnmpAdminString,
+        fusionLineCardBoard       SnmpAdminString
+    }
+
+fusionLineCardIndex OBJECT-TYPE
+    SYNTAX          Integer32 (1..255)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Line card index"
+    ::= { fusionLineCard 1 }
+
+fusionLineCardName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Line card name"
+    ::= { fusionLineCard 2 }
+
+fusionLineCardBoard OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Line card hardware type"
+    ::= { fusionLineCard 3 }
+
+fusionModuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FusionModule
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of internal modules"
+    ::= { fusionInfo 6 }
+
+fusionModule OBJECT-TYPE
+    SYNTAX          FusionModule
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Internal module information"
+    INDEX           { fusionModuleIndex }
+    ::= { fusionModuleTable 1 }
+
+FusionModule ::=
+    SEQUENCE {
+        fusionModuleIndex       Integer32,
+        fusionModuleName        SnmpAdminString,
+        fusionModuleBoard       SnmpAdminString,
+        fusionModuleFunction    SnmpAdminString
+    }
+
+fusionModuleIndex OBJECT-TYPE
+    SYNTAX          Integer32 (1..255)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Internal module index"
+    ::= { fusionModule 1 }
+
+fusionModuleName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Internal module name"
+    ::= { fusionModule 2 }
+
+fusionModuleBoard OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Internal module hardware type"
+    ::= { fusionModule 3 }
+
+fusionModuleFunction OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Current internal module firmware"
+    ::= { fusionModule 4 }
+
+fusionSysInfo OBJECT IDENTIFIER ::= { fusionInfo 7 }
+
+fusionSysInfoLoadAverage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The 1, 5 and 15 minute load averages multipled by 100"
+    ::= { fusionSysInfo 1 }
+
+fusionSysInfoAvailMem OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System available memory in bytes"
+    ::= { fusionSysInfo 2 }
+
+fusionSysInfoNumProcesses OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of current processes"
+    ::= { fusionSysInfo 3 }
+
+fusionSensor OBJECT IDENTIFIER ::= { exaFusion 2 }
+
+fusionTempSensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FusionTempSensor
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of temperature sensors"
+    ::= { fusionSensor 1 }
+
+fusionTempSensor OBJECT-TYPE
+    SYNTAX          FusionTempSensor
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Temperature sensor"
+    INDEX           { fusionTempSensorIndex }
+    ::= { fusionTempSensorTable 1 }
+
+FusionTempSensor ::=
+    SEQUENCE {
+        fusionTempSensorIndex       Integer32,
+        fusionTempSensorName        SnmpAdminString,
+        fusionTempSensorValue       Integer32
+    }
+
+fusionTempSensorIndex OBJECT-TYPE
+    SYNTAX          Integer32 (1..255)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Temperature sensor index"
+    ::= { fusionTempSensor 1 }
+
+fusionTempSensorName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Temperature sensor name"
+    ::= { fusionTempSensor 2 }
+
+fusionTempSensorValue OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "Celsius"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Current reading of temperature sensor"
+    ::= { fusionTempSensor 3 }
+
+fusionFanSensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FusionFanSensor
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of fan sensors"
+    ::= { fusionSensor 2 }
+
+fusionFanSensor OBJECT-TYPE
+    SYNTAX          FusionFanSensor
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Fan sensor"
+    INDEX           { fusionFanSensorIndex }
+    ::= { fusionFanSensorTable 1 }
+
+FusionFanSensor ::=
+    SEQUENCE {
+        fusionFanSensorIndex        Integer32,
+        fusionFanSensorName         SnmpAdminString,
+        fusionFanSensorValue        Integer32
+    }
+
+fusionFanSensorIndex OBJECT-TYPE
+    SYNTAX          Integer32 (1..255)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fan sensor index"
+    ::= { fusionFanSensor 1 }
+
+fusionFanSensorName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Fan sensor name"
+    ::= { fusionFanSensor 2 }
+
+fusionFanSensorValue OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "RPM"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Current reading of fan sensor"
+    ::= { fusionFanSensor 3 }
+
+fusionPsuTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FusionPsu
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of power supplies"
+    ::= { exaFusion 3 }
+
+fusionPsu OBJECT-TYPE
+    SYNTAX          FusionPsu
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Power supply information"
+    INDEX           { fusionPsuIndex }
+    ::= { fusionPsuTable 1 }
+
+FusionPsu ::=
+    SEQUENCE {
+        fusionPsuIndex              Integer32,
+        fusionPsuType               SnmpAdminString,
+        fusionPsuPresent            Integer32,
+        fusionPsuTemperature        Integer32,
+        fusionPsuPowerIn            Integer32,
+        fusionPsuPowerOut           Integer32
+    }
+
+fusionPsuIndex OBJECT-TYPE
+    SYNTAX          Integer32 (1..255)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Power supply index"
+    ::= { fusionPsu 1 }
+
+fusionPsuType OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Power supply manufacturer and model number"
+    ::= { fusionPsu 2 }
+
+fusionPsuPresent OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "True if power supply is present"
+    ::= { fusionPsu 3 }
+
+fusionPsuTemperature OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "Celsius"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Average of current power supply temperature readings"
+    ::= { fusionPsu 4 }
+
+fusionPsuPowerIn OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "Watts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Current power supply input power"
+    ::= { fusionPsu 5 }
+
+fusionPsuPowerOut OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "Watts"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Current power supply output power"
+    ::= { fusionPsu 6 }
+
+fusionPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FusionPort
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of ports"
+    ::= { exaFusion 4 }
+
+fusionPort OBJECT-TYPE
+    SYNTAX          FusionPort
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Port information"
+    INDEX           { fusionPortLineCard, fusionPortIndex }
+    ::= { fusionPortTable 1 }
+
+FusionPort ::=
+    SEQUENCE {
+        fusionPortLineCard          Integer32,
+        fusionPortIndex             Integer32,
+        fusionPortName              SnmpAdminString,
+        fusionPortPresent           Integer32,
+        fusionPortHasSignal         Integer32,
+        fusionPortEnabled           Integer32,
+        fusionPortAlias             SnmpAdminString,
+        fusionPortSpeed             Integer32,
+        fusionPortRXPackets         Counter64,
+        fusionPortRXBytes           Counter64,
+        fusionPortRXErrors          Counter64,
+        fusionPortTXPackets         Counter64,
+        fusionPortTXBytes           Counter64
+    }
+
+fusionPortLineCard OBJECT-TYPE
+    SYNTAX          Integer32 (1..255)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Line card index"
+    ::= { fusionPort 1 }
+
+fusionPortIndex OBJECT-TYPE
+    SYNTAX          Integer32 (1..255)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Port index"
+    ::= { fusionPort 2 }
+
+fusionPortName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Port name"
+    ::= { fusionPort 3 }
+
+fusionPortPresent OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "True if a SFP is present in the port"
+    ::= { fusionPort 4 }
+
+fusionPortHasSignal OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "True if signal has been detected on the port"
+    ::= { fusionPort 5 }
+
+fusionPortEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "True if the port is currently enabled"
+    ::= { fusionPort 6 }
+
+fusionPortAlias OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Port alias"
+    ::= { fusionPort 7 }
+
+fusionPortSpeed OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "Mbps"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Currently configured port speed"
+    ::= { fusionPort 8 }
+
+fusionPortRXPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames received"
+    ::= { fusionPort 9 }
+
+fusionPortRXBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "B"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet bytes received"
+    ::= { fusionPort 10 }
+
+fusionPortRXErrors OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "B"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames received with checksum mismatch"
+    ::= { fusionPort 11 }
+
+fusionPortTXPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames transmitted"
+    ::= { fusionPort 12 }
+
+fusionPortTXBytes OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "B"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet bytes transmitted"
+    ::= { fusionPort 13 }
+
+--
+-- Values passed in Traps
+--
+
+fusionTrapValues OBJECT IDENTIFIER ::= { exaFusion 5 }
+
+fusionLidOpenStatus OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "True if the lid is currently open"
+    ::= { fusionTrapValues 1 }
+
+fusionFanFaultStatus OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "True if there is a fan fault"
+    ::= { fusionTrapValues 2 }
+
+fusionHighTempStatus OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "True if there is a fan fault"
+    ::= { fusionTrapValues 3 }
+
+fusionPortUsageStatus OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        off(0),
+                        error(1),
+                        unused(2),
+                        ok(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Port usage status, corresponds to right hand LED for port"
+    ::= { fusionTrapValues 4 }
+
+fusionPortLinkStatus OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        off(0),
+                        error(1),
+                        unused(2),
+                        ok(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Port link status, corresponds to left hand LED for port"
+    ::= { fusionTrapValues 5 }
+
+fusionPsuFaultStatus OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "True if there is a PSU fault"
+    ::= { fusionTrapValues 6 }
+
+fusionTimeSourceStatus OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "True if a time synchronisation source is available"
+    ::= { fusionTrapValues 7 }
+
+--
+-- SNMP Trap alerts
+--
+
+fusionTraps OBJECT IDENTIFIER ::= { exaFusion 6 }
+
+fusionPowerFail NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "System is shutting down because of power loss"
+    ::= { fusionTraps 1 }
+
+fusionTamperAlert NOTIFICATION-TYPE
+    OBJECTS {
+        fusionLidOpenStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The lid of the device has been opened or closed"
+    ::= { fusionTraps 2 }
+
+fusionTempAlert NOTIFICATION-TYPE
+    OBJECTS {
+        fusionTempSensorName,
+        fusionHighTempStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "Temperature has gone above or below a threshold"
+    ::= { fusionTraps 3 }
+
+fusionPsuAlert NOTIFICATION-TYPE
+    OBJECTS {
+        fusionPsuFaultStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "Power supply has been added or removed, become faulty or returned to normal"
+    ::= { fusionTraps 4 }
+
+fusionSystemAlert NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "The system service has restarted"
+    ::= { fusionTraps 5 }
+
+fusionFanAlert NOTIFICATION-TYPE
+    OBJECTS {
+        fusionFanFaultStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "A fan has become faulty or returned to normal"
+    ::= { fusionTraps 6 }
+
+fusionPortAlert NOTIFICATION-TYPE
+    OBJECTS {
+        fusionPortName,
+        fusionPortLinkStatus,
+        fusionPortUsageStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "Port link status or usage has changed, corresponds to changes in LEDs"
+    ::= { fusionTraps 7 }
+
+fusionConfigUpdateAlert NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "The device's configuration has been changed"
+    ::= { fusionTraps 8 }
+
+fusionTimeAlert NOTIFICATION-TYPE
+    OBJECTS {
+        fusionTimeSourceStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "A time synchronisation source has been gained or lost"
+    ::= { fusionTraps 9 }
+
+END

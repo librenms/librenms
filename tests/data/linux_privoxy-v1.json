@@ -1,0 +1,376 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "privoxy",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "privoxy",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "block_percent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "blocks",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "bytes_to_client",
+                    "value": 11398923,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "client_cons",
+                    "value": 27,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "client_requests",
+                    "value": 20,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "con_failures",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "con_timeouts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "crunches",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "empty_resps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "empty_resps_new",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "empty_resps_reuse",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "fast_redirs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "imp_accounted",
+                    "value": 7,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "max_reqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "nog_conns",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "out_requests",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "req_connect",
+                    "value": 20,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "req_delete",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "req_get",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "req_head",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "req_options",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "req_patch",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "req_post",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "req_put",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "req_trace",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_1xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_200",
+                    "value": 20,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_2xx",
+                    "value": 20,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_2xx_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_301",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_302",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_303",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_3xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_3xx_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_403",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_404",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_451",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_4xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_4xx_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_500",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_502",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_503",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_504",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_5xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "resp_5xx_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "reused_server_cons",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "ska_offers",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "ubd_np_per",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "ubd_per",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "unique_bdomains",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "unique_bdomains_np",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "unique_domains",
+                    "value": 10,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "unique_domains_np",
+                    "value": 10,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "ver_1_0",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "ver_1_1",
+                    "value": 20,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "ver_2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                },
+                {
+                    "metric": "ver_3",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "privoxy"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,430 @@
+
+ALCATEL-IND1-EVB-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
+        Integer32, Unsigned32, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        RowStatus
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        VlanIndex
+            FROM Q-BRIDGE-MIB
+
+        IEEE8021BridgePortNumber
+            FROM IEEE8021-TC-MIB
+
+        ieee8021BridgeEvbVSIID, ieee8021BridgeEvbVSIIDType, 
+        ieee8021BridgeEvbVSITypeVersion, ieee8021BridgeEvbVSIVlanId,
+        ieee8021BridgeEvbSbpPortNumber, ieee8021BridgeEvbVSIMvFormat
+            FROM IEEE8021-EVBB-MIB
+
+        InterfaceIndex
+            FROM IF-MIB
+        TmnxPortID, TmnxEncapVal, TmnxServId
+            FROM ALCATEL-IND1-TIMETRA-TC-MIB
+        softentIND1EvbMib
+            FROM ALCATEL-IND1-BASE
+    ;
+
+    alcatelIND1EVBMIB MODULE-IDENTITY
+        LAST-UPDATED  "201107110000Z"
+        ORGANIZATION  "Alcatel-Lucent"
+        CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                      Alcatel-Lucent, Enterprise Solutions Division
+                    (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+        DESCRIPTION
+            "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 Edge Virtual Bridge (EVB) Subsystem for OS10K Product Line.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 2011 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201107110000Z"
+        DESCRIPTION
+            "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
+
+        REVISION      "201107110000Z"
+        DESCRIPTION
+            "The latest version of this MIB Module."
+        ::= { softentIND1EvbMib 1 }
+
+
+alcatelIND1EvbMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            " Alcatel-Lucent EVB Subsystem Managed Objects."
+        ::= { alcatelIND1EVBMIB 1 }
+
+
+ evbMIBNotifications OBJECT IDENTIFIER ::= { alcatelIND1EvbMIBObjects 0 }
+
+
+ evbMIBScalarObjects OBJECT IDENTIFIER ::= { alcatelIND1EvbMIBObjects 1 }
+  
+      evbPortAutoMode OBJECT-TYPE
+          SYNTAX INTEGER {
+                 disable(0),
+                 enable (1)
+          }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              " Alcatel-Lucent EVB port auto detect mode."
+          ::= { evbMIBScalarObjects 1 }
+  
+      evbDefaultType OBJECT-TYPE
+          SYNTAX   INTEGER {
+                       undefined (0),
+                       vlanBridging (1),
+                       serviceAccess (2)
+                     }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              " Alcatel-Lucent EVB default port type."
+          ::= { evbMIBScalarObjects 2 }
+
+--    Overview of the EVB MIB
+--
+--    this MIB provides configuration of the EVB services.
+--
+
+--    EVB SAP MIB
+
+    evbSapMIB    OBJECT IDENTIFIER ::= { alcatelIND1EvbMIBObjects 2 }
+
+
+--
+--    EVB VSI SAP database table
+--
+
+    evbVSISAPTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF EVBVSISAPEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A table that contains database of the active VSI on Service Access Point."
+        ::= { evbSapMIB 1 }
+
+    evbVSISAPEntry OBJECT-TYPE
+        SYNTAX        EVBVSISAPEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of objects containing database of the VSI entries associated with
+             Service Access Points."
+        INDEX     { evbVSIPortNumber, evbVSIID, evbVSIVlanID }
+        ::= { evbVSISAPTable 1 }
+
+    EVBVSISAPEntry ::= SEQUENCE
+        {
+            evbVSIPortNumber       IEEE8021BridgePortNumber,
+            evbVSIID               OCTET STRING,
+            evbVSIVlanID           VlanIndex,
+            evbSAPPortId           TmnxPortID,
+            evbSAPServiceType      INTEGER,
+            evbSAPEncapValue       TmnxEncapVal,
+            evbSAPServiceId        TmnxServId
+        }
+
+    evbVSIPortNumber OBJECT-TYPE
+        SYNTAX        IEEE8021BridgePortNumber
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The evbVSIPortNumber is the Port Number for the SBP where 
+             the VSI is accessed."
+        ::= { evbVSISAPEntry 1}
+
+    evbVSIID OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (16))
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This object specifies the VSIID that uniquely identifies the VSI in the DCN."
+        ::= { evbVSISAPEntry 2}
+
+    evbVSIVlanID OBJECT-TYPE
+        SYNTAX        VlanIndex
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The Vlan ID of the VSIID.
+             Multiple Vlan IDs can be assigned to one VSIID.
+             If GroupID is used, this Vlan ID is a locally defined C-VLAN ID."
+        ::= { evbVSISAPEntry 3}
+
+    evbSAPPortId OBJECT-TYPE
+        SYNTAX        TmnxPortID
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The evbSAPPortId is the access port where the EVB Service Access Point is accessed."
+        ::= { evbVSISAPEntry 4}
+
+    evbSAPServiceType OBJECT-TYPE
+        SYNTAX     INTEGER {
+                     spb(1),
+                     vpls(2)
+             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The value of the label used to identify the SAP
+             on the access port specified by evbSAPPortId."
+        DEFVAL   { spb }
+        ::= { evbVSISAPEntry 5}
+
+    evbSAPEncapValue OBJECT-TYPE
+        SYNTAX        TmnxEncapVal
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The value of the label used to identify the SAP
+             on the access port specified by evbSAPPortId."
+        ::= { evbVSISAPEntry 6}
+
+    evbSAPServiceId OBJECT-TYPE
+        SYNTAX        TmnxServId
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This object is used to identify the Service of the EVB SAP."
+        ::= { evbVSISAPEntry 7}
+
+--
+--    EVB Port Type table
+--
+
+    evbPortModeTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF EVBPortModeEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A table that contains Service Access Port Mode."
+        ::= { evbSapMIB 2 }
+
+    evbPortModeEntry OBJECT-TYPE
+        SYNTAX        EVBPortModeEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of objects containing Service Access Port Mode."
+        INDEX     { evbPortId }
+        ::= { evbPortModeTable 1 }
+
+    EVBPortModeEntry ::= SEQUENCE
+        {
+            evbPortId        InterfaceIndex,
+            evbPortMode      INTEGER,
+            evbRowStatus     RowStatus
+	}
+
+    evbPortId OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+           "IfIndex uniquely identify this port table."
+          ::= { evbPortModeEntry 1 }
+
+    evbPortMode  OBJECT-TYPE
+          SYNTAX   INTEGER {
+                     undefined (0),
+                     vlan(1),
+                     access (2)
+                   }
+          MAX-ACCESS  read-create
+          STATUS  current
+          DESCRIPTION
+          "The EvbPortMode variable indicates if the interface on this port
+           is configured as a service access port or a vlan bridging.
+           An access port can be created manually (through CLI) or dynamically
+           (through requests from UNP or EVB)."
+          DEFVAL { undefined }
+          ::= { evbPortModeEntry 2 }
+
+    evbRowStatus OBJECT-TYPE
+          SYNTAX        RowStatus
+          MAX-ACCESS    read-create
+          STATUS        current
+          DESCRIPTION
+              "The status of this table entry."
+        DEFVAL        { notInService }
+          ::= { evbPortModeEntry 3}
+
+
+   alcatelIND1EvbMIBConformance OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+              " Alcatel-Lucent EVB Subsystem Conformance Information."
+          ::= { alcatelIND1EVBMIB 2 }
+  
+      alcatelIND1EvbMIBGroups OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+                "Branch For ALU EVB MIB Subsystem Units Of Conformance."
+          ::= { alcatelIND1EvbMIBConformance 1 }
+
+      alcatelIND1EvbMIBCompliances OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+                "Branch For ALU EVB MIB Subsystem Compliance Statements."
+          ::= { alcatelIND1EvbMIBConformance 2 }
+  
+-- EVB traps Object definition 
+
+-- evbTrapsObj  OBJECT IDENTIFIER ::= { alcatelIND1EvbMIBObjects 3 }
+
+
+   evbFailedCdcpTlvTrap NOTIFICATION-TYPE
+      OBJECTS {
+           evbPortId
+      }
+
+      STATUS        current
+      DESCRIPTION
+         "A Software Trouble report is sent by whatever application
+          encountering a problem during its execution and would
+          want to make the user aware of problem for maintenance purpose. "
+     ::= { evbMIBNotifications 1 }
+
+   evbFailedEvbTlvTrap NOTIFICATION-TYPE
+      OBJECTS {
+          evbPortId,
+          ieee8021BridgeEvbVSIVlanId
+      }
+      STATUS        current
+      DESCRIPTION
+         "A Software Trouble report is sent by whatever application
+          encountering a problem during its execution and would
+          want to make the user aware of problem for maintenance purpose. "
+     ::= { evbMIBNotifications 2 }
+
+   evbUnknownVsiManagerTrap NOTIFICATION-TYPE
+      OBJECTS {
+          evbPortId,
+          ieee8021BridgeEvbSbpPortNumber
+      }
+      STATUS        current
+      DESCRIPTION
+         "A Software Trouble report is sent by whatever application
+          encountering a problem during its execution and would
+          want to make the user aware of problem for maintenance purpose. "
+     ::= { evbMIBNotifications 3 }
+
+   evbVdpAssocTlvTrap NOTIFICATION-TYPE
+      OBJECTS {
+          evbPortId,
+          ieee8021BridgeEvbSbpPortNumber,
+          ieee8021BridgeEvbVSIID,
+          ieee8021BridgeEvbVSIIDType,
+          ieee8021BridgeEvbVSITypeVersion,
+          ieee8021BridgeEvbVSIMvFormat
+      }
+      STATUS        current
+      DESCRIPTION
+         "A Software Trouble report is sent by whatever application
+          encountering a problem during its execution and would
+          want to make the user aware of problem for maintenance purpose. "
+     ::= { evbMIBNotifications 4 }
+
+   evbCdcpLldpExpiredTrap NOTIFICATION-TYPE
+      STATUS        current
+      DESCRIPTION
+         "A Software Trouble report is sent by whatever application
+          encountering a problem during its execution and would
+          want to make the user aware of problem for maintenance purpose. "
+     ::= { evbMIBNotifications 5 }
+
+   evbTlvExpiredTrap NOTIFICATION-TYPE
+      STATUS        current
+      DESCRIPTION
+         "A Software Trouble report is sent by whatever application
+          encountering a problem during its execution and would
+          want to make the user aware of problem for maintenance purpose. "
+     ::= { evbMIBNotifications 6 }
+
+   evbVdpKeepaliveExpiredTrap NOTIFICATION-TYPE
+      STATUS        current
+      DESCRIPTION
+         "A Software Trouble report is sent by whatever application
+          encountering a problem during its execution and would
+          want to make the user aware of problem for maintenance purpose. "
+     ::= { evbMIBNotifications 7 }
+
+-- Conformance information
+
+   alcatelIND1EvbMIBCompliance MODULE-COMPLIANCE
+          STATUS  current
+          DESCRIPTION
+              "Compliance statement for EVB."
+          MODULE -- This module
+          MANDATORY-GROUPS { alaEvbModuleGroup }
+          ::= { alcatelIND1EvbMIBCompliances 1 }
+
+   alaEvbModuleGroup OBJECT-GROUP
+          OBJECTS
+          {
+             evbPortAutoMode,
+             evbDefaultType,
+             evbSAPEncapValue,
+             evbSAPPortId,
+             evbSAPServiceType,
+             evbSAPServiceId,
+             evbPortMode,
+             evbRowStatus
+          }
+          STATUS  current
+          DESCRIPTION
+              "Evb Control Modules Group."
+          ::= { alcatelIND1EvbMIBGroups 1 }
+ 
+   alaEvbNotificationsGroup NOTIFICATION-GROUP
+         NOTIFICATIONS {
+ 			evbFailedEvbTlvTrap,
+ 			evbFailedCdcpTlvTrap,
+ 			evbVdpAssocTlvTrap,
+ 			evbCdcpLldpExpiredTrap,
+ 			evbTlvExpiredTrap,
+ 			evbUnknownVsiManagerTrap,
+ 			evbVdpKeepaliveExpiredTrap
+           }
+         STATUS  current
+         DESCRIPTION
+             "Collection of Notifications for management of EVB."
+         ::= { alcatelIND1EvbMIBGroups 2 }
+
+END

@@ -1,0 +1,407 @@
+-- Copyright 2005, 2006 MITEL Networks Corporation
+-- All rights reserved.
+-- This MITEL SNMP Management Information Base Specification
+-- (Specification) embodies MITEL's confidential and
+-- proprietary intellectual property. MITEL retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS", and MITEL makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+MITEL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, 
+        OBJECT-IDENTITY, 
+        OBJECT-TYPE, 
+        enterprises,
+        Integer32                            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION                   FROM SNMPv2-TC
+        MODULE-COMPLIANCE, 
+        OBJECT-GROUP                         FROM SNMPv2-CONF 
+        ifIndex                              FROM IF-MIB;
+
+    mitel                 MODULE-IDENTITY
+        LAST-UPDATED      "201402111200Z"
+        ORGANIZATION      "MITEL Networks Corporation"
+        CONTACT-INFO      "Standards Group,
+                           Postal:    MITEL Networks Corporation
+                           350 Legget Drive, PO Box 13089
+                           Kanata, Ontario
+                           Canada  K2K 2W7
+                           Tel: +1 613 592 2122
+                           Fax: +1 613 592 4784
+                           URL: www.mitel.com"
+        DESCRIPTION       "Replace E-Mail: std@mitel.com with URL: www.mitel.com."
+        REVISION          "201402111200Z"
+        DESCRIPTION       "The top-level MITEL MIB module."
+        REVISION          "201107140000Z"
+        DESCRIPTION       "Restoring the mitelIdCallServers from previous revision"
+        REVISION          "200601010000Z"
+        DESCRIPTION       "To be consistent with all other products this MIB was
+                           sanitized." 
+        REVISION          "200504122134Z"
+        DESCRIPTION       "Small mods to naming convention to be consistent." 
+        REVISION          "200402230000Z"
+        DESCRIPTION       "MITEL-MIB Version 3.0.0.2 - Draft" 
+        REVISION          "9902230000Z"
+        DESCRIPTION       "MIB Version 2.0" 
+        REVISION          "9604260000Z"
+        DESCRIPTION       "MIB Version 1.0" 
+    ::= { enterprises 1027 }
+
+
+    -- ****************************************************************
+    -- MITEL-specific Textual Conventions
+    -- ****************************************************************
+
+    MitelIfType ::=       TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION       "The MITEL-defined interface type.
+                          Additions to this list must be provided
+                          by the MITEL Standards Group."
+        SYNTAX            INTEGER {
+                                dnic(1) -- DNIC interface (example only)
+                          }
+
+    MitelNotifyTransportType ::= TEXTUAL-CONVENTION
+        STATUS            current
+        DESCRIPTION       "The method of transporting a notification
+                          to an interested manager."
+        SYNTAX            INTEGER {
+                                mitelNotifTransV1Trap(1), -- use SNMPv1 trap PDU
+                                mitelNotifTransV2Trap(2), -- use SNMPv2 trap PDU
+                                mitelNotifTransInform(3)  -- use InformRequest PDU
+                          }
+
+
+    -- ****************************************************************
+    -- MITEL sub-tree
+    -- ****************************************************************
+
+    mitelIdentification   OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The identification subtree. Leaves in this subtree are
+                           used for the sysObjectID field in the MIB-II system tree or
+                           other similar OID fields."
+        ::= { mitel 1 }
+
+    mitelExperimental     OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The experimental MIB development subtree. The branches 
+                           in this subtree should follow the format of the mitelProprietary 
+                           subtree."
+        ::= { mitel 2 }
+
+    mitelExtensions       OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The standards extension subtree. Used for extensions to 
+                           any of the standard subtrees under the MIB-II subtree."
+        ::= { mitel 3 }
+
+    mitelProprietary      OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The managed information subtree. Leaves in this subtree 
+                           are generic devices or protocols that can be managed."
+        ::= { mitel 4 }
+
+    mitelConformance      OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The conformance subtree. Leaves in this subtree 
+                           identify compliance grouping and requirements."
+        ::= { mitel 5 }
+
+    -- ****************************************************************
+    -- The mitelIdentification subtree... platform/test identification.
+    -- ****************************************************************
+
+    mitelIdMgmtPlatforms  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Products used to manage MITEL equipment."
+        ::= { mitelIdentification 1 }
+
+    mitelIdCallServers    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Products providing call processing capabilities."
+        ::= { mitelIdentification 2 }
+
+    mitelIdTerminals      OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Desktop products."
+        ::= { mitelIdentification 3 }
+
+    mitelIdInterfaces     OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Products providing the interface between a call 
+                           processing entity and a network or terminal."
+        ::= { mitelIdentification 4 }
+
+    mitelIdCtiPlatforms   OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Products providing computer-telephony integration 
+                           capabilities."
+        ::= { mitelIdentification 5 }
+
+    mitelIdApplicationPlatforms   OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Products providing application-based platforms that
+                           provide value-added capabilities."
+        ::= { mitelIdentification 6 }
+
+   
+    -- mitelIdApplications ::= { mitelIdentification 7 }   Located in MTL-APPLIST-MIB
+
+    -- ****************************************************************
+    -- The mitelIdentification subtree... platform/test identification.
+    -- ****************************************************************
+
+    -- mitelIdMgmtPlatforms subtree
+
+    --  ::= { mitelIdMgmtPlatforms 1 }        this OID is obsolete
+
+    -- mitelIdCallServers subtree
+
+    mitelIdCsMc2          OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The MC-2 Call Server."
+        ::= { mitelIdCallServers 1 }
+
+    mitelIdCs2000Light          OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel SX-2000 LIGHT Call Server."
+        ::= { mitelIdCallServers 2 }
+
+    mitelIdCsIpera3000      OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The MITEL Networks 3300 ICP Call Server."
+        ::= { mitelIdCallServers 3 }
+
+    -- mitelIdApplicationPlatforms subtree
+
+    -- mitelIdAppPlatMasServer  OBJECT-IDENTITY
+    --     STATUS            current
+    --     DESCRIPTION       "The Mitel Networks 3300 MAS application server platform."
+    --         ::= { mitelIdApplicationPlatforms 1 }
+
+    -- ****************************************************************
+    -- The mitelExperimental subtree... prototype MIB development.
+    -- ****************************************************************
+
+    -- ****************************************************************
+    -- The mitelExtensions subtree... extensions to MIB-II.
+    -- ****************************************************************
+
+    mitelExtInterfaces    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Proprietary extensions to the MIB-II subtree."
+        ::= { mitelExtensions 2 }
+
+    -- the Interfaces table
+
+    -- The Interfaces table contains information on the entity's
+    -- interfaces.  Each sub-layer below the internetwork-layer
+    -- of a network interface is considered to be an interface.
+
+    mitelIfNumber        OBJECT-TYPE
+        SYNTAX           Integer32
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION      "The number of MITEL proprietary interfaces 
+                         (regardless of their current state) present on 
+                         this system."
+        ::= { mitelExtInterfaces 1 }
+
+    mitelIfTable         OBJECT-TYPE
+        SYNTAX           SEQUENCE OF MitelIfTableEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION      "A list of interface entries.  The number of entries
+                         is given by the value of mitelIfNumber. The table 
+                         consists of one row for each MITEL-specific interface,
+                         and is indexed by the ifIndex value of the corresponding
+                         row in the MIB-II ifTable."
+        ::= { mitelExtInterfaces 2 }
+
+    mitelIfTableEntry    OBJECT-TYPE
+        SYNTAX           MitelIfTableEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION      "An entry containing management information applicable
+                         to a particular interface."
+        INDEX   { ifIndex }
+        ::= { mitelIfTable 1 }
+
+    MitelIfTableEntry ::=
+        SEQUENCE {
+            mitelIfTblType   MitelIfType
+        }
+
+    mitelIfTblType        OBJECT-TYPE
+        SYNTAX            MitelIfType
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "The type of interface.  Additional values for 
+                          mitelIfTblType are assigned by the Standards Group, 
+                          through updating the syntax of the MitelIfType 
+                          textual convention. This row is deleted automatically
+                          when the corresponding ifTable row is deleted."
+        ::= { mitelIfTableEntry 1 }
+
+    -- ****************************************************************
+    -- The mitelProprietary subtree... proprietary managed objects.
+    -- ****************************************************************
+
+    mitelPropApplications OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Manageable applications."
+        ::= { mitelProprietary 1 }
+
+    mitelPropTransmission OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "MITEL proprietary transmission media."
+        ::= { mitelProprietary 2 }
+
+    mitelPropProtocols    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Manageable proprietary protocols."
+        ::= { mitelProprietary 3 }
+
+    mitelPropUtilities    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Manageable utilities and middleware."
+        ::= { mitelProprietary 4 }
+
+    mitelPropHardware     OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Management of proprietary hardware."
+        ::= { mitelProprietary 5 }
+
+    mitelPropNotifications OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Control and history of proprietary notifications."
+        ::= { mitelProprietary 6 }
+
+    mitelPropReset        OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Access for remote reset of agent and platform."
+        ::= { mitelProprietary 7 }
+
+     -- ::= { mitelProprietary 8 }     Located in MITEL-xx-MIB
+
+    mitelPropCommon       OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Manageable of common information that can span hardware,
+                           middleware, and utilities."
+        ::= { mitelProprietary 9 }
+
+    -- ****************************************************************
+    -- The mitelPropApplications subtree... Manageable Applications.
+    -- ****************************************************************
+    
+    mitelAppCallServer    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Manageable Mitel Call Servers."
+    ::= { mitelPropApplications 1 }
+
+    -- mitelAppCommon ::= { mitelPropApplications 2 }    Located in MTL-APPCMN-MIB
+
+    --  ::= { mitelPropApplications 5 }                  this OID is obsolete
+
+    -- ****************************************************************
+    -- The mitelPropCommon subtree... Management of common information 
+    --   that may apply many manageable entities.
+    -- ****************************************************************
+    
+    -- mitelPropCommon ::= { mitelCmnAlarms 1 }          Located in MTL-CMNALM-MIB
+
+    -- ****************************************************************
+    -- The mitelConformance subtree.
+    -- ****************************************************************
+
+    mitelConfCompliances  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The compliance subtree. Leaves in this subtree are
+                          used for defining the ways in which an agent can
+                          claim compliance with this or other MITEL MIBs."
+        ::= { mitelConformance 1 }
+
+    mitelConfGroups       OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The group subtree. Leaves in this subtree identify
+                          object groupings used in the compliance statements."
+        ::= { mitelConformance 2 }
+
+      mitelGrpCommon      OBJECT-IDENTITY
+          STATUS          current
+          DESCRIPTION     "The groups associated with the MITEL MIB."
+          ::= { mitelConfGroups 1 }
+
+      --  ::= { mitelConfGroups 2 }    this OID is obsolete
+
+      mitelGrpCs2000      OBJECT-IDENTITY
+          STATUS          current
+          DESCRIPTION     "The groups associated with the MITEL SX2000 MIB."
+          ::= { mitelConfGroups 3 }
+
+
+      mitelGrpIpera3000     OBJECT-IDENTITY
+          STATUS          current
+          DESCRIPTION     "The groups associated with the MITEL 3300 ICP MIB."
+          ::= { mitelConfGroups 4 }
+
+    mitelConfAgents       OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The agent capabilities subtree. Leaves in this subtree
+                          are used for defining the capabilities of a particular
+                          agent implementation regarding the MIB compliance
+                          statements."
+        ::= { mitelConformance 3 }
+
+    --  ::= { mitelConfAgents 1 }         this OID is obsolete
+    --  ::= { mitelConfAgents 2 }         Located in MITEL-SX2000-MIB
+    --  ::= { mitelConfAgents 3 }         Located in MITEL-3300ICP-MIB
+
+    -- ****************************************************************
+    -- The mitelConfCompliances subtree.
+    -- ****************************************************************
+
+    mitelComplMitel       MODULE-COMPLIANCE
+        STATUS            current
+        DESCRIPTION       "The compliance statement for SNMPv2 entities which
+                           implement the MITEL MIB."
+        MODULE -- compliance to the MITEL MIB module
+           GROUP            mitelGrpCmnInterfaces
+              DESCRIPTION  "This group is mandatory for systems
+                           with MITEL-proprietary interfaces."
+        ::= { mitelConfCompliances 1 }
+
+    --  ::= { mitelConfCompliances 2 }       This OID is obsolete
+    --  ::= { mitelConfCompliances 3 }       Located in MITEL-SX2000-MIB
+    --  ::= { mitelConfCompliances 4 }       Located in MITEL-3300ICP-MIB 
+    --  ::= { mitelConfCompliances 5 }       Located in MITEL-APPCMN-MIB
+
+
+    -- ****************************************************************
+    -- The mitelConfGroups common subtree.
+    -- ****************************************************************
+
+    --  mitelGrpCmnNotifTraps ::= { mitelGrpCommon 1 } (preserved)
+    --  mitelGrpCmnNotifBasic ::= { mitelGrpCommon 2 } (preserved)
+    --  mitelGrpCmnNotifManagers ::= { mitelGrpCommon 3 } (preserved)
+    --  mitelGrpCmnNotifHistory ::= { mitelGrpCommon 4 } (preserved)
+    --  mitelGrpCmnNotifAck ::= { mitelGrpCommon 5 } (preserved)
+
+    mitelGrpCmnInterfaces OBJECT-GROUP
+        OBJECTS           {
+                            mitelIfNumber, mitelIfTblType
+                          }
+        STATUS            current
+        DESCRIPTION       "The objects in the MIB-II interfaces extension."
+        ::= { mitelGrpCommon 6 }
+
+    --  mitelGrpCmnReset ::= { mitelGrpCommon 7 } (preserved)
+
+
+END

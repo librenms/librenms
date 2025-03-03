@@ -1,10 +1,9 @@
 -- ********************************************************************************
 -- File         : mmblade.mib
 -- Description  : Management Module MIB for SNMP
--- Version      : 5.3
--- Date         : May 2009
--- Copyright (c) 2002-2009 IBM  All Rights Reserved.
--- Copyright (c) 2009 DCT Corporation  All Rights Reserved.
+-- Version      : 6.3
+-- Date         : July 2013
+-- Copyright (c) 2002-2013 IBM  All Rights Reserved.
 -- ********************************************************************************
 --
 -- Contains MIB description for:
@@ -4120,7 +4119,8 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                  bladeDetailsMaximumClockRate OCTET STRING,
                  bladeDetailsPowerSaverMode INTEGER,
                  bladeDetailsDynamicPowerSaver INTEGER,
-                 bladeDetailsDynamicPowerFavorPerformanceOverPower INTEGER
+                 bladeDetailsDynamicPowerFavorPerformanceOverPower INTEGER,
+                 bladeDetailsPowerControl INTEGER
                  }
 
        bladeDetailsIndex  OBJECT-TYPE
@@ -4275,6 +4275,27 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                  Therefore, it is highly recommended that the user perform a GET of this object after performing a SET,
                  in order to verify the completion of the intended operation."
                  ::= { bladeDetailsEntry 8 }
+
+       bladeDetailsPowerControl OBJECT-TYPE
+                 SYNTAX  INTEGER {
+                         none(0),
+                         measurement(1),
+                         measurementpcap(2),
+                         psave(3),
+                         measurementpsave(4),
+                         measurementpcappsave(5),
+                         notApplicable(255)
+                 }
+                 ACCESS  read-write
+                 STATUS  mandatory
+                 DESCRIPTION
+                 "This object is used to get or set the power control setting on a blade. 
+
+                 If dynamic power mgmt is not supported on a blade, notApplicable(255) will be returned.
+
+                 This will set the power control setting on all slots of the multiwide blade. The 
+                 same can be used if the blade is single wide."
+                 ::= { bladeDetailsEntry 9 }
 
        bladePowerTrending  OBJECT IDENTIFIER ::= { bladeDetails 3 }
 
@@ -6175,7 +6196,7 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                                 ::= { remoteAccessIdsEntry 1 }
 
       remoteAccessIdEntryUserId    OBJECT-TYPE
-                                SYNTAX  OCTET STRING (SIZE(0..16))
+                                SYNTAX  OCTET STRING (SIZE(0..15))
                                 ACCESS  read-write
                                 STATUS  mandatory
                                 DESCRIPTION
@@ -6185,7 +6206,7 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                                 ::= { remoteAccessIdsEntry 2 }
 
       remoteAccessIdEntryPassword OBJECT-TYPE
-                                SYNTAX  OCTET STRING (SIZE(0..16))
+                                SYNTAX  OCTET STRING (SIZE(0..15))
                                 ACCESS  read-write
                                 STATUS  mandatory
                                 DESCRIPTION
@@ -9754,7 +9775,11 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                    ACCESS  read-only
                    STATUS  mandatory
                    DESCRIPTION
-                   "Firmware VPD name description."
+                   "Firmware VPD name description.
+                   'AMM firmware' indicates the running firmware of the MM.
+                   'AMM firmware (pending restart)' indicates the flashed
+                   firmware of the MM which will become active after the
+                   next restart."
                    ::= { mmMainApplVpdEntry 2 }
 
        mmMainApplVpdBuildId  OBJECT-TYPE
@@ -10730,6 +10755,14 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                   bladeHSDaughterCard1MACAddress6Vpd OCTET STRING,
                   bladeHSDaughterCard1MACAddress7Vpd OCTET STRING,
                   bladeHSDaughterCard1MACAddress8Vpd OCTET STRING,
+                  bladeHSDaughterCard1MACAddress9Vpd OCTET STRING,
+                  bladeHSDaughterCard1MACAddress10Vpd OCTET STRING,
+                  bladeHSDaughterCard1MACAddress11Vpd OCTET STRING,
+                  bladeHSDaughterCard1MACAddress12Vpd OCTET STRING,
+                  bladeHSDaughterCard1MACAddress13Vpd OCTET STRING,
+                  bladeHSDaughterCard1MACAddress14Vpd OCTET STRING,
+                  bladeHSDaughterCard1MACAddress15Vpd OCTET STRING,
+                  bladeHSDaughterCard1MACAddress16Vpd OCTET STRING,
                   bladeSideCardMACAddress1Vpd      OCTET STRING,
                   bladeSideCardMACAddress2Vpd      OCTET STRING,
                   bladeSideCardMACAddress3Vpd      OCTET STRING,
@@ -11252,6 +11285,78 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                   "Blade high speed expansion card (daughter card) 1 MAC address 8.
                   For consistent results, view as a table and not as individual entries."
                   ::= { bladeMACAddressVpdEntry 107 }
+                  
+      bladeHSDaughterCard1MACAddress9Vpd OBJECT-TYPE
+                  SYNTAX OCTET STRING
+                  ACCESS read-only
+                  STATUS mandatory
+                  DESCRIPTION
+                  "Blade high speed expansion card (daughter card) 1 MAC address 9.
+                  For consistent results, view as a table and not as individual entries."
+                  ::= { bladeMACAddressVpdEntry 108 } 
+
+      bladeHSDaughterCard1MACAddress10Vpd OBJECT-TYPE
+                  SYNTAX OCTET STRING
+                  ACCESS read-only
+                  STATUS mandatory
+                  DESCRIPTION
+                  "Blade high speed expansion card (daughter card) 1 MAC address 10.
+                  For consistent results, view as a table and not as individual entries."
+                  ::= { bladeMACAddressVpdEntry 109 }
+
+      bladeHSDaughterCard1MACAddress11Vpd OBJECT-TYPE
+                  SYNTAX OCTET STRING
+                  ACCESS read-only
+                  STATUS mandatory
+                  DESCRIPTION
+                  "Blade high speed expansion card (daughter card) 1 MAC address 11.
+                  For consistent results, view as a table and not as individual entries."
+                  ::= { bladeMACAddressVpdEntry 110 }
+
+      bladeHSDaughterCard1MACAddress12Vpd OBJECT-TYPE
+                  SYNTAX OCTET STRING
+                  ACCESS read-only
+                  STATUS mandatory
+                  DESCRIPTION
+                  "Blade high speed expansion card (daughter card) 1 MAC address 12.
+                  For consistent results, view as a table and not as individual entries."
+                  ::= { bladeMACAddressVpdEntry 111 }
+
+      bladeHSDaughterCard1MACAddress13Vpd OBJECT-TYPE
+                  SYNTAX OCTET STRING
+                  ACCESS read-only
+                  STATUS mandatory
+                  DESCRIPTION
+                  "Blade high speed expansion card (daughter card) 1 MAC address 13.
+                  For consistent results, view as a table and not as individual entries."
+                  ::= { bladeMACAddressVpdEntry 112 }
+
+      bladeHSDaughterCard1MACAddress14Vpd OBJECT-TYPE
+                  SYNTAX OCTET STRING
+                  ACCESS read-only
+                  STATUS mandatory
+                  DESCRIPTION
+                  "Blade high speed expansion card (daughter card) 1 MAC address 14.
+                  For consistent results, view as a table and not as individual entries."
+                  ::= { bladeMACAddressVpdEntry 113 }
+
+      bladeHSDaughterCard1MACAddress15Vpd OBJECT-TYPE
+                  SYNTAX OCTET STRING
+                  ACCESS read-only
+                  STATUS mandatory
+                  DESCRIPTION
+                  "Blade high speed expansion card (daughter card) 1 MAC address 15.
+                  For consistent results, view as a table and not as individual entries."
+                  ::= { bladeMACAddressVpdEntry 114 }
+
+      bladeHSDaughterCard1MACAddress16Vpd OBJECT-TYPE
+                  SYNTAX OCTET STRING
+                  ACCESS read-only
+                  STATUS mandatory
+                  DESCRIPTION
+                  "Blade high speed expansion card (daughter card) 1 MAC address 16.
+                  For consistent results, view as a table and not as individual entries."
+                  ::= { bladeMACAddressVpdEntry 115 }
 
       bladeSideCardMACAddress1Vpd  OBJECT-TYPE
                   SYNTAX  OCTET STRING
@@ -13143,7 +13248,7 @@ BLADE-MIB DEFINITIONS ::= BEGIN
 				  ::= { bladeFWBuildIDTable 1 }
 
 
-      BladeFWBuildIDEntry::= SEQUENCE {
+      BladeFWBuildIDEntry ::= SEQUENCE {
 				  bladeFWBuildIDIndex INTEGER,
 				  bladeFWBuildMfg OCTET STRING,
 				  bladeFWBuildMT OCTET STRING,
@@ -16542,7 +16647,8 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                   componentFirmwareLevelStatus OCTET STRING,
                   componentFirmwarePendingBuildID OCTET STRING,
                   componentFirmwarePendingReleaseDate OCTET STRING,
-                  componentFirmwarePendingRevision OCTET STRING
+                  componentFirmwarePendingRevision OCTET STRING,
+                  componentFirmwareTypeID INTEGER
                   }
 
       componentFirmwareTopologyPath  OBJECT-TYPE
@@ -16737,6 +16843,28 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                   DESCRIPTION
                   "A text description of the revision level of this pending firmware load."
                   ::= { componentFirmwareEntry 15 }
+
+      componentFirmwareTypeID  OBJECT-TYPE
+                  SYNTAX  INTEGER {
+                    bladeFwBios(1),
+                    bladeDiagnostics(2),
+                    bladeSysMgmtProcessor(3),
+                    bladeFpga(4),
+                    bladecKVM(5),
+                    switchModuleMainAppl1(41),
+                    switchModuleMainAppl2(42),
+                    switchModuleBootROM(43),
+                    mgmtModuleMainAppl(61),
+                    mgmtModuleMainApplPendingRestart(62),
+                    fanController(81),
+                    unknown(255)
+                  }
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "Indicates the type of firmware load with a numeric identifier."
+                  ::= { componentFirmwareEntry 20 }
+
                   
       componentInventoryReady OBJECT-TYPE
                    SYNTAX  INTEGER {
@@ -16763,6 +16891,94 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                     
                     A more granular, per-blade status is available via the bladeSystemStatusTable"
                    ::= { componentInformation 3 }
+
+
+      componentDriveTable OBJECT-TYPE
+                    SYNTAX  SEQUENCE OF ComponentDriveEntry
+                    ACCESS  not-accessible
+                    STATUS  mandatory
+                    DESCRIPTION
+                    "Table of information indicating presence of a disk drive on a component.
+                     The management module does not receive any inventory VPD from the
+                     component, so only the presence of a drive can be indicated by this table."
+                    ::= { componentInformation 10 }
+
+      componentDriveEntry OBJECT-TYPE
+                    SYNTAX ComponentDriveEntry
+                    ACCESS  not-accessible
+                    STATUS  mandatory
+                    DESCRIPTION
+                    "Component drive information."
+                    INDEX { componentDriveTopologyPath }
+                    ::= { componentDriveTable 1 }
+
+      ComponentDriveEntry ::= SEQUENCE {
+                  componentDriveTopologyPath OCTET STRING,
+                  componentDriveDescription OCTET STRING
+                  }
+
+      componentDriveTopologyPath  OBJECT-TYPE
+                  SYNTAX  OCTET STRING  (SIZE (0..100))
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "The unique identifier for a row in this table. The chassis and each
+                   installed component is represented by a hardware topology tree, where
+                   each node in the tree represents a component. The path to a particular
+                   component consists of one or more <component>,<instance> pairs, where
+                   each successive pair is a child of the previous parent pair.
+
+                   As an example, the root of the tree is the chassis and is represented
+                   by the pair 'CHASSIS, 1'. This pair indicates the first instance of
+                   the chassis. If a blade is inserted in slot 4 of the chassis, its
+                   topology path is 'CHASSIS, 1, BLADE, 4'. With this format, the
+                   components in the chassis can be determined along with their relative
+                   hierarchy to each other.
+
+                   This component table is indexed by this unique topology
+                   path and the numeric designations for the components are:
+
+                    CHASSIS,                0x01   Chassis
+                    MM,                     0x02   Management Module
+                    BLADE,                  0x03   Main system board of a blade
+                    POWER,                  0x04   Power Supply, Power Module, etc
+                    COOLING,                0x05   Fan, blower, or other cooling device
+                    IO_MODULE,              0x06   Has I/O interface, i.e. - switch or bridge
+                    MEDIA,                  0x07   Media device
+                    PROCESSOR,              0x08   Any processor, processor module, etc
+                    STORAGE,                0x09   Any type of storage device
+                    EXPANSION,              0x0A   Expansion Card (not covered by more specific type)
+                    MEMORY,                 0x0B   Any memory device, module, etc
+                    MFRU,                   0x0C   Managed FRU Device
+                    PANEL,                  0x0D   Any sort of panel device, such as a front panel
+                    BLADE_EXPANSION_MODULE, 0x0E   Expansion option (BEM) such as PEU, BSE, etc
+                    CARD_EXPANSION,         0x0F   Expansion card, ie. daughter card
+                    CARD_HS_EXPANSION,      0x10   High Speed Expansion card, ie. daughter card
+                    INTERPOSER,             0x11   Interposer device
+                    CLOCK,                  0x12   Clock card
+                    MUX,                    0x13   Mulitplexer card
+                    ADDIN,                  0x14   cKVM card & other addin cards
+                    STORAGE_MODULE,         0x15   Container of one or more Storage Devices
+                    SYS_EXPANSION_CARD,     0x16   Management card
+                    BATTERY,                0x17   A single battery
+                    BATTERY_MODULE,         0x18   Container of one or more batteries
+                    MEDIA_MODULE,           0x19   Container of one or more media devices
+                    MEMORY_BANK,            0x1A   Memory banks
+                    AIR_FILTER,             0x1B   Filter mechanism (bezel)
+                    SERIAL_PORT_MODULE,     0x1C   Container of one or more serial ports
+                    PARENT,                 0x1D   Reference to parent for multi-parent support
+                    PHY_PORT,               0x1E   Physical port
+                    IO_EXPANDER,            0x1F   RAID card"
+                  ::= { componentDriveEntry 1 }
+
+      componentDriveDescription  OBJECT-TYPE
+                  SYNTAX  OCTET STRING
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                  "A short text string describing the particular drive on the component."
+                  ::= { componentDriveEntry 2 }
+
 
       -- ********************************************************************************
       -- MM Security Settings
@@ -18035,6 +18251,510 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                      applicable to systems with a standby MM."
                      ::= { networkInterfaces 14 }
 
+       vlanConfigure  OBJECT IDENTIFIER ::= { networkInterfaces 20 }
+
+       vlanGlobalState  OBJECT-TYPE
+                     SYNTAX  INTEGER { disable(0), enable(1) }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object disables or enables the VLAN feature.  The
+                     configuration objects for the VLAN are in the
+                     table, vlanTable.
+
+                     The default setting for this object is disable(0).
+
+                     IMPORTANT NOTE:  Any change to this object will revert
+                     back to its previous value if the change is not
+                     committed by setting the object vlanCommitState to
+                     executeCommit(3) within the number of minutes indicated
+                     in the object vlanCommitTimeout."
+                     ::= { vlanConfigure 1 }
+
+       vlanCommitTimeout  OBJECT-TYPE
+                     SYNTAX  INTEGER (1..255)
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object is the number of minutes from the last
+                     VLAN-related object change until any non-committed changes
+                     will revert back to their previous settings.
+
+                     This means if a user makes a change that disrupts TCP/IP
+                     access to the CMM, the change will revert back to its
+                     previous setting after the number of minutes in this
+                     object.  This allows the user to access the CMM again
+                     if access is lost through an unintended VLAN setting.
+
+                     Once the changes are committed using the object,
+                     vlanCommitState, setting it to executeCommit(3), the
+                     changes will be saved in non-volatile memory.
+
+                     The amount of time before uncommitted changes revert back
+                     to their previous settings starts from the last change made
+                     to any VLAN-related object.  If no other change is made,
+                     the user has this number of minutes (the number in this
+                     object) to commit the changes with vlanCommitState before
+                     the changes will revert back.
+
+                     The default setting for this object is 2 minutes.
+
+                     IMPORTANT NOTE:  Any change to this object will revert
+                     back to its previous value if the change is not
+                     committed by setting the object vlanCommitState to
+                     executeCommit(3) within the number of minutes indicated
+                     in the object vlanCommitTimeout."
+                     ::= { vlanConfigure 2 }
+
+       vlanCommitState  OBJECT-TYPE
+                     SYNTAX  INTEGER { noChangesPending(1), commitNeeded(2), executeCommit(3) }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object gives the status of whether there are
+                     VLAN-related changes pending that need to be committed,
+                     and allows a user to commit (save) any VLAN changes.
+
+                     If changes are pending, reading this object will give
+                     a value of commitNeeded(2).  If no changes are pending,
+                     this object will have the value of noChangesPending(1).
+
+                     To save any VLAN-related changes so they do not revert
+                     back to previous settings, set this object to
+                     executeCommit(3) whenever this object has a value of
+                     commitNeeded(2)."
+                     ::= { vlanConfigure 3 }
+
+      vlanTable      OBJECT-TYPE
+                     SYNTAX  SEQUENCE OF VlanEntry
+                     ACCESS  not-accessible
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This table contains the VLAN configuration objects.
+                     The default entry has an vlanEntryIndex equal to 1.
+                     The objects for this default entry are configurable.
+
+                     An additional VLAN entry may be added by setting the
+                     object, vlanEntryStatus, at vlanEntryIndex=2 to the value
+                     of createRequest(2) and also setting the object,
+                     vlanEntryVlanId, at vlanEntryIndex=2 to a valid, unique
+                     value.
+
+                     IMPORTANT NOTE:  Any changes to the object of this table
+                     will revert back to their previous settings if the
+                     changes are not committed by setting the object
+                     vlanCommitState to executeCommit(3) within the number of
+                     minutes indicated in the object vlanCommitTimeout."
+                     ::= {  vlanConfigure 20 }
+
+      vlanEntry      OBJECT-TYPE
+                     SYNTAX VlanEntry
+                     ACCESS  not-accessible
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "VLAN entries."
+                     INDEX { vlanEntryIndex }
+                     ::= { vlanTable 1 }
+
+
+      VlanEntry ::=  SEQUENCE {
+                     vlanEntryIndex INTEGER,
+                     vlanEntryVlanId INTEGER,
+                     vlanEntryName OCTET STRING,
+                     vlanEntryStatus EntryStatus,
+                     vlanEntryState INTEGER,
+                     vlanEntrySOLAccess INTEGER,
+                     vlanEntrycKVMAccess INTEGER,
+                     vlanEntryTagging INTEGER,
+                     vlanEntryIOModuleAccess INTEGER,
+                     vlanEntryVlanDefault INTEGER,
+                     vlanEntryIPv4StaticAddress IpAddress,
+                     vlanEntryIPv4StaticGateway IpAddress,
+                     vlanEntryIPv4StaticMask IpAddress,
+                     vlanEntryIPv4SubnetRoute1 IpAddress,
+                     vlanEntryIPv4SubnetRouteMask1 IpAddress,
+                     vlanEntryIPv4SubnetRoute2 IpAddress,
+                     vlanEntryIPv4SubnetRouteMask2 IpAddress,
+                     vlanEntryIPv4SubnetRoute3 IpAddress,
+                     vlanEntryIPv4SubnetRouteMask3 IpAddress
+                     }
+
+      vlanEntryIndex  OBJECT-TYPE
+                     SYNTAX  INTEGER (1..2)
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Index for VLAN entry.  If vlanEntryIndex is equal to 1,
+                     it is the Default VLAN entry and cannot be deleted."
+                     ::= { vlanEntry 1 }
+
+      vlanEntryVlanId  OBJECT-TYPE
+                     SYNTAX  INTEGER (1..4094)
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Valid VLAN ID.  Allowed values are 1..4094.  If the entry
+                     is not valid, this object will have the value of 0.
+
+                     If this entry has the vlanEntryIndex value of 1 (default
+                     VLAN entry), then setting this object will take effect
+                     immediately.  For other entries, when this object is set,
+                     this entry must have the object, vlanEntryState set to
+                     enable(1) or restart(2) for this change to take effect."
+                     ::= { vlanEntry 2 }
+
+      vlanEntryName  OBJECT-TYPE
+                     SYNTAX  OCTET STRING (SIZE(0..31))
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object allows the user to configure a text string
+                     name for this VLAN entry.  This entry name is only used
+                     as a label for this entry."
+                     ::= { vlanEntry 3 }
+
+      vlanEntryStatus  OBJECT-TYPE
+                     SYNTAX  EntryStatus
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object manages the creation and deletion of this
+                     entry.
+                     The steps recommended to add a new VLAN entry are:
+                         1. Create a new entry in this table
+                            vlanEntryStatus = createRequest
+                         2. Set vlanEntryVlanId as required.
+                            Then the entry will be valid.
+
+                     valid(1)         - Indicates that this entry is available
+                                        for use.
+
+                     createRequest(2) - A new entry will be created in this
+                                        table and will transition to the
+                                        vlanEntryStatus value of
+                                        underCreation(3).
+
+                     underCreation(3) - Indicates that this entry exists in the
+                                        agent but is unavailable for use. After
+                                        completing the create operation, the
+                                        agent will set this object to the value
+                                        underCreation(3).
+
+                     invalid(4)       - Deletes this entry.
+
+                     The entry with the vlanEntryIndex value of 1 (default VLAN
+                     entry) cannot be deleted."
+                     ::= { vlanEntry 4 }
+
+      vlanEntryState  OBJECT-TYPE
+                     SYNTAX  INTEGER {
+                       disable(0),
+                       enable(1),
+                       restart(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object indicates whether this VLAN entry is enabled
+                     or disabled and allows the user to disable, enable or
+                     restart this entry except for the exceptions noted below.
+
+                     The entry with a vlanEntryIndex value of 1 (default VLAN
+                     entry) will always have this object set to enable(1) and
+                     cannot be set to any other value.  Other table entries do
+                     not have this restriction.
+
+                     Some other objects in this table may not take effect after
+                     a change until either this object is: set to enable(1) if
+                     this object currently has the value of disable(0), or set
+                     to restart(2) if this object currently has the value of
+                     enable(1). The other objects in this table that require
+                     this object be set to enable(1) or restart(2) after a
+                     change are noted in the description for those objects."
+                     ::= { vlanEntry 5 }
+
+      vlanEntrySOLAccess  OBJECT-TYPE
+                     SYNTAX  INTEGER { disable(0), enable(1) }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object allows the user to set whether the VLAN
+                     for this entry will have access to the Serial Over
+                     LAN (SOL) interface.
+
+                     Only one VLAN entry may have this object set to enable(1).
+
+                     By default, the entry with the vlanEntryIndex value of 1
+                     (default VLAN entry) will have this object set to
+                     enable(1).
+
+                     To set this object to enable(1) on another entry, this
+                     object must first be set to disable(0) on any entry
+                     that has this object set to enable(1)."
+                     ::= { vlanEntry 6 }
+
+      vlanEntrycKVMAccess  OBJECT-TYPE
+                     SYNTAX  INTEGER { disable(0), enable(1) }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object allows the user to set whether the VLAN
+                     for this entry will have access to the installed cards
+                     for concurrent keyboard, video, and mouse (cKVM).
+
+                     Only one VLAN entry may have this object set to enable(1).
+
+                     By default, the entry with the vlanEntryIndex value of 1
+                     (default VLAN entry) will have this object set to
+                     enable(1).
+
+                     To set this object to enable(1) on another entry, this
+                     object must first be set to disable(0) on any entry
+                     that has this object set to enable(1)."
+                     ::= { vlanEntry 7 }
+
+      vlanEntryTagging  OBJECT-TYPE
+                     SYNTAX  INTEGER { disable(0), enable(1) }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object allows the user to set whether VLAN tagging
+                     is enabled for this VLAN entry.
+
+                     This object is only configurable for the entry with the
+                     vlanEntryIndex value of 1.
+
+                     By default, the entry with the vlanEntryIndex value of 1
+                     (default VLAN entry) will have this object set to
+                     disable(0), all other entries will have this object set to
+                     enable(1)."
+                     ::= { vlanEntry 8 }
+
+      vlanEntryIOModuleAccess  OBJECT-TYPE
+                     SYNTAX  INTEGER { disable(0), enable(1) }
+                     ACCESS  read-only
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This read-only object indicates whether the VLAN
+                     for this entry will have access to the IO Modules.
+
+                     Only the VLAN entry with the vlanEntryIndex value of 1
+                     will report this object with the value of enable(1),
+                     all other entries will have a value of disable(0)."
+                     ::= { vlanEntry 9 }
+
+      vlanEntryVlanDefault  OBJECT-TYPE
+                     SYNTAX  INTEGER { false(0), true(1) }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object specifies which vlanTable entry is the
+                     'default entry'.  By default, the entry with the
+                     vlanEntryIndex value of 1 will have this object set to
+                     true(1).
+
+                     Only one vlanTable entry can be designated as the VLAN
+                     default entry.  Setting this object to true(1) for an
+                     entry will make this object false(0) for all other
+                     vlanTable entries.
+
+                     Only the vlanTable entry with this object set to true(1)
+                     will allow the vlanEntryTagging object to be configurable
+                     for this vlanEntryIndex index."
+                     ::= { vlanEntry 10 }
+
+      vlanEntryIPv4StaticAddress  OBJECT-TYPE
+                     SYNTAX  IpAddress
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object sets the IP address for this VLAN entry.
+
+                     The entry with the vlanEntryIndex value of 1 (default VLAN
+                     entry) will have this object set to the IP address of the
+                     ethernet interface.  The IP address of the default VLAN
+                     entry can only change by changing the IP address of the
+                     ethernet interface.
+
+                     For all other VLAN entries, this object may be set to any
+                     IP address except the IP address of the ethernet
+                     interface.
+
+                     For a change of this object to take effect, the object,
+                     vlanEntryState, must be set to enable(1) if the
+                     vlanEntryState is currently disable(0), or set to
+                     restart(2) if the vlanEntryState is currently enable(1)."
+                     ::= { vlanEntry 31 }
+
+      vlanEntryIPv4StaticGateway  OBJECT-TYPE
+                     SYNTAX  IpAddress
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object sets the IP address for the IP gateway
+                     for this VLAN entry.
+
+                     The entry with the vlanEntryIndex value of 1 (default VLAN
+                     entry) will have this object set to the IP gateway for the
+                     ethernet interface.  The IP address of the default VLAN
+                     entry can only change by changing the IP gateway of the
+                     ethernet interface.
+
+                     For all other VLAN entries, this object may be set to any
+                     IP address except the IP address of the ethernet
+                     interface.
+
+                     For a change of this object to take effect, the object,
+                     vlanEntryState, must be set to enable(1) if the
+                     vlanEntryState is currently disable(0), or set to
+                     restart(2) if the vlanEntryState is currently enable(1)."
+                     ::= { vlanEntry 32 }
+
+      vlanEntryIPv4StaticMask  OBJECT-TYPE
+                     SYNTAX  IpAddress
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object sets the subnet mask for this VLAN entry.
+
+                     The entry with the vlanEntryIndex value of 1 (default VLAN
+                     entry) will have this object set to the subnet mask of the
+                     ethernet interface.  The subnet mask of the default VLAN
+                     entry can only change by changing the subnet mask of the
+                     ethernet interface.
+
+                     For all other VLAN entries, this object may be set to any
+                     valid subnet mask.
+
+                     For a change of this object to take effect, the object,
+                     vlanEntryState, must be set to enable(1) if the
+                     vlanEntryState is currently disable(0), or set to
+                     restart(2) if the vlanEntryState is currently enable(1)."
+                     ::= { vlanEntry 33 }
+
+      vlanEntryIPv4SubnetRoute1  OBJECT-TYPE
+                     SYNTAX  IpAddress
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object sets the IP address of the subnet route 1 for
+                     this VLAN entry.
+
+                     The entry with the vlanEntryIndex value of 1 (default VLAN
+                     entry) will always have this object set to 0.0.0.0.
+
+                     For all other VLAN entries, this object may be set to any
+                     valid subnet route.
+
+                     For a change of this object to take effect, the object,
+                     vlanEntryState, must be set to enable(1) if the
+                     vlanEntryState is currently disable(0), or set to
+                     restart(2) if the vlanEntryState is currently enable(1)."
+                     ::= { vlanEntry 51 }
+
+      vlanEntryIPv4SubnetRouteMask1  OBJECT-TYPE
+                     SYNTAX  IpAddress
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object sets the subnet route mask 1 for this VLAN
+                     entry.
+
+                     The entry with the vlanEntryIndex value of 1 (default VLAN
+                     entry) will always have this object set to 0.0.0.0.
+
+                     For all other VLAN entries, this object may be set to any
+                     valid subnet mask.
+
+                     For a change of this object to take effect, the object,
+                     vlanEntryState, must be set to enable(1) if the
+                     vlanEntryState is currently disable(0), or set to
+                     restart(2) if the vlanEntryState is currently enable(1)."
+                     ::= { vlanEntry 52 }
+
+
+      vlanEntryIPv4SubnetRoute2  OBJECT-TYPE
+                     SYNTAX  IpAddress
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object sets the IP address of the subnet route 2 for
+                     this VLAN entry.
+
+                     The entry with the vlanEntryIndex value of 1 (default VLAN
+                     entry) will always have this object set to 0.0.0.0.
+
+                     For all other VLAN entries, this object may be set to any
+                     valid subnet route.
+
+                     For a change of this object to take effect, the object,
+                     vlanEntryState, must be set to enable(1) if the
+                     vlanEntryState is currently disable(0), or set to
+                     restart(2) if the vlanEntryState is currently enable(1)."
+                     ::= { vlanEntry 53 }
+
+      vlanEntryIPv4SubnetRouteMask2  OBJECT-TYPE
+                     SYNTAX  IpAddress
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object sets the subnet route mask 2 for this VLAN
+                     entry.
+
+                     The entry with the vlanEntryIndex value of 1 (default VLAN
+                     entry) will always have this object set to 0.0.0.0.
+
+                     For all other VLAN entries, this object may be set to any
+                     valid subnet mask.
+
+                     For a change of this object to take effect, the object,
+                     vlanEntryState, must be set to enable(1) if the
+                     vlanEntryState is currently disable(0), or set to
+                     restart(2) if the vlanEntryState is currently enable(1)."
+                     ::= { vlanEntry 54 }
+
+
+      vlanEntryIPv4SubnetRoute3  OBJECT-TYPE
+                     SYNTAX  IpAddress
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object sets the IP address of the subnet route 3 for
+                     this VLAN entry.
+
+                     The entry with the vlanEntryIndex value of 1 (default VLAN
+                     entry) will always have this object set to 0.0.0.0.
+
+                     For all other VLAN entries, this object may be set to any
+                     valid subnet route.
+
+                     For a change of this object to take effect, the object,
+                     vlanEntryState, must be set to enable(1) if the
+                     vlanEntryState is currently disable(0), or set to
+                     restart(2) if the vlanEntryState is currently enable(1)."
+                     ::= { vlanEntry 55 }
+
+      vlanEntryIPv4SubnetRouteMask3  OBJECT-TYPE
+                     SYNTAX  IpAddress
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "This object sets the subnet route mask 3 for this VLAN
+                     entry.
+
+                     The entry with the vlanEntryIndex value of 1 (default VLAN
+                     entry) will always have this object set to 0.0.0.0.
+
+                     For all other VLAN entries, this object may be set to any
+                     valid subnet mask.
+
+                     For a change of this object to take effect, the object,
+                     vlanEntryState, must be set to enable(1) if the
+                     vlanEntryState is currently disable(0), or set to
+                     restart(2) if the vlanEntryState is currently enable(1)."
+                     ::= { vlanEntry 56 }
+
+
        -- ********************************************************************************
        -- TCP/IP Protocol Configuration
        -- ********************************************************************************
@@ -18108,7 +18828,16 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                        snmpCommunityEntryCommunityIpAddress1 OCTET STRING,
                        snmpCommunityEntryCommunityIpAddress2 OCTET STRING,
                        snmpCommunityEntryCommunityIpAddress3 OCTET STRING,
-                       snmpCommunityEntryCommunityViewType INTEGER
+                       snmpCommunityEntryCommunityViewType INTEGER,
+                       snmpCommunityEntryCommunityIpAddress4 OCTET STRING,
+                       snmpCommunityEntryCommunityIpAddress5 OCTET STRING,
+                       snmpCommunityEntryCommunityIpAddress6 OCTET STRING,
+                       snmpCommunityEntryCommunityIpAddress7 OCTET STRING,
+                       snmpCommunityEntryCommunityIpAddress8 OCTET STRING,
+                       snmpCommunityEntryCommunityIpAddress9 OCTET STRING,
+                       snmpCommunityEntryCommunityIpAddress10 OCTET STRING,
+                       snmpCommunityEntryCommunityIpAddress11 OCTET STRING,
+                       snmpCommunityEntryCommunityIpAddress12 OCTET STRING
                        }
 
 
@@ -18181,6 +18910,124 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                                      is set for each community.  Therefore all three managers
                                      in the same community have the same access level."
                                      ::= { snmpCommunityEntry 6 }
+
+
+          snmpCommunityEntryCommunityIpAddress4  OBJECT-TYPE
+                                    SYNTAX  OCTET STRING (SIZE(0..63))
+                                    ACCESS  read-write
+                                    STATUS  mandatory
+                                    DESCRIPTION
+                                    "SNMP Community IP address or host name.
+                                    Can either be a dotted decimal IP string (e.g. 9.37.44.2)
+                                    or if DNS is enabled a host name. This field also allows two
+                                    wildard values for read-Traps and write-Read-Traps communities:
+                                      0.0.0.0 - allow any IPv4 address
+                                      0::0    - allow any IPv6 address"
+                                    ::= { snmpCommunityEntry 7 }
+
+          snmpCommunityEntryCommunityIpAddress5  OBJECT-TYPE
+                                    SYNTAX  OCTET STRING (SIZE(0..63))
+                                    ACCESS  read-write
+                                    STATUS  mandatory
+                                    DESCRIPTION
+                                    "SNMP Community IP address or host name.
+                                    Can either be a dotted decimal IP string (e.g. 9.37.44.2)
+                                    or if DNS is enabled a host name. This field also allows two
+                                    wildard values for read-Traps and write-Read-Traps communities:
+                                      0.0.0.0 - allow any IPv4 address
+                                      0::0    - allow any IPv6 address"
+                                    ::= { snmpCommunityEntry 8 }
+
+          snmpCommunityEntryCommunityIpAddress6  OBJECT-TYPE
+                                    SYNTAX  OCTET STRING (SIZE(0..63))
+                                    ACCESS  read-write
+                                    STATUS  mandatory
+                                    DESCRIPTION
+                                    "SNMP Community IP address or host name.
+                                    Can either be a dotted decimal IP string (e.g. 9.37.44.2)
+                                    or if DNS is enabled a host name. This field also allows two
+                                    wildard values for read-Traps and write-Read-Traps communities:
+                                      0.0.0.0 - allow any IPv4 address
+                                      0::0    - allow any IPv6 address"
+                                    ::= { snmpCommunityEntry 9 }
+
+          snmpCommunityEntryCommunityIpAddress7  OBJECT-TYPE
+                                    SYNTAX  OCTET STRING (SIZE(0..63))
+                                    ACCESS  read-write
+                                    STATUS  mandatory
+                                    DESCRIPTION
+                                    "SNMP Community IP address or host name.
+                                    Can either be a dotted decimal IP string (e.g. 9.37.44.2)
+                                    or if DNS is enabled a host name. This field also allows two
+                                    wildard values for read-Traps and write-Read-Traps communities:
+                                      0.0.0.0 - allow any IPv4 address
+                                      0::0    - allow any IPv6 address"
+                                    ::= { snmpCommunityEntry 10 }
+
+          snmpCommunityEntryCommunityIpAddress8  OBJECT-TYPE
+                                    SYNTAX  OCTET STRING (SIZE(0..63))
+                                    ACCESS  read-write
+                                    STATUS  mandatory
+                                    DESCRIPTION
+                                    "SNMP Community IP address or host name.
+                                    Can either be a dotted decimal IP string (e.g. 9.37.44.2)
+                                    or if DNS is enabled a host name. This field also allows two
+                                    wildard values for read-Traps and write-Read-Traps communities:
+                                      0.0.0.0 - allow any IPv4 address
+                                      0::0    - allow any IPv6 address"
+                                    ::= { snmpCommunityEntry 11 }
+
+          snmpCommunityEntryCommunityIpAddress9  OBJECT-TYPE
+                                    SYNTAX  OCTET STRING (SIZE(0..63))
+                                    ACCESS  read-write
+                                    STATUS  mandatory
+                                    DESCRIPTION
+                                    "SNMP Community IP address or host name.
+                                    Can either be a dotted decimal IP string (e.g. 9.37.44.2)
+                                    or if DNS is enabled a host name. This field also allows two
+                                    wildard values for read-Traps and write-Read-Traps communities:
+                                      0.0.0.0 - allow any IPv4 address
+                                      0::0    - allow any IPv6 address"
+                                    ::= { snmpCommunityEntry 12 }
+
+          snmpCommunityEntryCommunityIpAddress10  OBJECT-TYPE
+                                    SYNTAX  OCTET STRING (SIZE(0..63))
+                                    ACCESS  read-write
+                                    STATUS  mandatory
+                                    DESCRIPTION
+                                    "SNMP Community IP address or host name.
+                                    Can either be a dotted decimal IP string (e.g. 9.37.44.2)
+                                    or if DNS is enabled a host name. This field also allows two
+                                    wildard values for read-Traps and write-Read-Traps communities:
+                                      0.0.0.0 - allow any IPv4 address
+                                      0::0    - allow any IPv6 address"
+                                    ::= { snmpCommunityEntry 13 }
+
+          snmpCommunityEntryCommunityIpAddress11  OBJECT-TYPE
+                                    SYNTAX  OCTET STRING (SIZE(0..63))
+                                    ACCESS  read-write
+                                    STATUS  mandatory
+                                    DESCRIPTION
+                                    "SNMP Community IP address or host name.
+                                    Can either be a dotted decimal IP string (e.g. 9.37.44.2)
+                                    or if DNS is enabled a host name. This field also allows two
+                                    wildard values for read-Traps and write-Read-Traps communities:
+                                      0.0.0.0 - allow any IPv4 address
+                                      0::0    - allow any IPv6 address"
+                                    ::= { snmpCommunityEntry 14 }
+
+          snmpCommunityEntryCommunityIpAddress12  OBJECT-TYPE
+                                    SYNTAX  OCTET STRING (SIZE(0..63))
+                                    ACCESS  read-write
+                                    STATUS  mandatory
+                                    DESCRIPTION
+                                    "SNMP Community IP address or host name.
+                                    Can either be a dotted decimal IP string (e.g. 9.37.44.2)
+                                    or if DNS is enabled a host name. This field also allows two
+                                    wildard values for read-Traps and write-Read-Traps communities:
+                                      0.0.0.0 - allow any IPv4 address
+                                      0::0    - allow any IPv6 address"
+                                    ::= { snmpCommunityEntry 15 }
 
          snmpv1SystemAgentEnable  OBJECT-TYPE
                       SYNTAX  INTEGER {
@@ -19074,11 +19921,11 @@ BLADE-MIB DEFINITIONS ::= BEGIN
         ldapClientCfg    OBJECT IDENTIFIER ::= { tcpProtocols 6 }
 
          ldapServer1NameOrIPAddress     OBJECT-TYPE
-                      SYNTAX  OCTET STRING (SIZE(0..64))
+                      SYNTAX  OCTET STRING (SIZE(0..256))
                       ACCESS  read-write
                       STATUS  mandatory
                       DESCRIPTION
-                      "A NULL terminated 64 byte string that contains the
+                      "A NULL terminated 255 byte string that contains the
                       LDAP server host name or IP address (a.b.c.d)."
                       ::= { ldapClientCfg 1 }
 
@@ -19091,11 +19938,11 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                       ::= { ldapClientCfg 2 }
 
          ldapServer2NameOrIPAddress     OBJECT-TYPE
-                      SYNTAX  OCTET STRING (SIZE(0..64))
+                      SYNTAX  OCTET STRING (SIZE(0..256))
                       ACCESS  read-write
                       STATUS  mandatory
                       DESCRIPTION
-                      "A NULL terminated 64 byte string that contains the
+                      "A NULL terminated 255 byte string that contains the
                       LDAP server host name or IP address (a.b.c.d)."
                       ::= { ldapClientCfg 3 }
 
@@ -19108,11 +19955,11 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                       ::= { ldapClientCfg 4 }
 
          ldapServer3NameOrIPAddress     OBJECT-TYPE
-                      SYNTAX  OCTET STRING (SIZE(0..64))
+                      SYNTAX  OCTET STRING (SIZE(0..256))
                       ACCESS  read-write
                       STATUS  mandatory
                       DESCRIPTION
-                      "A NULL terminated 64 byte string that contains the
+                      "A NULL terminated 255 byte string that contains the
                       LDAP server host name or IP address (a.b.c.d)."
                       ::= { ldapClientCfg 5 }
 
@@ -19125,16 +19972,17 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                       ::= { ldapClientCfg 6 }
 
          ldapRootDN     OBJECT-TYPE
-                      SYNTAX  OCTET STRING (SIZE(0..64))
+                      SYNTAX  OCTET STRING (SIZE(0..256))
                       ACCESS  read-write
                       STATUS  mandatory
                       DESCRIPTION
-                      "Distinguished Name for root entry of directory tree.
+                      "A NULL terminated 255 byte string that contains the
+                      distinguished Name for root entry of directory tree.
                       An example might look like dn=foobar,dn=com."
                       ::= { ldapClientCfg 7 }
 
          ldapUserSearchBaseDN     OBJECT-TYPE
-                      SYNTAX  OCTET STRING (SIZE(0..64))
+                      SYNTAX  OCTET STRING (SIZE(0..255))
                       ACCESS  read-write
                       STATUS  deprecated
                       DESCRIPTION
@@ -19142,7 +19990,8 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                       the LDAP server for one or more attributes associated with a particular
                       user. Any search request must specify the base DN for the actual search.
                       This field specifies the base DN which should be used to search the User
-                      directory. An example might look like cn=users,dn=foobar,dn=com. If this
+                      directory. This is a NULL terminated 255 byte string.
+                      An example might look like cn=users,dn=foobar,dn=com. If this
                       field is left blank, the Root DN will be used as the search base instead.
                       As mentioned, user searches are part of the authentication process. They
                       are carried out to retrieve information about the user such as login
@@ -19156,7 +20005,7 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                       ::= { ldapClientCfg 8 }
 
          ldapGroupFilter     OBJECT-TYPE
-                      SYNTAX  OCTET STRING (SIZE(0..64))
+                      SYNTAX  OCTET STRING (SIZE(0..511))
                       ACCESS  read-write
                       STATUS  mandatory
                       DESCRIPTION
@@ -19208,14 +20057,15 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                       ::= { ldapClientCfg 10 }
 
          ldapClientAuthenticationDN     OBJECT-TYPE
-                      SYNTAX  OCTET STRING (SIZE(0..64))
+                      SYNTAX  OCTET STRING (SIZE(0..255))
                       ACCESS  read-write
                       STATUS  mandatory
                       DESCRIPTION
                       "The initial bind to the LDAP server during user authentication can be
                       performed with anonymous authentication, client based authentication, or UPN.
                       The client based option requires a client DN and password as parameters to
-                      the bind request. These parameters are configured here. Note that the password
+                      the bind request. The client DN is a NULL terminated 255 byte string.
+                      These parameters are configured here. Note that the password
                       can be left blank."
                       ::= { ldapClientCfg 11 }
 
@@ -19416,20 +20266,21 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                       ::= { ldapClientCfg 23 }
 
         ldapDomainName     OBJECT-TYPE
-                      SYNTAX  OCTET STRING (SIZE(0..64))
+                      SYNTAX  OCTET STRING (SIZE(0..256))
                       ACCESS  read-write
                       STATUS  mandatory
                       DESCRIPTION
-                      "LDAP Domain Name."
+                      "A NULL terminated 255 byte string that contains the 
+                       LDAP Domain Name."
                       ::= { ldapClientCfg 24 }
 
 
          ldapServer4NameOrIPAddress     OBJECT-TYPE
-                      SYNTAX  OCTET STRING (SIZE(0..64))
+                      SYNTAX  OCTET STRING (SIZE(0..256))
                       ACCESS  read-write
                       STATUS  mandatory
                       DESCRIPTION
-                      "A NULL terminated 64 byte string that contains the
+                      "A NULL terminated 255 byte string that contains the
                       LDAP server host name or IP address (a.b.c.d)."
                       ::= { ldapClientCfg 25 }
 
@@ -20240,7 +21091,7 @@ BLADE-MIB DEFINITIONS ::= BEGIN
 		    DESCRIPTION
 		    "The identifier of a particular CIN protocol port configuration
                      for a given CIN configuration as specified by cinPortConfigCINIndex. 
-                     There can be up to 8 unique protocol port definitions per CIN 
+                     There can be up to 16 unique protocol port definitions per CIN
                      configuration."
 	            ::= { cinPortConfigEntry 2 }
 
@@ -21300,6 +22151,57 @@ BLADE-MIB DEFINITIONS ::= BEGIN
 		               - auto: all blades will automatically be powered on when power is applied to the chassis.
 		               - manual: all blades will be left off until manually powered on by the user."
                      ::= { bladePolicy 7 }
+
+         bladePolicyDisconnectionMode OBJECT-TYPE
+                     SYNTAX  INTEGER {
+                       noDisconnection(0),
+                       forceDisconnection(1),
+                       accessRequest(2)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Blade disconnection mode.
+                       - noDisconnection: If the blade is already serving a maximum number of users, the requester can't get connection
+		               - forcedisconnection: If the blade is already serving a maximum number of users, the requester can disconnect any connected user.
+		               - accessRequest: If the blade is already serving an user, this one will get an access request from the requester."
+                     ::= { bladePolicy 8 }
+
+		bladePolicySessionTimeOut OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Client session time out in minutes.
+                          If there is no remote presence activity, after that time, the session will be closed authomatically."
+                     ::= { bladePolicy 9 }
+
+		bladePolicyRequestTimeOut OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Client connection request time out in seconds.
+                          In case of single session mode, if the requested user does not respond within this timeout, the user request will be accepted authomatically."
+                     ::= { bladePolicy 10 }
+
+        bladePolicyRetryTimeOut OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Client connection retry time out in seconds.
+                          It is possible that the current blade access is negotiated by other 2 clients. If the third comes it will need to wait and retry to connect after a while."
+                     ::= { bladePolicy 11 }
+
+        bladePolicySessionLostTimeOut OBJECT-TYPE
+                     SYNTAX  INTEGER
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Client session lost in minutes.
+                          Amount of time before session closes due to loss of session, and user may regain control. This may happen if for example the client machine loses a network connection."
+                     ::= { bladePolicy 12 }
 
       -- ********************************************************************************
       -- Blade system health state params
@@ -25222,7 +26124,8 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                      restartBladeClearNVRAM INTEGER,
                      restartBladeInvokeDiags INTEGER,
                      restartBladeInvokeDiagsFromDefaultBootList INTEGER,
-                     restartBladeToSMSBootMenu INTEGER
+                     restartBladeToSMSBootMenu INTEGER,
+                     restartBladeToUEFIMenu INTEGER
                      }
 
          powerRestartIndex  OBJECT-TYPE
@@ -25273,12 +26176,15 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                        off(0),
                        on(1),
                        standby(3),
-                       hibernate(4)
+                       hibernate(4), 
+                       unknown(255)
                      }
                      ACCESS  read-only
                      STATUS  mandatory
                      DESCRIPTION
-                     "Indicates the power state of the blade specified."
+                     "Indicates the power state of the blade specified.
+                      If the state cannot be determined, the unknown(255) 
+                      value is returned."
                      ::= { bladePowerRestartEntry 4 }
 
          powerRestartBladeHealthState  OBJECT-TYPE
@@ -25439,6 +26345,21 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                      NOTE: Value returned for the GET command is meaningless
                      for this MIB object."
                      ::= { bladePowerRestartEntry 14 }
+
+        restartBladeToUEFIMenu OBJECT-TYPE
+                        SYNTAX  INTEGER {
+                       execute(1)
+                     }
+                     ACCESS  read-write
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Restart a blade to UEFI setup menu. This option is not supported on
+                     all blades.
+
+                     NOTE: Value returned for the GET command is meaningless
+                     for this MIB object."
+                     ::= { bladePowerRestartEntry 15 }
+
 
       bladeConfiguration OBJECT IDENTIFIER ::= { processorBlade 7 }
        -- blade power/restart control
@@ -32337,6 +33258,8 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                         bladeCenterHOrBladeCenterHT(2),
                         bladeCenterS(3),
                         bladeCenterE(4),
+                        bladeCenterH(5),
+                        bladeCenterT(32),
                         unknown(255)
                  }
                  ACCESS  read-only
@@ -33475,6 +34398,128 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                   "This field displays the available space of the AMM file system."
                   ::= { fileManagement 6 }
 
+
+    -- ********************************************************************************
+    -- componentMonitors
+    -- ********************************************************************************
+    componentMonitors OBJECT IDENTIFIER ::= { blades 37 }
+
+
+      -- ********************************************************************************
+      -- componentMACAddressTable
+      -- ********************************************************************************
+      componentMACAddressTable OBJECT-TYPE
+                     SYNTAX  SEQUENCE OF ComponentMACAddressEntry
+                     ACCESS  not-accessible
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Table of MAC address VPD information for each component."
+                     ::= { componentMonitors 11 }
+
+       componentMACAddressEntry OBJECT-TYPE
+                     SYNTAX  ComponentMACAddressEntry
+                     ACCESS  not-accessible
+                     STATUS  mandatory
+                     DESCRIPTION
+                     "Component MAC address table entry"
+                     INDEX { componentMACAddressTopologyPath, componentMACAddressIndex }
+                     ::= { componentMACAddressTable 1 }
+
+       ComponentMACAddressEntry ::= SEQUENCE {
+                   componentMACAddressTopologyPath OCTET STRING,
+                   componentMACAddressIndex INTEGER,
+                   componentMACAddressName OCTET STRING,
+                   componentMACAddress OCTET STRING
+                   }
+
+       componentMACAddressTopologyPath  OBJECT-TYPE
+                   SYNTAX  OCTET STRING  (SIZE (0..100))
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                   "The unique identifier for a component in this table. The chassis and each
+                    installed component is represented by a hardware topology tree, where
+                    each node in the tree represents a component. The path to a particular
+                    component consists of one or more <component>,<instance> pairs, where
+                    each successive pair is a child of the previous parent pair.
+
+                    As an example, the root of the tree is the chassis and is represented
+                    by the pair 'CHASSIS, 1'. This pair indicates the first instance of
+                    the chassis. If a blade is inserted in slot 4 of the chassis, its
+                    topology path is 'CHASSIS, 1, BLADE, 4'. With this format, the
+                    components in the chassis can be determined along with their relative
+                    hierarchy to each other.
+
+                    Note that this TP is preceded by a single octet that specifies the TP length.
+                    This is required since this table is indexed with two indices and, therefore,
+                    the TP length must be explicitly provided.
+
+                    This component firmware table is indexed by this unique topology
+                    path and the numeric designations for the components are:
+
+                     CHASSIS,                0x01   Chassis
+                     MM,                     0x02   Management Module
+                     BLADE,                  0x03   Main system board of a blade
+                     POWER,                  0x04   Power Supply, Power Module, etc
+                     COOLING,                0x05   Fan, blower, or other cooling device
+                     IO_MODULE,              0x06   Has I/O interface, i.e. - switch or bridge
+                     MEDIA,                  0x07   Media device
+                     PROCESSOR,              0x08   Any processor, processor module, etc
+                     STORAGE,                0x09   Any type of storage device
+                     EXPANSION,              0x0A   Expansion Card (not covered by more specific type)
+                     MEMORY,                 0x0B   Any memory device, module, etc
+                     MFRU,                   0x0C   Managed FRU Device
+                     PANEL,                  0x0D   Any sort of panel device, such as a front panel
+                     BLADE_EXPANSION_MODULE, 0x0E   Expansion option (BEM) such as PEU, BSE, etc
+                     CARD_EXPANSION,         0x0F   Expansion card, ie. daughter card
+                     CARD_HS_EXPANSION,      0x10   High Speed Expansion card, ie. daughter card
+                     INTERPOSER,             0x11   Interposer device
+                     CLOCK,                  0x12   Clock card
+                     MUX,                    0x13   Mulitplexer card
+                     ADDIN,                  0x14   cKVM card & other addin cards
+                     STORAGE_MODULE,         0x15   Container of one or more Storage Devices
+                     SYS_EXPANSION_CARD,     0x16   Management card
+                     BATTERY,                0x17   A single battery
+                     BATTERY_MODULE,         0x18   Container of one or more batteries
+                     REAR_LED,               0x19   Rear LED card
+                     MEMORY_BANK,            0x1A   Memory banks
+                     AIR_FILTER,             0x1B   Filter mechanism (bezel)
+                     SERIAL_PORT_MODULE,     0x1C   Container of one or more serial ports
+                     PARENT,                 0x1D   Reference to parent for multi-parent support
+                     PHY_PORT,               0x1E   Physical port
+                     IO_EXPANDER,            0x1F   RAID card
+                     CABLE,                  0x20   Cable/Interconnect
+                     FAN_MUX                 0x29   Fan multiplexer card"
+                   ::= { componentMACAddressEntry 1 }
+
+       componentMACAddressIndex  OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                   "Each component may have one or more MAC address VPD values
+                   associated with it, and this index object identifies the
+                   particular instance."
+                   ::= { componentMACAddressEntry 2 }
+
+       componentMACAddressName OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                   "The name of the component as a null terminated string."
+                   ::= { componentMACAddressEntry 3 }
+
+       componentMACAddress OBJECT-TYPE
+                   SYNTAX  OCTET STRING
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                   "The MAC address VPD value for this component and index. The
+                   value is a null terminated string."
+                   ::= { componentMACAddressEntry 4 }
+
+
     -- ************************************************************************
     -- FFDC Service
     -- ************************************************************************
@@ -33487,7 +34532,7 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                        enabled(1)
                    }
                    ACCESS  read-write
-                   STATUS  mandatory
+                   STATUS  deprecated
                    DESCRIPTION
                    "Disable/Enable AMM debugging with USB key by service personnel."
                    ::= { serviceConfig 3 }
@@ -33669,7 +34714,8 @@ BLADE-MIB DEFINITIONS ::= BEGIN
        serviceDataDumpInProgress OBJECT-TYPE
                    SYNTAX INTEGER {
                      inProgress(1),
-                     notInProgress(2)
+                     notInProgress(2),
+                     unknown(255)
                    }
                    ACCESS read-only
                    STATUS mandatory
@@ -33680,7 +34726,8 @@ BLADE-MIB DEFINITIONS ::= BEGIN
                     serviceDataDumpCapabilityMask object for support levels. The flag that this MIB object 
                     represents will be set on when the IPMI command is sent to the blade indicating 'init dump'
                     and will be cleared upon receiving the valid dump file from the blade or the 
-                    creation of the text file indicating the problem encountered."
+                    creation of the text file indicating the problem encountered.
+                    If it cannot be determined if the dump is in progress, the unknown(255) value is returned."
                    ::= { bladeServiceDataEntry 10 }
 
 
@@ -33892,7 +34939,7 @@ contactInformation  OBJECT IDENTIFIER ::= {serviceAdvisor 3}
          ACCESS read-write
          STATUS mandatory
          DESCRIPTION
-         "The email of the contact person. It must contain '@' and dot '.' in form userid@hostname (30 characters maximum).
+         "The email of the contact person. It must contain '@' and dot '.' in form userid@hostname (50 characters maximum).
          The userid can be alphanumeric characters, '.', '-', or '_' but must begin and end with alphanumeric characters.
          The hostname can be alphanumeric characters, '.', '-', or '_'. It must contain at least two domain items.
          Every domain item should begin and end with alphanumeric character, and the last domain item should be 2-20 alphabetic characters."
@@ -33932,6 +34979,57 @@ contactInformation  OBJECT IDENTIFIER ::= {serviceAdvisor 3}
          DESCRIPTION
          "The postal code of the location for this system. 1-9 characters, only alphanumeric characters are valid."
          ::= {contactInformation 8}
+
+     phoneNumberExt OBJECT-TYPE
+         SYNTAX OCTET STRING
+         ACCESS read-write
+         STATUS mandatory
+         DESCRIPTION
+         "The extension of the phone. 30 characters maximum."
+         ::= {contactInformation 10}
+
+     altContactName OBJECT-TYPE
+         SYNTAX OCTET STRING
+         ACCESS read-write
+         STATUS mandatory
+         DESCRIPTION
+         "(Optional) The name of the alternate contact person.1-30 characters."
+         ::= {contactInformation 11}
+
+     altPhoneNumber OBJECT-TYPE
+         SYNTAX OCTET STRING
+         ACCESS read-write
+         STATUS mandatory
+         DESCRIPTION
+         "(Optional) The phone of the alternate contact person. 5-30 characters."
+         ::= {contactInformation 12}
+
+     altPhoneNumberExt OBJECT-TYPE
+         SYNTAX OCTET STRING
+         ACCESS read-write
+         STATUS mandatory
+         DESCRIPTION
+         "(Optional) The extension of the alternate phone. 30 characters maximum."
+         ::= {contactInformation 13}
+
+     altEmailAddress OBJECT-TYPE
+         SYNTAX OCTET STRING
+         ACCESS read-write
+         STATUS mandatory
+         DESCRIPTION
+         "(Optional) The email of the alternate contact person. It must contain '@' and dot '.' in form userid@hostname (50 characters maximum).
+         The userid can be alphanumeric characters, '.', '-', or '_' but must begin and end with alphanumeric characters.
+         The hostname can be alphanumeric characters, '.', '-', or '_'. It must contain at least two domain items.
+         Every domain item should begin and end with alphanumeric character, and the last domain item should be 2-20 alphabetic characters."
+         ::= {contactInformation 14}
+
+     machineLocPhone OBJECT-TYPE
+         SYNTAX OCTET STRING
+         ACCESS read-write
+         STATUS mandatory
+         DESCRIPTION
+         "(Optional) The contact phone number of the machine location. 5-30 characters."
+         ::= {contactInformation 15}
 
 httpProxyConfig  OBJECT IDENTIFIER ::= {serviceAdvisor 4}
 
@@ -34148,7 +35246,7 @@ callHomeExclusionEvents OBJECT IDENTIFIER ::= {  service 6}
                     ::= { readCallHomeExclusionEventTable 1 }
 
 
-      ReadCallHomeExclusionEventEntry::= SEQUENCE {
+      ReadCallHomeExclusionEventEntry ::= SEQUENCE {
                  readCallHomeExclusionEventIndex INTEGER,
                  readCallHomeExclusionEventID OCTET STRING
                   }

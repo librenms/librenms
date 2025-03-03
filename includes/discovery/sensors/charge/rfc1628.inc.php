@@ -3,22 +3,23 @@
 // RFC1628 UPS
 echo 'RFC1628 ';
 
-$oids = snmp_walk($device, '.1.3.6.1.2.1.33.1.2.4', '-Osqn', 'UPS-MIB');
-d_echo($oids."\n");
+$value = snmp_get($device, 'upsEstimatedChargeRemaining.0', '-OvqU', 'UPS-MIB');
 
-$oids = trim($oids);
-foreach (explode("\n", $oids) as $data) {
-    $data = trim($data);
-    if ($data) {
-        list($oid,$descr) = explode(' ', $data, 2);
-        $split_oid        = explode('.', $oid);
-        $current_id       = $split_oid[(count($split_oid) - 1)];
-        $current_oid      = ".1.3.6.1.2.1.33.1.2.4.$current_id";
-        $current          = snmp_get($device, $current_oid, '-O vq');
-        $descr            = 'Battery charge remaining'.(count(explode("\n", $oids)) == 1 ? '' : ' '.($current_id + 1));
-        $type             = 'rfc1628';
-        $index            = (500 + $current_id);
-
-        discover_sensor($valid['sensor'], 'charge', $device, $current_oid, $index, $type, $descr, 1, 1, 15, 50, null, 101, $current);
-    }
+if (is_numeric($value)) {
+    discover_sensor(
+        null,
+        'charge',
+        $device,
+        '.1.3.6.1.2.1.33.1.2.4.0',
+        500,
+        'rfc1628',
+        'Battery charge remaining',
+        1,
+        1,
+        15,
+        50,
+        null,
+        null,
+        $value
+    );
 }

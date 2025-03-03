@@ -1,0 +1,729 @@
+-- =================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Segment Routing Traffic Engineering (SR-TE) policy MIB
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 2019-12-06 The initial version, created by Xu Jing
+-- V1.1 2021-05-15 Add hh3cSrpolicyPathTable by lin hao
+--                 Add nodes hh3cSrpolicyBsidFailReason,
+--                 hh3cSrpolicyBsidConflictState
+--                 in hh3cSrpolicyTable
+--                 Add nodes hh3cSrpSeglistStatus, hh3cSrpSeglistDownReason
+--                 in hh3cSrpSeglistTable
+--                 Add Trap in HH3C-SRPOLICY-MIB
+-- =================================================================
+HH3C-SRPOLICY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    InterfaceIndex
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cSrpolicy MODULE-IDENTITY
+    LAST-UPDATED "201912061100Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB file provides information about SR-TE policies."
+    REVISION "201912061100Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 186 }
+
+-- SR-TE policies information table
+hh3cSrpolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSrpolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table provides information about SR-TE policies."
+    ::= { hh3cSrpolicy 1 }
+
+hh3cSrpolicyEntry OBJECT-TYPE
+    SYNTAX Hh3cSrpolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about a policy."
+    INDEX { hh3cSrpolicyColor, hh3cSrpolicyEndPoint }
+    ::= { hh3cSrpolicyTable 1 }
+
+Hh3cSrpolicyEntry ::=
+    SEQUENCE {
+        hh3cSrpolicyColor
+            Unsigned32,
+        hh3cSrpolicyEndPoint
+            IpAddress,
+        hh3cSrpolicyName
+          OCTET STRING,
+        hh3cSrpolicyBsid
+            Integer32,
+        hh3cSrpolicyInPackets
+            Counter64,
+        hh3cSrpolicyInOctets
+            Counter64,
+        hh3cSrpolicyOutPackets
+            Counter64,
+        hh3cSrpolicyOutOctets
+            Counter64,
+        hh3cSrpolicyStatus
+            OCTET STRING,
+        hh3cSrpolicyDownReason
+            OCTET STRING,
+        hh3cSrpolicyBsidFailReason
+            OCTET STRING,
+        hh3cSrpolicyBsidConflictState
+            INTEGER
+     }
+
+hh3cSrpolicyColor OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The color associates the SR-TE Policy with certain intent."
+    ::= { hh3cSrpolicyEntry 1 }
+
+hh3cSrpolicyEndPoint OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The endpoint is the destination of the SR-TE policy."
+    ::= { hh3cSrpolicyEntry 2 }
+
+hh3cSrpolicyName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of the SR policy."
+    ::= { hh3cSrpolicyEntry 3 }
+
+hh3cSrpolicyBsid OBJECT-TYPE
+    SYNTAX Integer32 (16..1048575)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Bound segment ID value of the SR policy."
+    ::= { hh3cSrpolicyEntry 4 }
+
+hh3cSrpolicyInPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of inbound packets for the bound segment ID."
+    ::= { hh3cSrpolicyEntry 5 }
+
+hh3cSrpolicyInOctets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of inbound bytes for the bound segment ID."
+    ::= { hh3cSrpolicyEntry 6 }
+
+hh3cSrpolicyOutPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of outbound packets for the SR-TE policy."
+    ::= { hh3cSrpolicyEntry 7 }
+
+hh3cSrpolicyOutOctets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of outbound bytes for the SR-TE policy."
+    ::= { hh3cSrpolicyEntry 8 }
+
+hh3cSrpolicyStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..31))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the SR-TE policy."
+    ::= { hh3cSrpolicyEntry 9 }
+
+hh3cSrpolicyDownReason OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..51))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Base identity for the reasons why SR-TE policy is operationally down."
+    ::= { hh3cSrpolicyEntry 10 }
+
+hh3cSrpolicyBsidFailReason OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..255))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason why the binding SID is unavailable."
+    ::= { hh3cSrpolicyEntry 11 }
+
+hh3cSrpolicyBsidConflictState OBJECT-TYPE
+    SYNTAX      INTEGER {
+            inConflict(1),
+            conflictResolved(2)
+            }
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The conflict state of the binding SID."
+    ::= { hh3cSrpolicyEntry 12 }
+
+
+-- Segment list information table for the policy
+hh3cSrpSeglistTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSrpSeglistEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table provides information about the segment lists for the
+         SR-TE policy."
+    ::= { hh3cSrpolicy 2 }
+
+hh3cSrpSeglistEntry OBJECT-TYPE
+    SYNTAX Hh3cSrpSeglistEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about segment lists."
+    INDEX { hh3cSrpSeglistColor, hh3cSrpSeglistEndPoint, hh3cSrpSeglistPathProto,
+            hh3cSrpSeglistPathInst,hh3cSrpSeglistPathOri, hh3cSrpSeglistPathDis,
+            hh3cSrpSeglistId }
+    ::= { hh3cSrpSeglistTable 1 }
+
+Hh3cSrpSeglistEntry ::=
+    SEQUENCE {
+        hh3cSrpSeglistColor
+            Unsigned32,
+        hh3cSrpSeglistEndPoint
+            IpAddress,
+        hh3cSrpSeglistPathProto
+            INTEGER,
+        hh3cSrpSeglistPathInst
+            Integer32,
+        hh3cSrpSeglistPathOri
+            OCTET STRING,
+        hh3cSrpSeglistPathDis
+            Unsigned32,
+        hh3cSrpSeglistId
+            Unsigned32,
+        hh3cSrpolicySeglistName
+            OCTET STRING,
+        hh3cSrpSeglistOutPackets
+          Counter64,
+        hh3cSrpSeglistOutOctets
+            Counter64,
+        hh3cSrpSeglistStatus
+            OCTET STRING,
+        hh3cSrpSeglistDownReason
+            OCTET STRING
+     }
+
+hh3cSrpSeglistColor OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The color associates the SR-TE Policy with certain intent."
+    ::= { hh3cSrpSeglistEntry 1 }
+
+hh3cSrpSeglistEndPoint OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The endpoint is the destination of the SR-TE policy."
+    ::= { hh3cSrpSeglistEntry 2 }
+
+hh3cSrpSeglistPathProto OBJECT-TYPE
+    SYNTAX INTEGER{
+                   pcep(10),
+                   bgp(20),
+                   cli(30)
+               }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Protocol-Origin of a candidate path identifies the protocol that
+         originates or signals the candidate path."
+    ::= { hh3cSrpSeglistEntry 3 }
+
+hh3cSrpSeglistPathInst OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The instance is a value of BGP instance number, when
+         the candidate path is originated by BGP."
+    ::= { hh3cSrpSeglistEntry 4 }
+
+hh3cSrpSeglistPathOri OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..63))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Originator is the identifier of the node that instantiated or signalled
+         the candidate path on the headend."
+    ::= { hh3cSrpSeglistEntry 5 }
+
+hh3cSrpSeglistPathDis OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The discriminator uniquely identifies a candidate path from a
+         specific Protocol-Origin."
+    ::= { hh3cSrpSeglistEntry 6 }
+
+hh3cSrpSeglistId OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The ID uniquely identifies the segment list."
+    ::= { hh3cSrpSeglistEntry 7 }
+
+hh3cSrpolicySeglistName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the segment list."
+    ::= { hh3cSrpSeglistEntry 8 }
+
+hh3cSrpSeglistOutPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of outbound packets for the segment list."
+    ::= { hh3cSrpSeglistEntry 9 }
+
+hh3cSrpSeglistOutOctets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of outbound bytes for the segment list."
+    ::= { hh3cSrpSeglistEntry 10 }
+
+hh3cSrpSeglistStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..31))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of segment list."
+    ::= { hh3cSrpSeglistEntry 11 }
+
+hh3cSrpSeglistDownReason OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..51))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Base identity for the reasons why segment list is down."
+    ::= { hh3cSrpSeglistEntry 12 }
+
+-- Forwarding paths information table for the policy
+hh3cSrpForwardingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSrpForwardingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table provides information about forwarding paths for the
+        SR-TE policy."
+    ::= { hh3cSrpolicy 3 }
+
+hh3cSrpForwardingEntry OBJECT-TYPE
+    SYNTAX Hh3cSrpForwardingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about forwarding paths."
+    INDEX { hh3cSrpFwdColor, hh3cSrpFwdEndPoint, hh3cSrpFwdPathProto,
+            hh3cSrpFwdPathInst, hh3cSrpFwdPathOri, hh3cSrpFwdPathDis,
+            hh3cSrpFwdSeglistId, hh3cSrpFwdOutIf, hh3cSrpFwdNexthop }
+    ::= { hh3cSrpForwardingTable 1 }
+
+Hh3cSrpForwardingEntry ::=
+    SEQUENCE {
+        hh3cSrpFwdColor
+            Unsigned32,
+        hh3cSrpFwdEndPoint
+            IpAddress,
+        hh3cSrpFwdPathProto
+            INTEGER,
+        hh3cSrpFwdPathInst
+            Integer32,
+        hh3cSrpFwdPathOri
+            OCTET STRING,
+        hh3cSrpFwdPathDis
+            Unsigned32,
+        hh3cSrpFwdSeglistId
+            Unsigned32,
+        hh3cSrpFwdOutIf
+            InterfaceIndex,
+        hh3cSrpFwdNexthop
+            IpAddress,
+        hh3cSrpFwdOutPackets
+            Counter64,
+        hh3cSrpFwdOutOctets
+            Counter64
+     }
+
+hh3cSrpFwdColor OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The color associates the SR-TE policy with certain intent."
+    ::= { hh3cSrpForwardingEntry 1 }
+
+hh3cSrpFwdEndPoint OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The endpoint is the destination of the SR-TE policy."
+    ::= { hh3cSrpForwardingEntry 2 }
+
+hh3cSrpFwdPathProto OBJECT-TYPE
+    SYNTAX INTEGER{
+                   pcep(10),
+                   bgp(20),
+                   cli(30)
+               }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Protocol-Origin of a candidate path identifies the protocol that
+         originates or signals the candidate path."
+    ::= { hh3cSrpForwardingEntry 3 }
+
+hh3cSrpFwdPathInst OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The instance is a value of BGP instance number, when
+         the candidate path is originated by BGP."
+    ::= { hh3cSrpForwardingEntry 4 }
+
+hh3cSrpFwdPathOri OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..63))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Originator is the identifier of the node that instantiated or signalled
+        the candidate path on the headend."
+    ::= { hh3cSrpForwardingEntry 5 }
+
+hh3cSrpFwdPathDis OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The discriminator uniquely identifies a candidate path from a
+         specific Protocol-Origin."
+    ::= { hh3cSrpForwardingEntry 6 }
+
+hh3cSrpFwdSeglistId OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The ID uniquely identifies the segment list."
+    ::= { hh3cSrpForwardingEntry 7 }
+
+hh3cSrpFwdOutIf OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The value of ifIndex for the outbound interface."
+    ::= { hh3cSrpForwardingEntry 8 }
+
+hh3cSrpFwdNexthop OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The IP address of the next hop."
+    ::= { hh3cSrpForwardingEntry 9 }
+
+hh3cSrpFwdOutPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of outbound packets for the outbound interface."
+    ::= { hh3cSrpForwardingEntry 10 }
+
+hh3cSrpFwdOutOctets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of outbound bytes for the outbound interface."
+    ::= { hh3cSrpForwardingEntry 11 }
+
+-- SR-TE policy path table.
+
+hh3cSrpolicyPathTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSrpolicyPathEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides information about SR-TE policy candidate paths."
+    ::= { hh3cSrpolicy 4 }
+
+hh3cSrpolicyPathEntry OBJECT-TYPE
+    SYNTAX      Hh3cSrpolicyPathEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information about candidate paths of a policy."
+    INDEX       { hh3cSrpolicyPathColor, hh3cSrpolicyPathEndPoint,
+                  hh3cSrpolicyPathProto, hh3cSrpolicyPathInst,
+          hh3cSrpolicyPathOri,
+          hh3cSrpolicyPathDis }
+    ::= { hh3cSrpolicyPathTable 1 }
+
+Hh3cSrpolicyPathEntry ::= SEQUENCE {
+    hh3cSrpolicyPathColor
+        Unsigned32,
+    hh3cSrpolicyPathEndPoint
+        IpAddress,
+    hh3cSrpolicyPathProto
+        INTEGER,
+    hh3cSrpolicyPathInst
+        Integer32,
+    hh3cSrpolicyPathOri
+        OCTET STRING,
+    hh3cSrpolicyPathDis
+        Unsigned32,
+    hh3cSrpolicyPathPref
+        Unsigned32,
+    hh3cSrpolicyPathPreviousRole
+        OCTET STRING,
+    hh3cSrpolicyPathDownReason
+        OCTET STRING
+    }
+
+hh3cSrpolicyPathColor OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The color associates the SR-TE policy with certain intent."
+    ::= { hh3cSrpolicyPathEntry 1 }
+
+hh3cSrpolicyPathEndPoint OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The endpoint is the destination of the SR-TE policy."
+    ::= { hh3cSrpolicyPathEntry 2 }
+
+hh3cSrpolicyPathProto OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   pcep(10),
+                   bgp(20),
+                   cli(30)
+               }
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Protocol-Origin of a candidate path identifies the protocol that
+         originates or signals the candidate path."
+    ::= { hh3cSrpolicyPathEntry 3 }
+
+hh3cSrpolicyPathInst OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The instance is a value of BGP instance number, when
+         the candidate path is originated by BGP."
+    ::= { hh3cSrpolicyPathEntry 4 }
+
+hh3cSrpolicyPathOri OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..63))
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Originator is the identifier of the node that instantiated or
+         signalled the candidate path on the headend."
+    ::= { hh3cSrpolicyPathEntry 5 }
+
+hh3cSrpolicyPathDis OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The discriminator uniquely identifies a candidate path from a
+         specific Protocol-Origin."
+    ::= { hh3cSrpolicyPathEntry 6 }
+
+hh3cSrpolicyPathPref OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The preference of the SR-TE policy candidate path."
+    ::= { hh3cSrpolicyPathEntry 7 }
+
+hh3cSrpolicyPathPreviousRole OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..31))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The previous role of an SR-TE policy candidate path.
+         The value may be primary or backup."
+    ::= { hh3cSrpolicyPathEntry 8 }
+
+hh3cSrpolicyPathDownReason OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..51))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Base identity for the reasons why SR-TE policy candidate path
+         is operationally down."
+    ::= { hh3cSrpolicyPathEntry 9 }
+
+
+-- Notification Definitions
+hh3cSrpolicyNotifications  OBJECT IDENTIFIER ::= { hh3cSrpolicy 0 }
+
+-- The notifications need to be throttled so as to not overwhelm the
+-- management agent in case of rapid changes to the SR-TE Policy module.
+
+hh3cSrpolicyStatusChange NOTIFICATION-TYPE
+    OBJECTS { hh3cSrpolicyColor,
+        hh3cSrpolicyEndPoint,
+        hh3cSrpolicyStatus,
+        hh3cSrpolicyDownReason
+        }
+    STATUS       current
+    DESCRIPTION
+        "An hh3cSrpolicyStatusChange trap signifies that there
+         has been a change in the state of a policy.
+         This trap should be generated when the policy
+         state regresses (e.g., goes from active to Down)
+         or progresses to a terminal state
+         (i.e., down)."
+    ::= { hh3cSrpolicyNotifications 1 }
+
+hh3cSrpolicyBsidConflict NOTIFICATION-TYPE
+    OBJECTS { hh3cSrpolicyColor,
+        hh3cSrpolicyEndPoint,
+        hh3cSrpolicyBsid,
+        hh3cSrpolicyBsidFailReason,
+        hh3cSrpolicyBsidConflictState
+        }
+    STATUS       current
+    DESCRIPTION
+        "BSID conflicts."
+    ::= { hh3cSrpolicyNotifications 2 }
+
+hh3cSrpolicyBsidConflictClear NOTIFICATION-TYPE
+    OBJECTS  { hh3cSrpolicyColor,
+        hh3cSrpolicyEndPoint,
+        hh3cSrpolicyBsid,
+        hh3cSrpolicyBsidFailReason,
+        hh3cSrpolicyBsidConflictState
+        }
+    STATUS  current
+    DESCRIPTION
+        "BSID conflicts resolved"
+    ::= { hh3cSrpolicyNotifications 3 }
+
+hh3cSrpolicyDown NOTIFICATION-TYPE
+    OBJECTS { hh3cSrpolicyColor,
+        hh3cSrpolicyEndPoint,
+        hh3cSrpolicyDownReason
+        }
+    STATUS  current
+    DESCRIPTION
+        "Policy down"
+    ::= { hh3cSrpolicyNotifications 4 }
+
+hh3cSrpolicyDownClear NOTIFICATION-TYPE
+    OBJECTS { hh3cSrpolicyColor,
+        hh3cSrpolicyEndPoint
+    }
+    STATUS  current
+    DESCRIPTION
+              "Policy down cleared"
+    ::= { hh3cSrpolicyNotifications 5 }
+
+hh3cSrpolicyPathDown NOTIFICATION-TYPE
+    OBJECTS { hh3cSrpolicyPathColor,
+        hh3cSrpolicyPathEndPoint,
+        hh3cSrpolicyPathProto,
+        hh3cSrpolicyPathInst,
+        hh3cSrpolicyPathOri,
+        hh3cSrpolicyPathDis,
+        hh3cSrpolicyPathPref,
+        hh3cSrpolicyPathPreviousRole,
+        hh3cSrpolicyPathDownReason
+        }
+    STATUS       current
+    DESCRIPTION
+        "An hh3cSrpolicyPathDown trap signifies that there
+         has been a change in the state of a policy primary
+         or backup path."
+    ::= { hh3cSrpolicyNotifications 6 }
+
+hh3cSrpolicySeglistDown NOTIFICATION-TYPE
+    OBJECTS { hh3cSrpSeglistColor,
+        hh3cSrpSeglistEndPoint,
+        hh3cSrpSeglistPathProto,
+        hh3cSrpSeglistPathInst,
+        hh3cSrpSeglistPathOri,
+        hh3cSrpSeglistPathDis,
+        hh3cSrpSeglistId,
+        hh3cSrpSeglistStatus,
+        hh3cSrpSeglistDownReason
+        }
+    STATUS       current
+    DESCRIPTION
+        "An hh3cSrpSeglistDown trap signifies that there
+         has been a change in the state of a segment list."
+    ::= { hh3cSrpolicyNotifications 7 }
+
+hh3cSrpolicySeglistDownClear NOTIFICATION-TYPE
+    OBJECTS { hh3cSrpSeglistColor,
+        hh3cSrpSeglistEndPoint,
+        hh3cSrpSeglistPathProto,
+        hh3cSrpSeglistPathInst,
+        hh3cSrpSeglistPathOri,
+        hh3cSrpSeglistPathDis,
+        hh3cSrpSeglistId,
+        hh3cSrpSeglistStatus
+        }
+    STATUS       current
+    DESCRIPTION
+        "An hh3cSrSeglistDownClear trap signifies that there
+         has been a change in the state of a segment list."
+    ::= { hh3cSrpolicyNotifications 8 }
+
+END
+

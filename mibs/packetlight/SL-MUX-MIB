@@ -1,0 +1,119 @@
+-- *****************************************************************
+-- MUX MIB
+-- *****************************************************************
+
+SL-MUX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, Integer32, TimeTicks
+					 			     	FROM SNMPv2-SMI
+	DisplayString, TruthValue, 
+	TimeStamp					  		FROM SNMPv2-TC
+    SnmpAdminString						FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+	CleiCode							FROM SL-ENTITY-MIB
+	sitelight				      		FROM SL-NE-MIB;
+
+slMux MODULE-IDENTITY
+	LAST-UPDATED "200008280000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the Mux interfaces"
+	::= { sitelight 5 }
+
+--	The MUX MIB consists of the following groups:
+--	MUX Interface Table
+
+
+-- ----------------------------------------------------
+--
+-- The Mux Interface Table
+--
+-- ----------------------------------------------------
+
+muxIfTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF MuxIfEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The Mux interface entity table."
+	::= { slMux 1 }
+
+muxIfEntry OBJECT-TYPE
+	SYNTAX  MuxIfEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the MUX interface table."
+	INDEX   { muxIfIndex }
+	::= { muxIfTable 1 }
+
+MuxIfEntry ::=
+	SEQUENCE {
+		muxIfIndex				InterfaceIndex,
+		muxIfType				INTEGER,
+		muxIfWaveSpacing		INTEGER,    
+		muxIfWaveLengthNm		INTEGER,
+		muxIfOscWaveLengthNm	INTEGER
+	}
+
+muxIfIndex OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The interface index of the Mux (type=196)."
+	::= { muxIfEntry 1 }
+
+muxIfType OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  	read-only
+	STATUS  		current
+	DESCRIPTION
+		"The number of wave lengths supported by the mux."
+	::= { muxIfEntry 2 }
+
+muxIfWaveSpacing OBJECT-TYPE
+	SYNTAX  INTEGER {
+		ghzNone(0),   -- Spacing is not applicable (e.g. OADM)
+		ghz400(1),
+		ghz200(2),
+		ghz100(3),
+		ghz50(4),
+		ghz2500(5)	  -- CWDM spacing of 20 nano-meter
+	}
+	MAX-ACCESS  	read-only
+	STATUS  		current
+	DESCRIPTION
+		"The spacing between two adjacent optical channels in GHz units."
+	::= { muxIfEntry 3 }
+
+muxIfWaveLengthNm OBJECT-TYPE
+	SYNTAX  INTEGER 
+	MAX-ACCESS  	read-only
+	STATUS  		current
+	DESCRIPTION
+		"The WDM base wave length.
+		For DWDM values are ituGrid[10] = 1569.59 to ituGrid[69] = 1522.56
+		For CWDM  values are ituGrid[70] = 1470 to ituGrid[77] = 1610
+		and ituGrid[80] = 1270 to ituGrid[89] = 1450."
+	::= { muxIfEntry 4 }
+
+muxIfOscWaveLengthNm OBJECT-TYPE
+	SYNTAX  INTEGER 
+	MAX-ACCESS  	read-only
+	STATUS  		current
+	DESCRIPTION
+		"The OSC WDM wave length.
+		For DWDM values are ituGrid[71] = 1490 or ituGrid[72] = 1510
+		For CWDM values are ituGrid[81] = 1290 or ituGrid[82] = 1310."
+	::= { muxIfEntry 5 }
+
+END

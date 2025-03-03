@@ -1,0 +1,931 @@
+-- ============================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: The MIB is extracted from draft-ietf-bfd-base-04.txt.
+-- This file defines a portion of the Management Information Base (MIB) for use
+-- with network management protocols in the Internet community. It describes
+-- managed objects to configure or monitor Bi-Directional Forwarding Detection
+-- on devices supporting this feature.
+-- Reference:
+-- Version: V1.5
+-- History:
+-- V1.0  2006-05-15 created by huanglina and xuqigang
+-- V1.1  2014-01-20 modified by wangxingying
+-- V1.2  2014-12-23 modified by wangxingying
+-- V1.3  2016-03-12 modified by guobin
+-- V1.4  2020-08-13 Update hh3cBfdGlobalObjects by xukele
+-- V1.5  2021-03-18 Add hh3cBfdTrapBindObjects, and update hh3cBfdSessStateDown, hh3cBfdSessStateUp by xukele
+-- ============================================================================
+HH3C-BFD-STD-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Counter32, Counter64,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI                        -- [RFC2578]
+
+    TEXTUAL-CONVENTION, TruthValue,
+    TimeStamp,DisplayString
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    InetAddress, InetAddressType, InetPortNumber
+        FROM INET-ADDRESS-MIB                 -- [RFC3291]
+
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cBfdMIB MODULE-IDENTITY
+    LAST-UPDATED "202103181100Z"  -- 18 Mar 2021 11:00:00 Beijing time
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "Bidirectional Forwarding Management Information Base."
+
+    -- Revision history.
+    REVISION "202103181100Z"  -- 18 Mar 2021 11:00:00 Beijing time
+    DESCRIPTION
+        "Add hh3cBfdTrapBindObjects, and modified the objects of hh3cBfdSessStateDown and hh3cBfdSessStateUp."
+
+    REVISION "202008131100Z"  -- 13 Aug 2020 11:00:00 Beijing time
+    DESCRIPTION
+        "Modified the objects of hh3cBfdGlobalObjects."
+
+    REVISION "201412131200Z"  -- 13 Dec 2014 12:00:00 Beijing time
+    DESCRIPTION
+        "Modified the objects of hh3cBfdSessEntry."
+
+    REVISION "201401171200Z"  -- 17 Jan 2014 12:00:00 Beijing time
+    DESCRIPTION
+        "Modified for bfd trap."
+
+    REVISION "200605161200Z"  -- 08 May 2006 12:00:00 Beijing time
+    DESCRIPTION
+         "The first version. "
+
+::= { hh3cCommon 72 }
+
+-- Top level components of this MIB module.
+
+hh3cBfdNotifications OBJECT IDENTIFIER ::= { hh3cBfdMIB 0 }
+hh3cBfdObjects       OBJECT IDENTIFIER ::= { hh3cBfdMIB 1 }
+hh3cBfdConformance   OBJECT IDENTIFIER ::= { hh3cBfdMIB 2 }
+hh3cBfdGlobalObjects OBJECT IDENTIFIER ::= { hh3cBfdObjects 1 }
+hh3cBfdTrapBindObjects   OBJECT IDENTIFIER ::= { hh3cBfdMIB 3 }
+
+-- Textual Conventions
+
+BfdSessIndexTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d"
+    STATUS        current
+    DESCRIPTION
+        "An index used to uniquely identify BFD sessions."
+    SYNTAX Unsigned32 (1..4294967295)
+
+BfdInterval ::=   TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d"
+    STATUS        current
+    DESCRIPTION
+        "A time interval delay in microseconds, which is used by the BFD."
+    SYNTAX        Unsigned32 (1..4294967295)
+
+BfdDiag ::=       TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "The diagnostic code is used by the BFD specifying the local
+         system's reason for the last session state change, and must
+         be initialized to zero(No Diagnostic).
+
+         The 'noDiagnostic' means the session keeps state up.
+         The 'controlDetectionTimeExpired' indicates the reason the session
+         enters state down from state up is that the control detection time
+         expires.
+         The 'echoFunctionFailed' indicates the reason the session
+         enters state down from state up is that Echo Function fails.
+         The 'neighborSignaledSessionDown' indicates the reason the session
+         enters state down from state up is that neighbor signals session Down.
+         The 'forwardingPlaneReset' indicates the reason the session
+         enters state down from state up is that the Forwarding Plane resets.
+         The 'pathDown' indicates the reason the session
+         enters state down from state up is that the path state is down.
+         The 'concatenatedPathDown' indicates the reason the session
+         enters state down from state up is that the concatenated path state
+         is down.
+         The 'administrativelyDown' indicates the reason the session
+         enters state down from state up is that the session is kept
+         administratively down by entering the AdminDown state.
+         The 'reverseConcatenatedPathDown' indicates the reason the session
+         enters state down from state up is that reverse concatenated path
+         state is down."
+
+    SYNTAX INTEGER { noDiagnostic(1),
+                     controlDetectionTimeExpired(2),
+                     echoFunctionFailed(3),
+                     neighborSignaledSessionDown(4),
+                     forwardingPlaneReset(5),
+                     pathDown(6),
+                     concatenatedPathDown(7),
+                     administrativelyDown(8),
+                     reverseConcatenatedPathDown(9)
+    }
+
+Hh3cBfdBindVpnInstanceName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "31a"
+    STATUS        current
+    DESCRIPTION
+         "An identifier that is assigned to each MPLS/BGP VPN and
+         is used to uniquely identify it.  This is assigned by the
+         system operator or NMS and SHOULD be unique throughout
+         the MPLS domain.  If this is the case, then this identifier
+         can then be used at any LSR within a specific MPLS domain
+         to identify this MPLS/BGP VPN.  It may also be possible to
+         preserve the uniqueness of this identifier across MPLS
+         domain boundaries, in which case this identifier can then
+         be used to uniquely identify MPLS/BGP VPNs on a more global
+         basis.  This object MAY be set to the VPN ID as defined in
+         RFC 2685."
+    REFERENCE
+        "RFC 2685 Fox B., et al, 'Virtual Private
+         Networks Identifier', September 1999."
+   SYNTAX OCTET STRING (SIZE (0..31))
+
+Hh3cBfdSessionName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "64a"
+    STATUS       current
+    DESCRIPTION
+        "A name used to uniquely identify BFD sessions."
+    SYNTAX  OCTET STRING(SIZE (0..64))
+
+--  BFD General Variables
+
+--  These variables apply globally to the Router's BFD Process.
+hh3cBfdVersionNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "It indicates the BFD session's current version number."
+    REFERENCE
+        "BFD Version 1 (draft-ietf-bfd-base-04.txt)"
+    DEFVAL { 1 }
+    ::= { hh3cBfdGlobalObjects 1 }
+
+hh3cBfdSysInitMode OBJECT-TYPE
+    SYNTAX      INTEGER { active(1), passive(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A system may take either an active role or a passive role in
+         session initialization. A system taking the active role must
+         send BFD control packets for a particular session, regardless
+         of whether it has received any BFD packets for that session.
+         A system taking the passive role must not begin sending BFD
+         packets for a particular session until it has received a BFD
+         packet for that session, and thus has learned the remote system's
+         discriminator value."
+    DEFVAL { active }
+    ::= { hh3cBfdGlobalObjects 2 }
+
+hh3cBfdSessNotificationsEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This variable enables the emission of hh3cBfdSessStateUp
+         hh3cBfdSessStateDown and hh3cBfdSessReachLimit notifications
+         if this variable is set to true(1); otherwise these notifications
+         are not emitted."
+    DEFVAL { false }
+    ::= { hh3cBfdGlobalObjects 3 }
+
+hh3cBfdSessNumberLimit OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable is the active session limit of this device."
+    ::= { hh3cBfdGlobalObjects 4 }
+
+hh3cBfdSessionsActive OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable is the active session count of this device."
+    ::= { hh3cBfdGlobalObjects 5 }
+
+
+--  BFD Interface Table
+--  The BFD Interface Table defines BFD interface specific information.
+
+hh3cBfdIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cBfdIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This Table describes the BFD interface specific information."
+    ::= { hh3cBfdObjects 2 }
+
+hh3cBfdIfEntry OBJECT-TYPE
+    SYNTAX      Hh3cBfdIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This Entry describes the BFD interface specific information."
+    INDEX { hh3cBfdIfIndex }
+    ::= { hh3cBfdIfTable 1 }
+
+Hh3cBfdIfEntry ::= SEQUENCE {
+        hh3cBfdIfIndex                      InterfaceIndex,
+        hh3cBfdIfDesiredMinTxInterval       BfdInterval,
+        hh3cBfdIfDesiredMinRxInterval       BfdInterval,
+        hh3cBfdIfDetectMult                 Unsigned32,
+        hh3cBfdIfAuthType                   INTEGER
+    }
+
+hh3cBfdIfIndex OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "This variable contains an index that represents a
+         unique BFD interface on this device."
+    ::= { hh3cBfdIfEntry 1 }
+
+hh3cBfdIfDesiredMinTxInterval OBJECT-TYPE
+    SYNTAX        BfdInterval
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This variable defines the minimum interval, in
+         microseconds, that the interface would like to use when
+         transmitting BFD Control packets."
+    ::= { hh3cBfdIfEntry 2 }
+
+hh3cBfdIfDesiredMinRxInterval OBJECT-TYPE
+    SYNTAX        BfdInterval
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This variable defines the minimum interval, in,
+         microseconds, between received  BFD Control packets the
+         local system is capable of supporting."
+    ::= { hh3cBfdIfEntry 3 }
+
+hh3cBfdIfDetectMult OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The desired detect time multiplier for BFD control packets.
+         The negotiated control packet transmission interval, multiplied
+         by this variable, will be the detection time for this session
+         (as seen by the remote system.)  The variable must be a
+         nonzero integer."
+    ::= { hh3cBfdIfEntry 4 }
+
+hh3cBfdIfAuthType OBJECT-TYPE
+    SYNTAX        INTEGER {
+                            none(1),
+                            simple(2),
+                            md5(3),
+                            mmd5(4),
+                            sha1(5),
+                            msha1(6)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The Authentication Type used for this interface. This
+         field is valid only when the Authentication Present bit is set.
+
+         The 'none' indicates the session doesn't support
+         authentication.
+         The 'simple' indicates the session supports simple
+         password authentication.
+         The 'md5' indicates the session supports Keyed MD5
+         authentication.
+         The 'mmd5' indicates the session supports
+         Meticulous Keyed MD5 authentication.
+         The 'sha1' indicates the session supports Keyed SHA1
+         authentication.
+         The 'msha1' indicates the session supports
+         Meticulous Keyed SHA1 authentication."
+    DEFVAL { none }
+    ::= { hh3cBfdIfEntry 5 }
+
+--  BFD Session Table
+--  The BFD Session Table defines BFD session specific information.
+
+hh3cBfdSessTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF Hh3cBfdSessEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table describes the BFD sessions."
+    REFERENCE
+        "BFD Version 1 (draft-ietf-bfd-base-04.txt)"
+    ::= { hh3cBfdObjects 3 }
+
+hh3cBfdSessEntry OBJECT-TYPE
+    SYNTAX        Hh3cBfdSessEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This Entry describes the BFD sessions."
+    INDEX { hh3cBfdSessIndex }
+    ::= { hh3cBfdSessTable 1 }
+
+Hh3cBfdSessEntry ::= SEQUENCE {
+        hh3cBfdSessIndex                    BfdSessIndexTC,
+        hh3cBfdSessIfIndex                  InterfaceIndex,
+        hh3cBfdSessAppSupportId             BITS,
+        hh3cBfdSessLocalDiscr               Unsigned32,
+        hh3cBfdSessRemoteDiscr              Unsigned32,
+        hh3cBfdSessDstPort                  InetPortNumber,
+        hh3cBfdSessOperMode                 INTEGER,
+        hh3cBfdSessAddrType                 InetAddressType,
+        hh3cBfdSessLocalAddr                InetAddress,
+        hh3cBfdSessRemoteAddr               InetAddress,
+        hh3cBfdSessLocalDiag                BfdDiag,
+        hh3cBfdSessState                    INTEGER,
+        hh3cBfdSessControlPlanIndepFlag     TruthValue,
+        hh3cBfdSessAuthFlag                 TruthValue,
+        hh3cBfdSessDemandModeFlag           TruthValue
+    }
+
+hh3cBfdSessIndex OBJECT-TYPE
+    SYNTAX        BfdSessIndexTC
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "This variable contains an index which represents a
+         unique BFD session on this device."
+    ::= { hh3cBfdSessEntry 1 }
+
+hh3cBfdSessIfIndex  OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable contains an interface's index under which the BFD
+         session runs."
+    ::= { hh3cBfdSessEntry 2 }
+
+hh3cBfdSessAppSupportId OBJECT-TYPE
+    SYNTAX        BITS {none(0), ospf(1), isis(2), bgp(3), mpls(4)}
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable contains an ID used to indicate
+         a local application which owns or maintains this
+         BFD session. Note, a BFD session can support several route
+         protocols. This is a bit-map of possible conditions.
+         The corresponding bit positions are:
+         |0        |none        |
+         |1        |ospf        |
+         |2        |isis        |
+         |3        |bgp         |
+         |4        |mpls        |
+        "
+    ::= { hh3cBfdSessEntry 3 }
+
+hh3cBfdSessLocalDiscr OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable defines the local discriminator for this BFD
+         session, used to uniquely identify it."
+    ::= { hh3cBfdSessEntry 4 }
+
+hh3cBfdSessRemoteDiscr OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4294967295)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable defines the session discriminator chosen
+         by the remote system for this BFD session."
+    ::= { hh3cBfdSessEntry 5 }
+
+hh3cBfdSessDstPort OBJECT-TYPE
+    SYNTAX        InetPortNumber
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The UDP Port for BFD. The default value is the
+         well-known value for this port."
+    REFERENCE
+        "BFD Version 1 (draft-ietf-bfd-base-04.txt)"
+    DEFVAL { 3784 }
+    ::= { hh3cBfdSessEntry 6 }
+
+hh3cBfdSessOperMode OBJECT-TYPE
+    SYNTAX   INTEGER {
+                         asynchModeWOEchoFun(1),
+                         demandModeWOEchoFunction(2),
+                         asyncModeWEchoFun(3),
+                         demandModeWEchoFunction(4)
+
+    }
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+        "This variable defines current operating mode that BFD
+         session is running in.
+
+         The primary mode which the BFD session runs in is known as
+         Asynchronous mode.  In this mode, the systems periodically
+         send BFD Control packets to one another, and if a number of
+         those packets in a row are not received by the other system,
+         the session is declared to be down.
+
+         The second mode is known as Demand mode.  In this mode, it is
+         assumed that each system has an independent way of verifying
+         that it has connectivity to the other system.  Once a BFD
+         session is established, the systems stop sending BFD Control
+         packets, except when either system feels the need to verify
+         connectivity explicitly, in which case a short sequence of BFD
+         Control packets is sent, and then the protocol quiesces.
+
+         An adjunct to both modes is the Echo function.  When the Echo
+         function is active, a stream of BFD Echo packets is transmitted
+         in such a way as to have the other system loop them back through
+         its forwarding path. If a number of packets of the echoed data
+         stream are not received, the session is declared to be down.
+         The Echo function may be used with either Asynchronous or
+         Demand modes.
+
+         The 'asynchModeWOEchoFun' indicates this BFD session operates in
+         the Asynchronous mode, and doesn't support the Echo Function.
+
+         The 'demandModeWOEchoFunction' indicates this BFD session operates in
+         the Demand mode, and doesn't support the Echo Function.
+
+         The 'asyncModeWEchoFun' indicates this BFD session operates in
+         the Asynchronous mode, and also supports the Echo Function.
+
+         The 'demandModeWEchoFunction' indicates this BFD session operates in
+         the Demand mode, and also supports the Echo Function."
+    DEFVAL { asynchModeWOEchoFun }
+    ::= { hh3cBfdSessEntry 7 }
+
+hh3cBfdSessAddrType  OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object defines IP address type of the interface
+         associated with this BFD session.
+
+         Only values unknown(0), ipv4(1) or ipv6(2)
+         have to be supported.
+
+         A value of unknown(0) is allowed only when
+         the outgoing interface is of type point-to-point, or
+         when the BFD session is not associated with a specific
+         interface.
+
+         If any other unsupported values are attempted in a set
+         operation, the agent must return an inconsistentValue
+         error."
+    ::= { hh3cBfdSessEntry 8 }
+
+hh3cBfdSessLocalAddr OBJECT-TYPE
+    SYNTAX        InetAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable defines IP address of the local interface
+         from which the BFD packets is transmitted.
+         It can also be used to enabled BFD on a specific
+         interface. The value is set to zero when BFD session is not
+         associated with a specific interface."
+    ::= { hh3cBfdSessEntry 9 }
+
+hh3cBfdSessRemoteAddr OBJECT-TYPE
+    SYNTAX        InetAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable defines IP address of the remote interface
+         from which the BFD packets is transmitted.
+         It can also be used to enabled BFD on a specific
+         interface. The value is set to zero when BFD session is not
+         associated with a specific interface."
+    ::= { hh3cBfdSessEntry 10 }
+
+hh3cBfdSessLocalDiag OBJECT-TYPE
+    SYNTAX        BfdDiag
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The BFD diagnostic code for the BFD session was down with the
+         neighbor. If no such event happens this object contains a zero
+         value."
+    DEFVAL { noDiagnostic }
+    ::= { hh3cBfdSessEntry 11 }
+
+hh3cBfdSessState OBJECT-TYPE
+    SYNTAX        INTEGER {
+                           adminDown(0),
+                           down(1),
+                           init(2),
+                           up(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The state of the running BFD session.
+
+         There are three states through which a session normally
+         proceeds, two for establishing a session (Init and Up)
+         and one for tearing down a session (Down.)  This allows
+         a three-way handshake for both session establishment and
+         session teardown (assuring that both systems are aware of
+         all session state changes.)  A fourth state (AdminDown)
+         exists so that a session can be administratively put down
+         indefinitely.
+
+         The Down state means that the session is down (or has just been
+         created.) A session remains in Down state until the remote
+         system indicates that it agrees that the session is down by
+         sending a BFD Control packet with the State field set to
+         anything other than Up.  If that packet signals Down state,
+         the session advances to Init state;  if that packet signals
+         Init state, the session advances to Up state.
+
+         Init state means that the remote system is 0communicating,
+         and the local system desires to bring the session up, but
+         the remote system does not yet realize it.  A session will
+         remain in Init state until either a BFD Control Packet is
+         received that is signaling Init or Up state (in which case
+         the session advances to Up state) or until the detection time
+         expires, meaning that communication with the remote system
+         has been lost (in which case the session advances to Down
+         state.)
+
+         Up state means that the BFD session has successfully been
+         established, and implies that connectivity between the systems
+         is working.  The session will remain in the Up state until either
+         connectivity fails, or the session is taken down administratively.
+         If either the remote system signals Down state, or the detection
+         time expires, the session advances to Down state.
+
+         AdminDown state means that the session is being held
+         administratively down.  This causes the remote system to enter
+         Down state, and remain there until the local system exits
+         AdminDown state."
+    DEFVAL { down }
+    ::= { hh3cBfdSessEntry 12 }
+
+hh3cBfdSessControlPlanIndepFlag OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable indicates whether the local system
+         can continue to work while the control plane is out
+         of work. Specifically, it is set to true(1) if the
+         local system is independent of the control plane. Otherwise,
+         the value is set to false(2)"
+    DEFVAL { true }
+    ::= { hh3cBfdSessEntry 13 }
+
+hh3cBfdSessAuthFlag OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable indicates that the local system wants
+         to use Authentication. Specifically, it is set
+         to true(1) if the local system wishes the session
+         to be authenticated or false(2) if not."
+    DEFVAL { false }
+    ::= { hh3cBfdSessEntry 14 }
+
+hh3cBfdSessDemandModeFlag OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable indicates that the local system wants
+         to use Demand mode. Specifically, it is set
+         to true(1) if the local system wishes to use
+         Demand mode or false(2) if not"
+    DEFVAL { false }
+    ::= { hh3cBfdSessEntry 15 }
+
+-- BFD Session State Table
+
+hh3cBfdSessStatTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF Hh3cBfdSessStatEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The table defines BFD session state."
+    ::= { hh3cBfdObjects 4 }
+
+hh3cBfdSessStatEntry OBJECT-TYPE
+    SYNTAX        Hh3cBfdSessStatEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created by a BFD-enabled node for
+         every BFD Session. It defines BFD session statistics."
+    AUGMENTS    { hh3cBfdSessEntry }
+    ::= { hh3cBfdSessStatTable 1 }
+
+Hh3cBfdSessStatEntry ::= SEQUENCE {
+        hh3cBfdSessStatPktInHC             Counter64,
+        hh3cBfdSessStatPktOutHC            Counter64,
+        hh3cBfdSessStatDownCount           Counter32,
+        hh3cBfdSessStatPktDiscard          Counter64,
+        hh3cBfdSessStatPktLost             Counter64
+    }
+
+
+hh3cBfdSessStatPktInHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of BFD messages received by this BFD
+         session."
+    ::= { hh3cBfdSessStatEntry 1 }
+
+hh3cBfdSessStatPktOutHC OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of BFD messages sent by this BFD session."
+    ::= { hh3cBfdSessStatEntry 2 }
+
+hh3cBfdSessStatDownCount OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of times this session has gone into the Down
+         state since the router last rebooted."
+    ::= { hh3cBfdSessStatEntry 3 }
+
+hh3cBfdSessStatPktDiscard OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of  packets the local system has discarded
+         since the router last rebooted."
+    ::= { hh3cBfdSessStatEntry 4 }
+
+hh3cBfdSessStatPktLost OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of packets the local system has failed to transmit
+         since the router last rebooted."
+    ::= { hh3cBfdSessStatEntry 5 }
+
+
+-- BFD Session Performance Table
+
+hh3cBfdSessPerfTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF Hh3cBfdSessPerfEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The table defines BFD session performance."
+    ::= { hh3cBfdObjects 5 }
+
+hh3cBfdSessPerfEntry OBJECT-TYPE
+    SYNTAX        Hh3cBfdSessPerfEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created by a BFD-enabled node for
+         every BFD session. It defines BFD Session performance."
+    AUGMENTS    { hh3cBfdSessEntry }
+    ::= { hh3cBfdSessPerfTable 1 }
+
+Hh3cBfdSessPerfEntry ::= SEQUENCE {
+        hh3cBfdSessPerfCreatTime       TimeStamp,
+        hh3cBfdSessPerfLastUpTime      TimeStamp,
+        hh3cBfdSessPerfLastDownTime    TimeStamp
+    }
+
+hh3cBfdSessPerfCreatTime OBJECT-TYPE
+    SYNTAX        TimeStamp
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The value of sysUpTime when the session was created. If no such
+         create event exists this object contains a zero value."
+    ::= { hh3cBfdSessPerfEntry 1 }
+
+hh3cBfdSessPerfLastUpTime OBJECT-TYPE
+    SYNTAX        TimeStamp
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The value of sysUpTime when the last time communication was lost.
+         If no such up event exists this variable contains a zero value."
+    ::= { hh3cBfdSessPerfEntry 2 }
+
+hh3cBfdSessPerfLastDownTime OBJECT-TYPE
+    SYNTAX        TimeStamp
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The value of sysUpTime when the last time communication was lost
+         with the neighbor. If no such event exist this variable contains
+         a zero value."
+    ::= { hh3cBfdSessPerfEntry 3 }
+
+
+-- Notification Configuration
+
+hh3cBfdSessName OBJECT-TYPE
+    SYNTAX        Hh3cBfdSessionName
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "A name used to uniquely identify BFD sessions."
+    ::= { hh3cBfdTrapBindObjects 1 }
+
+hh3cBfdVpnInstanceName OBJECT-TYPE
+    SYNTAX        Hh3cBfdBindVpnInstanceName
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "The human-readable name of this VPN.  This MAY
+         be equivalent to the [RFC2685] VPN-ID, but may
+         also vary.  If it is set to the VPN ID, it MUST
+         be equivalent to the value of mplsL3VpnVrfVpnId.
+         It is strongly recommended that all sites supporting
+         VRFs that are part of the same VPN use the same
+         naming convention for VRFs as well as the same VPN
+         ID."
+    REFERENCE
+        "[RFC2685]"
+    ::= { hh3cBfdTrapBindObjects 2 }
+
+hh3cBfdLocalAddr OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "This variable defines IP address of the local interface
+         from which the BFD packets is transmitted.
+         It can also be used to enabled BFD on a specific
+         interface. The value is set to zero when BFD session is not
+         associated with a specific interface."
+    ::= { hh3cBfdTrapBindObjects 3 }
+
+hh3cBfdRemoteAddr OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "This variable defines IP address of the local interface
+         from which the BFD packets is transmitted.
+         It can also be used to enabled BFD on a specific
+         interface. The value is set to zero when BFD session is not
+         associated with a specific interface."
+    ::= { hh3cBfdTrapBindObjects 4 }
+
+hh3cBfdSessStateChange NOTIFICATION-TYPE
+    OBJECTS       { hh3cBfdSessIfIndex,
+                    hh3cBfdSessIndex,
+                    hh3cBfdSessState
+    }
+    STATUS        current
+    DESCRIPTION
+        "A notification sent when a session changes
+         state, entering state up or entering state down.
+         The session will enter state up finishing three times handshakes
+         , and will enter state down when the communication path is out
+         of work.
+
+         When the hh3cBfdSessState's value is state up, the session enters
+         state up, and the session enters state down when the
+         hh3cBfdSessState's value is state down.
+
+         The hh3cBfdSessIfIndex contains an interface's index under which
+         the BFD session runs.
+
+         The hh3cBfdSessIndex contains an index which represents a
+         unique BFD session on this device.
+
+         The hh3cBfdSessState is the state of the running BFD session.
+         "
+    ::= { hh3cBfdNotifications 1 }
+
+hh3cBfdSessAuthFail NOTIFICATION-TYPE
+    OBJECTS       { hh3cBfdIfIndex
+    }
+    STATUS        current
+    DESCRIPTION
+        "A notification sent when receiving a session
+         with an authentication fail.
+
+         The hh3cBfdIfIndex is an index which represents a unique BFD
+         interface on this device.
+         "
+    ::= { hh3cBfdNotifications 2 }
+
+hh3cBfdSessStateUp NOTIFICATION-TYPE
+    OBJECTS       { hh3cBfdSessIfIndex,
+                    hh3cBfdSessIndex,
+                    hh3cBfdSessState,
+                    hh3cBfdSessName,
+                    hh3cBfdVpnInstanceName,
+                    hh3cBfdLocalAddr,
+                    hh3cBfdRemoteAddr
+    }
+    STATUS        current
+    DESCRIPTION
+        "A notification sent when a session changes state to up.
+
+         The session will enter state up finishing three times handshakes.
+
+         The hh3cBfdSessIfIndex contains an interface's index under which
+         the BFD session runs.
+
+         The hh3cBfdSessIndex contains an index which represents a
+         unique BFD session on this device.
+
+         The hh3cBfdSessState is the state of the running BFD session.
+
+         The hh3cBfdSessName is the name of the running BFD session.
+
+         The hh3cBfdVpnInstanceName contains a VPN's name under which
+         the BFD session runs.
+
+         The hh3cBfdLocalAddr contains an IP address of the local interface
+         from which the BFD packets is transmitted.
+
+         The hh3cBfdRemoteAddr contains an IP address of the remote interface
+         from which the BFD packets is transmitted.
+         "
+    ::= { hh3cBfdNotifications 3 }
+
+hh3cBfdSessStateDown NOTIFICATION-TYPE
+    OBJECTS       { hh3cBfdSessIfIndex,
+                    hh3cBfdSessIndex,
+                    hh3cBfdSessState,
+                    hh3cBfdSessName,
+                    hh3cBfdVpnInstanceName,
+                    hh3cBfdLocalAddr,
+                    hh3cBfdRemoteAddr
+    }
+    STATUS        current
+    DESCRIPTION
+        "A notification sent when a session changes state to down.
+
+         The session will enter state down when the communication path is out
+         of work.
+
+         The hh3cBfdSessIfIndex contains an interface's index under which
+         the BFD session runs.
+
+         The hh3cBfdSessIndex contains an index which represents a
+         unique BFD session on this device.
+
+         The hh3cBfdSessState is the state of the running BFD session.
+
+         The hh3cBfdSessName is the name of the running BFD session.
+
+         The hh3cBfdVpnInstanceName contains a VPN's name under which
+         the BFD session runs.
+
+         The hh3cBfdLocalAddr contains an IP address of the local interface
+         from which the BFD packets is transmitted.
+
+         The hh3cBfdRemoteAddr contains an IP address of the remote interface
+         from which the BFD packets is transmitted.
+         "
+    ::= { hh3cBfdNotifications 4 }
+
+hh3cBfdSessReachLimit NOTIFICATION-TYPE
+    OBJECTS       { hh3cBfdSessNumberLimit
+    }
+    STATUS        current
+    DESCRIPTION
+        "A notification would be sent when the number of active BFD sessions
+         reached this device's upper limit and no more session could be
+         activated.
+
+         The hh3cBfdSessNumberLimit is the active session limit of this device."
+    ::= { hh3cBfdNotifications 5 }
+
+END

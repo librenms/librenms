@@ -1,0 +1,12 @@
+os: smartos-dcp-m
+text: 'SmartOptics DCP-M Series'
+type: network
+icon: smartoptics
+group: smartoptics
+mib_dir: smartoptics
+over:
+    - { graph: device_dbm, text: dbm }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.30826.2

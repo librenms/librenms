@@ -1,0 +1,27 @@
+mib: PEPVPN-SPEEDFUSION
+modules:
+    os:
+        hardware: DEVICE::deviceModel.0
+        serial: DEVICE::deviceSerialNumber.0
+        version: DEVICE::deviceFirmwareVersion.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - pepVpnStatusProfileName
+        state:
+            data:
+                -
+                    oid: pepVpnStatusConnectionState
+                    num_oid: ".1.3.6.1.4.1.23695.200.1.10.1.1.2.1.3.{{ $index }}"
+                    descr: "{{ $pepVpnStatusProfileName }}"
+                    group: "VPN"
+                    index: "pepVpnStatusConnectionState.{{ $index }}"
+                    state_name: pepVpnStatusConnectionState
+                    states:
+                        - { descr: start, graph: 1, value: 0, generic: 3 }
+                        - { descr: authen, graph: 1, value: 1, generic: 3 }
+                        - { descr: tunnel, graph: 1, value: 2, generic: 3 }
+                        - { descr: route, graph: 1, value: 3, generic: 3 }
+                        - { descr: connected, graph: 1, value: 4, generic: 0 }

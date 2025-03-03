@@ -1,0 +1,483 @@
+--          *****************************
+--          *                           *
+--          *         ONEOS MIB         *
+--          *                           *
+--          *****************************
+--
+--          ONEOS_MIB_STD_V05.1.R005_E001
+--
+--          Creation date : 18/02/2003
+--
+--          Compatibility with ONEOS_V31
+--
+--          Compatibility with ONEOS_V32
+--
+--          Compatibility with ONEOS_V33
+--
+--          Compatibility with ONEOS_V34
+--
+--          Modified for ONEOS_V32R2E26 : oacSysIMSysMainBoard added
+--
+--	    10032005 : Add hardware description
+--
+--          20060111 : Add oacSysSecureCrashlogCount
+-- 
+--		    20100412 : Add oacSysStartCaused
+--
+--          20100811 : Add objects for Factory area  description
+--
+--          20120824 : Add object Product Name
+--
+     ONEACCESS-SYS-MIB DEFINITIONS ::= BEGIN 
+
+     IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE,Unsigned32
+			FROM SNMPv2-SMI
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+	    TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC
+		oacExpIMSystem,oacMIBModules	  
+			FROM ONEACCESS-GLOBAL-REG;
+
+     oacSysMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "201405050001Z"
+        ORGANIZATION    " OneAccess "
+         CONTACT-INFO
+           "Pascal KESTELOOT
+            Postal: ONE ACCESS
+                    381 Avenue du General de Gaulle
+                    92140 Clamart, France
+		    FRANCE
+
+            Tel: (+33) 01 41 87 70 00
+            Fax: (+33) 01 41 87 74 00
+
+            E-mail: pascal.kesteloot@oneaccess-net.com"
+
+	    DESCRIPTION
+		            "Add Cpu usage table for multicore HW"
+
+        REVISION	"201405050001Z"
+
+         DESCRIPTION
+                        "Contact updated"
+        REVISION        "201106150000Z"
+
+	    DESCRIPTION
+		            "oacExpIMSysFactory OID updated"
+        REVISION	"201012140001Z"
+
+       DESCRIPTION  "Add objects for Factory area  description."
+        REVISION     "201008111000Z"  -- August 11, 2010
+
+        DESCRIPTION
+			"Fixed minor corrections. changed oacExpIMSysHwcDescription
+			type from OCTET STRING to DisplayString."
+		REVISION	"201007081000Z"
+
+         DESCRIPTION
+              "This MIB module describes system Management objects."
+	
+	::= { oacMIBModules 671 }
+
+
+-- ----------------------------------------------------------------------------
+-- >> textual conventions
+-- ----------------------------------------------------------------------------
+
+OASysHwcClass ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+  	"The object specify the class of OASysHwc"
+	SYNTAX INTEGER
+  {
+    board(0),
+    cpu(1),
+    slot(2)
+   }
+
+OASysHwcType ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+  	"The object specify the type of OASysHwc"
+	SYNTAX INTEGER
+  {
+    mainboard(0),
+    microprocessor(1),
+    ram(2),
+    flash(3),
+    dsp(4),
+    uplink(5),
+    module(6)
+  }
+
+OASysCoreType ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+  	"The object specify the type of Core usage"
+	SYNTAX INTEGER
+  {
+    controlplane(0),
+    dataforwarding(1),
+    application(2),
+    mixed(3)
+  }
+
+
+oacExpIMSysStatistics OBJECT IDENTIFIER ::= { oacExpIMSystem 1 }
+oacExpIMSysHardwareDescription OBJECT IDENTIFIER ::= { oacExpIMSystem 2 }
+
+oacSysMemStatistics OBJECT IDENTIFIER ::= { oacExpIMSysStatistics 1 }
+oacSysCpuStatistics OBJECT IDENTIFIER ::= { oacExpIMSysStatistics 2 }
+
+oacSysSecureCrashlogCount OBJECT-TYPE
+  SYNTAX  INTEGER
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+  	"The number of avaiable crash logs"
+  ::= { oacExpIMSysStatistics 100 }
+
+oacSysStartCaused OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE (0..255))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+  	"Cause of system start"
+  ::= { oacExpIMSysStatistics 200 }
+
+oacSysIMSysMainBoard OBJECT IDENTIFIER ::= { oacExpIMSysHardwareDescription 1 }
+
+oacExpIMSysHwComponents OBJECT IDENTIFIER ::= { oacExpIMSysHardwareDescription 2 }
+
+oacExpIMSysFactory OBJECT IDENTIFIER ::= { oacExpIMSysHardwareDescription 3 }
+
+
+oacSysIMSysMainIdentifier OBJECT-TYPE
+		SYNTAX OBJECT IDENTIFIER
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"The vendor's authoritative identification of
+			the main board. This value is allocated within 
+			the SMI enterprise subtree"
+	 ::= { oacSysIMSysMainBoard 1 }
+
+oacSysIMSysMainManufacturedIdentity OBJECT-TYPE
+	    SYNTAX      DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"Unique ID string self to each equipment. 
+			 By default, it is retrieved from the 
+			 manufacturer of the equipment. Can also be 
+			 configure by CLI ( see command  'snmp chassis-id')
+			 for customer purposes"
+	 ::= { oacSysIMSysMainBoard 2 }
+
+oacSysIMSysMainManufacturedDate OBJECT-TYPE
+	      SYNTAX      DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"the date of the manufacturing of
+			the equipment"
+	 ::= { oacSysIMSysMainBoard 3 }
+
+oacSysIMSysMainCPU OBJECT-TYPE
+	      SYNTAX      DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"Description of the main CPU used
+			on the main board"
+	 ::= { oacSysIMSysMainBoard 4 }
+
+oacSysIMSysMainBSPVersion OBJECT-TYPE
+	      SYNTAX      DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"the current BSP version supported
+			on the equipment"
+	 ::= { oacSysIMSysMainBoard 5 }
+
+oacSysIMSysMainBootVersion OBJECT-TYPE
+	      SYNTAX      DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"the current boot version supported
+			on the equipment"
+	 ::= { oacSysIMSysMainBoard 6 }
+
+oacSysIMSysMainBootDateCreation OBJECT-TYPE
+	      SYNTAX      DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"the date the current boot version
+			has been generated"
+	 ::= { oacSysIMSysMainBoard 7 }
+
+
+
+
+oacSysMemoryFree OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"The number of bytes in free memory "
+	 ::= { oacSysMemStatistics 1 }
+
+oacSysMemoryAllocated OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"The number of bytes in allocated memory "
+	 ::= { oacSysMemStatistics 2 }
+
+oacSysMemoryTotal OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"Total number of bytes in the system memory partition "
+	 ::= { oacSysMemStatistics 3 }
+
+oacSysMemoryUsed OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"Used memory expressed in percent of the total memory size "
+	 ::= { oacSysMemStatistics 4 }
+
+oacSysCpuUsed OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"Used cpu in percent "
+	 ::= { oacSysCpuStatistics 1 }
+
+------------------------------------------------------------------------------
+-->> Cpu usage table for multicore HW
+------------------------------------------------------------------------------
+oacSysCpuUsedCoresCount OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The number of Cores for the equipment"
+  ::= { oacSysCpuStatistics 2 }
+
+oacSysCpuUsedCoresTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OacSysCpuUsedCoresEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Table for Oneaccess hardware Cores"
+  ::= { oacSysCpuStatistics 3 }
+
+oacSysCpuUsedCoresEntry OBJECT-TYPE
+  SYNTAX OacSysCpuUsedCoresEntry
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Table entry for a hardware Core"
+  INDEX { oacSysCpuUsedIndex }
+  ::= { oacSysCpuUsedCoresTable 1 }
+
+OacSysCpuUsedCoresEntry ::=
+  SEQUENCE {
+    oacSysCpuUsedIndex       	Unsigned32,
+    oacSysCpuUsedCoreType	   	OASysCoreType,
+    oacSysCpuUsedValue       	Unsigned32,
+	oacSysCpuUsedOneMinuteValue	Unsigned32
+ }
+
+oacSysCpuUsedIndex OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Core index"
+  ::= { oacSysCpuUsedCoresEntry 1 }
+
+oacSysCpuUsedCoreType OBJECT-TYPE
+  SYNTAX OASysCoreType
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Type of the core"
+  ::= { oacSysCpuUsedCoresEntry 2 }
+
+ oacSysCpuUsedValue OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Used cpu in percent : equivalent for core 0 to the oacSysCpuUsed object. This is the current value"
+  ::= { oacSysCpuUsedCoresEntry 3 }
+  
+ oacSysCpuUsedOneMinuteValue OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Cpu load for the last minute period"
+  ::= { oacSysCpuUsedCoresEntry 4 }
+  
+
+oacSysLastRebootCause OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "To display the cause for the last reboot."
+    ::= { oacExpIMSysStatistics 3 }
+
+-- ----------------------------------------------------------------------------
+-- >> hardware components
+-- ----------------------------------------------------------------------------
+oacExpIMSysHwComponentsCount OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The number of components for the equipment"
+  ::= { oacExpIMSysHwComponents 1 }
+
+oacExpIMSysHwComponentsTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OacExpIMSysHwComponentsEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Table for Oneaccess hardware components"
+  ::= { oacExpIMSysHwComponents 2 }
+
+oacExpIMSysHwComponentsEntry OBJECT-TYPE
+  SYNTAX OacExpIMSysHwComponentsEntry
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Table entry for a hardware component"
+  INDEX { oacExpIMSysHwcIndex }
+  ::= { oacExpIMSysHwComponentsTable 1 }
+     
+OacExpIMSysHwComponentsEntry ::=
+  SEQUENCE {
+    oacExpIMSysHwcIndex             Unsigned32,
+    oacExpIMSysHwcClass             OASysHwcClass, 
+    oacExpIMSysHwcType	            OASysHwcType,		
+    oacExpIMSysHwcDescription       DisplayString,
+    oacExpIMSysHwcSerialNumber      DisplayString,		
+    oacExpIMSysHwcManufacturer	    DisplayString,	
+    oacExpIMSysHwcManufacturedDate  DisplayString,
+    oacExpIMSysHwcProductName       DisplayString 
+  }
+
+oacExpIMSysHwcIndex OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Component index"
+  ::= { oacExpIMSysHwComponentsEntry 1 }
+
+oacExpIMSysHwcClass OBJECT-TYPE
+  SYNTAX OASysHwcClass
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Class of the component"
+  ::= { oacExpIMSysHwComponentsEntry 2 }
+
+oacExpIMSysHwcType OBJECT-TYPE
+  SYNTAX OASysHwcType
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Type of the component"
+  ::= { oacExpIMSysHwComponentsEntry 3 }
+
+oacExpIMSysHwcDescription OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Component description, identifies the component"
+  ::= { oacExpIMSysHwComponentsEntry 4 }
+
+oacExpIMSysHwcSerialNumber OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Component's serial number"
+  ::= { oacExpIMSysHwComponentsEntry 5 }
+
+oacExpIMSysHwcManufacturer OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Component manufacturer"
+  ::= { oacExpIMSysHwComponentsEntry 6 }
+
+oacExpIMSysHwcManufacturedDate OBJECT-TYPE
+  SYNTAX DisplayString (SIZE (0..10))
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Component's manufacturing date"
+  ::= { oacExpIMSysHwComponentsEntry 7 }
+
+oacExpIMSysHwcProductName OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..255))
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION 
+			"The Product name"
+  ::= { oacExpIMSysHwComponentsEntry 8 }
+
+-- ----------------------------------------------------------------------------
+-- Factory area
+-- ----------------------------------------------------------------------------
+
+oacExpIMSysFactorySupplierID OBJECT-TYPE
+  SYNTAX DisplayString (SIZE (0..14))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Supplier ID. Mapped to Mid field of product-info-area.
+	String is empty if Mid field is not included in
+	product-info-area."
+  ::= { oacExpIMSysFactory 1 }
+
+oacExpIMSysFactoryProductSalesCode OBJECT-TYPE
+  SYNTAX DisplayString (SIZE (0..22))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "OA Product Sales Code. Mapped to Mcode field of
+	product-info-area. String is empty if Mcode field
+	is not included in product-info-area."
+  ::= { oacExpIMSysFactory 2 }
+
+oacExpIMSysFactoryHwRevision OBJECT-TYPE
+  SYNTAX DisplayString (SIZE (2..7))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Hardware Revision. Mapped to Mrevision field of
+	product-info-area. String is empty if Mrevision
+	field is not included in product-info-area."
+  ::= { oacExpIMSysFactory 3 }
+
+END
+--

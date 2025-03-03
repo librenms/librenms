@@ -1,0 +1,425 @@
+CISCOSB-VRRP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        NOTIFICATION-TYPE, Counter32,
+        Integer32, mib-2, Unsigned32        FROM SNMPv2-SMI
+
+        DisplayString, TimeInterval, RowStatus
+                                            FROM SNMPv2-TC
+
+        vrrpv3OperationsEntry,
+        vrrpv3AssociatedIpAddrEntry         FROM VRRPV3-MIB
+
+        ipSpec                              FROM CISCOSB-IP
+
+        InterfaceIndexOrZero                FROM IF-MIB
+
+        InetAddressType, InetAddress        FROM INET-ADDRESS-MIB;
+
+rlVrrp  MODULE-IDENTITY
+        LAST-UPDATED "201012090000Z"         -- June 9, 2010
+		ORGANIZATION "Cisco Systems, Inc."
+
+		CONTACT-INFO
+		"Postal: 170 West Tasman Drive
+		San Jose , CA 95134-1706
+		USA
+
+		
+		Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+		DESCRIPTION
+		"The private MIB module definition for VRRPv3 MIB."
+        REVISION "201012090000Z"
+        DESCRIPTION
+                "Initial version of this MIB."
+
+      ::= { ipSpec 26 }
+
+-- Textual Conventions
+
+-- rlVrrpv3OperationsTable --
+rlVrrpv3OperationsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlVrrpv3OperationsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION  "This table is parallel to vrrpv3OperationsTable, and is used
+                  to change VRRP on interface working version, description and
+                  display several statuses.
+                  It contains private objects."
+    ::= { rlVrrp 1 }
+
+rlVrrpv3OperationsEntry OBJECT-TYPE
+    SYNTAX     RlVrrpv3OperationsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION  "An operation entry mapping for a particular interface."
+    AUGMENTS { vrrpv3OperationsEntry }
+    ::= { rlVrrpv3OperationsTable 1 }
+
+RlVrrpv3OperationsEntry ::= SEQUENCE {
+        rlVrrpv3OperationsDefaultPrimaryIpAddr      InetAddress,
+        rlVrrpv3OperationsPrimaryIpAddrState        INTEGER,
+        rlVrrpv3OperationsVrDescription             DisplayString,
+        rlVrrpv3OperationsVrrpVersion               INTEGER,
+        rlVrrpv3OperationsAdminState                INTEGER,
+        rlVrrpv3OperationsMasterPriority            Unsigned32,
+        rlVrrpv3OperationsMasterAdvInterval         TimeInterval,
+        rlVrrpv3OperationsMasterDownInterval        TimeInterval,
+        rlVrrpv3OperationsSkewTime                  TimeInterval,
+        rlVrrpv3OperationsTrackObject               Unsigned32,
+        rlVrrpv3OperationsTrackStatus               INTEGER,
+        rlVrrpv3OperationsTrackDecrementPriority    Unsigned32,
+        rlVrrpv3OperationsTrackOperPriority         Unsigned32
+    }
+
+rlVrrpv3OperationsDefaultPrimaryIpAddr OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "In the case where there are more than one IP
+        Address (associated IP addresses) for a given
+        `ifIndex', this object is used to specify the IP
+        address that will become the
+        vrrpv3OperationsMasterIpAddr', should the virtual
+        router transition from backup state to master and no
+        vrrpv3OperationsDefaultPrimaryIpAddr was configured."
+    ::= { rlVrrpv3OperationsEntry 1 }
+
+rlVrrpv3OperationsPrimaryIpAddrState OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     up(1),
+                     down(2)
+                 }
+
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION  "This object represents enabled/disabled state of user configured
+                  primary address of the virtual router."
+    DEFVAL { down }
+    ::= { rlVrrpv3OperationsEntry 2 }
+
+rlVrrpv3OperationsVrDescription OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION  "The description of the VRRP virtual router."
+    ::= { rlVrrpv3OperationsEntry 3 }
+
+rlVrrpv3OperationsAdminState OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     up(1),
+                     down(2)
+                 }
+
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION  "This object will enable/disable the virtual router
+                  function. Setting the value to `up', will transition
+                  the state of the virtual router from `initialize' to `backup'
+                  or `master', depending on the value of `vrrpOperPriority'.
+                  Setting the value to `down', will transition  the
+                  router from `master' or `backup' to `initialize'. State
+                  transitions may not be immediate; they sometimes depend on
+                  other factors, such as the interface (IF) state."
+    DEFVAL { down }
+    ::= { rlVrrpv3OperationsEntry 4 }
+
+rlVrrpv3OperationsVrrpVersion OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 version2and3(1),
+                 version2(2),
+                 version3(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION  "Current VRRP virtual router version it is working with."
+    DEFVAL { version3 }
+    ::= { rlVrrpv3OperationsEntry 5 }
+
+rlVrrpv3OperationsMasterPriority OBJECT-TYPE
+    SYNTAX       Unsigned32 (1..255)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object specifies the priority which is used by master router."
+    ::= { rlVrrpv3OperationsEntry 6 }
+
+rlVrrpv3OperationsMasterAdvInterval OBJECT-TYPE
+    SYNTAX       TimeInterval (1..4095)
+    UNITS        "centiseconds"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The time interval, in centiseconds, which is used by master router
+        for sending advertisement messages. "
+    ::= { rlVrrpv3OperationsEntry 7 }
+
+rlVrrpv3OperationsMasterDownInterval OBJECT-TYPE
+    SYNTAX       TimeInterval
+    UNITS        "centiseconds"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Time interval for Backup to declare Master down (centiseconds)."
+    ::= { rlVrrpv3OperationsEntry 8 }
+
+rlVrrpv3OperationsSkewTime OBJECT-TYPE
+    SYNTAX       TimeInterval
+    UNITS        "centiseconds"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Time to skew Master_Down_Interval in milliseconds."
+    ::= { rlVrrpv3OperationsEntry 9 }
+
+rlVrrpv3OperationsTrackObject OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Number of associates a track object with this VRRP router.
+        0 - no association"
+    DEFVAL { 0 }
+    ::= { rlVrrpv3OperationsEntry 10 }
+
+rlVrrpv3OperationsTrackStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     up(0),
+                     down(1)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Track status"
+    ::= { rlVrrpv3OperationsEntry 11 }
+
+rlVrrpv3OperationsTrackDecrementPriority OBJECT-TYPE
+    SYNTAX       Unsigned32 (1..253)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Amount by which the priority for the router is decremented (or incremented)
+        when the tracked object goes down (or comes back up)."
+    DEFVAL { 10 }
+    ::= { rlVrrpv3OperationsEntry 12 }
+
+rlVrrpv3OperationsTrackOperPriority OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..255)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Operational priority"
+    ::= { rlVrrpv3OperationsEntry 13 }
+
+-- rlVrrpv3AssociatedIpAddrTable --
+
+rlVrrpv3AssociatedIpAddrTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlVrrpv3AssociatedIpAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION  "This table is parallel to vrrpv3AssociatedIpAddrTable, and is used
+                  to display address statuses.
+                  It contains private objects."
+    ::= { rlVrrp 2 }
+
+rlVrrpv3AssociatedIpAddrEntry OBJECT-TYPE
+    SYNTAX     RlVrrpv3AssociatedIpAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION  "An entry in the table contains an IP address that is
+                  associated with a virtual router"
+    AUGMENTS { vrrpv3AssociatedIpAddrEntry }
+    ::= { rlVrrpv3AssociatedIpAddrTable 1 }
+
+RlVrrpv3AssociatedIpAddrEntry ::= SEQUENCE {
+        rlVrrpv3AssociatedIpAddrState        INTEGER
+    }
+
+rlVrrpv3AssociatedIpAddrState OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     up(1),
+                     down(2)
+                 }
+
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION  "This object represents state of the assosiated IP address,
+                  backed up by current virtual router."
+    DEFVAL { down }
+    ::= { rlVrrpv3AssociatedIpAddrEntry 1 }
+
+--  VRRP Router Counters Table
+
+    rlVrrpv3CountersTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF RlVrrpv3CountersEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Table of virtual router statistics."
+        ::= { rlVrrp 3 }
+
+    rlVrrpv3CountersEntry OBJECT-TYPE
+        SYNTAX       RlVrrpv3CountersEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "An entry in the table, containing statistics
+            information about a given virtual router."
+        INDEX    { rlVrrpv3CountersIfIndex }
+        ::= { rlVrrpv3CountersTable 1 }
+
+    RlVrrpv3CountersEntry ::=
+        SEQUENCE {
+            rlVrrpv3CountersIfIndex                     InterfaceIndexOrZero,
+            rlVrrpv3CountersChecksumErrors              Counter32,
+            rlVrrpv3CountersRcvdPacketsLength           Counter32,
+            rlVrrpv3CountersIpTtlErrors                 Counter32,
+            rlVrrpv3CountersRcvdInvalidTypePackets      Counter32,
+            rlVrrpv3CountersRcvdInvalidVrrpId           Counter32,
+            rlVrrpv3CountersProtoErrors                 Counter32,
+            rlVrrpv3CountersAddressListErrors           Counter32,
+            rlVrrpv3CountersAdvIntervalErrors           Counter32,
+            rlVrrpv3CountersAuthErrors                  Counter32,
+            rlVrrpv3CountersRowStatus                   RowStatus
+        }
+
+    rlVrrpv3CountersIfIndex OBJECT-TYPE
+        SYNTAX       InterfaceIndexOrZero
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Interface index"
+
+        ::= { rlVrrpv3CountersEntry 1 }
+
+    rlVrrpv3CountersChecksumErrors OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of checksum errors received on
+            this interface.
+
+            Counter is only valid as long as there is a VRRP router defined on
+            this interface."
+
+        ::= { rlVrrpv3CountersEntry 2 }
+
+    rlVrrpv3CountersRcvdPacketsLength OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of packet length errors received on
+            this interface.
+
+            Counter is only valid as long as there is a VRRP router defined on
+            this interface."
+
+        ::= { rlVrrpv3CountersEntry 3 }
+
+    rlVrrpv3CountersIpTtlErrors OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of TTL errors received on
+            this interface.
+
+            Counter is only valid as long as there is a VRRP router defined on
+            this interface."
+
+        ::= { rlVrrpv3CountersEntry 4 }
+
+    rlVrrpv3CountersRcvdInvalidTypePackets OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of invalid VRRP packet type errors received on
+            this interface.
+
+            Counter is only valid as long as there is a VRRP router defined on
+            this interface."
+
+        ::= { rlVrrpv3CountersEntry 5 }
+
+    rlVrrpv3CountersRcvdInvalidVrrpId OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of invalid VRRP id errors received on
+            this interface.
+
+            Counter is only valid as long as there is a VRRP router defined on
+            this interface."
+
+        ::= { rlVrrpv3CountersEntry 6 }
+
+    rlVrrpv3CountersProtoErrors OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of invalid VRRP protocol errors received on
+            this interface.
+
+            Counter is only valid as long as there is a VRRP router defined on
+            this interface."
+
+        ::= { rlVrrpv3CountersEntry 7 }
+
+    rlVrrpv3CountersAddressListErrors OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of invalid IP address list errors received on
+            this interface.
+
+            Counter is only valid as long as there is a VRRP router defined on
+            this interface."
+
+        ::= { rlVrrpv3CountersEntry 8 }
+
+    rlVrrpv3CountersAdvIntervalErrors OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of invalid advertisement interval errors received on
+            this interface.
+
+            Counter is only valid as long as there is a VRRP router defined on
+            this interface."
+
+        ::= { rlVrrpv3CountersEntry 9 }
+
+    rlVrrpv3CountersAuthErrors OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The total number of authentication errors received on
+            this interface.
+
+            Counter is only valid as long as there is a VRRP router defined on
+            this interface."
+
+        ::= { rlVrrpv3CountersEntry 10 }
+
+    rlVrrpv3CountersRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "Row status of the entry. Used for clearing table by setting."
+
+        ::= { rlVrrpv3CountersEntry 11 }
+
+END
+

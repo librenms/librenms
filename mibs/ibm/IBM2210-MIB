@@ -1,0 +1,471 @@
+IBM2210-MIB  DEFINITIONS ::= BEGIN
+
+------------------------------------------------------------------
+-- IBM 2210 Enterprise MIB (SNMP Version 1 Format)
+------------------------------------------------------------------
+--
+--    This MIB defines the enterprise specific management
+--    objects for the 2210 family of products.
+--
+--    This MIB is defined in the SNMP version 1 SMI format.
+--
+--    August 25, 1998
+--
+--    Contact Information:
+--
+--            Randy Worzella
+--            IBM Corp.
+--            G420/664
+--            Research Triangle Park, NC 27709
+--
+--            phone:    919-254-2202
+--            email:    worzella@us.ibm.com
+--
+------------------------------------------------------------------
+
+          IMPORTS
+              enterprises, IpAddress, Counter
+                                 FROM RFC1155-SMI
+
+              proElsTrapSeqs, proElsTrapSubSystem,
+              proElsTrapEvent, proElsSubSysEventMsg
+                                 FROM PROTEON-MIB
+              TRAP-TYPE
+                                 FROM RFC-1215
+              ifIndex
+                                 FROM RFC1213-MIB
+              OBJECT-TYPE
+                                 FROM RFC-1212;
+
+-- Path to proteon enterprise
+
+           proteon    OBJECT IDENTIFIER ::= { enterprises 1 }
+
+-- Path to ibm2210 enterprise
+
+           ibm        OBJECT IDENTIFIER ::= { enterprises 2 }
+           ibmProd    OBJECT IDENTIFIER ::= { ibm 6 }
+           ibm2210    OBJECT IDENTIFIER ::= { ibmProd 72 }
+
+------------------------------------------------------------------
+-- IBM 2210 Anchor
+------------------------------------------------------------------
+ibm2210admin     OBJECT IDENTIFIER ::= { ibm2210 1 }
+ibm2210system    OBJECT IDENTIFIER ::= { ibm2210 2 }
+ibm2210hardware  OBJECT IDENTIFIER ::= { ibm2210 3 }
+ibm2210routing   OBJECT IDENTIFIER ::= { ibm2210 4 }
+ibm2210switching OBJECT IDENTIFIER ::= { ibm2210 5 }
+
+------------------------------------------------------------------
+-- IBM 2210 Administrative
+------------------------------------------------------------------
+ibm2210hardwareinfo    OBJECT IDENTIFIER ::= { ibm2210hardware 1 }
+
+------------------------------------------------------------------
+-- Proteon groups defined in this MIB
+------------------------------------------------------------------
+           proto            OBJECT IDENTIFIER ::= { proteon 3 }
+           pDot3ChipSets    OBJECT IDENTIFIER ::= { proteon 5 }
+
+------------------------------------------------------------------
+-- Service port information
+------------------------------------------------------------------
+
+          ibmServiceGenericTable  OBJECT-TYPE
+             SYNTAX  SEQUENCE OF IbmServiceGenericEntry
+             ACCESS  not-accessible
+             STATUS  mandatory
+             DESCRIPTION
+                "A table of information about each service port."
+             ::= { ibm2210hardwareinfo 1 }
+
+          ibmServiceGenericEntry  OBJECT-TYPE
+             SYNTAX  IbmServiceGenericEntry
+             ACCESS  not-accessible
+             STATUS  mandatory
+             DESCRIPTION
+                "An entry containing objects to describe the
+                 service port."
+             INDEX  { ibmServiceGenericPort }
+             ::= { ibmServiceGenericTable 1 }
+
+          IbmServiceGenericEntry  ::=
+             SEQUENCE {
+               ibmServiceGenericPort
+                 INTEGER,
+               ibmServiceGenericBaurdrate
+                 INTEGER,
+               ibmServiceGenericType
+                 INTEGER
+          }
+
+
+          ibmServiceGenericPort OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The number of service port.  On 12x and 1Sx/1Ux models,
+                   only one service port exists and is designated #1.  On
+                   x4x models, the lower paort is designated #1, the upper
+                   port is #2."
+              ::= { ibmServiceGenericEntry 1 }
+
+          ibmServiceGenericBaurdrate OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The baudrate of service port."
+              ::= { ibmServiceGenericEntry 2 }
+
+          ibmServiceGenericType OBJECT-TYPE
+              SYNTAX    INTEGER {
+                        eia232(1),
+                        modem(2),
+                        nocard(3)
+              }
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The card type of service port.  On 12x, 1Sx and 1Ux
+                   models, the second row will always indeicate nocard(3)."
+              ::= { ibmServiceGenericEntry 3 }
+
+------------------------------------------------------------------
+-- Generic interface group.
+------------------------------------------------------------------
+          proXfaceGenericTable  OBJECT-TYPE
+             SYNTAX  SEQUENCE OF ProXfaceGenericEntry
+             ACCESS  not-accessible
+             STATUS  mandatory
+             DESCRIPTION
+                "A table of information about each interface."
+             ::= { proteon 2 }
+
+          proXfaceGenericEntry  OBJECT-TYPE
+             SYNTAX  ProXfaceGenericEntry
+             ACCESS  not-accessible
+             STATUS  mandatory
+             DESCRIPTION
+                "An entry containing objects to describe the
+                 interface."
+             INDEX  { ifIndex }
+             ::= { proXfaceGenericTable 1 }
+
+          ProXfaceGenericEntry  ::=
+             SEQUENCE {
+               proXfaceGenericType
+                 INTEGER,
+               proXfaceGenericCSR
+                 INTEGER,
+               proXfaceGenericIntVec
+                 INTEGER,
+               proXfaceGenericMaintInt
+                 INTEGER,
+               proXfaceGenericMaintLim
+                 INTEGER,
+               proXfaceGenericNextTest
+                 INTEGER,
+               proXfaceGenericNextMaint
+                 INTEGER,
+               proXfaceGenericMaintCnt
+                 Counter,
+               proXfaceGenericMaintFails
+                 Counter,
+               proXfaceGenericTestPasses
+                 Counter,
+               proXfaceGenericTestFails
+                 Counter,
+               proXfaceGenericModuleId
+                 INTEGER
+          }
+
+          proXfaceGenericType OBJECT-TYPE
+              SYNTAX    INTEGER {
+                                -- None  has value (0)
+                  vi(1),        -- VI LNI
+                  pn10(2),      -- ProNET-10
+                  pn80(3),      -- ProNET-80
+                  chaos(4),     -- CHAOSnet
+                  xeth(5),      -- Experimental Ethernet (3Mb)
+                  m1822(6),     -- ACC M/1822
+                  scc(7),       -- On-board SCC on HK68ME
+                  ieth(8),      -- Interlan Ethernet
+                  peth(9),      -- Proteon Ethernet
+                  com2(10),     -- COM-2
+                  com4(11),     -- COM-4
+                  omn(12),      -- Omninet
+                  pn4(13),      -- ProNET-4
+                  hyper(14),    -- Hyper channel
+                  wdeth(15),    -- Western Digital Ethernet
+                  gwslc(16),    -- Gateway Serial Line Controller
+                  x25(17),      -- X.25
+                  pqsx(18),     -- Proteon QPSX MAN
+                  atr(19),      -- Apollo Token Ring
+                  fddi(20),     -- p4200 FDDI
+                  vlane(21),    -- SBE VLAN-E
+                  vcom4(22),    -- SBE VCOM-4
+                  pn16(23),     -- ProNET-16
+                  atcomsl(24),  -- AT COM-2
+                  ceth(25),     -- CNX/DNX300 Single/Dual Ethernet
+                  csl(26),      -- CNX/DNX300 T1/E1 serial
+                  seth(27),     -- Interlan NP-600 smart Ethernet
+                  srlygwsl(28), -- SDLC Relay on a gwslc
+                  srlyatc2(29), -- SDLC Relay on a atcomsl
+                  srlycsl(30),  -- SDLC Relay on a csl
+                  srbtnl(31),   -- SRB Tunnel over a protocol net
+                  sdlcrly(32),  -- SDLC Relay over a protocol net
+                  nseth(33),    -- National Semiconductor Ethernet
+                  x25atc2(34),  -- x25 on a atcomsl
+                  x25csl(35),   -- x25 on a CNX csl
+                  x25dcsl(36),  -- x25 on a DNX300 csl
+                  qsl(37),      -- CNX Quad Serial Controller
+                  ydcisdn(38),  -- YDC ISDN
+                  tsl(39),      -- CNX Twin Serial Controller
+                  qslch(40),    -- DNX Quad Serial Controller
+                  v25bis(41),   -- V.25 bis Dial
+                  hssi(42),     -- High Speed Serial Interface
+                  quiceth(43),  -- QUIC Ethernet
+                  quictkr(44),  -- QUIC 802.5 Token-Ring
+                  quicsl(45),   -- QUIC Serial Controller
+                  quicbisdn(46),-- QUIC ISDN BRI
+                  vlic     (47),-- Virtual lic
+                  atm      (48),-- ATM
+                  escon    (49),-- ESCON channel
+                  isdnpri  (50),-- ISDN Primary rate
+                  quic4wan (51),-- 4 port WAN
+                  quic8wan (52),-- 8 port WAN
+                  quic4mdm (53),-- 4 port modem
+                  quic8mdm (54),-- 8 port modem
+                  pawx21   (55),-- x21
+                  pawv36   (56),-- v36
+                  pawrs232 (57),-- rs232
+                  nwescon  (58),-- More ESCON channel
+                  atmvirt  (59),-- ATM virtual
+                  appnl    (60),-- APPN loopback
+                  v34      (61),-- V34
+                  mp       (62),-- PPP Multilink
+                  atmpmpls (63),-- ATM multiprotocol label swap
+                  eth100   (64) -- Fast Ethernet
+                  }
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The type of the interface, according to the internal
+                   net identifier."
+              ::= { proXfaceGenericEntry 1 }
+
+          proXfaceGenericCSR OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The Command and Status Register address for the
+                  interface."
+              ::= { proXfaceGenericEntry 2 }
+
+          proXfaceGenericIntVec OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The multi-bus interrupt vector for the interface."
+              ::= { proXfaceGenericEntry 3 }
+
+          proXfaceGenericMaintInt OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The number of seconds before the next interface
+                   maintenance."
+              ::= { proXfaceGenericEntry 4 }
+
+          proXfaceGenericMaintLim OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The number of maintenance check failures permitted
+                  before a self test is run."
+              ::= { proXfaceGenericEntry 5 }
+
+          proXfaceGenericNextTest OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The number of seconds before the next self test."
+              ::= { proXfaceGenericEntry 6 }
+
+          proXfaceGenericNextMaint OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The number of seconds between maintenance checks."
+              ::= { proXfaceGenericEntry 7 }
+
+          proXfaceGenericMaintCnt OBJECT-TYPE
+              SYNTAX    Counter
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The number of failed maintenance checks since the
+                  last successful maintenance check."
+              ::= { proXfaceGenericEntry 8 }
+
+          proXfaceGenericMaintFails OBJECT-TYPE
+              SYNTAX    Counter
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The total number of maintenance failures on this
+                   interface."
+              ::= { proXfaceGenericEntry 9 }
+
+          proXfaceGenericTestPasses OBJECT-TYPE
+              SYNTAX    Counter
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The total number of self test successes on this
+                  interface."
+              ::= { proXfaceGenericEntry 10 }
+
+          proXfaceGenericTestFails OBJECT-TYPE
+              SYNTAX    Counter
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The total number of self test failures on this
+                  interface."
+              ::= { proXfaceGenericEntry 11 }
+
+          proXfaceGenericModuleId OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The module identifier of this interface, this
+                  object is relevant only to the CNX and DNX
+                  platforms. It uniquely identifies the interface
+                  card-type.
+
+                  It will always be '0' for the IBM2210 platform."
+              ::= { proXfaceGenericEntry 12 }
+
+
+------------------------------------------------------------------
+-- Generic protocol group.
+------------------------------------------------------------------
+          general        OBJECT IDENTIFIER ::= { proto 1 }
+
+-- there are no general variables defined at this time.
+
+------------------------------------------------------------------
+-- IP protocol group.
+--
+-- The IBM 2210 does not support this group.
+--
+------------------------------------------------------------------
+          proip        OBJECT IDENTIFIER ::= { proto 2 }
+
+-- default gateway
+
+          defgw        OBJECT IDENTIFIER ::= { proip 1 }
+
+          proProtoIpDefGwAddress OBJECT-TYPE
+              SYNTAX    IpAddress
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The Internet address of the default gateway for the
+                  router."
+              ::= { defgw 1 }
+
+          proProtoIpDefGwCost OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The cost of the default gateway for the router."
+              ::= { defgw 2 }
+
+          proProtoIpDefGwAge OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                  "The age of the default gateway for the router."
+              ::= { defgw 3 }
+
+------------------------------------------------------------------
+-- Hardware Chip Set Information
+--
+-- This object identifies the MAC hardware used to
+-- communicate on an interface. The following
+-- hardware chipset is used for 802.3:
+------------------------------------------------------------------
+          pDot3ChipMC68EN360 OBJECT IDENTIFIER ::= { pDot3ChipSets 1 }
+
+
+------------------------------------------------------------------
+-- Trap information
+------------------------------------------------------------------
+
+------------------------------------------------------------------
+-- ELS Trap
+--
+-- The following trap is generated when an ELS event
+-- occurs and the corresponding event is enabled for
+-- trap generation.
+--
+-- IBM 2210 does not support the ibmElsTrapV1 trap format,
+-- instead, the ibmElsTrapV2 format is supported.
+--
+------------------------------------------------------------------
+
+            ibmElsTrapV1 TRAP-TYPE
+             ENTERPRISE   ibm2210
+             VARIABLES    { proElsTrapSeqs, proElsTrapSubSystem,
+                            proElsTrapEvent }
+             DESCRIPTION
+              "An ELS trap event.
+
+              Note that this trap is being deprecated and will not be
+              supported in all future releases.
+
+              The objects proELSTrapVar1 through proElsTrapVar9 are
+              conditionally included in this trap to carry variable
+              data fields from the ELS message.  These objects are not
+              carried as object IDs as defined, but in fact are data
+              objects.  Their syntax will change depending on the
+              data they cary for a particular trap instance."
+             ::= 1
+
+            ibmElsTrapV2 TRAP-TYPE
+             ENTERPRISE   ibm2210
+             VARIABLES    { proElsSubSysEventMsg }
+             DESCRIPTION
+                "When the routing subsystem ELS component is configured to
+                 generate SNMP traps, the following trap is generated.
+                 It contains a single varBind containing a text string in one
+                 of the two following formats.
+
+                 If ELS timestamping is enabled:
+
+                     hr:min:sec subsys_name.event_num: message_text
+
+                     For example - 09:32:56 IP.008: no rte 9.7.1.8 -> 9.7.4.3 dsc
+
+                 If ELS timestamping is disabled:
+
+                     subsys_name.event_num: message_text
+
+                     For example - IP.008: no rte 9.7.1.8 -> 9.7.4.3 dsc"
+
+             ::= 2
+
+          END

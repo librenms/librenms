@@ -1,0 +1,617 @@
+-- *****************************************************************
+-- MY-ENTITY-MIB.mib:  My Entity MIB file
+--
+-- $Copyright$
+-- 
+-- *****************************************************************
+--
+
+MY-ENTITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Counter32
+                FROM SNMPv2-SMI
+        TruthValue,
+        DisplayString,
+        RowStatus,
+        MacAddress
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        myMgmt
+                FROM MY-SMI;
+
+myEntityMIB MODULE-IDENTITY
+	LAST-UPDATED "200203200000Z"
+	ORGANIZATION "$Company$"
+	CONTACT-INFO
+		" 
+		Tel: $Telephone$ 
+
+		E-mail: $E-mail$"
+	DESCRIPTION
+		"This module defines my entity mibs."
+	REVISION      "200203200000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { myMgmt 21}
+
+myDeviceMIBObjects OBJECT IDENTIFIER ::= { myEntityMIB 1 }
+
+
+--
+-- device information
+--
+myDeviceMaxNumber OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "Max number of devices of the system permitting."
+          ::= { myDeviceMIBObjects 1 }
+        
+myDeviceInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyDeviceInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "List of devices."
+        ::= { myDeviceMIBObjects 2 }
+        
+myDeviceInfoEntry OBJECT-TYPE
+        SYNTAX MyDeviceInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of a device information."
+        INDEX { myDeviceInfoIndex }
+        ::= { myDeviceInfoTable 1 }
+    
+MyDeviceInfoEntry ::=
+        SEQUENCE {
+	       myDeviceInfoIndex Integer32,
+	       myDeviceInfoDescr DisplayString,
+	       myDeviceInfoSlotNumber Integer32,
+               myDevicePowerStatus  INTEGER,
+	       myDeviceMacAddress MacAddress,
+               myDevicePriority Integer32,
+               myDeviceAlias  DisplayString,
+               myDeviceSWVersion DisplayString,
+               myDeviceHWVersion DisplayString                   
+        }
+        
+myDeviceInfoIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An unique value of each devices in system. Its value ranges between
+            1 and the value of the object myDeviceNumber."
+        ::= { myDeviceInfoEntry 1 }
+              
+myDeviceInfoDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the device."
+        ::= { myDeviceInfoEntry 2 }
+        
+myDeviceInfoSlotNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of slots exists on the device."
+        ::= { myDeviceInfoEntry 3 }
+        
+          
+myDevicePowerStatus OBJECT-TYPE
+          SYNTAX  INTEGER {
+                    rpsNoLink   (1), -- no rps link or rps not electrifying,
+                    rpsLinkAndNoPower (2), -- rps linked but not electrifying,
+                    rpsLinkAndReadyForPower (3), -- rps is ready for power,
+                    rpsLinkAndPower (4)  -- rps is serving as a power
+                }
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The power status of device"
+          ::= { myDeviceInfoEntry 4 }
+        
+myDeviceMacAddress OBJECT-TYPE
+          SYNTAX  MacAddress
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The physical address of device"
+          ::= { myDeviceInfoEntry 5 }
+
+myDevicePriority OBJECT-TYPE
+          SYNTAX  Integer32(1..10)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "The device priority value"
+          ::= { myDeviceInfoEntry 6 }
+          
+myDeviceAlias OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Alias of the device."
+        ::= { myDeviceInfoEntry 7 }     
+
+
+myDeviceSWVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the device."
+        ::= { myDeviceInfoEntry 8 }
+        
+myDeviceHWVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the device."
+        ::= { myDeviceInfoEntry 9 }                  
+       
+--
+-- module information  
+--
+--myModuleNumber OBJECT-TYPE
+--        SYNTAX Integer32
+--        MAX-ACCESS read-only
+--        STATUS current
+--        DESCRIPTION
+--            "Current number of modules in the system."
+--        ::= { myDeviceMIBObjects 2 }
+
+mySlotInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MySlotInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "a list of module Entries."
+        ::= { myDeviceMIBObjects 3 }
+    
+mySlotInfoEntry OBJECT-TYPE
+        SYNTAX MySlotInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry containing status information about one slot."
+        INDEX { mySlotInfoDeviceIndex, mySlotInfoIndex }
+        ::= { mySlotInfoTable 1 }
+
+MySlotInfoEntry ::= 
+        SEQUENCE {
+             mySlotInfoDeviceIndex Integer32,
+             mySlotInfoIndex Integer32,
+             mySlotModuleInfoDescr DisplayString,
+             mySlotInfoPortNumber Integer32,
+             mySlotInfoPortMaxNumber Integer32,
+             mySlotInfoDesc  DisplayString
+        }
+    
+mySlotInfoDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of the device, that the slot exists on."
+        ::= { mySlotInfoEntry 1 }
+    
+mySlotInfoIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A unique value for each slot exist on the device specified by
+            the field mySlotInfoDeviceIndex, Its value ranges
+            between 1 and the value of the solt num  of this device."
+        ::= { mySlotInfoEntry 2 }
+    
+mySlotModuleInfoDescr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Descriptions for the module in the Slot. just like 's1902m' etc. It is a 
+             unique value for identifing a kind of module.This value will be null string
+             if slot is empty is NULL"
+        ::= { mySlotInfoEntry 3 }
+    
+mySlotInfoPortNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of ports on this slot.This value will be 0  if slot is empty"
+        ::= { mySlotInfoEntry 4 }
+
+mySlotInfoPortMaxNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Max number of ports on this slot has possibly."
+        ::= { mySlotInfoEntry 5 }
+                      
+mySlotInfoDesc OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the slot,the same as the pannel show."
+        ::= { mySlotInfoEntry 6 }
+--
+--ModuleTempState
+--          
+myModuleTempStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyModuleTempStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myDeviceMIBObjects 4 }
+    
+myModuleTempStateEntry OBJECT-TYPE
+        SYNTAX MyModuleTempStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        INDEX { myModuleTempStateDeviceIndex, myModuleTempStateIndex }
+        ::= { myModuleTempStateTable 1 }
+
+MyModuleTempStateEntry ::= 
+        SEQUENCE {
+	     myModuleTempStateDeviceIndex Integer32, 
+             myModuleTempStateIndex Integer32,
+             myModuleTempState  INTEGER
+        }
+
+myModuleTempStateDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myModuleTempStateEntry 1 }
+  
+myModuleTempStateIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myModuleTempStateEntry 2 }
+    
+myModuleTempState OBJECT-TYPE
+        SYNTAX INTEGER{
+        	tempNormal(1),
+        	tempWarning(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myModuleTempStateEntry 3 }
+
+myPowerStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyPowerStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myDeviceMIBObjects 5 }
+    
+myPowerStateEntry OBJECT-TYPE
+        SYNTAX MyPowerStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        INDEX { myPowerStateDeviceIndex, myPowerStateIndex }
+        ::= { myPowerStateTable 1 }
+
+MyPowerStateEntry ::= 
+        SEQUENCE {
+	     myPowerStateDeviceIndex Integer32,
+             myPowerStateIndex Integer32,
+             myPowerState  INTEGER
+        }
+
+myPowerStateDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myPowerStateEntry 1 }
+    
+myPowerStateIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myPowerStateEntry 2 }
+    
+myPowerState OBJECT-TYPE
+        SYNTAX INTEGER{
+        	noLink(1),                 --no exist
+        	linkAndNoPower(2),         --exist but no power
+        	linkAndReadyForPower(3),   --exist and ready for power
+        	linkAndPower(4),           --normal power 
+		linkAndPowerAbnormal(5)    --power,but abnormal at fan
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myPowerStateEntry 3 }
+
+
+myFanStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyFanStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myDeviceMIBObjects 6 }
+    
+myFanStateEntry OBJECT-TYPE
+        SYNTAX MyFanStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            ""
+        INDEX {  myFanStateDeviceIndex, myFanStateIndex }
+        ::= { myFanStateTable 1 }
+
+MyFanStateEntry ::= 
+        SEQUENCE {
+	     myFanStateDeviceIndex Integer32,
+             myFanStateIndex Integer32,
+             myFanState  INTEGER
+        }
+
+myFanStateDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myFanStateEntry 1 }
+    
+myFanStateIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myFanStateEntry 2 }
+    
+myFanState OBJECT-TYPE
+        SYNTAX INTEGER{
+        	work(1),      --fan working
+        	stop(2)      --fan stopping or no exist 
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { myFanStateEntry 3 }
+           
+
+myEntityMIBTraps OBJECT IDENTIFIER ::= { myEntityMIB 2 }      
+
+myEntityStateChgDesc OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of entity change."
+        ::= { myEntityMIBTraps 1 }       
+        
+myEntityStatusChange NOTIFICATION-TYPE
+        OBJECTS   {myEntityStateChgDesc}
+        STATUS     current
+        DESCRIPTION
+                "while status of the entity changed, then this trap will be sent."
+        ::= { myEntityMIBTraps 2 }                    
+        
+myTemperatureWarningDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..256)) 
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          ""
+        ::= { myEntityMIBTraps 3 }       
+        
+myTemperatureWarning NOTIFICATION-TYPE
+        OBJECTS   { myTemperatureWarningDesc }
+        STATUS     current
+        DESCRIPTION
+                ""
+        ::= { myEntityMIBTraps 4 }
+        
+        
+-- conformance information
+
+myDeviceMIBConformance OBJECT IDENTIFIER ::= { myEntityMIB 3 }
+myDeviceMIBCompliances OBJECT IDENTIFIER ::= { myDeviceMIBConformance 1 }
+myDeviceMIBGroups      OBJECT IDENTIFIER ::= { myDeviceMIBConformance 2 }
+
+
+-- compliance statements
+
+myDeviceMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the My Device MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { myDeviceInfoMIBGroup,
+                                   myModuleInfoMIBGroup
+                 }
+                 GROUP      myOptionalDevInfoMIBGroup
+                 DESCRIPTION
+                     "This group is optional for those system which support device priority,alias and macaddress 
+                      information"  
+                 
+                 GROUP      myEntityChgDescGroup
+                 DESCRIPTION
+                     "This group is mandatory only for those system which support entity
+                     change notification."  
+                                      
+                GROUP       myDeviceMIBNotificationGroup
+                DESCRIPTION
+                     "This group is mandatory only for those system which support entity
+                     change notification."  
+                      
+                GROUP   myModuleTempStateGroup
+		DESCRIPTION  
+                     ""   
+
+                GROUP   myPowerStateGroup
+		DESCRIPTION  
+                     ""   
+
+                GROUP   myFanStateGroup
+		DESCRIPTION  
+                     ""
+  
+		GROUP  myTemperatureWarningDescGroup 
+		DESCRIPTION
+                      ""
+
+                GROUP   myTemperatureWarningGroup
+                DESCRIPTION 
+                      ""
+
+        ::= { myDeviceMIBCompliances 1 }
+                
+-- units of conformance
+
+myDeviceInfoMIBGroup OBJECT-GROUP
+        OBJECTS {
+          myDeviceMaxNumber, 
+	       myDeviceInfoIndex,
+	       myDeviceInfoDescr,
+	       myDeviceInfoSlotNumber,
+	       myDevicePowerStatus
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing device information to a
+                My agent."
+        ::= { myDeviceMIBGroups 1 } 
+
+myOptionalDevInfoMIBGroup OBJECT-GROUP
+        OBJECTS {
+	       myDeviceMacAddress,
+	       myDevicePriority,
+	       myDeviceAlias,
+               myDeviceSWVersion,
+               myDeviceHWVersion
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing optional device information to a
+                My agent."
+        ::= { myDeviceMIBGroups 2 } 
+        
+myModuleInfoMIBGroup OBJECT-GROUP
+        OBJECTS {
+             mySlotInfoDeviceIndex,
+             mySlotInfoIndex,
+             mySlotModuleInfoDescr,
+             mySlotInfoPortNumber,
+             mySlotInfoPortMaxNumber,
+	     mySlotInfoDesc 	
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing module information to a
+                My agent."
+        ::= { myDeviceMIBGroups 3 }                
+                               
+myEntityChgDescGroup OBJECT-GROUP
+        OBJECTS {myEntityStateChgDesc}
+        STATUS  current
+        DESCRIPTION
+                "Objects that providing a literal description of entity's change."
+        ::= { myDeviceMIBGroups 4 }             
+        
+myDeviceMIBNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {myEntityStatusChange}
+    STATUS        current
+    DESCRIPTION
+            "The collection of notifications which used to inform entity general status information"
+    ::= { myDeviceMIBGroups 5}
+
+myModuleTempStateGroup OBJECT-GROUP
+        OBJECTS {
+	     myModuleTempStateDeviceIndex, 
+             myModuleTempStateIndex,
+             myModuleTempState
+		}
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { myDeviceMIBGroups 6 }             
+
+myPowerStateGroup OBJECT-GROUP
+        OBJECTS {
+	     myPowerStateDeviceIndex,
+             myPowerStateIndex,
+             myPowerState
+		}
+        STATUS  current
+        DESCRIPTION
+                "."
+        ::= { myDeviceMIBGroups 7 } 
+            
+myFanStateGroup OBJECT-GROUP
+        OBJECTS {
+	     myFanStateDeviceIndex,
+             myFanStateIndex,
+             myFanState
+		}
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { myDeviceMIBGroups 8 }   
+
+myTemperatureWarningDescGroup OBJECT-GROUP
+        OBJECTS { myTemperatureWarningDesc }
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { myDeviceMIBGroups 9 } 
+
+myTemperatureWarningGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { myTemperatureWarning }
+	STATUS        current
+	DESCRIPTION
+            ""
+    ::= { myDeviceMIBGroups 10}
+          
+
+-- definitions in RFC 1213 made
+
+        
+END

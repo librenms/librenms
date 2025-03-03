@@ -1,0 +1,311 @@
+-- **************************************************************
+-- CERENT-ENVMON-MIB module
+--
+-- This module contains the environmental monitoring objects and 
+-- events for the Cisco ONS devices.
+
+-- Copyright (c) 2004 by Cisco Systems, Inc.
+-- All rights reserved.
+--
+-- **************************************************************
+
+CERENT-ENVMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	cerentModules,
+	cerentRequirements,
+	cerentGeneric
+		FROM CERENT-GLOBAL-REGISTRY
+	DisplayString
+		FROM SNMPv2-TC
+    OBJECT-GROUP,
+	MODULE-COMPLIANCE
+		FROM SNMPv2-CONF
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE,
+	Gauge32,
+	Integer32
+		FROM SNMPv2-SMI;
+
+cerentEnvMonMIB MODULE-IDENTITY
+	LAST-UPDATED "200401271451Z"
+	ORGANIZATION "Cisco Systems, Inc."
+	CONTACT-INFO
+		"Support@Cisco.com
+
+		Postal: 1435 North McDowell Blvd
+		              Petaluma CA 94954
+
+		Tel:      +1.877.323.7368"
+	DESCRIPTION
+		"This MIB module provides Environmental status information"
+	REVISION "200401271451Z"
+	DESCRIPTION
+		"First  Version"
+	::= { cerentModules 120 }
+
+cerentEnvMonMibConformance OBJECT-IDENTITY
+      STATUS      current
+      DESCRIPTION
+            "This node is created for compliance. Has
+             objects as required by the RFCs"
+      ::= { cerentRequirements 70 }
+
+cerentEnvMonMibCompliance OBJECT-IDENTITY
+      STATUS      current
+      DESCRIPTION
+            "The compliance statements
+             for Cisco ONS devices."
+      ::= { cerentEnvMonMibConformance 10 }
+
+cerentEnvMonMibGroups OBJECT-IDENTITY
+      STATUS      current
+      DESCRIPTION
+            "All the objects and events are
+             grouped under this for conformance"
+      ::= { cerentEnvMonMibConformance 20 }
+
+cerentEnvMonObjects OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { cerentGeneric 80 }
+
+cerentEnvMonVoltageStatsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CerentEnvMonVoltageStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table maintains the status info for all
+		EnvMon related voltages picked up by the
+		sensors in the device."
+	::= { cerentEnvMonObjects 10 }
+
+
+cerentEnvMonVoltageStatsEntry OBJECT-TYPE
+	SYNTAX CerentEnvMonVoltageStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"There will as many rows as there are sensors
+		in the device."
+	INDEX {
+		cerentEnvMonVoltageStatsIndex }
+	::= { cerentEnvMonVoltageStatsTable 1 }
+
+
+CerentEnvMonVoltageStatsEntry ::= SEQUENCE {
+
+	cerentEnvMonVoltageStatsIndex             Integer32,
+	cerentEnvMonVoltageStatsDescr             DisplayString,
+	cerentEnvMonVoltageStatsCurrentValue      Integer32,
+	cerentEnvMonVoltageStatsThresholdVeryHigh Integer32,
+	cerentEnvMonVoltageStatsThresholdHigh     Integer32,
+	cerentEnvMonVoltageStatsThresholdLow      Integer32,
+	cerentEnvMonVoltageStatsThresholdVeryLow  Integer32 }
+
+
+cerentEnvMonVoltageStatsIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The value index uniquely indicates the voltage 
+		sensor in the device. "
+	::= { cerentEnvMonVoltageStatsEntry 10 }
+
+
+cerentEnvMonVoltageStatsDescr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Unique Name/Description of the voltage
+		sensor."
+	::= { cerentEnvMonVoltageStatsEntry 20 }
+
+
+cerentEnvMonVoltageStatsCurrentValue OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS
+		"millivolts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current voltage measurement at this 
+		voltage sensor."
+	::= { cerentEnvMonVoltageStatsEntry 30 }
+
+
+cerentEnvMonVoltageStatsThresholdVeryHigh OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS
+		"millivolts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"If the current voltage value exceeds this
+		threshold value, an alarm event will be raised 
+		by the device. 
+
+		The severity of this event may be 
+		provisionable."
+	::= { cerentEnvMonVoltageStatsEntry 40 }
+
+
+cerentEnvMonVoltageStatsThresholdHigh OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS
+		"millivolts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"If the current voltage value exceeds this
+		threshold value, a warning event will be raised 
+		by the device. 
+
+		The severity of this event may be 
+		provisionable."
+	::= { cerentEnvMonVoltageStatsEntry 50 }
+
+
+cerentEnvMonVoltageStatsThresholdLow OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS
+		"millivolts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"If the current voltage value falls below this
+		threshold value, a warning event will be raised 
+		by the device. 
+
+		The severity of this event may be 
+		provisionable."
+	::= { cerentEnvMonVoltageStatsEntry 60 }
+
+
+cerentEnvMonVoltageStatsThresholdVeryLow OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS
+		"millivolts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"If the current voltage value falls below this
+		threshold value, an alarm event will be raised 
+		by the device. 
+
+		The severity of this event may be 
+		provisionable."
+	::= { cerentEnvMonVoltageStatsEntry 70 }
+
+
+cerentEnvMonTemperatureStatsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CerentEnvMonTemperatureStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table provides ambient temperature 
+		information as measured by the 
+		temperature sensors."
+	::= { cerentEnvMonObjects 20 }
+
+
+cerentEnvMonTemperatureStatsEntry OBJECT-TYPE
+	SYNTAX CerentEnvMonTemperatureStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Each temperature is represented by a row 
+		in the table."
+	INDEX {
+		cerentEnvMonTemperatureStatsIndex }
+	::= { cerentEnvMonTemperatureStatsTable 1 }
+
+
+CerentEnvMonTemperatureStatsEntry ::= SEQUENCE {
+
+	cerentEnvMonTemperatureStatsIndex         Integer32,
+	cerentEnvMonTemperatureStatsDescr         DisplayString,
+	cerentEnvMonTemperatureStatsCurrentValue  Gauge32,
+	cerentEnvMonTemperatureStatsThresholdHigh Gauge32 }
+
+
+cerentEnvMonTemperatureStatsIndex OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The value index uniquely indicates the 
+		temperature sensor in the device. "
+	::= { cerentEnvMonTemperatureStatsEntry 10 }
+
+
+cerentEnvMonTemperatureStatsDescr OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Unique Name/Description of the 
+		temperature sensor."
+	::= { cerentEnvMonTemperatureStatsEntry 20 }
+
+
+cerentEnvMonTemperatureStatsCurrentValue OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS
+		"Degree Celsius"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current Temperature measurement at this
+		temperature sensor."
+	::= { cerentEnvMonTemperatureStatsEntry 30 }
+
+
+cerentEnvMonTemperatureStatsThresholdHigh OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS
+		"Degree Celsius"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"If the current temperature value exceeds this
+		 threshold value, an alarm event will be
+		raised by the device. 
+
+		The severity of this event may be 
+		provisionable."
+	::= { cerentEnvMonTemperatureStatsEntry 40 }
+
+cerentEnvMonMibObjectsGroup  OBJECT-GROUP
+        OBJECTS {
+          cerentEnvMonVoltageStatsDescr,
+          cerentEnvMonVoltageStatsCurrentValue,
+          cerentEnvMonVoltageStatsThresholdVeryHigh,
+          cerentEnvMonVoltageStatsThresholdHigh,
+          cerentEnvMonVoltageStatsThresholdLow,
+          cerentEnvMonVoltageStatsThresholdVeryLow,
+          cerentEnvMonTemperatureStatsDescr,
+          cerentEnvMonTemperatureStatsCurrentValue,
+          cerentEnvMonTemperatureStatsThresholdHigh
+          }
+        STATUS current
+        DESCRIPTION
+          "All NMS accessible objects"
+        ::= { cerentEnvMonMibGroups 10 }
+
+
+cerentEnvMonMibBasicCompliance MODULE-COMPLIANCE
+       STATUS current
+       DESCRIPTION
+         "The basic implementation requirements
+          for all Cisco ONS network devices."
+       MODULE
+         MANDATORY-GROUPS { cerentEnvMonMibObjectsGroup }
+       ::= { cerentEnvMonMibCompliance 10 }
+
+END
+

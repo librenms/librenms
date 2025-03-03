@@ -12,34 +12,29 @@
  * the source code distribution for details.
  */
 
-if (strpos($_SERVER['PATH_INFO'], 'debug')) {
-    $debug = '1';
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    ini_set('log_errors', 1);
-    ini_set('error_reporting', E_ALL);
-} else {
-    $debug = false;
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('error_reporting', 0);
-}
+use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
-$init_modules = array('web', 'auth');
+$init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-$report = mres($vars['report']);
-if (!empty($report) && file_exists("includes/reports/$report.csv.inc.php")) {
-    if ($debug === false) {
+if (! Auth::check()) {
+    exit('Unauthorized');
+}
+
+Debug::set(strpos($_SERVER['PATH_INFO'], 'debug'));
+
+$report = basename($vars['report']);
+if ($report && file_exists(Config::get('install_dir') . "/includes/html/reports/$report.csv.inc.php")) {
+    if (! Debug::isEnabled()) {
         header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="'.$report.'-'.date('Ymd').'.csv"');
+        header('Content-Disposition: attachment; filename="' . $report . '-' . date('Ymd') . '.csv"');
     }
 
-    $csv = array();
-    require $config['install_dir'] . "/html/includes/reports/$report.csv.inc.php";
+    $csv = [];
+    require Config::get('install_dir') . "/includes/html/reports/$report.csv.inc.php";
     foreach ($csv as $line) {
-        echo implode(',', $line)."\n";
+        echo implode(',', $line) . "\n";
     }
 } else {
     echo "Report not found.\n";

@@ -1,0 +1,777 @@
+-- =============================================================================
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The MIB for VSI (Virtual Switch Instance).
+-- Reference:
+-- Version: V1.7
+-- History:
+--   V1.0 2009-08-08 Initial version Created by Zhonghua Gao
+--   V1.1 2012-11-21 Modified by yanneng, added hh3cVsiSpbIsid,
+--               Value 'default(0)' is added for data type 'hh3cVsiMode'
+--   V1.2 2013-04-27 Modified by raoxiaobing, Value 'minmpxp(6), martiniAndMinmpxp(7)
+--               and kompellaAndMinmpxp(8)' is added for data type 'hh3cVsiMode'
+--   V1.3 2013-09-11 Modified by yanneng, added hh3cVsiPwBindTable table.
+--   V1.4 2013-11-22 Modified by yanneng, added hh3cVsiL2vpnStatus,
+--               hh3cVsiVxlanID, hh3cVsiArpSuppression, hh3cVsiFlooding,
+--               hh3cVsiLocalMacCount, hh3cVsiFloodMacTable, hh3cVsiLocalMacTable
+--   V1.5 2014-03-22 Modified by wangrui, added hh3cVsiInterfaceID, hh3cVsiStatistics,
+--               hh3cVsiPerfTable, hh3cVsiIfTable
+--        2014-04-12 Modified by yanneng, added hh3cVsiNvgreID
+--   V1.6 2015-05-19 Modified by fuzhihua, modified hh3cVsiXconnectEvcSrvInstId
+--   V1.7 2016-10-29 Modified by liuqingye, added value 'vxlan(9)' for
+--               data type 'hh3cVsiMode'
+-- =============================================================================
+HH3C-VSI-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        RowStatus, TruthValue, MacAddress
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Counter64,
+        Unsigned32
+    FROM SNMPv2-SMI
+        InterfaceIndex
+    FROM IF-MIB
+        hh3cCommon
+    FROM HH3C-OID-MIB;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cVsi MODULE-IDENTITY
+    LAST-UPDATED
+        "201610291650Z"        -- Oct 29, 2016 at 16:50 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "The MIB for VSI (Virtual Switch Instance)."
+    REVISION
+        "201610291650Z"   -- Oct 29, 2016 at 16:50 GMT
+    DESCRIPTION
+        "Added value 'vxlan(9)' for data type 'hh3cVsiMode' version."
+    REVISION
+        "201505261555Z"   -- May 26, 2015 at 15:55 GMT
+    DESCRIPTION
+        "Modified hh3cVsiXconnectEvcSrvInstId version."
+    REVISION
+        "200908081000Z"   -- Aug 08, 2009 at 10:00 GMT
+    DESCRIPTION
+        "Initial version."
+    ::= { hh3cCommon 105 }
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+
+hh3cVsiObjects      OBJECT IDENTIFIER ::= { hh3cVsi 1 }
+
+hh3cVsiScalarGroup OBJECT IDENTIFIER ::= { hh3cVsiObjects 1 }
+
+hh3cVsiNextAvailableVsiIndex    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Next available VSI entry index for creating VSI.  Its value ranges
+        from 0x1 to 0xFFFFFFFF.  The invalid value 0xFFFFFFFF indicates that
+        no VSI entry can be created."
+    ::= { hh3cVsiScalarGroup 1 }
+
+hh3cVsiL2vpnStatus    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The global configuration of L2VPN."
+    ::= { hh3cVsiScalarGroup 2 }
+
+-- =============================================================================
+-- hh3cVsiTable Definition
+-- =============================================================================
+hh3cVsiTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring VSI parameters."
+    ::= { hh3cVsiObjects 2 }
+
+hh3cVsiEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVsiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring VSI parameters."
+    INDEX
+    {
+        hh3cVsiIndex
+    }
+    ::= { hh3cVsiTable 1 }
+
+Hh3cVsiEntry ::=
+    SEQUENCE
+    {
+        hh3cVsiIndex             Unsigned32,
+        hh3cVsiName              OCTET STRING,
+        hh3cVsiMode              INTEGER,
+        hh3cMinmIsid             Integer32,
+        hh3cVsiId                Unsigned32,
+        hh3cVsiTransMode         INTEGER,
+        hh3cVsiEnableHubSpoke    INTEGER,
+        hh3cVsiAdminState        INTEGER,
+        hh3cVsiRowStatus         RowStatus,
+        hh3cVsiSpbIsid           Integer32,
+        hh3cVsiVxlanID           Unsigned32,
+        hh3cVsiArpSuppression    TruthValue,
+        hh3cVsiFlooding          TruthValue,
+        hh3cVsiLocalMacCount     Unsigned32,
+        hh3cVsiInterfaceID       Unsigned32,
+        hh3cVsiStatistics        TruthValue,
+        hh3cVsiNvgreID           Unsigned32
+    }
+
+hh3cVsiIndex    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of VSI.  Its value ranges from 0x1 to 0xFFFFFFFE."
+    ::= { hh3cVsiEntry 1 }
+
+hh3cVsiName    OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Name of VSI.  Max string length of VSI name is 31."
+    ::= { hh3cVsiEntry 2 }
+
+hh3cVsiMode    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        default(0),
+        martini(1),
+        minm(2),
+        martiniAndMinm(3),
+        kompella(4),
+        kompellaAndMinm(5),
+        minmpxp(6),
+        martiniAndMinmpxp(7),
+        kompellaAndMinmpxp(8),
+        vxlan(9)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Mode of VSI.  Martini mode indicated this VSI supports VPLS service
+         signalled using LDP.  Kompella indicated this VSI supports VPLS
+         service signalled using BGP.  Minm indicated this VSI supports
+         MAC-in-MAC service.
+         Default indicated this VSI supports all services."
+
+    ::= { hh3cVsiEntry 3 }
+
+hh3cMinmIsid    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The PBB I-SID of VSI in minm or martiniAndMinm mode.  It
+        must be different for every VSI.  Its value ranges from 0x1 to
+        0xFFFFFF.  In other VSI modes, its value is invalid value 0x0."
+    ::= { hh3cVsiEntry 4 }
+
+hh3cVsiId    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Identifier of VSI in martini or martiniAndMinm mode, by default,
+        it's the PW ID of this VSI.  Its value ranges from 1 to 4294967295.
+        In other VSI modes, its value is invalid value 0."
+    ::= { hh3cVsiEntry 5 }
+
+hh3cVsiTransMode    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        vlan(1),
+        ethernet(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Transit Mode of VSI."
+    ::= { hh3cVsiEntry 6 }
+
+hh3cVsiEnableHubSpoke    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        disable(1),
+        enable(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Config HubSpoke property of this VSI."
+    ::= { hh3cVsiEntry 7 }
+
+hh3cVsiAdminState   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        adminUp(1),
+        adminDown(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Set VSI admin state as adminUp or adminDown."
+    ::= { hh3cVsiEntry 8 }
+
+hh3cVsiRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVsiEntry 9 }
+
+hh3cVsiSpbIsid    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The SPB I-SID of VSI in minm or martiniAndMinm mode.  It
+        must be different for every VSI.  Its value ranges from 0xFF to
+        0xFFFFFF.  In other VSI modes, its value is invalid value 0x0."
+    ::= { hh3cVsiEntry 10 }
+
+hh3cVsiVxlanID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VXLAN ID, in the range of 0x0 to 0xFFFFFF.  Value 0xFFFFFFFF means
+        this VSI does not enable VXLAN service."
+    ::= { hh3cVsiEntry 11 }
+
+hh3cVsiArpSuppression    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The capability of ARP suppression."
+    DEFVAL { false }
+    ::= { hh3cVsiEntry 12 }
+
+hh3cVsiFlooding    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The capability of MAC(Media Access Control) flooding."
+    DEFVAL { true }
+    ::= { hh3cVsiEntry 13 }
+
+hh3cVsiLocalMacCount    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of VSI local MAC addresses."
+    ::= { hh3cVsiEntry 14 }
+
+hh3cVsiInterfaceID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VSI interface ID.  A value of 0xFFFFFFFF indicates that no gateway
+        interface has been assigned to the VSI."
+    ::= { hh3cVsiEntry 15 }
+
+hh3cVsiStatistics    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The enable status of VSI traffic flow statistics."
+    DEFVAL { false }
+    ::= { hh3cVsiEntry 16 }
+
+hh3cVsiNvgreID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "NVGRE ID, in the range of 4096 to 16777214.  Value 4294967295 means
+        this VSI does not enable NVGRE service."
+    ::= { hh3cVsiEntry 17 }
+
+-- =============================================================================
+-- End of hh3cVsiTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cVsiXconnectTable Definition
+-- =============================================================================
+hh3cVsiXconnectTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsiXconnectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring xconnect parameters."
+    ::= { hh3cVsiObjects 3 }
+
+hh3cVsiXconnectEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVsiXconnectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring xconnect parameters.  Each entry means
+        connecting a service instance of a interface to a VSI."
+    INDEX
+    {
+        hh3cVsiXconnectIfIndex,
+        hh3cVsiXconnectEvcSrvInstId
+    }
+    ::= { hh3cVsiXconnectTable 1 }
+
+Hh3cVsiXconnectEntry ::=
+    SEQUENCE
+    {
+        hh3cVsiXconnectIfIndex      Unsigned32,
+        hh3cVsiXconnectEvcSrvInstId Unsigned32,
+        hh3cVsiXconnectVsiName      OCTET STRING,
+        hh3cVsiXconnectAccessMode   INTEGER,
+        hh3cVsiXconnectHubSpoke     INTEGER,
+        hh3cVsiXconnectRowStatus    RowStatus
+    }
+hh3cVsiXconnectIfIndex    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of the interface associated with the VSI."
+    ::= { hh3cVsiXconnectEntry 1 }
+
+hh3cVsiXconnectEvcSrvInstId    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of the service instance associated with the VSI.  The value is always 0 when the
+         interface isn't a layer 2 Ethernet interface."
+    ::= { hh3cVsiXconnectEntry 2 }
+
+
+hh3cVsiXconnectVsiName    OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Name of VSI.  Max string length of VSI name is 31."
+    ::= { hh3cVsiXconnectEntry 3 }
+
+hh3cVsiXconnectAccessMode    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        vlan(1),
+        ethernet(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Access mode of this service instance."
+    ::= { hh3cVsiXconnectEntry 4 }
+
+hh3cVsiXconnectHubSpoke    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        none(1),
+        hub(2),
+        spoke(3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Config HubSpoke property of this service instance."
+    ::= { hh3cVsiXconnectEntry 5 }
+
+hh3cVsiXconnectRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVsiXconnectEntry 6 }
+
+-- =============================================================================
+-- End of hh3cVsiXconnectTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cVsiPwBindTable Definition
+-- =============================================================================
+hh3cVsiPwBindTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsiPwBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for PW(PseudoWire) mapping to VSI."
+    ::= { hh3cVsiObjects 4 }
+
+hh3cVsiPwBindEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVsiPwBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry means a PW mapping to a VSI."
+    INDEX
+    {
+        hh3cVsiIndex,
+        hh3cVsiPwIndex
+    }
+    ::= { hh3cVsiPwBindTable 1 }
+
+Hh3cVsiPwBindEntry ::=
+    SEQUENCE
+    {
+        hh3cVsiPwIndex            Unsigned32,
+        hh3cVsiPwBindAttributes   BITS,
+        hh3cVsiPwBindRowStatus    RowStatus
+    }
+
+hh3cVsiPwIndex    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique index for the conceptual row identifying
+         a PW in the pwTable."
+    ::= { hh3cVsiPwBindEntry 1 }
+
+hh3cVsiPwBindAttributes    OBJECT-TYPE
+    SYNTAX      BITS {
+                     noSplitHorizon (0),
+                     hub (1)
+                    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This bit mask indicates optional values for this PW.
+         The following describes these bit fields:
+
+         noSplitHorizon flag indicates that the PW disable
+         split horizon forwarding.
+
+         hub flag indicates that the PW as the hub link the VSI."
+    ::= { hh3cVsiPwBindEntry 2 }
+
+hh3cVsiPwBindRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  A row entry cannot
+        be modified when the value of this object is 'active'."
+    ::= { hh3cVsiPwBindEntry 3 }
+
+-- =============================================================================
+-- End of hh3cVsiPwBindTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cVsiFloodMacTable Definition
+-- =============================================================================
+hh3cVsiFloodMacTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsiFloodMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of MAC addresses enabled with selective flooding."
+    ::= { hh3cVsiObjects 5 }
+
+hh3cVsiFloodMacEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVsiFloodMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents a selective flooding MAC."
+    INDEX
+    {
+        hh3cVsiIndex,
+        hh3cVsiFloodMac
+    }
+    ::= { hh3cVsiFloodMacTable 1 }
+
+Hh3cVsiFloodMacEntry ::=
+    SEQUENCE
+    {
+        hh3cVsiFloodMac               MacAddress,
+        hh3cVsiFloodMacRowStatus      RowStatus
+    }
+
+hh3cVsiFloodMac    OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MAC address."
+    ::= { hh3cVsiFloodMacEntry 1 }
+
+hh3cVsiFloodMacRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVsiFloodMacEntry 2 }
+
+-- =============================================================================
+-- End of hh3cVsiFloodMacTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cVsiLocalMacTable Definition
+-- =============================================================================
+hh3cVsiLocalMacTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsiLocalMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for VSI local MAC addresses."
+    ::= { hh3cVsiObjects 6 }
+
+hh3cVsiLocalMacEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVsiLocalMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A local MAC address of VSI."
+    INDEX
+    {
+        hh3cVsiIndex,
+        hh3cVsiLocalMacAddr
+    }
+    ::= { hh3cVsiLocalMacTable 1 }
+
+Hh3cVsiLocalMacEntry ::=
+    SEQUENCE
+    {
+        hh3cVsiLocalMacAddr            MacAddress,
+        hh3cVsiLocalMacIfIndex         InterfaceIndex,
+        hh3cVsiLocalMacSrvID           Unsigned32
+    }
+
+hh3cVsiLocalMacAddr    OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MAC address."
+    ::= { hh3cVsiLocalMacEntry 1 }
+
+hh3cVsiLocalMacIfIndex    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index of the interface associated with the MAC address."
+    ::= { hh3cVsiLocalMacEntry 2 }
+
+hh3cVsiLocalMacSrvID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index of the service instance associated with the MAC address."
+    ::= { hh3cVsiLocalMacEntry 3 }
+
+-- =============================================================================
+-- End of hh3cVsiLocalMacTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cVsiPerfTable Definition
+-- =============================================================================
+hh3cVsiPerfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsiPerfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains performance statistics for each VSI."
+    ::= { hh3cVsiObjects 7 }
+
+hh3cVsiPerfEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVsiPerfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in this table contains statistics for a VSI."
+    INDEX
+    {
+        hh3cVsiIndex
+    }
+    ::= { hh3cVsiPerfTable 1 }
+
+Hh3cVsiPerfEntry ::=
+    SEQUENCE
+    {
+        hh3cVsiPerfInOctets            Counter64,
+        hh3cVsiPerfInPackets           Counter64,
+        hh3cVsiPerfInErrors            Counter64,
+        hh3cVsiPerfInDiscards          Counter64,
+        hh3cVsiPerfOutOctets           Counter64,
+        hh3cVsiPerfOutPackets          Counter64,
+        hh3cVsiPerfOutErrors           Counter64,
+        hh3cVsiPerfOutDiscards         Counter64
+    }
+
+hh3cVsiPerfInOctets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received by the VSI."
+    ::= { hh3cVsiPerfEntry 1 }
+
+hh3cVsiPerfInPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received by the VSI."
+    ::= { hh3cVsiPerfEntry 2 }
+
+hh3cVsiPerfInErrors    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of error packets received by the VSI."
+    ::= { hh3cVsiPerfEntry 3 }
+
+hh3cVsiPerfInDiscards    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of incoming packets discarded by the VSI."
+    ::= { hh3cVsiPerfEntry 4 }
+
+hh3cVsiPerfOutOctets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets sent by the VSI."
+    ::= { hh3cVsiPerfEntry 5 }
+
+hh3cVsiPerfOutPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets sent by the VSI."
+    ::= { hh3cVsiPerfEntry 6 }
+
+hh3cVsiPerfOutErrors    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that failed to be sent because of a VSI error."
+    ::= { hh3cVsiPerfEntry 7 }
+
+hh3cVsiPerfOutDiscards    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Number of packets discarded by the VSI because of transmission failure."
+    ::= { hh3cVsiPerfEntry 8 }
+-- =============================================================================
+-- End of hh3cVsiPerfTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cVsiNextAvailableVsiIfID Definition
+-- =============================================================================
+hh3cVsiNextAvailableVsiIfID OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object contains the next available value for hh3cVsiIfID
+        when creating entries in the hh3cVsiIfTable.  A value of 0xFFFFFFFF
+        indicates that no new entries can be created in this table.
+        To prevent managers from creating entries in this table, the agent
+        must set this object to this special value."
+   ::= { hh3cVsiObjects 8 }
+
+-- =============================================================================
+-- hh3cVsiIfTable Definition
+-- =============================================================================
+hh3cVsiIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsiIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VSI interface table."
+    ::= { hh3cVsiObjects 9 }
+
+hh3cVsiIfEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVsiIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in this table contains a VSI interface."
+    INDEX
+    {
+        hh3cVsiIfID
+    }
+    ::= { hh3cVsiIfTable 1 }
+
+Hh3cVsiIfEntry ::=
+    SEQUENCE
+    {
+        hh3cVsiIfID               Unsigned32,
+        hh3cVsiIfIndex            InterfaceIndex,
+        hh3cVsiIfRowStatus        RowStatus
+    }
+
+hh3cVsiIfID    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VSI interface ID."
+    ::= { hh3cVsiIfEntry 1 }
+
+hh3cVsiIfIndex    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VSI interface index."
+    ::= { hh3cVsiIfEntry 2 }
+
+hh3cVsiIfRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of the table entry."
+    ::= { hh3cVsiIfEntry 3 }
+
+-- =============================================================================
+-- End of hh3cVsiIfTable Definition
+-- =============================================================================
+
+END

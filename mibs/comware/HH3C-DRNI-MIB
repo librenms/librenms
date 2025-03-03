@@ -1,0 +1,581 @@
+-- =====================================================================
+-- Copyright (c) 2004-2021 New H3C Tech.  Co., Ltd.  All rights reserved.
+--
+-- Description: DRNI MIB
+-- Reference:
+-- Version: V1.2
+-- History:
+--   V1.0 Initial version, created by jinshengzhong dangfangchao
+--   V1.1 2019-04-11 updated by jinshengzhong
+--        Change description of hh3cDrniIppEntry.
+--   V1.2 2020-02-23 updated by liuyafang
+--        Change description of nodes hh3cDrniPortLocalMemberList
+--        and hh3cDrniPortPeerMemberList
+-- =====================================================================
+HH3C-DRNI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    MacAddress, TruthValue, RowStatus
+        FROM SNMPv2-TC
+    InetAddressIPv4, InetAddressIPv6
+        FROM INET-ADDRESS-MIB
+    PortList
+        FROM Q-BRIDGE-MIB
+    InterfaceIndex
+        FROM IF-MIB;
+
+hh3cDrni MODULE-IDENTITY
+    LAST-UPDATED "202002231101Z"
+    ORGANIZATION
+        "New H3C Tech.  Co., Ltd."
+    CONTACT-INFO
+        "
+        Platform Team New H3C Tech.  Co., Ltd.
+        Hai-Dian District Beijing P.R.  China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "
+        This MIB defines objects for
+        Distributed Resilient Network Interconnect (DRNI).
+        "
+    REVISION
+        "202002231101Z"
+    DESCRIPTION
+        "
+        Change description of nodes hh3cDrniPortLocalMemberList
+        and hh3cDrniPortPeerMemberList.
+        "
+    REVISION
+        "201904110901Z"
+    DESCRIPTION
+        "
+        Change description of hh3cDrniIppEntry.
+        "
+    REVISION
+        "201808141021Z"
+    DESCRIPTION
+        "DRNI MIB."
+    ::= { hh3cCommon 176 }
+
+
+--
+-- Node definitions
+--
+
+    hh3cDrniObjects OBJECT IDENTIFIER ::= { hh3cDrni 1 }
+
+
+    hh3cDrniBaseGroup OBJECT IDENTIFIER ::= { hh3cDrniObjects 1 }
+
+    hh3cDrniRoleGroup OBJECT IDENTIFIER ::= { hh3cDrniObjects 2 }
+
+    hh3cDrniKeepaliveGroup OBJECT IDENTIFIER ::= { hh3cDrniObjects 3 }
+
+    hh3cDrniTables OBJECT IDENTIFIER ::= { hh3cDrniObjects 4 }
+
+
+    hh3cDrniSystemMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Distributed relay (DR) system MAC address.
+             The default value is six octets of zero."
+        ::= { hh3cDrniBaseGroup 1 }
+
+    hh3cDrniSystemPriority OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DR system priority.  The default value is 32768."
+        DEFVAL { 32768 }
+        ::= { hh3cDrniBaseGroup 2 }
+
+    hh3cDrniSystemNumber OBJECT-TYPE
+        SYNTAX Integer32 (0..2)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DR system number."
+        DEFVAL { 0 }
+        ::= { hh3cDrniBaseGroup 3 }
+
+    hh3cDrniRestoreDelay OBJECT-TYPE
+        SYNTAX Integer32 (1..3600)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Data restoration interval in seconds."
+        DEFVAL { 30 }
+        ::= { hh3cDrniBaseGroup 4 }
+
+    hh3cDrniAutoRecoveryReloadDelay OBJECT-TYPE
+        SYNTAX Integer32 (0|240..3600)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reload delay timer for DR system auto-recovery."
+        DEFVAL { 0 }
+        ::= { hh3cDrniBaseGroup 5 }
+
+
+    hh3cDrniRoleLocalRolePriority OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DR role priority of the local DR member device."
+        DEFVAL { 32768 }
+        ::= { hh3cDrniRoleGroup 1 }
+
+    hh3cDrniRolePeerRolePriority OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DR role priority of the peer DR member device."
+        ::= { hh3cDrniRoleGroup 2 }
+
+    hh3cDrniRoleLocalBridgeMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Bridge MAC address of the local DR member device.
+             The default value is six octets of zero."
+        ::= { hh3cDrniRoleGroup 3 }
+
+    hh3cDrniRolePeerBridgeMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Bridge MAC address of the peer DR member device.  If this address
+             is unknown, the default value is six octets of zero."
+        ::= { hh3cDrniRoleGroup 4 }
+
+    hh3cDrniRoleLocalConfiguredRole OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            none(0),
+            primary(1),
+            secondary(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DR role calculated based on the role priority and bridge MAC
+             address of the local DR member device."
+        ::= { hh3cDrniRoleGroup 5 }
+
+    hh3cDrniRolePeerConfiguredRole OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            none(0),
+            primary(1),
+            secondary(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DR role calculated based on the role priority and bridge MAC
+             address of the peer DR member device."
+        ::= { hh3cDrniRoleGroup 6 }
+
+    hh3cDrniRoleLocalEffectiveRole OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            none(0),
+            primary(1),
+            secondary(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Current role of the local DR member device."
+        ::= { hh3cDrniRoleGroup 7 }
+
+    hh3cDrniRolePeerEffectiveRole OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            none(0),
+            primary(1),
+            secondary(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Current role of the peer DR member device."
+        ::= { hh3cDrniRoleGroup 8 }
+
+
+    hh3cDrniKeepaliveDestIpv4 OBJECT-TYPE
+        SYNTAX InetAddressIPv4
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Destination IPv4 address of the keepalive link.
+             The default value is 0.0.0.0."
+        ::= { hh3cDrniKeepaliveGroup 1 }
+
+    hh3cDrniKeepaliveSourceIpv4 OBJECT-TYPE
+        SYNTAX InetAddressIPv4
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Source IPv4 address of the keepalive link.
+             The default value is 0.0.0.0.
+             This object must be used with the KeepaliveDestIpv4 object."
+        ::= { hh3cDrniKeepaliveGroup 2 }
+
+    hh3cDrniKeepaliveDestIpv6 OBJECT-TYPE
+        SYNTAX InetAddressIPv6
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Destination IPv6 address of the keepalive link.
+             The default value is 0::0."
+        ::= { hh3cDrniKeepaliveGroup 3 }
+
+    hh3cDrniKeepaliveSourceIpv6 OBJECT-TYPE
+        SYNTAX InetAddressIPv6
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Source IPv6 address of the keepalive link.
+             The default value is 0::0.
+             This object must be used with the KeepaliveDestIpv6 object."
+        ::= { hh3cDrniKeepaliveGroup 4 }
+
+    hh3cDrniKeepaliveUdpPort OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Keepalive destination UDP port."
+        DEFVAL { 6400 }
+        ::= { hh3cDrniKeepaliveGroup 5 }
+
+    hh3cDrniKeepaliveInterval OBJECT-TYPE
+        SYNTAX Integer32 (100..10000)
+        UNITS "milliseconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Keepalive interval."
+        DEFVAL { 1000 }
+            ::= { hh3cDrniKeepaliveGroup 6 }
+
+    hh3cDrniKeepaliveTimeout OBJECT-TYPE
+        SYNTAX Integer32 (3..20)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Keepalive timeout time."
+        DEFVAL { 5 }
+            ::= { hh3cDrniKeepaliveGroup 7 }
+
+    hh3cDrniKeepaliveHoldTime OBJECT-TYPE
+        SYNTAX Integer32 (3..10)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Keepalive hold time."
+        DEFVAL { 3 }
+            ::= { hh3cDrniKeepaliveGroup 8 }
+
+    hh3cDrniKeepaliveLinkStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            unknown(1),
+            up(2),
+            down(3)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Keepalive link status."
+            ::= { hh3cDrniKeepaliveGroup 9 }
+
+    hh3cDrniKeepaliveVrf OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "VPN instance name.  A zero-length string represents that the
+             local device is on the public network."
+        ::= { hh3cDrniKeepaliveGroup 10 }
+
+    hh3cDrniIppTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cDrniIppEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The DRNI intra-portal port(IPP) table."
+        ::= { hh3cDrniTables 1 }
+
+    hh3cDrniIppEntry OBJECT-TYPE
+        SYNTAX Hh3cDrniIppEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of hh3cDrniIPPTable."
+        INDEX { hh3cDrniIppNumber }
+        ::= { hh3cDrniIppTable 1 }
+
+    Hh3cDrniIppEntry ::=
+        SEQUENCE {
+            hh3cDrniIppNumber
+                Integer32,
+            hh3cDrniIppIfIndex
+                InterfaceIndex,
+            hh3cDrniIppRowStatus
+                RowStatus
+         }
+
+    hh3cDrniIppNumber OBJECT-TYPE
+        SYNTAX Integer32 (1..2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The number of an IPP."
+        ::= { hh3cDrniIppEntry 1 }
+
+    hh3cDrniIppIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Interface index."
+        ::= { hh3cDrniIppEntry 2 }
+
+    hh3cDrniIppRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is responsible for managing creation,
+             deletion, and modification of rows.  The rows support active
+             status and destroy operations."
+        ::= { hh3cDrniIppEntry 3 }
+
+
+    hh3cDrniDrPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cDrniDrPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The DRNI DR interface table."
+        ::= { hh3cDrniTables 2 }
+
+    hh3cDrniDrPortEntry OBJECT-TYPE
+        SYNTAX Hh3cDrniDrPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of hh3cDrniDRPortTable."
+        INDEX { hh3cDrniDrPortDRGroupId }
+        ::= { hh3cDrniDrPortTable 1 }
+
+    Hh3cDrniDrPortEntry ::=
+        SEQUENCE {
+            hh3cDrniDrPortDRGroupId
+                Integer32,
+            hh3cDrniDrPortIfIndex
+                InterfaceIndex,
+            hh3cDrniDrPortRowStatus
+                RowStatus
+         }
+
+    hh3cDrniDrPortDRGroupId OBJECT-TYPE
+        SYNTAX Integer32 (1..1024)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DR group identifier."
+        ::= { hh3cDrniDrPortEntry 1 }
+
+    hh3cDrniDrPortIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Interface index of the Layer 2 aggregate interface."
+        ::= { hh3cDrniDrPortEntry 2 }
+
+    hh3cDrniDrPortRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is responsible for managing creation,
+             deletion, and modification of rows.  The rows support active
+             status and destroy operations."
+        ::= { hh3cDrniDrPortEntry 3 }
+
+
+    hh3cDrniPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cDrniPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The DRNI port table."
+        ::= { hh3cDrniTables 3 }
+
+    hh3cDrniPortEntry OBJECT-TYPE
+        SYNTAX Hh3cDrniPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry of hh3cDrniPortTable."
+        INDEX { hh3cDrniPortIfIndex }
+        ::= { hh3cDrniPortTable 1 }
+
+    Hh3cDrniPortEntry ::=
+        SEQUENCE {
+            hh3cDrniPortIfIndex
+                InterfaceIndex,
+            hh3cDrniPortDrcpIsShortPeriod
+                TruthValue,
+            hh3cDrniPortPortStatus
+                INTEGER,
+            hh3cDrniPortLocalDRCPState
+                OCTET STRING,
+            hh3cDrniPortPeerDRCPState
+                OCTET STRING,
+            hh3cDrniPortLocalMemberList
+                PortList,
+            hh3cDrniPortPeerMemberList
+                PortList
+         }
+
+    hh3cDrniPortIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Interface index."
+        ::= { hh3cDrniPortEntry 1 }
+
+    hh3cDrniPortDrcpIsShortPeriod OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            Short Distributed Relay Control Protocol (DRCP)
+            timeout timer flag, true or false.
+            "
+        ::= { hh3cDrniPortEntry 2 }
+
+    hh3cDrniPortPortStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            up(1),
+            down(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port status."
+        ::= { hh3cDrniPortEntry 3 }
+
+    hh3cDrniPortLocalDRCPState OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DRCP state flags on the local port.
+             The flag field is one byte long,represented by ABCDEFGH
+             from the lowest bit to the highest bit.A letter is displayed
+             when its bit is 1 and is not displayed when its bit is 0.
+             A-Indicates whether DRCP is enabled on the local device.
+               1 indicates enabled.0 indicates disabled.
+             B-Indicates whether DRCP is enabled on the DR peer.
+               1 indicates enabled.0 indicates disabled.
+             C-Indicates whether DRCP is enabled on a third DR member device.
+               1 indicates enabled.0 indicates disabled.
+             D-Indicates whether the local IPP has determined that
+               DRCP is enabled on the DR peer.
+               1 indicates yes.0 indicates no.
+             E-Indicates the DRCP timeout timer.
+               1 indicates the short timeout timer.
+               0 indicates the long timeout timer.
+             F-Indicates whether the local IPP permits the packets
+               that contain the negotiated gateway conversation IDs.
+               1 indicates yes.0 indicates no.
+             G-Indicates whether the local IPP permits the packets that
+               contain the negotiated port conversation IDs.
+               1 indicates yes.0 indicates no.
+             H-Indicates whether the local DRCPDU receive machine is in
+               default or expired state.
+               1 indicates yes.0 indicates no."
+        ::= { hh3cDrniPortEntry 4 }
+
+    hh3cDrniPortPeerDRCPState OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DRCP state flags on the local port.
+             The flag field is one byte long,represented by ABCDEFGH
+             from the lowest bit to the highest bit.A letter is displayed
+             when its bit is 1 and is not displayed when its bit is 0.
+             A-Indicates whether DRCP is enabled on the local device.
+               1 indicates enabled.0 indicates disabled.
+             B-Indicates whether DRCP is enabled on the DR peer.
+               1 indicates enabled.0 indicates disabled.
+             C-Indicates whether DRCP is enabled on a third DR member device.
+               1 indicates enabled.0 indicates disabled.
+             D-Indicates whether the local IPP has determined that
+               DRCP is enabled on the DR peer.
+               1 indicates yes.0 indicates no.
+             E-Indicates the DRCP timeout timer.
+               1 indicates the short timeout timer.
+               0 indicates the long timeout timer.
+             F-Indicates whether the local IPP permits the packets
+               that contain the negotiated gateway conversation IDs.
+               1 indicates yes.0 indicates no.
+             G-Indicates whether the local IPP permits the packets that
+               contain the negotiated port conversation IDs.
+               1 indicates yes.0 indicates no.
+             H-Indicates whether the local DRCPDU receive machine is in
+               default or expired state.
+               1 indicates yes.0 indicates no."
+        ::= { hh3cDrniPortEntry 5 }
+
+    hh3cDrniPortLocalMemberList OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Local DR member device's Selected aggregation member ports in
+             a DR or IPP aggregation group."
+        ::= { hh3cDrniPortEntry 6 }
+
+    hh3cDrniPortPeerMemberList OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Peer DR member device's Selected aggregation member ports in
+             a DR or IPP aggregation group."
+        ::= { hh3cDrniPortEntry 7 }
+
+
+END
+
+--
+-- hh3c-drni.mib
+--

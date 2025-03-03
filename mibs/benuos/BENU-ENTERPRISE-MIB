@@ -1,0 +1,33 @@
+-- *****************************************************************
+-- BENU-ENTERPRISE-MIB.txt: Benu Enterprise Structure of Management
+-- Information
+-- Copyright (C) 2012  by Benu Networks, Inc.
+-- All rights reserved.
+-- *****************************************************************
+BENU-ENTERPRISE-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            MODULE-IDENTITY, enterprises
+                FROM SNMPv2-SMI;
+
+
+        benu MODULE-IDENTITY
+            LAST-UPDATED "201210180000Z" -- October 18, 2012
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+
+            DESCRIPTION "The Structure of Management Information for the
+		                 Benu Networks enterprise."
+
+            REVISION "201210180000Z" -- October 18, 2012
+            DESCRIPTION "Initial version."
+
+            ::= { enterprises 39406 }
+
+    END

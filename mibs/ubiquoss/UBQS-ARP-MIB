@@ -1,0 +1,490 @@
+-- *****************************************************************
+-- UBQS-ARP-MIB.mib:  Ubiquoss arp MIB file
+--
+-- June 2011, kimbk
+--
+-- Copyright (c) 2010 by Ubiquoss, Corp.
+-- All rights reserved.    
+--
+-- *****************************************************************
+--
+
+UBQS-ARP-MIB	DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE,
+	IpAddress
+		FROM SNMPv2-SMI     
+	RowStatus, TruthValue, MacAddress
+	    FROM SNMPv2-TC
+	DisplayString			
+		FROM RFC1213-MIB    
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,      
+    	FROM INET-ADDRESS-MIB
+    ifIndex
+    	FROM IF-MIB   		
+	ubiMgmtv2
+		FROM UBQS-SMI;
+		
+
+ubiArpMIB  MODULE-IDENTITY
+    LAST-UPDATED    "201012170000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+    DESCRIPTION
+        "The UBQS-SYSLOG-MIB is used to get 
+        the syslog information."   
+      	::= { ubiMgmtv2  20 }
+   				
+
+-- ***********************************************************
+-- Textual Conventions
+-- *********************************************************** 
+
+-- ***************************************************************
+-- ubiSyslogMIB
+-- *************************************************************** 
+ubiArpMIBNotificationPrefix 	OBJECT IDENTIFIER 	::= { ubiArpMIB 0 }
+ubiArpMIBObjects				OBJECT IDENTIFIER 	::= { ubiArpMIB 1 }
+ubiArpMIBConformance    		OBJECT IDENTIFIER 	::= { ubiArpMIB 2 }
+
+ubiArpEntryMIBObjects			OBJECT IDENTIFIER	::= { ubiArpMIBObjects 1 }
+ubiArpSnoopMIBObjects			OBJECT IDENTIFIER	::= { ubiArpMIBObjects 3 }                            
+
+-- ***********************************************************
+-- ubiArpTable
+-- ***********************************************************
+      		
+	ubiArpTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiArpEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The Table of arp cache list entrys"
+		::= { ubiArpEntryMIBObjects 1 }
+		
+	ubiArpEntry		OBJECT-TYPE
+		SYNTAX		UbiArpEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The entry of arp cache entry"
+		INDEX
+		{
+			ifIndex,
+			ubiArpMacAddress
+		}
+		::= { ubiArpTable 1 }
+		
+	UbiArpEntry ::= SEQUENCE {
+		ubiArpIpAddress		        DisplayString,
+		ubiArpMacAddress			DisplayString,
+		ubiArpType					INTEGER,
+		ubiArpPortIndex				Integer32,
+		ubiArpRowStatus				RowStatus
+	}
+
+	ubiArpIpAddress		OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION  
+			"arp cache ip address"
+		::= { ubiArpEntry 1 }
+		
+	ubiArpMacAddress	OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"arp cache mac address"
+		::= { ubiArpEntry 2 }
+		
+	ubiArpType			OBJECT-TYPE
+		SYNTAX		INTEGER
+		{            
+			dynamic(0),
+			static(1)
+		}
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"arp cache type"
+		::= { ubiArpEntry 3 }
+
+	ubiArpPortIndex		OBJECT-TYPE
+		SYNTAX		Integer32
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"arp cache port index"
+		::= { ubiArpEntry 4 }
+				
+	ubiArpRowStatus		OBJECT-TYPE
+		SYNTAX		RowStatus
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"arp cache row status"
+		::= { ubiArpEntry 5 }
+
+	ubiClearArpCache		OBJECT-TYPE
+    	SYNTAX		Integer32
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"command to clear arp-cache.
+    		 If value == 0
+    		 	clear all arp-cache
+    		 else if value == specific ifindex
+    		 	clear specific ifindex arp-cache"
+    	::= { ubiArpEntryMIBObjects 2 }
+ 		
+-- ***********************************************************
+-- ubiArpGetPonInfo
+-- ***********************************************************
+	
+	ubiArpGetPonInfo	OBJECT IDENTIFIER ::= { ubiArpEntryMIBObjects 3 }
+	
+	ubiArpGetPonInfoIpAddress		OBJECT-TYPE
+		SYNTAX		IpAddress
+		ACCESS      read-write
+		STATUS		current
+		DESCRIPTION
+			"IP address to be used to get pon information in arp table"
+		::= { ubiArpGetPonInfo 1 }
+
+	ubiArpGetPonInfoOnuId			OBJECT-TYPE
+		SYNTAX		Integer32
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"Searched ONU ID"
+		::= { ubiArpGetPonInfo 2 }
+				
+	ubiArpGetPonInfoOnuMacAddress	OBJECT-TYPE
+		SYNTAX		MacAddress 
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"Searched ONU MAC Address"
+		::= { ubiArpGetPonInfo 3 }
+		
+	ubiArpGetTotalCount		OBJECT-TYPE
+    	SYNTAX		Unsigned32
+    	ACCESS		read-only
+    	STATUS		current
+    	DESCRIPTION
+    		"Total Count of arp-cache"
+    	::= { ubiArpEntryMIBObjects 4 }		
+	
+-- ***********************************************************
+-- ubiArpSnoopGlobal
+-- ***********************************************************
+	ubiArpSnoopGlobal		OBJECT IDENTIFIER ::= { ubiArpSnoopMIBObjects 1 }
+		
+	ubiArpSnoopStatus		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			disable(0),
+			enable(1)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"arp snoop enable status"
+		::= { ubiArpSnoopGlobal 1 }
+
+    ubiArpSnoopGratuitous	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			disable(0),
+			enable(1)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"arp snoop gratuitous-arp-update"
+		::= { ubiArpSnoopGlobal 2 }
+		
+	ubiArpSnoopHealthCheck	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			disable(0),
+			enable(1)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"arp snoop health-check"
+		::= { ubiArpSnoopGlobal 3 }
+		
+	ubiArpSnoopProbe		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			disable(0),
+			enable(1)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"arp snoop probe"
+		::= { ubiArpSnoopGlobal 4 }
+		
+	ubiArpSnoopProbeInterval	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			noProbeInterval(0)
+		}(10..120)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"arp snoop probe-interval"
+		::= { ubiArpSnoopGlobal 5 }
+		
+	ubiArpSnoopWaitTime		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			noWaitTime(0)
+		}(1..5)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"arp snoop wait-time"
+		::= { ubiArpSnoopGlobal 6 }
+	 	
+		
+-- ***********************************************************
+-- ubiArpSnoopTable
+-- ***********************************************************
+	ubiArpSnoopTable		OBJECT-TYPE	
+		SYNTAX		SEQUENCE OF UbiArpSnoopEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The table of arp snoop entrys"
+		::= { ubiArpSnoopMIBObjects 2 }
+		
+	ubiArpSnoopEntry		OBJECT-TYPE
+		SYNTAX		UbiArpSnoopEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The entry representing arp snoop entry"
+		INDEX	{ ubiArpSnoopBeginAddress }	
+		::= { ubiArpSnoopTable 1 }
+		
+	UbiArpSnoopEntry	::= SEQUENCE {
+		ubiArpSnoopBeginAddress		IpAddress,
+		ubiArpSnoopEndAddress		IpAddress,
+		ubiArpSnoopAgingTime		INTEGER,
+		ubiArpSnoopRowStatus		RowStatus
+	}
+	
+	ubiArpSnoopBeginAddress		OBJECT-TYPE
+		SYNTAX		IpAddress
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"arp snoop begin address"
+		::= { ubiArpSnoopEntry 1 }
+		
+	ubiArpSnoopEndAddress		OBJECT-TYPE
+		SYNTAX		IpAddress
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"arp snoop end address"
+		::= { ubiArpSnoopEntry 2 }
+		
+	ubiArpSnoopAgingTime		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			defaultAgingTime(80)
+		}(0..300)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"arp snoop aging time"
+		::= { ubiArpSnoopEntry 3 }
+		
+	ubiArpSnoopRowStatus		OBJECT-TYPE
+		SYNTAX		RowStatus
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"arp snoop row status"
+		::= { ubiArpSnoopEntry 4 }
+
+-- ***********************************************************
+-- ubiArpSnoopBindingTable
+-- ***********************************************************
+
+	ubiArpSnoopBindingTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiArpSnoopBindingEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The table of arp snoop binding information"
+		::= { ubiArpSnoopMIBObjects 3 }
+		
+	ubiArpSnoopBindingEntry		OBJECT-TYPE
+		SYNTAX		UbiArpSnoopBindingEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The entry of arp snoop binding information"
+		INDEX	{ ubiArpSnoopBindingIpAddr }
+		::= { ubiArpSnoopBindingTable 1 }
+		
+	UbiArpSnoopBindingEntry ::= SEQUENCE {
+		ubiArpSnoopBindingIpAddr		IpAddress,
+		ubiArpSnoopBindingMacAddr		MacAddress,
+		ubiArpSnoopBindingInterface		DisplayString,
+		ubiArpSnoopBindingPort			DisplayString,
+		ubiArpSnoopBindingState			INTEGER,
+		ubiArpSnoopBindingAge			INTEGER,
+		ubiArpSnoopBindingAnalysis		INTEGER,
+		ubiArpSnoopBindingRcvRequest	Integer32,
+		ubiArpSnoopBindingReply			Integer32
+	}
+	
+	ubiArpSnoopBindingIpAddr		OBJECT-TYPE
+		SYNTAX		IpAddress
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"binding ip address"
+		::= { ubiArpSnoopBindingEntry 1 }
+		
+	ubiArpSnoopBindingMacAddr		OBJECT-TYPE
+		SYNTAX		MacAddress	
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"binding mac address"
+		::= { ubiArpSnoopBindingEntry 2 }
+		
+	ubiArpSnoopBindingInterface		OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"binding vlan interface"
+		::= { ubiArpSnoopBindingEntry 3 }
+		
+	ubiArpSnoopBindingPort			OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-only			
+		STATUS		current
+		DESCRIPTION
+			"binding physical port"
+		::= { ubiArpSnoopBindingEntry 4 }
+		
+	ubiArpSnoopBindingState			OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			init(0),
+			incomplete(1),
+			reachable(2),
+			stale(3),
+			unsolicited(4),
+			threeWay(5)
+		}
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"binding state"
+		::= { ubiArpSnoopBindingEntry 5 }
+		
+	ubiArpSnoopBindingAge			OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			noAge(301),
+			n/a(302)
+		}(0..300)
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"binding age time"
+		::= { ubiArpSnoopBindingEntry 6 }
+		
+	ubiArpSnoopBindingAnalysis		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			none(0),
+			manyReply(1),
+			inactive(2),
+			active(3)
+		}
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"binding analysis"
+		::= { ubiArpSnoopBindingEntry 7 }
+		
+	ubiArpSnoopBindingRcvRequest	OBJECT-TYPE
+		SYNTAX		Integer32
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"binding statistics - received ARP request"
+		::= { ubiArpSnoopBindingEntry 8 }
+		
+	ubiArpSnoopBindingReply			OBJECT-TYPE
+		SYNTAX		Integer32 
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"binding statistices - ARP reply"
+		::= { ubiArpSnoopBindingEntry 9 } 	
+		
+		
+-- ***********************************************************
+-- ubiClearArpSnoop
+-- ***********************************************************
+   	ubiClearArpSnoop		OBJECT IDENTIFIER ::= { ubiArpSnoopMIBObjects 4 }
+   	
+    ubiClearArpSnoopBinding		OBJECT-TYPE
+    	SYNTAX		IpAddress
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"command to clear arp snoop binding.
+    		 If value == 0.0.0.0
+    		 	clear all arp snoop binding
+    		 else if value == specific Ip address
+    		 	clear specific Ip address arp snoop binding"
+    	::= { ubiClearArpSnoop 1 }
+    	
+    ubiClearArpSnoopStatistics	OBJECT-TYPE
+    	SYNTAX		INTEGER
+    	{
+    		none(0),
+    		clear(1)
+    	}
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"command to clear arp snoop statistics"
+    	::= { ubiClearArpSnoop 2 }		
+
+
+-- *****************************************************************   
+-- ubiSyslogMIBConformance
+-- *****************************************************************
+        
+ubiArpMIBCompliances 	OBJECT IDENTIFIER ::= { ubiArpMIBConformance 1 }
+ubiArpMIBGroups      	OBJECT IDENTIFIER ::= { ubiArpMIBConformance 2 }      
+         
+END

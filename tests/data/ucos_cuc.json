@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.1348",
+                    "sysDescr": "Hardware:VMware, 1  Intel(R) Xeon(R) CPU E5-2660 0 @ 2.20GHz, 4096 MB Memory: Software:UCOS 6.0.0.0-2.i386",
+                    "sysContact": "<private>",
+                    "version": "10.5.2.18900-15",
+                    "hardware": "ciscoUCVirtualMachine",
+                    "features": "CUC",
+                    "location": "<private>",
+                    "os": "ucos",
+                    "type": "collaboration",
+                    "serial": null,
+                    "icon": "cisco.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

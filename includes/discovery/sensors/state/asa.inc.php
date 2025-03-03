@@ -1,64 +1,59 @@
 <?php
 /*
- * LibreNMS
+ * asa.inc.php
  *
- * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
+ * LibreNMS state sensor discovery module for Cisco ASA appliances
+ *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
+ *
+ * @link        https://www.librenms.org
+ *
+ * @copyright   2016 Søren Friis Rosiak <sorenrosiak@gmail.com>
+ * @author      Søren Friis Rosiak <sorenrosiak@gmail.com>
+ * @copyright   2024 CTNET BV
+ * @author      Rudy Broersma <r.broersma@ctnet.nl>
  */
 
-$temp = snmpwalk_cache_multi_oid($device, 'cfwHardwareStatusTable', array(), 'CISCO-FIREWALL-MIB');
 $cur_oid = '.1.3.6.1.4.1.9.9.147.1.2.1.1.1.3.';
+$temp = SnmpQuery::cache()->walk('CISCO-FIREWALL-MIB::cfwHardwareStatusTable')->table(1);
 
 if (is_array($temp)) {
     //Create State Index
-    if (strstr($temp['netInterface']['cfwHardwareStatusDetail'], 'not Configured') == false) {
+    if (strstr($temp['netInterface']['CISCO-FIREWALL-MIB::cfwHardwareStatusDetail'], 'not Configured') == false) {
         $state_name = 'cfwHardwareStatus';
-        $state_index_id = create_state_index($state_name);
-
-        //Create State Translation
-        if ($state_index_id !== null) {
-            $states = array(
-                array($state_index_id,'other',0,1,2) ,
-                array($state_index_id,'up',0,2,0) ,
-                array($state_index_id,'down',0,3,2) ,
-                array($state_index_id,'error',0,4,2) ,
-                array($state_index_id,'overTemp',0,5,2) ,
-                array($state_index_id,'busy',0,6,2) ,
-                array($state_index_id,'noMedia',0,7,2) ,
-                array($state_index_id,'backup',0,8,2) ,
-                array($state_index_id,'active',0,9,0) ,
-                array($state_index_id,'standby',0,10,0)
-            );
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }
-        }
+        $states = [
+            ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'other'],
+            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
+            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'down'],
+            ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'error'],
+            ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'overTemp'],
+            ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'busy'],
+            ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'noMedia'],
+            ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'backup'],
+            ['value' => 9, 'generic' => 0, 'graph' => 0, 'descr' => 'active'],
+            ['value' => 10, 'generic' => 0, 'graph' => 0, 'descr' => 'standby'],
+        ];
+        create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
-            $descr = ucwords(trim(preg_replace('/\s*\([^\s)]*\)/', '', $temp[$index]['cfwHardwareInformation'])));
-            if ($index == 'netInterface') {
-                $index = 4;
-            } elseif ($index == 'primaryUnit') {
-                $index = 6;
-            } elseif ($index == 'secondaryUnit') {
-                $index = 7;
-            }
-            //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $cur_oid.$index, $index, $state_name, $descr, '1', '1', null, null, null, null, $temp[$index][' cfwHardwareStatusValue'], 'snmp', $index);
+            $descr = ucwords(trim(preg_replace('/\s*\([^\s)]*\)/', '', $temp[$index]['CISCO-FIREWALL-MIB::cfwHardwareInformation'])));
 
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
+            if ($index == 'netInterface') {
+                $oid_index = 4;
+            } elseif ($index == 'primaryUnit') {
+                $oid_index = 6;
+            } elseif ($index == 'secondaryUnit') {
+                $oid_index = 7;
+            }
+
+            $sensor_value = $temp[$index]['CISCO-FIREWALL-MIB::cfwHardwareStatusValue'];
+
+            //Discover Sensors
+            discover_sensor(null, 'state', $device, $cur_oid . $oid_index, $oid_index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', $oid_index);
         }
     }
 }

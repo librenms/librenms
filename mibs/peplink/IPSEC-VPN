@@ -1,0 +1,187 @@
+-- ********************************************************************
+	IPSEC-VPN DEFINITIONS ::= BEGIN
+		IMPORTS
+			OBJECT-GROUP
+				FROM SNMPv2-CONF
+			enterprises, Integer32, IpAddress,Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+				FROM SNMPv2-SMI
+			DisplayString, RowStatus, TruthValue, MacAddress
+				FROM SNMPv2-TC;
+--
+-- Node definitions
+--
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+-- The Enterprises Number
+	peplink OBJECT IDENTIFIER ::= { enterprises 23695 }
+
+	productMib  OBJECT IDENTIFIER ::= { peplink 200 }
+
+	generalMib OBJECT IDENTIFIER ::= { productMib 1 }
+
+	ipsecVpnMib MODULE-IDENTITY
+		LAST-UPDATED "201812181200Z"	-- 12 18, 2018 at 12:00 GMT
+		ORGANIZATION "PEPLINK"
+		CONTACT-INFO ""
+		DESCRIPTION
+			"MIB module for IPSEC-VPN."
+		::= { generalMib 13 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+	ipsecVpnStatusTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF IpsecVpnStatusEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"IPsec VPN status table"
+		::= { ipsecVpnMib 1 }
+
+		ipsecVpnStatusEntry OBJECT-TYPE
+			SYNTAX IpsecVpnStatusEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			"An entry in the ipsecVpnStatusTable"
+			INDEX { ipsecVpnStatusId }
+			::= { ipsecVpnStatusTable 1 }
+
+		IpsecVpnStatusEntry ::=
+		SEQUENCE {
+			ipsecVpnStatusId
+				Integer32,
+			ipsecVpnStatusProfileName
+				OCTET STRING,
+			ipsecVpnStatusConnectionState
+				INTEGER,
+			ipsecVpnStatusWanName
+				OCTET STRING
+		}
+
+		ipsecVpnStatusId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPsec VPN status ID."
+			::= { ipsecVpnStatusEntry 1 }
+
+		ipsecVpnStatusProfileName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPsec VPN profile name."
+			::= { ipsecVpnStatusEntry 2 }
+
+		ipsecVpnStatusConnectionState OBJECT-TYPE
+			SYNTAX INTEGER {
+				standby(0),
+				connecting(1),
+				established(2),
+				partially-established(3)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPsec VPN connection state."
+			::= { ipsecVpnStatusEntry 3 }
+
+		ipsecVpnStatusWanName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPsec VPN WAN name."
+			::= { ipsecVpnStatusEntry 4 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+	ipsecVpnRouteStatusTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF IpsecVpnRouteStatusEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"IPsec VPN route status table"
+		::= { ipsecVpnMib 2 }
+
+		ipsecVpnRouteStatusEntry OBJECT-TYPE
+			SYNTAX IpsecVpnRouteStatusEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+			"An entry in the ipsecVpnRouteStatusTable"
+			INDEX { ipsecVpnStatusId, ipsecVpnRouteStatusId }
+			::= { ipsecVpnRouteStatusTable 1 }
+
+		IpsecVpnRouteStatusEntry ::=
+		SEQUENCE {
+			ipsecVpnRouteStatusId
+				Integer32,
+			ipsecVpnRouteState
+				INTEGER,
+			ipsecVpnRouteStatusLocalNetwork
+				IpAddress,
+			ipsecVpnRouteStatusLocalSubnet
+				IpAddress,
+			ipsecVpnRouteStatusRemoteNetwork
+				IpAddress,
+			ipsecVpnRouteStatusRemoteSubnet
+				IpAddress
+		}
+
+		ipsecVpnRouteStatusId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPsec VPN route status ID."
+			::= { ipsecVpnRouteStatusEntry 1 }
+
+		ipsecVpnRouteState OBJECT-TYPE
+			SYNTAX INTEGER {
+				down(0),
+				up(1),
+				standby(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPsec VPN route state."
+			::= { ipsecVpnRouteStatusEntry 2 }
+
+		ipsecVpnRouteStatusLocalNetwork OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPsec VPN route local network."
+			::= { ipsecVpnRouteStatusEntry 3 }
+
+		ipsecVpnRouteStatusLocalSubnet OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPsec VPN route local subnet."
+			::= { ipsecVpnRouteStatusEntry 4 }
+
+		ipsecVpnRouteStatusRemoteNetwork OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPsec VPN route remote network."
+			::= { ipsecVpnRouteStatusEntry 5 }
+
+		ipsecVpnRouteStatusRemoteSubnet OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPsec VPN route remote subnet."
+			::= { ipsecVpnRouteStatusEntry 6 }
+END

@@ -1,0 +1,12 @@
+os: panduit
+text: 'Panduit PDU'
+type: power
+mib_dir: panduit
+icon: panduit
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_power, text: Power }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.19536

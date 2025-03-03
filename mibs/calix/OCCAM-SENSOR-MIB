@@ -1,0 +1,539 @@
+OCCAM-SENSOR-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, 
+OBJECT-IDENTITY
+			FROM SNMPv2-SMI
+		TEXTUAL-CONVENTION, TimeStamp, TruthValue, DisplayString
+			FROM SNMPv2-TC
+                SnmpAdminString
+                        FROM SNMP-FRAMEWORK-MIB 
+		PhysicalIndex
+			FROM OCCAM-ENTITY-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		occamGenericHardwareModules
+			FROM OCCAM-REG-MODULE;
+
+	sensorMIB	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks"	
+		CONTACT-INFO	"email : support@occamnetworks.com"
+		DESCRIPTION		
+				"The OCCAM-ENTITY-SENSOR-MIB is used to monitor
+				the values of Sensors in the BLC1100."
+
+                REVISION        "200104271051Z"
+                DESCRIPTION     "Reformatted certain text and revised certain
+                                description and syntax sections"
+
+                REVISION        "201004140000Z"
+                DESCRIPTION     "Updated sensorEventType"
+
+		REVISION        "200907060000Z"
+		DESCRIPTION	"corrected sensorEventType's syntac to		
+				DisplayString"
+		
+                REVISION	"200702220000Z"
+		DESCRIPTION	"remove DISPLAY-HINT"
+		
+		::=  {  occamGenericHardwareModules  2  }
+
+-- TEXTUAL-CONVENTIONS
+    
+    SensorThresholdRelation ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION		
+                        "Sensor threshold relational operator types.
+                        valid values are:
+
+                lessThan(1):            if the Sensor value is less than
+                                        the threshold value
+                lessOrEqual(2):		if the Sensor value is less than or	
+					equal to the threshold value
+                greaterThan(3):         if the Sensor value is greater than 
+                                        the threshold value
+                greaterOrEqual(4):      if the Sensor value is greater than or	
+					equal to the threshold value
+                equalTo(5):             if the Sensor value is equal to
+                                        the threshold value
+                notEqualTo(6):          if the Sensor value is not equal to
+                                        the threshold value"
+
+		SYNTAX 			INTEGER{
+                                        lessThan(1),
+                                        lessOrEqual(2),
+                                        greaterThan(3),
+                                        greaterOrEqual(4),
+                                        equalTo(5),
+                                        notEqualTo(6)} 
+
+	SensorStatus ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION		"Indicates the operational status of the	
+					Sensor.
+                                        
+                ok(1):                  The agent can read the Sensor value.
+                unavailable(2):         The agent presently can not report 
+                                        the Sensor value.
+                nonoperational(3):      The agent believes the Sensor is broken.
+                                        The Sensor could have a hard failure 
+                                        (disconnected wire), or a soft failure
+                                        such as out-of-range, jittery, or wildly
+                                        fluctuating readings."
+		SYNTAX 			INTEGER  {
+                                                ok(1),
+                                                unavailable(2),
+                                                nonoperational(3)
+                                        } 
+
+	SensorValue ::= TEXTUAL-CONVENTION 
+		DISPLAY-HINT	        "d"
+		STATUS			current
+		DESCRIPTION		
+                        "For Sensors that measure voltsAC, voltsDC, 
+                        celsius this item is a fixed point number ranging from 
+                        -99,999 to +99,999.  Use the value 
+                        -100000 to indicate underflow. Use the value 
+                        +100000 to indicate overflow.  Use SensorPrecision to
+                        indicate how many fractional digits the SensorValue has.
+
+                        For Sensors that measure rpm, this item
+                        can take only nonnegative values, 0..99999."
+
+		SYNTAX 			Integer32  ( -100000 .. 100000  ) 
+
+	SensorDataType ::= TEXTUAL-CONVENTION 
+				STATUS			current
+		DESCRIPTION		
+                        "Sensor measurement data types.  valid values are:
+        			    	 other(1):       a measure other than	
+						         those listed below
+        				 volts(2):       electric potential
+       			                 celsius(3):     temperature
+       				         rpm(4):         fan revolutions per	
+							 minute
+					 milliAmp(5):    milliampere
+					 microAmp(6):    microampere
+					 milliWatt(7):   milliwatt
+					 microWatt(8):   microwatt
+					 alarmInput(9):  alarm Input
+					 sdram(10):      memory SDRAM
+					 usage(11):      system resource usage
+					 count(12):      ."
+
+		SYNTAX 			INTEGER  {
+                                                other(1), -- deprecated    
+                                                volts(2),
+                                                celsius(3),
+                                                rpm(4),
+                                                milliAmp(5),
+                                                microAmp(6),
+                                                milliWatt(7),
+                                                microWatt(8),
+                                                alarmInput(9),
+                                                sdram(10),
+                                                usage(11),
+                                                count(12)
+                                        }
+
+	SensorThresholdSeverity ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION		
+                        "Sensor threshold severity.  Valid values are:
+                                        other(1): a severity other than those	
+					listed below.
+                                        minor(10): Minor Problem threshold.
+                                        major(20): Major Problem threshold.
+                                        critical(30): Critical Problem		
+					Threshold."
+		SYNTAX 			INTEGER  {
+                                                other(1),
+                                                minor(10),
+                                                major(20),
+                                                critical(30)
+                                        } 
+
+    SensorDataScale ::= TEXTUAL-CONVENTION
+                STATUS          current
+                DESCRIPTION     "International System of Units (SI) prefixes."
+                SYNTAX          INTEGER  { 
+                                        micro (1),    -- 10^-6
+                                        milli (2),    -- 10^-3
+                                        centi (3),    -- 10^-2
+                                        units (4),    -- 10^0
+                                        kilo (5),     -- 10^3
+                                        mega (6)      -- 10^6 
+                                     }  
+            
+-- identifier statements
+
+	sensorMIBObjects	OBJECT IDENTIFIER
+		::=  {  sensorMIB  1  }
+
+
+--traps
+
+	sensorMIBTraps	OBJECT IDENTIFIER
+		::=  {sensorMIB  2 }
+		
+	sensorMIBTrapsSubID  OBJECT IDENTIFIER
+		 ::= { sensorMIBTraps  0}		
+		 
+--conformance statements
+
+	sensorMIBConformance	OBJECT IDENTIFIER
+		::=  {sensorMIB  3 }
+
+	sensorMIBGroups	OBJECT IDENTIFIER
+		::=  {  sensorMIBConformance  1  }
+
+	sensorMIBCompliances	OBJECT IDENTIFIER
+		::=  {  sensorMIBConformance  2  }
+
+
+--
+-- MIB variables
+-- 
+
+	sensorValues	OBJECT IDENTIFIER
+		::=  {  sensorMIBObjects  1  }
+
+	sensorThresholds	OBJECT IDENTIFIER
+		::=  {  sensorMIBObjects  2  }
+
+
+--
+-- notifications
+--
+
+	sensorThresholdNotification	NOTIFICATION-TYPE
+                OBJECTS                 { sensorName,
+                                        sensorType, 
+                                        sensorThresholdValue,
+                                        sensorThresholdSeverity,
+                                        sensorEventType
+                                        } 
+		STATUS			current
+		DESCRIPTION	
+			"The Sensor value crossed the threshold
+			listed in sensorThresholdTable.
+			This notification is generated once each time
+			the Sensor value crosses the threshold.
+			The agent implementation guarantees prompt, timely
+			evaluation of threshold and generation of this
+			notification."
+		::=  {  sensorMIBTrapsSubID  1  }
+
+	
+	occamExtAlarmRaised	NOTIFICATION-TYPE
+	OBJECTS		{  occamExtAlarmDescription	 }  
+		STATUS			current
+		DESCRIPTION
+                        "An external alarm has been detected, the alarm
+                        is described in the associated variable binding."
+		::= {sensorMIBTrapsSubID  2}
+
+	occamExtAlarmCleared	NOTIFICATION-TYPE
+	OBJECTS		{occamExtAlarmDescription	  }
+		STATUS			current
+		DESCRIPTION
+			"The condition causing the external alarm has 
+                        been cleared, the alarm is described in the 
+                        associated variable binding."
+		::={ sensorMIBTrapsSubID  3}
+		
+	
+	sensorMIBObjectGroups	OBJECT IDENTIFIER
+		::=  {  sensorMIBGroups  1  }
+
+	sensorMIBEventGroups	OBJECT IDENTIFIER
+		::=  {  sensorMIBGroups  2  }
+
+
+--
+-- compliance statements
+--
+
+	sensorMIBCompliance	MODULE-COMPLIANCE
+		STATUS			current
+		DESCRIPTION		
+			"An Entity-MIB implementation that lists
+			Sensors in its entPhysicalTable must implement
+			this group."
+
+		MODULE 	
+			MANDATORY-GROUPS	{ sensorGroup 
+,sensorThresholdGroup  }
+		::=  {  sensorMIBCompliances  1  }
+
+
+--
+-- sensorTable 
+--
+	sensorTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  SensorEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table lists the type, scale, and present value
+                        of a Sensor in the BLC1100."
+		::=  { sensorValues  1 }
+
+	sensorEntry	OBJECT-TYPE
+		SYNTAX		SensorEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An sensorTable entry describes the
+			present reading of a Sensor, the measurement units
+			and scale, and Sensor operational status."
+		INDEX		{  sensorIndex  }
+		::=  { sensorTable 1 }
+
+	SensorEntry  ::=  SEQUENCE {
+                sensorIndex PhysicalIndex,
+                sensorName SnmpAdminString,
+		sensorType  SensorDataType,
+		sensorValue  SensorValue,
+		sensorScale SensorDataScale, 
+		sensorTimeStamp  TimeStamp,
+		sensorEventType  DisplayString
+		}
+
+
+	sensorIndex		OBJECT-TYPE	
+		SYNTAX			PhysicalIndex	
+        MAX-ACCESS      not-accessible  
+		STATUS			current
+		DESCRIPTION		"This serves as an index for identifying	
+					the sensor."
+		::=  {  sensorEntry  1  }
+
+	sensorName		OBJECT-TYPE	
+		SYNTAX			SnmpAdminString	
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "This is the textual description of the name of the 
+                         sensor.For e.g., in the BLC1100 there are two 
+                         temperature Sensors,and their locations 
+                         ExternalTempSensor and  InternalTempSensor."
+		::=  {  sensorEntry  2  }
+
+	sensorType	OBJECT-TYPE	
+		SYNTAX			SensorDataType
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "This variable indicates the type of data reported by 
+                        the sensorValue.  This variable is set by the agent at
+                        start-up and the value does not change during		
+			operation."
+		::=  {  sensorEntry  3  }
+
+
+	sensorValue	OBJECT-TYPE	
+		SYNTAX			SensorValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "This variable reports the most recent measurement seen
+                        by the Sensor. To correctly display or interpret this 
+                        variable's value, you must also know sensorType, 
+                        sensorScale, and sensorPrecision. However, you can	
+			compare sensorValue with the threshold values given in 
+                        sensorThresholdTable without any semantic knowledge."
+		::=  {  sensorEntry  4  }
+
+    sensorScale   OBJECT-TYPE
+        SYNTAX          SensorDataScale 
+        MAX-ACCESS      read-only
+        STATUS          current 
+        DESCRIPTION     "This variable indicates the exponent to apply
+                        to sensor values reported by entSensorValue.
+                        This variable is set by the agent at start-up
+                        and the value does not change during operation."
+        ::=  {  sensorEntry  5  }
+
+	sensorTimeStamp	OBJECT-TYPE	
+		SYNTAX			TimeStamp
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "This variable indicates the age of the value reported	
+			by sensorValue"
+		::=  {  sensorEntry  6  }
+
+   sensorEventType	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "This variable indicates the event type reported by
+                        the sensor. The possible values are: 
+                                Cleared,
+                                LowLimitExceeded, 
+				HighLimitExceeded,
+                                AlarmInOn,
+                                AlarmInOff,
+                                FanFastSpeed,
+                                FanSlowSpeed,
+                                wrongSfp."
+		::=  {  sensorEntry  7  }
+
+	occamExtAlarmDescription	OBJECT-TYPE	
+ 		SYNTAX			DisplayString 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION		
+                        "This is the value of the alarm-description as 
+                        entered by the user.  The string is associated with
+                        the external alarm detection mechanism and as a
+                        variable binding for the occamExtAlarmRaised and 
+                        occamExtAlarmCleared SNMP Traps "
+		::=  { sensorValues  2 }
+
+
+--
+-- sensorThresholdTable 
+--
+	sensorThresholdTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  EntSensorThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"This table lists the threshold severity, relation, and
+			comparison value for a Sensor listed in the sensor	
+			Table."
+		::=  { sensorThresholds  1 }
+
+	sensorThresholdEntry	OBJECT-TYPE
+		SYNTAX		EntSensorThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+			"An sensorThresholdTable entry describes the
+			thresholds for a Sensor: the threshold severity,
+			the threshold value, the relation, and the
+			evaluation of the threshold.
+			Only pre-configured thresholds are listed in this table.
+			Entries are created by the agent at system startup."
+		INDEX		{ sensorThresholdIndex, sensorIndex}
+		::=  { sensorThresholdTable 1 }
+
+	EntSensorThresholdEntry  ::=  SEQUENCE {
+		sensorThresholdIndex  Integer32,
+		sensorThresholdSeverity  SensorThresholdSeverity,
+		sensorThresholdRelation  SensorThresholdRelation,
+		sensorThresholdValue  SensorValue,
+		sensorThresholdNotificationEnable  TruthValue
+		}
+
+
+	sensorThresholdIndex	OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 99999999  ) 
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		
+                        "An index that uniquely identifies an entry in 
+                        the sensorThreshold table. This index permits
+                        the same Sensor to have several different thresholds."
+		::=  {  sensorThresholdEntry  1  }
+
+
+	sensorThresholdSeverity	OBJECT-TYPE	
+		SYNTAX			SensorThresholdSeverity
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "This variable indicates the severity of this		
+			threshold."
+		::=  {  sensorThresholdEntry  2  }
+
+
+	sensorThresholdRelation	OBJECT-TYPE	
+		SYNTAX			SensorThresholdRelation
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                	"This variable indicates the relation between Sensor	
+			value  (sensorValue) and threshold value		
+			senshresholdValue), required to trigger the alarm.  when	
+			evaluating the relation, sensorValue is on the left of	
+			sensorThresholdRelation, sensorThresholdValue is on the	
+			right.  in pseudo-code, the evaluation-alarm mechanism	
+			is:
+				
+				...
+			if (sensorStatus == ok)
+                        then
+			if (evaluate(sensorValue, sensorThresholdRelation,
+                       		sensorThresholdValue))
+			then
+			if (sensorThresholdNotificationEnable == true))
+			then
+				raise_alarm(sensorThresholdAlarmOID);
+			endif
+			endif
+			endif
+			..."
+		::=  {  sensorThresholdEntry  3  }
+
+
+	sensorThresholdValue	OBJECT-TYPE	
+		SYNTAX			SensorValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+			"This variable indicates the value of the threshold.
+			To correctly display or interpret this variable's value,
+			you must also know sensorType, sensorScale, and
+			sensorPrecision.
+			However, you can directly compare sensorValue
+			with the threshold values given in sensorThresholdTable
+			without any semantic knowledge."
+		::=  {  sensorThresholdEntry  4  }
+
+
+	sensorThresholdNotificationEnable	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		
+			"This variable controls generation of
+			sensorThresholdNotification for this threshold.
+			When this variable is true(1), generation of
+			sensorThresholdNotification is enabled.  When this
+			variable is false(2), generation of
+			sensorThresholdNotification is disabled.
+			This variable only controls generation of
+			sensorThresholdNotification."
+		::=  {  sensorThresholdEntry  5  }
+
+
+--
+-- units of conformance
+--
+
+	sensorGroup	OBJECT-GROUP
+		OBJECTS			{ sensorType , sensorValue ,
+					sensorTimeStamp , sensorName }
+		STATUS			current
+		DESCRIPTION		
+			"The collection of objects which are used
+			to describe and monitor values of Entity-MIB
+			entPhysicalTable entries of Sensors."
+		::=  {  sensorMIBObjectGroups  1  }
+
+	sensorThresholdGroup	OBJECT-GROUP
+		OBJECTS		{ sensorThresholdSeverity 
+				,sensorThresholdRelation			
+				,sensorThresholdValue 
+				,sensorThresholdNotificationEnable  }
+		STATUS			current
+		DESCRIPTION		
+			"The collection of objects which are used
+			to describe and monitor thresholds for Sensors."
+		::=  {  sensorMIBObjectGroups  2  }
+
+END

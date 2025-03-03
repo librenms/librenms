@@ -1,0 +1,743 @@
+-- =========================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The MIB is designed to set session configuration or get session information.
+-- Reference:
+-- Version: V1.4
+-- History:
+--  V1.0 2013-12-20 created by liqian 04379
+--       Initial version.
+--  V1.1 2014-07-14 modified by songhaibin 03750
+--       Add hh3cSessionStatTCPCount, hh3cSessionStatUDPCount,
+--       hh3cSessionStatOtherCount, hh3cSessionStatTCPCreateRate,
+--       hh3cSessionStatUDPCreateRate, hh3cSessionStatOtherCreateRate.
+--  V1.2 2014-10-14 modified by songhaibin 03750
+--       Add hh3cSessionEntTCPTotal, hh3cSessionEntUDPTotal,
+--       hh3cSessionEntOtherTotal, hh3cSessionEntTable.
+--       2016-12-25 modified by wangxiaohua 11458
+--       Add hh3cSessionStatDNSCount, hh3cSessionStatFTPCount,
+--       hh3cSessionStatGTPCount, hh3cSessionStatH323Count,
+--       hh3cSessionStatHTTPCount, hh3cSessionStatILSCount,
+--       hh3cSessionStatMGCPCount, hh3cSessionStatNBTCount,
+--       hh3cSessionStatPPTPCount, hh3cSessionStatRSHCount,
+--       hh3cSessionStatRTSPCount, hh3cSessionStatSCCPCount,
+--       hh3cSessionStatSIPCount, hh3cSessionStatSMTPCount,
+--       hh3cSessionStatSQLNETCount, hh3cSessionStatSSHCount,
+--       hh3cSessionStatTELNETCount, hh3cSessionStatTFTPCount,
+--       hh3cSessionStatXDMCPCount.
+--  V1.3 2018-4-26 modified by zhouliping 01738
+--       Add hh3cSessionDrvTrap, hh3cSessionDrvMaxNum.
+--  V1.4 2019-07-25 modified by liuzhengrui 17656
+--       Add hh3cSessUsageAbruptAlarmTrap hh3cSessRateAbruptAlarmTrap hh3cSessTryRateAbruptAlarmTrap.
+--       2019-11-11 modified by zhongtingming 18548
+--       Add hh3cSessionThdMaxTrap hh3cSessionThdRecoveryTrap.
+-- =========================================================================
+HH3C-SESSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, Counter64, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI;
+
+hh3cSession MODULE-IDENTITY
+    LAST-UPDATED "201911111427Z"   -- November 11, 2019
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "The MIB is designed to manage sessions."
+
+    -- Revision History
+    REVISION "201911111427Z"  -- November 11, 2019
+    DESCRIPTION
+        "Add hh3cSessionThdMaxTrap hh3cSessionThdRecoveryTrap"
+    REVISION "201907251105Z"  -- July 25, 2019
+    DESCRIPTION
+        "Add hh3cSessUsageAbruptAlarmTrap, hh3cSessUsageAbruptAlarmTrap, hh3cSessTryRateAbruptAlarmTrap."
+    REVISION "201805161105Z"  -- May 16, 2018
+    DESCRIPTION
+        "Add hh3cSessionDrvTrap, hh3cSessionDrvMaxNum."
+    REVISION "201612251105Z"  -- December 25, 2016
+    DESCRIPTION
+        "Add the hh3cSessionStatDNSCount,
+         h3cSessionStatFTPCount,
+         h3cSessionStatGTPCount,
+         h3cSessionStatH323Count,
+         h3cSessionStatHTTPCount,
+         h3cSessionStatILSCount,
+         h3cSessionStatMGCPCount,
+         h3cSessionStatNBTCount,
+         h3cSessionStatPPTPCount,
+         h3cSessionStatRSHCount,
+         h3cSessionStatRTSPCount,
+         h3cSessionStatSCCPCount,
+         h3cSessionStatSIPCount,
+         h3cSessionStatSMTPCount,
+         h3cSessionStatSQLNETCount,
+         h3cSessionStatSSHCount,
+         h3cSessionStatTELNETCount,
+         h3cSessionStatTFTPCount,
+         h3cSessionStatXDMCPCount."
+    REVISION "201410141830Z"
+    DESCRIPTION
+        "Add hh3cSessionEntTCPTotal, hh3cSessionEntUDPTotal, hh3cSessionEntOtherTotal, hh3cSessionEntTable."
+    REVISION "201407151530Z"
+    DESCRIPTION
+        "The latest version of this MIB module."
+    REVISION     "201312200000Z"  -- December 26, 2013
+    DESCRIPTION  "Initial version."
+
+    ::= { hh3cCommon 149 }
+
+--
+-- Table definitions
+--
+
+hh3cSessionTables OBJECT IDENTIFIER ::= { hh3cSession 1 }
+-- ----------------------------------------------------------------------
+  -- Session statistic table
+-- ----------------------------------------------------------------------
+hh3cSessionStatTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Hh3cSessionStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The statistics of sessions."
+::= { hh3cSessionTables 1 }
+
+hh3cSessionStatEntry OBJECT-TYPE
+    SYNTAX  Hh3cSessionStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry (conceptual row) representing session statistics information."
+    INDEX { hh3cSessionStatChassis, hh3cSessionStatSlot, hh3cSessionStatCPUID }
+::= { hh3cSessionStatTable 1 }
+
+Hh3cSessionStatEntry ::= SEQUENCE {
+    hh3cSessionStatChassis          Unsigned32,
+    hh3cSessionStatSlot             Unsigned32,
+    hh3cSessionStatCPUID            Unsigned32,
+    hh3cSessionStatCount            Unsigned32,
+    hh3cSessionStatCreateRate       Unsigned32,
+    hh3cSessionStatTCPCount         Unsigned32,
+    hh3cSessionStatUDPCount         Unsigned32,
+    hh3cSessionStatOtherCount       Unsigned32,
+    hh3cSessionStatTCPCreateRate    Unsigned32,
+    hh3cSessionStatUDPCreateRate    Unsigned32,
+    hh3cSessionStatOtherCreateRate  Unsigned32,
+    hh3cSessionStatTCPTotal         Counter64,
+    hh3cSessionStatUDPTotal         Counter64,
+    hh3cSessionStatOtherTotal       Counter64,
+    hh3cSessionStatDNSCount         Unsigned32,
+    hh3cSessionStatFTPCount         Unsigned32,
+    hh3cSessionStatGTPCount         Unsigned32,
+    hh3cSessionStatH323Count        Unsigned32,
+    hh3cSessionStatHTTPCount        Unsigned32,
+    hh3cSessionStatILSCount         Unsigned32,
+    hh3cSessionStatMGCPCount        Unsigned32,
+    hh3cSessionStatNBTCount         Unsigned32,
+    hh3cSessionStatPPTPCount        Unsigned32,
+    hh3cSessionStatRSHCount         Unsigned32,
+    hh3cSessionStatRTSPCount        Unsigned32,
+    hh3cSessionStatSCCPCount        Unsigned32,
+    hh3cSessionStatSIPCount         Unsigned32,
+    hh3cSessionStatSMTPCount        Unsigned32,
+    hh3cSessionStatSQLNETCount      Unsigned32,
+    hh3cSessionStatSSHCount         Unsigned32,
+    hh3cSessionStatTELNETCount      Unsigned32,
+    hh3cSessionStatTFTPCount        Unsigned32,
+    hh3cSessionStatXDMCPCount       Unsigned32
+    }
+
+hh3cSessionStatChassis   OBJECT-TYPE
+    SYNTAX Unsigned32(0..65534)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An IRF member device ID."
+::= { hh3cSessionStatEntry  1 }
+
+hh3cSessionStatSlot    OBJECT-TYPE
+    SYNTAX Unsigned32(0..65534)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The slot where the card resides."
+::= { hh3cSessionStatEntry  2 }
+
+hh3cSessionStatCPUID   OBJECT-TYPE
+    SYNTAX Unsigned32(0..7)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "CPU ID."
+::= { hh3cSessionStatEntry  3 }
+
+hh3cSessionStatCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of current sessions."
+::= { hh3cSessionStatEntry  4 }
+
+hh3cSessionStatCreateRate     OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of sessions per second."
+::= { hh3cSessionStatEntry  5 }
+
+hh3cSessionStatTCPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of TCP sessions."
+::= { hh3cSessionStatEntry  6 }
+
+hh3cSessionStatUDPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of UDP sessions."
+::= { hh3cSessionStatEntry  7 }
+
+hh3cSessionStatOtherCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of other sessions."
+::= { hh3cSessionStatEntry  8 }
+
+hh3cSessionStatTCPCreateRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of TCP sessions per second."
+::= { hh3cSessionStatEntry  9 }
+
+hh3cSessionStatUDPCreateRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of UDP sessions per second."
+::= { hh3cSessionStatEntry  10 }
+
+hh3cSessionStatOtherCreateRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of other sessions per second."
+::= { hh3cSessionStatEntry  11 }
+
+hh3cSessionStatTCPTotal  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The total number of TCP sessions created till now."
+::= { hh3cSessionStatEntry  12 }
+
+hh3cSessionStatUDPTotal  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The total number of UDP sessions created till now."
+::= { hh3cSessionStatEntry  13 }
+
+hh3cSessionStatOtherTotal  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The total number of Other sessions created till now."
+::= { hh3cSessionStatEntry  14 }
+
+hh3cSessionStatDNSCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of DNS sessions."
+::= { hh3cSessionStatEntry  15 }
+
+hh3cSessionStatFTPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of FTP sessions."
+::= { hh3cSessionStatEntry  16 }
+
+hh3cSessionStatGTPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of GTP sessions."
+::= { hh3cSessionStatEntry  17 }
+
+hh3cSessionStatH323Count  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of H323 sessions."
+::= { hh3cSessionStatEntry  18 }
+
+hh3cSessionStatHTTPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of HTTP sessions."
+::= { hh3cSessionStatEntry  19 }
+
+hh3cSessionStatILSCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of ILS sessions."
+::= { hh3cSessionStatEntry  20 }
+
+hh3cSessionStatMGCPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of MGCP sessions."
+::= { hh3cSessionStatEntry  21 }
+
+hh3cSessionStatNBTCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of NBT sessions."
+::= { hh3cSessionStatEntry  22 }
+
+hh3cSessionStatPPTPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of PPTP sessions."
+::= { hh3cSessionStatEntry  23 }
+
+hh3cSessionStatRSHCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of RSH sessions."
+::= { hh3cSessionStatEntry  24 }
+
+hh3cSessionStatRTSPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of RTSP sessions."
+::= { hh3cSessionStatEntry  25 }
+
+hh3cSessionStatSCCPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of SCCP sessions."
+::= { hh3cSessionStatEntry  26 }
+
+hh3cSessionStatSIPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of SIP sessions."
+::= { hh3cSessionStatEntry  27 }
+
+hh3cSessionStatSMTPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of SMTP sessions."
+::= { hh3cSessionStatEntry  28 }
+
+hh3cSessionStatSQLNETCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of SQLNET sessions."
+::= { hh3cSessionStatEntry  29 }
+
+hh3cSessionStatSSHCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of SSH sessions."
+::= { hh3cSessionStatEntry  30 }
+
+hh3cSessionStatTELNETCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of TELNET sessions."
+::= { hh3cSessionStatEntry  31 }
+
+hh3cSessionStatTFTPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of TFTP sessions."
+::= { hh3cSessionStatEntry  32 }
+
+hh3cSessionStatXDMCPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of XDMCP sessions."
+::= { hh3cSessionStatEntry  33 }
+
+-- ----------------------------------------------------------------------
+  -- Session statistic by entity table
+-- ----------------------------------------------------------------------
+hh3cSessionEntTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Hh3cSessionEntEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The statistics of sessions by entity."
+::= { hh3cSessionTables 2 }
+
+hh3cSessionEntEntry OBJECT-TYPE
+    SYNTAX  Hh3cSessionEntEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry (conceptual row) representing session statistics information."
+    INDEX { hh3cSessionEntIndex }
+::= { hh3cSessionEntTable 1 }
+
+Hh3cSessionEntEntry ::= SEQUENCE {
+    hh3cSessionEntIndex            Unsigned32,
+    hh3cSessionEntCount            Unsigned32,
+    hh3cSessionEntCreateRate       Unsigned32,
+    hh3cSessionEntTCPCount         Unsigned32,
+    hh3cSessionEntUDPCount         Unsigned32,
+    hh3cSessionEntOtherCount       Unsigned32,
+    hh3cSessionEntTCPCreateRate    Unsigned32,
+    hh3cSessionEntUDPCreateRate    Unsigned32,
+    hh3cSessionEntOtherCreateRate  Unsigned32,
+    hh3cSessionEntTCPTotal         Counter64,
+    hh3cSessionEntUDPTotal         Counter64,
+    hh3cSessionEntOtherTotal       Counter64
+    }
+
+hh3cSessionEntIndex   OBJECT-TYPE
+    SYNTAX Unsigned32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Device entity index."
+::= { hh3cSessionEntEntry  1 }
+
+hh3cSessionEntCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of current sessions."
+::= { hh3cSessionEntEntry  2 }
+
+hh3cSessionEntCreateRate     OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of sessions per second."
+::= { hh3cSessionEntEntry  3 }
+
+hh3cSessionEntTCPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of TCP sessions."
+::= { hh3cSessionEntEntry  4 }
+
+hh3cSessionEntUDPCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of UDP sessions."
+::= { hh3cSessionEntEntry  5 }
+
+hh3cSessionEntOtherCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of other sessions."
+::= { hh3cSessionEntEntry  6 }
+
+hh3cSessionEntTCPCreateRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of TCP sessions per second."
+::= { hh3cSessionEntEntry  7 }
+
+hh3cSessionEntUDPCreateRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of UDP sessions per second."
+::= { hh3cSessionEntEntry  8 }
+
+hh3cSessionEntOtherCreateRate  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of other sessions per second."
+::= { hh3cSessionEntEntry  9 }
+
+hh3cSessionEntTCPTotal  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The total number of TCP sessions created till now."
+::= { hh3cSessionEntEntry  10 }
+
+hh3cSessionEntUDPTotal  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The total number of UDP sessions created till now."
+::= { hh3cSessionEntEntry  11 }
+
+hh3cSessionEntOtherTotal  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The total number of other sessions created till now."
+::= { hh3cSessionEntEntry  12 }
+
+-- Describe objects for session hardware resources trap
+hh3cSessionDrvTraps OBJECT IDENTIFIER ::= { hh3cSessionTables 3 }
+hh3cSessionDrvTrapPrefix OBJECT IDENTIFIER ::= { hh3cSessionDrvTraps 0 }
+hh3cSessionDrvMaxTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionDrvNum,
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+    "Send trap when the number of sessions supported by hardware
+     already reached the hh3cSessionDrvNum."
+    ::= { hh3cSessionDrvTrapPrefix 1 }
+hh3cSessionDrvRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+         }
+    STATUS      current
+    DESCRIPTION
+    "Send trap when the Session resources supported by hardware had been released."
+    ::= { hh3cSessionDrvTrapPrefix 2 }
+
+hh3cSessionThdMaxTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionUsage,
+            hh3cSessionThreshold,
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+    "This notification is generated when the usage of sessions reached the threshold."
+    ::= { hh3cSessionDrvTrapPrefix 3 }
+hh3cSessionThdRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionUsage,
+            hh3cSessionThreshold,
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+    "This notification is generated when the usage of sessions dropped below the threshold."
+    ::= { hh3cSessionDrvTrapPrefix 4 }
+
+hh3cSessionDrvTrapObjects OBJECT IDENTIFIER ::= { hh3cSessionDrvTraps 1 }
+hh3cSessionDrvNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The number of sessions supported by hardware."
+    ::= { hh3cSessionDrvTrapObjects 1 }
+hh3cSessionChassis OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "An IRF member device ID."
+    ::= { hh3cSessionDrvTrapObjects 2}
+hh3cSessionSlot OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The slot where the card resides."
+    ::= { hh3cSessionDrvTrapObjects 3 }
+hh3cSessionCpu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "CPU ID."
+    ::= { hh3cSessionDrvTrapObjects 4 }
+hh3cSessionUsage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The number of rate."
+    ::= { hh3cSessionDrvTrapObjects 5 }
+hh3cSessionThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The number of threshold rate."
+    ::= { hh3cSessionDrvTrapObjects 6 }
+
+--Describe objects for session abrupt trap
+hh3cSessionMonitor OBJECT IDENTIFIER ::= { hh3cSessionTables 4}
+
+hh3cSessionTrapObjects OBJECT IDENTIFIER ::= { hh3cSessionMonitor 0 }
+
+hh3cSessUsageAbruptAlarmTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cSessionChassis,
+    hh3cSessionSlot,
+    hh3cSessionCpu,
+    hh3cSessionUsageAbruptVar,
+    hh3cSessionLastStat,
+    hh3cSessionCurrentStat
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification is generated when a hh3cSessionUsageAbruptVar
+    alarm is generated."
+::= { hh3cSessionTrapObjects 1}
+
+hh3cSessRateAbruptAlarmTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cSessionChassis,
+    hh3cSessionSlot,
+    hh3cSessionCpu,
+    hh3cSessionRateAbruptVar,
+    hh3cSessionLastStat,
+    hh3cSessionCurrentStat
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification is generated when a hh3cSessionRateAbruptVar
+    alarm is generated."
+::= { hh3cSessionTrapObjects 2 }
+
+hh3cSessTryRateAbruptAlarmTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cSessionChassis,
+    hh3cSessionSlot,
+    hh3cSessionCpu,
+    hh3cSessionTryRateAbruptVar,
+    hh3cSessionLastStat,
+    hh3cSessionCurrentStat
+  }
+  STATUS current
+  DESCRIPTION
+    "This notification is generated when a hh3cSessionTryRateAbruptVar
+    alarm is generated."
+::= { hh3cSessionTrapObjects 3 }
+
+hh3cSessionAbruptAlarm OBJECT IDENTIFIER ::= { hh3cSessionMonitor 1 }
+
+hh3cSessionUsageAbruptVar OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS accessible-for-notify
+  STATUS current
+  DESCRIPTION
+    "The value is percentage change about session concurrency during a statistical period(10s)."
+  ::= { hh3cSessionAbruptAlarm 1}
+
+hh3cSessionRateAbruptVar OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS accessible-for-notify
+  STATUS current
+  DESCRIPTION
+    "The value is percentage change about session creation rate during a statistical period(10s)."
+  ::= { hh3cSessionAbruptAlarm 2 }
+
+hh3cSessionTryRateAbruptVar OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS accessible-for-notify
+  STATUS current
+  DESCRIPTION
+    "The value is percentage change about session attempt rate during a statistical period(10s)."
+  ::= { hh3cSessionAbruptAlarm 3 }
+
+hh3cSessionLastStat OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS accessible-for-notify
+  STATUS current
+  DESCRIPTION
+    "The value of last session statistics(Usage:piece  Rate/TryRate:piece/s)."
+  ::= { hh3cSessionAbruptAlarm 4}
+
+hh3cSessionCurrentStat OBJECT-TYPE
+  SYNTAX Unsigned32
+  MAX-ACCESS accessible-for-notify
+  STATUS current
+  DESCRIPTION
+    "The value of current session statistics(Usage:piece  Rate/TryRate:piece/s)."
+  ::= { hh3cSessionAbruptAlarm 5}
+END

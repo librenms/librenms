@@ -1,0 +1,973 @@
+-- ***********************************************************************************************
+-- TN-PTP-MIB.smi:  Transition Networks Enterprise MIB for TN device SyncE feature
+--
+-- Copyright (c) 2013 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+--
+
+TN-PTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    TruthValue, RowStatus
+                FROM SNMPv2-TC
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+    entPhysicalIndex FROM ENTITY-MIB
+    tnProducts FROM TRANSITION-SMI;
+
+tnPtpMIB MODULE-IDENTITY
+    LAST-UPDATED "201311110000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+                "       Transition Networks
+                        Technical Support
+                        10900 Red Circle Drive
+                        Minnetonka, MN 55343 USA
+                        Tel: +1-800-526-9267
+
+                    E-mail: techsupport@transition.com"
+
+    DESCRIPTION
+        "The mib provides functionalities for managing PTP."
+
+    REVISION      "201311110000Z"
+    DESCRIPTION
+        "Initial Revision of this module"
+        ::= { tnProducts 123 }
+
+tnPtp            OBJECT IDENTIFIER ::= { tnPtpMIB 1 }
+--
+-- PTP Clock Modes
+--
+tnPtpClkModesTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnPtpClkModesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of SyncE External I/O"
+    ::= { tnPtp 1 }
+
+tnPtpClkModesEntry  OBJECT-TYPE
+    SYNTAX      TnPtpClkModesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table,tnPtpClkModesTable"
+    INDEX       { entPhysicalIndex }
+    ::= { tnPtpClkModesTable 1 }
+
+TnPtpClkModesEntry ::= SEQUENCE
+{
+    tnPtpInState             INTEGER,
+    tnPtpOutState            INTEGER,
+    tnPtpInFreq              INTEGER,
+    tnPtpOutFreq             INTEGER,
+    tnPtpImpedance           INTEGER,
+    tnPtpActualInFreq        INTEGER,
+    tnPtpActualOutFreq       INTEGER
+}
+
+tnPtpInState  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IEEE 1588 Input State."
+    ::= { tnPtpClkModesEntry 1 }
+
+tnPtpOutState  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IEEE 1588 Output State."
+    ::= { tnPtpClkModesEntry 2 }
+
+tnPtpInFreq  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    onePps(0),
+                    f8kHz(1),
+                    f64kHz(2),
+                    f1544kHz(3),
+                    f2048kHz(4),
+                    f10000kHz(5),
+                    f19440kHz(6),
+                    f25Mhz(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Clock frequency 1 PPS or
+                 8k-25Mhz table of values."
+    ::= { tnPtpClkModesEntry 3 }
+
+tnPtpOutFreq  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The following values are possible:
+    Editable value with the possible range of values are 1 - 25000000 (1 - 25MHz)."
+    ::= { tnPtpClkModesEntry 4 }
+
+tnPtpImpedance  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    imp50(1),
+                    imp75(2),
+                    hi-Z(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Select the impedance termination of the input clock.
+    The following values are possible:
+    1. 50 : 50 ohm impedance.
+    2. 75 : 75 ohm impedance.
+    3. Hi-Z : no impedance termination driven, tri-stated or floating."
+    ::= { tnPtpClkModesEntry 5 }
+
+tnPtpActualInFreq  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The actual input frequency in Hz."
+    ::= { tnPtpClkModesEntry 6 }
+
+tnPtpActualOutFreq  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The actual output frequency in Hz. If output state is disabled set to 0"
+    ::= { tnPtpClkModesEntry 7 }
+
+--
+-- PTP Add New Clk Configuration
+--
+tnPtpCreateClkConfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnPtpCreateClkConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of PTP ClkInstance"
+    ::= { tnPtp 2 }
+
+tnPtpCreateClkConfEntry  OBJECT-TYPE
+    SYNTAX      TnPtpCreateClkConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table,tnPtpCreateClkConfTable"
+    INDEX       { tnPtpCreateClkConfIndex }
+    ::= { tnPtpCreateClkConfTable 1 }
+
+
+TnPtpCreateClkConfEntry ::= SEQUENCE
+{
+    tnPtpCreateClkConfIndex  INTEGER,
+    tnPtpDeviceType          INTEGER,
+    tnPtpTwoStepFlag         TruthValue,
+    tnPtpClockId             OCTET STRING,
+    tnPtpOneWay              TruthValue,
+    tnPtpProtocol            INTEGER,
+    tnPtpVLANTag             TruthValue,
+    tnPtpVID                 INTEGER,
+    tnPtpPCP                 INTEGER,
+    tnPtpClkConfRowStatus    RowStatus
+}
+
+tnPtpCreateClkConfIndex  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index of ptp clocks."
+    ::= { tnPtpCreateClkConfEntry 1 }
+
+tnPtpDeviceType OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    inactive(0),
+                    ordBound(1),
+                    p2pTransp(2),
+                    e2eTransp(3),
+                    masterOnly(4),
+                    slaveOnly(5)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Indicates the Type of the Clock Instance. There are five Device Types.
+    1. Ord-Bound - clock's Device Type is Ordinary-Boundary Clock.
+    2. P2p Transp - clock's Device Type is Peer to Peer Transparent Clock.
+    3. E2e Transp - clock's Device Type is End to End Transparent Clock.
+    4. Master Only - clock's Device Type is Master Only.
+    5. Slave Only - clock's Device Type is Slave Only."
+    ::= { tnPtpCreateClkConfEntry 2 }
+
+tnPtpTwoStepFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Static member: defined by the system, true if two-step Sync events and Pdelay_Resp events are used."
+    ::= { tnPtpCreateClkConfEntry 3 }
+
+tnPtpClockId OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS current
+    DESCRIPTION
+    "A unique clock identifier."
+    ::= { tnPtpCreateClkConfEntry 4 }
+
+tnPtpOneWay OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "If true, one-way measurements are used. This parameter applies only to a slave. In one-way mode no delay
+    measurements are performed, i.e. this is applicable only if frequency synchronization is needed. The master always responds to delay requests.."
+    ::= { tnPtpCreateClkConfEntry 5 }
+
+tnPtpProtocol OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    ethernet(0),
+                    ipv4multi(1),
+                    ipv4uni(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Transport protocol used by the PTP protocol engine
+    ethernet PTP over Ethernet multicast
+    ip4multi PTP over IPv4 multicast
+    ip4uni PTP over IPv4 unicast
+    Note : IPv4 unicast protocol only works in Master only and Slave only clocks
+    See parameter Device Type
+    In a unicast Slave only clock you also need configure which master clocks
+    to request Announce and Sync messages from. See: Unicast Slave Configuration."
+    ::= { tnPtpCreateClkConfEntry 6 }
+
+tnPtpVLANTag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Enables the VLAN tagging for the PTP frames.
+    Note: Packets are only tagged if the port is configured for vlan tagging. i.e:
+    Port Type != Unaware and PortVLAN mode == None, and the port is member of the VLAN."
+    ::= { tnPtpCreateClkConfEntry 7 }
+
+tnPtpVID OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "VLAN Identifier used for tagging the PTP frames."
+    ::= { tnPtpCreateClkConfEntry 8 }
+
+tnPtpPCP OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Priority Code Point value used for PTP frames."
+    ::= { tnPtpCreateClkConfEntry 9 }
+
+tnPtpClkConfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row cannot be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated."
+   ::= { tnPtpCreateClkConfEntry 10 }
+
+--
+-- PTP Clk Configuration 0
+--
+tnPtpClkConf0Table  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnPtpClkConf0Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of PTP ClkInstance"
+    ::= { tnPtp 3 }
+
+tnPtpClkConf0Entry  OBJECT-TYPE
+    SYNTAX      TnPtpClkConf0Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table,tnPtpClkConf0Table"
+    INDEX       { tnPtpClkConf0Index }
+    ::= { tnPtpClkConf0Table 1 }
+
+
+TnPtpClkConf0Entry ::= SEQUENCE
+{
+    tnPtpClkConf0Index       INTEGER,
+
+    tnPtpDefaultDom          INTEGER,
+    tnPtpDefaultClockQuality OCTET STRING,
+    tnPtpDefaultPri1         INTEGER,
+    tnPtpDefaultPri2         INTEGER,
+
+    tnPtpTime                OCTET STRING,
+    tnPtpAdjustMethod        INTEGER,
+    tnPtpSynce               INTEGER,
+}
+
+tnPtpClkConf0Index  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the Instance of a particular Clock Instance [0..CLOCK_INST_MAX]."
+    ::= { tnPtpClkConf0Entry 1 }
+
+tnPtpDefaultDom OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Clock domain [0..127]."
+    ::= { tnPtpClkConf0Entry 2 }
+
+tnPtpDefaultClockQuality OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+    "The clock quality is determined by the system, and holds 3 parts: Clock Class, Clock Accuracy and OffsetScaledLog Variance as defined in IEEE1588.
+    The Clock Accuracy values are defined in IEEE1588 table 6 (Currently the clock Accuracy is set to 'Unknown' as default)."
+    ::= { tnPtpClkConf0Entry 3 }
+
+tnPtpDefaultPri1 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Clock priority 1 [0..255] used by the BMC master select algorithm."
+    ::= { tnPtpClkConf0Entry 4 }
+
+tnPtpDefaultPri2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Clock priority 2 [0..255] used by the BMC master select algorithm."
+    ::= { tnPtpClkConf0Entry 5 }
+
+tnPtpTime OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..256))
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+    "Shows the actual PTP time with nanosecond resolution."
+    ::= { tnPtpClkConf0Entry 6 }
+
+tnPtpAdjustMethod OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    internal(1),
+                    vcxo(2),
+                    software(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Shows the actual clock adjustment method. The method depends on the available hardware."
+    ::= { tnPtpClkConf0Entry 7 }
+
+tnPtpSynce OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    doNothing(1),
+                    sync(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Activate to synchronize the System Clock to PTP Time."
+    ::= { tnPtpClkConf0Entry 8 }
+
+--
+-- PTP Clk Configuration 1
+--
+tnPtpClkConfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnPtpClkConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of PTP ClkInstance"
+    ::= { tnPtp 4 }
+
+tnPtpClkConfEntry  OBJECT-TYPE
+    SYNTAX      TnPtpClkConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table,tnPtpClkConfTable"
+    INDEX       { tnPtpClkConfIndex }
+    ::= { tnPtpClkConfTable 1 }
+
+
+TnPtpClkConfEntry ::= SEQUENCE
+{
+    tnPtpClkConfIndex        INTEGER,
+
+    tnPtpStpRm               INTEGER,
+    tnPtpOffset              OCTET STRING,
+    tnPtpPathDelay           OCTET STRING,
+    tnPtpDelayFilter         INTEGER,
+    tnPtpFilterPeriod        INTEGER,
+    tnPtpFilterDist          INTEGER,
+
+    tnPtpParentPortId        OCTET STRING,
+    tnPtpParentPort          INTEGER,
+    tnPtpParentPStat         TruthValue,
+    tnPtpParentVar           INTEGER,
+    tnPtpParentChgRate       INTEGER,
+    tnPtpParentGMId          OCTET STRING,
+    tnPtpParentGMQual        OCTET STRING,
+    tnPtpParentPri1          INTEGER,
+    tnPtpParentPri2          INTEGER
+}
+
+tnPtpClkConfIndex  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Indicates the Instance of a particular Clock Instance [0..CLOCK_INST_MAX]."
+    ::= { tnPtpClkConfEntry 1 }
+
+tnPtpStpRm  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Steps Removed : It is the number of PTP clocks traversed from the grandmaster to the local slave clock."
+    ::= { tnPtpClkConfEntry 2 }
+
+tnPtpOffset OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Time difference between the master clock and the local slave clock, measured in ns."
+    ::= { tnPtpClkConfEntry 3 }
+
+tnPtpPathDelay OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "The mean propagation time for the link between the master and the local slave."
+    ::= { tnPtpClkConfEntry 4 }
+
+tnPtpDelayFilter  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The default delay filter is a low pass filter, with a time constant of 2**DelayFilter*DelayRequestRate.
+                 The value must be in the range of 1..6."
+    ::= { tnPtpClkConfEntry 5 }
+
+tnPtpFilterPeriod  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The default offset filter uses a minimum delay filter method
+    i.e. The minimum measured offset during Period samples is used in the calculation.
+    The value must be in the range of 1..1000."
+    ::= { tnPtpClkConfEntry 6 }
+
+tnPtpFilterDist  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The distance between two calculations is Dist periods.
+    Note: In configurations with Timestamp enabled PHYs, the period is automatically increased, if (period*dist < SyncPackets pr sec/4),
+    i.e. max 4 adjustments are made pr sec.
+    If Dist is 1 the offset is averaged over the Period,
+    If Dist is >1 the offset is calculated using 'min' offset.
+    The value must be in the range of 1..10"
+    ::= { tnPtpClkConfEntry 7 }
+
+tnPtpParentPortId  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Clock identity for the parent clock, if the local clock is not a slave, the value is the clocks own id."
+    ::= { tnPtpClkConfEntry 8 }
+
+tnPtpParentPort  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port Id for the parent master port."
+    ::= { tnPtpClkConfEntry 9 }
+
+tnPtpParentPStat  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Parents Stats (always false)."
+    ::= { tnPtpClkConfEntry 10 }
+
+tnPtpParentVar  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "It is observed parent offset scaled log variance."
+    ::= { tnPtpClkConfEntry 11 }
+
+tnPtpParentChgRate  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Observed Parent Clock Phase Change Rate. i.e. the slave clocks rate offset compared to the master. (unit = ns per s)."
+    ::= { tnPtpClkConfEntry 12 }
+
+tnPtpParentGMId  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Clock identity for the grand master clock, if the local clock is not a slave, the value is the clocks own id."
+    ::= { tnPtpClkConfEntry 13 }
+
+tnPtpParentGMQual  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The clock quality announced by the grand master."
+    ::= { tnPtpClkConfEntry 14 }
+
+tnPtpParentPri1  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Clock priority 1 announced by the grand master."
+    ::= { tnPtpClkConfEntry 15 }
+
+tnPtpParentPri2  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Clock priority 2 announced by the grand master."
+    ::= { tnPtpClkConfEntry 16 }
+
+--
+-- PTP Clk Configuration 2
+--
+tnPtpClkConf2Table  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnPtpClkConf2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table 2 of PTP ClkInstance"
+    ::= { tnPtp 5 }
+
+tnPtpClkConf2Entry  OBJECT-TYPE
+    SYNTAX      TnPtpClkConf2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table,tnPtpClkConf2Table"
+    INDEX       { tnPtpClkConfIndex2 }
+    ::= { tnPtpClkConf2Table 1 }
+
+
+TnPtpClkConf2Entry ::= SEQUENCE
+{
+    tnPtpClkConfIndex2        INTEGER,
+
+    tnPtpUtcOffset           INTEGER,
+    tnPtpValid               TruthValue,
+    tnPtpLeap59              TruthValue,
+    tnPtpLeap61              TruthValue,
+    tnPtpTimeTrac            TruthValue,
+    tnPtpFreqTrac            TruthValue,
+    tnPtpTimeScale           TruthValue,
+    tnPtpTimeSource          INTEGER,
+
+    tnPtpDisplay             TruthValue,
+    tnPtpPEnable             TruthValue,
+    tnPtpIEnable             TruthValue,
+    tnPtpDEnable             TruthValue,
+    tnPtpPConstant           INTEGER,
+    tnPtpIConstant           INTEGER,
+    tnPtpDConstant           INTEGER,
+    tnPtpServoDelayFilter    INTEGER
+}
+
+tnPtpClkConfIndex2  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Indicates the Instance of a particular Clock Instance [0..CLOCK_INST_MAX]."
+    ::= { tnPtpClkConf2Entry 1 }
+
+tnPtpUtcOffset  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Unicast Offset must be an integer value between 0 and 10000."
+    ::= { tnPtpClkConf2Entry 2 }
+
+tnPtpValid  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Valid."
+    ::= { tnPtpClkConf2Entry 3 }
+
+tnPtpLeap59  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Leap 59."
+    ::= { tnPtpClkConf2Entry 4 }
+
+tnPtpLeap61  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Leap 61."
+    ::= { tnPtpClkConf2Entry 5 }
+
+tnPtpTimeTrac  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Time Trac."
+    ::= { tnPtpClkConf2Entry 6 }
+
+tnPtpFreqTrac  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Freq Trac."
+    ::= { tnPtpClkConf2Entry 7 }
+
+tnPtpTimeScale  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Time Scale."
+    ::= { tnPtpClkConf2Entry 8 }
+
+tnPtpTimeSource  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Time Source. Value of 0-255"
+    ::= { tnPtpClkConf2Entry 9 }
+
+tnPtpDisplay  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "If true then Offset From Master, MeanPathDelay and clockAdjustment are logged on the debug terminal."
+    ::= { tnPtpClkConf2Entry 10 }
+
+tnPtpPEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "If true the P part of the algorithm is included."
+    ::= { tnPtpClkConf2Entry 11 }
+
+tnPtpIEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "If true the I part of the algorithm is included."
+    ::= { tnPtpClkConf2Entry 12 }
+
+tnPtpDEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "If true the D part of the algorithm is included."
+    ::= { tnPtpClkConf2Entry 13 }
+
+tnPtpPConstant  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The default clock servo uses a PID regulator to calculate the current clock rate. i.e.
+    clockAdjustment = OffsetFromMaster/ P constant + Integral(OffsetFromMaster)/ I constant +
+    Differential OffsetFromMaster)/ D constant [1..1000]."
+    ::= { tnPtpClkConf2Entry 14 }
+
+tnPtpIConstant  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The default clock servo uses a PID regulator to calculate the current clock rate. i.e.
+    clockAdjustment = OffsetFromMaster/ P constant + Integral(OffsetFromMaster)/ I constant +
+    Differential OffsetFromMaster)/ D constant [1..10000]."
+    ::= { tnPtpClkConf2Entry 15 }
+
+tnPtpDConstant  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The default clock servo uses a PID regulator to calculate the current clock rate. i.e.
+    clockAdjustment = OffsetFromMaster/ P constant + Integral(OffsetFromMaster)/ I constant +
+    Differential OffsetFromMaster)/ D constant [1..10000]."
+    ::= { tnPtpClkConf2Entry 16 }
+
+tnPtpServoDelayFilter OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The default delay filter is a low pass filter, with a time constant of 2**DelayFilter*DelayRequestRate.
+    This is for the custom filter."
+    ::= { tnPtpClkConf2Entry 17 }
+
+--
+-- PTP Unicast Slave Config
+--
+tnPtpUnicastSlaveTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnPtpUnicastSlaveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of PTP Unicast Slave"
+    ::= { tnPtp 6 }
+
+tnPtpUnicastSlaveEntry  OBJECT-TYPE
+    SYNTAX      TnPtpUnicastSlaveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table,tnPtpUnicastSlaveTable"
+    INDEX       { tnPtpUnicastInstIndex, tnPtpUnicastSlaveIndex }
+    ::= { tnPtpUnicastSlaveTable 1 }
+
+
+TnPtpUnicastSlaveEntry ::= SEQUENCE
+{
+    tnPtpUnicastInstIndex    INTEGER,
+    tnPtpUnicastSlaveIndex   INTEGER,
+    tnPtpUnicastDuration     INTEGER,
+    tnPtpIPAddress           InetAddress,
+    tnPtpGrant               INTEGER,
+    tnPtpCommState           INTEGER
+}
+
+tnPtpUnicastInstIndex  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Indicates the Instance of a particular Clock Instance [0..3]."
+    ::= { tnPtpUnicastSlaveEntry 1 }
+
+tnPtpUnicastSlaveIndex  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Indicates the Instance of a particular Unicast Slave [0..4]."
+    ::= { tnPtpUnicastSlaveEntry 2 }
+
+tnPtpUnicastDuration  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The number of seconds a master is requested to send Announce/Sync messages.
+    The request is repeated from the slave each Duration/4 seconds. [10..1000]."
+    ::= { tnPtpUnicastSlaveEntry 3 }
+
+tnPtpIPAddress  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IPv4 Address of the Master clock."
+    ::= { tnPtpUnicastSlaveEntry 4 }
+
+tnPtpGrant  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The granted repetition period for the sync message."
+    ::= { tnPtpUnicastSlaveEntry 5 }
+
+tnPtpCommState  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    idle(1),
+                    init(2),
+                    conn(3),
+                    sell(4),
+                    sync(5)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "    The state of the communication with the master, possible values are:
+    IDLE : The entry is not in use.
+    INIT : Announce is sent to the master (Waiting for a response).
+    CONN : The master has responded.
+    SELL : The assigned master is selected as current master.
+    SYNC : The master is sending Sync messages."
+    ::= { tnPtpUnicastSlaveEntry 6 }
+
+--
+-- PTP Clock Port Data Set Configuration
+--
+tnPtpPortConfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnPtpPortConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of PTP Clock Port Data Set Configuration"
+    ::= { tnPtp 7 }
+
+tnPtpPortConfEntry  OBJECT-TYPE
+    SYNTAX      TnPtpPortConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table,tnPtpPortConfTable"
+    INDEX       { tnPtpPortConfInstIndex, tnPtpPortConfIndex }
+    ::= { tnPtpPortConfTable 1 }
+
+
+TnPtpPortConfEntry ::= SEQUENCE
+{
+    tnPtpPortConfInstIndex   INTEGER,
+    tnPtpPortConfIndex       INTEGER,
+    tnPtpStat                OCTET STRING,
+    tnPtpMDR                 INTEGER,
+    tnPtpMeanPath            OCTET STRING,
+    tnPtpAnv                 INTEGER,
+    tnPtpATO                 INTEGER,
+    tnPtpSyv                 INTEGER,
+    tnPtpSyncIntErr          TruthValue,
+    tnPtpDim                 INTEGER,
+    tnPtpMPR                 INTEGER,
+    tnPtpDelayAsym           INTEGER,
+    tnPtpIngerssLat          INTEGER,
+    tnPtpEgressLat           INTEGER,
+    tnPtpVersion             INTEGER,
+    tnPtpPortConfRowStatus   RowStatus
+}
+
+tnPtpPortConfInstIndex  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Indicates the Instance of a particular Clock Instance [0..3]."
+    ::= { tnPtpPortConfEntry 1 }
+
+tnPtpPortConfIndex  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Static member port Identity : Port number [1..max port no]."
+    ::= { tnPtpPortConfEntry 2 }
+
+tnPtpStat  OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dynamic member portState: Current state of the port."
+    ::= { tnPtpPortConfEntry 3 }
+
+tnPtpMDR  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Dynamic member log Min Delay Req Interval: The delay request interval announced by the master."
+    ::= { tnPtpPortConfEntry 4 }
+
+tnPtpMeanPath  OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The path delay measured by the port in P2P mode. In E2E mode this value is 0."
+    ::= { tnPtpPortConfEntry 5 }
+
+tnPtpAnv  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The interval for issuing announce messages in master state. [-3..4]"
+    ::= { tnPtpPortConfEntry 6 }
+
+tnPtpATO  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The timeout for receiving announce messages on the port. [-1..10]"
+    ::= { tnPtpPortConfEntry 7 }
+
+tnPtpSyv  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The interval for issuing sync messages in master. [-7..4]"
+    ::= { tnPtpPortConfEntry 8 }
+
+tnPtpSyncIntErr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Synce Interval Error truth value"
+    ::= { tnPtpPortConfEntry 9 }
+
+tnPtpDim  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    e2e(1),
+                    p2p(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Configurable member delayMechanism: The delay mechanism used for the port:
+    e2e End to end delay measurement
+    p2p Peer to peer delay measurement.
+    Can be defined per port in an Ordinary/Boundary clock.
+    In a transparent clock all ports use the same delay mechanism, determined by the clock type."
+    ::= { tnPtpPortConfEntry 10 }
+
+tnPtpMPR  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The interval for issuing Delay_Req messages for the port in E2e mode.
+    This value is announced from the master to the slave in an announce message. The value is reflected in the MDR field in the Slave
+    The interval for issuing Pdelay_Req messages for the port in P2P mode
+    Note: The interpretation of this parameter has changed from release 2.40.
+    In earlier versions the value was interpreted relative to the Sync interval, this was a violation of the standard, so now the value is interpreted as an interval.
+    I.e. MPR = 0 =>1    Delay_Req pr sec, independent of the Sync rate. [-7..5]"
+    ::= { tnPtpPortConfEntry 11 }
+
+tnPtpDelayAsym  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "If the transmission delay for a link in not symmetric, the asymmetry can be configured here,
+        see IEEE 1588 Section 7.4.2 Communication path asymmetry. [-100000..100000]"
+    ::= { tnPtpPortConfEntry 12 }
+
+tnPtpIngerssLat  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Ingress latency measured in ns, as defined in IEEE 1588 Section 7.3.4.2. [-100000..100000]"
+    ::= { tnPtpPortConfEntry 13 }
+
+tnPtpEgressLat  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Egress latency measured in ns, as defined in IEEE 1588 Section 7.3.4.2. [-100000..100000]"
+    ::= { tnPtpPortConfEntry 14 }
+
+tnPtpVersion  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The current implementation only supports PTP version 2."
+    ::= { tnPtpPortConfEntry 15 }
+
+tnPtpPortConfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row cannot be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+   ::= { tnPtpPortConfEntry 16 }
+END

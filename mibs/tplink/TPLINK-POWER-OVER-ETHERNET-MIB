@@ -1,0 +1,594 @@
+    TPLINK-POWER-OVER-ETHERNET-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            TPRowStatus
+				FROM TPLINK-TC-MIB
+			tplinkMgmt	          
+				FROM TPLINK-MIB;
+			                        
+        tplinkPowerOverEthernetMIB MODULE-IDENTITY
+            LAST-UPDATED    "201307030000Z"
+            ORGANIZATION    "TP-LINK"
+            CONTACT-INFO    " www.tplink.com"
+            DESCRIPTION     "Private MIB for PoE module."
+            REVISION        "201307030000Z"
+            DESCRIPTION     "Initial version of this MIB module."
+            ::= { tplinkMgmt 56 }
+			
+ -- (Top) SubNodes
+			tplinkPoeMIBObjects OBJECT IDENTIFIER ::= {tplinkPowerOverEthernetMIB 1}
+			tplinkPoeNotifications OBJECT IDENTIFIER ::= {tplinkPowerOverEthernetMIB 2}
+
+-------------- tplinkPoeMIBObjects Overview------------
+            tpPoeConfig              OBJECT IDENTIFIER ::= {tplinkPoeMIBObjects 1}  
+			tpPoeProfile              OBJECT IDENTIFIER ::= {tplinkPoeMIBObjects 2}  
+			tpPoeRecovery			 OBJECT IDENTIFIER ::= {tplinkPoeMIBObjects 3}
+			tpPoeExtend			 OBJECT IDENTIFIER ::= {tplinkPoeMIBObjects 4} 
+        
+-- (1) tpPoeConfig Objects
+			tpPoeGlobal           OBJECT IDENTIFIER ::= {tpPoeConfig 1}  
+			tpPoePort             OBJECT IDENTIFIER ::= {tpPoeConfig 2}  
+			
+			tpSystemPowerLimit OBJECT-TYPE
+            SYNTAX  INTEGER(1..3200)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Define max power the PoE switch supply. The unit is 0.1W."
+            ::= { tpPoeGlobal 1 }
+            
+            tpPowerDisconnectMethod OBJECT-TYPE
+            SYNTAX  INTEGER
+                {
+                deny-lower-priority(1)                      
+                }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The PoE Switch use this method to offset the power 
+                limit being exceeded and keep the switch system using 
+                power at a usable level."
+            ::= { tpPoeGlobal 2 } 
+            
+            tpSystemPowerConsumption OBJECT-TYPE
+            SYNTAX  INTEGER(1..3200)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    "Display the PoE switch's real time system power consumption. The unit is 0.1W."
+            ::= { tpPoeGlobal 3 }
+            
+            tpSystemPowerRemain OBJECT-TYPE
+            SYNTAX  INTEGER(1..3200)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    "Display the PoE switch's real time remaining system power. The unit is 0.1W."
+            ::= { tpPoeGlobal 4 }			
+			
+			tpPoePortConfigTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF POEPORTCONFIGENTRY
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                    "A list of PoE entries.
+                     Here you can configure the PoE feature on each port."
+            ::= { tpPoePort 1 }
+
+            tpPoePortConfigEntry OBJECT-TYPE
+            SYNTAX  POEPORTCONFIGENTRY
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                    "An entry contains of the configuration and information of poe port."
+            INDEX   { tpPoePortIndex  }
+            ::= { tpPoePortConfigTable 1 }
+    
+        POEPORTCONFIGENTRY ::=
+            SEQUENCE {        
+                                    
+                                tpPoePortIndex
+                                        INTEGER, 
+                                tpPoePortStatus
+                                        INTEGER,
+                                tpPoePriority
+                                        INTEGER,
+                                tpPoePowerLimit  
+                                        INTEGER, 
+                                tpPoePortTimeRangeName
+                                        OCTET STRING (SIZE (0..255)),
+                                tpPoePortProfileName
+                                        OCTET STRING (SIZE (0..255)),
+                                tpPoePower
+                                        INTEGER,
+                                tpPoeCurrent
+                                        INTEGER,
+                                tpPoeVoltage
+                                        INTEGER,
+                                tpPoeClass
+                                        INTEGER,
+                                tpPoePowerStatus
+                                        INTEGER            
+                }
+        tpPoePortIndex OBJECT-TYPE
+            SYNTAX  INTEGER  
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    "The port number of the Switch."
+            ::= { tpPoePortConfigEntry 1 }
+        
+        tpPoePortStatus OBJECT-TYPE
+            SYNTAX  INTEGER{
+                disable(0),                         
+                enable(1)                       
+                }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Select to disable/enable the PoE feature
+                     for the corresponding port. If set enable,
+                     the corresponding port can supply power to
+                      the linked PD (Powered Device)."
+            ::= { tpPoePortConfigEntry 2 }
+       
+       tpPoePriority OBJECT-TYPE
+             SYNTAX  INTEGER{
+                high(0),                        
+                middle(1),
+                low(2)                      
+                }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Cooperates with the Power Disconnected Method
+                     to decide the way to supply power to the new 
+                     linked PD (Powered Device) when the surplus 
+                     power is inadequate."
+            ::= { tpPoePortConfigEntry 3 }
+       tpPoePowerLimit OBJECT-TYPE
+            SYNTAX  INTEGER(1..300)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Defines the max power the corresponding port can supply.The unit is 0.1W"
+            ::= { tpPoePortConfigEntry 4 }  
+            
+        tpPoePortTimeRangeName OBJECT-TYPE
+            SYNTAX  OCTET STRING (SIZE (0..255))  
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Select time range by entering its name."
+            ::= { tpPoePortConfigEntry 5 } 
+            
+        tpPoePortProfileName OBJECT-TYPE
+            SYNTAX  OCTET STRING (SIZE (0..255))  
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Select profile by entering its name. "
+            ::= { tpPoePortConfigEntry 6 }  
+        tpPoePower OBJECT-TYPE
+            SYNTAX  INTEGER(1..300)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    " Displays the port's real time power supply in 0.1W."
+            ::= { tpPoePortConfigEntry 7 }
+        tpPoeCurrent OBJECT-TYPE
+            SYNTAX  INTEGER(1..1000)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    " Displays the port's real time current in 1mA."
+            ::= { tpPoePortConfigEntry 8 }
+        tpPoeVoltage OBJECT-TYPE
+            SYNTAX  INTEGER(1..300)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    " Displays the port's real time voltage in 0.1V."
+            ::= { tpPoePortConfigEntry 9 } 
+        tpPoeClass OBJECT-TYPE
+            SYNTAX      INTEGER
+            {
+                     class0(0),
+                     class1(1),
+                     class2(2),
+                     class3(3),
+                     class4(4),
+                     class-not-defined(7)
+            }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    " Displays the class the linked PD (Powered Device) belongs to."
+            ::= { tpPoePortConfigEntry 10 }   
+        tpPoePowerStatus OBJECT-TYPE
+            SYNTAX      INTEGER
+            {
+                    off(0),
+                    turning-on(1),
+					on(2),
+                    overload(3),
+                    short(4),
+                    nonstandard-pd(5),
+                    voltage-high(6),
+                    voltage-low(7),
+                    hardware-fault(8),
+                    overtemperature(9)
+            }
+
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    " Displays the port's real time power status."
+            ::= { tpPoePortConfigEntry 11 }
+			
+-- (2) tpPoeProfile Objects
+       tpPoeProfileTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF POEPROFILEENTRY
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                    "A list of PoE profile entries.
+                     Here you can define the PoE profile."
+            ::= { tpPoeProfile 1 }     
+            
+            tpPoeProfileEntry OBJECT-TYPE
+            SYNTAX  POEPROFILEENTRY
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                    "An entry contains of the information of PoE profile."
+            INDEX   { tpPoeProfileName  }
+            ::= { tpPoeProfileTable 1 }
+
+            
+            POEPROFILEENTRY ::=
+            SEQUENCE {
+                                tpPoeProfileIndex        
+                                        INTEGER,            
+                                tpPoeProfileName
+                                        OCTET STRING (SIZE (0..255)), 
+                                tpPoeProfilePortStatus
+                                        INTEGER,
+                                tpPoeProfilePriority
+                                        INTEGER,
+                                tpPoeProfilePowerLimit  
+                                        INTEGER,
+                                tpPoeProfileStatus
+                                		TPRowStatus                              
+                    }
+            tpPoeProfileIndex OBJECT-TYPE
+              SYNTAX  INTEGER  
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                    "The index number of the Switch."
+              ::= { tpPoeProfileEntry 1 }
+                      
+            tpPoeProfileName OBJECT-TYPE
+              SYNTAX  OCTET STRING (SIZE (0..255))   
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      " the name of PoE profile."
+              ::= { tpPoeProfileEntry 2 } 
+              
+            tpPoeProfilePortStatus OBJECT-TYPE
+            SYNTAX  INTEGER{
+                disable(0),                         
+                enable(1)                       
+                }
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                    "Select to disable/enable the PoE feature
+                     for the corresponding profile. If set enable,
+                     the port selected the profile can supply power to
+                      the linked PD (Powered Device)."
+            ::= { tpPoeProfileEntry 3 }
+            
+            tpPoeProfilePriority OBJECT-TYPE
+             SYNTAX  INTEGER{
+                high(0),                        
+                middle(1),
+                low(2)                      
+                }
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                    "Cooperates with the Power Disconnected Method
+                     to decide the way to supply power to the new 
+                     linked PD (Powered Device) when the surplus 
+                     power is inadequate."
+            ::= { tpPoeProfileEntry 4 }
+            
+            tpPoeProfilePowerLimit OBJECT-TYPE
+            SYNTAX  INTEGER(1..300)
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                    "Defines the max power the corresponding port can supply.The unit is 0.1W."
+            ::= { tpPoeProfileEntry 5 }
+             
+            tpPoeProfileStatus OBJECT-TYPE
+            SYNTAX  TPRowStatus
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                    ""
+            ::= { tpPoeProfileEntry 6 } 
+ 			
+-- (3) tpPoeRecovery Objects
+			tpPoeRecoveryGlobal		OBJECT IDENTIFIER ::= {tpPoeRecovery 1}  
+			tpPoeRecoveryPort		OBJECT IDENTIFIER ::= {tpPoeRecovery 2}  
+			
+			tpPoeRecoveryGlobalStatus OBJECT-TYPE
+            SYNTAX  INTEGER
+				{
+					disable(0),
+					enable(1)
+				}
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Enable the PoE Auto Recovery function."
+            ::= { tpPoeRecoveryGlobal 1 }			
+			
+			tpPoeRecoveryPortTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF POERECOVERYPORTENTRY
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                    "A list of PoE Auto Recovery entries. Here you can configure the PoE Auto Recovery feature on each port."
+            ::= { tpPoeRecoveryPort 1 }
+
+            tpPoeRecoveryPortEntry OBJECT-TYPE
+            SYNTAX  POERECOVERYPORTENTRY
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                    "An entry contains of the poe auto recovery configuration and information of poe port."
+            INDEX   { tpPoePortIndex  }
+            ::= { tpPoeRecoveryPortTable 1 }
+    
+        POERECOVERYPORTENTRY ::=
+            SEQUENCE {        
+                                    
+                                tpPoeRecoveryPort
+                                        INTEGER, 
+                                tpPoeRecoveryIp
+                                        OCTET STRING (SIZE (0..255)),
+                                tpPoeRecoveryStartup
+                                        INTEGER,
+                                tpPoeRecoveryInterval
+                                        INTEGER,
+                                tpPoeRecoveryRetry
+                                        INTEGER,
+                                tpPoeRecoveryBreak
+                                        INTEGER,
+                                tpPoeRecoveryStatus
+                                        INTEGER,
+                                tpPoeRecoveryFailure
+                                        INTEGER,
+                                tpPoeRecoveryRestart
+                                        INTEGER,
+                                tpPoeRecoveryTotal
+                                        INTEGER            
+                }
+        tpPoeRecoveryPort OBJECT-TYPE
+            SYNTAX  INTEGER  
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    "The port number of the Switch."
+            ::= { tpPoeRecoveryPortEntry 1 }
+       
+       tpPoeRecoveryIp OBJECT-TYPE
+            SYNTAX  OCTET STRING (SIZE (0..255)) 
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Defines the ping IP address for the corresponding port. (Format: x.x.x.x)"
+            ::= { tpPoeRecoveryPortEntry 2 }
+
+       tpPoeRecoveryStartup OBJECT-TYPE
+            SYNTAX  INTEGER(30..600)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Defines the startup delay for the corresponding port.(30-600 Seconds)"
+            ::= { tpPoeRecoveryPortEntry 3 }  
+            
+        tpPoeRecoveryInterval OBJECT-TYPE
+            SYNTAX  INTEGER(10..120)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Defines the ping interval for the corresponding port. (10-120 Seconds)"
+            ::= { tpPoeRecoveryPortEntry 4 } 
+            
+        tpPoeRecoveryRetry OBJECT-TYPE
+            SYNTAX  INTEGER(1..10)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Defines the ping failure threshold for the corresponding port. (1-10) "
+            ::= { tpPoeRecoveryPortEntry 5 }  
+        
+		tpPoeRecoveryBreak OBJECT-TYPE
+            SYNTAX  INTEGER(3..120)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Defines the break time for the corresponding port. (3-120 Seconds)"
+            ::= { tpPoeRecoveryPortEntry 6 }
+        
+		tpPoeRecoveryStatus OBJECT-TYPE
+            SYNTAX  INTEGER{
+                disable(0),                         
+                enable(1)                       
+                }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Select to disable/enable the PoE Auto Recovery feature for the corresponding port."
+            ::= { tpPoeRecoveryPortEntry 7 }
+			
+		tpPoeRecoveryFailure OBJECT-TYPE
+            SYNTAX  INTEGER(1..9999)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    " Displays the port's ping failures."
+            ::= { tpPoeRecoveryPortEntry 8 }
+        
+		tpPoeRecoveryRestart OBJECT-TYPE
+            SYNTAX  INTEGER(1..9999)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    " Displays the port's restarts."
+            ::= { tpPoeRecoveryPortEntry 9 } 
+        
+		tpPoeRecoveryTotal OBJECT-TYPE
+            SYNTAX  INTEGER(1..9999)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    " Displays the port's total pings."
+            ::= { tpPoeRecoveryPortEntry 10 }
+			
+---(4) tpPoeExtend Objects
+			tpPoeExtendPort			OBJECT IDENTIFIER ::= {tpPoeExtend 1}  
+			
+			tpPoeExtendPortTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF POEEXTENDPORTENTRY
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                    "A list of PoE Extend Mode entries. Here you can configure the PoE Extend Mode feature on each port."
+            ::= { tpPoeExtendPort 1 }
+
+            tpPoeExtendPortEntry OBJECT-TYPE
+            SYNTAX  POEEXTENDPORTENTRY
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                    "An entry contains of the poe extend mode configuration and information of poe port."
+            INDEX   { tpPoePortIndex  }
+            ::= { tpPoeExtendPortTable 1 }
+    
+        POEEXTENDPORTENTRY ::=
+            SEQUENCE {        
+                                    
+                                tpPoeExtendPort
+                                        INTEGER,
+                                tpPoeExtendStatus
+                                        INTEGER            
+                }
+        tpPoeExtendPort OBJECT-TYPE
+            SYNTAX  INTEGER  
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                    "The port number of the Switch."
+            ::= { tpPoeExtendPortEntry 1 }
+       
+       tpPoeExtendStatus OBJECT-TYPE
+            SYNTAX  INTEGER{
+                disable(0),                         
+                enable(1)                       
+                }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                    "Select to disable/enable the PoE Extend Mode feature for the corresponding port."
+            ::= { tpPoeExtendPortEntry 2 }  
+			
+--  (5) poeNotifications Objects	
+		tpPoePortPowerChange NOTIFICATION-TYPE
+                        OBJECTS
+                        {
+                            tpPoePortIndex,
+                            tpPoePortStatus
+                        }
+                        STATUS current
+                        DESCRIPTION 
+                            "A poePortPowerChange notification is sent when the status of a port power changes."
+                        ::= {tplinkPoeNotifications 1}
+                        
+                    tpPoePortPowerOverLoading NOTIFICATION-TYPE
+                        OBJECTS
+                        {
+                            tpPoePortIndex
+                        }
+                        STATUS current
+                        DESCRIPTION 
+                            "A poePortPowerOverLoading notification is sent when a port is over loading."
+                        ::= {tplinkPoeNotifications 2}
+                        
+                    tpPoePortShortCircuit NOTIFICATION-TYPE
+                        OBJECTS
+                        {
+                            tpPoePortIndex
+                        }
+                        STATUS current
+                        DESCRIPTION 
+                            "A poePortShortCircuit notification is sent when short circuit occurs on a port."
+                        ::= {tplinkPoeNotifications 3}
+                        
+                    tpPoePortPowerOver30Watts NOTIFICATION-TYPE
+                        OBJECTS
+                        {
+                            tpPoePortIndex
+                        }
+                        STATUS current
+                        DESCRIPTION 
+                            "A poePortPowerOver30Watts notification is sent when a port's consumption is over 30W."
+                        ::= {tplinkPoeNotifications 4}
+                    
+                    tpPoePortPowerDeny NOTIFICATION-TYPE
+                        OBJECTS
+                        {
+                            tpPoePortIndex
+                        }
+                        STATUS current
+                        DESCRIPTION 
+                            "A poePowerDeny notification is sent when a port's power supply is denied."
+                        ::= {tplinkPoeNotifications 5}
+                        
+                    tpPoeThermalShutdown NOTIFICATION-TYPE
+                        OBJECTS
+                        {
+							tpPoePortIndex -- an dummpy object, for compile pass
+                        }
+                        STATUS current
+                        DESCRIPTION 
+                            "A poeThermalShutdown notification is sent when the power supply shutdown occurs because temperature is too high."
+                        ::= {tplinkPoeNotifications 6}
+                        
+                    tpPoeOverMaxPowerBudget NOTIFICATION-TYPE 
+                        OBJECTS
+                        {
+                            tpSystemPowerLimit
+                        }
+                        STATUS current
+                        DESCRIPTION 
+                            "A poeOverMaxPowerBudget notification is sent when the total power is over the budget."
+                        ::= {tplinkPoeNotifications 7}
+END
+
+	
+	
+	
+	
+	
+	
+	
+	

@@ -2,31 +2,27 @@ os: linux
 type: server
 group: unix
 text: Linux
-ifXmcbc: 1
-ifname: 1
-mib_dir:
-    - supermicro
+ifXmcbc: true
+ifname: true
 over:
     - { graph: device_processor, text: 'Processor Usage' }
-    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
 poller_modules:
-    bgp-peers: 0
-    ospf: 0
-    stp: 0
+    bgp-peers: false
+    ospf: false
+    stp: false
 discovery_modules:
-    applications: 1
-    bgp-peers: 0
-    stp: 0
-    vmware-vminfo: 1
-    libvirt-vminfo: 1
-processor_stacked: 1
-register_mibs:
-    rxCounter: GANDI-MIB
-    txCounter: GANDI-MIB
-    dropCounter: GANDI-MIB
-    acldropCounter: GANDI-MIB
-    ratedropCounter: GANDI-MIB
-    KNIrxCounter: GANDI-MIB
-    KNItxCounter: GANDI-MIB
-    KNIdropCounter: GANDI-MIB
+    applications: true
+    bgp-peers: false
+    stp: false
+    vminfo: true
+processor_stacked: true
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+    -
+        sysDescr_regex: '/^Linux/'
+ignore_mount_regexp:
+    - '#^/run($|/)#'
+    - '#^/dev/shm$#'

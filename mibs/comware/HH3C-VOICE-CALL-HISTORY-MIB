@@ -1,0 +1,503 @@
+-- ==========================================================================
+-- Copyright (C) 2004-2010 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The purpose of this MIB file is to provide the definition of
+--              voice call record.
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 2008-02-17 Initial version, created by Tian Xiaoqiang, Qu Jin
+-- V1.1 2009-12-09 Add g729br8 to "Hh3cCodecType", Wang Tong
+-- ==========================================================================
+HH3C-VOICE-CALL-HISTORY-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32, Gauge32
+    FROM SNMPv2-SMI
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+        InterfaceIndexOrZero
+    FROM IF-MIB
+        AbsoluteCounter32
+    FROM DIAL-CONTROL-MIB
+        TEXTUAL-CONVENTION, DisplayString, TimeStamp
+    FROM SNMPv2-TC
+        hh3cVoice
+    FROM HH3C-OID-MIB;
+
+hh3cVoCallHistory MODULE-IDENTITY
+    LAST-UPDATED "200802170000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB file is to provide the definition of voice call
+        history record information."
+    REVISION "200802170000Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cVoice 16 }
+
+-- ======================================
+--          Type declaration
+-- ======================================
+
+Hh3cGUid ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+        "Represents a global call identifier.  The global call identifier is
+         used as a unique identifier for an end-to-end call.  A zero length
+         Hh3cGUid indicates no value for the global call identifier."
+SYNTAX       OCTET STRING(SIZE(0..16))
+
+Hh3cCodecType      ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+        "Type of Codec."
+SYNTAX  INTEGER
+        {
+        g711a(1),
+        g711u(2),
+        g723r53(3),
+        g723r63(4),
+        g729r8(5),
+        g729a(6),
+        g726r16(7),
+        g726r24(8),
+        g726r32(9),
+        g726r40(10),
+        unknown(11),
+        g729br8(12)
+        }
+
+hh3cVoiceCallHistoryObjects OBJECT IDENTIFIER ::= { hh3cVoCallHistory 1 }
+
+-- ===========================================================================
+--                        hh3cCallHistoryTable
+-- ===========================================================================
+-- callHistoryTable
+-- Table to store the past call information.  The destination number
+-- and the call connect and disconnect time, and the disconnection
+-- cause are stored.  These calls could be circuit switched or virtual
+-- circuits.  History of each and every call is stored, of successful
+-- calls as well as of unsuccessful and rejected calls.  An entry will
+-- be created when a call is cleared.
+
+hh3cCallHistoryTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cCallHistoryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table containing information about specific
+             calls to a specific destination."
+        ::= { hh3cVoiceCallHistoryObjects 1 }
+
+hh3cCallHistoryEntry OBJECT-TYPE
+        SYNTAX      Hh3cCallHistoryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The information regarding a single connection."
+        INDEX       { hh3cCallHistoryIndex }
+        ::= { hh3cCallHistoryTable 1 }
+
+
+Hh3cCallHistoryEntry ::=
+        SEQUENCE {
+            hh3cCallHistoryIndex                     Integer32,
+            hh3cCallHistorySetupTime                 TimeStamp,
+            hh3cCallHistoryConnectTime               TimeStamp,
+            hh3cCallHistoryTerminateTime             TimeStamp,
+            hh3cCallHistoryPeerAddress               DisplayString,
+            hh3cCallHistoryPeerId                    Integer32,
+            hh3cCallHistoryLogicalIfIndex            InterfaceIndexOrZero,
+            hh3cCallHistoryCallOrigin                INTEGER,
+            hh3cCallHistoryChargedUnits              AbsoluteCounter32,
+            hh3cCallHistoryInfoType                  INTEGER,
+            hh3cCallHistoryTransmitPackets           AbsoluteCounter32,
+            hh3cCallHistoryTransmitBytes             AbsoluteCounter32,
+            hh3cCallHistoryReceivePackets            AbsoluteCounter32,
+            hh3cCallHistoryReceiveBytes              AbsoluteCounter32
+        }
+
+hh3cCallHistoryIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index of the call history table.  It's a monotonically
+             increasing integer for the sole purpose of indexing call
+             disconnection events.  When it reaches to the maximum value,
+             the value will back to 1."
+        ::= { hh3cCallHistoryEntry 1 }
+
+hh3cCallHistorySetupTime OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of sysUpTime when the call was started."
+        ::= { hh3cCallHistoryEntry 2 }
+
+hh3cCallHistoryConnectTime OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of sysUpTime when the call was connected.
+             If the call is not connected, this object will have a
+             value of zero."
+        ::= { hh3cCallHistoryEntry 3 }
+
+hh3cCallHistoryTerminateTime OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of sysUpTime when the call was terminated."
+        ::= { hh3cCallHistoryEntry 4 }
+
+hh3cCallHistoryPeerAddress OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number this call was connected to.  If the number is
+             not available, it will have a length of zero."
+        ::= { hh3cCallHistoryEntry 5 }
+
+hh3cCallHistoryPeerId OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies a single peer.  This is the Id value
+             of the peer table entry to which this call was made.  If a
+             peer table entry for this call does not exist or is unknown,
+             the value of this object will be zero."
+        ::= { hh3cCallHistoryEntry 6 }
+
+hh3cCallHistoryLogicalIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This is the ifIndex value of the logical interface through
+             which this call was made.  For ISDN media, this would be
+             the ifIndex of the B channel which was used for this call.
+             If the ifIndex value is unknown, the value of this object
+             will be zero."
+        ::= { hh3cCallHistoryEntry 7 }
+
+hh3cCallHistoryCallOrigin OBJECT-TYPE
+        SYNTAX      INTEGER {
+            originate(1),
+            answer(2),
+            callback(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The call origin.
+             originate        The call that is initiated.
+             answer           The call that is accepted.
+             callback         Either rejects the call and then calls back,
+                              or uses the 'Reverse charging' information
+                              element if it is available. Note that callback(3)
+                              is supposed to control charging, not security,
+                              and applies to callback prior to accepting a call.
+                              Callback for security reasons can be handled using
+                              PPP callback."
+        ::= { hh3cCallHistoryEntry 8 }
+
+hh3cCallHistoryChargedUnits OBJECT-TYPE
+        SYNTAX      AbsoluteCounter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of charged units for this connection.
+             For incoming calls or if charging information is
+             not supplied by the switch, the value of this object
+             will be zero."
+        ::= { hh3cCallHistoryEntry 9 }
+
+hh3cCallHistoryInfoType OBJECT-TYPE
+        SYNTAX      INTEGER {
+            other(1),
+            speech(2),
+            unrestrictedDigital(3),
+            unrestrictedDigital56(4),
+            restrictedDigital(5),
+            audio31(6),
+            audio7(7),
+            video(8),
+            packetSwitched(9),
+            fax(10)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The information type for this call.
+             other                          E.g. for non-isdn media.
+             speech                         Speech.
+             unrestrictedDigital            Unrestricted digital information
+                                            with 64k rate adaption.
+             unrestrictedDigital56          Unrestricted digital information
+                                            with 56k rate adaption.
+             restrictedDigital              Restricted digital information.
+             audio31                        3.1 kHz audio.
+             audio7                         7 kHz audio.
+             video                          Video.
+             packetSwitched                 Packetswitch.
+             fax                            Fax."
+        ::= { hh3cCallHistoryEntry 10 }
+
+hh3cCallHistoryTransmitPackets OBJECT-TYPE
+        SYNTAX      AbsoluteCounter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets which were transmitted while this
+             call was active."
+        ::= { hh3cCallHistoryEntry 11 }
+
+hh3cCallHistoryTransmitBytes OBJECT-TYPE
+        SYNTAX      AbsoluteCounter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of bytes which were transmitted for this call."
+        ::= { hh3cCallHistoryEntry 12 }
+
+hh3cCallHistoryReceivePackets OBJECT-TYPE
+        SYNTAX      AbsoluteCounter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets which were received for this call."
+        ::= { hh3cCallHistoryEntry 13 }
+
+hh3cCallHistoryReceiveBytes OBJECT-TYPE
+        SYNTAX      AbsoluteCounter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of bytes which were received for this call."
+        ::= { hh3cCallHistoryEntry 14 }
+
+-- ===========================================================================
+--                        hh3cVoiceCallHistoryTable
+-- ===========================================================================
+
+hh3cVoiceCallHistoryTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cVoiceCallHistoryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table is the voice extension to the call history table
+            of DIAL-CONTROL-MIB.  It contains voice encapsulation call
+            leg information that is derived from the statistics of lower
+            layer telephony interface."
+        ::= { hh3cVoiceCallHistoryObjects 2 }
+
+hh3cVoiceCallHistoryEntry OBJECT-TYPE
+        SYNTAX      Hh3cVoiceCallHistoryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The information regarding a extended voice call history information."
+        INDEX { hh3cCallHistoryIndex }
+        ::= { hh3cVoiceCallHistoryTable 1 }
+
+Hh3cVoiceCallHistoryEntry ::= SEQUENCE {
+        hh3cVoCallHistoryConnectionId    Hh3cGUid,
+        hh3cVoCallHistoryTxDuration      Gauge32,
+        hh3cVoCallHistoryVoiceTxDuration Gauge32,
+        hh3cVoCallHistoryFaxTxDuration   Gauge32,
+        hh3cVoCallHistoryCoderType       Hh3cCodecType,
+        hh3cVoCallHistoryImgPageCount    Gauge32
+    }
+
+hh3cVoCallHistoryConnectionId OBJECT-TYPE
+        SYNTAX      Hh3cGUid
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The global call identifier of circuit switched network for
+            the gateway call."
+        ::= { hh3cVoiceCallHistoryEntry 1 }
+
+hh3cVoCallHistoryTxDuration OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Duration of transmit path open from this peer to the
+            voice gateway for the call.  The units is milliseconds."
+        ::= { hh3cVoiceCallHistoryEntry 2 }
+
+hh3cVoCallHistoryVoiceTxDuration OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Duration of voice transmitted from this peer to voice
+            gateway for this call.  The voice utilization rate can be
+            obtained by dividing this by hh3cVoCallHistoryTxDuration object.
+            The units is milliseconds."
+        ::= { hh3cVoiceCallHistoryEntry 3 }
+
+hh3cVoCallHistoryFaxTxDuration OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Duration of fax transmitted from this peer to voice gateway
+            for this call.  The fax utilization rate can be obtained by
+            dividing this by hh3cVoCallHistoryTxDuration object.  The units
+            is milliseconds."
+        ::= { hh3cVoiceCallHistoryEntry 4 }
+
+hh3cVoCallHistoryCoderType OBJECT-TYPE
+        SYNTAX      Hh3cCodecType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The negotiated coder type.  It specifies the encode type to
+            the PSTN leg of a call."
+        ::= { hh3cVoiceCallHistoryEntry 5 }
+
+hh3cVoCallHistoryImgPageCount OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of fax related image pages are received or
+            transmitted via the peer for the call.  The units is page."
+        ::= { hh3cVoiceCallHistoryEntry 6 }
+
+-- ===========================================================================
+--                        hh3cVoiceVoIPCallHistoryTable
+-- ===========================================================================
+hh3cVoiceVoIPCallHistoryTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cVoiceVoIPCallHistoryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table is the VoIP extension to the call active table of
+            DIAL-CONTROL-MIB.  It contains VoIP call leg information about
+            specific VoIP call destination."
+        ::= { hh3cVoiceCallHistoryObjects 3 }
+
+hh3cVoiceVoIPCallHistoryEntry OBJECT-TYPE
+        SYNTAX      Hh3cVoiceVoIPCallHistoryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The information regarding a extended VoIP call history
+            information."
+        INDEX {hh3cCallHistoryIndex }
+        ::= { hh3cVoiceVoIPCallHistoryTable 1 }
+
+Hh3cVoiceVoIPCallHistoryEntry ::= SEQUENCE {
+        hh3cVoVoIPCallHistoryConnectionId    Hh3cGUid,
+        hh3cVoVoIPCallHistoryRemSigIPType    InetAddressType,
+        hh3cVoVoIPCallHistoryRemSigIPAddr    InetAddress,
+        hh3cVoVoIPCallHistoryRemSigPort      Integer32,
+        hh3cVoVoIPCallHistoryRemMedIPType    InetAddressType,
+        hh3cVoVoIPCallHistoryRemMedIPAddr    InetAddress,
+        hh3cVoVoIPCallHistoryRemMedPort      Integer32,
+        hh3cVoVoIPCallHistorySessProtocol    INTEGER,
+        hh3cVoVoIPCallHistoryCoderType       Hh3cCodecType
+    }
+
+hh3cVoVoIPCallHistoryConnectionId OBJECT-TYPE
+        SYNTAX      Hh3cGUid
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The global call identifier of packet-switched network for the
+            gateway call."
+        ::= { hh3cVoiceVoIPCallHistoryEntry 1 }
+
+hh3cVoVoIPCallHistoryRemSigIPType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of remote system signalling IP address for the VoIP call."
+        ::= { hh3cVoiceVoIPCallHistoryEntry 2 }
+
+hh3cVoVoIPCallHistoryRemSigIPAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Remote system signalling IP address for the VoIP call."
+        ::= { hh3cVoiceVoIPCallHistoryEntry 3 }
+
+hh3cVoVoIPCallHistoryRemSigPort OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Remote system UDP listener signalling port to which to
+            transmit voice packets."
+        ::= { hh3cVoiceVoIPCallHistoryEntry 4 }
+
+hh3cVoVoIPCallHistoryRemMedIPType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of remote system media IP address for the VoIP call."
+        ::= { hh3cVoiceVoIPCallHistoryEntry 5 }
+
+hh3cVoVoIPCallHistoryRemMedIPAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Remote system media IP address for the VoIP call."
+        ::= { hh3cVoiceVoIPCallHistoryEntry 6 }
+
+hh3cVoVoIPCallHistoryRemMedPort OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Remote system UDP listener media port to which to transmit voice
+            packets."
+        ::= { hh3cVoiceVoIPCallHistoryEntry 7 }
+
+hh3cVoVoIPCallHistorySessProtocol OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            h323(2),
+            sip(3)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object specifies the session protocol to be used for internet
+            call between local and remote router via IP backbone.
+            unknown        The protocol is unknown.
+            h323           The protocol is H323.
+            sip            The protocol is session initiation."
+        ::= { hh3cVoiceVoIPCallHistoryEntry 8 }
+
+hh3cVoVoIPCallHistoryCoderType OBJECT-TYPE
+        SYNTAX      Hh3cCodecType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The negotiated coder type.  It specifies the encode type to the
+            VoIP leg of a call."
+        ::= { hh3cVoiceVoIPCallHistoryEntry 9 }
+
+END
+
+

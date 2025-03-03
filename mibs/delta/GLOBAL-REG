@@ -1,0 +1,75 @@
+-- file: GLOBAL-REG.mib
+
+GLOBAL-REG DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY
+		FROM SNMPv2-SMI;
+
+globalRegModule MODULE-IDENTITY
+	LAST-UPDATED "201309131218Z"
+	ORGANIZATION "Delta Energy Systems (Switzerland) AG"
+	CONTACT-INFO
+		"postal: Delta Energy Systems (Switzerland) AG
+                         Freiburgstrasse 251,
+                         CH-3018 Bern-Buempliz
+                 web:     www.deltapowersolutions.com
+                 email: adrian.pluess@delta-es.com"
+	DESCRIPTION
+		"The Delta Energy Systems (Switzerland) AG cental registration modules."
+
+	::= { modules 1 }
+
+-- the root of the sub-tree for Delta Energy Systems (Sweden)
+
+delta       OBJECT IDENTIFIER   ::= { enterprises 20246 }
+
+-- the root of the sub-tree for Delta Energy Systems (Switzerland)
+
+root OBJECT IDENTIFIER 	::= { delta 2 }
+
+-- sub-tree fro registrations, which includes modules
+
+reg OBJECT IDENTIFIER 	::= { root 1 }
+
+modules OBJECT IDENTIFIER 	::= { reg 1 }
+
+-- sub-tree for company-wide objects and events
+
+generic OBJECT IDENTIFIER 	::= { root 2 }
+
+-- sub-tree for product specific objects and events
+
+products OBJECT IDENTIFIER 	::= { root 3 }
+
+controller OBJECT IDENTIFIER 	::= { products 1 }
+
+orion OBJECT IDENTIFIER 	::= { controller 1 }
+
+-- sub-tree for agent profiles
+
+caps OBJECT IDENTIFIER 	::= { root 4 }
+
+-- sub-tree for requirements specifications
+
+regs OBJECT IDENTIFIER 	::= { root 5 }
+
+-- sub-tree for experiements
+
+expr OBJECT IDENTIFIER 	::= { root 6 }
+
+-- product families
+
+controllerReg OBJECT IDENTIFIER 	::= { reg 2 }
+
+-- products
+
+controllerOrionReg OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"The Controller Model Orion"
+	::= { controllerReg 1 }
+
+END

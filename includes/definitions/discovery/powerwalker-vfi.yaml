@@ -1,0 +1,156 @@
+mib: UPS-MIB
+modules:
+  os:
+          version: UPS-MIB::upsIdentUPSSoftwareVersion.0
+          version_regex: '/^(?<version>.*\w)|\.+$/'
+          hardware: UPS-MIB::upsIdentModel.0
+          hardware_regex: '/^(?<hardware>.*\w)|\.+$/'
+  sensors:
+    runtime:
+       data:
+         -
+           oid: upsEstimatedMinutesRemaining
+           num_oid: '.1.3.6.1.2.1.33.1.2.3.{{ $index }}'
+           index: 'upsEstimatedMinutesRemaining.{{ $index }}'
+           descr: Estimated time on battery
+         -
+           oid: upsSecondsOnBattery
+           num_oid: '.1.3.6.1.2.1.33.1.2.2.{{ $index }}'
+           index: 'upsSecondsOnBattery.{{ $index }}'
+           descr: Current time on battery
+           divisor: 60
+    charge:
+       data:      
+         -
+           oid: upsEstimatedChargeRemaining
+           num_oid: '.1.3.6.1.2.1.33.1.2.4.{{ $index }}'
+           index: 'upsEstimatedChargeRemaining.{{ $index }}'
+           descr: Battery charge remaining
+    temperature:
+       data:
+         -
+           oid: upsBatteryTemperature
+           num_oid: '.1.3.6.1.2.1.33.1.2.7.{{ $index }}'
+           index: 'upsBatteryTemperature.{{ $index }}'
+           descr: Battery Temperature
+    voltage:
+        data:
+          -
+           oid: upsInputVoltage
+           num_oid: '.1.3.6.1.2.1.33.1.3.3.1.3.{{ $index }}'
+           index: 'upsInputVoltage.{{ $index }}'
+           descr: 'Input Phase {{ $subindex0 }}'
+          -
+           oid: upsOutputVoltage
+           num_oid: '.1.3.6.1.2.1.33.1.4.4.1.2.{{ $index }}'
+           index: 'upsOutputVoltage.{{ $index }}'
+           descr: 'Output Phase {{ $subindex0 }}'
+          -
+           oid: upsBypassVoltage
+           num_oid: '.1.3.6.1.2.1.33.1.5.3.1.2.{{ $index }}'
+           index: 'upsBypassputVoltage.{{ $index }}'
+           descr: 'Bypass Phase {{ $subindex0 }}'
+          -
+           oid: upsBatteryVoltage
+           num_oid: '.1.3.6.1.2.1.33.1.2.5.{{ $index }}'
+           index: 'upsBatteryVoltage.{{ $index }}'
+           descr: Battery Voltage
+           divisor: 10
+    current:
+        data:
+          -
+           oid: upsInputCurrent
+           num_oid: '.1.3.6.1.2.1.33.1.3.3.1.4.{{ $index }}'
+           index: 'upsInputCurrent.{{ $index }}'
+           descr: 'Input Phase {{ $subindex0 }}'
+           divisor: 10
+          -
+           oid: upsOutputCurrent
+           num_oid: '.1.3.6.1.2.1.33.1.4.4.1.3.{{ $index }}'
+           index: 'upsOutputCurrent.{{ $index }}'
+           descr: 'Output Phase {{ $subindex0 }}'
+           divisor: 10
+          -
+           oid: upsBypassCurrent
+           num_oid: '.1.3.6.1.2.1.33.1.5.3.1.3.{{ $index }}'
+           index: 'upsBypassputCurrent.{{ $index }}'
+           descr: 'Bypass Phase {{ $subindex0 }}'
+           divisor: 10
+          -
+           oid: upsBatteryCurrent
+           num_oid: '.1.3.6.1.2.1.33.1.2.6.{{ $index }}'
+           index: 'upsBatteryCurrent.{{ $index }}'
+           descr: Battery
+           divisor: 10
+           
+    power:
+       data:
+          -
+           oid: upsInputTruePower
+           num_oid: '.1.3.6.1.2.1.33.1.3.3.1.5.{{ $index }}'
+           index: 'upsInputTruePower.{{ $index }}'
+           descr: 'System Input Watts {{ $subindex0 }}'
+          -
+           oid: upsOutputPower
+           num_oid: '.1.3.6.1.2.1.33.1.4.4.1.4.{{ $index }}'
+           index: 'upsOutputPower.{{ $index }}'
+           descr: 'System Output Watts {{ $subindex0 }}'
+          -
+           oid: upsBypassPower
+           num_oid: '.1.3.6.1.2.1.33.1.5.3.1.4.{{ $index }}'
+           index: 'upsBypassPower.{{ $index }}'
+           descr: 'System Bypass Watts {{ $subindex0 }}'
+                    
+    frequency:
+       data:
+          -
+           oid: upsInputFrequency
+           num_oid: '.1.3.6.1.2.1.33.1.3.3.1.2.{{ $index }}'
+           index: 'upsInputFrequency.{{ $index }}'
+           descr: 'Input Frequency {{ $subindex0 }}'
+           divisor: 10
+          -
+           oid: upsOutputFrequency
+           num_oid: '.1.3.6.1.2.1.33.1.4.2.{{ $index }}'
+           index: 'upsOutputFrequency.{{ $index }}'
+           descr: 'Output Frequency {{ $subindex0 }}'
+           divisor: 10
+          -
+           oid: upsBypassFrequency
+           num_oid: '.1.3.6.1.2.1.33.1.5.1.{{ $index }}'
+           index: 'upsBypassputFrequency.{{ $index }}'
+           descr: 'Bypass Frequency {{ $subindex0 }}'
+           divisor: 10
+         
+    load:
+       data:
+          -
+           oid: upsOutputPercentLoad
+           num_oid: '.1.3.6.1.2.1.33.1.4.4.1.5.{{ $index }}'
+           index: 'upsOutputPercentLoad.{{ $index }}'
+           descr: 'Percentage Load {{ $subindex0 }}'
+    state:
+       data:
+         -
+          oid: upsBatteryStatus
+          num_oid: '.1.3.6.1.2.1.33.1.2.1.{{ $index }}'
+          descr: Battery Status
+          state_name: upsBatteryStatus
+          states:
+            - { descr: unknown, graph: 1, value: 1, generic: 3 }
+            - { descr: batteryNormal, graph: 1, value: 2, generic: 0 }
+            - { descr: batteryLow, graph: 1, value: 3, generic: 1 }
+            - { descr: batteryDepleted, graph: 1, value: 4, generic: 2 }
+         -
+          oid: upsOutputSource
+          num_oid: '.1.3.6.1.2.1.33.1.4.1.{{ $index }}'
+          descr: Output Source
+          state_name: upsOutputSource
+          states:
+            - { descr: other, graph: 1, value: 1, generic: 3 }
+            - { descr: none, graph: 1, value: 2, generic: 3 }
+            - { descr: normal, graph: 1, value: 3, generic: 0 }
+            - { descr: bypass, graph: 1, value: 4, generic: 1 }
+            - { descr: battery, graph: 1, value: 5, generic: 2 }
+            - { descr: booster, graph: 1, value: 6, generic: 2 }
+            - { descr: reducer, graph: 1, value: 7, generic: 2 }

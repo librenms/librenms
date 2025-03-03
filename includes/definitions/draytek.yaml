@@ -1,12 +1,19 @@
 os: draytek
-text: 'DrayTek'
+text: DrayTek
 type: network
 icon: draytek
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-
 discovery:
-    - sysObjectId:
-        - .1.3.6.1.4.1.7367
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.7367
+    -
+        sysDescr_regex:
+            - '/^DrayTek/'
+poller_modules:
+    xdsl: true
+discovery_modules:
+    xdsl: true

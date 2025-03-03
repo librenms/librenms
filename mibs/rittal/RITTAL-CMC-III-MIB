@@ -1,0 +1,4287 @@
+-- ********************************************************************
+-- RITTAL GmbH & Co. KG, Herborn
+-- CMC-III-MIB Version 1.7
+-- CMC-III-Processing Unit - 7030.000, 7030.010, 7030.020
+-- PDU Metered/Managed/Switched - 7955.xxx
+-- IoT Interface - 3124.300
+--
+-- Management Information Base for SNMP Network Management
+--
+-- Copyright 2018 Rittal Herborn.
+-- All Rights Reserved.
+--
+-- The information in this document is subject to change without notice.
+-- Refer to document "AGB_Software_Rittal.pdf"
+--
+-- ********************************************************************
+-- File   : $RCSfile: RITTAL-CMC-III-MIB.txt,v $
+-- Rev.   : $Revision: 1.7 $
+-- Date   : $Date: 2018/03/05 $
+-- Author : $Author: fis $
+-- Id     : $Id: RITTAL-CMC-III-MIB.txt,v 1.6 2015/10/09 17:29:40 fis Exp $
+-- ********************************************************************
+
+RITTAL-CMC-III-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                                MODULE-IDENTITY,
+                                NOTIFICATION-TYPE,
+                                OBJECT-TYPE,
+                                Integer32,
+                                Unsigned32
+        FROM                SNMPv2-SMI
+                                MODULE-COMPLIANCE,
+                                OBJECT-GROUP,
+                                NOTIFICATION-GROUP
+        FROM                SNMPv2-CONF
+                                DisplayString
+        FROM                SNMPv2-TC
+                                sysObjectID
+        FROM                SNMPv2-MIB
+                                rittal
+        FROM                RITTAL-SMI-MIB;
+
+
+cmcIII                      MODULE-IDENTITY
+        LAST-UPDATED        "201803050000Z"
+        ORGANIZATION        "RITTAL GmbH & Co. KG"
+        CONTACT-INFO        "www.rittal.de
+
+                            RITTAL GmbH & Co. KG
+                            Forschung & Entwicklung
+                            Auf dem Stuetzelberg
+                            D-35745 Herborn
+                            Germany, Europe
+
+                            +49(0)2772 5050
+                            info@rittal.de."
+        DESCRIPTION         "The MIB module for representing cmcIII SNMP agent."
+
+        REVISION            "201803050000Z"
+        DESCRIPTION         "enums added to cmcIIIVarType, enums added to cmcIIIUnitType."
+		
+        REVISION            "201708040000Z"
+        DESCRIPTION         "cmcIIIModbusAccess, changed enums to 'readonly' and 'readwrite'.
+							'noaccess' and 'writeonly' no longer supported."
+
+        REVISION            "201602020000Z"
+        DESCRIPTION         "added new enums, fixed wrong descriptions."
+
+        REVISION            "201510270000Z"
+        DESCRIPTION         "added cmcIIIFiles, cmcIIIVarByTypeTable, cmcIIIVarIntDynTable, cmcIIIUnitLoadTable, cmcIIIUnitMode, cmcIIICapabilityRev,
+                            and all members of cmcIIIRadiusMibGroup, cmcIIIWebCamMibGroup."
+
+        REVISION            "201501230000Z"
+        DESCRIPTION         "added new enums."
+
+        REVISION            "201407100000Z"
+        DESCRIPTION         "matching of SIZEs."
+
+        REVISION            "201311100000Z"
+        DESCRIPTION         "added cmcIIIDevAssembly."
+
+        REVISION            "201305010000Z"
+        DESCRIPTION         "extended cmcIIILdapMibGroup, added cmcIIIShutdownMibGroup, cmcIIIModbusMibGroup, cmcIIIDrcMibGroup, added OPC UA support."
+
+        REVISION            "201208300000Z"
+        DESCRIPTION         "modified object-grouping."
+
+        REVISION            "201109020000Z"
+        DESCRIPTION         "SMIv2 Version of cmcIII MIB."
+
+        REVISION            "201104110000Z"
+        DESCRIPTION         "Initial Version of cmcIII MIB."
+
+--      ::=                 { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) rittal(2606) 7 }
+        ::=                 { rittal            7 }
+
+-- *****************************************************************************
+
+--  rittal                  OBJECT IDENTIFIER ::= { enterprises 2606 }
+--  cmcIII                  OBJECT IDENTIFIER ::= {   rittal 7 }
+    cmcIIINotifications     OBJECT IDENTIFIER ::= {     cmcIII 0 }
+    cmcIIIMibRev            OBJECT IDENTIFIER ::= {     cmcIII 1 }
+    cmcIIIUnit              OBJECT IDENTIFIER ::= {     cmcIII 2 }
+    cmcIIISetup             OBJECT IDENTIFIER ::= {     cmcIII 3 }
+    cmcIIISetupGeneral      OBJECT IDENTIFIER ::= {       cmcIIISetup 2 }
+    cmcIIISetupTimer        OBJECT IDENTIFIER ::= {       cmcIIISetup 3 }
+    cmcIIISetupTrap         OBJECT IDENTIFIER ::= {       cmcIIISetup 4 }
+    cmcIIISetupSMTP         OBJECT IDENTIFIER ::= {       cmcIIISetup 5 }
+    cmcIIISetupSMS          OBJECT IDENTIFIER ::= {       cmcIIISetup 6 }
+    cmcIIISetupSysLog       OBJECT IDENTIFIER ::= {       cmcIIISetup 7 }
+    cmcIIISetupNTP          OBJECT IDENTIFIER ::= {       cmcIIISetup 8 }
+    cmcIIISetupLDAP         OBJECT IDENTIFIER ::= {       cmcIIISetup 9 }
+    cmcIIISetupShutdown     OBJECT IDENTIFIER ::= {       cmcIIISetup 10 }
+    cmcIIISetupModbus       OBJECT IDENTIFIER ::= {       cmcIIISetup 11 }
+    cmcIIISetupRadius       OBJECT IDENTIFIER ::= {       cmcIIISetup 12 }
+    cmcIIISetupWebCam       OBJECT IDENTIFIER ::= {       cmcIIISetup 13 }
+    cmcIIIDevice            OBJECT IDENTIFIER ::= {     cmcIII 4 }
+    cmcIIIDevs              OBJECT IDENTIFIER ::= {       cmcIIIDevice 1 }
+    cmcIIIDevInfo           OBJECT IDENTIFIER ::= {         cmcIIIDevs 1 }
+    cmcIIIVars              OBJECT IDENTIFIER ::= {       cmcIIIDevice 2 }
+    cmcIIIVarInfo           OBJECT IDENTIFIER ::= {         cmcIIIVars 1 }
+    cmcIIIMsgs              OBJECT IDENTIFIER ::= {       cmcIIIDevice 3 }
+    cmcIIIMsgInfo           OBJECT IDENTIFIER ::= {         cmcIIIMsgs 1 }
+    cmcIIIDrcs              OBJECT IDENTIFIER ::= {       cmcIIIDevice 4 }
+    cmcIIIDrcInfo           OBJECT IDENTIFIER ::= {         cmcIIIDrcs 1 }
+    cmcIIIFiles             OBJECT IDENTIFIER ::= {       cmcIIIDevice 5 }
+    cmcIIIFileInfo          OBJECT IDENTIFIER ::= {         cmcIIIFiles 1 }
+    cmcIIIControl           OBJECT IDENTIFIER ::= {     cmcIII 5 }
+--  cmcIIIExtAlarm          OBJECT IDENTIFIER ::= {       cmcIIIControl 4 }
+    cmcIIIConformance       OBJECT IDENTIFIER ::= {     cmcIII 6 }
+    cmcIIIMibCompliances    OBJECT IDENTIFIER ::= {       cmcIIIConformance 1 }
+    cmcIIIMibGroups         OBJECT IDENTIFIER ::= {       cmcIIIConformance 2 }
+--  cmcIIIProducts          OBJECT IDENTIFIER ::= {     cmcIII 7 }
+--  cmcIIICapability        OBJECT IDENTIFIER ::= {     cmcIII 8 }
+--  cmcIIITraps             OBJECT IDENTIFIER ::= {     cmcIII 9 }
+
+
+--  *****************************************************************************
+--  CMC-III ComputerMultiControl DK7030.yyy  --
+--  *****************************************************************************
+
+--  cmcIIIMibRev:  --
+
+    cmcIIIMibMajRev         OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Major Revision level.
+                            A change in the major revision level represents a major change
+                            in the architecture of the MIB. A change in the major revision
+                            level may indicate a significant change in the information,
+                            correct interpretation of data may require a MIB document
+                            with the same major revision level."
+        ::=                 { cmcIIIMibRev      1 }
+
+
+    cmcIIIMibMinRev         OBJECT-TYPE
+        SYNTAX              Unsigned32          (0..65535)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Minor Revision level.
+                            A change in the minor revision level may represent some minor
+                            additional support, no changes to any pre-existing information
+                            has occurred."
+        ::=                 { cmcIIIMibRev      2 }
+
+
+    cmcIIIAgentRev          OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..20))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The SNMP Agent Revision level."
+        ::=                 { cmcIIIMibRev      3 }
+
+    cmcIIICapabilityRev     OBJECT-TYPE
+        SYNTAX              Unsigned32          (30000..39999)
+--                          = 3 (cmcIII) * 10000
+--                            + x (0 as default or cmcIIIUnitType * 1000 for specific hardware)
+--                              + cmcIIIMibMajRev
+--                                + cmcIIIMibMinRev        
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "This agents capabilities as used in RITTAL-CMC-III-CAPABILITY-MIB."
+        ::=                 { cmcIIIMibRev      4 }
+
+-- =============================================================================
+
+--  cmcIIIUnit:  --
+
+    cmcIIIUnitStatus        OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                ok              (1),
+                                failed          (2),
+                                overload        (3)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "General Status of CMCIII PU unit itself
+                            (1) OK
+                            (2) failed
+                            (3) overload (current too high)."
+        ::=                 { cmcIIIUnit        1 }
+
+
+    cmcIIIUnitURL           OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..30))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "URL of CMCIII PU."
+        ::=                 { cmcIIIUnit        2 }
+
+
+    cmcIIIUnitHWRev         OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..24))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Hardware Revision of CMCIII PU."
+        ::=                 { cmcIIIUnit        3 }
+
+
+    cmcIIIUnitFWRev         OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..24))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Firmware Revision of CMCIII PU."
+        ::=                 { cmcIIIUnit        4 }
+
+
+    cmcIIIUnitOSRev         OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..20))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Linux Revision of CMCIII PU."
+        ::=                 { cmcIIIUnit        5 }
+
+
+    cmcIIIUnitSerial        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..10))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Serial Number of CMCIII PU."
+        ::=                 { cmcIIIUnit        6 }
+
+
+    cmcIIIUnitProd          OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..24))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Production Code of CMCIII PU."
+        ::=                 { cmcIIIUnit        7 }
+
+
+    cmcIIIUnitType          OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                unknown         (1),
+                                pu              (2),
+                                compact         (3),
+                                lcp             (4),
+                                pdu             (5),
+                                rms             (6),
+								mcs				(7),
+								iot				(8)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Type of CMCIII
+                            (1) Unit unknown
+                            (2) Processing Unit
+                            (3) Processing Unit Compact
+                            (4) LCP
+                            (5) PDU
+                            (6) RiMatrix S."
+        ::=                 { cmcIIIUnit        8 }
+
+
+    cmcIIIUnitCurrentSource OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                unknown         (1),
+                                acAdapter       (2),
+                                terminalStrip   (3),
+                                poe             (4),
+                                usb             (5)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Current source of CMCIII PU
+                            (1) unknown
+                            (2) AC Adapter Power Supply
+                            (3) Terminal Strip
+                            (4) poe: Power Over Ethernet
+                            (5) usb: Universal Serial Bus."
+        ::=                 { cmcIIIUnit        9 }
+
+
+    cmcIIICan0CurrentConsumption OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Maximal current consumption required by CANopen fieldbus 1."
+        ::=                 { cmcIIIUnit        10 }
+
+
+    cmcIIICan1CurrentConsumption OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Maximal current consumption required by CANopen fieldbus 2."
+        ::=                 { cmcIIIUnit        11 }
+
+
+    cmcIIIUnitUpTime        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Operating time of CMCIII PU in seconds since an epoch."
+        ::=                 { cmcIIIUnit        12 }
+
+
+    cmcIIIUnitMode          OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                localInit       (1),
+                                start           (2),
+                                pwrDelay        (3),
+                                restartBus      (4),
+                                localOnline     (5),
+                                collectSlaves   (6),
+                                reorganizeBus   (7),
+                                online          (8),
+                                prepareUpgrade  (9),
+                                upgradeSensor   (10),
+                                terminate       (11)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Current status mode of CMCIII PU and all subsystems
+                            (1) local init ini progress
+                            (2) start local system first time
+                            (3) first start delay
+                            (4) restart bus system, reread configuration
+                            (5) locally online
+                            (6) collect all slaves at the bus
+                            (7) reorganize bus
+                            (8) up and running
+                            (9) prepare for sensor upgrade
+                            (10) upgrade sensors
+                            (11) gentle termination."
+        ::=                 { cmcIIIUnit        13 }
+
+
+    cmcIIIUnitLoadTable     OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIUnitLoadEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "A list of system load entries."
+        ::=                 { cmcIIIUnit        14 }
+
+    cmcIIIUnitLoadEntry     OBJECT-TYPE
+        SYNTAX              CmcIIIUnitLoadEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of system load table."
+        INDEX               { cmcIIIUnitLoadIndex }
+        ::=                 { cmcIIIUnitLoadTable 1 }
+
+    CmcIIIUnitLoadEntry     ::= SEQUENCE            {
+                                cmcIIIUnitLoadIndex         Unsigned32,
+                                cmcIIIUnitLoadAverage       Unsigned32
+                            }
+
+    cmcIIIUnitLoadIndex     OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..10)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the system load table.
+                            These are the past minutes the load is given for."
+        ::=                 { cmcIIIUnitLoadEntry 1 }
+
+    cmcIIIUnitLoadAverage   OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "System load average multiplied by 100."
+        ::=                 { cmcIIIUnitLoadEntry 2 }
+
+-- =============================================================================
+
+--  cmcIIISetup:  --
+
+    cmcIIILastChangeSetup   OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Last change of configuration
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIISetup       1 }
+
+--  cmcIIISetupGeneral:  --
+
+    cmcIIISetTempUnit       OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                celsius         (1),
+                                fahrenheit      (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Unit of all temperature values and setpoints."
+        DEFVAL              { celsius }
+        ::=                 { cmcIIISetupGeneral 1 }
+
+
+    cmcIIISetBeeper         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off             (1),
+                                on              (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Audible alarm in CMCIII unit:
+                            (1) beeper is off (general)
+                            (2) beeper is on."
+        DEFVAL              { off }
+        ::=                 { cmcIIISetupGeneral 2 }
+
+
+    cmcIIIQuitRelay         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable or disable acknowledging currently active alarm relay
+                            (with 'C' on CMCIII)."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupGeneral 3 }
+
+
+    cmcIIILogicRelay        OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                closeAtAlarm    (1),
+                                openAtAlarm     (2),
+                                disabled        (3)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Logic of alarm relay:
+                            (1) Relay will pick up in case of an alarm
+                            (2) Relay will release in case of an alarm
+                            (3) Relay disabled."
+        DEFVAL              { closeAtAlarm }
+        ::=                 { cmcIIISetupGeneral 4 }
+
+
+    cmcIIIUnitMsgRelay      OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Alarm relay in case of Device Messages (detect, lost, changed..):
+                            (1) Relay disabled, relay will not switch in case of a device message
+                            (2) Relay enabled, relay will switch in case of a unit message."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupGeneral 5 }
+
+
+    cmcIIIFunctionRelay     OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                warningOnly     (1),
+                                alarmOnly       (2),
+                                warningOrAlarm  (3)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Logic of alarm relay:
+                            (1) Relay will switch in case of a warning only
+                            (2) Relay will switch in case of an alarm only
+                            (3) Relay will switch in case of an alarm or warning."
+        DEFVAL              { warningOnly }
+        ::=                 { cmcIIISetupGeneral 6 }
+
+
+    cmcIIITimeZone          OBJECT-TYPE
+        SYNTAX              Integer32           (0..74)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Time Zone
+                            0  : (GMT-12:00) International Date Line West
+                            1  : (GMT-11:00) Midway Island, Samoa
+                            2  : (GMT-10:00) Hawaii
+                            3  : (GMT-09:00) Alaska
+                            4  : (GMT-08:00) Pacific Time (US and Canada), Tijuana
+                            5  : (GMT-07:00) Arizona
+                            6  : (GMT-07:00) Chihuahua, La Paz, Mazatlan
+                            7  : (GMT-07:00) Mountain Time (US & Canada)
+                            8  : (GMT-06:00) Central America
+                            9  : (GMT-06:00) Central Time (US and Canada)
+                            10 : (GMT-06:00) Guadalajara, Mexico City, Monterrey
+                            11 : (GMT-06:00) Saskatchewan
+                            12 : (GMT-05:00) Bogota, Lima, Quito
+                            13 : (GMT-05:00) Eastern Time (Us and Canada)
+                            14 : (GMT-05:00) Indiana (East)
+                            15 : (GMT-04:00) Atlantic Time (Canada)
+                            16 : (GMT-04:00) Caracas, La Paz
+                            17 : (GMT-04:00) Santiago
+                            18 : (GMT-03:30) Newfoundland
+                            19 : (GMT-03:00) Brasilia
+                            20 : (GMT-03:00) Buenos Aires, Georgetown
+                            21 : (GMT-03:00) Greenland
+                            22 : (GMT-02:00) Mid-Atlantic
+                            23 : (GMT-01:00) Azores
+                            24 : (GMT-01:00) Cape Verde Is.
+                            25 : (GMT) Casablanca, Monrovia
+                            26 : (GMT) Greenwich Mean Time : Dublin, Lisbon, London
+                            27 : (GMT+01:00) Amsterdam, Berlin, Bern, Rome, Vienna
+                            28 : (GMT+01:00) Belgrade, Bratislava, Budapest, Prague
+                            29 : (GMT+01:00) Brussels, Copenhagen, Madrid, Paris
+                            30 : (GMT+01:00) Sarajevo, Skopje, Warsaw, Zagreb
+                            31 : (GMT+01:00) West Central Africa
+                            32 : (GMT+02:00) Athens, Istanbul, Minsk
+                            33 : (GMT+02:00) Bucharest
+                            34 : (GMT+02:00) Harare, Pretoria
+                            35 : (GMT+02:00) Helsinki, Kyiv, Sofia
+                            36 : (GMT+02:00) Riga, Tallinn, Vilnius
+                            37 : (GMT+02:00) Jerusalem
+                            38 : (GMT+03:00) Baghdad
+                            39 : (GMT+03:00) Kuwait, Riyadh
+                            40 : (GMT+03:00) Moscow, St. Petersburg, Volgograd
+                            41 : (GMT+03:00) Nairobi
+                            42 : (GMT+03:30) Tehran
+                            43 : (GMT+04:00) Abu Dhabi, Muscat
+                            44 : (GMT+04:00) Baku, Tbilisi, Yerevan
+                            45 : (GMT+04:30) Kabul
+                            46 : (GMT+05:00) Ekaterinburg
+                            47 : (GMT+05:00) Islamabad, Karachi, Tashkent
+                            48 : (GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi
+                            49 : (GMT+05:45) Kathmandu
+                            50 : (GMT+06:00) Almaty, Novosibirsk
+                            51 : (GMT+06:00) Astana, Dhaka
+                            52 : (GMT+06:00) Sri Jayawardenepura
+                            53 : (GMT+06:30) Rangoon
+                            54 : (GMT+07:00) Bangkok, Hanoi, Jakarta
+                            55 : (GMT+07:00) Krasnoyarsk
+                            56 : (GMT+08:00) Beijing, Chongqing, Hong Kong, Urumqi
+                            57 : (GMT+08:00) Irkutsk, Ulaan Bataar
+                            58 : (GMT+08:00) Kuala Lumpur, Singapore
+                            59 : (GMT+08:00) Perth
+                            60 : (GMT+08:00) Taipei
+                            61 : (GMT+09:00) Osaka, Sapporo, Tokyo
+                            62 : (GMT+09:00) Seoul
+                            63 : (GMT+09:00) Yakutsk
+                            64 : (GMT+09:30) Adelaide
+                            65 : (GMT+09:30) Darwin
+                            66 : (GMT+10:00) Brisbane
+                            67 : (GMT+10:00) Canberra, Melbourne, Sydney
+                            68 : (GMT+10:00) Guam, Port Moresby
+                            69 : (GMT+10:00) Hobart
+                            70 : (GMT+10:00) Vladivostok
+                            71 : (GMT+11:00) Magadan, Solomon Is., New Caledonia
+                            72 : (GMT+12:00) Auckland, Wellington
+                            73 : (GMT+12:00) Fiji, Kamchatka, Marshall Is.
+                            74 : (GMT+13:00) Nukualofa."
+        DEFVAL              { 27 }
+        ::=                 { cmcIIISetupGeneral 7 }
+
+    cmcIIISetupDate         OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (10..10))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Actual date in format DD.MM.YYYY
+                            Use UTC date to set date."
+        ::=                 { cmcIIISetupGeneral 8 }
+
+
+    cmcIIISetupTime         OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (8..8))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Actual time in format HH:MM:SS, HH (0-23), MM (0-59), SS (0-59).
+                            Use UTC time to set time."
+        ::=                 { cmcIIISetupGeneral 9 }
+
+    cmcIIIWebAccess         OBJECT-TYPE
+        SYNTAX              BITS {
+                                httpEnabled     (0),
+                                httpsEnabled    (1)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Web access status:
+                            (0) httpEnabled  : http protocol is enabled
+                            (1) httpsEnabled : https protocol is enabled."
+        DEFVAL              { { httpEnabled, httpsEnabled } }
+        ::=                 { cmcIIISetupGeneral 10 }
+
+    cmcIIIHttpPort          OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TCP/IP port of HTTP daemon."
+        DEFVAL              { 80 }
+        ::=                 { cmcIIISetupGeneral 11 }
+
+    cmcIIIHttpsPort         OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TCP/IP port of HTTPS daemon."
+        DEFVAL              { 443 }
+        ::=                 { cmcIIISetupGeneral 12 }
+
+    cmcIIIFtpAccess         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ftp access:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { enabled }
+        ::=                 { cmcIIISetupGeneral 13 }
+
+    cmcIIIFtpPort           OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TCP/IP port of FTP daemon."
+        DEFVAL              { 21 }
+        ::=                 { cmcIIISetupGeneral 14 }
+
+    cmcIIISshAccess         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Ssh access:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { enabled }
+        ::=                 { cmcIIISetupGeneral 15 }
+
+    cmcIIISshPort           OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TCP/IP port of SSH daemon."
+        DEFVAL              { 22 }
+        ::=                 { cmcIIISetupGeneral 16 }
+
+    cmcIIITelnetAccess      OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Telnet access:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { enabled }
+        ::=                 { cmcIIISetupGeneral 17 }
+
+    cmcIIITelnetPort        OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TCP/IP port of telnet daemon."
+        DEFVAL              { 23 }
+        ::=                 { cmcIIISetupGeneral 18 }
+
+    cmcIIILanguage          OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                english         (1),
+                                german          (2),
+                                french          (3),
+                                spanish         (4),
+                                portuguese      (5),
+                                russian         (6),
+                                chinese         (7),
+                                japanese        (8)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Language:
+                            (1) English.
+                            (2) German,
+                            (3) French,
+                            (4) Spanish,
+                            (5) Portuguese,
+                            (6) Russian,
+                            (7) Chinese
+                            (8) Japanese."
+        DEFVAL              { english }
+        ::=                 { cmcIIISetupGeneral 19 }
+
+    cmcIIIOpcUaAccess       OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "OPC UA access:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupGeneral 20 }
+
+    cmcIIIOpcUaPort         OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TCP/IP port of OPC UA daemon."
+        DEFVAL              { 4840 }
+        ::=                 { cmcIIISetupGeneral 21 }
+
+--  cmcIIISetupTimer:  --
+
+    cmcIIINumberOfTimers    OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of value table entries=number of outlets available on this unit."
+        ::=                 { cmcIIISetupTimer  1 }
+
+    cmcIIITimerTable        OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIITimerEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of Timer Table."
+        ::=                 { cmcIIISetupTimer  2 }
+
+    cmcIIITimerEntry        OBJECT-TYPE
+        SYNTAX              CmcIIITimerEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of Timer Table."
+        INDEX               { cmcIIITimerIndex }
+        ::=                 { cmcIIITimerTable  1 }
+
+    CmcIIITimerEntry        ::=
+        SEQUENCE            {
+                                cmcIIITimerIndex            Unsigned32,
+                                cmcIIITimerStatus           INTEGER,
+                                cmcIIITimerDayOfWeek        INTEGER,
+                                cmcIIITimeOn                DisplayString,
+                                cmcIIITimeOff               DisplayString,
+                                cmcIIITimeControl           INTEGER,
+                                cmcIIITimerFunction         INTEGER
+                            }
+
+    cmcIIITimerIndex        OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the list of timer entries. Its value ranges
+                            between 1 and the value of cmcIIINumberOfTimers."
+        ::=                 { cmcIIITimerEntry  1 }
+
+    cmcIIITimerStatus       OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                switchedOff     (1),
+                                switchedOn      (2),
+                                noTime          (3)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Actual status of the timer."
+        ::=                 { cmcIIITimerEntry  2 }
+
+    cmcIIITimerDayOfWeek    OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                sun             (1),
+                                mon             (2),
+                                tue             (3),
+                                wed             (4),
+                                thu             (5),
+                                fri             (6),
+                                sat             (7),
+                                sat2sun         (8),
+                                mon2fri         (9),
+                                mon2sun         (10)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Selection of day of week for timer to switch."
+        ::=                 { cmcIIITimerEntry  3 }
+
+    cmcIIITimeOn            OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (5..5))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Time to switch on current function, Format: HH:MM."
+        ::=                 { cmcIIITimerEntry  4 }
+
+    cmcIIITimeOff           OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (5..5))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Time to switch off current function, Format: HH:MM."
+        ::=                 { cmcIIITimerEntry  5 }
+
+    cmcIIITimeControl       OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Control via RTC."
+        ::=                 { cmcIIITimerEntry  6 }
+
+    cmcIIITimerFunction     OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disKeypads      (1),
+                                unlDoors        (2),
+                                disTrapRec1     (3),
+                                disTrapRec2     (4),
+                                disTrapRec3     (5),
+                                disTrapRec4     (6),
+                                disSMS1         (7),
+                                disSMS2         (8),
+                                disSMS3         (9),
+                                disSMS4         (10),
+                                schedule1       (11),
+                                schedule2       (12),
+                                schedule3       (13),
+                                schedule4       (14),
+                                schedule5       (15),
+                                schedule6       (16),
+                                schedule7       (17),
+                                schedule8       (18)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Function which is controlled via timer
+                            1: Unlock of doors via keypad is disabled
+                            2: Doors will be unlocked
+                            3-6: sending traps to this trap receiver will be disabled
+                            7-10: sending SMS to phone number 1..4 will be disabled
+                            11-18: Scheduled alarm off."
+        ::=                 { cmcIIITimerEntry  7 }
+
+--  cmcIIISetupTrapReceiver:  --
+
+    cmcIIINumberOfTrapReceivers OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of TrapReceiverTable entries. The number of trap receivers."
+        ::=                 { cmcIIISetupTrap   1 }
+
+    cmcIIITrapReceiverTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIITrapReceiverEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "A list of trap receiver entries."
+        ::=                 { cmcIIISetupTrap   2 }
+
+    cmcIIITrapReceiverEntry OBJECT-TYPE
+        SYNTAX              CmcIIITrapReceiverEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of trapTable."
+        INDEX               { cmcIIITrapReceiverIndex }
+        ::=                 { cmcIIITrapReceiverTable 1 }
+
+    CmcIIITrapReceiverEntry ::=
+        SEQUENCE            {
+                                cmcIIITrapReceiverIndex     Unsigned32,
+                                cmcIIITrapReceiverStatus    INTEGER,
+                                cmcIIITrapReceiverIpAddress DisplayString
+                            }
+
+    cmcIIITrapReceiverIndex OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the trap receiver table. Its value ranges between
+                            1 and the value of NumberOfTrapReceivers."
+        ::=                 { cmcIIITrapReceiverEntry 1 }
+
+    cmcIIITrapReceiverStatus OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                snmpv1Trap      (2),
+                                snmpv2cTrap     (3),
+                                snmpv2cInform   (4),
+                                snmpv3Trap      (5),
+                                snmpv3Inform    (6)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable SNMP version and trap/inform type or disable trap receiver.
+                            Enumeration type snmpv3Inform(6) is not yet supported."
+        DEFVAL              { snmpv1Trap }
+        ::=                 { cmcIIITrapReceiverEntry 2 }
+
+    cmcIIITrapReceiverIpAddress OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of trap receiver."
+        ::=                 { cmcIIITrapReceiverEntry 3 }
+
+--  cmcIIISetupSMTP:  --
+
+    cmcIIISmtpStatus        OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SMTP (email) usage:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupSMTP   1 }
+
+    cmcIIISmtpServer        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of SMTP server."
+        ::=                 { cmcIIISetupSMTP   2 }
+
+    cmcIIISmtpPort          OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TCP/IP port of SMTP server."
+        DEFVAL              { 25 }
+        ::=                 { cmcIIISetupSMTP   3 }
+
+    cmcIIISmtpAuth          OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2),
+                                enabledTls      (3)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SMTP authentication usage:
+                            (1) disabled
+                            (2) enabled
+                            (3) enabled with TLS support."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupSMTP   4 }
+
+    cmcIIISmtpUsername      OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..50))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Username required to authenticate at the SMTP server."
+        ::=                 { cmcIIISetupSMTP   5 }
+
+    cmcIIISmtpPassword      OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..50))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Password required to authenticate at the SMTP server."
+        ::=                 { cmcIIISetupSMTP   6 }
+
+    cmcIIISmtpSender        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..50))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Sender address (FROM:) of the SMTP message."
+        ::=                 { cmcIIISetupSMTP   7 }
+
+    cmcIIISmtpReply         OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..50))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Reply address (REPLY:) of the SMTP message."
+        ::=                 { cmcIIISetupSMTP   8 }
+
+    cmcIIINumberOfSmtpReceivers OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of SmtpReceiverTable entries. The number of SMTP receivers."
+        ::=                 { cmcIIISetupSMTP   9 }
+
+    cmcIIISmtpReceiverTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIISmtpReceiverEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "A list of SMTP receiver entries."
+        ::=                 { cmcIIISetupSMTP   10 }
+
+    cmcIIISmtpReceiverEntry OBJECT-TYPE
+        SYNTAX              CmcIIISmtpReceiverEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of SMTPTable."
+        INDEX               { cmcIIISmtpReceiverIndex }
+        ::=                 { cmcIIISmtpReceiverTable 1 }
+
+    CmcIIISmtpReceiverEntry ::=
+        SEQUENCE            {
+                                cmcIIISmtpReceiverIndex     Unsigned32,
+                                cmcIIISmtpReceiverStatus    INTEGER,
+                                cmcIIISmtpReceiverAddress   DisplayString
+                            }
+
+    cmcIIISmtpReceiverIndex OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the SMTP receiver table. Its value ranges between
+                            1 and the value of NumberOfSmtpReceivers."
+        ::=                 { cmcIIISmtpReceiverEntry 1 }
+
+    cmcIIISmtpReceiverStatus OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable or disable SMTP receiver."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISmtpReceiverEntry 2 }
+
+    cmcIIISmtpReceiverAddress OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..50))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of SMTP receiver."
+        ::=                 { cmcIIISmtpReceiverEntry 3 }
+
+--  cmcIIISetupSMS:  --
+
+    cmcIIISmsStatus         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SMS usage:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupSMS    1 }
+
+    cmcIIISmsPIN            OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..10))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SMS PIN number."
+        ::=                 { cmcIIISetupSMS    2 }
+
+    cmcIIISmsService        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..30))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SMS service number."
+        ::=                 { cmcIIISetupSMS    3 }
+
+    cmcIIISmsMSN            OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..30))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SMS MSN for ISDN."
+        ::=                 { cmcIIISetupSMS    4 }
+
+    cmcIIISmsPreDial        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..2))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SMS PreDial number."
+        ::=                 { cmcIIISetupSMS    5 }
+
+    cmcIIINumberOfSmsReceivers OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of SmsReceiverTable entries. The number of SMS receivers."
+        ::=                 { cmcIIISetupSMS    6 }
+
+    cmcIIISmsReceiverTable  OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIISmsReceiverEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "A list of SMS receiver entries."
+        ::=                 { cmcIIISetupSMS    7 }
+
+    cmcIIISmsReceiverEntry  OBJECT-TYPE
+        SYNTAX              CmcIIISmsReceiverEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of SMSTable."
+        INDEX               { cmcIIISmsReceiverIndex }
+        ::=                 { cmcIIISmsReceiverTable 1 }
+
+    CmcIIISmsReceiverEntry  ::=
+        SEQUENCE            {
+                                cmcIIISmsReceiverIndex      Unsigned32,
+                                cmcIIISmsReceiverStatus     INTEGER,
+                                cmcIIISmsReceiverNumber     DisplayString
+                            }
+
+    cmcIIISmsReceiverIndex  OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the SMS receiver table. Its value ranges between
+                            1 and the value of NumberOfSmsReceivers."
+        ::=                 { cmcIIISmsReceiverEntry 1 }
+
+    cmcIIISmsReceiverStatus OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable or disable SMS receiver."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISmsReceiverEntry 2 }
+
+    cmcIIISmsReceiverNumber OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..30))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Phone number of SMS receiver."
+        ::=                 { cmcIIISmsReceiverEntry 3 }
+
+--  cmcIIISetupSysLog:  --
+
+    cmcIIISysLogStatus      OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SysLog usage:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupSysLog 1 }
+
+    cmcIIISysLogFacility    OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                local0          (1),
+                                local1          (2),
+                                local2          (3),
+                                local3          (4),
+                                local4          (5),
+                                local5          (6),
+                                local6          (7),
+                                local7          (8)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SysLog facility local0..7."
+        DEFVAL              { local0 }
+        ::=                 { cmcIIISetupSysLog 2 }
+
+    cmcIIISysLogServer1     OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of first SysLog server."
+        ::=                 { cmcIIISetupSysLog 3 }
+
+    cmcIIISysLogServer2     OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of second SysLog server."
+        ::=                 { cmcIIISetupSysLog 4 }
+
+--  cmcIIISetupNTP:  --
+
+    cmcIIINtpStatus         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "NTP usage:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupNTP    1 }
+
+    cmcIIINtpTimeZone       OBJECT-TYPE
+        SYNTAX              Integer32           (0..74)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "NTP time zone, see cmcIIITimeZone for valid time zones."
+        DEFVAL              { 27 }
+        ::=                 { cmcIIISetupNTP    2 }
+
+    cmcIIINtpServer1        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of first NTP server."
+        ::=                 { cmcIIISetupNTP    3 }
+
+    cmcIIINtpServer2        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of second NTP server."
+        ::=                 { cmcIIISetupNTP    4 }
+
+--  cmcIIISetupLDAP:  --
+
+    cmcIIILdapStatus        OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "LDAP usage:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupLDAP   1 }
+
+    cmcIIILdapServer        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of LDAP server."
+        ::=                 { cmcIIISetupLDAP   2 }
+
+    cmcIIILdapBindDN        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..100))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "LDAP user name."
+        ::=                 { cmcIIISetupLDAP   3 }
+
+    cmcIIILdapBindPW        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "LDAP user password."
+        ::=                 { cmcIIISetupLDAP   4 }
+
+    cmcIIILdapUserBase      OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "LDAP base user."
+        ::=                 { cmcIIISetupLDAP   5 }
+
+    cmcIIILdapUserSearch    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..200))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "LDAP searchpath user."
+        ::=                 { cmcIIISetupLDAP   6 }
+
+    cmcIIILdapUserAttrib    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..20))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "LDAP attribute user."
+        ::=                 { cmcIIISetupLDAP   7 }
+
+    cmcIIILdapGroupBase     OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "LDAP base group."
+        ::=                 { cmcIIISetupLDAP   8 }
+
+    cmcIIILdapGroupSearch   OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..200))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "LDAP searchpath group."
+        ::=                 { cmcIIISetupLDAP   9 }
+
+    cmcIIILdapGroupAttrib   OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..20))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "LDAP attribute group."
+        ::=                 { cmcIIISetupLDAP   10 }
+
+-- cmcIIIShutdown:  --
+
+    cmcIIINumberOfShutdowns OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of cmcIIIShutdownTable entries. The number of shutdown servers."
+        ::=                 { cmcIIISetupShutdown 1 }
+
+    cmcIIIShutdownTable     OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIShutdownEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "A list of shutdown entries."
+        ::=                 { cmcIIISetupShutdown 2 }
+
+    cmcIIIShutdownEntry     OBJECT-TYPE
+        SYNTAX              CmcIIIShutdownEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of Shutdown table."
+        INDEX               { cmcIIIShutdownIndex }
+        ::=                 { cmcIIIShutdownTable 1 }
+
+    CmcIIIShutdownEntry     ::=
+        SEQUENCE            {
+                                cmcIIIShutdownIndex         Unsigned32,
+                                cmcIIIShutdownServer        DisplayString,
+                                cmcIIIShutdownName          DisplayString,
+                                cmcIIIShutdownPort          Unsigned32,
+                                cmcIIIShutdownDelay         Unsigned32,
+                                cmcIIIShutdownEnabled       INTEGER
+                            }
+
+    cmcIIIShutdownIndex     OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the shutdown server table. Its value ranges between
+                            1 and the value of cmcIIINumberOfShutdowns."
+        ::=                 { cmcIIIShutdownEntry 1 }
+
+    cmcIIIShutdownServer    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address or name of server to shutdown."
+        ::=                 { cmcIIIShutdownEntry 2 }
+
+    cmcIIIShutdownName      OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..20))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Name of server to shutdown."
+        ::=                 { cmcIIIShutdownEntry 3 }
+
+    cmcIIIShutdownPort      OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Port used to shutdown server."
+        DEFVAL              { 6003 }
+        ::=                 { cmcIIIShutdownEntry 4 }
+
+    cmcIIIShutdownDelay     OBJECT-TYPE
+        SYNTAX              Unsigned32          (0..999)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Delay of server shutdown."
+        DEFVAL              { 0 }
+        ::=                 { cmcIIIShutdownEntry 5 }
+
+    cmcIIIShutdownEnabled   OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Enable or disable this server shutdown entry."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIIShutdownEntry 6 }
+
+--  cmcIIISetupModbus:  --
+
+    cmcIIIModbusStatus      OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                shutdown        (1),
+                                readonly        (2),
+                                writeonly       (3),
+                                readwrite       (4)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Modbus daemon running status:
+                            (1) shutdown
+                            (2) readonly
+                            (3) writeonly
+                            (4) readwrite."
+        DEFVAL              { readonly }
+        ::=                 { cmcIIISetupModbus 1 }
+
+    cmcIIIModbusPort        OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TCP/IP port of Modbus daemon."
+        DEFVAL              { 502 }
+        ::=                 { cmcIIISetupModbus 2 }
+
+    cmcIIINumberOfModbusSources OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of cmcIIIModbusTable entries. The number of Modbus access settings."
+        ::=                 { cmcIIISetupModbus 3 }
+
+    cmcIIIModbusTable       OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIModbusEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "A list of Modbus entries."
+        ::=                 { cmcIIISetupModbus 4 }
+
+    cmcIIIModbusEntry       OBJECT-TYPE
+        SYNTAX              CmcIIIModbusEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of Modbus table."
+        INDEX               { cmcIIIModbusIndex }
+        ::=                 { cmcIIIModbusTable 1 }
+
+    CmcIIIModbusEntry       ::=
+        SEQUENCE            {
+                                cmcIIIModbusIndex           Unsigned32,
+                                cmcIIIModbusAccess          INTEGER,
+                                cmcIIIModbusSource          DisplayString
+                            }
+
+    cmcIIIModbusIndex       OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the Modbus access table. Its value ranges
+                            between 1 and the value of cmcIIINumberOfModbusSources."
+        ::=                 { cmcIIIModbusEntry 1 }
+
+    cmcIIIModbusAccess      OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                readonly        (1),
+                                readwrite       (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Modbus access for this source entry:
+                            (1) readonly
+                            (2) readwrite
+                            This access is inferior to cmcIIIModbusStatus, e.g.
+                            readwrite access also requires readwrite status."
+        DEFVAL              { readonly }
+        ::=                 { cmcIIIModbusEntry 2 }
+
+    cmcIIIModbusSource      OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Source to restrict Modbus access.
+
+                            It can either be a
+                            specific hostname,
+                            IP address, or a subnet represented as
+                            IP/MASK (e.g. 10.10.10.0/255.255.255.0),
+                            or IP/BITS (e.g. 10.10.10.0/24),
+                            or the IPv6 equivalents.
+
+                            The same source can be specified in several separate
+                            entries (presumably with different access tokens),
+                            and the first combination that matches the incoming
+                            request will be selected."
+        ::=                 { cmcIIIModbusEntry 3 }
+
+--  cmcIIISetupRadius:  --
+
+    cmcIIIRadiusStatus      OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Radius usage:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupRadius 1 }
+
+    cmcIIIRadiusServer      OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of Radius server."
+        ::=                 { cmcIIISetupRadius 2 }
+
+    cmcIIIRadiusPort        OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TCP/IP port of Radius server."
+        DEFVAL              { 1812 }
+        ::=                 { cmcIIISetupRadius 3 }
+
+    cmcIIIRadiusPassword    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..20))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Password required to authenticate at the Radius server."
+        ::=                 { cmcIIISetupRadius 4 }
+
+    cmcIIIRadiusGroupMode   OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                manual          (1),
+                                byAttribute     (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Radius group method:
+                            (1) manual
+                            (2) byAttribute."
+        DEFVAL              { manual }
+        ::=                 { cmcIIISetupRadius 5 }
+
+    cmcIIIRadiusGroupId     OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..32)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Radius group id."
+        ::=                 { cmcIIISetupRadius 6 }
+
+    cmcIIIRadiusAuth        OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                auto            (1),
+                                pap             (2),
+                                chap            (3),
+                                mschap          (4),
+                                md5             (5)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Radius authentification method:
+                            (1) auto - not supported
+                            (2) pap
+                            (3) chap
+                            (4) mschap
+                            (5) md5."
+        DEFVAL              { pap }
+        ::=                 { cmcIIISetupRadius 7 }
+
+--  cmcIIISetupWebCam:  --
+
+    cmcIIIWebCamStatus      OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disabled        (1),
+                                enabled         (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WebCam usage:
+                            (1) disabled
+                            (2) enabled."
+        DEFVAL              { disabled }
+        ::=                 { cmcIIISetupWebCam 1 }
+
+    cmcIIIWebCamServer      OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "IP address of WebCam."
+        ::=                 { cmcIIISetupWebCam 2 }
+
+    cmcIIIWebCamUsername    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..30))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Username required to authenticate at the WebCam server."
+        ::=                 { cmcIIISetupWebCam 3 }
+
+    cmcIIIWebCamPassword    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..20))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Password required to authenticate at the WebCam server."
+        ::=                 { cmcIIISetupWebCam 4 }
+
+    cmcIIIWebCamIntervall   OBJECT-TYPE
+        SYNTAX              Unsigned32          (5..100)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WebCam snapshot intervall in 1/10 seconds."
+        DEFVAL              { 10 }
+        ::=                 { cmcIIISetupWebCam 5 }
+
+    cmcIIIWebCamNumberofImages OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..16)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WebCam number of images per event."
+        DEFVAL              { 8 }
+        ::=                 { cmcIIISetupWebCam 6 }
+
+    cmcIIIWebCamDestination OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                usb             (1),
+                                sd              (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WebCam storage destination:
+                            (1) usb
+                            (2) sd."
+        DEFVAL              { usb }
+        ::=                 { cmcIIISetupWebCam 7 }
+
+
+-- =============================================================================
+
+--  cmcIIIDevs:  --
+
+    cmcIIIOverallDevStatus  OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                ok              (1),
+                                warning         (2),
+                                alarm           (3),
+                                detected        (4),
+                                lost            (5),
+                                changed         (6),
+                                update          (7)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Overall status of all devices."
+        ::=                 { cmcIIIDevInfo     1 }
+
+    cmcIIINumberOfDevs      OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of devices available."
+        ::=                 { cmcIIIDevInfo     2 }
+
+    cmcIIILastChangeOverallDevStatus OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last status change of any device connected to CMCIII PU
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIDevInfo     3 }
+
+    cmcIIILastChangeNumberOfDevs OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last device number change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIDevInfo     4 }
+
+    cmcIIILastChangeDevSettings OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last setting change of any device connected to CMCIII PU
+                            according to operating time cmcIIIUnitUpTime.
+                            This timestamp will be affected by SNMP settings only!"
+        ::=                 { cmcIIIDevInfo     5 }
+
+    cmcIIILastChangeDevs    OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last device change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIDevInfo     6 }
+
+
+    cmcIIIDevTable          OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIDevEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of device table."
+        ::=                 { cmcIIIDevs        2 }
+
+    cmcIIIDevEntry          OBJECT-TYPE
+        SYNTAX              CmcIIIDevEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of device table."
+        INDEX               { cmcIIIDevIndex }
+        ::=                 { cmcIIIDevTable    1 }
+
+
+    CmcIIIDevEntry          ::=
+        SEQUENCE            {
+                                cmcIIIDevIndex              Unsigned32,
+                                cmcIIIDevName               DisplayString,
+                                cmcIIIDevAlias              DisplayString,
+                                cmcIIIDevType               OBJECT IDENTIFIER,
+                                cmcIIIDevNodeID             Integer32,
+                                cmcIIIDevStatus             INTEGER,
+                                cmcIIIDevArtNr              DisplayString,
+                                cmcIIIDevLocation           DisplayString,
+                                cmcIIIDevBus                INTEGER,
+                                cmcIIIDevPos                Integer32,
+                                cmcIIIDevFW                 DisplayString,
+                                cmcIIIDevHW                 DisplayString,
+                                cmcIIIDevSerial             DisplayString,
+                                cmcIIIDevProductWeek        DisplayString,
+                                cmcIIIDevLastChange         Unsigned32,
+                                cmcIIIDevURL                DisplayString,
+                                cmcIIIDevNumberOfVars       Integer32,
+                                cmcIIIDevNumberOfMsgs       Integer32,
+                                cmcIIIDevStatusText         DisplayString,
+                                cmcIIIDevCurrentMinConsumption Integer32,
+                                cmcIIIDevCurrentMaxConsumption Integer32,
+                                cmcIIIDevEntPhysicalIndex   Integer32,
+                                cmcIIIDevAssembly           DisplayString
+                            }
+
+    cmcIIIDevIndex          OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..126)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index of device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    1 }
+
+    cmcIIIDevName           OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..30))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Name of the device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    2 }
+
+    cmcIIIDevAlias          OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..40))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Descriptional text for device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    3 }
+
+    cmcIIIDevType           OBJECT-TYPE
+        SYNTAX              OBJECT IDENTIFIER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Type of device chassis connected to CMCIII PU.
+                            The authoritative identification of the device contained
+                            in the entity is allocated within the SMI cmcIIIProducts
+                            subtree (1.3.6.1.4.1.2606.7.7) and provides an easy and
+                            unambiguous means for determining `what kind of box' is
+                            connected.
+                            E.g.: in cmcIIIProductChassis (1.3.6.1.4.1.2606.7.7.4.x)
+                            the placeholder x is used for
+
+                            1 : Not Available
+                            2 : Internal Device of Processing Unit
+                            3 : Virtual Device
+                            4 : Temperature Sensor 7030.110
+                            5 : Temp/Humidity Sensor 7030.111
+                            6 : Vandalism Sensor 7030.130
+                            7 : Access Sensor 7030.120
+                            8 : Door Lock Device 7030.200, .210
+                            9 : Universal Sensor 7030.190
+                            10: Sensor Gateway 7030.100
+                            11: Power Unit 7030.050
+                            12: Pressure Sensor 7030.150
+                            20-25: Gateways to RS422, RS485."
+        ::=                 { cmcIIIDevEntry    4 }
+
+    cmcIIIDevNodeID         OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Node ID of device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    5 }
+
+    cmcIIIDevStatus         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                notAvail        (1),
+                                ok              (2),
+                                detect          (3),
+                                lost            (4),
+                                changed         (5),
+                                error           (6),
+                                fwUpdate        (7),
+                                fwUpdateRun     (8)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "General Status of device connected to CMCIII PU
+                            (1) Device not available
+                            (2) OK
+                            (3) Device detected, confirmation required
+                            (4) Device lost (disconnected), confirmation required
+                            (5) Device changed
+                            (6) Error
+                            (7) Firmware Update pending
+                            (8) Firmware Update running."
+        ::=                 { cmcIIIDevEntry    6 }
+
+    cmcIIIDevArtNr          OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..10))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Article number of device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    7 }
+
+    cmcIIIDevLocation       OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..40))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Location of device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    8 }
+
+    cmcIIIDevBus            OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                canBus1         (1),
+                                canBus2         (2),
+                                virtual         (3),
+								modbus          (4)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "CAN bus of device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    9 }
+
+    cmcIIIDevPos            OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Position (order) of device in CAN bus connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    10 }
+
+    cmcIIIDevFW             OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..12))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "FW version of device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    11 }
+
+    cmcIIIDevHW             OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..12))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "HW version of device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    12 }
+
+    cmcIIIDevSerial         OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (8..8))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Serial number of device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    13 }
+
+    cmcIIIDevProductWeek    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (8..8))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Production week of device connected to CMCIII PU."
+        ::=                 { cmcIIIDevEntry    14 }
+
+    cmcIIIDevLastChange     OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last change of device connected to CMCIII PU
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIDevEntry    15 }
+
+    cmcIIIDevURL            OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..30))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "URL to device page of CMCIII PU (if available)."
+        ::=                 { cmcIIIDevEntry    16 }
+
+    cmcIIIDevNumberOfVars   OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of variables available on this device.
+                            This variable will give the number of rows of the
+                            variable table cmcIIIVarTable belonging to this device."
+        ::=                 { cmcIIIDevEntry    17 }
+
+    cmcIIIDevNumberOfMsgs   OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of messages available in this device.
+                            This variable will give the number of rows of the message
+                            table cmcIIIMsgTable belonging to this device."
+        ::=                 { cmcIIIDevEntry    18 }
+
+    cmcIIIDevStatusText     OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..160))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Latest status of this device."
+        ::=                 { cmcIIIDevEntry    19 }
+
+    cmcIIIDevCurrentMinConsumption OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Standby power consumption of device in mA."
+        ::=                 { cmcIIIDevEntry    20 }
+
+    cmcIIIDevCurrentMaxConsumption OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Maximal power consumption of device in mA."
+        ::=                 { cmcIIIDevEntry    21 }
+
+    cmcIIIDevEntPhysicalIndex OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Corresponding entPhysicalIndex of this device. 0 if none exists."
+        ::=                 { cmcIIIDevEntry    22 }
+
+    cmcIIIDevAssembly       OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..100))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Assembly of this device."
+        ::=                 { cmcIIIDevEntry    23 }
+
+-- =============================================================================
+
+--  cmcIIIVars:  --
+
+    cmcIIINumberOfVars      OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Total number of variables available."
+        ::=                 { cmcIIIVarInfo     1 }
+
+    cmcIIILastChangeNumberOfVars OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last change number of variables
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIVarInfo     2 }
+
+    cmcIIILastChangeVarSettings OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last setting change
+                            according to operating time cmcIIIUnitUpTime
+                            This timestamp will be affected by SNMP settings only!"
+        ::=                 { cmcIIIVarInfo     3 }
+
+    cmcIIILastChangeVars    OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last variable change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIVarInfo     4 }
+
+    cmcIIIVarByQualityHide  OBJECT-TYPE
+        SYNTAX              BITS {
+-- notInUse is a dummy entry to keep mapping to cmcIIIVarQuality and avoid warnings of MIB checking using smilint!
+                                notInUse        (0),
+                                undefined       (1),
+                                ok              (2),
+                                warning         (3),
+                                alarm           (4),
+                                info            (5),
+                                undefinedNoValue(21),
+                                okNoValue       (22),
+                                warningNoValue  (23),
+                                alarmNoValue    (24),
+                                infoNoValue     (25)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Hide entries in cmcIIIVarByQualityTable to reduce table size."
+        DEFVAL              {{ ok }}
+        ::=                 { cmcIIIVarInfo     5 }
+
+    cmcIIIDynUpdateRate     OBJECT-TYPE
+        SYNTAX              Unsigned32          (5..86400)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Update rate in seconds to add/remove entries
+                            from cmcIIIVarIntDynTable and cmcIIIVarStrDynTable.
+                            Note: cmcIIIDynUpdateHistory (>0) has to be at least twice cmcIIIDynUpdateRate."
+        DEFVAL              { 10 }
+        ::=                 { cmcIIIVarInfo     6 }
+
+    cmcIIIDynUpdateHistory  OBJECT-TYPE
+        SYNTAX              Unsigned32          (0 | 10..2419200)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "History range in seconds to restrict data view
+                            in cmcIIIVarIntDynTable and cmcIIIVarStrDynTable.
+                            The value 0 will disable the history range restriction completly.
+                            Note: cmcIIIDynUpdateHistory (>0) has to be at least twice cmcIIIDynUpdateRate."
+        DEFVAL              { 300 }
+        ::=                 { cmcIIIVarInfo     7 }
+
+
+-- table with entry for each variable available on this unit
+
+    cmcIIIVarTable          OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIVarEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of variable table."
+        ::=                 { cmcIIIVars        2 }
+
+    cmcIIIVarEntry          OBJECT-TYPE
+        SYNTAX              CmcIIIVarEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of variable table."
+        INDEX               { cmcIIIVarDeviceIndex,cmcIIIVarIndex }
+        ::=                 { cmcIIIVarTable    1 }
+
+    CmcIIIVarEntry          ::=
+        SEQUENCE            {
+                                cmcIIIVarDeviceIndex        Unsigned32,
+                                cmcIIIVarIndex              Unsigned32,
+                                cmcIIIVarName               DisplayString,
+                                cmcIIIVarType               INTEGER,
+                                cmcIIIVarUnit               DisplayString,
+                                cmcIIIVarDataType           INTEGER,
+                                cmcIIIVarScale              Integer32,
+                                cmcIIIVarConstraints        DisplayString,
+                                cmcIIIVarSteps              Integer32,
+                                cmcIIIVarValueStr           DisplayString,
+                                cmcIIIVarValueInt           Integer32,
+                                cmcIIIVarLastChange         Unsigned32,
+                                cmcIIIVarAccess             INTEGER,
+                                cmcIIIVarQuality            INTEGER,
+                                cmcIIIVarEntPhysicalIndex   Integer32
+                            }
+
+    cmcIIIVarDeviceIndex    OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the device. Its value ranges
+                            between 1 and the value of cmcIIINumberOfDevs."
+        ::=                 { cmcIIIVarEntry    1 }
+
+    cmcIIIVarIndex          OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the list of value entries. Its value ranges
+                            between 1 and the value of cmcIIINumberOfVars."
+        ::=                 { cmcIIIVarEntry    2 }
+
+    cmcIIIVarName           OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..50))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Clear name of variable."
+        ::=                 { cmcIIIVarEntry    3 }
+
+    cmcIIIVarType           OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                description     (1),
+                                value           (2),
+                                setHigh         (3),
+                                setWarn         (4),
+                                setLow          (5),
+                                hysteresis      (6),
+                                status          (7),
+                                statusEnum      (8),
+                                setWarnLow      (9),
+                                unit            (10),
+                                alarmDur        (11),
+                                steps           (12),
+                                configPar       (13),
+                                category        (14),
+                                logic           (15),
+                                logicEnum       (16),
+                                setCntrl        (17),
+                                offset          (18),
+                                type            (19),
+                                output          (20),
+                                outputdelay     (21),
+                                outputaction    (22),
+                                outdelayExec    (23),
+                                outputEnum      (24),
+                                config          (25),
+                                configNum       (26),
+                                configLcpFcs    (27),
+                                assembly        (28),
+                                configWiring    (29),
+                                sensitivity     (30),
+                                accessTime      (31),
+                                accessLogic     (32),
+                                position        (33),
+                                positionEnum    (34),
+                                pin             (35),
+                                sequence        (36),
+                                remote          (37),
+								stringValue		(38),
+                                outputPWM       (40),
+                                rotation        (41),
+                                circuit         (42),
+                                rizoneArray     (43),
+                                socketType      (44),
+                                customValue     (45),
+								rcmPosition		(46),
+								rcmPosEnum		(47),
+								rcmResult		(48),
+                                productDate     (50),
+                                orderNr         (51),
+                                devName         (52),
+                                devLocation     (53),
+                                currentMin      (54),
+                                currentMax      (55),
+                                keycode         (80),
+                                command         (81),
+                                commandEnum     (82),
+                                commandKeypad   (83),
+                                commandService  (84),
+                                commandRack     (85),
+								commandRCM		(86),
+                                unitType        (90),
+                                swVersion       (91),
+                                serialNumber    (92),
+                                mountPos        (93),
+                                mountPosEnum    (94),
+                                gsmStatus       (95),
+                                connected       (96),
+                                connectedEnum   (97),
+                                grouping        (100),
+                                scaleValue      (110),
+                                scaleUnit       (111),
+                                scaleStart      (112),
+                                scaleEnd        (113),
+                                commandCtrl     (120),
+                                commandCtrlDP   (121),
+                                commandCtrlWdt  (122),
+                                fanAffect       (123),
+                                waterAffect     (124),
+								commandDP		(125),
+                                commandBEP      (126),
+								commandMiniCh	(127),
+								remoteBEP		(128),
+                                location        (130),
+                                building        (131),
+                                level           (132),
+                                room            (133),
+                                row             (134),
+                                rack            (135),
+                                operatingTime   (136),
+                                numberOfRU      (137),
+                                tagsQuit        (138),
+                                tagsChanged     (139),
+                                uid             (140),
+								opModeMiniCh	(145),
+								opModeBEP		(146),
+                                ignore          (254),
+                                illegal         (255)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Type of variable."
+        ::=                 { cmcIIIVarEntry    4 }
+
+    cmcIIIVarUnit           OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..12))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Unit of variable e. g. degree C."
+        ::=                 { cmcIIIVarEntry    5 }
+
+    cmcIIIVarDataType       OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                notAvail        (1),
+                                int             (2),
+                                string          (3),
+                                enum            (4)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Datatype of variable."
+        ::=                 { cmcIIIVarEntry    6 }
+
+    cmcIIIVarScale          OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Scaling factor of variable value,
+                            e. g. -100 -> value has to be divided by 100
+                            +100 -> value has to be multiplied by 100."
+        ::=                 { cmcIIIVarEntry    7 }
+
+    cmcIIIVarConstraints    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..64))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Constraints of value,
+                            e. g. [-_ a-zA-Z0-9]+ (if VariableDatatype is 'string')."
+        ::=                 { cmcIIIVarEntry    8 }
+
+    cmcIIIVarSteps          OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Steps of variable value (resolution)."
+        ::=                 { cmcIIIVarEntry    9 }
+
+    cmcIIIVarValueStr       OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..40))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Value as string, including sign (+/-) and unit (degree C)."
+        ::=                 { cmcIIIVarEntry    10 }
+
+    cmcIIIVarValueInt       OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Value as integer."
+        ::=                 { cmcIIIVarEntry    11 }
+
+    cmcIIIVarLastChange     OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last update or change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIVarEntry    12 }
+
+    cmcIIIVarAccess         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                none            (1),
+                                readonly        (2),
+                                readwrite       (3),
+                                readwriteswitch (4),
+                                readwriteextended(5)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Access for value."
+        ::=                 { cmcIIIVarEntry    13 }
+
+    cmcIIIVarQuality        OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                undefined       (1),
+                                ok              (2),
+                                warning         (3),
+                                alarm           (4),
+                                info            (5),
+                                undefinedNoValue(21),
+                                okNoValue       (22),
+                                warningNoValue  (23),
+                                alarmNoValue    (24),
+                                infoNoValue     (25)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Quality of variable."
+        ::=                 { cmcIIIVarEntry    14 }
+
+    cmcIIIVarEntPhysicalIndex OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Corresponding entPhysicalIndex of this variable. 0 if none exists."
+        ::=                 { cmcIIIVarEntry    15 }
+
+
+-- table with entry for each variable available on this unit sorted by cmcIIIVarType
+
+    cmcIIIVarByTypeTable    OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIVarByTypeEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of variable by type table."
+        ::=                 { cmcIIIVars        3 }
+
+    cmcIIIVarByTypeEntry    OBJECT-TYPE
+        SYNTAX              CmcIIIVarByTypeEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of variable by type table."
+        INDEX               { cmcIIIVarByTypeType,cmcIIIVarByTypeDeviceIndex,cmcIIIVarByTypeIndex }
+        ::=                 { cmcIIIVarByTypeTable 1 }
+
+    CmcIIIVarByTypeEntry    ::=
+        SEQUENCE            {
+                                cmcIIIVarByTypeType         INTEGER,
+                                cmcIIIVarByTypeDeviceIndex  Unsigned32,
+                                cmcIIIVarByTypeIndex        Unsigned32,
+                                cmcIIIVarByTypeValueStr     DisplayString,
+                                cmcIIIVarByTypeValueInt     Integer32,
+                                cmcIIIVarByTypeLastChange   Unsigned32
+                            }
+
+    cmcIIIVarByTypeType     OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                 description     (1),
+                                value           (2),
+                                setHigh         (3),
+                                setWarn         (4),
+                                setLow          (5),
+                                hysteresis      (6),
+                                status          (7),
+                                statusEnum      (8),
+                                setWarnLow      (9),
+                                unit            (10),
+                                alarmDur        (11),
+                                steps           (12),
+                                configPar       (13),
+                                category        (14),
+                                logic           (15),
+                                logicEnum       (16),
+                                setCntrl        (17),
+                                offset          (18),
+                                type            (19),
+                                output          (20),
+                                outputdelay     (21),
+                                outputaction    (22),
+                                outdelayExec    (23),
+                                outputEnum      (24),
+                                config          (25),
+                                configNum       (26),
+                                configLcpFcs    (27),
+                                assembly        (28),
+                                configWiring    (29),
+                                sensitivity     (30),
+                                accessTime      (31),
+                                accessLogic     (32),
+                                position        (33),
+                                positionEnum    (34),
+                                pin             (35),
+                                sequence        (36),
+                                remote          (37),
+								stringValue		(38),
+                                outputPWM       (40),
+                                rotation        (41),
+                                circuit         (42),
+                                rizoneArray     (43),
+                                socketType      (44),
+                                customValue     (45),
+								rcmPosition		(46),
+								rcmPosEnum		(47),
+								rcmResult		(48),
+                                productDate     (50),
+                                orderNr         (51),
+                                devName         (52),
+                                devLocation     (53),
+                                currentMin      (54),
+                                currentMax      (55),
+                                keycode         (80),
+                                command         (81),
+                                commandEnum     (82),
+                                commandKeypad   (83),
+                                commandService  (84),
+                                commandRack     (85),
+								commandRCM		(86),
+                                unitType        (90),
+                                swVersion       (91),
+                                serialNumber    (92),
+                                mountPos        (93),
+                                mountPosEnum    (94),
+                                gsmStatus       (95),
+                                connected       (96),
+                                connectedEnum   (97),
+                                grouping        (100),
+                                scaleValue      (110),
+                                scaleUnit       (111),
+                                scaleStart      (112),
+                                scaleEnd        (113),
+                                commandCtrl     (120),
+                                commandCtrlDP   (121),
+                                commandCtrlWdt  (122),
+                                fanAffect       (123),
+                                waterAffect     (124),
+								commandDP		(125),
+                                commandBEP      (126),
+								commandMiniCh	(127),
+								remoteBEP		(128),
+                                location        (130),
+                                building        (131),
+                                level           (132),
+                                room            (133),
+                                row             (134),
+                                rack            (135),
+                                operatingTime   (136),
+                                numberOfRU      (137),
+                                tagsQuit        (138),
+                                tagsChanged     (139),
+                                uid             (140),
+								opModeMiniCh	(145),
+								opModeBEP		(146),
+                                ignore          (254),
+                                illegal         (255)
+                            }
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Type of variable."
+        ::=                 { cmcIIIVarByTypeEntry 1 }
+
+    cmcIIIVarByTypeDeviceIndex OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the device. Its value ranges
+                            between 1 and the value of cmcIIINumberOfDevs."
+        ::=                 { cmcIIIVarByTypeEntry 2 }
+
+    cmcIIIVarByTypeIndex    OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the list of value entries. Its value ranges
+                            between 1 and the value of cmcIIINumberOfVars."
+        ::=                 { cmcIIIVarByTypeEntry 3 }
+
+    cmcIIIVarByTypeValueStr OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..40))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Value as string, including sign (+/-) and unit (degree C)."
+        ::=                 { cmcIIIVarByTypeEntry 4 }
+
+    cmcIIIVarByTypeValueInt OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Value as integer."
+        ::=                 { cmcIIIVarByTypeEntry 5 }
+
+    cmcIIIVarByTypeLastChange OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last update or change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIVarByTypeEntry 6 }
+
+-- table with entry for each variable available on this unit sorted by cmcIIIVarType
+
+    cmcIIIVarByQualityTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIVarByQualityEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of variable by quality table."
+        ::=                 { cmcIIIVars        4 }
+
+    cmcIIIVarByQualityEntry OBJECT-TYPE
+        SYNTAX              CmcIIIVarByQualityEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of variable by quality table.
+                            The view of this table may be reduced using the bits of cmcIIIVarByQualityHide."
+        INDEX               { cmcIIIVarByQualityQuality,cmcIIIVarByQualityDeviceIndex,cmcIIIVarByQualityIndex }
+        ::=                 { cmcIIIVarByQualityTable 1 }
+
+    CmcIIIVarByQualityEntry ::=
+        SEQUENCE            {
+                                cmcIIIVarByQualityQuality   INTEGER,
+                                cmcIIIVarByQualityDeviceIndex Unsigned32,
+                                cmcIIIVarByQualityIndex     Unsigned32,
+                                cmcIIIVarByQualityValueStr  DisplayString,
+                                cmcIIIVarByQualityValueInt  Integer32,
+                                cmcIIIVarByQualityLastChange Unsigned32
+                            }
+
+    cmcIIIVarByQualityQuality OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                undefined       (1),
+                                ok              (2),
+                                warning         (3),
+                                alarm           (4),
+                                info            (5),
+                                undefinedNoValue(21),
+                                okNoValue       (22),
+                                warningNoValue  (23),
+                                alarmNoValue    (24),
+                                infoNoValue     (25)
+                            }
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Quality of variable."
+        ::=                 { cmcIIIVarByQualityEntry 1 }
+
+    cmcIIIVarByQualityDeviceIndex OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the device. Its value ranges
+                            between 1 and the value of cmcIIINumberOfDevs."
+        ::=                 { cmcIIIVarByQualityEntry 2 }
+
+    cmcIIIVarByQualityIndex OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the list of value entries. Its value ranges
+                            between 1 and the value of cmcIIINumberOfVars."
+        ::=                 { cmcIIIVarByQualityEntry 3 }
+
+    cmcIIIVarByQualityValueStr OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..40))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Value as string, including sign (+/-) and unit (degree C)."
+        ::=                 { cmcIIIVarByQualityEntry 4 }
+
+    cmcIIIVarByQualityValueInt OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Value as integer."
+        ::=                 { cmcIIIVarByQualityEntry 5 }
+
+    cmcIIIVarByQualityLastChange OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last update or change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIVarByQualityEntry 6 }
+
+
+-- table with entry for each dynamic integer variable (cmcIIIVarDataType = int(2) or enum(4)) available on this unit
+
+    cmcIIIVarIntDynTable    OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIVarIntDynEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of dynamically changed variable table of cmcIIIVarDatatype int(2) or enum(4).
+                            This table is updated each cmcIIIVarDynUpdateRate seconds only.
+                            This table has variables updated/changed within the last cmcIIIVarDynUpdateHistory seconds only.
+                            This table has dynamic integer variables (cmcIIIVarDataType = int(2) or enum(4)) only."
+        ::=                 { cmcIIIVars        5 }
+
+    cmcIIIVarIntDynEntry    OBJECT-TYPE
+        SYNTAX              CmcIIIVarIntDynEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of dynamically changed table."
+        INDEX               { cmcIIIVarIntDynDeviceIndex,cmcIIIVarIntDynIndex,cmcIIIVarIntDynLastChange }
+        ::=                 { cmcIIIVarIntDynTable 1 }
+
+    CmcIIIVarIntDynEntry    ::=
+        SEQUENCE            {
+                                cmcIIIVarIntDynDeviceIndex  Unsigned32,
+                                cmcIIIVarIntDynIndex        Unsigned32,
+                                cmcIIIVarIntDynLastChange   Unsigned32,
+                                cmcIIIVarIntDynValue        Integer32
+                            }
+
+    cmcIIIVarIntDynDeviceIndex OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the device. Its value ranges
+                            between 1 and the value of cmcIIINumberOfDevs."
+        ::=                 { cmcIIIVarIntDynEntry 1 }
+
+    cmcIIIVarIntDynIndex    OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the list of value entries. Its value ranges
+                            between 1 and the value of cmcIIINumberOfVars."
+        ::=                 { cmcIIIVarIntDynEntry 2 }
+
+    cmcIIIVarIntDynLastChange OBJECT-TYPE
+        SYNTAX              Unsigned32          (0..2147483647)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Timestamp of last update or change
+                            according to operating time cmcIIIUnitUpTime.
+                            Entries may be restricted by cmcIIIDynUpdateHistory."
+        ::=                 { cmcIIIVarIntDynEntry 3 }
+
+    cmcIIIVarIntDynValue    OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Value as integer."
+        ::=                 { cmcIIIVarIntDynEntry 4 }
+
+
+-- table with entry for each dynamic string variable (cmcIIIVarDataType = string(3)) available on this unit
+
+    cmcIIIVarStrDynTable    OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIVarStrDynEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of dynamically changed variable table of cmcIIIVarDataType string(3).
+                            This table is updated each cmcIIIVarDynUpdateRate seconds only.
+                            This table has variables updated/changed within the last cmcIIIVarDynUpdateHistory seconds only.
+                            This table has dynamic string variables (cmcIIIVarDataType = string(3)) only.
+                            Please note, this table will be empty in most cases as strings are rarely changing."
+        ::=                 { cmcIIIVars        6 }
+
+    cmcIIIVarStrDynEntry    OBJECT-TYPE
+        SYNTAX              CmcIIIVarStrDynEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of dynamically changed table."
+        INDEX               { cmcIIIVarStrDynDeviceIndex,cmcIIIVarStrDynIndex,cmcIIIVarStrDynLastChange }
+        ::=                 { cmcIIIVarStrDynTable 1 }
+
+    CmcIIIVarStrDynEntry    ::=
+        SEQUENCE            {
+                                cmcIIIVarStrDynDeviceIndex  Unsigned32,
+                                cmcIIIVarStrDynIndex        Unsigned32,
+                                cmcIIIVarStrDynLastChange   Unsigned32,
+                                cmcIIIVarStrDynValue        DisplayString
+                            }
+
+    cmcIIIVarStrDynDeviceIndex OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the device. Its value ranges
+                            between 1 and the value of cmcIIINumberOfDevs."
+        ::=                 { cmcIIIVarStrDynEntry 1 }
+
+    cmcIIIVarStrDynIndex    OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the list of value entries. Its value ranges
+                            between 1 and the value of cmcIIINumberOfVars."
+        ::=                 { cmcIIIVarStrDynEntry 2 }
+
+    cmcIIIVarStrDynLastChange OBJECT-TYPE
+        SYNTAX              Unsigned32          (0..2147483647)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Timestamp of last update or change
+                            according to operating time cmcIIIUnitUpTime.
+                            Entries may be restricted by cmcIIIDynUpdateHistory."
+        ::=                 { cmcIIIVarStrDynEntry 3 }
+
+    cmcIIIVarStrDynValue    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..40))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Value as string."
+        ::=                 { cmcIIIVarStrDynEntry 4 }
+
+-- =============================================================================
+
+--  cmcIIIMsgs:  --
+
+    cmcIIIOverallMsgStatus  OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                ok              (1),
+                                warning         (2),
+                                alarm           (3)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Overall message status of device."
+        ::=                 { cmcIIIMsgInfo     1 }
+
+    cmcIIINumberOfMsgs      OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of messages.
+                            All status vars available in cmcIIIVarTable will cause a message in cmcIIIMsgTable."
+        ::=                 { cmcIIIMsgInfo     2 }
+
+    cmcIIILastChangeOverallMsgStatus OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last status change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIMsgInfo     3 }
+
+    cmcIIILastChangeNumberOfMsgs OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last message number change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIMsgInfo     4 }
+
+    cmcIIILastChangeMsgSettings OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last setting change
+                            according to operating time cmcIIIUnitUpTime
+                            This timestamp will be affected by SNMP settings only!"
+        ::=                 { cmcIIIMsgInfo     5 }
+
+
+-- table with entry for each alarm available on this unit
+
+    cmcIIIMsgTable          OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIMsgEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of message table."
+        ::=                 { cmcIIIMsgs        2 }
+
+    cmcIIIMsgEntry          OBJECT-TYPE
+        SYNTAX              CmcIIIMsgEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of message table."
+        INDEX               { cmcIIIMsgDeviceIndex,cmcIIIMsgIndex }
+        ::=                 { cmcIIIMsgTable    1 }
+
+    CmcIIIMsgEntry          ::=
+        SEQUENCE            {
+                                cmcIIIMsgDeviceIndex        Unsigned32,
+                                cmcIIIMsgIndex              Unsigned32,
+                                cmcIIIMsgText               DisplayString,
+                                cmcIIIMsgStatus             INTEGER,
+                                cmcIIIMsgRelay              INTEGER,
+                                cmcIIIMsgBeeper             INTEGER,
+                                cmcIIIMsgTrap               BITS,
+                                cmcIIIMsgSMTP               BITS,
+                                cmcIIIMsgSMS                BITS,
+                                cmcIIIMsgQuit               INTEGER,
+                                cmcIIIMsgDelay              Unsigned32,
+                                cmcIIIMsgSchedAlarmOff      Integer32,
+                                cmcIIIMsgQuality            INTEGER,
+                                cmcIIIMsgVarIdx             Integer32,
+                                cmcIIIMsgVarValueIdx        Integer32,
+                                cmcIIIMsgStatusText         DisplayString
+                            }
+
+    cmcIIIMsgDeviceIndex    OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the device. Its value ranges
+                            between 1 and the value of cmcIIINumberOfDevs."
+        ::=                 { cmcIIIMsgEntry    1 }
+
+    cmcIIIMsgIndex          OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the list of message entries. Its value ranges
+                            between 1 and the value of cmcIIINumberOfMsgs."
+        ::=                 { cmcIIIMsgEntry    2 }
+
+    cmcIIIMsgText           OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..40))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Text for each message (entry in the table)."
+        ::=                 { cmcIIIMsgEntry    3 }
+
+    cmcIIIMsgStatus         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                notAvail        (1),
+                                configChanged   (2),
+                                error           (3),
+                                ok              (4),
+                                alarm           (5),
+                                highWarn        (6),
+                                lowAlarm        (7),
+                                highAlarm       (8),
+                                lowWarn         (9),
+                                setOff          (10),
+                                setOn           (11),
+                                open            (12),
+                                closed          (13),
+                                locked          (14),
+                                unlRemote       (15),
+                                doorOpen        (16),
+                                service         (17),
+                                standby         (18),
+                                busy            (19),
+                                noAccess        (20),
+                                lost            (21),
+                                detected        (22),
+                                lowVoltage      (23),
+                                probeopen       (24),
+                                probeshort      (25),
+                                calibration     (26),
+                                inactive        (27),
+                                active          (28),
+                                noPower         (29),
+                                readOnly        (30),
+								exchanged       (31),
+								valveOpen		(32),
+								warning			(33),
+								remote			(34)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Actual message status
+                            1: not available
+                            2: configuration has changed (sensor new, changed, lost)
+                            3: error
+                            4: OK
+                            5: alarm, e.g. smoke, vibration...
+                            6: warning of analog value, value reached high warning threshold
+                            7: analog value too low, value reached low threshold (Alarm)
+                            8: analog value too high, value reached high threshold (Alarm)
+                            9: warning of analog value, value reached low warning threshold
+                            10: output is set to OFF
+                            11: output is set to ON
+                            12: door is open
+                            13: door is closed
+                            14: door is locked
+                            15: door is unlocked by remote input, e.g. external card reader
+                            16: door is unlocked by reader or keypad connected
+                            17: door is unlocked by SNMP set command
+                            18: door is unlocked by WEB
+                            19: door is unlocked by timer
+                            20: no access, wrong key code or card number
+                            21: lost
+                            22: detected
+                            23: battery low, wireless sensor
+                            24: sensor cable broken
+                            25: sensor cable short
+                            26: sensor calibration in progress
+                            27: sensor is inactive
+                            28: sensor is active
+                            29: no Power (PSM)
+                            30: read only (SD, USB-Stick)
+							31: control boards of LCP exchanged
+							32: valve open (info)
+							33: warning 
+							34: remote control."
+        ::=                 { cmcIIIMsgEntry    4 }
+
+    cmcIIIMsgRelay          OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disable         (1),
+                                enable          (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Setup of Alarm relay for this message/alarm
+                            1:        no switching of alarm relay
+                            2:        switching of alarm relay."
+        DEFVAL              { enable }
+        ::=                 { cmcIIIMsgEntry    5 }
+
+    cmcIIIMsgBeeper         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disable         (1),
+                                enable          (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Setup of Alarm beeper for this alarm
+                            1:        no audible alarm
+                            2:        audible alarm."
+        DEFVAL              { enable }
+        ::=                 { cmcIIIMsgEntry    6 }
+
+    cmcIIIMsgTrap           OBJECT-TYPE
+        SYNTAX              BITS {
+                                receiver1       (0),
+                                receiver2       (1),
+                                receiver3       (2),
+                                receiver4       (3),
+                                receiver5       (4),
+                                receiver6       (5),
+                                receiver7       (6),
+                                receiver8       (7),
+                                receiver9       (8),
+                                receiver10      (9),
+                                receiver11      (10),
+                                receiver12      (11),
+                                receiver13      (12),
+                                receiver14      (13),
+                                receiver15      (14),
+                                receiver16      (15)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Each bit is representing an entry of cmcIIITrapReceiverTable.
+                            If the corresponding cmcIIITrapReceiverStatus is enabled
+                            setting this bit enables sending messages to this receiver."
+        ::=                 { cmcIIIMsgEntry    7 }
+
+    cmcIIIMsgSMTP           OBJECT-TYPE
+        SYNTAX              BITS {
+                                receiver1       (0),
+                                receiver2       (1),
+                                receiver3       (2),
+                                receiver4       (3),
+                                receiver5       (4),
+                                receiver6       (5),
+                                receiver7       (6),
+                                receiver8       (7),
+                                receiver9       (8),
+                                receiver10      (9),
+                                receiver11      (10),
+                                receiver12      (11),
+                                receiver13      (12),
+                                receiver14      (13),
+                                receiver15      (14),
+                                receiver16      (15)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Each bit is representing an entry of cmcIIISmtpReceiverTable.
+                            If the corresponding cmcIIISmtpReceiverStatus is enabled
+                            setting this bit enables sending messages to this receiver."
+        ::=                 { cmcIIIMsgEntry    8 }
+
+    cmcIIIMsgSMS            OBJECT-TYPE
+        SYNTAX              BITS {
+                                receiver1       (0),
+                                receiver2       (1),
+                                receiver3       (2),
+                                receiver4       (3),
+                                receiver5       (4),
+                                receiver6       (5),
+                                receiver7       (6),
+                                receiver8       (7),
+                                receiver9       (8),
+                                receiver10      (9),
+                                receiver11      (10),
+                                receiver12      (11),
+                                receiver13      (12),
+                                receiver14      (13),
+                                receiver15      (14),
+                                receiver16      (15)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Each bit is representing an entry of cmcIIISmsReceiverTable.
+                            If the corresponding cmcIIISmsReceiverStatus is enabled
+                            setting this bit enables sending messages to this receiver."
+        ::=                 { cmcIIIMsgEntry    9 }
+
+    cmcIIIMsgQuit           OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                auto            (1),
+                                manual          (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Reset of this alarm
+                            1:  auto
+                            2:  manual, alarm needs confirmation, e. g. with 'C' key."
+        DEFVAL              { auto }
+        ::=                 { cmcIIIMsgEntry    10 }
+
+    cmcIIIMsgDelay          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Delay of alarm condition."
+        ::=                 { cmcIIIMsgEntry    11 }
+
+    cmcIIIMsgSchedAlarmOff  OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Alarm condition disabled by scheduler."
+        ::=                 { cmcIIIMsgEntry    12 }
+
+    cmcIIIMsgQuality        OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                undefined       (1),
+                                ok              (2),
+                                warning         (3),
+                                alarm           (4),
+                                info            (5),
+                                undefinedNoValue(21),
+                                okNoValue       (22),
+                                warningNoValue  (23),
+                                alarmNoValue    (24),
+                                infoNoValue     (25)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Quality of variable."
+        ::=                 { cmcIIIMsgEntry    13 }
+
+    cmcIIIMsgVarIdx         OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Index of variable 'Status' in variable table generating this message."
+        ::=                 { cmcIIIMsgEntry    14 }
+
+    cmcIIIMsgVarValueIdx    OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Index of variable 'Value' in the variable table."
+        ::=                 { cmcIIIMsgEntry    15 }
+
+    cmcIIIMsgStatusText     OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..160))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Message status text."
+        ::=                 { cmcIIIMsgEntry    16 }
+
+-- =============================================================================
+
+--  cmcIIIDrcs:  --
+
+    cmcIIIOverallDrcStatus  OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                ok              (1),
+                                warning         (2),
+                                alarm           (3)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Overall DRC status of devices."
+        ::=                 { cmcIIIDrcInfo     1 }
+
+    cmcIIINumberOfDrcs      OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of DRCs available."
+        ::=                 { cmcIIIDrcInfo     2 }
+
+    cmcIIIOverallLastChangeDrcStatus OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Overall timestamp of last DRC change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIDrcInfo     3 }
+
+    cmcIIILastChangeNumberOfDrcs OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Overall timestamp of last DRC number change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIDrcInfo     4 }
+
+    cmcIIIOverallDrcUtilization OBJECT-TYPE
+        SYNTAX              Unsigned32          (0..100)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Percentage of occupied RUs."
+        ::=                 { cmcIIIDrcInfo     5 }
+
+    cmcIIIOverallDrcPower   OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Total Power in Watts, calculated from all cmcIIITotalDrcPower -values."
+        ::=                 { cmcIIIDrcInfo     6 }
+
+-- table with entry for each DRC available on this unit
+
+    cmcIIIDrcTable          OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIDrcEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of DRC table."
+        ::=                 { cmcIIIDrcs        2 }
+
+    cmcIIIDrcEntry          OBJECT-TYPE
+        SYNTAX              CmcIIIDrcEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of DRC table."
+        INDEX               { cmcIIIDrcIndex }
+        ::=                 { cmcIIIDrcTable    1 }
+
+    CmcIIIDrcEntry          ::=
+        SEQUENCE            {
+                                cmcIIIDrcIndex              Unsigned32,
+                                cmcIIIDrcStatus             INTEGER,
+                                cmcIIILastChangeDrcStatus   Unsigned32,
+                                cmcIIIDrcUnitName           DisplayString,
+                                cmcIIIDrcLocation           DisplayString,
+                                cmcIIIDrcBuilding           DisplayString,
+                                cmcIIIDrcLevel              DisplayString,
+                                cmcIIIDrcRoom               DisplayString,
+                                cmcIIIDrcRow                DisplayString,
+                                cmcIIIDrcRackNr             DisplayString,
+                                cmcIIIDrcMfgDate            DisplayString,
+                                cmcIIIDrcSerialNr           Unsigned32,
+                                cmcIIIDrcOpHours            Unsigned32,
+                                cmcIIIDrcNumberOfRU         Unsigned32,
+                                cmcIIIDrcUtilization        Unsigned32,
+                                cmcIIITotalDrcPower         Unsigned32,
+                                cmcIIIDrcSwController       DisplayString,
+                                cmcIIIDrcSwBootloader       DisplayString,
+                                cmcIIIDrcFwController       DisplayString,
+                                cmcIIIDrcSwAntenna          DisplayString,
+                                cmcIIIDrcSwAntennaBL        DisplayString,
+                                cmcIIIDrcCommand            INTEGER
+                            }
+
+    cmcIIIDrcIndex          OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the DRC. Its value ranges
+                            between 1 and the value of cmcIIINumberOfDrcs."
+        ::=                 { cmcIIIDrcEntry    1 }
+
+    cmcIIIDrcStatus         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                notAvail        (1),
+                                configChanged   (2),
+                                error           (3),
+                                ok              (4),
+                                alarm           (5),
+                                service         (17),
+                                lost            (21),
+                                detected        (22)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "DRC status of device."
+        ::=                 { cmcIIIDrcEntry    2 }
+
+    cmcIIILastChangeDrcStatus OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last DRC change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIDrcEntry    3 }
+
+    cmcIIIDrcUnitName       OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..10))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Unit of Installation of DRC."
+        ::=                 { cmcIIIDrcEntry    4 }
+
+    cmcIIIDrcLocation       OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..32))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Location of Installation of DRC."
+        ::=                 { cmcIIIDrcEntry    5 }
+
+    cmcIIIDrcBuilding       OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..32))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Building of Installation of DRC."
+        ::=                 { cmcIIIDrcEntry    6 }
+
+    cmcIIIDrcLevel          OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..32))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Level of Installation of DRC."
+        ::=                 { cmcIIIDrcEntry    7 }
+
+    cmcIIIDrcRoom           OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..32))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Room of Installation of DRC."
+        ::=                 { cmcIIIDrcEntry    8 }
+
+    cmcIIIDrcRow            OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..16))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Row of Installation of DRC."
+        ::=                 { cmcIIIDrcEntry    9 }
+
+    cmcIIIDrcRackNr         OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..8))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Rack number of Installation of DRC."
+        ::=                 { cmcIIIDrcEntry    10 }
+
+    cmcIIIDrcMfgDate        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..10))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Manufacture date of DRC, format DD.MM.YYYY."
+        ::=                 { cmcIIIDrcEntry    11 }
+
+    cmcIIIDrcSerialNr       OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Serial number of DRC."
+        ::=                 { cmcIIIDrcEntry    12 }
+
+    cmcIIIDrcOpHours        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Operational hours of DRC."
+        ::=                 { cmcIIIDrcEntry    13 }
+
+    cmcIIIDrcNumberOfRU     OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of RUs."
+        ::=                 { cmcIIIDrcEntry    14 }
+
+    cmcIIIDrcUtilization    OBJECT-TYPE
+        SYNTAX              Unsigned32          (0..100)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Percentage of occupied RUs."
+        ::=                 { cmcIIIDrcEntry    15 }
+
+    cmcIIITotalDrcPower     OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Total Power in Watts, calculated from all cmcIIIDrcPower -values."
+        ::=                 { cmcIIIDrcEntry    16 }
+
+    cmcIIIDrcSwController   OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..8))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Software version of controller."
+        ::=                 { cmcIIIDrcEntry    17 }
+
+    cmcIIIDrcSwBootloader   OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..8))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Software version of controller bootloader."
+        ::=                 { cmcIIIDrcEntry    18 }
+
+    cmcIIIDrcFwController   OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..8))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Firmware version of controller."
+        ::=                 { cmcIIIDrcEntry    19 }
+
+    cmcIIIDrcSwAntenna      OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..8))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Software version of antenna module."
+        ::=                 { cmcIIIDrcEntry    20 }
+
+    cmcIIIDrcSwAntennaBL    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..8))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Software version of antenna modul bootloader."
+        ::=                 { cmcIIIDrcEntry    21 }
+
+    cmcIIIDrcCommand        OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noQuit          (1),
+                                quit            (2),
+                                ledAuto         (3),
+                                ledOnOccupied   (4),
+                                ledOnFreeRU     (5)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Command (to) send to the DRC
+                            1: no Quit command
+                            2: Quit command
+                            3: LED auto, LED will show status of TAG (detected, lost..)
+                            4: LEDs of occupied RUs will be switched on
+                            5: LEDs of free RUs will be switched on."
+        DEFVAL              { noQuit }
+        ::=                 { cmcIIIDrcEntry    22 }
+
+
+-- table with entry for each DRC Tag available on this unit
+
+    cmcIIITagTable          OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIITagEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of DRC Tag table."
+        ::=                 { cmcIIIDrcs        3 }
+
+    cmcIIITagEntry          OBJECT-TYPE
+        SYNTAX              CmcIIITagEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of tag table."
+        INDEX               { cmcIIITagDrcIndex,cmcIIITagRuIndex }
+        ::=                 { cmcIIITagTable    1 }
+
+    CmcIIITagEntry          ::=
+        SEQUENCE            {
+                                cmcIIITagDrcIndex           Unsigned32,
+                                cmcIIITagRuIndex            Unsigned32,
+                                cmcIIITagStatus             INTEGER,
+                                cmcIIITagUID                DisplayString,
+                                cmcIIITagPosition           Unsigned32,
+                                cmcIIITagUnitFormfactor     Unsigned32,
+                                cmcIIITagOffset             Unsigned32,
+                                cmcIIITagRuPosition         Unsigned32,
+                                cmcIIITagDeviceClass        INTEGER,
+                                cmcIIITagDescName           DisplayString,
+                                cmcIIITagManufacturer       DisplayString,
+                                cmcIIITagType               DisplayString,
+                                cmcIIITagSerialNumber       DisplayString,
+                                cmcIIITagVendor             DisplayString,
+                                cmcIIITagMac1               DisplayString,
+                                cmcIIITagMac2               DisplayString,
+                                cmcIIITagService            DisplayString,
+                                cmcIIITagDeviceName         DisplayString,
+                                cmcIIITagInventoryCode      DisplayString,
+                                cmcIIITagPower              Unsigned32,
+                                cmcIIITagCurrent            Unsigned32,
+                                cmcIIITagVoltage            Unsigned32,
+                                cmcIIITagLastService        DisplayString,
+                                cmcIIITagNextService        DisplayString,
+                                cmcIIITagLastUpdate         DisplayString,
+                                cmcIIITagNextUpdate         DisplayString,
+                                cmcIIITagInitialStart       DisplayString,
+                                cmcIIITagCustom             DisplayString,
+                                cmcIIITagCommand            INTEGER,
+                                cmcIIITagStart              Unsigned32,
+                                cmcIIITagEnd                Unsigned32,
+                                cmcIIITagAntennaMap         Unsigned32
+                            }
+
+    cmcIIITagDrcIndex       OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the DRC. Its value ranges
+                            between 1 and the value of cmcIIINumberOfDrcs."
+        ::=                 { cmcIIITagEntry    1 }
+
+    cmcIIITagRuIndex        OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the RU of this DRC. This is the RU for this tag."
+        ::=                 { cmcIIITagEntry    2 }
+
+    cmcIIITagStatus         OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                notAvail        (1),
+                                configChanged   (2),
+                                error           (3),
+                                ok              (4),
+                                alarm           (5),
+                                service         (17),
+                                lost            (21),
+                                detected        (22)
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Status of the unit at this RU."
+        ::=                 { cmcIIITagEntry    3 }
+
+    cmcIIITagUID            OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..16))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "UID of the tag of the unit mounted at this position (RU)."
+        ::=                 { cmcIIITagEntry    4 }
+
+    cmcIIITagPosition       OBJECT-TYPE
+        SYNTAX              Unsigned32          (0..9999)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tag position within this RU, 0,1 or 2.
+                            0: topmost position
+                            1: middle position
+                            2: lowermost position."
+        ::=                 { cmcIIITagEntry    5 }
+
+    cmcIIITagUnitFormfactor OBJECT-TYPE
+        SYNTAX              Unsigned32          (0..9999)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Formfactor of the chassis (number of RUs)."
+        ::=                 { cmcIIITagEntry    6 }
+
+    cmcIIITagOffset         OBJECT-TYPE
+        SYNTAX              Unsigned32          (0..9999)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Tag offset.
+                            Offset of the tag related to the topmost position (in one-third of a RU)."
+        ::=                 { cmcIIITagEntry    7 }
+
+    cmcIIITagRuPosition     OBJECT-TYPE
+        SYNTAX              Unsigned32          (0..9999)
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Position (RU) of the chassis."
+        ::=                 { cmcIIITagEntry    8 }
+
+    cmcIIITagDeviceClass    OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                notDefined      (1),
+                                blankingPlate   (2),
+                                componentShelf  (3),
+                                cableRouting    (4),
+                                patchPanelCatX  (5),
+                                patchPanelFibreOptic(6),
+                                ups             (7),
+                                powerSupply     (8),
+                                kvm             (9),
+                                switch          (10),
+                                monitorKeyboardDrawer(11),
+                                monitor         (12),
+                                server          (13),
+                                storage         (14)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Class of the device."
+        DEFVAL              { notDefined }
+        ::=                 { cmcIIITagEntry    9 }
+
+    cmcIIITagDescName       OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..20))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Description name of the unit at this RU."
+        ::=                 { cmcIIITagEntry    10 }
+
+    cmcIIITagManufacturer   OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..16))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Manufacturer of the unit at this RU."
+        ::=                 { cmcIIITagEntry    11 }
+
+    cmcIIITagType           OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..16))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Type Name of the unit at this RU."
+        ::=                 { cmcIIITagEntry    12 }
+
+    cmcIIITagSerialNumber   OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..16))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Serial number of the Unit at this RU."
+        ::=                 { cmcIIITagEntry    13 }
+
+    cmcIIITagVendor         OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..16))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Vendor of the unit at this RU."
+        ::=                 { cmcIIITagEntry    14 }
+
+    cmcIIITagMac1           OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..17))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "MAC address 1 of the Unit at this RU."
+        ::=                 { cmcIIITagEntry    15 }
+
+    cmcIIITagMac2           OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..17))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "MAC address 2 of the unit at this RU."
+        ::=                 { cmcIIITagEntry    16 }
+
+    cmcIIITagService        OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..64))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Vendor contact of the unit at this RU."
+        ::=                 { cmcIIITagEntry    17 }
+
+    cmcIIITagDeviceName     OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..32))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Name of Unit at this RU."
+        ::=                 { cmcIIITagEntry    18 }
+
+    cmcIIITagInventoryCode  OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..200))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Inventory code of the unit at this RU."
+        ::=                 { cmcIIITagEntry    19 }
+
+    cmcIIITagPower          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Power in Watts of the unit at this RU."
+        ::=                 { cmcIIITagEntry    20 }
+
+    cmcIIITagCurrent        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Current in Amperes*10 of the unit at this RU."
+        ::=                 { cmcIIITagEntry    21 }
+
+    cmcIIITagVoltage        OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Voltage in Volts of the unit at this RU."
+        ::=                 { cmcIIITagEntry    22 }
+
+    cmcIIITagLastService    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..40))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Last service of the unit at this RU."
+        ::=                 { cmcIIITagEntry    23 }
+
+    cmcIIITagNextService    OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..40))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Next service of the Unit at this RU."
+        ::=                 { cmcIIITagEntry    24 }
+
+    cmcIIITagLastUpdate     OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..20))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Last update of the unit at this RU."
+        ::=                 { cmcIIITagEntry    25 }
+
+    cmcIIITagNextUpdate     OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..20))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Next update of the unit at this RU."
+        ::=                 { cmcIIITagEntry    26 }
+
+    cmcIIITagInitialStart   OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..8))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Initial start (YYYYMMDD) of the unit at this RU."
+        ::=                 { cmcIIITagEntry    27 }
+
+    cmcIIITagCustom         OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..40))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Custom field of the unit at this RU."
+        ::=                 { cmcIIITagEntry    28 }
+
+    cmcIIITagCommand        OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noQuit          (1),
+                                quit            (2),
+                                ledAuto         (3),
+                                ledOn           (4)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Command (to) send to the unit at this RU."
+        DEFVAL              { noQuit }
+        ::=                 { cmcIIITagEntry    29 }
+
+    cmcIIITagStart          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Start position (bottom) of the chassis of this tag.
+                            The resolution is one-third of a RU."
+        ::=                 { cmcIIITagEntry    30 }
+
+    cmcIIITagEnd            OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "End position (top) of the chassis of this tag.
+                            The resolution is one-third of a RU."
+        ::=                 { cmcIIITagEntry    31 }
+
+    cmcIIITagAntennaMap     OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tag position mapping to the antennas.
+                            The resolution is one-third of a RU, one RU has three antennas.
+                            Position 1 is at the bottom of the rack.
+                            This value ranges from 1 to cmcIIIDrcNumberOfRU*3."
+        ::=                 { cmcIIITagEntry    32 }
+
+-- =============================================================================
+
+--  cmcIIIFiles:  --
+
+    cmcIIINumberOfFiles     OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of Files available."
+        ::=                 { cmcIIIFileInfo    1 }
+
+    cmcIIILastChangeFiles   OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Overall timestamp of last file change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIFileInfo    2 }
+
+    cmcIIILastChangeNumberOfFiles OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Overall timestamp of last file number change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIFileInfo    3 }
+
+-- table with entry for each file available on this unit
+
+    cmcIIIFileTable         OBJECT-TYPE
+        SYNTAX              SEQUENCE OF CmcIIIFileEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Headline of file table."
+        ::=                 { cmcIIIFiles       2 }
+
+    cmcIIIFileEntry         OBJECT-TYPE
+        SYNTAX              CmcIIIFileEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Entries of file table."
+        INDEX               { cmcIIIFileIndex }
+        ::=                 { cmcIIIFileTable   1 }
+
+    CmcIIIFileEntry         ::=
+        SEQUENCE            {
+                                cmcIIIFileIndex             Unsigned32,
+                                cmcIIILastChangeFile        Unsigned32,
+                                cmcIIIFileSize              Unsigned32,
+                                cmcIIIFileChecksum          Unsigned32,
+                                cmcIIIFileName              DisplayString
+                            }
+
+    cmcIIIFileIndex         OBJECT-TYPE
+        SYNTAX              Unsigned32          (1..65535)
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index for the file. Its value ranges
+                            between 1 and the value of cmcIIINumberOfFiles."
+        ::=                 { cmcIIIFileEntry   1 }
+
+    cmcIIILastChangeFile    OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Timestamp of last file change
+                            according to operating time cmcIIIUnitUpTime."
+        ::=                 { cmcIIIFileEntry   2 }
+
+    cmcIIIFileSize          OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Size of the file in bytes."
+        ::=                 { cmcIIIFileEntry   3 }
+
+    cmcIIIFileChecksum      OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Checksum of the file."
+        ::=                 { cmcIIIFileEntry   4 }
+
+    cmcIIIFileName          OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE(0..40))
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Name of the file."
+        ::=                 { cmcIIIFileEntry   5 }
+
+-- =============================================================================
+
+--  cmcIIIControl:  --
+
+    cmcIIIQuitUnit          OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noQuit          (1),
+                                quit            (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Command to quit (acknowledge) alarms of CMCIII unit.
+                            Setting to 'quit' (2) will have same result as pressing 'C' on CMCIII.
+                            Variable is automatically set back to 'noQuit' (1)."
+        DEFVAL              { noQuit }
+        ::=                 { cmcIIIControl     1 }
+
+    cmcIIISmsQueue          OBJECT-TYPE
+        SYNTAX              DisplayString       (SIZE (0..180))
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Fast track to send a SMS message based on configuration of
+                            cmcIIISetupSMS.
+                            Message format: MessageText TabulatorAsSeparator ReceiverPhoneNumber
+                            e.g.: Hello World!\t0123456789"
+        ::=                 { cmcIIIControl     2 }
+
+-- *****************************************************************************
+
+--  Traps and Notifications:  --
+
+    alarmSensorDevice       NOTIFICATION-TYPE
+        OBJECTS             {
+                                cmcIIIDevName,
+                                cmcIIIMsgText,
+                                cmcIIIMsgStatus,
+                                cmcIIIMsgStatusText
+                            }
+        STATUS              current
+        DESCRIPTION         "Alarm of sensors of device."
+--
+--            #CATEGORY     "Status Events."
+--            #TYPE         "Sensor unit alarm."
+--            #SUMMARY      "Device: %s, Message %s, Status: %s, Text: %s."
+--            #ARGUMENTS    {0,1,2,3}
+--            #SEVERITY     MAJOR
+--            #TIMEINDEX    6
+--            #STATE        OPERATIONAL
+--
+        ::=                 { cmcIIINotifications 1 }
+
+    alarmDevice             NOTIFICATION-TYPE
+        OBJECTS             {
+                                cmcIIIDevName,
+                                cmcIIIDevAlias,
+                                cmcIIIDevStatus,
+                                cmcIIIDevStatusText
+                            }
+        STATUS              current
+        DESCRIPTION         "Alarm of device."
+--
+--            #CATEGORY     "Status Events."
+--            #TYPE         "Device alarm."
+--            #SUMMARY      "Device: %s, Alias %s, Status: %s, Text: %s."
+--            #ARGUMENTS    {0,1,2,3}
+--            #SEVERITY     MAJOR
+--            #TIMEINDEX    6
+--            #STATE        OPERATIONAL
+--
+        ::=                 { cmcIIINotifications 2 }
+
+    reConfigAgent           NOTIFICATION-TYPE
+        OBJECTS             {
+                                sysObjectID
+                            }
+        STATUS              current
+        DESCRIPTION         "Agent reconfiguration."
+--
+--            #CATEGORY     "Status Events."
+--            #TYPE         "Agent status."
+--            #SUMMARY      "Agent type: %s, Status: configuration has changed."
+--            #ARGUMENTS    {0}
+--            #SEVERITY     INFORMATIONAL
+--            #TIMEINDEX    6
+--            #STATE        OPERATIONAL
+--
+        ::=                 { cmcIIINotifications 3 }
+
+    shutdownAgent           NOTIFICATION-TYPE
+        OBJECTS             {
+                                sysObjectID
+                            }
+        STATUS              current
+        DESCRIPTION         "Agent shutdown."
+--
+--            #CATEGORY     "Status Events."
+--            #TYPE         "Agent status."
+--            #SUMMARY      "Agent type: %s, Status: shutdown."
+--            #ARGUMENTS    {0}
+--            #SEVERITY     SEVERE
+--            #TIMEINDEX    6
+--            #STATE        NONOPERATIONAL
+--
+        ::=                 { cmcIIINotifications 4 }
+
+-- *****************************************************************************
+
+--  Compliance Statements  --
+
+    cmcIIIMibCompliance     MODULE-COMPLIANCE
+        STATUS              current
+        DESCRIPTION         "The core compliance statement for all cmcIII implementations."
+        MODULE              MANDATORY-GROUPS {
+                                cmcIIITrapGroup,
+                                cmcIIINotificationGroup,
+                                cmcIIIInfoMibGroup,
+                                cmcIIISetupMibGroup,
+                                cmcIIIDeviceMibGroup
+                            }
+
+        GROUP               cmcIIITrapGroup
+        DESCRIPTION         "trap handling."
+
+        GROUP               cmcIIINotificationGroup
+        DESCRIPTION         "notification handling."
+
+        GROUP               cmcIIIInfoMibGroup
+        DESCRIPTION         "base information handling."
+
+        GROUP               cmcIIISetupMibGroup
+        DESCRIPTION         "setup handling."
+
+        GROUP               cmcIIIDeviceMibGroup
+        DESCRIPTION         "device handling."
+
+        GROUP               cmcIIIDrcMibGroup
+        DESCRIPTION         "DRC handling."
+
+        GROUP               cmcIIIFileMibGroup
+        DESCRIPTION         "File handling."
+
+        GROUP               cmcIIIControlMibGroup
+        DESCRIPTION         "device control."
+
+        GROUP               cmcIIIRelayMibGroup
+        DESCRIPTION         "relay handling."
+
+        GROUP               cmcIIISmsMibGroup
+        DESCRIPTION         "SMS handling."
+
+        GROUP               cmcIIISmtpMibGroup
+        DESCRIPTION         "SMTP handling."
+
+        GROUP               cmcIIISyslogMibGroup
+        DESCRIPTION         "syslog handling."
+
+        GROUP               cmcIIITimerMibGroup
+        DESCRIPTION         "timer handling."
+
+        GROUP               cmcIIILdapMibGroup
+        DESCRIPTION         "LDAP handling."
+
+        GROUP               cmcIIINtpMibGroup
+        DESCRIPTION         "NTP handling."
+
+        GROUP               cmcIIIShutdownMibGroup
+        DESCRIPTION         "Shutdown server handling."
+
+        GROUP               cmcIIIModbusMibGroup
+        DESCRIPTION         "Modbus access handling."
+
+        GROUP               cmcIIIRadiusMibGroup
+        DESCRIPTION         "Radius handling."
+
+        GROUP               cmcIIIWebCamMibGroup
+        DESCRIPTION         "WebCam handling."
+
+        ::=                 { cmcIIIMibCompliances 1 }
+
+-- *****************************************************************************
+
+--  Conformance Groups  --
+
+    cmcIIITrapGroup         OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIIDevName,
+                                cmcIIIDevAlias,
+                                cmcIIIDevStatus,
+                                cmcIIIDevStatusText,
+                                cmcIIIMsgText,
+                                cmcIIIMsgStatus,
+                                cmcIIIMsgStatusText
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for objects contained in cmcIII notifications."
+        ::=                 { cmcIIIMibGroups   1 }
+
+    cmcIIINotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS       {
+                                alarmSensorDevice,
+                                alarmDevice,
+                                reConfigAgent,
+                                shutdownAgent
+                            }
+        STATUS              current
+        DESCRIPTION         "The cmcIII MIB notification group."
+        ::=                 { cmcIIIMibGroups   2 }
+
+    cmcIIIInfoMibGroup      OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIIMibMajRev,
+                                cmcIIIMibMinRev,
+                                cmcIIIAgentRev,
+                                cmcIIICapabilityRev,
+                                cmcIIIUnitStatus,
+                                cmcIIIUnitURL,
+                                cmcIIIUnitHWRev,
+                                cmcIIIUnitFWRev,
+                                cmcIIIUnitOSRev,
+                                cmcIIIUnitSerial,
+                                cmcIIIUnitProd,
+                                cmcIIIUnitType,
+                                cmcIIIUnitCurrentSource,
+                                cmcIIICan0CurrentConsumption,
+                                cmcIIICan1CurrentConsumption,
+                                cmcIIIUnitUpTime,
+                                cmcIIIUnitMode,
+                                cmcIIIUnitLoadAverage
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for all cmcIII base information."
+        ::=                 { cmcIIIMibGroups   3 }
+
+    cmcIIISetupMibGroup     OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIILastChangeSetup,
+                                cmcIIISetTempUnit,
+                                cmcIIITimeZone,
+                                cmcIIISetupDate,
+                                cmcIIISetupTime,
+                                cmcIIIWebAccess,
+                                cmcIIIHttpPort,
+                                cmcIIIHttpsPort,
+                                cmcIIIFtpAccess,
+                                cmcIIIFtpPort,
+                                cmcIIISshAccess,
+                                cmcIIISshPort,
+                                cmcIIITelnetAccess,
+                                cmcIIITelnetPort,
+                                cmcIIILanguage,
+                                cmcIIIOpcUaAccess,
+                                cmcIIIOpcUaPort,
+
+                                cmcIIINumberOfTrapReceivers,
+                                cmcIIITrapReceiverStatus,
+                                cmcIIITrapReceiverIpAddress
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for default cmcIII setup operations."
+        ::=                 { cmcIIIMibGroups   4 }
+
+    cmcIIIDeviceMibGroup    OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIIOverallDevStatus,
+                                cmcIIINumberOfDevs,
+                                cmcIIILastChangeOverallDevStatus,
+                                cmcIIILastChangeNumberOfDevs,
+                                cmcIIILastChangeDevSettings,
+                                cmcIIILastChangeDevs,
+                                cmcIIIDevName,
+                                cmcIIIDevAlias,
+                                cmcIIIDevType,
+                                cmcIIIDevNodeID,
+                                cmcIIIDevStatus,
+                                cmcIIIDevArtNr,
+                                cmcIIIDevLocation,
+                                cmcIIIDevBus,
+                                cmcIIIDevPos,
+                                cmcIIIDevFW,
+                                cmcIIIDevHW,
+                                cmcIIIDevSerial,
+                                cmcIIIDevProductWeek,
+                                cmcIIIDevLastChange,
+                                cmcIIIDevURL,
+                                cmcIIIDevNumberOfVars,
+                                cmcIIIDevNumberOfMsgs,
+                                cmcIIIDevStatusText,
+                                cmcIIIDevCurrentMinConsumption,
+                                cmcIIIDevCurrentMaxConsumption,
+                                cmcIIIDevEntPhysicalIndex,
+                                cmcIIIDevAssembly,
+                                cmcIIINumberOfVars,
+                                cmcIIILastChangeNumberOfVars,
+                                cmcIIILastChangeVarSettings,
+                                cmcIIILastChangeVars,
+                                cmcIIIVarByQualityHide,
+                                cmcIIIDynUpdateRate,
+                                cmcIIIDynUpdateHistory,
+                                cmcIIIVarName,
+                                cmcIIIVarType,
+                                cmcIIIVarUnit,
+                                cmcIIIVarDataType,
+                                cmcIIIVarScale,
+                                cmcIIIVarConstraints,
+                                cmcIIIVarSteps,
+                                cmcIIIVarValueStr,
+                                cmcIIIVarValueInt,
+                                cmcIIIVarAccess,
+                                cmcIIIVarLastChange,
+                                cmcIIIVarQuality,
+                                cmcIIIVarEntPhysicalIndex,
+                                cmcIIIVarByTypeValueStr,
+                                cmcIIIVarByTypeValueInt,
+                                cmcIIIVarByTypeLastChange,
+                                cmcIIIVarByQualityValueStr,
+                                cmcIIIVarByQualityValueInt,
+                                cmcIIIVarByQualityLastChange,
+                                cmcIIIVarIntDynValue,
+                                cmcIIIVarStrDynValue,
+                                cmcIIIOverallMsgStatus,
+                                cmcIIINumberOfMsgs,
+                                cmcIIILastChangeOverallMsgStatus,
+                                cmcIIILastChangeNumberOfMsgs,
+                                cmcIIILastChangeMsgSettings,
+                                cmcIIIMsgText,
+                                cmcIIIMsgStatus,
+                                cmcIIIMsgTrap,
+                                cmcIIIMsgSMTP,
+                                cmcIIIMsgQuit,
+                                cmcIIIMsgDelay,
+                                cmcIIIMsgSchedAlarmOff,
+                                cmcIIIMsgQuality,
+                                cmcIIIMsgVarIdx,
+                                cmcIIIMsgVarValueIdx,
+                                cmcIIIMsgStatusText
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for all cmcIII device information."
+        ::=                 { cmcIIIMibGroups   5 }
+
+    cmcIIIControlMibGroup   OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIIQuitUnit
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for all cmcIII control operations."
+        ::=                 { cmcIIIMibGroups   6 }
+
+
+    cmcIIIRelayMibGroup     OBJECT-GROUP
+
+        OBJECTS             {
+                                cmcIIISetBeeper,
+                                cmcIIIQuitRelay,
+                                cmcIIILogicRelay,
+                                cmcIIIUnitMsgRelay,
+                                cmcIIIFunctionRelay,
+                                cmcIIIMsgRelay,
+                                cmcIIIMsgBeeper
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII relay and beeper operations."
+        ::=                 { cmcIIIMibGroups   7 }
+
+    cmcIIISmsMibGroup       OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIISmsStatus,
+                                cmcIIISmsPIN,
+                                cmcIIISmsService,
+                                cmcIIISmsMSN,
+                                cmcIIISmsPreDial,
+                                cmcIIINumberOfSmsReceivers,
+                                cmcIIISmsReceiverStatus,
+                                cmcIIISmsReceiverNumber,
+                                cmcIIIMsgSMS,
+                                cmcIIISmsQueue
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII SMS operations."
+        ::=                 { cmcIIIMibGroups   8 }
+
+    cmcIIISmtpMibGroup      OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIISmtpStatus,
+                                cmcIIISmtpServer,
+                                cmcIIISmtpPort,
+                                cmcIIISmtpAuth,
+                                cmcIIISmtpUsername,
+                                cmcIIISmtpPassword,
+                                cmcIIISmtpSender,
+                                cmcIIISmtpReply,
+                                cmcIIINumberOfSmtpReceivers,
+                                cmcIIISmtpReceiverStatus,
+                                cmcIIISmtpReceiverAddress
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII SMTP operations."
+        ::=                 { cmcIIIMibGroups   9 }
+
+    cmcIIISyslogMibGroup    OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIISysLogStatus,
+                                cmcIIISysLogFacility,
+                                cmcIIISysLogServer1,
+                                cmcIIISysLogServer2
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII syslog operations."
+        ::=                 { cmcIIIMibGroups   10 }
+
+    cmcIIITimerMibGroup     OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIINumberOfTimers,
+                                cmcIIITimerStatus,
+                                cmcIIITimerDayOfWeek,
+                                cmcIIITimeOn,
+                                cmcIIITimeOff,
+                                cmcIIITimeControl,
+                                cmcIIITimerFunction
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII timer operations."
+        ::=                 { cmcIIIMibGroups   11 }
+
+    cmcIIILdapMibGroup      OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIILdapStatus,
+                                cmcIIILdapServer,
+                                cmcIIILdapBindDN,
+                                cmcIIILdapBindPW,
+                                cmcIIILdapUserBase,
+                                cmcIIILdapUserSearch,
+                                cmcIIILdapUserAttrib,
+                                cmcIIILdapGroupBase,
+                                cmcIIILdapGroupSearch,
+                                cmcIIILdapGroupAttrib
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII LDAP operations."
+        ::=                 { cmcIIIMibGroups   12 }
+
+    cmcIIINtpMibGroup       OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIINtpStatus,
+                                cmcIIINtpTimeZone,
+                                cmcIIINtpServer1,
+                                cmcIIINtpServer2
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII NTP operations."
+        ::=                 { cmcIIIMibGroups   13 }
+
+    cmcIIIShutdownMibGroup  OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIINumberOfShutdowns,
+                                cmcIIIShutdownServer,
+                                cmcIIIShutdownName,
+                                cmcIIIShutdownPort,
+                                cmcIIIShutdownDelay,
+                                cmcIIIShutdownEnabled
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII shutdown server operations."
+        ::=                 { cmcIIIMibGroups   14 }
+
+    cmcIIIModbusMibGroup    OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIIModbusStatus,
+                                cmcIIIModbusPort,
+                                cmcIIINumberOfModbusSources,
+                                cmcIIIModbusAccess,
+                                cmcIIIModbusSource
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII modbus operations."
+        ::=                 { cmcIIIMibGroups   15 }
+
+    cmcIIIDrcMibGroup       OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIIOverallDrcStatus,
+                                cmcIIINumberOfDrcs,
+                                cmcIIIOverallLastChangeDrcStatus,
+                                cmcIIILastChangeNumberOfDrcs,
+                                cmcIIIOverallDrcUtilization,
+                                cmcIIIOverallDrcPower,
+
+                                cmcIIIDrcStatus,
+                                cmcIIILastChangeDrcStatus,
+                                cmcIIIDrcUnitName,
+                                cmcIIIDrcLocation,
+                                cmcIIIDrcBuilding,
+                                cmcIIIDrcLevel,
+                                cmcIIIDrcRoom,
+                                cmcIIIDrcRow,
+                                cmcIIIDrcRackNr,
+                                cmcIIIDrcMfgDate,
+                                cmcIIIDrcSerialNr,
+                                cmcIIIDrcOpHours,
+                                cmcIIIDrcNumberOfRU,
+                                cmcIIIDrcUtilization,
+                                cmcIIITotalDrcPower,
+                                cmcIIIDrcSwController,
+                                cmcIIIDrcSwBootloader,
+                                cmcIIIDrcFwController,
+                                cmcIIIDrcSwAntenna,
+                                cmcIIIDrcSwAntennaBL,
+                                cmcIIIDrcCommand,
+
+                                cmcIIITagStatus,
+                                cmcIIITagUID,
+                                cmcIIITagPosition,
+                                cmcIIITagUnitFormfactor,
+                                cmcIIITagOffset,
+                                cmcIIITagRuPosition,
+                                cmcIIITagDeviceClass,
+                                cmcIIITagDescName,
+                                cmcIIITagManufacturer,
+                                cmcIIITagType,
+                                cmcIIITagSerialNumber,
+                                cmcIIITagVendor,
+                                cmcIIITagMac1,
+                                cmcIIITagMac2,
+                                cmcIIITagService,
+                                cmcIIITagDeviceName,
+                                cmcIIITagInventoryCode,
+                                cmcIIITagPower,
+                                cmcIIITagCurrent,
+                                cmcIIITagVoltage,
+                                cmcIIITagLastService,
+                                cmcIIITagNextService,
+                                cmcIIITagLastUpdate,
+                                cmcIIITagNextUpdate,
+                                cmcIIITagInitialStart,
+                                cmcIIITagCustom,
+                                cmcIIITagCommand,
+                                cmcIIITagStart,
+                                cmcIIITagEnd,
+                                cmcIIITagAntennaMap
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII Drc operations."
+        ::=                 { cmcIIIMibGroups   16 }
+
+    cmcIIIFileMibGroup      OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIINumberOfFiles,
+                                cmcIIILastChangeFiles,
+                                cmcIIILastChangeNumberOfFiles,
+                                cmcIIILastChangeFile,
+                                cmcIIIFileSize,
+                                cmcIIIFileChecksum,
+                                cmcIIIFileName
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII files."
+        ::=                 { cmcIIIMibGroups   17 }
+
+    cmcIIIRadiusMibGroup    OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIIRadiusStatus,
+                                cmcIIIRadiusServer,
+                                cmcIIIRadiusPort,
+                                cmcIIIRadiusPassword,
+                                cmcIIIRadiusGroupMode,
+                                cmcIIIRadiusGroupId,
+                                cmcIIIRadiusAuth
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII Radius operations."
+        ::=                 { cmcIIIMibGroups   18 }
+
+    cmcIIIWebCamMibGroup    OBJECT-GROUP
+        OBJECTS             {
+                                cmcIIIWebCamStatus,
+                                cmcIIIWebCamServer,
+                                cmcIIIWebCamUsername,
+                                cmcIIIWebCamPassword,
+                                cmcIIIWebCamIntervall,
+                                cmcIIIWebCamNumberofImages,
+                                cmcIIIWebCamDestination
+                            }
+        STATUS              current
+        DESCRIPTION         "Conformance group for cmcIII WebCam operations."
+        ::=                 { cmcIIIMibGroups   19 }
+
+
+-- *****************************************************************************
+
+--  Capabilities --
+
+--  please refer to RITTAL-CMCIII-CAPABILITY-MIB definitions --
+
+-- *****************************************************************************
+END

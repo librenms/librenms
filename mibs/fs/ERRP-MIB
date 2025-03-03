@@ -1,0 +1,506 @@
+ERRP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Counter32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue, DisplayString, 
+	TEXTUAL-CONVENTION, MacAddress
+        FROM SNMPv2-TC
+    gbnL2
+        FROM ADMIN-MASTER-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+    errpMib MODULE-IDENTITY
+        LAST-UPDATED "201012140000Z"
+        ORGANIZATION "NEW ADMIN MIB Working Group"
+        CONTACT-INFO
+                     "Email: support@admin.com"
+        DESCRIPTION
+                     " The errp MIB is targeted at easing errp configuration via snmp tools."
+        REVISION     "1012140000Z"
+        DESCRIPTION
+                     "Draft 1"
+        ::= {gbnL2 7 }
+
+    errpMIBObjects    OBJECT IDENTIFIER ::= { errpMib 1 }
+    errp              OBJECT IDENTIFIER ::= { errpMIBObjects 1 }
+    
+    errpOnoff OBJECT-TYPE
+              SYNTAX  INTEGER {
+                  enable(1),
+                  disable(2)
+              }
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "Enable/disable errp function for this bridge."
+                          --errp使能开关
+              ::= { errp 1 }
+    
+    errpHealthTime OBJECT-TYPE
+              SYNTAX      Integer32(1..10)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The hello timer is used by master or edge node for ring health detection.
+                          The correct operational formula: FailedTimer >= 3 * HelloTimer "
+                          --主节点和边界节点使用此定时器对环路的完整性进行周期性检测
+              ::= { errp 2 }
+  
+    errpHealthTimeout OBJECT-TYPE
+              SYNTAX      Integer32(3..30)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The timeout value used by master during ring health detection.
+                          The correct operational formula: FailedTimer >= 3 * HelloTimer"
+                          --主节点检测环路完整性使用的超时定时器值，该值必须大于等于HelloTimer的3倍。
+              ::= { errp 3 }
+              
+    errpMajorFaultTime OBJECT-TYPE
+              SYNTAX      Integer32(2..29)
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The timeout value used by assitant edge during ring health detection."
+                          --辅助边缘节点检测环路完整性使用的超时定时器值
+              ::= { errp 4 }
+                   
+    errpPrefwdTimeout OBJECT-TYPE
+              SYNTAX      Integer32(3..30)
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The block timeout value used by node when portup event occurs."
+                          --端口UP时节点使用的端口阻塞超时定时器
+              ::= { errp 5 } 
+                      
+    errpDomainTable OBJECT-TYPE
+              SYNTAX      SEQUENCE OF ErrpDomainEntry 
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                          "A table that contains domain-specific information."
+                          --由errp域表项构成的表              
+              ::= { errp 6 }
+    
+    errpDomainEntry  OBJECT-TYPE
+              SYNTAX      ErrpDomainEntry 
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                          "A list of information maintained by every domain."
+                          --基于每个域的表项
+              INDEX       { errpDomainId }
+              ::= { errpDomainTable 1 }
+              
+    ErrpDomainEntry ::=
+              SEQUENCE {
+                  errpDomainId           Integer32,
+                  errpMVlanId            Integer32,
+                  errpWorkMode           INTEGER,
+                  errpDomainRowStatus    RowStatus
+              }
+              
+    errpDomainId OBJECT-TYPE
+              SYNTAX      Integer32(0..15)
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The domain ID is used when network is managed in unit of domain, one
+                          domain should be a set of contiguous bridges."
+                          --域ID在网络分域管理时使用，一个域就是一个毗邻的网桥集合
+              ::= { errpDomainEntry 1 }
+              
+    errpMVlanId OBJECT-TYPE
+              SYNTAX      Integer32 (1..4093)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The manage VLAN ID of the domain, can not be an existing vlan."
+                          --域的管理VLAN ID, 每个域具有两个控制VLAN，分别叫做主控制VLAN和子控制VLAN。
+                          --主环的协议报文在主控制VLAN中传播，子环的协议报文在子控制VLAN中传播。
+                          --配置时只需要指定主控制VLAN，而把比主控制VLAN ID值大1的VLAN作为子控制VLAN。
+                          --主控制VLAN和子控制VLAN都不能指定为已经存在的VLAN，MAC地址学习模式必须配置为IVL。
+              ::= { errpDomainEntry 2 }
+    
+    errpWorkMode OBJECT-TYPE
+              SYNTAX      INTEGER {
+                  standard(1),
+                  huaWei(2)
+              }
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The work mode of the domain. If standard(1) is set, then the domain works on RFC3619
+                           standard. If huaWei(2) is set, then the domain works on RRPP standard, and is able
+                           to work together with the Huawei equipment."
+                          --域的工作模式
+              ::= { errpDomainEntry 3 }
+              
+    errpDomainRowStatus OBJECT-TYPE
+              SYNTAX      RowStatus {
+                  active(1),
+                  createAndGo(4),
+                  destroy(6)
+              }
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                         "This object is used to create or delete a domain."
+              ::= { errpDomainEntry 4 }
+              
+    errpRingTable OBJECT-TYPE
+              SYNTAX      SEQUENCE OF ErrpRingEntry 
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                          "A table that contains domain-and-ring-specific information."
+                          --由errp环表项构成的表
+              ::= { errp 7 }
+    
+    errpRingEntry  OBJECT-TYPE
+              SYNTAX      ErrpRingEntry 
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                          "A list of information maintained by every ring."
+                          --基于每个环的表项
+              INDEX       { errpDomainId, errpRingId }
+              ::= { errpRingTable 1 }
+               
+    ErrpRingEntry ::=
+              SEQUENCE {
+                  errpRingId            Integer32,
+                  errpRingLevel         Integer32,
+                  errpBrdgRole          INTEGER,
+                  errpPriComPortId      Integer32,
+                  errpSecEdgePortId     Integer32,
+                  errpRingRowStatus     RowStatus,
+                  errpNodeState         INTEGER,
+                  errpPriComPortState   INTEGER,
+                  errpSecEdgePortState  INTEGER,
+                  errpQuerySolicit      INTEGER
+              }
+              
+    errpRingId OBJECT-TYPE
+              SYNTAX      Integer32 (0..15)
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The identifier of ethernet ring which reside in a domain."
+                          --域内以太环的ID
+              ::= { errpRingEntry 1 }
+  
+    errpRingLevel OBJECT-TYPE
+              SYNTAX      Integer32 (0..1)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The ring level,0 means master ring, while 1 means sub ring."
+                          --环的级别,0为主环,1为子环
+              ::= { errpRingEntry 2 }
+  
+    errpBrdgRole OBJECT-TYPE
+              SYNTAX      INTEGER {
+                  master(1),
+                  trans(2),
+                  edge(3),
+                  assEdge(4)
+              }
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "The bridge role in ethernet ring."
+                          --网桥在环中的角色
+              ::= { errpRingEntry 3 }
+    
+    errpPriComPortId OBJECT-TYPE
+              SYNTAX      Integer32 (1..255)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                         "The primary port id when bridge is master or transmit,the common port id otherwise."
+                         --网桥为主节点或者传输节点时此值代表主端口,否则代表公共端口
+              ::= { errpRingEntry 4 }
+              
+    errpSecEdgePortId OBJECT-TYPE
+              SYNTAX      Integer32 (1..255)
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                         "The secondary port id when bridge is master or transmit,the edge port id otherwise."
+                         --网桥为主节点或者传输节点时此值代表副端口,否则代表边界端口
+              ::= { errpRingEntry 5 }
+          
+    errpRingRowStatus OBJECT-TYPE
+              SYNTAX      RowStatus {
+                  active(1),
+                  notInService(2),
+                  notReady(3),
+                  createAndGo(4),
+                  createAndWait(5),
+                  destroy(6)
+              }
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                         "This object indicates the status of this ring."
+                         --指示当前环的活动状态
+              ::= { errpRingEntry 6 }
+              
+    errpNodeState OBJECT-TYPE
+              SYNTAX      INTEGER {
+                  begin(0),
+                  health(1),
+                  fault(2),
+                  linkUp(3),
+                  linkDown(4),
+                  preforwarding(5)
+              }
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The node state in the ring. begin(0) means node is inactive or inital state.
+                           health(1) means master node detects the ring in a health state.
+                           fault(2) means master node detects the ring in a fault state.
+                           linkUp(3) means both ring ports of the transmit node are link up and in the forwarding state.
+                           linkDown(4) means at least one ring port of the transmit node is link down.
+                           preforwarding(5) means at least one ring port of the transmit node is just link up and in the blocking state.
+                           Edge node and assistant edge node are same as transmit node, but only concern about the edge port state."
+              ::= { errpRingEntry 7 }
+              
+    errpPriComPortState OBJECT-TYPE
+              SYNTAX      INTEGER {
+                  disabled(0),
+                  forwarding(1),
+                  blocking(2)
+              }
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The primary port or common port state in the ring. disabled(0) means port is link down.
+                           forwarding(1) means port is in the forwarding state.
+                           blocking(2) means port is in the blocking or discarding state."
+              ::= { errpRingEntry 8 }
+              
+    errpSecEdgePortState OBJECT-TYPE
+              SYNTAX      INTEGER {
+                  disabled(0),
+                  forwarding(1),
+                  blocking(2)
+              }
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The secondary port or edge port state in the ring. disabled(0) means port is link down.
+                           forwarding(1) means port is in the forwarding state.
+                           blocking(2) means port is in the blocking or discarding state."
+              ::= { errpRingEntry 9 }
+              
+    errpQuerySolicit OBJECT-TYPE
+              SYNTAX      INTEGER {
+                  enable(1),
+                  disable(2)
+              }
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                          "Enable/disable Query Solicit function of the ring."
+              ::= { errpRingEntry 10 }
+              
+    errpRingStatsTable OBJECT-TYPE
+              SYNTAX      SEQUENCE OF ErrpRingStatsEntry 
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                          "This table contains statistics for the ERRP ring ports."
+              ::= { errp 8 }
+    
+    errpRingStatsEntry  OBJECT-TYPE
+              SYNTAX      ErrpRingStatsEntry 
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                          "A list of statistics maintained by every ring port. The sequence is:
+                           (domain,ring,priComPort),(domain,ring,secEdgePort),
+                           (domain,next ring,priComPort),(domain,next ring,secEdgePort),...,
+                           (next domain,ring,priComPort),(next domain,ring,secEdgePort),
+                           (next domain,next ring,priComPort),......"
+              INDEX       { errpDomainId, errpRingId, errpRingPortId }
+              ::= { errpRingStatsTable 1 }
+              
+    ErrpRingStatsEntry ::=
+              SEQUENCE {
+                  errpRingPortId        Integer32,
+                  errpHealthTx          Counter32,
+                  errpHealthRx          Counter32,
+                  errpCommonFlushTx     Counter32,
+                  errpCommonFlushRx     Counter32,
+                  errpCompleteFlushTx   Counter32,
+                  errpCompleteFlushRx   Counter32,
+                  errpLinkDownTx        Counter32,
+                  errpLinkDownRx        Counter32,
+                  errpLinkUpTx          Counter32,
+                  errpLinkUpRx          Counter32,
+                  errpEdgeHelloTx       Counter32,
+                  errpEdgeHelloRx       Counter32,
+                  errpMajorFaultTx      Counter32,
+                  errpMajorFaultRx      Counter32
+              }
+              
+    errpRingPortId OBJECT-TYPE
+              SYNTAX      Integer32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "The port equals to errpPriComPortId or errpSecEdgePortId of the ring within errpRingTable."
+              ::= { errpRingStatsEntry 1 }
+  
+    errpHealthTx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Health(or Hello) packets transmitted on this port."
+              ::= { errpRingStatsEntry 2 }
+              
+    errpHealthRx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Health(or Hello) packets received on this port."
+              ::= { errpRingStatsEntry 3 }
+              
+    errpCommonFlushTx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Common Flush packets transmitted on this port."
+              ::= { errpRingStatsEntry 4 }
+              
+    errpCommonFlushRx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Common Flush packets received on this port."
+              ::= { errpRingStatsEntry 5 }
+              
+    errpCompleteFlushTx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Complete Flush packets transmitted on this port."
+              ::= { errpRingStatsEntry 6 }
+              
+    errpCompleteFlushRx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Complete Flush packets received on this port."
+              ::= { errpRingStatsEntry 7 }
+              
+    errpLinkDownTx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Link Down packets transmitted on this port."
+              ::= { errpRingStatsEntry 8 }
+              
+    errpLinkDownRx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Link Down packets received on this port."
+              ::= { errpRingStatsEntry 9 }
+              
+    errpLinkUpTx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Link Up packets transmitted on this port."
+              ::= { errpRingStatsEntry 10 }
+              
+    errpLinkUpRx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Link Up packets received on this port."
+              ::= { errpRingStatsEntry 11 }
+              
+    errpEdgeHelloTx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Edge Hello packets transmitted on this port."
+              ::= { errpRingStatsEntry 12 }
+              
+    errpEdgeHelloRx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Edge Hello packets received on this port."
+              ::= { errpRingStatsEntry 13 }
+              
+    errpMajorFaultTx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Major Fault packets transmitted on this port."
+              ::= { errpRingStatsEntry 14 }
+              
+    errpMajorFaultRx OBJECT-TYPE
+              SYNTAX      Counter32
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION
+                          "A count of the number of Major Fault packets received on this port."
+              ::= { errpRingStatsEntry 15 }
+          
+    errpTrap      OBJECT IDENTIFIER ::= { errp 9 }
+    ----------------------------------------------------------------------------------
+    --ERRP TRAP MIB--
+    ----------------------------------------------------------------------------------
+                
+    errpRingNodeStateChange NOTIFICATION-TYPE
+    OBJECTS { errpNodeState }
+    STATUS  current
+    DESCRIPTION
+           "The node state in the ring  turns to health or fault.
+             health(1) means master node detects the ring in a health state.
+             fault(2) means master node detects the ring in a fault state."
+   	::= { errpTrap 1 }
+   	
+    errpPriComPortStateChange NOTIFICATION-TYPE
+    OBJECTS { errpPriComPortState }
+    STATUS  current
+    DESCRIPTION
+           "The primary port or common port state in the ring turns to disabled, forwarding, or blocking.
+             disabled(0) means port is link down.
+             forwarding(1) means port is in the forwarding state.
+             blocking(2) means port is in the blocking or discarding state."
+   	::= { errpTrap 2 }
+
+    errpSecEdgePortStateChange NOTIFICATION-TYPE
+    OBJECTS { errpSecEdgePortState }
+    STATUS  current
+    DESCRIPTION
+           "The secondary port or edge port state in the ring turns to disabled, forwarding, or blocking.
+             disabled(0) means port is link down.
+             forwarding(1) means port is in the forwarding state.
+             blocking(2) means port is in the blocking or discarding state."
+    ::= { errpTrap 3 }
+  END

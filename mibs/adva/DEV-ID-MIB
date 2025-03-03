@@ -1,0 +1,780 @@
+-- =======================================================================
+--  File        : dev-id.mib
+--  Description : Private MIB for Linux Router
+--  By          : Alex Rozin
+--  Supports information about device identifiaction
+
+-- Copyright (c) 2006 MRV.  All Rights Reserved.
+--
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.  This MRV SNMP MIB Specification
+-- embodies MRV's proprietary intellectual property.  MRV
+-- retains all title and ownership in the specification, including any
+-- revisions.
+--
+-- It is MRV's intent to encourage the widespread use of this
+-- specification in connection with the management of MRV's
+-- products. MRV grants vendor, end-users, and other interested
+-- parties a non-exclusive license to use this specification in
+-- connection with the management of MRV's products.
+--
+-- This specification is supplied "AS IS," and MRV makes no
+-- warranty, either express or implied, as to the use, operation,
+-- condition, or performance of the specification.
+--
+-- Copyright text courtesy of MRV
+--
+-- If you have any questions about this MIB, please call MRV
+-- Technical Support Center at 1-800-858-7815 from inside USA or
+-- 1-818-773-0900 from outside USA.
+--
+--
+-- MRV retains the right to change this MIB without notification.
+
+DEV-ID-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises,
+    Integer32                                    FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP              FROM SNMPv2-CONF
+    nbSwitchG1Il, nbase                          FROM OS-COMMON-TC-MIB
+    DisplayString                                FROM SNMPv2-TC;
+
+
+nbDevId  MODULE-IDENTITY
+    LAST-UPDATED "201609140000Z" -- 14 September 2016
+    ORGANIZATION "MRV Communications, Inc."
+    CONTACT-INFO
+        "Alex Rozin
+         MRV Communication, Inc
+         http://www.mrv.com
+         Email:  ARozin@mrv.com"
+    DESCRIPTION
+        "Supports information about device identifiaction."
+
+    -- Revision history
+
+    REVISION "201609140000Z" -- 14 September 2016
+    DESCRIPTION
+        "1. osNgBobk device family.
+         2. Drafts for nbDevIdOamFpgaInfo & nbDevIdPiggyInfo."
+
+    REVISION "201503240000Z" -- 24 March 2015
+    DESCRIPTION
+        "OIDs for OP-X series."
+
+    REVISION "201203190000Z" -- 19 March 2012
+    DESCRIPTION
+        "nbProducts and its sons."
+
+    REVISION "200602220000Z"
+    DESCRIPTION
+        "Initial edition."
+    ::= { nbSwitchG1Il 16 }
+
+-- ************************************************************
+-- MIB place Definition
+-- ************************************************************
+
+nbDevIdHardware        OBJECT IDENTIFIER ::= { nbDevId 4 }
+nbDevIdSoftware        OBJECT IDENTIFIER ::= { nbDevId 5 }
+nbDevIdConformance     OBJECT IDENTIFIER ::= { nbDevId 101 }
+nbDevIdHardwareSerial  OBJECT IDENTIFIER ::= { nbDevIdHardware 3 }
+nbDevIdOamFpgaInfo     OBJECT IDENTIFIER ::= { nbDevIdHardware 6 }
+nbDevIdPiggyInfo       OBJECT IDENTIFIER ::= { nbDevIdHardware 7 }
+nbDevIdUnitInfo        OBJECT IDENTIFIER ::= { nbDevIdHardware 10 }
+
+
+nbProducts             OBJECT IDENTIFIER ::= { nbase 22 }
+
+os9024v4CBase          OBJECT IDENTIFIER ::= { nbProducts 1 }
+os9024v4C              OBJECT IDENTIFIER ::= { os9024v4CBase  1 }
+os9048v4GBase          OBJECT IDENTIFIER ::= { nbProducts 2 }
+os9048v4G              OBJECT IDENTIFIER ::= { os9048v4GBase  1 }
+
+os9024vMBase           OBJECT IDENTIFIER ::= { nbProducts 4 }
+os9024vM               OBJECT IDENTIFIER ::= { os9024vMBase  1 }
+os9024Fv4GBase         OBJECT IDENTIFIER ::= { nbProducts 5 }
+os9024Fv4G             OBJECT IDENTIFIER ::= { os9024Fv4GBase  1 }
+os9012v10GBase         OBJECT IDENTIFIER ::= { nbProducts 6 }
+os9012v10G             OBJECT IDENTIFIER ::= { os9012v10GBase  1 }
+os9012vMBase           OBJECT IDENTIFIER ::= { nbProducts 7 }
+os9012vM               OBJECT IDENTIFIER ::= { os9012vMBase  1 }
+os910Base              OBJECT IDENTIFIER ::= { nbProducts 8 }
+os910                  OBJECT IDENTIFIER ::= { os910Base  1 }
+os912Base              OBJECT IDENTIFIER ::= { nbProducts 9 }
+os912                  OBJECT IDENTIFIER ::= { os912Base  1 }
+os9024M210GBase        OBJECT IDENTIFIER ::= { nbProducts 10 }
+os9024M210G            OBJECT IDENTIFIER ::= { os9024M210GBase  1 }
+
+
+os9052Base             OBJECT IDENTIFIER ::= { nbProducts 13 }
+os9052                 OBJECT IDENTIFIER ::= { os9052Base  1 }
+os9012M10GBase         OBJECT IDENTIFIER ::= { nbProducts 14 }
+os9012M10G             OBJECT IDENTIFIER ::= { os9012M10GBase  1 }
+os910MBase             OBJECT IDENTIFIER ::= { nbProducts 15 }
+os910M                 OBJECT IDENTIFIER ::= { os910MBase  1 }
+os930Base              OBJECT IDENTIFIER ::= { nbProducts 16 }
+os930                  OBJECT IDENTIFIER ::= { os930Base   1 }
+os904Base              OBJECT IDENTIFIER ::= { nbProducts 18 }
+os904                  OBJECT IDENTIFIER ::= { os904Base   1 }
+-- os904E              OBJECT IDENTIFIER ::= { os904Base   1 }
+-- os904EXT            OBJECT IDENTIFIER ::= { os904Base   1 }
+osOPN1600v8C2Base      OBJECT IDENTIFIER ::= { nbProducts 19 }
+osOPN1600v8C2          OBJECT IDENTIFIER ::= { osOPN1600v8C2Base  1 }
+-- reserve             OBJECT IDENTIFIER ::= { nbProducts 20 }
+-- reserve             OBJECT IDENTIFIER ::= { os927Base  1 }
+os912CBase             OBJECT IDENTIFIER ::= { nbProducts 21 }
+os912C                 OBJECT IDENTIFIER ::= { os912CBase  1 }
+os906CBase             OBJECT IDENTIFIER ::= { nbProducts 22 }
+os906C                 OBJECT IDENTIFIER ::= { os906CBase  1 }
+-- os906CE             OBJECT IDENTIFIER ::= { nbProducts  1 }
+-- os906CEXT           OBJECT IDENTIFIER ::= { nbProducts  1 }
+os9124Base             OBJECT IDENTIFIER ::= { nbProducts 23 }
+os9124                 OBJECT IDENTIFIER ::= { os9124Base  1 }
+osOPN1600v8S2Base      OBJECT IDENTIFIER ::= { nbProducts 24 }
+osOPN1600v8S2          OBJECT IDENTIFIER ::= { osOPN1600v8S2Base  1 }
+os904vMBHBase          OBJECT IDENTIFIER ::= { nbProducts 25 }
+os904vMBH              OBJECT IDENTIFIER ::= { os904vMBHBase  1 }
+os904vDSL4Base         OBJECT IDENTIFIER ::= { nbProducts 26 }
+os904vDSL4             OBJECT IDENTIFIER ::= { os904vDSL4Base  1 }
+os940Base              OBJECT IDENTIFIER ::= { nbProducts 27 }
+os940                  OBJECT IDENTIFIER ::= { os940Base  1 }
+os940MBase             OBJECT IDENTIFIER ::= { nbProducts 28 }
+os940M                 OBJECT IDENTIFIER ::= { os940MBase  1 }
+osOPN800v8S2Base       OBJECT IDENTIFIER ::= { nbProducts 29 }
+osOPN800v8S2           OBJECT IDENTIFIER ::= { osOPN800v8S2Base  1 }
+os904vMBH4Base         OBJECT IDENTIFIER ::= { nbProducts 30 }
+os904vMBH4             OBJECT IDENTIFIER ::= { os904vMBH4Base  1 }
+os9244Base             OBJECT IDENTIFIER ::= { nbProducts 31 }
+os9244                 OBJECT IDENTIFIER ::= { os9244Base  1 }
+os940RBase             OBJECT IDENTIFIER ::= { nbProducts 32 }
+os940R                 OBJECT IDENTIFIER ::= { os940RBase  1 }
+os940rTL               OBJECT IDENTIFIER ::= { os940R      1 }
+os606Base              OBJECT IDENTIFIER ::= { nbProducts 33 }
+os606                  OBJECT IDENTIFIER ::= { os606Base  1 }
+os904GBase             OBJECT IDENTIFIER ::= { nbProducts 34 }
+os904G                 OBJECT IDENTIFIER ::= { os904GBase  1 }
+
+os906GBase             OBJECT IDENTIFIER ::= { nbProducts 36 }
+
+   os906GShort         OBJECT IDENTIFIER ::= { os906GBase  1 }
+
+     os906GnotSync     OBJECT IDENTIFIER ::= { os906GShort    1 }
+       os906G          OBJECT IDENTIFIER ::= { os906GnotSync  1 }
+       os906GMbh       OBJECT IDENTIFIER ::= { os906GnotSync  2 }
+     os906GSync        OBJECT IDENTIFIER ::= { os906GShort    2 }
+       os906GS         OBJECT IDENTIFIER ::= { os906GSync     1 }
+       os906GSMbh      OBJECT IDENTIFIER ::= { os906GSync     2 }
+     
+   os906GLong          OBJECT IDENTIFIER ::= { os906GBase     2 }
+     os906GLnotSync    OBJECT IDENTIFIER ::= { os906GLong     1 }
+       os906GMB        OBJECT IDENTIFIER ::= { os906GLnotSync 1 }
+         os906GM       OBJECT IDENTIFIER ::= { os906GMB       1 }
+         os906GMe      OBJECT IDENTIFIER ::= { os906GMB       2 }
+       os906GMMbhB     OBJECT IDENTIFIER ::= { os906GLnotSync 2 }
+         os906GMMbh    OBJECT IDENTIFIER ::= { os906GMMbhB    1 }
+         os906GMMbhe   OBJECT IDENTIFIER ::= { os906GMMbhB    2 }
+     os906GLSync       OBJECT IDENTIFIER ::= { os906GLong     2 }
+       os906GMSB       OBJECT IDENTIFIER ::= { os906GLSync    1 }
+         os906GMS      OBJECT IDENTIFIER ::= { os906GMSB      1 }
+         os906GMSe     OBJECT IDENTIFIER ::= { os906GMSB      2 }
+       os906GMSMbhB    OBJECT IDENTIFIER ::= { os906GLSync    2 }
+         os906GMSMbh   OBJECT IDENTIFIER ::= { os906GMSMbhB   1 }
+         os906GMSMbhe  OBJECT IDENTIFIER ::= { os906GMSMbhB   2 }
+
+osNgBase               OBJECT IDENTIFIER ::= { nbProducts 37 }
+   osNgV20             OBJECT IDENTIFIER ::= { osNgBase  1 }    -- Bobcat2
+   osNgV8              OBJECT IDENTIFIER ::= { osNgBase  2 }    -- Bobcat2
+   osNgSimple          OBJECT IDENTIFIER ::= { osNgBase  3 }    -- Bobcat2
+     osNgV8m1          OBJECT IDENTIFIER ::= { osNgSimple  8 }  -- Bobcat2
+     osNgV20m1         OBJECT IDENTIFIER ::= { osNgSimple  20 } -- Bobcat2
+
+   osNgBobk            OBJECT IDENTIFIER ::= { osNgBase        4 }   -- C-Chip 
+     osNgBobkCetus     OBJECT IDENTIFIER ::= { osNgBobk        8 }
+       osNgBobkV8      OBJECT IDENTIFIER ::= { osNgBobkCetus   1 } 
+       osNgBobkV8m     OBJECT IDENTIFIER ::= { osNgBobkCetus   2 }   -- With slot for a module without FPGA
+       osNgBobkV8f     OBJECT IDENTIFIER ::= { osNgBobkCetus   3 }   -- With FPGA without slot for a module
+       osNgBobkV8mf    OBJECT IDENTIFIER ::= { osNgBobkCetus   4 }   -- With slot for a module and FPGA
+       osNgBobkV8h     OBJECT IDENTIFIER ::= { osNgBobkCetus   5 }   -- XG304H
+       osNgBobkV8hf    OBJECT IDENTIFIER ::= { osNgBobkCetus   6 }   -- XG304H With FPGA
+
+     osNgBobkCaelum    OBJECT IDENTIFIER ::= { osNgBobk       20 }
+       osNgBobkV20     OBJECT IDENTIFIER ::= { osNgBobkCaelum  1 } 
+       osNgBobkV20f    OBJECT IDENTIFIER ::= { osNgBobkCaelum  3 }   -- With FPGA 
+       osNgBobkV20h    OBJECT IDENTIFIER ::= { osNgBobkCaelum  5 }   -- XG308H
+       osNgBobkV20h    OBJECT IDENTIFIER ::= { osNgBobkCaelum  6 }   -- XG308H With FPGA
+
+   osNgBc2             OBJECT IDENTIFIER ::= { osNgBase        5 }   -- Bobcat2
+     osNgBc2p52        OBJECT IDENTIFIER ::= { osNgBc2        52 }   -- 52 ports
+       osXG312         OBJECT IDENTIFIER ::= { osNgBc2p52      1 }   -- Without FPGA
+       osXG312f        OBJECT IDENTIFIER ::= { osNgBc2p52      3 }   -- With FPGA
+
+
+-- ************************************************************
+-- OS-DM products
+-- ************************************************************
+osDmBase                   OBJECT IDENTIFIER ::= { nbProducts     80 }
+
+  osDmIPoe                 OBJECT IDENTIFIER ::= { osDmBase        1 }    
+
+    osDmIPoe1g             OBJECT IDENTIFIER ::= { osDmIPoe        1 }    
+
+      osDmIPoe1gMrv        OBJECT IDENTIFIER ::= { osDmIPoe1g      1 }    
+
+      osDmIPoe1gRb         OBJECT IDENTIFIER ::= { osDmIPoe1g      2 }    
+        osDmIPoe1gRb6      OBJECT IDENTIFIER ::= { osDmIPoe1gRb    6 }    
+          osDmIPoe1gRb6p4  OBJECT IDENTIFIER ::= { osDmIPoe1gRb6   4 }    
+        osDmIPoe1gRb8      OBJECT IDENTIFIER ::= { osDmIPoe1gRb    8 }    
+          osDmIPoe1gRb8p6  OBJECT IDENTIFIER ::= { osDmIPoe1gRb8   6 }    
+        osDmIPoe1gRb10     OBJECT IDENTIFIER ::= { osDmIPoe1gRb   10 }    
+          osDmIPoe1gRb10p8 OBJECT IDENTIFIER ::= { osDmIPoe1gRb10  8 }    
+
+    osDmIPoe10g            OBJECT IDENTIFIER ::= { osDmIPoe       10 }    
+
+  osDmINonPoe              OBJECT IDENTIFIER ::= { osDmBase        2 }    
+
+  osDmCEth                 OBJECT IDENTIFIER ::= { osDmBase        3 }    
+
+-- ************************************************************
+-- OP-X products
+-- ************************************************************
+nbOpx                  OBJECT IDENTIFIER ::= { nbProducts 100 }
+opx1                   OBJECT IDENTIFIER ::= { nbOpx 1 }
+opx4                   OBJECT IDENTIFIER ::= { nbOpx 4 }
+ciscoStackMakerConf    OBJECT IDENTIFIER ::= { enterprises cisco(9) ciscoMgmt(9) ciscoStackMakerMIB(59) ciscoStackMakerMIBObjects(1) 1 }
+
+-- ************************************************************
+-- Textual conventions
+-- ************************************************************
+
+
+-- ************************************************************
+-- Product Name
+-- ************************************************************
+nbDevIdTypeName                OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the device type, for example 'OptiSwitch 9024-4C'."
+    ::= { nbDevId 1 }
+
+nbDevIdSysName                 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "An administratively-assigned name for this managed node.
+            By convention, this is the node's fully-qualified domain
+            name.  If the name is unknown, the value is the zero-length
+            string. See also sysName=mib-2.system.5"
+    ::= { nbDevId 2 }
+
+nbDevIdBaseMAC                 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Base MAC address."
+    ::= { nbDevId 3 }
+
+-- ************************************************************
+-- Hardware
+-- ************************************************************
+
+nbDevIdHardwareVersion         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hardware version."
+    ::= { nbDevIdHardware 2 }
+    
+nbDevIdHardwareSubVersion         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hardware sub version."
+    ::= { nbDevIdHardware 8 }
+
+nbDevIdHardwareVersionString      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hardware version string."
+    ::= { nbDevIdHardware 9 }
+
+
+nbDevIdHardwareSerialBoard     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Board serial number."
+    ::= { nbDevIdHardwareSerial 1 }
+
+nbDevIdHardwareSerialUnit      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unit serial number."
+    ::= { nbDevIdHardwareSerial 2 }
+
+nbDevIdHardwareCpuNumber       OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of CPUs."
+    ::= { nbDevIdHardware 4 }
+
+nbDevIdCpuTable                OBJECT-TYPE
+    SYNTAX       SEQUENCE OF NbDevIdCpuEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "List of supported standard MIBs."
+    ::= { nbDevIdHardware 5 }
+
+nbDevIdCpuEntry                OBJECT-TYPE
+    SYNTAX       NbDevIdCpuEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "."
+
+    INDEX       { nbDevIdCpuIndex }
+
+    ::= { nbDevIdCpuTable 1 }
+
+NbDevIdCpuEntry ::= SEQUENCE {
+                              nbDevIdCpuIndex      Integer32,
+                              nbDevIdCpuSerial     DisplayString,
+                              nbDevIdCpuDescr      DisplayString
+                             }
+
+nbDevIdCpuIndex              OBJECT-TYPE
+    SYNTAX       Integer32 (1..2147483647)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "1-base index of CPU entry."
+    ::= { nbDevIdCpuEntry 1 }
+
+nbDevIdCpuSerial              OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "CPU serial number."
+    ::= { nbDevIdCpuEntry 4 }
+
+nbDevIdCpuDescr               OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "CPU description, let's say
+         'MPC8245, 266MHz with 64MB flash and 128MB Dram memory'."
+    ::= { nbDevIdCpuEntry 9 }
+
+
+
+nbDevIdOamFpgaNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of OAM FPGAs. If the agent return 0 or error <<No Such Object available on this agent>>,
+        then the table is empty."
+    ::= { nbDevIdOamFpgaInfo 1 }
+
+nbDevIdOamFpgaTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF NbDevIdOamFpgaEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "List of OAM FPGA."
+    ::= { nbDevIdOamFpgaInfo 2 }
+
+nbDevIdOamFpgaEntry OBJECT-TYPE
+    SYNTAX       NbDevIdOamFpgaEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Entry of nbDevIdOamFpgaTable."
+
+    INDEX       { nbDevIdOamFpgaIndex }
+
+    ::= { nbDevIdOamFpgaTable 1 }
+
+NbDevIdOamFpgaEntry ::= SEQUENCE {
+                              nbDevIdOamFpgaIndex      Integer32,
+                              nbDevIdOamFpgaType       INTEGER,
+                              nbDevIdOamFpgaVersion    Integer32,
+                              nbDevIdOamFpgaDescr      DisplayString
+                             }
+
+nbDevIdOamFpgaIndex OBJECT-TYPE
+    SYNTAX       Integer32 (1..2147483647)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "1-based index of entry."
+    ::= { nbDevIdOamFpgaEntry 1 }
+
+nbDevIdOamFpgaType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                      unknown                 (1),
+                      oam1GFpga               (2)
+                    }
+
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Type of the entity."
+    ::= { nbDevIdOamFpgaEntry 3 }
+
+nbDevIdOamFpgaVersion OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Numerical version of the entity."
+    ::= { nbDevIdOamFpgaEntry 4 }
+
+nbDevIdOamFpgaDescr OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Description of the entity."
+    ::= { nbDevIdOamFpgaEntry 9 }
+
+
+nbDevIdPiggyNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Piggy modules. If the agent return 0 or error <<No Such Object available on this agent>>,
+        then the table is empty."
+    ::= { nbDevIdPiggyInfo 1 }
+
+nbDevIdPiggyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF NbDevIdPiggyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "List of Piggy modules."
+    ::= { nbDevIdPiggyInfo 2 }
+
+nbDevIdPiggyEntry OBJECT-TYPE
+    SYNTAX       NbDevIdPiggyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Entry of nbDevIdPiggyTable."
+
+    INDEX       { nbDevIdPiggyIndex }
+
+    ::= { nbDevIdPiggyTable 1 }
+
+NbDevIdPiggyEntry ::= SEQUENCE {
+                              nbDevIdPiggyIndex      Integer32,
+                              nbDevIdPiggyType       INTEGER,
+                              nbDevIdPiggyVersion    Integer32,
+                              nbDevIdPiggyDescr      DisplayString
+                             }
+
+nbDevIdPiggyIndex OBJECT-TYPE
+    SYNTAX       Integer32 (1..2147483647)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "1-based index of entry."
+    ::= { nbDevIdPiggyEntry 1 }
+
+nbDevIdPiggyType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                      unknown                 (1),
+                      dryContactOnly          (2)
+                    }
+
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Type of the entity."
+    ::= { nbDevIdPiggyEntry 3 }
+
+nbDevIdPiggyVersion OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Numerical version of the entity."
+    ::= { nbDevIdPiggyEntry 4 }
+
+nbDevIdPiggyDescr OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Description of the entity."
+    ::= { nbDevIdPiggyEntry 9 }
+    
+    
+nbDevIdUnitInfoName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unit name."
+    ::= { nbDevIdUnitInfo 1 }
+
+nbDevIdUnitInfoPartNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unit part number."
+    ::= { nbDevIdUnitInfo 2 }
+    
+nbDevIdUnitInfoManufacturer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unit manufacturer name."
+    ::= { nbDevIdUnitInfo 3 }
+
+nbDevIdUnitInfoManufactureSite OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unit manufacturer site."
+    ::= { nbDevIdUnitInfo 4 }
+    
+nbDevIdUnitInfoManufactureDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unit manufacturer date"
+    ::= { nbDevIdUnitInfo 5 }
+
+-- ************************************************************
+-- Software
+-- ************************************************************
+
+nbDevIdSoftwareMasterOSVers    OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Software version description, let's say '1_0_6'."
+    ::= { nbDevIdSoftware 1 }
+
+nbDevIdSoftwareBuildTime       OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Build time, for example: Tue Jun 14 23:03:09 IDT 2005."
+    ::= { nbDevIdSoftware 2 }
+
+-- ************************************************************
+-- nbDevIdMibTable
+-- ************************************************************
+
+nbDevIdMibTable                OBJECT-TYPE
+    SYNTAX       SEQUENCE OF NbDevIdMibEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "List of supported standard MIBs."
+    ::= { nbDevIdSoftware 3 }
+
+nbDevIdMibEntry                OBJECT-TYPE
+    SYNTAX       NbDevIdMibEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "."
+
+    INDEX       { nbDevIdMibStdName }
+
+    ::= { nbDevIdMibTable 1 }
+
+NbDevIdMibEntry ::= SEQUENCE {
+                              nbDevIdMibStdName    DisplayString,
+                              nbDevIdMibName       DisplayString,
+                              nbDevIdMibTitle      DisplayString,
+                              nbDevIdMibNote       DisplayString
+                             }
+
+nbDevIdMibStdName              OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(3..32))
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Name of the standart, like RFC2819."
+    ::= { nbDevIdMibEntry 1 }
+
+nbDevIdMibName                 OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(3..32))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Name of the MIB, like RMON-MIB."
+    ::= { nbDevIdMibEntry 2 }
+
+nbDevIdMibTitle                OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Title of standart, like 
+         'Remote Network Monitoring Management Information Base'."
+    ::= { nbDevIdMibEntry 5 }
+
+nbDevIdMibNote                 OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Note about level of support on the current device."
+    ::= { nbDevIdMibEntry 8 }
+
+nbDevIdFirmware                OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Firmware version."
+    ::= { nbDevId 6 }
+
+nbDevIdFpgaHwVers           OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "FPGA Hardware Version name."
+    ::= { nbDevId 7 }
+
+nbDevIdFpgaSwVers    OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FPGA Software version."
+    ::= { nbDevId 8 }
+    
+nbDevIdBrandId    OBJECT-TYPE
+    SYNTAX  INTEGER {
+                      unknown                 (1),
+                      mrv	                  (2),
+                      adva					  (3)
+                    }    
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Product brand id"
+    ::= { nbDevId 9 }
+
+nbDevIdModuleInfo    OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Module Hardware information"
+    ::= { nbDevId 10 }
+
+csmStackName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "For TELSTA: fetched from CISCO-STACKMAKER-MIB .
+         <<A descriptive string used by the network administrator
+         one stack at any given time. If this entry is empty,
+         the device is not a member of a stack.
+         Changing the value of this object will move the device
+         to a different stack. If the value is cleared, the device
+         is no longer a member of any stack.>>"
+    ::= { ciscoStackMakerConf 1 }
+
+-- ******************************************************************* 
+--  Conformance Information 
+-- ******************************************************************* 
+ 
+nbDevIdMIBCompliances  OBJECT IDENTIFIER ::= { nbDevIdConformance 1 }
+nbDevIdMIBGroups       OBJECT IDENTIFIER ::= { nbDevIdConformance 2 }
+
+nbDevIdMIBCompliance MODULE-COMPLIANCE
+    STATUS current 
+    DESCRIPTION 
+        "The core compliance statement for all 'nbDevId' MIB implementations."
+    MODULE -- this module 
+     
+        MANDATORY-GROUPS { 
+                          nbDevIdGroup
+                         } 
+        GROUP nbDevIOptionaldGroup
+        DESCRIPTION 
+        "."
+    ::= { nbDevIdMIBCompliances 1 }
+ 
+-- ................................................................... 
+-- Conformance Groups 
+-- ................................................................... 
+ 
+nbDevIdGroup  OBJECT-GROUP
+    OBJECTS { 
+             nbDevIdTypeName,
+             nbDevIdSysName,
+             nbDevIdBaseMAC,
+             nbDevIdHardwareVersion,
+             nbDevIdHardwareSubVersion,
+             nbDevIdHardwareVersionString,
+             nbDevIdHardwareSerialBoard,
+             nbDevIdHardwareSerialUnit,
+             nbDevIdOamFpgaNumber,
+             nbDevIdOamFpgaType, nbDevIdOamFpgaVersion, nbDevIdOamFpgaDescr,
+             nbDevIdPiggyNumber,
+             nbDevIdPiggyType, nbDevIdPiggyVersion, nbDevIdPiggyDescr,
+             nbDevIdSoftwareMasterOSVers,
+             nbDevIdSoftwareBuildTime,
+             nbDevIdHardwareCpuNumber,
+             nbDevIdCpuSerial,
+             nbDevIdCpuDescr,
+             csmStackName,
+             nbDevIdBrandId,
+             nbDevIdModuleInfo,
+             nbDevIdUnitInfoName, nbDevIdUnitInfoPartNumber, nbDevIdUnitInfoManufacturer,
+             nbDevIdUnitInfoManufactureSite, nbDevIdUnitInfoManufactureDate
+            } 
+    STATUS current 
+    DESCRIPTION 
+        "Mandatory objects for grouping of Device Id parameters."
+    ::= { nbDevIdMIBGroups 1 }
+ 
+
+nbDevIOptionaldGroup  OBJECT-GROUP
+    OBJECTS { 
+             nbDevIdMibName,
+             nbDevIdMibTitle,
+             nbDevIdMibNote,
+             nbDevIdFirmware,
+             nbDevIdFpgaHwVers,
+             nbDevIdFpgaSwVers
+            } 
+    STATUS current
+    DESCRIPTION 
+        "Optional objects for grouping of Device Id parameters."
+    ::= { nbDevIdMIBGroups 2 }
+
+
+END

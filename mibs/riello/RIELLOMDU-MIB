@@ -1,0 +1,386 @@
+-- RPS S.p.A enterprise MIB definition
+
+-- Copyright (c) RPS S.p.A.
+-- Version: 1.0 by Michele Marcon
+-- Date: 1.04.2016
+
+-- Title: RIELLOMDU-MIB
+
+-- MDU-MIB { iso org(3) dod(6) internet(1) private(4)
+-- enterprises(1) riello(5491) }
+
+-- ************************************************************************
+-- ************************************************************************
+
+RIELLOMDU-MIB DEFINITIONS ::= BEGIN
+   
+IMPORTS
+     DisplayString
+         FROM RFC1213-MIB
+     OBJECT-TYPE
+         FROM RFC-1212
+     TRAP-TYPE
+         FROM RFC-1215
+     rielloMIB
+             FROM RIELLO-MIB;
+
+mduMIB              OBJECT IDENTIFIER ::= { rielloMIB 11 }
+                                    
+mduIdent              OBJECT IDENTIFIER ::= { mduMIB 1 }
+
+mduIdentManufacturer OBJECT-TYPE
+    SYNTAX     DisplayString
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The name of the mdu manufacturer."
+    ::= { mduIdent 1 }
+
+mduIdentModel OBJECT-TYPE
+    SYNTAX     DisplayString 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mdu Model designation."
+    ::= { mduIdent 2 }
+
+mduIdentSoftwareVersion OBJECT-TYPE
+    SYNTAX     DisplayString 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mdu Software version."
+    ::= { mduIdent 3 }
+
+mduIdentIOConfiguration OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mdu input/output configuration (1 for Mono/mono, 4 for Tri/tri)."
+    ::= { mduIdent 4 }
+
+mduIdentInputSockets OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of mdu input sockets."
+    ::= { mduIdent 5 }
+
+mduIdentOutputSockets OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of mdu output sockets."
+    ::= { mduIdent 6 }
+
+mduIdentNominalCurrent OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mdu nominal current (A)."
+    ::= { mduIdent 7 }
+
+mduIdentNominalVoltage OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mdu nominal voltage (V)."
+    ::= { mduIdent 8 }
+
+mduIdentNominalFrequency OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mdu nominal frequency (0.1 Hz)."
+    ::= { mduIdent 9 }
+
+mduStatus             OBJECT IDENTIFIER ::= { mduMIB 2 }
+
+mduLineAFrequency OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The frequency of source A (0.1 Hz)."
+    ::= { mduStatus 1 }
+
+mduLineAVoltage OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The voltage of source 1 (V)."
+    ::= { mduStatus 2 }
+
+mduLineACurrent OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The current of line A (0.1 A)."
+    ::= { mduStatus 3 }
+
+mduOutput OBJECT-TYPE
+    SYNTAX  SEQUENCE OF MduOutputSockets
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of output table entries."
+    ::= { mduStatus  4 }
+
+mduOutputSockets OBJECT-TYPE
+    SYNTAX  MduOutputSockets
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+               particular output line."
+    INDEX   { mduOutputLineIndex }
+    ::= { mduOutput  1 }
+        
+        
+MduOutputSockets ::=
+    SEQUENCE {
+        mduOutputLineIndex
+            INTEGER,
+                        
+        mduOutputCurrent
+            INTEGER,
+
+        mduOutputDisabled
+            INTEGER,
+
+        mduOutputOverload
+            INTEGER,
+                        
+        mduOutputStatus
+            INTEGER
+    }
+
+mduOutputLineIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..2147483647)
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "The line identifier."
+    ::= { mduOutputSockets  1 }       
+
+mduOutputCurrent OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "Output current (0.1 A)"
+    ::= { mduOutputSockets 2 }
+
+mduOutputDisabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+    no(1),
+    yes(2)
+}
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1->line active, 2->line deactivated"
+    ::= { mduOutputSockets 3 }
+        
+mduOutputOverload OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1->line ok, 2->line deactivated for overload"
+    ::= { mduOutputSockets 4 }
+
+mduOutputStatus OBJECT-TYPE
+    SYNTAX     INTEGER{
+		   off(0),
+           on(1),
+           shutdownActive(2),
+           shutdownImminent(3),
+           restoreActive(4),
+           overload(5),
+           locked(6)
+	}
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "0=OFF
+			1=ON
+			2= Shutdown active (when a CS or a CR command is received but shutdown is not yet been executed and the "Imminent time" is not reached)
+			3= Shutdown imminent (S01 ÷ S08 code)
+			4= Restore active (when after that a CR command is received and the shutdown has been acted but the restore delay time is not expired)
+			5= Overload alarm (F01 ÷ F08 code)
+			6= Locked: OFF for overload (L01 ÷ L08 code)"
+    ::= { mduOutputSockets 5 }
+
+mduLowInputVoltage OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mduStatus 5 }
+
+mduHighInputVoltage OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mduStatus 6 }
+
+mduLowInputCurrent OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mduStatus 7 }
+
+mduHighInputCurrent OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mduStatus 8 }
+
+mduPowerFailAux1 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mduStatus 9 }
+
+mduPowerFailAux2 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mduStatus 10 }
+
+mduManualBypass OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= on manual bypass, 0= no."
+    ::= { mduStatus 11 }
+
+mduTemperature OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The temperature (°C)."
+    ::= { mduStatus 12 }
+
+mduCommand             OBJECT IDENTIFIER ::= { mduMIB 3 }     
+        
+mduCommandCode OBJECT-TYPE
+    SYNTAX  INTEGER {
+           shutdown(1),
+           restore(2),
+           commandDelete(3),
+           testPanel(22)
+    }
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "This object determines the nature of the action to be
+             taken at the time when the countdown of the
+             mduShutdownDelay and mduRestoreDelay objects reaches zero.
+             Setting this object to shutdown(1) indicates that
+             the specified sockets mduOutputSocketApplyCommand will yurn off.
+             Setting this object to restore(2) indicates that the specified output
+             sockets will turn on.
+             command delete(3) will delete the applied command, test panel will perform
+             a test of LCD panel and audible alarm"
+    ::= { mduCommand 1 }
+        
+mduShutdownDelay OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "Setting this object will shutdown (i.e., turn off)
+             either the MDU output socket by the value of mduCommandCode
+             at the time of shutdown after the indicated number of seconds.
+             Setting this object to 0 will cause the shutdown to occur
+             immediately"
+    ::= { mduCommand 2 }
+        
+mduRestoreDelay OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "The restore delay."
+    ::= { mduCommand 3 }
+        
+mduOutputSocketApplyCommand OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+            "Specify the socket to apply the command, the value 0 apply to all sockets."
+    ::= { mduCommand 4 }
+        
+mduCommandResult OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The command result, refer to the follow codes:
+             0+mduCommandCode Command in progress
+             256+mduCommandCode Wrong Command code
+             512+mduCommandCode Command is not handled
+             768+mduCommandCode Parameter out of range
+             3584+mduCommandCode Command sent to MDU
+             3840+mduCommandCode Command executed"
+    ::= { mduCommand 5 }
+        
+mduTraps OBJECT IDENTIFIER ::= { mduMIB 4 }
+
+   -- This section defines the well-known notifications sent by
+   -- MDU agents.
+   -- Care must be taken to insure that no particular notification
+   -- is sent to a single receiving entity more often than once
+   -- every minute.
+
+mduNormal TRAP-TYPE
+       ENTERPRISE  mduTraps
+       DESCRIPTION "This trap is sent when MDU is on normal status"
+       ::= 1
+
+mduAnomaly TRAP-TYPE
+       ENTERPRISE  mduTraps
+       DESCRIPTION "This trap is sent when MDU is has some anomaly and is resent every minute"
+       ::= 2
+           
+mduFault TRAP-TYPE
+       ENTERPRISE  mduTraps
+       DESCRIPTION "This trap is sent when MDU is has some fault and is resent every minute"
+       ::= 3
+
+mduLock TRAP-TYPE
+       ENTERPRISE  mduTraps
+       DESCRIPTION "This trap is sent when MDU is locked and is resent every minute"
+       ::= 4
+
+mduManualBypassEnabled TRAP-TYPE
+       ENTERPRISE  mduTraps
+       DESCRIPTION "This trap is sent when MDU is on manual bypass and is resent every minute"
+       ::= 5
+           
+END
+

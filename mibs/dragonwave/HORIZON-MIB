@@ -1,0 +1,32 @@
+
+-- File Name : horizon-MIB.mib
+-- Version    : 1.02.00
+-- Date        : July 13, 2011
+-- Author     : DragonWave Inc.
+
+HORIZON-MIB	DEFINITIONS ::= BEGIN
+         IMPORTS
+                  OBJECT-TYPE
+                      FROM RFC-1212
+                  enterprises
+                      FROM RFC1155-SMI;	          
+ 
+
+
+	dragonwave	OBJECT IDENTIFIER
+		::=  {  enterprises  7262  }
+
+      horizon 		OBJECT IDENTIFIER
+         ::= { dragonwave 2 }  
+         
+--
+-- Node definitions
+--
+ 	hzSystemType	OBJECT-TYPE	
+		SYNTAX			INTEGER  { odu( 1 ) , idu( 2 ) , quantum( 3 ), hcp(4)} 
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"The current type of the system. "
+				::=  {  horizon  1  }
+  	
+END

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" id="svg2" viewBox="0 0 113.362 113.386" xmlns="http://www.w3.org/2000/svg">
+  <defs id="defs6">
+    <clipPath clipPathUnits="userSpaceOnUse" id="clipPath24">
+      <path d="M 0,85.039 H 287.978 V 0 H 0 Z" id="path22"/>
+    </clipPath>
+  </defs>
+  <g id="g8" transform="matrix(1.3333333,0,0,-1.3333333,0,113.38587)">
+    <g id="g10" transform="translate(18.6021,85.0392)">
+      <path d="m 0,0 v -18.602 h 47.835 v -47.835 h 18.602 v 39.863 L 39.863,0 Z" style="fill:#de3c06;fill-opacity:1;fill-rule:nonzero;stroke:none" id="path12"/>
+    </g>
+    <g id="g14" transform="translate(0,66.4371)">
+      <path d="m 0,0 v -39.862 l 26.575,-26.575 h 39.862 v 18.602 H 18.602 l 0,47.835 z" style="fill:#de3c06;fill-opacity:1;fill-rule:nonzero;stroke:none" id="path16"/>
+    </g>
+    <g id="g18">
+      <g id="g20" clip-path="url(#clipPath24)">
+        <g id="g26" transform="translate(105.6001,16.5099)"/>
+        <g id="g30" transform="translate(115.7046,15.882)"/>
+        <g id="g34" transform="translate(121.2124,18.5988)"/>
+        <g id="g38" transform="translate(129.0444,18.4718)"/>
+        <g id="g42" transform="translate(133.0034,17.5705)"/>
+        <g id="g48" transform="translate(145.4292,16.0851)"/>
+        <g id="g52" transform="translate(147.9282,15.4435)"/>
+        <g id="g56" transform="translate(164.0229,16.0851)"/>
+        <g id="g60" transform="translate(170.6294,15.882)"/>
+        <g id="g64" transform="translate(174.4555,17.6017)"/>
+        <g id="g68" transform="translate(182.4204,18.4084)"/>
+        <g id="g72" transform="translate(190.6137,13.1906)"/>
+        <g id="g76" transform="translate(196.4331,17.5705)"/>
+        <g id="g80" transform="translate(200.1831,21.3156)"/>
+        <g id="g84" transform="translate(209.1694,15.8117)"/>
+        <g id="g88" transform="translate(225.5376,16.1037)"/>
+        <g id="g92" transform="translate(228.0366,15.4435)"/>
+        <g id="g96" transform="translate(240.477,15.4377)"/>
+        <g id="g100" transform="translate(248.1616,15.882)"/>
+        <g id="g104" transform="translate(258.3598,15.882)"/>
+        <g id="g108" transform="translate(261.4497,15.4435)"/>
+        <g id="g112" transform="translate(271.3696,15.8117)"/>
+        <g id="g116" transform="translate(278.9917,18.4718)"/>
+        <g id="g120" transform="translate(140.0239,48.6558)"/>
+        <g id="g124" transform="translate(164.9936,29.563)"/>
+        <g id="g128" transform="translate(195.603,40.4732)"/>
+        <g id="g132" transform="translate(214.4682,40.2876)"/>
+        <g id="g136" transform="translate(242.0542,41.5123)"/>
+        <g id="g140" transform="translate(254.9995,40.4732)"/>
+        <g id="g144" transform="translate(273.8647,40.2876)"/>
+        <g id="g148" transform="translate(283.5101,53.9907)"/>
+        <g id="g152" transform="translate(116.3716,35.7789)"/>
+      </g>
+    </g>
+  </g>
+</svg>

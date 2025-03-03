@@ -3,30 +3,34 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'bind';
-$app_id = $app['app_id'];
 
-echo " $name";
-
-if (!empty($agent_data['app'][$name])) {
+if (! empty($agent_data['app'][$name])) {
     $bind = $agent_data['app'][$name];
 } else {
-    $options = '-O qv';
-    $mib     = 'NET-SNMP-EXTEND-MIB';
-    $oid     = 'nsExtendOutputFull.4.98.105.110.100';
-    $bind    = snmp_get($device, $oid, $options, $mib);
+    $options = '-Oqv';
+    $mib = 'NET-SNMP-EXTEND-MIB';
+    $oid = 'nsExtendOutputFull.4.98.105.110.100';
+    $bind = snmp_get($device, $oid, $options, $mib);
 }
-update_application($app, $bind);
 
-list ($incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets) = explode("\n", $bind);
+$bind_data = explode("\n", $bind);
+if (count($bind_data) !== 8) {
+    echo " Incorrect number of datapoints returned from device, skipping\n";
+
+    return;
+}
+
+[$incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets] = $bind_data;
 
 //
 // INCOMING PROCESSING
 //
-list ($a, $aaaa, $afsdb, $apl, $caa, $cdnskey, $cds, $cert, $cname, $dhcid, $dlv, $dnskey, $ds, $ipseckey, $key, $kx,
+[$a, $aaaa, $afsdb, $apl, $caa, $cdnskey, $cds, $cert, $cname, $dhcid, $dlv, $dnskey, $ds, $ipseckey, $key, $kx,
     $loc, $mx, $naptr, $ns, $nsec, $nsec3, $nsec3param, $ptr, $rrsig, $rp, $sig, $soa, $srv, $sshfp, $ta, $tkey, $tlsa,
-    $tsig, $txt, $uri, $dname, $any, $axfr, $ixfr, $opt, $spf) = explode(',', $incoming);
+    $tsig, $txt, $uri, $dname, $any, $axfr, $ixfr, $opt, $spf] = explode(',', $incoming);
 
-$rrd_name = array('app', $name, $app_id);
+$metrics = [];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('any', 'DERIVE', 0)
     ->addDataset('a', 'DERIVE', 0)
@@ -39,23 +43,24 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('srv', 'DERIVE', 0)
     ->addDataset('spf', 'DERIVE', 0);
 
-$fields = array(
-    'any'   => $any,
-    'a'     => $a,
-    'aaaa'  => $aaaa,
+$fields = [
+    'any' => $any,
+    'a' => $a,
+    'aaaa' => $aaaa,
     'cname' => $cname,
-    'mx'    => $mx,
-    'ns'    => $ns,
-    'ptr'   => $ptr,
-    'soa'   => $soa,
-    'srv'   => $srv,
-    'spf'   => $spf,
-);
+    'mx' => $mx,
+    'ns' => $ns,
+    'ptr' => $ptr,
+    'soa' => $soa,
+    'srv' => $srv,
+    'spf' => $spf,
+];
+$metrics['queries'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'incoming', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
-$rrd_name = array('app', $name, $app_id, 'incoming');
+$rrd_name = ['app', $name, $app->app_id, 'incoming'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('afsdb', 'DERIVE', 0)
     ->addDataset('apl', 'DERIVE', 0)
@@ -90,7 +95,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('ixfr', 'DERIVE', 0)
     ->addDataset('opt', 'DERIVE', 0);
 
-$fields = array(
+$fields = [
     'afsdb' => $afsdb,
     'apl' => $apl,
     'caa' => $caa,
@@ -123,19 +128,20 @@ $fields = array(
     'axfr' => $axfr,
     'ixfr' => $ixfr,
     'opt' => $opt,
-);
+];
+$metrics['incoming'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'incoming_extended', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // OUTGOING PROCESSING
 //
-list ($a, $aaaa, $afsdb, $apl, $caa, $cdnskey, $cds, $cert, $cname, $dhcid, $dlv, $dnskey, $ds, $ipseckey, $key, $kx,
+[$a, $aaaa, $afsdb, $apl, $caa, $cdnskey, $cds, $cert, $cname, $dhcid, $dlv, $dnskey, $ds, $ipseckey, $key, $kx,
     $loc, $mx, $naptr, $ns, $nsec, $nsec3, $nsec3param, $ptr, $rrsig, $rp, $sig, $soa, $srv, $sshfp, $ta, $tkey, $tlsa,
-    $tsig, $txt, $uri, $dname, $any, $axfr, $ixfr, $opt, $spf) = explode(',', $outgoing);
+    $tsig, $txt, $uri, $dname, $any, $axfr, $ixfr, $opt, $spf] = explode(',', $outgoing);
 
-$rrd_name = array('app', $name, $app_id, 'outgoing');
+$rrd_name = ['app', $name, $app->app_id, 'outgoing'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('any', 'DERIVE', 0)
     ->addDataset('a', 'DERIVE', 0)
@@ -180,17 +186,17 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('ixfr', 'DERIVE', 0)
     ->addDataset('opt', 'DERIVE', 0);
 
-$fields = array(
-    'any'   => $any,
-    'a'     => $a,
-    'aaaa'  => $aaaa,
+$fields = [
+    'any' => $any,
+    'a' => $a,
+    'aaaa' => $aaaa,
     'cname' => $cname,
-    'mx'    => $mx,
-    'ns'    => $ns,
-    'ptr'   => $ptr,
-    'soa'   => $soa,
-    'srv'   => $srv,
-    'spf'   => $spf,
+    'mx' => $mx,
+    'ns' => $ns,
+    'ptr' => $ptr,
+    'soa' => $soa,
+    'srv' => $srv,
+    'spf' => $spf,
     'afsdb' => $afsdb,
     'apl' => $apl,
     'caa' => $caa,
@@ -223,18 +229,19 @@ $fields = array(
     'axfr' => $axfr,
     'ixfr' => $ixfr,
     'opt' => $opt,
-);
+];
+$metrics['outgoing'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'outgoing', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // SERVER PROCESSING
 //
-list ($i4rr, $i6rr, $rwer, $trr, $aqr, $rqr, $rs, $trs, $rwes, $qrisa, $qriaa, $qrinaa, $qrin, $qris, $qrind,
-    $qcr, $dqr, $oqf, $uqr, $tqr, $oeor, $qd) = explode(',', $server);
+[$i4rr, $i6rr, $rwer, $trr, $aqr, $rqr, $rs, $trs, $rwes, $qrisa, $qriaa, $qrinaa, $qrin, $qris, $qrind,
+    $qcr, $dqr, $oqf, $uqr, $tqr, $oeor, $qd] = explode(',', $server);
 
-$rrd_name = array('app', $name, $app_id, 'server');
+$rrd_name = ['app', $name, $app->app_id, 'server'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('i4rr', 'DERIVE', 0)
     ->addDataset('i6rr', 'DERIVE', 0)
@@ -259,7 +266,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('oeor', 'DERIVE', 0)
     ->addDataset('qd', 'DERIVE', 0);
 
-$fields = array(
+$fields = [
     'i4rr' => $i4rr,
     'i6rr' => $i6rr,
     'rwer' => $rwer,
@@ -282,19 +289,20 @@ $fields = array(
     'tqr' => $tqr,
     'oeor' => $oeor,
     'qd' => $qd,
-);
+];
+$metrics['server'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'server', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // RESOLVER PROCESSING
 //
-list ($i4qs, $i6qs, $i4rr, $i6rr, $nr, $sr, $fr, $eqf, $trr, $ldr, $qr, $qt, $i4naf, $i6naf,
+[$i4qs, $i6qs, $i4rr, $i6rr, $nr, $sr, $fr, $eqf, $trr, $ldr, $qr, $qt, $i4naf, $i6naf,
     $i4naff, $i6naff, $rttl10, $rtt10t100, $rtt100t500, $rtt500t800, $rtt800t1600, $rttg1600,
-    $bs, $rr) = explode(',', $resolver);
+    $bs, $rr] = explode(',', $resolver);
 
-$rrd_name = array('app', $name, $app_id, 'resolver');
+$rrd_name = ['app', $name, $app->app_id, 'resolver'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('i4qs', 'DERIVE', 0)
     ->addDataset('i6qs', 'DERIVE', 0)
@@ -321,8 +329,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('bs', 'GAUGE', 0)
     ->addDataset('rr', 'DERIVE', 0);
 
-
-$fields = array(
+$fields = [
     'i4qs' => $i4qs,
     'i6qs' => $i6qs,
     'i4rr' => $i4rr,
@@ -347,18 +354,18 @@ $fields = array(
     'rttg1600' => $rttg1600,
     'bs' => $bs,
     'rr' => $rr,
-);
+];
+$metrics['resolver'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'resolver', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // CACHE PROCESSING
 //
-list ($ch, $cm, $chfq, $cmfq, $crddtme, $crddtte, $cdn, $cdhb, $ctmt, $ctmiu, $cthmiu,
-    $chmt, $chmiu, $chhmiu) = explode(',', $cache);
+[$ch, $cm, $chfq, $cmfq, $crddtme, $crddtte, $cdn, $cdhb, $ctmt, $ctmiu, $cthmiu,
+    $chmt, $chmiu, $chhmiu] = explode(',', $cache);
 
-$rrd_name = array('app', $name, $app_id, 'cache');
 $rrd_def = RrdDefinition::make()
     ->addDataset('ch', 'DERIVE', 0)
     ->addDataset('cm', 'DERIVE', 0)
@@ -375,7 +382,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('chmiu', 'GAUGE', 0)
     ->addDataset('chhmiu', 'GAUGE', 0);
 
-$fields = array(
+$fields = [
     'ch' => $ch,
     'cm' => $cm,
     'chfq' => $chfq,
@@ -390,41 +397,48 @@ $fields = array(
     'chmt' => $chmt,
     'chmiu' => $chmiu,
     'chhmiu' => $chhmiu,
-);
+];
+$metrics['cache'] = $fields;
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id, 'cache'],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 //
 // ADB PROCESSING
 //
-list ($ahts, $aiht, $nhts, $niht) = explode(',', $adb);
+[$ahts, $aiht, $nhts, $niht] = explode(',', $adb);
 
-$rrd_name = array('app', $name, $app_id, 'adb');
+$rrd_name = ['app', $name, $app->app_id, 'adb'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('ahts', 'GAUGE', 0)
     ->addDataset('aiht', 'GAUGE', 0)
     ->addDataset('nhts', 'GAUGE', 0)
     ->addDataset('niht', 'GAUGE', 0);
 
-$fields = array(
+$fields = [
     'ahts' => $ahts,
     'aiht' => $aiht,
     'nhts' => $nhts,
-    'niht' => $niht
-);
+    'niht' => $niht,
+];
+$metrics['adb'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'adb', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // SOCKETS PROCESSING
 //
-list ($ui4so, $ui6so, $ti4so, $ti6so, $rso, $ui4sc, $ui6sc, $ti4sc, $ti6sc, $ui4sbf, $ti4sbf, $ui6sbf, $ti6sbf,
+[$ui4so, $ui6so, $ti4so, $ti6so, $rso, $ui4sc, $ui6sc, $ti4sc, $ti6sc, $ui4sbf, $ti4sbf, $ui6sbf, $ti6sbf,
     $ui4scf, $ti4scf, $ui6scf, $ti6scf, $ui4ce, $ti4ce, $ui6ce, $ti6ce, $ti4ca, $ti6ca, $ui4se, $ti4se, $ui6se,
-    $ti6se, $ui4re, $ti4re, $ui6re, $ti6re, $ui4sa, $ui6sa, $ti4sa, $ti6sa, $rsa) = explode(',', $sockets);
+    $ti6se, $ui4re, $ti4re, $ui6re, $ti6re, $ui4sa, $ui6sa, $ti4sa, $ti6sa, $rsa] = explode(',', $sockets);
 
-$rrd_name = array('app', $name, $app_id, 'sockets');
+$rrd_name = ['app', $name, $app->app_id, 'sockets'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('ui4so', 'DERIVE', 0)
     ->addDataset('ui6so', 'DERIVE', 0)
@@ -463,8 +477,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('ti6sa', 'GAUGE', 0)
     ->addDataset('rsa', 'GAUGE', 0);
 
-
-$fields = array(
+$fields = [
     'ui4so' => $ui4so,
     'ui6so' => $ui6so,
     'ti4so' => $ti4so,
@@ -501,21 +514,22 @@ $fields = array(
     'ti4sa' => $ti4sa,
     'ti6sa' => $ti6sa,
     'rsa' => $ti6sa,
-);
+];
+$metrics['sockets'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'sockets', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // RR SETS PROCESSING
 //
-list ($a, $aaaa, $afsdb, $apl, $caa, $cdnskey, $cds, $cert, $cname, $dhcid, $dlv, $dnskey, $ds, $ipseckey, $key, $kx,
+[$a, $aaaa, $afsdb, $apl, $caa, $cdnskey, $cds, $cert, $cname, $dhcid, $dlv, $dnskey, $ds, $ipseckey, $key, $kx,
     $loc, $mx, $naptr, $ns, $nsec, $nsec3, $nsec3param, $ptr, $rrsig, $rp, $sig, $soa, $srv, $sshfp, $ta, $tkey, $tlsa,
     $tsig, $txt, $uri, $dname, $nxdomain, $any, $axfr, $ixfr, $opt, $spf, $nota, $notaaaa, $notafsdb, $notapl, $notcaa, $notcdnskey,
     $notcds, $notcert, $notcname, $notdhcid, $notdlv, $notdnskey, $notds, $notipseckey, $notkey, $notkx, $notloc, $notmx,
     $notnaptr, $notns, $notnsec, $notnsec3, $notnsec3param, $notptr, $notrrsig, $notrp, $notsig, $notsoa, $notsrv,
     $notsshfp, $notta, $nottkey, $nottlsa, $nottsig, $nottxt, $noturi, $notdname, $notnxdomain, $notany, $notaxfr, $notixfr, $notopt,
-    $notspf) = explode(',', $rrsets);
+    $notspf] = explode(',', $rrsets);
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('any', 'GAUGE', 0)
@@ -563,19 +577,19 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('opt', 'GAUGE', 0);
 
 //first handle the positive
-$rrd_name = array('app', $name, $app_id, 'rrpositive');
+$rrd_name = ['app', $name, $app->app_id, 'rrpositive'];
 
-$fields = array(
-    'any'   => $any,
-    'a'     => $a,
-    'aaaa'  => $aaaa,
+$fields = [
+    'any' => $any,
+    'a' => $a,
+    'aaaa' => $aaaa,
     'cname' => $cname,
-    'mx'    => $mx,
-    'ns'    => $ns,
-    'ptr'   => $ptr,
-    'soa'   => $soa,
-    'srv'   => $srv,
-    'spf'   => $spf,
+    'mx' => $mx,
+    'ns' => $ns,
+    'ptr' => $ptr,
+    'soa' => $soa,
+    'srv' => $srv,
+    'spf' => $spf,
     'afsdb' => $afsdb,
     'apl' => $apl,
     'caa' => $caa,
@@ -609,25 +623,26 @@ $fields = array(
     'axfr' => $axfr,
     'ixfr' => $ixfr,
     'opt' => $opt,
-);
+];
+$metrics['rrpositive'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'rrpositive', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 // now handle the negative
-$rrd_name = array('app', $name, $app_id, 'rrnegative');
+$rrd_name = ['app', $name, $app->app_id, 'rrnegative'];
 
-$fields = array(
-    'any'   => $notany,
-    'a'     => $nota,
-    'aaaa'  => $notaaaa,
+$fields = [
+    'any' => $notany,
+    'a' => $nota,
+    'aaaa' => $notaaaa,
     'cname' => $notcname,
-    'mx'    => $notmx,
-    'ns'    => $notns,
-    'ptr'   => $notptr,
-    'soa'   => $notsoa,
-    'srv'   => $notsrv,
-    'spf'   => $notspf,
+    'mx' => $notmx,
+    'ns' => $notns,
+    'ptr' => $notptr,
+    'soa' => $notsoa,
+    'srv' => $notsrv,
+    'spf' => $notspf,
     'afsdb' => $notafsdb,
     'apl' => $notapl,
     'caa' => $notcaa,
@@ -657,11 +672,13 @@ $fields = array(
     'txt' => $nottxt,
     'uri' => $noturi,
     'dname' => $notdname,
-    'nxdomin'=> $notnxdomain,
+    'nxdomain' => $notnxdomain,
     'axfr' => $notaxfr,
     'ixfr' => $notixfr,
     'opt' => $notopt,
-);
+];
+$metrics['rrnegative'] = $fields;
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'rrnegative', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
+update_application($app, $bind, $metrics);

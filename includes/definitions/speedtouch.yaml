@@ -1,12 +1,14 @@
 os: speedtouch
 text: 'Thomson Speedtouch'
-ifname: 1
+ifname: true
 type: network
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
-    - sysDescr:
-        - 'TG585v7'
-        - 'SpeedTouch '
-    - sysDescr_regex:
-        - '/^ST/'
+    -
+        sysDescr:
+            - 'TG585v7'
+            - 'SpeedTouch '
+    -
+        sysDescr_regex:
+            - '/^ST/'

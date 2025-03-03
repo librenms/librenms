@@ -1,0 +1,1203 @@
+-- *****************************************************************
+-- Ethernet Module MIB
+-- *****************************************************************
+
+SL-ETH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+	NOTIFICATION-TYPE, Gauge32, 
+	Counter64     	                    FROM SNMPv2-SMI
+	DisplayString, TruthValue,
+	DateAndTime							FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+	slService				      		FROM SL-NE-MIB;
+
+slEthernet MODULE-IDENTITY
+	LAST-UPDATED "200508171200Z"   -- 17 Jan. 2005  12:00:00 EST
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the Ethernet Service"
+	::= { slService 1 }
+
+-- The Ethernet MIB consists of the following groups:
+--    Configuration
+--    Current
+--    Interval
+--    Total
+--    Traps
+
+ethTraps 		OBJECT IDENTIFIER ::= { slEthernet 7 }
+
+-- Textual Conventions  
+
+
+--
+-- The Ethernet Configuration Table
+--
+
+ethConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EthConfigEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The Ethernet Configuration table."
+	::= { slEthernet 1 }
+
+ethConfigEntry OBJECT-TYPE
+	SYNTAX  EthConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the Ethernet Configuration table."
+	INDEX   { ethLineIndex }
+	::= { ethConfigTable 1 }
+
+EthConfigEntry ::=
+	SEQUENCE {
+		ethLineIndex			InterfaceIndex,
+		ethTimeElapsed			INTEGER,
+		ethValidIntervals		INTEGER,
+		ethResetPm				INTEGER,
+        ethAutoNegSupported 	TruthValue,
+		ethAutoNegAdminStatus	INTEGER,
+		ethConfigStatus			INTEGER,
+		ethTransceiverType		INTEGER,    -- deprecated
+		ethPauseTime			INTEGER,	-- deprecated
+		ethPauseEnable			TruthValue,	-- deprecated
+		ethResetPmCounters		INTEGER,
+		ethTransceiverMedia		INTEGER
+	}
+
+ethLineIndex OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"This object should be made equal to ifIndex."
+	::= { ethConfigEntry 1 }
+
+ethTimeElapsed OBJECT-TYPE
+	SYNTAX  	INTEGER (0..899)
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of seconds that have elapsed since
+		the beginning of the near end current error-
+		measurement period.  If, for some reason, such
+		as an adjustment in the system's time-of-day
+		clock, the current interval exceeds the maximum
+		value, the agent will return the maximum value."
+	::= { ethConfigEntry 2 }
+
+ethValidIntervals OBJECT-TYPE
+	SYNTAX  	INTEGER (0..96)
+	MAX-ACCESS 	read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of previous near end intervals for
+		which data was collected.  The value will be
+		96 unless the interface was brought online within
+		the last 24 hours, in which case the value will be
+		the number of complete 15 minute near end
+		intervals since the interface has been online.  In
+		the case where the agent is a proxy, it is
+		possible that some intervals are unavailable.  In
+		this case, this interval is the maximum interval
+		number for which data is available."
+	::= { ethConfigEntry 3 }
+
+ethResetPm OBJECT-TYPE
+	SYNTAX  		INTEGER
+	MAX-ACCESS  	read-write
+	STATUS  		current
+	DESCRIPTION
+		"Writing to this object cause a Reset to the current
+		PM counters of the corresponding Ethernet interface."
+	::= { ethConfigEntry 4 }
+
+ethAutoNegSupported OBJECT-TYPE
+	SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+    	"This object indicates the AutoNeg oper status.
+    	 TRUE - meanse that ethAutoNegAdminStatus is enabled(1)
+    	        and the Remote interface supports AutoNeg.
+    	 FALSE - Otherwise."
+    ::= { ethConfigEntry 5 }
+
+ethAutoNegAdminStatus OBJECT-TYPE
+	SYNTAX      INTEGER {
+		enabled(1),
+		disabled(2)
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION 
+		"Setting this object to enabled(1) will cause
+		the interface auto-negotiation function capability 
+		to be enabled."
+    ::= { ethConfigEntry 6 }
+
+
+ethConfigStatus OBJECT-TYPE
+	SYNTAX  INTEGER (1..16)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This variable indicates the Line Status of the
+		Ethrenet interface.  
+
+		The ethConfigStatus is a bit map represented as a
+		sum, therefore, it can represent multiple failures (alarms) 
+		simultaneously.
+
+		ethConfigNoAlarm must be set if and only if no other
+		flag is set.
+
+	       The various bit positions are:
+	      1     ethConfigNoAlarm           No alarm present
+	      2     ethConfigTransmitFault     Optical GbE transceiver transmit fault 
+	      4     ethConfigLossOfSignal      Optical GbE transceiver signal detect failed
+	      8     ethConfigLinkFail          Mac Layer Link failed"
+     ::= { ethConfigEntry 7 }
+
+ethTransceiverType OBJECT-TYPE
+	SYNTAX      INTEGER {
+		none(1),        --
+		base1000SX(2),  --   
+		base1000LX(3)   --   
+	}
+	MAX-ACCESS  read-only
+	STATUS      current           -- deprecated
+	DESCRIPTION 
+		"The GBIC Type."
+    ::= { ethConfigEntry 8 }
+
+ethPauseTime OBJECT-TYPE
+	SYNTAX      INTEGER (50..16383)
+    MAX-ACCESS  read-write		-- deprecated
+    STATUS      current
+    DESCRIPTION 
+    	"This object indicate how much time the other mac
+    	device should pause after it receive a pause frame.
+    	The unit are of 512 ns."
+    ::= { ethConfigEntry 9 }
+
+ethPauseEnable OBJECT-TYPE
+	SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current			-- deprecated
+    DESCRIPTION 
+    	"This object indicates whether or not
+        we want to use the flow control mechanism."
+    ::= { ethConfigEntry 10 }
+
+ethResetPmCounters OBJECT-TYPE
+	SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"Setting this object to 1 reset the current interval PM
+    	counters of the port."
+    ::= { ethConfigEntry 11 }
+
+ethTransceiverMedia OBJECT-TYPE
+	SYNTAX      INTEGER {
+		none(1),        --
+		copper(2),  -- BaseT Copper 
+		fiber(3)    -- BaseX Fiber 
+	}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION 
+		"The thernet port tranceiver media.
+		Used to determine which uplink interface to use."
+    ::= { ethConfigEntry 12 }
+
+
+--
+-- The PM Current Table
+--
+
+ethCurrentTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EthCurrentEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The Ethernet current table contains various statistics
+		being collected for the current 15 minute
+		interval."
+	::= { slEthernet 2 }
+
+ethCurrentEntry OBJECT-TYPE
+	SYNTAX  		EthCurrentEntry
+	MAX-ACCESS  	not-accessible
+	STATUS  		current
+	DESCRIPTION
+		"An entry in the Ethernet Current table."
+	INDEX   { ethCurrentIndex }
+	::= { ethCurrentTable 1 }
+
+EthCurrentEntry ::=
+	SEQUENCE {
+		ethCurrentIndex            			InterfaceIndex,
+		ethCurrentRxDropEvents            	Counter64,
+		ethCurrentOctets                	Counter64,
+		ethCurrentPkts                  	Counter64,
+		ethCurrentBroadcastPkts         	Counter64,
+		ethCurrentMulticastPkts         	Counter64,
+		ethCurrentCRCAlignErrors   			Counter64,
+		ethCurrentUndersizePkts         	Counter64,
+		ethCurrentOversizePkts          	Counter64,
+		ethCurrentFragments             	Counter64,
+		ethCurrentJabbers               	Counter64,
+		ethCurrentCollisions            	Counter64,
+		ethCurrentUtilization           	Counter64,
+		ethCurrentTxOctets                	Counter64,
+		ethCurrentTxPkts                  	Counter64,
+		ethCurrentRxPause                	Counter64,
+		ethCurrentTxPause                  	Counter64,
+		ethCurrentTxDropEvents            	Counter64,
+		ethCurrentRxPkts64Octets            Counter64,
+		ethCurrentRxPkts65to127Octets		Counter64,
+		ethCurrentRxPkts128to255Octets		Counter64,
+		ethCurrentRxPkts256to511Octets		Counter64,
+		ethCurrentRxPkts512to1023Octets		Counter64,
+		ethCurrentRxPkts1024to1518Octets	Counter64,
+		ethCurrentRxPkts1519to1522Octets	Counter64,
+		ethCurrentTxPkts64Octets            Counter64,
+		ethCurrentTxPkts65to127Octets		Counter64,
+		ethCurrentTxPkts128to255Octets		Counter64,
+		ethCurrentTxPkts256to511Octets		Counter64,
+		ethCurrentTxPkts512to1023Octets		Counter64,
+		ethCurrentTxPkts1024to1518Octets	Counter64,
+		ethCurrentTxPkts1519to1522Octets	Counter64,
+		ethCurrentRxVlanPkts               	Counter64,
+		ethCurrentTxVlanPkts               	Counter64,
+		ethCurrentRxJumboPkts              	Counter64,
+		ethCurrentTxJumboPkts               Counter64
+	}
+
+ethCurrentIndex OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The index value which uniquely identifies  the
+		Ethernet interface to which this entry is applicable.
+		The interface identified by a particular value of
+		this index is the same interface as identified by
+		the same value as a ethLineIndex object
+		instance."
+	::= { ethCurrentEntry 1 }
+
+ethCurrentRxDropEvents            OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of events in which packets were 
+		dropped by the probe due to lack of Ingress resources during 
+		this sampling interval. Note that this number is not
+		necessarily the number of packets dropped, it is just 
+		the number of times this condition has been detected."
+	::= { ethCurrentEntry 2 }
+
+ethCurrentOctets                OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of octets of data (including those 
+		in bad packets) received on the network (excluding 
+		framing bits but including FCS octets).
+		This object can be used as a reasonable estimate of
+		10-Megabit ethernet utilization.  If greater precision is
+		desired, the etherStatsPkts and etherStatsOctets objects
+		should be sampled before and after a common interval.  The
+		differences in the sampled values are Pkts and Octets,
+		respectively, and the number of seconds in the interval is
+		Interval.  These values are used to calculate the Utilization
+		as follows:
+
+                          Pkts * (9.6 + 6.4) + (Octets * .8)
+          Utilization = -------------------------------------
+                                  Interval * 10,000
+
+		The result of this equation is the value Utilization which
+		is the percent utilization of the ethernet segment on a
+		scale of 0 to 100 percent."
+	::= { ethCurrentEntry 3 }
+
+ethCurrentPkts                  OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets (including bad packets) 
+		received during this sampling interval."
+	::= { ethCurrentEntry 4 }
+
+ethCurrentBroadcastPkts         OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of good packets received during this 
+		sampling interval that were directed to the broadcast 
+		address."
+	::= { ethCurrentEntry 5 }
+
+ethCurrentMulticastPkts         OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of good packets received during this 
+		sampling interval that were directed to a multicast 
+		address. Note that this number does not include 
+		packets addressed to the broadcast address."
+	::= { ethCurrentEntry 6 }
+
+ethCurrentCRCAlignErrors   OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received during this 
+		sampling interval that had a length (excluding framing 
+		bits but including FCS octets) between 64 and 1518 octets,
+		inclusive, but had either a bad Frame Check Sequence (FCS)
+		with an integral number of octets (FCS Error) or a bad FCS
+		with a non-integral number of octets (Alignment Error)."
+	::= { ethCurrentEntry 7 }
+
+ethCurrentUndersizePkts         OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received during this sampling
+		interval that were less than 64 octets long (excluding
+		framing bits but including FCS octets) and were 
+		otherwise well formed."
+	::= { ethCurrentEntry 8 }	
+	
+ethCurrentOversizePkts          OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received during this sampling
+		interval that were longer than 1518 octets (excluding 
+		framing bits but including FCS octets) but were otherwise
+		well formed."
+	::= { ethCurrentEntry 9 }
+
+ethCurrentFragments             OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of packets received during this 
+		sampling interval that were less than 64 octets in length
+		(excluding framing bits but including FCS octets) had 
+		either a bad Frame Check Sequence (FCS) with an integral
+		number of octets (FCS Error) or a bad FCS with a non-integral
+		number of octets (Alignment error)."
+	::= { ethCurrentEntry 10 }
+
+ethCurrentJabbers               OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received during this sampling
+		interval that were longer than 1518 octets (excluding 
+		framing bits but including FCS octets), and had either a 
+		bad Frame Check Sequence (FCS) with an integral number of
+		octets (FCS Error) or a bad FCS with a non-integral number 
+		of octets (Alignment Error)."
+	::= { ethCurrentEntry 11 }
+
+ethCurrentCollisions            OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The best estimate of the total number of collisions 
+		on this Ethernet segment during this sampling interval."
+	::= { ethCurrentEntry 12 }
+
+ethCurrentUtilization           OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The best estimate of the mean physical layer network
+		utilization on this interface during this sampling interval,
+		in hundredths of a percent (0..10000)."
+	::= { ethCurrentEntry 13 }
+
+ethCurrentTxOctets                OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of octets of data 
+		transmited during the current interval."
+	::= { ethCurrentEntry 14 }
+
+ethCurrentTxPkts                  OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets (including bad packets) 
+		received during the current interval."
+	::= { ethCurrentEntry 15 }
+
+ethCurrentRxPause                OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of Pause frames 
+		received during the current interval."
+	::= { ethCurrentEntry 16 }
+
+ethCurrentTxPause                  OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of Pause farmes 
+		transmitted during the current interval."
+	::= { ethCurrentEntry 17 }
+
+ethCurrentTxDropEvents            OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of events in which packets were 
+		dropped by the probe due to lack of Egress resources during 
+		this sampling interval. Note that this number is not
+		necessarily the number of packets dropped, it is just 
+		the number of times this condition has been detected."
+	::= { ethCurrentEntry 18 }
+
+ethCurrentRxPkts64Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were 64 octets in length
+         (excluding framing bits but including FCS octets)."
+    ::= { ethCurrentEntry 19 }
+
+ethCurrentRxPkts65to127Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         65 and 127 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 20 }
+
+ethCurrentRxPkts128to255Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         128 and 255 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 21 }
+
+ethCurrentRxPkts256to511Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         256 and 511 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 22 }
+
+ethCurrentRxPkts512to1023Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         512 and 1023 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 23 }
+
+ethCurrentRxPkts1024to1518Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         1024 and 1518 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 24 }
+
+ethCurrentRxPkts1519to1522Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         1024 and 1518 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 25 }
+
+ethCurrentTxPkts64Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets transmitted 
+         that were 64 octets in length
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 26 }
+
+ethCurrentTxPkts65to127Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets transmitted that were between
+         65 and 127 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 27 }
+
+ethCurrentTxPkts128to255Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets transmitted that were between
+         128 and 255 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 28 }
+
+ethCurrentTxPkts256to511Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets transmitted that were between
+         256 and 511 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 29 }
+
+ethCurrentTxPkts512to1023Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets transmitted that were between
+         512 and 1023 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 30 }
+
+ethCurrentTxPkts1024to1518Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets transmitted that were between
+         1024 and 1518 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 31 }
+
+ethCurrentTxPkts1519to1522Octets OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets transmitted that were between
+         1519 and 1522 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { ethCurrentEntry 32 }
+
+ethCurrentRxVlanPkts OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of VLAN packets received."
+     ::= { ethCurrentEntry 33 }
+
+ethCurrentTxVlanPkts OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of VLAN packets transmitted."
+     ::= { ethCurrentEntry 34 }
+
+ethCurrentRxJumboPkts OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of Jumbo packets received."
+     ::= { ethCurrentEntry 35 }
+
+ethCurrentTxJumboPkts OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of Jumbo packets transmitted."
+     ::= { ethCurrentEntry 36 }
+
+
+--
+-- The Ethernet Interval Table
+--
+
+ethIntervalTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EthIntervalEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The Ethernet Interval Table contains various
+		statistics collected by each Ethernet Interface over
+		the previous 24 hours of operation.  The past 24
+		hours are broken into 96 completed 15 minute
+		intervals.  Each row in this table represents one
+		such interval (identified by ethIntervalNumber)
+		for one specific instance (identified by
+		ethIntervalIndex)."
+	::= { slEthernet 3 }
+
+ethIntervalEntry OBJECT-TYPE
+	SYNTAX  	EthIntervalEntry
+	MAX-ACCESS  not-accessible
+	STATUS  	current
+	DESCRIPTION
+		"An entry in the Ethernet Interval table."
+	INDEX   { ethIntervalIndex, ethIntervalNumber }
+	::= { ethIntervalTable 1 }
+
+EthIntervalEntry ::=
+	SEQUENCE {
+		ethIntervalIndex             		InterfaceIndex,
+		ethIntervalNumber            		INTEGER,
+		ethIntervalDropEvents            	Counter64,
+		ethIntervalOctets                	Counter64,
+		ethIntervalPkts                  	Counter64,
+		ethIntervalBroadcastPkts         	Counter64,
+		ethIntervalMulticastPkts         	Counter64,
+		ethIntervalCRCAlignErrors   		Counter64,
+		ethIntervalUndersizePkts         	Counter64,
+		ethIntervalOversizePkts          	Counter64,
+		ethIntervalFragments             	Counter64,
+		ethIntervalJabbers               	Counter64,
+		ethIntervalCollisions            	Counter64,
+		ethIntervalUtilization           	Counter64, 
+		ethIntervalTxOctets                	Counter64,
+		ethIntervalTxPkts                  	Counter64,
+		ethIntervalRxPause                	Counter64,
+		ethIntervalTxPause                 	Counter64,
+        ethIntervalValidData  				TruthValue,
+        ethIntervalTcaFlag    				TruthValue
+	}
+
+ethIntervalIndex OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The index value which uniquely identifies the Ethernet
+		interface to which this entry is applicable.  The
+		interface identified by a particular value of this
+		index is the same interface as identified by the
+		same value as a ethLineIndex object instance."
+ 	::= { ethIntervalEntry 1 }
+
+ethIntervalNumber OBJECT-TYPE
+	SYNTAX  	INTEGER (1..96)
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"A number between 1 and 96, where 1 is the most
+		recently completed 15 minute interval and 96 is
+		the 15 minutes interval completed 23 hours and 45
+		minutes prior to interval 1."
+	::= { ethIntervalEntry 2 }
+
+ethIntervalDropEvents            OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of events in which packets were 
+		dropped by the probe due to lack of resources during 
+		this sampling interval. Note that this number is not
+		necessarily the number of packets dropped, it is just 
+		the number of times this condition has been detected."
+	::= { ethIntervalEntry 3 }
+
+ethIntervalOctets                OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of octets of data (including those 
+		in bad packets) received on the network (excluding 
+		framing bits but including FCS octets) in the current 
+		interval."
+	::= { ethIntervalEntry 4 }
+
+ethIntervalPkts                  OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets (including bad packets) 
+		received during this sampling interval."
+	::= { ethIntervalEntry 5 }
+
+ethIntervalBroadcastPkts         OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of good packets received during this 
+		sampling interval that were directed to the broadcast 
+		address."
+	::= { ethIntervalEntry 6 }
+
+ethIntervalMulticastPkts         OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of good packets received during this 
+		sampling interval that were directed to a multicast 
+		address. Note that this number does not include 
+		packets addressed to the broadcast address."
+	::= { ethIntervalEntry 7 }
+
+ethIntervalCRCAlignErrors   OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received during this 
+		sampling interval that had a length (excluding framing 
+		bits but including FCS octets) between 64 and 1518 octets,
+		inclusive, but had either a bad Frame Check Sequence (FCS)
+		with an integral number of octets (FCS Error) or a bad FCS
+		with a non-integral number of octets (Alignment Error)."
+	::= { ethIntervalEntry 8 }
+
+ethIntervalUndersizePkts         OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received during this sampling
+		interval that were less than 64 octets long (excluding
+		framing bits but including FCS octets) and were 
+		otherwise well formed."
+	::= { ethIntervalEntry 9 }
+
+ethIntervalOversizePkts          OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received during this sampling
+		interval that were longer than 1518 octets (excluding 
+		framing bits but including FCS octets) but were otherwise
+		well formed."
+	::= { ethIntervalEntry 10 }
+
+ethIntervalFragments             OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of packets received during this 
+		sampling interval that were less than 64 octets in length
+		(excluding framing bits but including FCS octets) had 
+		either a bad Frame Check Sequence (FCS) with an integral
+		number of octets (FCS Error) or a bad FCS with a non-integral
+		number of octets (Alignment error)."	
+	::= { ethIntervalEntry 11 }
+
+ethIntervalJabbers               OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received during this sampling
+		interval that were longer than 1518 octets (excluding 
+		framing bits but including FCS octets), and had either a 
+		bad Frame Check Sequence (FCS) with an integral number of
+		octets (FCS Error) or a bad FCS with a non-integral number 
+		of octets (Alignment Error)."
+	::= { ethIntervalEntry 12 }
+
+ethIntervalCollisions            OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The best estimate of the total number of collisions 
+		on this Ethernet segment during this sampling interval."
+	::= { ethIntervalEntry 13 }
+
+ethIntervalUtilization           OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The best estimate of the mean physical layer network
+		utilization on this interface during this sampling interval,
+		in hundredths of a percent (0..10000)."
+	::= { ethIntervalEntry 14 }
+
+ethIntervalTxOctets                OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of octets of data 
+		transmited on the network."
+	::= { ethIntervalEntry 15 }
+
+ethIntervalTxPkts                  OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets (including bad packets) 
+		received during this sampling interval."
+	::= { ethIntervalEntry 16 }
+
+ethIntervalRxPause                OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of Pause frames 
+		received during this sampling interval."
+	::= { ethIntervalEntry 17 }
+
+ethIntervalTxPause                  OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of Pause farmes 
+		transmitted during this sampling interval."
+	::= { ethIntervalEntry 18 }
+
+ethIntervalValidData OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS 	read-only
+	STATUS  	current
+	DESCRIPTION
+       "This variable indicates if the data for this
+        interval is valid."
+	::= { ethIntervalEntry 19 }
+
+ethIntervalTcaFlag OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS 	read-only
+	STATUS  	current
+	DESCRIPTION
+       "TRUE if one of the counters crossed the threshold during the interval."
+	::= { ethIntervalEntry 20 }
+
+
+--
+-- The Ethernet Total Table
+--
+
+ethTotalTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EthTotalEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The Ethernet Total Table contains the cumulative sum
+		of the various statistics for the 24 hour period
+		preceding the current day, starting from startOfDay."
+	::= { slEthernet 4 }
+
+ethTotalEntry OBJECT-TYPE
+	SYNTAX  	EthTotalEntry
+	MAX-ACCESS  not-accessible
+	STATUS  	current
+	DESCRIPTION
+		"An entry in the Ethernet Total table."
+	INDEX   { ethTotalIndex, ethTotalDayNumber }
+	::= { ethTotalTable 1 }
+
+EthTotalEntry ::=
+	SEQUENCE {
+		ethTotalIndex                	InterfaceIndex,
+		ethTotalDayNumber				INTEGER,
+		ethTotalDropEvents            	Counter64,
+		ethTotalOctets                	Counter64,
+		ethTotalPkts                  	Counter64,
+		ethTotalBroadcastPkts         	Counter64,
+		ethTotalMulticastPkts         	Counter64,
+		ethTotalCRCAlignErrors   		Counter64,
+		ethTotalUndersizePkts         	Counter64,
+		ethTotalOversizePkts          	Counter64,
+		ethTotalFragments             	Counter64,
+		ethTotalJabbers              	Counter64,
+		ethTotalCollisions            	Counter64,
+		ethTotalUtilization           	Counter64, 
+		ethTotalTxOctets                Counter64,
+		ethTotalTxPkts                  Counter64,
+		ethTotalRxPause                 Counter64,
+		ethTotalTxPause                 Counter64,
+        ethTotalValidData  				TruthValue
+	}
+
+ethTotalIndex OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The index value which uniquely identifies the Ethernet
+		interface to which this entry is applicable.  The
+		interface identified by a particular value of this
+		index is the same interface as identified by the
+		same value as a ethLineIndex object instance."
+	::= { ethTotalEntry 1 }
+
+ethTotalDayNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..33)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number which identifies the 1-day interval for which the set
+        of section related statistics is available.  The number is
+        between 1 and n, where n is the number of 1-day intervals
+        supported by the agent.  The interval identified by 1 is the
+        current 1-day interval, 2 is the previous (most recently
+        completed) 1-day interval and n is the least recently completed
+        1-day interval."
+    ::= { ethTotalEntry 2 }
+
+ethTotalDropEvents            OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of events in which packets were 
+		dropped by the probe due to lack of resources in the 
+		previous 24 hour interval. Note that this number is not
+		necessarily the number of packets dropped, it is just 
+		the number of times this condition has been detected."
+	::= { ethTotalEntry 3 }
+
+ethTotalOctets                OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of octets of data (including those 
+		in bad packets) received on the network (excluding 
+		framing bits but including FCS octets) in the 
+		previous 24 hour interval."
+	::= { ethTotalEntry 4 }
+
+ethTotalPkts                  OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		" The number of packets (including bad packets) 
+		received in the previous 24 hour interval."
+	::= { ethTotalEntry 5 }
+
+ethTotalBroadcastPkts         OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+                 " The number of good packets received in the 
+				previous 24 hour interval that were directed 
+				to the broadcast address."
+    ::= { ethTotalEntry 6 }
+
+ethTotalMulticastPkts         OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+                 "The number of good packets received in the 
+				previous 24 hour interval that were directed to a 
+				multicast address. Note that this number does not include 
+				packets addressed to the broadcast address."
+    ::= { ethTotalEntry 7 }
+
+ethTotalCRCAlignErrors   OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received in the previous 24 
+		hour interval that had a length (excluding framing 
+		bits but including FCS octets) between 64 and 1518 octets,
+		inclusive, but had either a bad Frame Check Sequence (FCS)
+		with an integral number of octets (FCS Error) or a bad FCS
+		with a non-integral number of octets (Alignment Error)."
+	::= { ethTotalEntry 8 }
+
+ethTotalUndersizePkts         OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received in the previous 24 hour
+		interval that were less than 64 octets long (excluding
+		framing bits but including FCS octets) and were 
+		otherwise well formed."
+	::= { ethTotalEntry 9 }	
+	
+ethTotalOversizePkts          OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received in the previous 24 
+		hour interval that were longer than 1518 octets (excluding 
+		framing bits but including FCS octets) but were otherwise
+		well formed."
+	::= { ethTotalEntry 10 }
+
+ethTotalFragments             OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of packets received in the previous 24 
+		hour interval that were less than 64 octets in length
+		(excluding framing bits but including FCS octets) had 
+		either a bad Frame Check Sequence (FCS) with an integral
+		number of octets (FCS Error) or a bad FCS with a non-integral
+		number of octets (Alignment error)."
+	::= { ethTotalEntry 11 }
+
+ethTotalJabbers               OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets received in the previous 24 hour 
+		interval that were longer than 1518 octets (excluding 
+		framing bits but including FCS octets), and had either a 
+		bad Frame Check Sequence (FCS) with an integral number of
+		octets (FCS Error) or a bad FCS with a non-integral number 
+		of octets (Alignment Error)."
+	::= { ethTotalEntry 12 }
+
+ethTotalCollisions            OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The best estimate of the total number of collisions 
+		on this Ethernet segment in the previous 24 hour interval."
+	::= { ethTotalEntry 13 }
+
+ethTotalUtilization           OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The avarage of the mean physical layer network
+		utilization on this interface in the previous 24 hour 
+		interval."
+	::= { ethTotalEntry 14 }
+
+ethTotalTxOctets                OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of octets of data 
+		transmited on the network."
+	::= { ethTotalEntry 15 }
+
+ethTotalTxPkts                  OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of packets (including bad packets) 
+		received during this sampling interval."
+	::= { ethTotalEntry 16 }
+
+ethTotalRxPause                OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of Pause frames 
+		received during this sampling interval."
+	::= { ethTotalEntry 17 }
+
+ethTotalTxPause                  OBJECT-TYPE
+	SYNTAX  	Counter64
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of Pause farmes 
+		transmitted during this sampling interval."
+	::= { ethTotalEntry 18 }
+
+ethTotalValidData OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS 	read-only
+	STATUS  	current
+	DESCRIPTION
+       "This variable indicates if the data for this
+        day is valid."
+	::= { ethTotalEntry 19 }
+
+
+-- ---------------------------------------------
+-- Ethernet Traps
+-- ---------------------------------------------
+
+ethStatusChange NOTIFICATION-TYPE
+	OBJECTS { ethLineIndex, ethConfigStatus }
+	STATUS  current
+	DESCRIPTION
+		"A ethStatusChange trap is sent when the
+		value of an instance ethConfigStatus changes. It
+		can be utilized by an NMS to trigger polls."
+	::= { ethTraps 1 }
+
+END

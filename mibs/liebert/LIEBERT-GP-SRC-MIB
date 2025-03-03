@@ -1,0 +1,346 @@
+LIEBERT-GP-SRC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    sysUpTime
+        FROM RFC1213-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Unsigned32
+        FROM SNMPv2-SMI
+    lgpSrc,
+    liebertSrcModuleReg
+        FROM LIEBERT-GP-REGISTRATION-MIB
+   ;
+
+-- =============================================================================
+-- Module Identification and Registration
+-- =============================================================================
+liebertGlobalProductsSrcModule MODULE-IDENTITY
+  LAST-UPDATED "201711100000Z"
+  ORGANIZATION "Liebert Corporation"
+  CONTACT-INFO
+      "Contact:   Technical Support
+
+      Postal:
+      Liebert Corporation
+      1050 Dearborn Drive
+      P.O. Box 29186
+      Columbus OH, 43229
+      US
+
+      Tel: +1 (800) 222-5877
+
+      E-mail: liebert.monitoring@vertivco.com
+      Web:    www.vertivco.com
+
+      Author:  Colby Lin "
+
+   DESCRIPTION
+      "The MIB module used to register Liebert POWER related SNMP OIDs.
+
+      Copyright 2008-2008 Liebert Corporation. All rights reserved.
+      Reproduction of this document is authorized on the condition
+      that the forgoing copyright notice is included.
+
+      This Specification is supplied 'AS IS' and Liebert Corporation
+      makes no warranty, either express or implied, as to the use,
+      operation, condition, or performance of the Specification."
+
+   REVISION "201711100000Z"
+   DESCRIPTION
+    "Added unknown(2147483647) for invalid SRC device readings"
+
+   REVISION "201710160000Z"
+   DESCRIPTION
+    "Added Temperature High/Low Threshold"
+
+   REVISION "201708180000Z"
+   DESCRIPTION
+    "Initial Version"
+
+   ::= { liebertSrcModuleReg 1 }
+
+lgpSrcTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF LgpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table containing information about SRC device."
+    ::= { lgpSrc 1 }
+
+lgpSrcEntry OBJECT-TYPE
+    SYNTAX      LgpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry defines the contents of the rows for the table
+        'lgpSrcTable'.  A row in this table cannot be created or deleted by
+        SNMP operations on columns of the table."
+    INDEX       { lgpSrcDevId }
+    ::= { lgpSrcTable 1 }
+
+    LgpSrcEntry ::= SEQUENCE {
+            lgpSrcDevId                           Unsigned32,
+            lgpSrcDevAddress                      Unsigned32,
+            lgpSrcDevState                        INTEGER,
+            lgpSrcDevTemperatureDegF              INTEGER,
+            lgpSrcDevTemperatureSetpointDegF      INTEGER,
+            lgpSrcDevTemperatureDegC              INTEGER,
+            lgpSrcDevTemperatureSetpointDegC      INTEGER,
+            lgpSrcDevFanSpeed                     INTEGER,
+            lgpSrcDevPowerStatus                  INTEGER,
+            lgpSrcDevOperatingMode                INTEGER,
+            lgpSrcDevTemperatureHighThresholdDegF INTEGER,
+            lgpSrcDevTemperatureLowThresholdDegF  INTEGER,
+            lgpSrcDevTemperatureHighThresholdDegC INTEGER,
+            lgpSrcDevTemperatureLowThresholdDegC  INTEGER
+            }
+
+    lgpSrcDevId OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This value must remain constant between agent initializations.
+            This Device ID is used as an index of the table
+            'lgpSrcTable'."
+        ::= { lgpSrcEntry 1 }
+
+    lgpSrcDevAddress OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This value must remain constant between agent initializations.
+            This Device Address is used as an index of the table
+            'lgpSrcTable'."
+        ::= { lgpSrcEntry 2 }
+
+    lgpSrcDevState OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        standbyOffline(2),
+                        unavailableOffline(3),
+                        absent(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the current state of SRC device.  The value of this
+            object is set to enabled(1) if the SRC device has been enabled.
+            The value of this object is set to standbyOffline(2) if the SRC
+            device is waiting for an external action to activate it.  The value
+            of this object is set to unavailableOffline(3) if the SRC device is
+            present but cannot be used.  The value of this object is set to
+            absent(4) if the SRC device is not present or not detected.  The
+            value of this object will be one of the valid device state:
+            enabled(1), standbyOffline(2), unavailableOffline(3), or
+            absent(4)."
+        ::= { lgpSrcEntry 3 }
+
+    lgpSrcDevTemperatureDegF OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        unknown(2147483647)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured temperature value in Fahrenheit.  The value of this
+            object is only vaild if the lgpSrcDevState object is set to
+            enabled(1).  The value of this object will be set to
+            unknown(2147483647) if the value of lgpSrcDevState object is set to
+            one of the following values: standbyOffline(2),
+            unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 4 }
+
+    lgpSrcDevTemperatureSetpointDegF OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        unknown(2147483647)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The temperature setting in Fahrenheit for SRC.  This setting may
+            or may not be the setting used from control.  Some systems have the
+            capability to dynamically change the control setting based on
+            environmental conditions and/or user configuration.  The value of
+            this object is only vaild if the lgpSrcDevState object is set to
+            enabled(1).  The value of this object will be set to
+            unknown(2147483647) if the value of lgpSrcDevState object is set to
+            one of the following values: standbyOffline(2),
+            unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 5 }
+
+    lgpSrcDevTemperatureDegC OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        unknown(2147483647)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The measured temperature value in Celsius.  The value of this
+            object is only vaild if the lgpSrcDevState object is set to
+            enabled(1).  The value of this object will be set to
+            unknown(2147483647) if the value of lgpSrcDevState object is set to
+            one of the following values: standbyOffline(2),
+            unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 6 }
+
+    lgpSrcDevTemperatureSetpointDegC OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        unknown(2147483647)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The temperature setting in Celsius for SRC.  This setting may or
+            may not be the setting used from control.  Some systems have the
+            capability to dynamically change the control setting based on
+            environmental conditions and/or user configuration.  The value of
+            this object is only vaild if the lgpSrcDevState object is set to
+            enabled(1).  The value of this object will be set to
+            unknown(2147483647) if the value of lgpSrcDevState object is set to
+            one of the following values: standbyOffline(2),
+            unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 7 }
+
+    lgpSrcDevFanSpeed OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        low(1),
+                        middle(2),
+                        high(3),
+                        auto(4),
+                        unknown(2147483647)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The present fan speed of the SRC device.  This object will be one
+            of the valid fan speed:  low(1), middle(2), high(3) or auto(4) if
+            the value of lgpSrcDevState object is set to enabled(1).  The value
+            of this object will be set to unknown(2147483647) if the value of
+            lgpSrcDevState object is set to one of the following values:
+            standbyOffline(2), unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 8 }
+
+    lgpSrcDevPowerStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        off(0),
+                        on(1),
+                        unknown(2147483647)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value of this object specifies the power status of SRC device.
+            Power status cannot be configured by an operator.  The value of
+            this object is set to off(0) if the SRC device is powered off.
+            The value of this object is set to on(1) if the SRC device is
+            powered on.  The value of this object will be one of the valid power
+            status: off(0) or on(1) if lgpSrcDevState is enabled(1).  The value
+            of this object will be set to unknown(2147483647) if the value of
+            lgpSrcDevState object is set to one of the following values:
+            standbyOffline(2), unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 9 }
+
+    lgpSrcDevOperatingMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        cooling(0),
+                        dehumidify(1),
+                        fan(2),
+                        ai(3),
+                        heating(4),
+                        unknown(2147483647)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The present operating mode of the SRC device.  This object will be
+            one of the valid operating mode: cooling(0), dehumidify(1), fan(2),
+            ai(3) or heating(4) if the value of lgpSrcDevState object is set to
+            enabled(1).  The value of this object will be set to
+            unknown(2147483647) if the value of lgpSrcDevState object is set to
+            one of the following values: standbyOffline(2),
+            unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 10 }
+
+    lgpSrcDevTemperatureHighThresholdDegF OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        unknown(2147483647)
+                    }
+        UNITS       "degrees Fahrenheit"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high temperature notification threshold.  This is the maximum
+            value of 'lgpSrcDevTemperatureDegF' before the agent sends a
+            notification.  The value of this object is only vaild if the
+            lgpSrcDevState object is set to enabled(1).  The value of this
+            object will be set to unknown(2147483647) if the value of
+            lgpSrcDevState object is set to one of the following values:
+            standbyOffline(2), unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 11 }
+
+    lgpSrcDevTemperatureLowThresholdDegF OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        unknown(2147483647)
+                    }
+        UNITS       "degrees Fahrenheit"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low temperature notification threshold.  This is the minimum
+            value of 'lgpSrcDevTemperatureDegF' before the agent sends a
+            notification.  The value of this object is only vaild if the
+            lgpSrcDevState object is set to enabled(1).  The value of this
+            object will be set to unknown(2147483647) if the value of
+            lgpSrcDevState object is set to one of the following values:
+            standbyOffline(2), unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 12 }
+
+    lgpSrcDevTemperatureHighThresholdDegC OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        unknown(2147483647)
+                    }
+        UNITS       "degrees Celsius"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high temperature notification threshold.  This is the maximum
+            value of 'lgpSrcDevTemperatureDegC' before the agent sends a
+            notification.  The value of this object is only vaild if the
+            lgpSrcDevState object is set to enabled(1).  The value of this
+            object will be set to unknown(2147483647) if the value of
+            lgpSrcDevState object is set to one of the following values:
+            standbyOffline(2), unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 13 }
+
+    lgpSrcDevTemperatureLowThresholdDegC OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        unknown(2147483647)
+                    }
+        UNITS       "degrees Celsius"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low temperature notification threshold.  This is the minimum
+            value of 'lgpSrcDevTemperatureDegC' before the agent sends a
+            notification.  The value of this object is only vaild if the
+            lgpSrcDevState object is set to enabled(1).  The value of this
+            object will be set to unknown(2147483647) if the value of
+            lgpSrcDevState object is set to one of the following values:
+            standbyOffline(2), unavailableOffline(3) or absent(4)."
+        ::= { lgpSrcEntry 14 }
+END

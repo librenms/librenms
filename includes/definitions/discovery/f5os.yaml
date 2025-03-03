@@ -1,0 +1,193 @@
+mib: F5-PLATFORM-STATS-MIB
+modules:
+    os:
+        hardware:
+            - .1.3.6.1.4.1.12276.1.2.1.1.1.1.8.8.112.108.97.116.102.111.114.109.0
+        hardware_template: '{{ .1.3.6.1.4.1.12276.1.2.1.1.1.1.8.8.112.108.97.116.102.111.114.109.0 }}'
+        version: SNMPv2-MIB::sysDescr.0
+        version_regex: '/version (?<version>.*)/'
+    processors:
+        data:
+            -
+                oid: CpuUtilizationStatsTable
+                value: cpuTotal1minAvg
+                num_oid: .1.3.6.1.4.1.12276.1.2.1.1.2.1.4.8.112.108.97.116.102.111.114.109
+                descr: cpuCore
+                snmp_flags: ['-OteQUsab']
+    mempools:
+        data:
+            -
+                oid: F5-PLATFORM-STATS-MIB::memoryStatsTable
+                free: F5-PLATFORM-STATS-MIB::memPlatformUsed
+                total: F5-PLATFORM-STATS-MIB::memPlatformTotal
+                index: 0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: F5-PLATFORM-STATS-MIB::temperatureStatsTable
+                    value: F5-PLATFORM-STATS-MIB::tempCurrent
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.3.1.1.2.{{ $index }}'
+                    descr: System Temp
+                    snmp_flags: ['-OQUb']
+        fanspeed:
+            data:
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-1-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.1.{{ $index }}'
+                    descr: fan-1-speed
+                    index: 0
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-2-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.2.{{ $index }}'
+                    descr: fan-2-speed
+                    index: 1
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-3-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.3.{{ $index }}'
+                    descr: fan-3-speed
+                    index: 2
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-4-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.4.{{ $index }}'
+                    descr: fan-4-speed
+                    index: 3
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-5-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.5.{{ $index }}'
+                    descr: fan-5-speed
+                    index: 4
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-6-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.6.{{ $index }}'
+                    descr: fan-6-speed
+                    index: 5
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-7-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.7.{{ $index }}'
+                    descr: fan-7-speed
+                    index: 6
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-8-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.8.{{ $index }}'
+                    descr: fan-8-speed
+                    index: 7
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-9-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.9.{{ $index }}'
+                    descr: fan-9-speed
+                    index: 8
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-10-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.10.{{ $index }}'
+                    descr: fan-10-speed
+                    index: 9
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-11-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.11.{{ $index }}'
+                    descr: fan-11-speed
+                    index: 10
+                    snmp_flags: ['-OQUb']
+                -
+                    oid: F5-PLATFORM-STATS-MIB::fantrayStatsTable
+                    value: F5-PLATFORM-STATS-MIB::fan-12-speed
+                    num_oid: '.1.3.6.1.4.1.12276.1.2.1.7.1.1.12.{{ $index }}'
+                    descr: fan-12-speed
+                    index: 11
+                    snmp_flags: ['-OQUb']
+        count:
+            data:
+                -
+                    oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
+                    value: F5-PLATFORM-STATS-MIB::diskTotalIops
+                    num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.4.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
+                    descr: Total IOPS
+                    group: Disk
+                    rrd_type: COUNTER
+                    index: diskTotalIops0
+                -
+                    oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
+                    value: F5-PLATFORM-STATS-MIB::diskReadIops
+                    num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.5.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
+                    descr: Read IOPS
+                    group: Disk
+                    rrd_type: COUNTER
+                    index: diskReadIops
+                -
+                    oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
+                    value: F5-PLATFORM-STATS-MIB::diskReadMerged
+                    num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.6.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
+                    descr: Read Merged
+                    group: Disk
+                    rrd_type: COUNTER
+                    index: diskReadMerged
+                -
+                    oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
+                    value: F5-PLATFORM-STATS-MIB::diskReadBytes
+                    num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.7.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
+                    descr: Read Bytes
+                    group: Disk
+                    rrd_type: COUNTER
+                    index: diskReadBytes
+                -
+                    oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
+                    value: F5-PLATFORM-STATS-MIB::diskReadLatencyMs
+                    num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.8.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
+                    descr: Read Latency
+                    group: Disk
+                    rrd_type: COUNTER
+                    index: diskReadLatencyMs
+                -
+                    oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
+                    value: F5-PLATFORM-STATS-MIB::diskWriteIops
+                    num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.9.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
+                    descr: Write IOPS
+                    group: Disk
+                    rrd_type: COUNTER
+                    index: diskWriteIops
+                -
+                    oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
+                    value: F5-PLATFORM-STATS-MIB::diskWriteMerged
+                    num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.10.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
+                    descr: Write Merged
+                    group: Disk
+                    rrd_type: COUNTER
+                    index: diskWriteMerged
+                -
+                    oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
+                    value: F5-PLATFORM-STATS-MIB::diskWriteBytes
+                    num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.11.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
+                    descr: Write Bytes
+                    group: Disk
+                    rrd_type: COUNTER
+                    index: diskWriteBytes
+                -
+                    oid: F5-PLATFORM-STATS-MIB::diskUtilizationStatsTable
+                    value: F5-PLATFORM-STATS-MIB::diskWriteLatencyMs
+                    num_oid: .1.3.6.1.4.1.12276.1.2.1.2.2.1.12.8.112.108.97.116.102.111.114.109.7.110.118.109.101.48.110.49
+                    descr: Write Latency
+                    group: Disk
+                    rrd_type: COUNTER
+                    index: diskWriteLatencyMs
+

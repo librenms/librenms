@@ -1,0 +1,4 @@
+modules:
+  os:
+    hardware: '1900'
+    sysDescr_regex: '/,(?<version>V[\d.]+)/'

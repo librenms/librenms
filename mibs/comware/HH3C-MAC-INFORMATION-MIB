@@ -1,0 +1,460 @@
+-- ============================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The purpose of this MIB file is to provide the definition of
+--              the MAC Information general configuration.
+-- Reference:
+-- Version: V1.2
+-- History:
+-- V1.0 2007-12-28
+--   Initial version, created by gejianzhuang
+-- V1.1 2009-08-13
+--   Add 'hh3cMACInformationTrapObjectsExt' by gejianzhuang
+-- V1.2 2013-05-02
+--   Add 'hh3cMACInformationMovedTrap' by yangjie
+-- ============================================================================
+HH3C-MAC-INFORMATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        Unsigned32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
+    FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, MacAddress
+    FROM SNMPv2-TC
+        ifIndex
+    FROM IF-MIB;
+
+-- Node definitions
+hh3cMACInformation MODULE-IDENTITY
+    LAST-UPDATED "200712281912Z"        -- DEC 28, 2007 at 19:12 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB file is to provide the definition of the MAC Information
+        general configuration.  MAC Information feature is used to
+        make that the changed MAC information in the monitored device is
+        knowable in remote monitoring device."
+    REVISION "200712281912Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 87 }
+
+Hh3cMACInfoWorkMode ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The working mode of the MAC Information feature."
+    SYNTAX      INTEGER
+        {
+            trap(1),
+            syslog(2)
+        }
+
+hh3cMACInformationObjects OBJECT IDENTIFIER ::= { hh3cMACInformation 1 }
+
+hh3cMACInformationMibGlobal OBJECT IDENTIFIER  ::= { hh3cMACInformationObjects 1 }
+
+hh3cMACInformationMIBTableTroop OBJECT IDENTIFIER  ::= { hh3cMACInformationObjects 2 }
+
+hh3cMACInformationMibTrap OBJECT IDENTIFIER  ::= { hh3cMACInformationObjects 3 }
+
+hh3cMACInformationMibTrapExt OBJECT IDENTIFIER  ::= { hh3cMACInformationObjects 4 }
+
+
+hh3cMACInformationEnabled OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value is a global setting.  The feature will not work until the
+        value is set to enabled(1).  If the value is set to disabled(2),
+        the feature will stop working even there are interfaces that have
+        been enabled the feature."
+    DEFVAL { disabled }
+    ::= { hh3cMACInformationMibGlobal 1 }
+
+hh3cMACInformationcSendInterval OBJECT-TYPE
+    SYNTAX      Unsigned32(1..20000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum interval that the device generate syslogs or traps.
+        The unit is second."
+    DEFVAL { 1 }
+    ::= { hh3cMACInformationMibGlobal 2 }
+
+
+hh3cMACInformationLearntMACNum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of MAC addresses that learnt by the device since the
+        hh3cMACInformationEnabled is set to enabled(1) and hh3cMACLearntEnable
+        is set to enabled(1) at least on one interface. If the hh3cMACInformationEnabled
+        is set to disabled(2), the object will always return 0."
+    ::= { hh3cMACInformationMibGlobal 3 }
+
+hh3cMACInformationRemovedMACNum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of MAC addresses that removed by the device since the
+        hh3cMACInformationEnabled is set to enabled(1) and hh3cMACRemovedEnable
+        is set to enabled(1) at least on one interface. If the hh3cMACInformationEnabled
+        is set to disabled(2), the object will always return 0."
+    ::= { hh3cMACInformationMibGlobal 4 }
+
+hh3cMACInformationTrapSendNum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of traps that have been generated. This object is valid
+        only when the hh3cMACInfomationWorkMode is set to trap(1). If the
+        hh3cMACInfomationWorkMode is set to syslog(2), the object will always return 0."
+    ::= { hh3cMACInformationMibGlobal 5 }
+
+
+hh3cMACInformationSyslogSendNum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of syslogs that have been generated. This object is valid only
+        when the hh3cMACInfomationWorkMode is set to syslog(2). If the
+        hh3cMACInfomationWorkMode is set to trap(1), the object will always return 0."
+    ::= { hh3cMACInformationMibGlobal 6 }
+
+
+hh3cMACInformationCacheLen OBJECT-TYPE
+    SYNTAX      Unsigned32(0..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum queue lenth used to cache the changed MAC addresses information
+        in the monitored device. If the value is set to 0, syslog or trap will generate
+        as soon as there is a MAC address learnt or removed."
+    DEFVAL { 50 }
+    ::= { hh3cMACInformationMibGlobal 7 }
+
+hh3cMACInfomationWorkMode OBJECT-TYPE
+    SYNTAX      Hh3cMACInfoWorkMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The working mode of MAC Information feature.  If the object is
+        set to trap(1), the device will use trap mode to notify the MAC
+        address information and all properties of trap interrelated is
+        valid.  If the object is set to syslog(2), the device will use
+        syslog mode to notify the MAC address information and all
+        properties of trap interrelated is invalid."
+    ::= { hh3cMACInformationMibGlobal 8}
+
+
+--hh3cMACInfomationIfTable
+
+hh3cMACInfomationIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMACInfomationIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table is used to enable or disable the MAC Information feature
+        on interfaces."
+    ::= { hh3cMACInformationMIBTableTroop 1 }
+
+hh3cMACInfomationIfEntry OBJECT-TYPE
+    SYNTAX      Hh3cMACInfomationIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cMACInfomationIfTable."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cMACInfomationIfTable 1 }
+
+Hh3cMACInfomationIfEntry ::= SEQUENCE
+    {
+        hh3cMACLearntEnable     INTEGER,
+        hh3cMACRemovedEnable    INTEGER
+    }
+
+hh3cMACLearntEnable OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If the object is set to enabled(1) on interface, the device
+        will cache the MAC address information that learnt on the interface."
+    DEFVAL { disabled }
+    ::= { hh3cMACInfomationIfEntry 1 }
+
+hh3cMACRemovedEnable OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If the object is set to enable(1) on interface, the device
+        will cache the MAC address information that removed on the interface."
+    DEFVAL { disabled }
+    ::= { hh3cMACInfomationIfEntry 2 }
+
+
+-- hh3cMACNotificationTrap
+
+hh3cMACInformationTraps OBJECT IDENTIFIER ::= { hh3cMACInformationMibTrap 0 }
+
+hh3cMACInformationChangedTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMACInfoTrapIndex,
+            hh3cMACInfoTrapCount,
+            hh3cMACInfoTrapMsg
+        }
+    STATUS      current
+    DESCRIPTION
+        "When the cached number of MAC address information is reached the
+        value specified by hh3cMACInformationCacheLen, trap is generated
+        and is sent to the remote monitoring device.  The trap is also
+        generated when the amount of time elapsed since the previous
+        notification is greater than the interval value specified by
+        hh3cMACInformationcSendInterval and there is at least one cached
+        MAC address information learnt or removed. The object is valid
+        only when hh3cMACInfomationWorkMode is set to trap(1).  When the
+        hh3cMACInfomationWorkMode is set to syslog(2), No trap will be
+        generated even hh3cMACInformationEnabled is set to enabled(1) and
+        the feature is enabled on interface."
+    ::= { hh3cMACInformationTraps 1 }
+
+hh3cMACInformationTrapObjects OBJECT IDENTIFIER  ::= { hh3cMACInformationMibTrap 2 }
+
+hh3cMACInfoTrapIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The sequence number of trap information. When it reaches the
+        maximum value, it should be set to 1."
+    ::= { hh3cMACInformationTrapObjects 1 }
+
+hh3cMACInfoTrapCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The cell number of the current trap information.  The trap
+        message may consists of more than one MAC address information.
+        Each of the one MAC address information in one trap is called cell."
+    ::= { hh3cMACInformationTrapObjects 2 }
+
+hh3cMACInfoTrapMsg OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..254))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is the MAC information that learnt or removed
+        in the monitored device. It can consists of more than
+        one MAC information in the object.
+        This object is in the format of '<cell1><cell2>...'. Each
+        cell consists of 12 octets in the format of
+        '<operationType><VLAN><MAC><MACtype><ifIndex>'.
+
+        <operationType> is the reason type of MAC address changed and have
+        size of 1 octet. It only supports the following values.
+        1 - MAC learnt.
+        2 - MAC removed.
+
+        <VLAN> is the vlan number that correspond to the MAC address in
+        MAC address table and has size of 2 octet.
+
+        <MAC> is the MAC address and has size of 6 octets.
+
+        <MACtype> is the MAC address type and has size of 1 octet. It only
+        supports the following values.
+        0 - Unknown
+        1 - Learnt
+        2 - Config dynamic
+        3 - Config static
+        4 - Blackhole
+        5 - Security
+        6 - 802.1x
+        7 - MAC authentication
+        8 - Voice VLAN
+        9 - Reserved
+
+        <ifIndex> is the index of the interface where the MAC
+        address is learnt or removed and has size of 2 octets."
+    ::= { hh3cMACInformationTrapObjects 3 }
+
+-- hh3cMACNotificationTrapExt
+
+hh3cMACInformationTrapsExt OBJECT IDENTIFIER ::= { hh3cMACInformationMibTrapExt 0 }
+
+hh3cMACInformationChangedTrapExt NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMACInfoTrapVerExt,
+            hh3cMACInfoTrapIndexExt,
+            hh3cMACInfoTrapCountExt,
+            hh3cMACInfoTrapMsgExt
+        }
+    STATUS      current
+    DESCRIPTION
+        "When the cached number of MAC address information is reached the
+        value specified by hh3cMACInformationCacheLen, trap is generated
+        and is sent to the remote monitoring device.  The trap is also
+        generated when the amount of time elapsed since the previous
+        notification is greater than the interval value specified by
+        hh3cMACInformationcSendInterval and there is at least one cached
+        MAC address information learnt or removed.  The object is valid
+        only when hh3cMACInfomationWorkMode is set to trap(1).  When the
+        hh3cMACInfomationWorkMode is set to syslog(2), No trap will be
+        generated even hh3cMACInformationEnabled is set to enabled(1) and
+        the feature is enabled on interface."
+    ::= { hh3cMACInformationTrapsExt 1 }
+
+hh3cMACInformationMovedTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMACInfoTrapMsgMovedAddress,
+            hh3cMACInfoTrapMsgMovedVlan,
+            hh3cMACInfoTrapMsgMovedFromIf,
+            hh3cMACInfoTrapMsgMovedToIf,
+            hh3cMACInfoTrapMsgMovedCount
+        }
+    STATUS      current
+    DESCRIPTION
+        "When the MAC address has been moved to another interface, trap
+        is generated and is sent to the remote monitoring device."
+    ::= { hh3cMACInformationTrapsExt 2 }
+
+hh3cMACInformationTrapObjectsExt OBJECT IDENTIFIER  ::= { hh3cMACInformationMibTrapExt 2 }
+
+hh3cMACInfoTrapVerExt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The version of trap information."
+    ::= { hh3cMACInformationTrapObjectsExt 1 }
+
+hh3cMACInfoTrapIndexExt OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The sequence number of trap information.  When it reaches the
+        maximum value, it should be set to 1."
+    ::= { hh3cMACInformationTrapObjectsExt 2 }
+
+hh3cMACInfoTrapCountExt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The cell number of the current trap information.  The trap
+        message may consists of more than one MAC address information.
+        Each of the one MAC address information in one trap is called cell."
+    ::= { hh3cMACInformationTrapObjectsExt 3 }
+
+hh3cMACInfoTrapMsgExt OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..254))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is the MAC information that learnt or removed
+        in the monitored device.  It can consists of more than
+        one MAC information in the object.
+        This object is in the format of '<cell1><cell2>...'.  Each
+        cell consists of 14 octets in the format of
+        '<operationType><VLAN><MAC><MACtype><ifIndex>'.
+
+        <operationType> is the reason type of MAC address changed and have
+        size of 1 octet.  It only supports the following values.
+        1 - MAC learnt.
+        2 - MAC removed.
+
+        <VLAN> is the vlan number that correspond to the MAC address in
+        MAC address table and has size of 2 octet.
+
+        <MAC> is the MAC address and has size of 6 octets.
+
+        <MACtype> is the MAC address type and has size of 1 octet.  It only
+        supports the following values.
+        0 - Unknown
+        1 - Learnt
+        2 - Config dynamic
+        3 - Config static
+        4 - Blackhole
+        5 - Security
+        6 - 802.1x
+        7 - MAC authentication
+        8 - Voice VLAN
+        9 - Reserved
+
+        <ifIndex> is the index of the interface where the MAC
+        address is learnt or removed and has size of 4 octets."
+    ::= { hh3cMACInformationTrapObjectsExt 4 }
+
+hh3cMACInfoTrapMsgMovedAddress   OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+        "The MAC address that is moved between interfaces."
+        ::= { hh3cMACInformationTrapObjectsExt  5 }
+
+hh3cMACInfoTrapMsgMovedVlan OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The VLAN number in which the MAC address is moved."
+        ::= { hh3cMACInformationTrapObjectsExt  6}
+
+hh3cMACInfoTrapMsgMovedFromIf OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The index of the interface from which the MAC address is moved."
+        ::= { hh3cMACInformationTrapObjectsExt  7 }
+
+hh3cMACInfoTrapMsgMovedToIf OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The index of the interface to which the MAC address is moved."
+        ::= { hh3cMACInformationTrapObjectsExt  8 }
+
+hh3cMACInfoTrapMsgMovedCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The times for which the MAC address has been moved between the
+        interfaces."
+        ::= { hh3cMACInformationTrapObjectsExt  9 }
+
+END

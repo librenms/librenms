@@ -1,0 +1,2009 @@
+-- *******************************************************************
+-- Juniper Networks GVPN object mibs
+--
+-- Copyright (c) 2001-2018, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+JNX-GDOI-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32, Counter64, Integer32, Unsigned32
+           FROM SNMPv2-SMI
+        InetAddress, InetAddressType
+           FROM INET-ADDRESS-MIB
+        TEXTUAL-CONVENTION, DisplayString, TimeInterval
+           FROM SNMPv2-TC
+        jnxMibs
+           FROM JUNIPER-SMI;
+
+-- ------------------------------------------------------------------ --
+-- GDOI MIB Module Identity
+-- ------------------------------------------------------------------ --
+jnxGdoiMIB MODULE-IDENTITY
+    LAST-UPDATED "201801040000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+            Juniper Networks, Inc.
+            1133 Innovation Way,
+            Sunnyvale, CA 94089
+            E-mail: support@juniper.net"
+    DESCRIPTION
+        "Initial version, implements only the GDOI GM notifications and
+            following tables for GDOI protocol.
+            - GDOI Group Table
+            - GDOI Gm Table
+            - GDOI Gm Kek Table
+            - GDOI Gm Tek SelectorTable
+            - GDOI Gm Tek PolicyTable
+        "
+    ::=  { jnxMibs 759}
+
+-- ------------------------------------------------------------------ --
+-- GDOI MIB Textual Conventions
+-- ------------------------------------------------------------------ --
+
+JnxGdoiIdentificationType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the type of value used to
+        identify a GDOI entity (i.e. Group, Key Server, or Group
+        Member).
+
+        Following are the Identification Type Values:
+
+          ID Type              Value
+          -------              -----
+          RESERVED               0  -- Not Used
+          ID_IPV4_ADDR           1  -- ipv4Address
+          ID_FQDN                2  -- domainName
+
+          ID_RFC822_ADDR         3  -- userName
+          (ID_USER_FQDN)
+
+          ID_IPV4_ADDR_SUBNET    4  -- ipv4Subnet - Not in RFC 4306
+          ID_IPV6_ADDR           5  -- ipv6Address
+          ID_IPV6_ADDR_SUBNET    6  -- ipv6Subnet - Not in RFC 4306
+          ID_IPV4_ADDR_RANGE     7  -- ipv4Range  - Not in RFC 4306
+          ID_IPV6_ADDR_RANGE     8  -- ipv6Range  - Not in RFC 4306
+          ID_DER_ASN1_DN         9  -- caDistinguishedName
+          ID_DER_ASN1_GN         10 -- caGeneralName
+          ID_KEY_ID              11 -- groupNumber
+
+        Following are the mappings to the type values above:
+
+          'ipv4Address' : a single four (4) octet IPv4 address.
+
+          'domainName'  : a fully-qualified domain name string.  An
+               example is, 'example.com'.  The string MUST not
+               contain any terminators (e.g., NULL, CR, etc.).
+
+          'userName'    : a fully-qualified RFC 822 username or email
+               address string. An example is, 'jsmith@example.com'.
+               The string MUST not contain any terminators.
+
+          'ipv4Subnet'  : a range of IPv4 addresses, represented by
+               two four (4) octet values concatenated together.  The
+               first value is an IPv4 address.  The second is an
+               IPv4 network mask.  Note that ones (1s) in the network
+               mask indicate that the corresponding bit in the address
+               is fixed, while zeros (0s) indicate a 'wildcard' bit.
+
+          'ipv6Address' : a single sixteen (16) octet IPv6 address.
+
+          'ipv6Subnet'  : a range of IPv6 addresses, represented by
+               two sixteen (16) octet values concatenated together.
+               The first value is an IPv6 address.  The second is an
+               IPv network mask.  Note that ones (1s) in the network
+               mask indicate that the corresponding bit in the address
+               is fixed, while zeros (0s) indicate a 'wildcard' bit.
+
+          'ipv4Range'   : a range of IPv4 addresses, represented by
+               two four (4) octet values.  The first value is the
+               beginning IPv4 address (inclusive) and the second
+               value is the ending IPv4 address (inclusive).  All
+               addresses falling between the two specified addresses
+               are considered to be within the list.
+
+          'ipv6Range'   : a range of IPv6 addresses, represented by
+               two sixteen (16) octet values.  The first value is the
+               beginning IPv6 address (inclusive) and the second
+               value is the ending IPv6 address (inclusive).  All
+               addresses falling between the two specified addresses
+               are considered to be within the list.
+
+          'caDistinguishedName' : the binary DER encoding of an ASN.1
+               X.500 Distinguished Name [X.501].
+
+          'caGeneralName' : the binary DER encoding of an ASN.1
+               X.500 GeneralName [X.509].
+
+          'groupNumber' : a four (4) octet group identifier."
+
+    REFERENCE
+        "IANA ISAKMP Registry - 'Magic Numbers' for ISAKMP Protocol
+         Section: IPSEC Identification Type
+         http://www.iana.org/assignments/isakmp-registry
+
+         RFC 4306 - Section: 3.5. Identification Payloads"
+    SYNTAX          INTEGER  {
+                        ipv4Address(1),
+                        domainName(2),
+                        userName(3),
+                        ipv4Subnet(4),
+                        ipv6Address(5),
+                        ipv6Subnet(6),
+                        ipv4Range(7),
+                        ipv6Range(8),
+                        caDistinguishedName(9),
+                        caGeneralName(10),
+                        groupNumber(11)
+                    }
+
+JnxGdoiIdentificationValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255d"
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the actual value of used to
+        identify a GDOI entity (i.e. Group, Key Server, or Group
+        Member).  The value of the JnxGdoiIdentificationValue object can
+        be parsed based on the value of the associated
+        JnxGdoiIdentificationType object.
+
+        The following JnxGdoiIdentificationType values indicate that the
+         JnxGdoiIdentificationValue object should be parsed as a binary
+        string of octets with the given lengths if a length is not
+        associated with the object:
+
+          ipv4Address(1)   -- 4 octets
+          ipv4Subnet(4)    -- 8 octets
+          ipv6Address(5)   -- 16 octets
+          ipv6Subnet(6)    -- 32 octets
+          ipv4Range(7)     -- 8 octets
+          ipv6Range(8)     -- 32 octets
+          groupNumber(11)  -- 4 octets
+
+        The following  JnxGdoiIdentificationType values indicate that
+        the JnxGdoiIdentificationValue object should be parsed as an
+        ASCII string of characters. Note that a length MUST be
+        associated with the object in these cases:
+
+          domainName(2)
+          userName(3)
+          caDistinguishedName(9)
+          caGeneralName(10)
+
+        Note that the length of 48 octets was chosen because the
+        gdoiKsKekEntry, gdoiGmKekEntry, gdoiKsTekEntry, &
+        gdoiGmTekEntry will exceed the OID size limit of 255 octets
+        if this size is any larger than 48 octets."
+
+    REFERENCE
+        "IANA ISAKMP Registry - 'Magic Numbers' for ISAKMP Protocol
+         Section: IPSEC Identification Type
+         http://www.iana.org/assignments/isakmp-registry
+
+         RFC 4306 - Section: 3.5. Identification Payloads"
+    SYNTAX          OCTET STRING (SIZE (0..48))
+
+JnxGdoiKekSPI ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "16x"
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating a SPI (Security Parameter
+        Index) of sixteen (16) octets for a KEK.  The SPI must be the
+        ISAKMP Header cookie pair where the first 8 octets become the
+        'Initiator Cookie' field of the GROUPKEY-PUSH message ISAKMP
+        HDR, and the second 8 octets become the 'Responder Cookie' in
+        the same HDR.  These cookies are assigned by the Key Server."
+
+    REFERENCE       "RFC 3547 - Section: 5.3. SA KEK Payload"
+    SYNTAX          OCTET STRING (SIZE (16))
+
+JnxGdoiIpProtocolId ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the identifier of the IP
+        Protocol being used for the rekey datagram.  Some possible
+        values are:
+
+          ID Value  ID Type
+          --------  -------
+             06       TCP    -- ipProtocolTCP
+             17       UDP    -- ipProtocolUDP"
+
+    REFERENCE       "RFC 3547 - Section: 5.3. SA KEK Payload"
+    SYNTAX          INTEGER  {
+                        ipProtocolUnknown(0),
+                        ipProtocolTCP(1),
+                        ipProtocolUDP(2)
+                    }
+
+JnxGdoiKeyManagementAlgorithm ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the identifier of the key/KEK
+        management algorithm being used to provide forward or
+        backward access control (i.e. used to exclude group
+        members).
+
+        Following are the possible KEK management algorithm values &
+        JnxGdoiKeyManagementAlgorithm mappings:
+
+          KEK Management Type  Value
+          -------------------  -----
+           LKH                   1  -- keyMgmtLkh"
+
+    REFERENCE       "RFC 3547 - Section: 5.3. SA KEK Payload"
+    SYNTAX          INTEGER  {
+                        keyMgmtNone(0),
+                        keyMgmtLkh(1)
+                    }
+
+JnxGdoiEncryptionAlgorithm ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the identifier of the
+        encryption algorithm being used.
+
+        Following are the possible updated encryption algorithm
+        values & JnxGdoiEncryptionAlgorithm mappings after RFC 4306:
+
+          Encryption Algorithm Type          Value
+          ---------------------------------  -----
+           ENCR_DES_IV64                       1  -- encrAlgDes64
+           ENCR_DES                            2  -- encrAlgDes
+           ENCR_3DES                           3  -- encrAlg3Des
+           ENCR_RC5                            4  -- encrAlgRc5
+           ENCR_IDEA                           5  -- encrAlgIdea
+           ENCR_CAST                           6  -- encrAlgCast
+           ENCR_BLOWFISH                       7  -- encrAlgBlowfish
+           ENCR_3IDEA                          8  -- encrAlg3Idea
+           ENCR_DES_IV32                       9  -- encrAlgDes32
+           ENCR_NULL                           11 -- encrAlgNull
+           ENCR_AES_CBC                        12 -- encrAlgAesCbc
+           ENCR_AES_CTR                        13 -- encrAlgAesCtr
+           ENCR_AES-CCM_8                      14 -- encrAlgAesCcm8
+           ENCR_AES-CCM_12                     15 -- encrAlgAesCcm12
+           ENCR_AES-CCM_16                     16 -- encrAlgAesCcm16
+           AES-GCM (8-octet ICV)               18 -- encrAlgAesGcm8
+           AES-GCM (12-octet ICV)              19 -- encrAlgAesGcm12
+           AES-GCM (16-octet ICV)              20 -- encrAlgAesGcm16
+           ENCR_NULL_AUTH_AES_GMAC             21
+               -- encrAlgNullAuthAesGmac
+           ENCR_CAMELLIA_CBC                   23
+               -- encrAlgCamelliaCbc
+           ENCR_CAMELLIA_CTR                   24
+               -- encrAlgCamelliaCtr
+           ENCR_CAMELLIA_CCM (8-octet ICV)     25
+               -- encrAlgCamelliaCcm8
+           ENCR_CAMELLIA_CCM (12-octet ICV)    26
+               -- encrAlgCamelliaCcm12
+           ENCR_CAMELLIA_CCM (16-octet ICV)    27
+               -- encrAlgCamelliaCcm16
+
+        Following are the possible ESP transform identifiers &
+        JnxGdoiEncryptionAlgorithm mappings from RFC 2407:
+
+          IPsec ESP Transform ID    Value
+          ------------------------  -----
+           ESP_DES_IV64               1  -- encrAlgDes64
+           ESP_DES                    2  -- encrAlgDes
+           ESP_3DES                   3  -- encrAlg3Des
+           ESP_RC5                    4  -- encrAlgRc5
+           ESP_IDEA                   5  -- encrAlgIdea
+           ESP_CAST                   6  -- encrAlgCast
+           ESP_BLOWFISH               7  -- encrAlgBlowfish
+           ESP_3IDEA                  8  -- encrAlg3Idea
+           ESP_DES_IV32               9  -- encrAlgDes32
+           ESP_RC4                    10 -- encrAlgRc4
+           ESP_NULL                   11 -- encrAlgNull
+           ESP_AES-CBC                12 -- encrAlgAesCbc
+           ESP_AES-CTR                13 -- encrAlgAesCtr
+           ESP_AES-CCM_8              14 -- encrAlgAesCcm8
+           ESP_AES-CCM_12             15 -- encrAlgAesCcm12
+           ESP_AES-CCM_16             16 -- encrAlgAesCcm16
+           ESP_AES-GCM_8              18 -- encrAlgAesGcm8
+           ESP_AES-GCM_12             19 -- encrAlgAesGcm12
+           ESP_AES-GCM_16             20 -- encrAlgAesGcm16
+           ESP_SEED_CBC               21 -- encrAlgSeedCbc
+           ESP_CAMELLIA               22
+               -- encrAlgCamelliaCbc, Ctr, Ccm8, Ccm12, Ccm16
+           ESP_NULL_AUTH_AES-GMAC     23
+               -- encrAlgNullAuthAesGmac
+
+        Following are the possible KEK_ALGORITHM values specifying
+        the encryption algorithm used with a KEK &
+        JnxGdoiEncryptionAlgorithm mappings from the GDOI RFC 3547:
+
+          Algorithm Type  Value
+          --------------  -----
+           KEK_ALG_DES      1  -- encrAlgDes
+           KEK_ALG_3DES     2  -- encrAlg3Des
+           KEK_ALG_AES      3  -- encrAlgAesCbc"
+
+    REFERENCE
+        "IANA IKEv2 Parameters
+         Section: Encryption Algorithm Transform IDs
+         http://www.iana.org/assignments/ikev2-parameters
+
+         IANA 'Magic Numbers' for ISAMP Protocol
+         Section: IPSEC ESP Transform Identifiers
+         http://www.iana.org/assignments/isakmp-registry
+
+         RFC 2407 - Section: 4.4.4. IPSEC ESP Transform Identifiers
+         RFC 3547 - Section: 5.3.3. KEK_ALGORITHM
+         RFC 4306 - Section: 3.3.2. Transform Substructure
+         RFC 4106, 4309, 4543, 5282, 5529"
+    SYNTAX          INTEGER  {
+                        encrAlgNone(0),
+                        encrAlgDes64(1),
+                        encrAlgDes(2),
+                        encrAlg3Des(3),
+                        encrAlgRc5(4),
+                        encrAlgIdea(5),
+                        encrAlgCast(6),
+                        encrAlgBlowfish(7),
+                        encrAlg3Idea(8),
+                        encrAlgDes32(9),
+                        encrAlgRc4(10),
+                        encrAlgNull(11),
+                        encrAlgAesCbc(12),
+                        encrAlgAesCtr(13),
+                        encrAlgAesCcm8(14),
+                        encrAlgAesCcm12(15),
+                        encrAlgAesCcm16(16),
+                        encrAlgAesGcm8(18),
+                        encrAlgAesGcm12(19),
+                        encrAlgAesGcm16(20),
+                        encrAlgNullAuthAesGmac(21),
+                        encrAlgCamelliaCbc(23),
+                        encrAlgCamelliaCtr(24),
+                        encrAlgCamelliaCcm8(25),
+                        encrAlgCamelliaCcm12(26),
+                        encrAlgCamelliaCcm1(27),
+                        encrAlgSeedCbc(28)
+                    }
+
+JnxGdoiPseudoRandomFunction ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the identifier of the
+        pseudo-random function (PRF) being used.
+
+        Following are the possible updated PRF values &
+        JnxGdoiPseudoRandomFunction mappings after RFC 4306:
+
+          Pseudo-Random Function Type        Value
+          ---------------------------------  -----
+           PRF_HMAC_MD5                        1  -- prfMd5Hmac
+           PRF_HMAC_SHA1                       2  -- prfSha1Hmac
+           PRF_HMAC_TIGER                      3  -- prfTigerHmac
+           PRF_AES128_XCBC                     4  -- prfAes128Xcbc
+           PRF_HMAC_SHA2_256                   5  -- prfSha2Hmac256
+           PRF_HMAC_SHA2_384                   6  -- prfSha2Hmac384
+           PRF_HMAC_SHA2_512                   7  -- prfSha2Hmac512
+           PRF_AES128_CMAC                     8  -- prfAes128Cmac
+
+        Following are the possible SIG_HASH_ALGORITHM values &
+        JnxGdoiPseudoRandomFunction mappings from the GDOI RFC 3547:
+
+          Algorithm Type  Value
+          --------------  -----
+           SIG_HASH_MD5     1  -- prfMd5Hmac
+           SIG_HASH_SHA1    2  -- prfSha1Hmac"
+
+    REFERENCE
+        "IANA IKEv2 Parameters
+         Section: Pseudo-random Function Transform IDs
+         http://www.iana.org/assignments/ikev2-parameters
+
+         RFC 3547 - Section: 5.3.6. SIG_HASH_ALGORITHM
+         RFC 4306 - Section: 3.3.2. Transform Substructure
+         RFC 4615, 4868"
+    SYNTAX          INTEGER  {
+                        prfNone(0),
+                        prfMd5Hmac(1),
+                        prfSha1Hmac(2),
+                        prfTigerHmac(3),
+                        prfAes128Xcbc(4),
+                        prfSha2Hmac256(5),
+                        prfSha2Hmac384(6),
+                        prfSha2Hmac512(7),
+                        prfAes128Cmac(8)
+                    }
+
+JnxGdoiIntegrityAlgorithm ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the identifier of the
+        integirty algorithm being used.
+
+        Following are the possible updated integrity algorithm
+        values & JnxGdoiIntegrityAlgorithm mappings after RFC 4306:
+
+          Integrity Algorithm Type  Value
+          ------------------------  -----
+           AUTH_HMAC_MD5_96           1  -- authAlgMd5Hmac96
+           AUTH_HMAC_SHA1_96          2  -- authAlgSha1Hmac96
+           AUTH_DES_MAC               3  -- authAlgDesMac
+           AUTH_KPDK_MD5              4  -- authAlgMd5Kpdk
+           AUTH_AES_XCBC_96           5  -- authAlgAesXcbc96
+           AUTH_HMAC_MD5_128          6  -- authAlgMd5Hmac128
+           AUTH_HMAC_SHA1_160         7  -- authAlgSha1Hmac160
+           AUTH_AES_CMAC_96           8  -- authAlgAesCmac96
+           AUTH_AES_128_GMAC          9  -- authAlgAes128Gmac
+           AUTH_AES_192_GMAC          10 -- authAlgAes192Gmac
+           AUTH_AES_256_GMAC          11 -- authAlgAes256Gmac
+           AUTH_HMAC_SHA2_256_128     12 -- authAlgSha2Hmac256to128
+           AUTH_HMAC_SHA2_384_192     13 -- authAlgSha2Hmac384to192
+           AUTH_HMAC_SHA2_512_256     14 -- authAlgSha2Hmac512to256
+
+        Following are the possible legacy authentication algorithm
+        values & JnxGdoIntegrityAlgorithm mappings from RFC 2407:
+
+          Algorithm Type  Value
+          --------------  -----
+           HMAC-MD5         1  -- authAlgMd5Hmac96
+           HMAC-SHA         2  -- authAlgSha1Hmac96
+           DES-MAC          3  -- authAlgDesMac
+           KPDK             4  -- authAlgMd5Kpdk"
+
+    REFERENCE
+        "IANA IKEv2 Parameters
+         Section: Integrity Algorithm Transform IDs
+         http://www.iana.org/assignments/ikev2-parameters
+
+         RFC 2407 - Section: 4.5.   IPSEC Security Assoc. Attributes
+         RFC 3547 - Section: 5.3.6. SIG_HASH_ALGORITHM
+         RFC 4306 - Section: 3.3.2. Transform Substructure
+         RFC 4494, 4543, 4595, 4868"
+    SYNTAX          INTEGER  {
+                        authAlgNone(0),
+                        authAlgMd5Hmac96(1),
+                        authAlgSha1Hmac96(2),
+                        authAlgDesMac(3),
+                        authAlgMd5Kpdk(4),
+                        authAlgAesXcbc96(5),
+                        authAlgMd5Hmac128(6),
+                        authAlgSha1Hmac160(7),
+                        authAlgAesCmac96(8),
+                        authAlgAes128Gmac(9),
+                        authAlgAes192Gmac(10),
+                        authAlgAes256Gmac(11),
+                        authAlgSha2Hmac256to128(12),
+                        authAlgSha2Hmac384to192(13),
+                        authAlgSha2Hmac512to256(14)
+                    }
+
+JnxGdoiSignatureMethod ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the identifier of the
+        integirty algorithm being used.
+
+        Following are the possible updated authentication method
+        values & JnxGdoiSignatureMethod mappings after RFC 4306:
+
+          Authentication Method                Value
+          -----------------------------------  -----
+           RSA Digital Signature                 1  -- sigRsa
+           Shared Key Message Integrity Code     2  -- sigSharedKey
+           DSS Digital Signature                 3  -- sigDss
+           ECDSA w/ SHA-256 (P-256 curve)        9  -- sigEcdsa256
+           ECDSA w/ SHA-384 (P-384 curve)        10 -- sigEcdsa384
+           ECDSA w/ SHA-512 (P-521 curve)        11 -- sigEcdsa512
+
+        Following are the possible legacy IPsec authentication method
+        values & JnxGdoiSignatureMethod mappings from RFC 2409:
+
+          Authentication Method             Value
+          --------------------------------  -----
+           Pre-Shared Key                     1  -- sigSharedKey
+           DSS Signature                      2  -- sigDss
+           RSA Signature                      3  -- sigRsa
+           Encryption w/ RSA                  4  -- sigEncryptRsa
+           Revised Encryption w/ RSA          5  -- sigRevEncryptRsa
+           ECDSA w/ SHA-256 (P-256 curve)     9  -- sigEcdsa256
+           ECDSA w/ SHA-384 (P-384 curve)     10 -- sigEcdsa384
+           ECDSA w/ SHA-512 (P-521 curve)     11 -- sigEcdsa512
+
+        Following are the possible POP algorithm values &
+        JnxGdoiSignatureMethod mappings from the GDOI RFC 3547:
+
+          Algorithm Type  Value
+          --------------  -----
+           POP_ALG_RSA      1  -- sigRsa
+           POP_ALG_DSS      2  -- sigDss
+           POP_ALG_ECDSS    3  -- sigEcdsa256, 384, 512
+
+        Following are the possible SIG_ALGORITHM values &
+        JnxGdoiSignatureMethod mappings from the GDOI RFC 3547:
+
+          Algorithm Type  Value
+          --------------  -----
+           SIG_ALG_RSA      1  -- sigRsa
+           SIG_ALG_DSS      2  -- sigDss
+           SIG_ALG_ECDSS    3  -- sigEcdsa256, 384, 512"
+
+    REFERENCE
+        "IANA IKEv2 Parameters
+         Section: Integrity Algorithm Transform IDs
+         http://www.iana.org/assignments/ikev2-parameters
+
+         RFC 2409 - Section:  Appendix A. Authentication Method
+         RFC 3547 - Sections: 5.3.SA KEK payload
+              5.3.7.      SIG_ALGORITHM
+         RFC 4306 - Section:  3.8.Authentication Payload
+         RFC 4754"
+    SYNTAX          INTEGER  {
+                        sigNone(0),
+                        sigRsa(1),
+                        sigSharedKey(2),
+                        sigDss(3),
+                        sigEncryptRsa(4),
+                        sigRevEncryptRsa(5),
+                        sigEcdsa256(9),
+                        sigEcdsa384(10),
+                        sigEcdsa512(11)
+                    }
+
+JnxGdoiDiffieHellmanGroup ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the identifier of the
+        Diffie-Hellman Group being used.
+
+        Following are the possible updated Diffie-Hellman Group
+        values & JnxGdoiDiffieHellmanGroup mappings after RFC 4306:
+
+          Diffie-Hellman Group Type  Value
+          -------------------------  -----
+           NONE                        0  -- dhNone
+           Group 1 - 768 Bit MODP      1  -- dhGroup1
+           Group 2 - 1024 Bit MODP     2  -- dhGroup2
+           1536-bit MODP Group         5  -- dh1536Modp
+           2048-bit MODP Group         14 -- dh2048Modp
+           3072-bit MODP Group         15 -- dh3072Modp
+           4096-bit MODP Group         16 -- dh4096Modp
+           6144-bit MODP Group         17 -- dh6144Modp
+           8192-bit MODP Group         18 -- dh8192Modp
+           256-bit random ECP group    19 -- dhEcp256
+           84-bit random ECP group     20 -- dhEcp84
+           521-bit random ECP group    21 -- dhEcp521
+           1024-bit MODP w/ 160-bit    22 -- dh1024Modp160
+             Prime Order Subgroup
+           2048-bit MODP w/ 224-bit    23 -- dh2048Modp224
+             Prime Order Subgroup
+           2048-bit MODP w/ 256-bit    24 -- dh2048Modp256
+             Prime Order Subgroup
+           192-bit Random ECP Group    25 -- dhEcp192
+           224-bit Random ECP Group    26 -- dhEcp224
+
+        Following are the possible legacy Diffie-Hellman Group
+        values & JnxGdoiDiffieHellmanGroup mappings from RFC 2409:
+
+          Diffie-Hellman Group Type  Value
+          -------------------------  -----
+           Group 1 - 768 Bit MODP      1  -- dhGroup1
+           Group 2 - 1024 Bit MODP     2  -- dhGroup2
+           EC2N group on GP[2^155]     3  -- dhEc2nGp155
+           EC2N group on GP[2^185]     4  -- dhEc2nGp185"
+
+    REFERENCE
+        "IANA IKEv2 Parameters
+         Section: Diffie-Hellman Group Transform IDs
+         http://www.iana.org/assignments/ikev2-parameters
+
+         RFC 2409 - Sections: 6.1. First Oakley Default Group
+              6.2. Second Oakley Default Group
+              6.3. Third Oakley Default Group
+              6.4. Fourth Oakley Default Group"
+    SYNTAX          INTEGER  {
+                        dhNone(0),
+                        dhGroup1(1),
+                        dhGroup2(2),
+                        dhEc2nGp155(3),
+                        dhEc2nGp185(4),
+                        dh1536Modp(5),
+                        dh2048Modp(14),
+                        dh3072Modp(15),
+                        dh4096Modp(16),
+                        dh6144Modp(17),
+                        dh8192Modp(18),
+                        dhEcp256(19),
+                        dhEcp84(20),
+                        dhEcp521(21),
+                        dh1024Modp160(22),
+                        dh2048Modp224(23),
+                        dh2048Modp256(24),
+                        dhEcp192(25),
+                        dhEcp224(26)
+                    }
+
+JnxGdoiEncapsulationMode ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the identifier of the
+        Encapsulation Mode being used.
+
+        Following are the possible Encapsulation Mode
+        values & JnxGdoiEncapsulationMode mappings from RFC 2407:
+
+          Encapsulation Mode            Value
+          ----------------------------  -----
+           Tunnel                         1  -- encapTunnel
+           Transport                      2  -- encapTransport
+           UDP-Encapsulated-Tunnel        3  -- encapUdpTunnel
+           UDP-Encapsulated-Transport     4  -- encapUdpTransport"
+
+    REFERENCE
+        "IANA 'Magic Numbers' for ISAKMP Protocol
+         Section: Encapsulation Mode
+         http://www.iana.org/assignments/isakmp-registry
+
+         RFC 2407 - Section: 4.5. IPSEC Security Assoc. Attributes
+         RFC 3947"
+    SYNTAX          INTEGER  {
+                        encapUnknown(0),
+                        encapTunnel(1),
+                        encapTransport(2),
+                        encapUdpTunnel(3),
+                        encapUdpTransport(4)
+                    }
+
+JnxGdoiSecurityProtocol ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the identifier of the
+        Security Protocol being used.
+
+        Following are the possible Security Protocol ID
+        values & JnxGdoiSecurityProtocol mappings from the
+        GDOI RFC 3547:
+
+          Security Protocol ID    Value
+          ----------------------  -----
+           GDOI_PROTO_IPSEC_ESP     1  -- secProtocolIpsecEsp"
+
+    REFERENCE       "RFC 3547 - Section: 5.4. SA TEK Payload"
+    SYNTAX          INTEGER  {
+                        secProtocolUnknown(0),
+                        secProtocolIpsecEsp(1)
+                    }
+
+JnxGdoiTekSPI ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "4x"
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating a SPI (Security Parameter
+        Index) of four (4) octets for a TEK using ESP."
+
+    REFERENCE       "RFC 3547 - Section: 5.4.1. PROTO_IPSEC_ESP"
+    SYNTAX          OCTET STRING (SIZE (4))
+
+JnxGdoiKekStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the status of a GDOI KEK and
+        its corresponding Security Association (SA).
+
+        'inUse' : KEK currently being used to encrypt new KEK/TEKs
+        'new'   : KEK currently being sent to all peers
+        'old'   : KEK that has expired and is no longer being used"
+    SYNTAX          INTEGER  {
+                        inUse(1),
+                        new(2),
+                        old(3)
+                    }
+
+JnxGdoiTekStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the status of a GDOI TEK and
+        its corresponding Security Association (SA).
+
+        'inbound'       : TEK is being used as inbound (receive) SA
+        'outbound'      : TEK is being used as outbound (transmit) SA
+        'biDirectional' : TEK is being used as both inbound and outbound SA"
+    SYNTAX          INTEGER  {
+                        inbound(1),
+                        outbound(2),
+                        biDirectional(3)
+                    }
+
+JnxGdoiUnsigned16 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "2d"
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating a 16-bit unsigned integer
+        value."
+    SYNTAX          OCTET STRING (SIZE (2))
+
+JnxGdoiPolicyMismatchAction ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A textual convention indicating the default action
+        for packets that does not match TEK policy/SA.
+
+        'drop'   : Drop packets that do not match the TEK policy/SA.
+        'forward': Forward the packets as received that do not match the TEK
+                   policy/SA
+        'unknown': The default action for TEK policy/SA mismatch is unknown."
+    SYNTAX          INTEGER  {
+                        drop(1),
+                        forward(2),
+                        unknown(3)
+                    }
+
+-- ------------------------------------------------------------------ --
+-- GDOI MIB Groups
+-- ------------------------------------------------------------------ --
+
+jnxGdoiMIBNotifications  OBJECT IDENTIFIER
+    ::= { jnxGdoiMIB 0 }
+
+jnxGdoiMIBObjects  OBJECT IDENTIFIER
+    ::= { jnxGdoiMIB 1 }
+
+-- ------------------------------------------------------------------ --
+-- GDOI MIB Notifications
+-- ------------------------------------------------------------------ --
+--
+-- *---------------------------------------------------------------- --
+-- * GDOI Group Member (GM) Notifications
+-- *---------------------------------------------------------------- --
+
+jnxGdoiGmRegister NOTIFICATION-TYPE
+    OBJECTS         {
+                        jnxGdoiGmRegKeyServerIdType,
+                        jnxGdoiGmRegKeyServerIdValue
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A notification from a Group Member when it is starting to
+        register with its GDOI Group's Key Server.  Registration
+        includes downloading keying & security association material.
+        This is equivalent to a Group Member or Initiator sending the
+        first message of a GROUPKEY-PULL exchange to its Group's Key
+        Server."
+    REFERENCE
+        "RFC 3547 - Sections: 1.   Introduction
+              3.   GROUPKEY-PULL Exchange
+              3.3. Initiator Operations"
+   ::= { jnxGdoiMIBNotifications 5 }
+
+jnxGdoiGmRegistrationComplete NOTIFICATION-TYPE
+    OBJECTS         {
+                        jnxGdoiGmRegKeyServerIdType,
+                        jnxGdoiGmRegKeyServerIdValue
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A notification from a Group Member when it has successfully
+        registered with a Key Server in its GDOI Group.  This is
+        equivalent to a Group Member receiving the last message of
+        a GROUPKEY-PULL exchange from the Key Server containing
+        KEKs, TEKs, and their associated policies."
+    REFERENCE
+        "RFC 3547 - Sections: 1.   Introduction
+              3.   GROUPKEY-PULL Exchange
+              3.3. Initiator Operations"
+   ::= { jnxGdoiMIBNotifications 6 }
+
+jnxGdoiGmReRegister NOTIFICATION-TYPE
+    OBJECTS         {
+                        jnxGdoiGmRegKeyServerIdType,
+                        jnxGdoiGmRegKeyServerIdValue
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A notification from a Group Member when it is starting to
+        re-register with a Key Server in its GDOI Group.  A Group
+        Member needs to re-register to the key server if its keying &
+        security association material has expired and it has not
+        received a rekey from the key server to refresh the material.
+        This is equivalent to a Group Member sending the first
+        message of a GROUPKEY-PULL exchange to the Key Server of a
+        Group it is already registered with."
+    REFERENCE
+        "RFC 3547 - Sections: 1.   Introduction
+              3.   GROUPKEY-PULL Exchange
+              3.3. Initiator Operations"
+   ::= { jnxGdoiMIBNotifications 7 }
+
+jnxGdoiGmRekeyReceived NOTIFICATION-TYPE
+    OBJECTS         {
+                        jnxGdoiGmRegKeyServerIdType,
+                        jnxGdoiGmRegKeyServerIdValue,
+                        jnxGdoiGmRekeysReceived
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A notification from a Group Member when it has successfully
+        received and processed a rekey from a Key Server in its GDOI
+        Group.  Periodically the key server sends a rekey to refresh
+        the keying & security association material.  This is
+        equivalent to a Group Member receiving a GROUPKEY-PUSH
+        message from the Key Server of the Group it is already
+        registered with."
+    REFERENCE
+        "RFC 3547 - Sections: 1.   Introduction
+              4.   GROUPKEY-PUSH Message
+              4.8. Group Member Operations"
+   ::= { jnxGdoiMIBNotifications 8 }
+
+jnxGdoiGmRekeyFailure NOTIFICATION-TYPE
+    OBJECTS         {
+                        jnxGdoiGmRegKeyServerIdType,
+                        jnxGdoiGmRegKeyServerIdValue,
+                        jnxGdoiGmRekeysReceived
+                    }
+    STATUS          current
+    DESCRIPTION
+        "An error notification from a Group Member when it is unable
+        to successfully process and install a rekey (GROUPKEY-PUSH
+        message) sent by the Key Server in its Group that it is
+        registered with."
+    REFERENCE
+        "RFC 3547 - Sections: 1.   Introduction
+              4.   GROUPKEY-PUSH Message
+              4.8. Group Member Operations"
+   ::= { jnxGdoiMIBNotifications 11 }
+
+
+-- ------------------------------------------------------------------ --
+-- GDOI MIB Management Objects
+-- ------------------------------------------------------------------ --
+--
+-- *---------------------------------------------------------------- --
+-- * The GDOI "Group" Table
+-- *---------------------------------------------------------------- --
+
+jnxGdoiGroupTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF JnxGdoiGroupEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of information regarding GDOI Groups in use on
+        the network device being queried.
+        This table is modified to include only fields related to
+        Group Member"
+    ::= { jnxGdoiMIBObjects 1 }
+
+jnxGdoiGroupEntry OBJECT-TYPE
+    SYNTAX          JnxGdoiGroupEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing GDOI Group information, uniquely
+        identified by the GDOI Group ID."
+    REFERENCE
+        "RFC 3547 - Sections: 5.1.1.   Identification Type Values
+              5.1.1.1. ID_KEY_ID
+         RFC 4306 - Section:  3.5.     Identification Payloads"
+    INDEX           {
+                        jnxGdoiGroupIdType,
+                        jnxGdoiGroupIdValue
+                    }
+    ::= { jnxGdoiGroupTable 1 }
+
+JnxGdoiGroupEntry ::= SEQUENCE {
+        jnxGdoiGroupIdType                   JnxGdoiIdentificationType,
+        jnxGdoiGroupIdLength                 Unsigned32,
+        jnxGdoiGroupIdValue                  JnxGdoiIdentificationValue,
+        jnxGdoiGroupName                     DisplayString
+}
+
+jnxGdoiGroupIdType OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Identification Type Value used to parse a GDOI Group ID.
+        The GDOI RFC 3547 defines the types that can be used as a
+        GDOI Group ID, and RFC 4306 defines all valid types that can
+        be used as an identifier.  This Group ID type is sent as the
+        'ID Type' field of the Identification Payload for a GDOI
+        GROUPKEY-PULL exchange."
+    REFERENCE
+        "RFC 3547 - Sections: 5.1.1.   Identification Type Values
+              5.1.1.1. ID_KEY_ID
+         RFC 4306 - Section:  3.5.     Identification Payloads"
+    ::= { jnxGdoiGroupEntry 1 }
+
+jnxGdoiGroupIdLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The length (i.e. number of octets) of a Group ID.  If no
+        length is given (i.e. it has a value of 0), the default
+        length of its jnxGdoiGroupIdType should be used as long as it
+        is not reprsented by an ASCII string.  If the value has a
+        type that is represented by an ASCII string, a length MUST
+        be included.  If the length given is not 0, it should match
+        the 'Payload Length' (subtracting the generic header length)
+        of the Identification Payload for a GDOI GROUPKEY-PULL
+        exchange."
+    REFERENCE
+        "RFC 3547 - Sections: 5.1.1.   Identification Type Values
+              5.1.1.1. ID_KEY_ID
+         RFC 4306 - Section:  3.5.     Identification Payloads"
+    ::= { jnxGdoiGroupEntry 2 }
+
+jnxGdoiGroupIdValue OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationValue
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The value of a Group ID with its type indicated by the
+        jnxGdoiGroupIdType.  Use the jnxGdoiGroupIdType to parse the
+        Group ID correctly.  This Group ID value is sent as the
+        'Identification Data' field of the Identification Payload
+        for a GDOI GROUPKEY-PULL exchange."
+    REFERENCE
+        "RFC 3547 - Sections: 5.1.1.   Identification Type Values
+              5.1.1.1. ID_KEY_ID
+         RFC 4306 - Section:  3.5.     Identification Payloads"
+    ::= { jnxGdoiGroupEntry 3 }
+
+jnxGdoiGroupName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string-readable name configured for or given to a GDOI
+        Group."
+    ::= { jnxGdoiGroupEntry 4 }
+
+-- *---------------------------------------------------------------- --
+-- * GDOI MIB Management Object Groups
+-- *---------------------------------------------------------------- --
+
+jnxGdoiPeers  OBJECT IDENTIFIER
+    ::= { jnxGdoiMIBObjects 2 }
+
+jnxGdoiSecAssociations  OBJECT IDENTIFIER
+    ::= { jnxGdoiMIBObjects 3 }
+
+-- *---------------------------------------------------------------- --
+-- * The GDOI "Peers" Group
+-- *---------------------------------------------------------------- --
+
+-- #-------------------------------------------------------------- --
+-- # The GDOI "Group Members" Table
+-- #-------------------------------------------------------------- --
+
+jnxGdoiGmTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF JnxGdoiGmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of information regarding GDOI Group Members (GMs)
+        locally configured on the network device being queried.  Note
+        that Local Group Members may or may not be registered to a
+        Key Server in its GDOI Group on the same network device being
+        queried."
+    ::= { jnxGdoiPeers 2 }
+
+jnxGdoiGmEntry OBJECT-TYPE
+    SYNTAX          JnxGdoiGmEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing Local GDOI Group Member information,
+        uniquely identified by Group & GM IDs. Because the Group
+        Member is Local to the network device being queried, TEKs
+        installed for this Group Member can be queried as well."
+    REFERENCE
+        "RFC 3547 - Sections: 1.   Introduction
+              3.3. Initiator Operations
+              4.8. Group Member Operations"
+    INDEX           {
+                        jnxGdoiGroupIdType,
+                        jnxGdoiGroupIdValue,
+                        jnxGdoiGmIdType,
+                        jnxGdoiGmIdValue
+                    }
+    ::= { jnxGdoiGmTable 1 }
+
+JnxGdoiGmEntry ::= SEQUENCE {
+        jnxGdoiGmIdType               JnxGdoiIdentificationType,
+        jnxGdoiGmIdLength             Unsigned32,
+        jnxGdoiGmIdValue              JnxGdoiIdentificationValue,
+        jnxGdoiGmRegKeyServerIdType   JnxGdoiIdentificationType,
+        jnxGdoiGmRegKeyServerIdLength Unsigned32,
+        jnxGdoiGmRegKeyServerIdValue  JnxGdoiIdentificationValue,
+        jnxGdoiGmActiveKEK            JnxGdoiKekSPI,
+        jnxGdoiGmRekeysReceived       Counter32,
+        jnxGdoiGmActiveTEKNum         Counter32
+}
+
+jnxGdoiGmIdType OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The Identification Type Value used to parse the identity
+        information for a Initiator or Group Member.  RFC 4306
+        defines all valid types that can be used as an identifier.
+        These identification types are sent as the 'SRC ID Type' and
+        'DST ID Type' of the KEK and TEK payloads for GDOI
+        GROUPKEY-PULL and GROUPKEY-PUSH exchanges."
+    REFERENCE
+        "RFC 3547 - Sections: 5.3.   SA KEK payload
+              5.4.1. PROTO_IPSEC_ESP
+         RFC 4306 - Section:  3.5.   Identification Payloads"
+    ::= { jnxGdoiGmEntry 1 }
+
+jnxGdoiGmIdLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The length (i.e. number of octets) of a Group Member ID.  If
+        no length is given (i.e. it has a value of 0), the default
+        length of its jnxGdoiGmIdType should be used as long as
+        it is not reprsented by an ASCII string.  If the value has a
+        type that is represented by an ASCII string, a length MUST
+        be included.  If the length given is not 0, it should match
+        the 'SRC ID Data Len' and 'DST ID Data Len' fields sent in
+        the KEK and TEK payloads for GDOI GROUPKEY-PULL and
+        GROUPKEY-PUSH exchanges."
+    REFERENCE
+        "RFC 3547 - Sections: 5.3.   SA KEK payload
+              5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmEntry 2 }
+
+jnxGdoiGmIdValue OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationValue
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The value of the identity information for a Group Member with
+        its type indicated by the jnxGdoiGmIdType.  Use the
+        jnxGdoiGmIdType to parse the Group Member ID correctly.
+        This Group Member ID value is sent as the 'SRC
+        Identification Data' and 'DST Identification Data' of the
+        KEK and TEK payloads for GDOI GROUPKEY-PULL and GROUPKEY-PUSH
+        exchanges."
+    REFERENCE
+        "RFC 3547 - Sections: 5.3.   SA KEK payload
+              5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmEntry 3 }
+
+jnxGdoiGmRegKeyServerIdType OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The Identification Type Value used to parse the identity
+        information of this Group Member's registered Key Server.
+        RFC 4306 defines all valid types that can be used as an
+        identifier.  These identification types are sent as the 'SRC
+        ID Type' and 'DST ID Type' of the KEK and TEK payloads for
+        GDOI GROUPKEY-PULL and GROUPKEY-PUSH exchanges."
+    REFERENCE
+        "RFC 3547 - Sections: 5.3.   SA KEK payload
+              5.4.1. PROTO_IPSEC_ESP
+         RFC 4306 - Section:  3.5.   Identification Payloads"
+    ::= { jnxGdoiGmEntry 4 }
+
+jnxGdoiGmRegKeyServerIdLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The length (i.e. number of octets) of the registered Key
+        Server's ID.  If no length is given (i.e. it has a value
+        of 0), the default length of its jnxGdoiGmRegKeyServerIdType
+        should be used as long as it is not reprsented by an ASCII
+        string.  If the value has a type that is represented by an
+        ASCII string, a length MUST be included.  If the length given
+        is not 0, it should match the 'SRC ID Data Len' and 'DST ID
+        Data Len' fields sent in the KEK and TEK payloads for GDOI
+        GROUPKEY-PULL and GROUPKEY-PUSH exchanges."
+    REFERENCE
+        "RFC 3547 - Sections: 5.3.   SA KEK payload
+              5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmEntry 5 }
+
+jnxGdoiGmRegKeyServerIdValue OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the identity information for this Group Member's
+        registered Key Server with its type indicated by the
+        jnxGdoiGmRegKeyServerIdType.  Use the
+        jnxGdoiGmRegKeyServerIdType to parse the registered Key
+        Server's ID correctly.  This Key Server ID value is sent as
+        the 'SRC Identification Data' and 'DST Identification Data'
+        of the KEK and TEK payloads for GDOI GROUPKEY-PULL and
+        GROUPKEY-PUSH exchanges."
+    REFERENCE
+        "RFC 3547 - Sections: 5.3.   SA KEK payload
+              5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmEntry 6 }
+
+jnxGdoiGmActiveKEK OBJECT-TYPE
+    SYNTAX          JnxGdoiKekSPI
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The SPI of the Key Encryption Key (KEK) that is currently
+        being used by the Group Member to authenticate & decrypt a
+        rekey from a GROUPKEY-PUSH message."
+    ::= { jnxGdoiGmEntry 7 }
+
+jnxGdoiGmRekeysReceived OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "GROUPKEY-PUSH Messages"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The sequence number of the last rekey successfully received
+        from this Group Member's registered Key Server."
+    REFERENCE
+        "RFC 3547 - Sections: 3.2. Messages
+              3.3. Initiator Operations
+              4.   GROUPKEY-PUSH Message
+              4.8. Group Member Operations
+              5.6. Sequence Number Payload"
+    ::= { jnxGdoiGmEntry 8 }
+
+jnxGdoiGmActiveTEKNum OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "Number of traffic encryption keys"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of active traffic encryption keys (TEKS) currently
+        being used by the Group Member to encrypt/decrypt/authenticate
+        dataplane traffic."
+    ::= { jnxGdoiGmEntry 9 }
+
+
+-- *---------------------------------------------------------------- --
+-- * The GDOI "Security Associations (SA)" Group
+-- *---------------------------------------------------------------- --
+--
+-- #-------------------------------------------------------------- --
+-- # The GDOI "Group Member (GM) KEK SA" Table
+-- #-------------------------------------------------------------- --
+
+jnxGdoiGmKekTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF JnxGdoiGmKekEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of information regarding GDOI Key Encryption Key
+        (KEK) Security Associations (SAs) currently installed for
+        GDOI entities acting as Group Members on the network device
+        being queried.  There is one entry in this table for each
+        KEK SA that has been installed and not yet deleted.  Each
+        KEK SA is uniquely identified by a SPI at any given time."
+    ::= { jnxGdoiSecAssociations 2 }
+
+jnxGdoiGmKekEntry OBJECT-TYPE
+    SYNTAX          JnxGdoiGmKekEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing the attributes associated with a GDOI KEK
+        SA, uniquely identified by the Group ID, Group Member (GM)
+        ID, & SPI value assigned by the GM's registered Key Server to
+        the KEK.  There will be at least one KEK SA entry for each GM
+        & two KEK SA entries for a given GM only during a KEK rekey
+        when a new KEK is received & installed.  The KEK SPI is
+        unique for every KEK for a given Group Member."
+    REFERENCE
+        "RFC 3547 - Sections: 1.     Introduction
+          3.2.   Messages
+          4.     GROUPKEY-PUSH Message
+          5.3.   SA KEK Payload
+          5.3.1. KEK Attributes
+          5.5.   Key Download Payload"
+    INDEX           {
+                        jnxGdoiGroupIdType,
+                        jnxGdoiGroupIdValue,
+                        jnxGdoiGmIdType,
+                        jnxGdoiGmIdValue,
+                        jnxGdoiGmKekIndex
+                    }
+    ::= { jnxGdoiGmKekTable 1 }
+
+JnxGdoiGmKekEntry ::= SEQUENCE {
+        jnxGdoiGmKekIndex             Unsigned32,
+        jnxGdoiGmKekSPI               JnxGdoiKekSPI,
+        jnxGdoiGmKekSrcIdType         JnxGdoiIdentificationType,
+        jnxGdoiGmKekSrcIdLength       Unsigned32,
+        jnxGdoiGmKekSrcIdValue        JnxGdoiIdentificationValue,
+        jnxGdoiGmKekSrcIdPort         JnxGdoiUnsigned16,
+        jnxGdoiGmKekDstIdType         JnxGdoiIdentificationType,
+        jnxGdoiGmKekDstIdLength       Unsigned32,
+        jnxGdoiGmKekDstIdValue        JnxGdoiIdentificationValue,
+        jnxGdoiGmKekDstIdPort         JnxGdoiUnsigned16,
+        jnxGdoiGmKekIpProtocol        JnxGdoiIpProtocolId,
+        jnxGdoiGmKekMgmtAlg           JnxGdoiKeyManagementAlgorithm,
+        jnxGdoiGmKekEncryptAlg        JnxGdoiEncryptionAlgorithm,
+        jnxGdoiGmKekEncryptKeyLength  Unsigned32,
+        jnxGdoiGmKekSigHashAlg        JnxGdoiPseudoRandomFunction,
+        jnxGdoiGmKekSigAlg            JnxGdoiSignatureMethod,
+        jnxGdoiGmKekSigKeyLength      Unsigned32,
+        jnxGdoiGmKekOakleyGroup       JnxGdoiDiffieHellmanGroup,
+        jnxGdoiGmKekOriginalLifetime  Unsigned32,
+        jnxGdoiGmKekRemainingLifetime Unsigned32,
+        jnxGdoiGmKekStatus            JnxGdoiKekStatus
+}
+
+jnxGdoiGmKekIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The index of the GM KEK in table.The value of the index is a
+        number which begins at one and is incremented with each
+        KEK that is used by the GM for that GDOI group."
+    ::= { jnxGdoiGmKekEntry 1 }
+
+jnxGdoiGmKekSPI OBJECT-TYPE
+    SYNTAX          JnxGdoiKekSPI
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the Security Parameter Index (SPI) of a KEK
+        SA.  The SPI must be the ISAKMP Header cookie pair
+        where the first 8 octets become the 'Initiator Cookie' field
+        of the GROUPKEY-PUSH message ISAKMP HDR, and the second 8
+        octets become the 'Responder Cookie' in the same HDR.  As
+        described above, these cookies are assigned by the GCKS."
+    ::= { jnxGdoiGmKekEntry 2 }
+
+jnxGdoiGmKekSrcIdType OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The Identification Type Value used to parse the identity
+        information for the source of a KEK SA.  RFC 4306
+        defines all valid types that can be used as an identifier.
+        This identification type is sent as the 'SRC ID Type' of
+        the KEK payload."
+    REFERENCE
+        "RFC 3547 - Sections: 5.3. SA KEK payload
+         RFC 4306 - Section:  3.5. Identification Payloads"
+    ::= { jnxGdoiGmKekEntry 3 }
+
+jnxGdoiGmKekSrcIdLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The length (i.e. number of octets) of the source ID of
+        a KEK SA.  If no length is given (i.e. it has a value
+        of 0), the default length of its jnxGdoiGmKekSrcIdType should be
+        used as long as it is not reprsented by an ASCII string.  If
+        the value has a type that is represented by an ASCII string,
+        a length MUST be included.  If the length given is not 0, it
+        should match the 'SRC ID Data Len' field sent in the KEK
+        payload."
+    REFERENCE       "RFC 3547 - Sections: 5.3. SA KEK payload"
+    ::= { jnxGdoiGmKekEntry 4 }
+
+jnxGdoiGmKekSrcIdValue OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the identity information for the source of
+        a KEK SA with its type indicated by the
+        jnxGdoiGmKekSrcIdType.  Use the jnxGdoiGmKekSrcIdType to parse
+        the KEK Source ID correctly.  This ID value is sent as the 'SRC
+        Identification Data' of a KEK payload."
+    REFERENCE       "RFC 3547 - Sections: 5.3. SA KEK payload"
+    ::= { jnxGdoiGmKekEntry 5 }
+
+jnxGdoiGmKekSrcIdPort OBJECT-TYPE
+    SYNTAX          JnxGdoiUnsigned16
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value specifying a port associated with the source ID of
+        a KEK SA.  A value of zero means that the port should
+        be ignored.  This port value is sent as the `SRC ID Port`
+        field of a KEK payload."
+    REFERENCE       "RFC 3547 - Sections: 5.3. SA KEK payload"
+    ::= { jnxGdoiGmKekEntry 6 }
+
+jnxGdoiGmKekDstIdType OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The Identification Type Value used to parse the identity
+        information for the dest. (multicast rekey address) of a
+        KEK SA.  RFC 4306 defines all valid types that can be used
+        as an identifier. This identification type is sent as the
+        'DST ID Type' of the KEK payload."
+    REFERENCE
+        "RFC 3547 - Sections: 5.3. SA KEK payload
+         RFC 4306 - Section:  3.5. Identification Payloads"
+    ::= { jnxGdoiGmKekEntry 7 }
+
+jnxGdoiGmKekDstIdLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The length (i.e. number of octets) of the destination ID of
+        a KEK SA.  If no length is given (i.e. it has a value
+        of 0), the default length of its jnxGdoiGmKekDstIdType should be
+        used as long as it is not reprsented by an ASCII string.  If
+        the value has a type that is represented by an ASCII string,
+        a length MUST be included.  If the length given is not 0, it
+        should match the 'DST ID Data Len' field sent in the KEK
+        payload."
+    REFERENCE       "RFC 3547 - Sections: 5.3. SA KEK payload"
+    ::= { jnxGdoiGmKekEntry 8 }
+
+jnxGdoiGmKekDstIdValue OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the identity information for the destination of
+        a KEK SA (multicast rekey address) with its type indicated by
+        jnxGdoiGmKekDstIdType.  Use the jnxGdoiGmKekDstIdType to parse
+        the KEK Dest. ID correctly.  This ID value is sent as the 'DST
+        Identification Data' of a KEK payload."
+    REFERENCE       "RFC 3547 - Sections: 5.3. SA KEK payload"
+    ::= { jnxGdoiGmKekEntry 9 }
+
+jnxGdoiGmKekDstIdPort OBJECT-TYPE
+    SYNTAX          JnxGdoiUnsigned16
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value specifying a port associated with the dest. ID of
+        a KEK SA.  A value of zero means that the port should
+        be ignored.  This port value is sent as the `DST ID Port`
+        field of a KEK payload."
+    REFERENCE       "RFC 3547 - Sections: 5.3. SA KEK payload"
+    ::= { jnxGdoiGmKekEntry 10 }
+
+jnxGdoiGmKekIpProtocol OBJECT-TYPE
+    SYNTAX          JnxGdoiIpProtocolId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the IP protocol ID (e.g. UDP/TCP) being used
+        for the rekey datagram."
+    REFERENCE       "RFC 3547 - Section: 5.3. SA KEK payload"
+    ::= { jnxGdoiGmKekEntry 11 }
+
+jnxGdoiGmKekMgmtAlg OBJECT-TYPE
+    SYNTAX          JnxGdoiKeyManagementAlgorithm
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the KEK_MANAGEMENT_ALGORITHM which specifies
+        the group KEK management algorithm used to provide forward
+        or backward access control (i.e. used to exclude group
+        members).
+
+          KEK Management Type  Value
+          -------------------  -----
+           RESERVED              0
+           LKH                   1
+           RESERVED              2-127
+           Private Use           128-255"
+    REFERENCE
+        "RFC 3547 - Section: 5.3.2. KEK_MANAGEMENT_ALGORITHM"
+    ::= { jnxGdoiGmKekEntry 12 }
+
+jnxGdoiGmKekEncryptAlg OBJECT-TYPE
+    SYNTAX          JnxGdoiEncryptionAlgorithm
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the KEK_ALGORITHM which specifies the
+        encryption algorithm used with the KEK SA.  A GDOI
+        implementaiton must support KEK_ALG_3DES.
+
+        Following are the KEK encryption algoritm values defined in
+        the GDOI RFC 3547, however the JnxGdoiEncryptionAlgorithm TC
+        defines all possible values.
+
+          Algorithm Type  Value
+          --------------  -----
+           RESERVED         0
+           KEK_ALG_DES      1
+           KEK_ALG_3DES     2
+           KEK_ALG_AES      3
+           RESERVED         4-127
+           Private Use      128-255"
+    REFERENCE       "RFC 3547 - Section 5.3.3. KEK_ALGORITHM"
+    ::= { jnxGdoiGmKekEntry 13 }
+
+jnxGdoiGmKekEncryptKeyLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Bits"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the KEK_KEY_LENGTH which specifies the KEK
+        Algorithm key length (in bits)."
+    REFERENCE       "RFC 3547 - Section: 5.3.4. KEK_KEY_LENGTH"
+    ::= { jnxGdoiGmKekEntry 14 }
+
+jnxGdoiGmKekSigHashAlg OBJECT-TYPE
+    SYNTAX          JnxGdoiPseudoRandomFunction
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the SIG_HASH_ALGORITHM which specifies the SIG
+        payload hash algorithm.  This is not required (i.e. could
+        have a value of zero) if the SIG_ALGORITHM is SIG_ALG_DSS or
+        SIG_ALG_ECDSS, which imply SIG_HASH_SHA1 (i.e. must have a
+        value of zero or SIG_HASH_SHA1).
+
+        Following are the Signature Hash Algorithm values defined in
+        the GDOI RFC 3547, however the JnxGdoiPseudoRandomFunction TC
+        defines all possible values.
+
+          Algorithm Type  Value
+          --------------  -----
+           RESERVED         0
+           SIG_HASH_MD5     1
+           SIG_HASH_SHA1    2
+           RESERVED         3-127
+           Private Use      128-255"
+    REFERENCE       "RFC 3547 - Section: 5.3.6. SIG_HASH_ALGORITHM"
+    ::= { jnxGdoiGmKekEntry 15 }
+
+jnxGdoiGmKekSigAlg OBJECT-TYPE
+    SYNTAX          JnxGdoiSignatureMethod
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the SIG_ALGORITHM which specifies the SIG
+        payload signature algorithm.  A GDOI implementation must
+        support SIG_ALG_RSA.
+
+        Following are the Signature Algorithm values defined in
+        the GDOI RFC 3547, however the JnxGdoiSignatureMethod TC
+        defines all possible values.
+
+          Algorithm Type  Value
+          --------------  -----
+           RESERVED         0
+           SIG_ALG_RSA      1
+           SIG_ALG_DSS      2
+           SIG_ALG_ECDSS    3
+           RESERVED         4-127
+           Private Use      128-255"
+    REFERENCE       "RFC 3547 - Section: 5.3.7. SIG_ALGORITHM"
+    ::= { jnxGdoiGmKekEntry 16 }
+
+jnxGdoiGmKekSigKeyLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Bits"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the SIG_KEY_LENGTH which specifies the length
+        of the SIG payload key."
+    REFERENCE       "RFC 3547 - Section 5.3.8. SIG_KEY_LENGTH"
+    ::= { jnxGdoiGmKekEntry 17 }
+
+jnxGdoiGmKekOakleyGroup OBJECT-TYPE
+    SYNTAX          JnxGdoiDiffieHellmanGroup
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the KE_OAKLEY_GROUP which specifies the OAKLEY
+        or Diffie-Hellman Group used to compute the PFS secret in the
+        optional KE payload of the GDOI GROUPKEY-PULL exchange."
+    REFERENCE       "RFC 3547 - Section 5.3.9. KE_OAKLEY_GROUP"
+    ::= { jnxGdoiGmKekEntry 18 }
+
+jnxGdoiGmKekOriginalLifetime OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the KEK_KEY_LIFETIME which specifies the maximum
+        time for which a KEK is valid.  The GCKS may refresh the KEK
+        at any time before the end of the valid period.  The value is
+        a four (4) octet (32-bit) number defining a valid time period
+        in seconds."
+    REFERENCE       "RFC 3547 - Section 5.3.5. KEK_KEY_LIFETIME"
+    ::= { jnxGdoiGmKekEntry 19 }
+
+jnxGdoiGmKekRemainingLifetime OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the remaining time for which a KEK is valid.
+        The value is a four (4) octet (32-bit) number which begins at
+        the value of jnxGdoiGmKekOriginalLifetime and counts down to 0
+        in seconds.  If the lifetime has already expired, this value
+        should remain at zero (0) until the GCKS refreshes the KEK."
+    REFERENCE       "RFC 3547 - Section 5.3.5. KEK_KEY_LIFETIME"
+    ::= { jnxGdoiGmKekEntry 20 }
+
+jnxGdoiGmKekStatus OBJECT-TYPE
+    SYNTAX          JnxGdoiKekStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The status of the KEK SA.  When this status value is
+        queried, one of the following is returned:
+        inUse(1), new(2), old(3)."
+    ::= { jnxGdoiGmKekEntry 21 }
+
+-- #-------------------------------------------------------------- --
+-- # The GDOI "Group Member (GM) TEK Selector" Table
+-- #-------------------------------------------------------------- --
+
+jnxGdoiGmTekSelectorTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF JnxGdoiGmTekSelectorEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of information regarding GDOI Traffic Encryption Key
+        (TEK) Security Associations (SAs/Policies) pushed by a
+        Key Server & installed for GDOI entities acting as Group
+        Members (GMs) on the network device being queried.  There is
+        one entry in this table for each unique TEK traffic selector
+        (Source/Destination tuple) that has been downloaded from the
+        Key Server and installed on the Group Member."
+    ::= { jnxGdoiSecAssociations 5 }
+
+jnxGdoiGmTekSelectorEntry OBJECT-TYPE
+    SYNTAX          JnxGdoiGmTekSelectorEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing the attributes associated with a GDOI TEK
+        Policy/SA, uniquely identified by the Group ID, Group Member
+        ID, Source/Destination IDs & Ports, and TEK SPI.  There will
+        be one or more TEK entries for each TEK Policy/SA received
+        and installed by the given Group Member from its registered
+        Key Server, each with a unique <SRC-ID, SRC-PORT, DST-ID,
+        DST-PORT, SPI> 5-tuple. This table does not contain the SPI
+        which is part of the TEK policy table."
+    REFERENCE
+        "RFC 3547 - Sections: 1.   Introduction
+          3.2. Messages
+          4.   GROUPKEY-PUSH Message
+          5.4. SA TEK Payload"
+    INDEX           {
+                        jnxGdoiGroupIdType,
+                        jnxGdoiGroupIdValue,
+                        jnxGdoiGmIdType,
+                        jnxGdoiGmIdValue,
+                        jnxGdoiGmTekSelectorIndex
+                    }
+    ::= { jnxGdoiGmTekSelectorTable 1 }
+
+JnxGdoiGmTekSelectorEntry ::= SEQUENCE {
+        jnxGdoiGmTekSelectorIndex           Unsigned32,
+        jnxGdoiGmTekSrcIdType               JnxGdoiIdentificationType,
+        jnxGdoiGmTekSrcIdLength             Unsigned32,
+        jnxGdoiGmTekSrcIdValue              JnxGdoiIdentificationValue,
+        jnxGdoiGmTekSrcIdPort               JnxGdoiUnsigned16,
+        jnxGdoiGmTekDstIdType               JnxGdoiIdentificationType,
+        jnxGdoiGmTekDstIdLength             Unsigned32,
+        jnxGdoiGmTekDstIdValue              JnxGdoiIdentificationValue,
+        jnxGdoiGmTekDstIdPort               JnxGdoiUnsigned16,
+        jnxGdoiGmTekSecurityProtocol        JnxGdoiSecurityProtocol,
+        jnxGdoiGmTekPolicyMismatchAction    JnxGdoiPolicyMismatchAction
+}
+
+jnxGdoiGmTekSelectorIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The index of the Source/Destination pair secured by the
+        GM TEK.The value of the index is a number which begins at
+        one and is incremented with each Source/Destination pair that
+        is secured by the GM TEK policy for that GDOI group."
+    ::= { jnxGdoiGmTekSelectorEntry 1 }
+
+jnxGdoiGmTekSrcIdType OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The Identification Type Value used to parse the identity
+        information for the source of a TEK Policy/SA.  RFC 4306
+        defines all valid types that can be used as an identifier.
+        This identification type is sent as the 'SRC ID Type' of
+        the TEK payload."
+    REFERENCE
+        "RFC 3547 - Sections: 5.4.1. PROTO_IPSEC_ESP
+         RFC 4306 - Section:  3.5.   Identification Payloads"
+    ::= { jnxGdoiGmTekSelectorEntry 2 }
+
+jnxGdoiGmTekSrcIdLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The length (i.e. number of octets) of the source ID of
+        a TEK Policy/SA.  If no length is given (i.e. it has a value
+        of 0), the default length of its jnxGdoiGmTekSrcIdType should be
+        used as long as it is not reprsented by an ASCII string.  If
+        the value has a type that is represented by an ASCII string,
+        a length MUST be included.  If the length given is not 0, it
+        should match the 'SRC ID Data Len' field sent in the TEK
+        payload."
+    REFERENCE       "RFC 3547 - Sections: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekSelectorEntry 3 }
+
+jnxGdoiGmTekSrcIdValue OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the identity information for the source of
+        a TEK Policy/SA with its type indicated by the
+        jnxGdoiGmTekSrcIdType.  Use the jnxGdoiGmTekSrcIdType to parse
+        the TEK Source ID correctly.  This ID value is sent as the 'SRC
+        Identification Data' of a TEK payload."
+    REFERENCE       "RFC 3547 - Sections: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekSelectorEntry 4 }
+
+jnxGdoiGmTekSrcIdPort OBJECT-TYPE
+    SYNTAX          JnxGdoiUnsigned16
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value specifying a port associated with the source ID of
+        a TEK Policy/SA.  A value of zero means that the port should
+        be ignored.  This port value is sent as the `SRC ID Port`
+        field of a TEK payload."
+    REFERENCE       "RFC 3547 - Sections: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekSelectorEntry 5 }
+
+jnxGdoiGmTekDstIdType OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The Identification Type Value used to parse the identity
+        information for the dest. of a TEK Policy/SA.  RFC 4306
+        defines all valid types that can be used as an identifier.
+        This identification type is sent as the 'DST ID Type' of
+        the TEK payload."
+    REFERENCE
+        "RFC 3547 - Sections: 5.4.1. PROTO_IPSEC_ESP
+         RFC 4306 - Section:  3.5. Identification Payloads"
+    ::= { jnxGdoiGmTekSelectorEntry 6 }
+
+jnxGdoiGmTekDstIdLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Octets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The length (i.e. number of octets) of the destination ID of
+        a TEK Policy/SA.  If no length is given (i.e. it has a value
+        of 0), the default length of its jnxGdoiGmTekDstIdType should be
+        used as long as it is not reprsented by an ASCII string.  If
+        the value has a type that is represented by an ASCII string,
+        a length MUST be included.  If the length given is not 0, it
+        should match the 'DST ID Data Len' field sent in the TEK
+        payload."
+    REFERENCE       "RFC 3547 - Sections: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekSelectorEntry 7 }
+
+jnxGdoiGmTekDstIdValue OBJECT-TYPE
+    SYNTAX          JnxGdoiIdentificationValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the identity information for the destination of
+        a TEK Policy/SA with its type indicated by the
+        jnxGdoiGmTekDstIdType.  Use the jnxGdoiGmTekDstIdType to parse
+        the TEK Dest. ID correctly.  This ID value is sent as the 'DST
+        Identification Data' of a TEK payload."
+    REFERENCE       "RFC 3547 - Sections: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekSelectorEntry 8 }
+
+jnxGdoiGmTekDstIdPort OBJECT-TYPE
+    SYNTAX          JnxGdoiUnsigned16
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value specifying a port associated with the dest. ID of
+        a TEK Policy/SA.  A value of zero means that the port should
+        be ignored.  This port value is sent as the `DST ID Port`
+        field of a TEK payload."
+    REFERENCE       "RFC 3547 - Sections: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekSelectorEntry 9 }
+
+jnxGdoiGmTekSecurityProtocol OBJECT-TYPE
+    SYNTAX          JnxGdoiSecurityProtocol
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the Protocol-ID field of a SA TEK (SAT) payload
+        which specifies the Security Protocol for a TEK.
+
+        Following are the Security Protocol values defined in
+        the GDOI RFC 3547, however the JnxGdoiSecurityProtocol TC
+        defines all possible values.
+
+          Protocol ID             Value
+          ----------------------  -----
+           RESERVED                 0
+           GDOI_PROTO_IPSEC_ESP     1
+           RESERVED                 2-127
+           Private Use              128-255"
+    REFERENCE       "RFC 3547 - Section: 5.4. SA TEK Payload"
+    ::= { jnxGdoiGmTekSelectorEntry 10 }
+
+jnxGdoiGmTekPolicyMismatchAction OBJECT-TYPE
+    SYNTAX          JnxGdoiPolicyMismatchAction
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Default action for packets that does not match TEK Policy/SA
+        received from group key server"
+    ::= { jnxGdoiGmTekSelectorEntry 11 }
+
+-- #-------------------------------------------------------------- --
+-- # The GDOI "Group Member (GM) TEK Policy" Table
+-- #-------------------------------------------------------------- --
+
+jnxGdoiGmTekPolicyTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF JnxGdoiGmTekPolicyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of information regarding GDOI Traffic Encryption Key
+        (TEK) Security Associations (SAs/Policies) received by a
+        Key Server & installed for GDOI entities acting as Group
+        Members (GMs) on the network device being queried.  There is
+        one entry in this table for each TEK SA that has been
+        installed on the Group Member."
+    ::= { jnxGdoiSecAssociations 6 }
+
+jnxGdoiGmTekPolicyEntry OBJECT-TYPE
+    SYNTAX          JnxGdoiGmTekPolicyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing the attributes associated with a GDOI TEK
+        Policy/SA, uniquely identified by the Group ID, Group Member
+        ID, TEK Selector (Source/Destination IDs & Ports), and TEK
+        Policy index (TEK SPI and direction).  There will be one or
+        more TEK entries for each TEK Policy/SA received and installed
+        by the given Group Member from its registered Key Server, each
+        with a unique <SRC-ID, SRC-PORT, DST-ID, DST-PORT, SPI> tuple.
+        This table contains the SPI information corresponding to a TEK
+        Selector index."
+    REFERENCE
+        "RFC 3547 - Sections: 1.   Introduction
+          3.2. Messages
+          4.   GROUPKEY-PUSH Message
+          5.4. SA TEK Payload"
+    INDEX           {
+                        jnxGdoiGroupIdType,
+                        jnxGdoiGroupIdValue,
+                        jnxGdoiGmIdType,
+                        jnxGdoiGmIdValue,
+                        jnxGdoiGmTekSelectorIndex,
+                        jnxGdoiGmTekPolicyIndex
+                    }
+    ::= { jnxGdoiGmTekPolicyTable 1 }
+
+JnxGdoiGmTekPolicyEntry ::= SEQUENCE {
+        jnxGdoiGmTekPolicyIndex         Unsigned32,
+        jnxGdoiGmTekSPI                 JnxGdoiTekSPI,
+        jnxGdoiGmTekEncapsulationMode   JnxGdoiEncapsulationMode,
+        jnxGdoiGmTekEncryptionAlgorithm JnxGdoiEncryptionAlgorithm,
+        jnxGdoiGmTekEncryptionKeyLength Unsigned32,
+        jnxGdoiGmTekIntegrityAlgorithm  JnxGdoiIntegrityAlgorithm,
+        jnxGdoiGmTekIntegrityKeyLength  Unsigned32,
+        jnxGdoiGmTekWindowSize          Unsigned32,
+        jnxGdoiGmTekOriginalLifetime    Unsigned32,
+        jnxGdoiGmTekRemainingLifetime   Unsigned32,
+        jnxGdoiGmTekStatus              JnxGdoiTekStatus
+}
+
+jnxGdoiGmTekPolicyIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The index of the SPI used to secure the GM TEK.The value of
+        the index is a number which begins at one and is incremented
+        with each row of the GM TEK SPI table."
+    ::= { jnxGdoiGmTekPolicyEntry 1 }
+
+jnxGdoiGmTekSPI OBJECT-TYPE
+    SYNTAX          JnxGdoiTekSPI
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the Security Parameter Index (SPI) of a TEK
+        Policy/SA.  The SPI must be the SPI for ESP."
+    REFERENCE       "RFC 3547 - Section: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekPolicyEntry 2 }
+
+jnxGdoiGmTekEncapsulationMode OBJECT-TYPE
+    SYNTAX          JnxGdoiEncapsulationMode
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the Encapsulation Mode of a TEK (IPsec SA).
+
+        Following are the Encapsulation Mode values defined in
+        RFC 2407, however the JnxGdoiEncapsulationMode TC defines all
+        possible values.
+
+          Encapsulation Mode  Value
+          ------------------  -----
+           RESERVED             0
+           Tunnel               1
+           Transport            2"
+    REFERENCE
+        "RFC 2407 - Section: 4.5.   IPSEC Security Assoc. Attributes
+         RFC 3547 - Section: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekPolicyEntry 3 }
+
+jnxGdoiGmTekEncryptionAlgorithm OBJECT-TYPE
+    SYNTAX          JnxGdoiEncryptionAlgorithm
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the Transform ID field of a PROTO_IPSEC_ESP
+        payload which specifies the ESP transform to be used.  If
+        no encryption is used, this value will be zero (0).
+
+        Following are the ESP Transform values defined in RFC 2407,
+        however the JnxGdoiEncryptionAlgorithm TC defines all possible
+        values.
+
+          IPsec ESP Transform ID    Value
+          ------------------------  -----
+           RESERVED                   0
+           ESP_DES_IV64               1
+           ESP_DES                    2
+           ESP_3DES                   3
+           ESP_RC5                    4
+           ESP_IDEA                   5
+           ESP_CAST                   6
+           ESP_BLOWFISH               7
+           ESP_3IDEA                  8
+           ESP_DES_IV32               9
+           ESP_RC4                    10
+           ESP_NULL                   11"
+    REFERENCE
+        "RFC 2407 - Section: 4.4.4. IPSEC ESP Transform Identifiers
+         RFC 3547 - Section: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekPolicyEntry 4 }
+
+jnxGdoiGmTekEncryptionKeyLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Bits"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The length of the key used for encryption in a TEK
+        (in bits)."
+    REFERENCE
+        "RFC 2407 - Section: 4.5    IPSEC Security Assoc. Attributes
+         RFC 3547 - Section: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekPolicyEntry 5 }
+
+jnxGdoiGmTekIntegrityAlgorithm OBJECT-TYPE
+    SYNTAX          JnxGdoiIntegrityAlgorithm
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the Authentication Algorithm for a TEK IPsec
+        ESP SA.  If no authentication is used, this value will be
+        zero (0).
+
+        Following are the Authentication Algorithm values defined in
+        RFC 2407, however the JnxGdoiEncryptionAlgorithm TC defines all
+        possible values.
+
+          Algorithm Type  Value
+          --------------  -----
+           HMAC-MD5         1
+           HMAC-SHA         2
+           DES-MAC          3
+           KPDK             4"
+    REFERENCE
+        "RFC 2407 - Section: 4.5.   IPSEC Security Assoc. Attributes
+         RFC 3547 - Section: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekPolicyEntry 6 }
+
+jnxGdoiGmTekIntegrityKeyLength OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Bits"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The length of the key used for integrity/authentication in a
+        TEK (in bits)."
+    REFERENCE
+        "RFC 2407 - Section: 4.5    IPSEC Security Assoc. Attributes
+         RFC 3547 - Section: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekPolicyEntry 7 }
+
+jnxGdoiGmTekWindowSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "GROUPKEY-PUSH Messages"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The size of the Time Based Anti-Replay (TBAR) window used by
+        this TEK Policy/SA."
+    REFERENCE
+        "RFC 2407 - Section: 4.6.3.2. REPLAY-STATUS
+         RFC 3547 - Section: 6.3.4.   Replay/Reflection Attack
+              Protection"
+    ::= { jnxGdoiGmTekPolicyEntry 8 }
+
+jnxGdoiGmTekOriginalLifetime OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the SA Life Type defined in RFC 2407 which
+        specifies the maximum time for which a TEK IPsec SA is valid.
+        The GCKS may refresh the TEK at any time before the end of
+        the valid period.  The value is a four (4) octet (32-bit)
+        number defining a valid time period in seconds."
+    REFERENCE
+        "RFC 2407 - Section: 4.5    IPSEC Security Assoc. Attributes
+         RFC 3547 - Section: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekPolicyEntry 9 }
+
+jnxGdoiGmTekRemainingLifetime OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "Seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of the remaining time for which a TEK is valid.
+        The value is a four (4) octet (32-bit) number which begins at
+        the value of jnxGdoiGmTekOriginalLifetime and counts down to 0
+        in seconds."
+    REFERENCE
+        "RFC 2407 - Section: 4.5    IPSEC Security Assoc. Attributes
+         RFC 3547 - Section: 5.4.1. PROTO_IPSEC_ESP"
+    ::= { jnxGdoiGmTekPolicyEntry 10 }
+
+jnxGdoiGmTekStatus OBJECT-TYPE
+    SYNTAX          JnxGdoiTekStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The status of the TEK Policy/SA.  When this status value is
+        queried, one of the following is returned:
+        inbound(1), outbound(2), biDirectional(3)."
+    ::= { jnxGdoiGmTekPolicyEntry 11 }
+END
+

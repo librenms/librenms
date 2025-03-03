@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -27,11 +27,9 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'tinydns';
-$app_id = $app['app_id'];
-if (!empty($agent_data['app'][$name]) && $app_id > 0) {
-    update_application($app, $name);
+
+if (! empty($agent_data['app'][$name]) && $app->app_id > 0) {
     echo ' tinydns';
-    $rrd_name = array('app', $name, $app_id);
     $rrd_def = RrdDefinition::make()
         ->addDataset('a', 'COUNTER', 0, 125000000000)
         ->addDataset('ns', 'COUNTER', 0, 125000000000)
@@ -54,6 +52,40 @@ if (!empty($agent_data['app'][$name]) && $app_id > 0) {
         ->addDataset('badclass', 'COUNTER', 0, 125000000000)
         ->addDataset('noquery', 'COUNTER', 0, 125000000000);
 
-    $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+    [
+        $a, $ns, $cname, $soa, $ptr, $hinfo, $mx, $txt, $rp, $sig, $key, $aaaa, $axfr, $any,
+        $total, $other, $notauth, $notimpl, $badclass, $noquery
+    ] = explode(':', $agent_data['app'][$name]);
+
+    $fields = [
+        'a' => $a,
+        'ns' => $ns,
+        'cname' => $cname,
+        'soa' => $soa,
+        'ptr' => $ptr,
+        'hinfo' => $hinfo,
+        'mx' => $mx,
+        'txt' => $txt,
+        'rp' => $rp,
+        'sig' => $sig,
+        'key' => $key,
+        'aaaa' => $aaaa,
+        'axfr' => $axfr,
+        'any' => $any,
+        'total' => $total,
+        'other' => $other,
+        'notauth' => $notauth,
+        'notimpl' => $notimpl,
+        'badclass' => $badclass,
+        'noquery' => $noquery,
+    ];
+
+    $tags = [
+        'name' => $name,
+        'app_id' => $app->app_id,
+        'rrd_name' => ['app', $name, $app->app_id],
+        'rrd_def' => $rrd_def,
+    ];
     data_update($device, 'app', $tags, $fields);
+    update_application($app, $name, $fields);
 }//end if

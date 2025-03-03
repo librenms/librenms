@@ -1,0 +1,1908 @@
+-- ==================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: Interface Management MIB
+-- Reference:
+-- Version: V4.1
+-- History:
+--      V1.0 (1) Created by Zhangshilin, 2001.06.29
+--           (2) Revised by Qizhenglin, 2002.01.08
+--      V1.1 2004/7/20 Add PortList and VlanIndex define
+--      V1.2 2004/8/05 Add hh3cifEthernetIsolate and hh3cIsolateGroupMax
+--                     by Chenshixing
+--      V1.3 2004/9/08 add fabric value to hh3cifVLANType object and
+--                     change the DESCRIPTION by chenshixing
+--           2004/9/08 1.change the DESCRIPTION and the range of
+--                       SYNTAX  INTEGER  from (5..100) to (1..100)
+--                       in hh3cifMcastControl object by wangyingxia
+--                     2.add the hh3cifPpsMcastControl object
+--                       by wangyingxia
+--                     3.change the status  in hh3cLswVlanMngObject
+--                       to current by gaolong
+--      V1.4 2004-10-12 updated by gaolong
+--           Import TEXTUAL-CONVENTION, OBJECT-IDENTITY, Unsigned32.
+--           Relocate hh3cLswL2InfMib MODULE-IDENTITY clause.
+--           Change SYNTAX clause type of VlanIndex from INTEGER to Unsigned32.
+--           Change MAX-ACCESS clause vlaue of hh3cifClearStat and hh3cifEthernetTest
+--           from write-only to read-write.
+--           Change value of hh3cifAggregateModel, hh3cdot1qVlanType, hh3cVlanInterfaceFrameType
+--           and hh3cifEthernetMdi from underscores to hyphens.
+--           Change value of hh3cifMacAddrLearnMode, beginning with lowercase.
+--      V1.5 2004-11-15
+--           Add the object hh3cdot1qVlanBcastSuppressionPPS by lihaijun
+--           Adjust the format of the description of hh3cdot1qVlanBroadcastSuppression
+--      V1.6 2004-12-2
+--           Add the object hh3cGlobalBroadcastMaxPps by zhanggang
+--           Add the object hh3cGlobalBroadcastMaxRatio by zhanggang
+--           Add hh3cifVlanVPNStatus and hh3cBpduTunnelStatus by caiqiang
+--           Add hh3cVlanInterfaceIpMethod by wangchao
+--      V1.7 2005-01-22
+--           Remove the content of hh3cLswVlan from this MIB to HH3C-LswVLAN-MIB
+--           Remove SnmpAdminString
+--      V1.8 2005-2-2
+--           Add the object hh3cifPpsBcastDisValControl by zhangjianwei
+--      V1.9 2005-03-08
+--           Add hh3cifUniSuppressionStep, hh3cifPpsUniSuppressionMax, hh3cifMulSuppressionStep,
+--           hh3cifPpsMulSuppressionMax, hh3cifUniSuppression, hh3cifPpsUniSuppression,
+--           hh3cifMulSuppression, hh3cifPpsMulSuppression by wanghaisheng
+--      V2.0 2005-06-14
+--           Add the object hh3cifComboActivePort by majun and adjust format
+--      V2.1 2005-06-30
+--           Add the object hh3cifVlanVPNUplinkStatus, hh3cifVlanVPNTPID,
+--           hh3cVlanVPNTPIDMode and hh3cVlanVPNTPID by hejunwei
+--           Add hh3cifUnknownPacketDropMul, hh3cifUnknownPacketDropUni by wangyupeng
+--           Add hh3cifBMbpsMulSuppressionMax, hh3cifBMbpsMulSuppression,
+--           hh3cifBKbpsMulSuppressionMax, hh3cifBKbpsMulSuppressionStep
+--           and hh3cifBKbpsMulSuppression by lichunyan
+--           Update decription of MIB objects by gaolong
+--      V2.2 2005-09-05
+--           Add the object hh3cifIsolateGroupID, hh3cifisUplinkPort,
+--           hh3cPortIsolateGroupTable, hh3cPortIsolateGroupEntry,
+--           hh3cPortIsolateGroupIndex, hh3cPortIsolateUplinkIfIndex,
+--           hh3cPortIsolateGroupRowStatus by huzinan
+--      V2.3 2005-10-13
+--           Add the object hh3cPortIsolateGroupDescription by hejunwei
+--      V2.4 2005-11-15
+--           Add the value 24000M to hh3cifEthernetSpeed by wanglirong
+--      V2.5 2006-01-16
+--           Add hh3cMaxMacLearnRange by zhangyinfei
+--           Change the DESCRIPTION and the range of hh3cMaxMacLearn by zhangyinfei
+--      V2.6 2006-01-03
+--           Remove the value range from the definition of hh3cifXXBasePortIndex
+--           by wangzhaoyan
+--      V2.7 2006-02-11
+--           Modify description of hh3cifXXBasePortIndex and hh3cifXXDevPortIndex
+--           Modify description of hh3cifHybridTaggedVlanListLow, hh3cifHybridTaggedVlanListHigh,
+--           hh3cifHybridUnTaggedVlanListLow and hh3cifHybridUnTaggedVlanListHigh
+--           Modify some wrong format of the description
+--      V2.8 2006-03-14
+--           Add hh3cifEthernetAutoSpeedMask, hh3cifEthernetAutoSpeed in
+--           hh3cethernetTable and SpeedModeFlag definition by Jin Yongfeng.
+--      V2.9 2006-04-24
+--           Remove value range of hh3cifEthernetMTU by Chenxi.
+--      V3.0 2006-04-30
+--           Add hh3cifBMbpsUniSuppressionMax, hh3cifBMbpsUniSuppression,
+--           hh3cifBKbpsUniSuppressionMax, hh3cifBKbpsUniSuppressionStep
+--           and hh3cifBKbpsUniSuppression by lichunyan.
+--      V3.1 2006-09-27
+--           hh3cifComboActivePort is obsoleted in hh3cifXXTable.
+--           hh3cifComboPortTable is added for combo interface.
+--           hh3cifComboActivePort is replaced with hh3cifComboPortCurActive.
+--      V3.2 2009-04-11
+--           Add hh3cifOutPayloadOctets, hh3cifInPayloadOctets, hh3cifInErrorPktsRate,
+--           hh3cifInPkts, hh3cifInNormalPkts, hh3cifOutPkts by lisong.
+--      V3.3 2011-11-08
+--           Add the value s40000M and s100000M to SpeedModeFlag and
+--           hh3cifEthernetSpeed by xiedong.
+--      V3.4 2012-09-29
+--           Modify description of hh3cifClearStat by xiedong.
+--           2012-11-03
+--           Add hh3cifPktBufTable, hh3cifPktBufEntry, hh3cifPktBufFree,
+--           hh3cifPktBufInit, hh3cifPktBufMin, hh3cifPktBufMiss by chenkaiping
+--      V3.5 2013-08-17
+--           Add hh3cifPortProtocolStatTable by yangxiaoren.
+--      V3.6 2014-02-08
+--           Modify description of hh3cifUniSuppression, hh3cifMulSuppression and
+--           hh3cifMcastControl, modify value list of hh3cifMcastControl by huhonghui,
+--           for supporting value 0.
+--      V3.7 2015-10-14
+--           Add hh3cifMulSuppressionFlag by chenzhouhui.
+--           Modify description of hh3cifMulSuppression and hh3cifPpsMulSuppression by chenzhouhui.
+--           Add hh3cifPktBufInDrop and hh3cifPktBufEgDrop to hh3cifPktBufTable,
+--           add hh3cifQueuePktBufTable by zhangji.
+--      V3.8 2016-07-02
+--           Add the values s2500M, s5000M, s20000M, s25000M and s50000M to SpeedModeFlag
+--           and hh3cifEthernetSpeed by yuhaiyan.
+--      V3.9 2018-10-09
+--           Modify description of hh3cifComboPortCurActive,
+--           modify value list of hh3cifComboPortCurActive by jinyiting,
+--           for supporting value 4.
+--      V4.0 2019-06-13
+--           Add hh3cifQueueBufUsageIn5Seconds, hh3cifQueueBufUsageIn1Minute, hh3cifQueueBufUsageIn5Minutes
+--           to hh3cifQueuePktBufTable by mazhixing.
+--      V4.1 2019-08-03
+--           Add the values s200000M, s400000M to SpeedModeFlag
+--           and hh3cifEthernetSpeed by mazhixing.
+
+-- ==================================================================
+--
+-- Variables and types be imported
+--
+-- ==================================================================
+HH3C-LswINF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    RowStatus, DisplayString, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64, Unsigned32, Counter32
+        FROM SNMPv2-SMI
+    ifIndex, InterfaceIndex
+        FROM IF-MIB
+    hh3clswCommon
+        FROM HH3C-OID-MIB;
+
+    hh3cLswL2InfMib MODULE-IDENTITY
+            LAST-UPDATED "201908030000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+            ""
+            REVISION "201908030000Z"
+            DESCRIPTION
+                "Add the values s200000M and s400000M to SpeedModeFlag and hh3cifEthernetSpeed"
+            REVISION "201906130000Z"
+            DESCRIPTION
+                "Add hh3cifQueueBufUsageIn5Seconds, hh3cifQueueBufUsageIn1Minute, hh3cifQueueBufUsageIn5Minutes to hh3cifQueuePktBufTable"
+            REVISION "201607020000Z"
+            DESCRIPTION
+                "Add the values s2500M, s5000M, s20000M, s25000M and s50000M to SpeedModeFlag and hh3cifEthernetSpeed"
+            REVISION "201510140000Z"
+            DESCRIPTION
+                "Add hh3cifPktBufInDrop and hh3cifPktBufEgDrop to hh3cifPktBufTable,
+                 hh3cifMulSuppressionFlag, and hh3cifQueuePktBufTable, modify description of hh3cifMulSuppression and hh3cifPpsMulSuppression"
+            REVISION "200106290000Z"
+            DESCRIPTION
+            "Initial version."
+            ::= { hh3clswCommon 5 }
+
+
+-- =============================================================
+-- Textual Conventions
+-- =============================================================
+
+    PortList ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            ports, with the first octet specifying ports 1 through
+            8, the second octet specifying ports 9 through 16, etc.
+            Within each octet, the most significant bit represents
+            the lowest numbered port, and the least significant bit
+            represents the highest numbered port.  Thus, each port
+            of the bridge is represented by a single bit within the
+            value of this object.  If that bit has a value of '1'
+            then that port is included in the set of ports; the port
+            is not included if its bit has a value of '0'."
+        SYNTAX      OCTET STRING
+
+
+    VlanIndex ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "A value used to index per-VLAN tables: values of 0 and
+            4095 are not permitted; if the value is between 1 and
+            4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with
+            global scope within a given bridged domain (see VlanId
+            textual convention).  If the value is greater than 4095
+            then it represents a VLAN with scope local to the
+            particular agent, i.e. one without a global VLAN-ID
+            assigned to it. Such VLANs are outside the scope of
+            IEEE 802.1Q but it is convenient to be able to manage them
+            in the same way using this MIB."
+        SYNTAX      Unsigned32 (0..4294967295)
+
+    DropDirection ::= TEXTUAL-CONVENTION
+       STATUS  current
+       DESCRIPTION
+          "Representing the direction of dropping packets, if applicable."
+       SYNTAX  INTEGER  {
+                   disable        (1),
+                   enableInbound  (2),
+                   enableOutbound (3),
+                   enableBoth     (4)
+               }
+
+    SpeedModeFlag ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Type of Negotiable Speed mode."
+        SYNTAX BITS
+            {
+                s10M(0),       -- 10M speed
+                s100M(1),      -- 100M speed
+                s1000M(2),     -- 1000M speed
+                s10000M(3),    -- 10000M speed
+                s24000M(4),    -- 24000M speed
+                s40000M(5),    -- 40000M speed
+                s100000M(6),   -- 100000M speed
+                s2500M(7),     -- 2500M speed
+                s5000M(8),     -- 5000M speed
+                s20000M(9),    -- 20000M speed
+                s25000M(10),   -- 25000M speed
+                s50000M(11),   -- 50000M speed
+                s200000M(12),  -- 200000M speed
+                s400000M(13)   -- 400000M speed
+            }
+
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+    hh3cLswExtInterface OBJECT IDENTIFIER ::= { hh3clswCommon 1 }
+
+    hh3cifXXTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cIfXXEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION "Extended interface information table."
+        ::= { hh3cLswExtInterface  1 }
+
+
+    hh3cifXXEntry  OBJECT-TYPE
+        SYNTAX Hh3cIfXXEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION "Entries of extended interface information table."
+        INDEX { ifIndex }
+        ::= { hh3cifXXTable 1}
+
+    Hh3cIfXXEntry ::=
+    SEQUENCE {
+        hh3cifUnBoundPort     TruthValue  ,
+        hh3cifISPhyPort       TruthValue  ,
+        hh3cifAggregatePort   TruthValue  ,
+        hh3cifMirrorPort      TruthValue  ,
+        hh3cifVLANType        INTEGER     ,
+        hh3cifMcastControl    INTEGER     ,
+        hh3cifFlowControl     TruthValue  ,
+        hh3cifSrcMacControl   TruthValue  ,
+        hh3cifClearStat       INTEGER,
+        hh3cifXXBasePortIndex INTEGER,
+        hh3cifXXDevPortIndex  INTEGER,
+        hh3cifPpsMcastControl  Integer32,
+        hh3cifPpsBcastDisValControl INTEGER,
+        hh3cifUniSuppressionStep Integer32,
+        hh3cifPpsUniSuppressionMax Integer32,
+        hh3cifMulSuppressionStep Integer32,
+        hh3cifPpsMulSuppressionMax Integer32,
+        hh3cifUniSuppression   Integer32,
+        hh3cifPpsUniSuppression Integer32,
+        hh3cifMulSuppression    Integer32,
+        hh3cifPpsMulSuppression Integer32,
+        hh3cifComboActivePort   INTEGER,
+        hh3cifBMbpsMulSuppressionMax Integer32,
+        hh3cifBMbpsMulSuppression Integer32,
+        hh3cifBKbpsMulSuppressionMax Integer32,
+        hh3cifBKbpsMulSuppressionStep Integer32,
+        hh3cifBKbpsMulSuppression Integer32,
+        hh3cifUnknownPacketDropMul DropDirection,
+        hh3cifUnknownPacketDropUni DropDirection,
+        hh3cifBMbpsUniSuppressionMax Integer32,
+        hh3cifBMbpsUniSuppression Integer32,
+        hh3cifBKbpsUniSuppressionMax Integer32,
+        hh3cifBKbpsUniSuppressionStep Integer32,
+        hh3cifBKbpsUniSuppression Integer32,
+        hh3cifOutPayloadOctets Counter64,
+        hh3cifInPayloadOctets Counter64,
+        hh3cifInErrorPktsRate Integer32,
+        hh3cifInPkts Counter64,
+        hh3cifInNormalPkts  Counter64,
+        hh3cifOutPkts Counter64,
+        hh3cifMulSuppressionFlag  INTEGER
+        }
+
+
+   hh3cifUnBoundPort  OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Whether it is the unbound port. (true indicates that the port is
+            the main port of the aggregation or the port does not participate
+            in the aggregation.)"
+        ::= { hh3cifXXEntry 1 }
+
+
+    hh3cifISPhyPort  OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Whether it is a physical interface."
+        ::= { hh3cifXXEntry 2 }
+
+
+    hh3cifAggregatePort OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Whether it is the aggregated port. (if the port participates
+                    in the aggregation, this value is true.)"
+        ::= { hh3cifXXEntry 3 }
+
+
+    hh3cifMirrorPort  OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Whether it is a mirror port."
+        ::= { hh3cifXXEntry 4 }
+
+
+    hh3cifVLANType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        vLANTrunk  (1),
+        access   (2),
+        hybrid    (3),
+        fabric   (4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "port vlan types.
+            hybrid (3) port can carry multiple VLANs.
+            If fabric function is supported, fabric(4) means the port is
+            a fabric port."
+        ::= { hh3cifXXEntry 5 }
+
+
+    hh3cifMcastControl OBJECT-TYPE
+        SYNTAX  INTEGER (0..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Broadcast storm suppression with the step length of 1,
+            ranging from 0 to 100 percent.
+            In some products the step is 5, ranging from 0 to 100."
+        ::= { hh3cifXXEntry 6 }
+
+    hh3cifFlowControl  OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Flow control status."
+        ::= { hh3cifXXEntry 7 }
+
+
+    hh3cifSrcMacControl OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Whether to filter by source MAC address."
+        ::= { hh3cifXXEntry 8 }
+
+
+    hh3cifClearStat  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            clear(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Clear specify port statistics.  Operation read is not supported."
+        ::= { hh3cifXXEntry 9 }
+
+    hh3cifXXBasePortIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Index number of the port and the first port index of the
+                    device is 1."
+        ::= { hh3cifXXEntry 10 }
+
+    hh3cifXXDevPortIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Device index of the port."
+        ::= { hh3cifXXEntry 11 }
+
+   hh3cifPpsMcastControl OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The broadcast suppression with pps(packet per second) type.
+            The max value is determined by the port type and product."
+        ::= { hh3cifXXEntry 12 }
+
+   hh3cifPpsBcastDisValControl OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+          enable(1),
+          disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Control the port's pps(packet per second) broadcast suppression.
+            When the port is enabled, its pps broadcast suppression value is the
+            global disperse value, and when disabled, it doesn't suppress broadcast."
+        ::= { hh3cifXXEntry 13 }
+
+   hh3cifUniSuppressionStep OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "The step of unicast suppression in ratio mode."
+        ::= { hh3cifXXEntry 14 }
+
+   hh3cifPpsUniSuppressionMax OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "The max pps(packet per second) value of unicast suppression
+                    in pps mode."
+        ::= { hh3cifXXEntry 15 }
+
+   hh3cifMulSuppressionStep OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "The step of multicast suppression in ratio mode."
+        ::= { hh3cifXXEntry 16 }
+
+   hh3cifPpsMulSuppressionMax OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "The max pps(packet per second) value of multicast suppression
+                    in pps mode."
+        ::= { hh3cifXXEntry 17 }
+
+   hh3cifUniSuppression OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The unicast suppression with the ranging from 0 to 100 percent
+            in ratio mode.
+            The step is determined by hh3cifUniSuppressionStep."
+        ::= { hh3cifXXEntry 18 }
+
+   hh3cifPpsUniSuppression OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The unicast suppression in pps(packet per second) mode.
+            The max value is determined by hh3cifPpsUniSuppressionMax."
+        ::= { hh3cifXXEntry 19 }
+
+   hh3cifMulSuppression OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The multicast suppression with ranging from 0 to 100 percent
+            in ratio mode.
+            The step is determined by hh3cifMulSuppressionStep.
+            If hh3cifMulSuppressionFlag is 2 it means only unknown
+            traffic suppression."
+        ::= { hh3cifXXEntry 20 }
+
+   hh3cifPpsMulSuppression OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The multicast suppression in pps(packet per second) mode.
+            The max pps value is determined by hh3cifPpsMulSuppressionMax.
+            If hh3cifMulSuppressionFlag is 2 it means only unknown
+            traffic suppression."
+        ::= { hh3cifXXEntry 21 }
+
+   hh3cifComboActivePort OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            fiber   (1),    -- Optical port
+            copper  (2),    -- Electrical port
+            na      (3)     -- Not applicable
+        }
+        MAX-ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION "Active port on combo interface."
+        ::= { hh3cifXXEntry 22 }
+
+    hh3cifBMbpsMulSuppressionMax OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The maximum value of the multicast suppression with bandwidth-based(Mbps)
+                that a port can be configured."
+        ::= { hh3cifXXEntry 23 }
+
+    hh3cifBMbpsMulSuppression OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "With bandwidth-based multicast suppression, the bandwidth is measured
+                in Mbps.
+                The upper limit of the multicast suppession with bandwidth-based(Mbps)
+                is the value of hh3cifBMbpsMulSuppressionMax in the entry.
+                The default value of hh3cifBMbpsMulSuppression is the value of
+                hh3cifBMbpsMulSuppressionMax."
+        ::= { hh3cifXXEntry 24 }
+
+    hh3cifBKbpsMulSuppressionMax OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The maximum value of the multicast suppression with bandwidth-based(Kbps)
+                that a port can be configured."
+        ::= { hh3cifXXEntry 25 }
+
+    hh3cifBKbpsMulSuppressionStep OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The step of multicast suppression with bandwidth-based(Kbps)."
+        ::= { hh3cifXXEntry 26 }
+
+    hh3cifBKbpsMulSuppression OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "With bandwidth-based multicast suppression, the bandwidth
+                is measured in Kbps.
+                The upper limit of the multicast suppession with bandwidth-based(Kbps)
+                is the value of hh3cifBKbpsMulSuppressionMax in the entry.
+                The value of hh3cifBKbpsMulSuppression must be multiple of the
+                value of hh3cifBKbpsMulSuppressionStep.
+                The default value of hh3cifBKbpsMulSuppression is the value of
+                hh3cifBKbpsMulSuppressionMax."
+        ::= { hh3cifXXEntry 27 }
+
+   hh3cifUnknownPacketDropMul OBJECT-TYPE
+        SYNTAX  DropDirection
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Control the port's unknown-multicast packets drop. When
+                     inbound direction is enabled on this port, the port will
+                     drop unknown-multicast packets in inbound direction. When
+                     outbound direction is enabled on this port, the port will
+                     drop unknown-multicast packets in outbound direction. When
+                     both directions are enabled on this port, the port will
+                     drop unknown-multicast packets in both inbound and outbound
+                     directions."
+        DEFVAL { disable }
+        ::= { hh3cifXXEntry 28 }
+
+   hh3cifUnknownPacketDropUni OBJECT-TYPE
+        SYNTAX  DropDirection
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Control the port's unknown-unicast packets drop. When
+                     inbound direction is enabled on this port, the port will
+                     drop unknown-unicast packets in inbound direction. When
+                     outbound direction is enabled on this port, the port will
+                     drop unknown-unicast packets in outbound direction. When
+                     both directions are enabled on this port, the port will
+                     drop unknown-unicast packets in both inbound and outbound
+                     directions."
+        DEFVAL { disable }
+        ::= { hh3cifXXEntry 29 }
+
+    hh3cifBMbpsUniSuppressionMax OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+            The maximum value of the unicast suppression with bandwidth-based
+            (Mbps) that a port can be configured."
+        ::= { hh3cifXXEntry 30 }
+
+    hh3cifBMbpsUniSuppression OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "
+            With bandwidth-based Unicast suppression, the bandwidth is measured
+            in Mbps.
+            The upper limit of the unicast suppession with bandwidth-based(Mbps)
+            is the value of hh3cifBMbpsUniSuppressionMax in the entry.
+            The default value of hh3cifBMbpsUniSuppression is the value of
+            hh3cifBMbpsUniSuppressionMax."
+        ::= { hh3cifXXEntry 31 }
+
+    hh3cifBKbpsUniSuppressionMax OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+            The maximum value of the unicast suppression with bandwidth-based
+            (Kbps) that a port can be configured."
+        ::= { hh3cifXXEntry 32 }
+
+    hh3cifBKbpsUniSuppressionStep OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+            The step of unicast suppression with bandwidth-based(Kbps)."
+        ::= { hh3cifXXEntry 33 }
+
+    hh3cifBKbpsUniSuppression OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "
+            With bandwidth-based unicast suppression, the bandwidth
+            is measured in Kbps.
+            The upper limit of the unicast suppession with bandwidth-based(Kbps)
+            is the value of hh3cifBKbpsUniSuppressionMax in the entry.
+            The value of hh3cifBKbpsUniSuppression must be multiple of the
+            value of hh3cifBKbpsUniSuppressionStep.
+            The default value of hh3cifBKbpsUniSuppression is the value of
+            hh3cifBKbpsUniSuppressionMax."
+        ::= { hh3cifXXEntry 34 }
+
+    hh3cifOutPayloadOctets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+            The actual output octets of the interface."
+        ::= { hh3cifXXEntry 35 }
+
+    hh3cifInPayloadOctets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+            The actual input octets of the interface."
+        ::= { hh3cifXXEntry 36 }
+
+    hh3cifInErrorPktsRate OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+            The rate of inbound error packets on the interface."
+        ::= { hh3cifXXEntry 37 }
+
+    hh3cifInPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+            The number of packets received on the interface."
+        ::= { hh3cifXXEntry 38 }
+
+    hh3cifInNormalPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+            The number of normal packets received on the interface."
+        ::= { hh3cifXXEntry 39 }
+
+    hh3cifOutPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "
+            The number of packets sent on the interface."
+        ::= { hh3cifXXEntry 40 }
+
+   hh3cifMulSuppressionFlag OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            all      (1),    -- known and unknown traffic
+            unknown  (2)    -- only unknown traffic
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "
+            The multicast suppression flag.  If only unknown multicast
+            traffic is suppressed, the value is unknown(2), and all(1) for suppression of all traffic (unknown and known)."
+        ::= { hh3cifXXEntry 41 }
+
+    hh3cifAggregateTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cIfAggregateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Port aggregation information table."
+        ::= { hh3cLswExtInterface  2 }
+
+
+    hh3cifAggregateEntry  OBJECT-TYPE
+        SYNTAX Hh3cIfAggregateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Port aggregation information table."
+        INDEX   { hh3cifAggregatePortIndex }
+        ::= { hh3cifAggregateTable 1}
+
+    Hh3cIfAggregateEntry  ::=
+    SEQUENCE {
+        hh3cifAggregatePortIndex      InterfaceIndex,
+        hh3cifAggregatePortName       OCTET STRING,
+        hh3cifAggregatePortListPorts  PortList,
+        hh3cifAggregateModel          INTEGER,
+        hh3cifAggregateOperStatus     RowStatus
+        }
+
+
+
+    hh3cifAggregatePortIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Index number of the main aggregated port."
+        ::= { hh3cifAggregateEntry 1 }
+
+
+    hh3cifAggregatePortName  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..40))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Aggregation group name."
+        ::= { hh3cifAggregateEntry 2 }
+
+
+    hh3cifAggregatePortListPorts OBJECT-TYPE
+        SYNTAX  PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "Portlist of a aggregating."
+        ::= { hh3cifAggregateEntry 3 }
+
+
+    hh3cifAggregateModel  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        ingress     (1),
+        both        (2),
+        round-robin (3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Load sharing mode for the port aggregation."
+        ::= { hh3cifAggregateEntry 4 }
+
+
+    hh3cifAggregateOperStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION "Current operation status of the row."
+        ::= { hh3cifAggregateEntry 5 }
+
+-- ==================================================================
+    hh3cifHybridPortTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cifHybridPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Hybrid-port configuration table."
+        ::= { hh3cLswExtInterface  3 }
+
+
+    hh3cifHybridPortEntry  OBJECT-TYPE
+        SYNTAX Hh3cifHybridPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Hybrid-port configuration table."
+        INDEX   { hh3cifHybridPortIndex }
+        ::= { hh3cifHybridPortTable 1}
+
+    Hh3cifHybridPortEntry  ::=
+    SEQUENCE {
+        hh3cifHybridPortIndex            INTEGER,
+        hh3cifHybridTaggedVlanListLow    OCTET STRING,
+        hh3cifHybridTaggedVlanListHigh   OCTET STRING,
+        hh3cifHybridUnTaggedVlanListLow  OCTET STRING,
+        hh3cifHybridUnTaggedVlanListHigh OCTET STRING
+        }
+
+
+
+    hh3cifHybridPortIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Index number of Hybrid-port."
+        ::= { hh3cifHybridPortEntry 1 }
+
+
+    hh3cifHybridTaggedVlanListLow  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Each octet within this value specifies a set of eight
+                    VLANs, with the first octet specifying VLANs 1 through
+                    8, the second octet specifying VLANs 9 through 16, etc.
+                    Within each octet, the most significant bit represents
+                    the highest numbered VLAN, and the least significant bit
+                    represents the lowest numbered VLAN. Thus, each tagged VLAN
+                    of the hybrid port is represented by a single bit within
+                    the value of this object. If that bit has a value of '1'
+                    then that VLAN is tagged in the set of VLANs; the VLAN
+                    is not tagged if its bit has a value of '0'."
+        ::= { hh3cifHybridPortEntry 2 }
+
+
+    hh3cifHybridTaggedVlanListHigh OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Each octet within this value specifies a set of eight
+                    VLANs, with the first octet specifying VLANs 2049 through
+                    2056, the second octet specifying VLANs 2057 through 2064,
+                    etc. Within each octet, the most significant bit represents
+                    the highest numbered VLAN, and the least significant bit
+                    represents the lowest numbered VLAN. Thus, each tagged VLAN
+                    of the hybrid port is represented by a single bit within
+                    the value of this object. If that bit has a value of '1'
+                    then that VLAN is tagged in the set of VLANs; the VLAN
+                    is not tagged if its bit has a value of '0'."
+        ::= { hh3cifHybridPortEntry 3 }
+
+
+    hh3cifHybridUnTaggedVlanListLow  OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Each octet within this value specifies a set of eight
+                    VLANs, with the first octet specifying VLANs 1 through
+                    8, the second octet specifying VLANs 9 through 16, etc.
+                    Within each octet, the most significant bit represents
+                    the highest numbered VLAN, and the least significant bit
+                    represents the lowest numbered VLAN. Thus, each untagged
+                    VLAN of the hybrid port is represented by a single bit
+                    within the value of this object. If that bit has a value
+                    of '1' then that VLAN is untagged in the set of VLANs; the
+                    VLAN is not untagged if its bit has a value of '0'."
+        ::= { hh3cifHybridPortEntry 4 }
+
+
+    hh3cifHybridUnTaggedVlanListHigh OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Each octet within this value specifies a set of eight
+                    VLANs, with the first octet specifying VLANs 2049 through
+                    2056, the second octet specifying VLANs 2057 through 2064,
+                    etc. Within each octet, the most significant bit represents
+                    the highest numbered VLAN, and the least significant bit
+                    represents the lowest numbered VLAN. Thus, each untagged
+                    VLAN of the hybrid port is represented by a single bit
+                    within the value of this object. If that bit has a value of
+                    '1' then that VLAN is untagged in the set of VLANs; the VLAN
+                    is not untagged if its bit has a value of '0'."
+        ::= { hh3cifHybridPortEntry 5 }
+
+-- ==================== Combo port table ============================
+    hh3cifComboPortTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cifComboPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Combo-port table."
+        ::= { hh3cLswExtInterface  4 }
+
+    hh3cifComboPortEntry  OBJECT-TYPE
+        SYNTAX Hh3cifComboPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of hh3cifComboPortTable."
+        INDEX    { hh3cifComboPortIndex }
+        ::= { hh3cifComboPortTable 1}
+
+    Hh3cifComboPortEntry  ::=
+    SEQUENCE {
+        hh3cifComboPortIndex       InterfaceIndex,
+        hh3cifComboPortCurActive   INTEGER
+        }
+
+    hh3cifComboPortIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The combo-port interface index. Its value is the same as the value
+            of ifIndex in ifTable, but only includes indexes of the combo-port
+            interfaces."
+        ::= { hh3cifComboPortEntry 1 }
+
+    hh3cifComboPortCurActive OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            fiber   (1),    -- Optical port
+            copper  (2),    -- Electrical port
+            na      (3),    -- Not applicable
+            auto    (4)     -- Identifing the optical/electrical port automatic
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Current active interface of combo interfaces. The value 'fiber'
+            means the interface with fiber connector of the pair of combo-port
+            interfaces is active. The value 'copper' means the interface with
+            copper connector of the pair is active. The value 'na' means not
+            supported. The value 'auto' means the interface identified
+            the copper or fiber port automatic."
+        ::= { hh3cifComboPortEntry 2 }
+
+-- ======================pkt buf table===============================
+    hh3cifPktBufTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cifPktBufEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Packet buffer table."
+        ::= { hh3cLswExtInterface  5 }
+
+    hh3cifPktBufEntry  OBJECT-TYPE
+        SYNTAX Hh3cifPktBufEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of hh3cifPktBufTable."
+        INDEX { ifIndex }
+        ::= { hh3cifPktBufTable 1}
+
+    Hh3cifPktBufEntry  ::=
+        SEQUENCE {
+            hh3cifPktBufFree      Integer32,
+            hh3cifPktBufInit      Integer32,
+            hh3cifPktBufMin       Integer32,
+            hh3cifPktBufMiss      Counter64,
+            hh3cifPktBufInDrop    Counter64,
+            hh3cifPktBufEgDrop    Counter64
+            }
+
+    hh3cifPktBufFree OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet buffers available for the interface."
+        ::= { hh3cifPktBufEntry 1 }
+
+    hh3cifPktBufInit OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet buffers allocated when the interface was created."
+        ::= { hh3cifPktBufEntry 2 }
+
+    hh3cifPktBufMin OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The smallest number of packet buffers available for the interface."
+        ::= { hh3cifPktBufEntry 3 }
+
+    hh3cifPktBufMiss OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times that the interface failed to obtain a packet
+             buffer.  Failure to obtain a buffer indicates that buffers were busy."
+        ::= { hh3cifPktBufEntry 4 }
+
+    hh3cifPktBufInDrop OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of ingress packets dropped by the interface
+             because of insufficient data buffer."
+        ::= { hh3cifPktBufEntry 5 }
+
+    hh3cifPktBufEgDrop OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of egress packets dropped by the interface
+             because of insufficient data buffer."
+        ::= { hh3cifPktBufEntry 6 }
+
+-- ======================if queue pkt buf table===============================
+    hh3cifQueuePktBufTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cifQueuePktBufEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "802.1p queue of the interface packet buffer table."
+        ::= { hh3cLswExtInterface  6 }
+
+    hh3cifQueuePktBufEntry  OBJECT-TYPE
+        SYNTAX Hh3cifQueuePktBufEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of hh3cifQueuePktBufTable."
+        INDEX
+            {
+                ifIndex,
+                hh3cifQueueId
+            }
+        ::= { hh3cifQueuePktBufTable 1}
+
+    Hh3cifQueuePktBufEntry  ::=
+        SEQUENCE {
+            hh3cifQueueId                  Integer32,
+            hh3cifQueuePktBufTotal         Unsigned32,
+            hh3cifQueueBufUsed             Unsigned32,
+            hh3cifQueueBufThreCount        Counter32,
+            hh3cifQueueBufUsageIn5Seconds  Integer32,
+            hh3cifQueueBufUsageIn1Minute   Integer32,
+            hh3cifQueueBufUsageIn5Minutes  Integer32
+            }
+
+    hh3cifQueueId OBJECT-TYPE
+        SYNTAX  Integer32(1..8)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The 802.1p queue ID of the interface. This value is
+             used to specify the queue ID of the interface
+             when the user wants to read one queue of the interface.
+             The index number 1-8 correspond with 802.1p queue ID 0-7."
+        ::= { hh3cifQueuePktBufEntry 1 }
+
+    hh3cifQueuePktBufTotal OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet buffers available for the interface,
+             including fixed buffer and shared buffer."
+        ::= { hh3cifQueuePktBufEntry 2 }
+
+    hh3cifQueueBufUsed OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet buffers that have been used for each
+             802.1p queue of the interface."
+        ::= { hh3cifQueuePktBufEntry 3 }
+
+    hh3cifQueueBufThreCount OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of times that each 802.1p queue of the interface has
+             exceeded the buffer threshold. The threshold is configurated by user."
+        ::= { hh3cifQueuePktBufEntry 4 }
+
+    hh3cifQueueBufUsageIn5Seconds OBJECT-TYPE
+        SYNTAX  Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The buffer usage in the last 5 seconds for each 802.1p queue of the interface."
+        ::= { hh3cifQueuePktBufEntry 5 }
+
+    hh3cifQueueBufUsageIn1Minute OBJECT-TYPE
+        SYNTAX  Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The buffer usage in the last 1 minute for each 802.1p queue of the interface."
+        ::= { hh3cifQueuePktBufEntry 6 }
+
+    hh3cifQueueBufUsageIn5Minutes OBJECT-TYPE
+        SYNTAX  Integer32 (0..100)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The buffer usage in the last 5 minutes for each 802.1p queue of the interface."
+        ::= { hh3cifQueuePktBufEntry 7 }
+
+-- ========================l2========================================
+    hh3cLswL2InfMibObject OBJECT IDENTIFIER ::= {  hh3cLswL2InfMib 1  }
+
+    hh3cSlotPortMax  OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Max ports of the slots."
+        ::= { hh3cLswL2InfMibObject  1 }
+
+    hh3cSwitchPortMax  OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Max ports that this switch includes."
+        ::= { hh3cLswL2InfMibObject  2 }
+
+    hh3cifVLANTrunkStatusTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cIfVLANTrunkStatusEntry
+        MAX-ACCESS not-accessible STATUS   current
+        DESCRIPTION "Gvrp attributes on the VlanTrunk port."
+        ::= { hh3cLswL2InfMibObject  3 }
+
+    hh3cifVLANTrunkStatusEntry  OBJECT-TYPE
+        SYNTAX Hh3cIfVLANTrunkStatusEntry
+        MAX-ACCESS not-accessible STATUS   current
+        DESCRIPTION "Gvrp attributes on the VlanTrunk port."
+        INDEX   { hh3cifVLANTrunkIndex }
+        ::= { hh3cifVLANTrunkStatusTable 1}
+
+    Hh3cIfVLANTrunkStatusEntry    ::=
+    SEQUENCE {
+        hh3cifVLANTrunkIndex              InterfaceIndex,
+        hh3cifVLANTrunkGvrpRegistration   INTEGER,
+        hh3cifVLANTrunkPassListLow        OCTET STRING,
+        hh3cifVLANTrunkPassListHigh       OCTET STRING,
+        hh3cifVLANTrunkAllowListLow       OCTET STRING,
+        hh3cifVLANTrunkAllowListHigh      OCTET STRING
+        }
+
+
+
+    hh3cifVLANTrunkIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Index number of the VLANTrunk interface."
+        ::= { hh3cifVLANTrunkStatusEntry 1 }
+
+
+    hh3cifVLANTrunkGvrpRegistration OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        normal  (1),
+        fixed   (2),
+        forbidden   (3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "GVRP registration information
+            normal:     This is the default configuration. Allow create, register
+                        and unregister vlans dynamiclly at this port.
+            fixed:      Aallow create and register vlan manually at this port.
+                        Prevent from unregistering vlans or registering known
+                        vlans of this port at another trunk port.
+            forbidden:  Unregister all vlans but vlan 1, forbid to create or
+                        register any other vlans at this port."
+        ::= { hh3cifVLANTrunkStatusEntry 2 }
+
+
+    hh3cifVLANTrunkPassListLow OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Each octet within this value specifies a set of eight
+                    VLANs, with the first octet specifying VLANs 1 through
+                    8, the second octet specifying VLANs 9 through 16, etc.
+                    Within each octet, the most significant bit represents
+                    the highest numbered VLAN, and the least significant bit
+                    represents the lowest numbered VLAN. Thus, each actually
+                    passed VLAN of the trunk port is represented by a single
+                    bit within the value of this object. If that bit has a
+                    value of '1' then that VLAN is actually passed in the set
+                    of VLANs; the VLAN is not actually passed if its bit has
+                    a value of '0'."
+        ::= { hh3cifVLANTrunkStatusEntry 4 }
+
+    hh3cifVLANTrunkPassListHigh OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Each octet within this value specifies a set of eight
+                    VLANs, with the first octet specifying VLANs 2049 through
+                    2056, the second octet specifying VLANs 2057 through 2064,
+                    etc. Within each octet, the most significant bit represents
+                    the highest numbered VLAN, and the least significant bit
+                    represents the lowest numbered VLAN. Thus, each actually
+                    passed VLAN of the trunk port is represented by a single
+                    bit within the value of this object. If that bit has a
+                    value of '1' then that VLAN is actually passed in the set
+                    of VLANs; the VLAN is not actually passed if its bit has
+                    a value of '0'."
+        ::= { hh3cifVLANTrunkStatusEntry 5 }
+
+    hh3cifVLANTrunkAllowListLow OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Each octet within this value specifies a set of eight
+                    VLANs, with the first octet specifying VLANs 1 through
+                    8, the second octet specifying VLANs 9 through 16, etc.
+                    Within each octet, the most significant bit represents
+                    the highest numbered VLAN, and the least significant bit
+                    represents the lowest numbered VLAN. Thus, each allowed
+                    VLAN of the trunk port is represented by a single bit
+                    within the value of this object. If that bit has a value
+                    of '1' then that VLAN is allowed in the set of VLANs;
+                    the VLAN is not allowed if its bit has a value of '0'."
+        ::= { hh3cifVLANTrunkStatusEntry 6 }
+
+    hh3cifVLANTrunkAllowListHigh OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Each octet within this value specifies a set of eight
+                    VLANs, with the first octet specifying VLANs 2049 through
+                    2056, the second octet specifying VLANs 2057 through 2064,
+                    etc. Within each octet, the most significant bit represents
+                    the highest numbered VLAN, and the least significant bit
+                    represents the lowest numbered VLAN. Thus, each allowed
+                    VLAN of the trunk port is represented by a single bit within
+                    the value of this object. If that bit has a value of '1'
+                    then that VLAN is allowed in the set of VLANs; the VLAN is
+                    not allowed if its bit has a value of '0'."
+        ::= { hh3cifVLANTrunkStatusEntry 7 }
+
+
+
+
+    hh3cethernetTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cEthernetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Ethernet port attribute table."
+        ::= { hh3cLswL2InfMibObject  4 }
+
+
+    hh3cethernetEntry  OBJECT-TYPE
+        SYNTAX Hh3cEthernetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Entries of Ethernet port attribute table"
+        INDEX { ifIndex }
+        ::= { hh3cethernetTable 1}
+
+    Hh3cEthernetEntry ::=
+    SEQUENCE {
+        hh3cifEthernetDuplex          INTEGER,
+        hh3cifEthernetMTU             INTEGER,
+        hh3cifEthernetSpeed           INTEGER,
+        hh3cifEthernetMdi             INTEGER,
+        hh3cMaxMacLearn               INTEGER,
+        hh3cifMacAddressLearn         INTEGER,
+        hh3cifEthernetTest            INTEGER,
+        hh3cifMacAddrLearnMode        INTEGER,
+        hh3cifEthernetFlowInterval    INTEGER,
+        hh3cifEthernetIsolate         OCTET STRING,
+        hh3cifVlanVPNStatus           INTEGER,
+        hh3cifVlanVPNUplinkStatus     INTEGER,
+        hh3cifVlanVPNTPID             Integer32,
+        hh3cifIsolateGroupID          Integer32,
+        hh3cifisUplinkPort            INTEGER,
+        hh3cifEthernetAutoSpeedMask   SpeedModeFlag,
+        hh3cifEthernetAutoSpeed       SpeedModeFlag
+        }
+
+    hh3cifEthernetDuplex OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        full    (1),
+        half    (2),
+        auto    (3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Ethernet interface mode."
+        ::= { hh3cethernetEntry 3 }
+
+
+    hh3cifEthernetMTU  OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "MTU on the Ethernet interface."
+        ::= { hh3cethernetEntry 4 }
+
+
+    hh3cifEthernetSpeed OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        auto    (0),
+        s10M    (10),
+        s100M   (100),
+        s1000M  (1000),
+        s2500M  (2500),
+        s5000M  (5000),
+        s10000M (10000),
+        s24000M (24000),
+        s40000M (40000),
+        s20000M (20000),
+        s25000M (25000),
+        s50000M (50000),
+        s100000M (100000),
+        s200000M (200000),
+        s400000M (400000)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Ethernet interface speed."
+        ::= { hh3cethernetEntry 5 }
+
+    hh3cifEthernetMdi OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        mdi-ii   (1),
+        mdi-x   (2),
+        mdi-auto   (3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Type of the line connected to the port.
+            MDI-II (straight-through cable): 1
+            MDI-X (crossover cable): 2
+            MDI-AUTO (auto-sensing): 3"
+        ::= { hh3cethernetEntry 7 }
+
+    hh3cMaxMacLearn OBJECT-TYPE
+        SYNTAX  INTEGER(-1..2147483647)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum number of MAC addresses that the port can learn.
+            The value -1 means that the number of Mac addresses that the port
+            can learn is unlimited."
+        ::= { hh3cethernetEntry 8 }
+
+    hh3cifMacAddressLearn OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates if the interface is allowed to learn mac address.
+            eanbled(1) means the interface can learn mac address, otherwise disabled(2)
+            can be set."
+        ::= { hh3cethernetEntry 9 }
+
+    hh3cifEthernetTest OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            test(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Test this interface.
+            The actual testing will be different according to products.
+            Read operation not supported."
+        ::= { hh3cethernetEntry 10 }
+
+    hh3cifMacAddrLearnMode OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            iVL(1),
+            sVL(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Status indicates mac address learn mode of the interface.
+            IVL(1) means independent VLAN learning.
+            SVL means shared VLAN learning."
+        ::= { hh3cethernetEntry 11 }
+
+    hh3cifEthernetFlowInterval OBJECT-TYPE
+        SYNTAX  INTEGER (5..300)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Set flow interval of the ethernet.
+            The NMS should set value to integer which is a multiple of 5."
+        ::= { hh3cethernetEntry 12 }
+
+    hh3cifEthernetIsolate  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Isolate group means that all ports in the same isolate group can not
+            send and receive packets each other.
+            Each octet within this value specifies a set of eight isolate groups,
+            with the first octet specifying isolate groups 1 through 8,  the second
+            octet specifying isolate groups 9 through 16, etc. Within each octet,
+            the leftmost bit is the first bit.
+            the first bit represents the lowest numbered isolate group, and the
+            last bit represents the highest numbered isolate group. one port can
+            belong to more than one isolate group.
+            Thus, each isolate group is represented by a single bit within the
+            value of this object.
+            If that bit has a value of '1', then that isolate group includes this port;
+            the port is not included if its bit has a value of '0'.
+            for example, the first octet is '10000100' means that the port is
+            included in the isolate group 1 and isolate group 6."
+        ::= { hh3cethernetEntry 13 }
+
+    hh3cifVlanVPNStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+             enabled(1),
+             disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Vlan VPN enable status."
+        ::= { hh3cethernetEntry 14 }
+
+    hh3cifVlanVPNUplinkStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+             enabled(1),
+             disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Vlan VPN uplink status."
+        ::= { hh3cethernetEntry 15 }
+
+    hh3cifVlanVPNTPID OBJECT-TYPE
+        SYNTAX  Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Port based Vlan VPN TPID(Tag Protocol Indentifier), default value
+            is 0x8100.
+            Please refer to hh3cVlanVPNTPIDMode to get more information."
+        ::= { hh3cethernetEntry 16 }
+
+    hh3cifIsolateGroupID OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Isolate group identifier. Value zero means this interface does not
+            belong to any isolate group."
+        ::= { hh3cethernetEntry 17 }
+
+    hh3cifisUplinkPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+             yes(1),
+             no(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ethernet uplink status, default value is 2."
+        ::= { hh3cethernetEntry 18 }
+
+    hh3cifEthernetAutoSpeedMask OBJECT-TYPE
+        SYNTAX  SpeedModeFlag
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object specifies which kinds of speed mode can be negotiated.
+            Each bit corresponds to a kind of speed mode.
+
+            If the value of a bit is '1', it means the corresponding speed mode
+            is negotiable on the port. Otherwise the negotiation for that
+            kind of speed mode is not supported on this port. If there are
+            several negotiable speed modes, all bits for them  are '1'.
+            For example, if the speed mode 's10M' and 's1000M' can be negotiable,
+            the value of this object is 0xA0."
+        ::= { hh3cethernetEntry 19 }
+
+    hh3cifEthernetAutoSpeed OBJECT-TYPE
+        SYNTAX  SpeedModeFlag
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates which kinds of speed mode are negotiable
+            on this port.
+
+            Only when a bit of hh3cifEthernetAutoSpeedMask is '1', the corresponding
+            bit of this object can be set to '1', indicating the corresponding
+            speed mode is negotiable.
+
+            For example, if the value of hh3cifEthernetAutoSpeedMask is 0xA0,
+            which indicates speed mode 's10M' and 's1000M' are negotiable,
+            the possible value of this object should be one of the four values
+            (0x00, 0x20, 0x80 and 0xA0).
+
+            If the value of hh3cifEthernetSpeed is not 'auto', the value of this
+            object is insignificant and should be ignored. The value length of
+            this object should be as long as that of hh3cifEthernetAutoSpeedMask."
+        ::= { hh3cethernetEntry 20 }
+
+    hh3cIsolateGroupMax  OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Max isolate group that this device support, the value is zero
+            means that the device does not support isolate group."
+        ::= { hh3cLswL2InfMibObject  5 }
+
+   hh3cGlobalBroadcastMaxPps   OBJECT-TYPE
+        SYNTAX INTEGER   (0..14881000)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The global max packets per second. When it is set, the value of
+            BroadcastMaxPps in all ports will be changed to that setting."
+        ::= { hh3cLswL2InfMibObject 6 }
+
+  hh3cGlobalBroadcastMaxRatio OBJECT-TYPE
+        SYNTAX INTEGER (0..100)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The global max-ratio of broadcast from 0 to 100 percent.
+            When it is set, the value of BroadcastMaxRatio in all ports
+            will be changed to that setting."
+        ::= { hh3cLswL2InfMibObject 7  }
+
+    hh3cBpduTunnelStatus  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+             enabled(1),
+             disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Bpdu tunnel enable status."
+        ::= { hh3cLswL2InfMibObject  8 }
+
+   hh3cVlanVPNTPIDMode OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+             port-based(1),
+             global(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Vlan VPN TPID mode.
+
+            The value 'port-based' means VLAN VPN TPID value would be set based
+            on port via hh3cifVlanVPNTPID. In this situation, hh3cVlanVPNTPID is
+            meaningless and always return 0x8100.
+
+            The value 'global' means VLAN VPN TPID value should be set globally
+            via hh3cVlanVPNTPID. In this situation, hh3cifVlanVPNTPID in hh3cethernetTable
+            has the same value with hh3cVlanVPNTPID."
+      ::= { hh3cLswL2InfMibObject  9 }
+
+   hh3cVlanVPNTPID OBJECT-TYPE
+        SYNTAX  Integer32 (1..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Global Vlan VPN TPID(Tag Protocol Indentifier), default value
+            is 0x8100."
+        ::= { hh3cLswL2InfMibObject  10 }
+
+   hh3cPortIsolateGroupTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cPortIsolateGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Isolate Group attribute table."
+        ::= { hh3cLswL2InfMibObject  11 }
+
+
+   hh3cPortIsolateGroupEntry  OBJECT-TYPE
+        SYNTAX Hh3cPortIsolateGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of hh3cPortIsolateGroupTable."
+        INDEX    { hh3cPortIsolateGroupIndex }
+        ::= { hh3cPortIsolateGroupTable 1 }
+
+    Hh3cPortIsolateGroupEntry ::=
+    SEQUENCE {
+        hh3cPortIsolateGroupIndex              Integer32,
+        hh3cPortIsolateUplinkIfIndex           InterfaceIndex,
+        hh3cPortIsolateGroupRowStatus          RowStatus,
+        hh3cPortIsolateGroupDescription        DisplayString
+        }
+
+   hh3cPortIsolateGroupIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Port isolate group identifier.
+            The index of the hh3cPortIsolateGroupTable.
+            The value ranges from 1 to the limit of isolate group quantity."
+        ::= { hh3cPortIsolateGroupEntry 1 }
+
+   hh3cPortIsolateUplinkIfIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION "Index number of the uplink interface."
+        ::= { hh3cPortIsolateGroupEntry 2 }
+
+    hh3cPortIsolateGroupRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Current operation status of the row."
+        ::= { hh3cPortIsolateGroupEntry  3 }
+
+    hh3cPortIsolateGroupDescription OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..80))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Port isolate group description, default value is zero-length string."
+        ::= { hh3cPortIsolateGroupEntry 4 }
+
+    hh3cMaxMacLearnRange OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "The maximum number of MAC address that the port supports."
+        ::= { hh3cLswL2InfMibObject  12 }
+
+
+    hh3cifPortProtocolStatTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cifPortProtocolStatEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains objects of port statistics information based on
+            IPv4 and IPv6 protocols."
+        ::= { hh3cLswL2InfMibObject  13 }
+
+    hh3cifPortProtocolStatEntry  OBJECT-TYPE
+        SYNTAX Hh3cifPortProtocolStatEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of hh3cifPortProtocolStatTable."
+        INDEX    { ifIndex }
+        ::= { hh3cifPortProtocolStatTable 1 }
+
+    Hh3cifPortProtocolStatEntry ::=
+        SEQUENCE {
+            hh3cifIPv4InOctets                        Counter64,
+            hh3cifIPv4InUcastPkts                     Counter64,
+            hh3cifIPv4InMultiPkts                     Counter64,
+            hh3cifIPv4InBroadcastPkts                 Counter64,
+            hh3cifIPv4InDiscards                      Counter64,
+            hh3cifIPv4InErrors                        Counter64,
+            hh3cifIPv4OutOctets                       Counter64,
+            hh3cifIPv4OutUcastPkts                    Counter64,
+            hh3cifIPv4OutMultiPkts                    Counter64,
+            hh3cifIPv4OutBroadcastPkts                Counter64,
+            hh3cifIPv4OutDiscards                     Counter64,
+            hh3cifIPv4OutErrors                       Counter64,
+            hh3cifIPv6InOctets                        Counter64,
+            hh3cifIPv6InUcastPkts                     Counter64,
+            hh3cifIPv6InMultiPkts                     Counter64,
+            hh3cifIPv6InAnycastPkts                   Counter64,
+            hh3cifIPv6InDiscards                      Counter64,
+            hh3cifIPv6InErrors                        Counter64,
+            hh3cifIPv6OutOctets                       Counter64,
+            hh3cifIPv6OutUcastPkts                    Counter64,
+            hh3cifIPv6OutMultiPkts                    Counter64,
+            hh3cifIPv6OutAnycastPkts                  Counter64,
+            hh3cifIPv6OutDiscards                     Counter64,
+            hh3cifIPv6OutErrors                       Counter64
+        }
+    hh3cifIPv4InOctets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of octets based on IPv4 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 1 }
+
+    hh3cifIPv4InUcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of unicast packets based on IPv4 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 2 }
+
+    hh3cifIPv4InMultiPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of multicast packets based on IPv4 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 3 }
+
+    hh3cifIPv4InBroadcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of broadcast packets based on IPv4 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 4 }
+
+    hh3cifIPv4InDiscards OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of discard packets based on IPv4 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 5 }
+
+    hh3cifIPv4InErrors OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of error packets based on IPv4 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 6 }
+
+    hh3cifIPv4OutOctets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of octets based on IPv4 transmitted out of the interface."
+        ::= { hh3cifPortProtocolStatEntry  7 }
+
+    hh3cifIPv4OutUcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of unicast packets based on IPv4 transmitted out of the
+            interface."
+        ::= { hh3cifPortProtocolStatEntry  8 }
+
+    hh3cifIPv4OutMultiPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of multicast packets based on IPv4 transmitted out of the
+            interface."
+        ::= { hh3cifPortProtocolStatEntry 9 }
+
+    hh3cifIPv4OutBroadcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of broadcast packets based on IPv4 transmitted out of the
+            interface."
+        ::= { hh3cifPortProtocolStatEntry 10 }
+
+    hh3cifIPv4OutDiscards OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of discard packets based on IPv4 transmitted out of the
+            interface."
+        ::= { hh3cifPortProtocolStatEntry 11 }
+
+    hh3cifIPv4OutErrors OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of error packets based on IPv4 transmitted out of the
+            interface."
+        ::= { hh3cifPortProtocolStatEntry 12 }
+
+    hh3cifIPv6InOctets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of octets based on IPv6 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 13 }
+
+    hh3cifIPv6InUcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of unicast packets based on IPv6 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 14 }
+
+    hh3cifIPv6InMultiPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of multicast packets based on IPv6 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 15 }
+
+    hh3cifIPv6InAnycastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of anycast packets based on IPv6 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 16 }
+
+    hh3cifIPv6InDiscards OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of discard packets based on IPv6 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 17 }
+
+    hh3cifIPv6InErrors OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of error packets based on IPv6 received on the interface."
+        ::= { hh3cifPortProtocolStatEntry 18 }
+
+    hh3cifIPv6OutOctets OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of octets based on IPv6 transmitted of the interface."
+        ::= { hh3cifPortProtocolStatEntry  19 }
+
+    hh3cifIPv6OutUcastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of unicast packets based on IPv6 transmitted out of the
+            interface."
+        ::= { hh3cifPortProtocolStatEntry  20 }
+
+    hh3cifIPv6OutMultiPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of multicast packets based on IPv6 transmitted out of the
+            interface."
+        ::= { hh3cifPortProtocolStatEntry 21 }
+
+    hh3cifIPv6OutAnycastPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of anycast packets based on IPv6 transmitted out of the
+            interface."
+        ::= { hh3cifPortProtocolStatEntry 22 }
+
+    hh3cifIPv6OutDiscards OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of discard packets based on IPv6 transmitted out of the
+            interface."
+        ::= { hh3cifPortProtocolStatEntry 23 }
+
+    hh3cifIPv6OutErrors OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of error packets based on IPv6 transmitted out of the
+            interface."
+        ::= { hh3cifPortProtocolStatEntry 24 }
+END

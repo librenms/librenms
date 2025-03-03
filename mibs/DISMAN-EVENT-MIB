@@ -8,7 +8,6 @@ IMPORTS
     TEXTUAL-CONVENTION, RowStatus,
     TruthValue                FROM SNMPv2-TC
 
-
     MODULE-COMPLIANCE, OBJECT-GROUP,
     NOTIFICATION-GROUP             FROM SNMPv2-CONF
     sysUpTime                 FROM SNMPv2-MIB
@@ -58,7 +57,6 @@ FailureReason ::= TEXTUAL-CONVENTION
         particular error code here does not imply that all
         implementations are capable of sensing that error and
 
-
         returning that code.
 
         The second group, numbered greater than 0, are copied
@@ -78,16 +76,13 @@ FailureReason ::= TEXTUAL-CONVENTION
                                 as not as expected
         sampleOverrun           another sample attempt occurred before
                                 the previous one completed"
-
     SYNTAX      INTEGER { localResourceLack(-1),
                           badDestination(-2),
                           destinationUnreachable(-3),
                           noResponse(-4),
                           badType(-5),
                           sampleOverrun(-6),
-
                           noError(0),
-
                           tooBig(1),
                           noSuchName(2),
                           badValue(3),
@@ -107,7 +102,6 @@ FailureReason ::= TEXTUAL-CONVENTION
                           notWritable(17),
                           inconsistentName(18) }
 --
-
 
 -- Resource Control Section
 --
@@ -157,8 +151,6 @@ mteResourceSampleInstanceMaximum OBJECT-TYPE
         Changing this value will not eliminate or inhibit existing
         sample state but could prevent allocation of additional state
         information."
-
-
     ::= { mteResource 2 }
 
 mteResourceSampleInstances OBJECT-TYPE
@@ -208,7 +200,6 @@ mteTriggerFailures OBJECT-TYPE
         condition has failed.  This counts individually for each
         attempt in a group of targets or each attempt for a
 
-
         wildcarded object."
     ::= { mteTrigger 1 }
 
@@ -257,8 +248,6 @@ mteOwner OBJECT-TYPE
    MAX-ACCESS  not-accessible
    STATUS      current
    DESCRIPTION
-
-
         "The owner of this entry. The exact semantics of this
         string are subject to the security policy defined by the
         security administrator."
@@ -307,7 +296,6 @@ mteTriggerTest OBJECT-TYPE
         become false and come back to true.
 
         For 'threshold' the test works as described below for
-
 
         mteTriggerThresholdStartup, mteTriggerThresholdRising, and
         mteTriggerThresholdFalling.
@@ -358,7 +346,6 @@ mteTriggerValueID OBJECT-TYPE
         instance portion, in which case the value is obtained
         as if with a GetNext function, checking multiple values
 
-
         if they exist.  If such wildcarding is applied,
         mteTriggerValueIDWildcard must be 'true' and if not it must
         be 'false'.
@@ -408,7 +395,6 @@ mteTriggerTargetTag OBJECT-TYPE
 
         Otherwise access rights are checked according to the security
 
-
         parameters resulting from the tag."
     DEFVAL { ''H }
     ::= { mteTriggerEntry 8 }
@@ -457,8 +443,6 @@ mteTriggerFrequency OBJECT-TYPE
     UNITS       "seconds"
     MAX-ACCESS  read-create
     STATUS      current
-
-
     DESCRIPTION
         "The number of seconds to wait between trigger samples.  To
         encourage consistency in sampling, the interval is measured
@@ -507,8 +491,6 @@ mteTriggerObjects OBJECT-TYPE
         A list of objects may also be added based on the event or on
         the value of mteTriggerTest.
 
-
-
         A length of 0 indicates no additional objects."
     DEFVAL { ''H }
     ::= { mteTriggerEntry 13 }
@@ -556,8 +538,6 @@ mteTriggerDeltaEntry OBJECT-TYPE
         that has mteTriggerSampleType set to 'deltaValue'."
     INDEX       { mteOwner, IMPLIED mteTriggerName }
     ::= { mteTriggerDeltaTable 1 }
-
-
 
 MteTriggerDeltaEntry ::= SEQUENCE {
     mteTriggerDeltaDiscontinuityID                OBJECT IDENTIFIER,
@@ -608,7 +588,6 @@ mteTriggerDeltaDiscontinuityIDWildcard OBJECT-TYPE
         be the same as that of the corresponding instance of
         mteTriggerValueIDWildcard when the corresponding
 
-
         mteTriggerSampleType is 'deltaValue'."
     DEFVAL { false }
     ::= { mteTriggerDeltaEntry 2 }
@@ -658,7 +637,6 @@ MteTriggerExistenceEntry ::= SEQUENCE {
     mteTriggerExistenceEvent             SnmpAdminString
 }
 
-
 mteTriggerExistenceTest OBJECT-TYPE
     SYNTAX      BITS { present(0), absent(1), changed(2) }
     MAX-ACCESS  read-write
@@ -707,8 +685,6 @@ mteTriggerExistenceObjectsOwner OBJECT-TYPE
 
 mteTriggerExistenceObjects OBJECT-TYPE
     SYNTAX      SnmpAdminString (SIZE (0..32))
-
-
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -758,7 +734,6 @@ mteTriggerBooleanTable OBJECT-TYPE
         triggers."
     ::= { mteTrigger 5 }
 
-
 mteTriggerBooleanEntry OBJECT-TYPE
     SYNTAX      MteTriggerBooleanEntry
     MAX-ACCESS  not-accessible
@@ -806,8 +781,6 @@ mteTriggerBooleanValue OBJECT-TYPE
         mteTriggerBooleanTest."
     DEFVAL { 0 }
     ::= { mteTriggerBooleanEntry 2 }
-
-
 
 mteTriggerBooleanStartup OBJECT-TYPE
     SYNTAX      TruthValue
@@ -857,8 +830,6 @@ mteTriggerBooleanEventOwner OBJECT-TYPE
         "To go with mteTriggerBooleanEvent, the mteOwner of an event
         entry from mteEventTable."
     DEFVAL { ''H }
-
-
     ::= { mteTriggerBooleanEntry 6 }
 
 mteTriggerBooleanEvent OBJECT-TYPE
@@ -907,8 +878,6 @@ MteTriggerThresholdEntry ::= SEQUENCE {
     mteTriggerThresholdRisingEventOwner         SnmpAdminString,
     mteTriggerThresholdRisingEvent              SnmpAdminString,
     mteTriggerThresholdFallingEventOwner        SnmpAdminString,
-
-
     mteTriggerThresholdFallingEvent             SnmpAdminString,
     mteTriggerThresholdDeltaRisingEventOwner    SnmpAdminString,
     mteTriggerThresholdDeltaRisingEvent         SnmpAdminString,
@@ -957,8 +926,6 @@ mteTriggerThresholdRising OBJECT-TYPE
         triggered until the sampled value falls below this threshold
         and reaches mteTriggerThresholdFalling."
     DEFVAL { 0 }
-
-
     ::= { mteTriggerThresholdEntry 2 }
 
 mteTriggerThresholdFalling OBJECT-TYPE
@@ -1007,8 +974,6 @@ mteTriggerThresholdDeltaRising OBJECT-TYPE
         triggered until the delta value falls below this threshold and
         reaches mteTriggerThresholdDeltaFalling."
     DEFVAL { 0 }
-
-
     ::= { mteTriggerThresholdEntry 4 }
 
 mteTriggerThresholdDeltaFalling OBJECT-TYPE
@@ -1058,7 +1023,6 @@ mteTriggerThresholdObjects OBJECT-TYPE
 
         A list of objects may also be added based on the overall
 
-
         trigger, the event or other settings in mteTriggerTest.
 
         A length of 0 indicates no additional objects."
@@ -1107,8 +1071,6 @@ mteTriggerThresholdFallingEvent OBJECT-TYPE
     DEFVAL { ''H }
     ::= { mteTriggerThresholdEntry 11 }
 
-
-
 mteTriggerThresholdDeltaRisingEventOwner OBJECT-TYPE
     SYNTAX      SnmpAdminString (SIZE (0..32))
     MAX-ACCESS  read-write
@@ -1156,8 +1118,6 @@ mteTriggerThresholdDeltaFallingEvent OBJECT-TYPE
 --
 -- Objects Table
 --
-
-
 
 mteObjectsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF MteObjectsEntry
@@ -1208,7 +1168,6 @@ mteObjectsIndex OBJECT-TYPE
         "An arbitrary integer for the purpose of identifying
         individual objects within a mteObjectsName group.
 
-
         Objects within a group are placed in the notification in the
         numerical order of this index.
 
@@ -1257,7 +1216,6 @@ mteObjectsIDWildcard OBJECT-TYPE
         fully-specified or wildcarded, with 'true' indicating wildcard."
     DEFVAL { false }
     ::= { mteObjectsEntry 4 }
-
 
 mteObjectsEntryStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -1308,7 +1266,6 @@ mteEventEntry OBJECT-TYPE
     INDEX       { mteOwner, IMPLIED mteEventName }
     ::= { mteEventTable 1 }
 
-
 MteEventEntry ::= SEQUENCE {
     mteEventName                        SnmpAdminString,
     mteEventComment                     SnmpAdminString,
@@ -1358,7 +1315,6 @@ mteEventEnabled OBJECT-TYPE
         "A control to allow an event to be configured but not used.
         When the value is 'false' the event does not execute even if
 
-
         triggered."
     DEFVAL { false }
     ::= { mteEventEntry 4 }
@@ -1407,8 +1363,6 @@ mteEventNotification OBJECT-TYPE
     SYNTAX      OBJECT IDENTIFIER
     MAX-ACCESS  read-write
     STATUS      current
-
-
     DESCRIPTION
         "The object identifier from the NOTIFICATION-TYPE for the
         notification to use if metEventActions has 'notification' set."
@@ -1457,8 +1411,6 @@ mteEventSetTable OBJECT-TYPE
 mteEventSetEntry OBJECT-TYPE
     SYNTAX      MteEventSetEntry
     MAX-ACCESS  not-accessible
-
-
     STATUS      current
     DESCRIPTION
         "Information about a single event's set option.  Entries
@@ -1508,7 +1460,6 @@ mteEventSetObject OBJECT-TYPE
     DEFVAL { zeroDotZero }
     ::= { mteEventSetEntry 1 }
 
-
 mteEventSetObjectWildcard OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
@@ -1557,8 +1508,6 @@ mteEventSetTargetTag OBJECT-TYPE
 mteEventSetContextName OBJECT-TYPE
     SYNTAX      SnmpAdminString
     MAX-ACCESS  read-write
-
-
     STATUS      current
     DESCRIPTION
         "The management context in which to set mteEventObjectID.
@@ -1606,8 +1555,6 @@ mteHotTrigger OBJECT-TYPE
     DESCRIPTION
         "The name of the trigger causing the notification."
     ::= { dismanEventMIBNotificationObjects 1 }
-
-
 
 mteHotTargetName OBJECT-TYPE
     SYNTAX      SnmpAdminString
@@ -1657,8 +1604,6 @@ mteFailedReason OBJECT-TYPE
     SYNTAX      FailureReason
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-
-
     DESCRIPTION
         "The reason for the failure of an attempt to check for a
         trigger condition or set an object in response to an event."
@@ -1707,8 +1652,6 @@ mteTriggerFalling NOTIFICATION-TYPE
 
 mteTriggerFailure NOTIFICATION-TYPE
     OBJECTS { mteHotTrigger,
-
-
               mteHotTargetName,
               mteHotContextName,
               mteHotOID,
@@ -1757,8 +1700,6 @@ dismanEventMIBGroups      OBJECT IDENTIFIER ::=
 dismanEventMIBCompliance MODULE-COMPLIANCE
         STATUS current
         DESCRIPTION
-
-
                 "The compliance statement for entities which implement
                 the Event MIB."
         MODULE  -- this module
@@ -1797,7 +1738,6 @@ dismanEventMIBCompliance MODULE-COMPLIANCE
                         "Write access is not required, thus allowing
                         the system not to implement wildcarding."
 
-
                 OBJECT mteObjectsIDWildcard
                 MIN-ACCESS  read-only
                 DESCRIPTION
@@ -1807,11 +1747,8 @@ dismanEventMIBCompliance MODULE-COMPLIANCE
                 OBJECT mteEventSetContextNameWildcard
                 MIN-ACCESS  read-only
                 DESCRIPTION
-
-
                         "Write access is not required, thus allowing
                         the system not to implement wildcarding."
-
         ::= { dismanEventMIBCompliances 1 }
 
 -- Units of Conformance
@@ -1832,7 +1769,6 @@ dismanEventResourceGroup OBJECT-GROUP
 dismanEventTriggerGroup OBJECT-GROUP
         OBJECTS {
                 mteTriggerFailures,
-
                 mteTriggerComment,
                 mteTriggerTest,
                 mteTriggerSampleType,
@@ -1846,7 +1782,6 @@ dismanEventTriggerGroup OBJECT-GROUP
                 mteTriggerObjects,
                 mteTriggerEnabled,
                 mteTriggerEntryStatus,
-
                 mteTriggerDeltaDiscontinuityID,
                 mteTriggerDeltaDiscontinuityIDWildcard,
                 mteTriggerDeltaDiscontinuityIDType,
@@ -1856,9 +1791,6 @@ dismanEventTriggerGroup OBJECT-GROUP
                 mteTriggerExistenceObjects,
                 mteTriggerExistenceEventOwner,
                 mteTriggerExistenceEvent,
-
-
-
                 mteTriggerBooleanComparison,
                 mteTriggerBooleanValue,
                 mteTriggerBooleanStartup,
@@ -1866,7 +1798,6 @@ dismanEventTriggerGroup OBJECT-GROUP
                 mteTriggerBooleanObjects,
                 mteTriggerBooleanEventOwner,
                 mteTriggerBooleanEvent,
-
                 mteTriggerThresholdStartup,
                 mteTriggerThresholdObjectsOwner,
                 mteTriggerThresholdObjects,
@@ -1902,17 +1833,13 @@ dismanEventObjectsGroup OBJECT-GROUP
 dismanEventEventGroup OBJECT-GROUP
         OBJECTS {
                 mteEventFailures,
-
                 mteEventComment,
                 mteEventActions,
                 mteEventEnabled,
                 mteEventEntryStatus,
-
-
                 mteEventNotification,
                 mteEventNotificationObjectsOwner,
                 mteEventNotificationObjects,
-
                 mteEventSetObject,
                 mteEventSetObjectWildcard,
                 mteEventSetValue,

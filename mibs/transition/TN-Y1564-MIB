@@ -1,0 +1,601 @@
+-- *****************************************************************
+-- TN-Y1564-MIB.my : TN Y.1564 OAM MIB
+--
+-- Author : Krish
+--
+-- Copyright (c) 2014 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************************************************
+--
+
+TN-Y1564-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32 FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue FROM SNMPv2-TC
+    SnmpAdminString FROM SNMP-FRAMEWORK-MIB
+    tnProducts FROM TRANSITION-SMI 
+    InetAddressType,InetAddress FROM INET-ADDRESS-MIB
+    MacAddress FROM SNMPv2-TC
+    ;
+
+tnY1564MIB    MODULE-IDENTITY
+     LAST-UPDATED "201408220000Z"
+     ORGANIZATION "Transition Networks, Inc."
+     CONTACT-INFO
+                 "       Transition Networks
+                         Technical Support
+                         10900 Red Circle Drive
+                         Minnetonka, MN 55343 USA
+                         Tel: +1-800-526-9267
+
+                     E-mail: techsupport@transition.com"
+     DESCRIPTION
+         "The MIB provides functionalities for system user management in TN modules."
+     REVISION      "201408220000Z"
+     DESCRIPTION
+         "Initial Revision of this module"
+     ::= { tnProducts 154 }
+
+
+tnY1564MIBNotifications  OBJECT IDENTIFIER ::= { tnY1564MIB 1 }
+tnY1564MIBObjects  OBJECT IDENTIFIER ::= { tnY1564MIB 2 }
+tnY1564MIBConformance  OBJECT IDENTIFIER ::= { tnY1564MIB 3 }
+
+
+--
+-- sub Objects list
+--
+tnY1564CfgMgmt          OBJECT IDENTIFIER ::= { tnY1564MIBObjects 1 }
+tnY1564ReportMgmt       OBJECT IDENTIFIER ::= { tnY1564MIBObjects 2 }
+
+tnY1564ProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnY1564ProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+     "This table provides configuration of SOAM Maintenance Point.
+     "
+    ::= { tnY1564CfgMgmt 1 }
+
+tnY1564ProfileEntry OBJECT-TYPE
+    SYNTAX      TnY1564ProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents a configuration for local SOAM."
+    INDEX { IMPLIED tnY1564ProfileName }
+    ::= { tnY1564ProfileTable 1 }
+
+TnY1564ProfileEntry ::=
+    SEQUENCE{
+        tnY1564ProfileName         SnmpAdminString,
+        tnY1564ProfileDescription  DisplayString,
+        tnY1564DuelEnded           TruthValue,
+        tnY1564DstOamAware         TruthValue,
+        tnY1564TrafficType         INTEGER,
+        tnY1564MegLevel            INTEGER,
+        tnY1564FrameSize           INTEGER,
+        tnY1564UserFrameSize       INTEGER,
+        tnY1564DwellTime           INTEGER,
+        tnY1564SacFLR              INTEGER,
+        tnY1564SacFTD              INTEGER,
+        tnY1564SacFDV              INTEGER,
+        tnY1564CirEnable           TruthValue,
+        tnY1564CirStepDuration     INTEGER,
+        tnY1564CirDmInterval       INTEGER,
+        tnY1564CirStepCount        INTEGER,
+        tnY1564EirEnable           TruthValue,
+        tnY1564EirDuration         INTEGER,
+        tnY1564EirDmInterval       INTEGER,
+        tnY1564TrafficPolicingEnable           TruthValue,
+        tnY1564TrafficPolicingDuration         INTEGER,
+        tnY1564TrafficPolicingDmInterval       INTEGER,
+        tnY1564PerfTestEnable           TruthValue,
+        tnY1564PerfTestDuration         INTEGER,
+        tnY1564PerfTestUserDuration     INTEGER,
+        tnY1564PerfTestDmInterval       INTEGER,
+        tnY1564ProfileStatus       RowStatus
+    }
+
+tnY1564ProfileName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name, ASCII range 33-126, of this table."
+    ::= { tnY1564ProfileEntry 1 }
+
+tnY1564ProfileDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..127))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The description of this table."
+    ::= { tnY1564ProfileEntry 2 }
+
+tnY1564DuelEnded OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "For future use."
+        ::= { tnY1564ProfileEntry 3 }
+
+tnY1564DstOamAware OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "When set, switch transmits Y.1731 DMM frames for delay measurements
+             and Y.1731 1DM frames when this is cleared. When Traffic Type is 'Y.1731 OAM', 
+             switch transmits Y.1731 LBM frames as background traffic when DST is 
+             configured as OAM-aware, and Y.1731 TST frames when not."
+        ::= { tnY1564ProfileEntry 4 }
+
+tnY1564TrafficType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        y1731Oam(1),
+                        simCustomer(2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "
+                     When set to 'Y.1731 OAM', this switch transmits Y.1731 
+                     OAM PDUs as background traffic, and DST is OAM-aware 
+                     determines the PDU type. In the current version of the
+                     software, only one ECE can be tested at a time in this mode.
+                     When set to 'Simulated Customer', the software will generate
+                     a traffic-pattern per ECE that will hit the ECE, and use 
+                     the ECE's counters to determine PASS/FAIL criteria.Besides
+                     supporting simultaneous test of multiple ECEs, 
+                     'Simulated Customer' has the advantage that the tester can 
+                     see directly from the report if she has configured ECEs wrongly,
+                     since the report will show per-ECE counters and fail if an ECE
+                     under test is not hit as expected by the traffic pattern."
+        ::= { tnY1564ProfileEntry 5 }
+
+tnY1564MegLevel OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        one(1),
+                        two(2),
+                        three(3),
+                        four(4),
+                        five(5),
+                        six(6),
+                        seven(7)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "
+                     The MEG level used in generated Y.1731 OAM frames (both LBM/TST and DMM/1DM)."
+        ::= { tnY1564ProfileEntry 6 }
+
+tnY1564FrameSize OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        bytes64(1),
+                        bytes128(2),
+                        bytes256(3),
+                        bytes512(4),
+                        bytes1024(5),
+                        bytes1280(6),
+                        bytes1518(7),
+                        mtu(8),
+                        userDefined(9)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "
+                    Selects the frame size of the background traffic. The frame size 
+                    does not include possible C-tag(s) added to match the ECE. Besides 
+                    standard frame sizes there are two custom selections:
+
+                    MTU - The UNI's MTU will be used for the background traffic.
+                    User-defined - custom specification of a frame size of the background traffic.
+                                   Valid range is 64 to 10236 bytes. 
+                    "
+        ::= { tnY1564ProfileEntry 7 }
+
+tnY1564UserFrameSize OBJECT-TYPE
+    SYNTAX          INTEGER(64..10236)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                    User defined frame size of the background traffic.
+                    Valid range is 64 to 10236 bytes. 
+                   "
+    ::= { tnY1564ProfileEntry 8 }
+
+tnY1564DwellTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                 When a trial (a single step of a subtest) is executed, background
+                 traffic is transmitted for a certain period of time. When that
+                 period has elapsed, the Dwell Time determines how long to wait
+                 before reading hardware counters and status in order to assess
+                 the status of the trial. The required dwell time must be at least
+                 the worst-case roundtrip time, and therefore a.o. depends on the
+                 physical distance between the near and far ends.
+
+                 Valid range is from 100 to 10000 in steps of 100 milliseconds
+                 with a default of 500 milliseconds. 
+                   "
+    ::= { tnY1564ProfileEntry 9 }
+
+tnY1564SacFLR OBJECT-TYPE
+    SYNTAX          INTEGER(0..1000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   Defines the acceptable Frame Loss Ratio. 
+                   The Acceptable FLR is measured in permille. Setting this to
+                   1000 effectively disables this check.The number is used in all
+                   enabled subtests. Only delay measurement PDUs and green
+                   background traffic undergoes FLR check. If the number of looped 
+                   green frames differs from the number of transmitted green frames 
+                   by more than the 'Acceptable FLR', the test is considered failing, 
+                   otherwise passing.If the EVC contains multiple ECEs that matches
+                   on the same VLAN ID (UNI ingress) and the EVC uses 'Tx Lookup' equal 
+                   to 'VID-PCP', the NNI ingress rules count looped traffic per NNI 
+                   outer tag's PCP, and therefore provide more detailed information about 
+                   which ECE is failing, than if the EVC uses 'Tx Lookup' equal to 'VID', 
+                   where all looped traffic arriving on NNI is counted on the same ECE. 
+                   The disadvantage of the 'VID-PCP' method is that it uses more chip 
+                   resources than does the 'VID' method.
+                   
+                   Valid range is from 0 to 1000 with a default of 0‰. 
+                   "
+    ::= { tnY1564ProfileEntry 10 }
+
+tnY1564SacFTD OBJECT-TYPE
+    SYNTAX          INTEGER(0..10000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                    Defines the acceptable Frame Transfer Delay, measured in 
+                    milliseconds. If the highest observed frame transfer delay
+                    exceeds this, the test fails.
+
+                    Valid range is from 0 to 10000 with a default of 0 milliseconds. 
+                    A value of 0 disables this check. 
+                   "
+    ::= { tnY1564ProfileEntry 11 }
+
+tnY1564SacFDV OBJECT-TYPE
+    SYNTAX          INTEGER(0..10000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                    Defines the acceptable Frame Delay Variation, measured in milliseconds. 
+                    If the highest observed frame delay variation exceeds this, the test fails.
+                    Valid range is from 0 to 10000 with a default of 0 milliseconds. 
+                    A value of 0 disables this check. 
+                   "
+    ::= { tnY1564ProfileEntry 12 }
+
+tnY1564CirEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                  "
+                   Set, to enable the CIR test."
+        ::= { tnY1564ProfileEntry 13 }
+
+tnY1564CirStepDuration OBJECT-TYPE
+    SYNTAX          INTEGER(1..3600)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   Each step in the CIR configuration test applies background
+                   traffic for this number of seconds.
+                   Valid range is from 1 to 3600 with a default of 10 seconds. 
+                   "
+    ::= { tnY1564ProfileEntry 14 }
+
+tnY1564CirDmInterval OBJECT-TYPE
+    SYNTAX          INTEGER(100..10000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   A Y.1731 1DM or DMM frame (depending on type of test) is 
+                   transmitted every so many milliseconds, in order to perform 
+                   delay measurements (DM). The number should be selected so 
+                   that at least three DM frames are transmitted during a trial 
+                   in order to obtain delay variation results. After each trial 
+                   the measured FTD and FDV is compared against the SAC's Acceptable FLR, FTD, and FDV.
+
+                   Valid range is from 100 to 10000 in steps of 100 milliseconds 
+                   with a default of 500 milliseconds.
+                   A value of 0 effectively disables transmission of DM frames, 
+                   which thereby indirectly disables the check against the SAC. 
+                   "
+    ::= { tnY1564ProfileEntry 15 }
+
+tnY1564CirStepCount OBJECT-TYPE
+    SYNTAX          INTEGER(1..1000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   The number of steps (trials) used to reach CIR. If, for example,
+                   Step Count is set to 4, four trials are executed. The first runs
+                   at 25% of this ECEs share of CIR, the second at 50%, then 75%,
+                   and finally 100%. A step count of 1 corresponds to executing 
+                   Y.1564's A.1 test (Simple CIR Validation Test). A step count 
+                   greater than 1 corresponds to executing Y.1564's A.2 test (Step Load CIR Test).
+ 
+                   Valid range is from 1 to 1000 with a default of 4 steps. 
+                   "
+    ::= { tnY1564ProfileEntry 16 }
+
+tnY1564EirEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                  "
+                   Set, to enable the EIR test."
+        ::= { tnY1564ProfileEntry 17 }
+
+tnY1564EirDuration OBJECT-TYPE
+    SYNTAX          INTEGER(1..3600)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   The EIR configuration test is executed in one single trial, 
+                   whose duration is configured with this parameter.
+                   Valid range is from 1 to 3600 with a default of 10 seconds.
+                   "
+    ::= { tnY1564ProfileEntry 18 }
+
+tnY1564EirDmInterval OBJECT-TYPE
+    SYNTAX          INTEGER(100..10000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   A Y.1731 1DM or DMM frame (depending on type of test) is 
+                   transmitted every so many milliseconds, in order to perform 
+                   delay measurements (DM). The number should be selected so 
+                   that at least three DM frames are transmitted during a trial 
+                   in order to obtain delay variation results. After each trial 
+                   the measured FTD and FDV is compared against the SAC's Acceptable FLR, FTD, and FDV.
+
+                   Valid range is from 100 to 10000 in steps of 100 milliseconds 
+                   with a default of 500 milliseconds.
+                   A value of 0 effectively disables transmission of DM frames, 
+                   which thereby indirectly disables the check against the SAC. 
+                   "
+    ::= { tnY1564ProfileEntry 19 }
+
+tnY1564TrafficPolicingEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                  "
+                   Set, to enable the Traffic Policing test."
+        ::= { tnY1564ProfileEntry 20 }
+
+tnY1564TrafficPolicingDuration OBJECT-TYPE
+    SYNTAX          INTEGER(1..3600)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   The Traffic Policing test is executed in one single trial, 
+                   whose duration is configured with this parameter.
+                   Valid range is from 1 to 3600 with a default of 10 seconds.
+                   "
+    ::= { tnY1564ProfileEntry 21 }
+
+tnY1564TrafficPolicingDmInterval OBJECT-TYPE
+    SYNTAX          INTEGER(100..10000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   A Y.1731 1DM or DMM frame (depending on type of test) is 
+                   transmitted every so many milliseconds, in order to perform 
+                   delay measurements (DM). The number should be selected so 
+                   that at least three DM frames are transmitted during a trial 
+                   in order to obtain delay variation results. After each trial 
+                   the measured FTD and FDV is compared against the SAC's Acceptable FLR, FTD, and FDV.
+
+                   Valid range is from 100 to 10000 in steps of 100 milliseconds 
+                   with a default of 500 milliseconds.
+                   A value of 0 effectively disables transmission of DM frames, 
+                   which thereby indirectly disables the check against the SAC. 
+                   "
+    ::= { tnY1564ProfileEntry 22 }
+
+tnY1564PerfTestEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                  "
+                   Set, to enable the Performance test."
+        ::= { tnY1564ProfileEntry 23 }
+
+tnY1564PerfTestDuration OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        mins15(1),
+                        hours2(2),
+                        hours24(3),
+                        userDefined(4)
+                    }
+
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   The performance test is executed in one single trial, whose 
+                   duration is configured with this parameter. There are 
+                   Y.1564-specified standard durations and a custom duration can be
+                   specified by selecting User-defined Duration option.
+                   "
+    ::= { tnY1564ProfileEntry 24 }
+
+tnY1564PerfTestUserDuration OBJECT-TYPE
+    SYNTAX          INTEGER(1..86400)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   User defined duration. Valid range is from 1 to 86400 with a default of 900 seconds
+                   "
+    ::= { tnY1564ProfileEntry 25 }
+
+tnY1564PerfTestDmInterval OBJECT-TYPE
+    SYNTAX          INTEGER(100..10000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+                   "
+                   A Y.1731 1DM or DMM frame (depending on type of test) is 
+                   transmitted every so many milliseconds, in order to perform 
+                   delay measurements (DM). The number should be selected so 
+                   that at least three DM frames are transmitted during a trial 
+                   in order to obtain delay variation results. After each trial 
+                   the measured FTD and FDV is compared against the SAC's Acceptable FLR, FTD, and FDV.
+
+                   Valid range is from 100 to 10000 in steps of 100 milliseconds 
+                   with a default of 500 milliseconds.
+                   A value of 0 effectively disables transmission of DM frames, 
+                   which thereby indirectly disables the check against the SAC. 
+                   "
+    ::= { tnY1564ProfileEntry 26 }
+
+tnY1564ProfileStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+        The writable columns in a row can not be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+    ::= { tnY1564ProfileEntry 27 }
+
+
+
+-- ------------------------------------------------------
+-- ------------------------------------------------------
+-- ------------------------------------------------------
+-- ------------------------------------------------------
+
+tnY1564ReportTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnY1564ReportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+     "This table provides configuration of SOAM Maintenance Point.
+     "
+    ::= { tnY1564ReportMgmt 1 }
+
+tnY1564ReportEntry OBJECT-TYPE
+    SYNTAX      TnY1564ReportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents a configuration for local SOAM."
+    INDEX { IMPLIED tnY1564ReportName }
+    ::= { tnY1564ReportTable 1 }
+
+TnY1564ReportEntry ::=
+    SEQUENCE{
+        tnY1564ReportName         SnmpAdminString,
+        tnY1564ReportDscr         DisplayString,
+        tnY1564ReportTime         DisplayString,
+        tnY1564ReportTftpAddrType     InetAddressType,
+        tnY1564ReportTftpAddr         InetAddress,
+        tnY1564ReportTestStatus   INTEGER,
+        tnY1564ReportAction       INTEGER
+    }
+
+tnY1564ReportName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name, ASCII range 33-126, of this table."
+    ::= { tnY1564ReportEntry 1 }
+
+tnY1564ReportDscr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The description of this table."
+    ::= { tnY1564ReportEntry 2 }
+
+tnY1564ReportTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (26))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The description of this table."
+    ::= { tnY1564ReportEntry 3 }
+
+tnY1564ReportTftpAddrType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The tftp server IP address type. "
+    ::= { tnY1564ReportEntry 4 }
+    
+tnY1564ReportTftpAddr  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The tftp server IP address. "
+    ::= { tnY1564ReportEntry 5 }
+
+tnY1564ReportTestStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        inactive(1),
+                        executing(2),
+                        cancelling(3),
+                        cancelled(4),
+                        passed(5),
+                        failed(6)
+                    }
+
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+                   "
+                   "
+    ::= { tnY1564ReportEntry 6 }
+
+tnY1564ReportAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        noAction(1),
+                        cancelTest(2),
+                        saveReport(3),
+                        deleteReport(4)
+                    }
+
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+                   "
+                   "
+    ::= { tnY1564ReportEntry 7 }
+END

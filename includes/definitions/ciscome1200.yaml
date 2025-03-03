@@ -1,0 +1,39 @@
+os: ciscome1200
+text: 'Cisco ME1200'
+ifname: true
+type: network
+icon: cisco
+group: cisco
+mib_dir: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+        - sysDescr:
+            - 'ME1200'
+        - sysObjectID:
+            - .1.3.6.1.4.1.9.1.1899
+poller_modules:
+    bgp-peers: false
+    hr-mib: false
+    ntp: false
+    ospf: false
+    ucd-diskio: false
+    ucd-mib: false
+    cisco-cef: true
+    cisco-mac-accounting: true
+    stp: true
+discovery_modules:
+    cisco-cef: true
+    cisco-mac-accounting: true
+    wireless: false
+    mpls: false
+    services: false
+    cisco-qfp: false
+    cisco-otv: false
+    cisco-pw: false
+    bgp-peers: false
+    vrf: false
+    cisco-vrf-lite: false
+    ntp: false
+    ucd-diskio: false
+    

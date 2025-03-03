@@ -1,0 +1,1773 @@
+
+NSCRTV-EPON-PERFORMANCE-STAT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    DateAndTime, MacAddress, TimeStamp, RowStatus, TruthValue, DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    EponDeviceIndex, EponCardIndex, EponPortIndex, EponAlarmCode, EponAlarmInstance, EponSeverityType,
+    AutoNegotiationTechAbility, TAddress, EponStats15MinRecordType, EponStats24HourRecordType, EponStatsThresholdType
+		FROM NSCRTV-EPONEOC-EPON-MIB
+    performanceStatisticObjects
+        FROM NSCRTV-EPONEOC-EPON-MIB; 
+
+--------------------------------------------------------------------------------
+--  performanceStatisticObjects[性能统计属性管理项](1.3.6.1.4.1.17409.2.3.10)
+-------------------------------------------------------------------------------- 
+        
+    curStatsTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF CurStatsEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "实时性能"
+      ::= { performanceStatisticObjects 1 }        
+    curStatsEntry OBJECT-TYPE
+      SYNTAX CurStatsEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "实时性能"
+      INDEX { curStatsDeviceIndex, curStatsCardIndex, curStatsPortIndex }
+      ::= { curStatsTable 1 }
+        
+    CurStatsEntry ::=
+      SEQUENCE { 
+        curStatsDeviceIndex
+          EponDeviceIndex,
+        curStatsCardIndex
+          EponCardIndex,
+        curStatsPortIndex
+          EponPortIndex,
+        curStatsInOctets
+          Counter64,
+        curStatsInPkts
+          Counter64,
+        curStatsInBroadcastPkts
+          Counter64,
+        curStatsInMulticastPkts
+          Counter64,
+        curStatsInPkts64Octets
+          Counter64,
+        curStatsInPkts65to127Octets
+          Counter64,
+        curStatsInPkts128to255Octets
+          Counter64,
+        curStatsInPkts256to511Octets
+          Counter64,
+        curStatsInPkts512to1023Octets
+          Counter64,
+        curStatsInPkts1024to1518Octets
+          Counter64,
+        curStatsInPkts1519to1522Octets
+          Counter64,
+        curStatsInUndersizePkts
+          Counter64,
+        curStatsInOversizePkts
+          Counter64,
+        curStatsInFragments
+          Counter64,
+        curStatsInMpcpFrames
+          Counter64,
+        curStatsInMpcpOctets
+          Counter64,
+        curStatsInOAMFrames
+          Counter64,
+        curStatsInOAMOctets
+          Counter64,
+        curStatsInCRCErrorPkts
+          Counter64,
+        curStatsInDropEvents
+          Counter64,
+        curStatsInJabbers
+          Counter64,
+        curStatsInCollision
+          Counter64,
+        curStatsOutOctets
+          Counter64,
+        curStatsOutPkts
+          Counter64,
+        curStatsOutBroadcastPkts
+          Counter64,
+        curStatsOutMulticastPkts
+          Counter64,
+        curStatsOutPkts64Octets
+          Counter64,
+        curStatsOutPkts65to127Octets
+          Counter64,
+        curStatsOutPkts128to255Octets
+          Counter64,
+        curStatsOutPkts256to511Octets
+          Counter64,
+        curStatsOutPkts512to1023Octets
+          Counter64,
+        curStatsOutPkts1024to1518Octets
+          Counter64,
+        curStatsOutPkts1519o1522Octets
+          Counter64,
+        curStatsOutUndersizePkts
+          Counter64,
+        curStatsOutOversizePkts
+          Counter64,
+        curStatsOutFragments
+          Counter64,
+        curStatsOutMpcpFrames
+          Counter64,
+        curStatsOutMpcpOctets
+          Counter64,
+        curStatsOutOAMFrames
+          Counter64,
+        curStatsOutOAMOctets
+          Counter64,
+        curStatsOutCRCErrorPkts
+          Counter64,
+        curStatsOutDropEvents
+          Counter64,
+        curStatsOutJabbers
+          Counter64,
+        curStatsOutCollision
+          Counter64,
+        curStatsStatusAndAction
+          INTEGER
+       }
+
+    curStatsDeviceIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "设备索引号        
+        For OLT, set to corresponding device/slot/port
+        For ONU, set to 0"
+      ::= { curStatsEntry 1 }
+    
+    curStatsCardIndex OBJECT-TYPE
+      SYNTAX EponCardIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "板卡索引号        
+        For OLT, set to 0
+        For ONU, set to corresponding slot
+        "
+      ::= { curStatsEntry 2 }    
+    curStatsPortIndex OBJECT-TYPE
+      SYNTAX EponPortIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "端口索引号         
+        For OLT, set to 0
+        For ONU, set to corresponding port
+        "
+      ::= { curStatsEntry 3 }
+    
+    curStatsInOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收字节数"
+      ::= { curStatsEntry 4 }
+    
+    curStatsInPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收帧数"
+      ::= { curStatsEntry 5 }
+    
+    curStatsInBroadcastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收广播帧数"
+      ::= { curStatsEntry 6 }
+    
+    curStatsInMulticastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收组播帧数"
+      ::= { curStatsEntry 7 }
+    
+    curStatsInPkts64Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收64字节包数"
+      ::= { curStatsEntry 8 }
+    
+    curStatsInPkts65to127Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收65～127字节包数"
+      ::= { curStatsEntry 9 }
+    
+    curStatsInPkts128to255Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收128～255字节包数"
+      ::= { curStatsEntry 10 }
+    
+    curStatsInPkts256to511Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收256～511字节包数"
+      ::= { curStatsEntry 11 }
+    
+    curStatsInPkts512to1023Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收512～1023字节包数"
+      ::= { curStatsEntry 12 }
+    
+    curStatsInPkts1024to1518Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收1024～1518字节包数"
+      ::= { curStatsEntry 13 }
+    
+    curStatsInPkts1519to1522Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收1519～1522字节包数"
+      ::= { curStatsEntry 14 }
+    
+    curStatsInUndersizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收超短帧数"
+      ::= { curStatsEntry 15 }
+    
+    curStatsInOversizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收超长帧数"
+      ::= { curStatsEntry 16 }
+    
+    curStatsInFragments OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收碎片数"
+      ::= { curStatsEntry 17 }
+    
+    curStatsInMpcpFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收MPCP帧数"
+      ::= { curStatsEntry 18 }
+    
+    curStatsInMpcpOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收MPCP字节数"
+      ::= { curStatsEntry 19 }
+    
+    curStatsInOAMFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收OAM帧数"
+      ::= { curStatsEntry 20 }
+    
+    curStatsInOAMOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收OAM字节数"
+      ::= { curStatsEntry 21 }
+    
+    curStatsInCRCErrorPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收CRC错误帧"
+      ::= { curStatsEntry 22 }
+    
+    curStatsInDropEvents OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收丢包事件次数"
+      ::= { curStatsEntry 23 }
+    
+    curStatsInJabbers OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收超长错帧数"
+      ::= { curStatsEntry 24 }
+    
+    curStatsInCollision OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收碰撞帧数"
+      ::= { curStatsEntry 25 }
+    
+    curStatsOutOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送字节数"
+      ::= { curStatsEntry 26 }
+    
+    curStatsOutPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送帧数"
+      ::= { curStatsEntry 27 }
+    
+    curStatsOutBroadcastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送广播帧数"
+      ::= { curStatsEntry 28 }
+    
+    curStatsOutMulticastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送组播帧数"
+      ::= { curStatsEntry 29 }
+    
+    curStatsOutPkts64Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送64字节包数"
+      ::= { curStatsEntry 30 }
+    
+    curStatsOutPkts65to127Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送65～127字节包数"
+      ::= { curStatsEntry 31 }
+    
+    curStatsOutPkts128to255Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送128～255字节包数"
+      ::= { curStatsEntry 32 }
+    
+    curStatsOutPkts256to511Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送256～511字节包数"
+      ::= { curStatsEntry 33 }
+    
+    curStatsOutPkts512to1023Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送512～1023字节包数"
+      ::= { curStatsEntry 34 }    
+    curStatsOutPkts1024to1518Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送1024～1518字节包数"
+      ::= { curStatsEntry 35 }
+    
+    curStatsOutPkts1519o1522Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送1519～1522字节包数"
+      ::= { curStatsEntry 36 }
+    
+    curStatsOutUndersizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送超短帧数"
+      ::= { curStatsEntry 37 }
+    
+    curStatsOutOversizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送超长帧数"
+      ::= { curStatsEntry 38 }
+    
+    curStatsOutFragments OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送碎片数"
+      ::= { curStatsEntry 39 }
+    
+    curStatsOutMpcpFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送MPCP帧数"
+      ::= { curStatsEntry 40 }
+    
+    curStatsOutMpcpOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送MPCP字节数"
+      ::= { curStatsEntry 41 }
+    
+    curStatsOutOAMFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送OAM帧数"
+      ::= { curStatsEntry 42 }
+    
+    curStatsOutOAMOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送OAM字节数"
+      ::= { curStatsEntry 43 }
+    
+    curStatsOutCRCErrorPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送CRC错误帧"
+      ::= { curStatsEntry 44 }
+    
+    curStatsOutDropEvents OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送丢包事件次数"
+      ::= { curStatsEntry 45 }
+    
+    curStatsOutJabbers OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送超长错帧数"
+      ::= { curStatsEntry 46 }
+    
+    curStatsOutCollision OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送碰撞帧数"
+      ::= { curStatsEntry 47 }
+    
+    curStatsStatusAndAction OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        none(1),
+        clean(2)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "当前统计状态及操作
+        clean(2) 统计量清零"
+      ::= { curStatsEntry 48 }
+    
+    stats15Table OBJECT-TYPE
+      SYNTAX SEQUENCE OF Stats15Entry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "15 minutes performance data"
+      ::= { performanceStatisticObjects 2 }
+    
+    stats15Entry OBJECT-TYPE
+      SYNTAX Stats15Entry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      INDEX { stats15DeviceIndex, stats15CardIndex, stats15PortIndex, stats15Index }
+      ::= { stats15Table 1 }
+    
+    Stats15Entry ::=
+      SEQUENCE { 
+        stats15DeviceIndex
+          EponDeviceIndex,
+        stats15CardIndex
+          EponCardIndex,
+        stats15PortIndex
+          EponPortIndex,
+        stats15Index
+          EponStats15MinRecordType,
+        stats15InOctets
+          Counter64,
+        stats15InPkts
+          Counter64,
+        stats15InBroadcastPkts
+          Counter64,
+        stats15InMulticastPkts
+          Counter64,
+        stats15InPkts64Octets
+          Counter64,
+        stats15InPkts65to127Octets
+          Counter64,
+        stats15InPkts128to255Octets
+          Counter64,
+        stats15InPkts256to511Octets
+          Counter64,
+        stats15InPkts512to1023Octets
+          Counter64,
+        stats15InPkts1024to1518Octets
+          Counter64,
+        stats15InPkts1519to1522Octets
+          Counter64,
+        stats15InUndersizePkts
+          Counter64,
+        stats15InOversizePkts
+          Counter64,
+        stats15InFragments
+          Counter64,
+        stats15InMpcpFrames
+          Counter64,
+        stats15InMpcpOctets
+          Counter64,
+        stats15InOAMFrames
+          Counter64,
+        stats15InOAMOctets
+          Counter64,
+        stats15InCRCErrorPkts
+          Counter64,
+        stats15InDropEvents
+          Counter64,
+        stats15InJabbers
+          Counter64,
+        stats15InCollision
+          Counter64,
+        stats15OutOctets
+          Counter64,
+        stats15OutPkts
+          Counter64,
+        stats15OutBroadcastPkts
+          Counter64,
+        stats15OutMulticastPkts
+          Counter64,
+        stats15OutPkts64Octets
+          Counter64,
+        stats15OutPkts65to127Octets
+          Counter64,
+        stats15OutPkts128to255Octets
+          Counter64,
+        stats15OutPkts256to511Octets
+          Counter64,
+        stats15OutPkts512to1023Octets
+          Counter64,
+        stats15OutPkts1024to1518Octets
+          Counter64,
+        stats15OutPkts1519o1522Octets
+          Counter64,
+        stats15OutUndersizePkts
+          Counter64,
+        stats15OutOversizePkts
+          Counter64,
+        stats15OutFragments
+          Counter64,
+        stats15OutMpcpFrames
+          Counter64,
+        stats15OutMpcpOctets
+          Counter64,
+        stats15OutOAMFrames
+          Counter64,
+        stats15OutOAMOctets
+          Counter64,
+        stats15OutCRCErrorPkts
+          Counter64,
+        stats15OutDropEvents
+          Counter64,
+        stats15OutJabbers
+          Counter64,
+        stats15OutCollision
+          Counter64,
+        stats15StatusAndAction
+          INTEGER,
+        stats15ValidityTag  
+          TruthValue,
+        stats15ElapsedTime  
+          Counter32,
+        stats15EndTime    
+          DateAndTime
+       }
+
+    stats15DeviceIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "设备索引号        
+        For OLT, set to corresponding device/slot/port
+        For ONU, set to 0       "
+      ::= { stats15Entry 1 }
+    
+    stats15CardIndex OBJECT-TYPE
+      SYNTAX EponCardIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "板卡索引号        
+        For OLT, set to 0
+        For ONU, set to corresponding slot
+        "
+      ::= { stats15Entry 2 }
+    
+    stats15PortIndex OBJECT-TYPE
+      SYNTAX EponPortIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "端口索引号        
+        For OLT, set to 0
+        For ONU, set to corresponding port
+        "
+      ::= { stats15Entry 3 }
+    
+    stats15Index OBJECT-TYPE
+      SYNTAX EponStats15MinRecordType
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        顺序索引号
+        "
+      ::= { stats15Entry 4 }
+    
+    stats15InOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收字节数"
+      ::= { stats15Entry 5 }
+    
+    stats15InPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收帧数"
+      ::= { stats15Entry 6 }
+    
+    stats15InBroadcastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收广播帧数"
+      ::= { stats15Entry 7 }
+    
+    stats15InMulticastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收组播帧数"
+      ::= { stats15Entry 8 }
+    
+    stats15InPkts64Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收64字节包数"
+      ::= { stats15Entry 9 }
+    
+    stats15InPkts65to127Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收65～127字节包数"
+      ::= { stats15Entry 10 }
+    
+    stats15InPkts128to255Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收128～255字节包数"
+      ::= { stats15Entry 11 }
+    
+    stats15InPkts256to511Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收256～511字节包数"
+      ::= { stats15Entry 12 }
+    
+    stats15InPkts512to1023Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收512～1023字节包数"
+      ::= { stats15Entry 13 }
+    
+    stats15InPkts1024to1518Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收1024～1518字节包数"
+      ::= { stats15Entry 14 }
+    
+    stats15InPkts1519to1522Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收1519～1522字节包数"
+      ::= { stats15Entry 15 }
+    
+    stats15InUndersizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收超短帧数"
+      ::= { stats15Entry 16 }
+    
+    stats15InOversizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收超长帧数"
+      ::= { stats15Entry 17 }    
+    stats15InFragments OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收碎片数"
+      ::= { stats15Entry 18 }
+    
+    stats15InMpcpFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收MPCP帧数"
+      ::= { stats15Entry 19 }
+    
+    stats15InMpcpOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收MPCP字节数"
+      ::= { stats15Entry 20 }
+    
+    stats15InOAMFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收OAM帧数"
+      ::= { stats15Entry 21 }
+    
+    stats15InOAMOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收OAM字节数"
+      ::= { stats15Entry 22 }
+    
+    stats15InCRCErrorPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收CRC错误帧"
+      ::= { stats15Entry 23 }
+    
+    stats15InDropEvents OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收丢包事件次数"
+      ::= { stats15Entry 24 }
+    
+    stats15InJabbers OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收超长错帧数"
+      ::= { stats15Entry 25 }
+    
+    stats15InCollision OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收碰撞帧数"
+      ::= { stats15Entry 26 }
+    
+    stats15OutOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送字节数"
+      ::= { stats15Entry 27 }
+    
+    stats15OutPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送帧数"
+      ::= { stats15Entry 28 }
+    
+    stats15OutBroadcastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送广播帧数"
+      ::= { stats15Entry 29 }
+    
+    stats15OutMulticastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送组播帧数"
+      ::= { stats15Entry 30 }
+    
+    stats15OutPkts64Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送64字节包数"
+      ::= { stats15Entry 31 }
+    
+    stats15OutPkts65to127Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送65～127字节包数"
+      ::= { stats15Entry 32 }
+    
+    stats15OutPkts128to255Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送128～255字节包数"
+      ::= { stats15Entry 33 }
+    
+    stats15OutPkts256to511Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送256～511字节包数"
+      ::= { stats15Entry 34 }
+    
+    stats15OutPkts512to1023Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送512～1023字节包数"
+      ::= { stats15Entry 35 }
+    
+    stats15OutPkts1024to1518Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送1024～1518字节包数"
+      ::= { stats15Entry 36 }
+    
+    stats15OutPkts1519o1522Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送1519～1522字节包数"
+      ::= { stats15Entry 37 }
+    
+    stats15OutUndersizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送超短帧数"
+      ::= { stats15Entry 38 }
+    
+    stats15OutOversizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送超长帧数"
+      ::= { stats15Entry 39 }
+    
+    stats15OutFragments OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送碎片数"
+      ::= { stats15Entry 40 }
+    
+    stats15OutMpcpFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送MPCP帧数"
+      ::= { stats15Entry 41 }
+    
+    stats15OutMpcpOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送MPCP字节数"
+      ::= { stats15Entry 42 }
+    
+    stats15OutOAMFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送OAM帧数"
+      ::= { stats15Entry 43 }
+    
+    stats15OutOAMOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送OAM字节数"
+      ::= { stats15Entry 44 }    
+    stats15OutCRCErrorPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送CRC错误帧"
+      ::= { stats15Entry 45 }
+    stats15OutDropEvents OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送丢包事件次数"
+      ::= { stats15Entry 46 }
+    
+    stats15OutJabbers OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送超长错帧数"
+      ::= { stats15Entry 47 }
+    
+    stats15OutCollision OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送碰撞帧数"
+      ::= { stats15Entry 48 }
+    
+    stats15StatusAndAction OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        none(1),
+        clean(2)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "当前统计状态及操作
+        clean(2) 统计量清零"
+      ::= { stats15Entry 49 }
+    stats15ValidityTag OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "Whether or not the current 15-min PM data is valid"
+      ::= { stats15Entry 50 }
+
+    stats15ElapsedTime OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "seconds"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        It is elapsed time, since start of this 15-min interval.
+        It is only valid for current PM data. For history PM data, set to 0.
+        "
+      ::= { stats15Entry 51 }
+
+    stats15EndTime OBJECT-TYPE
+      SYNTAX DateAndTime
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        It is time, when the PM history data is created.
+        It is only valid for history PM data.
+        "
+      ::= { stats15Entry 52 }
+    
+    stats24Table OBJECT-TYPE
+      SYNTAX SEQUENCE OF Stats24Entry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "1-day performance data"
+      ::= { performanceStatisticObjects 3 }
+    
+    stats24Entry OBJECT-TYPE
+      SYNTAX Stats24Entry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      INDEX { stats24DeviceIndex, stats24CardIndex, stats24PortIndex, stats24Index }
+      ::= { stats24Table 1 }
+    
+    Stats24Entry ::=
+      SEQUENCE { 
+        stats24DeviceIndex
+          EponDeviceIndex,
+        stats24CardIndex
+          EponCardIndex,
+        stats24PortIndex
+          EponPortIndex,
+        stats24Index
+          EponStats24HourRecordType,
+        stats24InOctets
+          Counter64,
+        stats24InPkts
+          Counter64,
+        stats24InBroadcastPkts
+          Counter64,
+        stats24InMulticastPkts
+          Counter64,
+        stats24InPkts64Octets
+          Counter64,
+        stats24InPkts65to127Octets
+          Counter64,
+        stats24InPkts128to255Octets
+          Counter64,
+        stats24InPkts256to511Octets
+          Counter64,
+        stats24InPkts512to1023Octets
+          Counter64,
+        stats24InPkts1024to1518Octets
+          Counter64,
+        stats24InPkts1519to1522Octets
+          Counter64,
+        stats24InUndersizePkts
+          Counter64,
+        stats24InOversizePkts
+          Counter64,
+        stats24InFragments
+          Counter64,
+        stats24InMpcpFrames
+          Counter64,
+        stats24InMpcpOctets
+          Counter64,
+        stats24InOAMFrames
+          Counter64,
+        stats24InOAMOctets
+          Counter64,
+        stats24InCRCErrorPkts
+          Counter64,
+        stats24InDropEvents
+          Counter64,
+        stats24InJabbers
+          Counter64,
+        stats24InCollision
+          Counter64,
+        stats24OutOctets
+          Counter64,
+        stats24OutPkts
+          Counter64,
+        stats24OutBroadcastPkts
+          Counter64,
+        stats24OutMulticastPkts
+          Counter64,
+        stats24OutPkts64Octets
+          Counter64,
+        stats24OutPkts65to127Octets
+          Counter64,
+        stats24OutPkts128to255Octets
+          Counter64,
+        stats24OutPkts256to511Octets
+          Counter64,
+        stats24OutPkts512to1023Octets
+          Counter64,
+        stats24OutPkts1024to1518Octets
+          Counter64,
+        stats24OutPkts1519o1522Octets
+          Counter64,
+        stats24OutUndersizePkts
+          Counter64,
+        stats24OutOversizePkts
+          Counter64,
+        stats24OutFragments
+          Counter64,
+        stats24OutMpcpFrames
+          Counter64,
+        stats24OutMpcpOctets
+          Counter64,
+        stats24OutOAMFrames
+          Counter64,
+        stats24OutOAMOctets
+          Counter64,
+        stats24OutCRCErrorPkts
+          Counter64,
+        stats24OutDropEvents
+          Counter64,
+        stats24OutJabbers
+          Counter64,
+        stats24OutCollision
+          Counter64,
+        stats24StatusAndAction
+          INTEGER,
+        stats24ValidityTag  
+          TruthValue,
+        stats24ElapsedTime  
+          Counter32,
+        stats24EndTime    
+          DateAndTime
+       }
+
+    stats24DeviceIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "设备索引号        
+        For OLT, set to corresponding device/slot/port
+        For ONU, set to 0
+        "
+      ::= { stats24Entry 1 }
+    
+    stats24CardIndex OBJECT-TYPE
+      SYNTAX EponCardIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "板卡索引号        
+        For OLT, set to 0
+        For ONU, set to corresponding slot
+        "
+      ::= { stats24Entry 2 }
+    
+    stats24PortIndex OBJECT-TYPE
+      SYNTAX EponPortIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "端口索引号        
+        For OLT, set to 0
+        For ONU, set to corresponding port
+        "
+      ::= { stats24Entry 3 }
+    
+    stats24Index OBJECT-TYPE
+      SYNTAX EponStats24HourRecordType
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "顺序索引号"
+      ::= { stats24Entry 4 }
+    
+    stats24InOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收字节数"
+      ::= { stats24Entry 5 }
+    
+    stats24InPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收帧数"
+      ::= { stats24Entry 6 }
+    
+    stats24InBroadcastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收广播帧数"
+      ::= { stats24Entry 7 }
+    
+    stats24InMulticastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收组播帧数"
+      ::= { stats24Entry 8 }
+    
+    stats24InPkts64Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收64字节包数"
+      ::= { stats24Entry 9 }
+    
+    stats24InPkts65to127Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收65～127字节包数"
+      ::= { stats24Entry 10 }
+    
+    stats24InPkts128to255Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收128～255字节包数"
+      ::= { stats24Entry 11 }
+    
+    stats24InPkts256to511Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收256～511字节包数"
+      ::= { stats24Entry 12 }
+    
+    stats24InPkts512to1023Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收512～1023字节包数"
+      ::= { stats24Entry 13 }
+    
+    stats24InPkts1024to1518Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收1024～1518字节包数"
+      ::= { stats24Entry 14 }
+    
+    stats24InPkts1519to1522Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收1519～1522字节包数"
+      ::= { stats24Entry 15 }
+    
+    stats24InUndersizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收超短帧数"
+      ::= { stats24Entry 16 }
+    
+    stats24InOversizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收超长帧数"
+      ::= { stats24Entry 17 }
+    
+    stats24InFragments OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收碎片数"
+      ::= { stats24Entry 18 }
+    
+    stats24InMpcpFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收MPCP帧数"
+      ::= { stats24Entry 19 }
+    
+    stats24InMpcpOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收MPCP字节数"
+      ::= { stats24Entry 20 }
+    
+    stats24InOAMFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收OAM帧数"
+      ::= { stats24Entry 21 }
+    
+    stats24InOAMOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收OAM字节数"
+      ::= { stats24Entry 22 }
+    
+    stats24InCRCErrorPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收CRC错误帧"
+      ::= { stats24Entry 23 }
+    
+    stats24InDropEvents OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收丢包事件次数"
+      ::= { stats24Entry 24 }
+    
+    stats24InJabbers OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收超长错帧数"
+      ::= { stats24Entry 25 }
+    
+    stats24InCollision OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "接收碰撞帧数"
+      ::= { stats24Entry 26 }
+    
+    stats24OutOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送字节数"
+      ::= { stats24Entry 27 }
+    
+    stats24OutPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送帧数"
+      ::= { stats24Entry 28 }
+    
+    stats24OutBroadcastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送广播帧数"
+      ::= { stats24Entry 29 }
+    
+    stats24OutMulticastPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送组播帧数"
+      ::= { stats24Entry 30 }
+    
+    stats24OutPkts64Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送64字节包数"
+      ::= { stats24Entry 31 }
+    
+    stats24OutPkts65to127Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送65～127字节包数"
+      ::= { stats24Entry 32 }
+    
+    stats24OutPkts128to255Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送128～255字节包数"
+      ::= { stats24Entry 33 }
+    
+    stats24OutPkts256to511Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送256～511字节包数"
+      ::= { stats24Entry 34 }
+    
+    stats24OutPkts512to1023Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送512～1023字节包数"
+      ::= { stats24Entry 35 }
+    
+    stats24OutPkts1024to1518Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送1024～1518字节包数"
+      ::= { stats24Entry 36 }
+    
+    stats24OutPkts1519o1522Octets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送1519～1522字节包数"
+      ::= { stats24Entry 37 }
+    
+    stats24OutUndersizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送超短帧数"
+      ::= { stats24Entry 38 }
+    
+    stats24OutOversizePkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送超长帧数"
+      ::= { stats24Entry 39 }
+    
+    stats24OutFragments OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送碎片数"
+      ::= { stats24Entry 40 }
+    
+    stats24OutMpcpFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送MPCP帧数"
+      ::= { stats24Entry 41 }
+    
+    stats24OutMpcpOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送MPCP字节数"
+      ::= { stats24Entry 42 }
+    
+    stats24OutOAMFrames OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送OAM帧数"
+      ::= { stats24Entry 43 }
+    
+    stats24OutOAMOctets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送OAM字节数"
+      ::= { stats24Entry 44 }
+    
+    stats24OutCRCErrorPkts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送CRC错误帧"
+      ::= { stats24Entry 45 }
+    
+    stats24OutDropEvents OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送丢包事件次数"
+      ::= { stats24Entry 46 }
+    
+    stats24OutJabbers OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送超长错帧数"
+      ::= { stats24Entry 47 }
+    
+    stats24OutCollision OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "发送碰撞帧数"
+      ::= { stats24Entry 48 }
+    
+    stats24StatusAndAction OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        none(1),
+        clear(2)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "当前统计状态及操作
+        clear(2) 统计量清零"
+      ::= { stats24Entry 49 }
+
+    stats24ValidityTag OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "Whether or not the current 1-day PM data is valid"
+      ::= { stats24Entry 50 }
+
+    stats24ElapsedTime OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "seconds"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        It is elapsed time, since start of this 1-day interval.
+        It is only valid for current PM data. For history PM data, set to 0.
+        "
+      ::= { stats24Entry 51 }
+
+    stats24EndTime OBJECT-TYPE
+      SYNTAX DateAndTime
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        It is time, when the PM history data is created.
+        It is only valid for history PM data.
+        "
+      ::= { stats24Entry 52 }
+
+    perfStatsGlobalSet  OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION 
+        ""
+      ::= { performanceStatisticObjects 4 }
+    
+    perfStats15MinMaxRecord OBJECT-TYPE
+      SYNTAX EponStats15MinRecordType
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "15分钟性能统计的最大记录数, 不能是0"
+      DEFVAL { 96 }
+      ::= { perfStatsGlobalSet 1 }
+    
+    perfStats24HourMaxRecord OBJECT-TYPE
+      SYNTAX EponStats24HourRecordType
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "24小时性能统计的最大记录数， 不能是0"
+      DEFVAL { 7 }
+      ::= { perfStatsGlobalSet 2 }
+    
+    perfStatsThresholdTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF PerfStatsThresholdEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "门限管理"
+      ::= { performanceStatisticObjects 5 }
+    
+    perfStatsThresholdEntry OBJECT-TYPE
+      SYNTAX PerfStatsThresholdEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "门限管理"
+      INDEX { perfStatsThresholdDeviceIndex, perfStatsThresholdCardIndex, perfStatsThresholdPortIndex, perfStatsThresholdTypeIndex }
+      ::= { perfStatsThresholdTable 1 }
+    
+    PerfStatsThresholdEntry ::=
+      SEQUENCE { 
+        perfStatsThresholdDeviceIndex
+          EponDeviceIndex,
+        perfStatsThresholdCardIndex
+          EponCardIndex,
+        perfStatsThresholdPortIndex
+          EponPortIndex,
+        perfStatsThresholdTypeIndex
+          EponStatsThresholdType,
+        perfStatsThresholdUpper
+          Counter64,
+        perfStatsThresholdLower
+          Counter64,
+        perfStatsThresholdRowStatus
+          RowStatus
+       }
+
+    perfStatsThresholdDeviceIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "设备索引号        
+        定义同curStatsDeviceIndex"
+      ::= { perfStatsThresholdEntry 1 }
+    
+    perfStatsThresholdCardIndex OBJECT-TYPE
+      SYNTAX EponCardIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "板卡索引号        
+        定义同curStatsCardIndex"
+      ::= { perfStatsThresholdEntry 2 }
+    
+    perfStatsThresholdPortIndex OBJECT-TYPE
+      SYNTAX EponPortIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "端口索引号        
+        定义同curStatsPortIndex"
+      ::= { perfStatsThresholdEntry 3 }
+    
+    perfStatsThresholdTypeIndex OBJECT-TYPE
+      SYNTAX EponStatsThresholdType
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "门限类型"
+      ::= { perfStatsThresholdEntry 4 }
+    
+    perfStatsThresholdUpper OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "阈值上限"
+      ::= { perfStatsThresholdEntry 5 }
+    
+    perfStatsThresholdLower OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "阈值下限"
+      ::= { perfStatsThresholdEntry 6 }
+    
+    perfStatsThresholdRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "行状态（添加、删除、修改）"
+      ::= { perfStatsThresholdEntry 7 }
+
+--
+-- END of NSCRTV-EPON-PERFORMANCE-STAT-MIB
+--
+
+END

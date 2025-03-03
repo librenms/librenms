@@ -1,0 +1,277 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-PMFTP-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             DisplayString
+        FROM SNMPv2-TC
+             OwnerString
+        FROM RMON-MIB
+             siaeMib
+        FROM SIAE-TREE-MIB
+             equipIpSnmpAgentAddress
+        FROM SIAE-EQUIP-MIB
+             alarmTrap
+        FROM SIAE-ALARM-MIB
+             accessControlLoginIpAddress
+        FROM SIAE-USER-MIB;
+
+    pmFTP MODULE-IDENTITY
+        LAST-UPDATED "201503230000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: help@siaemic.com
+            "
+        DESCRIPTION
+            "Transfer of data gathered by Performance Monitoring and RMON 
+             to managers through the FTP protocol.
+             "
+        REVISION "201503230000Z"
+        DESCRIPTION
+            "Removed alarmTrapNumber from pmFTPStatusTrap and IMPORTS.
+            "
+        REVISION "201409290000Z"
+        DESCRIPTION
+            "MIB 01.00.01
+             - Added enumerator readInterval(7) to pmFTPActionRequest
+             - Added pmFTPBeginInterval and pmFTPEndInterval
+             - changed SYNTAX of pmFTPTpRmonOwner from INTEGER to OwnerString.
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of pmFTPMibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 31 }
+
+--------------------------------------------------------------------------------
+--  object identifier inside the module
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+--  pmFTP (File PM Data Read) Group
+--------------------------------------------------------------------------------
+--
+--  This group is used to read P.M. data through a file transfer (FTP)
+--  It is common to all Performance Monitoring group and RMON.
+--  For each Performance Monitoring group (and RMON) and for each Termination
+--  point (TP class) two file are generated: one concerning the day before and
+--  one concerning the current day.
+--
+--  Through the objects of this group it is possible to read each file.
+--  After transfering, local files are deleted.
+--
+--  To avoid concurrency, values set are internally collected per user and IP
+--  address. So, to ensure a successful transfer, manager needs to set 
+--  pmFTPfileName, pmFTPObject and pmFTPActionRequest (optionally also
+--  pmFTPBeginInterval, pmFTPEndInterval and pmFTPTpRmonOwner). These object
+--  can be  set sending more SNMP SET packets.
+--------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    pmFTPMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {pmFTP 1}
+
+    pmFTPfileName OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..255))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Path and file name used when the PM data file is transferred
+             using Ftp (action = read).
+             The Agent software concatenates the following fields to the display
+             string set in this object:
+              1) groupName: it identifies the name of the P.M. mib group
+              2) tpClassName: it identifies the termination point
+              3) index: only for RMON data
+              4) date: YYMMDD
+             As example: when the string set is equal to /pub/pm/G828/alcplus
+             The name of the file transfered to the defined directory is:
+             alcplus_pmRxPwr_Radio1_081015.csv."
+    ::= {pmFTP 2}
+
+    pmFTPTpClass   OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Object identifier of the first leaf of the record selected 
+             to transfer. To read all rows of a table, this object should be
+             set with the object identifier of the table entry.
+             The SET of the value {0 0} is accepted and means that no record
+             is selected.
+            "
+--        DEFVAL {0 0}
+    ::= {pmFTP 3}
+
+    pmFTPTpRmonOwner  OBJECT-TYPE
+        SYNTAX      OwnerString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "For PM is meaningless.
+             For RMON it corresponds to historyControlOwner of
+             historyControlTable and it cannot be null.
+             If pmFTPTpClass is set in order to read all rows of RMON history,
+             this object is used to select rows belonging to selected owner.
+            "
+        DEFVAL {""}
+    ::= {pmFTP 4}
+
+    pmFTPActionRequest  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             none                (0),
+                             dayBeforeRead       (1),
+                             currentDayRead      (3),
+                             readAll             (5),
+                             readAbort           (6),
+                             readInterval        (7)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Action requested to the equipment:
+              - none          : no action required;
+              - dayBeforeRead : for the selected PM or RMON group according to
+                                the selected TpClass a file with record of 
+                                previous day is sent to the manager;
+              - currentDayRead: for the selected PM or RMON group according to
+                                the selected TpClass a file with records of
+                                the current day is sent to the manager;
+              - readAll       : for the selected PM or RMON group a file with
+                                records of current and previous day are
+                                sent to the manager;
+              - readAbort     : the action in progress will be interrupted.
+              - readInterval  : for the selected PM or RMON group according
+                                to the selected TpClass a file with records in
+                                the selected interval (see pmFTPBeginInterval
+                                and pmFTPEndInterval) is sent to the manager
+             The value of this object is self cleared (reset to the value none)
+             after its use.
+             The source IP address of the SNMP packet setting this object
+             is used as target Ip address, it identifies the server where the 
+             files are transferred."
+        DEFVAL {none}
+    ::= {pmFTP 5}
+
+    pmFTPStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             transferring  (1),
+                             completed     (2),
+                             interrupted   (3),
+                             empty         (4),
+                             deleting      (5)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status of pm Ftp transfer/delete operation."
+        DEFVAL {completed}
+    ::= {pmFTP 6}
+
+    pmFTPStatusTrapNotification OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             trapDisable  (1),
+                             trapEnable   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/disable the trap generation on FTP tranfer operation."
+        DEFVAL {trapEnable}
+    ::= {pmFTP 7}
+
+    pmFTPCompressedFile OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/disable the compression (zip) of the transferred files.
+             For RMON only."
+        DEFVAL {disable}
+    ::= {pmFTP 8}
+
+    pmFTPBeginInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the begin of the selected interval for the action 
+             readInterval(7) (see pmFTPActionRequest). It is the number of
+             seconds since midnight of January 1, 1970."
+        DEFVAL {0}
+    ::= {pmFTP 9}
+
+    pmFTPEndInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the begin of the selected interval for the action 
+             readInterval(7) (see pmFTPActionRequest). It is the number of
+             seconds since midnight of January 1, 1970. The value of this object
+             can not be less than pmFTPBeginInterval."
+        DEFVAL {0}
+    ::= {pmFTP 10}
+
+-----------------------
+--
+--  The pmFTP Group generates the following TRAP:
+--
+-----------------------
+
+    pmFTPStatusTrap  NOTIFICATION-TYPE
+        OBJECTS  {equipIpSnmpAgentAddress, pmFTPStatus, accessControlLoginIpAddress}
+        STATUS current
+        DESCRIPTION
+            "This event is generated by NE when the status of FTP transfer is changed.
+             The data passed with the event are:
+                1) equipIpSnmpAgentAddress
+                2) pmFTPStatus
+                3) accessControlLoginIpAddress"
+    ::= {alarmTrap 3101}
+
+------ End group -----------------------------------------------------------------
+
+END
+
+
+
+

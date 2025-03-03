@@ -1,0 +1,348 @@
+
+IPVS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+    Integer32, Opaque, enterprises, Counter32, Counter64
+        FROM SNMPv2-SMI
+ 
+    TEXTUAL-CONVENTION, DisplayString, TruthValue, TimeInterval
+        FROM SNMPv2-TC
+
+    one4net 
+	FROM ONE4NET-MIB;
+
+ipvs MODULE-IDENTITY
+	LAST-UPDATED	"201112010000Z"
+	ORGANIZATION	"KEMP Technologies"
+	CONTACT-INFO	"email:      support@kemptechnologies.com"
+	DESCRIPTION	"Load Master metrics."
+	REVISION	"201112010000Z"
+	DESCRIPTION	"version 6.0"
+	::= { one4net 12 }
+
+
+ipvsVSTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF VSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table containing ipvs Virtual Service (VS) specific information."
+	::= { ipvs 1 }
+
+ipvsRSTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table containing ipvs Real Server (RS) specific information."
+	::= { ipvs 2 }
+
+ipvsRSTotalTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RsTotalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table containing Totals for Real Server (RS) specific information."
+	::= { ipvs 8 }
+
+RsTotalEntry ::= SEQUENCE {
+	totRSidx	Integer32,
+        totRSDesc	OCTET STRING,
+	totRSConns	Counter32,
+	totRSInPkts	Counter32,
+	totRSOutPkts	Counter32,
+	totRSInBytes	Counter64,
+	totRSOutBytes	Counter64,
+	totRSActiveConns	Counter32,
+	totRSInactiveConns	Counter32 }
+
+rsTotalEntry OBJECT-TYPE
+	SYNTAX		RsTotalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Totals for an RS"
+	INDEX { totRSidx }
+	::= { ipvsRSTotalTable 1 }
+
+totRSidx OBJECT-TYPE
+	SYNTAX		Integer32 (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"RS Index "
+	::= { rsTotalEntry 1 }
+
+totRSDesc OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..1024))
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"RS description"
+	::= { rsTotalEntry 2 }
+
+totRSConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of connections for this RS"
+	::= { rsTotalEntry 3 }
+
+totRSInPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of incoming pakets to this RS"
+	::= { rsTotalEntry 4 }
+
+totRSOutPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of outgoing pakets from this RS"
+	::= { rsTotalEntry 5 }
+
+totRSInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of incoming bytes from this RS"
+	::= { rsTotalEntry 6 }
+
+totRSOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of outgoing bytes from this RS"
+	::= { rsTotalEntry 7 }
+
+totRSActiveConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the number of active connection for this RS"
+	::= { rsTotalEntry 8 }
+
+totRSInactiveConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the number of inactive connection for this RS"
+	::= { rsTotalEntry 9 }
+
+--
+
+vsEntry OBJECT-TYPE
+	SYNTAX		VSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"information about a VS"
+	INDEX   { 	vSidx }
+	::= { ipvsVSTable 1 }
+
+VSEntry ::= SEQUENCE {
+        vSidx		Integer32,
+        vSDesc		OCTET STRING,
+	vSConns		Counter32,
+	vSInPkts	Counter32,
+	vSOutPkts	Counter32,
+	vSInBytes	Counter64,
+	vSOutBytes	Counter64,
+	vSActivConns	Counter32 }
+
+vSidx OBJECT-TYPE
+	SYNTAX		INTEGER (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Unique VS Id"
+	::= { vsEntry 1 }
+    
+
+vSDesc OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..1024))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"VS description"
+	::= { vsEntry 11 }
+
+vSConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of connections for this VS"
+	::= { vsEntry 12 }
+
+vSInPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of incomming pakets to this VS"
+	::= { vsEntry 13 }
+
+vSOutPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of outgoing pakets from this VS"
+	::= { vsEntry 14 }
+
+vSInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of incomming bytes to this VS"
+	::= { vsEntry 15 }
+
+vSOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the number of outgoing bytes from this VS"
+	::= { vsEntry 16 }
+
+vSActivConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the current number of connections for this VS"
+	::= { vsEntry 17 }
+
+--
+
+rsEntry OBJECT-TYPE
+	SYNTAX		RSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"information about a RS"
+	INDEX   { 	rSidx }
+	::= { ipvsRSTable 1 }
+
+RSEntry ::= SEQUENCE {
+        rSidx		Integer32,        
+        rSVSidx		Integer32,
+        rSDesc		OCTET STRING,
+	rSConns		Counter32,
+	rSInPkts	Counter32,
+	rSOutPkts	Counter32,
+	rSInBytes	Counter64,
+	rSOutBytes	Counter64,
+	rSActiveConns	Counter32,
+	rSInactiveConns	Counter32,
+	rSWeight	Counter32 }
+
+rSidx OBJECT-TYPE
+	SYNTAX		INTEGER (0..1024)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Unique Id of RS"
+	::= { rsEntry 1 }
+
+rSVSidx OBJECT-TYPE
+	SYNTAX		INTEGER (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Id of associated VS"
+	::= { rsEntry 2 }
+
+rSDesc OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..1024))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"RS description"
+	::= { rsEntry 11 }
+
+rSConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of connections for this RS"
+	::= { rsEntry 12 }
+
+rSInPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of incoming pakets to this RS"
+	::= { rsEntry 13 }
+
+rSOutPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of outgoing pakets from this RS"
+	::= { rsEntry 14 }
+
+rSInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of incoming bytes from this RS"
+	::= { rsEntry 15 }
+
+rSOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the total number of outgoing bytes from this RS"
+	::= { rsEntry 16 }
+
+rSActiveConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the number of active connection for this RS"
+	::= { rsEntry 17 }
+
+rSInactiveConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the number of inactive connection for this RS"
+	::= { rsEntry 18 }
+
+rSWeight OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"the current weight of this RS"
+	::= { rsEntry 19 }
+
+--
+
+conns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Total number of connections handled for all VS"
+	::= { ipvs 3 } 
+
+inPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Total number of incoming packets for all VS"
+	::= { ipvs 4 } 
+
+outPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Total number of outgoing packets for all VS"
+	::= { ipvs 5 } 
+
+inBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Total number of incoming bytes for all VS"
+	::= { ipvs 6 } 
+
+outBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Total number of outgoing bytes for all VS"
+	::= { ipvs 7 } 
+
+END
+
+
+
+
+
+
+

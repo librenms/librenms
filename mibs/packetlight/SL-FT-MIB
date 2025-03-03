@@ -1,0 +1,291 @@
+-- *****************************************************************
+-- FT MIB
+-- *****************************************************************
+
+SL-FT-MIB	DEFINITIONS ::= BEGIN
+
+IMPORTS
+      TimeTicks, enterprises, 
+      IpAddress, OBJECT-TYPE, 
+      Integer32, Counter32,
+      Gauge32, OBJECT-IDENTITY, 
+      NOTIFICATION-TYPE, 
+      Unsigned32,Counter64		        FROM SNMPv2-SMI
+      RowStatus, TimeStamp, 
+      DisplayString, TruthValue,
+      TEXTUAL-CONVENTION,RowPointer     FROM SNMPv2-TC
+      PerfCurrentCount, 
+      PerfIntervalCount, 
+      PerfTotalCount					FROM PerfHist-TC-MIB
+      ifAlias, ifIndex				    FROM IF-MIB
+      SnmpAdminString					FROM SNMP-FRAMEWORK-MIB 
+      IANAifType						FROM IANAifType-MIB
+      InetAddressType,InetAddress		FROM INET-ADDRESS-MIB
+      slMain			      			FROM SL-MAIN-MIB;
+
+
+MacAddress ::= OCTET STRING (SIZE(6))
+
+slFt MODULE-IDENTITY
+	LAST-UPDATED "200007240000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the file transfer operations"
+	::= { slMain 30 }
+
+slFtGen				OBJECT IDENTIFIER ::= { slFt 1 } 
+slFtSystems			OBJECT IDENTIFIER ::= { slFtGen 1} 
+slFtAgnt			OBJECT IDENTIFIER ::= { slFtGen 2} 
+slFtFileTransfer	OBJECT IDENTIFIER ::= { slFtAgnt 12 }
+
+
+SftpUserLogin ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "The SFTP User Login Type."
+    SYNTAX         DisplayString (SIZE (1..20))
+
+SftpUserPassword ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "The SFTP User Password Type."
+    SYNTAX         DisplayString (SIZE (1..20))
+
+--
+--
+--    File Transfer
+--
+--
+
+slFtFileServerIP  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"The IP address of the server from which the file is loaded "
+	::= { slFtFileTransfer 1 }
+
+slFtFileName  OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"The name of the file to be loaded. For protection, read returns
+	 NULL. "
+	::= { slFtFileTransfer 2 }
+
+slFtFileTransCmd  OBJECT-TYPE
+	SYNTAX  INTEGER {
+         swDwnLoad         (1),
+		 configDwnLoad     (2),
+		 configUpLoad      (3),
+		 coProcDwnLoad     (4),
+		 stateUpLoad       (5),
+		 dwnLoadUserFile   (6),
+		 upLoadUserFile    (7), 
+		 swDwnLoadAndReset (8),
+		 swUpLoad          (9),
+		 swDwnLoad2BkupStorage(10),
+		 bootDwnLoad      (11),
+		 bootUpLoad       (12), 
+		 swUpLoadFromBkupStorage(13),
+		 licenseDwnLoad   (14),
+		 configDwnLoadToDefaultFile(15),
+		 noOp            (255)
+	}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"The command to be executed on fileName at fileServerIP."
+	::= { slFtFileTransfer 3 }
+ 
+-- tftp  group  
+
+slFtTftpRetryTimeOut OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " General Retransmission time-out value (seconds) "
+    -- DEFVAL  { 15 }
+    ::= { slFtFileTransfer 4 }
+
+slFtTftpTotalTimeOut OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " Total Retransmission time-out value (seconds) "
+    -- DEFVAL  { 60 }
+    ::= { slFtFileTransfer 5 }
+
+slFtTftpStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+		noOp(2),
+		connecting(3),
+		transferringData(4),
+		endedTimeOut(5),
+		endedOk(6),
+		error(7)
+	}
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Status of tftp session. When a session ended with success,
+    the tftpStatus should be endedOk(6). Before restarting a
+    tftp session, the NMS should set the tftpStatus to noOp(2).
+    That's the reason of MAX-ACCESS read-write to this field."
+    DEFVAL  { noOp}
+    ::= { slFtFileTransfer 6 }
+
+slFtTftpError OBJECT-TYPE
+    SYNTAX  OCTET STRING ( SIZE(2) )
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    " The MSB represents the standard error code.
+    The LSB represents the private error code.
+	0x0000 is No Error
+	0x0100 is File Not Found
+	0x0200 is Access violation
+	0x0300 is Disk full or allocation exceeded
+	0x0400 is Illegal TFTP operation
+	0x0500 is Unknown transfer ID
+	0x0600 is File already exists
+	0x0700 is No such user
+	0x0001 is Server Overflow
+	0x0002 is No empty UDP port
+	0x0003 is No empty connection
+	0x0004 is Illegal File Mode
+	0x0007 is Illegal PDU size
+	0x0008 is TFTP Server does not exist 
+	0x0009 is Incorrect File
+	0x000A is Wrong License format
+	0x000B is License ID already used "
+    DEFVAL  { '0000'h }
+    ::= { slFtFileTransfer 7 }
+
+slFtFileTransferToSubSystems OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (1))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    " This object represents the sub-systems the fileTransCmd 
+      refers to. It should be used when a system is divided 
+      to sub-systems and each sub-system (or part of them) can 
+	  have a different SW/Configuration.
+
+	  Each bit of this object will represent one of the sub-systems.
+	  Bit='1' - APPLY to respective sub-system
+	  Bit='0' - DO NOT APPLY to respective sub-system
+
+	  For the meaning of each bit, see product's specification.
+	  User will select the sub-systems envolved by filling-in the bits
+      that represent these sub-systems.
+      In this case, the file represented by 'fileName' will 
+	  include several parts, each representing one of the sub-systems.
+	  The agent will refer only to the part/s indicated by this object.
+
+      0 Octet Strings = not applicable  
+      DEFVAL = 0h	for  the products that support this object."
+    ::= { slFtFileTransfer 8 }
+
+slFtFileNameWithinProduct  OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"The file name used by the product within the product file system."
+	::= { slFtFileTransfer 9 }
+						
+
+slFtFileTransferServerPort OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Server Port number used for File Transfer. 
+     Applicable for SFTP.
+     Valid values: 0..65535."
+    -- DEFVAL  { 22 }
+    ::= { slFtFileTransfer 14 }
+
+slFtFileTransferProtocol OBJECT-TYPE
+    SYNTAX  INTEGER
+	{
+	 tftp (1),	--default
+	 sftp (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "File Transfer protocol used."
+    ::= { slFtFileTransfer 15 }
+
+slFtSftpUserLogin OBJECT-TYPE
+    SYNTAX  SftpUserLogin
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "The SFTP User Login."
+    ::= { slFtFileTransfer 16 }
+
+slFtSftpPasswordLogin OBJECT-TYPE
+    SYNTAX  SftpUserPassword
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "The SFTP User Password."
+    ::= { slFtFileTransfer 17 }
+
+
+slFtSystemReset  OBJECT-TYPE
+	SYNTAX  INTEGER	{
+         off          (2),
+		 on           (3),
+		 resetConfig  (4),
+		 resetMapping (5),
+		 resetStandby (6) 
+    }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"Reset action to be performed on the system.
+	 - resetStandby(6) - can be used only by devices with redundancy on MAIN/CL."
+	::= { slFtAgnt 13 }
+
+
+slFtAgnSwVersionSwapCmd OBJECT-TYPE
+	SYNTAX  INTEGER
+	{
+	 off  (2),
+	 mainAndBackup  (3)
+ 	 }
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+	"SW switch command.
+	 mainAndBackup (3) = Swap between Main SW and the backup one.
+	 Agent will perform the required command and change automatically 
+	 the value of this object to off(2)."
+     ::= { slFtAgnt 51 }
+
+
+-- NOTIFICATIONS
+
+slFtSystemsEvents OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION
+     "The system events for products."
+     ::= { slFtSystems 0 }
+
+slFtTftpStatusChangeTrap  NOTIFICATION-TYPE
+     OBJECTS       { slFtTftpStatus }
+     STATUS current
+     DESCRIPTION     
+     "This trap is sent whenever the status of tftp changed."
+     ::= { slFtSystemsEvents 1 }
+
+
+END
+

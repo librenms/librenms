@@ -3,15 +3,10 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'nfsstat';
-$app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.4';
 
-echo ' ' . $name;
-
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
-update_application($app, $nfsstats);
 
-$rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
     ->addDataset('total', 'GAUGE', 0)
     ->addDataset('null', 'GAUGE', 0)
@@ -30,7 +25,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('fsstat', 'GAUGE', 0);
 
 $data = explode("\n", $nfsstats);
-$fields = array(
+$fields = [
     'total' => $data[0],
     'null' => $data[1],
     'getattr' => $data[2],
@@ -46,9 +41,15 @@ $fields = array(
     'rename' => $data[12],
     'readdirplus' => $data[13],
     'fsstat' => $data[14],
-);
+];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
+update_application($app, $nfsstats, $fields);
 
-unset($nfsstats, $rrd_name, $rrd_def, $data, $fields, $tags);
+unset($nfsstats, $rrd_def, $data, $fields, $tags);

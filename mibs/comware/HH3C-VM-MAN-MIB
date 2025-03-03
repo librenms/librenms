@@ -1,0 +1,738 @@
+-- ===========================================================================================================
+-- Copyright (C) 2007 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: VM(Video Management) Feature Configuration management MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 Initial version 2007-04-13 created by zhoujianming
+--- ============================================================================================================
+HH3C-VM-MAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    entPhysicalAssetID
+        FROM ENTITY-MIB
+    Integer32, Unsigned32,IpAddress, Counter32, OBJECT-TYPE,
+    MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DateAndTime, DisplayString
+        FROM SNMPv2-TC
+    hh3cSurveillanceMIB
+        FROM HH3C-OID-MIB;
+
+
+hh3cVMMan MODULE-IDENTITY
+    LAST-UPDATED "200704130000Z"        -- April 13, 2007  GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "VM is one of surveillance features, implementing user authentication,
+        configuration management, network management and control signalling
+        forwarding.
+        This MIB contains objects to manage the VM feature."
+    ::= { hh3cSurveillanceMIB 1 }
+
+--
+-- Node definitions
+--
+
+hh3cVMManMIBObjects OBJECT IDENTIFIER ::= { hh3cVMMan 1 }
+
+hh3cVMCapabilitySet OBJECT-TYPE
+    SYNTAX BITS
+    {
+        cms(0),
+        css(1),
+        dm(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Components included in the VM feature represented by bit fields. VM feature
+        includes three componets: CMS(Central Management Server), CSS(Control Signalling
+        Server) and DM(Data Managment).
+        A bit set to 1 indicates the corresponding component of this bit is included
+        otherwise indicates the corresponding component of this bit is not included. VM
+        can include one or more components at one time.
+        "
+    ::= { hh3cVMManMIBObjects 1 }
+
+--
+-- statistics
+--
+hh3cVMStat OBJECT IDENTIFIER ::= { hh3cVMManMIBObjects 2 }
+
+hh3cVMStatTotalConnEstablishRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of establishment requests for video connection."
+    ::= { hh3cVMStat 1 }
+
+hh3cVMStatSuccConnEstablishRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of successful establishment requests for video connection."
+    ::= { hh3cVMStat 2 }
+
+hh3cVMStatFailConnEstablishRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of unsuccessful establishment requests for video connection."
+    ::= { hh3cVMStat 3 }
+
+hh3cVMStatTotalConnReleaseRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of release requests for video connection."
+    ::= { hh3cVMStat 4 }
+
+hh3cVMStatSuccConnReleaseRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of successful release requests for video connection."
+    ::= { hh3cVMStat 5 }
+
+hh3cVMStatFailConnReleaseRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of unsuccessful release requests for video connection."
+    ::= { hh3cVMStat 6 }
+
+hh3cVMStatExceptionTerminationConn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of exceptional termination for video connection."
+    ::= { hh3cVMStat 7 }
+
+
+--
+-- Notification definitions
+--
+-- =================================================================
+-- Traps are defined below.
+hh3cVMManMIBTrap OBJECT IDENTIFIER ::= { hh3cVMMan 2 }
+
+-- All trap definitions should be placed under this object.
+hh3cVMManTrapPrex OBJECT IDENTIFIER ::= { hh3cVMManMIBTrap 0 }
+
+hh3cVMManDeviceOnlineTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about the device having been registered to VM."
+    ::= { hh3cVMManTrapPrex 1 }
+
+hh3cVMManDeviceOfflineTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about the device having been unregistered to VM."
+    ::= { hh3cVMManTrapPrex 2 }
+
+hh3cVMManForwardDeviceExternalSemaphoreTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUExternalInputAlarmChannelID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about external semaphore alarm, which is created
+        by the third party device."
+    ::= { hh3cVMManTrapPrex 3 }
+
+hh3cVMManForwardDeviceVideoLossTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUECVideoChannelName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about video loss, which is created by the third
+        party device."
+    ::= { hh3cVMManTrapPrex 4 }
+
+hh3cVMManForwardDeviceVideoRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUECVideoChannelName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about video recovery after loss, which is created
+        by the third party device."
+    ::= { hh3cVMManTrapPrex 5 }
+
+hh3cVMManForwardDeviceMotionDetectTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUECVideoChannelName,
+        hh3cVMManRegionCoordinateX1,
+        hh3cVMManRegionCoordinateY1,
+        hh3cVMManRegionCoordinateX2,
+        hh3cVMManRegionCoordinateY2
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about motion detection, which is created by the
+        third party device."
+    ::= { hh3cVMManTrapPrex 6 }
+
+hh3cVMManForwardDeviceCoverTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUECVideoChannelName,
+        hh3cVMManRegionCoordinateX1,
+        hh3cVMManRegionCoordinateY1,
+        hh3cVMManRegionCoordinateX2,
+        hh3cVMManRegionCoordinateY2
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about video cover, which is created by the third
+        party device."
+    ::= { hh3cVMManTrapPrex 7 }
+
+hh3cVMManForwardDeviceCpuUsageThresholdTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManCpuUsage,
+        hh3cVMManCpuUsageThreshold
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about cpu usage exceeding its threshold, which is
+        created by the third party device."
+    ::= { hh3cVMManTrapPrex 8 }
+
+hh3cVMManForwardDeviceMemUsageThresholdTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManMemUsage,
+        hh3cVMManMemUsageThreshold
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about memory usage exceeding its threshold, which is
+        created by the third party device."
+    ::= { hh3cVMManTrapPrex 9 }
+
+hh3cVMManForwardDeviceHardDiskUsageThresholdTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManHardDiskUsage,
+        hh3cVMManHardDiskUsageThreshold
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about harddisk usage exceeding its threshold, which is
+        created by the third party device."
+    ::= { hh3cVMManTrapPrex 10 }
+
+
+hh3cVMManForwardDeviceTemperatureThresholdTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManTemperature,
+        hh3cVMManTemperatureThreshold
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about temperature exceeding its threshold, which is created
+        by the third party device."
+    ::= { hh3cVMManTrapPrex 11 }
+
+hh3cVMManForwardDeviceStartKinescopeTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUECVideoChannelName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about starting kinescope, which is created by the third party
+        device."
+    ::= { hh3cVMManTrapPrex 12 }
+
+hh3cVMManForwardDeviceStopKinescopeTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUECVideoChannelName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Forward a trap about stopping kinescope, which is created by the third party
+        device."
+    ::= { hh3cVMManTrapPrex 13 }
+
+hh3cVMManClientReportTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManClientIP,
+        hh3cVMManUserName,
+        hh3cVMManReportContent
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about the fault which is reported by clients."
+    ::= { hh3cVMManTrapPrex 14 }
+
+hh3cVMManClientRealtimeSurveillanceNoVideoTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManClientIP,
+        hh3cVMManUserName,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUECVideoChannelName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about no realtime surveillance video stream which is reported by clients.
+        hh3cVMManRegDevIP, entPhysicalAssetID, hh3cVMManRegDevName and hh3cVMManPUECVideoChannelName
+        describe an EC's relative information. "
+    ::= { hh3cVMManTrapPrex 15 }
+
+hh3cVMManClientVODNoVideoTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManClientIP,
+        hh3cVMManUserName,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUECVideoChannelName,
+        hh3cVMManClientVODStart,
+        hh3cVMManClientVODEnd,
+        hh3cVMManIPSANDevIP
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about no VOD video stream which is reported by clients. hh3cVMManRegDevIP,
+        entPhysicalAssetID, hh3cVMManRegDevName and hh3cVMManPUECVideoChannelName describe an EC's relative information."
+    ::= { hh3cVMManTrapPrex 16 }
+
+hh3cVMManClientRealtimeSurveillanceVideoStreamDiscontinuityTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManClientIP,
+        hh3cVMManUserName,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUECVideoChannelName,
+        hh3cVMManClientVideoStreamDiscontinuityInterval,
+        hh3cVMManClientVideoStreamDiscontinuityIntervalThreshold,
+        hh3cVMManClientStatPeriod
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about the realtime surveillance video stream discontinuity which is reported by clients.
+        entPhysicalAssetID, hh3cVMManRegDevIP, hh3cVMManRegDevName and hh3cVMManPUECVideoChannelName describe an EC's relative
+        information."
+    ::= { hh3cVMManTrapPrex 17 }
+
+hh3cVMManClientVODVideoStreamDiscontinuityTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManClientIP,
+        hh3cVMManUserName,
+        hh3cVMManRegDevIP,
+        hh3cVMManRegDevName,
+        hh3cVMManPUECVideoChannelName,
+        hh3cVMManClientVODStart,
+        hh3cVMManClientVODEnd,
+        hh3cVMManIPSANDevIP,
+        hh3cVMManClientVideoStreamDiscontinuityInterval,
+        hh3cVMManClientVideoStreamDiscontinuityIntervalThreshold,
+        hh3cVMManClientStatPeriod
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about the VOD video stream discontinuity which is reported by clients.
+        hh3cVMManRegDevIP, entPhysicalAssetID, hh3cVMManRegDevName and hh3cVMManPUECVideoChannelName
+        describe an EC's relative information."
+    ::= { hh3cVMManTrapPrex 18 }
+
+hh3cVMManClientCtlConnExceptionTerminationTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManClientIP,
+        hh3cVMManUserName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about the exceptional termination for control connection. "
+    ::= { hh3cVMManTrapPrex 19 }
+
+hh3cVMManClientFrequencyLoginFailTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManClientIP,
+        hh3cVMManUserName,
+        hh3cVMManClientLoginFailNum,
+        hh3cVMManClientLoginFailNumThreshold,
+        hh3cVMManClientStatPeriod
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about the frequency of client login failure."
+    ::= { hh3cVMManTrapPrex 20 }
+
+hh3cVMManClientFrequencyVODFailTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManClientIP,
+        hh3cVMManUserName,
+        hh3cVMManClientVODFailNum,
+        hh3cVMManClientVODFailNumThreshold,
+        hh3cVMManClientStatPeriod
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about the frequency of client VOD failure."
+    ::= { hh3cVMManTrapPrex 21 }
+
+-- All DM trap definitions should be placed here.
+hh3cVMManDMECDisobeyStorageScheduleTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManPUECVideoChannelName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about EC disobeying storage schedule created by DM."
+    ::= { hh3cVMManTrapPrex 22 }
+
+hh3cVMManDMECDisobeyStorageScheduleRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        entPhysicalAssetID,
+        hh3cVMManRegDevIP,
+        hh3cVMManPUECVideoChannelName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Send a trap about recovery after EC disobeying storage schedule created by DM."
+    ::= { hh3cVMManTrapPrex 23 }
+
+
+-- All objects used for TRAP only are defined here.
+hh3cVMManTrapObjects OBJECT IDENTIFIER ::= { hh3cVMManMIBTrap 1 }
+
+hh3cVMManIPSANDevIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP address of IPSAN Device which can store video data."
+    ::= { hh3cVMManTrapObjects 1 }
+
+hh3cVMManRegDevIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP address of devices which can registered or unregistered to VM."
+    ::= { hh3cVMManTrapObjects 2 }
+
+hh3cVMManRegDevName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of devices which can registered or unregistered to VM."
+    ::= { hh3cVMManTrapObjects 3 }
+
+hh3cVMManRegionCoordinateX1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The horizontal coordinate of top left point of the motion detection region."
+    ::= { hh3cVMManTrapObjects 4 }
+
+hh3cVMManRegionCoordinateY1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The vertical coordinate of top left point of the motion detection region."
+    ::= { hh3cVMManTrapObjects 5 }
+
+hh3cVMManRegionCoordinateX2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The horizontal coordinate of botton right point of the motion detection region."
+    ::= { hh3cVMManTrapObjects 6 }
+
+hh3cVMManRegionCoordinateY2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The horizontal coordinate of botton right point of the motion detection region."
+    ::= { hh3cVMManTrapObjects 7 }
+
+hh3cVMManCpuUsage OBJECT-TYPE
+    SYNTAX      Unsigned32 ( 0..100 )
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The CPU usage for this entity. Generally, the CPU usage
+        will caculate the overall CPU usage on the entity, and it
+        is not sensible with the number of CPU on the entity. "
+    ::= { hh3cVMManTrapObjects 8 }
+
+hh3cVMManCpuUsageThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 ( 0..100 )
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the CPU usage. When the CPU usage exceeds
+        the threshold, a notification will be sent."
+    ::= { hh3cVMManTrapObjects 9 }
+
+hh3cVMManMemUsage OBJECT-TYPE
+    SYNTAX      Unsigned32 ( 0..100 )
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The memory usage for the entity. This object indicates what
+        percent of memory are used. "
+    ::= { hh3cVMManTrapObjects 10 }
+
+hh3cVMManMemUsageThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 ( 0..100 )
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the Memory usage. When the memory usage
+        exceeds the threshold, a notification will be sent. "
+    ::= { hh3cVMManTrapObjects 11 }
+
+hh3cVMManHardDiskUsage OBJECT-TYPE
+    SYNTAX      Unsigned32 ( 0..100 )
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The hard disk usage for the entity. This object indicates what
+        percent of hard disk are used. "
+    ::= { hh3cVMManTrapObjects 12 }
+
+hh3cVMManHardDiskUsageThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 ( 0..100 )
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the hard disk usage. When the hard disk usage
+        exceeds the threshold, a notification will be sent. "
+    ::= { hh3cVMManTrapObjects 13 }
+
+hh3cVMManTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The temperature for the entity. "
+    ::= { hh3cVMManTrapObjects 14 }
+
+hh3cVMManTemperatureThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the temperature. When the temperature
+        exceeds the threshold, a notification will be sent. "
+    ::= { hh3cVMManTrapObjects 15 }
+
+hh3cVMManClientIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The client device IP address."
+    ::= { hh3cVMManTrapObjects 16 }
+
+hh3cVMManUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The client user name."
+    ::= { hh3cVMManTrapObjects 17 }
+
+hh3cVMManReportContent OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The details of the fault which reported by clients"
+    ::= { hh3cVMManTrapObjects 18 }
+
+hh3cVMManClientVideoStreamDiscontinuityInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Video stream discontinuity interval. "
+    ::= { hh3cVMManTrapObjects 19 }
+
+hh3cVMManClientVideoStreamDiscontinuityIntervalThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the video stream discontinuity interval. When the
+        discontinuity interval exceeds the threshold, a notification will be sent. "
+    ::= { hh3cVMManTrapObjects 20 }
+
+hh3cVMManClientStatPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The client statistic period. "
+    ::= { hh3cVMManTrapObjects 21 }
+
+hh3cVMManClientLoginFailNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The total number of client login failure in last statistic period which is
+        defined by hh3cVMManClientStatPeriod entity."
+    ::= { hh3cVMManTrapObjects 22 }
+
+hh3cVMManClientLoginFailNumThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the total number of client login failure in last statistic
+        period. When the number exceeds the threshold, a notification will be sent. "
+    ::= { hh3cVMManTrapObjects 23 }
+
+hh3cVMManClientVODFailNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The total number of client VOD failure in last statistic period which is
+        defined by hh3cVMManClientStatPeriod entity."
+    ::= { hh3cVMManTrapObjects 24 }
+
+hh3cVMManClientVODFailNumThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The threshold for the total number of client VOD failure in last statistic
+        period. When the number exceeds the threshold, a notification will be sent. "
+    ::= { hh3cVMManTrapObjects 25 }
+
+hh3cVMManClientVODStart OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The start time for VOD."
+    ::= { hh3cVMManTrapObjects 26 }
+
+hh3cVMManClientVODEnd OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The end time for VOD."
+    ::= { hh3cVMManTrapObjects 27 }
+
+hh3cVMManPUExternalInputAlarmChannelID  OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The ID of the external input alarm channel."
+    ::= { hh3cVMManTrapObjects 28 }
+
+hh3cVMManPUECVideoChannelName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The name of the video channel. It is suggested that the name includes
+        the channel ID information."
+    ::= { hh3cVMManTrapObjects 29 }
+
+END

@@ -1,0 +1,96 @@
+modules:
+  os:
+    sysDescr_regex: '/Hardware Model:(?<hardware>\S+), Software version: OcNOS,(?<version>\S+)/'
+    hardware:
+      - IPI-CMM-CHASSIS-MIB::cmmStackUnitModelName.1
+      - IPI-CMM-CHASSIS-MIB::cmmStackVendorName.1
+    hardware_template: '{{ IPI-CMM-CHASSIS-MIB::cmmStackVendorName.1 }} {{ IPI-CMM-CHASSIS-MIB::cmmStackUnitModelName.1 }}'
+    serial: IPI-CMM-CHASSIS-MIB::cmmStackUnitSerialNumber.1
+  sensors:
+    current:
+        data:
+            -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorTable
+                value: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorValue
+                divisor: 1000
+                descr: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorName
+                high_limit: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorUpperCritical
+                num_oid: '.1.3.6.1.4.1.36673.100.1.5.1.1.3.{{ $index }}'
+                skip_values:
+                    - -10002
+                    -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorUnits
+                        op: '!='
+                        value: 'Amps'
+                    -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorName
+                        op: 'ends'
+                        value: '_IIN'
+            -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorTable
+                value: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorValue
+                divisor: 1000
+                descr: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorName
+                num_oid: '.1.3.6.1.4.1.36673.100.1.5.1.1.3.{{ $index }}'
+                skip_values:
+                    - -10002
+                    -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorUnits
+                        op: '!='
+                        value: 'Amps'
+                    - oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorName
+                      op: 'not_ends'
+                      value: '_IIN'
+    fanspeed:
+        data:
+            -
+                oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorTable
+                value: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorValue
+                divisor: 1000
+                descr: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorName
+                low_limit: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorLowerCritical
+                low_warn_limit: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorLowerNonCritical
+                high_limit: 100000
+                num_oid: '.1.3.6.1.4.1.36673.100.1.5.1.1.3.{{ $index }}'
+                skip_values:
+                    -   -10002
+                    -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorUnits
+                        op: '!='
+                        value: 'RPM'
+    power:
+        data:
+            -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorTable
+                value: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorValue
+                divisor: 1000
+                descr: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorName
+                low_limit: 0
+                num_oid: '.1.3.6.1.4.1.36673.100.1.5.1.1.3.{{ $index }}'
+                skip_values:
+                    - -10002
+                    -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorUnits
+                        op: '!='
+                        value: 'Watts'
+    temperature:
+      data:
+          -
+              oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorTable
+              value: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorValue
+              divisor: 1000
+              descr: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorName
+              warn_limit: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorUpperNonCritical
+              high_limit: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorUpperCritical
+              num_oid: '.1.3.6.1.4.1.36673.100.1.5.1.1.3.{{ $index }}'
+              skip_values:
+                  -   -10002
+                  -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorUnits
+                      op: '!='
+                      value: 'degrees C'
+    voltage:
+        data:
+            -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorTable
+                value: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorValue
+                divisor: 1000
+                descr: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorName
+                low_limit: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorLowerCritical
+                high_limit: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorUpperCritical
+                num_oid: '.1.3.6.1.4.1.36673.100.1.5.1.1.3.{{ $index }}'
+                skip_values:
+                    - -10002
+                    -   oid: IPI-CMM-IPMI-MIB::cmmIpmiDeviceSensorUnits
+                        op: '!='
+                        value: 'Volts'

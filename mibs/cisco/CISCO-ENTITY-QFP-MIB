@@ -1,0 +1,1294 @@
+-- *****************************************************************
+-- CISCO-ENTITY-QFP-MIB.my
+--   
+-- This MIB module is used to monitor Quantum Flow Processors (QFP).
+--   
+-- November 2009, Muthukrishnan Venkatraman
+--   
+-- Copyright (c) 2009, 2012, 2014 by cisco Systems Inc.
+-- All rights reserved.
+--   
+-- *****************************************************************
+
+CISCO-ENTITY-QFP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Gauge32,
+    NOTIFICATION-TYPE,
+    Counter32,
+    Counter64,
+    Unsigned32,
+    Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    entPhysicalIndex
+        FROM ENTITY-MIB
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoEntityQfpMIB MODULE-IDENTITY
+    LAST-UPDATED    "201406180000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+
+            Postal: 170 W Tasman Drive
+
+            San Jose, CA  95134
+
+            USA
+
+
+            Tel: +1 800 553-NETS
+
+
+            E-mail: cs-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB module defines managed objects that facilitate the
+        management of Quantum Flow Processors (QFP), which are listed
+        in the ENTITY-MIB (RFC 4133) entPhysicalTable as an
+        entPhysicalClass of 'cpu'.
+
+        The Quantum Flow Processors (QFP) technology is an architecture
+        family developed by Cisco, which has fully integrated and
+        programmable networking chip set that controls different
+        functions of a system such as packet forwarding.
+
+        This module contains objects to monitor various QFP
+        statistics such as system, utilization, memory, etc.
+
+        The utilization statistics can be used for future capacity
+        planning. The calculation of this statistics may vary by
+        devices which host QFPs, hence the user must refer to the
+        specific device document of interest for the exact method
+        of calculation. The utilization statistics have the following
+        terminology.
+
+        o Input - Communication channel where packets arrive on the
+                  QFP.
+
+        o Output - Communication channel where packets leave the QFP.
+
+        o Priority - A classification applied to packets indicating
+                     they should be treated with greater urgency.
+
+        o Non-Priority - A classification applied to packets indicating
+                         they should be treated with lesser urgency.
+
+        o Processing Load - The percentage of time over some interval
+                            that the QFP has spent forwarding packets,
+                            relative to the total time spent both 
+                            forwarding packets and being idle."
+    REVISION        "201406180000Z"
+    DESCRIPTION
+        "Added the following objects to the MIB.
+
+        ceqfpThroughputLicensedBW, ceqfpThroughputLevel,
+        ceqfpThroughputInterval, ceqfpThroughputThreshold,
+        ceqfpThroughputAvgRate to ceqfpThroughputTable.
+
+        Added ceqfpThroughputNotifEnabled to ciscoEntityQfpNotif group.
+
+        Added ceqfpThroughputNotif as a new notification to the MIB.
+
+        Added a new MIB conform group, ceqfpThroughputGroup for the new
+        objects.
+
+        Also modified the ciscoEntityQfpMIBComplianceRev2 to add the new
+        group ceqfpThroughputGroup."
+    REVISION        "201206060000Z"
+    DESCRIPTION
+        "Added the following new objects to the
+        ceqfpMemoryResourceTable.
+        ceqfpMemoryResTotalOvrflw, ceqfpMemoryHCResTotal,
+        ceqfpMemoryResInUseOvrflw, ceqfpMemoryHCResInUse,
+        ceqfpMemoryResFreeOvrflw,ceqfpMemoryHCResFree,
+        ceqfpMemoryResLowFreeWatermarkOvrflw,
+        ceqfpMemoryHCResLowFreeWatermark.
+
+        Added following new compliance groups.
+        ciscoEntityQfpMemoryResourceOvrflwGroup,
+        ciscoEntityQfpMemoryHCResourceGroup.
+
+        Added new compliance ciscoEntityQfpMIBComplianceRev2 which
+        deprecates ciscoEntityQfpMIBComplianceRev1."
+    REVISION        "200912020000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 715 }
+
+
+
+CiscoQfpPacketRate ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "An estimate of throughput in units of packets per second.
+
+        The CiscoQfpPacketRate type represents a non-negative integer,
+        which may increase or decrease, but shall never exceed a 
+        maximum value, nor fall below a minimum value of Counter64.
+        The Counter64 syntax is used for encoding rules."
+    SYNTAX          Counter64
+
+CiscoQfpBitRate ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "An estimate of throughput in units of bits per second.
+
+        The CiscoQfpBitRate type represents a non-negative integer,
+        which may increase or decrease, but shall never exceed a 
+        maximum value, nor fall below a minimum value of Counter64.
+        The Counter64 syntax is used for encoding rules."
+    SYNTAX          Counter64
+
+CiscoQfpTimeInterval ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An enumerated integer-value describing the available interval
+        values for which the periodic statistics are to be collected.
+
+        fiveSeconds (1)   - Interval to collect last 5 seconds       
+                            statistics
+        oneMinute(2)      - Interval to collect last 1 minute
+                            statistics
+        fiveMinutes(3)    - Interval to collect last 5 minutes       
+                            statistics
+        sixtyMinutes(4)   - Interval to collect last 60 minutes       
+                            statistics"
+    SYNTAX          INTEGER  {
+                        fiveSeconds(1),
+                        oneMinute(2),
+                        fiveMinutes(3),
+                        sixtyMinutes(4)
+                    }
+
+CiscoQfpMemoryResource ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An enumerated integer-value describing various memory resources
+        used by the QFP.
+
+        dram (1) - Dynamic Random Access Memory (DRAM) memory resource"
+    SYNTAX          INTEGER  {
+                        dram(1)
+                    }
+ciscoEntityQfpMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoEntityQfpMIB 0 }
+
+ciscoEntityQfpMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoEntityQfpMIB 1 }
+
+ciscoEntityQfpMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoEntityQfpMIB 2 }
+
+ciscoEntityQfp  OBJECT IDENTIFIER
+    ::= { ciscoEntityQfpMIBObjects 1 }
+
+ciscoEntityQfpNotif  OBJECT IDENTIFIER
+    ::= { ciscoEntityQfpMIBObjects 2 }
+
+
+ceqfpSystemTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeqfpSystemEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table maintains the QFP system information for each QFP
+        physical entity.
+
+        An agent creates a conceptual row to this table corresponding
+        to a QFP physical entity upon detection of a physical entity
+        supporting the QFP system information.
+
+        An agent destroys a conceptual row from this table       
+        corresponding to a QFP physical entity upon removal
+        of the QFP host physical entity."
+    ::= { ciscoEntityQfp 1 }
+
+ceqfpSystemEntry OBJECT-TYPE
+    SYNTAX          CeqfpSystemEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A conceptual row in the ceqfpSystemTable. There is an entry
+        in this table for each QFP entity, as defined by a value of
+        entPhysicalIndex."
+    INDEX           { entPhysicalIndex } 
+    ::= { ceqfpSystemTable 1 }
+
+CeqfpSystemEntry ::= SEQUENCE {
+        ceqfpSystemTrafficDirection INTEGER,
+        ceqfpSystemState            INTEGER,
+        ceqfpNumberSystemLoads      Counter32,
+        ceqfpSystemLastLoadTime     DateAndTime
+}
+
+ceqfpSystemTrafficDirection OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        none(1),
+                        ingress(2),
+                        egress(3),
+                        both(4)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the traffic direction that this QFP is
+        assigned to process. The enumerated values are described below.
+
+        none (1)    - The QFP is not assigned to processes any traffic
+                      yet
+        ingress (2) - The QFP processes inbound traffic
+        egress (3)  - The QFP processes outbound traffic
+        both (4)    - The QFP processes both inbound and outbound
+                      traffic" 
+    ::= { ceqfpSystemEntry 1 }
+
+ceqfpSystemState OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        reset(2),
+                        init(3),
+                        active(4),
+                        activeSolo(5),
+                        standby(6),
+                        hotStandby(7)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the current QFP state. The enumerated
+        values are described below.
+
+        unknown (1)    - The state of the QFP is unknown
+        reset (2)      - The QFP is reset
+        init (3)       - The QFP is being initialized
+        active (4)     - The QFP is active in a system with redundant
+                         QFP
+        activeSolo (5) - The QFP is active and there is no redundant
+                         QFP in the system
+        standby (6)    - The QFP is standby in a redundant system.
+        hotStandby (7) - The QFP is standby and synchronized with
+                         active, so that a switchover in this state
+                         will preserve state of the active. Stateful 
+                         datapath features are synchronized between the
+                         active QFP and standby QFP" 
+    ::= { ceqfpSystemEntry 2 }
+
+ceqfpNumberSystemLoads OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the number of times the QFP is loaded,
+        since the QFP host is up." 
+    ::= { ceqfpSystemEntry 3 }
+
+ceqfpSystemLastLoadTime OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP last load time." 
+    ::= { ceqfpSystemEntry 4 }
+ 
+
+
+ceqfpFiveSecondUtilAlgo OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        fiveSecSample(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This objects represents the method used to calculate 5 Second
+        interval utilization data. The enumerated values are described
+        below.
+
+        unknown       (1) - The calculation method is unknown
+        fiveSecSample (2) - The value is calculated based on the last
+                            5 second sampling period of utilization
+                            data." 
+    ::= { ciscoEntityQfp 2 }
+
+ceqfpOneMinuteUtilAlgo OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        fiveSecSMA(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This objects represents the method used to calculate 1 Minute
+        interval utilization data. The enumerated values are described
+        below.
+
+        unknown    (1) - The calculation method is unknown
+        fiveSecSMA (2) - The value is calculated using Simple Moving  
+                         Average of last 12 five seconds utilization
+                         data." 
+    ::= { ciscoEntityQfp 3 }
+
+ceqfpFiveMinutesUtilAlgo OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        fiveSecSMA(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This objects represents the method used to calculate 5 Minutes
+        interval utilization data. The enumerated values are described
+        below.
+
+        unknown    (1) - The calculation method is unknown
+        fiveSecSMA (2) - The value is calculated using Simple Moving  
+                         Average of last 60 five seconds utilization
+                         data." 
+    ::= { ciscoEntityQfp 4 }
+
+ceqfpSixtyMinutesUtilAlgo OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        fiveSecSMA(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This objects represents the method used to calculate 60 Minutes
+        interval utilization data. The enumerated values are described
+        below.
+
+        unknown    (1) - The calculation method is unknown
+        fiveSecSMA (1) - The value is calculated using Simple Moving  
+                         Average of last 720 five seconds utilization
+                         data." 
+    ::= { ciscoEntityQfp 5 }
+
+ceqfpUtilizationTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeqfpUtilizationEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table maintains the utilization statistics collected
+        by each QFP physical entity at various time interval such as
+        last 5 seconds, 1 minute, etc.
+
+        An agent creates a conceptual row to this table corresponding
+        to a QFP physical entity for a time interval upon detection of
+        a physical entity supporting the utilization statistics for a
+        time interval.
+
+        The agent destroys a conceptual row from this table       
+        corresponding to a QFP physical entity for a time interval
+        upon removal of the QFP host physical entity or it does not
+        receive the utilization statistics update for a certain time
+        period. The time period to wait before deleting an entry from
+        this table would be the discretion of the supporting device."
+    ::= { ciscoEntityQfp 6 }
+
+ceqfpUtilizationEntry OBJECT-TYPE
+    SYNTAX          CeqfpUtilizationEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A conceptual row in the ceqfpUtilizationTable. There is
+        an entry in this table for each QFP entity by a value of
+        entPhysicalIndex and the supported time interval by a value 
+        of ceqfpUtilTimeInterval.
+
+        The method of utilization data calculation for each interval
+        period can be identified through the respective interval
+        scalar objects. For example the utilizaiton data calculation
+        method for 'fiveSecond' interval can be identified by
+        ceqfpFiveSecondUtilAlgo."
+    INDEX           {
+                        entPhysicalIndex,
+                        ceqfpUtilTimeInterval
+                    } 
+    ::= { ceqfpUtilizationTable 1 }
+
+CeqfpUtilizationEntry ::= SEQUENCE {
+        ceqfpUtilTimeInterval             CiscoQfpTimeInterval,
+        ceqfpUtilInputPriorityPktRate     CiscoQfpPacketRate,
+        ceqfpUtilInputPriorityBitRate     CiscoQfpBitRate,
+        ceqfpUtilInputNonPriorityPktRate  CiscoQfpPacketRate,
+        ceqfpUtilInputNonPriorityBitRate  CiscoQfpBitRate,
+        ceqfpUtilInputTotalPktRate        CiscoQfpPacketRate,
+        ceqfpUtilInputTotalBitRate        CiscoQfpBitRate,
+        ceqfpUtilOutputPriorityPktRate    CiscoQfpPacketRate,
+        ceqfpUtilOutputPriorityBitRate    CiscoQfpBitRate,
+        ceqfpUtilOutputNonPriorityPktRate CiscoQfpPacketRate,
+        ceqfpUtilOutputNonPriorityBitRate CiscoQfpBitRate,
+        ceqfpUtilOutputTotalPktRate       CiscoQfpPacketRate,
+        ceqfpUtilOutputTotalBitRate       CiscoQfpBitRate,
+        ceqfpUtilProcessingLoad           Gauge32
+}
+
+ceqfpUtilTimeInterval OBJECT-TYPE
+    SYNTAX          CiscoQfpTimeInterval
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the time interval for which the
+        utilization statistics being collected. The interval 
+        values can be 5 second, 1 minute, etc. as specified in 
+        the CiscoQfpTimeInterval." 
+    ::= { ceqfpUtilizationEntry 1 }
+
+ceqfpUtilInputPriorityPktRate OBJECT-TYPE
+    SYNTAX          CiscoQfpPacketRate
+    UNITS           "packets per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP input channel priority packet
+        rate during this interval." 
+    ::= { ceqfpUtilizationEntry 2 }
+
+ceqfpUtilInputPriorityBitRate OBJECT-TYPE
+    SYNTAX          CiscoQfpBitRate
+    UNITS           "bits per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP input channel priority bit rate
+        during this interval." 
+    ::= { ceqfpUtilizationEntry 3 }
+
+ceqfpUtilInputNonPriorityPktRate OBJECT-TYPE
+    SYNTAX          CiscoQfpPacketRate
+    UNITS           "packets per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP input channel non-priority
+        packet rate during this interval." 
+    ::= { ceqfpUtilizationEntry 4 }
+
+ceqfpUtilInputNonPriorityBitRate OBJECT-TYPE
+    SYNTAX          CiscoQfpBitRate
+    UNITS           "bits per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP input channel non-priority
+        bit rate during this interval." 
+    ::= { ceqfpUtilizationEntry 5 }
+
+ceqfpUtilInputTotalPktRate OBJECT-TYPE
+    SYNTAX          CiscoQfpPacketRate
+    UNITS           "packets per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP input channel total packet rate
+        during this interval, which includes both priority and
+        non-priority input packet rate." 
+    ::= { ceqfpUtilizationEntry 6 }
+
+ceqfpUtilInputTotalBitRate OBJECT-TYPE
+    SYNTAX          CiscoQfpBitRate
+    UNITS           "bits per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP input channel total bit rate
+        during this interval, which includes both priority and
+        non-priority input bit rate." 
+    ::= { ceqfpUtilizationEntry 7 }
+
+ceqfpUtilOutputPriorityPktRate OBJECT-TYPE
+    SYNTAX          CiscoQfpPacketRate
+    UNITS           "packets per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP output channel priority packet
+        rate during this interval." 
+    ::= { ceqfpUtilizationEntry 8 }
+
+ceqfpUtilOutputPriorityBitRate OBJECT-TYPE
+    SYNTAX          CiscoQfpBitRate
+    UNITS           "bits per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP output channel priority bit
+        rate during this interval." 
+    ::= { ceqfpUtilizationEntry 9 }
+
+ceqfpUtilOutputNonPriorityPktRate OBJECT-TYPE
+    SYNTAX          CiscoQfpPacketRate
+    UNITS           "packets per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP output channel non-priority
+        packet rate during this interval." 
+    ::= { ceqfpUtilizationEntry 10 }
+
+ceqfpUtilOutputNonPriorityBitRate OBJECT-TYPE
+    SYNTAX          CiscoQfpBitRate
+    UNITS           "bits per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP output channel non-priority
+        bit rate during this interval." 
+    ::= { ceqfpUtilizationEntry 11 }
+
+ceqfpUtilOutputTotalPktRate OBJECT-TYPE
+    SYNTAX          CiscoQfpPacketRate
+    UNITS           "packets per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP output channel total packet rate
+        during this interval, which includes both priority and
+        non-priority output packet rate." 
+    ::= { ceqfpUtilizationEntry 12 }
+
+ceqfpUtilOutputTotalBitRate OBJECT-TYPE
+    SYNTAX          CiscoQfpBitRate
+    UNITS           "bits per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP output channel total bit rate
+        during this interval, which includes both priority and
+        non-priority bit rate." 
+    ::= { ceqfpUtilizationEntry 13 }
+
+ceqfpUtilProcessingLoad OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the QFP processing load during this
+        interval." 
+    ::= { ceqfpUtilizationEntry 14 }
+ 
+
+
+ceqfpMemoryResourceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeqfpMemoryResourceEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table maintains the memory resources statistics for
+        each QFP physical entity.
+
+        An agent creates a conceptual row to this table corresponding
+        to a QFP physical entity and its supported memory resource type
+        upon detection of a physical entity supporting the memory 
+        resource statistics for a memory resource type.
+
+        An agent destroys a conceptual row from this table       
+        corresponding to a QFP physical entity and its supported
+        memory resource type upon removal of the QFP host physical
+        entity or it does not receive memory resource statistics
+        update for a certain time period. The time period to wait
+        before deleting an entry from this table would be the
+        discretion of the supporting device."
+    ::= { ciscoEntityQfp 7 }
+
+ceqfpMemoryResourceEntry OBJECT-TYPE
+    SYNTAX          CeqfpMemoryResourceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A conceptual row in the ceqfpMemoryResourceTable. There
+        is an entry in this table for each QFP entity by a value 
+        of entPhysicalIndex and the supported memory resource type 
+        by a value of ceqfpMemoryResType."
+    INDEX           {
+                        entPhysicalIndex,
+                        ceqfpMemoryResType
+                    } 
+    ::= { ceqfpMemoryResourceTable 1 }
+
+CeqfpMemoryResourceEntry ::= SEQUENCE {
+        ceqfpMemoryResType                   CiscoQfpMemoryResource,
+        ceqfpMemoryResTotal                  Gauge32,
+        ceqfpMemoryResInUse                  Gauge32,
+        ceqfpMemoryResFree                   Gauge32,
+        ceqfpMemoryResLowFreeWatermark       Gauge32,
+        ceqfpMemoryResRisingThreshold        Unsigned32,
+        ceqfpMemoryResFallingThreshold       Unsigned32,
+        ceqfpMemoryResTotalOvrflw            Gauge32,
+        ceqfpMemoryHCResTotal                CounterBasedGauge64,
+        ceqfpMemoryResInUseOvrflw            Gauge32,
+        ceqfpMemoryHCResInUse                CounterBasedGauge64,
+        ceqfpMemoryResFreeOvrflw             Gauge32,
+        ceqfpMemoryHCResFree                 CounterBasedGauge64,
+        ceqfpMemoryResLowFreeWatermarkOvrflw Gauge32,
+        ceqfpMemoryHCResLowFreeWatermark     CounterBasedGauge64
+}
+
+ceqfpMemoryResType OBJECT-TYPE
+    SYNTAX          CiscoQfpMemoryResource
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the type of the memory resource used by
+        the QFP. This object is one of the indices to uniquely identify
+        the QFP memory resource type." 
+    ::= { ceqfpMemoryResourceEntry 1 }
+
+ceqfpMemoryResTotal OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents total memory available on this memory
+        resource." 
+    ::= { ceqfpMemoryResourceEntry 2 }
+
+ceqfpMemoryResInUse OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the memory which is currently under use
+        on this memory resource." 
+    ::= { ceqfpMemoryResourceEntry 3 }
+
+ceqfpMemoryResFree OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the memory which is currently free on
+        this memory resource." 
+    ::= { ceqfpMemoryResourceEntry 4 }
+
+ceqfpMemoryResLowFreeWatermark OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents lowest free water mark on this memory
+        resource." 
+    ::= { ceqfpMemoryResourceEntry 5 }
+
+ceqfpMemoryResRisingThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the rising threshold value for this
+        memory resource. A value of zero means that the rising
+        threshold is not supported for this memory resource.
+
+        The value of this object can not be set to lower than or
+        equal to ceqfpMemoryResFallingThreshold.
+
+        A rising (ceqfpMemoryResRisingThreshNotif) notification
+        will be generated, whenever the memory resource usage
+        (ceqfpMemoryHCResInUse) is equal to or greater than this
+        value.
+
+        After a rising notification is generated, another such 
+        notification will not be generated until the 
+        ceqfpMemoryResInUse falls below this value and reaches 
+        the ceqfpMemoryResFallingThreshold."
+    DEFVAL          { 90 } 
+    ::= { ceqfpMemoryResourceEntry 6 }
+
+ceqfpMemoryResFallingThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the falling threshold value for this
+        memory resource. A value of zero means that the falling
+        threshold is not supported for this memory resource.
+
+        The value of this object can not be set to higher than or
+        equal to ceqfpMemoryResRisingThreshold.
+
+        A falling (ceqfpMemoryResRisingThreshNotif) notification 
+        will be generated, whenever the memory resource usage
+        (ceqfpMemoryHCResInUse) is equal to or lesser than this value.
+
+        After a falling notification is generated, another 
+        such notification will not be generated until the 
+        ceqfpMemoryResInUse rises above this value and reaches 
+        the ceqfpMemoryResRisingThreshold."
+    DEFVAL          { 85 } 
+    ::= { ceqfpMemoryResourceEntry 7 }
+
+ceqfpMemoryResTotalOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        ceqfpMemoryResTotal.
+        This object needs to be supported only when the value of
+        ceqfpMemoryResTotal exceeds 32-bit, otherwise this object value
+        would be set to 0." 
+    ::= { ceqfpMemoryResourceEntry 8 }
+
+ceqfpMemoryHCResTotal OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is a 64-bit version of ceqfpMemoryResTotal." 
+    ::= { ceqfpMemoryResourceEntry 9 }
+
+ceqfpMemoryResInUseOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        ceqfpMemoryResInUse.
+        This object needs to be supported only when the value of
+        ceqfpMemoryResInUse exceeds 32-bit, otherwise this object value
+        would be set to 0." 
+    ::= { ceqfpMemoryResourceEntry 10 }
+
+ceqfpMemoryHCResInUse OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is a 64-bit version of ceqfpMemoryInRes." 
+    ::= { ceqfpMemoryResourceEntry 11 }
+
+ceqfpMemoryResFreeOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of ceqfpMemoryResFree.
+        This object needs to be supported only when the value of
+        ceqfpMemoryResFree exceeds 32-bit, otherwise this object value
+        would be set to 0." 
+    ::= { ceqfpMemoryResourceEntry 12 }
+
+ceqfpMemoryHCResFree OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is a 64-bit version of ceqfpMemoryResFree." 
+    ::= { ceqfpMemoryResourceEntry 13 }
+
+ceqfpMemoryResLowFreeWatermarkOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        ceqfpMemoryResLowFreeWatermark. This object needs to be
+        supported only when the value of ceqfpMemoryResLowFreeWatermark
+        exceeds 32-bit, otherwise this object value would be set to 0." 
+    ::= { ceqfpMemoryResourceEntry 14 }
+
+ceqfpMemoryHCResLowFreeWatermark OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "kilo bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is a 64-bit version of
+        ceqfpMemoryResLowFreeWatermark." 
+    ::= { ceqfpMemoryResourceEntry 15 }
+ 
+
+
+ceqfpThroughputTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeqfpThroughputEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table maintains the throughput information for each
+        QFP physical entity.
+
+                An agent creates a conceptual row to this table
+        corresponding to a QFP physical entity upon detection of a
+        physical entity supporting the QFP throughput information.
+
+                An agent destroys a conceptual row from this table     
+
+        corresponding to a QFP physical entity upon removal of the QFP
+        host physical entity."
+    ::= { ciscoEntityQfp 8 }
+
+ceqfpThroughputEntry OBJECT-TYPE
+    SYNTAX          CeqfpThroughputEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A conceptual row in the ceqfpThroughputTable. There is an entry
+        in this table for each QFP entity, as defined by a value of
+        entPhysicalIndex."
+    INDEX           { entPhysicalIndex } 
+    ::= { ceqfpThroughputTable 1 }
+
+CeqfpThroughputEntry ::= SEQUENCE {
+        ceqfpThroughputLicensedBW Counter64,
+        ceqfpThroughputLevel      INTEGER,
+        ceqfpThroughputInterval   Integer32,
+        ceqfpThroughputThreshold  Integer32,
+        ceqfpThroughputAvgRate    Counter64
+}
+
+ceqfpThroughputLicensedBW OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bits per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the bandwidth for installed
+        throughput license." 
+    ::= { ceqfpThroughputEntry 1 }
+
+ceqfpThroughputLevel OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        normal(1),
+                        warning(2),
+                        exceed(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the current throughput level for
+        installed throughput license.
+
+                        normal  (1) - Throughput usage is normal
+                        warning (2) - Throughput usage has crossed the
+                                      configured threshold limit
+                        exceed  (3) - Throughput usage has exceeded the
+                                      total licensed bandwidth" 
+    ::= { ceqfpThroughputEntry 2 }
+
+ceqfpThroughputInterval OBJECT-TYPE
+    SYNTAX          Integer32 (10..86400)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The object represents the configured time interval at which the
+        ceqfpThroughputLevel is checked."
+    ::= { ceqfpThroughputEntry 3 }
+
+ceqfpThroughputThreshold OBJECT-TYPE
+    SYNTAX          Integer32 (75..95)
+    UNITS           "percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The object represents the configured throughput threshold."
+    ::= { ceqfpThroughputEntry 4 }
+
+ceqfpThroughputAvgRate OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bits per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object represents the average throughput rate in the
+        interval ceqfpThroughputInterval." 
+    ::= { ceqfpThroughputEntry 5 }
+ 
+
+
+ceqfpMemoryResThreshNotifEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object controls memory resource rising and falling
+        threshold notification.
+
+        When this object contains a value 'true', then generation of
+        memory resource threshold notification is enabled. If this
+        object contains a value 'false', then generation of memory
+        resource threshold notification is disabled."
+    DEFVAL          { false } 
+    ::= { ciscoEntityQfpNotif 1 }
+
+ceqfpMemoryResCurrentRisingThresh OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..100)
+    UNITS           "percent"
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This object represents the current rising threshold
+        value, which triggers the rising threshold notification
+        (ceqfpMemoryResRisingThreshNotif)." 
+    ::= { ciscoEntityQfpNotif 2 }
+
+ceqfpMemoryResCurrentFallingThresh OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "percent"
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This object represents the current falling threshold
+        value, which triggers the falling threshold notification
+        (ceqfpMemoryResFallingThreshNotif)." 
+    ::= { ciscoEntityQfpNotif 3 }
+
+ceqfpThroughputNotifEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object controls throughput rate notification.
+
+        When this object contains a value 'true', then generation of
+        ceqfpThroughputNotif is enabled. If this object contains a value
+        'false', then generation of ceqfpThroughputNotif is disabled."
+    DEFVAL          { false } 
+    ::= { ciscoEntityQfpNotif 4 }
+ciscoEntityQfpMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoEntityQfpMIBConform 1 }
+
+
+ceqfpMemoryResRisingThreshNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        ceqfpMemoryResInUse,
+                        ceqfpMemoryResCurrentRisingThresh
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A notification indicating that the QFP memory usage is rising
+        the threshold on this memory resource.
+
+        This notification will be sent, whenever the QFP memory
+        usage (ceqfpMemoryResInUse) is equal to or above the 
+        rising threshold (ceqfpMemoryResRisingThreshold).
+
+        An agent may throttle the generation of consecutive
+        ceqfpMemoryResRisingThreshNotif notification so that
+        there is at least a five second (suggested default)
+        gap between notification of this type."
+   ::= { ciscoEntityQfpMIBNotifs 1 }
+
+ceqfpMemoryResFallingThreshNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        ceqfpMemoryResInUse,
+                        ceqfpMemoryResCurrentFallingThresh
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A notification indicating that the QFP memory usage is equal
+        to or below the falling threshold on this memory resource.
+
+        This notification will be sent, whenever the QFP memory
+        usage (ceqfpMemoryResInUse) is equal to or below the 
+        falling threshold (ceqfpMemoryResFallingThreshold).
+
+        An agent may throttle the generation of consecutive
+        ceqfpMemoryResFallingThreshNotif notification so that
+        there is at least a five second (suggested default)
+        gap between notification of this type."
+   ::= { ciscoEntityQfpMIBNotifs 2 }
+
+ceqfpThroughputNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        ceqfpThroughputLicensedBW,
+                        ceqfpThroughputLevel,
+                        ceqfpThroughputAvgRate
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A notification indicating that the average throughput rate for
+        the configured interval has exceeded the threshold or reached
+        maximum bandwidth allowed.
+
+        This notification will be sent, whenever the ceqfpThroughputLevel
+        object has the value warning(2) or exceed(3). The condition for
+        trap generation will be checked in every
+        ceqfpThroughputInterval.
+
+        ceqfpThroughputNotif with ceqfpThrougputLevel as warning(2)
+        indicates that average throughput rate has crossed the
+        configured threshold.
+
+        ceqfpThroughputNotif with ceqfpThrougputLevel as exceed(3)
+        indicates that average throughput rate has reached maximum
+        licensed bandwidth."
+   ::= { ciscoEntityQfpMIBNotifs 3 }
+ciscoEntityQfpMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoEntityQfpMIBConform 2 }
+
+
+ciscoEntityQfpMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for CISCO-ENTITY-QFP-MIB"
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoEntityQfpSystemGroup,
+                        ciscoEntityQfpUtilizationGroup,
+                        ciscoEntityQfpUtilizationAlgoGroup
+                    }
+
+    GROUP           ciscoEntityQfpMemoryResourceGroup
+    DESCRIPTION
+        "This group is optional for the QFP entity, which does not use
+        the listed memory resources."
+
+    GROUP           ciscoEntityQfpMemoryResNotifGroup
+    DESCRIPTION
+        "This group is optional for the QFP, which does not support the
+        memory resource."
+
+    GROUP           ciscoEntityQfpNotifGroup
+    DESCRIPTION
+        "This group is optional."
+
+    OBJECT          ceqfpMemoryResRisingThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not mandatory."
+
+    OBJECT          ceqfpMemoryResFallingThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not mandatory."
+    ::= { ciscoEntityQfpMIBCompliances 1 }
+
+ciscoEntityQfpMIBComplianceRev2 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for CISCO-ENTITY-QFP-MIB.
+        This compliance module deprecates
+        ciscoEntityQfpMIBComplianceRev1."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoEntityQfpSystemGroup,
+                        ciscoEntityQfpUtilizationGroup,
+                        ciscoEntityQfpUtilizationAlgoGroup
+                    }
+
+    GROUP           ciscoEntityQfpMemoryResourceGroup
+    DESCRIPTION
+        "This group is optional for the QFP entity, which does not use
+        the listed memory resources."
+
+    GROUP           ciscoEntityQfpMemoryResourceOvrflwGroup
+    DESCRIPTION
+        "This group is optional."
+
+    GROUP           ciscoEntityQfpMemoryHCResourceGroup
+    DESCRIPTION
+        "This group is optional."
+
+    GROUP           ciscoEntityQfpMemoryResNotifGroup
+    DESCRIPTION
+        "This group is optional for the QFP, which does not support the
+        memory resource."
+
+    GROUP           ciscoEntityQfpNotifGroup
+    DESCRIPTION
+        "This group is optional."
+
+    GROUP           ceqfpThroughputGroup
+    DESCRIPTION
+        "This group is optional."
+
+    OBJECT          ceqfpMemoryResRisingThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not mandatory."
+
+    OBJECT          ceqfpMemoryResFallingThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not mandatory."
+    ::= { ciscoEntityQfpMIBCompliances 2 }
+
+ciscoEntityQfpSystemGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceqfpSystemTrafficDirection,
+                        ceqfpSystemState,
+                        ceqfpNumberSystemLoads,
+                        ceqfpSystemLastLoadTime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains collection of QFP system information."
+    ::= { ciscoEntityQfpMIBGroups 1 }
+
+ciscoEntityQfpUtilizationAlgoGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceqfpFiveSecondUtilAlgo,
+                        ceqfpOneMinuteUtilAlgo,
+                        ceqfpFiveMinutesUtilAlgo,
+                        ceqfpSixtyMinutesUtilAlgo
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains collection of QFP utilization algorithm
+        objects."
+    ::= { ciscoEntityQfpMIBGroups 2 }
+
+-- Units of Conformance
+
+ciscoEntityQfpUtilizationGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceqfpUtilInputPriorityPktRate,
+                        ceqfpUtilInputPriorityBitRate,
+                        ceqfpUtilInputNonPriorityPktRate,
+                        ceqfpUtilInputNonPriorityBitRate,
+                        ceqfpUtilInputTotalPktRate,
+                        ceqfpUtilInputTotalBitRate,
+                        ceqfpUtilOutputPriorityPktRate,
+                        ceqfpUtilOutputPriorityBitRate,
+                        ceqfpUtilOutputNonPriorityPktRate,
+                        ceqfpUtilOutputNonPriorityBitRate,
+                        ceqfpUtilOutputTotalPktRate,
+                        ceqfpUtilOutputTotalBitRate,
+                        ceqfpUtilProcessingLoad
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains collection of QFP utilization information."
+    ::= { ciscoEntityQfpMIBGroups 3 }
+
+ciscoEntityQfpMemoryResourceGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceqfpMemoryResTotal,
+                        ceqfpMemoryResInUse,
+                        ceqfpMemoryResFree,
+                        ceqfpMemoryResLowFreeWatermark,
+                        ceqfpMemoryResRisingThreshold,
+                        ceqfpMemoryResFallingThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains collection of QFP memory resource
+        information."
+    ::= { ciscoEntityQfpMIBGroups 4 }
+
+ciscoEntityQfpNotifGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        ceqfpMemoryResRisingThreshNotif,
+                        ceqfpMemoryResFallingThreshNotif,
+                        ceqfpThroughputNotif
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains collection of QFP notifications."
+    ::= { ciscoEntityQfpMIBGroups 5 }
+
+ciscoEntityQfpMemoryResNotifGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceqfpMemoryResThreshNotifEnabled,
+                        ceqfpMemoryResCurrentRisingThresh,
+                        ceqfpMemoryResCurrentFallingThresh
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains memory resource notification control
+        objects."
+    ::= { ciscoEntityQfpMIBGroups 6 }
+
+ciscoEntityQfpMemoryResourceOvrflwGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceqfpMemoryResTotalOvrflw,
+                        ceqfpMemoryResInUseOvrflw,
+                        ceqfpMemoryResFreeOvrflw,
+                        ceqfpMemoryResLowFreeWatermarkOvrflw
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains collection of upper 32-bit QFP memory
+        resource
+        information."
+    ::= { ciscoEntityQfpMIBGroups 7 }
+
+ciscoEntityQfpMemoryHCResourceGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceqfpMemoryHCResTotal,
+                        ceqfpMemoryHCResInUse,
+                        ceqfpMemoryHCResFree,
+                        ceqfpMemoryHCResLowFreeWatermark
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains collection of high capacity(HC) objects of
+        QFP memory resource information."
+    ::= { ciscoEntityQfpMIBGroups 8 }
+
+ceqfpThroughputGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceqfpThroughputLicensedBW,
+                        ceqfpThroughputLevel,
+                        ceqfpThroughputInterval,
+                        ceqfpThroughputThreshold,
+                        ceqfpThroughputAvgRate,
+                        ceqfpThroughputNotifEnabled
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group contains collection of throughput rate information."
+    ::= { ciscoEntityQfpMIBGroups 9 }
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

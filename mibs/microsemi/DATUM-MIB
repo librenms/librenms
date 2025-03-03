@@ -1,0 +1,46 @@
+-- **************************************************************
+-- **************************************************************
+-- +++
+-- Copyright 2000 Datum Austin (Austron)
+-- 
+-- FILENAME:	DATUM.MIB	
+-- PRODUCT:	SSU2000 COMM Module
+-- DESCRIPTION:
+-- 		This file contains the top level node of the Datum-Austin 
+--		private MIB.
+-- 
+-- COMMENTS/CHANGES:
+-- 
+-- 01/11/2001 Jay Wang: Created
+-- 
+-- CURRENT VERSION:
+-- 		Part No		- 12613250-000-2
+-- 		04/16/2001	- A.00
+-- 
+-- +++
+-- **************************************************************
+-- **************************************************************
+
+
+	DATUM-MIB DEFINITIONS ::= BEGIN
+
+
+	IMPORTS
+		enterprises
+		FROM RFC1155-SMI;
+ 
+ 
+	datum		OBJECT IDENTIFIER ::= { enterprises 601 }
+	bancomm		OBJECT IDENTIFIER ::= { datum 1 }
+	timing		OBJECT IDENTIFIER ::= { datum 2 }
+	austron		OBJECT IDENTIFIER ::= { datum 3 }
+	fts			OBJECT IDENTIFIER ::= { datum 4 }
+	efratom		OBJECT IDENTIFIER ::= { datum 5 }
+	experiment	OBJECT IDENTIFIER ::= { datum 99 }
+
+	products	OBJECT IDENTIFIER ::= { austron 1 }
+	ssu2000		OBJECT IDENTIFIER ::= { products 1 }
+	ot21		OBJECT IDENTIFIER ::= { products 2 }
+
+
+	END

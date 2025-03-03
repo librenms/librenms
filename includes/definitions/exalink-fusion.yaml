@@ -1,0 +1,26 @@
+os: exalink-fusion
+text: 'Cisco Nexus 3550 Series'
+type: network
+icon: cisco
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.43296.
+mib_dir: exalink-fusion
+poller_modules:
+    ipmi: false
+    processors: false
+    mempools: false
+    storage: false
+    ospf: false
+    ucd-diskio: false
+    wireless: false
+    applications: false
+
+discovery_modules:
+    processors: false
+    mempools: false
+    storage: false
+    ospf: false
+    ucd-diskio: false
+    cisco-vrf-lite: false
+    wireless: false

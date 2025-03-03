@@ -1,0 +1,3392 @@
+--  ============================================================================
+-- Copyright (C)2011  by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  The MIB module defines MIB objects which include Environment Monitor Unit,
+--				 Analog Environment data, Digital Environment data, Out data and
+--				 Fan data Monitor management MIB interfaces.
+-- Reference:  
+-- Version: V3.53
+-- ============================================================================
+
+	HUAWEI-ENVIRONMENT-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+		
+			huaweiUtility			
+				FROM HUAWEI-MIB			
+			Integer32, BITS, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI			
+			DisplayString, RowStatus			
+				FROM SNMPv2-TC
+		    hwFrameIndex
+		        FROM HUAWEI-DEVICE-MIB; 
+
+
+		hwEnvironment MODULE-IDENTITY
+			LAST-UPDATED "201306170900Z"
+			ORGANIZATION "Fix-Net DepT, Huawei Technologies Co.,Ltd."
+			CONTACT-INFO                                 
+			             "Huawei Industrial Base         
+			              Bantian, Longgang              
+			              Shenzhen 518129                
+			              People's Republic of China     
+			              Website: http://www.huawei.com 
+			              Email: support@huawei.com      
+			             "                               
+			DESCRIPTION 
+				"The MIB module defines MIB objects which include Environment Monitor Unit,
+				Analog Environment data, Digital Environment data, Out data and
+				Fan data Monitor management MIB interfaces.
+				"
+		
+--  Revision history
+			REVISION    "201306170900Z"
+			DESCRIPTION "V3.53, modified the range of hwORRFPowerLowThreshold and hwORRFPowerHighThreshold for Optical-Receiver in hwEnvironmentInfoTable leaf node."
+			                    
+			REVISION    "201305130900Z"
+			DESCRIPTION "V3.52, add hwOpticalReceiverFailTrap, hwOpticalReceiverRecoverTrap, hwOpticalReceiverPowerFailTrap, hwOpticalReceiverPowerRecoverTrap,
+			                    hwOpticalReceiverRFPowerFailTrap, hwOpticalReceiverRFPowerRecoverTrap for Optical-Receiver."
+
+			REVISION    "201301240900Z"
+			DESCRIPTION "V3.51, modified this MIB for supporting Optical-receiver.add hwOpticalreceiverTable (optical-receiver) in hwEnvironmentInfoTable leaf node."
+
+			REVISION    "201211190900Z"
+			DESCRIPTION "V3.50, add Digital alarm type(hard-fault:23) in hwDigAlarmID leaf node."  	
+			
+			REVISION    "201211051000Z"
+			DESCRIPTION "V3.49, add emu type(H801PMU:44) in hwEnvEmuType leaf node."
+			
+			REVISION    "201210251700Z"
+			DESCRIPTION "V3.48, add emu type(LeadAcidBattery:43) in hwEnvEmuType leaf node."
+			
+			REVISION    "201209241700Z"
+			DESCRIPTION "V3.47, add hwEnvEmuTypeName the length is 30 bytes"  
+
+			REVISION    "201207231700Z"
+			DESCRIPTION "V3.46, add emu type(H801VESC:42) in hwEnvEmuType leaf node."
+	
+			REVISION    "201201140900Z"
+			DESCRIPTION "V3.45, add emu type(vpea:41) in hwEnvEmuType leaf node."  
+
+			REVISION    "201111100900Z"
+			DESCRIPTION "V3.44, add emu type(smu:40) in hwEnvEmuType leaf node."  
+			
+			REVISION    "201108080900Z"
+			DESCRIPTION "V3.43, add the leaf of hwEmmDigitalSwitchOpenTrap and hwEmmDigitalSwitchCloseTrap for ESC digital alarm."
+
+			REVISION    "201105120900Z"
+			DESCRIPTION "V3.42, modified the value list of hwFanControlMode. "
+			                    		
+			REVISION    "201103180900Z"
+			DESCRIPTION "V3.41, added emu type(transemu:39) in hwEnvEmuType leaf node. 
+			                    added digital-alarm(DC voltage and Output switch) in hwDigAlarmID leaf node."
+		
+			REVISION    "201101180900Z"
+			DESCRIPTION "V3.40, added hwEmmFanCriticalBlockFaultTrap and hwEmmFanCriticalBlockRecoverTrap for Fan critical block."
+			
+			REVISION    "201011100000Z"
+			DESCRIPTION "V3.39, modified the description of the alarm objects in this MIB file for standard trap.
+			             modified the description of the hwEnvironmentInfoEntry,hwEnvEmuType,hwAnaChannelEntry,
+			             hwDigChannelEntry,hwDigAlarmID,hwControlOutEntry,hwControlOutAdminStatus and hwFanEntry."
+			             
+			REVISION    "201008200900Z"
+			DESCRIPTION "V3.38, modified the description of the objects in this MIB file for standard trap.
+			             Deleted hwEmmDigMainsupplyFaultTrap and hwEmmDigMainsupplyRecoverTrap,which were moved to HUAWEI-POWER-MIB."
+		
+			REVISION    "201007190900Z"
+			DESCRIPTION "V3.37, modified the Objects of the hwEmmEmuHardwareRecoverTrap and hwEmmEmuHardwareFaultTrap for standard trap.
+			             Modified the value of hwFailureCause. 
+			             Modified the description of hwFailureCause, hwFanStatus, hwEnvAutofindNodeId, and hwEnvAutofindEmuType."
+	    
+			REVISION    "201006100900Z"
+			DESCRIPTION "V3.36, added enum elabel(liFeBattery:38) in hwEnvEmuType leaf node for the supporting LiFeBattery. "
+			
+			REVISION    "201005300900Z"
+			DESCRIPTION "V3.35, modified description of hwEnvironmentInfoTable."			
+			
+			REVISION    "201005180900Z"
+			DESCRIPTION "V3.34, modified this MIB for supporting Power3000."
+			
+			REVISION    "201004080900Z"
+			DESCRIPTION "V3.33, modified this MIB for supporting Temperature Heat Exchange Unit"
+			
+			REVISION    "201003270900Z"
+			DESCRIPTION "V3.32, modified this MIB for clearing Simple Tester errors and warnings."
+			
+			REVISION    "201003240900Z"
+			DESCRIPTION "V3.31, modified this MIB for clearing Simple Tester errors and warnings."
+			
+			REVISION    "201002220900Z"
+			DESCRIPTION "V3.30, added hwEnvAutofindNodeId for DT."
+			
+			REVISION    "201002060900Z"
+			DESCRIPTION "V3.29, added hwEnvironTraps for DT."
+			
+			REVISION    "201001290900Z"
+			DESCRIPTION "V3.28, deleted simptester mib compile errors and warnings."
+			
+			REVISION    "200907200900Z"
+			DESCRIPTION "V3.27, added hwEnvEmuPower."
+			        
+			REVISION    "200905050000Z"
+			DESCRIPTION "V3.26, added hwEnvCLEICode."
+			
+			REVISION    "200211290000Z"
+			DESCRIPTION "V1.00, initial version."
+
+			::= { huaweiUtility 1 }
+		
+	
+-- 1.3.6.1.4.1.2011.6.1.1
+		hwEnvironmentMon OBJECT IDENTIFIER ::= { hwEnvironment 1 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.1
+		hwEnvironmentInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwEnvironmentInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of Environment Monitor Unit. 
+				The Environment Monitor Unit is some kind of Environment monitoring device 
+				and is used to monitor many kinds of Environment data. 
+				The maximum number of Environment Monitor Units in one device node is 64.  
+				The index of this table is hwEnvEmuIndex. 
+				hwEnvEmuIndex is the index of one Environment Monitor Unit.
+				"
+			::= { hwEnvironmentMon 1 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.1.1
+		hwEnvironmentInfoEntry OBJECT-TYPE
+			SYNTAX HwEnvironmentInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of Environment Monitor Unit. 
+				The Environment Monitor Unit is some kind of Environment monitoring device 
+				and is used to monitor many kinds of Environment data. 
+				The maximum number of Environment Monitor Units in one device node is 64.  
+				The index of this entry is hwEnvEmuIndex. 
+				hwEnvEmuIndex is the index of one Environment Monitor Unit.
+				"
+			INDEX { hwEnvEmuIndex }
+			::= { hwEnvironmentInfoTable 1 }
+			
+			HwEnvironmentInfoEntry ::=
+				SEQUENCE 
+				{ 
+				hwEnvEmuIndex
+				Integer32,
+				hwEnvEmuType
+				INTEGER,
+				hwEnvBoardName
+				DisplayString,
+				hwEnvCommState
+				INTEGER,
+				hwEnvRowStatus
+				RowStatus,
+				hwEnvVersion
+				DisplayString,
+				hwEnvFrameId
+				Integer32,
+				hwEnvAdminStatus
+				INTEGER,
+				hwEnvSlaveNodeId
+				Integer32,
+				hwEnvComType
+				INTEGER,
+				hwEnvCLEICode
+				OCTET STRING,
+				hwEnvEmuPower
+				Integer32,	
+				hwEnvEmuTypeName
+				DisplayString
+				}
+		
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.1
+		hwEnvEmuIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..2048)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				hwEnvEmuIndex is the index of the Environment monitoring unit,
+				used as the index of hwEnvironmentInfoTable.
+				Range: 0 - 2048
+				"
+			::= { hwEnvironmentInfoEntry 1 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.2
+		hwEnvEmuType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			h302ESC(1),
+			h303ESC(2),
+			h4875(3),
+			h301ESC(4),
+			switch(5),
+			fanEscFrame(6),
+			fanFrame(7),
+			h4845(8),
+			fanFCBFrame(9),
+			fanFDMUFrame(10),
+			h304ESC(11),
+			pwma(12),
+			h561esc(13),
+			h801esc(14),
+			h612pwbp(15),
+			pse158(16),
+			h4805(19),
+			pdu(20),
+			acrmu(21),
+			acfan(22),
+			dcfan(23),
+			rmun1509(24),
+			onps150(25),
+			h801pmix(26),
+			h4875L(27),
+			miniESC(28),
+			h831VESC(29),
+			h601VESC(30),
+			h4830L(31),
+			h801citx(32),
+			h801citd(33),
+			h831ccuh(34),
+			h831pmu(35),
+			pwr3000(36),
+			tcu(37),
+			liFeBattery(38),
+			transemu(39),
+			smu(40),
+			vpea(41),
+			h801VESC(42),
+			leadAcidBattery(43),
+			h801PMU(44),
+			other(255)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Type of the physical monitoring devices associated with the environment monitoring unit. 
+				Options: 
+				1.h302ESC(1)        -Type of the physical monitoring devices is H302ESC
+				2.h303ESC(2)        -Type of the physical monitoring devices is H303ESC
+				3.h4875(3)          -Type of the physical monitoring devices is 4875 power monitoring frame
+				4.h301ESC(4)        -Type of the physical monitoring devices is H301ESC
+				5.switch(5)         -Distribute monitoring frame
+				6.fanEscFrame(6)    -ESC monitoring fan frame
+				7.fanFrame(7)       -monitoring fan frame
+				8.h4845(8)          -4845 power monitoring
+				9.fanFCBFrame(9)    -FCB monitoring fan frame
+				10.fanFDMUFrame(10) -FDMU monitoring fan frame
+				11.h304ESC(11)      -provides the management function of battery 
+				12.pwma(12)         -Type of the physical monitoring devices is pwma
+				13.h561esc(13)      -H561ESC
+				14.h801esc(14)      -H801Esc
+				15.h612pwbp(15)     -H612pwbp  
+				16.pse158(16)       -pse158
+				17.h4805(19)        -h4805
+				18.pdu(20)          -pdu
+				19.acrmu(21)       -ac_rmu
+				20.acfan(22)       -ac_fan
+				21.dcfan(23)       -dc_fan
+				22.rmun1509(24)     -rmun1509
+				23.onps150(25)      -onps150
+				24.h801pmix(26)     -h801pmix
+				25.h4875L(27)       -h4875L
+				26.miniESC(28)      -miniESC
+				27.h831VESC(29)     -H831VESC
+				28.h601VESC(30)     -H601VESC
+				29.h4830L(31)       -h4830L
+				30.h801citx(32)     -h801citx
+				31.h801citd(33)     -h801citd
+				32.h831ccuh(34)     -h831ccuh
+				33.h831pmu(35)      -h831pmu
+				34.pwr3000(36)      -a type of power named power 3000, supports 12 rectifier modules
+				35.tcu(37)          -tcu
+				36.liFeBattery(38)  -liFeBattery
+				37.transemu(39)     -a type of emu for transport environment information to managment center
+				38.smu(40)          -site monitoring unit
+				39.vpea(41)         -vector monitoring unit
+				40.h801VESC(42)     -H801VESC
+				41.h801PMU(44)      -H801PMU	
+				42.other(255)       -other
+				"
+			::= { hwEnvironmentInfoEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.3
+		hwEnvBoardName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Name of the environment monitoring unit.
+				"
+			::= { hwEnvironmentInfoEntry 3 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.4
+		hwEnvCommState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			shutdown(2),
+			fault(3),
+			abnormal(4),
+			config(5)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Status of the communication between the environment monitoring unit and the device. 
+				The environmental condition can be tested only when the communication is normal. 
+				Options: 
+				1.normal(1)   -  indicates that communication state is normal
+				2.shutdown(2) -  indicates that communication state is shutdown
+				3.fault(3)    -  indicates that communication state is fault
+				4.abnormal(4) -  indicates that communication state is abnormal
+				5.config(5)   -  indicates that communication state is config
+				"
+			::= { hwEnvironmentInfoEntry 4 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.5
+		hwEnvRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				RowStatus standard operation. 
+				The creation and deletion operations are supported currently.
+				"
+			::= { hwEnvironmentInfoEntry 5 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.6
+		hwEnvVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Version information of the environment monitoring unit.
+				"
+			::= { hwEnvironmentInfoEntry 6 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.7
+		hwEnvFrameId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				ID of the shelf housing the environment monitoring unit.
+				"
+			::= { hwEnvironmentInfoEntry 7 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.8
+		hwEnvAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			noOperation(1),
+			reset(2),
+			manage(3),
+			unmanage(4),
+			clearsmokealarm(5)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The management status of the monitoring unit. 
+				Options:
+				1.noOperation(1)     -no any operation 
+				2.reset(2)           -reset the monitoring board  
+				3.manage(3)          -manage the monitoring unit   
+				4.unmanage(4)        -undo manage the monitoring unit   
+				5.clearsmokealarm(5) -clear the smoke alarm for miniEsc
+				"
+			::= { hwEnvironmentInfoEntry 8 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.9
+		hwEnvSlaveNodeId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				ID of the slave object that the environment monitoring unit belongs to. 
+				The  environment monitoring unit uses the slave object ID to communicate 
+				with the upstream equipment.
+				"
+			::= { hwEnvironmentInfoEntry 9 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.10
+		hwEnvComType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			unknown(1),
+			serialRS485(2),
+			serialRS232(3),
+			serialRS422(4)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The serial communication protocol type between the monitoring unit 
+				and the upstream equipment.	The protocol types used are as follows:
+				Options: 
+				1.unknown(1)     -The protocol types is unknown     
+				2.serialRS485(2) -The protocol types is serialRS485 
+				3.serialRS232(3) -The protocol types is serialRS232   
+				4.serialRS422(4) -The protocol types is serialRS422     
+				"
+			::= { hwEnvironmentInfoEntry 10 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.11
+		hwEnvCLEICode OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..640))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Environment CLEI Code.
+				"
+			::= { hwEnvironmentInfoEntry 11 }     
+				
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.12
+		hwEnvEmuPower OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Power of the environment monitoring equipment associated with the 
+				environment monitoring unit. Unit: Watt. 
+				"
+			::= { hwEnvironmentInfoEntry 12 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.1.1.13
+		hwEnvEmuTypeName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+	                        Name of the environment type. 
+				"
+			::= { hwEnvironmentInfoEntry 13 }
+						
+-- 1.3.6.1.4.1.2011.6.1.1.2
+		hwAnaChannelTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwAnaChannelEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of the analog parameters monitored. 
+				The indexes of this table are hwEnvEmuIndex or hwAnaChannelIndex.
+				hwEnvEmuIndex is the index of the environment monitoring unit, 
+				and hwAnaChannelIndex is the index of the analog parameter that 
+				is monitored by a monitoring unit.
+				"
+			::= { hwEnvironmentMon 2 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1
+		hwAnaChannelEntry OBJECT-TYPE
+			SYNTAX HwAnaChannelEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of the analog parameters monitored. 
+				The indexes of this entry are hwEnvEmuIndex or hwAnaChannelIndex.
+				hwEnvEmuIndex is the index of the environment monitoring unit, 
+				and hwAnaChannelIndex is the index of the analog parameter that 
+				is monitored by a monitoring unit.
+				"
+			INDEX { hwEnvEmuIndex, hwAnaChannelIndex }
+			::= { hwAnaChannelTable 1 }
+			
+			HwAnaChannelEntry ::=
+				SEQUENCE 
+				{ 
+				hwAnaChannelIndex
+					Integer32,
+				hwAnaName
+					DisplayString,
+				hwAnaType
+					INTEGER,
+				hwAnaMeasureType
+					DisplayString,
+				hwAnaWorkHigh
+					Integer32,
+				hwAnaWorkLow
+					Integer32,
+				hwAnaAlmHigh
+					Integer32,
+				hwAnaAlmLow
+					Integer32,
+				hwAnaCurrentValue
+					Integer32,
+				hwAnaAlarmState
+					INTEGER,
+				hwAnaRowStatus
+					RowStatus,
+				hwAnaAlarmID
+					INTEGER
+				}
+	
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.1
+		hwAnaChannelIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Index of the analog parameter that is monitored by the monitoring unit.
+				Range: 0 - 255
+				"
+			::= { hwAnaChannelEntry 1 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.2
+		hwAnaName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Name of the analog parameter that is monitored by a monitoring unit. 
+				"
+			::= { hwAnaChannelEntry 2 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.3
+		hwAnaType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			invalid(-1),
+			voltage(1),
+			current(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				This object indicates the type of the sensor that is used to test the
+				Analog parameter. 
+				Options:
+				1.invalid(-1) -there is no valid sensor
+				2.voltage(1)  -voltage sensor currently
+				3.current(2)  -current sensor currently
+				"
+			::= { hwAnaChannelEntry 3 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.4
+		hwAnaMeasureType OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				This object indicates the unit of the analog parameter that is tested.
+				"
+			::= { hwAnaChannelEntry 4 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.5
+		hwAnaWorkHigh OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				High limit of the analog normal work
+				"
+			::= { hwAnaChannelEntry 5 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.6
+		hwAnaWorkLow OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Low limit of the analog normal work
+				"
+			::= { hwAnaChannelEntry 6 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.7
+		hwAnaAlmHigh OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				High limit of the analog alarm. The alarm is produced 
+				when the measurement value is higher than this value
+				"
+			::= { hwAnaChannelEntry 7 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.8
+		hwAnaAlmLow OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The low limit of the analog alarm. The alarm is produced
+				when the measurement value is lower than this value.
+				"
+			::= { hwAnaChannelEntry 8 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.9
+		hwAnaCurrentValue OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "milli"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The actual measurement value of the present analog.
+				Unit: milli
+				"
+			::= { hwAnaChannelEntry 9 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.10
+		hwAnaAlarmState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			overWorkHigh(2),
+			belowWorkLow(3),
+			abnormal(4),
+			invalid(-1)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The status of the present monitored.
+				Options:
+				1.normal(1)       -indicates that the measurement value is lower than the set high 
+				                   limit of the alarm, and higher than the low limit				 
+				2.overWorkHigh(2) -indicates that the measurement value is higher than the high limit of the alarm
+				3.belowWorkLow(3) -indicates that the measurement value is lower than the low limit of the alarm
+				4.abnormal(4)     -indicates that the measurement value is outside the scope of limit of the alarm
+				5.invalid(-1)     -indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+				"
+			::= { hwAnaChannelEntry 10 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.11
+		hwAnaRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				RowStatus standard operation. The values 1 and 2 are supported currently. 
+				1 indicates the activation status, and 2 indicates the non-activation status.
+				"
+			::= { hwAnaChannelEntry 11 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.12
+		hwAnaAlarmID OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			temperature(1),
+			humidity(2),
+			voltage(3),
+			current(4),
+			userDefinedAlarm0(100),
+			userDefinedAlarm1(101),
+			userDefinedAlarm2(102),
+			userDefinedAlarm3(103),
+			userDefinedAlarm4(104),
+			userDefinedAlarm5(105),
+			userDefinedAlarm6(106),
+			userDefinedAlarm7(107),
+			userDefinedAlarm8(108),
+			userDefinedAlarm9(109),
+			userDefinedAlarm10(110),
+			userDefinedAlarm11(111),
+			userDefinedAlarm12(112),
+			userDefinedAlarm13(113),
+			userDefinedAlarm14(114),
+			userDefinedAlarm15(115),
+			default(65535)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+		        "
+		        Analog alarm definition.
+		        Options:
+		        1.temperature(1)           -temperature alarm
+		        2.humidity(2)              -humidity alarm
+		        3.voltage(3)               -voltage alarm
+		        4.current(4)               -current alarm
+		        5.userDefinedAlarm0(100)   -analog user-defined alarm 0        
+		        6.userDefinedAlarm1(101)   -analog user-defined alarm 1                                            
+		        7.userDefinedAlarm2(102)   -analog user-defined alarm 2                                            
+		        8.userDefinedAlarm3(103)   -analog user-defined alarm 3                                            
+		        9.userDefinedAlarm4(104)  -analog user-defined alarm 4                                            
+		        10.userDefinedAlarm5(105)  -analog user-defined alarm 5                                            
+		        11.userDefinedAlarm6(106)  -analog user-defined alarm 6                                            
+		        12.userDefinedAlarm7(107)  -analog user-defined alarm 7                                            
+		        13.userDefinedAlarm8(108)  -analog user-defined alarm 8                                            
+		        14.userDefinedAlarm9(109)  -analog user-defined alarm 9                                            
+		        15.userDefinedAlarm10(110) -analog user-defined alarm 10                                          
+		        16.userDefinedAlarm11(111) -analog user-defined alarm 11                                          
+		        17.userDefinedAlarm12(112) -analog user-defined alarm 12                                          
+		        18.userDefinedAlarm13(113) -analog user-defined alarm 13                                          
+		        19.userDefinedAlarm14(114) -analog user-defined alarm 14                                          
+		        20.userDefinedAlarm15(115) -analog user-defined alarm 15                                          
+		        21.default(65535) -default analog alarm
+		        "
+			::= { hwAnaChannelEntry 12 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.3
+		hwDigChannelTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwDigChannelEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of the digital parameters monitored. 
+				The indexes of this table are hwEnvEmuIndex and hwDigChannelIndex.
+				hwEnvEmuIndex is the index of the environment monitoring unit, 
+				and hwDigChannelIndex is the index of the digital parameter that
+				is monitored by a monitoring unit.
+				"
+			::= { hwEnvironmentMon 3 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.3.1
+		hwDigChannelEntry OBJECT-TYPE
+			SYNTAX HwDigChannelEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of the digital parameters monitored. 
+				The indexes of this entry are hwEnvEmuIndex and hwDigChannelIndex.
+				hwEnvEmuIndex is the index of the environment monitoring unit, 
+				and hwDigChannelIndex is the index of the digital parameter that
+				is monitored by a monitoring unit.
+				"
+			INDEX { hwEnvEmuIndex, hwDigChannelIndex }
+			::= { hwDigChannelTable 1 }
+			
+			HwDigChannelEntry ::=
+				SEQUENCE 
+				{ 
+				hwDigChannelIndex
+					Integer32,
+				hwDigChannelName
+					DisplayString,
+				hwAlmCondition
+					INTEGER,
+				hwDigChannelState
+					INTEGER,
+				hwDigRowStatus
+					RowStatus,
+				hwDigAlarmID
+					INTEGER
+				}
+	
+-- 1.3.6.1.4.1.2011.6.1.1.3.1.1
+		hwDigChannelIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Index of the digital parameter that is monitored by a monitoring unit.
+				Range: 0 - 255
+				"
+			::= { hwDigChannelEntry 1 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.3.1.2
+		hwDigChannelName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Name of the digital parameter that is monitored by a monitoring unit.
+				"
+			::= { hwDigChannelEntry 2 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.3.1.3
+		hwAlmCondition OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			lowLevelAlarm(1),
+			highLevelAlarm(2),
+			invalid(-1)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Alarm conditions. 
+				Options:
+				1.lowLevelAlarm(1)  -refers to the alarm produced when the digital sensor detects the low level
+				2.highLevelAlarm(2) -refers to the alarm produced when the digital sensor detects the high level
+				3.invalid(-1)       -indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+				"
+			::= { hwDigChannelEntry 3 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.3.1.4
+		hwDigChannelState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			alarm(2),
+			invalid(-1)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The status of the present monitored digital sensor
+				Options:
+				1.normal(1)   -indicates that the digital sensor works normally
+				2.alarm(2)    -indicates that the digital sensor produces the alarm signal		
+				3.invalid(-1) -indicates that the device can not get the value, e.g. the EMU does not support this operation, or the EMU state is abnormal
+				"
+			::= { hwDigChannelEntry 4 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.3.1.5
+		hwDigRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				RowStatus standard operation. The values 1 and 2 are supported currently. 
+				1 indicates the activation status, and 2 indicates the non-activation status.
+				"
+			::= { hwDigChannelEntry 5 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.3.1.6
+		hwDigAlarmID OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			acvoltage(1),
+			acswitch(2),
+			batteryvoltage(3),
+			batteryfuse(4),
+			loadfuse(5),
+			rectifier(6),
+			dcpower(7),
+			cupboarddoor(8),
+			roomdoor(9),
+			window(10),
+			thief(11),
+			wiring(12),
+			fan(13),
+			fire(14),
+			fog(15),
+			water(16),
+			diesel(17),
+			smell(18),
+			aircondition(19),
+			arrester(20),
+			dcvoltage(21),
+			outputswitch(22),
+			hard-fault(23),
+			userDefinedAlarm0(100),
+			userDefinedAlarm1(101),
+			userDefinedAlarm2(102),
+			userDefinedAlarm3(103),
+			userDefinedAlarm4(104),
+			userDefinedAlarm5(105),
+			userDefinedAlarm6(106),
+			userDefinedAlarm7(107),
+			userDefinedAlarm8(108),
+			userDefinedAlarm9(109),
+			userDefinedAlarm10(110),
+			userDefinedAlarm11(111),
+			userDefinedAlarm12(112),
+			userDefinedAlarm13(113),
+			userDefinedAlarm14(114),
+			userDefinedAlarm15(115),
+			userDefinedAlarm16(116),
+			userDefinedAlarm17(117),
+			userDefinedAlarm18(118),
+			userDefinedAlarm19(119),
+			userDefinedAlarm20(120),
+			userDefinedAlarm21(121),
+			userDefinedAlarm22(122),
+			userDefinedAlarm23(123),
+			userDefinedAlarm24(124),
+			userDefinedAlarm25(125),
+			userDefinedAlarm26(126),
+			userDefinedAlarm27(127),
+			userDefinedAlarm28(128),
+			userDefinedAlarm29(129),
+			userDefinedAlarm30(130),
+			userDefinedAlarm31(131),
+			default(65535)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+		        "
+		        Digital alarm definition.
+		        Options:
+		        1.acvoltage(1)            -ac voltage alarm                 
+		        2.acswitch(2)             -ac switch alarm                  
+		        3.batteryvoltage(3)       -battery voltage alarm            
+		        4.batteryfuse(4)          -battery fuse alarm               
+		        5.loadfuse(5)             -load fuse alarm                  
+		        6.rectifier(6)            -rectifier alarm                  
+		        7.dcpower(7)              -dc power alarm                   
+		        8.cupboarddoor(8)         -cupboard alarm                   
+		        9.roomdoor(9)             -room door alarm                  
+		        10.window(10)             -window alarm                     
+		        11.thief(11)              -thief alarm                      
+		        12.wiring(12)             -wiring alarm                     
+		        13.fan(13)                -fan alarm                        
+		        14.fire(14)               -fire alarm                       
+		        15.fog(15)                -fog alarm                        
+		        16.water(16)              -water alarm                      
+		        17.diesel(17)             -diesel alarm                     
+		        18.smell(18)              -smell alarm                      
+		        19.aircondition(19)       -air-condition alarm              
+		        20.arrester(20)           -arrester alarm 
+		        21.dcvoltage(21)          -dc voltage
+		        22.outputswitch(22)       -output swith       
+		        23.hard-fault(23)         -hard-fault       
+		        24.userDefinedAlarm0(100)  -digital user-defined alarm 0     
+		        25.userDefinedAlarm1(101)  -digital user-defined alarm 1     
+		        26.userDefinedAlarm2(102)  -digital user-defined alarm 2     
+		        27.userDefinedAlarm3(103)  -digital user-defined alarm 3     
+		        28.userDefinedAlarm4(104)  -digital user-defined alarm 4     
+		        29.userDefinedAlarm5(105)  -digital user-defined alarm 5     
+		        30.userDefinedAlarm6(106)  -digital user-defined alarm 6     
+		        31.userDefinedAlarm7(107)  -digital user-defined alarm 7     
+		        32.userDefinedAlarm8(108)  -digital user-defined alarm 8     
+		        33.userDefinedAlarm9(109)  -digital user-defined alarm 9     
+		        34.userDefinedAlarm10(110) -digital user-defined alarm 10    
+		        35.userDefinedAlarm11(111) -digital user-defined alarm 11    
+		        36.userDefinedAlarm12(112) -digital user-defined alarm 12    
+		        37.userDefinedAlarm13(113) -digital user-defined alarm 13    
+		        38.userDefinedAlarm14(114) -digital user-defined alarm 14    
+		        39.userDefinedAlarm15(115) -digital user-defined alarm 15    
+		        40.userDefinedAlarm16(116) -digital user-defined alarm 16    
+		        41.userDefinedAlarm17(117) -digital user-defined alarm 17    
+		        42.userDefinedAlarm18(118) -digital user-defined alarm 18    
+		        43.userDefinedAlarm19(119) -digital user-defined alarm 19    
+		        44.userDefinedAlarm20(120) -digital user-defined alarm 20    
+		        45.userDefinedAlarm21(121) -digital user-defined alarm 21    
+		        46.userDefinedAlarm22(122) -digital user-defined alarm 22    
+		        47.userDefinedAlarm23(123) -digital user-defined alarm 23    
+		        48.userDefinedAlarm24(124) -digital user-defined alarm 24    
+		        49.userDefinedAlarm25(125) -digital user-defined alarm 25    
+		        50.userDefinedAlarm26(126) -digital user-defined alarm 26    
+		        51.userDefinedAlarm27(127) -digital user-defined alarm 27    
+		        52.userDefinedAlarm28(128) -digital user-defined alarm 28    
+		        53.userDefinedAlarm29(129) -digital user-defined alarm 29    
+		        54.userDefinedAlarm30(130) -digital user-defined alarm 30    
+		        55.userDefinedAlarm31(131) -digital user-defined alarm 31    
+		        56.default(65535)          -digital alarm                   
+		        "
+			::= { hwDigChannelEntry 6 }
+			      
+-- 1.3.6.1.4.1.2011.6.1.1.4
+		hwControlOutTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwControlOutEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"   
+				Monitored digital out table.
+				This table indicates information about whether digital parameter is monitored.
+				The indexes of this table are hwEnvEmuIndex and hwControlOutIndex. 
+				hwEnvEmuIndex is the index of the monitoring unit, 
+				and hwControlOutIndex is the index of the digital out table monitored in the monitoring unit.
+				"   
+			::= { hwEnvironmentMon 4 }
+			      
+-- 1.3.6.1.4.1.2011.6.1.1.4.1
+		hwControlOutEntry OBJECT-TYPE
+			SYNTAX HwControlOutEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"   
+				Monitored digital out table.
+				This table indicates information about whether digital parameter is monitored.
+				The indexes of this entry are hwEnvEmuIndex and hwControlOutIndex. 
+				hwEnvEmuIndex is the index of the monitoring unit, 
+				and hwControlOutIndex is the index of the digital out table monitored in the monitoring unit.
+				"   
+			INDEX { hwEnvEmuIndex, hwControlOutIndex }
+			::= { hwControlOutTable 1 }
+			      
+			HwControlOutEntry ::=
+				SEQUENCE 
+				{   
+				hwControlOutIndex
+					Integer32,
+				hwControlOutName
+					DisplayString,
+				hwControlOutAdminStatus
+					INTEGER,
+				hwControlOutRowStatus
+					RowStatus
+				}   
+	          
+-- 1.3.6.1.4.1.2011.6.1.1.4.1.1
+		hwControlOutIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Index of the digital out table monitored in the monitoring unit 
+				Range: 0 - 255
+				"
+			::= { hwControlOutEntry 1 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.4.1.2
+		hwControlOutName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Name of the monitored digital out table
+				"
+			::= { hwControlOutEntry 2 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.4.1.3
+		hwControlOutAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			on(1),
+			off(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Control Out administration: executes the on/off operation. 
+				Options:
+				1. on(1)  - trun on  
+				2. off(2) - trun off
+				"
+			::= { hwControlOutEntry 3 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.4.1.4
+		hwControlOutRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				RowStatus standard operation. The values 1 and 2 are supported currently. 
+				1 indicates the activation status, and 2 indicates the non-activation status.
+				"
+			::= { hwControlOutEntry 4 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5
+		hwFanTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwFanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of fan monitoring. 
+				The index of this table is hwEnvEmuIndex that comes from hwEnvironmentInfoTable. 
+				hwEnvEmuIndex is the index of the monitoring unit whose monitoring type is fan.
+				"
+			::= { hwEnvironmentMon 5 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5.1
+		hwFanEntry OBJECT-TYPE
+			SYNTAX HwFanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of fan monitoring. 
+				The index of this entry is hwEnvEmuIndex that comes from hwEnvironmentInfoTable. 
+				hwEnvEmuIndex is the index of the monitoring unit whose monitoring type is fan.
+				"
+			INDEX { hwEnvEmuIndex }
+			::= { hwFanTable 1 }
+			
+			HwFanEntry ::=
+				SEQUENCE 
+				{ 
+				hwFanName
+					DisplayString,
+				hwFanControlMode
+					INTEGER,
+				hwFanControlState
+					BITS,
+				hwESCFanTempAutoOn
+					Integer32,
+				hwESCFanTempAutoOff
+					Integer32,
+				hwFanRowStatus
+					RowStatus,
+				hwCurrentTemp
+					Integer32,
+				hwFanSpeedMode
+					INTEGER,
+				hwFanSpeed
+					Integer32,
+				hwFanTypeDescription
+					DisplayString
+				}
+	
+-- 1.3.6.1.4.1.2011.6.1.1.5.1.1
+		hwFanName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Fan name
+				"
+			::= { hwFanEntry 1 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5.1.2
+		hwFanControlMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			manual(1),
+			emuAuto(2),
+			fixed(3),
+			mainboardAuto(4)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The fan control modes of the fan frame.
+				Options: 
+				1.manual(1)        -indicates that the fan is always on, and the fan speed can be manually adjusted
+				2.emuAuto(2)       -indicates that the fan is in the automatic mode, and can be automatically 
+				                    controlled depending on the temperature of the fan
+				3.fixed(3)         -indicates that the fan is in the fixed mode, and adjusting its speed is not allowed                    
+				4.mainboardAuto(4) -indicates that the fan is in the automatic mode, and can be automatically 
+				                    controlled depending on the temperature of the boards in the frame 
+				"
+			::= { hwFanEntry 2 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5.1.3
+		hwFanControlState OBJECT-TYPE
+			SYNTAX BITS
+			{
+			fan1(0),
+			fan2(1),
+			fan3(2),
+			fan4(3),
+			fan5(4),
+			fan6(5)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				" 
+				For ESC fan, all should be checked to turn on the fan, 
+				while all should not be checked to turn off the fan.
+				Options:
+				1.fan1(0) -indicates that the first fan needs to be opened
+				2.fan2(1) -indicates that the second fan needs to be opened
+				3.fan3(2) -indicates that the third fan needs to be opened
+				4.fan4(3) -indicates that the fourth fan needs to be opened
+				5.fan5(4) -indicates that the fifth fan needs to be opened
+				6.fan6(5) -indicates that the sixth fan needs to be opened			
+				"
+			::= { hwFanEntry 3 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5.1.4
+		hwESCFanTempAutoOn OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The fan temperature set, in unit of centigrade. 
+				The MIB object only functions for the fan monitoring board of ESC and 
+				is not applicable to the type of fan monitoring board.
+				Only when the fan control mode of the fan frame is hwFanControl =auto (3), 
+				the temperature control mode will take effect. 
+				When detecting the environment temperature higher than the set value,
+				the fan will be on (or increase its rotation).
+				"
+			::= { hwFanEntry 4 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5.1.5
+		hwESCFanTempAutoOff OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The fan temperature set, in unit of centigrade. 
+				The MIB object only functions for the fan monitoring board of ESC and 
+				is not applicable to the type of fan monitoring board. 
+				Only when the fan control mode of the fan frame is hwFanControl =auto (3),
+				the temperature control mode will take effect. 
+				When detecting the environment temperature is lower than the set value, 
+				the fan will be turned off (decrease its rotation).
+				
+				"
+			::= { hwFanEntry 5 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5.1.6
+		hwFanRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				RowStatus standard operation.
+				"
+			::= { hwFanEntry 6 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5.1.7
+		hwCurrentTemp OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The present temperature value, in unit of cent-centigrade
+				"
+			::= { hwFanEntry 7 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5.1.8
+		hwFanSpeedMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			continue(1),
+			discontinue(2),
+			percent(3),
+			invalid(-1)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The adjusting rotation mode of the fan.
+				Options:
+				1.continue(1)    -continuous control
+				2.discontinue(2) -discrete control
+				3.percent(3)     -duty ratio control
+				4.invalid(-1)    -indicates that the device can not get the value, e.g. the EMU does not support 
+				                  this operation, or the EMU state is abnormal
+				"
+			::= { hwFanEntry 8 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5.1.9
+		hwFanSpeed OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				When hwFanSpeedMode is the continue mode, 0 indicates the present wind speed +1, while 1 indicates the present wind speed -1.
+				When hwFanSpeedMode is discontinuous, 0 indicates fixed high speed, while 1 indicates fixed low speed.
+				When hwFanSpeedMode is percent,	the value delivered by the main control is the percent value, ranging from 35 to 100, used to initialize the rotation of fan for various device main controls.
+				invalid(-1) indicates that the fan tray does not work normally. For example, the fan tray is disconnected from the control board, or some of the fans in the fan tray are blocked.
+				"
+			::= { hwFanEntry 9 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.5.1.10
+		hwFanTypeDescription OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Fan Type Description. The values 1 and 2 are supported currently. 
+				1 indicates the activation status, and 2 indicates the non-activation status.
+				"
+			::= { hwFanEntry 10 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.6
+		hwTcuTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwTcuEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of temperature control unit. 
+				The index of this table is hwEnvEmuIndex that comes from hwEnvironmentInfoTable. 
+				hwEnvEmuIndex is the index of the monitoring unit whose monitoring type is temperature control unit.
+				"
+			::= { hwEnvironmentMon 6 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.6.1
+		hwTcuEntry OBJECT-TYPE
+			SYNTAX HwTcuEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of temperature control unit. 
+				The index of this entry is hwEnvEmuIndex that comes from hwEnvironmentInfoTable. 
+				hwEnvEmuIndex is the index of the monitoring unit whose monitoring type is temperature control unit.
+				"
+			INDEX { hwEnvEmuIndex }
+			::= { hwTcuTable 1 }
+			
+			HwTcuEntry ::=
+				SEQUENCE 
+				{ 
+				hwTcuHeatExchangerType
+					DisplayString,
+				hwTcuExternalFanRev
+					Integer32,
+				hwTcuInternalFanRev
+					Integer32,
+				hwTcuStartHeatTemp
+					Integer32,
+				hwTcuStopHeatTemp
+					Integer32
+				}
+				 
+-- 1.3.6.1.4.1.2011.6.1.1.6.1.1
+		hwTcuHeatExchangerType OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Heat Exchanger Type Description.
+				"
+			::= { hwTcuEntry 1 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.6.1.2
+		hwTcuExternalFanRev OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The rev of Heat Exchanger outer fan, in unit of RMP (rotate per minite)
+				"
+			::= { hwTcuEntry 2 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.6.1.3
+		hwTcuInternalFanRev OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The rev of Heat Exchanger inner fan, in unit of RMP (rotate per minite)
+				"
+			::= { hwTcuEntry 3 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.6.1.4
+		hwTcuStartHeatTemp OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The temperature of Heat Exchanger starts to heat up, in unit of Celsius
+				"
+			::= { hwTcuEntry 4 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.6.1.5
+		hwTcuStopHeatTemp OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The temperature of Heat Exchanger stops heating, in unit of Celsius
+				"
+			::= { hwTcuEntry 5 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7
+		hwOpticalreceiverTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwOpticalreceiverEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of optical receiver unit. 
+				The index of this table is  hwFrameIndex that comes from hwFrameTable. 
+				 hwFrameIndex is the index of the optical receiver unit whose optical receiver type is optical receiver unit.
+				"
+			::= { hwEnvironmentMon 7 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1
+		hwOpticalreceiverEntry OBJECT-TYPE
+			SYNTAX HwOpticalreceiverEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Information table of optical receiver unit. 
+				interface optical receiver config mode.
+				"
+			INDEX { hwFrameIndex }
+			::= { hwOpticalreceiverTable 1 }
+			
+			HwOpticalreceiverEntry ::=
+				SEQUENCE 
+				{ 
+				hwORCOMState
+					INTEGER,
+				hwORModelNumber
+					DisplayString,
+				hwORHardwareVer
+					DisplayString,
+				hwORSoftwareVer 
+					DisplayString,
+				hwORProductDate
+					OCTET STRING,
+			  hwOROpticalPowerValue 
+					Integer32,
+			  hwOROpticalPowerAlarmState 
+					INTEGER,
+				hwOROpticalPowerLowThreshold 
+					Integer32,
+				hwOROpticalPowerHighThreshold 
+					Integer32,
+				hwOROpticalAGCStart 
+					Integer32,
+			  hwORRFPowerValue 
+					Integer32,
+				hwORRFPowerAlarmState 
+					INTEGER,
+				hwORRFPowerLowThreshold 
+					Integer32,
+				hwORRFPowerHighThreshold 
+					Integer32,
+				hwORRFAttValue 
+					Integer32,
+			  hwORRFSwitch 
+					INTEGER,
+				hwORBarcode 
+					DisplayString,
+				hwOR5VVoltage
+				  Integer32,
+				hwOR24VVoltage
+				  Integer32,
+				hwORAGCRange
+				  DisplayString
+				}
+				 
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.1
+		hwORCOMState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			online(1),
+			offline(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The state of Optical receiver
+				The Optical receiver can be used only when it is online.
+				Options: 
+				1.online(1)   -  indicates that Optical state is online
+				2.offline(2)  -  indicates that Optical state is offline
+				"
+			::= { hwOpticalreceiverEntry 1 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.2
+		hwORModelNumber OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The model number of Optical receiver
+				"
+			::= { hwOpticalreceiverEntry 2 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.3
+		hwORHardwareVer OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The hard version of Optical receiver
+				"
+			::= { hwOpticalreceiverEntry 3 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.4
+		hwORSoftwareVer OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The software version of Optical receiver
+				"
+			::= { hwOpticalreceiverEntry 4 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.5
+		hwORProductDate OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (4))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The product date of Optical receiver
+				field  octets  contents                  range
+ 				-----  ------  --------                  -----
+ 	  			1        1-2   year                      0..65536
+ 	  			2         3    month                     1..12
+ 	  			3         4    day                       1..31
+				"
+			::= { hwOpticalreceiverEntry 5 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.6
+		hwOROpticalPowerValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The optical power value of Optical receiver
+				Its unit is dbm,its real accuracy is 0.01.
+				SNMP uses it which has been enlarged 100 by host.
+				user uses it which has been lessened 100 by SNMP.
+				"
+			::= { hwOpticalreceiverEntry 6 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.7
+		hwOROpticalPowerAlarmState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			low(2),
+			high(3)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The optical power alarm state of Optical receiver
+				The Optical receiver can be used only when it is normal.
+				Options: 
+				1.normal(1)   -  indicates that Optical power alarm state is normal
+				2.low(2)      -  indicates that Optical power alarm state is low
+				3.high(3)     -  indicates that Optical power alarm state is high
+				"
+			::= { hwOpticalreceiverEntry 7 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.8
+		hwOROpticalPowerLowThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The optical power low threshold of Optical receiver
+				Its unit is dbm,its real accuracy is 0.01.
+				SNMP uses it which has been enlarged 100 by host.
+				user uses it which has been lessened 100 by SNMP.
+				Its real range is -10dbm~3dbm,mib range is -1000dbm~300dbm.
+				"
+			::= { hwOpticalreceiverEntry 8 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.9
+		hwOROpticalPowerHighThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The optical power high threshold of Optical receiver
+				Its unit is dbm,its real accuracy is 0.01.
+				SNMP uses it which has been enlarged 100 by host.
+				user uses it which has been lessened 100 by SNMP.
+				Its real range is -10dbm~3dbm,mib range is -1000dbm~300dbm.
+				"
+			::= { hwOpticalreceiverEntry 9 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.10
+		hwOROpticalAGCStart OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The optical AGC start of Optical receiver
+				Its unit is dBm,its real range is -4dBm~3dBm.
+				"
+			::= { hwOpticalreceiverEntry 10 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.11
+		hwORRFPowerValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The RF power value of Optical receiver
+				Its unit is dBuV,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				"
+			::= { hwOpticalreceiverEntry 11 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.12
+		hwORRFPowerAlarmState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			low(2),
+			high(3)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The RF power alarm state of Optical receiver
+				The Optical receiver can be used only when it is normal.
+				Options: 
+				1.normal(1)   -  indicates that RF power alarm state is normal
+				2.low(2)      -  indicates that RF power alarm state is low
+				3.high(3)     -  indicates that RF power alarm state is high
+				"
+			::= { hwOpticalreceiverEntry 12 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.13
+		hwORRFPowerLowThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The RF power low threshold of Optical receiver
+				Its unit is dBuV,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				Its real range is 85dBuV~130dBuV,mib range is 850dBuV~1300dBuV.
+				"
+			::= { hwOpticalreceiverEntry 13 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.14
+		hwORRFPowerHighThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The RF power high threshold of Optical receiver
+				Its unit is dBuV,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				Its real range is 85dBuV~130dBuV,mib range is 850dBuV~1300dBuV.
+				"
+			::= { hwOpticalreceiverEntry 14 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.15
+		hwORRFAttValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The RF ATT value of Optical receiver
+				Its unit is db.
+				Its range is 0db~20db.
+				"
+			::= { hwOpticalreceiverEntry 15 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.16
+		hwORRFSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			off(1),
+			on(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The RF switch of Optical receiver
+				The Optical receiver can be used only when it is on.
+				Options: 
+				1.off(1)   -  indicates that RF Switch state is off
+				2.on(2)    -  indicates that RF Switch state is on
+				"
+			::= { hwOpticalreceiverEntry 16 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.17
+		hwORBarcode OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The barcode of Optical receiver 
+				"
+			::= { hwOpticalreceiverEntry 17 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.18
+		hwOR5VVoltage OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The current input voltage of Optical receiver.
+				Its unit is V,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				+5V is positive voltage.
+				"
+			::= { hwOpticalreceiverEntry 18 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.19
+		hwOR24VVoltage OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The current input voltage of Optical receiver.
+				Its unit is V,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				+24V is positive voltage.
+				"
+			::= { hwOpticalreceiverEntry 19 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.20
+		hwORAGCRange OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Start value of the AGC range for optical paths of Optical receiver.
+				"
+			::= { hwOpticalreceiverEntry 20 }
+							
+-- 1.3.6.1.4.1.2011.6.1.2
+		snmpTrapsDef OBJECT IDENTIFIER ::= { hwEnvironment 2 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0
+		emmsnmpTraps OBJECT IDENTIFIER ::= { snmpTrapsDef 0 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.1
+		envCommAlarm NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				"
+				The communication alarm of environment monitoring board, 
+				reporting the environment monitoring unit ID.
+				This trap message is reported when the communication between the emu and control board is fault.
+				"
+			::= { emmsnmpTraps 1 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.2
+		envCommAlarmResume NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				"
+				The communication alarm recovery of the environment monitoring,
+				reporting the environment monitoring unit ID.    
+				This trap message is reported when the communication between the emu and control board resumes.        
+				"
+			::= { emmsnmpTraps 2 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.3
+		anaFaultAlarm NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex, 
+			hwAnaChannelIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				" 
+				The alarm recovery of the analog exception, 
+				reporting the environment monitoring unit ID.  
+				This trap message is reported when there is an analog exception in emu. 
+				"
+			::= { emmsnmpTraps 3 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.4
+		anaFaultAlarmResume NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex, 
+			hwAnaChannelIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				" 
+				The alarm recovery of the analog exception, 
+				reporting the environment monitoring unit ID.    
+				This trap message is reported when the analog exception recovery in emu.    
+				"
+			::= { emmsnmpTraps 4 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.5
+		anaTooHighAlarm NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex, 
+			hwAnaChannelIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				" 
+				The alarm of too high an analog, reporting the environment
+				monitoring unit ID and the channel ID of the analog sensor.		
+				This trap message is reported when an analog value is too high. 				
+				"
+			::= { emmsnmpTraps 5 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.6
+		anaTooHighAlarmResume NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex, 
+			hwAnaChannelIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				" 
+				The alarm of too high analog resume, 
+				reporting the environment monitoring unit ID.   
+				This trap message is reported when an analog value 
+				returns to normal range from the high value. 			
+				"
+			::= { emmsnmpTraps 6 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.7
+		anaTooLowAlarm NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex, 
+			hwAnaChannelIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				" 
+				The alarm of too low an analog, reporting the environment
+				monitoring unit ID and the channel ID of the analog sensor.  
+				This trap message is reported when an analog value is too low. 			
+				"
+			::= { emmsnmpTraps 7 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.8
+		anaTooLowAlarmResume NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex, 
+			hwAnaChannelIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				" 
+				The alarm of too low an analog, reporting the 
+				environment monitoring unit ID.  
+				This trap message is reported when an analog value
+				returns to normal range from the low value. 			
+				"
+			::= { emmsnmpTraps 8 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.9
+		controlAlarm NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex, 
+			hwControlOutIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				"
+				The control alarm, reporting the environment monitoring unit ID.
+				This trap message is reported when emu control operation fails.		
+				"
+			::= { emmsnmpTraps 9 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.10
+		controlAlarmResume NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex, 
+			hwControlOutIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				"
+				The control alarm, reporting the environment monitoring unit ID.	
+				This trap message is reported when emu control operation resumes.		
+				"
+			::= { emmsnmpTraps 10 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.11
+		digtalMeasureAlarm NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex, 
+			hwDigChannelIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				" 
+				The digital measure alarm, reporting the environment 
+				monitoring unit ID and the channel ID of the digital sensor.
+				This trap message is reported when emu measure operation fails.	
+				"
+			::= { emmsnmpTraps 11 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.12
+		digtaleasureAlarmResume NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex, 
+			hwDigChannelIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				" 
+				The digital measure alarm recovery, reporting the environment
+				monitoring unit ID and the channel ID of the digital sensor.  
+				This trap message is reported when emu measure operation resumes.	 
+				"
+			::= { emmsnmpTraps 12 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.13
+		fanExistsAlarm NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				"
+				Fan nonexistance alarm.      
+				This trap message is reported when there is no fan device connected to control board.	  				
+				"
+			::= { emmsnmpTraps 13 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.14
+		fanExistsAlarmResume NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				" 
+				Fan nonexistance alarm recovery.     
+				This trap message is reported when there is a fan device connected to control board.	  
+				"
+			::= { emmsnmpTraps 14 }
+		
+-- 1.3.6.1.4.1.2011.6.1.2.0.15
+		fanRunStateAlarm NOTIFICATION-TYPE
+			OBJECTS 
+			{ 
+			hwEnvEmuIndex 
+			}
+			STATUS current
+			DESCRIPTION 
+				" 
+				Fan running status alarm.
+				This trap message is reported when the fan run state gets abnormal.	  
+				"
+			::= { emmsnmpTraps 15 }
+		
+-- 1.3.6.1.4.1.2011.6.1.3
+		envConformance OBJECT IDENTIFIER ::= { hwEnvironment 3 }
+		
+-- 1.3.6.1.4.1.2011.6.1.3.1
+		envCompliances OBJECT IDENTIFIER ::= { envConformance 1 }
+		
+-- 1.3.6.1.4.1.2011.6.1.3.2
+		envGroups OBJECT IDENTIFIER ::= { envConformance 2 }
+
+-- 1.3.6.1.4.1.2011.6.1.4
+		hwEnvironTraps OBJECT IDENTIFIER ::= { hwEnvironment 4 }
+		
+-- 1.3.6.1.4.1.2011.6.1.4.1
+		hwEnvironCommonTraps OBJECT IDENTIFIER ::= { hwEnvironTraps 1 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.1.0
+		hwEnvironCommonTrapsPrefix OBJECT IDENTIFIER ::= { hwEnvironCommonTraps 0 }
+                 
+-- 1.3.6.1.4.1.2011.6.1.4.1.1
+		hwEmmEmuAutofindTrap NOTIFICATION-TYPE
+			OBJECTS     
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwEnvEmuType
+			}
+			STATUS      current
+			DESCRIPTION    
+			    "The agent generates this trap when a new
+			    EMU autofind.
+			    "
+			::= { hwEnvironCommonTrapsPrefix 1 }	
+		
+					
+-- 1.3.6.1.4.1.2011.6.1.4.2
+		hwEnvironAlarmTraps OBJECT IDENTIFIER ::= { hwEnvironTraps 2 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1
+		hwEnvironEmuAlarmTraps OBJECT IDENTIFIER ::= { hwEnvironAlarmTraps  1 }
+		
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0
+		hwEnvironEmuAlarmTrapsPrefix OBJECT IDENTIFIER ::= { hwEnvironEmuAlarmTraps  0 }
+		
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.1
+		hwEmmEmufailTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwEnvEmuType,
+			hwEnvBoardName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 communication of the EMU with the host
+			 is abnormal.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 1 }			
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.2
+		hwEmmEmuRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwEnvEmuType,
+			hwEnvBoardName
+			}
+			STATUS      current
+			DESCRIPTION    
+			"The agent generates this trap when the
+			communication of the EMU with the host 
+			recovers.
+			"
+			::= { hwEnvironEmuAlarmTrapsPrefix 2 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.3
+		hwEmmEmuHardwareFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+		        hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 a Hardware exception occurs.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 3 }
+		    
+		    		
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.4
+		hwEmmEmuHardwareRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+		        hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 a Hardware exception Recover
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 4 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.5	
+		hwEmmEmuAutofindFailTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvAutofindNodeId,
+			hwEnvAutofindEmuType,
+			hwEnvAutofindBoardName,
+			hwFailureCause
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 emu autofind fail.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 5 }	
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.6
+		hwEmmEmuFanStateTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwFanStatus
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the fan is not configured or fails.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 6 }			    	    	    		
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.7
+		hwOpticalReceiverFailTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 communication of the OpticalReceiver with the host
+			 is abnormal.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 7 }			    	    	    		
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.8
+		hwOpticalReceiverRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			"The agent generates this trap when the
+			communication of the OpticalReceiver with the host 
+			recovers.
+			"
+			::= { hwEnvironEmuAlarmTrapsPrefix 8 }			    	    	    		
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.9
+		hwOpticalReceiverPowerFailTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOROpticalPowerValue
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the optical power of OpticalReceiver is abnormal.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 9 }			    	    	    		
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.10
+		hwOpticalReceiverPowerRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOROpticalPowerValue
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the optical power of OpticalReceiver recovers to normal rage.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 10 }			    	    	    		
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.11
+		hwOpticalReceiverRFPowerFailTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwORRFPowerValue
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the RF power of OpticalReceiver is abnormal.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 11 }			    	    	    		
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.12
+		hwOpticalReceiverRFPowerRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwORRFPowerValue
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the RF power of OpticalReceiver recovers to normal rage.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 12 }			    	    	    		
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.2
+		hwEnvironAnaAlarmTraps OBJECT IDENTIFIER ::= { hwEnvironAlarmTraps  2 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0
+		hwEnvironAnaAlarmTrapsPrefix OBJECT IDENTIFIER ::= { hwEnvironAnaAlarmTraps  0 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0.1
+		hwEmmAnaUnnamedFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwAnaAlarmID,
+			hwEnvEmuType,
+			hwAnaName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when an unnamed
+			 analog alarm occurs.
+			 "
+			::= { hwEnvironAnaAlarmTrapsPrefix 1 }	
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0.2
+		hwEmmAnaUnnamedRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwAnaAlarmID,
+			hwEnvEmuType,
+			hwAnaName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when an unnamed
+			 analog alarm recovers.
+			 "
+			::= { hwEnvironAnaAlarmTrapsPrefix 2 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0.3
+		hwEmmAnaTempFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwAnaAlarmID,
+			hwEnvEmuType,
+			hwAnaName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the analog
+			 temperature alarm occurs.
+			 "
+			::= { hwEnvironAnaAlarmTrapsPrefix 3 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0.4
+		hwEmmAnaTempRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwAnaAlarmID,
+			hwEnvEmuType,
+			hwAnaName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the analog
+			 temperature alarm recovers.
+			 "
+			::= { hwEnvironAnaAlarmTrapsPrefix 4 }	
+	
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0.5
+		hwEmmAnaHumyFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwAnaAlarmID,
+			hwEnvEmuType,
+			hwAnaName
+			}
+			STATUS      current 
+			DESCRIPTION    
+			 "The agent generates this trap when the analog
+			 humidity alarm occurs.
+			 "
+			::= { hwEnvironAnaAlarmTrapsPrefix 5 }		
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0.6
+		hwEmmAnaHumyRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwAnaAlarmID,
+			hwEnvEmuType,
+			hwAnaName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the analog
+			 humidity alarm recovers.
+			 "
+			::= { hwEnvironAnaAlarmTrapsPrefix 6 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0.0.7
+		hwEmmAnaVoltFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwAnaAlarmID,
+			hwEnvEmuType,
+			hwAnaName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the analog
+			 voltage alarm occurs.
+			 "
+			::= { hwEnvironAnaAlarmTrapsPrefix 7 }		
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0.8
+		hwEmmAnaVoltRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwAnaAlarmID,
+			hwEnvEmuType,
+			hwAnaName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the analog
+			 voltage alarm recovers.
+			 "
+			::= { hwEnvironAnaAlarmTrapsPrefix 8 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0.9
+		hwEmmAnaCurrentFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwAnaAlarmID,
+			hwEnvEmuType,
+			hwAnaName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the analog
+			 current alarm occurs.
+			 "
+			::= { hwEnvironAnaAlarmTrapsPrefix 9 }		
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.2.0.10
+		hwEmmAnaCurrentRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwAnaAlarmID,
+			hwEnvEmuType,
+			hwAnaName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the analog
+			 current alarm recovers.
+			 "
+			::= { hwEnvironAnaAlarmTrapsPrefix 10 }	
+
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3
+		hwEnvironDigAlarmTraps OBJECT IDENTIFIER ::= { hwEnvironAlarmTraps  3 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0
+		hwEnvironDigAlarmTrapsPrefix OBJECT IDENTIFIER ::= { hwEnvironDigAlarmTraps  0 }
+                
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.1
+		hwEmmDigFanBlockFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 fan is blocked.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 1 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.2
+		hwEmmDigFanBlockRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 fan is recovered from block.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 2 }
+		    		    		
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.3
+		hwEmmDigFanTempHighFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 temperature of fan is too high.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 3 }
+		    		    		
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.4
+		hwEmmDigFanTempHighRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the
+			 temperature of fan recover from too high.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 4 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.5
+		hwEmmDigUnnamedFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when a
+			 unnamed digital fault occurs.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 5 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.6
+		hwEmmDigUnnamedRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when a
+			 unnamed digital recovers.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 6 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.7
+		hwEmmDigOutputswitchFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when Output
+			 switch digital fault occurs.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 7 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.8
+		hwEmmDigOutputswitchRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when Output
+			 switch  digital recovers.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 8 }
+		    
+	    
+
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.11
+		hwEmmDigAcvolFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The AC voltage is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 11 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.12
+		hwEmmDigAcvolRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The AC voltage recovers to the 
+			 normal range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 12 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.13
+		hwEmmDigAcswitchFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The AC switch is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 13 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.14
+		hwEmmDigAcswitchRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The AC switch recovers to the 
+			 normal range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 14 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.15
+		hwEmmDigBattvolFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The batt vol is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 15 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.16
+		hwEmmDigBattvolRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The batt vol recovers to the 
+			 normal range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 16 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.17
+		hwEmmDigBattfuseFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The battery fuse is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 17 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.18
+		hwEmmDigBattfuseRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The battery fuse recovers to the 
+			 normal range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 18 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.19
+		hwEmmDigLoadfuseFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The load fuse is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 19 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.20
+		hwEmmDigLoadfuseRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The load fuse recovers to the 
+			 normal range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 20 }			    
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.21
+		hwEmmDigRectifierFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Rectifier is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 21 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.22
+		hwEmmDigRectifierRecoverTrap NOTIFICATION-TYPE
+			OBJECTS     
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Rectifier recovers to the 
+			 normal range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 22 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.23
+		hwEmmDigDcpowerFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The dc-power is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 23 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.24
+		hwEmmDigDcpowerRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The dc-power recovers to the 
+			 normal range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 24 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.25
+		hwEmmDigRoomdoorFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Roomdoor is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 25 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.26
+		hwEmmDigRoomdoorRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Roomdoor recovers to the 
+			 normal range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 26 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.27
+		hwEmmDigTheftFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Roomdoor is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 27 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.28
+		hwEmmDigTheftRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Roomdoor recovers to the 
+			 normal range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 28 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.29
+		hwEmmDigWiringFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The WIRING is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 29 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.30
+		hwEmmDigWiringRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			"The agent generates this trap when 
+			The WIRING recovers to the 
+			normal range.
+			"
+			::= { hwEnvironDigAlarmTrapsPrefix 30 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.31
+		hwEmmDigFanFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			"The agent generates this trap when 
+			The FAN is out of the normal 
+			range.
+			"
+			::= { hwEnvironDigAlarmTrapsPrefix 31 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.32
+		hwEmmDigFanRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The FAN recovers to the normal
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 32 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.33
+		hwEmmDigFireFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Fire is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 33 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.34
+		hwEmmDigFireRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Fire recovers to the normal
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 34 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.35
+		hwEmmDigFogFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Fog is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 35 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.36
+		hwEmmDigFogRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Fog recovers to the normal
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 36 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.37
+		hwEmmDigWaterFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Water is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 37 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.38
+		hwEmmDigWaterRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Water recovers to the normal
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 38 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.39
+		hwEmmDigDieselFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Diesel is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 39 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.40
+		hwEmmDigDieselRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Diesel recovers to the normal
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 40 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.41
+		hwEmmDigSmellFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Smell is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 41 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.42
+		hwEmmDigSmellRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Smell recovers to the normal
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 42 }	
+	
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.43
+		hwEmmDigAirconditionFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Air condition is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 43 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.44
+		hwEmmDigAirconditionRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The Air condition recovers to the normal
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 44 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.45
+			hwEmmDigArrsterFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The arrester is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 45 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.46
+		hwEmmDigArrsterRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The arrester recovers to the normal
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 46 }		
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.47
+		hwEmmDigDcvolFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The DC VOL is out of the normal 
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 47 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.48
+		hwEmmDigDcvolRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 The DC VOL recovers to the normal
+			 range.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 48 }	
+		    		    	    		    		    		    		    		    		    		    		    		    		    		    		    						
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.49
+		hwEmmFanCriticalBlockFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when more
+			 than two fans are blocked.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 49 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.50
+		hwEmmFanCriticalBlockRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			 critical multi-fan blocking recovers.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 50 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.51
+		hwEmmDigitalSwitchOpenTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			 48V input switch is closed.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 51 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.52
+		hwEmmDigitalSwitchCloseTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			 48V input switch is opened.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 52 }
+		    			    		    	    		    		    		    		    		    		    		    		    		    		    		    		    						
+	
+-- 1.3.6.1.4.1.2011.6.1.5		
+		hwEmmTrapVbOids OBJECT IDENTIFIER ::= { hwEnvironment 5}
+
+-- 1.3.6.1.4.1.2011.6.1.5.1
+		hwFanStatus OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			notconfig(1),
+			failure(2)
+			}
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"
+				The status of the fan. 
+				Options:
+				1.notconfig(1) -The status of the fan is notconfig 
+				2.failure(2)   -The status of the fan is fail
+				"
+			::= { hwEmmTrapVbOids 1 }
+			
+-- 1.3.6.1.4.1.2011.6.1.5.2
+		hwFailureCause OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			fullemu(1),
+			shelfnotsupport(2),
+			emunotsupportautofind(3)
+			}
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"
+				The reason of the auto-finding failure:
+				Options: 
+				1.fullemu(1)               -No enough EMU IDs are available
+				2.shelfnotsupport(2)       -The EMU does not support the auto discovery function
+				3.emunotsupportautofind(3) -The shelf does not support the EMU of this type
+				"
+			::= { hwEmmTrapVbOids 2 }
+		
+-- 1.3.6.1.4.1.2011.6.1.5.3		
+		hwEnvAutofindNodeId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"				
+				The NodeId of the auto-found EMU.
+				"
+			::= { hwEmmTrapVbOids 3 }
+				
+			
+-- 1.3.6.1.4.1.2011.6.1.5.4
+		hwEnvAutofindEmuType OBJECT-TYPE
+			SYNTAX OCTET STRING				
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"				
+				The type of the auto-found EMU.
+				"
+			::= { hwEmmTrapVbOids 4 }
+	
+-- 1.3.6.1.4.1.2011.6.1.5.5
+		hwEnvAutofindBoardName OBJECT-TYPE
+			SYNTAX OCTET STRING				
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"				
+				The board name of the auto-found EMU.
+				"
+			::= { hwEmmTrapVbOids 5 }
+
+	END

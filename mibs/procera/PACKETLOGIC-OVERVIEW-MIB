@@ -1,0 +1,90 @@
+PACKETLOGIC-OVERVIEW-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE,
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
+	Unsigned32, TimeTicks FROM SNMPv2-SMI
+	packetlogic2 FROM PACKETLOGIC-MIB
+	DisplayString, DateAndTime FROM SNMPv2-TC
+	CounterBasedGauge64 FROM HCNUM-TC;
+
+systemOverview MODULE-IDENTITY
+	LAST-UPDATED "201909121500Z"
+	ORGANIZATION "Procera Networks, Inc."
+	CONTACT-INFO "support@proceranetworks.com"
+	DESCRIPTION "MIB for Packetlogic2 system overview"
+	REVISION "201909121500Z"
+	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
+
+	::={packetlogic2 40}
+
+OverviewEntry ::= SEQUENCE {
+	model DisplayString,
+	configMd5Sum DisplayString,
+	machineId DisplayString,
+	firmwareVersion DisplayString,
+	overviewEntryIndex Integer32
+}
+
+overview	OBJECT-TYPE
+	SYNTAX SEQUENCE OF OverviewEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {systemOverview 1}
+
+overviewEntry	OBJECT-TYPE
+	SYNTAX OverviewEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { overviewEntryIndex }
+	::= {overview 1}
+
+overviewEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={overviewEntry 999}
+
+
+
+
+
+
+model	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "SYSTEM_MODEL name"
+
+	::={overviewEntry 1}
+
+configMd5Sum	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "MD5 hash of system's configuration"
+
+	::={overviewEntry 2}
+
+machineId	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "MACHINEID of the system"
+
+	::={overviewEntry 3}
+
+firmwareVersion	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Firmware Version"
+
+	::={overviewEntry 4}
+
+
+
+END

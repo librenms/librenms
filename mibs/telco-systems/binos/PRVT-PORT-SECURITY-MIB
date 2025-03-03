@@ -1,0 +1,123 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-PORT-SECURITY-MIB.mib
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2004, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+--
+PRVT-PORT-SECURITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+NOTIFICATION-TYPE
+FROM SNMPv2-SMI
+
+dot1qTpFdbStatus,
+dot1qVlanStatus
+FROM Q-BRIDGE-MIB
+
+NOTIFICATION-GROUP
+FROM SNMPv2-CONF
+
+switch,
+configL2IfaceEnable
+FROM PRVT-SWITCH-MIB;
+
+prvtPortSecurityMib MODULE-IDENTITY
+LAST-UPDATED "200806180000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+" BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"The Port Security MIB module for managing the port security attributes."
+
+-- revision history
+REVISION "200806180000Z"
+DESCRIPTION
+"Added prvtDuplicatedMACAddressAlarm."
+
+REVISION "200502160000Z"
+DESCRIPTION
+"Fixed spelling errors and changed the contact info."
+
+REVISION "200405100000Z"
+DESCRIPTION
+"Initial version."
+
+::= { switch 109 }
+
+-- ----------------------------------------------------------------------------
+-- Groups
+-- ----------------------------------------------------------------------------
+
+prvtPortSECNotifications OBJECT IDENTIFIER ::= { prvtPortSecurityMib 0 }
+prvtPortSECObjects OBJECT IDENTIFIER ::= { prvtPortSecurityMib 1 }
+prvtPortSECConformance OBJECT IDENTIFIER ::= { prvtPortSecurityMib 2 }
+
+prvtPortSECViolation NOTIFICATION-TYPE
+OBJECTS {dot1qVlanStatus,dot1qTpFdbStatus,configL2IfaceEnable}
+STATUS current
+DESCRIPTION
+"This notification is sent by the agent when a security violation occurres on a port."
+::= {prvtPortSECNotifications 1}
+
+prvtDuplicatedMACAddressAlarm NOTIFICATION-TYPE
+OBJECTS { dot1qVlanStatus, dot1qTpFdbStatus, configL2IfaceEnable }
+STATUS current
+DESCRIPTION
+"This notification is sent by the agent when a duplicated MAC is recived."
+::= {prvtPortSECNotifications 2}
+
+-- *******************************************************************
+-- Conformance Information
+-- *******************************************************************
+
+prvtPortSECMIBGroups OBJECT IDENTIFIER ::= { prvtPortSECConformance 2 }
+
+prvtPortSECNotificationGroup NOTIFICATION-GROUP
+NOTIFICATIONS {
+prvtPortSECViolation
+}
+STATUS current
+DESCRIPTION
+"Notification Group for the private Port Security Violation Trap"
+::= { prvtPortSECMIBGroups 1 }
+
+END

@@ -6798,7 +6798,7 @@ agentPortMirrorTypeTable OBJECT-TYPE
          STATUS      current
          DESCRIPTION
                      "STP port table."
-         ::= { agentStpSwitchConfigGroup 7 }
+         ::= { agentStpSwitchConfigGroup 9 }
 
     agentStpPortEntry OBJECT-TYPE
          SYNTAX      AgentStpPortEntry
@@ -6922,12 +6922,20 @@ agentPortMirrorTypeTable OBJECT-TYPE
                      A non-zero value indicates that BPDUs are to be sent on the specified port."
          ::= { agentStpPortEntry 9 }
 
+   agentStpPortHelloTime OBJECT-TYPE
+         SYNTAX      Unsigned32 (1..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The spanning-tree hello time for the specified port."
+         ::= { agentStpPortEntry 10 }
+
     --**************************************************************************************
     -- agentStpCstConfigGroup
     --
     --**************************************************************************************
 
-    agentStpCstConfigGroup                      OBJECT IDENTIFIER ::= { agentStpSwitchConfigGroup 8 }
+    agentStpCstConfigGroup                      OBJECT IDENTIFIER ::= { agentStpSwitchConfigGroup 10 }
 
     agentStpCstHelloTime OBJECT-TYPE
          SYNTAX      Unsigned32
@@ -7046,7 +7054,7 @@ agentPortMirrorTypeTable OBJECT-TYPE
          STATUS      current
          DESCRIPTION
                      "CIST port table."
-         ::= { agentStpSwitchConfigGroup 9 }
+         ::= { agentStpSwitchConfigGroup 11 }
 
     agentStpCstPortEntry OBJECT-TYPE
          SYNTAX      AgentStpCstPortEntry
@@ -7346,7 +7354,7 @@ agentPortMirrorTypeTable OBJECT-TYPE
          STATUS      current
          DESCRIPTION
                      "MST table."
-         ::= { agentStpSwitchConfigGroup 10 }
+         ::= { agentStpSwitchConfigGroup 12 }
 
     agentStpMstEntry OBJECT-TYPE
          SYNTAX      AgentStpMstEntry
@@ -7481,7 +7489,7 @@ agentPortMirrorTypeTable OBJECT-TYPE
          STATUS      current
          DESCRIPTION
                      "MST port table."
-         ::= { agentStpSwitchConfigGroup 11 }
+         ::= { agentStpSwitchConfigGroup 13 }
 
     agentStpMstPortEntry OBJECT-TYPE
          SYNTAX      AgentStpMstPortEntry
@@ -7623,7 +7631,7 @@ agentPortMirrorTypeTable OBJECT-TYPE
          STATUS      current
          DESCRIPTION
                      "MST VLAN table."
-         ::= { agentStpSwitchConfigGroup 12 }
+         ::= { agentStpSwitchConfigGroup 14 }
 
     agentStpMstVlanEntry OBJECT-TYPE
          SYNTAX      AgentStpMstVlanEntry
@@ -7667,7 +7675,7 @@ agentPortMirrorTypeTable OBJECT-TYPE
                      disable(2) - disables BPDU Guard Mode on the switch.
 
                      The default status is disabled."
-         ::= { agentStpSwitchConfigGroup 13 }
+         ::= { agentStpSwitchConfigGroup 7 }
 
 
     agentStpBpduFilterDefault OBJECT-TYPE
@@ -7685,7 +7693,7 @@ agentPortMirrorTypeTable OBJECT-TYPE
                      disable(2) - disables BPDU Filter Mode on the switch.
 
                      The default status is disabled."
-         ::= { agentStpSwitchConfigGroup 14 }
+         ::= { agentStpSwitchConfigGroup 8 }
 
 --**************************************************************************************
 --    agentAuthenticationGroup

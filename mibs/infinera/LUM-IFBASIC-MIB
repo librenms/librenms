@@ -1,0 +1,1570 @@
+LUM-IFBASIC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DateAndTime, DisplayString
+        FROM SNMPv2-TC
+    lumModules, lumIfBasicMIB
+        FROM LUM-REG
+    SignalFormat, AdminStatusWithNA, OperStatusWithNA,
+    Unsigned32WithNA, SignalStatusWithNA, EnabledDisabledWithNA,
+    Time7200min, Time7200minNo0, Layer, AutoAlarmStatus, ResetWithNA, FaultStatusWithNA,
+    MgmtNameString, DisplayStringWithNA, CommandString, TribPortIdType, OpticalLayerMappingType,
+    PhysicalLayerMappingType, SignalDirection, InterfaceStatus, ConnectorType, InterfaceType, TruthValueWithNA
+        FROM LUM-TC;
+
+lumIfBasicMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201906280000Z" -- June 28th 2019
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The MIB module for management of basic port objects.
+
+        The tables contained in this MIB are:
+
+        (1) The General group contains some general attributes as time stamps
+            and tables sizes.
+
+        (2) The If group contains information about the name of the port that
+            is used in GUI.
+
+        (2) The Admin group contains information and configuration for all
+            interfaces available for If Basic Admin objects.
+
+        (3) The Signal group contains information and configuration for all
+            interfaces available for If Basic Signal objects.
+
+"
+    REVISION
+        "201906280000Z" -- June 28th 2019
+    DESCRIPTION
+        "Changes made for release r33.0:
+         - Added oa1x21dBmVgEC board
+         - Added oa2x21dBmVgEC board"
+    REVISION
+        "201812310000Z" -- December 31st 2018
+    DESCRIPTION
+        "Changes made for release r32.0:
+         - Added ifBasicAdminNotAvailableForUse"
+    REVISION
+        "201806290000Z" -- June 29th 2018
+    DESCRIPTION
+        "Changes made for release r31.0:
+         - Added mxp200gotn board
+         - Added ifBasicSignalConnectorType
+         - Added ifBasicAdminIfNo
+         - Added ifBasicSignalLowOrderTribPortId
+         - Added ifBasicAdminIfType"
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+         - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28:
+        - Added interface status attribute.
+        - Added Terminal and facility loopback (and corresponding attributes)."
+    REVISION
+        "201611040000Z" -- November 4th 2016
+    DESCRIPTION
+        "Changes made for patch release r27.0.3:
+        - Enabled Read-Write to Loopback and TTI attributes via SNMP."
+    REVISION
+        "201601310000Z" -- January 31th 2016
+    DESCRIPTION
+        "Changes made for release r26.1:
+        - Added upId in If group."
+    REVISION
+        "201512220000Z" -- December 22nd 2015
+    DESCRIPTION
+        "Changes made for release r27:
+        - Added fhau1 board
+        - Added fha1u1 board"
+    REVISION
+        "201510300000Z" -- October 30th 2015
+    DESCRIPTION
+        "Added tpmrHL16GUni board:
+        -Added SignalSpeed."
+    REVISION
+        "201409300000Z" -- September 30th 2014
+    DESCRIPTION
+        "Changes made for release r23.1:
+        - Added mxp100gotn board."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Changes made for release r23:
+        - Added Optical layer mapping configuration mismatch object.
+        - Changed board name from tp10gotn to tphex10gotn.
+        - Added tpmrHL16G board"
+    REVISION
+        "201311150000Z" -- November 15th 2013
+    DESCRIPTION
+        "Changes made for release r22:
+        - Added tp10gotn, tp100gotn board.
+        - Added lane format"
+    REVISION
+        "201211200000Z" -- November 20th 2012
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 46 }
+
+
+-- ----------------------------------------------------
+-- Compliance area, containing groups and compliance
+-- specifications.
+-- ----------------------------------------------------
+
+lumIfBasicConfs OBJECT IDENTIFIER ::= { lumIfBasicMIB 1 }
+lumIfBasicGroups OBJECT IDENTIFIER ::= { lumIfBasicConfs 1 }
+lumIfBasicCompl OBJECT IDENTIFIER ::= { lumIfBasicConfs 2 }
+
+
+-- ----------------------------------------------------
+-- Root for objects in the IFBASIC MIB
+-- ----------------------------------------------------
+
+lumIfBasicMIBObjects OBJECT IDENTIFIER ::= { lumIfBasicMIB 2 }
+
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+ifBasicGeneral OBJECT IDENTIFIER ::= { lumIfBasicMIBObjects 1 }
+ifBasicIfList OBJECT IDENTIFIER ::= {lumIfBasicMIBObjects 2}
+ifBasicAdminList OBJECT IDENTIFIER ::= { lumIfBasicMIBObjects 3 }
+ifBasicSignalList OBJECT IDENTIFIER ::= { lumIfBasicMIBObjects 4 }
+
+-- ----------------------------------------------------
+-- General group
+-- ----------------------------------------------------
+
+ifBasicGeneralConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the MIB was
+        last changed.
+
+"
+    ::= { ifBasicGeneral 1 }
+
+ifBasicGeneralStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state of the MIB was last
+        changed.
+
+"
+    ::= { ifBasicGeneral 2 }
+
+ifBasicGeneralIfBasicIfTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of if table
+
+"
+    ::= { ifBasicGeneral 3 }
+
+ifBasicGeneralIfBasicIfConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the
+        table was last changed.
+"
+    ::= { ifBasicGeneral 4 }
+
+ifBasicGeneralIfBasicIfStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table was last changed.
+
+"
+    ::= { ifBasicGeneral 5 }
+
+ifBasicGeneralIfBasicAdminTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of admin table
+
+"
+    ::= { ifBasicGeneral 6 }
+
+ ifBasicGeneralIfBasicAdminConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifBasicGeneral 7 }
+
+ifBasicGeneralIfBasicAdminStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table was last changed.
+
+"
+    ::= { ifBasicGeneral 8 }
+
+ifBasicGeneralIfBasicSignalTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of signal table
+
+"
+    ::= { ifBasicGeneral 9 }
+
+ifBasicGeneralIfBasicSignalConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifBasicGeneral 10 }
+
+ifBasicGeneralIfBasicSignalStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table  was last changed.
+
+"
+    ::= { ifBasicGeneral 11 }
+
+-- ----------------------------------------------------
+-- If group
+-- ----------------------------------------------------
+
+ifBasicIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfBasicIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The if basic if interface list."
+
+    ::= { ifBasicIfList 1 }
+
+ifBasicIfEntry OBJECT-TYPE
+    SYNTAX      IfBasicIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifBasic if list.
+
+"
+    INDEX { ifBasicIfIndex }
+    ::= { ifBasicIfTable 1 }
+
+IfBasicIfEntry ::=
+    SEQUENCE {
+        ifBasicIfIndex                          Unsigned32,
+        ifBasicIfName                           MgmtNameString,
+        ifBasicIfTxSignalStatus                 SignalStatusWithNA,
+        ifBasicIfRxSignalStatus                 SignalStatusWithNA,
+        ifBasicIfUpId                           Unsigned32,
+        ifBasicIfAid                            DisplayString,
+        ifBasicIfPhysicalLocation               DisplayString }
+
+ifBasicIfIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifBasicIfEntry 1 }
+
+ifBasicIfName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface, for example
+        'client:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifBasicIfEntry 2 }
+
+ifBasicIfTxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (TX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifBasicIfEntry 3 }
+
+ifBasicIfRxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for incoming (RX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifBasicIfEntry 4 }
+
+ifBasicIfUpId OBJECT-TYPE
+    SYNTAX      Unsigned32   (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identity in the UP for the interface. The upId is used internally between CU and
+         TU to define a certain interface in the TU.
+"
+    ::= { ifBasicIfEntry 5 }
+
+ifBasicIfAid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The access identifier (AID) of the interface.
+         The format is according to GR-833.
+
+"
+    ::= { ifBasicIfEntry 6 }
+
+
+ifBasicIfPhysicalLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The physical location of the if.
+         The format is according to GR-833.
+
+"
+    ::= { ifBasicIfEntry 7 }
+
+-- ----------------------------------------------------
+-- Admin group
+-- ----------------------------------------------------
+
+ifBasicAdminTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfBasicAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The if basic admin interface list."
+
+    ::= { ifBasicAdminList 1 }
+
+ifBasicAdminEntry OBJECT-TYPE
+    SYNTAX      IfBasicAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifBasic admin list.
+
+"
+    INDEX { ifBasicAdminIndex }
+    ::= { ifBasicAdminTable 1 }
+
+IfBasicAdminEntry ::=
+    SEQUENCE {
+        ifBasicAdminIndex                        Unsigned32,
+        ifBasicAdminName                         MgmtNameString,
+        ifBasicAdminDescr                        DisplayStringWithNA,
+        ifBasicAdminSubrack                      Unsigned32WithNA,
+        ifBasicAdminSlot                         Unsigned32WithNA,
+        ifBasicAdminTxPort                       Unsigned32WithNA,
+        ifBasicAdminRxPort                       Unsigned32WithNA,
+        ifBasicAdminAdminStatus                  AdminStatusWithNA,
+        ifBasicAdminOperStatus                   OperStatusWithNA,
+        ifBasicAdminAutoAlarmEnableStatus        AutoAlarmStatus,
+        ifBasicAdminAutoAlarmEnableReset         ResetWithNA,
+        ifBasicAdminInterfaceStatus              InterfaceStatus,
+        ifBasicAdminIfNo                         Unsigned32WithNA,
+        ifBasicAdminIfType                       InterfaceType,
+        ifBasicAdminNotAvailableForUse           TruthValueWithNA }
+
+ifBasicAdminIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifBasicAdminEntry 1 }
+
+ifBasicAdminName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface, for example
+        'admin:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifBasicAdminEntry 2 }
+
+ifBasicAdminDescr OBJECT-TYPE
+    SYNTAX      DisplayStringWithNA
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable label.
+
+
+"
+    DEFVAL { "" }
+    ::= { ifBasicAdminEntry 3 }
+
+ifBasicAdminSubrack OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The subrack of the physical port that this interface is bound to.
+
+"
+    ::= { ifBasicAdminEntry 4 }
+
+ifBasicAdminSlot OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The slot of the physical port that this interface is bound to.
+
+"
+    ::= { ifBasicAdminEntry 5 }
+
+ifBasicAdminTxPort OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The transmitting physical port that this interface is bound to.
+
+"
+    ::= { ifBasicAdminEntry 6 }
+
+ifBasicAdminRxPort OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The receiving physical port that this interface is bound to.
+
+"
+    ::= { ifBasicAdminEntry 7 }
+
+ifBasicAdminAdminStatus OBJECT-TYPE
+    SYNTAX     AdminStatusWithNA
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The administrative state of the ifBasic interface.
+
+        down - The interface is de-activated.
+
+        service - The interface is activated but alarms
+        are suppressed. Intended for use during service
+        or re-configuration. When service is concluded
+        adminStatus should be set to 'up' again. Note that
+        there is no difference between 'up' and 'service',
+        if no alarms can be raised from this object.
+
+        up - The interface will be activated when
+        available. Alarms are not suppressed.
+
+"
+    DEFVAL { up }
+    ::= { ifBasicAdminEntry 8 }
+
+ifBasicAdminOperStatus OBJECT-TYPE
+    SYNTAX      OperStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for the interface.
+
+        notPresent - The interface is not available.
+
+        down - The interface is de-activated or there are
+        faults preventing its transition to the 'up' state.
+
+        up - The interface is active.
+
+"
+    DEFVAL { notPresent }
+    ::= { ifBasicAdminEntry 9 }
+
+ifBasicAdminAutoAlarmEnableStatus OBJECT-TYPE
+    SYNTAX      AutoAlarmStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of auto alarm enable for the interface.
+
+        suppressTrxAndSignal  - Both signal alarms and trx alarms are suppressed
+        suppressSignal        - Only signal alarms are suppressed
+        suppressNone          - Neither trx nor signal alarms
+                                are suppressed
+
+"
+    DEFVAL { suppressTrxAndSignal }
+    ::= { ifBasicAdminEntry 10 }
+
+ifBasicAdminAutoAlarmEnableReset OBJECT-TYPE
+    SYNTAX      ResetWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When the attribute is set to reset the auto-alarm enable function
+        is re-initialised. Then the attribute is set to normal again
+        automatically.
+
+        reset - Re-initialises the auto-alarm enable function
+
+        normal - The auto-alarm enable function is in normal state
+
+"
+    DEFVAL { normal }
+    ::= { ifBasicAdminEntry 11 }
+
+ifBasicAdminInterfaceStatus OBJECT-TYPE
+    SYNTAX      InterfaceStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the traffic interface.
+
+        outOfService    - No PM and no alarms.
+        autoInService   - No PM and no alarms. Changes to 'inService' when OK.
+        inService       - Reports PM and alarms.
+        maintenance     - Maintenance mode.
+
+"
+    ::= { ifBasicAdminEntry 12 }
+
+ifBasicAdminIfNo OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The physical interface number of the actual multi-connector port.
+
+"
+    DEFVAL { 2147483647 }
+    ::= { ifBasicAdminEntry 13 }
+
+ifBasicAdminIfType OBJECT-TYPE
+    SYNTAX      InterfaceType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Type of interface (Individual or bundled).
+
+"
+    DEFVAL { notApplicable }
+    ::= { ifBasicAdminEntry 14 }
+
+ifBasicAdminNotAvailableForUse OBJECT-TYPE
+    SYNTAX      TruthValueWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Is the interface not available for use.
+          The interface may be created in order to show some
+          physical properties but may otherwise be unavailable
+          for service depending on setup and available resources.
+
+"
+    DEFVAL { notApplicable }
+    ::= { ifBasicAdminEntry 15 }
+
+-- ----------------------------------------------------
+-- Signal group
+-- ----------------------------------------------------
+
+ifBasicSignalTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfBasicSignalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The if basic signal interface list."
+
+    ::= { ifBasicSignalList 1 }
+
+ifBasicSignalEntry OBJECT-TYPE
+    SYNTAX      IfBasicSignalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifBasic signal list.
+
+"
+    INDEX { ifBasicSignalIndex }
+    ::= { ifBasicSignalTable 1 }
+
+IfBasicSignalEntry ::=
+    SEQUENCE {
+        ifBasicSignalIndex                           Unsigned32,
+        ifBasicSignalName                            MgmtNameString,
+        ifBasicSignalSignalStructure                 Counter64,
+        ifBasicSignalSignalFormat                    SignalFormat,
+        ifBasicSignalOpticalLayerMapping             OpticalLayerMappingType,
+        ifBasicSignalFarEndLoopbackTerminatingLayer  Layer,
+        ifBasicSignalFarEndLoopback                  EnabledDisabledWithNA,
+        ifBasicSignalFarEndLoopbackTimeout           Time7200min,
+        ifBasicSignalNearEndLoopbackTerminatingLayer Layer,
+        ifBasicSignalNearEndLoopback                 EnabledDisabledWithNA,
+        ifBasicSignalNearEndLoopbackTimeout          Time7200min,
+        ifBasicSignalFarEndLoopbackEnabled           FaultStatusWithNA,
+        ifBasicSignalNearEndLoopbackEnabled          FaultStatusWithNA,
+        ifBasicSignalConfigurationMismatch           FaultStatusWithNA,  -- deprecated
+        ifBasicSignalActualOpticalLayerMapping       OpticalLayerMappingType,
+        ifBasicSignalSpeed                           Unsigned32WithNA,
+        ifBasicSignalDirection                       SignalDirection,
+        ifBasicSignalFormatConfigurable              INTEGER,
+        ifBasicSignalFormatConfigurationSharedWithInterface Unsigned32WithNA,
+        ifBasicSignalPhysicalLayerMapping            PhysicalLayerMappingType,
+        ifBasicSignalFacilityLoopback                EnabledDisabledWithNA,
+        ifBasicSignalFacilityLoopbackTimeout         Time7200minNo0,
+        ifBasicSignalFacilityLoopbackEnabled         FaultStatusWithNA,
+        ifBasicSignalTerminalLoopback                EnabledDisabledWithNA,
+        ifBasicSignalTerminalLoopbackTimeout         Time7200minNo0,
+        ifBasicSignalTerminalLoopbackEnabled         FaultStatusWithNA,
+        ifBasicSignalConnectorType                   ConnectorType }
+
+ifBasicSignalIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifBasicSignalEntry 1 }
+
+ifBasicSignalName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface, for example
+        'signal:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifBasicSignalEntry 2 }
+
+ifBasicSignalSignalStructure OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The signal structure used. Bitfield 64 bit wide. For internal use.
+        Bit 0 tells if mib ifBasicPhysicalTrx is loaded,
+        bit 1 ifBasicOpticalTranssection, etc according to list below.
+        Add new items last.
+          ifPhysicalTrx
+          ifOpticalTranssection
+          ifOpticalChannel
+          ifOpticalDigitalSignalRate
+          ifEthPhysical
+          ifEthMac
+          ifOtnOdu
+          ifOtnOtu
+          ifOtnOpu
+          ifOtnMonSm
+          ifOtnMonPm
+          ifOtnMonTcm
+          ifOtnMonTrace
+          ifSdhRs
+          ifSdhMs
+          ifSonetSection
+          ifSonetLine
+          ifPerfFec
+          ifPerfAdmin
+          ifPerfG826
+          ifPerfL2Error
+          ifPerfL1
+          ifPerfL0
+          ifOpticalFec
+          ifFcPhysical
+          ifOtnTp
+          ifOpticalTransportLaneCarrier
+          ifOpticalTransportLaneCarrierGroup
+          ifPerfL2Stat
+          ifIwdmRs
+          ifIwdmMS
+          ifAmplifierAmplifier
+          ifAmplifierModule
+          ifAmplifierRaman
+          ifAmplifierEdfa
+          ifIwdmPath
+          ifFhCpri
+          ifFhObsai
+          ifPhysicalCage
+          ifEthRsFec
+          ifPerfDelay
+          ifOtdr
+"
+    DEFVAL { 0 }
+    ::= { ifBasicSignalEntry 3 }
+
+ifBasicSignalSignalFormat OBJECT-TYPE
+    SYNTAX      SignalFormat
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The signal format.
+
+"
+    DEFVAL { unused }
+    ::= { ifBasicSignalEntry 4 }
+
+ifBasicSignalFarEndLoopbackTerminatingLayer OBJECT-TYPE
+    SYNTAX      Layer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The layer where the far end loopback (a.k.a.
+         terminal loopback for a client interface and
+         facility loopback for a line interface) is done.
+         This is coded in a bitmask
+
+"
+    ::= { ifBasicSignalEntry 5 }
+
+ifBasicSignalFarEndLoopback OBJECT-TYPE
+    SYNTAX     EnabledDisabledWithNA
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The far end loopback (a.k.a. terminal loopback for
+         a client interface and facility loopback for a line
+         interface) setting.
+
+        disabled - Far end loopback is not set. This is the
+        default setting.
+
+        enabled - Far end loopback is set.
+
+"
+    DEFVAL { disabled }
+    ::= { ifBasicSignalEntry 6 }
+
+ifBasicSignalFarEndLoopbackTimeout OBJECT-TYPE
+    SYNTAX      Time7200min
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Timeout for far end loopback (a.k.a. terminal
+         loopback for a client interface and facility
+         loopback for a line interfac) to make sure
+         connection to node is not lost if ppp link is
+         broken. The unit is minutes. The value 0 is used in
+         SNMP to indicate that the setting will last forever.
+
+         Note! This attribute is not saved in backup,
+         meaning the loopback will be set to disabled
+         when rebooting CU.
+
+"
+    DEFVAL { 3 }
+    ::= { ifBasicSignalEntry 7 }
+
+ifBasicSignalNearEndLoopbackTerminatingLayer OBJECT-TYPE
+    SYNTAX      Layer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The layer where the near end loopback (a.k.a.
+         terminal loopback for a line interface and facility
+         loopback for a client interface) is done.
+         This is coded in a bitmask.
+
+"
+    ::= { ifBasicSignalEntry 8 }
+
+ifBasicSignalNearEndLoopback OBJECT-TYPE
+    SYNTAX     EnabledDisabledWithNA
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The near end loopback (a.k.a. terminal
+        loopback for a line interface and facility loopback
+        for a client interface) setting.
+
+        disabled - Near end loopback is not set. This is the
+        default setting.
+
+        enabled - Near end loopback is set.
+
+"
+    DEFVAL { disabled }
+    ::= { ifBasicSignalEntry 9 }
+
+ifBasicSignalNearEndLoopbackTimeout OBJECT-TYPE
+    SYNTAX      Time7200min
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Timeout for near end loopback (a.k.a. terminal
+         loopback for a line interface and facility loopback
+         for a client interface) to make sure connection to
+         node is not lost if ppp link is broken. The unit is
+         minutes. The value 0 is used in SNMP to indicate
+         that the setting will last forever.
+
+         Note! This attribute is not saved in backup,
+         meaning the loopback will be set to disabled
+         when rebooting CU.
+
+"
+    DEFVAL { 3 }
+    ::= { ifBasicSignalEntry 10 }
+
+ifBasicSignalFarEndLoopbackEnabled OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Far end end loopback (a.k.a. terminal loopback for
+         a client interface and facility loopback for a line
+         interface) is enabled.
+
+        alarm: Far end loopback is enabled.
+
+        ok: Far end loopback is disabled.
+
+"
+    ::= { ifBasicSignalEntry 11 }
+
+ifBasicSignalNearEndLoopbackEnabled OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Near end end loopback (a.k.a. terminal loopback for
+         a line interface and facility loopback for a client
+         interface) is enabled.
+
+        alarm: Near end loopback is enabled.
+
+        ok: Near end loopback is disabled.
+
+"
+    ::= { ifBasicSignalEntry 12 }
+
+ifBasicSignalOpticalLayerMapping OBJECT-TYPE
+    SYNTAX      OpticalLayerMappingType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The optical layer mapping.
+
+"
+    DEFVAL { singleOpticalChannel }
+    ::= { ifBasicSignalEntry 13 }
+
+ifBasicSignalConfigurationMismatch OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The inserted transceiver does not support the
+        configuration of the optical layer mapping.
+
+        alarm: A transceiver with other supported optical layer
+               mapping than the requested mapping is inserted.
+
+        ok: The transceiver with the non-requested optical
+            layer mapping is removed, or the object is reconfigured.
+
+"
+    ::= { ifBasicSignalEntry 14 }
+
+ifBasicSignalActualOpticalLayerMapping OBJECT-TYPE
+    SYNTAX      OpticalLayerMappingType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual optical layer mapping.
+
+"
+    DEFVAL { undefined }
+    ::= { ifBasicSignalEntry 15 }
+
+ifBasicSignalSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA (61440..1402500|2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected signal bit rate in units of
+        10,000 bits (0.01 Mb) per second.
+
+"
+
+    DEFVAL { 61440 }
+    ::= { ifBasicSignalEntry 16 }
+
+ifBasicSignalDirection OBJECT-TYPE
+    SYNTAX      SignalDirection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The direction in which this object is
+        referred to.
+
+        rx    - In bound direction. (1)
+
+        tx    - out bound direction. (2)
+
+        biDir - the interface has one connector used for both rx and tx. (3)
+
+        txRx  - the interface has two connectors one for tx and one for rx. (4)
+
+        Not Available - the direction is not available.
+
+"
+
+    DEFVAL { txRx }
+    ::= { ifBasicSignalEntry 17 }
+
+ifBasicSignalFormatConfigurable OBJECT-TYPE
+    SYNTAX INTEGER {
+        true (1),
+        false (2),
+        notApplicable (2147483647)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This atttribute indicates if the interface is format configurable or not
+
+        true    -  The interface is format configurable
+
+        false    - The interface is not format configurable
+
+"
+
+    ::= { ifBasicSignalEntry 18 }
+
+ifBasicSignalFormatConfigurationSharedWithInterface OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This attribute specifies whether this object instances shares the format
+        configuration with another object instance.
+           value == 0: it is not shared
+           value != 0: it is shared with the interface object with index = value in IfBasicIfEntry
+        If it is shared, it means that updating the format (and optionally speed)
+        will affect the configuration of the other object instance
+
+"
+
+    ::= { ifBasicSignalEntry 19 }
+
+ifBasicSignalPhysicalLayerMapping OBJECT-TYPE
+    SYNTAX      PhysicalLayerMappingType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected physical layer mapping.
+
+"
+    DEFVAL { dualFiber }
+    ::= { ifBasicSignalEntry 20 }
+
+ifBasicSignalFacilityLoopback OBJECT-TYPE
+    SYNTAX     EnabledDisabledWithNA
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The facility loopback setting. Rx is looped to Tx.
+        The purpose of facility loopback is to test
+        the line interface termination.
+
+        disabled - Facility loopback is not set. This is the
+        default setting.
+
+        enabled - Facility loopback is set.
+
+"
+    DEFVAL { disabled }
+    ::= { ifBasicSignalEntry 21 }
+
+ifBasicSignalFacilityLoopbackTimeout OBJECT-TYPE
+    SYNTAX      Time7200minNo0
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Timeout for facility loopback to make sure
+         connection to node is not lost if ppp link is
+         broken. The unit is minutes.
+
+         Note! This attribute is not saved in backup,
+         meaning the loopback will be set to disabled
+         when rebooting CU.
+
+"
+    DEFVAL { 3 }
+    ::= { ifBasicSignalEntry 22 }
+
+ifBasicSignalFacilityLoopbackEnabled OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Facility loopback is enabled.
+
+        alarm: Facility loopback is enabled.
+
+        ok: Facility loopback is disabled.
+
+"
+    ::= { ifBasicSignalEntry 23 }
+
+ifBasicSignalTerminalLoopback OBJECT-TYPE
+    SYNTAX     EnabledDisabledWithNA
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The terminal loopback setting. Tx is looped to Rx.
+        The purpose of a terminal loopback is to test
+        the path through the equipment (a cross-connect,
+        mux/demux stage, or similar) and execute the loop
+        close to the outgoing interface.
+
+        disabled - Terminal loopback is not set. This is the
+        default setting.
+
+        enabled - Terminal loopback is set.
+
+"
+    DEFVAL { disabled }
+    ::= { ifBasicSignalEntry 24 }
+
+ifBasicSignalTerminalLoopbackTimeout OBJECT-TYPE
+    SYNTAX      Time7200minNo0
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Timeout for terminal loopback to make sure connection to
+         node is not lost if ppp link is broken. The unit is
+         minutes.
+
+         Note! This attribute is not saved in backup,
+         meaning the loopback will be set to disabled
+         when rebooting CU.
+
+"
+    DEFVAL { 3 }
+    ::= { ifBasicSignalEntry 25 }
+
+ifBasicSignalTerminalLoopbackEnabled OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Terminal loopback is enabled.
+
+        alarm: Terminal loopback is enabled.
+
+        ok: Terminal loopback is disabled.
+
+"
+    ::= { ifBasicSignalEntry 26 }
+
+ifBasicSignalConnectorType OBJECT-TYPE
+    SYNTAX      ConnectorType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The connector type.
+
+"
+    DEFVAL { notApplicable }
+    ::= { ifBasicSignalEntry 27 }
+
+-- ----------------------------------------------------
+-- Notifications
+-- ----------------------------------------------------
+
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+ifBasicGeneralGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifBasicGeneralConfigLastChangeTime,
+        ifBasicGeneralStateLastChangeTime,
+        ifBasicGeneralIfBasicIfTableSize,
+        ifBasicGeneralIfBasicIfConfigLastChangeTime,
+        ifBasicGeneralIfBasicIfStateLastChangeTime,
+        ifBasicGeneralIfBasicAdminTableSize,
+        ifBasicGeneralIfBasicAdminConfigLastChangeTime,
+        ifBasicGeneralIfBasicAdminStateLastChangeTime,
+        ifBasicGeneralIfBasicSignalTableSize,
+        ifBasicGeneralIfBasicSignalConfigLastChangeTime,
+        ifBasicGeneralIfBasicSignalStateLastChangeTime }
+
+    STATUS      current
+    DESCRIPTION
+        "The general objects."
+    ::= { lumIfBasicGroups 1 }
+
+ifBasicIfGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifBasicIfIndex,
+        ifBasicIfName,
+        ifBasicIfTxSignalStatus,
+        ifBasicIfRxSignalStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic if objects (R20.0)."
+    ::= { lumIfBasicGroups 2 }
+
+ifBasicAdminGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifBasicAdminIndex,
+        ifBasicAdminName,
+        ifBasicAdminDescr,
+        ifBasicAdminSubrack,
+        ifBasicAdminSlot,
+        ifBasicAdminTxPort,
+        ifBasicAdminRxPort,
+        ifBasicAdminAdminStatus,
+        ifBasicAdminOperStatus,
+        ifBasicAdminAutoAlarmEnableStatus,
+        ifBasicAdminAutoAlarmEnableReset }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic admin objects (R20.0)."
+    ::= { lumIfBasicGroups 3 }
+
+ifBasicSignalGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifBasicSignalIndex,
+        ifBasicSignalName,
+        ifBasicSignalSignalStructure,
+        ifBasicSignalSignalFormat,
+        ifBasicSignalFarEndLoopbackTerminatingLayer,
+        ifBasicSignalFarEndLoopback,
+        ifBasicSignalFarEndLoopbackTimeout,
+        ifBasicSignalNearEndLoopbackTerminatingLayer,
+        ifBasicSignalNearEndLoopback,
+        ifBasicSignalNearEndLoopbackTimeout,
+        ifBasicSignalFarEndLoopbackEnabled,
+        ifBasicSignalNearEndLoopbackEnabled}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic signal objects (R20.0)."
+    ::= { lumIfBasicGroups 4 }
+
+ifBasicSignalGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifBasicSignalIndex,
+        ifBasicSignalName,
+        ifBasicSignalSignalStructure,
+        ifBasicSignalSignalFormat,
+        ifBasicSignalFarEndLoopbackTerminatingLayer,
+        ifBasicSignalFarEndLoopback,
+        ifBasicSignalFarEndLoopbackTimeout,
+        ifBasicSignalNearEndLoopbackTerminatingLayer,
+        ifBasicSignalNearEndLoopback,
+        ifBasicSignalNearEndLoopbackTimeout,
+        ifBasicSignalFarEndLoopbackEnabled,
+        ifBasicSignalNearEndLoopbackEnabled,
+        ifBasicSignalOpticalLayerMapping}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic signal objects (R22.0)."
+    ::= { lumIfBasicGroups 5 }
+
+ifBasicSignalGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifBasicSignalIndex,
+        ifBasicSignalName,
+        ifBasicSignalSignalStructure,
+        ifBasicSignalSignalFormat,
+        ifBasicSignalFarEndLoopbackTerminatingLayer,
+        ifBasicSignalFarEndLoopback,
+        ifBasicSignalFarEndLoopbackTimeout,
+        ifBasicSignalNearEndLoopbackTerminatingLayer,
+        ifBasicSignalNearEndLoopback,
+        ifBasicSignalNearEndLoopbackTimeout,
+        ifBasicSignalFarEndLoopbackEnabled,
+        ifBasicSignalNearEndLoopbackEnabled,
+        ifBasicSignalOpticalLayerMapping,
+        ifBasicSignalConfigurationMismatch,
+        ifBasicSignalActualOpticalLayerMapping}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic signal objects (R23.0)."
+    ::= { lumIfBasicGroups 6 }
+
+ifBasicSignalGroupV4 OBJECT-GROUP
+    OBJECTS {
+        ifBasicSignalIndex,
+        ifBasicSignalName,
+        ifBasicSignalSignalStructure,
+        ifBasicSignalSignalFormat,
+        ifBasicSignalFarEndLoopbackTerminatingLayer,
+        ifBasicSignalFarEndLoopback,
+        ifBasicSignalFarEndLoopbackTimeout,
+        ifBasicSignalNearEndLoopbackTerminatingLayer,
+        ifBasicSignalNearEndLoopback,
+        ifBasicSignalNearEndLoopbackTimeout,
+        ifBasicSignalFarEndLoopbackEnabled,
+        ifBasicSignalNearEndLoopbackEnabled,
+        ifBasicSignalOpticalLayerMapping,
+        ifBasicSignalConfigurationMismatch,
+        ifBasicSignalActualOpticalLayerMapping,
+        ifBasicSignalSpeed,
+        ifBasicSignalDirection,
+        ifBasicSignalFormatConfigurable,
+        ifBasicSignalFormatConfigurationSharedWithInterface}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic signal objects (R26.0)."
+    ::= { lumIfBasicGroups 7 }
+
+ifBasicIfGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifBasicIfIndex,
+        ifBasicIfName,
+        ifBasicIfTxSignalStatus,
+        ifBasicIfRxSignalStatus,
+        ifBasicIfUpId }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic if objects (R26.0)."
+    ::= { lumIfBasicGroups 8 }
+
+ifBasicSignalGroupV5 OBJECT-GROUP
+    OBJECTS {
+        ifBasicSignalIndex,
+        ifBasicSignalName,
+        ifBasicSignalSignalStructure,
+        ifBasicSignalSignalFormat,
+        ifBasicSignalFarEndLoopbackTerminatingLayer,
+        ifBasicSignalFarEndLoopback,
+        ifBasicSignalFarEndLoopbackTimeout,
+        ifBasicSignalNearEndLoopbackTerminatingLayer,
+        ifBasicSignalNearEndLoopback,
+        ifBasicSignalNearEndLoopbackTimeout,
+        ifBasicSignalFarEndLoopbackEnabled,
+        ifBasicSignalNearEndLoopbackEnabled,
+        ifBasicSignalOpticalLayerMapping,
+        ifBasicSignalConfigurationMismatch,
+        ifBasicSignalActualOpticalLayerMapping,
+        ifBasicSignalSpeed,
+        ifBasicSignalDirection,
+        ifBasicSignalFormatConfigurable,
+        ifBasicSignalFormatConfigurationSharedWithInterface,
+        ifBasicSignalPhysicalLayerMapping }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic signal objects (R26.1)."
+    ::= { lumIfBasicGroups 9 }
+
+ifBasicSignalGroupV6 OBJECT-GROUP
+    OBJECTS {
+        ifBasicSignalIndex,
+        ifBasicSignalName,
+        ifBasicSignalSignalStructure,
+        ifBasicSignalSignalFormat,
+        ifBasicSignalFarEndLoopbackTerminatingLayer,
+        ifBasicSignalFarEndLoopback,
+        ifBasicSignalFarEndLoopbackTimeout,
+        ifBasicSignalNearEndLoopbackTerminatingLayer,
+        ifBasicSignalNearEndLoopback,
+        ifBasicSignalNearEndLoopbackTimeout,
+        ifBasicSignalFarEndLoopbackEnabled,
+        ifBasicSignalNearEndLoopbackEnabled,
+        ifBasicSignalOpticalLayerMapping,
+        ifBasicSignalConfigurationMismatch,
+        ifBasicSignalActualOpticalLayerMapping,
+        ifBasicSignalSpeed,
+        ifBasicSignalDirection,
+        ifBasicSignalFormatConfigurable,
+        ifBasicSignalFormatConfigurationSharedWithInterface,
+        ifBasicSignalPhysicalLayerMapping,
+        ifBasicSignalFacilityLoopback,
+        ifBasicSignalFacilityLoopbackTimeout,
+        ifBasicSignalFacilityLoopbackEnabled,
+        ifBasicSignalTerminalLoopback,
+        ifBasicSignalTerminalLoopbackTimeout,
+        ifBasicSignalTerminalLoopbackEnabled }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic signal objects (R28.0)."
+    ::= { lumIfBasicGroups 10 }
+
+ifBasicAdminGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifBasicAdminIndex,
+        ifBasicAdminName,
+        ifBasicAdminDescr,
+        ifBasicAdminSubrack,
+        ifBasicAdminSlot,
+        ifBasicAdminTxPort,
+        ifBasicAdminRxPort,
+        ifBasicAdminAdminStatus,
+        ifBasicAdminOperStatus,
+        ifBasicAdminAutoAlarmEnableStatus,
+        ifBasicAdminAutoAlarmEnableReset,
+        ifBasicAdminInterfaceStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic admin objects (R28.0)."
+    ::= { lumIfBasicGroups 11 }
+
+ifBasicIfGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifBasicIfIndex,
+        ifBasicIfName,
+        ifBasicIfTxSignalStatus,
+        ifBasicIfRxSignalStatus,
+        ifBasicIfUpId,
+        ifBasicIfAid,
+        ifBasicIfPhysicalLocation }
+    STATUS      current
+    DESCRIPTION
+        "The ifBasic if objects (R28.0)."
+    ::= { lumIfBasicGroups 12 }
+
+ifBasicAdminGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifBasicAdminIndex,
+        ifBasicAdminName,
+        ifBasicAdminDescr,
+        ifBasicAdminSubrack,
+        ifBasicAdminSlot,
+        ifBasicAdminTxPort,
+        ifBasicAdminRxPort,
+        ifBasicAdminAdminStatus,
+        ifBasicAdminOperStatus,
+        ifBasicAdminAutoAlarmEnableStatus,
+        ifBasicAdminAutoAlarmEnableReset,
+        ifBasicAdminInterfaceStatus,
+        ifBasicAdminIfNo,
+        ifBasicAdminIfType }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifBasic admin objects (R31.0)."
+    ::= { lumIfBasicGroups 13 }
+
+ifBasicSignalGroupV7 OBJECT-GROUP
+    OBJECTS {
+        ifBasicSignalIndex,
+        ifBasicSignalName,
+        ifBasicSignalSignalStructure,
+        ifBasicSignalSignalFormat,
+        ifBasicSignalFarEndLoopbackTerminatingLayer,
+        ifBasicSignalFarEndLoopback,
+        ifBasicSignalFarEndLoopbackTimeout,
+        ifBasicSignalNearEndLoopbackTerminatingLayer,
+        ifBasicSignalNearEndLoopback,
+        ifBasicSignalNearEndLoopbackTimeout,
+        ifBasicSignalFarEndLoopbackEnabled,
+        ifBasicSignalNearEndLoopbackEnabled,
+        ifBasicSignalOpticalLayerMapping,
+        ifBasicSignalConfigurationMismatch,
+        ifBasicSignalActualOpticalLayerMapping,
+        ifBasicSignalSpeed,
+        ifBasicSignalDirection,
+        ifBasicSignalFormatConfigurable,
+        ifBasicSignalFormatConfigurationSharedWithInterface,
+        ifBasicSignalPhysicalLayerMapping,
+        ifBasicSignalFacilityLoopback,
+        ifBasicSignalFacilityLoopbackTimeout,
+        ifBasicSignalFacilityLoopbackEnabled,
+        ifBasicSignalTerminalLoopback,
+        ifBasicSignalTerminalLoopbackTimeout,
+        ifBasicSignalTerminalLoopbackEnabled,
+        ifBasicSignalConnectorType }
+    STATUS      current
+    DESCRIPTION
+        "The ifBasic signal objects (R31.0)."
+    ::= { lumIfBasicGroups 14 }
+
+
+ifBasicAdminGroupV4 OBJECT-GROUP
+    OBJECTS {
+        ifBasicAdminIndex,
+        ifBasicAdminName,
+        ifBasicAdminDescr,
+        ifBasicAdminSubrack,
+        ifBasicAdminSlot,
+        ifBasicAdminTxPort,
+        ifBasicAdminRxPort,
+        ifBasicAdminAdminStatus,
+        ifBasicAdminOperStatus,
+        ifBasicAdminAutoAlarmEnableStatus,
+        ifBasicAdminAutoAlarmEnableReset,
+        ifBasicAdminInterfaceStatus,
+        ifBasicAdminIfNo,
+        ifBasicAdminIfType,
+        ifBasicAdminNotAvailableForUse }
+    STATUS      current
+    DESCRIPTION
+        "The ifBasic admin objects (R32.0)."
+    ::= { lumIfBasicGroups 15 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumIfBasicBasicComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifBasic MIB. (R20.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifBasicGeneralGroupV1,
+            ifBasicIfGroupV1,
+            ifBasicAdminGroupV1,
+            ifBasicSignalGroupV1 }
+    ::= { lumIfBasicCompl 1 }
+
+lumIfBasicBasicComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifBasic MIB. (R22.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifBasicGeneralGroupV1,
+            ifBasicIfGroupV1,
+            ifBasicAdminGroupV1,
+            ifBasicSignalGroupV2 }
+    ::= { lumIfBasicCompl 2 }
+
+lumIfBasicBasicComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifBasic MIB. (R23.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifBasicGeneralGroupV1,
+            ifBasicIfGroupV1,
+            ifBasicAdminGroupV1,
+            ifBasicSignalGroupV3 }
+    ::= { lumIfBasicCompl 3 }
+
+lumIfBasicBasicComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifBasic MIB. (R26.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifBasicGeneralGroupV1,
+            ifBasicIfGroupV2,
+            ifBasicAdminGroupV1,
+            ifBasicSignalGroupV4 }
+    ::= { lumIfBasicCompl 4 }
+
+lumIfBasicBasicComplV5 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifBasic MIB. (R26.1)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifBasicGeneralGroupV1,
+            ifBasicIfGroupV2,
+            ifBasicAdminGroupV1,
+            ifBasicSignalGroupV5 }
+    ::= { lumIfBasicCompl 5 }
+
+lumIfBasicBasicComplV6 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifBasic MIB. (R28.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifBasicGeneralGroupV1,
+            ifBasicIfGroupV3,
+            ifBasicAdminGroupV2,
+            ifBasicSignalGroupV6 }
+    ::= { lumIfBasicCompl 6 }
+
+lumIfBasicBasicComplV7 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifBasic MIB. (R31.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifBasicGeneralGroupV1,
+            ifBasicIfGroupV3,
+            ifBasicAdminGroupV3,
+            ifBasicSignalGroupV7 }
+    ::= { lumIfBasicCompl 7 }
+
+lumIfBasicBasicComplV8 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the ifBasic MIB. (R32.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifBasicGeneralGroupV1,
+            ifBasicIfGroupV3,
+            ifBasicAdminGroupV4,
+            ifBasicSignalGroupV7 }
+    ::= { lumIfBasicCompl 8 }
+END
+

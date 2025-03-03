@@ -1,0 +1,590 @@
+ALCATEL-IND1-DHL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Integer32,
+        MODULE-IDENTITY, OBJECT-TYPE,
+        NOTIFICATION-TYPE, OBJECT-IDENTITY
+                        FROM SNMPv2-SMI
+	RowStatus
+                        FROM SNMPv2-TC
+	SnmpAdminString
+	                FROM SNMP-FRAMEWORK-MIB
+	InterfaceIndex
+			FROM IF-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                        FROM SNMPv2-CONF
+        softentIND1DHL
+                        FROM ALCATEL-IND1-BASE;
+
+
+    alcatelIND1DHLMIB MODULE-IDENTITY
+        LAST-UPDATED "201008150000Z"
+        ORGANIZATION "Alcatel - Architects Of An Internet World"
+        CONTACT-INFO
+            "Please consult with Customer Service to insure the most appropriate
+            version of this document is used with the products in question:
+
+                Alcatel Internetworking, Incorporated
+                (Division 1, Formerly XYLAN Corporation)
+                26801 West Agoura Road
+                Agoura Hills, CA  91301-5122
+                United States Of America
+
+                Telephone:      North America  +1 800 995 2696
+                                Latin America  +1 877 919 9526
+                                Europe         +31 23 556 0100
+                                Asia           +65 394 7933
+                                All Other      +1 818 878 4507
+
+                Electronic Mail:         support@ind.alcatel.com
+                World Wide Web:          http://www.ind.alcatel.com
+                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+        DESCRIPTION
+		"The Dual Homed Link uses two links with a number of VLANs split between 
+		them from the common pool of vlans, in such a way that any vlan is not 
+		associated with both of the redundant links at the same time to avoid formation 
+		of loops and also VLANs are still connected to the core when one link fails. 
+		STP is disabled on both the DHL links implicitly."
+	::= { softentIND1DHL 1 }
+
+    alcatelIND1DHLMIBNotifications OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+                "Branch For DHL Subsystem Notifications."
+        ::= { alcatelIND1DHLMIB 0 }
+ 
+    alcatelIND1DHLMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+                "Branch For DHL Subsystem Managed Objects."
+        ::= { alcatelIND1DHLMIB 1 }
+
+    alcatelIND1DHLMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+                "Branch for DHL Module MIB Subsystem Conformance Information."
+        ::= { alcatelIND1DHLMIB 2 }
+
+    alcatelIND1DHLMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+                "Branch for DHL Module MIB Subsystem Units of Conformance."
+        ::= { alcatelIND1DHLMIBConformance 1 }
+
+    alcatelIND1DHLMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+                "Branch for DHL Module MIB Subsystem Compliance Statements."
+        ::= { alcatelIND1DHLMIBConformance 2 }
+
+-- --------------------------------------------------------------
+
+    alaDHLSessionConfig  OBJECT IDENTIFIER ::= { alcatelIND1DHLMIBObjects 1 }
+
+    alaDHLSessionTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDHLSessionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          	"Defines the DHL control table for providing the 
+           	capability of performing DHL Active-Active operations."
+        ::= { alaDHLSessionConfig  1 }
+
+    alaDHLSessionEntry OBJECT-TYPE
+        SYNTAX     AlaDHLSessionEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in this table containing information of
+	        a single DHL (Active-Active) session."
+        INDEX { 
+                alaDHLSessionIndex               
+              }
+        ::= { alaDHLSessionTable 1 }
+
+    AlaDHLSessionEntry ::=
+        SEQUENCE {
+          alaDHLSessionIndex	                Integer32,
+          alaDHLSessionDescr		        SnmpAdminString,
+          alaDHLSessionAdminStatus		INTEGER,
+          alaDHLSessionOperStatus	        INTEGER,
+          alaDHLSessionPreemptionTime           Integer32,
+          alaDHLSessionAdminMacFlushing	        INTEGER,
+	  alaDHLSessionActiveMacFlushing	INTEGER,
+          alaDHLSessionRowStatus		RowStatus
+        }                                 
+
+    alaDHLSessionIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1 .. 1000)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          	"DHL session Index identify the entries in the table.
+           	we are currently supporting one session." 
+        ::= { alaDHLSessionEntry 1 }
+
+    alaDHLSessionDescr OBJECT-TYPE
+        SYNTAX      SnmpAdminString
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          	"User provided description string for the DHL session."
+        ::= { alaDHLSessionEntry 2 }
+
+    alaDHLSessionAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER  {
+			disable(1),
+			enable(2)
+			}
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          	"Indicates whether the admin state of DHL session is ENBLED or DISABLED."
+	DEFVAL { disable }
+        ::= { alaDHLSessionEntry 3 }
+
+    alaDHLSessionOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          	"Indicates whether the operational state of DHL session is UP or DOWN."
+	DEFVAL { down }
+        ::= { alaDHLSessionEntry 4 }
+        
+
+    alaDHLSessionPreemptionTime OBJECT-TYPE
+        SYNTAX      Integer32 (0..600)
+	UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          	"Interval, in seconds, which defines the pre-emption time used for delay
+           	in moving back the vlan to their original link."
+	DEFVAL { 30 }
+        ::= { alaDHLSessionEntry 5 }
+        
+    alaDHLSessionAdminMacFlushing	 OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none (1),
+                        raw  (2),
+                        mvrp (3)
+                        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          	"Value for mac-flushing technique used for the specified DHL session." 
+        DEFVAL { none }
+        ::= { alaDHLSessionEntry 6 }
+
+    alaDHLSessionActiveMacFlushing	 OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none (1),
+                        raw  (2),
+                        mvrp (3)
+                        }
+        MAX-ACCESS  read-only
+	STATUS      current
+        DESCRIPTION
+                "Operational state of mac-flushing technique used for the specified DHL session."
+        DEFVAL { none }
+        ::= { alaDHLSessionEntry 7 }
+
+    alaDHLSessionRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "This object allows entries to be created and deleted in the table."
+        ::= { alaDHLSessionEntry 8 }
+
+
+    alaDHLLinksConfig  OBJECT IDENTIFIER ::= { alcatelIND1DHLMIBObjects 2 }
+
+    alaDHLLinksTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDHLLinksEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Defines the DHLG links table for a DHL session. this table allows the  
+           capability to add or remove the DHL links from the DHL session."
+        ::= { alaDHLLinksConfig  1 }
+
+    alaDHLLinksEntry OBJECT-TYPE
+        SYNTAX     AlaDHLLinksEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+          "An entry in this table, contains information of 
+	  the configured port/ling-aggs that participate in a DHL session."
+        INDEX { 
+                alaDHLSessionIndex,
+                alaDHLLinkslinkA, 
+                alaDHLLinkslinkB                                       
+              }
+        ::= { alaDHLLinksTable 1 }
+
+    AlaDHLLinksEntry ::=
+        SEQUENCE {
+          alaDHLLinkslinkA                 InterfaceIndex,
+          alaDHLLinkslinkB                 InterfaceIndex,
+	  alaDHLLinkslinkAOperStatus       INTEGER,
+	  alaDHLLinkslinkBOperStatus       INTEGER,
+          alaDHLLinksRowStatus		   RowStatus
+        }
+
+    alaDHLLinkslinkA       OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+     	DESCRIPTION
+     		"The physical identification number for DHL linkA. it can be a physical 
+           	port or a logical port"
+        ::= { alaDHLLinksEntry 1 }
+
+    alaDHLLinkslinkB       OBJECT-TYPE
+     	SYNTAX      InterfaceIndex
+     	MAX-ACCESS  not-accessible
+     	STATUS      current
+     	DESCRIPTION
+     		"The physical identification number for DHL linkB. it can be a physical
+            	port or a logical port"
+        ::= { alaDHLLinksEntry 2 }
+      
+     alaDHLLinkslinkAOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up  (1),
+                        down(2)
+                        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This object indicates whether the operational state of DHL linkA is UP
+                or DOWN. "
+	DEFVAL { down }
+        ::= { alaDHLLinksEntry 3 }
+ 
+     alaDHLLinkslinkBOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up  (1),
+                        down(2)
+                        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Indicates whether the operational state of DHL linkB is UP 
+                or DOWN. "
+	DEFVAL { down }
+        ::= { alaDHLLinksEntry 4 }
+ 
+    alaDHLLinksRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          	"This object allows entries to be created and deleted in the table."
+        ::= { alaDHLLinksEntry 5 }        
+
+    alaDHLVpa  OBJECT IDENTIFIER ::= { alcatelIND1DHLMIBObjects 3 }
+
+    alaDHLVpaTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDHLVpaEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          	"Used to display the vlan membership of the DHL links. this table is also 
+		used to display whether a vlan is protected or unprotected and operational on which DHL link. "
+        ::= { alaDHLVpa  1 }
+
+    alaDHLVpaEntry OBJECT-TYPE
+        SYNTAX     AlaDHLVpaEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+          "An entry in this table, contains VPA information of
+	  of each link per DHL session."
+        INDEX { 
+                alaDHLSessionIndex,
+                alaDHLVpalink,
+                alaDHLVpaVlan
+              }
+        ::= { alaDHLVpaTable 1 }
+
+    AlaDHLVpaEntry ::=
+        SEQUENCE {
+          alaDHLVpalink                        InterfaceIndex, 
+          alaDHLVpaVlan                        Integer32,
+          alaDHLVpaVlanType                    INTEGER,
+          alaDHLVpaActiveLink                  InterfaceIndex
+        }
+
+    alaDHLVpalink  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION
+          	"Indicates the vlan is member of linkA or linkB. the value is 
+		physical identification number for DHL link. it can be a physical port or a logical port "
+        ::= { alaDHLVpaEntry 1 }
+
+    alaDHLVpaVlan       OBJECT-TYPE
+     	SYNTAX      Integer32 (1 .. 4094)
+     	MAX-ACCESS  not-accessible 
+     	STATUS      current
+     	DESCRIPTION
+     	       "The vlan number where the DHL linkA or linkB is  member of it."
+        ::= { alaDHLVpaEntry 2 }
+
+        
+    alaDHLVpaVlanType    OBJECT-TYPE
+     	SYNTAX      INTEGER {
+                          protectedVlan   (1),
+                          unprotectedVlan (2)
+                      }
+     	MAX-ACCESS  read-only
+     	STATUS      current
+     	DESCRIPTION
+     	       "indicates whether the vlan is protected or un protected where
+               one of the DHL link is member of it."
+     	::= { alaDHLVpaEntry 3 }
+
+
+    alaDHLVpaActiveLink	     OBJECT-TYPE
+     	SYNTAX      InterfaceIndex 
+     	MAX-ACCESS  read-only
+     	STATUS      current
+     	DESCRIPTION 
+               "indicates the DHL link on which the vlan is operational.
+               If the value is zero that means the vlan is not operational and 
+               it's unprotected."
+     	::= { alaDHLVpaEntry 4 }
+
+    alaDHLVlanMap  OBJECT IDENTIFIER ::= { alcatelIND1DHLMIBObjects 4 }
+
+    alaDHLVlanMapTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDHLVlanMapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+               "Defines the DHL vlan map for linkB. this indicates the vlans 
+               that will be operational on DHL linkB from the common pool of
+               vlans between DHL linkA and linkB and by default the vlans 
+               that are not specified by  this table are operational on DHL
+               linkA."
+        ::= { alaDHLVlanMap  1 }
+
+    alaDHLVlanMapEntry OBJECT-TYPE
+        SYNTAX     AlaDHLVlanMapEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+               "An entry in this table, 
+               contains the vlan-map for linkB in DHL session."
+        INDEX { 
+                alaDHLSessionIndex,
+                alaDHLVlanMapVlanStart,
+                alaDHLVlanMapVlanEnd
+              }
+        ::= { alaDHLVlanMapTable 1 }
+
+    AlaDHLVlanMapEntry ::=
+        SEQUENCE {
+          alaDHLVlanMapVlanStart                    Integer32,
+          alaDHLVlanMapVlanEnd                      Integer32,
+          alaDHLVlanMapRowStatus	            RowStatus
+        }
+
+    alaDHLVlanMapVlanStart OBJECT-TYPE
+        SYNTAX            Integer32 (1..4094)
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION
+               "The VLAN number identifying the first vlan id in the
+               range. And if start and end is same then it will
+               be treated a one vlan id."
+        ::= { alaDHLVlanMapEntry 1 }
+
+    alaDHLVlanMapVlanEnd OBJECT-TYPE
+        SYNTAX            Integer32 (1..4094)
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION
+               "The VLAN number identifying the end vlan id in the
+               range. And if start and end is same then it will
+               be treated a one vlan id."
+        ::= { alaDHLVlanMapEntry 2 }
+
+    alaDHLVlanMapRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+               "This object allows entries to be created and deleted
+               in the table."
+        ::= { alaDHLVlanMapEntry 3 }
+
+    alaDHLTrapsObj OBJECT IDENTIFIER ::= { alcatelIND1DHLMIBObjects 5 }
+
+-- -------------------------------------------------------------
+-- Notifications
+-- -------------------------------------------------------------
+
+    alaDHLVlanMoveTrap	NOTIFICATION-TYPE
+        OBJECTS  {
+		    alaDHLSessionID,
+                    alaDHLPortFrom,
+                    alaDHLPortTo,
+		    alaDHLVlanMoveReason 
+                 }
+        STATUS   current
+        DESCRIPTION
+		"When linkA or linkB goes down or becomes up and both the ports are 
+		are part of some vlan-map, then this 
+		trap is sent to the Management Entity, with the DHL port information."
+        ::= { alcatelIND1DHLMIBNotifications 1 }
+
+-- -------------------------------------------------------------
+-- Notification Objects
+-- -------------------------------------------------------------
+    alaDHLSessionID OBJECT-TYPE
+        SYNTAX Integer32
+	MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "This object specifies the DHL Session ID for which alaDHLVlanMoveTrap needs to be
+		sent to the Management Entity."
+	::= { alaDHLTrapsObj 1 }
+	
+    alaDHLPortFrom OBJECT-TYPE
+	SYNTAX InterfaceIndex	
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+		"This object specifies the port, either linkA or linkB, from which
+		vlan-mapped vlans have joined to other port due to linkUp or linkDown
+		as specified by alaDHLVlanMoveReason."
+        ::= { alaDHLTrapsObj 2 }
+
+    alaDHLPortTo OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "This object specifies the port, either linkA or linkB, to which 
+		vlan-mapped vlans have joined from other port due to linkUp or linkDown
+                as specified by alaDHLVlanMoveReason."
+	::= { alaDHLTrapsObj 3 }
+
+    alaDHLVlanMoveReason OBJECT-TYPE
+        SYNTAX INTEGER {
+			linkUp   (1),
+			linkDown (2)
+			}
+	MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "This object specifies the reason for Vlan Movement from one port to another port."
+        ::= { alaDHLTrapsObj 4 }
+
+-- -------------------------------------------------------------
+-- COMPLIANCE
+-- -------------------------------------------------------------
+    alcatelIND1DHLMIBCompliance MODULE-COMPLIANCE
+        STATUS    current
+        DESCRIPTION
+            "Compliance statement for DHL."
+        MODULE
+        MANDATORY-GROUPS
+        {
+                alaDHLSessionGroup,
+                alaDHLLinksGroup,
+                alaDHLVpaGroup,
+		alaDHLVlanMapGroup, 
+		alaDHLNotificationGroup	
+        }
+        ::= { alcatelIND1DHLMIBCompliances 1 }
+
+-- -------------------------------------------------------------
+-- UNITS OF CONFORMANCE
+-- -------------------------------------------------------------
+    alaDHLSessionGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaDHLSessionDescr,
+                alaDHLSessionAdminStatus,
+                alaDHLSessionOperStatus,
+		alaDHLSessionPreemptionTime,
+		alaDHLSessionAdminMacFlushing,
+		alaDHLSessionActiveMacFlushing,
+		alaDHLSessionRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            	"Collection of objects for management of a single DHL (Active-Active) session."
+        ::= { alcatelIND1DHLMIBGroups 1 }
+
+    alaDHLLinksGroup OBJECT-GROUP
+        OBJECTS
+        {
+		alaDHLLinkslinkAOperStatus,
+		alaDHLLinkslinkBOperStatus,
+                alaDHLLinksRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            	"Collection of objects for information of the configured port/ling-aggs
+	  	that participate in a DHL session."
+	::= { alcatelIND1DHLMIBGroups 2 }
+
+    alaDHLVpaGroup OBJECT-GROUP
+        OBJECTS
+        {
+		alaDHLVpaVlanType,
+		alaDHLVpaActiveLink
+	}
+	STATUS  current
+        DESCRIPTION
+                "Collection of objects providing VPA information of each link 
+		per DHL session."
+	::= { alcatelIND1DHLMIBGroups 3 }
+
+    alaDHLVlanMapGroup OBJECT-GROUP
+        OBJECTS
+        {
+		alaDHLVlanMapRowStatus
+	}
+	STATUS  current
+        DESCRIPTION
+                "Collection of objects providing the vlan-map for linkB in DHL session."
+	::= { alcatelIND1DHLMIBGroups 4 }
+
+    alaDHLNotificationObjectGroup	OBJECT-GROUP
+	OBJECTS
+        {
+		alaDHLSessionID,
+                alaDHLPortFrom,
+                alaDHLPortTo,
+                alaDHLVlanMoveReason
+	}
+	STATUS  current
+        DESCRIPTION
+                "Collection of objects providing the information regarding DHL Trap."
+	::= { alcatelIND1DHLMIBGroups 5 }
+
+    alaDHLNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+        {
+               alaDHLVlanMoveTrap 
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for DHL Trap information."
+	::= { alcatelIND1DHLMIBGroups 6 }
+
+END
+

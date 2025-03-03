@@ -15,22 +15,21 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $oid = '.1.3.6.1.4.1.32050.2.1.27.5.1';
 $current = (snmp_get($device, $oid, '-Oqv') / 10);
-discover_sensor($valid['sensor'], 'voltage', $device, $oid, 1, 'sitemonitor', 'Shunt Input', 10, 1, null, null, null, null, $current);
+discover_sensor(null, 'voltage', $device, $oid, 1, 'sitemonitor', 'Shunt Input', 10, 1, null, null, null, null, $current);
 
 $oid = '.1.3.6.1.4.1.32050.2.1.27.5.2';
 $current = (snmp_get($device, $oid, '-Oqv') / 10);
-discover_sensor($valid['sensor'], 'voltage', $device, $oid, 2, 'sitemonitor', 'Power 1', 10, 1, null, null, null, null, $current);
+discover_sensor(null, 'voltage', $device, $oid, 2, 'sitemonitor', 'Power 1', 10, 1, null, null, null, null, $current);
 
 $oid = '.1.3.6.1.4.1.32050.2.1.27.5.3';
 $current = (snmp_get($device, $oid, '-Oqv') / 10);
-discover_sensor($valid['sensor'], 'voltage', $device, $oid, 3, 'sitemonitor', 'Power 2', 10, 1, null, null, null, null, $current);
+discover_sensor(null, 'voltage', $device, $oid, 3, 'sitemonitor', 'Power 2', 10, 1, null, null, null, null, $current);

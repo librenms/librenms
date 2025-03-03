@@ -1,0 +1,83 @@
+CONEL-STATUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+			enterprises, Gauge
+				FROM RFC1155-SMI
+			OBJECT-TYPE
+				FROM RFC-1212;
+
+conel			OBJECT IDENTIFIER ::= { enterprises 30140 }
+
+status			OBJECT IDENTIFIER ::= { conel 3 }
+
+statusMBusOverload1	OBJECT-TYPE
+			SYNTAX	Gauge {
+				no (0),
+				yes (1)
+			}
+			ACCESS	read-only
+			STATUS	current
+			::= { status 1 }
+
+statusMBusOverload2	OBJECT-TYPE
+			SYNTAX	Gauge {
+				no (0),
+				yes (1)
+			}
+			ACCESS	read-only
+			STATUS	current
+			::= { status 2 }
+
+statusTemperature	OBJECT-TYPE
+			SYNTAX	INTEGER
+			ACCESS	read-only
+			STATUS	current
+			::= { status 3 }
+
+statusVoltage		OBJECT-TYPE
+			SYNTAX	INTEGER
+			ACCESS	read-only
+			STATUS	current
+			::= { status 4 }
+
+statusRTCBattery	OBJECT-TYPE
+			SYNTAX	INTEGER {
+				unknown (0),
+				ok (1),
+				empty (2)
+			}
+			ACCESS	read-only
+			STATUS	current
+			::= { status 5 }
+
+statusCPUUsage		OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { status 6 }
+
+statusRAMUsage		OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { status 7 }
+
+statusRAMUsed		OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { status 8 }
+
+statusRAMFree		OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { status 9 }
+
+statusRAMTotal		OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { status 10 }
+
+END

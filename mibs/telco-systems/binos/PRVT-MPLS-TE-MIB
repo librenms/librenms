@@ -1,0 +1,5234 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename:   PRVT-MPLS-TE-MIB.mib
+-- ** Project:    T-Metro Switches.
+-- ** Purpose:    Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications.  All rights reserved.
+--                             WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information.  This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM.  Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-MPLS-TE-MIB DEFINITIONS ::= BEGIN
+-- PRODUCT-SHORT-NAME MPLS
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+   Integer32, Unsigned32, Counter32, zeroDotZero,
+   Counter64, TimeTicks
+      FROM SNMPv2-SMI
+      
+           NOTIFICATION-TYPE, transmission
+          FROM SNMPv2-SMI                    -- [RFC2578]
+
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF
+
+   TEXTUAL-CONVENTION, TruthValue, RowStatus, RowPointer,
+   StorageType, DisplayString, TimeStamp
+      FROM SNMPv2-TC
+
+   InterfaceIndexOrZero
+      FROM IF-MIB
+
+   MplsBitRate, MplsBurstSize, MplsLSPID,
+   MplsTunnelIndex, MplsTunnelInstanceIndex,
+   MplsTunnelAffinity, MplsExtendedTunnelId, MplsPathIndex,
+   MplsPathIndexOrZero, MplsOwner, TeHopAddressType,
+   TeHopAddress, TeHopAddressAS, TeHopAddressUnnum
+      FROM MPLS-TC-PRIV-STDEXT-MIB                               -- [RFC3811]
+
+   InetAddressPrefixLength, InetAddressType, InetAddress, InetAddressIPv4
+      FROM INET-ADDRESS-MIB                              -- [RFC3291]
+
+   prvtMplsTeMibEntityIndex
+      FROM PRVT-TEMIB-ENTITY-MIB 
+      
+   mpls 				 		FROM PRVT-CR-LDP-MIB;
+
+mplsTeMIB MODULE-IDENTITY
+      LAST-UPDATED "200902170000Z" 
+      ORGANIZATION "BATM Advanced Communication"
+      CONTACT-INFO
+                   " BATM/Telco Systems Support team
+					Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"
+   DESCRIPTION
+        "This MIB module contains managed object definitions
+          for MPLS Traffic Engineering (TE) as defined in:
+          Extensions to RSVP for LSP Tunnels, Awduche et al,
+          Internet Draft <draft-ietf-mpls-rsvp-lsp-tunnel-
+          07.txt>, August 2000; Constraint-Based LSP Setup
+          using LDP, B. Jamoussi, Internet Draft <draft-ietf-
+          mpls-cr-ldp-04.txt>, July 2000; Requirements for
+          Traffic Engineering Over MPLS, Awduche, D., J.
+          Malcolm, J., Agogbua, J., O'Dell, M., J. McManus,
+          <rfc2702.txt>, September 1999."
+
+
+   -- Revision history.  
+   REVISION "200902170000Z"
+   DESCRIPTION
+        "Removed references to undefined OBJECT-GROUPs."
+   REVISION     "200811200000Z"
+    DESCRIPTION
+        "Added additional timer (mplsTunnelMBBTimeOut) in the tunnel mib."
+   REVISION     "200808280000Z"
+    DESCRIPTION
+        "mplsTunnelReoptimized notification updates." 
+    REVISION     "200803030000Z"
+    DESCRIPTION
+        "mplsTunnelRebuildTimer updates." 
+    REVISION     "200712060000Z"
+    DESCRIPTION
+        "Minor TC updates."
+  
+    REVISION     "200712020959Z"
+    DESCRIPTION
+        "The attribute for guarded destination has IPv4 TC."
+
+  
+    
+
+
+   ::= { mpls 2 }
+
+
+-- Textual Conventions.
+
+MplsTunnelIndexSyntax ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+        "Index into mplsTunnelTable."
+   SYNTAX        Integer32 (0..65535)
+
+MplsLsrId ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+        "A unique identifier for an MPLS LSR. This MAY
+          represent an IpV4 address."
+   SYNTAX   Unsigned32
+
+MplsGeneralizedLabelType ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+       "The  label  types that are defined  for  Generalized
+        MPLS."
+   SYNTAX     INTEGER {
+                  mplsLabel(1),
+                  generalizedLabel(2),
+                  wavebandLabel(3)
+              }
+-- Addition
+
+MplsTunnelPrivateDataSyntax ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+       "Represents private data field."
+    SYNTAX       OCTET STRING (SIZE (0..8))
+
+MplsTunnelTNAAddress ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+      "TNA address of a tunnel."
+    SYNTAX       OCTET STRING (SIZE (0..20))
+
+MplsGeneralizedLabel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255x"
+    STATUS      current
+    DESCRIPTION
+        "This value represents a generalized MPLS Label.
+        The label contents are specific to the label being
+        represented.
+
+        Wherever an MplsGeneralizedLabel is copied to or from
+        a signaling protocol message, it is copied byte for
+        byte as is.  Therefore, if the octet string is
+        intended to represent multibyte values, it encodes
+        those values in network (big-endian) byte order.
+        This interpretation applies in particular to the
+        non-generalized MPLS labels (32 bits) used in ATM, FR
+        and generic MPLS networks."
+    SYNTAX      OCTET STRING (SIZE (0..255))
+-- End Addition
+
+-- Top level components of this MIB.
+
+-- tables, scalars
+mplsTeObjects       OBJECT IDENTIFIER ::= { mplsTeMIB 1 }
+
+-- traps
+mplsTeNotifications OBJECT IDENTIFIER ::= { mplsTeMIB 2 }
+mplsTeNotifyPrefix  OBJECT IDENTIFIER ::= { mplsTeNotifications 0 }
+
+-- conformance
+mplsTeConformance   OBJECT IDENTIFIER ::= { mplsTeMIB 3 }
+
+-- MPLS tunnel table.
+
+-- Addition
+mplsTunnelIndexNextTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_TNI
+   SYNTAX        SEQUENCE OF MplsTunnelIndexNextEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains the next available values of
+        mplsTunnelIndex for all entities."
+   ::= { mplsTeObjects 1 }
+
+mplsTunnelIndexNextEntry  OBJECT-TYPE
+   SYNTAX        MplsTunnelIndexNextEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents the next available
+        mplsTunnelIndex for a specific TE-MIB entity.
+        This MIB table is indexed by the PRVT-TE-MIB entity Index."
+
+   INDEX  { prvtMplsTeMibEntityIndex }
+      ::= { mplsTunnelIndexNextTable 1 }
+
+MplsTunnelIndexNextEntry ::= SEQUENCE {
+      mplsTunnelIndexNextIndex           Integer32
+    }
+-- End Addition
+
+mplsTunnelIndexNextIndex OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object contains the next appropriate value
+        to be used for mplsTunnelIndex when creating
+        entries in the mplsTunnelTable. If the number of
+        unassigned entries is exhausted, this object
+        will take on the value of 0.  To obtain the
+        mplsTunnelIndex value for a new entry, the
+        manager must first issue a management protocol
+        retrieval operation to obtain the current value
+        of this object. The agent should modify the
+        value to reflect the next unassigned index after
+        each retrieval operation. After a manager
+        retrieves a value the agent will determine
+        through its local policy when this index value
+        will be made available for reuse."
+::= { mplsTunnelIndexNextEntry 1 }
+
+
+mplsTunnelTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_TNNL
+   SYNTAX        SEQUENCE OF MplsTunnelEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The mplsTunnelTable allows new MPLS tunnels to be
+          created between an LSR and a remote endpoint, and
+          existing tunnels to be reconfigured or removed.
+          Note that only point-to-point tunnel segments are
+          supported, although multi-point-to-point and point-
+          to-multi-point connections are supported by an LSR
+          acting as a cross-connect.  Each MPLS tunnel can
+          thus have one out-segment originating at this LSR
+          and/or one in-segment terminating at this LSR.
+
+          To configure tunnels where the ingress and egress routers
+          are identified by IPv6 addresses, the following approach is
+          used.
+
+          - The mplsTunnelIngressLSRId and mplsTunnelEgressLSRId
+            fields are set to 32-bit identifiers for the ingress and
+            egress routers.
+
+          - mplsTunnelHopTableIndex must be set to a non-zero value.
+
+          - The first hop in the hop table for the tunnel path must be
+            set to a global scope IPv6 address of the local router.
+
+          - The last entry in the hop table must be set to a global
+            scope IPv6 address of the egress router."
+   ::= { mplsTeObjects 2 }
+
+mplsTunnelEntry OBJECT-TYPE
+   SYNTAX        MplsTunnelEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table represents an MPLS tunnel.
+          An entry can be created by a network administrator
+          or by an SNMP agent as instructed by an MPLS
+          signaling protocol. Whenever a new entry is created
+          with mplsTunnelIsIf set to true(1), then a
+          corresponding entry is created in ifTable as well
+          (see RFC 2233). The ifType of this entry is
+          mplsTunnel(150)."
+   INDEX  { prvtMplsTeMibEntityIndex,
+            mplsTunnelIndex, mplsTunnelInstance,
+            mplsTunnelIngressLSRId, mplsTunnelEgressLSRId }
+      ::= { mplsTunnelTable 1 }
+
+
+MplsTunnelEntry ::= SEQUENCE {
+      mplsTunnelIndex                   MplsTunnelIndexSyntax,
+      mplsTunnelInstance                MplsTunnelInstanceIndex,
+      mplsTunnelIngressLSRId            MplsExtendedTunnelId,
+      mplsTunnelEgressLSRId             MplsExtendedTunnelId,
+      mplsTunnelName                    DisplayString,
+      mplsTunnelDescr                   DisplayString,
+      mplsTunnelIsIf                    TruthValue,
+      mplsTunnelIfIndex                 InterfaceIndexOrZero,
+      mplsTunnelOwner                   MplsOwner,
+      mplsTunnelRole                    INTEGER,
+      mplsTunnelXCPointer               RowPointer,
+      mplsTunnelSignallingProto         INTEGER,
+      mplsTunnelSetupPrio               Integer32,
+      mplsTunnelHoldingPrio             Integer32,
+      mplsTunnelSessionAttributes       BITS,
+      mplsTunnelLocalProtectInUse       TruthValue,
+      mplsTunnelResourcePointer         RowPointer,
+      mplsTunnelPrimaryInstance         MplsTunnelInstanceIndex,
+      mplsTunnelInstancePriority        Unsigned32,
+      mplsTunnelHopTableIndex           MplsPathIndexOrZero,
+      mplsTunnelPathInUse               MplsPathIndexOrZero,
+      mplsTunnelARHopTableIndex         MplsPathIndexOrZero,
+      mplsTunnelCHopTableIndex          MplsPathIndexOrZero,
+      mplsTunnelIncludeAnyAffinity      MplsTunnelAffinity,
+      mplsTunnelIncludeAllAffinity      MplsTunnelAffinity,
+      mplsTunnelExcludeAnyAffinity      MplsTunnelAffinity,
+      mplsTunnelTotalUpTime             TimeTicks,
+      mplsTunnelInstanceUpTime          TimeTicks,
+      mplsTunnelPrimaryUpTime           TimeTicks,
+      mplsTunnelPathChanges             Counter32,
+      mplsTunnelLastPathChange          TimeTicks,
+      mplsTunnelCreationTime            TimeStamp,
+      mplsTunnelStateTransitions        Counter32,
+      mplsTunnelAdminStatus             INTEGER,
+      mplsTunnelOperStatus              INTEGER,
+      mplsTunnelRowStatus               RowStatus,
+      mplsTunnelStorageType             StorageType,
+-- Addition
+      mplsTunnelUnnumIf                 TruthValue,
+      mplsTunnelAttributes              BITS,
+      mplsTunnelLSPEncoding             INTEGER,
+      mplsTunnelSwitchingType           Unsigned32,
+      mplsTunnelLinkProtection          BITS,
+      mplsTunnelGPid                    INTEGER,
+      mplsTunnelSecondary               TruthValue,
+      mplsTunnelDirection               INTEGER,
+      mplsTunnelPathComp                INTEGER,
+      mplsTunnelUpNotRecipType          InetAddressType,
+      mplsTunnelUpNotRecip              InetAddress,
+      mplsTunnelDownNotRecipType        InetAddressType,
+      mplsTunnelDownNotRecip            InetAddress,
+      mplsTunnelAdminStatusFlags        BITS,
+      mplsTunnelExtraParamsPtr          RowPointer,
+      mplsTunnelUseEgressLabel          TruthValue,
+      mplsTunnelEgressLabel             MplsGeneralizedLabel,
+      mplsTunnelEgressLabelType         MplsGeneralizedLabelType,
+      mplsTunnelOmitEROIfOneHop         TruthValue,
+      mplsTunnelPrivateData             MplsTunnelPrivateDataSyntax,
+      mplsTunnelSrcTNAAddressType       INTEGER,
+      mplsTunnelSrcTNAAddress           MplsTunnelTNAAddress,
+      mplsTunnelDestTNAAddressType      INTEGER,
+      mplsTunnelDestTNAAddress          MplsTunnelTNAAddress,
+      mplsTunnelEndToEndRerouting       TruthValue,
+      mplsTunnelIsUni                   TruthValue,
+      mplsTunnelUniServiceLevel         Integer32,
+      mplsTunnelUniEgressLabel          MplsGeneralizedLabel,
+      mplsTunnelUniEgressLabelType      MplsGeneralizedLabelType,
+      mplsTunnelUniEgressLabelPort      Unsigned32,
+      mplsTunnelUniRvsEgressLabel       MplsGeneralizedLabel,
+      mplsTunnelUniRvsEgressLabelType   MplsGeneralizedLabelType,
+      mplsTunnelUniRvsEgressLabelPort   Unsigned32,
+      mplsTunnelDeletionMode            INTEGER,
+      mplsTunnelUniDiversityListIndex   Integer32,
+      mplsTunnelDiffServIndex           Integer32,
+      mplsTunnelReversePrivateData      MplsTunnelPrivateDataSyntax,
+      mplsTunnelFastRerouteMode         INTEGER,
+      mplsTunnelBackupSetupPrio         Integer32,
+      mplsTunnelBackupHoldingPriority   Integer32,
+      mplsTunnelBackupIncAny            MplsTunnelAffinity,
+      mplsTunnelBackupIncAll            MplsTunnelAffinity,
+      mplsTunnelBackupExcAny            MplsTunnelAffinity,
+      mplsTunnelBackupBandwidth         MplsBitRate,
+      mplsTunnelBackupMaxHops           Unsigned32,
+      mplsTunnelIsSpc                   TruthValue,
+      mplsTunnelUniIngressLabel         MplsGeneralizedLabel,
+      mplsTunnelUniIngressLabelType     MplsGeneralizedLabelType,
+      mplsTunnelUniIngressLabelPort     Unsigned32,
+      mplsTunnelUniRvsIngrLabel         MplsGeneralizedLabel,
+      mplsTunnelUniRvsIngrLabelType     MplsGeneralizedLabelType,
+      mplsTunnelUniRvsIngrLabelPort     Unsigned32,
+      mplsTunnelDiffServClassType       Integer32,
+      mplsTunnelExtendedProtection      TruthValue,
+      mplsTunnelProtecting              TruthValue,
+      mplsTunnelNotification            TruthValue,
+      mplsTunnelLspProtection           Unsigned32,
+      mplsTunnelAssociatedLspId         MplsTunnelInstanceIndex,
+      mplsTunnelCallIdType              INTEGER,
+      mplsTunnelCallId                  OCTET STRING,
+      mplsTunnelIsIpv6                  TruthValue,
+      mplsTunnelMtu                     Integer32,
+      mplsTunnelRebuildTimer            TimeTicks,
+      mplsTunnelOperStatusFlags	        BITS,
+      mplsTunnelGuardedDest             InetAddressIPv4,
+      mplsTunnelMBBTimeOut              Integer32
+-- End Addition
+   }
+
+mplsTunnelIndex OBJECT-TYPE
+   SYNTAX        MplsTunnelIndexSyntax
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Uniquely identifies this row."
+   ::= { mplsTunnelEntry 1 }
+
+mplsTunnelInstance OBJECT-TYPE
+   SYNTAX        MplsTunnelInstanceIndex
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Uniquely identifies an instance of a tunnel. It is
+          useful to identify multiple instances of tunnels
+          for the purposes of backup and parallel tunnels."
+   ::= { mplsTunnelEntry 2 }
+
+mplsTunnelIngressLSRId OBJECT-TYPE
+   SYNTAX        MplsExtendedTunnelId
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Identity of the ingress LSR associated with this
+          tunnel instance. When the MPLS signalling protocol
+          is rsvp(2) this value SHOULD be equal to the Tunnel
+          Sender Address in the Sender Template object and MAY
+          be equal to the Extended Tunnel Id field in the
+          SESSION object. When the MPLS signalling protocol is
+          crldp(3) this value SHOULD be equal to the Ingress
+          LSR Router ID field in the LSPID TLV object."
+   REFERENCE
+        "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+          Awduche et al, RFC 3209, December 2001
+         2. Constraint-Based LSP Setup using LDP, Jamoussi
+          (Editor), RFC 3212, January 2002"
+   ::= { mplsTunnelEntry 3 }
+
+mplsTunnelEgressLSRId OBJECT-TYPE
+   SYNTAX        MplsExtendedTunnelId
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Identity of the egress LSR associated with this
+          tunnel instance."
+   ::= { mplsTunnelEntry 4 }
+
+mplsTunnelName OBJECT-TYPE
+   SYNTAX        DisplayString
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The canonical name assigned to the tunnel. This name
+          can be used to refer to the tunnel on the LSRs
+          console port.  If mplsTunnelIsIf is set to true
+          then the ifName of the interface corresponding to
+          this tunnel should have a value equal to
+          mplsTunnelName.  Also see the description of ifName
+          in RFC 2863."
+   REFERENCE
+        "RFC 2863 - The Interfaces Group MIB, McCloghrie, K.,
+          and F. Kastenholtz, June 2000"
+   ::= { mplsTunnelEntry 5 }
+
+mplsTunnelDescr OBJECT-TYPE
+   SYNTAX        DisplayString
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "A textual string containing information about the
+          tunnel.  If there is no description this object
+          contains a zero length string. This object is may
+          not be signaled by MPLS signaling protocols,
+          consequentally the value of this object at transit
+          and egress LSRs MAY be automatically generated or
+          absent."
+   ::= { mplsTunnelEntry 6 }
+
+mplsTunnelIsIf OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Denotes whether or not this tunnel corresponds to an
+          interface represented in the interfaces group
+          table. Note that if this variable is set to true
+          then the ifName of the interface corresponding to
+          this tunnel should have a value equal to
+          mplsTunnelName.  Also see the description of ifName
+          in RFC 2233."
+   DEFVAL        { false }
+   ::= { mplsTunnelEntry 7 }
+
+mplsTunnelIfIndex OBJECT-TYPE
+   SYNTAX        InterfaceIndexOrZero
+-- Addition
+-- MAX-ACCESS    read-only
+   MAX-ACCESS    read-create
+-- End Addition
+   STATUS        current
+   DESCRIPTION
+        "If mplsTunnelIsIf is set to true, then this value
+          contains the LSR-assigned ifIndex which corresponds
+          to an entry in the interfaces table.  Otherwise
+          this variable should contain the value of zero
+          indicating that a valid ifIndex was not assigned to
+          this tunnel interface."
+   REFERENCE
+        "RFC 2863 - The Interfaces Group MIB, McCloghrie, K.,
+          and F. Kastenholtz, June 2000"
+   DEFVAL { 0 }
+   ::= { mplsTunnelEntry 8 }
+
+mplsTunnelOwner OBJECT-TYPE
+   SYNTAX        MplsOwner
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Denotes the entity that created and is responsible
+          for managing this tunnel. This column is
+          automatically filled by the agent on creation of a
+          row."
+   ::= { mplsTunnelEntry 9 }
+
+mplsTunnelRole OBJECT-TYPE
+   SYNTAX        INTEGER { head(1),
+                           transit(2),
+                           tail(3),
+                           headTail(4) }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This value signifies the role that this tunnel
+          entry/instance represents. This value MUST be set
+          to head(1) at the originating point of the tunnel.
+          This value MUST be set to transit(2) at transit
+          points along the tunnel, if transit points are
+          supported. This value MUST be set to tail(3) at the
+          terminating point of the tunnel if tunnel tails are
+          supported.
+
+         The value headTail(4) is provided for tunnels that
+          begin and end on the same LSR."
+   DEFVAL        { head }
+      ::= { mplsTunnelEntry 10 }
+
+mplsTunnelXCPointer OBJECT-TYPE
+   SYNTAX        RowPointer
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable points to a row in the mplsXCTable.
+          This table identifies the segments that compose
+          this tunnel, their characteristics, and
+          relationships to each other. A value of zeroDotZero
+          indicates that no LSP has been associated with this
+          tunnel yet.
+
+          The array of longs specified here is configured as
+          the OID array for the lmgr entity cross connect row.
+          This consists of the length, family, lmgr entity
+          index and row index values.  Only the
+          AMB_MPLS_XC_INDEX_IDX index is referenced by the
+          TE-MIB."
+   REFERENCE
+        "Srinivasan, C., Viswanathan, A., and T. Nadeau,
+          Multiprotocol Label Switching (MPLS) Label Switching
+          Router (LSR) Management Information Base (MIB), RFC 3813,
+          June 2004"
+   DEFVAL        { zeroDotZero }
+   ::= { mplsTunnelEntry 11 }
+
+mplsTunnelSignallingProto OBJECT-TYPE
+   SYNTAX       INTEGER {
+                     none(1),
+                     rsvp(2),
+                     crldp(3),
+                     other(4)
+                     }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The signalling protocol, if any, used to setup this
+          tunnel."
+   DEFVAL        { none }
+   ::= { mplsTunnelEntry 12 }
+
+mplsTunnelSetupPrio OBJECT-TYPE
+   SYNTAX        Integer32 (0..7)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Indicates the setup priority of this tunnel."
+   REFERENCE
+        "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+          Awduche et al, RFC 3209, December 2001
+         2. Constraint-Based LSP Setup using LDP, Jamoussi
+          (Editor), RFC 3212, January 2002"
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 13 }
+
+mplsTunnelHoldingPrio OBJECT-TYPE
+   SYNTAX        Integer32 (0..7)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Indicates the holding priority for this tunnel."
+   REFERENCE
+        "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+          Awduche et al, RFC 3209, December 2001
+
+         2. Constraint-Based LSP Setup using LDP, Jamoussi
+          (Editor), RFC 3212, January 2002"
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 14 }
+
+mplsTunnelSessionAttributes OBJECT-TYPE
+   SYNTAX      BITS {
+                  fastReroute (0),
+                  mergingPermitted (1),
+                  isPersistent (2),
+                  isPinned (3),
+                  recordRoute(4),
+-- Addition
+                  reserved5(5),
+                  bandwidthProtect(6),
+                  nodeProtect(7)
+-- End Addition
+                 }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+         "This bitmask indicates optional session values for
+          this tunnel. The following describes these bit
+          fields:
+
+         fastReroute This flag indicates that any tunnel
+          hop may choose to reroute this tunnel without
+          tearing it down.  This flag permits transit routers
+          to use a local repair mechanism which may result in
+          violation of the explicit routing of this tunnel.
+          When a fault is detected on an adjacent downstream
+          link or node, a transit router can reroute traffic
+          for fast service restoration.
+
+         mergingPermitted This flag permits transit routers
+          to merge this session with other RSVP sessions for
+          the purpose of reducing resource overhead on
+          downstream transit routers, thereby providing
+          better network scalability.
+
+        isPersistent  Indicates whether this tunnel should
+          be restored automatically after a failure occurs.
+
+        isPinned   This flag indicates whether the loose-
+          routed hops of this tunnel are to be pinned.
+
+        recordRoute This flag indicates if the
+          signaling protocol should remember the tunnel path
+          after it has been signaled.
+
+--        recordLabels This flag indicates if the
+--          signaling protocol should record labels as well as
+--          the tunnel path.
+
+        bandwidthProtect This flag indicates whether fast reroute
+          bandwidth protection is desired.
+
+        nodeProtect This flag indicates whether fast reroute
+          node protection is desired."
+   REFERENCE
+        "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+          Awduche et al, RFC 3209, December 2001."
+   DEFVAL        { {} }
+   ::= { mplsTunnelEntry 15 }
+
+mplsTunnelLocalProtectInUse  OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Indicates that the local repair mechanism is in use
+          to maintain this tunnel (usually in the face of an
+          outage of the link it was previously routed over)."
+   DEFVAL        { false }
+   ::= { mplsTunnelEntry 16 }
+
+mplsTunnelResourcePointer OBJECT-TYPE
+   SYNTAX        RowPointer
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable represents a pointer to the traffic
+          parameter specification for this tunnel.  This
+          value may point at an entry in the
+          mplsTunnelResourceEntry to indicate which
+          mplsTunnelResourceEntry is to be assigned to this
+          LSP instance.  This value may optionally point at
+          an externally defined traffic parameter
+          specification table.  A value of zeroDotZero
+          indicates best-effort treatment.  By having the
+          same value of this object, two or more LSPs can
+          indicate resource sharing.
+
+          In this implementation of the mplsTunnelTable, the row must either
+          be set to zeroDotZero, or must point at an entry in the
+          mplsTunnelResourceTable.
+
+          If a value other than zeroDotZero is used, then
+          mplsTunnelExtraParamsPtr must be set to zeroDotZero."
+   ::= { mplsTunnelEntry 17 }
+
+mplsTunnelPrimaryInstance OBJECT-TYPE
+   SYNTAX         MplsTunnelInstanceIndex
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Specifies the instance index of the primary instance
+          of this tunnel."
+   DEFVAL { 0 }
+   ::= { mplsTunnelEntry 18 }
+
+mplsTunnelInstancePriority OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This value indicates which priority, in descending
+          order, with 0 indicating the lowest priority,
+          within a group of tunnel instances.  A group of
+          tunnel instances is defined as a set of LSPs with
+          the same mplsTunnelIndex in this table, but with a
+          different mplsTunnelInstance. Tunnel instance
+          priorities are used to denote the priority at which
+          a particular tunnel instance will supercede
+          another.  Instances of tunnels containing the same
+          mplsTunnelInstancePriority will be used for load
+          sharing."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 19 }
+
+mplsTunnelHopTableIndex OBJECT-TYPE
+   SYNTAX         MplsPathIndexOrZero
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Index into the mplsTunnelHopTable entry that
+          specifies the explicit route hops for this tunnel.
+          This object is meaningful only at the head-end of
+          the tunnel.
+
+          For UNI tunnels, this field should be set to 0.
+
+          For tunnels with no configured explicit route hops, this
+          field should be set to 0.  In this case, the tunnel is
+          routed using mplsTunnelEgressLSRId."
+   DEFVAL { 0 }
+   ::= { mplsTunnelEntry 20 }
+
+mplsTunnelPathInUse OBJECT-TYPE
+   SYNTAX        MplsPathIndexOrZero
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This value denotes the configured path that was
+          chosen for this tunnel. This value reflects the
+          secondary index into mplsTunnelHopTable. This path
+          may not exactly match the one in
+          mplsTunnelARHopTable due to the fact that some CSPF
+          modification may have taken place. See
+          mplsTunnelARHopTable for the actual path being
+          taken by the tunnel. A value of zero denotes that
+          no path is currently in use or available.
+
+          For UNI tunnels, this field should be set to 0.
+
+          For tunnels with no configued explicit route hops,
+          this field should be set to 0."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 21 }
+
+mplsTunnelARHopTableIndex OBJECT-TYPE
+   SYNTAX        MplsPathIndexOrZero
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Index into the mplsTunnelARHopTable entry that
+          specifies the actual hops traversed by the tunnel.
+          This is automatically updated by the agent when the
+          actual hops becomes available."
+   DEFVAL { 0 }
+   ::= { mplsTunnelEntry 22 }
+
+mplsTunnelCHopTableIndex OBJECT-TYPE
+   SYNTAX        MplsPathIndexOrZero
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Index into the mplsTunnelCHopTable entry that
+          specifies the computed hops traversed by the
+          tunnel. This is automatically updated by the agent
+          when computed hops become available or when
+          computed hops get modified."
+   DEFVAL { 0 }
+   ::= { mplsTunnelEntry 23 }
+
+mplsTunnelIncludeAnyAffinity OBJECT-TYPE
+   SYNTAX        MplsTunnelAffinity
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "A link satisfies the include-any constraint if and
+          only if the constraint is zero, or the link and the
+          constraint have a resource class in common.
+          
+          The field is a bitmask. Every request does not overwrite 
+          the previous one. 0 value resets the field.
+        "
+   REFERENCE
+        "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+          Awduche et al, RFC 3209, December 2001."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 24 }
+
+mplsTunnelIncludeAllAffinity OBJECT-TYPE
+   SYNTAX        MplsTunnelAffinity
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "A link satisfies the include-all constraint if and
+          only if the link contains all of the administrative
+          groups specified in the constraint.
+          
+          The field is a bitmask. Every request does not overwrite 
+          the previous one. 0 value resets the field.
+        "
+   REFERENCE
+        "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+          Awduche et al, RFC 3209, December 2001."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 25 }
+
+mplsTunnelExcludeAnyAffinity OBJECT-TYPE
+   SYNTAX        MplsTunnelAffinity
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "A link satisfies the exclude-any constraint if and
+          only if the link contains none of the
+          administrative groups specified in the constraint.
+          
+          The field is a bitmask. Every request does not overwrite 
+          the previous one. 0 value resets the field.
+        "
+   REFERENCE
+        "1. RSVP-TE: Extensions to RSVP for LSP Tunnels,
+          Awduche et al, RFC 3209, December 2001."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 26 }
+
+mplsTunnelTotalUpTime OBJECT-TYPE
+   SYNTAX        TimeTicks
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "This value represents the aggregate up time for all
+          instances of this tunnel, if available. If this
+          value is unavailable, it MUST return a value of 0."
+   DEFVAL        { 0 }
+      ::= { mplsTunnelEntry 27 }
+
+mplsTunnelInstanceUpTime OBJECT-TYPE
+   SYNTAX        TimeTicks
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "This value identifies the total time that this
+          tunnel instance's operStatus has been Up(1)."
+   DEFVAL        { 0 }
+      ::= { mplsTunnelEntry 28 }
+
+mplsTunnelPrimaryUpTime OBJECT-TYPE
+   SYNTAX        TimeTicks
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Specifies the total time the primary instance of
+          this tunnel has been active. The primary instance
+          of this tunnel is defined in
+          mplsTunnelPrimaryInstance."
+   ::= { mplsTunnelEntry 29 }
+
+mplsTunnelPathChanges OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Specifies the number of times the actual path for
+         this tunnel instance has changed."
+   ::= { mplsTunnelEntry 30 }
+
+mplsTunnelLastPathChange OBJECT-TYPE
+   SYNTAX        TimeTicks
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Specifies the time since the last change to the
+         actual path for this tunnel instance."
+   ::= { mplsTunnelEntry 31 }
+
+mplsTunnelCreationTime OBJECT-TYPE
+   SYNTAX        TimeStamp
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Specifies the value of SysUpTime when the first
+          instance of this tunnel came into existence.
+          That is, when the value of mplsTunnelOperStatus
+          was first set to up(1)."
+   ::= { mplsTunnelEntry 32 }
+
+mplsTunnelStateTransitions OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Specifies the number of times the state
+          (mplsTunnelOperStatus) of this tunnel instance has
+          changed."
+   ::= { mplsTunnelEntry 33 }
+
+mplsTunnelAdminStatus OBJECT-TYPE
+   SYNTAX     INTEGER {
+                   -- ready to pass packets
+                   up(1),
+                   down(2),
+                   -- in some test mode
+                   testing(3)
+             }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Indicates the desired operational status of this
+          tunnel."
+   ::= { mplsTunnelEntry 34 }
+
+mplsTunnelOperStatus OBJECT-TYPE
+   SYNTAX     INTEGER {
+               -- ready to pass packets
+               up(1),
+               down(2),
+               -- in some test mode
+               testing(3),
+               -- status cannot be determined
+               unknown(4),
+               dormant(5),
+               -- some component is missing
+               notPresent(6),
+               -- down due to the state of
+               -- lower layer interfaces
+               lowerLayerDown(7)
+             }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Indicates the actual operational status of this
+          tunnel, which is typically but not limited to, a
+          function of the state of individual segments of
+          this tunnel."
+   ::= { mplsTunnelEntry 35 }
+
+mplsTunnelRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable is used to create, modify, and/or
+          delete a row in this table.  When a row in this
+          table is in active(1) state, no objects in that row
+          can be modified by the agent except
+          mplsTunnelAdminStatus, mplsTunnelRowStatus and
+          mplsTunnelStorageType."
+   ::= { mplsTunnelEntry 36 }
+
+mplsTunnelStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION  "The storage type for this tunnel entry.
+                 Conceptual rows having the value 'permanent'
+                 need not allow write-access to any columnar
+                 objects in the row."
+   DEFVAL        { volatile }
+   ::= { mplsTunnelEntry 37 }
+
+-- Addition
+mplsTunnelUnnumIf OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "Denotes whether or not this tunnel corresponds to an unnumbered
+      interface represented in the interfaces group table.
+
+      This object is only used if mplsTunnelIsIf is set to 'true'.
+
+      If both this object and the mplsTunnelIsIf object are set to
+      'true', the originating LSR adds an LSP_TUNNEL_INTERFACE_ID
+      object to the outgoing Path message.
+
+      This object contains information that is only used by the
+      terminating LSR."
+   REFERENCE
+     "Signalling Unnumbered Links in RSVP-TE, Kompella, K.
+      and Rekhter, Y., RFC 3477, January 2003."
+   DEFVAL        { false }
+   ::= { mplsTunnelEntry 38 }
+
+   mplsTunnelAttributes OBJECT-TYPE
+     SYNTAX BITS {
+       reserved0(0),
+       reserved1(1),
+       reserved2(2),
+       reserved3(3),
+       reserved4(4),
+       labelRecordingDesired (5)
+     }
+     MAX-ACCESS read-create
+     STATUS  current
+     DESCRIPTION
+       "This bitmask indicates optional parameters for this tunnel.
+        These bits should be taken in addition to those defined in
+        mplsTunnelSessionAttributes in order to determine the full set
+        of options to be signaled (for example SESSION_ATTRIBUTES flags
+        in RSVP-TE). The following describes these bitfields:
+
+        labelRecordingDesired
+          This flag indicates that label information should be included
+          when doing a route record. This bit is not valid unless the
+          recordRoute bit is set in the mplsTunnelSessionAttributes object."
+     REFERENCE
+       "RSVP-TE: Extensions to RSVP for LSP Tunnels, Awduche et al.,
+        RFC 3209, December 2001."
+     DEFVAL  { { } }
+   ::= { mplsTunnelEntry 39 }
+
+mplsTunnelLSPEncoding OBJECT-TYPE
+   SYNTAX        INTEGER {
+        notInUse (0),
+        tunnelLspPacket (1),
+        tunnelLspEthernet (2),
+        tunnelLspAnsiEtsiPdh (3),
+        tunnelLspSdhSonet (5),
+        tunnelLspDigitalWrapper (7),
+        tunnelLspLambda (8),
+        tunnelLspFiber (9),
+        tunnelLspFiberChannel (11)
+   }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This object indicates the encoding of the LSP being requested.
+         It is only required when a generalized label request will be used
+         for this LSP.   A value of 0 in this object indicates that a
+         generalized label request will not be used to set up this LSP.
+
+         If this object indicates Sonet / SDH LSP encoding, then
+         the choice of QOS to use is controlled by the
+         mplsTunnelResourcePointer object.  If
+         mplsTunnelResourcePointer is 0.0, then a Sonet/SDH QOS
+         format is used, else an Intserv QOS is used."
+   DEFVAL        { notInUse }
+   ::= { mplsTunnelEntry 40 }
+
+mplsTunnelSwitchingType OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+     "Indicates the type of switching that should be performed on
+      a particular link. This field is needed for links that
+                 advertise more than one type of switching capability.
+                 Values of this field are as in the Switching Capability
+                 field defined in rfc3471.
+
+                 It is only used when mplsTunnelLSPEncoding is non-zero."
+
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 41 }
+
+mplsTunnelLinkProtection OBJECT-TYPE
+   SYNTAX      BITS {
+          extraTraffic(0),
+          unprotected (1),
+          shared (2),
+          dedicatedOneToOne (3),
+          dedicatedOnePlusOne (4),
+          enhanced (5)
+      }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "This bitmask indicates the level of link protection required. A
+      value of zero (no bits set) indicates that any protection may be
+      used. The following describes these bitfields:
+
+      extraTraffic
+        Indicates that the LSP should use links that are protecting
+        other (primary) traffic. Such LSPs may be preempted when the
+        links carrying the (primary) traffic being protected fail.
+
+      unprotected
+        Indicates that the LSP should not use any link layer
+        protection.
+
+      shared
+        Indicates that a shared link layer protection scheme, such as
+        1:N protection, should be used to support the LSP.
+
+      dedicatedOneToOne
+        Indicates that a dedicated link layer protection scheme,
+        i.e., 1:1 protection, should be used to support the LSP.
+
+      dedicatedOnePlusOne
+        Indicates that a dedicated link layer protection scheme,
+        i.e., 1+1 protection, should be used to support the LSP.
+
+      enhanced
+        Indicates that a protection scheme that is more reliable than
+        Dedicated 1+1 should be used, e.g., 4 fiber BLSR/MS-SPRING.
+
+      This object is only meaningful if mplsTunnelLSPEncoding is
+      not set to 'tunnelLspNotGmpls'."
+   REFERENCE
+      "Berger, L., et al., Generalized Multi-Protocol
+       Label Switching (GMPLS) Signaling Functional
+       Description, RFC 3471, January 2003."
+   DEFVAL { {} }
+   ::= { mplsTunnelEntry 42 }
+
+mplsTunnelGPid OBJECT-TYPE
+   SYNTAX        INTEGER {
+        unknown (0),
+        ds1SF (1),
+        ds1ESF (2),
+        ds3M23 (3),
+        ds3Cbit (4),
+        asyncE4 (5),
+        asyncDS3 (6),
+        asyncE3 (7),
+        bitSyncE3 (8),
+        byteSyncE3 (9),
+        asyncDS2 (10),
+        bitSyncDS2 (11),
+        byteSyncDS2 (12),
+        asyncE1 (13),
+        byteSyncE1 (14),
+        byteSync31DS0 (15),
+        asyncDS1 (16),
+        bitSyncDS1 (17),
+        byteSyncDS1 (18),
+        vcByteSyncDS2 (19),
+        vcAsyncE1 (20),
+        vcByteSyncE1 (21),
+        ds1SFAsync (22),
+        ds1ESFAsync (23),
+        ds3M23Async (24),
+        ds3CbitAsync (25),
+        vt (26),
+        sts (27),
+        pos16CRC (28),
+        pos32CRC (29),
+        posScrambling16CRC (30),
+        posScrambling32CRC (31),
+        atmMapping (32),
+        ethernet (33),
+        sdh (34),
+        sonet (35),
+        digitalWrapper (36),
+        lambda (37),
+        etsiPdh (38),
+        ansiPdh (39),
+        laps (40),
+        fddi (41),
+        dqdb (42),
+        fiberch3 (43),
+        hdlc (44),
+        etherV2di (45),
+        ether8023 (46),
+        etherGfpSonet (56)
+   }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This object indicates the payload carried by the LSP.It is only
+      required when GMPLS will be used for this LSP.
+
+        Only valid if Generalized Label Request is in use as specified
+        by mplsTunnelLSPEncodingType.
+        This object is only meaningful if mplsTunnelLSPEncoding is not
+        set to 0"
+   DEFVAL  { 0 }
+   ::= { mplsTunnelEntry 43 }
+
+
+mplsTunnelSecondary OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "Indicates that the requested LSP is a secondary LSP.
+
+        This is a GMPLS feature, and should only be used when GMPLS will be
+        be used for this LSP.
+
+       This object is only meaningful if mplsTunnelLSPEncoding is not
+       set to 0."
+   REFERENCE
+     "Berger, L., et al., Generalized Multi-Protocol
+      Label Switching (GMPLS) Signaling Functional
+      Description, RFC 3471, January 2003."
+   DEFVAL  { false }   
+::= { mplsTunnelEntry 44 }
+
+mplsTunnelDirection OBJECT-TYPE
+   SYNTAX        INTEGER {
+     out (0),
+     outbidir (1),
+-- PRVT-Addition
+     in (2),
+     hwbidir (3),
+     inbidir (4),
+     transuni (5),
+     transbi (6),
+     transbih (7)
+-- End PRVT-Addition
+
+   }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Whether   this  tunnel  is  unidirectional-incoming,
+        unidirectional-outgoing, bidirectional in hardware,
+        the terminator end of a signalled bidirectional
+        tunnel, the initiator end of a signalled
+        bidirectional tunnel, unidirectional at transit,
+        signalled bidirectional at transit, or bidirectional
+        in hardware at transit.
+
+      Values of this object other than 'out' are meaningful
+      only if mplsTunnelLSPEncoding is not set to 0."
+   DEFVAL        { out }
+   ::= { mplsTunnelEntry 45 }
+
+mplsTunnelPathComp OBJECT-TYPE
+   SYNTAX  INTEGER {
+       dynamicFull(1),-- CSPF fully computed
+       explicit(2),-- fully specified path
+       dynamicPartial(3) -- CSPF partially computed
+   }
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+     "This value instructs the source node on how to perform path
+      computation on the explicit route specified by the associated
+      entries in the mplsTunnelHopTable.
+
+        dynamicFull
+        The user specifies at least the source and
+        destination of the path and expects that the CSPF
+        will calculate the remainder of the path.
+
+        explicit
+        The user specifies the entire path for the tunnel to
+        take. This path may contain strict or loose hops.
+        Evaluation of the explicit route will be performed
+        hop by hop through the network.
+
+        dynamicPartial
+        The user specifies at least the source and
+        destination of the path and expects that the CSPF
+        will calculate the remainder of the path. The path
+        computed by CSPF is allowed to be only partially
+        computed allowing the remainder of the path to be
+        filled in across the network.
+
+      This object deprecates mplsTunnelHopEntryPathComp."
+   DEFVAL { dynamicFull }
+ ::= { mplsTunnelEntry 46 }
+
+mplsTunnelUpNotRecipType OBJECT-TYPE
+   SYNTAX  InetAddressType
+   MAX-ACCESS read-create
+   STATUS  current
+   DESCRIPTION
+     "Type of upstream notify recipient address for this tunnel."
+   DEFVAL { unknown }
+ ::= { mplsTunnelEntry 101 }
+
+mplsTunnelUpNotRecip OBJECT-TYPE
+   SYNTAX  InetAddress
+   MAX-ACCESS read-create
+   STATUS  current
+   DESCRIPTION
+     "Indicates the address of the upstream recipient for Notify
+      messages relating to this tunnel.
+
+      This object is only valid when signaling a tunnel using RSVP. It
+      is also not valid at the tail end of the tunnel.
+
+      If set to 0, no Notify Request object will be included in
+      outgoing Path messages."
+   REFERENCE
+     "Generalized MPLS Signaling - RSVP-TE Extensions, Berger,
+      L. (Editor), RFC 3473, January 2003."
+ ::= { mplsTunnelEntry 47 }
+
+mplsTunnelDownNotRecipType OBJECT-TYPE
+   SYNTAX  InetAddressType
+   MAX-ACCESS read-create
+   STATUS  current
+   DESCRIPTION
+     "Type of downstream notify recipient address for this tunnel."
+   DEFVAL { unknown }
+ ::= { mplsTunnelEntry 102 }
+
+mplsTunnelDownNotRecip OBJECT-TYPE
+   SYNTAX  InetAddress
+   MAX-ACCESS read-create
+   STATUS  current
+   DESCRIPTION
+     "Indicates the address of the downstream recipient for Notify
+      messages relating to this tunnel.
+
+      This object is only valid when signaling a tunnel using RSVP. It
+      is also not valid at the head end of the tunnel.
+
+      If set to 0, no Notify Request object will be included in
+      outgoing Resv messages."
+
+   REFERENCE
+     "Generalized MPLS Signaling - RSVP-TE Extensions, Berger, L.
+      (Editor), RFC 3473, January 2003."
+ ::= { mplsTunnelEntry 48 }
+
+mplsTunnelAdminStatusFlags OBJECT-TYPE
+   SYNTAX      BITS {
+          delInProgress (0),
+          adminDown (1),
+          testing (2),
+           reserved3 (3),            -- reserved
+           reserved4 (4),            -- reserved
+           reserved5 (5),            -- reserved
+           reserved6 (6),            -- reserved
+           reserved7 (7),            -- reserved
+           reserved8 (8),            -- reserved
+           reserved9 (9),            -- reserved
+           reserved10 (10),          -- reserved
+           reserved11 (11),          -- reserved
+           reserved12 (12),          -- reserved
+           reserved13 (13),          -- reserved
+           reserved14 (14),          -- reserved
+           reserved15 (15),          -- reserved
+           reserved16 (16),          -- reserved
+           reserved17 (17),          -- reserved
+           reserved18 (18),          -- reserved
+           reserved19 (19),          -- reserved
+           reserved20 (20),          -- reserved
+           reserved21 (21),          -- reserved
+           reserved22 (22),          -- reserved
+           reserved23 (23),          -- reserved
+           reserved24 (24),          -- reserved
+           reserved25 (25),          -- reserved
+           reserved26 (26),          -- reserved
+           reserved27 (27),          -- reserved
+           reserved28 (28),          -- reserved
+           reserved29 (29),          -- reserved
+           reserved30 (30),          -- reserved
+           reflect (31)
+          }
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+        "Determines the setting of the Admin Status flags in the
+       Admin Status object or TLV, as described in RFC 3471. Setting
+       this field to a non-zero value will result in the inclusion of
+       the admin status object on signaling messages.
+
+         If the prvtMplsTeMibAllowGracefulDeletion product MIB field
+         is set, then the delInProgress flag is
+         not writable.  Instead, Use the deletion_mode setting to
+         indicate whether Graceful deletion should be used for
+         the tunnel.
+
+       This value of this object can be modified when the
+       corresponding mplsTunnelRowStatus and mplsTunnelAdminStatus
+       is active(1). By doing so, a new signaling message will be
+       triggered including the requested Admin Status object or
+       TLV."
+   REFERENCE
+     "Berger, L., et al., Generalized Multi-Protocol Label Switching
+      (GMPLS) Signaling Functional Description, RFC 3471,
+      January 2003."
+   DEFVAL  { { } }
+   ::= { mplsTunnelEntry 49 }
+
+mplsTunnelExtraParamsPtr  OBJECT-TYPE
+   SYNTAX       RowPointer
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+     "Some Tunnels will run over transports that can usefully support
+      technology-specific additional parameters (for example, SONET
+      resource usage). Such parameters can be supplied in an external
+      table and referenced from here.
+
+      In this implementation of the mplsTunnelTable, the row must either
+      be set to zeroDotZero, or must point at an entry in the
+      mplsTunnelSonetResTable.
+
+      If a value other than zeroDotZero is used, then
+      mplsTunnelResourcePointer must be set to zeroDotZero."
+   ::= { mplsTunnelEntry 50 }
+
+mplsTunnelUseEgressLabel OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+      "Whether or not to use an explicit route Label subobject as
+       configured in mplsTunnelEgressLabel."
+    DEFVAL { false }
+   ::= { mplsTunnelEntry 51 }
+
+mplsTunnelEgressLabel OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabel
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "The egress control Label in the explicit route, and its
+      length.
+
+      At ingress, this value must be inserted as the last hop of the
+      explicit route.
+
+      At egress this is the value of the received Label subobject.
+      Since 0 is a valid value, the validity of this field is
+      indicated by mplsTunnelUseEgressLabel.
+
+      When this label is used in signaling protocol messages,
+      it is copied byte for byte as is.  Therefore, if the label
+      octet string is intended to represent multibyte values, it
+      should encode those values in network (big-endian) byte
+      order.  This interpretation applies in particular to the
+      non-generalized MPLS labels (32 bits) used in ATM, FR and
+      generic MPLS networks."
+
+   ::= { mplsTunnelEntry 52 }
+
+mplsTunnelEgressLabelType OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabelType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The C-Type of the egress control Label configured in
+        mplsTunnelEgressLabel."
+   ::= { mplsTunnelEntry 53 }
+
+mplsTunnelOmitEROIfOneHop OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Indicates whether the explicit route object should be
+        omitted from the Path message when the tunnel consists of
+        just one loose hop.
+
+        Note that if mplsTunnelHopTableIndex is set to 0, the
+        tunnel is routed to the address configured in
+        mplsTunnelEgressLSRId.  This avoids the need to configure
+        a single loose hop containing the tunnel's destination
+        address and setting this field to true."
+   DEFVAL        { false }
+   ::= { mplsTunnelEntry 54 }
+
+mplsTunnelPrivateData OBJECT-TYPE
+   SYNTAX        MplsTunnelPrivateDataSyntax
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This object contains the customer defined private data for
+        the forward signaling direction.  At ingress it is
+        filled in with the private data present on the MIB SET
+        message.  Note that this field can be updated even when
+        the Tunnel is OperUp.
+        At egress it is filled in with the decoded forward private
+        data.
+        Note that there is a separate MIB field for the reverse
+        signaling direction private data,
+        mplsTunnelReversePrivateData."
+   ::= { mplsTunnelEntry 55 }
+
+mplsTunnelSrcTNAAddressType OBJECT-TYPE
+  SYNTAX         INTEGER {
+       none (0),
+       ipv4 (1),
+       ipv6 (2),
+       nsap (3)
+  }
+  MAX-ACCESS     read-create
+  STATUS         current
+  DESCRIPTION
+      "Type of the source TNA address of this tunnel.  This field
+       is used for UNI.  For standard MPLS and GMPLS, this field
+       must be set to none."
+  DEFVAL        { none }
+  ::= { mplsTunnelEntry 56 }
+
+mplsTunnelSrcTNAAddress OBJECT-TYPE
+  SYNTAX         MplsTunnelTNAAddress
+  MAX-ACCESS     read-create
+  STATUS         current
+  DESCRIPTION
+      "Source TNA address of this tunnel.  This field is only
+       valid if mplsTunnelSrcTNAAddressType is not none."
+  ::= { mplsTunnelEntry 57 }
+
+mplsTunnelDestTNAAddressType OBJECT-TYPE
+  SYNTAX         INTEGER {
+       none (0),
+       ipv4 (1),
+       ipv6 (2),
+       nsap (3)
+  }
+  MAX-ACCESS     read-create
+  STATUS         current
+  DESCRIPTION
+      "Type of the destination TNA address of this tunnel.  This
+       field is used for UNI.  For standard MPLS and GMPLS, this
+       field must be set to none."
+   DEFVAL        { none }
+  ::= { mplsTunnelEntry 58 }
+
+mplsTunnelDestTNAAddress OBJECT-TYPE
+  SYNTAX         MplsTunnelTNAAddress
+  MAX-ACCESS     read-create
+  STATUS         current
+  DESCRIPTION
+      "Destination TNA address of this tunnel.  This field is only
+       valid if mplsTunnelDestTNAAddressType is not none."
+  ::= { mplsTunnelEntry 59 }
+
+mplsTunnelEndToEndRerouting OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Indicates that Crankback End to End rerouting should be
+        enabled on this LSP.  Setting this flag will cause Rerouting
+        information to be returned to the ingress node on PathErrs
+        and Notifications.
+
+        No Rerouting information will be included if the Path
+        Message does not contain an ERO.  Rerouting
+        information will be limited to 'Node' errors unless a
+        switch managed label space is used."
+   DEFVAL        { false }
+   ::= { mplsTunnelEntry 60 }
+
+mplsTunnelIsUni OBJECT-TYPE
+   SYNTAX       TruthValue
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+       "This flag indicates whether the tunnel is to conform to
+        UNI 1.0."
+
+   DEFVAL        { false }
+   ::= { mplsTunnelEntry 62 }
+
+mplsTunnelUniServiceLevel OBJECT-TYPE
+   SYNTAX       Integer32
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+       "Indicates the UNI service level.  It is only valid when
+        _is_uni_ is set to true."
+   ::= { mplsTunnelEntry 63 }
+
+mplsTunnelUniEgressLabel OBJECT-TYPE
+   SYNTAX       MplsGeneralizedLabel
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The label to be used at the destination UNI in the
+                 forward direction.
+
+                 This field is only valid if one of mplsTunnelIsUni or
+                 mplsTunnelIsSpc is set, and must be filled in if
+                 mplsTunnelIsSpc is set."
+
+   ::= { mplsTunnelEntry 64 }
+
+mplsTunnelUniEgressLabelType OBJECT-TYPE
+   SYNTAX       MplsGeneralizedLabelType
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The C-Type of the forward label to be used at the
+                 destination UNI.
+
+                 This field is only valid if one of mplsTunnelIsUni or
+                 mplsTunnelIsSpc is set, and must be filled in if
+                 mplsTunnelIsSpc is set."
+
+   ::= { mplsTunnelEntry 65 }
+
+mplsTunnelUniEgressLabelPort OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The logical port identifier used to uniquely identify and
+                 select a (forward) data link at the destination UNI.
+
+                 This port identifier is relative to the destination UNI-C
+                 for UNI-initiated connections, but is relative to the
+                 destination UNI-N for connections that are initiated by
+                 management at the source UNI-N.
+
+                 This field is only valid if one of mplsTunnelIsUni or
+                 mplsTunnelIsSpc is set, and must be filled in if
+                 mplsTunnelIsSpc is set."
+
+   ::= { mplsTunnelEntry 66 }
+
+mplsTunnelUniRvsEgressLabel OBJECT-TYPE
+   SYNTAX       MplsGeneralizedLabel
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The label to be used at the destination UNI in the
+                 reverse direction.
+
+                 This field is only valid if one of mplsTunnelIsUni or
+                 mplsTunnelIsSpc is set, and must be filled in if
+                 mplsTunnelIsSpc is set and the tunnel is bi-directional."
+
+   ::= { mplsTunnelEntry 67 }
+
+mplsTunnelUniRvsEgressLabelType OBJECT-TYPE
+   SYNTAX       MplsGeneralizedLabelType
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The C-Type of the reverse label to be used at the
+                 destination UNI.
+
+                 This field is only valid if one of mplsTunnelIsUni or
+                 mplsTunnelIsSpc is set, and must be filled in if
+                 mplsTunnelIsSpc is set and the tunnel is bi-directional."
+
+   ::= { mplsTunnelEntry 68 }
+
+mplsTunnelUniRvsEgressLabelPort OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The logical port identifier used to uniquely identify and
+                 select a (reverse) data link at the destination UNI.
+
+                 This port identifier is relative to the destination UNI-C
+                 for UNI-initiated connections, but is relative to the
+                 destination UNI-N for connections that are initiated by
+                 management at the source UNI-N.
+
+                 This field is only valid if one of mplsTunnelIsUni or
+                 mplsTunnelIsSpc is set, and must be filled in if
+                 mplsTunnelIsSpc is set and the tunnel is bi-directional."
+
+   ::= { mplsTunnelEntry 69 }
+
+mplsTunnelDeletionMode OBJECT-TYPE
+   SYNTAX       INTEGER {
+                     forced(1),
+                     graceful(2)
+                     }
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "Whether to use forced or graceful deletion to delete this
+                 LSP.  This field is ignored if graceful deletion is not
+                 allowed in the TE-MIB entity MIB."
+
+   DEFVAL        { forced }
+   ::= { mplsTunnelEntry 70 }
+
+mplsTunnelUniDiversityListIndex OBJECT-TYPE
+   SYNTAX       Integer32
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "UNI specific.  This field references a
+                 prvtMplsTunnelUNIDivListIndex in the
+                 mplsTunnelUNIDiversityTable, and defines this list of
+                 tunnels to be diverse from.  A value of zero indicates
+                 that no diversity is configured.
+
+                 Note that if the diversity requirements specified in the
+                 referenced diversity list cannot be satisfied by
+                 signaling, this tunnel will fail to move to oper_status
+                 up.  See the Description in the
+                 mplsTunnelUNIDiversityTable for more information."
+
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 71 }
+
+mplsTunnelDiffServIndex OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Index into the mplsDiffServTable entry that
+          specifies the L-LSP or E-LSP parameters to signal
+          when setting up the tunnel.  If this field is not filled
+          in or is assigned the value zero then no DiffServ
+          parameters are signalled."
+   REFERENCE
+        "Le Faucher, et. al, MPLS Support of Differentiated
+          Services, Internet Draft <draft-ietf-mpls-diff-
+          ext-09.txt>, April 2001."
+   ::= { mplsTunnelEntry 72 }
+
+mplsTunnelReversePrivateData OBJECT-TYPE
+   SYNTAX        MplsTunnelPrivateDataSyntax
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This object contains the customer defined private data for
+         the reverse signaling direction.  At egress it is
+         initially set by the RRR_EGRESS_TRANSLATE_PRIV_DATA user exit and
+         subsequently may be altered via MIB operations.
+         At ingress it is filled in with the decoded reverse
+         private data.
+         Note that there is a separate MIB field for the forward
+         signaling direction private data, mplsTunnelPrivateData."
+   ::= { mplsTunnelEntry 73 }
+
+mplsTunnelFastRerouteMode OBJECT-TYPE
+   SYNTAX        INTEGER {
+      noFastReroute(0),
+      detourFastReroute(1),
+      facilityFastReroute(2)
+   }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Indicates whether or not this tunnel should be protected
+          by a fast reroute mechanism, and if so which method should
+          be used.
+          noFastReroute       - no fast reroute protection.
+          detourFastReroute   - fast reroute protection using the
+                                one-to-one detour backup method.
+          facilityFastReroute - fast reroute protection using the
+                                facility backup method.
+          Fast reroute is only available for uni-directional LSPs."
+   DEFVAL        { noFastReroute }
+   ::= { mplsTunnelEntry 74 }
+
+mplsTunnelBackupSetupPrio OBJECT-TYPE
+   SYNTAX        Integer32 (0..7)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Setup priority for backup tunnels set up to protect this
+         tunnel.  This field is only valid if the mplsTunnelFastRerouteMode
+         above is not noFastReroute."
+   ::= { mplsTunnelEntry 75 }
+
+mplsTunnelBackupHoldingPriority OBJECT-TYPE
+   SYNTAX        Integer32 (0..7)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Holding priority for backup tunnels set up to protect this
+         tunnel.  This field is only valid if the mplsTunnelFastRerouteMode
+         above is not noFastReroute."
+   ::= { mplsTunnelEntry 76 }
+
+mplsTunnelBackupIncAny OBJECT-TYPE
+   SYNTAX        MplsTunnelAffinity
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Include-any resource affinity for backup tunnels set up to
+         protect this tunnel.
+         A link satisfies the include-any constraint if and only if
+         the constraint is zero, or the link and the constraint
+         have a resource class in common.
+         This field is only valid if the mplsTunnelFastRerouteMode
+         above is not noFastReroute."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 77 }
+
+mplsTunnelBackupIncAll OBJECT-TYPE
+   SYNTAX        MplsTunnelAffinity
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Include-all resource affinity for backup tunnels set up to
+         protect this tunnel.
+         A link satisfies the include-all constraint if and only if
+         the link contains all of the adminstrative groups
+         specified in the constraint.
+         This field is only valid if the mplsTunnelFastRerouteMode
+         above is not noFastReroute."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 78 }
+
+mplsTunnelBackupExcAny OBJECT-TYPE
+   SYNTAX        MplsTunnelAffinity
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Exclude-any resource affinity for backup tunnels set up to
+         protect this tunnel.
+         A link satisfies the exclude-any constraint if and only if
+         the constraint is zero, or the link and the constraint
+         have a resource class in common.
+         This field is only valid if the mplsTunnelFastRerouteMode
+         above is not noFastReroute."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 79 }
+
+mplsTunnelBackupBandwidth OBJECT-TYPE
+   SYNTAX        MplsBitRate
+   UNITS         "1000s of bits per second"
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The estimated bandwidth required for backup tunnels, in
+         units of 1000 bits/second.  A value of zero indicates
+         best-effort.
+         This field is only valid if the mplsTunnelFastRerouteMode
+         above is not noFastReroute."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 80 }
+
+mplsTunnelBackupMaxHops OBJECT-TYPE
+   SYNTAX        Unsigned32(0..255)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The maximum number of extra hops the backup path is
+         allowed to take, from a Point of Local Repair (PLR) to a
+         Merge Point (MP), with PLR and MP excluded in counting.
+         A hop-limit of 0 means only direct links between PLR and MP
+         can be used.
+         This field is only valid if the mplsTunnelFastRerouteMode
+         above is not noFastReroute."
+   DEFVAL        { 255 }
+   ::= { mplsTunnelEntry 81 }
+
+mplsTunnelIsSpc OBJECT-TYPE
+   SYNTAX       TruthValue
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+       "This flag indicates whether the tunnel is an OIF soft
+        permanent connection (SPC)."
+
+   DEFVAL        { false }
+   ::= { mplsTunnelEntry 84 }
+
+mplsTunnelUniIngressLabel OBJECT-TYPE
+   SYNTAX       MplsGeneralizedLabel
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The label to be used for the in-segment at the source
+                 UNI-N in the forward direction.
+
+                 This field is only valid if the mplsTunnelIsSpc field
+                 is true."
+
+   ::= { mplsTunnelEntry 85 }
+
+mplsTunnelUniIngressLabelType OBJECT-TYPE
+   SYNTAX       MplsGeneralizedLabelType
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The C-Type of the forward label to be used for the
+                 in-segment at the source UNI-N.
+
+                 This field is only valid if the mplsTunnelIsSpc field
+                 is true."
+
+   ::= { mplsTunnelEntry 86 }
+
+mplsTunnelUniIngressLabelPort OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The logical port identifier used to uniquely identify and
+                 select a (forward) data link for the in-segment at the
+                 source UNI-N.
+
+                 This field is only valid if the mplsTunnelIsSpc field
+                 is true."
+
+   ::= { mplsTunnelEntry 87 }
+
+mplsTunnelUniRvsIngrLabel OBJECT-TYPE
+   SYNTAX       MplsGeneralizedLabel
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The label to be used at the source UNI-N for the
+                 out-segment in the reverse direction.
+
+                 This field is only valid if the mplsTunnelIsSpc field
+                 is true."
+
+   ::= { mplsTunnelEntry 88 }
+
+mplsTunnelUniRvsIngrLabelType OBJECT-TYPE
+   SYNTAX       MplsGeneralizedLabelType
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The C-Type of the reverse label to be used for the
+                 out-segment at the source UNI-N.
+
+                 This field is only valid if the mplsTunnelIsSpc field
+                 is true."
+
+   ::= { mplsTunnelEntry 89 }
+
+mplsTunnelUniRvsIngrLabelPort OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION  "The logical port identifier used to uniquely identify and
+                 select a data link for the reverse out-segment at the
+                 source UNI-N.
+
+                 This field is only valid if the mplsTunnelIsSpc field
+                 is true."
+
+   ::= { mplsTunnelEntry 90 }
+
+mplsTunnelDiffServClassType OBJECT-TYPE
+   SYNTAX        Integer32 (0..7)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION   "DiffServ Class-Type of the LSP as defined in
+                  draft-ietf-tewg-diff-te-proto-03."
+
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 91 }
+
+mplsTunnelExtendedProtection OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Indicates that the requested LSP should use the extended PROTECTION
+        object as defined in draft-lang-ccamp-gmpls-recovery-e2e-signaling.
+        This is a GMPLS feature, and should only be used when GMPLS will
+        be used for this LSP."
+   DEFVAL        { false }
+   ::= { mplsTunnelEntry 92 }
+
+mplsTunnelProtecting OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Indicates that the requested LSP is a protecting LSP and not a
+        working LSP.
+        This field is only valid if mplsTunnelExtendedProtection is true."
+   DEFVAL        { false }
+   ::= { mplsTunnelEntry 93 }
+
+mplsTunnelNotification OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Indicates that the control plane message exchange is only used for
+        notification during protection switching.
+        This field is only valid if mplsTunnelExtendedProtection is true."
+   DEFVAL        { false }
+   ::= { mplsTunnelEntry 94 }
+
+mplsTunnelLspProtection OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+
+       "This field indicates the level of end-to-end protection
+        for this LSP.
+        This field is only valid if mplsTunnelExtendedProtection is true.
+        A value  of zero indicates that no protection is provided for the
+        tunnel.
+
+        This field is not a bitmask; only one LSP protection may be selected.
+        See draft-lang-ccamp-gmpls-recovery-e2e-signaling for a
+        description of the possible values."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelEntry 95 }
+
+mplsTunnelAssociatedLspId OBJECT-TYPE
+   SYNTAX        MplsTunnelInstanceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The mplsTunnelInstance of an associated tunnel between the
+        same ingress and egress and with the same mplsTunnelIndex.
+        If this field is zero, the associated LSP ID is not known,
+        or there are multiple.
+        This field is only valid if mplsTunnelExtendedProtection is true."
+   DEFVAL        { 0 }
+::= { mplsTunnelEntry 96 }       
+
+mplsTunnelCallIdType OBJECT-TYPE
+   SYNTAX       INTEGER {
+                     operatorSpecific(1),
+                     globallyUnique(2)
+                     }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The C-Type of the following CALL ID.  This field is
+        insignificant if the mplsTunnelCallId has zero length.
+        This field can only be changed when the Admin Status is down."
+   ::= { mplsTunnelEntry 97 }
+
+mplsTunnelCallId OBJECT-TYPE
+   SYNTAX        OCTET STRING (SIZE (0..255))
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The CALL ID to be used on this tunnel, including the
+        address type, International and National segment (if applicable),
+        source transport network element address, and Local
+        Identifier as defined in G.7713.2 (version 0.8).
+        This field can only be changed when the Admin Status is down."
+   ::= { mplsTunnelEntry 98 }
+
+mplsTunnelIsIpv6 OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Flag indicating whether this tunnel uses IPv6 addresses.
+        If this flag is set, the tunnel may only be activated if
+        - TE-MIB is configured to allow IPv6 tunnels
+        - the hop path index is non-zero
+        - all hops in the hop path have IPv6 addresses
+        - the first and last hops in the hop path have global
+          scope addresses."
+   DEFVAL { false }
+   ::= {mplsTunnelEntry 100}
+
+mplsTunnelMtu OBJECT-TYPE
+    SYNTAX        Integer32
+  	MAX-ACCESS    read-create
+   	STATUS        current
+   	DESCRIPTION
+       "Maximal transfer unit of the tunnel"
+::= { mplsTunnelEntry 103 }
+
+mplsTunnelRebuildTimer OBJECT-TYPE
+    SYNTAX        TimeTicks
+  	MAX-ACCESS    read-create
+   	STATUS        current
+   	DESCRIPTION
+       "Defines a period in minutes (0..1440), after which the tunnel will be unconditionally
+        rebuild. The maximal valid value is 1440 minutes (24 hours)"
+   	DEFVAL { 60 }
+::= { mplsTunnelEntry 104 }
+
+mplsTunnelOperStatusFlags OBJECT-TYPE
+    SYNTAX        BITS { empty(0), 
+                         tunnelResignalling(1), 
+                         tunnelSuppressed(2)
+                       }
+  	MAX-ACCESS    read-create
+   	STATUS        current
+   	DESCRIPTION
+       "Flags to extend the information of the tunnel state
+For the behaviour - bits meaning:
+tunnelResignalling (1) - This status shows that currently the tunnel 
+has been resignalled. The resignalling state of a tunnel 
+should be considered together with the mplsTunnelOperStatus 
+attribute value of the same tunnel.
+tunnelSuppressed (2) - This status shows that the tunnel has 
+been established, but higher priority tunnel is active 
+and in use. This tunnel can be activated, once the higher 
+protocol tunnel fails by any reason, and in this case 
+the tunnelSuppressed status will be cleared.
+		 "
+
+::= { mplsTunnelEntry 105 }
+
+mplsTunnelGuardedDest OBJECT-TYPE
+    SYNTAX        InetAddressIPv4
+  	MAX-ACCESS    read-create
+   	STATUS        current
+   	DESCRIPTION
+       "The guarded destination object specifies which IP destination address the current
+        tunnel protects used with the fast reroute feature.
+       The tunnel must not be fast reroute enabled."
+::= { mplsTunnelEntry 106 }
+
+mplsTunnelMBBTimeOut OBJECT-TYPE
+    SYNTAX        Integer32
+  	MAX-ACCESS    read-create
+   	STATUS        current
+   	DESCRIPTION
+       "Specifies the timer configuration (in minutes) for Make-before-break (MBB).
+        The default value of this object is 10 minutes."
+::= { mplsTunnelEntry 107 }
+
+-- End Addition
+
+-- End of mplsTunnelTable
+
+-- Addition
+mplsTunnelHopIndexNextTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_HOPNI
+   SYNTAX        SEQUENCE OF MplsTunnelHopIndexNextEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains the next available values of
+        mplsTunnelHopIndex for all entities."
+   ::= { mplsTeObjects 3 }
+
+mplsTunnelHopIndexNextEntry  OBJECT-TYPE
+   SYNTAX        MplsTunnelHopIndexNextEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents the next available
+        mplsTunnelHopIndex for a specific TE-MIB entity.
+        This MIB table is indexed by the PRVT-TE-MIB entity Index."
+
+   INDEX  { prvtMplsTeMibEntityIndex }
+      ::= { mplsTunnelHopIndexNextTable 1 }
+
+MplsTunnelHopIndexNextEntry ::= SEQUENCE {
+      mplsTunnelHopIndexNextIndex        Unsigned32
+    }
+-- End Addition
+
+mplsTunnelHopIndexNextIndex OBJECT-TYPE
+   SYNTAX        Unsigned32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "This object contains an appropriate value to be used
+          for mplsTunnelHopListIndex when creating entries in
+          the mplsTunnelHopTable.  If the number of
+          unassigned entries is exhausted, a retrival
+          operation will return a value of 0.  This object
+          may also return a value of 0 when the LSR is unable
+          to accept conceptual row creation, for example, if
+          the mplsTunnelHopTable is implemented as read-only.
+          To obtain the value of mplsTunnelHopListIndex for a
+          new entry in the mplsTunnelHopTable, the manager
+          issues a management protocol retrieval operation to
+          obtain the current value of mplsTunnelHopIndex.
+          After each retrieval operation, the agent should
+          modify the value to reflect the next unassigned
+          index.  After a manager retrieves a value the agent
+          will determine through its local policy when this
+          index value will be made available for reuse."
+   ::= { mplsTunnelHopIndexNextEntry 1 }
+
+mplsTunnelHopTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_HOP
+   SYNTAX        SEQUENCE OF MplsTunnelHopEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The mplsTunnelHopTable is used to indicate the hops,
+          strict or loose, for an MPLS tunnel defined in
+          mplsTunnelTable, when it is established via
+          signaling, for the outgoing direction of the
+          tunnel.  Each row in this table is indexed by
+          mplsTunnelHopListIndex.  Each row also has a
+          secondary index mplsTunnelHopIndex corresponding to
+          the next hop that this row corresponds to.  The
+          first row in the table is the first hop after the
+          origination point of the tunnel.  In case we want
+          to specify a particular interface on the
+          originating LSR of an outgoing tunnel by which we
+          want packets to exit the LSR, we specify this as
+          the first hop for this tunnel in
+          mplsTunnelHopTable."
+   ::= { mplsTeObjects 4 }
+
+mplsTunnelHopEntry  OBJECT-TYPE
+   SYNTAX        MplsTunnelHopEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table represents a tunnel hop.  An
+          entry is created by a network administrator for
+          signaled ERLSP set up by an MPLS signaling
+          protocol."
+   INDEX { prvtMplsTeMibEntityIndex, mplsTunnelHopListIndex,
+           mplsTunnelHopPathOptionIndex, mplsTunnelHopIndex }
+      ::= { mplsTunnelHopTable 1 }
+
+MplsTunnelHopEntry ::= SEQUENCE {
+      mplsTunnelHopListIndex                     MplsPathIndex,
+      mplsTunnelHopPathOptionIndex               MplsPathIndex,
+      mplsTunnelHopIndex                         MplsPathIndex,
+      mplsTunnelHopAddrType                      TeHopAddressType,
+      mplsTunnelHopIpAddr                        TeHopAddress,
+      mplsTunnelHopIpPrefixLen                   Unsigned32,
+      mplsTunnelHopAsNumber                      TeHopAddressAS,
+      mplsTunnelHopAddrUnnum                     TeHopAddressUnnum,
+      mplsTunnelHopLspId                         MplsLSPID,
+      mplsTunnelHopType                          INTEGER,
+      mplsTunnelHopInclude                       TruthValue,
+      mplsTunnelHopPathOptionName                DisplayString,
+      mplsTunnelHopEntryPathComp                 INTEGER,
+      mplsTunnelHopRowStatus                     RowStatus,
+      mplsTunnelHopStorageType                   StorageType,
+      mplsTunnelHopLabelStatuses                 BITS,
+      mplsTunnelHopExpLabelType                  MplsGeneralizedLabelType,
+      mplsTunnelHopExpLabel                      MplsGeneralizedLabel,
+      mplsTunnelHopExpRvrsLabelType              MplsGeneralizedLabelType,
+      mplsTunnelHopExpRvrsLabel                  MplsGeneralizedLabel
+   }
+
+mplsTunnelHopListIndex OBJECT-TYPE
+   SYNTAX         MplsPathIndex
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Primary index into this table identifying a
+          particular explicit route object."
+   ::= { mplsTunnelHopEntry 1 }
+
+mplsTunnelHopPathOptionIndex OBJECT-TYPE
+   SYNTAX        MplsPathIndex
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Secondary index into this table identifying a
+          particular group of hops representing a particular
+          configured path. This is otherwise known as a path
+          option."
+   ::= { mplsTunnelHopEntry 2 }
+
+mplsTunnelHopIndex OBJECT-TYPE
+   SYNTAX        MplsPathIndex
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Secondary index into this table identifying a
+          particular hop."
+   ::= { mplsTunnelHopEntry 3 }
+
+mplsTunnelHopAddrType OBJECT-TYPE
+    SYNTAX        TeHopAddressType
+   MAX-ACCESS    read-create
+   STATUS        current
+    DESCRIPTION  "The Hop Address Type of this tunnel hop.
+
+                  The value of this object cannot be changed
+                  if the value of the corresponding
+                  mplsTunnelHopRowStatus object is 'active'.
+
+                  Note that lspid(5) is a valid option only
+                  for tunnels signaled via CRLDP.
+                 "
+    DEFVAL        { 1 }
+   ::= { mplsTunnelHopEntry 4 }
+
+mplsTunnelHopIpAddr OBJECT-TYPE
+    SYNTAX        TeHopAddress
+   MAX-ACCESS    read-create
+   STATUS        current
+    DESCRIPTION  "The Tunnel Hop Address for this tunnel hop.
+
+                  The type of this address is determined by the
+                  value of the corresponding mplsTunnelHopAddrType.
+
+                  The value of this object cannot be changed
+                  if the value of the corresponding
+                  mplsTunnelHopRowStatus object is 'active'.
+                 "
+   ::= { mplsTunnelHopEntry 5 }
+
+ mplsTunnelHopIpPrefixLen OBJECT-TYPE
+    SYNTAX        Unsigned32
+   MAX-ACCESS    read-create
+   STATUS        current
+    DESCRIPTION  "If mplsTunnelHopAddrType is set to ipv4(1) or
+                  ipv6(2), then this value will contain an
+                  appropriate prefix length for the IP address in
+                  object mplsTunnelHopIpAddr. Otherwise this value
+                  is irrelevant and should be ignored.
+                 "
+    DEFVAL         { 32 }
+   ::= { mplsTunnelHopEntry 6 }
+
+mplsTunnelHopAsNumber OBJECT-TYPE
+   SYNTAX        TeHopAddressAS
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "If mplsTunnelHopAddrType is set to asnumber(3), then
+          this value will contain the AS number of this hop.
+          Otherwise the agent should set this object to zero-
+          length string and the manager should ignore this."
+   ::= { mplsTunnelHopEntry 7 }
+
+mplsTunnelHopAddrUnnum OBJECT-TYPE
+   SYNTAX        TeHopAddressUnnum
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "If mplsTunnelHopAddrType is set to unnum(4) or
+          unnumv6(6), then this value will contain the interface
+          identifier of the unnumbered interface for this hop.
+          This object should be used in conjunction with
+          mplsTunnelHopIpAddress which would contain the LSR
+          Router ID in this case. Otherwise the agent should
+          set this object to zero-length string and the
+          manager should ignore this."
+   ::= { mplsTunnelHopEntry 8 }
+
+mplsTunnelHopLspId OBJECT-TYPE
+   SYNTAX        MplsLSPID
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "If mplsTunnelHopAddrType is set to lspid(5), then
+          this value will contain the LSPID of a tunnel of
+          this hop. The present tunnel being configured is
+          tunneled through this hop (using label stacking).
+          This object is otherwise insignificant and should
+          contain a value of 0 to indicate this fact."
+   ::= { mplsTunnelHopEntry 9 }
+
+mplsTunnelHopType OBJECT-TYPE
+   SYNTAX        INTEGER {
+                      strict(1),
+                      loose(2)
+                     }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Denotes whether this tunnel hop is routed in a
+          strict or loose fashion. The value of this object
+          has no meaning if the mplsTunnelHopInclude object
+          is set to 'false'."
+   DEFVAL { 2 }
+   ::= { mplsTunnelHopEntry 10 }
+
+mplsTunnelHopInclude OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "If this value is set to true, then this indicates
+          that this hop must be included in the tunnel's
+          path. If this value is set to 'false', then this hop
+          must be avoided when calculating the path for this
+          tunnel. The default value of this object is 'true',
+          so that by default all indicated hops are included
+          in the CSPF path computation. If this object is set
+          to 'false' the value of mplsTunnelHopType should be
+          ignored."
+   DEFVAL { true }
+   ::= { mplsTunnelHopEntry 11 }
+
+mplsTunnelHopPathOptionName OBJECT-TYPE
+   SYNTAX        DisplayString
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The description of this series of hops as they
+          relate to the specified path option. The
+          value of this object SHOULD be the same for
+          each hop in the series that comprises a
+          path option."
+   ::= { mplsTunnelHopEntry 12 }
+
+mplsTunnelHopEntryPathComp OBJECT-TYPE
+   SYNTAX        INTEGER {
+                      dynamic(1),    -- CSPF computed
+                      explicit(2)    -- strict hop
+                  }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "If this value is set to dynamic, then the user
+          should only specify the source and destination of
+          the path and expect that the CSPF will calculate
+          the remainder of the path.  If this value is set to
+          explicit, the user should specify the entire path
+          for the tunnel to take.  This path may contain
+          strict or loose hops.  Each hop along a specific
+          path SHOULD have this object set to the same value."
+   ::= { mplsTunnelHopEntry 13 }
+
+mplsTunnelHopRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable is used to create, modify, and/or
+          delete a row in this table.  When a row in this
+          table is in active(1) state, no objects in that row
+          can be modified by the agent except
+          mplsTunnelHopRowStatus and
+          mplsTunnelHopStorageType."
+   ::= { mplsTunnelHopEntry 14 }
+
+mplsTunnelHopStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The storage type for this Hop entry. Conceptual
+         rows having the value 'permanent' need not
+         allow write-access to any columnar objects
+         in the row."
+   DEFVAL { 2 }
+   ::= { mplsTunnelHopEntry 15 }
+
+mplsTunnelHopLabelStatuses OBJECT-TYPE
+   SYNTAX  BITS {
+     forwardPresent (0),
+     reversePresent (1)
+   }
+   MAX-ACCESS read-only
+   STATUS  current
+   DESCRIPTION
+     "This bitmask indicates the presence of labels indicated by the
+      mplsTunnelHopExpLabel and mplsTunnelHopExpRvrsLabel
+      objects.
+
+      For the Present bits, a set bit indicates that a label is
+      present for this hop in the route. This allows zero to be a
+      valid label value."
+   DEFVAL  { { } }
+ ::= { mplsTunnelHopEntry 16 }
+
+mplsTunnelHopExpLabelType OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabelType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Denotes   the  type  of  the  label  configured  in
+        mplsTunnelHopExpLabel."
+   ::= { mplsTunnelHopEntry 17 }
+
+mplsTunnelHopExpLabel OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabel
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "If mplsTunnelHopLabelStatuses object indicates that a forward
+      label is present then the label to use on this hop is found in
+      this object."
+ ::= { mplsTunnelHopEntry 18 }
+
+mplsTunnelHopExpRvrsLabelType OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabelType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Denotes   the  type  of  the  label  configured  in
+        mplsTunnelHopExpRvrsLabel."
+   ::= { mplsTunnelHopEntry 19 }
+
+mplsTunnelHopExpRvrsLabel OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabel
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "If the mplsTunnelHopLabelStatuses object indicates that a
+      reverse label is present then the label to use on this
+      hop is found in this object."
+ ::= { mplsTunnelHopEntry 20 }
+
+-- End of mplsTunnelHopTable
+
+-- Begin of mplsTunnelResourceTable
+
+-- Addition
+mplsTunnelResourceIndexNextTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_RESNI
+   SYNTAX        SEQUENCE OF MplsTunnelResourceIndexNextEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains the next available values of
+        mplsTunnelResourceIndex for all entities."
+   ::= { mplsTeObjects 5 }
+
+mplsTunnelResourceIndexNextEntry  OBJECT-TYPE
+   SYNTAX        MplsTunnelResourceIndexNextEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents the next available
+        mplsTunnelResourceIndex for a specific TE-MIB entity.
+        This MIB table is indexed by the PRVT-TE-MIB entity Index."
+
+   INDEX  { prvtMplsTeMibEntityIndex }
+      ::= { mplsTunnelResourceIndexNextTable 1 }
+
+MplsTunnelResourceIndexNextEntry ::= SEQUENCE {
+      mplsTunnelResourceIndexNextIndex  Unsigned32
+    }
+-- End Addition
+
+mplsTunnelResourceIndexNextIndex OBJECT-TYPE
+   SYNTAX        Unsigned32 (0.. 2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "This object contains the next appropriate value to
+          be used for mplsTunnelResourceIndex when creating
+          entries in the mplsTunnelResourceTable. If the
+          number of unassigned entries is exhausted, a
+          retrival operation will return a value of 0.  This
+          object may also return a value of 0 when the LSR is
+          unable to accept conceptual row creation, for
+          example, if the mplsTunnelTable is implemented as
+          read-only.  To obtain the mplsTunnelResourceIndex
+          value for a new entry, the manager must first issue
+          a management protocol retrieval operation to obtain
+          the current value of this object. The agent should
+          modify the value to reflect the next unassigned
+          index after each retrieval operation. After a
+          manager retrieves a value the agent will determine
+          through its local policy when this index value will
+          be made available for reuse."
+   ::= { mplsTunnelResourceIndexNextEntry 1 }
+
+mplsTunnelResourceTable OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_RES
+   SYNTAX        SEQUENCE OF MplsTunnelResourceEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The mplsTunnelResourceTable allows a manager to
+          specify which resources are desired for an MPLS
+          tunnel.  This table also allows several tunnels to
+          point to a single entry in this table, implying
+          that these tunnels should share resources."
+   ::= { mplsTeObjects 6 }
+
+mplsTunnelResourceEntry OBJECT-TYPE
+   SYNTAX        MplsTunnelResourceEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table represents a set of resources
+          for an MPLS tunnel.  An entry can be created by a
+          network administrator or by an SNMP agent as
+          instructed by any MPLS signaling protocol."
+   INDEX  { prvtMplsTeMibEntityIndex, mplsTunnelResourceIndex }
+      ::= { mplsTunnelResourceTable 1 }
+
+MplsTunnelResourceEntry ::= SEQUENCE {
+      mplsTunnelResourceIndex                Unsigned32,
+      mplsTunnelResourceMaxRate              MplsBitRate,
+      mplsTunnelResourceMeanRate             MplsBitRate,
+      mplsTunnelResourceMaxBurstSize         MplsBurstSize,
+      mplsTunnelResourceMeanBurstSize        MplsBurstSize,
+      mplsTunnelResourceExBurstSize          MplsBurstSize,
+      mplsTunnelResourceFrequency            INTEGER,
+      mplsTunnelResourceWeight               Unsigned32,
+      mplsTunnelResourceRowStatus            RowStatus,
+      mplsTunnelResourceStorageType          StorageType
+   }
+
+mplsTunnelResourceIndex OBJECT-TYPE
+   SYNTAX        Unsigned32 (1..2147483647)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Uniquely identifies this row."
+   ::= { mplsTunnelResourceEntry 1 }
+
+mplsTunnelResourceMaxRate OBJECT-TYPE
+   SYNTAX        MplsBitRate
+   UNITS         "1000s of bits per second"
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The maximum rate in units of 1000 bits/second.
+
+         Note that setting mplsTunnelResourceMaxRate,
+          mplsTunnelResourceMeanRate, and
+          mplsTunnelResourceMaxBurstSize to 0 indicates best-effort
+          treatment.  This object is copied to an instance of
+          mplsTrafficParamMaxRate in mplsTrafficParamTable the OID
+          of which is copied into the corresponding
+          mplsInSegmentTrafficParamPtr.
+
+         If the ingress node sets a maximum rate of positive
+          infinity, the egress node will return a value of
+          positive infinity on the MIB GET response.  This
+          special value may not be used when setting the maximum
+          rate with this MIB."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelResourceEntry 2 }
+
+mplsTunnelResourceMeanRate OBJECT-TYPE
+   SYNTAX        MplsBitRate
+   UNITS         "1000s of bits per second"
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The mean rate in units of 1000 bits/second.
+
+         This object is copied into an instance of
+          mplsTrafficParamMeanRate in the
+          mplsTrafficParamTable. The OID of this table entry
+          is then copied into the corresponding
+          mplsInSegmentTrafficParamPtr.
+
+         When resource allocation is performed as requested
+          by this TSpec object, it is copied into an entry in
+          mplsTrafficParamTable [LSRMIB]:
+          mplsTunnelInMeanRate to mplsTrafficParamMeanRate.
+          The OID of this entry is copied to
+          mplsInSegmentTrafficParamPtr of the corresponding
+          in-segment entry."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelResourceEntry 3 }
+
+mplsTunnelResourceMaxBurstSize OBJECT-TYPE
+   SYNTAX        MplsBurstSize
+   UNITS         "bytes"
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The maximum burst size in bytes.  This object is
+          copied to mplsInSegmentMaxBurstSize of the
+          corresponding in-segment.
+
+         When resource allocation is performed as requested
+          by this TSpec object, it is copied into an entry in
+          mplsTrafficParamTable [LSRMIB]:
+          mplsTunnelInMaxBurstSize to
+          mplsTrafficParamMaxBurstSize. The OID of this entry
+          is copied to mplsInSegmentTrafficParamPtr of the
+          corresponding in-segment entry."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelResourceEntry 4 }
+
+mplsTunnelResourceMeanBurstSize OBJECT-TYPE
+   SYNTAX       MplsBurstSize
+   UNITS        "bytes"
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+        "The mean burst size in bytes.  The implementations
+          which do not implement this variable must return 0
+          for this value and must not allow a user to set
+          this value."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelResourceEntry 5 }
+
+mplsTunnelResourceExBurstSize OBJECT-TYPE
+   SYNTAX       MplsBurstSize
+   UNITS        "bytes"
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+        "The Excess burst size in bytes.  The implementations
+          which do not implement this variable must return
+          noSuchObject(0) exception for this object and must
+          not allow a user to set this value."
+   REFERENCE
+        "CR-LDP Specification, Section 4.3."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelResourceEntry 6 }
+
+mplsTunnelResourceFrequency  OBJECT-TYPE
+   SYNTAX       INTEGER {
+                     unspecified(1),
+                     frequent(2),
+                     veryFrequent(3)
+                 }
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+        "The granularity of the availability of committed
+          rate.  The implementations which do not implement
+          this variable must return unspecified(1) for this
+          value and must not allow a user to set this value."
+   DEFVAL        { unspecified }
+   ::= { mplsTunnelResourceEntry 7 }
+
+mplsTunnelResourceWeight    OBJECT-TYPE
+   SYNTAX       Unsigned32(0..255)
+   MAX-ACCESS   read-create
+   STATUS       current
+   DESCRIPTION
+        "The relative weight for using excess bandwidth above
+          its committed rate.  The value of 0 means that
+          weight is not applicable for the CR-LSP."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelResourceEntry 8 }
+
+mplsTunnelResourceRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable is used to create, modify, and/or
+          delete a row in this table."
+   ::= { mplsTunnelResourceEntry 9 }
+
+mplsTunnelResourceStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable indicates the storage type for this
+          object."
+   DEFVAL        { 2 }
+   ::= { mplsTunnelResourceEntry 10 }
+
+-- End mplsTunnelResourceTable
+
+-- Tunnel Actual Route Hop table.
+
+mplsTunnelARHopTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_ARHOP
+   SYNTAX        SEQUENCE OF MplsTunnelARHopEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The mplsTunnelARHopTable is used to indicate the
+          hops, strict or loose, for an MPLS tunnel defined
+          in mplsTunnelTable, as reported by the MPLS
+          signaling protocol, for the outgoing direction of
+          the tunnel.  Each row in this table is indexed by
+          mplsTunnelARHopListIndex.  Each row also has a
+          secondary index mplsTunnelARHopIndex, corresponding
+          to the next hop that this row corresponds to.  The
+          first row in the table is the first hop after the
+          origination point of the tunnel.  In case we want
+          to specify a particular interface on the
+          originating LSR of an outgoing tunnel by which we
+          want packets to exit the LSR, we specify this as
+          the first hop for this tunnel in
+          mplsTunnelARHopTable.
+
+         Please note that since the information necessary to
+          build entries within this table are not provided by
+          some MPLS signaling protocols, implementation of
+          this table is optional. Furthermore, since the
+          information in this table is actually provided by
+          the MPLS signaling protocol after the path has been
+          set-up, the entries in this table are provided only
+          for observation, and hence, all variables in this
+          table are accessible exclusively as read-only."
+   ::= { mplsTeObjects 7 }
+
+mplsTunnelARHopEntry  OBJECT-TYPE
+   SYNTAX        MplsTunnelARHopEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table represents a tunnel hop.  An
+          entry is created by a network administrator for
+          signaled ERLSP set up by an MPLS signaling
+          protocol."
+   INDEX { prvtMplsTeMibEntityIndex, mplsTunnelARHopListIndex,
+           mplsTunnelARHopIndex }
+      ::= { mplsTunnelARHopTable 1 }
+
+MplsTunnelARHopEntry ::= SEQUENCE {
+      mplsTunnelARHopListIndex          MplsPathIndex,
+      mplsTunnelARHopIndex              MplsPathIndex,
+      mplsTunnelARHopAddrType           TeHopAddressType,
+      mplsTunnelARHopIpAddr             TeHopAddress,
+      mplsTunnelARHopAddrUnnum          TeHopAddressUnnum,
+      mplsTunnelARHopLspId              MplsLSPID,
+-- Addition
+      mplsTunnelARHopLabelStatuses      BITS,
+      mplsTunnelARHopExpLabelType       MplsGeneralizedLabelType,
+      mplsTunnelARHopExpLabel           MplsGeneralizedLabel,
+      mplsTunnelARHopExpRvrsLabelType   MplsGeneralizedLabelType,
+      mplsTunnelARHopExpRvrsLabel       MplsGeneralizedLabel,
+      mplsTunnelARHopProtection         BITS
+-- End Addition
+   }
+
+mplsTunnelARHopListIndex OBJECT-TYPE
+   SYNTAX        MplsPathIndex
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Primary index into this table identifying a
+          particular recorded hop list."
+   ::= { mplsTunnelARHopEntry 1 }
+
+mplsTunnelARHopIndex OBJECT-TYPE
+   SYNTAX        MplsPathIndex
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Secondary index into this table identifying the
+          particular hop."
+   ::= { mplsTunnelARHopEntry 2 }
+
+
+mplsTunnelARHopAddrType OBJECT-TYPE
+   SYNTAX        TeHopAddressType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The Hop Address Type of this tunnel hop.
+
+         If the type value is set to ipv4(1) or ipv6(2). The tunnel path 
+         can be determin using mplsTunnelARHopIpAddr object.  
+         mplsTunnelARHopAddrUnnum and mplsTunnelARHopLspId 
+         should not be used.
+         
+         If the type value is set to unnum(4) or unnumv6(6). The tunnel path 
+         can be determin using mplsTunnelARHopAddrUnnum object.  
+         mplsTunnelARHopIpAddr and mplsTunnelARHopLspId 
+         should not be used.
+
+         Note that lspid(5) is a valid option only
+         for tunnels signaled via CRLDP. The tunnel path 
+         can be determin using mplsTunnelARHopLspId object.  
+         mplsTunnelARHopIpAddr and mplsTunnelARHopAddrUnnum 
+         should not be used.
+         
+         Currently only ipv4(1) type is supported"
+   DEFVAL        { 1 }
+   ::= { mplsTunnelARHopEntry 3 }
+
+mplsTunnelARHopIpAddr OBJECT-TYPE
+   SYNTAX        TeHopAddress
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The Tunnel Hop Address for this tunnel hop.
+
+         The type of this address is determined by the
+         value of the corresponding mplsTunnelARHopAddrType.
+         If mplsTunnelARHopAddrType is set to ipv4(1) or
+         ipv6(2), then this value contains the LSR Router
+         ID of the unnumbered interface. Otherwise the agent
+         SHOULD set this object to the zero-length string
+         and the manager should ignore this object."
+   ::= { mplsTunnelARHopEntry 4 }
+
+mplsTunnelARHopAddrUnnum OBJECT-TYPE
+   SYNTAX        TeHopAddressUnnum
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "If mplsTunnelARHopAddrType is set to unnum(4) or
+         unnumv6(6), then this value will contain the
+         interface identifier of the unnumbered interface
+         for this hop. This object should be used in
+         conjunction with mplsTunnelARHopIpAddr which would
+         contain the LSR Router ID in this case. Otherwise
+         the agent should set this object to zero-length
+         string and the manager should ignore this."
+   ::= { mplsTunnelARHopEntry 5 }
+
+mplsTunnelARHopLspId OBJECT-TYPE
+   SYNTAX        MplsLSPID
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "If mplsTunnelARHopAddrType is set to lspid(5), then
+          this value will contain the LSP ID of this hop.
+          This object is otherwise insignificant and should
+          contain a value of 0 to indicate this fact."
+   ::= { mplsTunnelARHopEntry 6 }
+
+-- Addition
+
+mplsTunnelARHopLabelStatuses OBJECT-TYPE
+   SYNTAX        BITS {
+     forwardPresent (0),
+     reversePresent (1),
+     forwardGlobal (2),
+     reverseGlobal (3)
+   }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+     "This bitmask indicates the presence and status of labels
+      indicated by the mplsTunnelARHopExpLabel and
+      mplsTunnelARHopExpRvrsLabel objects.
+
+      For the Present bits, a set bit indicates that a label is
+      present for this hop in the route. For the Global bits, a set
+      bit indicates that the label comes from the Global Label Space.
+      A clear bit indicates that this is a Per- Interface label. A
+      Global bit only has meaning if the corresponding Present bit is
+                         set."
+ ::= { mplsTunnelARHopEntry 7 }
+
+mplsTunnelARHopExpLabelType OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabelType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The C-Type of the following hop label.  This field is
+        insignificant unless mplsTunnelARHopLabelStatuses has the
+        forwardPresent(0) or forwardGlobal(2) bits set."
+   ::= { mplsTunnelARHopEntry 8 }
+
+mplsTunnelARHopExpLabel OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabel
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+     "If mplsTunnelARHopLabelStatus has the present(0) bit set,
+      then this value indicates the label value used for this hop.
+      This object is otherwise insignificant and should
+      contain a value of 0.
+
+      When this label is read from a signaling protocol message,
+      it is copied byte for byte as is.  Therefore, if the label
+      octet string is understood to represent multibyte values,
+      it encodes those values in network (big-endian) byte
+      order.  This interpretation applies in particular to the
+      non-generalized MPLS labels (32 bits) used in ATM, FR and
+      generic MPLS networks."
+
+   ::= { mplsTunnelARHopEntry 9 }
+
+mplsTunnelARHopExpRvrsLabelType OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabelType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The C-Type of the following hop label.  This field is
+        insignificant unless mplsTunnelARHopLabelStatuses has the
+        reversePresent(1) or reverseGlobal(3) bits set."
+   ::= { mplsTunnelARHopEntry 10 }
+
+mplsTunnelARHopExpRvrsLabel OBJECT-TYPE
+   SYNTAX  MplsGeneralizedLabel
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+     "If the mplsTunnelARHopLabelStatuses object indicates that a
+      reverse label is present then the label in use on this
+      hop is found in this object."
+ ::= { mplsTunnelARHopEntry 11 }
+
+mplsTunnelARHopProtection  OBJECT-TYPE
+   SYNTAX  BITS {
+     localAvailable (0),
+     localInUse (1)
+   }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+    "Availability and usage of protection on the reported link.
+
+     localAvailable
+        Indicates that the link downstream of this node is protected
+        via a local repair mechanism.
+
+     localInUse
+        Indicates that a local repair mechanism is in use to maintain
+        this tunnel (usually in the face of an outage of the link it
+        was previously routed over)."
+ ::= { mplsTunnelARHopEntry 12 }
+
+-- End Addition
+
+-- End of mplsTunnelARHopTable
+
+
+-- Tunnel Computed Hop table.
+
+mplsTunnelCHopTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_CHOP
+   SYNTAX        SEQUENCE OF MplsTunnelCHopEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The mplsTunnelCHopTable is used to indicate the
+          hops, strict or loose, for an MPLS tunnel defined
+          in mplsTunnelTable, as computed by a constraint-
+          based routing protocol, based on the
+          mplsTunnelHopTable for the outgoing direction of
+          the tunnel.  Each row in this table is indexed by
+          mplsTunnelCHopListIndex.  Each row also has a
+          secondary index mplsTunnelCHopIndex, corresponding
+          to the next hop that this row corresponds to.  The
+          first row in the table is the first hop after the
+          origination point of the tunnel.  In case we want
+          to specify a particular interface on the
+          originating LSR of an outgoing tunnel by which we
+          want packets to exit the LSR, we specify this as
+          the first hop for this tunnel in
+          mplsTunnelCHopTable.
+
+         Please note that since the information necessary to
+          build entries within this table may not be
+          supported by some LSRs, implementation of this
+          table is optional. Furthermore, since the
+          information in this table is actually provided by
+          routing protocol after the path has been computed,
+          the entries in this table are provided only for
+          observation, and hence, all variables in this table
+          are accessible exclusively as read-only."
+   ::= { mplsTeObjects 8 }
+
+mplsTunnelCHopEntry  OBJECT-TYPE
+   SYNTAX        MplsTunnelCHopEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table represents a tunnel hop.  An
+          entry in this table is created by a constraint-
+          based routing protocol based on the hops specified
+          in the corresponding mplsTunnelHopTable."
+   INDEX { prvtMplsTeMibEntityIndex, mplsTunnelCHopListIndex,
+           mplsTunnelCHopIndex }
+      ::= { mplsTunnelCHopTable 1 }
+
+MplsTunnelCHopEntry ::= SEQUENCE {
+      mplsTunnelCHopListIndex                 MplsPathIndex,
+      mplsTunnelCHopIndex                     MplsPathIndex,
+      mplsTunnelCHopAddrType                  TeHopAddressType,
+      mplsTunnelCHopIpAddr                    TeHopAddress,
+      mplsTunnelCHopIpPrefixLen               Unsigned32,
+      mplsTunnelCHopAsNumber                  TeHopAddressAS,
+      mplsTunnelCHopAddrUnnum                 TeHopAddressUnnum,
+      mplsTunnelCHopLspId                     MplsLSPID,
+      mplsTunnelCHopType                      INTEGER,
+      mplsTunnelCHopLabelStatuses             BITS,
+      mplsTunnelCHopExpLabelType              MplsGeneralizedLabelType,
+      mplsTunnelCHopExpLabel                  MplsGeneralizedLabel,
+      mplsTunnelCHopExpRvrsLabelType          MplsGeneralizedLabelType,
+      mplsTunnelCHopExpRvrsLabel              MplsGeneralizedLabel
+   }
+
+mplsTunnelCHopListIndex OBJECT-TYPE
+   SYNTAX        MplsPathIndex
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Primary index into this table identifying a
+          particular computed hop list."
+   ::= { mplsTunnelCHopEntry 1 }
+
+mplsTunnelCHopIndex OBJECT-TYPE
+   SYNTAX        MplsPathIndex
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Secondary index into this table identifying the
+          particular hop."
+   ::= { mplsTunnelCHopEntry 2 }
+
+mplsTunnelCHopAddrType OBJECT-TYPE
+   SYNTAX        TeHopAddressType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The Hop Address Type of this tunnel hop.
+
+         Note that lspid(5) is a valid option only
+         for tunnels signaled via CRLDP."
+   DEFVAL        { 1 }
+   ::= { mplsTunnelCHopEntry 3 }
+
+mplsTunnelCHopIpAddr OBJECT-TYPE
+   SYNTAX        TeHopAddress
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The Tunnel Hop Address for this tunnel hop.
+
+         The type of this address is determined by the
+          value of the corresponding mplsTunnelCHopAddrType.
+
+         If mplsTunnelCHopAddrType is set to unnum(4) or
+         unnumv6(6), then this value will contain the LSR
+         Router ID of the unnumbered interface. Otherwise
+         the agent should set this object to the zero-length
+         string and the manager SHOULD ignore this object."
+   ::= { mplsTunnelCHopEntry 4 }
+
+mplsTunnelCHopIpPrefixLen OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+         "If mplsTunnelCHopAddrType is set to ipv4(1) or
+           ipv6(2), then this value will contain an
+           appropriate prefix length for the IP address in
+           object mplsTunnelCHopIpAddr. Otherwise this value
+           is irrelevant and should be ignored.
+          "
+    DEFVAL         { 32 }
+   ::= { mplsTunnelCHopEntry 5 }
+
+mplsTunnelCHopAsNumber OBJECT-TYPE
+   SYNTAX        TeHopAddressAS
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "If mplsTunnelCHopAddrType is set to asnumber(3),
+          then this value will contain the AS number of this
+          hop. Otherwise the agent should set this object to
+          zero-length string and the manager should ignore
+          this."
+   ::= { mplsTunnelCHopEntry 6 }
+
+mplsTunnelCHopAddrUnnum OBJECT-TYPE
+   SYNTAX        TeHopAddressUnnum
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "If mplsTunnelCHopAddrType is set to unnum(4) or
+          unnumv6(6), then this value will contain the unnumbered
+          interface identifier of this hop. This object should
+          be used in conjunction with mplsTunnelCHopIpAddr
+          which would contain the LSR Router ID in this case.
+          Otherwise the agent should set this object to zero-
+          length string and the manager should ignore this."
+   ::= { mplsTunnelCHopEntry 7 }
+
+mplsTunnelCHopLspId OBJECT-TYPE
+   SYNTAX        MplsLSPID
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "If mplsTunnelCHopAddrType is set to lspid(5), then
+          this value will contain the LSP ID of this hop.
+          This object is otherwise insignificant and should
+          contain a value of 0 to indicate this fact."
+   ::= { mplsTunnelCHopEntry 8 }
+
+mplsTunnelCHopType OBJECT-TYPE
+   SYNTAX        INTEGER { strict(1),
+                           loose(2)
+                          }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Denotes whether this is tunnel hop is routed in a
+          strict or loose fashion."
+   ::= { mplsTunnelCHopEntry 9 }
+
+mplsTunnelCHopLabelStatuses OBJECT-TYPE
+   SYNTAX  BITS {
+      forwardPresent (0),
+      reversePresent (1)
+   }
+   MAX-ACCESS read-only
+   STATUS  current
+   DESCRIPTION
+     "This bitmask indicates the presence of labels indicated by the
+      mplsTunnelCHopExpLabel and mplsTunnelCHopExpRvrsLabel
+      objects.
+      A set bit indicates that a label is present for this hop in the
+      route thus allowing zero to be a valid label value."
+   ::= { mplsTunnelCHopEntry 11 }
+
+mplsTunnelCHopExpLabelType OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabelType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The C-Type of the following hop label. This field is
+        insignificant unless mplsTunnelCHopLabelStatuses has the
+        forwardPresent(0) bit set."
+   ::= { mplsTunnelCHopEntry 12 }
+
+mplsTunnelCHopExpLabel OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabel
+   MAX-ACCESS read-only
+   STATUS        current
+   DESCRIPTION
+        "The  explicit  out-segment  label  to  use  on  the
+        forward path.
+
+        When this label is used in signaling protocol messages,
+        it is copied byte for byte as is.  Therefore, if the label
+        octet string is intended to represent multibyte values, it
+        should encode those values in network (big-endian) byte
+        order.  This interpretation applies in particular to the
+        non-generalized MPLS labels (32 bits) used in ATM, FR and
+        generic MPLS networks."
+   ::= { mplsTunnelCHopEntry 13 }
+
+mplsTunnelCHopExpRvrsLabelType OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabelType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The C-Type of the following hop label.  This field is
+         insignificant unless mplsTunnelCHopLabelStatuses has the
+         reversePresent(0) bit set."
+   ::= { mplsTunnelCHopEntry 14 }
+
+mplsTunnelCHopExpRvrsLabel OBJECT-TYPE
+   SYNTAX        MplsGeneralizedLabel
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The   explicit  in-segment  label  to  use  on  the
+        reverse path.
+
+        When this label is used in signaling protocol messages,
+        it is copied byte for byte as is.  Therefore, if the label
+        octet string is intended to represent multibyte values, it
+        should encode those values in network (big-endian) byte
+        order.  This interpretation applies in particular to the
+        non-generalized MPLS labels (32 bits) used in ATM, FR and
+        generic MPLS networks."
+   ::= { mplsTunnelCHopEntry 15 }
+
+-- End of mplsTunnelCHopTable
+
+
+-- MPLS Tunnel Performance Table.
+
+mplsTunnelPerfTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_TPRF
+   SYNTAX        SEQUENCE OF MplsTunnelPerfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "This table provides per-tunnel MPLS performance
+          information."
+   ::= { mplsTeObjects 9 }
+
+mplsTunnelPerfEntry OBJECT-TYPE
+   SYNTAX        MplsTunnelPerfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table is created by the LSR for
+          every tunnel.  Its is an extension to
+          mplsTunnelEntry."
+   AUGMENTS { mplsTunnelEntry }
+   ::= { mplsTunnelPerfTable 1 }
+
+MplsTunnelPerfEntry ::= SEQUENCE {
+      mplsTunnelPerfPackets           Counter32,
+      mplsTunnelPerfHCPackets         Counter64,
+      mplsTunnelPerfErrors            Counter32,
+      mplsTunnelPerfBytes             Counter32,
+      mplsTunnelPerfHCBytes           Counter64
+   }
+
+mplsTunnelPerfPackets OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Number of packets forwarded by the tunnel."
+   ::= { mplsTunnelPerfEntry 1 }
+
+mplsTunnelPerfHCPackets OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "High capacity counter for number of packets
+          forwarded by the tunnel."
+   ::= { mplsTunnelPerfEntry 2 }
+
+mplsTunnelPerfErrors OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Number of errored packets."
+   ::= { mplsTunnelPerfEntry 3 }
+
+mplsTunnelPerfBytes OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "Number of bytes forwarded by the tunnel."
+   ::= { mplsTunnelPerfEntry 4 }
+
+mplsTunnelPerfHCBytes OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "High capacity counter for number of bytes forwarded
+          by the tunnel."
+   ::= { mplsTunnelPerfEntry 5 }
+
+-- End of mplsTunnelPerfTable
+
+
+-- CR-LDP Tunnel Resource Table
+
+mplsTunnelCRLDPResTable OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_TCRS
+   SYNTAX        SEQUENCE OF MplsTunnelCRLDPResEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The mplsTunnelCRLDPResTable allows a manager to
+          specify which CR-LDP-specific resources are desired
+          for an MPLS tunnel if that tunnel is signaled using
+          CR-LDP. Note that these attributes are in addition
+          to those specified in mplsTunnelResourceTable. This
+          table also allows several tunnels to point to a
+          single entry in this table, implying that these
+          tunnels should share resources."
+   ::= { mplsTeObjects 10 }
+
+mplsTunnelCRLDPResEntry OBJECT-TYPE
+   SYNTAX        MplsTunnelCRLDPResEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table represents a set of resources
+          for an MPLS tunnel established using CRLDP
+          (mplsTunnelSignallingProto equal to crldp (3)). An
+          entry can be created by a network administrator or
+          by an SNMP agent as instructed by any MPLS
+          signaling protocol."
+   INDEX { prvtMplsTeMibEntityIndex, mplsTunnelResourceIndex }
+      ::= { mplsTunnelCRLDPResTable 1 }
+
+MplsTunnelCRLDPResEntry ::= SEQUENCE {
+     mplsTunnelCRLDPResMeanBurstSize   MplsBurstSize,
+     mplsTunnelCRLDPResExBurstSize     MplsBurstSize,
+     mplsTunnelCRLDPResFrequency       INTEGER,
+     mplsTunnelCRLDPResWeight          Unsigned32,
+     mplsTunnelCRLDPResFlags           Unsigned32,
+     mplsTunnelCRLDPResRowStatus       RowStatus,
+     mplsTunnelCRLDPResStorageType     StorageType
+   }
+
+mplsTunnelCRLDPResMeanBurstSize OBJECT-TYPE
+   SYNTAX        MplsBurstSize
+   UNITS         "bytes"
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The mean burst size in bytes."
+   DEFVAL { 0 }
+   ::= { mplsTunnelCRLDPResEntry 2 }
+
+mplsTunnelCRLDPResExBurstSize OBJECT-TYPE
+   SYNTAX        MplsBurstSize
+   UNITS         "bytes"
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "The Excess burst size in bytes."
+   REFERENCE
+     "CR-LDP Specification, Section 4.3."
+   ::= { mplsTunnelCRLDPResEntry 3 }
+
+mplsTunnelCRLDPResFrequency OBJECT-TYPE
+   SYNTAX  INTEGER {
+         unspecified(1),
+         frequent(2),
+         veryFrequent(3)
+      }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The granularity of the availability of committed
+          rate."
+   REFERENCE
+        "CR-LDP Specification, Section 4.3."
+   ::= { mplsTunnelCRLDPResEntry 4 }
+
+mplsTunnelCRLDPResWeight OBJECT-TYPE
+   SYNTAX        Unsigned32(0..255)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The relative weight for using excess bandwidth above
+          its committed rate.  The value of 0 means that
+          weight is not applicable for the CR-LSP."
+   DEFVAL { 0 }
+   ::= { mplsTunnelCRLDPResEntry 5 }
+
+mplsTunnelCRLDPResFlags OBJECT-TYPE
+   SYNTAX        Unsigned32 (0..63)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "The value of the 1 byte Flags conveyed as part of
+          the traffic parameters during the establishment of
+          the CRLSP. The bits in this object are to be
+          interpreted as follows.
+
+          +==+==+==+==+==+==+==+==+
+          | Res |F6|F5|F4|F3|F2|F1|
+          +==+==+==+==+==+==+==+==+
+
+        Res - These bits are reserved. Zero on transmission.
+          Ignored on receipt.
+        F1 - Corresponds to the PDR.
+        F2 - Corresponds to the PBS.
+        F3 - Corresponds to the CDR.
+        F4 - Corresponds to the CBS.
+        F5 - Corresponds to the EBS.
+        F6 - Corresponds to the Weight.
+
+        Each flag if is a Negotiable Flag corresponding to a
+          Traffic Parameter. The Negotiable Flag value zero
+          denotes Not Negotiable and value one denotes
+          Negotiable."
+    DEFVAL { 0 }
+    ::= { mplsTunnelCRLDPResEntry 6 }
+
+mplsTunnelCRLDPResRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable is used to create, modify, and/or
+          delete a row in this table."
+   ::= { mplsTunnelCRLDPResEntry 7 }
+
+mplsTunnelCRLDPResStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable indicates the storage type for this
+          object."
+   DEFVAL { 2 }
+   ::= { mplsTunnelCRLDPResEntry 8 }
+
+-- End of CR-LDP Tunnel Resource Table
+
+-- Addition
+
+-- MPLS DiffServ Table
+
+mplsDiffServIndexNextTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_DSI
+   SYNTAX        SEQUENCE OF MplsDiffServIndexNextEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains the next available values of
+        mplsDiffServIndex for all entities."
+   ::= { mplsTeObjects 11 }
+
+mplsDiffServIndexNextEntry  OBJECT-TYPE
+   SYNTAX        MplsDiffServIndexNextEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents the next available
+         mplsDiffServIndex for a specific TE-MIB entity.
+         This MIB table is indexed by the PRVT-TE-MIB entity
+         Index."
+
+   INDEX  { prvtMplsTeMibEntityIndex }
+      ::= { mplsDiffServIndexNextTable 1 }
+
+MplsDiffServIndexNextEntry ::= SEQUENCE {
+      mplsDiffServIndexNextIndex           Integer32
+    }
+
+mplsDiffServIndexNextIndex OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object contains the next appropriate value
+         to be used for mplsDiffServIndex when creating
+         entries in the mplsDiffServTable. If the number of
+         unassigned entries is exhausted, this object
+         will take on the value of 0.  To obtain the
+         mplsDiffServIndex value for a new entry, the
+         manager must first issue a management protocol
+         retrieval operation to obtain the current value
+         of this object. The agent should modify the
+         value to reflect the next unassigned index after
+         each retrieval operation. After a manager
+         retrieves a value the agent will determine
+         through its local policy when this index value
+         will be made available for reuse."
+::= { mplsDiffServIndexNextEntry 1 }
+
+mplsDiffServTable OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_DS
+   SYNTAX        SEQUENCE OF MplsDiffServEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The mplsDiffServTable allows DiffServ parameters to be
+          configured for DiffServ enabled LSPs signalled by the
+          mplsTunnelTable.
+
+        If a tunnel is an E-LSP, then fields in this table must be
+          set to indicate 0 - 8 EXP->PHB maps, and the number
+          of such maps, to be used by LSRs in the E-LSP to
+          determine the PHB to apply to incoming packets.
+
+        If a tunnel is an L-LSP, then fields in this table must be
+          set to indicate the PHB Scheduling Class (PSC) to use
+          for incoming packets."
+   REFERENCE
+        "Le Faucher, et. al, MPLS Support of Differentiated
+          Services, Internet Draft <draft-ietf-mpls-diff-
+          ext-09.txt>, April 2001."
+   ::= { mplsTeObjects 12 }
+
+mplsDiffServEntry OBJECT-TYPE
+   SYNTAX        MplsDiffServEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table represents either a set of 0 -
+          8 EXP->PHB maps, and the number of such maps, for an
+          E-LSP or a PSC value for an L-LSP."
+   REFERENCE
+        "Le Faucher, et. al, MPLS Support of Differentiated
+          Services, Internet Draft <draft-ietf-mpls-diff-
+          ext-09.txt>, April 2001."
+   INDEX {
+      prvtMplsTeMibEntityIndex, mplsDiffServIndex
+   }
+   ::= { mplsDiffServTable 1 }
+
+MplsDiffServEntry ::= SEQUENCE {
+      mplsDiffServIndex            Integer32,
+      mplsDiffServType             INTEGER,
+      mplsDiffServLLSPPSC          Integer32,
+      mplsDiffServELSPNumPHBs      Integer32,
+      mplsDiffServELSPPHB0         Integer32,
+      mplsDiffServELSPPHB1         Integer32,
+      mplsDiffServELSPPHB2         Integer32,
+      mplsDiffServELSPPHB3         Integer32,
+      mplsDiffServELSPPHB4         Integer32,
+      mplsDiffServELSPPHB5         Integer32,
+      mplsDiffServELSPPHB6         Integer32,
+      mplsDiffServELSPPHB7         Integer32,
+      mplsDiffServRowStatus        RowStatus
+   }
+
+mplsDiffServIndex OBJECT-TYPE
+   SYNTAX        Integer32 (1..2147483647)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Uniquely identifies this row."
+   ::= { mplsDiffServEntry 1 }
+
+mplsDiffServType OBJECT-TYPE
+   SYNTAX        INTEGER { elsp(0), llsp(1) }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This field must be set to indicate whether this row
+          contains parameters for an E-LSP or an L-LSP."
+   ::= { mplsDiffServEntry 2 }
+
+mplsDiffServLLSPPSC OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Valid only when mplsDiffServType takes the value l-lsp
+          (1), this field contains the16-bit encoding of the
+          PHB Scheduling Class (PSC) to be used for packets on
+          this LSP (RFC 3140)."
+   ::= { mplsDiffServEntry 3 }
+
+mplsDiffServELSPNumPHBs OBJECT-TYPE
+   SYNTAX        Integer32 (0..8)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Valid only when mplsDiffServType takes the value e-lsp
+          (0), this value indicates the number of EXP->PHB
+          maps defined in this row."
+   ::= { mplsDiffServEntry 4 }
+
+mplsDiffServELSPPHB0 OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Valid only when mplsDiffServType takes the value e-lsp
+          (0), this field contains the 16-bit encoding of the
+          PHB (RFC 3140) which is assigned to packets on this
+          LSP with the value 0 in the EXP field of their MPLS
+          shim header."
+   ::= { mplsDiffServEntry 5 }
+
+mplsDiffServELSPPHB1 OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Valid only when mplsDiffServType takes the value e-lsp
+          (0), this field contains the 16-bit encoding of the
+          PHB (RFC 3140) which is assigned to packets on this
+          LSP with the value 1 in the EXP field of their MPLS
+          shim header."
+   ::= { mplsDiffServEntry 6 }
+
+mplsDiffServELSPPHB2 OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Valid only when mplsDiffServType takes the value e-lsp
+          (0), this field contains the 16-bit encoding of the
+          PHB (RFC 3140) which is assigned to packets on this
+          LSP with the value 2 in the EXP field of their MPLS
+          shim header."
+   ::= { mplsDiffServEntry 7 }
+
+mplsDiffServELSPPHB3 OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Valid only when mplsDiffServType takes the value e-lsp
+          (0), this field contains the 16-bit encoding of the
+          PHB (RFC 3140) which is assigned to packets on this
+          LSP with the value 3 in the EXP field of their MPLS
+          shim header."
+   ::= { mplsDiffServEntry 8 }
+
+mplsDiffServELSPPHB4 OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Valid only when mplsDiffServType takes the value e-lsp
+          (0), this field contains the 16-bit encoding of the
+          PHB (RFC 3140) which is assigned to packets on this
+          LSP with the value 4 in the EXP field of their MPLS
+          shim header."
+   ::= { mplsDiffServEntry 9 }
+
+mplsDiffServELSPPHB5 OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Valid only when mplsDiffServType takes the value e-lsp
+          (0), this field contains the 16-bit encoding of the
+          PHB (RFC 3140) which is assigned to packets on this
+          LSP with the value 5 in the EXP field of their MPLS
+          shim header."
+   ::= { mplsDiffServEntry 10 }
+
+mplsDiffServELSPPHB6 OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Valid only when mplsDiffServType takes the value e-lsp
+          (0), this field contains the 16-bit encoding of the
+          PHB (RFC 3140) which is assigned to packets on this
+          LSP with the value 6 in the EXP field of their MPLS
+          shim header."
+   ::= { mplsDiffServEntry 11 }
+
+mplsDiffServELSPPHB7 OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "Valid only when mplsDiffServType takes the value e-lsp
+          (0), this field contains the 16-bit encoding of the
+          PHB (RFC 3140) which is assigned to packets on this
+          LSP with the value 7 in the EXP field of their MPLS
+          shim header."
+   ::= { mplsDiffServEntry 12 }
+
+mplsDiffServRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable is used to create, modify, and/or
+          delete a row in this table."
+   ::= { mplsDiffServEntry 13 }
+
+-- End of MPLS DiffServ Table
+
+-- UNI Diversity table.
+
+prvtMplsTunnelUNIDvLstIdxNxtTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_DIVNI
+   SYNTAX        SEQUENCE OF PrvtMplsTunnelUNIDvLstIdxNxtEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains the next available values of
+        prvtMplsTunnelUNIDivListIdx for all entities."
+   ::= { mplsTeObjects 13 }
+
+prvtMplsTunnelUNIDvLstIdxNxtEntry OBJECT-TYPE
+   SYNTAX        PrvtMplsTunnelUNIDvLstIdxNxtEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents the next available
+        prvtMplsTunnelUNIDivListIdx for a specific TE-MIB entity.
+        This MIB table is indexed by the PRVT-TE-MIB entity Index."
+
+   INDEX  { prvtMplsTeMibEntityIndex }
+      ::= { prvtMplsTunnelUNIDvLstIdxNxtTable 1 }
+
+PrvtMplsTunnelUNIDvLstIdxNxtEntry ::= SEQUENCE {
+      prvtMplsTunnelUNIDivListIdxNext       Integer32
+    }
+
+prvtMplsTunnelUNIDivListIdxNext OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "This is the next available List Index in the
+         prvtMplsTunnelUNIDiversityTable."
+
+   ::= { prvtMplsTunnelUNIDvLstIdxNxtEntry 1 }
+
+prvtMplsTunnelUNIDiversityTable OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_DIV
+   SYNTAX        SEQUENCE OF PrvtMplsTunnelUNIDiversityEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The prvtMplsTunnelUNIDiversityTable is used to indicate which
+         existing tunnels a new UNI Connection is to be diverse from.
+         This table is UNI specific.  Each
+         prvtMplsTunnelUNIDiversityTable is indexed using
+         prvtMplsTeMibEntityIndex, prvtMplsTunnelUNIDivListIdx,
+         prvtMplsTunnelUNIDivTnnlIdx.
+
+         To create a UNI tunnel to use Diversity, set up a row entry
+         in the prvtMplsTunnelUNIDiversityTable for each existing
+         tunnel that the new tunnel should be diverse from.
+
+         Then when creating the new UNI tunnel, set
+         prvtMplsTunnelUNIDiversityTableIndex in the mplsTunnelTable to
+         the list_index corresponding to the Diversity Table to be
+         used.
+
+         A diversity list is read-only if it is referenced by an
+         active row in the mplsTunnelTable that is admin_status up.
+         Under these circumstances, no individual rows/diversity
+         requirements making up the list can be added, modified or
+         deleted.
+
+         A list of diversity requirements can only be satisfied by
+         signaling if all of the referenced rows in the
+         mplsTunnelTable are oper_status up when signaling is
+         initiated.  If the requirements cannot be satisfied, any
+         tunnel attempting to use the list will remain oper_status
+         down."
+
+   ::= { mplsTeObjects 14 }
+
+prvtMplsTunnelUNIDiversityEntry  OBJECT-TYPE
+   SYNTAX        PrvtMplsTunnelUNIDiversityEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table corresponds to an entry in the mplsTunnelTable.
+         A subsequent Tunnel that references this entry will be created Diverse
+         from the tunnel row entry specified here."
+   INDEX { prvtMplsTeMibEntityIndex, prvtMplsTunnelUNIDivListIdx,
+           prvtMplsTunnelUNIDivIdx }
+      ::= { prvtMplsTunnelUNIDiversityTable 1 }
+
+PrvtMplsTunnelUNIDiversityEntry ::= SEQUENCE {
+      prvtMplsTunnelUNIDivListIdx                  Integer32,
+      prvtMplsTunnelUNIDivIdx                      Integer32,
+      prvtMplsTunnelUNIDivRowPointer               RowPointer,
+      prvtMplsTunnelOperStatus                     Integer32,
+      prvtMplsTunnelUNIDivRowStatus                RowStatus,
+      prvtMplsTunnelUNIDivRequirement              INTEGER,
+      prvtMplsTunnelUNIDivAccess                   Integer32
+   }
+
+prvtMplsTunnelUNIDivListIdx OBJECT-TYPE
+   SYNTAX         Integer32 (0..2147483647)
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+        "Primary index into this table identifying a
+          particular list of Diversity requirements."
+   ::= { prvtMplsTunnelUNIDiversityEntry 2 }
+
+prvtMplsTunnelUNIDivIdx OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "Secondary index into this table identifying a
+         Diversity requirement within the list."
+
+   ::= { prvtMplsTunnelUNIDiversityEntry 3 }
+
+prvtMplsTunnelUNIDivRowPointer OBJECT-TYPE
+   SYNTAX        RowPointer
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This field represents a pointer to the entry in the
+         mplsTunnelTable to which the Diversity requirement
+         applies.  The array of longs specified here is configured
+         as the OID of the corresponding tunnel."
+
+   ::= { prvtMplsTunnelUNIDiversityEntry 4 }
+
+prvtMplsTunnelOperStatus OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The Oper Status of the mplsTunnelTable row referred to by
+         prvtMplsTunnelUNIDivPointer.  If this tunnel is removed
+         from the mplsTunnelTable then this is set to AMB_OPER_STATUS_DOWN.
+
+         This field is used to determine whether a diversity
+         requirement can currently be satisfied by signaling."
+
+   ::= { prvtMplsTunnelUNIDiversityEntry 5 }
+
+prvtMplsTunnelUNIDivRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable is used to create or delete this row."
+   ::= { prvtMplsTunnelUNIDiversityEntry 6 }
+
+prvtMplsTunnelUNIDivRequirement OBJECT-TYPE
+   SYNTAX        INTEGER {
+         nodeDiverse(1),    -- node diverse
+         linkDiverse(2),    -- link diverse
+         srlg(3),           -- shared risk link group
+         sharedPath(4)      -- shared path
+      }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This field indicates the Diversity Requirement for the
+         corresponding tunnel.  Once an row entry has been created
+         and is oper status 'up' for this tunnel this value cannot
+         be altered."
+
+   ::= { prvtMplsTunnelUNIDiversityEntry 7 }
+
+prvtMplsTunnelUNIDivAccess OBJECT-TYPE
+   SYNTAX        Integer32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "This field indicates the access (read-only or writable)
+         that the user has over this row entry.
+
+         The circumstances under which a row is read-only are
+         described above."
+
+   ::= { prvtMplsTunnelUNIDiversityEntry 8 }
+
+-- End of UNI Diversity table.
+
+prvtMplsTunnelTrapEnableTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF PrvtMplsTunnelTrapEnableEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The prvtMplsTunnelTrapEnable Table allows a manager to
+         enable or disable TRAPs."
+   ::= { mplsTeObjects 15 }
+
+prvtMplsTunnelTrapEnableEntry OBJECT-TYPE
+   SYNTAX        PrvtMplsTunnelTrapEnableEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table is used to configure trap support for this
+         instance of TE-MIB"
+
+   INDEX  { prvtMplsTeMibEntityIndex }
+      ::= { prvtMplsTunnelTrapEnableTable 1 }
+
+PrvtMplsTunnelTrapEnableEntry ::= SEQUENCE {
+      mplsTunnelTrapEnable             TruthValue
+    }
+
+mplsTunnelTrapEnable OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+        "If this object is true, then it enables the
+          generation of mplsTunnelUp and mplsTunnelDown
+          traps, otherwise these traps are not emitted."
+   DEFVAL { false }
+   ::= { prvtMplsTunnelTrapEnableEntry 2 }
+
+-- Scalar table
+
+mplsTunnelHoldTimer OBJECT-TYPE
+    SYNTAX        Unsigned32
+  	MAX-ACCESS    read-write
+   	STATUS        current
+   	DESCRIPTION
+       "Defines a period in seconds needed to wait before rebuilding backup 
+       or primary tunnels if a frr condition occurs
+       Currently no more than 10 seconds are allowed"
+::= { mplsTeObjects 19 }
+
+-- Addition
+
+mplsTeMibEntityScalarTable  OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_SCALAR
+   SYNTAX        SEQUENCE OF MplsTeMibEntityScalarEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The mplsTeMibEntityScalarTable contains all MPLS Tunnel
+          scalars."
+   ::= { mplsTeObjects 16 }
+
+mplsTeMibEntityScalarEntry OBJECT-TYPE
+   SYNTAX        MplsTeMibEntityScalarEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The mplsTeMibEntityScalarTable contains all MPLS Tunnel
+          scalars."
+   INDEX { prvtMplsTeMibEntityIndex }
+      ::= { mplsTeMibEntityScalarTable 1 }
+
+MplsTeMibEntityScalarEntry ::= SEQUENCE {
+      mplsTunnelConfigured              Unsigned32,
+      mplsTunnelActive                  Unsigned32,
+      mplsTunnelTEDistProto             BITS,
+      mplsTunnelMaxHops                 Unsigned32,
+      mplsTunnelNotificationMaxRate     Unsigned32
+   }
+
+-- End Addition
+
+mplsTunnelConfigured OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The number of tunnels configured on this device. A
+          tunnel is considered configured if the
+          mplsTunnelRowStatus is active(1)."
+   ::= { mplsTeMibEntityScalarEntry 2 }
+
+mplsTunnelActive OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The number of tunnels active on this device. A
+          tunnel is considered active if the
+          mplsTunnelOperStatus is up(1)."
+   ::= { mplsTeMibEntityScalarEntry 3 }
+
+mplsTunnelTEDistProto OBJECT-TYPE
+   SYNTAX        BITS {
+          other (0),
+          ospf (1),
+          isis (2)
+      }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The traffic engineering distribution protocol(s)
+          used by this LSR. Note that an LSR may support more
+          than one distribution protocol simultaneously."
+   ::= { mplsTeMibEntityScalarEntry 4 }
+
+mplsTunnelMaxHops OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+        "The maximum number of hops that can be specified for
+          a tunnel on this device."
+   ::= { mplsTeMibEntityScalarEntry 5 }
+
+mplsTunnelNotificationMaxRate OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+        "This variable indicates the maximum number of
+          notifications issued per second. If events occur
+          more rapidly, the implementation may simply fail to
+          emit these notifications during that period, or may
+          queue them until an appropriate time. A value of 0
+          means no throttling is applied and events may be
+          notified at the rate at which they occur."
+   DEFVAL       { 0 }
+   ::= { mplsTeMibEntityScalarEntry 6 }
+
+-- PRVT-Addition
+
+-- SONET Tunnel Resource Table
+
+mplsTunnelSonetResTable OBJECT-TYPE
+-- FAMILY-SHORT-NAME MPLS_TSRS
+   SYNTAX        SEQUENCE OF MplsTunnelSonetResEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "The mplsTunnelSonetResTable allows a manager to
+          specify which Sonet-specific resources are desired
+          for an MPLS tunnel. Note that these attributes are in addition
+          to those specified in mplsTunnelResourceTable. This
+          table also allows several tunnels to point to a
+          single entry in this table, implying that these
+          tunnels should share resources."
+   ::= { mplsTeObjects 17 }
+
+mplsTunnelSonetResEntry OBJECT-TYPE
+   SYNTAX        MplsTunnelSonetResEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+        "An entry in this table represents a set of Sonet resources
+          for an MPLS tunnel.  An entry can be created by a
+          network administrator or by an SNMP agent as
+          instructed by any MPLS signaling protocol."
+   INDEX { prvtMplsTeMibEntityIndex, mplsTunnelResourceIndex }
+      ::= { mplsTunnelSonetResTable 1 }
+
+MplsTunnelSonetResEntry ::= SEQUENCE {
+      mplsTunnelSonetResRCC             Integer32,
+      mplsTunnelSonetResNCC             Unsigned32,
+      mplsTunnelSonetResNVC             Unsigned32,
+      mplsTunnelSonetResMultiplier      Unsigned32,
+      mplsTunnelSonetResTransparency    Unsigned32,
+      mplsTunnelSonetResRowStatus       RowStatus,
+      mplsTunnelSonetResSignalType      Integer32
+   }
+
+mplsTunnelSonetResRCC OBJECT-TYPE
+   SYNTAX        Integer32 (0..255)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Requested Contiguous Concatenation.  Indicates the types
+        of contiguous concatenation requested for this LSP.  This
+        field is only valid if <lsp_encoding> is SDH or SONET, and the
+        <resource_pointer> is 0.0."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelSonetResEntry 2 }
+
+mplsTunnelSonetResNCC OBJECT-TYPE
+   SYNTAX        Unsigned32 (0..65535)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Requested Number of Contiguous Components.  Indicates the
+        number of identical SDH/SONET SPEs/VCs that are
+        requested to be concatenated, as indicated in the <rcc>
+        field.  This field is only valid if <lsp_encoding> is SDH
+        or SONET, and the <resource_pointer> is 0.0."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelSonetResEntry 3 }
+
+mplsTunnelSonetResNVC OBJECT-TYPE
+   SYNTAX        Unsigned32 (0..65535)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This field indicates the number of signals that are
+        requested to be virtually concatenated.  These signals
+        are all of the same type.  This field is valid only if
+        <lsp_encoding> is SDH or SONET, and the <resource_pointer> is 0.0."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelSonetResEntry 4 }
+
+mplsTunnelSonetResMultiplier OBJECT-TYPE
+   SYNTAX        Unsigned32 (1..65535)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This field is a bit field indicating the number of
+        identical signals that are requested for the LSP.  This
+        field is valid only if <lsp_encoding> is SDH or SONET, and the
+        <resource_pointer> is 0.0."
+   DEFVAL        { 1 }
+   ::= { mplsTunnelSonetResEntry 5 }
+
+mplsTunnelSonetResTransparency OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This field is a bit field indicating the type of
+        Transparency being requested.  Several flags can be
+        combined to provide different types of transparency.  Not
+        all combinations are necessarily valid.  This field is
+        valid only if <lsp_encoding> is SDH or SONET, and the
+        <resource_pointer> is 0.0."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelSonetResEntry 6 }
+
+mplsTunnelSonetResRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+        "This variable is used to create, modify, and/or
+          delete a row in this table."
+   ::= { mplsTunnelSonetResEntry 7 }
+
+mplsTunnelSonetResSignalType OBJECT-TYPE
+   SYNTAX        Integer32 (0..255)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Indicates the overhead termination type and is interpreted
+        in relation to the LSP Encoding Type."
+   DEFVAL        { 0 }
+   ::= { mplsTunnelSonetResEntry 9 }
+
+-- End of Sonet Tunnel Resource Table
+
+-- GMPLS Tunnel Error Table.
+
+mplsTunnelErrorTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF MplsTunnelErrorEntry
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION
+    "This table 'augments' the mplsTunnelTable.
+     This table provides per-tunnel information about errors. Errors
+     may be detected locally or reported through the signaling
+     protocol. Error reporting is not exclusive to GMPLS and this
+     table may be applied in MPLS systems."
+  REFERENCE
+    "Multiprotocol Label Switching (MPLS) Traffic Engineering (TE)
+     Management Information Base (MIB), Srinivasan, C., Viswanathan,
+     A., Nadeau, T., RFC 3812, June 2004."
+  ::= { mplsTeObjects 18 }
+
+mplsTunnelErrorEntry OBJECT-TYPE
+  SYNTAX  MplsTunnelErrorEntry
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION
+    "An entry in this table is created by the LSR for every tunnel
+     where error information is visible to the LSR.
+     Note that systems which read the objects in this table one at a
+     time may experience a discontinuity as the result of a new error
+     occurring in between object reads. Systems that are vulnerable
+     to this should read mplsTunnelErrorLastTime before and after
+     reading the other objects."
+  AUGMENTS { mplsTunnelEntry }
+  ::= { mplsTunnelErrorTable 1 }
+
+MplsTunnelErrorEntry ::= SEQUENCE {
+  mplsTunnelErrorLastErrorType      INTEGER,
+  mplsTunnelErrorLastTime           TimeStamp,
+  mplsTunnelErrorReporterType       InetAddressType,
+  mplsTunnelErrorReporter           InetAddress,
+  mplsTunnelErrorCode               Unsigned32,
+  mplsTunnelErrorSubcode            Unsigned32,
+  mplsTunnelErrorTLVs               OCTET STRING,
+  mplsTunnelErrorHelpString         DisplayString
+}
+
+mplsTunnelErrorLastErrorType OBJECT-TYPE
+  SYNTAX  INTEGER {
+    noError (0),
+    unknown (1),
+    protocol (2),
+    pathComputation (3),
+    localConfiguration (4),
+    localResources (5),
+    localOther (6)
+  }
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+    "The nature of the last error. Provides interpretation context
+     for mplsTunnelErrorProtocolCode and mplsTunnelErrorProtocolSubcode.
+
+     A value of noError (0) shows that there is no error associated
+     with this tunnel and means that the other objects in this table
+     entry have no meaning.
+
+     A value of unknown (1) shows that there is an error but that no
+     additional information about the cause is known. The error may
+     have been received in a signaled message or generated locally.
+
+     A value of protocol (2) or pathComputation (3) indicates that
+     the cause of an error and identifies an error that has been
+     received through signaling or will itself be signaled.
+
+     A value of localConfiguration (4), localResources (5) or
+     localOther (6) identifies an error which has been detected
+     by the local node, but which will not be reported through
+     signaling."
+  ::= { mplsTunnelErrorEntry 1 }
+
+mplsTunnelErrorLastTime OBJECT-TYPE
+  SYNTAX  TimeStamp
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+    "The time at which the last error occurred. This is presented as
+     the value of SysUpTime when the error occurred or was reported
+     to this node.
+     If mplsTunnelErrorLastErrorType has the value noError (0), then
+     this object is ignored."
+  ::= { mplsTunnelErrorEntry 2 }
+
+mplsTunnelErrorReporterType OBJECT-TYPE
+   SYNTAX  InetAddressType
+   MAX-ACCESS read-only
+   STATUS  current
+   DESCRIPTION
+     "The address type of the error reported.
+      This object is used to aid in interpretation of
+      mplsTunnelErrorReporter."
+  ::= { mplsTunnelErrorEntry 3 }
+
+mplsTunnelErrorReporter OBJECT-TYPE
+  SYNTAX  InetAddress
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+    "The address of the node reporting the last error, or the address
+     of the resource (such as an interface) associated with the
+     error.
+
+     If mplsTunnelErrorLastErrorType has the value noError (0), then
+     this object is ignored.
+
+     If mplsTunnelErrorLastErrorType has the value unknown (1),
+     localConfiguration (4), localResources (5), or localOther (6)
+     this object MAY contain a zero value.
+
+     This object should be interpreted in the context of the value of
+     the object mplsTunnelErrorReporterType."
+  REFERENCE
+    "RFC3291, Textual Conventions for Internet Network Addresses,
+     Section 4. Usage Hints."
+  ::= { mplsTunnelErrorEntry 4 }
+
+mplsTunnelErrorCode OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+    "The primary error code associated with the last error.
+     The interpretation of this error code depends on the value of
+     mplsTunnelErrorLastErrorType. If the value of
+     mplsTunnelErrorLastErrorType is noError (0) the value of this
+     object should be 0 and should be ignored. If the value of
+     mplsTunnelErrorLastErrorType is protocol (2) the error should
+     be interpreted in the context of the signling protocol
+     identified by the mplsTunnelSignallingProto object.
+
+     Values in excess 32767 of are not used by signaling protocols
+     and may safely be used as implementation-specific error codes."
+  REFERENCE
+    "1. Braden, R. (Ed.) et al., Resource ReserVation Protocol --
+        Version 1 Functional Specification, RFC 2205, September 1997.
+     2. RSVP-TE: Extensions to RSVP for LSP Tunnels, Awduche et al.,
+        RFC 3209, December 2001.
+     3. Generalized MPLS Signaling - RSVP-TE Extensions, Berger, L.
+        (Editor), RFC 3473, January 2003."
+  ::= { mplsTunnelErrorEntry 5 }
+
+mplsTunnelErrorSubcode OBJECT-TYPE
+  SYNTAX  Unsigned32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+    "The secondary error code associated with the last error and the
+     protocol used to signal this tunnel. This value is interpreted
+     in the context of the value of mplsTunnelErrorCode.
+     If the value of mplsTunnelErrorLastErrorType is noError (0) the
+     value of this object should be 0 and should be ignored."
+  REFERENCE
+    "1. Braden, R. (Ed.) et al., Resource ReserVation Protocol --
+        Version 1 Functional Specification, RFC 2205, September 1997.
+     2. RSVP-TE: Extensions to RSVP for LSP Tunnels, Awduche et al.,
+        RFC 3209, December 2001.
+     3. Generalized MPLS Signaling - RSVP-TE Extensions, Berger, L.
+        (Editor), RFC 3473, January 2003."
+  ::= { mplsTunnelErrorEntry 6 }
+
+mplsTunnelErrorTLVs OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE (0..255))
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+    "The sequence of interface identifier TLVs reported with the
+     error by the protocol code. The interpretation of the TLVs and
+     the encoding within the protocol are described in the
+     references. A value of zero in the first octet indicates that no
+     TLVs are present."
+   REFERENCE
+    "Generalized MPLS Signaling - RSVP-TE Extensions, Berger, L.
+     (Editor), RFC 3473, January 2003."
+  ::= { mplsTunnelErrorEntry 7 }
+
+mplsTunnelErrorHelpString OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+    "A textual string containing information about the last error,
+     recovery actions and support advice. If there is no help string
+     this object contains a zero length string.
+     If the value of mplsTunnelErrorLastErrorType is noError (0)
+     this object should contain a zero length string, but may contain
+     a help string indicating that there is no error."
+  ::= { mplsTunnelErrorEntry 8 }
+
+-- End Addition
+
+-- Notifications.
+
+mplsTunnelUp NOTIFICATION-TYPE
+   OBJECTS     {
+      mplsTunnelAdminStatus,
+      mplsTunnelOperStatus
+   }
+   STATUS      current
+   DESCRIPTION
+        "This notification is generated when a
+          mplsTunnelOperStatus object for one of the
+          configured tunnels is about to leave the down state
+          and transition into some other state (but not into
+          the notPresent state).  This other state is
+          indicated by the included value of
+          mplsTunnelOperStatus.
+
+          This structure is the same as the generic
+          AMB_MPLS_TUNNEL_TRAP_COMMON."
+   ::= { mplsTeNotifyPrefix 1 }
+
+mplsTunnelDown NOTIFICATION-TYPE
+   OBJECTS     {
+      mplsTunnelAdminStatus,
+      mplsTunnelOperStatus
+   }
+   STATUS      current
+   DESCRIPTION
+        "This notification is generated when a
+          mplsTunnelOperStatus object for one of the
+          configured tunnels is about to enter the down state
+          from some other state (but not from the notPresent
+          state).  This other state is indicated by the
+          included value of mplsTunnelOperStatus.
+
+          This structure is the same as the generic
+          AMB_MPLS_TUNNEL_TRAP_COMMON."
+   ::= { mplsTeNotifyPrefix 2 }
+
+mplsTunnelRerouted NOTIFICATION-TYPE
+   OBJECTS     {
+      mplsTunnelAdminStatus,
+      mplsTunnelOperStatus,
+      mplsTunnelARHopTableIndex
+   }
+   STATUS      current
+   DESCRIPTION
+        "This notification is generated when a tunnel is
+          rerouted. If the actual path is used, then this
+          object MAY contain the new path for this tunnel
+          some time after this trap is issued by the agent.
+
+          This structure is the same as the generic
+          AMB_MPLS_TUNNEL_TRAP_COMMON."
+    ::= { mplsTeNotifyPrefix 3 }
+
+mplsTunnelReoptimized NOTIFICATION-TYPE
+   OBJECTS     {
+      mplsTunnelAdminStatus,
+      mplsTunnelOperStatus,
+      mplsTunnelARHopTableIndex
+   }
+   STATUS      current
+   DESCRIPTION
+        "This notification is generated when a tunnel is
+          reoptimized. If the mplsTunnelARHopTable is used,
+          then this tunnel instance's entry in the
+          mplsTunnelARHopTable MAY contain the new path for
+          this tunnel some time after this trap is issued by
+          the agent.
+
+          This structure is the same as the generic
+          AMB_MPLS_TUNNEL_TRAP_COMMON."
+    ::= { mplsTeNotifyPrefix 4 }
+
+-- End of notifications.
+
+
+-- Module compliance.
+
+mplsTeGroups
+   OBJECT IDENTIFIER ::= { mplsTeConformance 1 }
+
+mplsTeCompliances
+   OBJECT IDENTIFIER ::= { mplsTeConformance 2 }
+
+
+mplsTeModuleFullCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+        "Compliance statement for agents that provide full
+          support the MPLS-TE-STD-MIB module."
+
+   MODULE IF-MIB -- The Interfaces Group MIB, RFC 2863.
+      MANDATORY-GROUPS {
+         ifGeneralInformationGroup,
+         ifCounterDiscontinuityGroup
+      }
+
+   MODULE -- this module
+
+      -- The mandatory group has to be implemented by all
+      -- LSRs that originate/terminate ESLSPs/tunnels.
+      -- In addition, depending on the type of tunnels
+      -- supported, other groups become mandatory as
+      -- explained below.
+
+      MANDATORY-GROUPS    {
+         mplsTunnelGroup,
+         mplsTunnelScalarGroup
+      }
+
+      GROUP mplsTunnelManualGroup
+      DESCRIPTION
+          "This group is mandatory for devices which support
+           manual configuration of tunnels."
+
+      GROUP mplsTunnelSignaledGroup
+      DESCRIPTION
+          "This group is mandatory for devices which support
+           signaled tunnel set up."
+
+      GROUP mplsTunnelIsNotIntfcGroup
+      DESCRIPTION
+          "This group is mandatory for devices which support
+           tunnels that are not interfaces."
+
+      GROUP mplsTunnelIsIntfcGroup
+      DESCRIPTION
+          "This group is mandatory for devices which support
+           tunnels that are interfaces."
+
+      GROUP mplsTunnelCRLDPResOptionalGroup
+      DESCRIPTION
+          "Objects in this group are required by
+           implementations supporting the CR-LDP protocol for
+           signalling of TE tunnels."
+
+      GROUP       mplsTunnelSonetGroup
+      DESCRIPTION
+          "Set of objects needed to implement Sonet."
+
+      GROUP       mplsTunnelUniGroup
+      DESCRIPTION
+          "Set of objects needed to implement UNI."
+
+      GROUP       mplsTunnelBackupGroup
+      DESCRIPTION
+         "Set of objects needed for backup tunnels."
+
+      GROUP       mplsTunnelARHopGroup
+      DESCRIPTION
+         "Set of objects relating to ARHop."
+
+      GROUP       mplsTunnelCHopGroup
+      DESCRIPTION
+         "Set of objects relating to CHop."
+
+      GROUP       mplsDiffServGroup
+      DESCRIPTION
+         "Set of objects relating to DiffServ."
+
+      GROUP mplsTeNotificationGroup
+      DESCRIPTION "This group is mandatory for those implementations
+                   which can implement the notifications
+                   contained in this group."
+
+      OBJECT       mplsTunnelRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2) }
+      WRITE-SYNTAX RowStatus { active(1), notInService(2),
+                               createAndGo(4), destroy(6)
+                             }
+      DESCRIPTION "Support for createAndWait and notReady is not
+                   required."
+
+      OBJECT      mplsTunnelHopRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2) }
+      WRITE-SYNTAX RowStatus { active(1), notInService(2),
+                               createAndGo(4), destroy(6)
+                             }
+      DESCRIPTION "Support for createAndWait and notReady is not
+                   required."
+
+      OBJECT      mplsTunnelCRLDPResRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2) }
+      WRITE-SYNTAX RowStatus { active(1), notInService(2),
+                               createAndGo(4), destroy(6)
+                             }
+      DESCRIPTION "Support for createAndWait and notReady is
+                   not required."
+
+   ::= { mplsTeCompliances 1 }
+
+-- Compliance requirement for read-only implementations.
+
+mplsTeModuleReadOnlyCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+        "Compliance requirement for implementations that only
+          provide read-only support for MPLS-TE-STD-MIB.
+          Such devices can then be monitored but cannot be
+          configured using this MIB modules."
+
+   MODULE -- this module
+
+      -- mplsTunnelTable
+
+      MANDATORY-GROUPS    {
+         mplsTunnelGroup,
+         mplsTunnelScalarGroup
+      }
+
+      GROUP mplsTunnelManualGroup
+      DESCRIPTION
+          "This group is mandatory for devices which support
+           manual configuration of tunnels."
+
+      GROUP mplsTunnelSignaledGroup
+      DESCRIPTION
+          "This group is mandatory for devices which support
+           signaled tunnel set up."
+
+      GROUP mplsTunnelIsNotIntfcGroup
+      DESCRIPTION
+          "This group is mandatory for devices which support
+           tunnels that are not interfaces."
+
+      GROUP mplsTunnelIsIntfcGroup
+      DESCRIPTION
+          "This group is mandatory for devices which support
+           tunnels that are interfaces."
+
+      GROUP mplsTunnelCRLDPResOptionalGroup
+      DESCRIPTION
+          "Objects in this group are required by
+           implementations supporting the CR-LDP protocol for
+           signalling of TE tunnels."
+
+      GROUP mplsTeNotificationGroup
+      DESCRIPTION "This group is mandatory for those implementations
+                   which can implement the notifications
+                   contained in this group."
+
+      -- mplsTunnelTable
+
+      OBJECT      mplsTunnelName
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelDescr
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelIsIf
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelIfIndex
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelXCPointer
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelSignallingProto
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelSetupPrio
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHoldingPrio
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelSessionAttributes
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelLocalProtectInUse
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelResourcePointer
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelInstancePriority
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopTableIndex
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelIncludeAnyAffinity
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelIncludeAllAffinity
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelExcludeAnyAffinity
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelPathInUse
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelRole
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelAdminStatus
+      SYNTAX      INTEGER { up (1), down (2) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Only up and down states must be supported. Write
+           access is not required."
+
+      OBJECT      mplsTunnelRowStatus
+      SYNTAX      RowStatus { active(1) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      -- mplsTunnelHopTable
+
+      OBJECT      mplsTunnelHopAddrType
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopIpAddr
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopIpPrefixLen
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopAddrUnnum
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopAsNumber
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopLspId
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopType
+      SYNTAX      INTEGER { strict(1) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "loose(2) need not be supported. Write access is
+           not required."
+
+      OBJECT      mplsTunnelHopInclude
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopPathOptionName
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopEntryPathComp
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopRowStatus
+      SYNTAX      RowStatus { active(1) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelHopStorageType
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      -- mplsTunnelResourceTable
+
+      OBJECT      mplsTunnelResourceMaxRate
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelResourceMeanRate
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelResourceMaxBurstSize
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelResourceMeanBurstSize
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelResourceExBurstSize
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelResourceFrequency
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelResourceWeight
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelResourceRowStatus
+      SYNTAX      RowStatus { active(1) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelResourceStorageType
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      -- mplsTunnelCRLDPResTable
+
+      OBJECT      mplsTunnelCRLDPResMeanBurstSize
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelCRLDPResExBurstSize
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelCRLDPResFrequency
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelCRLDPResWeight
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelCRLDPResFlags
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelCRLDPResRowStatus
+      SYNTAX      RowStatus { active(1) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      mplsTunnelCRLDPResStorageType
+      MIN-ACCESS   read-only
+      DESCRIPTION
+          "Write access is not required."
+
+   ::= { mplsTeCompliances 2 }
+
+
+-- Units of conformance.
+
+mplsTunnelGroup OBJECT-GROUP
+   OBJECTS {
+      mplsTunnelIndexNextIndex,
+      mplsTunnelName,
+      mplsTunnelDescr,
+      mplsTunnelOwner,
+      mplsTunnelXCPointer,
+      mplsTunnelIfIndex,
+      mplsTunnelHopTableIndex,
+      mplsTunnelARHopTableIndex,
+      mplsTunnelCHopTableIndex,
+      mplsTunnelAdminStatus,
+      mplsTunnelOperStatus,
+      mplsTunnelRowStatus,
+      mplsTunnelStorageType,
+      mplsTunnelDirection,
+      mplsTunnelLSPEncoding,
+      mplsTunnelLinkProtection,
+      mplsTunnelGPid,
+      mplsTunnelUseEgressLabel,
+      mplsTunnelEgressLabel,
+      mplsTunnelEgressLabelType,
+      mplsTunnelOmitEROIfOneHop,
+      mplsTunnelPrivateData,
+      mplsTunnelSrcTNAAddressType,
+      mplsTunnelSrcTNAAddress,
+      mplsTunnelDestTNAAddressType,
+      mplsTunnelDestTNAAddress,
+      mplsTunnelSecondary,
+      mplsTunnelUnnumIf,
+      mplsTunnelAttributes,
+      mplsTunnelEndToEndRerouting,
+      mplsTunnelIsUni,
+      mplsTunnelUniServiceLevel,
+      mplsTunnelUniEgressLabel,
+      mplsTunnelUniEgressLabelType,
+      mplsTunnelUniEgressLabelPort,
+      mplsTunnelUniRvsEgressLabel,
+      mplsTunnelUniRvsEgressLabelType,
+      mplsTunnelUniRvsEgressLabelPort,
+      mplsTunnelSwitchingType,
+      mplsTunnelDeletionMode,
+      mplsTunnelUniDiversityListIndex,
+      mplsTunnelDiffServIndex,
+      mplsTunnelReversePrivateData,
+      mplsTunnelAdminStatusFlags,
+      mplsTunnelFastRerouteMode,
+      mplsTunnelBackupSetupPrio,
+      mplsTunnelBackupHoldingPriority,
+      mplsTunnelBackupIncAny,
+      mplsTunnelBackupIncAll,
+      mplsTunnelBackupExcAny,
+      mplsTunnelBackupBandwidth,
+      mplsTunnelBackupMaxHops,
+      mplsTunnelDownNotRecipType,
+      mplsTunnelDownNotRecip,
+      mplsTunnelPathComp,
+      mplsTunnelUpNotRecipType,
+      mplsTunnelUpNotRecip,
+      mplsTunnelExtraParamsPtr,
+      mplsTunnelIsSpc,
+      mplsTunnelUniIngressLabel,
+      mplsTunnelUniIngressLabelType,
+      mplsTunnelUniIngressLabelPort,
+      mplsTunnelUniRvsIngrLabel,
+      mplsTunnelUniRvsIngrLabelType,
+      mplsTunnelUniRvsIngrLabelPort,
+      mplsTunnelDiffServClassType,
+      mplsTunnelExtendedProtection,
+      mplsTunnelProtecting,
+      mplsTunnelNotification,
+      mplsTunnelLspProtection,
+      mplsTunnelAssociatedLspId,
+      mplsTunnelCallIdType,
+      mplsTunnelCallId,
+      mplsTunnelIsIpv6,
+      mplsTunnelConfigured,
+      mplsTunnelActive,
+      mplsTunnelPrimaryInstance,
+      mplsTunnelPrimaryUpTime,
+      mplsTunnelPathChanges,
+      mplsTunnelLastPathChange,
+      mplsTunnelCreationTime,
+      mplsTunnelStateTransitions,
+      mplsTunnelIncludeAnyAffinity,
+      mplsTunnelIncludeAllAffinity,
+      mplsTunnelExcludeAnyAffinity,
+--      mplsTunnelPerfPackets,
+--      mplsTunnelPerfHCPackets,
+--      mplsTunnelPerfErrors,
+--      mplsTunnelPerfBytes,
+--      mplsTunnelPerfHCBytes,
+      mplsTunnelResourcePointer,
+      mplsTunnelInstancePriority,
+      mplsTunnelPathInUse,
+      mplsTunnelRole,
+      mplsTunnelTotalUpTime,
+      mplsTunnelInstanceUpTime,
+      mplsTunnelResourceMaxRate,
+      mplsTunnelResourceMeanRate,
+      mplsTunnelResourceMaxBurstSize,
+      mplsTunnelResourceMeanBurstSize,
+      mplsTunnelResourceExBurstSize,
+      mplsTunnelResourceFrequency,
+      mplsTunnelResourceWeight,
+      mplsTunnelResourceRowStatus,
+      mplsTunnelResourceStorageType,
+      mplsTunnelResourceIndexNextIndex,
+      mplsTunnelSonetResRCC,
+      mplsTunnelSonetResNCC,
+      mplsTunnelSonetResNVC,
+      mplsTunnelSonetResMultiplier,
+      mplsTunnelSonetResTransparency,
+      mplsTunnelSonetResRowStatus,
+      mplsTunnelARHopAddrType,
+      mplsTunnelARHopIpAddr,
+      mplsTunnelARHopAddrUnnum,
+      mplsTunnelARHopLspId,
+      mplsTunnelCHopAddrType,
+      mplsTunnelCHopIpAddr,
+      mplsTunnelCHopIpPrefixLen,
+      mplsTunnelCHopAsNumber,
+      mplsTunnelCHopAddrUnnum,
+      mplsTunnelCHopLspId,
+      mplsTunnelCHopType,
+      mplsTunnelTrapEnable,
+      mplsTunnelErrorLastErrorType,
+      mplsTunnelErrorLastTime,
+      mplsTunnelErrorReporterType,
+      mplsTunnelErrorReporter,
+      mplsTunnelErrorCode,
+      mplsTunnelErrorSubcode,
+      mplsTunnelErrorTLVs,
+      mplsTunnelErrorHelpString
+   }
+   STATUS  current
+   DESCRIPTION
+        "Necessary, but not sufficient, set of objects to
+          implement tunnels.  In addition, depending on the
+          type of the tunnels supported (for example,
+          manually configured or signaled, persistent or non-
+          persistent, etc.), the following other groups
+          defined below are mandatory: mplsTunnelManualGroup
+          and/or mplsTunnelSignaledGroup,
+          mplsTunnelIsNotIntfcGroup and/or
+          mplsTunnelIsIntfcGroup."
+   ::= { mplsTeGroups 1 }
+
+mplsTunnelManualGroup  OBJECT-GROUP
+   OBJECTS { mplsTunnelSignallingProto }
+   STATUS  current
+   DESCRIPTION
+        "Object(s) needed to implement manually configured
+          tunnels."
+   ::= { mplsTeGroups 2 }
+
+mplsTunnelSignaledGroup OBJECT-GROUP
+   OBJECTS {
+      mplsTunnelSetupPrio,
+      mplsTunnelHoldingPrio,
+      mplsTunnelSignallingProto,
+      mplsTunnelLocalProtectInUse,
+      mplsTunnelSessionAttributes,
+      mplsTunnelHopAddrType,
+      mplsTunnelHopIpAddr,
+      mplsTunnelHopIpPrefixLen,
+      mplsTunnelHopAddrUnnum,
+      mplsTunnelHopAsNumber,
+      mplsTunnelHopLspId,
+      mplsTunnelHopType,
+      mplsTunnelHopInclude,
+      mplsTunnelHopPathOptionName,
+      mplsTunnelHopEntryPathComp,
+      mplsTunnelHopRowStatus,
+      mplsTunnelHopStorageType,
+      mplsTunnelHopLabelStatuses,
+      mplsTunnelHopExpLabelType,
+      mplsTunnelHopExpLabel,
+      mplsTunnelHopExpRvrsLabelType,
+      mplsTunnelHopExpRvrsLabel,
+      mplsTunnelHopIndexNextIndex
+   }
+   STATUS  current
+   DESCRIPTION
+        "Objects needed to implement signaled tunnels."
+   ::= { mplsTeGroups 3 }
+
+mplsTunnelScalarGroup OBJECT-GROUP
+   OBJECTS {
+      mplsTunnelConfigured,
+      mplsTunnelActive,
+      mplsTunnelTEDistProto,
+      mplsTunnelMaxHops,
+      mplsTunnelNotificationMaxRate
+   }
+   STATUS  current
+   DESCRIPTION
+        "Scalar object needed to implement MPLS tunnels."
+   ::= { mplsTeGroups 4 }
+
+mplsTunnelIsIntfcGroup OBJECT-GROUP
+   OBJECTS { mplsTunnelIsIf }
+   STATUS  current
+   DESCRIPTION
+        "Objects needed to implement tunnels that are
+          interfaces."
+   ::= { mplsTeGroups 5 }
+
+mplsTunnelIsNotIntfcGroup OBJECT-GROUP
+   OBJECTS { mplsTunnelIsIf }
+   STATUS  current
+   DESCRIPTION
+        "Objects needed to implement tunnels that are not
+          interfaces."
+   ::= { mplsTeGroups 6 }
+
+mplsTunnelCRLDPResOptionalGroup OBJECT-GROUP
+   OBJECTS {
+      mplsTunnelCRLDPResMeanBurstSize,
+      mplsTunnelCRLDPResExBurstSize,
+      mplsTunnelCRLDPResFrequency,
+      mplsTunnelCRLDPResWeight,
+      mplsTunnelCRLDPResFlags,
+      mplsTunnelCRLDPResRowStatus,
+      mplsTunnelCRLDPResStorageType
+   }
+   STATUS  current
+   DESCRIPTION
+        "Set of objects implemented for resources applicable
+          for tunnels signaled using CR-LDP."
+   ::= { mplsTeGroups 7 }
+
+
+mplsTunnelSonetGroup OBJECT-GROUP
+   OBJECTS {
+      mplsTunnelSonetResSignalType,
+      mplsTunnelSonetResRCC,
+      mplsTunnelSonetResNCC,
+      mplsTunnelSonetResNVC,
+      mplsTunnelSonetResMultiplier,
+      mplsTunnelSonetResTransparency
+   }
+   STATUS  current
+   DESCRIPTION
+        "Set of objects needed to implement Sonet.
+          None of these objects are mandatory."
+   ::= { mplsTeGroups 8 }
+
+mplsTunnelUniGroup OBJECT-GROUP
+   OBJECTS {
+      mplsTunnelIsUni,
+      mplsTunnelUniServiceLevel,
+      mplsTunnelUniEgressLabel,
+      mplsTunnelUniEgressLabelType,
+      mplsTunnelUniEgressLabelPort,
+      mplsTunnelUniRvsEgressLabel,
+      mplsTunnelUniRvsEgressLabelType,
+      mplsTunnelUniRvsEgressLabelPort,
+      mplsTunnelUniDiversityListIndex,
+      mplsTunnelUniIngressLabelType,
+      mplsTunnelUniIngressLabelPort,
+      mplsTunnelUniIngressLabel,
+      mplsTunnelUniRvsIngrLabel,
+      mplsTunnelUniRvsIngrLabelType,
+      mplsTunnelUniRvsIngrLabelPort
+   }
+   STATUS  current
+   DESCRIPTION
+        "Set of objects needed to implement UNI.
+          None of these objects are mandatory."
+   ::= { mplsTeGroups 9 }
+
+-- mplsTunnelUniDivGroup OBJECT-GROUP
+--   OBJECTS {
+--      prvtMplsTunnelUNIDivListIdxNext,
+--      prvtMplsTunnelUNIDivRowPointer,
+--      prvtMplsTunnelOperStatus,
+--      prvtMplsTunnelUNIDivRowStatus,
+--      prvtMplsTunnelUNIDivRequirement,
+--      prvtMplsTunnelUNIDivAccess
+--   }
+--   STATUS  current
+--   DESCRIPTION
+--        "Set of objects needed to implement UNI Diversity.
+--          None of these objects are mandatory."
+--   ::= { mplsTeGroups 10 }
+
+mplsTunnelBackupGroup OBJECT-GROUP
+   OBJECTS {
+      mplsTunnelBackupSetupPrio,
+      mplsTunnelBackupHoldingPriority,
+      mplsTunnelBackupIncAny,
+      mplsTunnelBackupIncAll,
+      mplsTunnelBackupExcAny,
+      mplsTunnelBackupBandwidth,
+      mplsTunnelBackupMaxHops
+   }
+   STATUS  current
+   DESCRIPTION
+        "Set of objects needed for backup tunnels.
+          None of these objects are mandatory."
+   ::= { mplsTeGroups 11 }
+
+mplsTunnelARHopGroup OBJECT-GROUP
+   OBJECTS {
+      mplsTunnelARHopAddrType,
+      mplsTunnelARHopIpAddr,
+      mplsTunnelARHopAddrUnnum,
+      mplsTunnelARHopLspId,
+      mplsTunnelARHopLabelStatuses,
+      mplsTunnelARHopExpLabelType,
+      mplsTunnelARHopExpLabel,
+      mplsTunnelARHopExpRvrsLabel,
+      mplsTunnelARHopExpRvrsLabelType,
+      mplsTunnelARHopProtection
+    }
+    STATUS  current
+    DESCRIPTION
+         "Set of objects relating to ARHop.
+           None of these objects are mandatory."
+    ::= { mplsTeGroups 12 }
+
+mplsTunnelCHopGroup OBJECT-GROUP
+   OBJECTS {
+      mplsTunnelCHopAddrType,
+      mplsTunnelCHopIpAddr,
+      mplsTunnelCHopIpPrefixLen,
+      mplsTunnelCHopAsNumber,
+      mplsTunnelCHopAddrUnnum,
+      mplsTunnelCHopLspId,
+      mplsTunnelCHopType,
+      mplsTunnelCHopLabelStatuses,
+      mplsTunnelCHopExpLabelType,
+      mplsTunnelCHopExpLabel,
+      mplsTunnelCHopExpRvrsLabelType,
+      mplsTunnelCHopExpRvrsLabel
+    }
+    STATUS  current
+    DESCRIPTION
+         "Set of objects relating to CHop.
+           None of these objects are mandatory."
+    ::= { mplsTeGroups 13 }
+
+mplsDiffServGroup OBJECT-GROUP
+   OBJECTS {
+      mplsDiffServIndexNextIndex,
+      mplsDiffServType,
+      mplsDiffServLLSPPSC,
+      mplsDiffServELSPNumPHBs,
+      mplsDiffServELSPPHB0,
+      mplsDiffServELSPPHB1,
+      mplsDiffServELSPPHB2,
+      mplsDiffServELSPPHB3,
+      mplsDiffServELSPPHB4,
+      mplsDiffServELSPPHB5,
+      mplsDiffServELSPPHB6,
+      mplsDiffServELSPPHB7,
+      mplsDiffServRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+         "Set of objects relating to DiffServ.
+            None of these objects are mandatory."
+    ::= { mplsTeGroups 14 }
+
+mplsTeNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS {
+      mplsTunnelUp,
+      mplsTunnelDown,
+      mplsTunnelRerouted,
+      mplsTunnelReoptimized
+   }
+   STATUS  current
+   DESCRIPTION
+        "Set of notifications implemented in this module.
+          None is mandatory."
+   ::= { mplsTeGroups 15 }
+
+-- End of MPLS-TE-MIB
+END
+

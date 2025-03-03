@@ -1,0 +1,241 @@
+-- ============================================================================
+-- Copyright (C) 2003 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: this MIB is a MIB for fabric topology management
+--
+-- Reference:
+-- Version:     V2.3
+-- History:
+-- V1.0 2004/01/13 created by wangjiao
+-- V1.1 2004/06/15 modifyied by huxiaolong
+-- V1.2 2004/07/13 modified by huxiaolong add hh3cFtmUnitRole node
+-- V1.3 2004/07/16 add hh3cFtmUnitRole to Hh3cFtmUnitEntry SEQUENCE { }
+--           add hh3cFtmUnitRole OBJECT
+-- V2.0 2004-10-12 updated by gaolong
+--      Relocate hh3cFtmManMIB MODULE-IDENTITY.
+--      Change MAX-ACCESS clause value of hh3cFtmIndex to accessible-for-notify
+--      because this index is used when sending trap.
+--      Relocate hh3cFtmManMIBNotification.
+--      Add MODULE clause for hh3cFtmMIBCompliance.
+--      Change value of hh3cFtmAuthMode from underscores to hephens.
+-- V2.1 2004-11-20 updated by xuhui
+--      Add hh3cFtmFabricVlanID
+-- V2.2 2004-12-22 add hh3cFtmFabricType node by zhuchaopeng
+-- V2.3 2005-03-31 add hh3cFtmNumberMode by yangjianfeng
+-- ============================================================================
+HH3C-FTM-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hh3cCommon
+                FROM HH3C-OID-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI;
+
+        hh3cFtmManMIB MODULE-IDENTITY
+            LAST-UPDATED "200401131055Z"        -- January 13, 2004 at 10:55 GMT
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                "this MIB will maintain Fabric topology management.
+                 The MIB includes unit-id, unit-name and
+                      fabric authentication information."
+            ::= { hh3cFtm 1 }
+
+        hh3cFtm    OBJECT IDENTIFIER ::= { hh3cCommon 1 }
+
+--
+-- Node definitions
+--
+
+        hh3cFtmManMIBObjects OBJECT IDENTIFIER ::= { hh3cFtmManMIB 1 }
+
+        hh3cFtmUnitTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cFtmUnitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of informations of XRN-Fabric Unit."
+            ::= { hh3cFtmManMIBObjects 1 }
+
+        hh3cFtmUnitEntry OBJECT-TYPE
+            SYNTAX Hh3cFtmUnitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for configuring unit informations of XRN-Fabric."
+            INDEX { hh3cFtmIndex }
+            ::= { hh3cFtmUnitTable 1 }
+
+        Hh3cFtmUnitEntry ::=
+            SEQUENCE {
+                hh3cFtmIndex
+                    Integer32,
+                hh3cFtmUnitID
+                    INTEGER,
+                hh3cFtmUnitName
+                    OCTET STRING,
+                hh3cFtmUnitRole
+                    INTEGER,
+                hh3cFtmNumberMode
+                    INTEGER
+             }
+
+        hh3cFtmIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The unique index of a unit."
+            ::= { hh3cFtmUnitEntry 1 }
+
+        hh3cFtmUnitID OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Identifer of unit in fabric. Its value should be between 1 and the maximum which defines
+                in product specification.
+                An exception is described in description of hh3cFtmNumberMode. In that case, the value
+                of this object remains its original value after set to zero.
+                "
+            ::= { hh3cFtmUnitEntry 2 }
+
+        hh3cFtmUnitName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Name of unit in XRN-Fabric. It consists of no more than 64 characters."
+            ::= { hh3cFtmUnitEntry 3 }
+
+        hh3cFtmUnitRole OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                master(0),   -- master unit
+                slave(1)     -- slave unit
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Role of unit in XRN-Fabric. One unit in a XRN-Fabric acts as master role and others
+                act as slave roles"
+            ::= { hh3cFtmUnitEntry 4 }
+
+        hh3cFtmNumberMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                automatic(0),
+                manual (1)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Numbering Mode of unit in XRN-Fabric.  If the unit ID is assigned by the auto
+                numbering algorithm, the numbering mode will be automatic numbering; if the
+                unit ID (hh3cFtmUnitID) is assigned by the user, the numbering mode will be manual
+                numbering; if hh3cFtmUnitID is set to be zero, the numbering mode will become
+                automatic numbering."
+            ::= { hh3cFtmUnitEntry 5 }
+
+        hh3cFtmAuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ftm-none(0),
+                ftm-simple(1),
+                ftm-md5(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Authentication mode of XRN-Fabric."
+            ::= { hh3cFtmManMIBObjects 2 }
+
+        hh3cFtmAuthValue OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Authentication value of XRN-Fabric Feature. ftm_none mode means no authentication.
+                In simple mode, the value is password of a string of 1 to 16 charactors.
+                While in md5 mode, the value is key of a string within 16 charactors."
+            ::= { hh3cFtmManMIBObjects 3 }
+
+        hh3cFtmFabricVlanID OBJECT-TYPE
+            SYNTAX INTEGER(2..4094)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object is used for get and set the Fabric VlanID.
+                Only is the equipment not in the stacking status, the value can be set."
+            ::= { hh3cFtmManMIBObjects 4 }
+
+        hh3cFtmFabricType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                outofStack(1),
+                line(2),
+                ring(3),
+                mesh(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Topology type of Fabric.
+                outofStack means this unit is not in stack."
+            ::= { hh3cFtmManMIBObjects 5 }
+
+        hh3cFtmManMIBNotification OBJECT IDENTIFIER ::= { hh3cFtmManMIB 3 }
+
+        hh3cFtmUnitIDChange NOTIFICATION-TYPE
+            OBJECTS { hh3cFtmIndex, hh3cFtmUnitID}
+            STATUS current
+            DESCRIPTION
+                "When unit id changes in fabric, this trap is sent with unit index and its new id ."
+            ::= { hh3cFtmManMIBNotification 1 }
+
+        hh3cFtmUnitNameChange NOTIFICATION-TYPE
+            OBJECTS { hh3cFtmIndex, hh3cFtmUnitName }
+            STATUS current
+            DESCRIPTION
+                "When unit name changes in fabric, this trap is sent with unit index and its new name."
+            ::= { hh3cFtmManMIBNotification 2 }
+
+        hh3cFtmManMIBComformance OBJECT IDENTIFIER ::= { hh3cFtmManMIB 2 }
+
+        hh3cFtmMIBCompliances OBJECT IDENTIFIER ::= { hh3cFtmManMIBComformance 1 }
+
+        hh3cFtmMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                "The compliance statement for FTM implementing the MIB."
+            MODULE HH3C-FTM-MIB
+                MANDATORY-GROUPS { hh3cFtmConfigGroup, hh3cFtmNotificationGroup
+                     }
+            ::= { hh3cFtmMIBCompliances 1 }
+
+        hh3cFtmMIBGroups OBJECT IDENTIFIER ::= { hh3cFtmManMIBComformance 2 }
+
+        hh3cFtmConfigGroup OBJECT-GROUP
+            OBJECTS { hh3cFtmUnitID, hh3cFtmUnitName, hh3cFtmAuthMode, hh3cFtmAuthValue, hh3cFtmFabricVlanID,
+                      hh3cFtmFabricType }
+            STATUS current
+            DESCRIPTION
+                "The basic collection of objects for sending trap of FTM Management."
+            ::= { hh3cFtmMIBGroups 1 }
+
+        hh3cFtmNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hh3cFtmUnitIDChange, hh3cFtmUnitNameChange }
+            STATUS current
+            DESCRIPTION
+                "The basic collection of objects for sending trap of FTM Management."
+            ::= { hh3cFtmMIBGroups 2 }
+
+END

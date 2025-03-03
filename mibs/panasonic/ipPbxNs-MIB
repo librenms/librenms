@@ -1,0 +1,105 @@
+-- **********************************************************
+-- *  FileName : ipPbxNs-MIB.mib                            *
+-- *  Version  : v1.0(2011/05/06 Created.)                  *
+-- *            (C)Panasonic System Networks Co., Ltd. 2011 *
+-- **********************************************************
+
+ipPbxNs-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    TRAP-TYPE
+        FROM RFC-1215
+    DisplayString
+        FROM RFC1158-MIB;
+
+panasonic OBJECT IDENTIFIER ::= { enterprises 258 }
+
+ipPbxSystem OBJECT IDENTIFIER ::= { panasonic 601 }
+
+nsMainProc OBJECT IDENTIFIER ::= { ipPbxSystem 3 }
+
+panaPbxNsAlmTrap OBJECT IDENTIFIER ::= { nsMainProc 10 }
+
+panaPbxNsAlmTrapDate OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (3))
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+        "The date of the error detection.
+        It is shown by the yymmdd format."
+    ::= { panaPbxNsAlmTrap 1 }
+
+panaPbxNsAlmTrapTime OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (2))
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+        "The time of the error detecttion.
+        It is shown by the hhmm format."
+    ::= { panaPbxNsAlmTrap 2 }
+
+panaPbxNsAlmTrapLevel OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 minor(1),
+                 major(2),
+               }
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+        "It shows whether it is major error or miner error.
+        major error(major):
+          Errors that affect the whole system operation,
+         or result in system failure.
+        miner error(minor):
+          Errors that affect certain part of system operation."
+    ::= { panaPbxNsAlmTrap 3 }
+
+panaPbxNsAlmTrapErr OBJECT-TYPE
+    SYNTAX     INTEGER (0..65535)
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+        "The error code assigned by the PBX."
+    ::= { panaPbxNsAlmTrap 4 }
+
+panaPbxNsAlmTrapSub OBJECT-TYPE
+    SYNTAX     INTEGER (0..16777215)
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+        "The sub code of the relevant hardware.
+        It shows shelf number, slot number and port number."
+    ::= { panaPbxNsAlmTrap 5 }
+
+panaPbxNsAlmTrapMes OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..42))
+    ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A description of error."
+    ::= { panaPbxNsAlmTrap 6 }
+
+panaPbxNsAlmTrapStype OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 physical(0),
+                 virtual(1),
+               }
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+        "The sub code of the relevant hardware.
+        It shows shelf type of physical shelf(physical) or virtual shelf(virtual)."
+    ::= { panaPbxNsAlmTrap 7 }
+
+nsMainProc TRAP-TYPE
+    ENTERPRISE panaPbxNsAlmTrap
+    VARIABLES  { panaPbxNsAlmTrapDate, panaPbxNsAlmTrapTime, panaPbxNsAlmTrapLevel, panaPbxNsAlmTrapErr, panaPbxNsAlmTrapSub, panaPbxNsAlmTrapMes, panaPbxNsAlmTrapStype }
+    DESCRIPTION
+        "T.B.D."
+    ::= 1		    
+
+END

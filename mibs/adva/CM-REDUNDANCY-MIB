@@ -1,0 +1,351 @@
+CM-REDUNDANCY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, TimeTicks, Integer32
+             FROM SNMPv2-SMI
+    DisplayString, TruthValue, RowStatus, StorageType, VariablePointer,
+    TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    fsp150cm
+             FROM  ADVA-MIB    
+    PhysicalIndex 
+             FROM ENTITY-MIB
+    neIndex, CardType
+             FROM CM-ENTITY-MIB;
+             
+cmRedundancyMIB MODULE-IDENTITY
+    LAST-UPDATED    "200902240000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the Redundancy MIB definitions used by 
+             the FSP150CM product line.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "200902240000Z"
+    DESCRIPTION
+            "Notes from release 200902240000Z,
+             (1)MIB version ready for release FSP150CM 5.1." 
+    ::= {fsp150cm 15}    
+
+-- 
+-- OID definitions
+-- 
+cmRedundancyObjects       OBJECT IDENTIFIER ::= {cmRedundancyMIB 1}
+cmRedundancyNotifications OBJECT IDENTIFIER ::= {cmRedundancyMIB 2}
+cmRedundancyConformance   OBJECT IDENTIFIER ::= {cmRedundancyMIB 3}
+
+-- 
+-- Textual Conventions 
+-- 
+CmRedundancyArch ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Redundancy Architecture.
+             loadbalance,
+             activestandby"
+    SYNTAX       INTEGER {
+                   loadbalance (1),
+                   activestandby (2)
+                 }
+
+CmRedundancyStandbyMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Redundancy Mode.
+                                                                                       
+         coldStandby(1)     
+         
+           A method of redundancy in which the secondary (i.e., backup) system is
+            only called upon when the primary system fails. The system on cold standby
+             receives scheduled data backups, but less frequently than a warm standby. 
+
+         warmStandby(2)  
+         
+           A method of redundancy in which the secondary (i.e., backup) system runs 
+           in the background of the primary system. Data is mirrored to the secondary
+            server at regular intervals, which means that there are times when both 
+            servers do not contain the exact same data..
+
+         hotStandby(3)
+
+           A method of redundancy in which the primary and secondary (i.e., backup)
+            systems run simultaneously. The data is mirrored to the secondary server
+             in real time so that both systems contain identical information. 
+        "
+    SYNTAX       INTEGER {
+                   cold (1),
+                   warm (2),
+                   hot (3)
+                 }
+
+CmRedundancyState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Redundancy State."
+    SYNTAX       INTEGER {
+                   disabled (1),                   
+                   enabled (2)
+                 }
+CmRedundancySyncStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for synchronization status."
+    SYNTAX       INTEGER {
+                   none (1),                   
+                   out-of-synchronize (2),                   
+                   bulk-synchronize (3),
+                   incremental-synchronize (4)
+                 }
+
+
+CmRedundancySwitchOverReason ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Redundancy Last Switch Over Reason."
+    SYNTAX       INTEGER {
+                   unknown (1),
+                   latestUpdatedData (2),
+                   userTrigger (3),
+                   cardReset (4),
+                   cardRemoval (5),
+                   softwareFailure (6),
+                   hardwareFailure (7)
+                 }
+
+CmRedundancySyncMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Redundancy Synchronization Mode.
+             automatically  - Active card automatically propagates config data to its peer             
+             manually  - User needs to manually copy config data to standby card and apply it.             
+             "
+    SYNTAX       INTEGER {
+                   automatically (1),
+                   manually(2)
+                 }
+
+
+
+CmRedundancyAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for User initiated Redundancy Switch Action.
+             force   - Force Switch from Active Card              
+             manual  - Manual Switch from Active Card
+             releasefore - Release Force switch from Active Card             
+             "
+    SYNTAX       INTEGER {
+                   notApplicable (0), 
+                   force (1), 
+                   manual (2),
+                   releaseforce (3)
+                 }
+
+CmRedundancyUnitState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Redundancy Unit State.
+             none   - no state              
+             normal  - normal state
+             maintenance - maintenance state
+             faultisolation - faultisolation        
+             "
+    SYNTAX       INTEGER {
+                   none (1), 
+                   normal (2), 
+                   maintenance(3),
+                   faultisolation(4),
+                   lock(5),
+                   extracted(6), 
+                   init(7),                    
+                   stanbdby(8)                 
+                 }
+                 
+
+
+--
+-- Entity Redundancy Group Table 
+--
+cmRedundancyGroupTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmRedundancyGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the Redundancy Groups.
+             "
+    ::= { cmRedundancyObjects 1 }
+
+cmRedundancyGroupEntry OBJECT-TYPE
+    SYNTAX     CmRedundancyGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             Redundancy Group."
+    INDEX { neIndex, cmRedundancyGroupIndex }
+    ::= { cmRedundancyGroupTable 1 }
+
+CmRedundancyGroupEntry ::= SEQUENCE {
+    cmRedundancyGroupIndex                    Integer32,
+    cmRedundancyGroupUserLabel                DisplayString,
+    cmRedundancyGroupType                     CardType,
+    cmRedundancyGroupSyncEnabled              TruthValue,
+    cmRedundancyGroupActiveCard               VariablePointer,
+    cmRedundancyGroupActiveCardState          CmRedundancyUnitState,
+    cmRedundancyGroupStandbyCard              VariablePointer,
+    cmRedundancyGroupStandbyCardState         CmRedundancyUnitState,
+    cmRedundancyGroupLastSwitchOverTime       TimeTicks,
+    cmRedundancyGroupLastSwitchOverReason     CmRedundancySwitchOverReason,
+    cmRedundancyGroupState                    CmRedundancyState,
+    cmRedundancyGroupSyncStatus               CmRedundancySyncStatus,
+    cmRedundancyGroupAction                   CmRedundancyAction
+}
+
+cmRedundancyGroupIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Redundancy Group."
+     ::= { cmRedundancyGroupEntry 1 }
+
+cmRedundancyGroupUserLabel OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "User Label associated with the Reduandancy Group."
+     ::= { cmRedundancyGroupEntry 2 }
+
+cmRedundancyGroupType OBJECT-TYPE
+    SYNTAX     CardType
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The type of card who belongs to the Redundancy Group."
+     ::= { cmRedundancyGroupEntry 3 }
+     
+cmRedundancyGroupSyncEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+         "The way of the synchronization in Redundancy Group."
+     ::= { cmRedundancyGroupEntry 4 }
+
+cmRedundancyGroupActiveCard OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The corresponding OID of the Active/Primary Card in the Redundancy Group."
+     ::= { cmRedundancyGroupEntry 5 }
+cmRedundancyGroupActiveCardState OBJECT-TYPE
+    SYNTAX     CmRedundancyUnitState
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The state of the Active Card in the Redundancy Group."
+     ::= { cmRedundancyGroupEntry 6 }
+     
+cmRedundancyGroupStandbyCard OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The corresponding OID of the Standby/Secondary Card in the Redundancy Group."
+     ::= { cmRedundancyGroupEntry 7 }
+     
+cmRedundancyGroupStandbyCardState OBJECT-TYPE
+    SYNTAX     CmRedundancyUnitState
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The state of the Standby Card in the Redundancy Group."
+     ::= { cmRedundancyGroupEntry 8 }
+     
+cmRedundancyGroupLastSwitchOverTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The value of sysUpTime when last switch over occurred."
+     ::= { cmRedundancyGroupEntry 9 }
+
+cmRedundancyGroupLastSwitchOverReason OBJECT-TYPE
+    SYNTAX     CmRedundancySwitchOverReason
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The reason for last switch over in the Redundancy Group."
+     ::= { cmRedundancyGroupEntry 10 }
+
+cmRedundancyGroupState OBJECT-TYPE
+    SYNTAX     CmRedundancyState
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The current state of the Redundancy Group."
+     ::= { cmRedundancyGroupEntry 11 }
+
+cmRedundancyGroupSyncStatus OBJECT-TYPE
+    SYNTAX     CmRedundancySyncStatus
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The current sync state of the Redundancy Group."
+     ::= { cmRedundancyGroupEntry 12 }
+
+cmRedundancyGroupAction OBJECT-TYPE
+    SYNTAX     CmRedundancyAction
+    MAX-ACCESS read-write 
+    STATUS     current
+    DESCRIPTION
+         "User initiated switch action of the Redundancy Group."
+     ::= { cmRedundancyGroupEntry 13 }
+
+
+
+
+--
+-- Notification
+--
+
+--
+-- Conformance
+--
+cmRedundancyCompliances OBJECT IDENTIFIER ::= {cmRedundancyConformance 1}
+cmRedundancyGroups      OBJECT IDENTIFIER ::= {cmRedundancyConformance 2}
+
+cmRedundancyCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the CM Redundancy
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              cmRedundancyObjectGroup
+        }
+    ::= { cmRedundancyCompliances 1 }
+
+cmRedundancyObjectGroup OBJECT-GROUP
+    OBJECTS {
+    cmRedundancyGroupIndex, cmRedundancyGroupUserLabel, cmRedundancyGroupType, cmRedundancyGroupSyncEnabled,
+    cmRedundancyGroupActiveCard, cmRedundancyGroupActiveCardState, cmRedundancyGroupStandbyCard,
+    cmRedundancyGroupStandbyCardState, cmRedundancyGroupLastSwitchOverTime, cmRedundancyGroupLastSwitchOverReason,
+    cmRedundancyGroupState, cmRedundancyGroupSyncStatus, cmRedundancyGroupAction
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the CM Redundancy Object group."
+    ::= { cmRedundancyGroups 1 }
+
+END

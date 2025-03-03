@@ -1,0 +1,666 @@
+-- *******************************************************************
+-- Juniper enterprise specific Wireless WAN MIB.
+--
+-- Copyright (c) 2018, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+JUNIPER-WIRELESS-WAN-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32,
+    IpAddress, Counter64
+        FROM SNMPv2-SMI
+    DisplayString, TimeStamp
+        FROM SNMPv2-TC
+    jnxWirelessWANStatusMibRoot
+        FROM JUNIPER-SMI;
+
+jnxWirelessWANMIB  MODULE-IDENTITY
+    LAST-UPDATED "201804130000Z" --  Apr 13, 2018
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "       Juniper Technical Assistance Center
+                    Juniper Networks, Inc.
+                    1133 Innovation Way,
+                    Sunnyvale, CA 94089
+                    E-mail: support@juniper.net"
+    DESCRIPTION
+        "The JUNOS Wireless WAN MIB for the Juniper Networks enterprise."
+
+    -- revision history
+    REVISION      "201804130000Z"
+    DESCRIPTION   "Creation Date"
+    ::= { jnxWirelessWANStatusMibRoot 1 }
+
+-- Managed object groups
+jnxWirelessWANNetworkObjects   OBJECT IDENTIFIER ::= { jnxWirelessWANMIB 1 }
+jnxWirelessWANFirmwareObjects   OBJECT IDENTIFIER ::= { jnxWirelessWANMIB 2 }
+
+-- Wireless WAN Network Info Table
+jnxWirelessWANNetworkInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxWirelessWANNetworkInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of LTE Wireless Network Info for the LTE interfaces maintained by wwand."
+    ::= { jnxWirelessWANNetworkObjects 1 }
+
+jnxWirelessWANNetworkInfoEntry OBJECT-TYPE
+    SYNTAX      JnxWirelessWANNetworkInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry resprenting the network info of one LTE interface maintained by wwand."
+    INDEX   { jnxWirelessWANNetworkInfoIfdIndex }
+    ::= { jnxWirelessWANNetworkInfoTable 1 }
+
+JnxWirelessWANNetworkInfoEntry ::= SEQUENCE {
+    jnxWirelessWANNetworkInfoIfdIndex              Counter32,
+    jnxWirelessWANNetworkInfoConnectTime           Counter32,
+    jnxWirelessWANNetworkInfoIP                    IpAddress,
+    jnxWirelessWANNetworkInfoGateway               IpAddress,
+    jnxWirelessWANNetworkInfoDNS                   IpAddress,
+    jnxWirelessWANNetworkInfoIPv6                  DisplayString,
+    jnxWirelessWANNetworkInfoIPv6Gateway           DisplayString,
+    jnxWirelessWANNetworkInfoIPv6DNS               DisplayString,
+    jnxWirelessWANNetworkInfoInputbps              Counter32,
+    jnxWirelessWANNetworkInfoOutputbps             Counter32,
+    jnxWirelessWANNetworkInfoBytesReceived         Counter64,
+    jnxWirelessWANNetworkInfoBytesTransferred      Counter64,
+    jnxWirelessWANNetworkInfoPacketsReceived       Counter64,
+    jnxWirelessWANNetworkInfoPacketsTransferred    Counter64,
+    jnxWirelessWANNetworkInfoCurrentModemStatus    DisplayString,
+    jnxWirelessWANNetworkInfoCurrentServiceStatus  DisplayString,
+    jnxWirelessWANNetworkInfoCurrentServiceType    DisplayString,
+    jnxWirelessWANNetworkInfoCurrentServiceMode     DisplayString,
+    jnxWirelessWANNetworkInfoCurrentBand           DisplayString,
+    jnxWirelessWANNetworkInfoNetwork               DisplayString,
+    jnxWirelessWANNetworkInfoMCC                   Counter32,
+    jnxWirelessWANNetworkInfoMNC                   Counter32,
+    jnxWirelessWANNetworkInfoLAC                   Counter32,
+    jnxWirelessWANNetworkInfoRAC                   Counter32,
+    jnxWirelessWANNetworkInfoCellIdentification    Counter32,
+    jnxWirelessWANNetworkInfoAPN                   DisplayString,
+    jnxWirelessWANNetworkInfoPLMN                  DisplayString,
+    jnxWirelessWANNetworkInfoPCI                   DisplayString,
+    jnxWirelessWANNetworkInfoIMSI                  DisplayString,
+    jnxWirelessWANNetworkInfoIMEI                  DisplayString,
+    jnxWirelessWANNetworkInfoICCID                 DisplayString,
+    jnxWirelessWANNetworkInfoRSRP                  DisplayString,
+    jnxWirelessWANNetworkInfoRSRQ                  DisplayString,
+    jnxWirelessWANNetworkInfoSINR                  DisplayString,
+    jnxWirelessWANNetworkInfoSNR                   DisplayString,
+    jnxWirelessWANNetworkInfoECIO                  Counter32,
+    jnxWirelessWANNetworkInfoRSSI                  DisplayString
+    }
+
+jnxWirelessWANNetworkInfoIfdIndex OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The LTE interface index associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 1 }
+
+jnxWirelessWANNetworkInfoConnectTime OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface connected time associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 2 }
+
+jnxWirelessWANNetworkInfoIP OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface IP associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 3 }
+
+jnxWirelessWANNetworkInfoGateway OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface gateway associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 4 }
+
+jnxWirelessWANNetworkInfoDNS OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface DNS associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 5 }
+
+jnxWirelessWANNetworkInfoIPv6 OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface IP associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 6 }
+
+jnxWirelessWANNetworkInfoIPv6Gateway OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface gateway associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 7 }
+
+jnxWirelessWANNetworkInfoIPv6DNS OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface DNS associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 8 }
+
+jnxWirelessWANNetworkInfoInputbps OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface input bps associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 9 }
+
+jnxWirelessWANNetworkInfoOutputbps OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface output bps associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 10 }
+
+jnxWirelessWANNetworkInfoBytesReceived OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface bytes received associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 11 }
+
+jnxWirelessWANNetworkInfoBytesTransferred OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface bytes transferred associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 12 }
+
+jnxWirelessWANNetworkInfoPacketsReceived OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface packets received associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 13 }
+
+jnxWirelessWANNetworkInfoPacketsTransferred OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface packet transferred associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 14 }
+
+jnxWirelessWANNetworkInfoCurrentModemStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface current modem status associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 15 }
+
+jnxWirelessWANNetworkInfoCurrentServiceStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface current service status associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 16 }
+
+jnxWirelessWANNetworkInfoCurrentServiceType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface current service type associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 17 }
+
+jnxWirelessWANNetworkInfoCurrentServiceMode OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface current service mode associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 18 }
+
+jnxWirelessWANNetworkInfoCurrentBand OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface current band associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 19 }
+
+jnxWirelessWANNetworkInfoNetwork OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface network associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 20 }
+
+jnxWirelessWANNetworkInfoMCC OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface mobile country code associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 21 }
+
+jnxWirelessWANNetworkInfoMNC OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface mobile network code associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 22 }
+
+jnxWirelessWANNetworkInfoLAC OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface location area code associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 23 }
+
+jnxWirelessWANNetworkInfoRAC OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface routing area code associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 24 }
+
+jnxWirelessWANNetworkInfoCellIdentification OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface cell identification associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 25 }
+
+jnxWirelessWANNetworkInfoAPN OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface access point name associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 26 }
+
+jnxWirelessWANNetworkInfoPLMN OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface public land mobile network associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 27 }
+
+jnxWirelessWANNetworkInfoPCI OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface physical cell ID associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 28 }
+
+jnxWirelessWANNetworkInfoIMSI OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface international mobile subscriber identification associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 29 }
+
+jnxWirelessWANNetworkInfoIMEI OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface international mobile equipment identification associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 30 }
+
+jnxWirelessWANNetworkInfoICCID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface integrate circuit card identity associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 31 }
+
+jnxWirelessWANNetworkInfoRSRP OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface reference signal receiving power associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 32 }
+
+jnxWirelessWANNetworkInfoRSRQ OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface reference signal receiving quality associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 33 }
+
+jnxWirelessWANNetworkInfoSINR OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface signal to interference-plus-noise ratio associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 34 }
+
+jnxWirelessWANNetworkInfoSNR OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface signal noise ratio associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 35 }
+
+jnxWirelessWANNetworkInfoECIO OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface energy per chip to interference associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 36 }
+
+jnxWirelessWANNetworkInfoRSSI OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface received signal strength indicator associated with this entry in LTE wireless network info table."
+    ::= { jnxWirelessWANNetworkInfoEntry 37 }
+
+-- Wireless WAN Firmware Info Table
+jnxWirelessWANFirmwareInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxWirelessWANFirmwareInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of LTE Wireless Firmware Info for the LTE interfaces maintained by wwand."
+    ::= { jnxWirelessWANFirmwareObjects 1 }
+
+jnxWirelessWANFirmwareInfoEntry OBJECT-TYPE
+    SYNTAX      JnxWirelessWANFirmwareInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry resprenting the firmware info of one LTE interface maintained by wwand."
+    INDEX   { jnxWirelessWANFirmwareInfoIfdIndex }
+    ::= { jnxWirelessWANFirmwareInfoTable 1 }
+
+JnxWirelessWANFirmwareInfoEntry ::= SEQUENCE {
+    jnxWirelessWANFirmwareInfoIfdIndex                     Counter32,
+    jnxWirelessWANFirmwareInfomPIMProductName              DisplayString,
+    jnxWirelessWANFirmwareInfomPIMSerialNumber             DisplayString,
+    jnxWirelessWANFirmwareInfomPIMHardwareVersion          DisplayString,
+    jnxWirelessWANFirmwareInfomPIMFirmwareVersion          DisplayString,
+    jnxWirelessWANFirmwareInfomPIMMAC                      DisplayString,
+    jnxWirelessWANFirmwareInfomPIMSystemUptime             TimeStamp,
+    jnxWirelessWANFirmwareInfoModemFirmwareVersion         DisplayString,
+    jnxWirelessWANFirmwareInfoModemFirmwareBuildDate       DisplayString,
+    jnxWirelessWANFirmwareInfoModemCardType                DisplayString,
+    jnxWirelessWANFirmwareInfoModemManufacturer            DisplayString,
+    jnxWirelessWANFirmwareInfoModemHardwareVersion         DisplayString,
+    jnxWirelessWANFirmwareInfoModemPowerAndTemperature     DisplayString,
+    jnxWirelessWANFirmwareInfoOTAState                     DisplayString,
+    jnxWirelessWANFirmwareInfoOTANewFirmwareAvailable      DisplayString,
+    jnxWirelessWANFirmwareInfoOTANewVersion                DisplayString,
+    jnxWirelessWANFirmwareInfoNumberOfSIM                  Counter32,
+    jnxWirelessWANFirmwareInfoSlotOfActive                 Counter32,
+    jnxWirelessWANFirmwareInfoSIM1State                    DisplayString,
+    jnxWirelessWANFirmwareInfoSIM1ModemPINSecurityStatus   DisplayString,
+    jnxWirelessWANFirmwareInfoSIM1Status                   DisplayString,
+    jnxWirelessWANFirmwareInfoSIM1UserOperationNeeded      DisplayString,
+    jnxWirelessWANFirmwareInfoSIM1RetriesRemaining         Counter32,
+    jnxWirelessWANFirmwareInfoSIM2State                    DisplayString,
+    jnxWirelessWANFirmwareInfoSIM2ModemPINSecurityStatus   DisplayString,
+    jnxWirelessWANFirmwareInfoSIM2Status                   DisplayString,
+    jnxWirelessWANFirmwareInfoSIM2UserOperationNeeded      DisplayString,
+    jnxWirelessWANFirmwareInfoSIM2RetriesRemaining         Counter32
+    }
+
+jnxWirelessWANFirmwareInfoIfdIndex OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The LTE interface index associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 1 }
+
+jnxWirelessWANFirmwareInfomPIMProductName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface mPIM product name associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 2 }
+
+jnxWirelessWANFirmwareInfomPIMSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface mPIM serial number associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 3 }
+
+jnxWirelessWANFirmwareInfomPIMHardwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface mPIM hardware version associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 4 }
+
+jnxWirelessWANFirmwareInfomPIMFirmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface mPIM firmware version associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 5 }
+
+jnxWirelessWANFirmwareInfomPIMMAC OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface mPIM MAC associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 6 }
+
+jnxWirelessWANFirmwareInfomPIMSystemUptime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface mPIM system uptime associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 7 }
+
+jnxWirelessWANFirmwareInfoModemFirmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface modem firmware version associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 8 }
+
+jnxWirelessWANFirmwareInfoModemFirmwareBuildDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface modem firmware build date associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 9 }
+
+jnxWirelessWANFirmwareInfoModemCardType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface modem card type associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 10 }
+
+jnxWirelessWANFirmwareInfoModemManufacturer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface modem manufacturer associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 11 }
+
+jnxWirelessWANFirmwareInfoModemHardwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface modem hardware version associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 12 }
+
+jnxWirelessWANFirmwareInfoModemPowerAndTemperature OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface modem power and temperature associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 13 }
+
+jnxWirelessWANFirmwareInfoOTAState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface OTA status associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 14 }
+
+jnxWirelessWANFirmwareInfoOTANewFirmwareAvailable OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface OTA new firmware available associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 15 }
+
+jnxWirelessWANFirmwareInfoOTANewVersion OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface OTA new firmware available associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 16 }
+
+jnxWirelessWANFirmwareInfoNumberOfSIM OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface number of SIM associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 17 }
+
+jnxWirelessWANFirmwareInfoSlotOfActive OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface slot of active associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 18 }
+
+jnxWirelessWANFirmwareInfoSIM1State OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface SIM1 state associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 19 }
+
+jnxWirelessWANFirmwareInfoSIM1ModemPINSecurityStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface SIM1 modem PIN security status associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 20 }
+
+jnxWirelessWANFirmwareInfoSIM1Status OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface SIM1 status associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 21 }
+
+jnxWirelessWANFirmwareInfoSIM1UserOperationNeeded OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface SIM1 user operation needed associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 22 }
+
+jnxWirelessWANFirmwareInfoSIM1RetriesRemaining OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface SIM1 retries remaining associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 23 }
+
+jnxWirelessWANFirmwareInfoSIM2State OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface SIM2 state associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 24 }
+
+jnxWirelessWANFirmwareInfoSIM2ModemPINSecurityStatus OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface SIM2 modem PIN security status associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 25 }
+
+jnxWirelessWANFirmwareInfoSIM2Status OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface SIM2 status associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 26 }
+
+jnxWirelessWANFirmwareInfoSIM2UserOperationNeeded OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The LTE interface SIM2 user operation needed associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 27 }
+
+jnxWirelessWANFirmwareInfoSIM2RetriesRemaining OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LTE interface SIM2 retires remaining associated with this entry in LTE wireless firmware info table."
+    ::= { jnxWirelessWANFirmwareInfoEntry 28 }
+END

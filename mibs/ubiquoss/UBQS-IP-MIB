@@ -1,0 +1,791 @@
+-- *****************************************************************
+-- UBQS-IP-MIB : Ubiquoss IP Information MIB
+--   
+-- Dec 2010,  Park Hyung Eun
+--
+-- Copyright (c) 2010 by Ubiquoss, Corp.
+--   
+-- All rights reserved.
+-- ***************************************************************
+
+UBQS-IP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,            
+    Unsigned32,
+    Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI              
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF     
+    RowStatus,
+    TimeStamp,
+    DisplayString,    
+    TruthValue,       
+    TEXTUAL-CONVENTION,              
+    PhysAddress
+        FROM SNMPv2-TC     
+    InetAddress, 
+    InetAddressType,
+    InetAddressPrefixLength, 
+    	FROM INET-ADDRESS-MIB      
+    InterfaceIndex                     
+    	FROM IF-MIB      
+    ubiMgmtv2
+        FROM UBQS-SMI;
+
+
+ubiIpMIB MODULE-IDENTITY
+        LAST-UPDATED    "201012280000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        "This MIB module defines IP information."
+     ::= { ubiMgmtv2 14 }
+
+
+
+-- ***********************************************************
+-- Textual Conventions
+-- ***********************************************************          
+ 
+-- ***************************************************************
+--   ubiInterfaceMIB
+-- ***************************************************************
+ubiIpMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiIpMIB 0 } 
+ubiIpMIBObjects  				OBJECT IDENTIFIER		::= { ubiIpMIB 1 }     
+ubiPingMIBObjects				OBJECT IDENTIFIER		::= { ubiIpMIB 2 } 
+ubiIpMIBConformance  			OBJECT IDENTIFIER		::= { ubiIpMIB 3 }
+        
+ubiPingGlobal					OBJECT IDENTIFIER		::= { ubiPingMIBObjects 1 }        
+ubiPingSend						OBJECT IDENTIFIER		::= { ubiPingMIBObjects 2 }  
+ubiPingResults					OBJECT IDENTIFIER		::= { ubiPingMIBObjects 3 }                   
+                       
+                         
+                         
+                         
+                         
+ -- ***************************************************************
+--   ubiIpMIBNotificationPrefix
+-- ***************************************************************
+ubiIpMIBNotifications  		OBJECT IDENTIFIER		::= { ubiIpMIBNotificationPrefix 1 }  
+ubiPingMIBNotifications  	OBJECT IDENTIFIER		::= { ubiIpMIBNotificationPrefix 2 }  
+
+	ubiPingSendCompletion NOTIFICATION-TYPE
+    	OBJECTS         { 
+    			ubiPingSendCompleted,       
+    			ubiPingSendPackets,
+    			ubiPingReceivedPackets    			        
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"This notification is sent at the completion 
+        	of the sequence of pings."
+   	::= { ubiPingMIBNotifications 1 }
+                         
+                         
+                         
+                                           
+-- ***********************************************************
+-- ubiIpAddrTable
+-- ***********************************************************
+	ubiIpAddrTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiIpAddrEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The table of addressing information relevant to
+ 			 this entity's IP addresses."
+    	::= { ubiIpMIBObjects 1 }
+
+	ubiIpAddrEntry OBJECT-TYPE
+    	SYNTAX          UbiIpAddrEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The addressing information for one of this
+ 			entity's IP addresses."
+    	INDEX           { ubiIpAddrType, ubiIpAddress, ubiIpAddrPrefixLen } 
+    	::= { ubiIpAddrTable 1 }
+
+	UbiIpAddrEntry ::= SEQUENCE {         
+			ubiIpAddrType						InetAddressType,  
+			ubiIpAddress						InetAddress,  
+			ubiIpAddrIfIndex					InterfaceIndex,  
+			ubiIpAddrPrefixLen                  InetAddressPrefixLength,
+			ubiIpAddrStatus						INTEGER, 
+			ubiIpAddrRowstatus					RowStatus,     
+	}
+  
+ 	ubiIpAddrType OBJECT-TYPE
+    	SYNTAX          InetAddressType
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"The IP address type.        
+        	
+				ipv4(1)     An IPv4 address as defined by the
+							InetAddressIPv4 textual convention.
+
+				ipv6(2)     An IPv6 address as defined by the
+							InetAddressIPv6 textual convention."
+	   	::= { ubiIpAddrEntry 1 }   
+    
+ 	ubiIpAddress OBJECT-TYPE
+    	SYNTAX          InetAddress
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"The IP address to which this entry's addressing 
+        	information pertains."
+	   	::= { ubiIpAddrEntry 2 } 
+
+   	ubiIpAddrPrefixLen OBJECT-TYPE
+        SYNTAX			InetAddressPrefixLength
+        MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"The prefix length associated with the IP address."
+       	::= { ubiIpAddrEntry 3 }
+                                  	   	    
+  	ubiIpAddrIfIndex OBJECT-TYPE
+    	SYNTAX          InterfaceIndex
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	"The index value which uniquely identifies 
+        	the interface to which this entry is applicable." 
+    	::= { ubiIpAddrEntry 4 }    
+  
+  	ubiIpAddrStatus OBJECT-TYPE
+    	SYNTAX          INTEGER {      
+    		primary(1),
+    		secondary(2)
+    	}
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"Indicate whether this entry is primary or not." 
+    	DEFVAL			{ primary }
+    	::= { ubiIpAddrEntry 5 }    
+    
+  
+  	ubiIpAddrRowstatus OBJECT-TYPE      
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"This object is used to create a new row or 
+ 			delete an existing row in this table." 
+    	::= { ubiIpAddrEntry 6 }
+                                         
+
+-- ***********************************************************
+-- ubiInetRouteTable
+-- ***********************************************************
+	ubiInetRouteTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiInetRouteEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The table of addressing information relevant to
+ 			 this entity's IP addresses."
+    	::= { ubiIpMIBObjects 2 }
+
+	ubiInetRouteEntry OBJECT-TYPE
+    	SYNTAX          UbiInetRouteEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The addressing information for one of this
+ 			entity's IP addresses."
+    	INDEX           { ubiInetRouteInstance,
+    					  ubiInetRouteDestType, ubiInetRouteDest, ubiInetRouteDestPfxLen, 
+    					  ubiInetRouteNextHopType, ubiInetRouteNextHop, ubiInetRouteIfIndex } 
+    	::= { ubiInetRouteTable 1 }
+
+	UbiInetRouteEntry ::= SEQUENCE {   
+			ubiInetRouteInstance				Unsigned32,     
+			ubiInetRouteDestType				InetAddressType,  
+			ubiInetRouteDest					InetAddress,     
+			ubiInetRouteDestPfxLen				InetAddressPrefixLength, 
+			ubiInetRouteNextHopType				InetAddressType,  
+			ubiInetRouteNextHop					InetAddress,  
+			ubiInetRouteIfIndex					InterfaceIndex,
+			ubiInetRoutetype					INTEGER,      
+			ubiInetRouteProto					INTEGER,     
+			ubiInetRouteMetric1					Integer32,  
+			ubiInetRouteMetric2					Integer32,
+			ubiInetRouteMetric3					Integer32,
+			ubiInetRouteMetric4					Integer32,
+			ubiInetRouteMetric5					Integer32,   
+			ubiInetRouteStatus					INTEGER,       
+			ubiInetRouteDistance				Integer32,
+			ubiInetRouteTag						Unsigned32,  
+			ubiInetRouteNextHopName				DisplayString,
+			ubiInetRouteRowstatus				RowStatus,     
+	}
+            
+            
+ 	ubiInetRouteInstance OBJECT-TYPE
+    	SYNTAX          Unsigned32
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"The instance identifier of the (conceptual) routing table
+        	containing this route."
+	   	::= { ubiInetRouteEntry 1 } 
+  
+ 	ubiInetRouteDestType OBJECT-TYPE
+    	SYNTAX          InetAddressType
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"The destination address type.        
+        	
+				ipv4(1)     An IPv4 address as defined by the
+							InetAddressIPv4 textual convention.
+
+				ipv6(2)     An IPv6 address as defined by the
+							InetAddressIPv6 textual convention."
+	   	::= { ubiInetRouteEntry 2 }   
+    
+ 	ubiInetRouteDest OBJECT-TYPE
+    	SYNTAX          InetAddress
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"The destination IP address of this route."
+	   	::= { ubiInetRouteEntry 3 } 
+
+   	ubiInetRouteDestPfxLen OBJECT-TYPE
+        SYNTAX			InetAddressPrefixLength
+        MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	""
+       	::= { ubiInetRouteEntry 4 }
+
+ 	ubiInetRouteNextHopType OBJECT-TYPE
+    	SYNTAX          InetAddressType
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 5 }   
+    
+ 	ubiInetRouteNextHop OBJECT-TYPE
+    	SYNTAX          InetAddress
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 6 } 
+
+ 	ubiInetRouteIfIndex OBJECT-TYPE
+    	SYNTAX          InterfaceIndex
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 7 } 
+ 
+ 	ubiInetRoutetype OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    		other(1),
+    		invalid(2),
+    		direct(3),
+    		indirect(4)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 8 }                                                    
+                                             
+ 	ubiInetRouteProto OBJECT-TYPE
+    	SYNTAX          INTEGER  {
+    	     other(1),
+    	     local(2),
+    	     netmgmt(3),
+    	     icmp(4),
+    	     egp(5),
+    	     ggp(6), 
+    	     hello(7),
+    	     rip(8),
+    	     isis(9),
+    	     esis(10),
+    	     ciscoIgrp(11),
+    	     bbnSpfIgp(12),
+    	     ospf(13),
+    	     bgp(14)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 9 }               
+     
+ 	ubiInetRouteMetric1 OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 10 }  
+
+ 	ubiInetRouteMetric2 OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 11 }        
+	   	
+ 	ubiInetRouteMetric3 OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 12 }  
+	   	
+ 	ubiInetRouteMetric4 OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 13 }  
+	   	
+ 	ubiInetRouteMetric5 OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 14 }           
+	   	
+ 	ubiInetRouteStatus OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    		active(1),
+    		inactive(2),
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 15 }       	   	
+
+ 	ubiInetRouteDistance OBJECT-TYPE
+    	SYNTAX          Integer32 (1..255)
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 16 }    
+
+ 	ubiInetRouteTag OBJECT-TYPE
+    	SYNTAX          Unsigned32
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 17 }    
+
+ 	ubiInetRouteNextHopName OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 18 }       
+
+ 	ubiInetRouteRowstatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""
+	   	::= { ubiInetRouteEntry 19 }       
+
+-- ***********************************************************
+-- ubiIpv6NeighborTable
+-- *********************************************************** 
+
+	ubiIpv6NeighborTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiIpv6NeighborEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The table of addressing information relevant to
+ 			 this entity's IPv6 addresses."
+    	::= { ubiIpMIBObjects 3 }
+
+	ubiIpv6NeighborEntry OBJECT-TYPE
+    	SYNTAX          UbiIpv6NeighborEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The addressing information for one of this
+ 			entity's IPv6 addresses."
+    	INDEX           { ubiIpv6NeighborIfIndex, ubiIpv6NeighborNetAddress }
+    	::= { ubiIpv6NeighborTable 1 }
+    	
+    UbiIpv6NeighborEntry ::= SEQUENCE {
+    	ubiIpv6NeighborIfIndex				InterfaceIndex,
+    	ubiIpv6NeighborPhysAddress			PhysAddress,
+    	ubiIpv6NeighborNetAddress			InetAddress,
+    	ubiIpv6NeighborType					INTEGER,
+    	ubiIpv6NeighborState				INTEGER,
+    	ubiIpv6NeighborLastUpdated			TimeStamp,
+    	ubiIpv6NeighborRowstatus			RowStatus
+    }
+    
+    ubiIpv6NeighborIfIndex OBJECT-TYPE
+    	SYNTAX			InterfaceIndex
+    	MAX-ACCESS		read-only
+    	STATUS			current
+    	DESCRIPTION
+    		"The inde value which uniquely identifies
+    		the interface to which this entry is applicable"
+    	::= { ubiIpv6NeighborEntry 1 }
+
+    ubiIpv6NeighborPhysAddress OBJECT-TYPE
+    	SYNTAX		PhysAddress (SIZE(0..65535))
+    	MAX-ACCESS	read-create
+    	STATUS		current
+    	DESCRIPTION
+    		"The media-dependent `physical' address.  This object should
+            return 0 when this entry is in the 'incomplete' state.
+
+            As the entries in this table are typically not persistent
+            when this object is written the entity should not save the
+            change to non-volatile storage.  Note: a stronger
+            requirement is not used because this object was previously
+            defined."
+        ::= { ubiIpv6NeighborEntry 2 }
+    
+	ubiIpv6NeighborNetAddress OBJECT-TYPE
+    	SYNTAX     InetAddress
+    	MAX-ACCESS read-only
+    	STATUS     current
+    	DESCRIPTION
+           "The Ipv6Address corresponding to the media-dependent
+            `physical' address.
+
+            This object predates the rule limiting index objects to a
+            max access value of 'not-accessible' and so continues to use
+            a value of 'read-create'."
+    	::= { ubiIpv6NeighborEntry 3 }
+
+	ubiIpv6NeighborType OBJECT-TYPE
+		SYNTAX     INTEGER {
+			dynamic(0),
+			static(1)
+		}
+    	MAX-ACCESS read-only
+    	STATUS     current
+    	DESCRIPTION
+           "The type of mapping.
+
+            Setting this object to the value invalid(2) has the effect
+
+            of invalidating the corresponding entry in the
+            ubiIpv6NeighborTable.  That is, it effectively dis-associates
+            the interface identified with said entry from the mapping
+            identified with said entry.  It is an implementation-
+            specific matter as to whether the agent removes an
+            invalidated entry from the table.  Accordingly, management
+            stations must be prepared to receive tabular information
+            from agents that corresponds to entries not currently in
+            use.  Proper interpretation of such entries requires
+            examination of the relevant ubiIpv6NeighborType object.
+
+            As the entries in this table are typically not persistent
+            when this object is written the entity should not save the
+            change to non-volatile storage.  Note: a stronger
+            requirement is not used because this object was previously
+            defined."
+    	::= { ubiIpv6NeighborEntry 4 }
+
+	ubiIpv6NeighborState OBJECT-TYPE
+    	SYNTAX     INTEGER {
+                   reachable(1), -- confirmed reachability
+                   stale(2),     -- unconfirmed reachability
+                   delay(3),     -- waiting for reachability
+                                 -- confirmation before entering
+                                 -- the probe state
+                   probe(4),     -- actively probing
+                   invalid(5),   -- an invalidated mapping
+                   unknown(6),   -- state can not be determined
+                                 -- for some reason.
+                   incomplete(7) -- address resolution is being
+                                 -- performed.
+    	          }
+    	MAX-ACCESS read-only
+    	STATUS     current
+    	DESCRIPTION
+            "The Neighbor Unreachability Detection [3] state for the
+             interface when the address mapping in this entry is used.
+             If Neighbor Unreachability Detection is not in use,
+             this object is always unknown(6)."
+    	REFERENCE "RFC2461"
+    		::= { ubiIpv6NeighborEntry 5 }
+
+
+	ubiIpv6NeighborLastUpdated OBJECT-TYPE
+	    SYNTAX     TimeStamp
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+            "The value of sysUpTime at the time this entry was last
+             updated.  If this entry was updated prior to the last re-
+             initialization of the local network management subsystem,
+             then this object contains a zero value."
+    	::= { ubiIpv6NeighborEntry 6 }
+    
+	ubiIpv6NeighborRowstatus OBJECT-TYPE
+		SYNTAX     RowStatus
+		MAX-ACCESS read-create
+		STATUS     current
+		DESCRIPTION
+           "The status of this conceptual row.
+
+            As all objects in this conceptual row have default values, a
+            row can be created and made active by setting this object
+            appropriately.
+
+            The RowStatus TC requires that this DESCRIPTION clause
+            states under which circumstances other objects in this row
+            can be modified.  The value of this object has no effect on
+            whether other objects in this conceptual row can be
+            modified."
+		::= { ubiIpv6NeighborEntry 7 }
+	   		   		   	                                      
+-- ***********************************************************
+-- ubiIpPingObject
+-- ***********************************************************   
+ 
+-- ubiPingSend          
+
+	ubiPingSendProto	OBJECT-TYPE
+		SYNTAX		INTEGER {     
+			other(1),
+			ip(2),
+			ipv6(3)
+		}       
+		ACCESS		read-write
+		STATUS		current	 
+		DESCRIPTION
+			"The protocol to use."
+		::= { ubiPingSend 1  }
+
+	ubiPingSendTarget	OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-write
+		STATUS		current	 
+		DESCRIPTION
+			"The address of the device to be pinged."
+		::= { ubiPingSend 2 }
+		
+	ubiPingSendRepeat	OBJECT-TYPE
+		SYNTAX		Integer32
+		ACCESS		read-write        
+		STATUS		current
+		DESCRIPTION
+			"Specifies the number of ping packets to send 
+			to the target."  
+		DEFVAL	  { 5 }
+		::= { ubiPingSend 3 }
+		
+	ubiPingSendPacketSize	OBJECT-TYPE
+		SYNTAX		Integer32(0..60000)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Specifies the size of ping packets to send 
+			to the target."    
+		DEFVAL	  { 100 }
+		::= { ubiPingSend 4 }
+                    
+	ubiPingSendTimeout	OBJECT-TYPE
+		SYNTAX		Integer32 
+		UNITS "seconds"
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Specifies the amount of time to wait for a response."      
+		DEFVAL	  { 2000 }		
+		::= { ubiPingSend 5 }
+     
+	ubiPingSendInterval	OBJECT-TYPE
+		SYNTAX		Integer32
+		UNITS "seconds"
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Specifies the amount of time to wait before 
+			sending the next packet."      
+		::= { ubiPingSend 6 }
+
+	ubiPingSendSrcAddr	OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Specifies the sender IP address for sending packets."
+		::= { ubiPingSend 7 }
+		
+	ubiPingSendTTL	OBJECT-TYPE
+		SYNTAX		Integer32
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Specifies the TTL."
+		::= { ubiPingSend 8 }
+                                  
+	ubiPingSendTos	OBJECT-TYPE
+		SYNTAX		Integer32
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Specifies the Type Of Service."      
+		::= { ubiPingSend 9 }
+      
+	ubiPingSendDF	OBJECT-TYPE
+		SYNTAX		INTEGER {   
+			none(0),
+			do(1),
+			dont(2)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Specifies the DF bit in IP header. dont(2) means 
+			a packet cannot be fragmented."      
+		::= { ubiPingSend 10 }
+		      
+	ubiPingSendExecute	OBJECT-TYPE
+		SYNTAX		INTEGER {
+			send(1)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Send the ping packets when value is set to 
+			send(1)."
+		::= { ubiPingSend 15 }
+
+
+                                  
+-- ubiPingResults                             
+ 	ubiPingSendCompleted	OBJECT-TYPE
+		SYNTAX		TruthValue
+		ACCESS		accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"Set to true when all the packets in this sequence have been
+ 			either responded to or timed out."
+		::= { ubiPingResults 1 }
+
+	ubiPingSendPackets	OBJECT-TYPE
+		SYNTAX		Counter32
+		ACCESS		accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"The total number of the sending ping."
+		::= { ubiPingResults 2 }
+
+	ubiPingReceivedPackets	OBJECT-TYPE
+		SYNTAX		Counter32
+		ACCESS		accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"The total number of the received ping."
+		::= { ubiPingResults 3 }
+                         
+                         
+-- ***********************************************************
+-- ubiIpMIBConformance
+-- ***********************************************************
+ubiIpMIBCompliances  	OBJECT IDENTIFIER		::= { ubiIpMIBConformance 1 }
+ubiIpMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiIpMIBConformance 2 }
+-- Compliance
+
+	ubiIpMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for entities which
+        	implement the UBQS-IP-MIB"
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {  
+    			ubiIpAddrGroup,            
+                ubiPingGroup
+           }  
+        GROUP    ubiIpAddrGroup
+        DESCRIPTION 
+        	"The ubiIpAddrGroup is applicable for implementations which
+ 			need to get the address information of the system."    
+ 			  
+        GROUP    ubiPingGroup
+        DESCRIPTION 
+        	"The ubiPingGroup is applicable for implementations which
+ 			need to test the ping."
+    	::= { ubiIpMIBCompliances 2 }
+
+
+	ubiIpAddrGroup OBJECT-GROUP
+    	OBJECTS         {     
+    		ubiIpAddrType,
+    		ubiIpAddress,
+    		ubiIpAddrIfIndex,       
+    		ubiIpAddrPrefixLen ,
+    		ubiIpAddrStatus ,
+    		ubiIpAddrRowstatus 
+    	}   
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about the address information of system."
+    	::= { ubiIpMIBGroups 1 }
+    	                               
+
+	ubiPingGroup OBJECT-GROUP
+    	OBJECTS         {     
+    		ubiPingSendProto,
+    		ubiPingSendTarget,
+    		ubiPingSendRepeat,       
+    		ubiPingSendPacketSize ,
+    		ubiPingSendTimeout ,
+    		ubiPingSendInterval,
+       		ubiPingSendSrcAddr,       
+    		ubiPingSendTtl ,      
+    		ubiPingSendTos,
+    		ubiPingSendDF,
+    		ubiPingSendExecute ,            
+    		ubiPingSendCompleted,
+       		ubiPingSendPackets,       
+    		ubiPingReceivedPackets
+       	}   
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about the ping."
+    	::= { ubiIpMIBGroups 2 }
+    	
+                
+    	                               
+END

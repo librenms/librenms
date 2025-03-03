@@ -1,20 +1,39 @@
 <?php
-$name = 'fbsd-nfs-client';
-$app_id = $app['app_id'];
 
+use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
-$options      = '-O qv';
-$oid          = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.13.102.98.115.100.110.102.115.99.108.105.101.110.116';
-$nfsclient = snmp_walk($device, $oid, $options);
-update_application($app, $nfsclient);
+$name = 'fbsd-nfs-client';
 
-list($getattr, $setattr, $lookup, $readlink, $read, $write, $create, $remove, $rename, $link, $symlink, $mkdir, $rmdir,
-    $readdir, $rdirplus, $access, $mknod, $fsstat, $fsinfo, $pathconf, $commit, $timedout, $invalid, $xreplies, $retries,
-    $requests, $attrhits, $attrmisses, $lkuphits, $lkupmisses, $biorhits, $biormisses, $biowhits, $biowmisses, $biorlhits,
-    $biorlmisses, $biodhits, $biodmisses, $direhits, $diremisses, $accshits, $accsmisses) = explode("\n", $nfsclient);
+try {
+    $nfs = json_app_get($device, 'fbsdnfsclient', 0);
+} catch (JsonAppParsingFailedException $e) {
+    // Legacy script, build compatible array
+    $legacy = $e->getOutput();
 
-$rrd_name = array('app', $name, $app_id);
+    $nfs = [
+        'data' => [],
+    ];
+
+    [$nfs['data']['Getattr'], $nfs['data']['Setattr'], $nfs['data']['Lookup'], $nfs['data']['Readlink'],
+        $nfs['data']['Read'], $nfs['data']['Write'], $nfs['data']['Create'], $nfs['data']['Remove'], $nfs['data']['Rename'],
+        $nfs['data']['Link'], $nfs['data']['Symlink'], $nfs['data']['Mkdir'], $nfs['data']['Rmdir'], $nfs['data']['Readdir'],
+        $nfs['data']['RdirPlus'], $nfs['data']['Access'], $nfs['data']['Mknod'], $nfs['data']['Fsstat'], $nfs['data']['Fsinfo'],
+        $nfs['data']['PathConf'], $nfs['data']['Commit'], $nfs['data']['TimedOut'], $nfs['data']['Invalid'], $nfs['data']['XReplies'],
+        $nfs['data']['Retries'], $nfs['data']['Requests'], $nfs['data']['AttrHits'], $nfs['data']['AttrMisses'], $nfs['data']['LkupHits'],
+        $nfs['data']['LkupMisses'], $nfs['data']['BioRHits'], $nfs['data']['BioRMisses'], $nfs['data']['BioWHits'],
+        $nfs['data']['BioWMisses'], $nfs['data']['BioRLHits'], $nfs['data']['BioRLMisses'], $nfs['data']['BioDHits'],
+        $nfs['data']['BioDMisses'], $nfs['data']['DirEHits'], $nfs['data']['DirEMisses'], $nfs['data']['AccsHits'],
+        $nfs['data']['AccsMisses']] = explode("\n", $legacy);
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+
+    return;
+}
+
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('getattr', 'DERIVE', 0)
     ->addDataset('setattr', 'DERIVE', 0)
@@ -59,50 +78,51 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('accshits', 'DERIVE', 0)
     ->addDataset('accsmisses', 'DERIVE', 0);
 
-$fields = array(
-    'getattr' => $getattr,
-    'setattr' => $setattr,
-    'lookup' => $lookup,
-    'readlink' => $readlink,
-    'read' => $read,
-    'write' => $write,
-    'create' => $create,
-    'remove' => $remove,
-    'rename' => $rename,
-    'link' => $link,
-    'symlink' => $symlink,
-    'mkdir' => $mkdir,
-    'rmdir' => $rmdir,
-    'readdir' => $readdir,
-    'rdirplus' => $rdirplus,
-    'access' => $access,
-    'mknod' => $mknod,
-    'fsstat' => $fsstat,
-    'fsinfo' => $fsinfo,
-    'pathconf' => $pathconf,
-    'commit' => $commit,
-    'timedout' => $timedout,
-    'invalid' => $invalid,
-    'xreplies' => $xreplies,
-    'retries' => $retries,
-    'requests' => $requests,
-    'attrhits' => $attrhits,
-    'attrmisses' => $attrmisses,
-    'lkuphits' => $lkuphits,
-    'lkupmisses' => $lkupmisses,
-    'biorhits' => $biorhits,
-    'biormisses' => $biormisses,
-    'biowhits' => $biowhits,
-    'biowmisses' => $biowmisses,
-    'biorlhits' => $biorlhits,
-    'biorlmisses' => $biorlmisses,
-    'biodhits' => $biodhits,
-    'biodmisses' => $biodmisses,
-    'direhits' => $direhits,
-    'diremisses' => $diremisses,
-    'accshits' => $accshits,
-    'accsmisses' => $accsmisses,
-);
+$fields = [
+    'getattr' => $nfs['data']['Getattr'],
+    'setattr' => $nfs['data']['Setattr'],
+    'lookup' => $nfs['data']['Lookup'],
+    'readlink' => $nfs['data']['Readlink'],
+    'read' => $nfs['data']['Read'],
+    'write' => $nfs['data']['Write'],
+    'create' => $nfs['data']['Create'],
+    'remove' => $nfs['data']['Remove'],
+    'rename' => $nfs['data']['Rename'],
+    'link' => $nfs['data']['Link'],
+    'symlink' => $nfs['data']['SymLink'],
+    'mkdir' => $nfs['data']['Mkdir'],
+    'rmdir' => $nfs['data']['Rmdir'],
+    'readdir' => $nfs['data']['Readdir'],
+    'rdirplus' => $nfs['data']['RdirPlus'],
+    'access' => $nfs['data']['Access'],
+    'mknod' => $nfs['data']['Mknod'],
+    'fsstat' => $nfs['data']['Fsstat'],
+    'fsinfo' => $nfs['data']['Fsinfo'],
+    'pathconf' => $nfs['data']['PathConf'],
+    'commit' => $nfs['data']['Commit'],
+    'timedout' => $nfs['data']['Timedout'],
+    'invalid' => $nfs['data']['Invalid'],
+    'xreplies' => $nfs['data']['XReplies'],
+    'retries' => $nfs['data']['Retries'],
+    'requests' => $nfs['data']['Requests'],
+    'attrhits' => $nfs['data']['AttrHits'],
+    'attrmisses' => $nfs['data']['AttrMisses'],
+    'lkuphits' => $nfs['data']['LkupHits'],
+    'lkupmisses' => $nfs['data']['LkupMisses'],
+    'biorhits' => $nfs['data']['BioRHits'],
+    'biormisses' => $nfs['data']['BioRMisses'],
+    'biowhits' => $nfs['data']['BioWHits'],
+    'biowmisses' => $nfs['data']['BioWMisses'],
+    'biorlhits' => $nfs['data']['BioRLHits'],
+    'biorlmisses' => $nfs['data']['BioRLMisses'],
+    'biodhits' => $nfs['data']['BioDHits'],
+    'biodmisses' => $nfs['data']['BioDMisses'],
+    'direhits' => $nfs['data']['DirEHits'],
+    'diremisses' => $nfs['data']['DirEMisses'],
+    'accshits' => $nfs['data']['AccsHits'],
+    'accsmisses' => $nfs['data']['AccsMisses'],
+];
 
-$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
+update_application($app, 'OK', $nfs['data']);

@@ -1,0 +1,482 @@
+-- *****************************************************************
+-- TN-DDMI-MIB.smi:  Transition Networks DDMI MIB.
+--
+-- Copyright (c) 2015 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+TN-DDMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    tnProducts FROM TRANSITION-SMI 
+    TruthValue FROM SNMPv2-TC
+    TNDisplayString FROM TN-TC
+    TNInterfaceIndex FROM TN-TC
+    TNSfpTransceiver FROM TN-TC
+    ;
+
+tnDdmiMib MODULE-IDENTITY
+    LAST-UPDATED "201506120000Z"
+     ORGANIZATION "Transition Networks, Inc."
+     CONTACT-INFO
+                 "       Transition Networks
+                         Technical Support
+                         10900 Red Circle Drive
+                         Minnetonka, MN 55343 USA
+                         Tel: +1-800-526-9267
+
+                     E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "This is a private version of DDMI"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201506120000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { tnProducts 152 }
+
+
+tnDdmiMibObjects OBJECT IDENTIFIER
+    ::= { tnDdmiMib 1 }
+
+tnDdmiConfig OBJECT IDENTIFIER
+    ::= { tnDdmiMibObjects 2 }
+
+tnDdmiConfigGlobals OBJECT IDENTIFIER
+    ::= { tnDdmiConfig 1 }
+
+tnDdmiConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Global operation mode of DDMI. true is to enable the functions of DDMI
+         and false is to disable it."
+    ::= { tnDdmiConfigGlobals 1 }
+
+tnDdmiStatus OBJECT IDENTIFIER
+    ::= { tnDdmiMibObjects 3 }
+
+tnDdmiStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNDdmiStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a DDMI status table of port interface."
+    ::= { tnDdmiStatus 2 }
+
+tnDdmiStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      TNDdmiStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry has a set of DDMI status."
+    INDEX       { tnDdmiStatusInterfaceIfIndex }
+    ::= { tnDdmiStatusInterfaceTable 1 }
+
+TNDdmiStatusInterfaceEntry ::= SEQUENCE {
+    tnDdmiStatusInterfaceIfIndex      TNInterfaceIndex,
+    tnDdmiStatusInterfaceA0Supported      TruthValue,
+    tnDdmiStatusInterfaceA0SfpDetected    TruthValue,
+    tnDdmiStatusInterfaceA0Vendor     TNDisplayString,
+    tnDdmiStatusInterfaceA0PartNumber     TNDisplayString,
+    tnDdmiStatusInterfaceA0SerialNumber   TNDisplayString,
+    tnDdmiStatusInterfaceA0Revision   TNDisplayString,
+    tnDdmiStatusInterfaceA0DateCode   TNDisplayString,
+    tnDdmiStatusInterfaceA0SfpType    TNSfpTransceiver,
+    tnDdmiStatusInterfaceA2Supported      TruthValue,
+    tnDdmiStatusInterfaceA2CurrentTemperature     TNDisplayString,
+    tnDdmiStatusInterfaceA2TemperatureHighAlarmThreshold      TNDisplayString,
+    tnDdmiStatusInterfaceA2TemperatureLowAlarmThreshold   TNDisplayString,
+    tnDdmiStatusInterfaceA2TemperatureHighWarnThreshold   TNDisplayString,
+    tnDdmiStatusInterfaceA2TemperatureLowWarnThreshold    TNDisplayString,
+    tnDdmiStatusInterfaceA2CurrentVoltage     TNDisplayString,
+    tnDdmiStatusInterfaceA2VoltageHighAlarmThreshold      TNDisplayString,
+    tnDdmiStatusInterfaceA2VoltageLowAlarmThreshold   TNDisplayString,
+    tnDdmiStatusInterfaceA2VoltageHighWarnThreshold   TNDisplayString,
+    tnDdmiStatusInterfaceA2VoltageLowWarnThreshold    TNDisplayString,
+    tnDdmiStatusInterfaceA2CurrentTxBias      TNDisplayString,
+    tnDdmiStatusInterfaceA2TxBiasHighAlarmThreshold   TNDisplayString,
+    tnDdmiStatusInterfaceA2TxBiasLowAlarmThreshold    TNDisplayString,
+    tnDdmiStatusInterfaceA2TxBiasHighWarnThreshold    TNDisplayString,
+    tnDdmiStatusInterfaceA2TxBiasLowWarnThreshold     TNDisplayString,
+    tnDdmiStatusInterfaceA2CurrentTxPower     TNDisplayString,
+    tnDdmiStatusInterfaceA2TxPowerHighAlarmThreshold      TNDisplayString,
+    tnDdmiStatusInterfaceA2TxPowerLowAlarmThreshold   TNDisplayString,
+    tnDdmiStatusInterfaceA2TxPowerHighWarnThreshold   TNDisplayString,
+    tnDdmiStatusInterfaceA2TxPowerLowWarnThreshold    TNDisplayString,
+    tnDdmiStatusInterfaceA2CurrentRxPower     TNDisplayString,
+    tnDdmiStatusInterfaceA2RxPowerHighAlarmThreshold      TNDisplayString,
+    tnDdmiStatusInterfaceA2RxPowerLowAlarmThreshold   TNDisplayString,
+    tnDdmiStatusInterfaceA2RxPowerHighWarnThreshold   TNDisplayString,
+    tnDdmiStatusInterfaceA2RxPowerLowWarnThreshold    TNDisplayString
+}
+
+tnDdmiStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number of physical port."
+    ::= { tnDdmiStatusInterfaceEntry 1 }
+
+tnDdmiStatusInterfaceA0Supported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Support transceiver status information or not. true is to supported and
+         false is not supported."
+    ::= { tnDdmiStatusInterfaceEntry 2 }
+
+tnDdmiStatusInterfaceA0SfpDetected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "SFP module is detected or not. true is to detected and false is not
+         detected."
+    ::= { tnDdmiStatusInterfaceEntry 3 }
+
+tnDdmiStatusInterfaceA0Vendor OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Vendor name."
+    ::= { tnDdmiStatusInterfaceEntry 4 }
+
+tnDdmiStatusInterfaceA0PartNumber OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Part number."
+    ::= { tnDdmiStatusInterfaceEntry 5 }
+
+tnDdmiStatusInterfaceA0SerialNumber OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Serial number."
+    ::= { tnDdmiStatusInterfaceEntry 6 }
+
+tnDdmiStatusInterfaceA0Revision OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Revision."
+    ::= { tnDdmiStatusInterfaceEntry 7 }
+
+tnDdmiStatusInterfaceA0DateCode OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Date Code."
+    ::= { tnDdmiStatusInterfaceEntry 8 }
+
+tnDdmiStatusInterfaceA0SfpType OBJECT-TYPE
+    SYNTAX      TNSfpTransceiver
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "SFP type. none(0) means no SFP module. notSupported(1) means SFP module
+         is not supported. sfp100Fx(2) means SFP 100BASE-FX. sfp100BaseLx(3)
+         means SFP 100BASE-LX. sfp100BaseBx10(4) means SFP 100BASE-BX10.
+         sfp100BaseT(5) means SFP 100BASE-T. sfp1000BaseBx10(6) means SFP
+         1000BASE-BX10. sfp1000BaseT(7) means SFP 1000BASE-T. sfp1000BaseCx(8)
+         means SFP 1000BASE-CX. sfp1000BaseSx(9) means SFP 1000BASE-SX.
+         sfp1000BaseLx(10) means SFP 1000BASE-LX. sfp1000BaseX(11) means SFP
+         1000BASE-X. sfp2G5(12) means SFP 2.5G. sfp5G(13) means SFP 5G.
+         sfp10G(14) means SFP 10G."
+    ::= { tnDdmiStatusInterfaceEntry 9 }
+
+tnDdmiStatusInterfaceA2Supported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Support DDMI status information or not. true is to supported and false
+         is not supported."
+    ::= { tnDdmiStatusInterfaceEntry 1002 }
+
+tnDdmiStatusInterfaceA2CurrentTemperature OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current temperature in Celcius."
+    ::= { tnDdmiStatusInterfaceEntry 1003 }
+
+tnDdmiStatusInterfaceA2TemperatureHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature high alarm threshold in Celcius."
+    ::= { tnDdmiStatusInterfaceEntry 1004 }
+
+tnDdmiStatusInterfaceA2TemperatureLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature low alarm threshold in Celcius."
+    ::= { tnDdmiStatusInterfaceEntry 1005 }
+
+tnDdmiStatusInterfaceA2TemperatureHighWarnThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature high warning threshold in Celcius."
+    ::= { tnDdmiStatusInterfaceEntry 1006 }
+
+tnDdmiStatusInterfaceA2TemperatureLowWarnThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Temperature low warning threshold in Celcius."
+    ::= { tnDdmiStatusInterfaceEntry 1007 }
+
+tnDdmiStatusInterfaceA2CurrentVoltage OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current voltage in Volt."
+    ::= { tnDdmiStatusInterfaceEntry 1008 }
+
+tnDdmiStatusInterfaceA2VoltageHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Voltage high alarm threshold in Volt."
+    ::= { tnDdmiStatusInterfaceEntry 1009 }
+
+tnDdmiStatusInterfaceA2VoltageLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Voltage low alarm threshold in Volt."
+    ::= { tnDdmiStatusInterfaceEntry 1010 }
+
+tnDdmiStatusInterfaceA2VoltageHighWarnThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Voltage high warning threshold in Volt."
+    ::= { tnDdmiStatusInterfaceEntry 1011 }
+
+tnDdmiStatusInterfaceA2VoltageLowWarnThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Voltage low warning threshold in Volt."
+    ::= { tnDdmiStatusInterfaceEntry 1012 }
+
+tnDdmiStatusInterfaceA2CurrentTxBias OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current Tx bias in mA."
+    ::= { tnDdmiStatusInterfaceEntry 1013 }
+
+tnDdmiStatusInterfaceA2TxBiasHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx bias high alarm threshold in mA."
+    ::= { tnDdmiStatusInterfaceEntry 1014 }
+
+tnDdmiStatusInterfaceA2TxBiasLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx bias low alarm threshold in mA."
+    ::= { tnDdmiStatusInterfaceEntry 1015 }
+
+tnDdmiStatusInterfaceA2TxBiasHighWarnThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx bias high warning threshold in mA."
+    ::= { tnDdmiStatusInterfaceEntry 1016 }
+
+tnDdmiStatusInterfaceA2TxBiasLowWarnThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx bias low warning threshold in mA."
+    ::= { tnDdmiStatusInterfaceEntry 1017 }
+
+tnDdmiStatusInterfaceA2CurrentTxPower OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current Tx power in mV."
+    ::= { tnDdmiStatusInterfaceEntry 1018 }
+
+tnDdmiStatusInterfaceA2TxPowerHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx power high alarm threshold in mV."
+    ::= { tnDdmiStatusInterfaceEntry 1019 }
+
+tnDdmiStatusInterfaceA2TxPowerLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx power low alarm threshold in mV."
+    ::= { tnDdmiStatusInterfaceEntry 1020 }
+
+tnDdmiStatusInterfaceA2TxPowerHighWarnThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx power high warning threshold in mV."
+    ::= { tnDdmiStatusInterfaceEntry 1021 }
+
+tnDdmiStatusInterfaceA2TxPowerLowWarnThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Tx power low warning threshold in mV."
+    ::= { tnDdmiStatusInterfaceEntry 1022 }
+
+tnDdmiStatusInterfaceA2CurrentRxPower OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current Rx power in mV."
+    ::= { tnDdmiStatusInterfaceEntry 1023 }
+
+tnDdmiStatusInterfaceA2RxPowerHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Rx power high alarm threshold in mV."
+    ::= { tnDdmiStatusInterfaceEntry 1024 }
+
+tnDdmiStatusInterfaceA2RxPowerLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Rx power low alarm threshold in mV."
+    ::= { tnDdmiStatusInterfaceEntry 1025 }
+
+tnDdmiStatusInterfaceA2RxPowerHighWarnThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Rx power high warning threshold in mV."
+    ::= { tnDdmiStatusInterfaceEntry 1026 }
+
+tnDdmiStatusInterfaceA2RxPowerLowWarnThreshold OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Rx power low warning threshold in mV."
+    ::= { tnDdmiStatusInterfaceEntry 1027 }
+
+tnDdmiMibConformance OBJECT IDENTIFIER
+    ::= { tnDdmiMib 2 }
+
+tnDdmiMibCompliances OBJECT IDENTIFIER
+    ::= { tnDdmiMibConformance 1 }
+
+tnDdmiMibGroups OBJECT IDENTIFIER
+    ::= { tnDdmiMibConformance 2 }
+
+tnDdmiConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { tnDdmiConfigGlobalsMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnDdmiMibGroups 1 }
+
+tnDdmiStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { tnDdmiStatusInterfaceA0Supported, 
+                  tnDdmiStatusInterfaceA0SfpDetected, 
+                  tnDdmiStatusInterfaceA0Vendor, 
+                  tnDdmiStatusInterfaceA0PartNumber, 
+                  tnDdmiStatusInterfaceA0SerialNumber, 
+                  tnDdmiStatusInterfaceA0Revision, 
+                  tnDdmiStatusInterfaceA0DateCode, 
+                  tnDdmiStatusInterfaceA0SfpType, 
+                  tnDdmiStatusInterfaceA2Supported, 
+                  tnDdmiStatusInterfaceA2CurrentTemperature, 
+                  tnDdmiStatusInterfaceA2TemperatureHighAlarmThreshold, 
+                  tnDdmiStatusInterfaceA2TemperatureLowAlarmThreshold, 
+                  tnDdmiStatusInterfaceA2TemperatureHighWarnThreshold, 
+                  tnDdmiStatusInterfaceA2TemperatureLowWarnThreshold, 
+                  tnDdmiStatusInterfaceA2CurrentVoltage, 
+                  tnDdmiStatusInterfaceA2VoltageHighAlarmThreshold, 
+                  tnDdmiStatusInterfaceA2VoltageLowAlarmThreshold, 
+                  tnDdmiStatusInterfaceA2VoltageHighWarnThreshold, 
+                  tnDdmiStatusInterfaceA2VoltageLowWarnThreshold, 
+                  tnDdmiStatusInterfaceA2CurrentTxBias, 
+                  tnDdmiStatusInterfaceA2TxBiasHighAlarmThreshold, 
+                  tnDdmiStatusInterfaceA2TxBiasLowAlarmThreshold, 
+                  tnDdmiStatusInterfaceA2TxBiasHighWarnThreshold, 
+                  tnDdmiStatusInterfaceA2TxBiasLowWarnThreshold, 
+                  tnDdmiStatusInterfaceA2CurrentTxPower, 
+                  tnDdmiStatusInterfaceA2TxPowerHighAlarmThreshold, 
+                  tnDdmiStatusInterfaceA2TxPowerLowAlarmThreshold, 
+                  tnDdmiStatusInterfaceA2TxPowerHighWarnThreshold, 
+                  tnDdmiStatusInterfaceA2TxPowerLowWarnThreshold, 
+                  tnDdmiStatusInterfaceA2CurrentRxPower, 
+                  tnDdmiStatusInterfaceA2RxPowerHighAlarmThreshold, 
+                  tnDdmiStatusInterfaceA2RxPowerLowAlarmThreshold, 
+                  tnDdmiStatusInterfaceA2RxPowerHighWarnThreshold, 
+                  tnDdmiStatusInterfaceA2RxPowerLowWarnThreshold }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnDdmiMibGroups 2 }
+
+tnDdmiMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { tnDdmiConfigGlobalsInfoGroup, 
+                  tnDdmiStatusInterfaceTableInfoGroup }
+
+    ::= { tnDdmiMibCompliances 1 }
+
+END

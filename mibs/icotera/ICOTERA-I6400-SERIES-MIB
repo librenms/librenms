@@ -1,0 +1,1141 @@
+ICOTERA-I6400-SERIES DEFINITIONS ::= BEGIN
+--
+-- Copyright (c) 2015-2017 Icotera A/S --
+--
+
+IMPORTS
+  MODULE-IDENTITY,
+  OBJECT-IDENTITY,
+  OBJECT-TYPE,
+  enterprises,
+  Counter32,
+  Gauge32,
+  Integer32,
+  Counter64,
+  IpAddress
+    	FROM SNMPv2-SMI
+  TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+  DisplayString
+        FROM RFC1213-MIB;
+
+--
+-- IcoteraEnterprise SMI --
+--
+
+icotera MODULE-IDENTITY
+    LAST-UPDATED "201703011646Z"
+    ORGANIZATION "Icotera A/S"
+    CONTACT-INFO
+    "Icotera A/S
+     Customer Support
+
+     Mail : Kongevejen 400D
+            2840 Holte
+            Danmark
+
+     Tel  : +45 7010 0033
+
+     E-mail: support@icotera.com
+     Web   : http://icotera.com"
+
+    DESCRIPTION
+    "The Icotera management information base SMI definitions"
+
+    REVISION "201703011646Z"
+    DESCRIPTION
+        "MIBs were adjusted to match all 
+		i64xx-series CPE product family."
+
+    REVISION "201702091427Z"
+    DESCRIPTION
+	"Minor correction of object values"
+
+    REVISION "201701161032Z"
+    DESCRIPTION
+	"Added support for Multicast Analyser"
+
+    REVISION "201608260924Z"
+    DESCRIPTION
+	"Minor correction of object names, 
+	unnecessary commentary removed"
+
+    REVISION "201608240904Z"
+    DESCRIPTION
+	"Missing descriptions added,
+	Some MODULE_IDENTITY was changed to correct OBJECT_IDENTITY,
+	CATV Filter packages fixed,
+	Fixed mib name from 4k to 1k,
+	Minor cosmetic corrections,
+	Added support for DDM"
+
+    REVISION "201504011357Z"
+    DESCRIPTION
+        "Created from ICOTERA-MIB.mib"
+
+    ::= { enterprises 29865 }  -- assigned by IANA --
+
+--
+-- All SNMP options supported by i6400-series CPE --
+--
+ictIGW1k OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+		"Device related SNMP options"
+		::= { icotera 11 }
+
+ictMgmt		OBJECT IDENTIFIER ::= { ictIGW1k 2 }
+ictServices	OBJECT IDENTIFIER ::= { ictIGW1k 3 }
+ictReset 	OBJECT IDENTIFIER ::= { ictIGW1k 5 }
+ictMcastAnalyzer   OBJECT IDENTIFIER ::= { ictIGW1k 7 }
+
+--
+-- CATV detailed status --
+--
+-- CATV definition --
+--
+
+ictServicesMibs OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+    "The MIB module for managing Icotera services"
+       ::= { ictServices 1 }
+
+ictCatv OBJECT-IDENTITY
+STATUS current
+    DESCRIPTION
+    "The MIB module for managing Icotera services"
+       ::= { ictServicesMibs 1 }
+
+--
+-- CATV subtree options --
+
+catvModuleAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      disabled(0),
+      enabled(1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The administrative status of the module, this can be enabled(1) or
+    disabled(0)."
+    DEFVAL { 0 }
+      ::= { ictCatv 1 }
+
+catvModuleFilter OBJECT-TYPE
+    SYNTAX INTEGER {
+      none(0),
+      pkg1(1),
+      pkg2(2),
+      pkg3(3),
+      pkg4(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Package filter selected for catv module"
+      ::= { ictCatv 2 }
+
+catvModuleRflevel OBJECT-TYPE
+    SYNTAX INTEGER {
+      auto(0),
+      low(1),
+      medium(2),
+      high(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "RF signal amplification on CATV output"
+      ::= { ictCatv 3 }
+
+catvModuleLowSignal OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Low signal level of catv led"
+      ::= { ictCatv 4 }
+
+catvModuleSignalDetected OBJECT-TYPE
+    SYNTAX INTEGER {
+      no(0),
+      yes(1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Tells whether CATV signal is detected: yes(1) - detected, no(0) - not detected." 
+      ::= { ictCatv 5 }
+
+catvModulePowerLevel OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Current CATV power level. It can have one of the following values:
+     - any integer between -1099 and 199 when the power level is higher than -11.00 and lower than 2.00,
+       which is the power level in dBm multiplied by 100.
+     - a value of -2147483648 when the power level is lower than -11 dBm
+     - a value of 2147483647 when the power level is higher than 2 dBm." 
+      ::= { ictCatv 6 }
+
+--
+-- DDM feature --
+--
+-- Note: this is supported only by CPE equipped with DDM Transciever
+-- 
+
+--ictTransceiver OBJECT-IDENTITY
+--    STATUS current
+--    DESCRIPTION
+--   "The general MIB module for Transciever diagnostic module"
+--      ::= { ictServices 1 }
+
+ictTransceiver OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+    "The container for DDM related MIB module"
+      ::= { ictServicesMibs 3 }
+
+transceiverDdmTemperature OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Internally measured transceiver temperature.
+     Represented in increments of 1/256 degrees Celsius,
+     yielding a total range of (minus) 128C to (plus) 128C." 
+      ::= { ictTransceiver 1 }
+
+transceiverDdmTxPower OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Measured TX output power.
+     Represented in increments of 1/10000 mW." 
+      ::= { ictTransceiver 2 }
+
+transceiverDdmRxPower OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Measured RX received optical power.
+     Represented in increments of 1/10000 mW." 
+      ::= { ictTransceiver 3 }
+
+transceiverDdmVoltage OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Internally measured transceiver supply voltage.
+     Represented in increments of 1/10000 V." 
+      ::= { ictTransceiver 4 }
+
+transceiverDdmTxBiasCurrent OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Measured TX bias current.
+     Represented in increments of 1/500 mA." 
+      ::= { ictTransceiver 5 }
+
+transceiverTransceiverType OBJECT-TYPE
+    SYNTAX INTEGER {
+      unknown(0),
+      gbic(1),
+      moduleSolderedToMotherboard(2),
+      sfp(3),
+      type300pinXbi(4),
+      xenpak(5),
+      xfp(6),
+      xff(7),
+      xfpE(8),
+      xPak(9),
+      x2(10),
+      dWdmSfp(11),
+      qSfp(12)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Type of serial transceiver." 
+      ::= { ictTransceiver 6 }
+
+transceiverLaserWavelength OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "TX Laser Wavelength, units of nm." 
+      ::= { ictTransceiver 7 }
+
+transceiverConnectorType OBJECT-TYPE
+    SYNTAX INTEGER {
+      unknown(0),
+      sc(1),
+      fibreChannelStyle1CopperConnector(2),
+      fibreChannelStyle2CopperConnector(3),
+      bncTnc(4),
+      fibreChannelCoaxialHeaders(5),
+      fiberJack(6),
+      lc(7),
+      mtRj(8),
+      mu(9),
+      sg(10),
+      opticalPigtail(11),
+      mpoParallelOptic(12),
+      hssdcII(32),
+      copperPigtail(33),
+      rj45(34)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Connector type provided." 
+      ::= { ictTransceiver 8 }
+
+transceiverEthernetCompliance OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Ethernet compliance. 8-bit bit field:
+     Bit 7 - BASE-PX
+     Bit 6 - BASE-BX10
+     Bit 5 - 100BASE-FX
+     Bit 4 - 100BASE-LX/LX10
+     Bit 3 - 1000BASE-T
+     Bit 2 - 1000BASE-CX
+     Bit 1 - 1000BASE-LX
+     Bit 0 - 1000BASE-SX." 
+      ::= { ictTransceiver 9 }
+
+transceiverLinkLength OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Link length supported for single mode fiber, units of km." 
+      ::= { ictTransceiver 10 }
+
+transceiverDiagCapable OBJECT-TYPE
+    SYNTAX INTEGER {
+      no(0),
+      yes(1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Digital diagnostic monitoring implemented." 
+      ::= { ictTransceiver 11 }
+
+-- END of SERVICEs part --
+--
+--
+-- RESET detailed status --
+--
+-- Factory reset definition --
+
+ictFacRst OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+    "The MIB parent for CPE reset"
+       ::= { ictReset 1 }
+
+ictFacRstMib OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+    "The MIB which makes Factory Reset of CPE"
+       ::= { ictFacRst 1 }
+
+--
+-- FactoryReset subtree options --
+
+performFactoryReset OBJECT-TYPE
+  SYNTAX INTEGER {
+    noActionRequested(0),
+    makeFactoryreset(1),
+    someErrorOccured(3)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION 
+     "MIB used to perform Factory Reset."
+  DEFVAL { 0 }
+    ::= { ictFacRstMib 1 }
+
+-- END of RESET part --
+
+--
+-- Management functions --
+--
+-- Management definition --
+--
+
+ictMgmtMib OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+    "The MIB which allows managing the CPE"
+       ::= { ictMgmt 1 }
+
+ictFwUpg OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+    "The MIB of firmware upgrade"
+       ::= { ictMgmtMib 1 }
+
+ictCfgUpdate OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+    "The MIB of configuration update"
+       ::= { ictMgmtMib 2 }
+
+ictReboot OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+    "The MIB responsible for CPE reboot"
+       ::= { ictMgmtMib 3 }
+
+--
+-- Management subtree options --
+
+upgUrl OBJECT-TYPE
+  SYNTAX OCTET STRING  (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "MIB for firmware file path declaration."
+    ::= { ictFwUpg 1 }
+
+upgExecute OBJECT-TYPE
+  SYNTAX INTEGER {
+    notUpgrading(0),
+    startUpgrade(1),
+    validatingUpgrade-CheckErrorCodeIfFailed(2),
+    someErrorOccured(3)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "MIB for firmware upgrade execution."
+    ::= { ictFwUpg 2 }
+
+upgStatus OBJECT-TYPE
+  SYNTAX OCTET STRING  (SIZE(0..255))
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "MIB used to check firmware upgrade status."
+    ::= { ictFwUpg 3 }
+
+cfgTftpPath OBJECT-TYPE
+  SYNTAX OCTET STRING  (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "MIB for configuration file path stored at TFTP declaration."
+    ::= { ictCfgUpdate 1 }
+
+cfgExecute OBJECT-TYPE
+  SYNTAX INTEGER {
+    notUpdating(0),
+    startUpdate(1),
+    inProgress(2),
+    someErrorOccured(3),
+    resultOK(4)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "MIB for configuration upload exectution."
+    ::= { ictCfgUpdate 2 }
+
+cfgStatus OBJECT-TYPE
+  SYNTAX OCTET STRING  (SIZE(0..255))
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "MIB used to check configuration upload status."
+    ::= { ictCfgUpdate 3 }
+
+performCpeReboot OBJECT-TYPE
+  SYNTAX INTEGER {
+    noActionRequested(0),
+    makeReboot(1),
+    someErrorOccured(3)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "MIB for CPE reboot execution."
+  DEFVAL { 0 }
+    ::= { ictReboot 2 }
+
+-- END of MANAGEMENT part -- 
+----------------------------
+
+IctTimeStamp ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "The time as the number of seconds since the Epoch." 
+    SYNTAX       Counter32
+
+IctPortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "Comma-separated list of LAN ports." 
+    SYNTAX       OCTET STRING
+
+IctJitter ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION
+            "When used in conjunction with the DISPLAY-HINT will show jitter calculated for the last second.
+             Without the DISPLAY-HINT the jitter value is multiplied by 100."
+    SYNTAX       INTEGER
+
+IctDelta ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION
+            "Time period between two successive packets expressed in hundredths of a milliseconds.
+             When used in conjunction with the DISPLAY-HINT will show milliseconds and fractions of millisecond." 
+    SYNTAX       INTEGER
+
+ictMcastAnalyzerCurrent   OBJECT IDENTIFIER ::= { ictMcastAnalyzer 1 }
+ictMcastAnalyzerHistory   OBJECT IDENTIFIER ::= { ictMcastAnalyzer 2 }
+
+CurrentListEntry ::=
+    SEQUENCE {
+        curGroupIndex            INTEGER,
+        curGroupAddr             IpAddress    }
+
+currentListEntry OBJECT-TYPE
+    SYNTAX      CurrentListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing a particular multicast group address." 
+    INDEX   { curGroupIndex }
+    ::= { ictMcastAnalyzerCurrentList 1 }
+
+ictMcastAnalyzerCurrentList OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CurrentListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of currently analyzed multicast groups." 
+    ::= { ictMcastAnalyzerCurrent 1 }
+
+curGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Index of the analyzed multicast group." 
+    ::= { currentListEntry 1 }
+
+curGroupAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The IPv4 address of this entry's multicast group." 
+    ::= { currentListEntry 2 }
+
+ictMcastAnalyzerCurrentMetrics OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CurrentMetricsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of currently analyzed multicast groups and their metrics." 
+    ::= { ictMcastAnalyzerCurrent 2 }
+
+currentMetricsEntry OBJECT-TYPE
+    SYNTAX      CurrentMetricsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing metrics concerning a particular multicast group." 
+    INDEX   { curMetrGroupAddr }
+    ::= { ictMcastAnalyzerCurrentMetrics 1 }
+
+CurrentMetricsEntry ::=
+    SEQUENCE {
+        curMetrGroupAddr             IpAddress,
+        curMetrSourceAddr            IpAddress,
+        curMetrDstPort               Integer32,
+        curMetrSrcPort               Integer32,
+        curMetrTotalBytes            Counter64,
+        curMetrTotalPackets          Counter64,
+        curMetrKbps                  Gauge32,
+        curMetrPps                   Gauge32,
+        curMetrAvgKbps               Gauge32,
+        curMetrAvgPps                Gauge32,
+        curMetrMaxDelta              IctDelta,
+        curMetrAvgDelta              IctDelta,
+        curMetrTotalMaxDelta         IctDelta,
+        curMetrTotalAvgDelta         IctDelta,
+        curMetrStartTimestamp        IctTimeStamp,
+        curMetrStopTimestamp         IctTimeStamp,
+        curMetrMemberPorts           IctPortList,
+        curMetrStreamType            OCTET STRING,
+        curMetrSkips                 Counter32,
+        curMetrDiscontinuities       Counter32,
+        curMetrLost                  Counter32,
+        curMetrReordered             Counter32,
+        curMetrTotalSkips            Counter32,
+        curMetrTotalDiscontinuities  Counter32,
+        curMetrTotalLost             Counter32,
+        curMetrTotalReordered        Counter32,
+        curMetrAvgLostPps            Gauge32,
+        curMetrJitter                IctJitter
+    }
+
+curMetrGroupAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The IPv4 address of this entry's multicast group." 
+    ::= { currentMetricsEntry 1 }
+
+curMetrSourceAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The source IPv4 address of this multicast stream." 
+    ::= { currentMetricsEntry 2 }
+
+curMetrDstPort OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The destination port number of this multicast stream." 
+    ::= { currentMetricsEntry 3 }
+
+curMetrSrcPort OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The source port number of this multicast stream." 
+    ::= { currentMetricsEntry 4 }
+
+curMetrTotalBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of bytes transferred within the stream." 
+    ::= { currentMetricsEntry 5 }
+
+curMetrTotalPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of packets transferred within the stream." 
+    ::= { currentMetricsEntry 6 }
+
+curMetrKbps OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Kilobits per second during last second." 
+    ::= { currentMetricsEntry 7 }
+
+curMetrPps OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Packets per second during last second." 
+    ::= { currentMetricsEntry 8 }
+
+curMetrAvgKbps OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Average kilobits per second." 
+    ::= { currentMetricsEntry 9 }
+
+curMetrAvgPps OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Average packets per second." 
+    ::= { currentMetricsEntry 10 }
+
+curMetrMaxDelta OBJECT-TYPE
+    SYNTAX     IctDelta
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Maximum time period between two successive packets from the last second." 
+    ::= { currentMetricsEntry 11 }
+
+curMetrAvgDelta OBJECT-TYPE
+    SYNTAX     IctDelta
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Average time period between two successive packets from the last second." 
+    ::= { currentMetricsEntry 12 }
+
+curMetrTotalMaxDelta OBJECT-TYPE
+    SYNTAX     IctDelta
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Maximum time period between two successive packets." 
+    ::= { currentMetricsEntry 13 }
+
+curMetrTotalAvgDelta OBJECT-TYPE
+    SYNTAX     IctDelta
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Average time period between two successive packets." 
+    ::= { currentMetricsEntry 14 }
+
+curMetrStartTimestamp OBJECT-TYPE
+    SYNTAX      IctTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The time at which the stream started being analyzed." 
+    ::= { currentMetricsEntry 15 }
+
+curMetrStopTimestamp OBJECT-TYPE
+    SYNTAX      IctTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The time at which the stream stopped being analyzed." 
+    ::= { currentMetricsEntry 16 }
+
+curMetrMemberPorts OBJECT-TYPE
+    SYNTAX      IctPortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "LAN ports being members of the multicast group." 
+    ::= { currentMetricsEntry 17 }
+
+curMetrStreamType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Type of the stream: either RTP or UDP." 
+    ::= { currentMetricsEntry 18 }
+
+curMetrSkips OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of skipped MPG-TS packets during last second." 
+    ::= { currentMetricsEntry 19 }
+
+curMetrDiscontinuities OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of MPG-TS discontinuities during last second." 
+    ::= { currentMetricsEntry 20 }
+
+curMetrLost OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of lost RTP packets during last second." 
+    ::= { currentMetricsEntry 21 }
+
+curMetrReordered OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of reordered RTP packets during last second." 
+    ::= { currentMetricsEntry 22 }
+
+curMetrTotalSkips OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of skipped MPG-TS packets." 
+    ::= { currentMetricsEntry 23 }
+
+curMetrTotalDiscontinuities OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of MPG-TS discontinuities." 
+    ::= { currentMetricsEntry 24 }
+
+curMetrTotalLost OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of lost RTP packets." 
+    ::= { currentMetricsEntry 25 }
+
+curMetrTotalReordered OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of reordered RTP packets." 
+    ::= { currentMetricsEntry 26 }
+
+curMetrAvgLostPps OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Average number of lost RTP packets per second." 
+    ::= { currentMetricsEntry 27 }
+
+curMetrJitter OBJECT-TYPE
+    SYNTAX     IctJitter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Jitter calculated for the last second." 
+    ::= { currentMetricsEntry 28 }
+
+HistoryListEntry ::=
+    SEQUENCE {
+        histGroupIndex            INTEGER,
+        histGroupAddr             IpAddress }
+
+historyListEntry OBJECT-TYPE
+    SYNTAX      HistoryListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing a particular multicast group address." 
+    INDEX   { histGroupIndex }
+    ::= { ictMcastAnalyzerHistoryList 1 }
+
+ictMcastAnalyzerHistoryList OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HistoryListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of formerly analyzed multicast groups." 
+    ::= { ictMcastAnalyzerHistory 1 }
+
+histGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Index of the historical multicast group." 
+    ::= { historyListEntry 1 }
+
+histGroupAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The IPv4 address of this entry's multicast group." 
+    ::= { historyListEntry 2 }
+
+ictMcastAnalyzerHistoryMetrics OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HistoryMetricsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of formerly analyzed multicast groups and their metrics." 
+    ::= { ictMcastAnalyzerHistory 2 }
+
+historyMetricsEntry OBJECT-TYPE
+    SYNTAX      HistoryMetricsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing metrics concerning a particular multicast group." 
+    INDEX   { histMetrGroupAddr }
+    ::= { ictMcastAnalyzerHistoryMetrics 1 }
+
+HistoryMetricsEntry ::=
+    SEQUENCE {
+        histMetrGroupAddr             IpAddress,
+        histMetrSourceAddr            IpAddress,
+        histMetrDstPort               Integer32,
+        histMetrSrcPort               Integer32,
+        histMetrTotalBytes            Counter64,
+        histMetrTotalPackets          Counter64,
+        histMetrKbps                  Gauge32,
+        histMetrPps                   Gauge32,
+        histMetrAvgKbps               Gauge32,
+        histMetrAvgPps                Gauge32,
+        histMetrMaxDelta              IctDelta,
+        histMetrAvgDelta              IctDelta,
+        histMetrTotalMaxDelta         IctDelta,
+        histMetrTotalAvgDelta         IctDelta,
+        histMetrStartTimestamp        IctTimeStamp,
+        histMetrStopTimestamp         IctTimeStamp,
+        histMetrMemberPorts           IctPortList,
+        histMetrStreamType            OCTET STRING,
+        histMetrSkips                 Counter32,
+        histMetrDiscontinuities       Counter32,
+        histMetrLost                  Counter32,
+        histMetrReordered             Counter32,
+        histMetrTotalSkips            Counter32,
+        histMetrTotalDiscontinuities  Counter32,
+        histMetrTotalLost             Counter32,
+        histMetrTotalReordered        Counter32,
+        histMetrAvgLostPps            Gauge32,
+        histMetrJitter                IctJitter
+    }
+
+histMetrGroupAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The IPv4 address of this entry's multicast group." 
+    ::= { historyMetricsEntry 1 }
+
+histMetrSourceAddr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The source IPv4 address of this multicast stream." 
+    ::= { historyMetricsEntry 2 }
+
+histMetrDstPort OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The destination port number of this multicast stream." 
+    ::= { historyMetricsEntry 3 }
+
+histMetrSrcPort OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The source port number of this multicast stream." 
+    ::= { historyMetricsEntry 4 }
+
+histMetrTotalBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of bytes transferred within the stream." 
+    ::= { historyMetricsEntry 5 }
+
+histMetrTotalPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of packets transferred within the stream." 
+    ::= { historyMetricsEntry 6 }
+
+histMetrKbps OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Kilobits per second during last second." 
+    ::= { historyMetricsEntry 7 }
+
+histMetrPps OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Packets per second during last second." 
+    ::= { historyMetricsEntry 8 }
+
+histMetrAvgKbps OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Average kilobits per second." 
+    ::= { historyMetricsEntry 9 }
+
+histMetrAvgPps OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Average packets per second." 
+    ::= { historyMetricsEntry 10 }
+
+histMetrMaxDelta OBJECT-TYPE
+    SYNTAX     IctDelta
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Maximum time period between two successive packets from the last second." 
+    ::= { historyMetricsEntry 11 }
+
+histMetrAvgDelta OBJECT-TYPE
+    SYNTAX     IctDelta
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Average time period between two successive packets from the last second." 
+    ::= { historyMetricsEntry 12 }
+
+histMetrTotalMaxDelta OBJECT-TYPE
+    SYNTAX     IctDelta
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Maximum time period between two successive packets." 
+    ::= { historyMetricsEntry 13 }
+
+histMetrTotalAvgDelta OBJECT-TYPE
+    SYNTAX     IctDelta
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Average time period between two successive packets." 
+    ::= { historyMetricsEntry 14 }
+
+histMetrStartTimestamp OBJECT-TYPE
+    SYNTAX      IctTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The time at which the stream started being analyzed." 
+    ::= { historyMetricsEntry 15 }
+
+histMetrStopTimestamp OBJECT-TYPE
+    SYNTAX      IctTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The time at which the stream stopped being analyzed." 
+    ::= { historyMetricsEntry 16 }
+
+histMetrMemberPorts OBJECT-TYPE
+    SYNTAX      IctPortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "LAN ports being members of the multicast group." 
+    ::= { historyMetricsEntry 17 }
+
+histMetrStreamType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Type of the stream: either RTP or UDP." 
+    ::= { historyMetricsEntry 18 }
+
+histMetrSkips OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of skipped MPG-TS packets during last second." 
+    ::= { historyMetricsEntry 19 }
+
+histMetrDiscontinuities OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of MPG-TS discontinuities during last second." 
+    ::= { historyMetricsEntry 20 }
+
+histMetrLost OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of lost RTP packets during last second." 
+    ::= { historyMetricsEntry 21 }
+
+histMetrReordered OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of reordered RTP packets during last second." 
+    ::= { historyMetricsEntry 22 }
+
+histMetrTotalSkips OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of skipped MPG-TS packets." 
+    ::= { historyMetricsEntry 23 }
+
+histMetrTotalDiscontinuities OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of MPG-TS discontinuities." 
+    ::= { historyMetricsEntry 24 }
+
+histMetrTotalLost OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of lost RTP packets." 
+    ::= { historyMetricsEntry 25 }
+
+histMetrTotalReordered OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of reordered RTP packets." 
+    ::= { historyMetricsEntry 26 }
+
+histMetrAvgLostPps OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Average number of lost RTP packets per second." 
+    ::= { historyMetricsEntry 27 }
+
+histMetrJitter OBJECT-TYPE
+    SYNTAX     IctJitter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Jitter calculated for the last second." 
+    ::= { historyMetricsEntry 28 }
+
+-- End of McastAnalyser part --
+------------------------------- 
+
+--
+END
+

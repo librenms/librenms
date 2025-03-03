@@ -15,34 +15,19 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Tests;
 
-class DBTestCase extends \PHPUnit_Framework_TestCase
-{
-    public function setUp()
-    {
-        parent::setUp();
-        if (getenv('DBTEST')) {
-            dbConnect();
-            dbBeginTransaction();
-        } else {
-            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
-        }
-    }
+use LibreNMS\Tests\Traits\RequiresDatabase;
 
-    public function tearDown()
-    {
-        parent::tearDown();
-        if (getenv('DBTEST')) {
-            dbRollbackTransaction();
-        }
-    }
+abstract class DBTestCase extends TestCase
+{
+    use RequiresDatabase;
 }

@@ -1,0 +1,15 @@
+os: montclair-edfa
+text: Montclair EDFA
+type: network
+ifname: true
+empty_ifdescr: true
+mib_dir: montclair
+icon: montclair
+over:
+    - { graph: device_dbm, text: 'Optical Power' }
+    - { graph: device_temperature, text: 'Device Temperature' }
+
+discovery:
+    -
+        sysObjectID_regex:
+            - "/^.1.3.6.1.4.1.1385$/"

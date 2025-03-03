@@ -1,0 +1,334 @@
+mib: LIEBERT-GP-AGENT-MIB:LIEBERT-GP-PDU-MIB:LIEBERT-GP-ENVIRONMENTAL-MIB:LIEBERT-GP-POWER-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: lgpPduAuxMeasTable
+                    value: lgpPduAuxMeasTempDegC
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.60.15.1.70.{{ $index }}'
+                    descr: 'Temp for {{ $lgpPduAuxMeasUsrLabel }}'
+                    index: 'lgpPduAuxMeasTempDegC.{{ $index }}'
+                    divisor: 10
+                    low_limit: lgpPduAuxMeasTempThrshldUndrAlmDegC
+                    low_warn_limit: lgpPduAuxMeasTempThrshldUndrWarnDegC
+                    warn_limit: lgpPduAuxMeasTempThrshldOvrWarnDegC
+                    high_limit: lgpPduAuxMeasTempThrshldOvrAlmDegC
+                -
+                    oid: lgpEnvTemperatureTableDegC
+                    value: lgpEnvTemperatureSetPointDegC
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.6.{{ $index }}'
+                    descr: 'Setpoint for {{ $lgpEnvTemperatureDescrDegC }}'
+                    index: 'lgpEnvTemperatureSetPointDegC.{{ $index }}'
+        humidity:
+            data:
+                -
+                    oid: lgpPduAuxMeasTable
+                    value: lgpPduAuxMeasHum
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.60.15.1.95.{{ $index }}'
+                    descr: 'Humidity for {{ $lgpPduAuxMeasUsrLabel }}'
+                    index: 'lgpPduAuxMeasHum.{{ $index }}'
+                    divisor: 10
+                    low_limit: lgpPduAuxMeasHumThrshldUndrAlm
+                    low_warn_limit: lgpPduAuxMeasHumThrshldUndrWarn
+                    warn_limit: lgpPduAuxMeasHumThrshldOvrWarn
+                    high_limit: lgpPduAuxMeasHumThrshldOvrAlm
+                -
+                    oid: lgpEnvHumidityTableRel
+                    value: lgpEnvHumiditySetPoint
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.6.{{ $index }}'
+                    descr: 'Setpoint for {{ $lgpEnvHumidityDescrRel }}'
+                    index: 'lgpEnvHumiditySetPoint.{{ $index }}'
+        voltage:
+            data:
+                -
+                    oid: lgpPduPsLineTable
+                    value: lgpPduPsLineEntryEpLNTenths
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.40.1.19.{{ $index }}'
+                    descr: 'AC RMS {{ $lgpPduPsLineEntryLine }}'
+                    index: 'lgpPduPsLineEntryEpLNTenths.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: lgpPduRcpTable
+                    value: lgpPduRcpEntryEp
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.55.{{ $index }}'
+                    descr: 'Voltage {{ $lgpPduRcpEntryUsrLabel }}'
+                    index: 'lgpPduRcpEntryEp.{{ $index }}'
+        power:
+            data:
+                -
+                    oid: lgpPduPsTable
+                    value: lgpPduPsEntryPwrTotal
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.65.{{ $index }}'
+                    descr: 'Total for {{ $lgpPduPsEntryModel }}'
+                    index: 'lgpPduPsEntryPwrTotal.{{ $index }}'
+                -
+                    oid: lgpPduPsTable
+                    value: lgpPduPsEntryApTotal
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.90.{{ $index }}'
+                    descr: 'Apparent Power {{ $lgpPduPsEntryModel }}'
+                    index: 'lgpPduPsEntryApTotal.{{ $index }}'
+                    group: ApparentPower
+                -
+                    oid: lgpPduRcpTable
+                    value: lgpPduRcpEntryPwrOut
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.65.{{ $index }}'
+                    descr: 'Power {{ $lgpPduRcpEntryUsrLabel }}'
+                    index: 'lgpPduRcpEntryPwrOut.{{ $index }}'
+                -
+                    oid: lgpPduRcpTable
+                    value: lgpPduRcpEntryApOut
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.70.{{ $index }}'
+                    descr: 'Apparent Power {{ $lgpPduRcpEntryUsrLabel }}'
+                    index: 'lgpPduRcpEntryApOut.{{ $index }}'
+                    group: ApparentPower
+        current:
+            data:
+                -
+                    oid: lgpPduRbTable
+                    value: lgpPduRbEntryEcAvailBeforeAlarmHundredths
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.40.20.1.150.{{ $index }}'
+                    descr: 'Before Alarm {{ $lgpPduRbEntryUsrLabel }}'
+                    index: 'lgpPduRbEntryEcAvailBeforeAlarmHundredths.{{ $index }}'
+                    divisor: 100
+                    group: Available
+                -
+                    oid: lgpPduRcpTable
+                    value: lgpPduRcpEntryEc
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.60.{{ $index }}'
+                    descr: 'Current {{ $lgpPduRcpEntryUsrLabel }}'
+                    divisor: 10
+                    index: 'lgpPduRcpEntryEc.{{ $index }}'
+        count:
+            data:
+                -
+                    oid: lgpPduRbTable
+                    value: lgpPduRbEntryEcUsedBeforeAlarm
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.40.20.1.160.{{ $index }}'
+                    descr: 'Utilization Percent {{ $lgpPduRbEntryUsrLabel }}'
+                    index: 'lgpPduRbEntryEcAvailBeforeAlarmHundredths.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: lgpEnvOperationalTimeTable
+                    value: lgpEnvOperationTimeValue
+                    group: 'Operating Time'
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.4.32.1.5.{{ $index }}'
+                    descr: '{{ $lgpEnvOperationTimePoint }} - ID {{ $lgpEnvOperationTimeSubID }}'
+                    index: '.1.3.6.1.4.1.476.1.42.3.4.4.32.1.1.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: lgpAgentTelnetEnabled
+                    num_oid: '.1.3.6.1.4.1.476.1.42.2.5.2.{{ $index }}'
+                    descr: Telnet Enabled
+                    index: 'lgpAgentTelnetEnabled.{{ $index }}'
+                    state_name: lgpAgentTelnetEnabled
+                    states:
+                        - { value: 1, graph: 0, descr: yes, generic: 0 }
+                        - { value: 2, graph: 0, descr: no, generic: 2 }
+                -
+                    oid: lgpAgentVelocityServerEnabled
+                    num_oid: '.1.3.6.1.4.1.476.1.42.2.5.3.{{ $index }}'
+                    descr: Velocity Server Enabled
+                    index: 'lgpAgentVelocityServerEnabled.{{ $index }}'
+                    state_name: lgpAgentVelocityServerEnabled
+                    states:
+                        - { value: 1, graph: 0, descr: yes, generic: 0 }
+                        - { value: 2, graph: 0, descr: no, generic: 2 }
+                -
+                    oid: lgpAgentWebServerMode
+                    num_oid: '.1.3.6.1.4.1.476.1.42.2.5.4.{{ $index }}'
+                    descr: Webserver Mode
+                    index: 'lgpAgentWebServerMode.{{ $index }}'
+                    state_name: lgpAgentWebServerMode
+                    states:
+                        - { value: 0, graph: 0, descr: disabled, generic: 2 }
+                        - { value: 1, graph: 0, descr: http, generic: 1 }
+                        - { value: 2, graph: 0, descr: https, generic: 0 }
+                -
+                    oid: lgpPduEntrySysStatus
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.20.1.25.{{ $index }}'
+                    descr: System Status
+                    index: 'lgpPduGrpSysStatus.{{ $index }}'
+                    state_name: lgpPduEntrySysStatus
+                    states:
+                        - { value: 1, graph: 0, descr: normalOperation, generic: 0 }
+                        - { value: 2, graph: 0, descr: startUp, generic: 1 }
+                        - { value: 4, graph: 0, descr: unknownNoSupport, generic: 3 }
+                        - { value: 8, graph: 0, descr: normalWithWarning, generic: 1 }
+                        - { value: 16, graph: 0, descr: normalWithAlarm, generic: 2 }
+                        - { value: 32, graph: 0, descr: abnormalOperation, generic: 2 }
+                        - { value: 64, graph: 0, descr: unknownCommFailure, generic: 2 }
+                -
+                    oid: lgpEnvStateFan
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.7.{{ $index }}'
+                    descr: 'System Fan Status'
+                    index: 'lgpEnvStateFan.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                -
+                    oid: lgpEnvStateSystem
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.1.{{ $index }}'
+                    descr: 'System Status'
+                    index: 'lgpEnvStateSystem.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 1, descr: 'off', generic: 1 }
+                        - { value: 3, graph: 2, descr: 'standby', generic: 0 }
+                -
+                    oid: lgpEnvStateCooling
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.2.{{ $index }}'
+                    descr: 'Cooling Subsystem Status'
+                    index: 'lgpEnvStateCooling.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                -
+                    oid: lgpEnvStateHumidifying
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.4.{{ $index }}'
+                    descr: 'Humidifier Subsystem Status'
+                    index: 'lgpEnvStateHumidifying.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                -
+                    oid: lgpEnvStateDehumidifying
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.5.{{ $index }}'
+                    descr: 'Dehumidifier Subsystem Status'
+                    index: 'lgpEnvStateDehumidifying.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                -
+                    oid: lgpEnvStateFan
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.7.{{ $index }}'
+                    descr: 'System Fan Status'
+                    index: 'lgpEnvStateFan.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 1 }
+                -
+                    oid: lgpEnvStateGeneralAlarmOutput
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.8.{{ $index }}'
+                    descr: 'General Alarm Status'
+                    index: 'lgpEnvStateGeneralAlarmOutput.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 2 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 0 }
+                -
+                    oid: lgpEnvStateAudibleAlarm
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.11.{{ $index }}'
+                    descr: 'Audible Alarm Status'
+                    index: 'lgpEnvStateAudibleAlarm.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 2 }
+                        - { value: 2, graph: 0, descr: 'off', generic: 0 }
+                -
+                    oid: lgpEnvStateOperatingReason
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.14.{{ $index }}'
+                    descr: 'Operating State Reason'
+                    index: 'lgpEnvStateOperatingReason.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'none', generic: 0 }
+                        - { value: 2, graph: 1, descr: 'localUser', generic: 0 }
+                        - { value: 3, graph: 2, descr: 'alarm', generic: 0 }
+                        - { value: 4, graph: 3, descr: 'schedule', generic: 0 }
+                        - { value: 5, graph: 4, descr: 'remoteUser', generic: 0 }
+                        - { value: 6, graph: 5, descr: 'externalDevice', generic: 0 }
+                        - { value: 7, graph: 6, descr: 'localDisplay', generic: 0 }
+                -
+                    oid: lgpEnvStateOperatingMode
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.15.{{ $index }}'
+                    descr: 'Operating Mode'
+                    index: 'lgpEnvStateOperatingMode.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'auto', generic: 0 }
+                        - { value: 2, graph: 1, descr: 'manual', generic: 0 }
+                -
+                    oid: lgpEnvStateElectricHeater
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.21.{{ $index }}'
+                    descr: 'Electric Heaters Status'
+                    index: 'lgpEnvStateElectricHeater.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 1, descr: 'off', generic: 0 }
+                -
+                    oid: lgpEnvStateHotWater
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.22.{{ $index }}'
+                    descr: 'Hot Water System Status'
+                    index: 'lgpEnvStateHotWater.{{ $index }}'
+                    states:
+                        - { value: 1, graph: 0, descr: 'on', generic: 0 }
+                        - { value: 2, graph: 1, descr: 'off', generic: 0 }
+                -
+                    oid: lgpPduRcpTable
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.95.{{ $index }}'
+                    descr: 'State {{ $lgpPduRcpEntryUsrLabel }}'
+                    index: 'lgpPduRcpEntryPwrState.{{ $index }}'
+                    value: lgpPduRcpEntryPwrState
+                    state_name: lgpPduRcpEntryPwrState
+                    states:
+                        - { value: 2, graph: 0, descr: 'on', generic: 1 }
+                        - { value: 1, graph: 0, descr: 'off', generic: 0 }
+                        - { value: 0, graph: 0, descr: 'unknown', generic: 2 }
+        percent:
+            data:
+                -
+                    oid: lgpEnvStateCoolingCapacity
+                    value: lgpEnvStateCoolingCapacity
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.9.{{ $index }}'
+                    descr: 'Cooling Capacity Usage'
+                    index: 'lgpEnvStateCoolingCapacity.{{ $index }}'
+                    skip_values: 4294967295
+                -
+                    oid: lgpEnvStateFanCapacity
+                    value: lgpEnvStateFanCapacity
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.16.{{ $index }}'
+                    descr: 'Fan Capacity Usage'
+                    index: 'lgpEnvStateFanCapacity.{{ $index }}'
+                    skip_values: 4294967295
+                -
+                    oid: lgpEnvStateFreeCoolingCapacity
+                    value: lgpEnvStateFreeCoolingCapacity
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.17.{{ $index }}'
+                    descr: 'Free Cooling Capacity Usage'
+                    index: 'lgpEnvStateFreeCoolingCapacity.{{ $index }}'
+                    skip_values: 4294967295
+                -
+                    oid: lgpEnvStateDehumidifyingCapacity
+                    value: lgpEnvStateDehumidifyingCapacity
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.18.{{ $index }}'
+                    descr: 'Dehumidifying Capacity Usage'
+                    index: 'lgpEnvStateDehumidifyingCapacity.{{ $index }}'
+                    skip_values: 4294967295
+                -
+                    oid: lgpEnvStateHumidifyingCapacity
+                    value: lgpEnvStateHumidifyingCapacity
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.19.{{ $index }}'
+                    descr: 'Humidifying Capacity Usage'
+                    index: 'lgpEnvStateHumidifyingCapacity.{{ $index }}'
+                    skip_values: 4294967295
+        power_factor:
+            data:
+                -
+                    oid: lgpPwrLineMeasurementTable
+                    value: lgpPwrLineMeasurementPowerFactor
+                    divisor: 100
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.14.{{ $index }}'
+                    descr: '{{ $lgpPwrMeasurementPoint }}.{{ $index }}'
+                    index: 'lgpPwrLineMeasurementPowerFactor.{{ $index }}'
+                -
+                    oid: lgpPduRcpTable
+                    value: lgpPduRcpEntryPf
+                    divisor: 100
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.75.{{ $index }}'
+                    descr: 'Power Factor {{ $lgpPduRcpEntryUsrLabel }}'
+                    index: 'lgpPduRcpEntryPf.{{ $index }}'
+                -
+                    oid: lgpPduPsTable
+                    value: lgpPduPsEntryPfTotal
+                    divisor: 100
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.95.{{ $index }}'
+                    descr: 'Power Factor Total {{ $lgpPduPsEntryModel }}'
+                    index: 'lgpPduPsEntryPfTotal.{{ $index }}'

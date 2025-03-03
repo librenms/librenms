@@ -1,20 +1,29 @@
 <?php
 
+use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
-//NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ntp-client"
 $name = 'ntp-client';
-$app_id = $app['app_id'];
-$oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.116.112.45.99.108.105.101.110.116';
-$ntpclient = snmp_get($device, $oid, '-Oqv');
-$ntpclient = str_replace('"', '', $ntpclient);
-update_application($app, $ntpclient);
 
-echo ' '.$name;
+try {
+    $ntp = json_app_get($device, $name);
+} catch (JsonAppParsingFailedException $e) {
+    // Legacy script, build compatible array
+    $legacy = $e->getOutput();
 
-list ($offset, $frequency, $jitter, $noise, $stability) = explode("\n", $ntpclient);
+    $ntp = [
+        'data' => [],
+    ];
+    [$ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['sys_jitter'],
+        $ntp['data']['clk_jitter'], $ntp['data']['clk_wander']] = explode("\n", $legacy);
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
 
-$rrd_name = array('app', $name, $app_id);
+    return;
+}
+
 $rrd_def = RrdDefinition::make()
     ->addDataset('offset', 'GAUGE', -1000, 1000)
     ->addDataset('frequency', 'GAUGE', -1000, 1000)
@@ -22,13 +31,19 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('noise', 'GAUGE', -1000, 1000)
     ->addDataset('stability', 'GAUGE', -1000, 1000);
 
-$fields = array(
-    'offset' => $offset,
-    'frequency' => $frequency,
-    'jitter' => $jitter,
-    'noise' => $noise,
-    'stability' => $stability,
-);
+$fields = [
+    'offset' => $ntp['data']['offset'],
+    'frequency' => $ntp['data']['frequency'],
+    'jitter' => $ntp['data']['sys_jitter'],
+    'noise' => $ntp['data']['clk_jitter'],
+    'stability' => $ntp['data']['clk_wander'],
+];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
+update_application($app, 'OK', $fields);

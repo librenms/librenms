@@ -1,0 +1,1493 @@
+-- *****************************************************************
+-- DLINKSW-IPMCAST-EXT-MIB: D-Link IP Multicast Extension MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+
+DLINKSW-IPMCAST-EXT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32
+            FROM SNMPv2-SMI   
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        RowStatus, DisplayString, TruthValue	
+		    FROM SNMPv2-TC   
+        InetAddressType, InetAddress, InetAddressPrefixLength, InetVersion
+            FROM INET-ADDRESS-MIB  
+        InterfaceIndex, InterfaceIndexOrZero
+            FROM IF-MIB
+	  VlanId
+        		FROM Q-BRIDGE-MIB        
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+    dlinkSwIpMcastExtMIB MODULE-IDENTITY
+        LAST-UPDATED    "201408010000Z"
+        ORGANIZATION    "D-Link Corp."
+        CONTACT-INFO
+            "   D-Link Corporation
+
+                Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                        Taipei City 114, Taiwan, R.O.C
+                Tel:     +886-2-66000123
+                E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for managing IP Multicast."
+
+        REVISION        "201305020000Z"
+        DESCRIPTION
+            "Initial revision of this MIB module."
+ 
+        REVISION        "201406160000Z"
+        DESCRIPTION
+            "Modify 'dIpmcExtStaticMrouteTable ', 'dIpmcExtRpfTable',dIpmcExtGrpOutgoingPortTable 
+             and 'dIpmcExtGrpOutgoingPortTable'.
+             Modify the description of objects in 'dIpmcExtIgmpIfStatTable', 'dIpmcExtPimIfStatTable', 
+             and 'dIpmcExtDvmrpIfStatTable'."
+
+        REVISION        "201407180000Z"
+	DESCRIPTION 
+		"Modify the OID of all rowstatus objects to 99."   
+		
+	REVISION        "201408010000Z"
+	DESCRIPTION 
+		"Remove objects IpmcExtStaticMrouteDistance and dIpmcExtRpfDistance because 
+		we don¡¯t have plan to implement these objects now.
+		Add the description for setting the value of dIpmcExtStaticMrouteRpfAddr to zero."  	
+        ::= { dlinkIndustrialCommon 55 }
+
+--
+-- Node definitions
+--
+
+    dIpmcExtNotifications OBJECT IDENTIFIER ::= { dlinkSwIpMcastExtMIB 0 }
+    dIpmcExtObjects       OBJECT IDENTIFIER ::= { dlinkSwIpMcastExtMIB 1 }
+    dIpmcExtConformance   OBJECT IDENTIFIER ::= { dlinkSwIpMcastExtMIB 2 }
+
+-- -----------------------------------------------------------------------------		
+    dIpmcExtMcastRouteEnabled OBJECT-TYPE
+        SYNTAX          BITS  {
+            ipv4(0),
+            ipv6(1)
+        } 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION           
+            "This object indicates whether the specific multicast routing is
+            enabled. This is the enhancement of the ipMcastEnabled in IPMCAST-MIB. 
+            If ipv4(0) bit is set to 1, then IPv4 multicast routing is enabled; 
+            If ipv6(1) bit is set to 1, then IPv6 multicast routing is enabled.
+            " 
+        ::= { dIpmcExtObjects 1 }
+
+    dIpmcExtIpv4McastTableLookupMode OBJECT-TYPE
+        SYNTAX          INTEGER {
+            ip(1),
+            mac(2)
+        } 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION           
+            "This object indicates the lookup mode of IPv4 multicast forwarding table. 
+            'ip' - forwarding IP multicast packets based on IP.
+            'mac' - forwarding IP multicast packets based on MAC.
+            "
+        ::= { dIpmcExtObjects 2 }    
+      
+-- -----------------------------------------------------------------------------
+    dIpmcExtClearStatisticsObjects  OBJECT IDENTIFIER    ::= { dIpmcExtObjects 3 }
+
+    dIpmcExtClearStatistics OBJECT-TYPE
+        SYNTAX           BITS  {
+            igmp(0),
+            pim(1),
+            dvmrp(2)
+        } 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to clear the multicast protocol packet statistics 
+            when set to the corresponding bit to '1'.        
+            When read, '00'H (no enumerated values are set) is returned."
+        ::= { dIpmcExtClearStatisticsObjects 1 }
+       
+-- -----------------------------------------------------------------------------      
+    dIpmcExtBoundaryTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpmcExtBoundaryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains a list of interface-specific configuration about 
+            access lists to avoid leaking of the limited scoped multicast traffic
+            in private domain across the domain boundary interfaces."            
+        ::= { dIpmcExtObjects 4 }
+
+    dIpmcExtBoundaryEntry OBJECT-TYPE
+        SYNTAX          DIpmcExtBoundaryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is used to avoid leaking of the limited scoped multicast 
+            traffic in private domain across the domain boundary interfaces."
+           
+        INDEX { 
+            dIpmcExtBoundaryVersion,
+            dIpmcExtBoundaryIfIdx,
+            dIpmcExtBoundaryAccessList,
+            dIpmcExtBoundaryApplyDirection 
+        }        
+        ::= { dIpmcExtBoundaryTable 1 }
+
+    DIpmcExtBoundaryEntry ::= SEQUENCE {
+        dIpmcExtBoundaryVersion         InetVersion,
+        dIpmcExtBoundaryIfIdx           InterfaceIndex,
+        dIpmcExtBoundaryAccessList      DisplayString,
+        dIpmcExtBoundaryApplyDirection  INTEGER,
+        dIpmcExtBoundaryRowStatus       RowStatus
+    }
+    
+    dIpmcExtBoundaryVersion OBJECT-TYPE
+        SYNTAX          InetVersion 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP protocol version of the entry.
+            "                         
+        ::= { dIpmcExtBoundaryEntry 1 }
+
+    dIpmcExtBoundaryIfIdx OBJECT-TYPE
+        SYNTAX          InterfaceIndex 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the entry.
+            Only VLAN interface is valid.
+            "                         
+        ::= { dIpmcExtBoundaryEntry 2 }
+
+    dIpmcExtBoundaryAccessList OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of a standard IP access list which
+            includes a list of permit or denied (*,G) or (S,G) entries."                         
+        ::= { dIpmcExtBoundaryEntry 3 }
+
+    dIpmcExtBoundaryApplyDirection OBJECT-TYPE
+        SYNTAX      INTEGER{ 
+            inbound(1),
+            outbound(2)         
+       	}
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           	"The filtering setting for inbound direction filters the multicast 
+           	user traffic arriving at the interface based on the specified 
+           	access list. 
+           	The filtering setting for outbound direction filters the PIM join 
+           	message or IGMP join message arrive at the interface based on the 
+           	specified access list."            	
+	    ::= { dIpmcExtBoundaryEntry 4 }
+	   
+    dIpmcExtBoundaryRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows."            
+        ::= { dIpmcExtBoundaryEntry 99 }
+   
+-- ----------------------------------------------------------------------------- 
+    dIpmcExtStaticMrouteTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpmcExtStaticMrouteEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of static multicast routes."            
+        ::= { dIpmcExtObjects 5 }
+
+    dIpmcExtStaticMrouteEntry OBJECT-TYPE
+        SYNTAX          DIpmcExtStaticMrouteEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is used to configure a static multicast route."
+        INDEX { 
+            dIpmcExtStaticMrouteSrcNetType,
+            dIpmcExtStaticMrouteSrcNetAddr,
+            dIpmcExtStaticMrouteSrcNetPreLen
+        }        
+        ::= { dIpmcExtStaticMrouteTable 1 }
+ 
+    DIpmcExtStaticMrouteEntry  ::= SEQUENCE {
+        dIpmcExtStaticMrouteSrcNetType          InetAddressType,
+        dIpmcExtStaticMrouteSrcNetAddr          InetAddress,
+        dIpmcExtStaticMrouteSrcNetPreLen        InetAddressPrefixLength,
+        dIpmcExtStaticMrouteRpfType             INTEGER,
+        dIpmcExtStaticMrouteRpfAddr             InetAddress,
+        dIpmcExtStaticMrouteRpfIfIndex          InterfaceIndexOrZero,
+        dIpmcExtStaticMrouteRowStatus           RowStatus
+    }
+    
+    dIpmcExtStaticMrouteSrcNetType  OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the address type of the multicast source
+            network."
+        ::= { dIpmcExtStaticMrouteEntry 1 }
+    
+    dIpmcExtStaticMrouteSrcNetAddr  OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the address of the multicast source network."
+        ::= { dIpmcExtStaticMrouteEntry 2 }
+    
+    dIpmcExtStaticMrouteSrcNetPreLen  OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the prefix length of the multicast source
+            network."
+        ::= { dIpmcExtStaticMrouteEntry 3 }
+
+    dIpmcExtStaticMrouteRpfType  OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            neighborAddr(1),
+            interfaceId(2)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of the RPF (Reverse Path Forwarding).
+            neighborAddr - The RPF address for the route, a lookup in the 
+                           routing table will be done to resolve the RPF 
+                           interface.
+            interfaceId - The interface which the reverse path forwarding to reach the
+                           network. 
+            "
+        ::= { dIpmcExtStaticMrouteEntry 4 }
+
+    dIpmcExtStaticMrouteRpfAddr  OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the address of the RPF neighbor router.
+             This object is meaningful when dIpmcExtStaticMrouteRpfType is
+            'neighborAddr'.
+             If the value of this obejct is set to zero, it indicates that 
+             RPF check will be always failed for multicast traffic sent from
+             the source network specified by this static multicast route.
+             The InetAddressType, e.g., IPv4 or IPv6, is identified by the 
+             dIpmcExtStaticMrouteSrcNetType variable in the dIpmcExtStaticMrouteTable
+	     table.
+            "
+        ::= { dIpmcExtStaticMrouteEntry 5 } 
+   
+    dIpmcExtStaticMrouteRpfIfIndex  OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface where the RPF
+            neighbor IP address is located. When set this object to ifIndex of 
+            null0, the RPF check result will always fail.
+            This object is meaningful when dIpmcExtStaticMrouteRpfType is
+            'interfaceId'.
+            "
+        ::= { dIpmcExtStaticMrouteEntry 6 } 
+
+    dIpmcExtStaticMrouteRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this row, by which rows in this table can
+            be created and destroyed.
+            "
+        ::= { dIpmcExtStaticMrouteEntry 99 }
+
+-- ----------------------------------------------------------------------------- 
+    dIpmcExtCtrlPktCpuFilterTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpmcExtCtrlPktCpuFilterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of information to filter layer 3 control
+            packets. An entry appears in this table for each interface on which 
+            the filtering is configurable."            
+        ::= { dIpmcExtObjects 6 }
+
+    dIpmcExtCtrlPktCpuFilterEntry OBJECT-TYPE
+        SYNTAX          DIpmcExtCtrlPktCpuFilterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry identifies the layer 3 control packets filtering on a capable
+            interface."           
+        INDEX { dIpmcExtCtrlPktCpuFilterIfIdx }        
+        ::= { dIpmcExtCtrlPktCpuFilterTable 1 }
+
+    DIpmcExtCtrlPktCpuFilterEntry ::= SEQUENCE {
+        dIpmcExtCtrlPktCpuFilterIfIdx       InterfaceIndex,
+        dIpmcExtCtrlPktCpuFilterV4Proto     BITS,
+        dIpmcExtCtrlPktCpuFilterV6Proto     BITS
+    }
+
+    dIpmcExtCtrlPktCpuFilterIfIdx OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The ifIndex value that uniquely identifies the interface to which 
+            this entry is applicable."            
+        ::= { dIpmcExtCtrlPktCpuFilterEntry 1 }
+
+    dIpmcExtCtrlPktCpuFilterV4Proto OBJECT-TYPE
+        SYNTAX          BITS {
+            dvmrp(0),
+            pim(1),
+            igmpQuery(2),
+            ospf(3),
+            rip(4),
+            vrrp(5)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the IPv4 layer 3 control packets is
+            filtered then not sent to the corresponding protocol stack. When 
+            the bit is '1', the corresponding IPv4 layer 3 control packets will
+            be filtered.
+            "        
+        ::= { dIpmcExtCtrlPktCpuFilterEntry 2 }
+	   
+     dIpmcExtCtrlPktCpuFilterV6Proto OBJECT-TYPE
+        SYNTAX          BITS {            
+            pim(0),
+            mldQuery(1),
+            ospf(2),
+            ripng(3),
+            nd(4)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the IPv6 layer 3 control packets is
+            filtered then not sent to the corresponding protocol stack. When 
+            the bit is '1', the corresponding IPv6 layer 3 control packets will
+            be filtered.
+            "        
+        ::= { dIpmcExtCtrlPktCpuFilterEntry 3 }
+
+-- -----------------------------------------------------------------------------      
+    dIpmcExtCtrlPktReplacePriTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpmcExtCtrlPktReplacePriEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of Priority and DSCP values  
+            of control packets which are forwarded by software."            
+        ::= { dIpmcExtObjects 7 }
+
+    dIpmcExtCtrlPktReplacePriEntry OBJECT-TYPE
+        SYNTAX          DIpmcExtCtrlPktReplacePriEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry consists of the Priority and DSCP values configured for 
+            a protocol."           
+        INDEX { dIpmcExtCtrlPktRepPriPotocol }
+        
+        ::= { dIpmcExtCtrlPktReplacePriTable 1 }
+
+    DIpmcExtCtrlPktReplacePriEntry ::= SEQUENCE {       
+        dIpmcExtCtrlPktRepPriPotocol     INTEGER,
+        dIpmcExtCtrlPktRepDscp           Integer32,
+        dIpmcExtCtrlPktRepPriority       Integer32,        
+        dIpmcExtCtrlPktRepPriRowStatus   RowStatus
+    }
+   
+    dIpmcExtCtrlPktRepPriPotocol OBJECT-TYPE
+        SYNTAX          INTEGER {
+            v4dvmrp(1),
+            v4pim(2),
+            igmpQuery(3),
+            v4ospf(4),
+            rip(5),
+            v4vrrp(6),
+            v6pim(7),
+            mld(8),
+            v6ospf(9),
+            ripng(10),
+            nd(11)           
+        }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the protocol type of the entry.
+            "
+        ::= { dIpmcExtCtrlPktReplacePriEntry 1 }
+    
+    dIpmcExtCtrlPktRepDscp  OBJECT-TYPE
+        SYNTAX          Integer32 ( -1 | 0..63)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the DSCP value to replace the DSCP field of
+            the protocol control packets.        
+            The value of -1 indicates the replacing DSCP is not enabled.   
+            "
+        DEFVAL { -1 }
+        ::= { dIpmcExtCtrlPktReplacePriEntry 2 }
+ 
+    dIpmcExtCtrlPktRepPriority  OBJECT-TYPE
+        SYNTAX          Integer32 (-1 | 0..7)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Priority value to replace the Priority
+            field of the protocol control packets.
+            The value of -1 indicates the replacing Priority is not enabled.
+            "            
+        ::= { dIpmcExtCtrlPktReplacePriEntry 3 }
+            	   
+    dIpmcExtCtrlPktRepPriRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows."            
+        ::= { dIpmcExtCtrlPktReplacePriEntry 99 }
+
+-- -----------------------------------------------------------------------------        
+    dIpmcExtRpfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpmcExtRpfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of Reverse Path Forwarding (RPF) information."
+            
+        ::= { dIpmcExtObjects 8 }
+
+    dIpmcExtRpfEntry OBJECT-TYPE
+        SYNTAX          DIpmcExtRpfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry consists of Reverse Path Forwarding (RPF) information."
+            
+        INDEX { 
+            dIpmcExtRpfAddrType,
+            dIpmcExtRpfAddr,
+            dIpmcExtRpfRouteAddr,
+            dIpmcExtRpfRoutePrefixLen
+        }
+        ::= { dIpmcExtRpfTable 1 }
+
+    DIpmcExtRpfEntry ::= SEQUENCE {
+        dIpmcExtRpfAddrType             InetAddressType,
+        dIpmcExtRpfAddr                 InetAddress,
+        dIpmcExtRpfRouteAddr            InetAddress,              
+        dIpmcExtRpfRoutePrefixLen       InetAddressPrefixLength,
+        dIpmcExtRpfIfIndex              InterfaceIndexOrZero,  
+        dIpmcExtRpfNeighborAddr         InetAddress,
+        dIpmcExtRpfType                 INTEGER,
+        dIpmcExtRpfMetricValid          TruthValue, 
+        dIpmcExtRpfMetric               Unsigned32
+    }
+    
+    dIpmcExtRpfAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of the RPF address.
+            "
+        ::= { dIpmcExtRpfEntry 1 }
+                
+    dIpmcExtRpfAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the RPF address of the entry.
+            "
+        ::= { dIpmcExtRpfEntry 2 }
+
+    dIpmcExtRpfRouteAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the route that matched
+            against the source.
+             The InetAddressType, e.g., IPv4 or IPv6, is identified by the 
+             dIpmcExtRpfAddrType variable in the dIpmcExtRpfTable table.
+            "
+        ::= { dIpmcExtRpfEntry 3 }
+ 
+    dIpmcExtRpfRoutePrefixLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the prefix length of the route that matched
+            against the source.
+            "
+        ::= { dIpmcExtRpfEntry 4}
+    
+    dIpmcExtRpfIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface where the RPF
+            neighbor IP address is located.
+            A value of 0 indicates that this object is not applicable."
+        ::= { dIpmcExtRpfEntry 5 }
+
+    dIpmcExtRpfNeighborAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the RPF neighbor address.
+             The InetAddressType, e.g., IPv4 or IPv6, is identified by the 
+             dIpmcExtRpfAddrType variable in the dIpmcExtRpfTable table.
+            "
+        ::= { dIpmcExtRpfEntry 6 } 
+        
+    dIpmcExtRpfType OBJECT-TYPE
+        SYNTAX          INTEGER {
+            unicast(1),
+            static(2)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the origination of RPF information."        
+        ::= { dIpmcExtRpfEntry 7 }
+   
+    dIpmcExtRpfMetricValid  OBJECT-TYPE    
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the dIpmcExtRpfMetric of the entry
+            is applicable."            
+        ::= { dIpmcExtRpfEntry 9 }   
+   
+    dIpmcExtRpfMetric  OBJECT-TYPE
+        SYNTAX          Unsigned32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the unicast routing metric. 
+            "            
+        ::= { dIpmcExtRpfEntry 10 }
+
+-- -----------------------------------------------------------------------------           			
+    dIpmcExtGrpOutgoingPortTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpmcExtGrpOutgoingPortEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table containing information on the outgoing ports for
+            IP multicast datagrams."
+        ::= { dIpmcExtObjects 9 }
+
+    dIpmcExtGrpOutgoingPortEntry OBJECT-TYPE
+        SYNTAX          DIpmcExtGrpOutgoingPortEntry
+        MAX-ACCESS      not-accessible
+        STATUS     current
+        DESCRIPTION
+            "An entry contains the information about outgoing port 
+            to which IP multicast datagrams from particular sources 
+            to an IP multicast group address.
+            "
+        INDEX      { 
+            dIpmcExtGrpOutgoingAddrType,
+	     dIpmcExtGrpOutgoingVlanIndex,
+            dIpmcExtGrpOutgoingGroupAddr,
+            dIpmcExtGrpOutgoingPfxLen,
+            dIpmcExtGrpOutgoingSrcAddr,
+            dIpmcExtGrpOutgoingSrcPfxLen,
+            dIpmcExtGrpOutgoingPort
+        }
+        ::= { dIpmcExtGrpOutgoingPortTable 1 }
+
+
+    DIpmcExtGrpOutgoingPortEntry ::= SEQUENCE {
+        dIpmcExtGrpOutgoingAddrType          InetAddressType,
+        dIpmcExtGrpOutgoingVlanIndex           VlanId,
+        dIpmcExtGrpOutgoingGroupAddr            InetAddress,
+        dIpmcExtGrpOutgoingPfxLen               InetAddressPrefixLength,
+        dIpmcExtGrpOutgoingSrcAddr              InetAddress,
+        dIpmcExtGrpOutgoingSrcPfxLen            InetAddressPrefixLength,
+        dIpmcExtGrpOutgoingPort                 InterfaceIndex    
+    }
+
+    dIpmcExtGrpOutgoingAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A value indicating the address type of the group address
+            "
+        ::= { dIpmcExtGrpOutgoingPortEntry 1 }
+
+    dIpmcExtGrpOutgoingVlanIndex  OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This indicates the VLAN ID of the entry."
+        ::= { dIpmcExtGrpOutgoingPortEntry 2 }
+
+   dIpmcExtGrpOutgoingGroupAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The IP multicast group address of the entry.
+            "
+        ::= { dIpmcExtGrpOutgoingPortEntry 3 }
+
+    dIpmcExtGrpOutgoingPfxLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The length in bits of the multicast group address.
+            "
+        ::= { dIpmcExtGrpOutgoingPortEntry 4 }
+
+    dIpmcExtGrpOutgoingSrcAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A value indicating the source address.
+               The InetAddressType, e.g., IPv4 or IPv6, is identified by the 
+	       dIpmcExtGrpOutgoingAddrType variable in the dIpmcExtGrpOutgoingPortTable table.
+            "            
+        ::= { dIpmcExtGrpOutgoingPortEntry 5 }
+
+    dIpmcExtGrpOutgoingSrcPfxLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The length in bits of the source address.
+            "
+        ::= { dIpmcExtGrpOutgoingPortEntry 6 }
+
+    dIpmcExtGrpOutgoingPort OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the outgpoing port.
+            "
+        ::= { dIpmcExtGrpOutgoingPortEntry 7 }
+
+-- -----------------------------------------------------------------------------      
+    dIpmcExtStatisticsObjects  OBJECT IDENTIFIER    ::= { dIpmcExtObjects 10 }
+
+    dIpmcExtIgmpPortIfStatTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpmcExtIgmpPortIfStatEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains a list of statistics about IGMP."            
+        ::= { dIpmcExtStatisticsObjects 1 }
+
+    dIpmcExtIgmpPortIfStatEntry OBJECT-TYPE
+        SYNTAX          DIpmcExtIgmpPortIfStatEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dIpmcExtIgmpPortIfStatTable."
+        INDEX  { 
+            dIpmcExtIgmpPortIfIndex            
+        }
+        ::= { dIpmcExtIgmpPortIfStatTable 1 }
+ 
+    DIpmcExtIgmpPortIfStatEntry ::=         SEQUENCE {
+        dIpmcExtIgmpPortIfIndex		        InterfaceIndex,        
+        dIpmcExtIgmpPortIfV1RxReport        Counter32,
+        dIpmcExtIgmpPortIfV1RxQuery         Counter32,
+        dIpmcExtIgmpPortIfV1TxReport        Counter32,
+        dIpmcExtIgmpPortIfV1TxQuery         Counter32,
+        dIpmcExtIgmpPortIfV2RxReport        Counter32,
+        dIpmcExtIgmpPortIfV2RxQuery         Counter32,
+        dIpmcExtIgmpPortIfV2RxLeave         Counter32,
+        dIpmcExtIgmpPortIfV2TxReport        Counter32,
+        dIpmcExtIgmpPortIfV2TxQuery         Counter32,
+        dIpmcExtIgmpPortIfV2TxLeave         Counter32,
+        dIpmcExtIgmpPortIfV3RxReport        Counter32,
+        dIpmcExtIgmpPortIfV3RxQuery         Counter32,
+        dIpmcExtIgmpPortIfV3TxReport        Counter32,
+        dIpmcExtIgmpPortIfV3TxQuery         Counter32,
+        dIpmcExtIgmpPortIfRxUnknown         Counter32,
+        dIpmcExtIgmpPortIfTxUnknown         Counter32
+    }
+
+    dIpmcExtIgmpPortIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex."
+        ::= { dIpmcExtIgmpPortIfStatEntry 1 }
+  	
+    dIpmcExtIgmpPortIfV1RxReport OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received IGMP v1 Report."
+        ::= { dIpmcExtIgmpPortIfStatEntry 2 }
+
+    dIpmcExtIgmpPortIfV1RxQuery OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received IGMP v1 Query packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 3 }
+    
+    dIpmcExtIgmpPortIfV1TxReport OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted IGMP v1 Report packets ."
+        ::= { dIpmcExtIgmpPortIfStatEntry 4 }
+        
+    dIpmcExtIgmpPortIfV1TxQuery OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted IGMP v1 Query packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 5 }
+    
+    dIpmcExtIgmpPortIfV2RxReport OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received IGMP v2 Report packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 6 }
+
+    dIpmcExtIgmpPortIfV2RxQuery OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received IGMP v2 Query packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 7 }
+    
+    dIpmcExtIgmpPortIfV2RxLeave OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received IGMP v2 Leave packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 8 }
+        
+    dIpmcExtIgmpPortIfV2TxReport OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "This indicates the number of transmitted IGMP v2 Report packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 9 }
+        
+    dIpmcExtIgmpPortIfV2TxQuery OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted IGMP v2 Query packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 10 }
+    
+    dIpmcExtIgmpPortIfV2TxLeave OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted IGMP v2 Leave packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 11 }
+        
+    dIpmcExtIgmpPortIfV3RxReport OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received IGMP v3 Report packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 12 }
+
+    dIpmcExtIgmpPortIfV3RxQuery OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received IGMP v3 Query packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 13 }
+    
+    dIpmcExtIgmpPortIfV3TxReport OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+             "This indicates the number of transmitted IGMP v3 Report packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 14 }
+        
+    dIpmcExtIgmpPortIfV3TxQuery OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of transmitted IGMP v3 Query packets."
+        ::= { dIpmcExtIgmpPortIfStatEntry 15 }        
+    
+     dIpmcExtIgmpPortIfRxUnknown OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of received IGMP packets which cannot
+             be classified into current message type."
+        ::= { dIpmcExtIgmpPortIfStatEntry 16 }       
+      
+     dIpmcExtIgmpPortIfTxUnknown OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "This indicates the number of transmitted IGMP packets which cannot
+             be classified into current message type."
+        ::= { dIpmcExtIgmpPortIfStatEntry 17 }    
+            
+-- -----------------------------------------------------------------------------
+    dIpmcExtPimPortIfStatTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpmcExtPimPortIfStatEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains a list of statistics about PIM."            
+        ::= { dIpmcExtStatisticsObjects 2 }
+
+    dIpmcExtPimPortIfStatEntry OBJECT-TYPE
+        SYNTAX          DIpmcExtPimPortIfStatEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dIpmcExtPimPortIfStatTable."
+        INDEX  { 
+            dIpmcExtPimPortIfIndex,
+            dIpmcExtPimPortIfVersion 
+        }
+        ::= { dIpmcExtPimPortIfStatTable 1 }
+ 
+    DIpmcExtPimPortIfStatEntry ::=         SEQUENCE {
+        dIpmcExtPimPortIfIndex		       InterfaceIndex,        
+        dIpmcExtPimPortIfVersion           InetVersion,
+        dIpmcExtPimPortIfRxHello           Counter32,
+        dIpmcExtPimPortIfTxHello           Counter32,
+        dIpmcExtPimPortIfRxRegister        Counter32,
+        dIpmcExtPimPortIfTxRegister        Counter32,
+        dIpmcExtPimPortIfRxRegisterStop    Counter32,
+        dIpmcExtPimPortIfTxRegisterStop    Counter32,
+        dIpmcExtPimPortIfRxJoinPrune       Counter32,
+        dIpmcExtPimPortIfTxJoinPrune       Counter32,
+        dIpmcExtPimPortIfRxBootstrap       Counter32,
+        dIpmcExtPimPortIfTxBootstrap       Counter32,
+        dIpmcExtPimPortIfRxAssert          Counter32,
+        dIpmcExtPimPortIfTxAssert          Counter32,
+        dIpmcExtPimPortIfRxGraft           Counter32,
+        dIpmcExtPimPortIfTxGraft           Counter32,
+        dIpmcExtPimPortIfRxGraftAck        Counter32, 
+        dIpmcExtPimPortIfTxGraftAck        Counter32,
+        dIpmcExtPimPortIfRxCRpAdv          Counter32,
+        dIpmcExtPimPortIfTxCRpAdv          Counter32,
+        dIpmcExtPimPortIfRxStateRefresh    Counter32,
+        dIpmcExtPimPortIfTxStateRefresh    Counter32,
+        dIpmcExtPimPortIfRxUnknown         Counter32,
+        dIpmcExtPimPortIfTxUnknown         Counter32      
+    }
+
+    dIpmcExtPimPortIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex."
+        ::= { dIpmcExtPimPortIfStatEntry 1 }
+
+    dIpmcExtPimPortIfVersion OBJECT-TYPE
+        SYNTAX          InetVersion
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the IP protocol version of the entry."
+        ::= { dIpmcExtPimPortIfStatEntry 2 }
+
+    dIpmcExtPimPortIfRxHello OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM Hello packets."
+        ::= { dIpmcExtPimPortIfStatEntry 3 }
+   
+    dIpmcExtPimPortIfTxHello OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM Hello packets."
+        ::= { dIpmcExtPimPortIfStatEntry 4 }
+
+    dIpmcExtPimPortIfRxRegister OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM Register packets."
+        ::= { dIpmcExtPimPortIfStatEntry 5 }
+   
+    dIpmcExtPimPortIfTxRegister OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM Register packets."
+        ::= { dIpmcExtPimPortIfStatEntry 6 }
+
+    dIpmcExtPimPortIfRxRegisterStop OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM Register-Stop packets."
+        ::= { dIpmcExtPimPortIfStatEntry 7 }
+   
+    dIpmcExtPimPortIfTxRegisterStop OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM Register-Stop packets."
+        ::= { dIpmcExtPimPortIfStatEntry 8 }
+
+    dIpmcExtPimPortIfRxJoinPrune OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM Join/Prune packets."
+        ::= { dIpmcExtPimPortIfStatEntry 9 }
+   
+    dIpmcExtPimPortIfTxJoinPrune OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM Join/Prune packets."
+        ::= { dIpmcExtPimPortIfStatEntry 10 }
+
+    dIpmcExtPimPortIfRxBootstrap OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM Bootstrap packets."
+        ::= { dIpmcExtPimPortIfStatEntry 11 }
+   
+    dIpmcExtPimPortIfTxBootstrap OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM Bootstrap packets."
+        ::= { dIpmcExtPimPortIfStatEntry 12 }
+  
+    dIpmcExtPimPortIfRxAssert OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM Assert packets."
+        ::= { dIpmcExtPimPortIfStatEntry 13 }
+   
+    dIpmcExtPimPortIfTxAssert OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM Assert packets."
+        ::= { dIpmcExtPimPortIfStatEntry 14 }
+    
+    dIpmcExtPimPortIfRxGraft OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM Graft packets."
+        ::= { dIpmcExtPimPortIfStatEntry 15 }
+   
+    dIpmcExtPimPortIfTxGraft OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM Graft packets."
+        ::= { dIpmcExtPimPortIfStatEntry 16 }
+
+    dIpmcExtPimPortIfRxGraftAck OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM Graft-Ack packets."
+        ::= { dIpmcExtPimPortIfStatEntry 17 }
+   
+    dIpmcExtPimPortIfTxGraftAck OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM Graft-Ack packets."
+        ::= { dIpmcExtPimPortIfStatEntry 18 }
+
+    dIpmcExtPimPortIfRxCRpAdv OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM Candidate-RP-Advertisement
+            packets."
+        ::= { dIpmcExtPimPortIfStatEntry 19 }
+   
+    dIpmcExtPimPortIfTxCRpAdv OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM Candidate-RP-Advertisement
+            packets."
+        ::= { dIpmcExtPimPortIfStatEntry 20 }
+
+    dIpmcExtPimPortIfRxStateRefresh OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM-DM State Refresh packets."
+        ::= { dIpmcExtPimPortIfStatEntry 21 }
+   
+    dIpmcExtPimPortIfTxStateRefresh OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM-DM State Refresh 
+            packets."
+        ::= { dIpmcExtPimPortIfStatEntry 22 }
+
+    dIpmcExtPimPortIfRxUnknown OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM packets which cannot
+             be classified into current message type."
+        ::= { dIpmcExtPimPortIfStatEntry 23 }
+   
+    dIpmcExtPimPortIfTxUnknown OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted IGMP packets which cannot
+             be classified into current message type."
+        ::= { dIpmcExtPimPortIfStatEntry 24 }
+
+-- -----------------------------------------------------------------------------
+    dIpmcExtDvmrpPortIfStatTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpmcExtDvmrpPortIfStatEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains a list of statistics about DVMRP."            
+        ::= { dIpmcExtStatisticsObjects 3 }
+
+    dIpmcExtDvmrpPortIfStatEntry OBJECT-TYPE
+        SYNTAX          DIpmcExtDvmrpPortIfStatEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in the dIpmcExtDvmrpPortIfStatTable."
+        INDEX  { 
+            dIpmcExtDvmrpPortIfIndex            
+        }
+        ::= { dIpmcExtDvmrpPortIfStatTable 1 }
+ 
+    DIpmcExtDvmrpPortIfStatEntry ::=         SEQUENCE {
+        dIpmcExtDvmrpPortIfIndex		   InterfaceIndex,                
+        dIpmcExtDvmrpPortIfRxProbe         Counter32,       
+        dIpmcExtDvmrpPortIfTxProbe         Counter32,
+        dIpmcExtDvmrpPortIfRxReport        Counter32,       
+        dIpmcExtDvmrpPortIfTxReport        Counter32,
+        dIpmcExtDvmrpPortIfRxPrune         Counter32,       
+        dIpmcExtDvmrpPortIfTxPrune         Counter32,
+        dIpmcExtDvmrpPortIfRxGraft         Counter32,       
+        dIpmcExtDvmrpPortIfTxGraft         Counter32,
+        dIpmcExtDvmrpPortIfRxGraftAck      Counter32,       
+        dIpmcExtDvmrpPortIfTxGraftAck      Counter32,                
+        dIpmcExtDvmrpPortIfRxUnknown       Counter32,
+        dIpmcExtDvmrpPortIfTxUnknown       Counter32
+    }
+
+    dIpmcExtDvmrpPortIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 1 }
+  	
+    dIpmcExtDvmrpPortIfRxProbe OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received DVMRP Probe packets."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 2 }
+
+    dIpmcExtDvmrpPortIfTxProbe OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted DVMRP Probe packets."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 3 }
+
+    dIpmcExtDvmrpPortIfRxReport OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received DVMRP Report packets."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 4 }
+
+    dIpmcExtDvmrpPortIfTxReport OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted DVMRP Report packets."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 5 }
+   
+    dIpmcExtDvmrpPortIfRxPrune OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received DVMRP Prune packets."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 6 }
+
+    dIpmcExtDvmrpPortIfTxPrune OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted DVMRP Prune packets."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 7 }
+
+    dIpmcExtDvmrpPortIfRxGraft OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received DVMRP Graft packets."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 8 }
+
+    dIpmcExtDvmrpPortIfTxGraft OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted DVMRP Graft packets."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 9 }
+
+    dIpmcExtDvmrpPortIfRxGraftAck OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received DVMRP Graft-Ack packets."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 10 }
+
+    dIpmcExtDvmrpPortIfTxGraftAck OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted DVMRP Graft-Ack packets."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 11 }
+
+    dIpmcExtDvmrpPortIfRxUnknown OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of received PIM packets which cannot
+             be classified into current message type."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 12 }
+   
+    dIpmcExtDvmrpPortIfTxUnknown OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This indicates the number of transmitted PIM packets which cannot
+             be classified into current message type."
+        ::= { dIpmcExtDvmrpPortIfStatEntry 13 }
+
+-- -----------------------------------------------------------------------------
+    dIpmcExtCompliances   OBJECT IDENTIFIER ::= { dIpmcExtConformance 1 }
+ 
+    dIpmcExtCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+            DLINKSW-IPMCAST-EXT-MIB."      		 
+        MODULE
+            MANDATORY-GROUPS {                
+                dIpmcExtGeneralCtrlGroup,
+                dIpmcExtBoundaryGroup,
+                dIpmcExtMrouteGroup,
+                dIpmcExtRpfGroup
+            }
+        
+        OBJECT          dIpmcExtIpv4McastTableLookupMode
+        MIN-ACCESS      read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        GROUP        dIpmcExtCtrlPktCpuFilterGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP        dIpmcExtCtrlPktReplacePriGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP        dIpmcExtOutgoingPortsInfoGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP        dIpmcExtClearStatisticsGroup
+        DESCRIPTION
+            "This group is optional."
+      
+        GROUP        dIpmcExtIgmpStatisticsGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP        dIpmcExtPimStatisticsGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP        dIpmcExtDvmrpStatisticsGroup
+        DESCRIPTION
+            "This group is optional."
+ 
+        ::= { dIpmcExtCompliances 1 }
+
+    dIpmcExtGroups   OBJECT IDENTIFIER ::= { dIpmcExtConformance 2 }      
+       
+    dIpmcExtClearStatisticsGroup OBJECT-GROUP
+        OBJECTS {
+            dIpmcExtClearStatistics                                                          
+        }
+        STATUS      current
+        DESCRIPTION           
+            "A collection of objects clears the statistics of multicast protocol
+            packets."
+        ::= { dIpmcExtGroups 1 }
+    
+     dIpmcExtGeneralCtrlGroup OBJECT-GROUP
+        OBJECTS {	   
+            dIpmcExtMcastRouteEnabled,
+            dIpmcExtIpv4McastTableLookupMode            
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects provides the multicast management."
+        ::= { dIpmcExtGroups 2 }
+
+    dIpmcExtBoundaryGroup OBJECT-GROUP
+        OBJECTS {	   
+            dIpmcExtBoundaryRowStatus
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects providing information for the system's 
+            multicast scope zone boundaries."
+        ::= { dIpmcExtGroups 3 }
+
+    dIpmcExtMrouteGroup OBJECT-GROUP
+        OBJECTS {	   
+            dIpmcExtStaticMrouteRpfType,
+            dIpmcExtStaticMrouteRpfAddr,
+            dIpmcExtStaticMrouteRpfIfIndex,
+            dIpmcExtStaticMrouteRowStatus                
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects provides the management of static multicast 
+            routes."
+        ::= { dIpmcExtGroups 4 }     
+    
+    dIpmcExtCtrlPktCpuFilterGroup OBJECT-GROUP
+        OBJECTS {	   
+            dIpmcExtCtrlPktCpuFilterV4Proto,
+            dIpmcExtCtrlPktCpuFilterV6Proto
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects providing information about the layer 3 
+            control packets filtering status."
+        ::= { dIpmcExtGroups 5 }
+        
+    dIpmcExtCtrlPktReplacePriGroup OBJECT-GROUP
+        OBJECTS {	   
+            dIpmcExtCtrlPktRepDscp,
+            dIpmcExtCtrlPktRepPriority,
+            dIpmcExtCtrlPktRepPriRowStatus          
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects providing information about the Priority 
+            and DSCP values configured for specific control protocols."
+        ::= { dIpmcExtGroups 6 }
+                   
+    dIpmcExtRpfGroup OBJECT-GROUP
+        OBJECTS {	   
+            dIpmcExtRpfIfIndex,
+            dIpmcExtRpfNeighborAddr,
+            dIpmcExtRpfType,
+            dIpmcExtRpfMetricValid, 
+            dIpmcExtRpfMetric               
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects provides information about the Reverse 
+            Path Forwarding (RPF) for IP multicast."
+        ::= { dIpmcExtGroups 7 }
+    
+    dIpmcExtOutgoingPortsInfoGroup OBJECT-GROUP
+        OBJECTS {	   
+            dIpmcExtGrpOutgoingPort          
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects provides outgoing ports information for  
+            multicast group address."
+        ::= { dIpmcExtGroups 8 }
+
+    dIpmcExtIgmpStatisticsGroup OBJECT-GROUP
+        OBJECTS {	   
+             dIpmcExtIgmpPortIfV1RxReport,                      
+             dIpmcExtIgmpPortIfV1RxQuery, 
+             dIpmcExtIgmpPortIfV1TxReport,
+             dIpmcExtIgmpPortIfV1TxQuery, 
+             dIpmcExtIgmpPortIfV2RxReport,
+             dIpmcExtIgmpPortIfV2RxQuery, 
+             dIpmcExtIgmpPortIfV2RxLeave, 
+             dIpmcExtIgmpPortIfV2TxReport,
+             dIpmcExtIgmpPortIfV2TxQuery, 
+             dIpmcExtIgmpPortIfV2TxLeave, 
+             dIpmcExtIgmpPortIfV3RxReport,
+             dIpmcExtIgmpPortIfV3RxQuery, 
+             dIpmcExtIgmpPortIfV3TxReport,
+             dIpmcExtIgmpPortIfV3TxQuery, 
+             dIpmcExtIgmpPortIfRxUnknown, 
+             dIpmcExtIgmpPortIfTxUnknown 
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects provides statistics information about the 
+            IGMP."
+        ::= { dIpmcExtGroups 9 }
+
+    dIpmcExtPimStatisticsGroup OBJECT-GROUP
+        OBJECTS {	                                          
+            dIpmcExtPimPortIfRxHello,        
+            dIpmcExtPimPortIfTxHello,        
+            dIpmcExtPimPortIfRxRegister,     
+            dIpmcExtPimPortIfTxRegister,     
+            dIpmcExtPimPortIfRxRegisterStop, 
+            dIpmcExtPimPortIfTxRegisterStop, 
+            dIpmcExtPimPortIfRxJoinPrune,    
+            dIpmcExtPimPortIfTxJoinPrune,    
+            dIpmcExtPimPortIfRxBootstrap,             
+            dIpmcExtPimPortIfTxBootstrap,    
+            dIpmcExtPimPortIfRxAssert,       
+            dIpmcExtPimPortIfTxAssert,       
+            dIpmcExtPimPortIfRxGraft,        
+            dIpmcExtPimPortIfTxGraft,        
+            dIpmcExtPimPortIfRxGraftAck,     
+            dIpmcExtPimPortIfTxGraftAck,     
+            dIpmcExtPimPortIfRxCRpAdv,       
+            dIpmcExtPimPortIfTxCRpAdv,       
+            dIpmcExtPimPortIfRxStateRefresh, 
+            dIpmcExtPimPortIfTxStateRefresh,
+            dIpmcExtPimPortIfRxUnknown,      
+            dIpmcExtPimPortIfTxUnknown                              
+        }   
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects provides statistics information about the 
+            PIM."
+        ::= { dIpmcExtGroups 10 }
+ 
+    dIpmcExtDvmrpStatisticsGroup OBJECT-GROUP
+        OBJECTS {	             
+            dIpmcExtDvmrpPortIfRxProbe,      
+            dIpmcExtDvmrpPortIfTxProbe,      
+            dIpmcExtDvmrpPortIfRxReport,                 
+            dIpmcExtDvmrpPortIfTxReport,      
+            dIpmcExtDvmrpPortIfRxPrune,       
+            dIpmcExtDvmrpPortIfTxPrune,       
+            dIpmcExtDvmrpPortIfRxGraft,       
+            dIpmcExtDvmrpPortIfTxGraft,       
+            dIpmcExtDvmrpPortIfRxGraftAck,    
+            dIpmcExtDvmrpPortIfTxGraftAck,    
+            dIpmcExtDvmrpPortIfRxUnknown,     
+            dIpmcExtDvmrpPortIfTxUnknown                                      
+        }   
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects provides statistics information about the 
+            DVMRP."
+        ::= { dIpmcExtGroups 11 }  
+END

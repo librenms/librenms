@@ -1,0 +1,193 @@
+--
+-- Juniper Enterprise Specific MIB: Structure of Management Information
+-- 
+-- Copyright (c) 2002-2008, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+JUNIPER-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+juniperMIB MODULE-IDENTITY
+    LAST-UPDATED "200910290000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+    DESCRIPTION
+            "The Structure of Management Information for Juniper Networks."
+    REVISION     "200910290000Z"    -- Oct 29, 2009
+    DESCRIPTION  
+             "Added jnxCosNotifications branch."
+    REVISION    "200304170100Z" -- 17-Apr-03
+    DESCRIPTION
+            "Added jnxExperiment branch."
+    REVISION    "200508170100Z" -- 17-Aug-05
+    DESCRIPTION
+            "Added jnxNsm branch."
+    REVISION    "200612140100Z" -- 14-Dec-06
+    DESCRIPTION
+            "Added jnxCA branch."
+    REVISION    "200701010000Z" -- 1-Jan-07
+    DESCRIPTION
+            "Added jnxUtilMibRoot branch."
+    REVISION    "200710090000Z" -- 9-Oct-07
+    DESCRIPTION
+            "Added jnxAdvancedInsightMgr branch."
+    ::= { enterprises 2636 }
+
+--
+-- Juniper MIB tree structure
+--
+
+jnxProducts OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "The root of Juniper's Product OIDs."
+    ::= { juniperMIB 1 }
+
+    --
+    -- Note, jnxProducts.1 is reserved for Junos-based products
+    --
+    -- The following OIDs are used as the basis for identifying other
+    -- Juniper products.
+    --
+    jnxReservedProducts1            OBJECT IDENTIFIER ::= { jnxProducts 2 }
+    jnxReservedProducts2            OBJECT IDENTIFIER ::= { jnxProducts 3 }
+    jnxReservedProducts3            OBJECT IDENTIFIER ::= { jnxProducts 4 }
+    jnxReservedProducts4            OBJECT IDENTIFIER ::= { jnxProducts 5 }
+    jnxReservedProducts5            OBJECT IDENTIFIER ::= { jnxProducts 6 }
+
+jnxServices OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+            "The root of Juniper's Services OIDs."
+    ::= { juniperMIB 2 }
+
+jnxMibs OBJECT-IDENTITY 
+    STATUS  current
+    DESCRIPTION
+            "The root of Juniper's MIB objects."
+    ::= { juniperMIB 3 }
+
+    --
+    -- Note, jnxMibs.1-38 is already in use.
+    --
+    jnxJsMibRoot               OBJECT IDENTIFIER ::= { jnxMibs 39 }
+    jnxExMibRoot               OBJECT IDENTIFIER ::= { jnxMibs 40 }
+    jnxWxMibRoot               OBJECT IDENTIFIER ::= { jnxMibs 41 }
+    jnxReservedMibs4           OBJECT IDENTIFIER ::= { jnxMibs 42 }
+    jnxReservedMibs5           OBJECT IDENTIFIER ::= { jnxMibs 43 }
+
+    -- PFE data
+    jnxPfeMibRoot              OBJECT IDENTIFIER ::= { jnxMibs 44 }
+
+    -- juniper Bfd Mib
+    jnxBfdMibRoot              OBJECT IDENTIFIER ::= { jnxMibs 45 }
+
+    -- XSTP mibs
+    jnxXstpMibs                OBJECT IDENTIFIER ::= { jnxMibs 46 }
+
+    -- juniper Utility Mib
+    jnxUtilMibRoot             OBJECT IDENTIFIER ::= { jnxMibs 47 }
+
+    -- juniper l2ald Mib
+    jnxl2aldMibRoot            OBJECT IDENTIFIER ::= { jnxMibs 48 } 
+
+    -- juniper L2tp Mib
+    jnxL2tpMibRoot             OBJECT IDENTIFIER ::= { jnxMibs 49 } 
+
+    -- juniper RPM Mib
+    jnxRpmMibRoot              OBJECT IDENTIFIER ::= { jnxMibs 50 }
+
+    -- juniper User AAA Mib
+    jnxUserAAAMibRoot          OBJECT IDENTIFIER ::= { jnxMibs 51 }
+
+    -- juniper Generic IPSEC MIB
+    jnxIpSecMibRoot            OBJECT IDENTIFIER ::= { jnxMibs 52 }
+
+    -- juniper L2 control protocols MIB
+    jnxL2cpMibRoot             OBJECT IDENTIFIER ::= { jnxMibs 53 }
+
+        -- juniper pwTDM MIB
+    jnxPwTdmMibRoot            OBJECT IDENTIFIER ::= { jnxMibs 54 }
+
+    -- juniper pwTC MIB
+    jnxPwTCMibRoot             OBJECT IDENTIFIER ::= { jnxMibs 55 }
+
+    -- juniper OTN MIB
+    jnxOtnMibRoot              OBJECT IDENTIFIER ::= { jnxMibs 56 }
+
+
+jnxTraps OBJECT-IDENTITY 
+    STATUS  current
+    DESCRIPTION
+            "The root of Juniper's Trap OIDs."
+    ::= { juniperMIB 4 }
+
+    jnxChassisTraps            OBJECT IDENTIFIER ::= { jnxTraps 1 }
+    jnxChassisOKTraps          OBJECT IDENTIFIER ::= { jnxTraps 2 }
+    jnxRmonTraps               OBJECT IDENTIFIER ::= { jnxTraps 3 }
+    jnxLdpTraps                OBJECT IDENTIFIER ::= { jnxTraps 4 }
+    jnxCmNotifications         OBJECT IDENTIFIER ::= { jnxTraps 5 }
+    jnxSonetNotifications      OBJECT IDENTIFIER ::= { jnxTraps 6 }
+    jnxPMonNotifications       OBJECT IDENTIFIER ::= { jnxTraps 7 }
+    jnxCollectorNotifications  OBJECT IDENTIFIER ::= { jnxTraps 8 }
+    jnxPingNotifications       OBJECT IDENTIFIER ::= { jnxTraps 9 }
+    jnxSpNotifications         OBJECT IDENTIFIER ::= { jnxTraps 10 }
+    jnxDfcNotifications        OBJECT IDENTIFIER ::= { jnxTraps 11 }
+    jnxSyslogNotifications     OBJECT IDENTIFIER ::= { jnxTraps 12 }
+    jnxEventNotifications      OBJECT IDENTIFIER ::= { jnxTraps 13 }
+    jnxVccpNotifications       OBJECT IDENTIFIER ::= { jnxTraps 14 }
+    jnxOtnNotifications        OBJECT IDENTIFIER ::= { jnxTraps 15 }
+    -- jnxSAIDPNotifications is for Stand alone IDP devices
+    jnxSAIDPNotifications      OBJECT IDENTIFIER ::= { jnxTraps 16 }
+    jnxCosNotifications        OBJECT IDENTIFIER ::= { jnxTraps 17 }
+
+
+--  This is the top-level object identifier registry used by Juniper
+--  products for SNMP modules containing experimental MIB definitions.
+--  In this context, experimental MIBs are defined as:
+--    1) IETF work-in-process MIBs which have not been assigned a permanent
+--       object identifier by the IANA.
+--    2) Juniper work-in-process MIBs that have not achieved final
+--       production quality or field experience.
+--   NOTE: Support for MIBs under the this OID subtree is temporary and
+--         changes to objects may occur without notice."
+
+jnxExperiment  OBJECT IDENTIFIER ::= { juniperMIB 5 }
+
+--
+--  This is the top-level object identifier registry used by Juniper
+--  NSM products.
+--
+jnxNsm OBJECT IDENTIFIER ::= { juniperMIB 6 }
+
+--
+--  This is the top-level object identifier registry used by the
+--  JuniperRoot Certificate Authority.
+--
+jnxCA OBJECT IDENTIFIER ::= { juniperMIB 7 }
+
+--
+-- This is the top-level object identifier registry used by the 
+-- Carrier AAA software product (Parksteet). 
+--
+jnxAAA OBJECT IDENTIFIER ::= { juniperMIB 8 }
+
+--
+-- This is the top-level object identifier registry used by the 
+-- Advanced Insight Manager. 
+--
+jnxAdvancedInsightMgr OBJECT IDENTIFIER ::= { juniperMIB 9 }
+
+END

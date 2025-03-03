@@ -1,0 +1,312 @@
+IBM-ELAN-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmlesrv.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Integer32, Counter32
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    TruthValue, DisplayString
+            FROM SNMPv2-TC-v1
+    elanConfEntry, lecsConfEntry, elanLesEntry
+            FROM LAN-EMULATION-ELAN-MIB
+    mssServerLanE, AtmPrivateAddrEsi, AtmSelector
+            FROM NWAYSMSS-MIB
+    AtmLaneAddress
+            FROM LAN-EMULATION-CLIENT-MIB;
+
+ibmElanMIB OBJECT IDENTIFIER ::= { mssServerLanE 4 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9701161200Z
+--  OrgName
+--    IBM Corporation
+--  ContactInfo
+--     Florian K Kandefer
+--       Postal:  IBM Corporation
+--                800 Park Offices Drive
+--                Research Triangle Park, NC 27709
+--                US
+--       Tel:     +1 919 254 0685
+--       Fax:     +1 919 254 0391
+--       E-mail:  kandefer@vnet.ibm.com     
+--  Descr
+--    
+--    This MIB module contains proprietary LAN Emulation management
+--    extensions.
+--  RevDate
+--    9701161200Z
+--  RevDescr
+--    
+--    2) Updated MIB import names to match ATM Forum MIB names.
+--    
+--       Updated some of the description fields.
+--    
+--       Corrected SYNTAX on idleVccTime and lecsMaxVccs it was
+--       Counter32 but is now UInteger32. Added range definition
+--       for idleVccTime, lecsMaxVccs and configDirectMaxReservedBw.
+--    
+--       Corrected idleVccTime and lecsMaxVccs OID values. This
+--       was done because the OID before idleVccTime was skipped
+--       and ibmLecsConfEntry 7 was not assigned.
+--    
+--       Added ibmElanLesTable
+--  RevDate
+--    9608281200Z
+--  RevDescr
+--    
+--    1)  This is the first version of this MIB
+
+ibmElanAdminGroup OBJECT IDENTIFIER ::= { ibmElanMIB 1 }
+ibmElanConfGroup OBJECT IDENTIFIER ::= { ibmElanMIB 2 }
+ibmElanLecsGroup OBJECT IDENTIFIER ::= { ibmElanMIB 3 }
+ibmElanLecsConfGroup OBJECT IDENTIFIER ::= { ibmElanLecsGroup 1 }
+ibmElanMIBConformance OBJECT IDENTIFIER ::= { ibmElanMIB 4 }
+ibmElanMIBGroups OBJECT IDENTIFIER ::= { ibmElanMIBConformance 1 }
+ibmElanMIBCompliances OBJECT IDENTIFIER ::= { ibmElanMIBConformance 2 }
+
+ibmElanLesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmElanLesEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains configuration information
+         for the all LESs for each ELAN specified in the
+         elanConfTable. This table is used by the LECS
+         to know if a backup LES is configured."
+    ::= { ibmElanConfGroup 2 }
+
+ibmElanLesEntry OBJECT-TYPE
+    SYNTAX IbmElanLesEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+         Each entry represents a LES/Emulated LAN pair this
+         agent maintains."
+    INDEX { elanConfIndex, elanLesIndex }
+-- Augments elanLesEntry FROM LAN-EMULATION-ELAN-MIB
+    ::= { ibmElanLesTable 1 }
+
+IbmElanLesEntry ::= SEQUENCE {
+    ibmBackupLesAtmAddrValid TruthValue,
+    ibmBackupLesAtmAddr AtmLaneAddress
+    }
+
+ibmBackupLesAtmAddrValid OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        When True specifies the backup LES is specified by ibmBackupLesAtmAddr.
+        When False specifies no backup LES is configured."
+    DEFVAL { false }
+    ::= { ibmElanLesEntry 1 }
+
+ibmBackupLesAtmAddr OBJECT-TYPE
+    SYNTAX AtmLaneAddress
+--    Rsyntax OCTET STRING(SIZE(0 | 20))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The ATM address of the backup LES."
+    DEFVAL { "" }
+    ::= { ibmElanLesEntry 2 }
+
+ibmLecsConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmLecsConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains configuration information the LECSs
+         within the scope of the agent."
+    ::= { ibmElanLecsConfGroup 1 }
+
+ibmLecsConfEntry OBJECT-TYPE
+    SYNTAX IbmLecsConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry represents a LECS this
+        agent maintains.
+        Objects lecsUseBurnedInEsi, lecsConfiguredEsi,
+        and lecsConfiguredSelector cannot be modified
+        unless the lecsAdminStatus is set to
+        down(2).  And the change doesn't take
+        effect until the lecsAdminStatus is set
+        to up(1)."
+    INDEX { lecsConfIndex }
+-- Augments lecsConfEntry FROM LAN-EMULATION-ELAN-MIB
+    ::= { ibmLecsConfTable 1 }
+
+IbmLecsConfEntry ::= SEQUENCE {
+    lecsUseBurnedInEsi TruthValue,
+    lecsConfiguredEsi AtmPrivateAddrEsi,
+    lecsConfiguredSelector AtmSelector,
+    lecsValidateBestEffortPcr TruthValue,
+    configDirectMaxReservedBw Integer32,
+    atmDevLineSpeed UInteger32,
+    idleVccTime UInteger32,
+    lecsMaxVccs UInteger32,
+    lecsDomainName DisplayString
+    }
+
+lecsUseBurnedInEsi OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies whether a MAC Address burned into the ATM
+         device should be used as the End System Identifier
+         component of the LECS ATM Address."
+    DEFVAL { true }
+    ::= { ibmLecsConfEntry 1 }
+
+lecsConfiguredEsi OBJECT-TYPE
+    SYNTAX AtmPrivateAddrEsi
+--    Rsyntax OCTET STRING(SIZE(6))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Locally Administered End System Identifier that is to be
+         used as the ESI component of the LECS's ATM Address."
+    ::= { ibmLecsConfEntry 2 }
+
+lecsConfiguredSelector OBJECT-TYPE
+    SYNTAX AtmSelector
+--    Rsyntax OCTET STRING(SIZE(1))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies value to be used as Selector field component
+         of LECS's ATM address."
+    ::= { ibmLecsConfEntry 3 }
+
+lecsValidateBestEffortPcr OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When false, Best Effort Configuration Direct VCCs will
+         be accepted without regard to the signalled forward
+         Peak Cell Rate (PCR).  When true, Best Effort VCCs
+         will be rejected if the signalled forward PCR exceeds
+         the line speed of the LECS ATM device.  Calls will not
+         be rejected due to the backward PCR.  The signalled
+         backward PCR will be honored if it does not exceed the
+         line rate; otherwise, transmissions to the caller will
+         be at line rate. "
+    ::= { ibmLecsConfEntry 4 }
+
+configDirectMaxReservedBw OBJECT-TYPE
+    SYNTAX Integer32(0..155000)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Defines the maximum acceptable Sustained Cell Rate (SCR)
+         for a Configuration Direct VCC; if SCR is not specified
+         on the incoming call, then this parameter defines the
+         maximum acceptable Peak Cell Rate (PCR) for a Configuration
+         Direct VCC with reserved bandwidth.  This parameter is
+         applied to both forward and backward directions.  Calls
+         received with Traffic Parameters specifying higher rates
+         will be released.  If SCR is specified on the incoming call,
+         the call will not be rejected due to the PCR or Maximum
+         Burst Size.  The constraint imposed by this parameter
+         is not applicable to BEST EFFORT connections.  "
+    ::= { ibmLecsConfEntry 5 }
+
+atmDevLineSpeed OBJECT-TYPE
+    SYNTAX UInteger32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Line Speed of LECS ATM Device.
+         This should not exposed to the user."
+    ::= { ibmLecsConfEntry 6 }
+
+idleVccTime OBJECT-TYPE
+    SYNTAX UInteger32(3..43200)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When the maximum number of VCCs is exceeded at
+         the LECS, VCCs are released (see lecsMaxVccs).
+         All active VCCs at the LECS are scanned.
+         If a VCC has been inactive for this length of time,
+         then it is released."
+    ::= { ibmLecsConfEntry 7 }
+
+lecsMaxVccs OBJECT-TYPE
+    SYNTAX UInteger32(1..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This is the maximum number of simultaneous VCCs
+         supported by the LECS.  If this number is exceeded,
+         then VCCs will be released (see idleVccTime)."
+    ::= { ibmLecsConfEntry 8 }
+
+lecsDomainName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+--    Rsyntax OCTET STRING(SIZE(0..32))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This is the name to associate with the Domain of the LECS"
+    ::= { ibmLecsConfEntry 9 }
+
+ibmElanCConfGroup OBJECT IDENTIFIER ::= { ibmElanMIBGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing configuration information
+--    about an emulated LAN.
+--  objects
+--    ibmBackupLesAtmAddrValid, ibmBackupLesAtmAddr
+
+ibmLecsCGroup OBJECT IDENTIFIER ::= { ibmElanMIBGroups 2 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    A collection of objects providing LECS configuration
+--    information.
+--  objects
+--    lecsUseBurnedInEsi, lecsConfiguredEsi, lecsConfiguredSelector, 
+--    lecsValidateBestEffortPcr, configDirectMaxReservedBw, 
+--    atmDevLineSpeed, idleVccTime, lecsMaxVccs
+
+ibmElanMIBCompliance OBJECT IDENTIFIER ::= { ibmElanMIBCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The compliance statement for SNMP IBM extensions
+--    to for ATM emulated LANS.
+--  Module
+--    >>current<<
+--   OptGroup
+--    ibmElanCConfGroup
+--   OptGroup
+--    ibmLecsCGroup
+
+
+END

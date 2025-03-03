@@ -11,7 +11,7 @@ IMPORTS
     TruthValue                                   FROM SNMPv2-TC;
 
 rlCDB MODULE-IDENTITY
-                LAST-UPDATED "200701020000Z"
+                LAST-UPDATED "200701020001Z"
                 ORGANIZATION "Cisco Systems, Inc."
 
                 CONTACT-INFO
@@ -46,5 +46,14 @@ rlManualReboot OBJECT-TYPE
         "Indicates whether the device was shutdown orderly before reboot or
          not (i.e. power failure)"
     ::= {rlCDB 2 }
+
+rlStartupCDBEmpty OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether the startup-cdb is empty, meaning: does not include
+         any user configuration."
+    ::= {rlCDB 3 }
 
 END

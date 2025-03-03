@@ -1,0 +1,188 @@
+EIP-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, TimeTicks, NetworkAddress, IpAddress, Counter
+			FROM RFC1155-SMI
+	OBJECT-TYPE
+			FROM RFC-1212
+	DisplayString, PhysAddress
+			FROM RFC1213-MIB
+	TRAP-TYPE
+			FROM RFC-1215;
+
+eip			OBJECT IDENTIFIER ::= { enterprises 2440 }
+products		OBJECT IDENTIFIER ::= { eip 1 }
+
+eipDns			OBJECT IDENTIFIER ::= { products 4 }
+eipDnsStat		OBJECT IDENTIFIER ::= { eipDns 2 }
+
+eipDhcp	OBJECT IDENTIFIER ::= { products 3 }
+eipDhcpStat	OBJECT IDENTIFIER ::= { eipDhcp 2 }
+
+eipDhcp6	OBJECT IDENTIFIER ::= { products 7 }
+eipDhcp6Stat	OBJECT IDENTIFIER ::= { eipDhcp6 1 }
+
+--
+--
+--	S T A T I S T I C S
+--
+--
+
+eipDnsStatTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EipDnsStatEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistics of DNS queries."
+	::= { eipDnsStat 3 }
+	
+
+eipDnsStatEntry OBJECT-TYPE
+	SYNTAX EipDnsStatEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistics of DNS queries."
+	INDEX { eipDnsStatName }
+	::= { eipDnsStatTable 1 }
+
+EipDnsStatEntry ::= SEQUENCE {
+	eipDnsStatIndex DisplayString,
+	eipDnsStatName DisplayString,
+	eipDnsStatValue INTEGER
+	}
+
+eipDnsStatIndex OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistic index"
+	::= { eipDnsStatEntry 1 }
+
+
+eipDnsStatName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistic name"
+	::= { eipDnsStatEntry 2 }
+
+eipDnsStatValue OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistic value"
+	::= { eipDnsStatEntry 3 }
+
+
+
+
+
+
+
+
+
+eipDhcpStatTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EipDhcpStatEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistics of DHCP queries."
+	::= { eipDhcpStat 22 }
+	
+
+eipDhcpStatEntry OBJECT-TYPE
+	SYNTAX EipDhcpStatEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistics of DHCP queries."
+	INDEX { eipDhcpStatName }
+	::= { eipDhcpStatTable 1 }
+
+EipDhcpStatEntry ::= SEQUENCE {
+	eipDhcpStatIndex DisplayString,
+	eipDhcpStatName DisplayString,
+	eipDhcpStatValue INTEGER
+	}
+
+eipDhcpStatIndex OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistic name"
+	::= { eipDhcpStatEntry 1 }
+
+eipDhcpStatName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistic name"
+	::= { eipDhcpStatEntry 2 }
+
+eipDhcpStatValue OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistic value"
+	::= { eipDhcpStatEntry 3 }
+
+
+
+eipDhcp6StatTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EipDhcp6StatEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistics of DHCP queries."
+	::= { eipDhcp6Stat 1 }
+	
+
+eipDhcp6StatEntry OBJECT-TYPE
+	SYNTAX EipDhcp6StatEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistics of DHCP queries."
+	INDEX { eipDhcp6StatName }
+	::= { eipDhcp6StatTable 1 }
+
+EipDhcp6StatEntry ::= SEQUENCE {
+	eipDhcp6StatIndex DisplayString,
+	eipDhcp6StatName DisplayString,
+	eipDhcp6StatValue INTEGER
+	}
+
+eipDhcp6StatIndex OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistic index"
+	::= { eipDhcp6StatEntry 1 }
+
+eipDhcp6StatName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistic name"
+	::= { eipDhcp6StatEntry 2 }
+
+eipDhcp6StatValue OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+	    "Statistic value"
+	::= { eipDhcp6StatEntry 3 }
+
+
+
+END

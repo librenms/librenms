@@ -1,0 +1,799 @@
+ Argus-Power-System-MIB DEFINITIONS ::= BEGIN
+
+ --==========================================================================
+ -- NOTE: Refer to RFC1628 for the formal definition of the SNMPv2-SMI MIB.
+ --==========================================================================
+
+ IMPORTS
+  MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises
+   FROM SNMPv2-SMI;
+
+ argus MODULE-IDENTITY
+  LAST-UPDATED "201612090000Z"
+  ORGANIZATION "Alpha Technologies Ltd."
+  CONTACT-INFO
+      "Alpha Technologies Ltd.
+     7700 Riverfront Gate
+     Burnaby, BC  V5J 5M4
+     Canada
+
+     Tel: 1-604-436-5900
+     Fax: 1-604-436-1233"
+  DESCRIPTION
+    "This MIB defines the information block(s) available in CXC RMU
+     as defined by the following list: 
+    - upsDevice: the CXC-series of controllers"   
+    
+  REVISION    "201612090000Z"  -- December 9, 2016
+  DESCRIPTION
+   "
+   Updated upsSecondsOnBattery to upsMinutesOnBattery to match unit value of the data.
+   "
+    
+    
+ ::= { enterprises 7309 }
+
+ PositiveInteger ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "This data type is a non-zero and non-negative value."
+       SYNTAX       INTEGER (1..2147483647)
+
+ NonNegativeInteger ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "This data type is a non-negative value."
+       SYNTAX       INTEGER (0..2147483647)        
+       
+    DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+          PhysAddress ::=
+              OCTET STRING
+          -- This data type is used to model media addresses.  For many
+          -- types of media, this will be in a binary representation.
+          -- For example, an ethernet address would be represented as
+          -- a string of 6 octets.
+
+       
+          
+
+ 
+ upsPower            OBJECT IDENTIFIER ::= { argus     6}
+ upsDevice   OBJECT IDENTIFIER ::= { upsPower  1} 
+ upsIdent             OBJECT IDENTIFIER ::= { upsDevice 1}
+ upsBattery           OBJECT IDENTIFIER ::= { upsDevice 2}
+ upsInput             OBJECT IDENTIFIER ::= { upsDevice 3}
+ upsOutput            OBJECT IDENTIFIER ::= { upsDevice 4}
+ upsAlarm   OBJECT IDENTIFIER ::= { upsDevice 5}
+ upsConfig   OBJECT IDENTIFIER ::= { upsDevice 6}
+ upsTraps   OBJECT IDENTIFIER ::= { upsDevice 7}
+ upsExtra   OBJECT IDENTIFIER ::= { upsDevice 8} 
+
+
+ --==========================================================================
+ -- Start of Extra Information
+ -- Power upstem specified variables and alarm status are maintained in the extra 
+ -- table. CXC RMU will populate realtime live data to these variables and 
+ -- status entries in the table. Table entries' string value are configured by 
+ -- CXC RMU web interface and support unicode string
+ --==========================================================================
+
+ upsExtraCount OBJECT-TYPE
+  SYNTAX INTEGER (0..65535)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Number of extra variables"
+ ::= { upsExtra 1 }
+
+ upsExtraTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF UpsExtraEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION "A table of CXC upstem controller extra variables"
+ ::= { upsExtra 2 }
+
+ upsExtraEntry OBJECT-TYPE
+  SYNTAX UpsExtraEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION "An entry into the CXC upstem controller extra variable table"
+  INDEX { upsExtraIndex }
+  ::= { upsExtraTable 1 }
+
+ UpsExtraEntry
+ ::= SEQUENCE {
+  upsExtraIndex INTEGER,
+  upsExtraName DisplayString ,
+  upsExtraIntegerValue INTEGER,
+  upsExtraStringValue DisplayString
+ }
+
+ upsExtraIndex OBJECT-TYPE
+  SYNTAX INTEGER (0..65535)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The index of the extra variable in the CXC upstem controller table"
+ ::= { upsExtraEntry 1 }
+
+ upsExtraName OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..30))
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The description of the extra variable as reported by the CXC upstem controller"
+ ::= { upsExtraEntry 2 }
+
+ upsExtraIntegerValue OBJECT-TYPE
+  SYNTAX INTEGER (-1000000000..1000000000)
+  MAX-ACCESS read-only 
+  STATUS current
+  DESCRIPTION "The integer value of the extra variable as reported by the CXC upstem controller"
+ ::= { upsExtraEntry 3 }
+
+ upsExtraStringValue OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..255))
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The string value of the extra variable as reported by the CXC upstem controller"
+ ::= { upsExtraEntry 4 }
+
+ --==========================================================================
+ -- The OBJECT IDENTIFIERs for the traps must be defined in this manner to
+ -- satisfy the NetSight MIB compiler; in particular, nodes cannot be defined 
+ -- concatenated in a single line, but must be defined explicitly node by node
+ -- (hence, the upsDevice.upsTraps.upsTrap definition)
+ -- In addition, forward references to extra upstem variables are needed for 
+ -- upsTrap by CastleRock SNMPc for event filter and match features.
+ --==========================================================================
+ upsTrap  OBJECT IDENTIFIER ::= { upsTraps 0 }
+
+ --==========================================================================
+ -- Start of Traps
+ --==========================================================================
+
+ upsAlarmTrap NOTIFICATION-TYPE
+  OBJECTS {
+   upsExtraIntegerValue,
+   upsExtraStringValue,
+   upsExtraIndex,   
+   upsExtraName
+  }
+  STATUS  current
+  DESCRIPTION "A trap issued from a change in state in one of the Alarms on the Novus controller"
+ ::= { upsTrap 1 }
+
+ upsAgentStartupTrap NOTIFICATION-TYPE
+  OBJECTS {
+   upsIdentSiteName
+  }
+  STATUS  current
+  DESCRIPTION "A trap to indicate that the agent software has started up."
+ ::= { upsTrap 2 }
+
+ upsAgentShutdownTrap NOTIFICATION-TYPE
+  OBJECTS {
+   upsIdentSiteName
+  }
+  STATUS  current
+  DESCRIPTION "A trap to indicate that the agent software has shutdown."
+ ::= { upsTrap 3 }
+
+     upsAgentFaultTrap NOTIFICATION-TYPE
+  OBJECTS {
+   upsExtraIntegerValue,
+   upsExtraStringValue,
+   upsExtraIndex,   
+   upsExtraName
+  }
+  STATUS  current
+  DESCRIPTION "A trap issued from a change in state in one of the Faults on the Novus controller"
+ ::= { upsTrap 4 }
+
+    upsAgentEventTrap NOTIFICATION-TYPE
+  OBJECTS {
+   upsExtraIntegerValue,
+   upsExtraStringValue,
+   upsExtraIndex,   
+   upsExtraName
+  }
+  STATUS  current
+  DESCRIPTION "A trap issued from a change in state in one of the Events on the Novus controller"
+ ::= { upsTrap 5 }
+
+
+ 
+
+   --
+   -- The Device Identification group.
+   --      All objects in this group are set at device initialization
+   --      and remain static.
+   --
+
+
+
+   upsIdentManufacturer OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The name of the UPS manufacturer."
+       ::= { upsIdent 1 }
+
+   upsIdentProductCode OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The UPS Model designation."
+       ::= { upsIdent 2 }
+
+   upsIdentModel OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The UPS Product code designation."
+       ::= { upsIdent 3 }
+
+   upsIdentUPSSoftwareVersion OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The UPS firmware/software version(s).  This variable
+               may or may not have the same value as
+               upsIdentAgentSoftwareVersion in some implementations."
+       ::= { upsIdent 4 }
+
+   upsIdentAgentSoftwareVersion OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The UPS agent software version.  This variable may or
+               may not have the same value as
+               upsIdentUPSSoftwareVersion in some implementations."
+       ::= { upsIdent 5 }
+
+   upsIdentName OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..255))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "A string identifying the UPS.  This object should be
+               set by the administrator."
+       ::= { upsIdent 6 }
+
+   upsIdentAttachedDevices OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..255))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "A string identifying the devices attached to the
+               output(s) of the UPS.  This object should be set by
+               the administrator."
+       ::= { upsIdent 7 }
+ 
+   upsIdentSiteName OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Site Name"
+ ::= { upsIdent 8 }
+
+   upsIdentSiteCity OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Site City"
+ ::= { upsIdent 9 }
+
+   upsIdentSiteRegion OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Site Region"
+ ::= { upsIdent 10 }
+
+   upsIdentSiteCountry OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Site Country"
+ ::= { upsIdent 11 }
+
+   upsIdentContactName OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Contact Name"
+ ::= { upsIdent 12 }
+
+  upsIdentPhoneNumber OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Phone Number"
+ ::= { upsIdent 13 }
+
+  upsIdentDate OBJECT-TYPE
+  SYNTAX DisplayString (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Date of the RMU-Novus"
+ ::= { upsIdent 14 }
+
+  upsIdentTime OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Time of the RMU-Novus"
+ ::= { upsIdent 15 }
+
+ 
+ 
+   --
+   -- Battery Group
+   --
+
+
+
+   upsBatteryStatus OBJECT-TYPE
+       SYNTAX     INTEGER {
+           unknown(1),
+           batteryNormal(2),
+           batteryLow(3),
+           batteryDepleted(4)
+       }
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The indication of the capacity remaining in the UPS
+               system's batteries.   A value of batteryNormal
+               indicates that the remaining run-time is greater than
+               upsConfigLowBattTime.  A value of batteryLow indicates
+               that the remaining battery run-time is less than or
+               equal to upsConfigLowBattTime.  A value of
+               batteryDepleted indicates that the UPS will be unable
+               to sustain the present load when and if the utility
+               power is lost (including the possibility that the
+               utility power is currently absent and the UPS is
+               unable to sustain the output)."
+       ::= { upsBattery 1 }        
+       
+   upsMinutesOnBattery OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "minutes"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "
+               The accumulated elapsed time that the UPS system have been on battery.
+               "
+       ::= { upsBattery 2 }
+
+   upsBatteryVoltage OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "0.1 Volt DC"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The magnitude of the present battery voltage."
+       ::= { upsBattery 3 }
+
+   upsBatteryChargingCurrent OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "0.1 Amp DC"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present battery charging current."
+       ::= { upsBattery 4 }
+
+   upsBatteryCapacity OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "0.1 Amp DC"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present battery capacity."
+       ::= { upsBattery 5 }
+
+
+   upsBatteryTemperature OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "degrees Centigrade"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The ambient temperature at or near the UPS Battery
+               casing."
+       ::= { upsBattery 6 }
+   upsBatteryLowWarning OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "percentage"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "The set battery capacity percentage at which the unit will raise an alarm."
+       ::= { upsBattery 7 }
+
+
+   --
+   -- Input Group
+   --
+
+
+   
+   upsInputNumLines OBJECT-TYPE
+       SYNTAX     INTEGER 
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The number of input lines utilized in this device.
+               This variable indicates the number of rows in the
+               input table."
+       ::= { upsInput 1 }
+
+   upsInputTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF UpsInputEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "A list of input table entries.  The number of entries
+               is given by the value of upsInputNumLines."
+       ::= { upsInput 2 }
+
+   upsInputEntry OBJECT-TYPE
+       SYNTAX     UpsInputEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "An entry containing information applicable to a
+               particular input line."
+       INDEX { upsInputLineIndex }
+       ::= { upsInputTable 1 }
+
+   UpsInputEntry ::= SEQUENCE {
+       upsInputLineIndex   INTEGER ,
+       upsInputFrequency   INTEGER ,
+       upsInputVoltage     INTEGER 
+   }
+
+   upsInputLineIndex OBJECT-TYPE
+       SYNTAX     INTEGER 
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The input line identifier."
+       ::= { upsInputEntry 1 }
+
+   upsInputFrequency OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "Hertz"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present input frequency."
+       ::= { upsInputEntry 2 }
+
+   upsInputVoltage OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "0.1 RMS Volts"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The magnitude of the present input voltage."
+       ::= { upsInputEntry 3 }
+ 
+   --
+   -- The Output group.
+   --
+
+
+
+   upsOutputSource OBJECT-TYPE
+       SYNTAX     INTEGER {
+           standby(1),
+           line(2),
+           boost2(3),
+           boost1(4),
+           buck1(5),
+           buck2(6),
+           inverter(7),
+      retransfer(8),
+      transfer(9),
+      shutdown(10),
+      bypass(11)
+       }
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present source of output power.  The enumeration
+               line(2) indicates that the Novus is in line mode."
+       ::= { upsOutput 1 }
+
+   upsOutputFrequency OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "0.1 Hertz"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present output frequency."
+       ::= { upsOutput 2 }
+
+   upsOutputNumLines OBJECT-TYPE
+       SYNTAX     INTEGER 
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The number of output lines utilized in this device.
+               This variable indicates the number of rows in the
+               output table."
+       ::= { upsOutput 3 }
+
+   upsOutputTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF UpsOutputEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "A list of output table entries.  The number of
+               entries is given by the value of upsOutputNumLines."
+       ::= { upsOutput 4 }
+
+   upsOutputEntry OBJECT-TYPE
+       SYNTAX     UpsOutputEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "An entry containing information applicable to a
+               particular output line."
+       INDEX { upsOutputLineIndex }
+       ::= { upsOutputTable 1 }
+
+   UpsOutputEntry ::= SEQUENCE {
+       upsOutputLineIndex   INTEGER ,
+       upsOutputVoltage     INTEGER ,
+       upsOutputCurrent     INTEGER ,
+       upsOutputPowerVA     INTEGER ,
+  upsOutputPowerWatt   INTEGER ,
+  upsPowerFactor     INTEGER ,
+       upsOutputPercentLoad INTEGER
+   }
+
+   upsOutputLineIndex OBJECT-TYPE
+       SYNTAX     INTEGER 
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The output line identifier."
+       ::= { upsOutputEntry 1 }
+
+   upsOutputVoltage OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "0.1 RMS Volts"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present output voltage."
+       ::= { upsOutputEntry 2 }
+
+   upsOutputCurrent OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "0.1 RMS Amp"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present output current."
+       ::= { upsOutputEntry 3 }
+
+   upsOutputPowerVA  OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "VA"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present output VA."
+       ::= { upsOutputEntry 4 }
+
+   upsOutputPowerWatt  OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "Watts"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present output true power."
+       ::= { upsOutputEntry 5 }
+
+   upsPowerFactor     OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "percent"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present power factor."
+       ::= { upsOutputEntry 6 }
+
+   upsOutputPercentLoad OBJECT-TYPE
+       SYNTAX     INTEGER (0..200)
+       UNITS      "percent"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The percentage of the UPS power capacity presently
+               being used on this output line, i.e., the greater of
+               the percent load of true power capacity and the
+               percent load of VA."
+       ::= { upsOutputEntry 7 }
+
+   --
+   -- The Alarms group.
+   --
+
+
+
+   upsAlarmsPresent OBJECT-TYPE
+       SYNTAX     INTEGER 
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "The present number of active alarm conditions."
+       ::= { upsAlarm 1 }
+
+   upsAlarmTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF UpsAlarmEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "A list of alarm table entries. "
+       ::= { upsAlarm 2 }
+
+   upsAlarmEntry OBJECT-TYPE
+       SYNTAX     UpsAlarmEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "An entry containing information applicable to a
+               particular alarm."
+       INDEX { upsAlarmId }
+       ::= { upsAlarmTable 1 }
+
+   UpsAlarmEntry ::= SEQUENCE {
+       upsAlarmId          INTEGER ,
+       upsAlarmDescr       DisplayString,
+  upsAlarmStatus    INTEGER      
+   }
+
+   upsAlarmId OBJECT-TYPE
+       SYNTAX     INTEGER 
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "A unique identifier for an alarm condition.  This
+               value must remain constant."
+       ::= { upsAlarmEntry 1 }
+
+   upsAlarmDescr OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..255))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "A unique description of the alarm. "
+       ::= { upsAlarmEntry 2 }
+  
+   upsAlarmStatus OBJECT-TYPE
+       SYNTAX     INTEGER      
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "1 - ON or 0 - OFF. "
+       ::= { upsAlarmEntry 3 }
+
+   --
+   -- The Config group.
+   --
+
+
+
+   upsConfigLineQualifyTime OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "seconds"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "This objects displays the line qualify time."
+       ::= { upsConfig 1 }
+
+   upsConfigLineOutputVoltageHighLimit OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "volttenth"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "This object represents the Line output High Voltage Limit."
+       ::= { upsConfig 2 }
+
+   upsConfigLineOutputVoltageLowLimit OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "volttenth"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "This object represents the Line output Low Voltage Limit."
+       ::= { upsConfig 3 }
+
+   upsConfigFanOnTemperature OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "degreeC"
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+               "This object represents the Fan on temperature."
+       ::= { upsConfig 4 }
+
+
+  upsShutdownStatus OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      ""
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "This object tells us if output is disabled or enabled."
+       ::= { upsConfig 5 }
+  upsInverterOffDelayTime OBJECT-TYPE
+       SYNTAX     INTEGER 
+       UNITS      "seconds"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "This object represents the inverter off delay time."
+       ::= { upsConfig 6 }
+
+  upsConfigIPAddress OBJECT-TYPE
+       SYNTAX DisplayString (SIZE(0..255))        
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "This objects displays the IP address of the RMU."
+       ::= { upsConfig 7 }
+
+  upsConfigNetMask OBJECT-TYPE
+       SYNTAX DisplayString (SIZE(0..255)) 
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "This object displays the Net Mask of the RMU."
+       ::= { upsConfig 8 }
+
+  upsConfigGateway OBJECT-TYPE
+       SYNTAX DisplayString (SIZE(0..255)) 
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "This object displays the Gateway of the RMU."
+       ::= { upsConfig 9 }
+
+  upsConfigSnmpCommunity OBJECT-TYPE
+       SYNTAX DisplayString (SIZE(0..255))        
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "This object displays the SNMP community"
+       ::= { upsConfig 10 }
+
+  upsConfigSnmpTrapIPDestination OBJECT-TYPE
+       SYNTAX DisplayString (SIZE(0..255)) 
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "This object displays the SNMP Trap IP destination."
+       ::= { upsConfig 11 }  
+  
+END

@@ -1,0 +1,472 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This file describes the hh3c MIB implementation of perormance
+-- Reference:   the content of this file include part description from RFC1757
+-- Version: V2.0
+-- History:
+--  v1.0 Created by Qizhenglin, 2002.8.15
+--  v1.1 2004-7-6 xiejianping
+--    merge HH3C-RMON-EXT-MIB to HH3C-LswPERFORMANCE-MIB and change
+--    module name from HH3C-LswPERFORMANCE-MIB to HH3C-RMON-EXT-MIB
+-- V2.0 2004-10-12 updated by gaolong
+--      Import from SNMPv2-SMI instead from RFC-1212
+--      Import hh3cInternetProtocol, rmonExtend instead define them in the MIB.
+--      Change ACCESS to MAX-ACCESS.
+--      Change value of STATUS from mandatory to current.
+--      Remove value range from PriAlarmEntry definition.
+--      Adjust text format of the whole file.
+-- ==================================================================
+
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+
+HH3C-RMON-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  DisplayString
+      FROM RFC1213-MIB
+  OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+  OwnerString
+      FROM IF-MIB
+  trapDestEntry, trapDestIndex
+      FROM RMON2-MIB
+  EntryStatus
+      FROM RMON-MIB
+  hh3crmonExtend
+      FROM HH3C-OID-MIB;
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+    hh3cperformance MODULE-IDENTITY
+        LAST-UPDATED "200303150000Z"        -- March 19, 2003 at 16:05 GMT
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            " "
+        REVISION "200303150000Z"        -- March 19, 2003 at 16:06 GMT
+        DESCRIPTION
+            "The initial revision of this MIB module."
+        ::= { hh3crmonExtend 4 }
+
+        hh3cprialarmTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF Hh3cPriAlarmEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                  "A list of alarm entries."
+                ::= { hh3cperformance 1 }
+
+        hh3cprialarmEntry OBJECT-TYPE
+                SYNTAX Hh3cPriAlarmEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                  "A list of parameters that set up a periodic checking
+                  for alarm conditions.  For example, an instance of the
+                  alarmValue object might be named alarmValue.8"
+                INDEX { hh3cprialarmIndex }
+                ::= { hh3cprialarmTable 1 }
+
+        Hh3cPriAlarmEntry ::= SEQUENCE {
+                hh3cprialarmIndex                    INTEGER,
+                hh3cprialarmInterval                 INTEGER,
+                hh3cprialarmVariable                 DisplayString,
+                hh3cprialarmSympol                   DisplayString,
+                hh3cprialarmSampleType               INTEGER,
+                hh3cprialarmValue                    INTEGER,
+                hh3cprialarmStartupAlarm             INTEGER,
+                hh3cprialarmRisingThreshold          INTEGER,
+                hh3cprialarmFallingThreshold         INTEGER,
+                hh3cprialarmRisingEventIndex         INTEGER,
+                hh3cprialarmFallingEventIndex        INTEGER,
+                hh3cprialarmStatCycle                INTEGER,
+                hh3cprialarmStatType                 INTEGER,
+                hh3cprialarmOwner                    OwnerString,
+                hh3cprialarmStatus                   EntryStatus
+        }
+
+        hh3cprialarmIndex OBJECT-TYPE
+                SYNTAX INTEGER (1..65535)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                  "An index that uniquely identifies an entry in the
+                  alarm table.  Each such entry defines a
+                  diagnostic sample at a particular interval
+                  for an object on the device."
+                ::= { hh3cprialarmEntry 1 }
+
+        hh3cprialarmInterval OBJECT-TYPE
+                SYNTAX INTEGER
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "The interval in seconds over which the data is
+                  sampled and compared with the rising and falling
+                  thresholds.  When setting this variable, care
+                  should be taken in the case of deltaValue
+                  sampling - the interval should be set short enough
+                  that the sampled variable is very unlikely to
+                  increase or decrease by more than 2^31 - 1 during
+                  a single sampling interval.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+                ::= { hh3cprialarmEntry 2 }
+
+        hh3cprialarmVariable OBJECT-TYPE
+                SYNTAX DisplayString
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "The object identifier of the particular variable to be
+                  sampled.  Only variables that resolve to an ASN.1 primitive
+                  type of INTEGER (INTEGER, Integer32, Counter32, Counter64,
+                  Gauge, or TimeTicks) may be sampled.
+
+                  Because SNMP access control is articulated entirely
+                  in terms of the contents of MIB views, no access
+                  control mechanism exists that can restrict the value of
+                  this object to identify only those objects that exist
+                  in a particular MIB view.  Because there is thus no
+                  acceptable means of restricting the read access that
+                  could be obtained through the alarm mechanism, the
+                  probe must only grant write access to this object in
+                  those views that have read access to all objects on
+                  the probe.
+
+                  During a set operation, if the supplied variable name is
+                  not available in the selected MIB view, a badValue error
+                  must be returned.  If at any time the variable name of
+                  an established alarmEntry is no longer available in the
+                  selected MIB view, the probe must change the status of
+                  this alarmEntry to invalid(4).
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+                ::= { hh3cprialarmEntry 3 }
+
+        hh3cprialarmSympol OBJECT-TYPE
+                SYNTAX  DisplayString
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  ""
+                ::= { hh3cprialarmEntry 4 }
+
+        hh3cprialarmSampleType OBJECT-TYPE
+                SYNTAX INTEGER {
+                  absoluteValue(1),
+                  deltaValue(2),
+                  speedValue(3)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "The method of sampling the selected variable and
+                  calculating the value to be compared against the
+                  thresholds.  If the value of this object is
+                  absoluteValue(1), the value of the selected variable
+                  will be compared directly with the thresholds at the
+                  end of the sampling interval.  If the value of this
+                  object is deltaValue(2), the value of the selected
+                  variable at the last sample will be subtracted from
+                  the current value, and the difference compared with
+                  the thresholds.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+                ::= { hh3cprialarmEntry 5 }
+
+        hh3cprialarmValue OBJECT-TYPE
+                SYNTAX INTEGER
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                  "The value of the statistic during the last sampling
+                  period.  For example, if the sample type is deltaValue,
+                  this value will be the difference between the samples
+                  at the beginning and end of the period.  If the sample
+                  type is absoluteValue, this value will be the sampled
+                  value at the end of the period.
+                  This is the value that is compared with the rising and
+                  falling thresholds.
+
+                  The value during the current sampling period is not
+                  made available until the period is completed and will
+                  remain available until the next period completes."
+                ::= { hh3cprialarmEntry 6 }
+
+        hh3cprialarmStartupAlarm OBJECT-TYPE
+                SYNTAX INTEGER {
+                  risingAlarm(1),
+                  fallingAlarm(2),
+                  risingOrFallingAlarm(3)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "The alarm that may be sent when this entry is first
+                  set to valid.  If the first sample after this entry
+                  becomes valid is greater than or equal to the
+                  risingThreshold and alarmStartupAlarm is equal to
+                  risingAlarm(1) or risingOrFallingAlarm(3), then a single
+                  rising alarm will be generated.  If the first sample
+                  after this entry becomes valid is less than or equal
+                  to the fallingThreshold and alarmStartupAlarm is equal
+                  to fallingAlarm(2) or risingOrFallingAlarm(3), then a
+                  single falling alarm will be generated.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+                ::= { hh3cprialarmEntry 7 }
+
+        hh3cprialarmRisingThreshold OBJECT-TYPE
+                SYNTAX INTEGER
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "A threshold for the sampled statistic.  When the current
+                  sampled value is greater than or equal to this threshold,
+                  and the value at the last sampling interval was less than
+                  this threshold, a single event will be generated.
+                  A single event will also be generated if the first
+                  sample after this entry becomes valid is greater than or
+                  equal to this threshold and the associated
+                  alarmStartupAlarm is equal to risingAlarm(1) or
+                  risingOrFallingAlarm(3).
+
+                  After a rising event is generated, another such event
+                  will not be generated until the sampled value
+                  falls below this threshold and reaches the
+                  alarmFallingThreshold.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+                ::= { hh3cprialarmEntry 8 }
+
+        hh3cprialarmFallingThreshold OBJECT-TYPE
+                SYNTAX INTEGER
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "A threshold for the sampled statistic.  When the current
+                  sampled value is less than or equal to this threshold,
+                  and the value at the last sampling interval was greater than
+                  this threshold, a single event will be generated.
+                  A single event will also be generated if the first
+                  sample after this entry becomes valid is less than or
+                  equal to this threshold and the associated
+                  alarmStartupAlarm is equal to fallingAlarm(2) or
+                  risingOrFallingAlarm(3).
+
+                  After a falling event is generated, another such event
+                  will not be generated until the sampled value
+                  rises above this threshold and reaches the
+                  alarmRisingThreshold.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+                ::= { hh3cprialarmEntry 9 }
+
+        hh3cprialarmRisingEventIndex OBJECT-TYPE
+                SYNTAX INTEGER (0..65535)
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "The index of the eventEntry that is
+                  used when a rising threshold is crossed.  The
+                  eventEntry identified by a particular value of
+                  this index is the same as identified by the same value
+                  of the eventIndex object.  If there is no
+                  corresponding entry in the eventTable, then
+                  no association exists.  In particular, if this value
+                  is zero, no associated event will be generated, as
+                  zero is not a valid event index.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+                ::= { hh3cprialarmEntry 10 }
+
+        hh3cprialarmFallingEventIndex OBJECT-TYPE
+                SYNTAX INTEGER (0..65535)
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "The index of the eventEntry that is
+                  used when a falling threshold is crossed.  The
+                  eventEntry identified by a particular value of
+                  this index is the same as identified by the same value
+                  of the eventIndex object.  If there is no
+                  corresponding entry in the eventTable, then
+                  no association exists.  In particular, if this value
+                  is zero, no associated event will be generated, as
+                  zero is not a valid event index.
+
+                  This object may not be modified if the associated
+                  alarmStatus object is equal to valid(1)."
+                ::= { hh3cprialarmEntry 11 }
+
+        hh3cprialarmStatCycle             OBJECT-TYPE
+                SYNTAX INTEGER
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  ""
+                ::= { hh3cprialarmEntry 12 }
+
+
+        hh3cprialarmStatType              OBJECT-TYPE
+                SYNTAX INTEGER{
+                  forever(1),
+                  during(2)
+                }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  ""
+                ::= { hh3cprialarmEntry 13 }
+
+        hh3cprialarmOwner OBJECT-TYPE
+                SYNTAX OwnerString
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "The entity that configured this entry and is therefore
+                  using the resources assigned to it."
+                ::= { hh3cprialarmEntry 14 }
+
+        hh3cprialarmStatus OBJECT-TYPE
+                SYNTAX EntryStatus
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "The status of this alarm entry."
+                ::= { hh3cprialarmEntry 15 }
+
+        hh3crmonEnableTable  OBJECT-TYPE
+                SYNTAX SEQUENCE OF Hh3crmonEnableEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                  "A list of enable rmon entries."
+                ::= { hh3crmonExtend 5 }
+
+        hh3crmonEnableEntry OBJECT-TYPE
+                SYNTAX Hh3crmonEnableEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                  "A list of parameters that set up a hh3crmonEnableTable"
+                INDEX { hh3crmonEnableIfIndex }
+                ::= { hh3crmonEnableTable 1 }
+
+        Hh3crmonEnableEntry ::= SEQUENCE {
+                hh3crmonEnableIfIndex             INTEGER,
+                hh3crmonEnableStatus              INTEGER
+        }
+
+        hh3crmonEnableIfIndex OBJECT-TYPE
+                SYNTAX INTEGER (0..65535)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                  "Specify an interface to enable rmon."
+                ::= { hh3crmonEnableEntry 1 }
+
+        hh3crmonEnableStatus OBJECT-TYPE
+                SYNTAX INTEGER {
+                             enable(1),
+                             disable(2)
+                            }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                  "Specify an interface to enable rmon."
+                ::= { hh3crmonEnableEntry 2 }
+
+        hh3cTrapDestTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF Hh3cTrapDestEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                 "Defines the trap destination Extend Table for providing, via SNMP,
+                 the capability of configure a trap dest."
+                ::= { hh3crmonExtend 6 }
+
+        hh3cTrapDestEntry OBJECT-TYPE
+                SYNTAX      Hh3cTrapDestEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                 "Defines an entry in the hh3cTrapDestTable."
+                AUGMENTS    { trapDestEntry }
+                ::= { hh3cTrapDestTable 1 }
+
+        Hh3cTrapDestEntry ::=
+                SEQUENCE {
+                hh3cTrapDestVersion     INTEGER
+                }
+
+        hh3cTrapDestVersion          OBJECT-TYPE
+                SYNTAX      INTEGER {
+                              snmpv1(1),
+                              snmpv2(2),
+                              snmpv3andauthen(3),
+                              snmpv3andnoauthen(4),
+                              snmpv3andpriv(5)
+                             }
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                 "The version for trap destination.
+                 This object may not be modified if the associated
+                 trapDestStatus object is equal to active(1)."
+                 DEFVAL      { snmpv1 }
+                ::= { hh3cTrapDestEntry 1 }
+
+        --  extend from Remote Network Monitoring Traps
+
+        hh3crmonExtendEventsV2 OBJECT-IDENTITY
+                STATUS      current
+                DESCRIPTION "Definition point for pri RMON notifications."
+                ::= { hh3crmonExtend 0 }
+
+        hh3cpririsingAlarm NOTIFICATION-TYPE
+                OBJECTS  { hh3cprialarmIndex, hh3cprialarmSympol, hh3cprialarmSampleType,
+                    hh3cprialarmValue, hh3cprialarmRisingThreshold }
+                STATUS   current
+                DESCRIPTION
+                 "The SNMP trap that is generated when an alarm
+                  entry crosses its rising threshold and generates
+                  an event that is configured for sending SNMP
+                  traps."
+                ::= { hh3crmonExtendEventsV2 1 }
+
+        hh3cprifallingAlarm NOTIFICATION-TYPE
+                OBJECTS { hh3cprialarmIndex, hh3cprialarmSympol, hh3cprialarmSampleType,
+                  hh3cprialarmValue, hh3cprialarmFallingThreshold }
+                STATUS    current
+                DESCRIPTION
+                 "The SNMP trap that is generated when an alarm
+                  entry crosses its falling threshold and generates
+                  an event that is configured for sending SNMP
+                  traps."
+                ::= { hh3crmonExtendEventsV2 2 }
+
+END

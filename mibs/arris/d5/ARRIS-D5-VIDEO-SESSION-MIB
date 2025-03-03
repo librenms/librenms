@@ -1,0 +1,904 @@
+ARRIS-D5-VIDEO-SESSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    arrisD5UEQam
+        FROM ARRIS-MIB
+    D5Program
+        FROM ARRIS-D5-VIDEO-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    Counter32,
+    Gauge32,
+    Unsigned32,
+    OBJECT-TYPE,
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TruthValue,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF;
+        
+d5VideoSessionMib MODULE-IDENTITY
+    LAST-UPDATED "201007261700Z"
+    ORGANIZATION
+        "Arris International"
+    CONTACT-INFO
+        "Network Management
+         Postal: Arris International.
+         4300 Cork Airport Business Park
+         Cork Airport, Kinsale Road
+         Cork, Ireland.
+         Tel: +353 21 7305 800
+         Fax: +353 21 4321 972"
+    DESCRIPTION
+        "This MIB contains objects to display video sessions and control Switched Digital Video RPC on the ARRIS D5 UEQ."
+    REVISION "200809080800Z"
+    DESCRIPTION
+        "D5 UEQ VIDEO SESSION MIB"
+    ::= {arrisD5UEQam 8}
+
+d5SdvRpcConfigurationGroup OBJECT-GROUP
+    OBJECTS {
+        d5SdvRpc,
+        d5SdvRpcDncsCompatibility,
+        d5SdvRpcPersistence,
+        d5SdvRpcQamModel,
+        d5SdvRpcMasterSrmIpAddress,
+        d5SdvRpcResetIndicatorType,
+        d5SdvRpcResetIndicatorInterval,
+        d5SdvRpcTimeout
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing SDV RPC configuration."
+    ::= { d5VideoSessionMib 1 }
+
+
+d5SdvRpc OBJECT-TYPE
+    SYNTAX       INTEGER {
+    	disabled(1),
+        enabled(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Enables or disables SDV RPC."
+    ::= { d5SdvRpcConfigurationGroup 1 }
+
+d5SdvRpcDncsCompatibility OBJECT-TYPE
+    SYNTAX       INTEGER {
+        disabled(1),
+        enabled(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "DNCS compatibility mode configures the bind policy to assume streams exists."
+    ::= { d5SdvRpcConfigurationGroup 2 }
+
+d5SdvRpcPersistence OBJECT-TYPE
+    SYNTAX       INTEGER {
+        disabled(1),
+        enabled(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Enables persistent SDV client response connections."
+    ::= { d5SdvRpcConfigurationGroup 3 }
+
+d5SdvRpcQamModel OBJECT-TYPE
+    SYNTAX       INTEGER {
+        qam2x4(1),
+        qam2x6(2),
+        qam4x8(3)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Sets the SDV RPC QAM model (48/72/192 QAM channels). This can only be set if RPC is disabled."
+    DEFVAL { qam2x4 }
+    ::= { d5SdvRpcConfigurationGroup 4 }
+
+d5SdvRpcMasterSrmIpAddress OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Sets the IP address of the master SRM to use for edge reset indications."
+    ::= { d5SdvRpcConfigurationGroup 5 }
+
+d5SdvRpcResetIndicatorType OBJECT-TYPE
+    SYNTAX       INTEGER {
+        udp(1),
+        tcp(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Sets the type of edge reset indications to send to the master SRM."
+    ::= { d5SdvRpcConfigurationGroup 6 }
+
+d5SdvRpcResetIndicatorInterval OBJECT-TYPE
+    SYNTAX       INTEGER(1..20)
+    UNITS        "seconds"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Sets the SDV RPC reset-indicator repeat interval."
+    ::= { d5SdvRpcConfigurationGroup 7 }
+
+d5SdvRpcTimeout OBJECT-TYPE
+    SYNTAX       INTEGER(0..65535)
+    UNITS        "milliseconds"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Sets the SDV RPC timeout."
+    DEFVAL { 25000 }
+    ::= { d5SdvRpcConfigurationGroup 8 }
+
+--------------------------------------------------------------------------------------------------
+-- SDV RPC statistics table
+--------------------------------------------------------------------------------------------------
+--d5SdvRpcStatsTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF D5SdvRpcStatsEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "This table displays SDV RPC message statistics."
+--    ::= {d5VideoSessionMib 2}
+--
+--d5SdvRpcStatsEntry OBJECT-TYPE
+--    SYNTAX D5SdvRpcStatsEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "An entry for the SDV RPC statistics table."
+--    INDEX {d5SdvRpcStatsIndex}
+--    ::= {d5SdvRpcStatsTable 1}
+--
+--D5SdvRpcStatsEntry ::= SEQUENCE {
+--    d5SdvRpcStatsIndex      INTEGER,
+--    d5SdvRpcStatsRequest    Counter32,
+--    d5SdvRpcStatsReply      Counter32,
+--    d5SdvRpcStatsSdvSuccess Counter32,
+--    d5SdvRpcStatsRpcError   Counter32,
+--    d5SdvRpcStatsSdvError   Counter32,
+--    d5SdvRpcStatsName       OCTET STRING
+--}
+--
+--d5SdvRpcStatsIndex OBJECT-TYPE
+--    SYNTAX INTEGER {
+--        bind(1),
+--        unbind(2),
+--        insertpacket(3),
+--        queryinsertpacket(4),
+--        cancelpacket(5),
+--        createsession(6),
+--        createshellsessiongroup(7),
+--        deleteshellsessiongroup(8),
+--        deletesession(9),
+--        querysesssions(10),
+--        querysessioninfo(11),
+--        querybindings(12),
+--        querybindinginfo(13),
+--        resetinidcation(14),
+--        resetindicationack(15)
+--    }
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "The SDV RPC message type on which the statistics are maintained."
+--    ::= {d5SdvRpcStatsEntry 1}
+--
+--d5SdvRpcStatsRequest OBJECT-TYPE
+--    SYNTAX      Counter32
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "The total number of RPC requests received."
+--    ::= { d5SdvRpcStatsEntry 2 }
+--
+--d5SdvRpcStatsReply OBJECT-TYPE
+--    SYNTAX      Counter32
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "The total number of RPC replies sent in response to this RPC request."
+--    ::= { d5SdvRpcStatsEntry 3 }
+--
+--d5SdvRpcStatsSuccess OBJECT-TYPE
+--    SYNTAX      Counter32
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "The total number of successful RPC transactions."
+--    ::= { d5SdvRpcStatsEntry 4 }
+--
+--d5SdvRpcStatsRpcError OBJECT-TYPE
+--    SYNTAX      Counter32
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "The total number of RPC errors replies received in response to this RPC request."
+--    ::= { d5SdvRpcStatsEntry 5 }
+--
+--d5SdvRpcStatsSdvError OBJECT-TYPE
+--    SYNTAX      Counter32
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "The total number of SDV RPC replies received in response to this RPC request."
+--    ::= { d5SdvRpcStatsEntry 6 }
+--
+--d5SdvRpcStatsName OBJECT-TYPE
+--    SYNTAX OCTET STRING (SIZE(0..23))
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "The name of this SDV RPC message."
+-- ::= {d5SdvRpcStatsEntry 7}
+
+--------------------------------------------------------------------------------------------------
+-- Video session table
+--------------------------------------------------------------------------------------------------
+d5VideoSessionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5VideoSessionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table lists video sessions."
+    ::= {d5VideoSessionMib 2}
+
+d5VideoSessionEntry OBJECT-TYPE
+    SYNTAX D5VideoSessionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the video session table."
+    INDEX {d5VideoSessionId}
+    ::= {d5VideoSessionTable 1}
+
+D5VideoSessionEntry ::= SEQUENCE {
+    d5VideoSessionId                  OCTET STRING,
+    d5VideoSessionState               INTEGER,
+    d5VideoSessionQamIfIndex          InterfaceIndex,
+    d5VideoSessionTsid                Unsigned32,
+    d5VideoSessionBandwidth           Unsigned32,
+    d5VideoSessionBitrate             Unsigned32,
+    d5VideoSessionTimeActive          Unsigned32,
+    d5VideoSessionNoPidRemapping      TruthValue,
+    d5VideoSessionSessionGroupId      Unsigned32,
+    d5VideoSessionTransportId	      Unsigned32,
+    d5VideoSessionProgramNumber	      D5Program
+}
+
+d5VideoSessionId OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..33))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video session identifier."
+    ::= {d5VideoSessionEntry 1}
+
+d5VideoSessionState OBJECT-TYPE
+    SYNTAX INTEGER {
+        inactive(1),
+        psi(2),
+        data(3),
+        active(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video session state."
+ ::= {d5VideoSessionEntry 2}
+
+d5VideoSessionQamIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ifIndex of the output QAM used by this video session."
+ ::= {d5VideoSessionEntry 3}
+
+d5VideoSessionTsid OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The TSID of the output QAM channel used by this video session."
+ ::= {d5VideoSessionEntry 4}
+
+d5VideoSessionBandwidth OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS  "bps"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Configured video session bandwidth in bits per second."
+ ::= {d5VideoSessionEntry 5}
+
+d5VideoSessionBitrate OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "bps"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current measured video session bitrate in bits per second."
+ ::= {d5VideoSessionEntry 6}
+
+d5VideoSessionTimeActive OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "seconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The amount of time this video session has been active in seconds."
+ ::= {d5VideoSessionEntry 7}
+
+d5VideoSessionNoPidRemapping OBJECT-TYPE
+    SYNTAX INTEGER {
+        disabled(1),
+        enabled(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "If this is enabled, PIDs are not remapped for this video session."
+ ::= {d5VideoSessionEntry 8}
+
+d5VideoSessionSessionGroupId OBJECT-TYPE
+    SYNTAX Unsigned32(0..1024)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Identifies the group to which this video session belongs.
+         A value of zero indicates that this session is not part of a group."
+    ::= {d5VideoSessionEntry 9}
+
+d5VideoSessionTransportId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ID of the active transport used by this video session."
+    ::= {d5VideoSessionEntry 10}
+
+d5VideoSessionProgramNumber OBJECT-TYPE
+    SYNTAX D5Program
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The program number of the active transport used by this video session."
+   ::= {d5VideoSessionEntry 11}
+
+--------------------------------------------------------------------------------------------------
+-- Video multicast session table
+--------------------------------------------------------------------------------------------------
+
+d5VideoMulticastSessionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5VideoMulticastSessionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table maps multicast IP address and UPD port to video session ID."
+    ::= {d5VideoSessionMib 3}
+
+d5VideoMulticastSessionEntry OBJECT-TYPE
+    SYNTAX D5VideoMulticastSessionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the video multicast session table."
+    INDEX {d5VideoMulticastSessionIpAddress,d5VideoMulticastSessionUdpPort,d5VideoMulticastSessionId}
+    ::= {d5VideoMulticastSessionTable 1}
+
+D5VideoMulticastSessionEntry ::= SEQUENCE {
+    d5VideoMulticastSessionIpAddress InetAddress,
+    d5VideoMulticastSessionUdpPort   Unsigned32,
+    d5VideoMulticastSessionId        OCTET STRING
+}
+
+d5VideoMulticastSessionIpAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The multicast IP address of this video session."
+    ::= {d5VideoMulticastSessionEntry 1}
+
+d5VideoMulticastSessionUdpPort OBJECT-TYPE
+    SYNTAX Unsigned32(0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The destination multicast UDP port of this video session."
+ ::= {d5VideoMulticastSessionEntry 2}
+
+d5VideoMulticastSessionId OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..33))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video session identifier."
+ ::= {d5VideoMulticastSessionEntry 3}
+
+--------------------------------------------------------------------------------------------------
+-- Video session transport table
+--------------------------------------------------------------------------------------------------
+
+d5VideoSessionTransportTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5VideoSessionTransportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table lists the transports used by video sessions on the D5."
+    ::= {d5VideoSessionMib 4}
+
+d5VideoSessionTransportEntry OBJECT-TYPE
+    SYNTAX D5VideoSessionTransportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the video session transport table."
+    INDEX {d5VideoSessionTransportTransportId}
+    ::= {d5VideoSessionTransportTable 1}
+
+D5VideoSessionTransportEntry ::= SEQUENCE {
+    d5VideoSessionTransportTransportId   Unsigned32,
+    d5VideoSessionTransportSrcIpAddress  InetAddress,
+    d5VideoSessionTransportDestIpAddress InetAddress,
+    d5VideoSessionTransportDestUdpPort   Unsigned32,
+    d5VideoSessionTransportGigIfIndex    Unsigned32
+}
+
+d5VideoSessionTransportTransportId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video session transport identifier."
+    ::= {d5VideoSessionTransportEntry 1}
+
+d5VideoSessionTransportSrcIpAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video session transport source IP address."
+    ::= {d5VideoSessionTransportEntry 2}
+
+d5VideoSessionTransportDestIpAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video session transport destination IP address.
+         For multicast streams, this is the multicast IP address of the stream.
+         For unicast streams, this is the IP address of the gigabit Ethernet port where the stream is received."
+    ::= {d5VideoSessionTransportEntry 3}
+
+d5VideoSessionTransportDestUdpPort OBJECT-TYPE
+    SYNTAX Unsigned32(0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video session transport destination UDP port."
+    ::= {d5VideoSessionTransportEntry 4}
+
+d5VideoSessionTransportGigIfIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video session transport gigabit Ethernet port ifIndex."
+    ::= {d5VideoSessionTransportEntry 5}
+
+--------------------------------------------------------------------------------------------------
+-- Video multicast transport table
+--------------------------------------------------------------------------------------------------
+
+d5VideoMulticastTransportTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5VideoMulticastTransportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table maps multicast IP address and UPD port to transport ID."
+    ::= {d5VideoSessionMib 5}
+
+d5VideoMulticastTransportEntry OBJECT-TYPE
+    SYNTAX D5VideoMulticastTransportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the video session multicast transport table."
+    INDEX {d5VideoMulticastTransportIpAddress,d5VideoMulticastTransportUdpPort,d5VideoMulticastTransportId}
+    ::= {d5VideoMulticastTransportTable 1}
+
+D5VideoMulticastTransportEntry ::= SEQUENCE {
+    d5VideoMulticastTransportIpAddress  InetAddress,
+    d5VideoMulticastTransportUdpPort    Unsigned32,
+    d5VideoMulticastTransportId         Unsigned32
+}
+
+d5VideoMulticastTransportIpAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video session transport multicast IP address."
+    ::= {d5VideoMulticastTransportEntry 1}
+
+d5VideoMulticastTransportUdpPort OBJECT-TYPE
+    SYNTAX Unsigned32(0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video session transport destination UDP port."
+    ::= {d5VideoMulticastTransportEntry 2}
+
+d5VideoMulticastTransportId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video multicast transport identifier."
+    ::= {d5VideoMulticastTransportEntry 3}
+
+--------------------------------------------------------------------------------------------------
+-- Video session group table
+--------------------------------------------------------------------------------------------------
+
+-- shell-session <active [verbose] | verbose>
+d5VideoSessionGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5VideoSessionGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table lists video session groups."
+    ::= {d5VideoSessionMib 6}
+
+d5VideoSessionGroupEntry OBJECT-TYPE
+    SYNTAX D5VideoSessionGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the video session group table."
+    INDEX {d5VideoSessionGroupId}
+    ::= {d5VideoSessionGroupTable 1}
+
+D5VideoSessionGroupEntry ::= SEQUENCE {
+    d5VideoSessionGroupId               Unsigned32,
+    d5VideoSessionGroupQamIfIndex       InterfaceIndex,
+    d5VideoSessionGroupNumSessions      Unsigned32,
+    d5VideoSessionGroupActiveSessions   Unsigned32,
+    d5VideoSessionGroupBandwidth        Unsigned32,
+    d5VideoSessionGroupBitrate          Unsigned32,
+    d5VideoSessionGroupMaxBoundSessions Unsigned32    
+}
+
+d5VideoSessionGroupId OBJECT-TYPE
+    SYNTAX Unsigned32(1..1024)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Video shell session group identifier."
+    ::= {d5VideoSessionGroupEntry 1}
+
+d5VideoSessionGroupQamIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ifIndex of the output QAM used by this video shell session."
+    ::= {d5VideoSessionGroupEntry 2}
+
+d5VideoSessionGroupNumSessions OBJECT-TYPE
+    SYNTAX Unsigned32(0..32)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of video shell sessions in this group."
+    ::= {d5VideoSessionGroupEntry 3}
+
+d5VideoSessionGroupActiveSessions OBJECT-TYPE
+    SYNTAX Unsigned32(0..32)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of video shell sessions in this group."
+    ::= {d5VideoSessionGroupEntry 4}
+
+d5VideoSessionGroupBandwidth OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "bps"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Configured video shell session group bandwidth in bits per second."
+    ::= {d5VideoSessionGroupEntry 5}
+
+d5VideoSessionGroupBitrate OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "bps"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current measured video shell session group bitrate in bits per second."
+    ::= {d5VideoSessionGroupEntry 6}
+
+d5VideoSessionGroupMaxBoundSessions OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "High watermark for the number of bound sessions in this group."
+    ::= {d5VideoSessionGroupEntry 7}
+
+--------------------------------------------------------------------------------------------------
+-- Video session QAM table
+--------------------------------------------------------------------------------------------------
+
+d5VideoSessionQamTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5VideoSessionQamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table lists video session statistics for a particular QAM."
+    ::= {d5VideoSessionMib 7}
+
+d5VideoSessionQamEntry OBJECT-TYPE
+    SYNTAX D5VideoSessionQamEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the video session qam table."
+    INDEX {d5VideoSessionQamQamIfIndex}
+    ::= {d5VideoSessionQamTable 1}
+
+D5VideoSessionQamEntry ::= SEQUENCE {
+    d5VideoSessionQamQamIfIndex            InterfaceIndex,
+    d5VideoSessionQamTsid                  Unsigned32,
+    d5VideoSessionQamCreateSessions        Counter32,
+    d5VideoSessionQamDeleteSessions        Counter32,
+    d5VideoSessionQamQuerySessions         Counter32,
+    d5VideoSessionQamPacketInserts         Counter32,
+    d5VideoSessionQamBindSessions          Counter32,
+    d5VideoSessionQamUnbindSessions        Counter32,
+    d5VideoSessionQamCreateSessionFailures Counter32,
+    d5VideoSessionQamBindSessionFailures   Counter32,
+    d5VideoSessionQamMaxActiveSessions     Gauge32,
+    d5VideoSessionQamMaxActiveBandwidth    Gauge32,
+    d5VideoSessionQamActiveSessions        Gauge32,
+    d5VideoSessionQamActiveBandwidth       Gauge32
+}
+
+d5VideoSessionQamQamIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ifIndex of the QAM channel used by this video session."
+    ::= {d5VideoSessionQamEntry 1}
+
+d5VideoSessionQamTsid OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The TSID of the QAM channel used by this video session."
+    ::= {d5VideoSessionQamEntry 2}
+
+d5VideoSessionQamCreateSessions OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of sessions created on this QAM channel."
+    ::= {d5VideoSessionQamEntry 3}
+
+d5VideoSessionQamDeleteSessions OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of sessions deleted on this QAM channel."
+    ::= {d5VideoSessionQamEntry 4}
+
+d5VideoSessionQamQuerySessions OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of sessions queried on this QAM channel."
+    ::= {d5VideoSessionQamEntry 5}
+
+d5VideoSessionQamPacketInserts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of packet inserts on this QAM channel."
+    ::= {d5VideoSessionQamEntry 6}
+
+d5VideoSessionQamBindSessions OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of sessions bound on this QAM channel."
+    ::= {d5VideoSessionQamEntry 7}
+
+d5VideoSessionQamUnbindSessions OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of sessions unbound on this QAM channel."
+    ::= {d5VideoSessionQamEntry 8}
+
+d5VideoSessionQamCreateSessionFailures OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of failed session creations on this QAM channel."
+    ::= {d5VideoSessionQamEntry 9}
+
+d5VideoSessionQamBindSessionFailures OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of failed session binds on this QAM channel."
+    ::= {d5VideoSessionQamEntry 10}
+
+d5VideoSessionQamMaxActiveSessions OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The high watermark for number of bound and created sessions on this QAM channel."
+    ::= {d5VideoSessionQamEntry 11}
+
+d5VideoSessionQamMaxActiveBandwidth OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The high watermark for bandwidth reserved for bound and created sessions on this QAM channel."
+    ::= {d5VideoSessionQamEntry 12}
+
+d5VideoSessionQamActiveSessions OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current number of bound and created sessions on this QAM channel."
+    ::= {d5VideoSessionQamEntry 13}
+
+d5VideoSessionQamActiveBandwidth OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current bandwidth reserved for bound and created sessions on this QAM channel."
+    ::= {d5VideoSessionQamEntry 14}
+
+--------------------------------------------------------------------------------------------------
+-- Video lb Configuration
+--------------------------------------------------------------------------------------------------
+
+d5SdvLoadBalancingConfigurationGroup OBJECT-GROUP
+    OBJECTS {
+        d5SdvLoadBalancingForced,
+        d5SdvLoadBalancingMode
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing SDV load balancing configuration."
+    ::= { d5VideoSessionMib 8 }
+
+d5SdvLoadBalancingForced OBJECT-TYPE
+    SYNTAX       INTEGER {
+    	disabled(1),
+        enabled(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Enables or disables SDV RPC forced load balancing."
+    ::= { d5SdvLoadBalancingConfigurationGroup 1 }
+
+d5SdvLoadBalancingMode OBJECT-TYPE
+    SYNTAX       INTEGER {
+        hothot(1),
+        hotwarm(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Set operational mode of SDV load balancing."
+    ::= { d5SdvLoadBalancingConfigurationGroup 2 }
+
+--------------------------------------------------------------------------------------------------
+-- Video lb table
+--------------------------------------------------------------------------------------------------
+d5SdvLoadBalancingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5SdvLoadBalancingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table lists video session statistics for a particular QAM."
+    ::= {d5VideoSessionMib 9}
+
+d5SdvLoadBalancingEntry OBJECT-TYPE
+    SYNTAX D5SdvLoadBalancingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the video session qam table."
+    INDEX {d5SdvLoadBalancingGigIfIndex}
+    ::= {d5SdvLoadBalancingTable 1}
+
+D5SdvLoadBalancingEntry ::= SEQUENCE {
+    d5SdvLoadBalancingGigIfIndex            InterfaceIndex,
+    d5SdvLoadBalancingGigOperStatus         INTEGER,
+    d5SdvLoadBalancingAssignment            INTEGER,
+    d5SdvLoadBalancingSessionCount          Counter32,
+    d5SdvLoadBalancingBandwidth             Counter32
+}
+
+d5SdvLoadBalancingGigIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ifIndex of the Gigabit interface."
+    ::= {d5SdvLoadBalancingEntry 1}
+
+d5SdvLoadBalancingGigOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        up(1),
+        down(2)
+    }   
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The load balancing operational state of this Gigabit interface."
+    ::= {d5SdvLoadBalancingEntry 2}
+ 
+d5SdvLoadBalancingAssignment OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(1),
+        primary(2),
+        secondary(3)
+    }   
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The SDV load balancing assignment of this Gigabit interface."
+    ::= {d5SdvLoadBalancingEntry 3}  
+
+d5SdvLoadBalancingSessionCount OBJECT-TYPE
+    SYNTAX Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of SDV sessions on this Gigabit interface."
+    ::= {d5SdvLoadBalancingEntry 4}  
+
+d5SdvLoadBalancingBandwidth OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The bandwidth used by SDV sessions on this Gigabit interface."
+    ::= {d5SdvLoadBalancingEntry 5}  
+    
+END

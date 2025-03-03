@@ -1,0 +1,2121 @@
+ATEN-IPMI-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the ATEN CORP. enterprise MIB tree
+--
+
+IMPORTS
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32, IpAddress FROM SNMPv2-SMI
+    DateAndTime FROM SNMPv2-TC;
+
+aten MODULE-IDENTITY
+    LAST-UPDATED "200903201150Z"
+    ORGANIZATION "www.aten.com.tw"
+    CONTACT-INFO "email:shuyufu@aten.com.tw"
+    DESCRIPTION  "Top-level infrastructure of the ATEN CORP. enterprise MIB tree"
+    REVISION     "200903201150Z"
+    DESCRIPTION  "First draft"
+    ::= { enterprises 21317 }
+
+--
+--  ATEN CORP. enterprise-specific management objects
+--
+
+ipmi            OBJECT IDENTIFIER ::= { aten 1 }
+boardinfo       OBJECT IDENTIFIER ::= { ipmi 5 }
+hardwareinfo    OBJECT IDENTIFIER ::= { ipmi 6 }
+storage         OBJECT IDENTIFIER ::= { ipmi 7 }
+powerinfo       OBJECT IDENTIFIER ::= { ipmi 14 }
+fruinfo         OBJECT IDENTIFIER ::= { ipmi 16 }
+ntpinfo         OBJECT IDENTIFIER ::= { ipmi 17 }
+nvme            OBJECT IDENTIFIER ::= { ipmi 19 }
+network         OBJECT IDENTIFIER ::= { ipmi 21 }
+smtp            OBJECT IDENTIFIER ::= { ipmi 22 }
+
+--
+--  MIB Module Object Types
+--
+sel         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Number of SELs"
+    ::= { ipmi 2 }
+
+sensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of sensors.  The number of entries is
+            given by the value of ifNumber."
+    ::= { ipmi 3 }
+
+sensorEntry OBJECT-TYPE
+    SYNTAX      SensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular sensor."
+    INDEX   { sensorNumber }
+    ::= { sensorTable 1 }
+
+SensorEntry ::=
+    SEQUENCE {
+        sensorNumber                Integer32,
+        sensorReading               OCTET STRING,
+        sensorPositiveHysteresis    Integer32,
+        sensorNegativeHysteresis    Integer32,
+        lncThreshold                OCTET STRING,
+        lcThreshold                 OCTET STRING,
+        lnrThreshold                OCTET STRING,
+        uncThreshold                OCTET STRING,
+        ucThreshold                 OCTET STRING,
+        unrThreshold                OCTET STRING,
+        eventAssertionEnable        Integer32,
+        eventDeassertionEnable      Integer32,
+        sensorIDString              OCTET STRING
+    }
+
+sensorNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each interface.  It
+            is recommended that values are assigned contiguously
+            starting from 1.  The value for each interface sub-layer
+            must remain constant at least from one re-initialization of
+            the entity's network management system to the next re-
+            initialization."
+    ::= { sensorEntry 1 }
+
+sensorReading OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the
+            interface.  This string should include the name of the
+            manufacturer, the product name and the version of the
+            interface hardware/software."
+    ::= { sensorEntry 2 }
+
+sensorPositiveHysteresis OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of interface.  Additional values for ifType are
+            assigned by the Internet Assigned Numbers Authority (IANA),
+            through updating the syntax of the IANAifType textual
+            convention."
+    ::= { sensorEntry 3 }
+
+sensorNegativeHysteresis OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size of the largest packet which can be sent/received
+            on the interface, specified in octets.  For interfaces that
+            are used for transmitting network datagrams, this is the
+            size of the largest network datagram that can be sent on the
+            interface."
+    ::= { sensorEntry 4 }
+
+lncThreshold OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An estimate of the interface's current bandwidth in bits
+            per second.  For interfaces which do not vary in bandwidth
+            or for those where no accurate estimation can be made, this
+            object should contain the nominal bandwidth.  If the
+            bandwidth of the interface is greater than the maximum value
+            reportable by this object then this object should report its
+            maximum value (4,294,967,295) and ifHighSpeed must be used
+            to report the interace's speed.  For a sub-layer which has
+            no concept of bandwidth, this object should be zero."
+    ::= { sensorEntry 5 }
+
+lcThreshold OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The interface's address at its protocol sub-layer.  For
+            example, for an 802.x interface, this object normally
+            contains a MAC address.  The interface's media-specific MIB
+            must define the bit and byte ordering and the format of the
+            value of this object.  For interfaces which do not have such
+            an address (e.g., a serial line), this object should contain
+            an octet string of zero length."
+    ::= { sensorEntry 6 }
+
+lnrThreshold OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The desired state of the interface.  The testing(3) state
+            indicates that no operational packets can be passed.  When a
+            managed system initializes, all interfaces start with
+            ifAdminStatus in the down(2) state.  As a result of either
+            explicit management action or per configuration information
+            retained by the managed system, ifAdminStatus is then
+            changed to either the up(1) or testing(3) states (or remains
+            in the down(2) state)."
+    ::= { sensorEntry 7 }
+
+
+
+uncThreshold OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current operational state of the interface.  The
+            testing(3) state indicates that no operational packets can
+            be passed.  If ifAdminStatus is down(2) then ifOperStatus
+            should be down(2).  If ifAdminStatus is changed to up(1)
+            then ifOperStatus should change to up(1) if the interface is
+            ready to transmit and receive network traffic; it should
+            change to dormant(5) if the interface is waiting for
+            external actions (such as a serial line waiting for an
+            incoming connection); it should remain in the down(2) state
+            if and only if there is a fault that prevents it from going
+            to the up(1) state; it should remain in the notPresent(6)
+            state if the interface has missing (typically, hardware)
+            components."
+    ::= { sensorEntry 8 }
+
+ucThreshold OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The value of sysUpTime at the time the interface entered
+            its current operational state.  If the current state was
+            entered prior to the last re-initialization of the local
+            network management subsystem, then this object contains a
+            zero value."
+    ::= { sensorEntry 9 }
+
+unrThreshold OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of octets received on the interface,
+
+
+            including framing characters.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { sensorEntry 10 }
+
+eventAssertionEnable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were not addressed to a multicast
+            or broadcast address at this sub-layer.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { sensorEntry 11 }
+
+eventDeassertionEnable OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were addressed to a multicast or
+            broadcast address at this sub-layer.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime.
+
+            This object is deprecated in favour of ifInMulticastPkts and
+            ifInBroadcastPkts."
+    ::= { sensorEntry 12 }
+
+sensorIDString OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "16-byte length field for displaying each available sensors' ID string."
+    ::= { sensorEntry 13 }
+
+powerStatus     OBJECT-TYPE
+    SYNTAX      INTEGER { poweroff(0), poweron(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Get and set the power status of system.
+                Set case:
+                0 : power off
+                1 : power on
+                2 : power reset"
+    ::= { ipmi 4 }
+
+coldResetBMC    OBJECT-TYPE
+    SYNTAX      Integer32 (1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Cold reset the BMC."
+    ::= { ipmi 8 }
+
+bmcMajorVesion  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "BMC Major Vesion"
+    ::= { boardinfo 1 }
+
+bmcMinorVesion  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "BMC Minor Vesion"
+    ::= { boardinfo 2 }
+
+bmcBuildDate    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "BMC FW Build Date"
+    ::= { boardinfo 3 }
+
+biosVesion      OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "BIOS Vesion"
+    ::= { boardinfo 4 }
+
+biosBuildDate   OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "BIOS Build Date"
+    ::= { boardinfo 5 }
+
+hostName        OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "BMC Host Name"
+    ::= { boardinfo 6 }
+
+bmcBuildVesion  OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "BMC Build Vesion"
+    ::= { boardinfo 7 }
+
+serialNumber    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Motherboard Serial Number"
+    ::= { hardwareinfo 1 }
+
+cpuTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of CPUs.  The number of entries is
+            given by the number of CPUs."
+    ::= { hardwareinfo 2 }
+
+cpuEntry OBJECT-TYPE
+    SYNTAX      CpuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular CPU."
+    INDEX   { cpuNumber }
+    ::= { cpuTable 1 }
+
+CpuEntry ::=
+    SEQUENCE {
+        cpuNumber                Integer32,
+        processor                OCTET STRING,
+        speed                    Integer32,
+        core                     Integer32,
+        coreActive               Integer32,
+        manufacturer             OCTET STRING
+    }
+
+cpuNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each CPU.  It
+            is recommended that values are assigned contiguously
+            starting from 1."
+    ::= { cpuEntry 1 }
+
+processor OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Processor name."
+    ::= { cpuEntry 2 }
+
+speed OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Processor speed (MHz)."
+    ::= { cpuEntry 3 }
+
+core OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of processor cores."
+    ::= { cpuEntry 4 }
+
+coreActive OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of active processor cores."
+    ::= { cpuEntry 5 }
+
+manufacturer OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "CPU Manufacturer"
+    ::= { cpuEntry 6 }
+
+dimmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DimmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of DIMMs.  The number of entries is
+            given by the number of DIMMs."
+    ::= { hardwareinfo 3 }
+
+dimmEntry OBJECT-TYPE
+    SYNTAX      DimmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular DIMM."
+    INDEX   { dimmNumber }
+    ::= { dimmTable 1 }
+
+DimmEntry ::=
+    SEQUENCE {
+        dimmNumber                Integer32,
+        dimmLocation              OCTET STRING,
+        dimmMaxCapSpeed           Integer32,
+        dimmOpSpeed               Integer32,
+        dimmSize                  Integer32,
+        dimmSerialNo              OCTET STRING,
+        dimmPartNo                OCTET STRING,
+        dimmManufacturer          OCTET STRING
+    }
+
+dimmNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each DIMM.  It
+            is recommended that values are assigned contiguously
+            starting from 1."
+    ::= { dimmEntry 1 }
+
+dimmLocation OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The location of this DIMM."
+    ::= { dimmEntry 2 }
+
+dimmMaxCapSpeed OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The max capable speed (MHz) of this DIMM."
+    ::= { dimmEntry 3 }
+
+dimmOpSpeed OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current operation speed (MHz) of this DIMM."
+    ::= { dimmEntry 4 }
+
+dimmSize OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size (MBytes) of this DIMM."
+    ::= { dimmEntry 5 }
+
+dimmSerialNo OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The serial number of this DIMM."
+    ::= { dimmEntry 6 }
+
+dimmPartNo OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The serial number of this DIMM."
+    ::= { dimmEntry 7 }
+
+dimmManufacturer OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The manufacturer of this DIMM."
+    ::= { dimmEntry 8 }
+
+controllerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ControllerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of raid controllers.  The number of entries is
+            given by the number of controllers."
+    ::= { storage 1 }
+
+controllerEntry OBJECT-TYPE
+    SYNTAX      ControllerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular controller."
+    INDEX   { controllerNumber }
+    ::= { controllerTable 1 }
+
+ControllerEntry ::=
+    SEQUENCE {
+        controllerNumber            Integer32,
+        controllerProductName       OCTET STRING,
+        serial                      OCTET STRING,
+        package                     OCTET STRING,
+        fwVersion                   OCTET STRING,
+        biosVersion                 OCTET STRING,
+        bootBlockVersion            OCTET STRING,
+        batteryStatus               Integer32,
+        pcieLocation                Integer32,
+        pcieSlot                    Integer32
+    }
+
+controllerNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each controller.  It
+            is recommended that values are assigned contiguously
+            starting from 1."
+    ::= { controllerEntry 1 }
+
+controllerProductName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(96))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Product name of the controller."
+    ::= { controllerEntry 2 }
+
+serial OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Serial number of the controller."
+    ::= { controllerEntry 3 }
+
+package OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(96))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Package version of the controller."
+    ::= { controllerEntry 4 }
+
+fwVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Firmware version of the controller."
+    ::= { controllerEntry 5 }
+
+biosVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "BIOS version of the controller."
+    ::= { controllerEntry 6 }
+
+bootBlockVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Boot block version of the controller."
+    ::= { controllerEntry 7 }
+
+batteryStatus OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Battery status of the controller.
+             0: Missing
+             1: Charging
+             2: Discharging
+             3: Optimal
+             4: Needs to be replaced"
+    ::= { controllerEntry 8 }
+
+pcieLocation OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PCIE location of the controller.
+             0: ONBOARD
+             1: RISER WIO Right
+             2: RISER WIO Left
+             3: RISER Ultra IO"
+    ::= { controllerEntry 9 }
+
+pcieSlot OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PCIE slot number of the controller."
+    ::= { controllerEntry 10 }
+
+nicTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NicEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of NICs.  The number of entries is
+            given by the number of NICs."
+    ::= { ipmi 20 }
+
+nicEntry OBJECT-TYPE
+    SYNTAX      NicEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular NIC."
+    INDEX   { nicNumber }
+    ::= { nicTable 1 }
+
+NicEntry ::=
+    SEQUENCE {
+        nicNumber                   Integer32,
+        nicName                     OCTET STRING,
+        nicMac                      OCTET STRING,
+        nicIpv4Addr                 IpAddress,
+        nicIpv6Addr                 OCTET STRING,
+        nicGateway                  OCTET STRING,
+        nicNetmask                  OCTET STRING,
+        nicFqdn                     OCTET STRING,
+        nicDns                      OCTET STRING,
+        nicSpeed                    Integer32,
+        nicDescript                 OCTET STRING,
+        nicStatus                   OCTET STRING
+    }
+
+nicNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each NIC.  It
+            is recommended that values are assigned contiguously
+            starting from 1."
+    ::= { nicEntry 1 }
+
+nicName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Name of the NIC."
+    ::= { nicEntry 2  }
+
+nicMac OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "MAC of the NIC."
+    ::= { nicEntry 3  }
+
+nicIpv4Addr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IPv4 address of the NIC."
+    ::= { nicEntry 4  }
+
+nicIpv6Addr OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(45))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IPv6 address of the NIC."
+    ::= { nicEntry 5  }
+
+nicGateway OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(45))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Gateway of the NIC."
+    ::= { nicEntry 6  }
+
+nicNetmask OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(45))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Netmask of the NIC."
+    ::= { nicEntry 7  }
+
+nicFqdn OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FQDN of the NIC."
+    ::= { nicEntry 8  }
+
+nicDns OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(91))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "DNS of the NIC."
+    ::= { nicEntry 9  }
+
+nicSpeed OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Speed of the NIC. (Unit: Mbps)"
+    ::= { nicEntry 10  }
+
+nicDescript OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Description of the NIC."
+    ::= { nicEntry 11  }
+
+nicStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Status of the NIC."
+    ::= { nicEntry 12  }
+
+phyHddTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HddEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of HDDs.  The number of entries is
+            given by the number of HDDs."
+    ::= { storage 2 }
+
+hddEntry OBJECT-TYPE
+    SYNTAX      HddEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular HDD."
+    INDEX   { hddNumber }
+    ::= { phyHddTable 1 }
+
+HddEntry ::=
+    SEQUENCE {
+        hddNumber                   Integer32,
+        hddControllerNumber         Integer32,
+        enclosureNumber             Integer32,
+        status                      Integer32,
+        temperature                 Integer32,
+        capacity                    Integer32,
+        vendor                      OCTET STRING,
+        modelName                   OCTET STRING,
+        revision                    OCTET STRING,
+        sn                          OCTET STRING,
+        linkSpeed                   Integer32,
+        fwState                     Integer32,
+        otherErrCount               Integer32,
+        predictedFailCount          Integer32,
+        mediaErrCount               Integer32
+    }
+
+hddNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each HDD.  It
+            is recommended that values are assigned contiguously
+            starting from 1."
+    ::= { hddEntry 1 }
+
+hddControllerNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The controller that this HDD belongs to."
+    ::= { hddEntry 2 }
+
+enclosureNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The enclosure that this HDD belongs to."
+    ::= { hddEntry 3 }
+
+status OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current status of the HDD.
+             1: present
+             0: not present"
+    ::= { hddEntry 4 }
+
+temperature OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current temperature of the HDD."
+    ::= { hddEntry 5 }
+
+capacity OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Capacity(GB) of the HDD. "
+    ::= { hddEntry 6 }
+
+vendor OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The vendor of the HDD."
+    ::= { hddEntry 7 }
+
+modelName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Model name of the HDD."
+    ::= { hddEntry 8 }
+
+revision OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Revision of the HDD."
+    ::= { hddEntry 9 }
+
+sn OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The serial number of the HDD."
+    ::= { hddEntry 10 }
+
+linkSpeed OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The link speed of the HDD.
+             0: not defined
+             1: 1.5Gb/s - SATA 150
+             2: 3.0Gb/s
+             3: 6.0Gb/s
+             4: 12.0Gb/s"
+    ::= { hddEntry 11 }
+
+fwState OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The firmware state of the HDD.
+              00: Unconfigured good drive
+              01: Unconfigured bad drive
+              02: Hot spare drive
+              16: Configured-good drive(data invalid)
+              17: Configured-bad drive (data invalid)
+              20: Configured-drive is rebuilding
+              24: Configured-drive is online
+              32: drive is getting copied
+              64: drive is exposed and controlled by host
+             128: UnConfigured - shielded
+             130: Hot Spare - shielded
+             144: Configured - shielded"
+    ::= { hddEntry 12 }
+
+otherErrCount OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Other error count of the HDD."
+    ::= { hddEntry 13 }
+
+predictedFailCount OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Predicted fail count of the HDD."
+    ::= { hddEntry 14 }
+
+mediaErrCount OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Media error Count of the HDD."
+    ::= { hddEntry 15 }
+
+
+logHddTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VolumeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of volumes.  The number of entries is
+            given by the number of volumes."
+    ::= { storage 3 }
+
+volumeEntry OBJECT-TYPE
+    SYNTAX      VolumeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular volume."
+    INDEX   { volNumber }
+    ::= { logHddTable 1 }
+
+VolumeEntry ::=
+    SEQUENCE {
+        volNumber                   Integer32,
+        volControllerNumber         Integer32,
+        volStatus                   Integer32,
+        volCapacity                 Integer32,
+        priRaidLevel                Integer32,
+        raidLevelQualifier          Integer32,
+        secRaidLevel                Integer32,
+        ldStripSize                 Integer32,
+        numDevices                  Integer32,
+        spanDepth                   Integer32,
+        state                       Integer32,
+        volName                     OCTET STRING
+    }
+
+volNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each volume.  It
+            is recommended that values are assigned contiguously
+            starting from 1."
+    ::= { volumeEntry 1 }
+
+volControllerNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The controller that this HDD belongs to."
+    ::= { volumeEntry 2 }
+
+volStatus OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current status of the volume.
+             1: present
+             0: not present"
+    ::= { volumeEntry 3 }
+
+volCapacity OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Capacity(GB) of the volume."
+    ::= { volumeEntry 4 }
+
+priRaidLevel OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Primary raid level of the volume."
+    ::= { volumeEntry 5 }
+
+raidLevelQualifier OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Raid level qaulifier of the volume."
+    ::= { volumeEntry 6 }
+
+secRaidLevel OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Secondary raid level of the volume."
+    ::= { volumeEntry 7 }
+
+ldStripSize OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "LD strip size of the volume.
+            (per DDF: 4=8K, 5=16K, 7=64K, 11=1MB, etc.)"
+    ::= { volumeEntry 8 }
+
+numDevices OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "number of drives per span."
+    ::= { volumeEntry 9 }
+
+spanDepth OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Span depth of the volume."
+    ::= { volumeEntry 10 }
+
+state OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "State of the volume.
+             0: offline
+             1: partially degraded
+             2: degraded
+             3: optimal"
+    ::= { volumeEntry 11 }
+
+volName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the volume."
+    ::= { volumeEntry 12 }
+
+userTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of all users."
+    ::= { ipmi 9 }
+
+userInfo OBJECT-TYPE
+    SYNTAX      UserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular user."
+    INDEX   { id }
+    ::= { userTable 1 }
+
+UserEntry ::=
+    SEQUENCE {
+        id               Integer32,
+        username         OCTET STRING,
+        password         OCTET STRING,
+        privilege        Integer32
+    }
+
+id OBJECT-TYPE
+    SYNTAX      Integer32 (1..15)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value for user ID, greater than zero."
+    ::= { userInfo 1 }
+
+username OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "User name."
+    ::= { userInfo 2 }
+
+password OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Password."
+    ::= { userInfo 3 }
+
+privilege OBJECT-TYPE
+    SYNTAX      Integer32 (2..4)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "User privilege."
+    ::= { userInfo 4 }
+
+uid OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Get and set the UID status.
+                Get case:
+                0 : off
+                1 : on
+                Set case:
+                0 : off
+                1 : on"
+    ::= { ipmi 10 }
+
+
+
+psuNumber    OBJECT-TYPE
+    SYNTAX      Integer32 (0..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of PSUs"
+    ::= { powerinfo 1 }
+
+psuTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PsuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of PSUs. The number of entries is
+            given by the number of PSUs."
+    ::= { powerinfo 2 }
+
+psuEntry OBJECT-TYPE
+    SYNTAX      PsuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing a particular PSU information."
+    INDEX   { psuIndex }
+    ::= { psuTable 1 }
+
+PsuEntry ::=
+    SEQUENCE {
+        psuIndex                 Integer32,
+        psuStatus                Integer32,
+        inputVoltage             OCTET STRING,
+        inputCurrent             OCTET STRING,
+        inputPower               Integer32,
+        outputVoltage            OCTET STRING,
+        outputCurrent            OCTET STRING,
+        outputPower              Integer32,
+        temperature1             Integer32,
+        temperature2             Integer32,
+        fanRPM1                  Integer32,
+        fanRPM2                  Integer32,
+        psuSerialNumber          OCTET STRING
+    }
+
+psuIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, start from one, for each PSU. It is
+            recommended that values are assigned contiguously
+            starting from 1."
+    ::= { psuEntry 1 }
+
+psuStatus OBJECT-TYPE
+    SYNTAX      INTEGER { fail(0), good(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Status."
+    ::= { psuEntry 2 }
+
+inputVoltage OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Input Voltage."
+    ::= { psuEntry 3 }
+
+inputCurrent OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Input Current."
+    ::= { psuEntry 4 }
+
+inputPower OBJECT-TYPE
+    SYNTAX      Integer32 (1..1048576)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Input Power."
+    ::= { psuEntry 5 }
+
+outputVoltage OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Output Voltage."
+    ::= { psuEntry 6 }
+
+outputCurrent OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Output Current."
+    ::= { psuEntry 7 }
+
+outputPower OBJECT-TYPE
+    SYNTAX      Integer32 (1..1048576)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Output Power."
+    ::= { psuEntry 8 }
+
+temperature1 OBJECT-TYPE
+    SYNTAX      Integer32 (1..256)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Temperature1."
+    ::= { psuEntry 9 }
+
+temperature2 OBJECT-TYPE
+    SYNTAX      Integer32 (1..256)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Temperature2."
+    ::= { psuEntry 10 }
+
+fanRPM1 OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Fan RPM1."
+    ::= { psuEntry 11 }
+
+fanRPM2 OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Fan RPM2."
+    ::= { psuEntry 12 }
+
+psuSerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PSU Serial Number."
+    ::= { psuEntry 13 }
+
+--
+--  FanMode MIB (15)
+--
+fanMode  OBJECT-TYPE
+    SYNTAX      INTEGER { standard(0), fullspeed(1), optimal(2), pue2optimal(3), heavyIO(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            ""
+    ::= { ipmi 15 }
+
+--
+--  FRU MIB (16)
+--
+chassis    OBJECT IDENTIFIER ::= { fruinfo 1 }
+board      OBJECT IDENTIFIER ::= { fruinfo 2 }
+product    OBJECT IDENTIFIER ::= { fruinfo 3 }
+
+chassisType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Chassis Type."
+    ::= { chassis 1 }
+
+chassisPartNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Chassis Part Number"
+    ::= { chassis 2 }
+
+chassisSerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Chassis Serial Number"
+    ::= { chassis 3 }
+
+boardLanguage OBJECT-TYPE
+    SYNTAX  INTEGER { afar(1), abkhazian(2), afrikaans(3), amharic(4), arabic(5), assamese(6), aymara(7), azerbaijani(8), bashkir(9), byelorussian(10), bulgarian(11), bihari(12), bislama(13), bengali(14), tibetan(15), breton(16), catalan(17), corsican(18), czech(19), welsh(20), danish(21), german(22), bhutani(23), greek(24), english(25), esperanto(26), spanish(27), estonian(28), basque(29), persian(30), finnish(31), fiji(32), faeroese(33), french(34), frisian(35), irish(36), gaelic(37), galician(38), guarani(39), gujarati(40), hausa(41), hindi(42), croatian(43), hungarian(44), armenian(45), interlingua(46), interlingue(47), inupiak(48), indonesian(49), icelandic(50), italian(51), hebrew(52), japanese(53), yiddish(54), javanese(55), georgian(56), kazakh(57), greenlandic(58), cambodian(59), kannada(60), korean(61), kashmiri(62), kurdish(63), kirghiz(64), latin(65), lingala(66), laothian(67), lithuanian(68), lettish(69), malagasy(70), maori(71), macedonian(72), malayalam(73), mongolian(74), moldavian(75), marathi(76), malay(77), maltese(78), burmese(79), nauru(80), nepali(81), dutch(82), norwegian(83), occitan(84), oromo(85), oriya(86), punjabi(87), polish(88), pushto(89), portuguese(90), quechua(91), rhaeto-romance(92), kirundi(93), romanian(94), russian(95), kinyarwanda(96), sanskrit(97), sindhi(98), sangro(99), serbo-croatian(100), singhalese(101), slovak(102), slovenian(103), samoan(104), shona(105), somali(106), albanian(107), serbian(108), siswati(109), sesotho(110), sudanese(111), swedish(112), swahili(113), tamil(114), tegulu(115), tajik(116), thai(117), tigrinya(118), turkmen(119), tagalog(120), setswana(121), tonga(122), turkish(123), tsonga(124), tatar(125), twi(126), ukrainian(127), urdu(128), uzbek(129), vietnamese(130), volapuk(131), wolof(132), xhosa(133), yoruba(134), chinese(135), zulu(136) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Board Language"
+    ::= { board 1 }
+
+boardManufacturer OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Board Manufacturer"
+    ::= { board 2 }
+
+boardProductName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Board Product Name"
+    ::= { board 3 }
+
+boardSerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Board Serial Number"
+    ::= { board 4 }
+
+boardPartNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Board part Number"
+    ::= { board 5 }
+
+productLanguage OBJECT-TYPE
+    SYNTAX  INTEGER { afar(1), abkhazian(2), afrikaans(3), amharic(4), arabic(5), assamese(6), aymara(7), azerbaijani(8), bashkir(9), byelorussian(10), bulgarian(11), bihari(12), bislama(13), bengali(14), tibetan(15), breton(16), catalan(17), corsican(18), czech(19), welsh(20), danish(21), german(22), bhutani(23), greek(24), english(25), esperanto(26), spanish(27), estonian(28), basque(29), persian(30), finnish(31), fiji(32), faeroese(33), french(34), frisian(35), irish(36), gaelic(37), galician(38), guarani(39), gujarati(40), hausa(41), hindi(42), croatian(43), hungarian(44), armenian(45), interlingua(46), interlingue(47), inupiak(48), indonesian(49), icelandic(50), italian(51), hebrew(52), japanese(53), yiddish(54), javanese(55), georgian(56), kazakh(57), greenlandic(58), cambodian(59), kannada(60), korean(61), kashmiri(62), kurdish(63), kirghiz(64), latin(65), lingala(66), laothian(67), lithuanian(68), lettish(69), malagasy(70), maori(71), macedonian(72), malayalam(73), mongolian(74), moldavian(75), marathi(76), malay(77), maltese(78), burmese(79), nauru(80), nepali(81), dutch(82), norwegian(83), occitan(84), oromo(85), oriya(86), punjabi(87), polish(88), pushto(89), portuguese(90), quechua(91), rhaeto-romance(92), kirundi(93), romanian(94), russian(95), kinyarwanda(96), sanskrit(97), sindhi(98), sangro(99), serbo-croatian(100), singhalese(101), slovak(102), slovenian(103), samoan(104), shona(105), somali(106), albanian(107), serbian(108), siswati(109), sesotho(110), sudanese(111), swedish(112), swahili(113), tamil(114), tegulu(115), tajik(116), thai(117), tigrinya(118), turkmen(119), tagalog(120), setswana(121), tonga(122), turkish(123), tsonga(124), tatar(125), twi(126), ukrainian(127), urdu(128), uzbek(129), vietnamese(130), volapuk(131), wolof(132), xhosa(133), yoruba(134), chinese(135), zulu(136) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Product Language"
+    ::= { product 1 }
+
+productManufacturer OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Product Manufacturer"
+    ::= { product 2 }
+
+productName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Product Name"
+    ::= { product 3 }
+
+productPartNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Product Part Number"
+    ::= { product 4 }
+
+productVersion OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Product Version"
+    ::= { product 5 }
+
+productSerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "FRU Product Serial Number"
+    ::= { product 6 }
+
+productAssetTag OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "FRU Product Asset Tag"
+    ::= { product 7 }
+--
+--  NTP INFO MIB (17)
+--
+timeZone OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(5))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Get and set time zone.
+            Get/Set case:
+            -1200
+            -1100
+            -1000
+            -0930
+            -0900
+            -0800
+            -0700
+            -0600
+            -0500
+            -0430
+            -0400
+            -0330
+            -0300
+            -0230
+            -0200
+            -0100
+            +0000
+            +0100
+            +0200
+            +0300
+            +0330
+            +0400
+            +0430
+            +0500
+            +0530
+            +0545
+            +0600
+            +0630
+            +0700
+            +0800
+            +0900
+            +0930
+            +1000
+            +1030
+            +1100
+            +1130
+            +1200
+            +1300
+            +1400"
+    ::= { ntpinfo 1 }
+
+ntpEnable OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Get and set NTP status.
+                Get case:
+                0 : off
+                1 : on
+                Set case:
+                0 : off
+                1 : on"
+    ::= { ntpinfo 2 }
+
+primaryNTPServer OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Get and set primary NTP server"
+    ::= { ntpinfo 3 }
+
+secondaryNTPServer OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Get and set secondary NTP server"
+    ::= { ntpinfo 4 }
+
+dst OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Get and set daylight saving time status
+            Get case:
+            0 : off
+            1 : on
+            Set case:
+            0 : off
+            1 : on"
+    ::= { ntpinfo 5 }
+
+selTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table displays a record of critical system events from the monitored system."
+    ::= { ipmi 18 }
+
+selEntry OBJECT-TYPE
+    SYNTAX      SelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry event logs indicate the time when a critical condition occurred and the time it was resolved"
+    INDEX   { selEid }
+    ::= { selTable 1 }
+
+SelEntry ::=
+    SEQUENCE {
+        selEid                      Integer32,
+        selTimeStamp                DateAndTime,
+        selSensorName               OCTET STRING,
+        selSensorType               OCTET STRING,
+        selDescription              OCTET STRING,
+        selRawData                  OCTET STRING
+    }
+
+selEid OBJECT-TYPE
+    SYNTAX      Integer32 (1..512)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "system event log EID"
+    ::= { selEntry 1 }
+
+selTimeStamp    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "System event log trigger time"
+    ::= { selEntry 2 }
+
+selSensorName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "System evnet log sensor name"
+    ::= { selEntry 3 }
+
+selSensorType OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "System evnet log sensor type"
+    ::= { selEntry 4 }
+
+selDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(512))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "System evnet log description"
+    ::= { selEntry 5 }
+
+selRawData OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "System evnet log raw data"
+    ::= { selEntry 6 }
+
+
+alertTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlertEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of all alerts."
+    ::= { ipmi 11 }
+
+alertInfo OBJECT-TYPE
+    SYNTAX      AlertEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular alert."
+    INDEX   { id }
+    ::= { alertTable 1 }
+
+AlertEntry ::=
+    SEQUENCE {
+        alertNo                    Integer32,
+        alertLevel                 OCTET STRING,
+        destinationAddress         OCTET STRING
+    }
+
+alertNo OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value for alert ID, greater than zero."
+    ::= { alertInfo 1 }
+
+alertLevel OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(25))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Alert Level."
+    ::= { alertInfo 2 }
+
+destinationAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(270))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Alert Level."
+    ::= { alertInfo 3 }
+
+--
+--  Network MIB (21)
+--
+
+ipv4DNSServer  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IPv4 dns server."
+    ::= { network 1 }
+
+ipv4Gateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IPv4 gateway"
+    ::= { network 2 }
+
+ipv6DNSServer  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(45))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IPv6 dns server."
+    ::= { network 3 }
+
+ipv6DUID  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IPv6 DUID"
+    ::= { network 4 }
+
+dhcpv6State  OBJECT-TYPE
+    SYNTAX      INTEGER { stateless(0) , stateful(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "DHCPv6 State"
+    ::= { network 5 }
+
+hostname  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "BMC hostname"
+    ::= { network 6 }
+
+dhcpEnabled  OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "DHCP enabled"
+    ::= { network 7 }
+
+vlanIDEnabled  OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "VLan enabled"
+    ::= { network 8 }
+
+vlanID  OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Vlan ID"
+    ::= { network 9 }
+
+lanInterface  OBJECT-TYPE
+    SYNTAX      INTEGER {  dedicated(0) , shared(1) ,failover(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "the current Lan interface"
+    ::= { network 10 }
+
+rmcpPort  OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IPMI port number"
+    ::= { network 11 }
+
+activeLanInterface  OBJECT-TYPE
+    SYNTAX      INTEGER {  dedicated(0) , shared(1) ,failover(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "which Lan interface is active."
+    ::= { network 12 }
+
+dedicatedLanDuplex  OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(0), fullduplex(1) , halfduplex(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Duplex Mode of the dedicated Lan"
+    ::= { network 13 }
+
+sharedLanDuplex  OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(0), fullduplex(1) , halfduplex(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Duplex Mode of the share Lan"
+    ::= { network 14 }
+
+
+--
+--  SMTP MIB (22)
+--
+
+smtpEnabled  OBJECT-TYPE
+    SYNTAX      INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "enable Email server "
+    ::= { smtp 1 }
+
+smtpServer  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Email server"
+    ::= { smtp 2 }
+
+smtpPort  OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "the port number of the email server"
+    ::= { smtp 3 }
+
+smtpUsername  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "the username for email server's authentication"
+    ::= { smtp 4 }
+
+smtpSenderEmail  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "the sender's email address"
+    ::= { smtp 5 }
+
+--
+--  MouseMode MIB (23)
+--
+mouseMode  OBJECT-TYPE
+    SYNTAX      INTEGER { absolute(1), relative(2), single(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "the port number of the email server"
+    ::= { ipmi 23 }
+
+--
+--  BootOrder MIB (24)
+--
+sysBootOrder  OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), pxe(1), hdd(2), diags(3), cdDvd(4), biosSetup(5), floppy(6), usbKey(7), usbHdd(8), usbFloppy(9), usbCD(10), uefiUsbKey(11), uefiCD(12), uefiHdd(13), uefiUsbHdd(14), uefiUsbCD(15) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "One time change system boot order."
+    ::= { ipmi 24 }
+
+
+--
+--  NVMe MIB (19)
+--
+
+nvmeCtrlTbl OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NVMeCtrlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of NVMe controllers.  The number of entries is
+            given by the number of controllers."
+    ::= { nvme 1 }
+
+nvmeCtrlEntry OBJECT-TYPE
+    SYNTAX      NVMeCtrlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing a particular NVMe controller information."
+    INDEX   { nvmeCtrlPresent }
+    ::= { nvmeCtrlTbl 1 }
+
+NVMeCtrlEntry ::=
+    SEQUENCE {
+        nvmeCtrlPresent             Integer32,
+        maxTemp                     Integer32,
+        maxSlotNum                  Integer32,
+        onboard                     Integer32,
+        driverIndex                 Integer32,
+        cpldVer                     OCTET STRING
+    }
+
+nvmeCtrlPresent OBJECT-TYPE
+    SYNTAX      INTEGER { absent(0), present(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe controllor present or not."
+    ::= { nvmeCtrlEntry 1 }
+
+maxTemp OBJECT-TYPE
+    SYNTAX      Integer32 (1..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The maximum temperature from all existed NVMe drives."
+    ::= { nvmeCtrlEntry 2 }
+
+maxSlotNum OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Maximum slot number at each group."
+    ::= { nvmeCtrlEntry 3 }
+
+onboard OBJECT-TYPE
+    SYNTAX      INTEGER { no(0), yes(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe controller type."
+    ::= { nvmeCtrlEntry 4 }
+
+driverIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe BPN driver index."
+    ::= { nvmeCtrlEntry 5 }
+
+cpldVer OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "CPLD FW version of this NVMe controller."
+    ::= { nvmeCtrlEntry 6 }
+
+nvmeDriveTbl OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NVMeDriveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of NVMe drives.  The number of entries is
+            given by the number of drives."
+    ::= { nvme 2 }
+
+nvmeDriveEntry OBJECT-TYPE
+    SYNTAX      NVMeDriveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing a particular NVMe drive information."
+    INDEX   { slotId }
+    ::= { nvmeDriveTbl 1 }
+
+NVMeDriveEntry ::=
+    SEQUENCE {
+        slotId                      Integer32,
+        groupId                     Integer32,
+        nvmeDrivePresent            Integer32,
+        locate                      Integer32,
+        save2Remove                 Integer32,
+        vmdMode                     Integer32,
+        temp                        Integer32,
+        classCode                   OCTET STRING,
+        vendorID                    OCTET STRING,
+        serialNum                   OCTET STRING,
+        modelNum                    OCTET STRING,
+        port0MaxLinkSpd             OCTET STRING,
+        port0MaxLinkWidth           OCTET STRING,
+        port1MaxLinkSpd             OCTET STRING,
+        port1MaxLinkWidth           OCTET STRING,
+        initPowerRequirement        Integer32,
+        maxPowerRequirement         Integer32
+    }
+
+slotId OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe Slot ID at one group."
+    ::= { nvmeDriveEntry 1 }
+
+groupId OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Group ID at this slot."
+    ::= { nvmeDriveEntry 2 }
+
+nvmeDrivePresent OBJECT-TYPE
+    SYNTAX      INTEGER { absent(0), present(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive presence at this slot."
+    ::= { nvmeDriveEntry 3 }
+
+locate OBJECT-TYPE
+    SYNTAX      INTEGER { dislocate(0), locate(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive locate/dislocate status at this slot."
+    ::= { nvmeDriveEntry 4 }
+
+save2Remove OBJECT-TYPE
+    SYNTAX      INTEGER { not-ready(0), ready(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive save2Remove status at this slot."
+    ::= { nvmeDriveEntry 5 }
+
+vmdMode OBJECT-TYPE
+    SYNTAX      INTEGER { vmd-off(0), vmd-on(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive vmdMode status at this slot."
+    ::= { nvmeDriveEntry 6 }
+
+temp OBJECT-TYPE
+    SYNTAX      Integer32 (0..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive temperature at this slot."
+    ::= { nvmeDriveEntry 7 }
+
+classCode OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive class code at this slot."
+    ::= { nvmeDriveEntry 8 }
+
+vendorID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive class code at this slot."
+    ::= { nvmeDriveEntry 9 }
+
+serialNum OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive serial number at this slot."
+    ::= { nvmeDriveEntry 10 }
+
+modelNum OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(40))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive model number at this slot."
+    ::= { nvmeDriveEntry 11 }
+
+port0MaxLinkSpd OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive port0 max link speed at this slot."
+    ::= { nvmeDriveEntry 12 }
+
+port0MaxLinkWidth OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive port0 max link width at this slot."
+    ::= { nvmeDriveEntry 13 }
+
+port1MaxLinkSpd OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive port1 max link speed at this slot."
+    ::= { nvmeDriveEntry 14 }
+
+port1MaxLinkWidth OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "NVMe drive port1 max link width at this slot."
+    ::= { nvmeDriveEntry 15 }
+
+initPowerRequirement OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Initial power requirment (Watts)."
+    ::= { nvmeDriveEntry 16 }
+
+maxPowerRequirement OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Maximum power requirment (Watts)."
+    ::= { nvmeDriveEntry 17 }
+
+guid NOTIFICATION-TYPE
+    STATUS        current
+    DESCRIPTION "GUID."
+    ::= { ipmi 30 }
+
+END

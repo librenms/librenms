@@ -1,17 +1,16 @@
 <?php
 
-$app_rows = dbFetchRows('SELECT * FROM `applications` WHERE `device_id`  = ?', array($device['device_id']));
+use Illuminate\Support\Facades\Cache;
 
-if (count($app_rows) > 0) {
-    foreach ($app_rows as $app) {
-        $app_include = $config['install_dir'].'/includes/polling/applications/'.$app['app_type'].'.inc.php';
-        if (is_file($app_include)) {
-            include $app_include;
-        } else {
-            echo $app['app_type'].' include missing! ';
-        }
+$agent_data = Cache::driver('array')->get('agent_data', []);
+\DeviceCache::getPrimary()->applications->each(function ($app) use ($device, $agent_data) {
+    echo 'Application: ' . $app->app_type . ', app_id=' . $app->app_id;
+
+    $app_include = base_path('includes/polling/applications/' . \LibreNMS\Util\Clean::fileName($app->app_type) . '.inc.php');
+    if (is_file($app_include)) {
+        include $app_include;
+    } else {
+        echo 'ERROR: ' . $app_include . ' include file missing!';
     }
     echo "\n";
-}
-
-unset($app_rows);
+});

@@ -1,0 +1,236 @@
+-- =================================================================
+-- Copyright (C) 2009 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: DNS MIB File
+-- Reference:
+-- Version: V1.0
+-- History:
+--      V1.0 created by jiangshuaihua
+--      initial version 2009-02-12
+-- =================================================================
+HH3C-DNS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP, MODULE-COMPLIANCE
+            FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32
+            FROM SNMPv2-SMI
+        RowStatus
+            FROM SNMPv2-TC
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        hh3cCommon
+            FROM HH3C-OID-MIB;
+
+    hh3cDns MODULE-IDENTITY
+        LAST-UPDATED
+            "200902120000Z"
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "This MIB contains objects to manage the DNS."
+        REVISION
+            "200902120000Z"
+        DESCRIPTION
+            " "
+        ::= { hh3cCommon 97 }
+
+-- Objects define
+    hh3cDnsObjects OBJECT IDENTIFIER ::= { hh3cDns 1 }
+
+-- DNS static server IP table
+    hh3cDnsStaticSrvIpTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cDnsStaticSrvIpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "
+            This table is a list of DNS static server IPv4 address
+            configuration, which is manually specified.
+            "
+       ::= { hh3cDnsObjects 1 }
+
+    hh3cDnsStaticSrvIpEntry OBJECT-TYPE
+        SYNTAX      Hh3cDnsStaticSrvIpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "
+            An entry of hh3cDnsStaticSrvIpTable.
+            "
+        INDEX
+        {
+            hh3cDnsStaticSrvIpType,
+            hh3cDnsStaticSrvIpAddr
+        }
+        ::= { hh3cDnsStaticSrvIpTable 1 }
+
+    Hh3cDnsStaticSrvIpEntry ::=
+        SEQUENCE {
+        hh3cDnsStaticSrvIpType       InetAddressType,
+        hh3cDnsStaticSrvIpAddr       InetAddress,
+        hh3cDnsStaticSrvIpPriority   Integer32,
+        hh3cDnsStaticSrvIpRowStatus  RowStatus
+        }
+
+    hh3cDnsStaticSrvIpType          OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "
+            This node gives the type of the static DNS server IP address.
+            "
+        ::= { hh3cDnsStaticSrvIpEntry 1 }
+
+    hh3cDnsStaticSrvIpAddr        OBJECT-TYPE
+        SYNTAX      InetAddress (SIZE (1..64))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "
+            This node gives the IP address of the DNS server
+            specified by the user.
+            "
+        ::= { hh3cDnsStaticSrvIpEntry 2 }
+
+    hh3cDnsStaticSrvIpPriority          OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "
+            This node gives the priority of the DNS server, according to the
+            creation order.  The smaller the value is, the higher the priority
+            level is.
+            "
+        ::= { hh3cDnsStaticSrvIpEntry 3 }
+
+    hh3cDnsStaticSrvIpRowStatus      OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "
+            This node gives the operation status of this table entry.
+            "
+        ::= { hh3cDnsStaticSrvIpEntry 4 }
+
+-- DNS dynamic server IP table
+    hh3cDnsDynamicSrvIpTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cDnsDynamicSrvIpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "
+            This table is a list of DNS dynamic server IPv4 address
+            configuration, which is dynamically obtained through DHCP.
+            "
+       ::= { hh3cDnsObjects 2 }
+
+    hh3cDnsDynamicSrvIpEntry OBJECT-TYPE
+        SYNTAX      Hh3cDnsDynamicSrvIpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry of hh3cDnsDynamicSrvIpTable."
+        INDEX
+        {
+           hh3cDnsDynamicSrvIpType,
+           hh3cDnsDynamicSrvIpAddr
+        }
+        ::= { hh3cDnsDynamicSrvIpTable 1 }
+
+    Hh3cDnsDynamicSrvIpEntry ::=
+        SEQUENCE
+        {
+            hh3cDnsDynamicSrvIpType      InetAddressType,
+            hh3cDnsDynamicSrvIpAddr      InetAddress,
+            hh3cDnsDynamicSrvIpPriority  Integer32
+        }
+
+    hh3cDnsDynamicSrvIpType          OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "
+            This node gives the type of the dynamic DNS server IP address.
+            "
+        ::= { hh3cDnsDynamicSrvIpEntry 1 }
+
+    hh3cDnsDynamicSrvIpAddr          OBJECT-TYPE
+        SYNTAX      InetAddress (SIZE (1..64))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "
+            This node gives the IP address of the DNS server dynamically
+            obtained through DHCP.
+            "
+        ::= { hh3cDnsDynamicSrvIpEntry 2 }
+
+    hh3cDnsDynamicSrvIpPriority      OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "
+            This node gives the priority of the DNS server, according to the
+            order obtained through DHCP.  The smaller the value is, the higher
+            the priority level is.
+            "
+        ::= { hh3cDnsDynamicSrvIpEntry 3 }
+
+-- Conformance define
+    hh3cDnsMIBConformance OBJECT IDENTIFIER ::= { hh3cDns 2 }
+
+        hh3cDnsMIBCompliances OBJECT IDENTIFIER ::= { hh3cDnsMIBConformance 1 }
+
+        hh3cDnsMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                "
+                The compliance statement for entities which implement
+                the DNS MIB.
+                "
+            MODULE -- this module
+                MANDATORY-GROUPS
+                {
+                    hh3cDnsStaticSrvIpGroup,
+                    hh3cDnsDynamicSrvIpGroup
+                }
+            ::= { hh3cDnsMIBCompliances 1 }
+
+        hh3cDnsMIBGroups OBJECT IDENTIFIER ::= { hh3cDnsMIBConformance 2 }
+
+        hh3cDnsStaticSrvIpGroup OBJECT-GROUP
+            OBJECTS
+            {
+                hh3cDnsStaticSrvIpPriority,
+                hh3cDnsStaticSrvIpRowStatus
+            }
+            STATUS current
+            DESCRIPTION
+                "
+                A collection of objects providing mandatory DNS server IP
+                addresses manually specified.
+                "
+            ::= { hh3cDnsMIBGroups 1 }
+
+        hh3cDnsDynamicSrvIpGroup OBJECT-GROUP
+            OBJECTS { hh3cDnsDynamicSrvIpPriority }
+            STATUS current
+            DESCRIPTION
+                "
+                A collection of objects providing mandatory DNS server IP
+                addresses dynamically obtained through DHCP.
+                "
+            ::= { hh3cDnsMIBGroups 2 }
+END

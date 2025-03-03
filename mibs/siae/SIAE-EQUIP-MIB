@@ -1,0 +1,593 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-EQUIP-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+             Integer32, IpAddress, TimeTicks
+        FROM SNMPv2-SMI
+             DisplayString, AutonomousType
+        FROM SNMPv2-TC
+             InterfaceIndex
+        FROM IF-MIB
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode, alarmTrap
+        FROM SIAE-ALARM-MIB
+             equipTypeUnknown
+        FROM SIAE-EQUIPTYPE-MIB;
+           
+    equipment MODULE-IDENTITY
+        LAST-UPDATED "201503230000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: help@siaemic.com
+            "
+        DESCRIPTION
+            "Common parameters of SIAE equipments.
+            "
+        REVISION "201503230000Z"
+        DESCRIPTION
+            "Removed alarmTrapNumber from TRAPs and IMPORTS.
+            "
+        REVISION "201412030000Z"
+        DESCRIPTION
+            "MIB version 01.00.02
+             Added equipIpEthDefGatewayIfIndex
+            "
+        REVISION "201407010000Z"
+        DESCRIPTION
+            "MIB version 01.00.01
+             Added equipIpEthVlanId and equipIpEthDefGateway
+            "
+        REVISION "201406230000Z"
+        DESCRIPTION
+            "Fixed IMPORTS clause
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of equipMibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 1 }
+
+----------------------------------------------------------------------------------
+--  SIAE equipment GROUP
+----------------------------------------------------------------------------------
+--
+--  The following listed objects are general object common to all SIAE equipment.
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+
+    equipMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {equipment 1}
+
+    equipCurrentTime  OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Seconds since 1/1/1970."
+    ::= {equipment 2}
+
+    equipUpTime  OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The time since the system was last re-initialized (in seconds
+             since 1/1/1970)."
+    ::= {equipment 3}
+
+    equipType  OBJECT-TYPE
+        SYNTAX      AutonomousType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Type of SIAE MICROELETTRONICA's equipment"
+        DEFVAL { equipTypeUnknown }
+    ::= {equipment 4}
+
+    -- OBJECT-IDENTIFIER {equipment 5} is used in sm_equiptype.mib
+
+    equipIpEthOsiAddress  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ip address of the equipment on Ethernet-OSI interface."
+    ::= {equipment 6}
+
+    equipGosipAddress  OBJECT-TYPE
+        SYNTAX      OCTET STRING    (SIZE(0..20))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "GOSIP address of the equipment."
+    ::= {equipment 7}
+
+    equipIpEthOsiNetMask  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The subnet Mask associated with the IP address of OSI ethernet interface.
+             The value of the Mask is an IP address with all the network bits set to 1
+             and all the hosts bits set to 0."
+    ::= {equipment 8}
+
+    equipL1L2IsIsRouting  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             l1  (1),
+                             l2  (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It defines the IS-IS routing type: L1 within the same area, L2 among
+             different areas."
+        DEFVAL {l1}
+    ::= {equipment 9}
+
+    equipStationID  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..63))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "ASCII string assigned by the operator to identify the specific equipment."
+    ::= {equipment 10}
+
+    equipLOMConfigEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disable  (1),
+                             enable   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables the capabilityto connect a LOM in Configuration Mode."
+    ::= {equipment 11}
+
+    equipLOMConnected  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             cleared              (1),
+                             connectionAsMonitor  (2),
+                             connectionAsConfig   (3)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Signal when the LOM is connected to the NE and if the connection
+             is for monitor or configuration."
+    ::= {equipment 12}
+
+    equipLOMConnectedTrapEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             trapDisable        (1),
+                             trapEnable         (2),
+                             trapEnableWithAck  (3)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables the trap generation on EquipLOMConnected status change event."
+        DEFVAL {trapEnable}
+    ::= {equipment 13}
+
+    equipConfigChange  OBJECT-TYPE
+        SYNTAX      OCTET STRING    (SIZE(6))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Set by the NE when the equipment configuration is changed by the local
+             or Remote LOM.
+             The octet string is a bit stream of flags; a set bit is a change on a
+             specific item. We had:
+             Byte 0.7: change in configuration for equipment group
+             Byte 0.6: change in configuration for userInput group
+             Byte 0.5: change in configuration for userOutput group
+             Byte 0.4: change in configuration for alarmLog group
+             ......
+             Byte 3.7: change in a severity for equipment group
+             Byte 3.6: change in a severity for userInput group
+             Byte 3.5: change in a severity for userOutput group
+             Byte 3.4: change in a severity for alarmLog group
+             CEM can reset the change condition writing one to desired bit flag
+             ......"
+    ::= {equipment 14}
+
+    equipConfigChangeTrapEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             trapDisable        (1),
+                             trapEnable         (2),
+                             trapEnableWithACK  (3)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables the trap generation on EquipConfigChange status
+             change event."
+        DEFVAL {trapEnable}
+    ::= {equipment 15}
+
+    equipRequest  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notActive              (0), -- no write-only in v2
+                             restart                (1),
+                             applyIfChange          (2),
+                             revertIfChange         (3),
+                             configClearAndRestart  (4),
+                             routeTableClear        (5),
+                             uploadBaseBand         (6),
+                             offLineRouteRetrieve   (7),
+                             offLineRouteSave       (8),
+                             hotApplyIfChange       (11),
+                             ipStackConfigure       (20),
+                             osiStackConfigure      (21),
+                             atuTableReset          (50),
+                             siaeReservedReq1       (100),
+                             siaeReservedReq26      (125),
+                             siaeReservedReq27      (126),
+                             switchFactoryDefault   (127)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Force Equipment Controller restart or change in interface properties."
+    ::= {equipment 16}
+
+    equipIpEthAddress  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ip address of the equipment on Ethernet interface."
+    ::= {equipment 17}
+
+    equipIpEthNetMask  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The subnet Mask associated with the IP address of ethernet interface.
+             The value of the Mask is an IP address with all the network bits set to 1
+             and all the hosts bits set to 0."
+    ::= {equipment 18}
+
+    equipOsiamParameter  OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..41))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It defines the set-up parameter for OSI stack."
+    ::= {equipment 19}
+
+    equipIpSnmpAgentAddress  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ip address used by SNMP Agent for mark generated TRAP."
+    ::= {equipment 20}
+
+    equipOperationInProgress  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "A value different from 0 means operation in progress."
+        DEFVAL {0}
+    ::= {equipment 21}
+
+    equipManagerWakeUpAlarm  OBJECT-TYPE
+       SYNTAX       AlarmStatus
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "This alarm switches on when periodic connection wake-up trap starts.
+            The trap related to this alarm is also sent periodically only to the
+            manager specified by the leaf equipManagerWakeUpIpAddr when
+            equipManagerWakeUpAlarmSeverityCode differs from disable."
+    ::= {equipment 22}
+
+    equipManagerWakeUpAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the equipManagerWakeUpAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {disable}
+    ::= {equipment 23}
+
+    equipManagerWakeUpTimeout  OBJECT-TYPE
+        SYNTAX      INTEGER    (0..1440)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object defines the time (in minutes) after which the periodic
+             connection wake-up trap is stopped.
+             The maximium value is equivalent to 24 hours.
+             When the timeout elapses the equipManagerWakeUpAlarmSeverityCode
+             is set to disable.
+             A zero means no timeout."
+        DEFVAL {60}
+    ::= {equipment 24}
+
+    equipManagerWakeUpIpAddr  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ip Address of manager wich to send a periodic connection wake-up trap.
+             The periodic trap is sent only if the equipManagerWakeUpAlarmSeverityCode
+             differs from disable.
+             If Ip Address equals 0 no trap will be sent."
+        DEFVAL {'00'H}
+    ::= {equipment 25}
+
+    equipManagerWakeUpGosipAddress  OBJECT-TYPE
+        SYNTAX      OCTET STRING    (SIZE(0..20))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Gosip Address of manager wich to send a periodic connection wake-up trap."
+    ::= {equipment 26}
+
+    equipManagerWakeUpTrapVersion  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              trapV1  (1),
+                              trapV2  (2),
+                              trapV3  (3)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Trap version supported by Manager to wake-up."
+        DEFVAL {trapV1}
+    ::= {equipment 27}
+
+    equipManager1IpAddr  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "First IP address of a SNMP Manager always logged to this equipment.
+             The address 0.0.0.0 mean that manager is not present."
+    ::= {equipment 28}
+
+    equipManager2IpAddr  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Second IP address of a SNMP Manager always logged to this equipment.
+             The address 0.0.0.0 mean that manager is not present."
+    ::= {equipment 29}
+
+    equipManager1TrapVersion  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             trapV1  (1),
+                             trapV2  (2),
+                             trapV3  (3)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Trap version supported by Manager 1 (related to equipManager1IpAddr)."
+        DEFVAL {trapV1}
+    ::= {equipment 30}
+
+    equipManager2TrapVersion  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             trapV1  (1),
+                             trapV2  (2),
+                             trapV3  (3)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Trap version supported by Manager 2 (related to equipManager2IpAddr)."
+        DEFVAL {trapV1}
+    ::= {equipment 31}
+
+    equipDailyPmTimeZone  OBJECT-TYPE
+        SYNTAX      INTEGER    (-12..12)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Reference GMT Time Zone to close the daily P.M. records."
+        DEFVAL {0}
+    ::= {equipment 32}
+
+   equipOperationMngtControl OBJECT-TYPE
+       SYNTAX      INTEGER {
+                             notActive         (0), -- no write-only in v2
+                             startOperation    (1),
+                             confirmOperation  (2)
+                           }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "startOperation means the apply of the 'management parameters
+            set' on the E6165 switch.
+            confirmOperation means the backup of the 'management
+            parameters set'."
+       DEFVAL {0}
+   ::= {equipment 33}
+
+   equipOperationMngtInProgress OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "A value different from 0 means Mngt operation in progress."
+   ::= {equipment 34}
+
+   equipLocation  OBJECT-TYPE
+       SYNTAX      DisplayString   (SIZE(0..31))
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "ASCII string assigned by the operator to identify the location of
+            specific equipment."
+   ::= {equipment 35}
+
+   equipLongitude OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "Geographic coordinate that specifies the east-west position of
+            the equipment.
+            In order to calculate the latitude in degrees the formula to be
+            applied is
+               Longitude = equipLongitude*180/2^31
+            This object is used with equipLatitude to locate the equipment
+            on a map.
+           "
+   ::= {equipment 36}
+
+   equipLatitude OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "Geographic coordinate that specifies the north-south position of
+            the equipment.
+            In order to calculate the latitude in degrees the formula to be
+            applied is
+               Latitude = equipLatitude*180/2^31
+            This object is used with equipLongitude to locate the equipment
+            on a map.
+           "
+   ::= {equipment 37}
+
+    equipIpEthVlanId  OBJECT-TYPE
+       SYNTAX      Integer32 (1..4094)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+          "Ethernet vlan id on top of which management is built"
+           DEFVAL  { 1 }
+       ::= { equipment 38 }
+
+    equipIpEthDefGateway  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ip address of the default gateway on Ethernet interface."
+    ::= {equipment 39}
+
+    equipIpEthDefGatewayIfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex(1..999)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ip address of the default gateway on Ethernet interface."
+    ::= {equipment 40}
+
+-----------------------
+--
+--  The equipment Group generates the following TRAPs:
+--
+-----------------------
+    equipLOMConnectedMonitor  NOTIFICATION-TYPE
+        OBJECTS  {equipIpSnmpAgentAddress, equipLOMConnected}
+        STATUS current
+        DESCRIPTION
+            "This event is generated by ALFOHD-NE when equipLOMConnected is set to Monitor mode.
+             The data passed with the event are:
+                1) equipIpSnmpAgentAddress
+                2) equipLOMConnected"
+    ::= {alarmTrap 109}
+
+    equipLOMConnectedConfig  NOTIFICATION-TYPE
+        OBJECTS  {equipIpSnmpAgentAddress, equipLOMConnected}
+        STATUS current
+        DESCRIPTION
+            "This event is generated by ALFOHD-NE when equipLOMConnected is set to Configuration mode.
+             The data passed with the event are:
+                1) equipIpSnmpAgentAddress
+                2) equipLOMConnected"
+    ::= {alarmTrap 110}
+
+    equipLOMDisconnected  NOTIFICATION-TYPE
+        OBJECTS  {equipIpSnmpAgentAddress, equipLOMConnected}
+        STATUS current
+        DESCRIPTION
+            "This event is generated by ALFOHD-NE when LOMConnected is cleared.
+             The data passed with the event are:
+                1) equipIpSnmpAgentAddress
+                2) equipLOMConnected"
+    ::= {alarmTrap 111}
+
+
+    equipConfigChangeStatus  NOTIFICATION-TYPE
+        OBJECTS  {equipIpSnmpAgentAddress, equipConfigChange}
+        STATUS current
+        DESCRIPTION
+            "This event is generated by ALFOHD-NE when equipConfigChange is changed.
+             The data passed with the event are:
+                1) equipIpSnmpAgentAddress
+                2) equipConfigChange"
+    ::= {alarmTrap 114}
+
+    equipManagerWakeUpNotify  NOTIFICATION-TYPE
+        OBJECTS {equipIpSnmpAgentAddress, equipStationID, equipLocation, equipIpSnmpAgentAddress, equipGosipAddress,
+                 equipManagerWakeUpIpAddr, equipManagerWakeUpAlarm}
+        STATUS current
+        DESCRIPTION
+            " This trap is sent periodically only to the manager specified by
+             the leaf equipManagerWakeUpIpAddr when equipManagerWakeUpAlarmSeverityCode
+             differs from disable.
+             The data passed with the event are:
+                1) equipIpSnmpAgentAddress
+                2) equipStationID
+                3) equipLocation
+                4) equipIpSnmpAgentAddress
+                5) equipGosipAddress
+                6) equipManagerWakeUpIpAddr
+                7) equipManagerWakeUpAlarm"
+    ::= {alarmTrap 123}
+
+------ End group -----------------------------------------------------------------
+
+END
+
+
+
+

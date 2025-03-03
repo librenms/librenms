@@ -1,6 +1,16 @@
 os: ibmtl
 text: 'IBM Tape Library'
 type: storage
-icon: generic
+icon: ibmos
+mib_dir: ibm
 over:
     - { graph: device_bits, text: Traffic }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.14851
+        snmpget:
+            oid: 'SML-MIB::product-Name.0'
+            value: 'IBM System Storage TS3500 Tape Library'
+    - sysDescr_regex:
+        - '/IBM (.*) UltraScaleable Tape Library/'
+

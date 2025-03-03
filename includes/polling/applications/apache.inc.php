@@ -4,24 +4,27 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'apache';
-$app_id = $app['app_id'];
-if (!empty($agent_data['app'][$name])) {
+
+if (! empty($agent_data['app'][$name])) {
     $apache = $agent_data['app'][$name];
 } else {
-    $options = '-O qv';
-    $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.6.97.112.97.99.104.101';
-    $apache  = snmp_get($device, $oid, $options);
-    update_application($app, $apache);
+    $options = '-Oqv';
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.6.97.112.97.99.104.101';
+    $apache = snmp_get($device, $oid, $options);
 }
 
-echo ' apache';
+$apache_data = explode("\n", $apache);
+if (count($apache_data) !== 20) {
+    echo " Incorrect number of datapoints returned from device, skipping\n";
 
-list ($total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec,
+    return;
+}
+
+[$total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec,
     $bytesperreq, $busyworkers, $idleworkers, $score_wait, $score_start,
     $score_reading, $score_writing, $score_keepalive, $score_dns,
-    $score_closing, $score_logging, $score_graceful, $score_idle, $score_open) = explode("\n", $apache);
+    $score_closing, $score_logging, $score_graceful, $score_idle, $score_open] = $apache_data;
 
-$rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
     ->addDataset('access', 'DERIVE', 0, 125000000000)
     ->addDataset('kbyte', 'DERIVE', 0, 125000000000)
@@ -44,28 +47,34 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('sb_idle', 'GAUGE', 0, 125000000000)
     ->addDataset('sb_open', 'GAUGE', 0, 125000000000);
 
-$fields = array(
-                'access'       => intval(trim($total_access, '"')),
-                'kbyte'        => $total_kbyte,
-                'cpu'          => $cpuload,
-                'uptime'       => $uptime,
-                'reqpersec'    => $reqpersec,
-                'bytespersec'  => $bytespersec,
-                'byesperreq'   => $bytesperreq,
-                'busyworkers'  => $busyworkers,
-                'idleworkers'  => $idleworkers,
-                'sb_wait'      => $score_wait,
-                'sb_start'     => $score_start,
-                'sb_reading'   => $score_reading,
-                'sb_writing'   => $score_writing,
-                'sb_keepalive' => $score_keepalive,
-                'sb_dns'       => $score_dns,
-                'sb_closing'   => $score_closing,
-                'sb_logging'   => $score_logging,
-                'sb_graceful'  => $score_graceful,
-                'sb_idle'      => $score_idle,
-                'sb_open'      => intval(trim($score_open, '"')),
-);
+$fields = [
+    'access' => intval(trim($total_access, '"')),
+    'kbyte' => $total_kbyte,
+    'cpu' => $cpuload,
+    'uptime' => $uptime,
+    'reqpersec' => $reqpersec,
+    'bytespersec' => $bytespersec,
+    'byesperreq' => $bytesperreq,
+    'busyworkers' => $busyworkers,
+    'idleworkers' => $idleworkers,
+    'sb_wait' => $score_wait,
+    'sb_start' => $score_start,
+    'sb_reading' => $score_reading,
+    'sb_writing' => $score_writing,
+    'sb_keepalive' => $score_keepalive,
+    'sb_dns' => $score_dns,
+    'sb_closing' => $score_closing,
+    'sb_logging' => $score_logging,
+    'sb_graceful' => $score_graceful,
+    'sb_idle' => $score_idle,
+    'sb_open' => intval(trim($score_open, '"')),
+];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
+update_application($app, $apache, $fields);

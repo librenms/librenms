@@ -1,0 +1,1601 @@
+-- This is a common MIB for Dominion KX/KSX G1, KX/KSX G2, KX G3, LX, and SX G2
+
+-- 10/13/2016 G. W
+-- Support get of:
+-- Port status for all ports
+-- System vitals: Memory, CPU, Power
+-- Adjust MAX-ACCESS of notification only objects.
+-- Maintenance.
+
+-- 07/12/2016 Y. Z
+-- notifications updated
+-- Added notification: dsamUpdateStarted
+-- Added notification: dsamUpdateCompleted
+-- Added notification: dsamConnected
+-- Added notification: dsamDisconnected
+
+-- 11/5/2014 G. W
+-- notifications updated
+-- Added notification: automaticScriptConfiguration
+-- Added variable: fileName
+-- SMIv2 OBJECT-TYPE (updated from SMIv1 RFC-1212)
+
+
+-- 12/20/11 H. G
+-- notifications updated
+-- Added new traps for userDisconnectedFromPort 
+
+-- 07/08/11 H. G
+-- Corrected description for portStatusChange
+
+-- 12/20/10 H. G
+-- notifications updated
+-- Added new traps for scanStarted, scanStopped
+-- Also added defn for portList 
+
+-- 03/09/10 H. G
+-- notifications updated
+-- Added new traps for securityBannerChanged, securityBannerAction
+-- Also added defn for bannerChanges, bannerAction
+
+-- 09/08/09 H. G
+-- notifications updated
+-- Added new traps for setDateTime, setFIPSMode
+-- Also added defn for sysDateAndTime, fipsModeStatus 
+
+-- 10/14/08 H. G
+-- notifications updated 
+-- Added new traps for userForcedLogout, userUploadedCertificate
+-- and bladeChassisCommError 
+-- Also added defn for certificateAuthorityName
+
+-- 03/05/2008 H. G
+-- notifications updated 
+--    provide additional support of notifications
+--    containing both IPv4 and IPv6 addresses
+
+-- Authors: P. N and S. O
+
+-- 01/15/2007 S. O
+-- restructured KX2.0 MIB to pass level 6 validation
+--    Import section is revised
+--    Module Identity section is revised
+--    Conformance information is added towards the end
+--    Renamed some ASN variables i.e. objectName -> rcpObjectName etc.
+-- Added 2 new traps for ipConflictDetected and ipConflictResolved
+-- Also added defn for count, new trap variable
+
+
+RemoteKVMDevice-MIB DEFINITIONS ::= BEGIN
+ IMPORTS
+                MODULE-IDENTITY, NOTIFICATION-TYPE,
+  OBJECT-TYPE, -- GW for SMIv2 compliance and consistency
+  enterprises, Integer32, Gauge32
+                         FROM SNMPv2-SMI
+
+  DisplayString, DateAndTime, TruthValue
+    FROM SNMPv2-TC
+
+                MODULE-COMPLIANCE,
+                NOTIFICATION-GROUP,
+                OBJECT-GROUP        
+                         FROM SNMPv2-CONF; 
+
+-- Raritan is registered with IANA for an enterprise MIB 
+
+raritan MODULE-IDENTITY
+ LAST-UPDATED "201610131200Z"
+ ORGANIZATION "Raritan Inc."
+ CONTACT-INFO
+   " Technical Support 
+   Raritan Inc.
+   400 Cottontail Lane
+   Somerset, New Jersey, 08873
+   E-mail: support@raritan.com"
+ DESCRIPTION
+        "The MIB module representing Raritan Computers'
+        implementation of enterprise specific MIBs
+        for KX products."
+
+     REVISION "201610131200Z"
+     DESCRIPTION
+        "Version updated for added get"
+
+     REVISION "201411061200Z"
+     DESCRIPTION
+        "Version updated for added support for SX G2"
+
+     REVISION "201311011200Z"
+     DESCRIPTION
+        "Version updated for added support for KX G3"
+ 
+     REVISION "201112201200Z"
+     DESCRIPTION
+        "Version updated for product release 2.5.0.  Add support for Disconnect User - Force User Off"
+ 
+     REVISION "201107081200Z"
+     DESCRIPTION
+        "Version updated for product release 2.4.5."
+
+ ::= { enterprises 13742 }
+
+remoteKVMDevice OBJECT IDENTIFIER ::= { raritan 3 }
+
+-- GW same location as TRAPS (implied remoteKVMDevice#) so that it is compatible with the previous MIB.
+remoteKVMDeviceNotifications OBJECT IDENTIFIER ::= { remoteKVMDevice 0 }
+remoteKVMDeviceGet OBJECT IDENTIFIER ::= { remoteKVMDevice 1 }
+
+--******************************************************************************
+-- Data objects
+--******************************************************************************
+
+rcpObjectName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "The model type of the device"
+    ::= { remoteKVMDevice 2 }
+
+rcpObjectInstance OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "The device name"
+    ::= { remoteKVMDevice 3}
+
+userName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "User Name"
+    ::= { remoteKVMDevice 4}
+
+targetUser OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "The user record being operated on"
+    ::= { remoteKVMDevice 5}
+
+groupName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "The group record being operated on"
+    ::= { remoteKVMDevice 6}
+
+rcpIPAddress OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "The IP address"
+    ::= { remoteKVMDevice 7}
+
+deviceName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "Device name"
+    ::= { remoteKVMDevice 8 }     
+
+portStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "Port status and availability:
+inactive - Target cannot be detected. (UI Status:down, Availability:idle)
+available - Target can be accessed. (UI Status:up, Availability:idle)
+connected - A user is connected but capacity is available. (UI Status:up/down, Availability:connected)
+busy - Reached maximum access capacity. (UI Status:up/down, Availability:busy)"
+    ::= { remoteKVMDevice 9 }     
+
+portName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "Port Name"         
+    ::= { remoteKVMDevice 10 }     
+
+clusterID OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "The cluster ID of the CommandCenter managing this device"         
+    ::= { remoteKVMDevice 11 }     
+
+ipPort OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "The IP Port"         
+    ::= { remoteKVMDevice 12 }   
+
+resetType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "How the device reset was performed"         
+    ::= { remoteKVMDevice 13 }     
+
+interface OBJECT-TYPE
+    SYNTAX INTEGER { lan(1), modem(2) }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+  "Interface type"
+    ::= { remoteKVMDevice 14}
+
+ethernetInterface OBJECT-TYPE
+    SYNTAX INTEGER { lan0(0), lan1(1)}
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION   
+     "Ethernet Interface"
+    ::= {  remoteKVMDevice 15 } 
+
+backupRestoreAction  OBJECT-TYPE
+    SYNTAX INTEGER { backup(0), restore(1) }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+     "Backup Restore Action."
+    ::= {  remoteKVMDevice 16 }
+
+imageType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS current
+    DESCRIPTION
+         "Image type to update."
+    ::= { remoteKVMDevice 17 }
+
+
+imageVersion OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+         "The version of the Upgrade image"
+    ::= { remoteKVMDevice 18 }     
+
+status OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The success status of an operation"
+    ::= { remoteKVMDevice 19 }     
+
+fileVersion OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+         "The file version"
+    ::= { remoteKVMDevice 20 }     
+
+fileType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+         "The file type"
+    ::= { remoteKVMDevice 21 }     
+                                         
+outletName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+     "Name of the power outlet."
+    ::= { remoteKVMDevice 22 }  
+
+
+portNumber OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+  "Port number"
+    ::= { remoteKVMDevice 23}
+
+serialNumber OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+  "Serial Number of the Device or CIM"
+    ::= { remoteKVMDevice 24}
+
+cimName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+     "Name of the cim."
+    ::= { remoteKVMDevice 25 } 
+
+count OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+  "A generic counter"
+    ::= { remoteKVMDevice 26} 
+
+restoredLanPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "Lan port restored after the failure"
+    ::= { remoteKVMDevice 27 }
+   
+remoteIpAddress OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "The IP address of a client"
+    ::= { remoteKVMDevice 28}
+
+oldIpAddress OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "The IP address"
+    ::= { remoteKVMDevice 29}
+
+newIpAddress OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "The IP address"
+    ::= { remoteKVMDevice 30}
+
+newNetmask OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "The net mask "
+    ::= { remoteKVMDevice 31}
+
+oldNetmask OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "The net mask"
+    ::= { remoteKVMDevice 32}
+
+oldGateway OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "The Gateway ip"
+    ::= { remoteKVMDevice 33}
+
+newGateway OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "The Gateway ip"
+    ::= { remoteKVMDevice 34}
+
+
+-- KSX G2 specific var Names sxAlertString, pduName
+
+sxAlertString OBJECT-TYPE
+ SYNTAX DisplayString
+ MAX-ACCESS accessible-for-notify
+ STATUS current
+ DESCRIPTION
+  " Serial Alert string on a port. "
+ ::= { remoteKVMDevice 38 }
+
+pduName OBJECT-TYPE
+ SYNTAX DisplayString
+ MAX-ACCESS accessible-for-notify
+ STATUS current
+ DESCRIPTION
+  " Name of the connected PDU "
+ ::= { remoteKVMDevice 39 }
+
+changeEventText OBJECT-TYPE
+    SYNTAX              DisplayString
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION         "A configurable parameter was changed.  The
+description text identifies the object changed and its new value.  The format
+of the text is 'IPv 4 Parameter : parameter = new value, . IPv6 Parameter :
+parameter = new value, ..."
+    ::= { remoteKVMDevice 40 }
+
+certificateAuthorityName  OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION
+     "Certificate Authority Name"
+   ::= { remoteKVMDevice 41 } 
+
+sysDateAndTime  OBJECT-TYPE
+   SYNTAX       DateAndTime
+   MAX-ACCESS   accessible-for-notify
+   STATUS       current
+   DESCRIPTION  
+     "The system date and time."
+   ::= { remoteKVMDevice 42 }
+
+fipsModeStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+      "FIPS Mode status (0-Disabled, 1-Enabled)"         
+    ::= { remoteKVMDevice 43 }
+
+bannerChanges  OBJECT-TYPE
+    SYNTAX      INTEGER {enabled(0), disabled(1), modified(2)}
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "KX2 Banner Changes "
+    ::= { remoteKVMDevice 44 }
+
+bannerAction   OBJECT-TYPE
+    SYNTAX     INTEGER {declined(0), accepted(1)}
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION  
+         "User Acceptance / Rejection of Initial Banner Consent"
+   ::= {  remoteKVMDevice 45 }
+
+portList OBJECT-TYPE
+ SYNTAX OCTET STRING (SIZE (1..1024))
+ MAX-ACCESS accessible-for-notify
+ STATUS current
+ DESCRIPTION
+ "Port List" 
+ ::= { remoteKVMDevice 46 }
+
+fileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Name of the file used in the operation"
+    ::= { remoteKVMDevice 47 }
+
+--******************************************************************************
+-- Available for retrieval &#40;SNMP Get&#41;
+-- Only supported on SX2.
+--******************************************************************************
+
+systemUsageMemory OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percent current memory usage"
+    ::= { remoteKVMDeviceGet 1 }
+
+systemUsageCPU OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percent processor usage"
+    ::= { remoteKVMDeviceGet 2 }
+
+systemPowerSupplyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemPowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Status of all power supplies"
+    ::= { remoteKVMDeviceGet 3 }
+
+systemPowerSupplyEntry OBJECT-TYPE
+    SYNTAX SystemPowerSupplyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "Power supply data"
+    INDEX { systemPowerSupplyNumber }
+    ::= { systemPowerSupplyTable 1 }
+
+SystemPowerSupplyEntry ::= SEQUENCE {
+    systemPowerSupplyNumber Integer32,
+    systemPowerSupplyPowerOn TruthValue
+}
+
+systemPowerSupplyNumber OBJECT-TYPE
+    SYNTAX Integer32 (1..2)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "System power supply identifier"
+    ::= { systemPowerSupplyEntry 1 }
+
+systemPowerSupplyPowerOn OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Is the system power supply on (true)"
+    ::= { systemPowerSupplyEntry 2 }
+
+portDataTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortDataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Retrieve data for all ports"
+    ::= { remoteKVMDeviceGet 4 }
+
+portDataEntry OBJECT-TYPE
+    SYNTAX PortDataEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+      "Port identification and current information"
+    INDEX { portDataIndex }
+    ::= { portDataTable 1 }
+
+PortDataEntry ::= SEQUENCE {
+    portDataIndex Integer32,
+    portDataNumber Integer32,
+    portDataName DisplayString,
+    portDataType DisplayString,
+    portDataStatus INTEGER
+}
+
+portDataIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..1024)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+ "table index"
+    ::= { portDataEntry 1 }
+
+portDataNumber OBJECT-TYPE
+    SYNTAX Integer32 (1..1024)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+ "Physical port number"
+    ::= { portDataEntry 2 }
+
+portDataName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "User assigned port name"
+    ::= { portDataEntry 3 }
+
+portDataType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Port connection type"
+    ::= { portDataEntry 4 }
+
+portDataStatus OBJECT-TYPE
+    SYNTAX INTEGER { inactive(1), available(2), connected(3), busy(4) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Port status and availability:
+inactive - Target cannot be detected. (UI Status:down, Availability:idle)
+available - Target can be accessed. (UI Status:up, Availability:idle)
+connected - A user is connected but capacity is available. (UI Status:up/down, Availability:connected)
+busy - Reached maximum access capacity. (UI Status:up/down, Availability:busy)"
+    ::= { portDataEntry 5 }
+
+--******************************************************************************
+-- Traps 
+--******************************************************************************
+
+rebootStarted NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName  
+    }
+    STATUS current
+    DESCRIPTION
+      "The reboot process has started"
+    ::= { remoteKVMDeviceNotifications 1 }
+
+
+rebootCompleted NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance
+    }
+    STATUS current
+    DESCRIPTION
+ "The reboot process is complete"
+    ::= { remoteKVMDeviceNotifications 2 }
+
+
+userLogin NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current  
+    DESCRIPTION
+ "A user logged in"
+    ::= { remoteKVMDeviceNotifications 3 }
+
+
+userLogout NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION
+ "A user logged out"
+    ::= { remoteKVMDeviceNotifications 4 }
+
+
+userAuthenticationFailure NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION
+ "A user authentication attempt failed"
+    ::= { remoteKVMDeviceNotifications 5 }
+
+
+portConnect NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ portName
+    }
+    STATUS current
+    DESCRIPTION 
+ "A user connected to a port"
+    ::= { remoteKVMDeviceNotifications 6 }
+
+
+portDisconnect NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ portName
+ }
+    STATUS current
+    DESCRIPTION 
+ "A user disconnected from a port"
+    ::= { remoteKVMDeviceNotifications 7 }
+
+
+userSessionTimeout NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION 
+ "A user timed out from the device"
+    ::= { remoteKVMDeviceNotifications 8 }
+
+
+userConnectionLost NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION 
+ "A user lost connection to the device"
+    ::= { remoteKVMDeviceNotifications 9 }
+
+
+portStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ deviceName,
+ portName,
+ portStatus
+    }
+    STATUS current
+    DESCRIPTION 
+ "A port status has changed"
+    ::= { remoteKVMDeviceNotifications 10 }
+
+userAdded NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName, 
+ targetUser
+    }
+    STATUS current
+    DESCRIPTION
+ "A user was added to the system"
+    ::= { remoteKVMDeviceNotifications 11 }
+
+userModified NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ targetUser
+    }
+    STATUS current   
+    DESCRIPTION
+ "A user account was modified"
+    ::= { remoteKVMDeviceNotifications 12 }
+
+userDeleted NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ targetUser
+    }
+    STATUS current
+    DESCRIPTION
+ "A user was deleted from the system"
+    ::= { remoteKVMDeviceNotifications 13 }
+
+groupAdded NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ groupName
+    }
+    STATUS current
+    DESCRIPTION
+ "A group was added to the system"
+    ::= { remoteKVMDeviceNotifications 14 }
+
+
+groupModified NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ groupName
+    }
+    STATUS current   
+    DESCRIPTION
+ "A group was modified"
+    ::= { remoteKVMDeviceNotifications 15 }
+
+
+groupDeleted NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ groupName
+    }
+    STATUS current
+    DESCRIPTION
+ "A group was deleted from the system"
+    ::= { remoteKVMDeviceNotifications 16 }
+
+startCCManagement NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION 
+ "The device was put under CommandCenter management"
+    ::= { remoteKVMDeviceNotifications 17 }
+
+stopCCManagement NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION 
+ "The device was removed from CommandCenter management"
+    ::= { remoteKVMDeviceNotifications 18 }
+
+factoryReset NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION
+ "The device was reset to factory default setting"
+    ::= { remoteKVMDeviceNotifications 19 }
+
+deviceUpdateStarted NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress,
+ imageVersion
+    }
+    STATUS current
+    DESCRIPTION
+ "The device update has started"
+    ::= { remoteKVMDeviceNotifications 20 }
+
+deviceUpdateCompleted NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress,
+ imageVersion,
+ status   
+    }
+    STATUS current
+    DESCRIPTION
+ "The device update is complete"
+    ::= { remoteKVMDeviceNotifications 21 }
+
+configBackup NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress,
+ fileType,
+ fileVersion,
+ status
+    }
+    STATUS current
+    DESCRIPTION
+ "The device configuration has been backed up"
+    ::= { remoteKVMDeviceNotifications 22 }
+
+configRestore NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress,
+ fileType,
+ fileVersion,
+ status
+    }
+    STATUS current
+    DESCRIPTION
+ "The device configuration has been restored"
+    ::= { remoteKVMDeviceNotifications 23 }
+
+userPasswordChanged NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName, 
+ targetUser,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION
+ "A user password was changed" 
+    ::= { remoteKVMDeviceNotifications 24 }
+
+powerNotification NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ outletName,
+ status
+    }
+    STATUS current
+    DESCRIPTION
+ "The power outlet status (1-Active or 0-Inactive) notification "
+    ::= { remoteKVMDeviceNotifications 25 }
+
+networkFailure NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ ethernetInterface
+    }
+    STATUS current
+    DESCRIPTION
+ "A network failure was detected on an ethernet port"
+    ::= { remoteKVMDeviceNotifications 26 }
+    
+-- Start new events defined exclusively for KX2
+
+
+networkParameterChanged NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ remoteIpAddress,
+ oldIpAddress,
+ newIpAddress,
+ oldNetmask,
+ newNetmask,
+ newGateway,
+ oldGateway
+    }
+    STATUS current
+    DESCRIPTION
+ "A network parameter change was detected"
+    ::= { remoteKVMDeviceNotifications 27 }
+
+vmImageConnected NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION
+ "A Virtual Media Connected"
+    ::= { remoteKVMDeviceNotifications 28 }
+
+
+vmImageDisconnected NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION
+ "A Virtual Media disconnected"
+    ::= { remoteKVMDeviceNotifications 29 }
+
+
+cimUpdateStarted NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance
+    }
+    STATUS current
+    DESCRIPTION
+ "CIM update started"
+    ::= { remoteKVMDeviceNotifications 30 }
+
+
+cimUpdateCompleted NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance
+    }
+    STATUS current
+    DESCRIPTION
+ "CIM update completed"
+    ::= { remoteKVMDeviceNotifications 31 }
+
+
+cimConnected NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ cimName,
+ serialNumber,
+ portNumber 
+    }
+    STATUS current
+    DESCRIPTION
+ "CIM Connected"
+    ::= { remoteKVMDeviceNotifications 32 }
+
+
+cimDisconnected NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ cimName,
+ serialNumber,
+ portNumber
+    }
+    STATUS current
+    DESCRIPTION
+ "CIM Disconnected"
+    ::= { remoteKVMDeviceNotifications 33 }
+
+powerOutletNotification NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ outletName,
+ status
+    }
+    STATUS current
+    DESCRIPTION
+ "Powerstip-device outlet status Notification"
+    ::= { remoteKVMDeviceNotifications 34 }
+
+
+-- Start new event to support RP products
+
+portConnectionDenied NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ portName
+    }
+    STATUS current
+    DESCRIPTION 
+ "A connection to the target port is denied"
+    ::= { remoteKVMDeviceNotifications 35 }
+
+-- Firmware file discarded
+
+
+firmwareFileDiscarded NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName
+    }
+    STATUS current
+    DESCRIPTION 
+ "A firmaware file discarded "
+    ::= { remoteKVMDeviceNotifications 36 }
+
+firmwareUpdateFailed NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName
+    }
+    STATUS current
+    DESCRIPTION 
+     "A firmware update failed "
+    ::= { remoteKVMDeviceNotifications 37 }
+
+firmwareValidationFailed NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName
+    }
+    STATUS current
+    DESCRIPTION 
+ "A firmware validation failed "
+    ::= { remoteKVMDeviceNotifications 38 }
+
+securityViolation NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION
+        "Security violation."
+    ::= { remoteKVMDeviceNotifications 39 }
+
+deviceUpdateFailed NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName
+    }
+    STATUS current
+    DESCRIPTION
+        "Device update has failed."
+    ::= { remoteKVMDeviceNotifications 40 }
+
+passwordSettingsChanged NOTIFICATION-TYPE
+     OBJECTS {
+       rcpObjectName,
+       rcpObjectInstance,
+       userName,
+       status
+     }
+     STATUS current
+     DESCRIPTION
+         " Strong password settings changed "
+     ::= { remoteKVMDeviceNotifications 41 }
+
+-- Network Failover Trap
+
+ethernetFailover NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ restoredLanPort
+    }
+    STATUS current
+    DESCRIPTION
+ "A ethernet failover was detected and restored on new ethernet interface"
+    ::= { remoteKVMDeviceNotifications 42 }
+
+-- New traps for KX 1.4.5 Sujata Osowski 01/15/2007
+
+ipConflictDetected NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ rcpIPAddress,
+ count
+    }
+    STATUS current
+    DESCRIPTION
+        "IP address conflict is detected."
+    ::= { remoteKVMDeviceNotifications 43 }
+
+ipConflictResolved NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION
+        "IP address conflict is resolved."
+    ::= { remoteKVMDeviceNotifications 44 }
+
+sxPortAlert NOTIFICATION-TYPE
+ OBJECTS {
+     rcpObjectName,
+     rcpObjectInstance,
+     portNumber,
+     sxAlertString
+ }
+ STATUS current
+ DESCRIPTION
+  "Port keyword detected."
+ ::= { remoteKVMDeviceNotifications 45 }
+
+pduConnected NOTIFICATION-TYPE
+ OBJECTS { 
+     rcpObjectName,
+     rcpObjectInstance,
+     portNumber,
+     pduName
+ }
+ STATUS current
+ DESCRIPTION
+  " A PDU is connected to the device directly through power port"
+ ::= { remoteKVMDeviceNotifications 46 }
+
+pduDisconnected NOTIFICATION-TYPE
+ OBJECTS {
+     rcpObjectName,
+     rcpObjectInstance,
+     portNumber,
+     pduName
+ }
+ STATUS current
+ DESCRIPTION
+  " A PDU is disconnected from a power port"
+ ::= { remoteKVMDeviceNotifications 47 }
+
+networkParameterChangedv2 NOTIFICATION-TYPE             
+      OBJECTS {           
+          rcpObjectName,
+          rcpObjectInstance,
+          userName,
+          remoteIpAddress,
+          changeEventText
+      }
+        STATUS              current
+        DESCRIPTION         "A network parameter change was detected"
+        ::= { remoteKVMDeviceNotifications 48 }
+
+portConnectv2 NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ portName,
+ rcpIPAddress
+    }
+    STATUS current
+    DESCRIPTION 
+ "A user connected to a port"
+    ::= { remoteKVMDeviceNotifications 49 }
+
+
+portDisconnectv2 NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ userName,
+ portName,
+ rcpIPAddress
+ }
+    STATUS current
+    DESCRIPTION 
+ "A user disconnected from a port"
+    ::= { remoteKVMDeviceNotifications 50 }
+
+userForcedLogout NOTIFICATION-TYPE
+    OBJECTS {
+    rcpObjectName,
+    rcpObjectInstance,
+    userName,
+    rcpIPAddress
+     }
+    STATUS current
+    DESCRIPTION
+    "A user was forcibly logged out by Admin"
+    ::= { remoteKVMDeviceNotifications 51 }
+
+userUploadedCertificate NOTIFICATION-TYPE
+   OBJECTS {
+             rcpObjectName,
+             rcpObjectInstance,
+             userName,
+             rcpIPAddress,
+             certificateAuthorityName
+           }
+   STATUS      current
+   DESCRIPTION
+     "A user uploaded a SSL Certificate."
+   ::= { remoteKVMDeviceNotifications 52 }
+
+bladeChassisCommError NOTIFICATION-TYPE
+    OBJECTS {
+         rcpObjectName,
+         rcpObjectInstance,
+         deviceName,
+ portNumber,
+         portName 
+    }
+    STATUS current
+    DESCRIPTION
+   "A communications error with blade chassis device connected to this port was detected."
+    ::= { remoteKVMDeviceNotifications 53 }
+
+setDateTime NOTIFICATION-TYPE
+    OBJECTS {
+         rcpObjectName,
+         rcpObjectInstance,
+         deviceName,
+         sysDateAndTime
+    }
+    STATUS current
+    DESCRIPTION
+   "The device time and date have been set."
+    ::= { remoteKVMDeviceNotifications 54 }
+
+setFIPSMode NOTIFICATION-TYPE
+    OBJECTS {
+         rcpObjectName,
+         rcpObjectInstance,
+         deviceName,
+ fipsModeStatus 
+    }
+    STATUS current
+    DESCRIPTION
+   "FIPS Mode status has been changed on the device."
+    ::= { remoteKVMDeviceNotifications 55 }
+
+securityBannerChanged NOTIFICATION-TYPE
+    OBJECTS {
+         rcpObjectName,
+         rcpObjectInstance,
+         userName,
+         rcpIPAddress,
+         bannerChanges
+    }
+    STATUS current
+    DESCRIPTION
+   "Security Banner has changed "
+    ::= { remoteKVMDeviceNotifications 56 }
+
+securityBannerAction NOTIFICATION-TYPE
+    OBJECTS {
+         rcpObjectName,
+         rcpObjectInstance,
+         userName,
+         rcpIPAddress,
+         bannerAction
+    }
+    STATUS     current
+    DESCRIPTION
+   "User Acceptance/Rejection of Security Banner "
+    ::= { remoteKVMDeviceNotifications 57 }
+
+scanStarted NOTIFICATION-TYPE
+ OBJECTS {
+  rcpObjectName,
+  rcpObjectInstance,
+  userName,
+  portList,
+  rcpIPAddress
+  }
+ STATUS current
+ DESCRIPTION 
+ "A user started a port scan"
+ ::= { remoteKVMDeviceNotifications 58 }
+
+scanStopped NOTIFICATION-TYPE
+ OBJECTS {
+  rcpObjectName,
+  rcpObjectInstance,
+  userName,
+  portList,
+  rcpIPAddress
+ }
+ STATUS current
+ DESCRIPTION 
+ "A user stopped a port scan"
+ ::= { remoteKVMDeviceNotifications 59 } 
+
+userDisconnectedFromPort NOTIFICATION-TYPE 
+ OBJECTS {
+  rcpObjectName,
+  rcpObjectInstance,
+  targetUser,
+  portName,
+  userName,
+  rcpIPAddress
+ } 
+ STATUS current 
+ DESCRIPTION 
+ "A user was forcibly disconnected from a port by Admin"
+ ::= { remoteKVMDeviceNotifications 60 } 
+
+automaticScriptConfiguration NOTIFICATION-TYPE
+ OBJECTS {
+  rcpObjectName,
+  rcpObjectInstance,
+  rcpIPAddress,
+  fileName,
+  status
+ } 
+ STATUS current 
+ DESCRIPTION 
+ "The system attempted to run a script downloaded via TFTP"
+ ::= { remoteKVMDeviceNotifications 61 } 
+
+
+dsamUpdateStarted NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance
+    }
+    STATUS current
+    DESCRIPTION
+ "DSAM update started"
+    ::= { remoteKVMDeviceNotifications 62 }
+
+
+dsamUpdateCompleted NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance
+    }
+    STATUS current
+    DESCRIPTION
+ "DSAM update completed"
+    ::= { remoteKVMDeviceNotifications 63 }
+
+
+dsamConnected NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ serialNumber
+    }
+    STATUS current
+    DESCRIPTION
+ "DSAM Connected"
+    ::= { remoteKVMDeviceNotifications 64 }
+
+
+dsamDisconnected NOTIFICATION-TYPE
+    OBJECTS {
+ rcpObjectName,
+ rcpObjectInstance,
+ serialNumber
+    }
+    STATUS current
+    DESCRIPTION
+ "DSAM Disconnected"
+    ::= { remoteKVMDeviceNotifications 65 }
+
+
+-- *
+-- * SNMPv2 Conformance Information *******************************************
+-- *
+
+raritanMibConformance   OBJECT IDENTIFIER ::= { raritan 9 }
+raritanMibCompliances   OBJECT IDENTIFIER ::= { raritanMibConformance 1 }
+raritanMibGroups        OBJECT IDENTIFIER ::= { raritanMibConformance 2 }
+
+raritanMibCompliance    MODULE-COMPLIANCE
+    STATUS              current
+    DESCRIPTION         "Compliance statement for the private Raritan MIB."
+    MODULE              -- Module Raritan-MIB
+    MANDATORY-GROUPS    {
+                            raritanMibBasicGroup,
+                            raritanMibTrapGroup,
+       raritanMibGetGroup
+                        }
+    ::= { raritanMibCompliances 1 }
+
+raritanMibBasicGroup    OBJECT-GROUP
+    OBJECTS             {
+                           rcpObjectName,   
+                           rcpObjectInstance,   
+                           userName,  
+                           targetUser,  
+                           groupName, 
+                           rcpIPAddress,  
+                           deviceName, 
+                           portStatus,  
+                           portName,   
+                           clusterID,   
+                           ipPort,  
+                           resetType,  
+                           interface, 
+                           ethernetInterface,  
+                           backupRestoreAction, 
+                           imageType,  
+                           imageVersion,   
+                           status, 
+                           fileVersion, 
+                           fileType,  
+                           outletName, 
+                           portNumber,  
+                           serialNumber,
+                           cimName,
+                           count,
+         restoredLanPort,
+         remoteIpAddress, 
+         oldIpAddress,
+         newIpAddress,
+         newNetmask,
+         oldNetmask,
+         oldGateway,
+         newGateway,
+         sxAlertString,
+         pduName,
+                      changeEventText,
+         certificateAuthorityName,
+                      sysDateAndTime,
+         fipsModeStatus,
+                      bannerChanges,
+                      bannerAction,
+    portList,
+    fileName
+   }
+    STATUS              current
+    DESCRIPTION         "Objects used in the traps."
+    ::= { raritanMibGroups 1 }
+
+
+raritanMibTrapGroup         NOTIFICATION-GROUP
+    NOTIFICATIONS       {
+                           rebootStarted,  
+                           rebootCompleted,  
+                           userLogin,   
+                           userLogout,   
+                           userAuthenticationFailure,   
+                           portConnect,  
+                           portDisconnect,  
+                           userSessionTimeout, 
+                           userConnectionLost,   
+                           portStatusChange,
+                           userAdded,   
+                           userModified, 
+                           userDeleted, 
+                           groupAdded,  
+                           groupModified, 
+                           groupDeleted,  
+                           startCCManagement,
+                           stopCCManagement,  
+                           factoryReset, 
+                           deviceUpdateStarted, 
+                           deviceUpdateCompleted,  
+                           configBackup,  
+                           configRestore,  
+                           userPasswordChanged,  
+                           powerNotification,  
+                           networkFailure,  
+                           networkParameterChanged,  
+                           vmImageConnected,  
+                           vmImageDisconnected,  
+                           cimUpdateStarted,  
+                           cimUpdateCompleted,   
+                           cimConnected,    
+                           cimDisconnected, 
+                           powerOutletNotification,
+                           portConnectionDenied,  
+                           firmwareFileDiscarded,  
+                           firmwareUpdateFailed,  
+                           firmwareValidationFailed,  
+                           securityViolation,  
+                           deviceUpdateFailed,  
+                           passwordSettingsChanged,   
+                           ethernetFailover, 
+                           ipConflictDetected,
+                           ipConflictResolved,
+                           sxPortAlert,
+                           pduConnected,
+                           pduDisconnected,
+                           networkParameterChangedv2,
+                           portConnectv2,
+                           portDisconnectv2,
+                          userForcedLogout,
+        userUploadedCertificate,
+         bladeChassisCommError,
+                           setDateTime,
+        setFIPSMode,
+                           securityBannerChanged,
+    securityBannerAction,
+        scanStarted,
+        scanStopped,
+    userDisconnectedFromPort,
+    automaticScriptConfiguration,
+                           dsamUpdateStarted,
+                           dsamUpdateCompleted,
+                           dsamConnected,
+                           dsamDisconnected
+                        }
+    STATUS              current
+    DESCRIPTION         "Raritan traps."
+    ::= { raritanMibGroups 2 }
+
+raritanMibGetGroup    OBJECT-GROUP
+    OBJECTS             {
+    systemUsageMemory,
+    systemUsageCPU,
+    systemPowerSupplyPowerOn,
+    portDataNumber,
+    portDataName,
+    portDataType,
+    portDataStatus
+                        }
+    STATUS              current
+    DESCRIPTION         "Raritan retrievable objects"
+    ::= { raritanMibGroups 3 }
+
+END 

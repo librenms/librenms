@@ -1,0 +1,311 @@
+-- ********************************************************************
+        PEPVPN-SPEEDFUSION DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        OBJECT-GROUP
+                                FROM SNMPv2-CONF
+                        enterprises, IpAddress,Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+                                FROM SNMPv2-SMI
+                        DisplayString, RowStatus, TruthValue, MacAddress
+                                FROM SNMPv2-TC;
+
+--
+-- Node definitions
+--
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+		peplink OBJECT IDENTIFIER ::= { enterprises 23695 }
+        
+		productMib  OBJECT IDENTIFIER ::= { peplink 200 }
+
+		generalMib OBJECT IDENTIFIER ::= { productMib 1 }
+
+		pepvpnMib OBJECT IDENTIFIER ::= { generalMib 10 }
+
+                pepvpn MODULE-IDENTITY
+           		LAST-UPDATED "201305140000Z"		-- 05 15, 2013 at 12:00 GMT
+			ORGANIZATION "PEPLINK"
+                       	CONTACT-INFO ""
+		    	DESCRIPTION
+				    "MIB module for PepVPN."
+		::= { pepvpnMib 1 }
+
+-- #####################################################################
+-- 
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+	pepVpnInfo OBJECT IDENTIFIER ::= { pepvpn 1 }
+
+-- **********************************************************************
+-- *  
+-- **********************************************************************
+
+--		pepVpnStatus OBJECT-TYPE
+--			SYNTAX INTEGER
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"PepVpn status."
+--			::= { pepVpnInfo 1 }
+
+-- **********************************************************************
+-- *  Table 
+-- **********************************************************************
+		pepVpnStatusTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF PepVpnStatusEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"PepVpn status table"
+			::= { pepVpnInfo 2 }
+
+			pepVpnStatusEntry OBJECT-TYPE
+			SYNTAX PepVpnStatusEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the pepVpnStatusTable"
+			INDEX { pepVpnStatusId, pepVpnRemotePeerId }
+			::= { pepVpnStatusTable 1 }
+
+			PepVpnStatusEntry ::=
+			SEQUENCE {
+				pepVpnStatusId
+					INTEGER,
+				pepVpnStatusProfileName
+					OCTET STRING,
+				pepVpnStatusConnectionState
+					INTEGER,
+				pepVpnStatusEncryption
+					INTEGER,
+				pepVpnStatusL2Bridging
+					INTEGER,
+				pepVpnStatusL2Vlan
+					INTEGER,
+				pepVpnRemotePeerId
+					INTEGER,
+				pepVpnRemotePeer
+					OCTET STRING
+			}
+
+			pepVpnStatusId OBJECT-TYPE
+				SYNTAX INTEGER
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn ID."
+				::= { pepVpnStatusEntry 1 }
+
+			pepVpnStatusProfileName OBJECT-TYPE
+				SYNTAX OCTET STRING (SIZE (1..32))
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn profile name."
+				::= { pepVpnStatusEntry 2 }
+
+			pepVpnStatusConnectionState OBJECT-TYPE
+				SYNTAX INTEGER {
+					start(0),
+					authen(1),
+					tunnel(2),
+					route(3),
+					connected(4)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn connection state."
+				::= { pepVpnStatusEntry 3 }
+
+			pepVpnStatusEncryption OBJECT-TYPE
+				SYNTAX INTEGER	{
+					na(0), 
+					off(1), 
+					aes256(2)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn encryption."
+				::= { pepVpnStatusEntry 4 }
+
+			pepVpnStatusL2Bridging OBJECT-TYPE
+				SYNTAX INTEGER{
+					disable(0), 
+					enable(1)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn L2 bridging status."
+				::= { pepVpnStatusEntry 5 }
+
+			pepVpnStatusL2Vlan OBJECT-TYPE
+				SYNTAX INTEGER(1..4094)
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn L2 VLAN ID.
+					Remark:
+					If the value equals 0, means VLAN ID 
+					not applicable in this PepVpn."
+				::= { pepVpnStatusEntry 6 }
+
+			pepVpnRemotePeerId OBJECT-TYPE
+				SYNTAX INTEGER
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn remote peer ID."
+				::= { pepVpnStatusEntry 7 }
+
+			pepVpnRemotePeer OBJECT-TYPE
+				SYNTAX OCTET STRING
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn remote peer."
+				::= { pepVpnStatusEntry 8 }
+
+-- **********************************************************************
+-- *  Table 
+-- **********************************************************************
+		pepVpnStatusWanTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF PepVpnStatusWanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"PepVpn status network WAN table"
+			::= { pepVpnInfo 3 }
+
+			pepVpnStatusWanEntry OBJECT-TYPE
+			SYNTAX PepVpnStatusWanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the pepVpnStatusWanTable"
+			INDEX { pepVpnStatusId, pepVpnRemotePeerId, pepVpnStatusWanId }
+			::= { pepVpnStatusWanTable 1 }
+
+			PepVpnStatusWanEntry ::=
+			SEQUENCE {
+				pepVpnStatusWanId
+					INTEGER,
+				pepVpnStatusWanName
+					OCTET STRING,
+				pepVpnStatusWanTxBytes
+					Counter64,
+				pepVpnStatusWanRxBytes
+					Counter64,
+				pepVpnStatusWanDropPackets
+					INTEGER,
+				pepVpnStatusWanLatency
+					INTEGER
+			}
+
+			pepVpnStatusWanId OBJECT-TYPE
+				SYNTAX INTEGER
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN id."
+				::= { pepVpnStatusWanEntry 1 }
+
+			pepVpnStatusWanName OBJECT-TYPE
+				SYNTAX OCTET STRING (SIZE (1..32))
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN name."
+				::= { pepVpnStatusWanEntry 2 }
+
+			pepVpnStatusWanTxBytes OBJECT-TYPE
+				SYNTAX Counter64
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN transmitted bytes."
+				::= { pepVpnStatusWanEntry 3 }
+
+			pepVpnStatusWanRxBytes OBJECT-TYPE
+				SYNTAX Counter64
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN received bytes."
+				::= { pepVpnStatusWanEntry 4 }
+
+			pepVpnStatusWanDropPackets OBJECT-TYPE
+				SYNTAX INTEGER
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN drop packets."
+				::= { pepVpnStatusWanEntry 5 }
+
+			pepVpnStatusWanLatency OBJECT-TYPE
+				SYNTAX INTEGER
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"WAN latency(units: ms)."
+				::= { pepVpnStatusWanEntry 6 }
+
+-- **********************************************************************
+-- *  Table 
+-- **********************************************************************
+		pepVpnStatusRemoteNetworkTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF PepVpnStatusRemoteNetworkEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"PepVpn status remote network table"
+			::= { pepVpnInfo 4 }
+
+			pepVpnStatusRemoteNetworkEntry OBJECT-TYPE
+			SYNTAX PepVpnStatusRemoteNetworkEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the pepVpnStatusRemoteNetworkTable"
+			INDEX { pepVpnStatusId, pepVpnRemotePeerId, pepVpnStatusRemoteNetowrkId }
+			::= { pepVpnStatusRemoteNetworkTable 1 }
+
+			PepVpnStatusRemoteNetworkEntry ::=
+			SEQUENCE {
+				pepVpnStatusRemoteNetowrkId
+					INTEGER,
+				pepVpnStatusRemoteNetwork
+					IpAddress,
+				pepVpnStatusRemoteSubnet
+					IpAddress
+			}
+
+			pepVpnStatusRemoteNetowrkId OBJECT-TYPE
+				SYNTAX INTEGER
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn remote network id."
+				::= { pepVpnStatusRemoteNetworkEntry 1 }
+
+			pepVpnStatusRemoteNetwork OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn remote network IP."
+				::= { pepVpnStatusRemoteNetworkEntry 2 }
+
+			pepVpnStatusRemoteSubnet OBJECT-TYPE
+				SYNTAX IpAddress
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"PepVpn remote network subnet."
+				::= { pepVpnStatusRemoteNetworkEntry 3 }
+
+END

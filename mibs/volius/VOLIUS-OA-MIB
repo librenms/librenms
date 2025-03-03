@@ -1,0 +1,809 @@
+
+VOLIUS-OA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY, 
+	enterprises, TimeTicks, Integer32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, TruthValue, MacAddress, 
+	DateAndTime, DisplayString
+		FROM SNMPv2-TC
+	InetAddressIPv4
+		FROM INET-ADDRESS-MIB;
+
+vlsGlobalModule MODULE-IDENTITY
+	LAST-UPDATED "201105311534Z"
+	ORGANIZATION 
+		"Volius"
+	CONTACT-INFO 
+		""
+	DESCRIPTION 
+		"This MIB describes all SNMP-enabled hardware produced by Volius,
+		such as Fiber optical receivers, Erbium-doped fiber amplifiers,
+		Optical switches, CATV optical transmitters."
+
+	REVISION "201105311543Z"
+	DESCRIPTION 
+		"Initial version"
+::= { volius 1 }
+
+
+VlsDeciCelsius ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT 	"d-1"
+	STATUS     current
+	DESCRIPTION 
+		"Data type representing temperature readings in units of 0.1
+		degrees Celsius. For example, a temperature of -12.3 degrees
+		Celsius will be represented as -123."
+	SYNTAX  Integer32
+
+
+VlsDeciDb ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT 	"d-1"
+	STATUS     current
+	DESCRIPTION 
+		"Data type a ratio (or gain) in units of 0.1 dB. For example,
+		a gain of 12.5 dB will be represented as 125."
+	SYNTAX  Integer32
+
+
+VlsDeciDbm ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT 	"d-1"
+	STATUS     current
+	DESCRIPTION 
+		"Data type representing power readings in units of 0.1 dBm. For
+		example, a power of -2.5 dBm will be represented as -25."
+	SYNTAX  Integer32
+
+
+VlsEdfaMode ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		vlsEdfaModeApc (1),
+		vlsEdfaModeAcc (2)
+	}
+
+
+VlsEvent ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		vlsEventStartUp (1),
+		vlsEventPowerOff (2),
+		vlsEventSntpSync (3),
+		vlsEventFwUpload (4),
+		vlsEventEmissionOn (5),
+		vlsEventEmissionOff (6),
+		vlsEventLaserTempNorm (7),
+		vlsEventLaserTempLow (8),
+		vlsEventLaserTempHigh (9),
+		vlsEventLaserCurrentNorm (10),
+		vlsEventLaserCurrentHigh (11),
+		vlsEventInputLossOfSignal (12),
+		vlsEventInputPowerLow (13),
+		vlsEventInputPowerNorm (14),
+		vlsEventInputPowerHigh (15),
+		vlsEventOutputPowerNorm (16),
+		vlsEventOutputPowerLow (17),
+		vlsEventOutputPowerHigh (18),
+		vlsEventCaseTempNorm (19),
+		vlsEventCaseTempLow (20),
+		vlsEventCaseTempHigh (21),
+		vlsEventFanSpeedNorm (22),
+		vlsEventFanSpeedLow (23),
+		vlsEventCurrentProtectionSM (24),
+		vlsEventCurrentProtectionMM (25),
+		vlsEventSelectedInputA (26),
+		vlsEventSelectedInputB (27)
+	}
+
+
+VlsMillivolt ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT 	"d-3"
+	STATUS     current
+	DESCRIPTION 
+		"Data type representing voltage values in units of mV."
+	SYNTAX  Integer32
+
+
+VlsPerMille ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"Data type representing fractions, where percentage would
+		normally be used. 1 per mille corresponds to 0.1%.
+		For example. 99.9% would be 999 per mille."
+	SYNTAX  Integer32
+
+
+VlsRPM ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"Rotational speed in units of revolutions per minute."
+	SYNTAX  Integer32
+
+
+VlsSwitchMode ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		vlsSwitchForceA (1),
+		vlsSwitchForceB (2),
+		vlsSwitchPreferA (3),
+		vlsSwitchPreferB (4),
+		vlsSwitchPreferALatch (5),
+		vlsSwitchPreferBLatch (6)
+	}
+
+
+VlsSwitchState ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		vlsSwitchStateA (1),
+		vlsSwitchStateB (2)
+	}
+
+volius               OBJECT IDENTIFIER ::= { enterprises 34652 }
+vlsSystem            OBJECT IDENTIFIER ::= { volius 2 }
+vlsSystemGeneral     OBJECT IDENTIFIER ::= { vlsSystem 10 }
+vlsNetworkServices   OBJECT IDENTIFIER ::= { vlsSystem 11 }
+vlsNetworkAddress    OBJECT IDENTIFIER ::= { vlsNetworkServices 5 }
+vlsHttp              OBJECT IDENTIFIER ::= { vlsNetworkServices 6 }
+vlsSnmp              OBJECT IDENTIFIER ::= { vlsNetworkServices 7 }
+vlsSntp              OBJECT IDENTIFIER ::= { vlsNetworkServices 8 }
+vlsEventLog          OBJECT IDENTIFIER ::= { vlsSystem 13 }
+vlsAlarms            OBJECT IDENTIFIER ::= { vlsSystem 14 }
+vlsEdfa              OBJECT IDENTIFIER ::= { volius 3 }
+vlsOpticalSwitch     OBJECT IDENTIFIER ::= { volius 4 }
+vlsCatvTransmitter   OBJECT IDENTIFIER ::= { volius 5 }
+vlsOpticalReceiver   OBJECT IDENTIFIER ::= { volius 6 }
+vlsCabinetMonitor    OBJECT IDENTIFIER ::= { volius 7 }
+vlsUpsMonitor        OBJECT IDENTIFIER ::= { volius 8 }
+
+vlsModelName  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 1 }
+
+vlsSerialNumber  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 2 }
+
+vlsFirmwareVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 3 }
+
+vlsDateAndTime  OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 4 }
+
+vlsTimeZone  OBJECT-TYPE
+	SYNTAX     Integer32 (-720..780)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Difference between local time and UTC in minutes."
+	::= { vlsSystemGeneral 5 }
+
+vlsCaseTemperature  OBJECT-TYPE
+	SYNTAX     VlsDeciCelsius
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 6 }
+
+vlsSupplyVoltageTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF VlsSupplyVoltageEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 7 }
+
+vlsSupplyVoltageEntry  OBJECT-TYPE
+	SYNTAX 	VlsSupplyVoltageEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { vlsSupplyVoltageIndex }
+	::= { vlsSupplyVoltageTable 1 }
+
+VlsSupplyVoltageEntry ::= SEQUENCE {
+	vlsSupplyVoltageIndex
+		Integer32,
+	vlsSupplyVoltageNominal
+		VlsMillivolt,
+	vlsSupplyVoltageActual
+		VlsMillivolt
+}
+
+vlsSupplyVoltageIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSupplyVoltageEntry 1 }
+
+vlsSupplyVoltageNominal  OBJECT-TYPE
+	SYNTAX     VlsMillivolt
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSupplyVoltageEntry 2 }
+
+vlsSupplyVoltageActual  OBJECT-TYPE
+	SYNTAX     VlsMillivolt
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSupplyVoltageEntry 3 }
+
+vlsOperationMinutes  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 8 }
+
+vlsActivePowerSupply  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 9 }
+
+vlsBootLoaderVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 10 }
+
+vlsFanSpeed  OBJECT-TYPE
+	SYNTAX     VlsRPM
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 11 }
+
+vlsMacAddress  OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsNetworkAddress 1 }
+
+vlsIpAddress  OBJECT-TYPE
+	SYNTAX     InetAddressIPv4
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsNetworkAddress 2 }
+
+vlsNetMask  OBJECT-TYPE
+	SYNTAX     InetAddressIPv4
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsNetworkAddress 3 }
+
+vlsDefaultGateway  OBJECT-TYPE
+	SYNTAX     InetAddressIPv4
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsNetworkAddress 4 }
+
+vlsHttpPassword  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION 
+		""
+	::= { vlsHttp 1 }
+
+vlsHttpPasswordEnabled  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsHttp 2 }
+
+vlsHttpPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsHttp 3 }
+
+vlsHttpEnabled  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsHttp 4 }
+
+vlsSnmpPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSnmp 1 }
+
+vlsTrapDestTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF VlsTrapDestEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSnmp 2 }
+
+vlsTrapDestEntry  OBJECT-TYPE
+	SYNTAX 	VlsTrapDestEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { vlsTrapDestIndex }
+	::= { vlsTrapDestTable 1 }
+
+VlsTrapDestEntry ::= SEQUENCE {
+	vlsTrapDestIndex
+		Integer32,
+	vlsTrapDestAddr
+		InetAddressIPv4,
+	vlsTrapDestPort
+		Integer32,
+	vlsTrapDestEnable
+		TruthValue
+}
+
+vlsTrapDestIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsTrapDestEntry 1 }
+
+vlsTrapDestAddr  OBJECT-TYPE
+	SYNTAX     InetAddressIPv4
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsTrapDestEntry 2 }
+
+vlsTrapDestPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsTrapDestEntry 3 }
+
+vlsTrapDestEnable  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsTrapDestEntry 4 }
+
+vlsSntpServerAddr  OBJECT-TYPE
+	SYNTAX     InetAddressIPv4
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSntp 1 }
+
+vlsSntpServerPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSntp 2 }
+
+vlsSntpEnabled  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSntp 3 }
+
+vlsLastEventCode  OBJECT-TYPE
+	SYNTAX     VlsEvent
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLog 1 }
+
+vlsLastEventIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLog 2 }
+
+vlsEventLogSize  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of events stored in the log."
+	::= { vlsEventLog 3 }
+
+vlsEventLogTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF VlsEventLogEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLog 4 }
+
+vlsEventLogEntry  OBJECT-TYPE
+	SYNTAX 	VlsEventLogEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { vlsEventIndex }
+	::= { vlsEventLogTable 1 }
+
+VlsEventLogEntry ::= SEQUENCE {
+	vlsEventIndex
+		Integer32,
+	vlsEventCode
+		VlsEvent,
+	vlsEventTimeStamp
+		TimeTicks,
+	vlsEventDateTime
+		DateAndTime,
+	vlsEventMessage
+		DisplayString
+}
+
+vlsEventIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLogEntry 1 }
+
+vlsEventCode  OBJECT-TYPE
+	SYNTAX     VlsEvent
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLogEntry 2 }
+
+vlsEventTimeStamp  OBJECT-TYPE
+	SYNTAX     TimeTicks
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLogEntry 3 }
+
+vlsEventDateTime  OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLogEntry 4 }
+
+vlsEventMessage  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLogEntry 5 }
+
+vlsEventTrap  NOTIFICATION-TYPE
+	OBJECTS { vlsLastEventCode }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLog 8 }
+
+vlsAlarmsActiveMask  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This is a bit mask where all active alarms are combined.
+		Alarms are latching, 
+		that is an alarm is still active even when
+		the condition activating the alarm no longer exists."
+	::= { vlsAlarms 1 }
+
+vlsAlarmsResetMask  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"You can write reset mask to reset individual alarms.
+		An alarm will be reset only if the activating condition no longer exists."
+	::= { vlsAlarms 2 }
+
+vlsAlarmsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF VlsAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsAlarms 3 }
+
+vlsAlarmsEntry  OBJECT-TYPE
+	SYNTAX 	VlsAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { vlsAlarmIndex }
+	::= { vlsAlarmsTable 1 }
+
+VlsAlarmsEntry ::= SEQUENCE {
+	vlsAlarmIndex
+		Integer32,
+	vlsAlarmState
+		TruthValue,
+	vlsAlarmMessage
+		DisplayString
+}
+
+vlsAlarmIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsAlarmsEntry 1 }
+
+vlsAlarmState  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"When read, this OID indicates if the alarm is active.
+		When vlsOff is written to this OID, the alarm is reset."
+	::= { vlsAlarmsEntry 2 }
+
+vlsAlarmMessage  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsAlarmsEntry 3 }
+
+vlsKeyState  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 1 }
+
+vlsEdfaEmissionState  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 2 }
+
+vlsEdfaMode  OBJECT-TYPE
+	SYNTAX     VlsEdfaMode
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 3 }
+
+vlsEdfaPowerSetting  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 4 }
+
+vlsEdfaPumpCurrentSetting  OBJECT-TYPE
+	SYNTAX     VlsPerMille
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 5 }
+
+vlsEdfaGainSetting  OBJECT-TYPE
+	SYNTAX     VlsDeciDb
+	MAX-ACCESS read-write
+	STATUS     obsolete
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 6 }
+
+vlsEdfaInputTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF VlsEdfaInputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 7 }
+
+vlsEdfaInputEntry  OBJECT-TYPE
+	SYNTAX 	VlsEdfaInputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { vlsEdfaInputIndex }
+	::= { vlsEdfaInputTable 1 }
+
+VlsEdfaInputEntry ::= SEQUENCE {
+	vlsEdfaInputIndex
+		Integer32,
+	vlsEdfaInputPower
+		VlsDeciDbm
+}
+
+vlsEdfaInputIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfaInputEntry 1 }
+
+vlsEdfaInputPower  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfaInputEntry 2 }
+
+vlsEdfaOutputPowerTotal  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 8 }
+
+vlsEdfaOutputPowerPerChannel  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 9 }
+
+vlsEdfaSplitRatio  OBJECT-TYPE
+	SYNTAX     VlsDeciDb
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 10 }
+
+vlsEdfaPumpCurrent  OBJECT-TYPE
+	SYNTAX     VlsPerMille
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 11 }
+
+vlsEdfaGain  OBJECT-TYPE
+	SYNTAX     VlsDeciDb
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 12 }
+
+vlsEdfaBackReflection  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 13 }
+
+vlsEdfaBackReflectionThreshold  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-write
+	STATUS     obsolete
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 14 }
+
+vlsEdfaSwitchMode  OBJECT-TYPE
+	SYNTAX     VlsSwitchMode
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 15 }
+
+vlsEdfaSwitchState  OBJECT-TYPE
+	SYNTAX     VlsSwitchState
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 16 }
+
+vlsEdfaPumpTemperature  OBJECT-TYPE
+	SYNTAX     VlsDeciCelsius
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 17 }
+
+vlsEdfaLosThreshold  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 18 }
+
+vlsEdfaLoqThreshold  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEdfa 19 }
+END

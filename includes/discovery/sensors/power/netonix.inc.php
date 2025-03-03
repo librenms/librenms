@@ -15,14 +15,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 echo 'Netonix: ';
 
 $power_oid = '.1.3.6.1.4.1.46242.6.0'; // NETONIX-SWITCH-MIB::totalPowerConsumption
@@ -31,5 +30,5 @@ $descr = 'Total Consumption';
 $divisor = 10;
 
 if (is_numeric($power_value) && $power_value > 0) {
-    discover_sensor($valid['sensor'], 'power', $device, $power_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $power_value / $divisor);
+    discover_sensor(null, 'power', $device, $power_oid, 0, $device['os'], $descr, $divisor, 1, null, null, null, null, $power_value / $divisor);
 }

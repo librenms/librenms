@@ -1,0 +1,725 @@
+-- -----------------------------------------------------------------------------
+-- MIB NAME : Single IP Management Common mib
+-- FILE NAME: SingleIP.mib
+-- DATE     : 2009/01/21
+-- VERSION  : 2.02
+-- PURPOSE  : To construct the MIB structure of Single IP management
+--            for proprietary enterprise
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version, Date, Author
+-- Description:
+--  [New Object]
+--  [Modification]
+-- Notes: (Requested by who and which project)
+--
+-- Version 2.02, 2009/01/21, Eli Lin
+-- [New Object]
+-- Add swSingleIPTrapMgmt and swSingleIPTrapStatus for enableing/disable the 
+-- trap function.
+-- Notes: Requested by Eli for project DES3028
+--
+-- Version 2.01, 2007/12/19, Jenny
+-- [New Object]
+-- 1.add object swSingleIPCSGroupName.
+-- Notes: Requested by Jenny for project DES3528
+--
+-- Version 2.00, 2007/03/27, Yedda
+-- This is the first formal version for universal MIB definition.
+-- -----------------------------------------------------------------------------
+
+SINGLE-IP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+ 	IpAddress
+ 	    FROM RFC1155-SMI
+    ifIndex
+        FROM RFC1213-MIB
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString ,MacAddress, RowStatus
+            FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+	dlink-common-mgmt	FROM DLINK-ID-REC-MIB;
+
+swSingleIPMIB MODULE-IDENTITY
+    LAST-UPDATED "0901210000Z"
+    ORGANIZATION "D-Link Corp."
+    CONTACT-INFO
+        "http://support.dlink.com"
+    DESCRIPTION
+        "The Single IP management MIB."
+    ::= { dlink-common-mgmt 8}
+
+swSingleIPMgmt OBJECT IDENTIFIER ::= { swSingleIPMIB 1 }
+
+swSingleIPInfo OBJECT IDENTIFIER ::= { swSingleIPMgmt 1 }
+swSingleIPCtrl OBJECT IDENTIFIER ::= { swSingleIPMgmt 2 }
+
+-- swSingleIPMSTable OBJECT IDENTIFIER ::= { swSingleIPMgmt 3 }
+-- swSingleIPCaSTable OBJECT IDENTIFIER ::= { swSingleIPMgmt 4 }
+-- swSingleIPGroupTable OBJECT IDENTIFIER ::= { swSingleIPMgmt 5 }
+
+-- -----------------------------------------------------------------------------
+-- swSingleIPInfo
+-- -----------------------------------------------------------------------------
+ swSingleIPVersion OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the version of Single IP Management supported in the system."
+        ::= { swSingleIPInfo 1}
+
+ swSingleIPCapability OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the capability of the switch system."
+        ::= { swSingleIPInfo 2}
+
+ swSingleIPPlatform OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the platform of the switch system."
+        ::= { swSingleIPInfo 3}
+
+-- swSingleIPSetMSStatus OBJECT-TYPE
+--        SYNTAX  INTEGER {
+--        			other(0),
+--                    set-as-ms-success(1),
+--                    set-as-ms-fail(2),
+--                    set-as-cas-success(3),
+--                    set-as-cas-fail(4),
+--                    password-invalid(5),
+--                    community-invalid(6),
+--                    updata-db-error(7),
+--                    wait-ack(8)
+--                }
+--        MAX-ACCESS  read-only
+--        STATUS  current
+--        DESCRIPTION
+--            "This object indicates the process status when set swSingleIPMSTable."
+--        ::= { swSingleIPInfo 4}
+
+-- -----------------------------------------------------------------------------
+-- swSingleIPCtrl
+-- -----------------------------------------------------------------------------
+ swSingleIPAdmin OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    disabled(2),
+                    enabled(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates Single IP Management is enabled or disabled on the system."
+        ::= { swSingleIPCtrl 1}
+
+ swSingleIPRoleState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    cs(1),
+                    cas(2),
+                    ms(3)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the role state of the switch system."
+        ::= { swSingleIPCtrl 2}
+
+ swSingleIPHoldtime OBJECT-TYPE
+        SYNTAX  INTEGER (100..255)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicate the holdtime of the switch in seconds.
+             The default value is 100, the maximum value is 255, and the minimum value is 100."
+        DEFVAL { 100 }
+        ::= { swSingleIPCtrl 3 }
+
+ swSingleIPTimeInterval OBJECT-TYPE
+        SYNTAX  INTEGER (30..90)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the time interval of the switch in seconds to
+             periodically send out Single IP protocol control packets.
+             The default value is 60, the maximum value is 120, and the minimum value is 30.
+             The swSingleIPTimeInterval will always <= swSingleIPHoldtime/2."
+        DEFVAL { 30 }
+        ::= { swSingleIPCtrl 4 }
+
+ swSingleIPCSGroupName OBJECT-TYPE
+ 	SYNTAX	DisplayString  (SIZE (0..64))
+ 	MAX-ACCESS read-write
+ 	STATUS current
+ 	DESCRIPTION
+ 		"This object is used to configure the group name for the commander switch."
+ 	::= { swSingleIPCtrl 5 }
+
+-- -----------------------------------------------------------------------------
+-- swSingleIPTrapMgmt
+-- -----------------------------------------------------------------------------
+  
+  swSingleIPTrapMgmt OBJECT IDENTIFIER ::= { swSingleIPCtrl 6 }
+
+  swSingleIPTrapStatus OBJECT-TYPE
+    	SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2)
+            }
+    	MAX-ACCESS  read-write
+    	STATUS  current
+    	DESCRIPTION
+            "When enabled (1), whenever the commander detects a member's trap
+             event, a trap will be sent out."
+    ::= { swSingleIPTrapMgmt 1 }
+              	
+-- -----------------------------------------------------------------------------
+-- swSingleIPMSTable
+-- -----------------------------------------------------------------------------
+
+    swSingleIPMSTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwSingleIPMSEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table contains information about member switches which belong to the
+            single IP management group.
+             A member will be joined into the group by row creation.
+             Before a switch is joined into a group as a member switch,
+             it must exist in the candidate table list."
+        ::= { swSingleIPMgmt 3 }
+
+    swSingleIPMSEntry OBJECT-TYPE
+        SYNTAX  SwSingleIPMSEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about member switches that belong to the single IP
+             management group."
+        INDEX  { swSingleIPMSID }
+        ::= { swSingleIPMSTable 1 }
+
+    SwSingleIPMSEntry ::=
+        SEQUENCE {
+            swSingleIPMSID
+                INTEGER,
+            swSingleIPMSDeviceName
+                DisplayString,
+            swSingleIPMSMacAddr
+                MacAddress,
+			swSingleIPMSFirmwareVer
+                DisplayString,
+            swSingleIPMSCapability
+                DisplayString,
+            swSingleIPMSPlatform
+                DisplayString,
+            swSingleIPMSHoldtime
+                INTEGER,
+			swSingleIPMSCasSource
+                INTEGER,
+			swSingleIPMSPassword
+                OCTET STRING,
+            swSingleIPMSRowStatus
+                RowStatus
+        }
+    swSingleIPMSID OBJECT-TYPE
+        SYNTAX  INTEGER (1..32)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The ID of the member switch. When creating a SwSingleIPMSEntry entry,
+             this object should fill a value between 1 to 32, but will not be
+             used during the create process (Note: The MS-ID is assigned by a Single IP
+             engine). The value of this object will be the correct member ID when
+             query/read."
+        ::= { swSingleIPMSEntry 1 }
+
+    swSingleIPMSDeviceName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the name of switch."
+        ::= { swSingleIPMSEntry 2 }
+
+    swSingleIPMSMacAddr OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object specifies the MAC address of the member switch."
+        ::= { swSingleIPMSEntry 3 }
+
+    swSingleIPMSFirmwareVer OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the firmware version of the switch."
+        ::= { swSingleIPMSEntry 4 }
+
+    swSingleIPMSCapability OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the capability of the switch."
+        ::= { swSingleIPMSEntry 5 }
+
+    swSingleIPMSPlatform OBJECT-TYPE
+        SYNTAX   DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the platform of the switch."
+        ::= { swSingleIPMSEntry 6 }
+
+    swSingleIPMSHoldtime OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the holdtime of Single IP Management protocol sent by
+            this member switch."
+        ::= { swSingleIPMSEntry 7 }
+
+    swSingleIPMSCasSource OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Specifies the CaS ID when creating the MS entry. The object is used
+            only when creating the swSingleIPMSEntry. The value always shows 0."
+        ::= { swSingleIPMSEntry 8 }
+
+    swSingleIPMSPassword OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (0..16))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Specifies the CaS password when creating the MS entry. The object is used
+            only when creating the swSingleIPMSEntry. The value always shows a zero length string."
+        ::= { swSingleIPMSEntry 9}
+
+    swSingleIPMSRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the status of this entry.
+            Create means set CaS to MS, and DESTROY means set MS to CaS"
+        ::= { swSingleIPMSEntry 10 }
+
+-- -----------------------------------------------------------------------------
+-- swSingleIPCaSTable
+-- -----------------------------------------------------------------------------
+   swSingleIPCaSTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwSingleIPCaSEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table contains information about candidate switches.
+             This table is a read-only table listing all information about candidate
+             switches that will be maintained automatically by the Single IP topology discovery
+             protocol.  "
+        ::= { swSingleIPMgmt 4 }
+
+    swSingleIPCaSEntry OBJECT-TYPE
+        SYNTAX  SwSingleIPCaSEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about candidate switches that belong to the Single
+             IP Management group."
+        INDEX  { swSingleIPCaSID }
+        ::= { swSingleIPCaSTable 1 }
+
+    SwSingleIPCaSEntry ::=
+        SEQUENCE {
+            swSingleIPCaSID
+                INTEGER,
+            swSingleIPCaSDeviceName
+                DisplayString,
+            swSingleIPCaSMacAddr
+                MacAddress,
+			swSingleIPCaSFirmwareVer
+                DisplayString,
+            swSingleIPCaSCapability
+                DisplayString,
+            swSingleIPCaSPlatform
+                DisplayString,
+            swSingleIPCaSHoldtime
+                INTEGER
+        }
+    swSingleIPCaSID OBJECT-TYPE
+        SYNTAX  INTEGER (1..100)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The ID of the candidate switches in the LAN learned by the commander switch."
+        ::= { swSingleIPCaSEntry 1 }
+
+    swSingleIPCaSDeviceName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the name of switch."
+        ::= { swSingleIPCaSEntry 2 }
+
+    swSingleIPCaSMacAddr OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object specifies the MAC address of the candidate switch."
+        ::= { swSingleIPCaSEntry 3 }
+
+    swSingleIPCaSFirmwareVer OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the firmware version of the switch."
+        ::= { swSingleIPCaSEntry 4 }
+
+    swSingleIPCaSCapability OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the capability of the switch."
+        ::= { swSingleIPCaSEntry 5 }
+
+    swSingleIPCaSPlatform OBJECT-TYPE
+        SYNTAX   DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the platform of the switch."
+        ::= { swSingleIPCaSEntry 6 }
+
+    swSingleIPCaSHoldtime OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the holdtime of the Single IP Management protocol
+             sent by this candidate switch."
+        ::= { swSingleIPCaSEntry 7 }
+
+-- -----------------------------------------------------------------------------
+-- swSingleIPGroupTable
+-- -----------------------------------------------------------------------------
+   swSingleIPGroupTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwSingleIPGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table contains information about Single IP Management groups learned by the
+             commander switch.
+             This table is a read-only table listing all information about the Single IP groups that will
+             maintained automatically by Single IP topology discovery protocol."
+        ::= { swSingleIPMgmt 5 }
+
+    swSingleIPGroupEntry OBJECT-TYPE
+        SYNTAX  SwSingleIPGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about Single IP Management groups."
+        INDEX  { swSingleIPGroupMacAddr }
+        ::= { swSingleIPGroupTable 1 }
+
+    SwSingleIPGroupEntry ::=
+        SEQUENCE {
+            swSingleIPGroupMacAddr
+                MacAddress,
+            swSingleIPGroupName
+                DisplayString,
+            swSingleIPGroupDeviceName
+                DisplayString,
+            swSingleIPGroupMSNumber
+                INTEGER,
+			swSingleIPGroupFirmwareVer
+                DisplayString,
+            swSingleIPGroupCapability
+                DisplayString,
+            swSingleIPGroupPlatform
+                DisplayString,
+            swSingleIPGroupHoldtime
+                INTEGER
+        }
+
+    swSingleIPGroupMacAddr OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object specifies the MAC address of the commander switch."
+        ::= { swSingleIPGroupEntry 1 }
+
+    swSingleIPGroupName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the name of the Single IP Management group."
+        ::= { swSingleIPGroupEntry 2 }
+
+    swSingleIPGroupDeviceName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the name of commander switch of the group."
+        ::= { swSingleIPGroupEntry 3 }
+
+    swSingleIPGroupMSNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the member switch number of the group.
+             "
+        ::= { swSingleIPGroupEntry 4 }
+
+    swSingleIPGroupFirmwareVer OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the firmware version of the switch."
+        ::= { swSingleIPGroupEntry 5 }
+
+    swSingleIPGroupCapability OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the capability of the switch."
+        ::= { swSingleIPGroupEntry 6 }
+
+    swSingleIPGroupPlatform OBJECT-TYPE
+        SYNTAX   DisplayString (SIZE (0..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the platform of the switch."
+        ::= { swSingleIPGroupEntry 7 }
+
+    swSingleIPGroupHoldtime OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the holdtime of the Single IP Management protocol sent by this commander
+             switch."
+        ::= { swSingleIPGroupEntry 8 }
+
+-- -----------------------------------------------------------------------------
+-- swSingleIPNeighborTable
+-- -----------------------------------------------------------------------------
+   swSingleIPNeighborTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwSingleIPNeighborEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table contains information about Single IP Management neighbors learned by the
+             switch.
+             This table is a read-only table listing all the information about Single IP neighbors
+that will be maintained automatically by the Single IP topology protocol."
+        ::= { swSingleIPMgmt 6 }
+
+    swSingleIPNeighborEntry OBJECT-TYPE
+        SYNTAX  SwSingleIPNeighborEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about Single IP Management neighbors."
+        INDEX  { swSingleIPNBReceivedPort,swSingleIPNBMacAddr }
+        ::= { swSingleIPNeighborTable 1 }
+
+    SwSingleIPNeighborEntry ::=
+        SEQUENCE {
+        	swSingleIPNBReceivedPort
+        		INTEGER,
+            swSingleIPNBMacAddr
+                MacAddress,
+            swSingleIPNBRoleState
+                INTEGER
+        }
+
+    swSingleIPNBReceivedPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Specifies the received port of the neighbor switch."
+        ::= { swSingleIPNeighborEntry 1 }
+
+    swSingleIPNBMacAddr OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object specifies the MAC address of the neighbor switch."
+        ::= { swSingleIPNeighborEntry 2 }
+
+    swSingleIPNBRoleState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    commander(1),
+                    candidate(2),
+                    member(3)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object specifies the role state of the neighbor switch."
+        ::= { swSingleIPNeighborEntry 3 }
+
+-- -----------------------------------------------------------------------------
+-- Traps for use by SIM
+-- -----------------------------------------------------------------------------
+      singleIPMSNotify OBJECT IDENTIFIER ::= {swSingleIPMIB 6}
+
+      singleIPMSNotifyPrefix OBJECT IDENTIFIER ::= {singleIPMSNotify 0}
+      swSingleIPMSColdStart NOTIFICATION-TYPE
+          OBJECTS { swSingleIPMSID, swSingleIPMSMacAddr }
+          STATUS  current
+          DESCRIPTION
+                  "The commander switch will send swSingleIPMSColdStart notification to the indicated
+                   host when its member generates a cold start notification."
+          ::= { singleIPMSNotifyPrefix 11 }
+
+      swSingleIPMSWarmStart NOTIFICATION-TYPE
+          OBJECTS { swSingleIPMSID, swSingleIPMSMacAddr }
+          STATUS  current
+          DESCRIPTION
+                  "The commander switch will send swSingleIPMSWarmStart notification to the indicated
+                   host when its member generates a warm start notification."
+          ::= { singleIPMSNotifyPrefix 12 }
+
+      swSingleIPMSLinkDown NOTIFICATION-TYPE
+          OBJECTS {  swSingleIPMSID, swSingleIPMSMacAddr,ifIndex }
+          STATUS  current
+          DESCRIPTION
+                  "The commander switch will send swSingleIPMSLinkDown notification to the indicated
+                   host when its member generates a link down notification."
+          ::= { singleIPMSNotifyPrefix 13 }
+
+      swSingleIPMSLinkUp NOTIFICATION-TYPE
+          OBJECTS {  swSingleIPMSID, swSingleIPMSMacAddr,ifIndex }
+          STATUS  current
+          DESCRIPTION
+                  "The commander switch will send swSingleIPMSLinkUp notification to the indicated
+                   host when its member generates a link up notification."
+          ::= { singleIPMSNotifyPrefix 14 }
+
+      swSingleIPMSAuthFail NOTIFICATION-TYPE
+          OBJECTS { swSingleIPMSID, swSingleIPMSMacAddr }
+          STATUS  current
+          DESCRIPTION
+                  "The commander switch will send swSingleIPMSAuthFail notification to the indicated
+                  host when its member generates an authentation failure notification."
+          ::= { singleIPMSNotifyPrefix 15 }
+
+      swSingleIPMSnewRoot NOTIFICATION-TYPE
+          OBJECTS { swSingleIPMSID, swSingleIPMSMacAddr }
+          STATUS  current
+          DESCRIPTION
+                  "The commander switch will send swSingleIPMSnewRoot notification to the indicated
+                  host when its member generates a new root notification."
+          ::= { singleIPMSNotifyPrefix 16 }
+
+      swSingleIPMSTopologyChange NOTIFICATION-TYPE
+          OBJECTS { swSingleIPMSID, swSingleIPMSMacAddr }
+          STATUS  current
+          DESCRIPTION
+                  "The commander switch will send swSingleIPMSTopologyChange notification to the
+                   indicated host when its member generates a topology change notification."
+          ::= { singleIPMSNotifyPrefix 17 }
+
+      swSingleIPMSrisingAlarm NOTIFICATION-TYPE
+          OBJECTS { swSingleIPMSID, swSingleIPMSMacAddr }
+          STATUS  current
+          DESCRIPTION
+                  "The commander switch will send swSingleIPMSrisingAlarm notification to
+                  the indicated host when its member generates a rising alarm notification."
+          ::= { singleIPMSNotifyPrefix 18 }
+
+      swSingleIPMSfallingAlarm NOTIFICATION-TYPE
+          OBJECTS { swSingleIPMSID,swSingleIPMSMacAddr }
+          STATUS  current
+          DESCRIPTION
+                  "The commander switch will send swSingleIPMSfallingAlarm notification to the
+                   indicated host when its member generates a falling alarm notification."
+          ::= { singleIPMSNotifyPrefix 19 }
+
+      swSingleIPMSmacNotification NOTIFICATION-TYPE
+        OBJECTS { swSingleIPMSID,swSingleIPMSMacAddr,swSingleIPMSTrapMessage }
+        STATUS  current
+        DESCRIPTION
+                  "The commander switch will send swSingleIPMSmacNotification notification to the
+                   indicated host when its member generates a MAC address variation notification."
+
+		::= { singleIPMSNotifyPrefix 20}
+
+	  swSingleIPMSPortTypeChange NOTIFICATION-TYPE
+        OBJECTS { swSingleIPMSID,swSingleIPMSMacAddr,ifIndex,swSingleIPMSTrapMessage }
+        STATUS  current
+        DESCRIPTION
+                  "The commander switch will send swSingleIPMSPortTypeChange notification to the
+                   indicated host when its member generates a port type change notification."
+
+		::= { singleIPMSNotifyPrefix 21 }
+
+      swSingleIPMSPowerStatusChg  NOTIFICATION-TYPE
+        OBJECTS { swSingleIPMSID,swSingleIPMSMacAddr,swSingleIPMSTrapMessage }
+        STATUS          current
+        DESCRIPTION
+                  "The commander switch will send swSingleIPMSPowerStatusChg notification to the
+                   indicated host when its member generates a power status change notification."
+        ::= { singleIPMSNotifyPrefix  22 }
+
+
+      swSingleIPMSPowerFailure  NOTIFICATION-TYPE
+        OBJECTS { swSingleIPMSID,swSingleIPMSMacAddr,swSingleIPMSTrapMessage }
+        STATUS          current
+        DESCRIPTION
+                  "The commander switch will send swSingleIPMSPowerFailure notification to the
+                   indicated host when its member generates a power failure notification."
+        ::= { singleIPMSNotifyPrefix  23 }
+
+      swSingleIPMSPowerRecover NOTIFICATION-TYPE
+        OBJECTS { swSingleIPMSID,swSingleIPMSMacAddr,swSingleIPMSTrapMessage }
+        STATUS          current
+        DESCRIPTION
+                  "The commander switch will send swSingleIPMSPowerRecover notification to the
+                   indicated host when its member generates a power recover notification."
+        ::= { singleIPMSNotifyPrefix  24 }
+
+-- -----------------------------------------------------------------------------
+--	notificationBidings
+-- -----------------------------------------------------------------------------
+    singleIPNotifyBidings OBJECT IDENTIFIER ::= { singleIPMSNotify 1 }
+
+    swSingleIPMSTrapMessage OBJECT-TYPE
+        SYNTAX     OCTET STRING(SIZE (0..1024))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The string that the member switch sent."
+        ::= { singleIPNotifyBidings 1 }
+
+END

@@ -1,0 +1,915 @@
+-- ################################################################################
+
+EXTREME-EAPS-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY         FROM SNMPv2-SMI
+		OBJECT-TYPE             FROM SNMPv2-SMI
+                Unsigned32              FROM SNMPv2-SMI
+                TEXTUAL-CONVENTION      FROM SNMPv2-TC
+                TruthValue              FROM SNMPv2-TC
+                RowStatus               FROM SNMPv2-TC
+                DisplayString           FROM RFC1213-MIB
+                extremeAgent            FROM EXTREME-BASE-MIB;
+
+    extremeEaps MODULE-IDENTITY
+        LAST-UPDATED "0502151530Z"
+        ORGANIZATION "Extreme Networks, Inc."
+        CONTACT-INFO "www.extremenetworks.com"
+        DESCRIPTION "Ethernet Automatic Protection Switching information."  
+        ::= { extremeAgent 18 }
+
+
+    EapsDomainMode
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Indicates the configured mode of an EAPS domain."
+        SYNTAX      INTEGER { invalid (0),
+                              master  (1),
+                              transit (2)
+                            }
+
+    EapsMbrVlanType
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Indicates the type of vlan, whether it is control or
+                     protected vlan, that is being added to the
+                     EAPS domain."
+        SYNTAX      INTEGER { unassigned (0),
+                              control    (1),
+                              protected  (2)
+                            }
+
+    EapsRingPort
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "This represents an EAPS ring-port."
+        SYNTAX      INTEGER (0..2147483647)
+
+    EapsPortType
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Indicates the ring port of the EAPS domains. The ring port
+                     can be primary or secondary. This is used to specify which
+                     port is being unconfigured."
+        SYNTAX      INTEGER {
+                              primary    (1),
+                              secondary  (2)
+                            }
+
+    EapsDomainState
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "The operational state of an EAPS domain.  
+                    The states complete(1), failed(2), init(6), precomplete(7),
+                    and preinit(8) apply only to domains configured as master.
+                    The states linksup(3), linkdown(4) and preforwarding(5) 
+                    apply only to domains configured as transit.  
+                    The state init(0) applys to domains configured as either 
+                    master or transit."
+        SYNTAX      INTEGER { idle          (0),
+                              complete      (1),
+                              failed        (2),
+                              linksup       (3),
+                              linkdown      (4),
+                              preforwarding (5),
+                              init          (6),
+                              precomplete   (7),
+                              preinit       (8)
+                            }
+
+    EapsDomainPortStatus
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "The operational state of an EAPS domain's ring-ports.
+                    If the state is unknown (0), it indicates the domain is
+                    still not up yet.
+                    The valid states are up(1), down(2), blocked(3)."
+        SYNTAX      INTEGER { 
+                              unknown     (0),
+                              up          (1),
+                              down        (2),
+                              blocked     (3)
+                            }
+
+    EapsFailTimerExpiryAction
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "The action to take when the failed timer expires.
+
+                     If action is configured to sendAlert(0), and the 
+                     fail expires, the Master will remain in Complete or Init
+                     state, and a trap - extremeEapsFailTimerExpFlagSet - will 
+                     be sent. 
+                     When this fail timer stops expiring another trap -
+                     extremeEapsFailTimerExpFlagClear - will be sent.
+
+                     If the action is configured to openSecondaryPort(1), and 
+                     the fail timer expires, the Master's state will be set to
+                     Failed, and it will open the secondary port."
+        SYNTAX      INTEGER { sendAlert         (0),
+                              openSecondaryPort (1)
+                            }
+
+    EapsSharedPortState
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "The operational state of an EAPS Shared-Port instance.  
+                    The states are idle(0), ready(1), blocking(2), and
+                    preforwarding(3)."
+        SYNTAX      INTEGER { idle          (0),
+                              ready         (1),
+                              blocking      (2),
+                              preforwarding (3)
+                            }
+
+
+    EapsSharedPortMode
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "If the mode is unconfigured(0), it indicates the EAPS 
+                     shared port's mode has yet to be configured.
+                     The valid configured modes of an EAPS Shared-port are
+                     controller(1) and partner(2)"
+        SYNTAX      INTEGER { 
+                              unconfigured  (0),
+                              controller    (1),
+                              partner       (2)
+                            }
+
+    EapsSharedPortSegmentTimerExpiryAction
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "The action to take when the EAPS Shared-port's segment 
+                     timer expires.
+
+                     If action is configured to sendAlert(0), and the 
+                     segment timer expires, the segment's status will remain
+                     in Up state, and  a trap -
+                     extremeEapsSegmentTimerExpFlagSet - will be sent. 
+                     When this segment timer stops expiring another trap -
+                     extremeEapsSegmentTimerExpFlagClear - will be sent.
+
+                     If the action is configured to segmentDown(1), and the
+                     segment timer expires, the segment's status will be set to
+                     Down."
+        SYNTAX      INTEGER { sendAlert   (0),
+                              segmentDown (1)
+                            }
+
+    EapsSharedPortNeighborStatus
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "The operational status of an EAPS Shared-port's neighbor
+                    reachabilty.
+                    The states are neighborDown(0), neighborUp(1), and
+                    neighborError(2)."
+        SYNTAX      INTEGER { neighborDown         (0),
+                              neighborUp           (1),
+                              neighborError        (2)
+                            }
+
+    EapsSharedPortRootBlockerStatus
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "The operational status of an EAPS Shared-port's Root- 
+                    Blocker.
+                    The states are false(0), active(1), and inactive(2)."
+        SYNTAX      INTEGER { false         (0),
+                              active        (1),
+                              inactive      (2)
+                            }
+
+    EapsSharedPortSegmentStatus
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "The operational status of an EAPS Shared-port's segments.
+                    The states are unknown(0), segUp(1), segDown(2), 
+                    segBlockingUp(3) and segBlockingDown(4)."
+        SYNTAX      INTEGER { unknown          (0),
+                              segUp            (1),
+                              segDown          (2),
+                              segBlockingUp    (3),
+                              segBlockingDown  (4)
+                            }
+
+    EapsSharedPortVlanPortStatus
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "The operational status of an EAPS Shared-port's vlan-port.
+                    The states are unknown(0), activeOpen(1), blocked(2), 
+                    open(3) and down(4)."
+        SYNTAX      INTEGER { unknown          (0),
+                              activeOpen       (1),
+                              blocked          (2),
+                              open             (3),
+                              down             (4)
+                            }
+
+    EapsDomainPriority
+    ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Indicates the configured priority of an EAPS domain."
+        SYNTAX      INTEGER { normal (0),
+                              high   (1)
+                            }
+
+    extremeEapsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ExtremeEapsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+	        "This table contains EAPS information about all EAPS
+                 domains on this device."
+        ::= { extremeEaps 1 }
+
+
+    extremeEapsEntry OBJECT-TYPE
+        SYNTAX ExtremeEapsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "An individual entry of this table contains EAPS 
+                 information related to that EAPS domain."
+        INDEX { extremeEapsName }
+        ::= { extremeEapsTable 1 }
+
+    ExtremeEapsEntry ::= SEQUENCE {
+        extremeEapsName                     DisplayString,
+        extremeEapsMode                     EapsDomainMode,
+        extremeEapsState                    EapsDomainState,
+        extremeEapsFailedFlag               TruthValue,
+        extremeEapsEnabled                  TruthValue,
+        extremeEapsPrimaryPort              EapsRingPort,
+        extremeEapsSecondaryPort            EapsRingPort,
+        extremeEapsHelloTimer               INTEGER,
+        extremeEapsHelloTimerMs             INTEGER,
+        extremeEapsFailedTimer              INTEGER,
+        extremeEapsFailedTimerExpiryAction  EapsFailTimerExpiryAction,
+        extremeEapsUnconfigRingPort         EapsPortType,
+        extremeEapsPrimaryStatus            EapsDomainPortStatus,
+        extremeEapsSecondaryStatus          EapsDomainPortStatus,
+        extremeEapsProtectedVlansCount      INTEGER,
+        extremeEapsPriority                 EapsDomainPriority,
+        extremeEapsRowStatus                RowStatus
+    }
+
+    extremeEapsName  OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+               "The EAPS domain name."
+        ::= { extremeEapsEntry 1 }
+
+    extremeEapsMode OBJECT-TYPE
+        SYNTAX      EapsDomainMode
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This indicates the mode of the EAPS domain."
+        ::= { extremeEapsEntry 2 }
+
+    extremeEapsState OBJECT-TYPE
+        SYNTAX      EapsDomainState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates the current EAPS state of this EAPS 
+                    domain."
+        ::= { extremeEapsEntry 3 }
+
+    extremeEapsFailedFlag OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates the status of the failed flag.
+                    If the failed timer expires while its expiry action is 
+                    configured to sendAlert, this failed flag is set.
+                    It is then cleared when the failed timer stops expiring, or
+                    the expiry action is configured to openSecondaryPort."
+        ::= { extremeEapsEntry 4 }
+
+    extremeEapsEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This indicated if this domain has been enabled or not."
+        ::= { extremeEapsEntry 5 }
+
+    extremeEapsPrimaryPort OBJECT-TYPE
+        SYNTAX      EapsRingPort
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This indicates the EAPS domain's primary ring-port.
+                     Value of 0 indicates the primary port is still not 
+                     configured"
+        ::= { extremeEapsEntry 6 }
+
+    extremeEapsSecondaryPort OBJECT-TYPE
+        SYNTAX      EapsRingPort
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This indicates the EAPS domain's secondary ring-port.
+                     Value of 0 indicates the secondary port is still not
+                     configured"
+        ::= { extremeEapsEntry 7 }
+
+    extremeEapsHelloTimer OBJECT-TYPE
+        SYNTAX      INTEGER (0..15)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This indicates the EAPS domain's hello timer's value
+                     in seconds."
+        ::= { extremeEapsEntry 8 }
+
+    extremeEapsFailedTimer OBJECT-TYPE
+        SYNTAX      INTEGER (2..300)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This indicates the EAPS domain's failed timer's value
+                     in seconds."
+        ::= { extremeEapsEntry 9 }
+
+    extremeEapsFailedTimerExpiryAction OBJECT-TYPE
+        SYNTAX      EapsFailTimerExpiryAction
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This indicates the action taken by the domain when the
+                     fail timer expires. 
+                     If the action is to sendAlert, then a SNMP trap -
+                     extremeEapsFailTimerExpFlagSet - will be sent, and the
+                     secondary port will continue to remain in blocking state.
+                     If the action is to openSecondaryPort, then the secondary
+                     port will open and be set to forwarding state."
+        ::= { extremeEapsEntry 10 }
+
+    extremeEapsUnconfigRingPort OBJECT-TYPE
+        SYNTAX      EapsPortType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This specifies which EAPS domain port is being
+                     unconfigured.
+                     Value of 1, indicates unconfigure the primary port.
+                     Value of 2, indicates unconfigure secondary port."
+        ::= { extremeEapsEntry 11 }
+
+    extremeEapsPrimaryStatus OBJECT-TYPE
+        SYNTAX      EapsDomainPortStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates the status of the EAPS domain's primary
+                     ring-port."
+        ::= { extremeEapsEntry 12 }
+
+    extremeEapsSecondaryStatus OBJECT-TYPE
+        SYNTAX      EapsDomainPortStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates the status of the EAPS domain's secondary
+                     ring-port."
+        ::= { extremeEapsEntry 13 }
+
+    extremeEapsProtectedVlansCount OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This gives the count of the number of vlans that are 
+                     being protected by this EAPS domain."
+        ::= { extremeEapsEntry 14 }
+
+    extremeEapsRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The status of this entry as per standard RowStatus 
+                     conventions."
+        ::= { extremeEapsEntry 15 }
+
+    extremeEapsHelloTimerMs OBJECT-TYPE
+        SYNTAX      INTEGER (100..900)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates the milliseconds portion of the EAPS domain's hello timer value
+                     in milliseconds."
+        ::= { extremeEapsEntry 16 }
+
+
+    extremeEapsPriority OBJECT-TYPE
+        SYNTAX      EapsDomainPriority
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This gives the priority of the domain. Used along with spatial re-use to prioritize
+                     handling of domains during a topology change."
+        ::= { extremeEapsEntry 17 }
+
+    extremeEapsPrevState OBJECT-TYPE
+        SYNTAX      EapsDomainState
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION "This indicates the previous EAPS state of this EAPS 
+                     domain. Used in state change traps information."
+       ::= { extremeEaps 2 }
+
+
+    extremeEapsGlobalInfo OBJECT IDENTIFIER
+        ::= { extremeEaps 3 }
+        
+    extremeEapsGlobalEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates if EAPS is enabled globally on the switch."
+        ::= { extremeEapsGlobalInfo 1 }
+
+    extremeEapsGlobalFastConvergence OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates if Fast Convergence is enabled globally on the 
+                     switch."
+        ::= { extremeEapsGlobalInfo 2 }
+
+    extremeEapsLastConfigurationChange OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the last time there was any change in 
+                     EAPS configuration on the switch."
+        ::= { extremeEapsGlobalInfo 3 }
+
+
+    extremeEapsLastStatusChange OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the last time there was any change in 
+                     EAPS domain, EAPS port, shared port, or segment status on
+                     the switch.  Time changes for extremeEapsState, 
+                     extremeEapsSharedPortState, extremeEapsSharedPortSegmentStatus,
+                     extremeEapsFailedFlag, extremeEapsPrimaryStatus, 
+                     extremeEapsSecondaryStatus, extremeEapsSharedPortNbrStatus,
+	             extremeEapsSharedPortRootBlockerStatus, 
+                     extremeEapsSharedPortSegmentFlagFailed."
+        ::= { extremeEapsGlobalInfo 4 }
+
+    extremeEapsStatusTrapCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the number of status traps sent out since the switch
+                     booted.  Status traps counted include
+		     extremeEapsSharedPortStateChange
+		     extremeEapsRootBlockerStatusChange
+		     extremeEapsPortStatusChange
+		     extremeEapsStateChange
+		     extremeEapsFailTimerExpFlagSet
+		     extremeEapsFailTimerExpFlagClear."
+        ::= { extremeEapsGlobalInfo 5 }
+	
+    extremeEapsGlobalMulticastAddRingPorts OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Ring ports are added to existing multicast groups for protected
+                     vlans on a topology change event."
+      
+        ::= { extremeEapsGlobalInfo 6 }
+
+    extremeEapsGlobalMulticastSendIGMPQuery OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "IGMP Query is sent out on all protected vlans on a topology change 
+                     event."
+        ::= { extremeEapsGlobalInfo 7 }
+
+    extremeEapsGlobalMulticastTempFlooding OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Temporary Multicast flooding occurs on all protected vlans on a 
+                     topology change event."
+        ::= { extremeEapsGlobalInfo 8 }
+
+    extremeEapsGlobalMulticastTempFloodingDuration OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The duration at which temporary Multicast flooding will occur."
+        ::= { extremeEapsGlobalInfo 9 }
+
+    extremeEapsMbrVlanTable OBJECT-TYPE    
+        SYNTAX      SEQUENCE OF ExtremeEapsMbrVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains the control and all protected vlans 
+                     added to each EAPS domain on this device.
+                     There can be only 1 control vlan, while many
+                     protected vlans added to a EAPS domain."
+        ::= { extremeEaps 4 }
+
+    extremeEapsMbrVlanEntry OBJECT-TYPE
+        SYNTAX      ExtremeEapsMbrVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An individual entry of this table correlates a EAPS
+                    domain with a VLAN added to it and its type whether it is
+                    control or protected."
+        INDEX       { extremeEapsName,
+                      extremeEapsMbrVlanName,
+                      extremeEapsMbrVlanType
+                    }
+        ::= { extremeEapsMbrVlanTable 1 }
+
+    ExtremeEapsMbrVlanEntry ::= SEQUENCE { 
+        extremeEapsMbrVlanName    DisplayString,
+        extremeEapsMbrVlanType    EapsMbrVlanType,
+        extremeEapsMbrVlanTag     INTEGER,
+        extremeEapsMbrVlanRowStatus RowStatus
+    }
+
+    extremeEapsMbrVlanName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The member VLAN's name."
+        ::= { extremeEapsMbrVlanEntry 1 }
+
+    extremeEapsMbrVlanType OBJECT-TYPE
+        SYNTAX      EapsMbrVlanType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The member VLAN's type whether it is control or 
+                     protected."
+        ::= { extremeEapsMbrVlanEntry 2 }
+
+    extremeEapsMbrVlanTag OBJECT-TYPE
+        SYNTAX      INTEGER (1..4095)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The member VLAN's Vlan Id tag."
+        ::= { extremeEapsMbrVlanEntry 3 }
+
+    extremeEapsMbrVlanRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The status of this entry as per standard RowStatus
+                     conventions."
+        ::= { extremeEapsMbrVlanEntry 4 }
+
+
+    extremeEapsSharedPortTable OBJECT-TYPE    
+        SYNTAX      SEQUENCE OF ExtremeEapsSharedPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains all EAPS shared ports configured 
+                    on this device."
+        ::= { extremeEaps 5 }
+
+    extremeEapsSharedPortEntry OBJECT-TYPE
+        SYNTAX      ExtremeEapsSharedPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An individual entry of this table describes the 
+                    configuration of an EAPS shared port."
+        INDEX       { extremeEapsSharedPortIfIndex }
+        ::= { extremeEapsSharedPortTable 1 }
+
+    ExtremeEapsSharedPortEntry ::= SEQUENCE { 
+        extremeEapsSharedPortIfIndex   EapsRingPort,
+        extremeEapsSharedPortMode      EapsSharedPortMode,
+        extremeEapsSharedPortLinkId    INTEGER,
+        extremeEapsSharedPortSegmentTimerExpiryAction    EapsSharedPortSegmentTimerExpiryAction,
+        extremeEapsSharedPortState                       EapsSharedPortState,
+        extremeEapsSharedPortNbrStatus                   EapsSharedPortNeighborStatus,
+        extremeEapsSharedPortDomainsCount                INTEGER,
+        extremeEapsSharedPortProtectedVlansCount         INTEGER,
+        extremeEapsSharedPortRootBlockerStatus           EapsSharedPortRootBlockerStatus,
+        extremeEapsSharedPortRootBlockerId               INTEGER,
+        extremeEapsSharedPortRowStatus                   RowStatus,
+        extremeEapsSharedPortSegmentHealthInterval       INTEGER,
+        extremeEapsSharedPortSegmentTimeout              INTEGER,	
+        extremeEapsSharedPortCommonPathFailedFlag        TruthValue,
+        extremeEapsSharedPortCommonPathHealthInterval    INTEGER,
+        extremeEapsSharedPortCommonPathTimeout           INTEGER
+    }
+
+    extremeEapsSharedPortIfIndex OBJECT-TYPE
+        SYNTAX      EapsRingPort
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The ifIndex of a port configured as an EAPS shared port."
+        ::= { extremeEapsSharedPortEntry 1 }
+
+    extremeEapsSharedPortMode OBJECT-TYPE
+        SYNTAX      EapsSharedPortMode
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The configured mode of the EAPS shared port."
+        ::= { extremeEapsSharedPortEntry 2 }
+
+    extremeEapsSharedPortLinkId OBJECT-TYPE
+        SYNTAX      INTEGER (0..65534)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The configured Link Id for the EAPS shared port.
+                     Each common link in the entire network will be assigned a
+                     unique link Id. Each shared-port instance on either end
+                     of this common link will be configured with this 
+                     link Id.
+                     Value of 0 indicates the link Id is still not configured."
+        ::= { extremeEapsSharedPortEntry 3 }
+
+    extremeEapsSharedPortSegmentTimerExpiryAction OBJECT-TYPE
+        SYNTAX      EapsSharedPortSegmentTimerExpiryAction
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This indicates the action taken by the EAPS Shared port
+                     instance when a segment timer expires. 
+                     If the action is sendAlert, then when the segment timer
+                     expires, an SNMP trap will be sent, and the segment will
+                     remain in Up state, with the failed flag set to True.
+                     If the action is segmentDown, then when the timer expires,
+                     the segment will be set to Down state."
+        ::= { extremeEapsSharedPortEntry 4 }
+
+    extremeEapsSharedPortState OBJECT-TYPE
+        SYNTAX      EapsSharedPortState
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates the state of the EAPS Shared port instance.
+                    The states can be idle(0), ready(1), blocking(2), and
+                    preforwarding(3)."
+        ::= { extremeEapsSharedPortEntry 5 }
+
+    extremeEapsSharedPortNbrStatus OBJECT-TYPE
+        SYNTAX      EapsSharedPortNeighborStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates the status of reachabilty to the neighbor
+                     on the other end of the Shared-segment. 
+                     If the neighbor on the other end is reachable with 
+                     matching link-id and different modes, then the status is 
+                     NeighborUp.
+                     If the neighbor is not reachable, this status is 
+                     NeighborDown.
+                     If the neighbor is reachable, but with the same mode,
+                     then this status is set to Error."
+        ::= { extremeEapsSharedPortEntry 6 }
+
+    extremeEapsSharedPortDomainsCount OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This gives the count of the number of EAPS domains that
+                     are sharing this shared-port."
+        ::= { extremeEapsSharedPortEntry 7 }
+
+    extremeEapsSharedPortProtectedVlansCount OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This gives the count of the number of vlans that are 
+                     being protected by this shared-port instance."
+        ::= { extremeEapsSharedPortEntry 8 }
+                   
+    extremeEapsSharedPortRootBlockerStatus OBJECT-TYPE
+        SYNTAX      EapsSharedPortRootBlockerStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "If this shared port instance is not in Root blocker state,
+                     the status is False.
+                     If the shared port is in Root blocker state, and its 
+                     path detect message is being returned to it, it is in 
+                     Active state.
+                     If the shared port is in Root blocker state, but its
+                     path detect message is not making it back to itself, then
+                     its root blocker status is Inactive."
+        ::= { extremeEapsSharedPortEntry 9 }
+
+    extremeEapsSharedPortRootBlockerId OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This is the Link Id of the Root Blocker in the entire
+                     network.
+                     If there is no root blocker in the network, this value
+                     is 65535."
+        ::= { extremeEapsSharedPortEntry 10 }
+
+    extremeEapsSharedPortRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The status of this entry as per standard RowStatus 
+                     conventions."
+        ::= { extremeEapsSharedPortEntry 11 }
+
+
+    extremeEapsSharedPortSegmentHealthInterval OBJECT-TYPE
+        SYNTAX      INTEGER (0..15)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Interval at which health check PDUs are sent out each segment port."
+        ::= { extremeEapsSharedPortEntry 12 }
+
+
+    extremeEapsSharedPortSegmentTimeout OBJECT-TYPE
+        SYNTAX      INTEGER (3..30)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION  "Time in seconds where segment fail timer expires, fail flag is set, and
+                      expiry action is taken."
+        ::= { extremeEapsSharedPortEntry 13 }
+
+    extremeEapsSharedPortCommonPathFailedFlag OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Shared port link fail timer expired, but our shared port link is up."
+        ::= { extremeEapsSharedPortEntry 14 }
+
+    extremeEapsSharedPortCommonPathHealthInterval OBJECT-TYPE
+        SYNTAX      INTEGER (1..10)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Interval at which health check PDUs are sent out shared port."
+        ::= { extremeEapsSharedPortEntry 15 }
+
+    extremeEapsSharedPortCommonPathTimeout OBJECT-TYPE
+        SYNTAX      INTEGER (3..30)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION  "Time in seconds where shared link fail timer expires and fail flag is set"
+        ::= { extremeEapsSharedPortEntry 16 }
+
+
+
+
+
+    extremeEapsSharedPortSegmentTable OBJECT-TYPE    
+        SYNTAX      SEQUENCE OF ExtremeEapsSharedPortSegmentEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains the EAPS shared port's segments 
+                     information"
+        ::= { extremeEaps 6 }
+
+    extremeEapsSharedPortSegmentEntry OBJECT-TYPE
+        SYNTAX      ExtremeEapsSharedPortSegmentEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An individual entry of this table describes the EAPS
+                     shared port's segment information. It will describe the
+                     EAPS domain, the segment's status, and other information
+                     related to neighboring node's blocking status."
+        INDEX       { extremeEapsSharedPortIfIndex,
+                      extremeEapsSharedPortSegmentPort,
+                      extremeEapsName
+                    }
+        ::= { extremeEapsSharedPortSegmentTable 1 }
+
+    ExtremeEapsSharedPortSegmentEntry ::= SEQUENCE { 
+        extremeEapsSharedPortSegmentPort           EapsRingPort,
+        extremeEapsSharedPortSegmentStatus         EapsSharedPortSegmentStatus,
+        extremeEapsSharedPortSegmentFailedFlag     TruthValue,
+        extremeEapsSharedPortSegmentVlanPortCount  INTEGER,
+        extremeEapsSharedPortSegmentAdjId          INTEGER,
+        extremeEapsSharedPortSegmentRBD            INTEGER
+    }
+
+    extremeEapsSharedPortSegmentPort OBJECT-TYPE
+        SYNTAX      EapsRingPort
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The segment port on a segment which is part of an EAPS 
+                     shared port."
+        ::= { extremeEapsSharedPortSegmentEntry 1 }
+
+    extremeEapsSharedPortSegmentStatus OBJECT-TYPE
+        SYNTAX      EapsSharedPortSegmentStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The status of a segment port which is part of an EAPS 
+                     shared port."
+        ::= { extremeEapsSharedPortSegmentEntry 2 }
+
+    extremeEapsSharedPortSegmentFailedFlag OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The status of the failed flag on a segment port which is 
+                     part of an EAPS shared port.
+                     This flag will be set to TRUE if the segment's fail timer
+                     expiry action is set to sendAlert, and this timer expires"
+        ::= { extremeEapsSharedPortSegmentEntry 3 }
+
+    extremeEapsSharedPortSegmentVlanPortCount OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The count of vlan ports being protected under this 
+                     segment's EAPS domain."
+        ::= { extremeEapsSharedPortSegmentEntry 4 }
+
+    extremeEapsSharedPortSegmentAdjId OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The link Id of a neighboring node if the neighbor's 
+                     shared port instance was in blocking state."
+        ::= { extremeEapsSharedPortSegmentEntry 5 }
+
+    extremeEapsSharedPortSegmentRBD OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The Root Blocker Id as determined by the neighboring 
+                     node's shared port instance."
+        ::= { extremeEapsSharedPortSegmentEntry 6 }
+
+
+    extremeEapsSharedPortVlanTable OBJECT-TYPE    
+        SYNTAX      SEQUENCE OF ExtremeEapsSharedPortVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains all VLANs protected by the EAPS 
+                     Shared Port instance."
+        ::= { extremeEaps 7 }
+
+    extremeEapsSharedPortVlanEntry OBJECT-TYPE
+        SYNTAX      ExtremeEapsSharedPortVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An individual entry of this table correlates a EAPS
+                    Shared port instance with a VLAN protected by it."
+        INDEX       { extremeEapsSharedPortIfIndex,
+                      extremeEapsSharedPortVlanName
+                    }
+        ::= { extremeEapsSharedPortVlanTable 1 }
+
+    ExtremeEapsSharedPortVlanEntry ::= SEQUENCE {
+        extremeEapsSharedPortVlanName           DisplayString,
+        extremeEapsSharedPortVlanPortCount      INTEGER,
+        extremeEapsSharedPortVlanActiveOpenPort EapsRingPort
+    }
+
+    extremeEapsSharedPortVlanName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The vlan being protected under this EAPS Shared port
+                     instance"
+        ::= { extremeEapsSharedPortVlanEntry 1 }
+
+    extremeEapsSharedPortVlanPortCount OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The count of vlan ports being protected under this
+                     vlan"
+        ::= { extremeEapsSharedPortVlanEntry 2 }
+
+    extremeEapsSharedPortVlanActiveOpenPort OBJECT-TYPE
+        SYNTAX      EapsRingPort
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Segment port that is Active Open.
+                     If there is no Active open port, then this value is 0."
+        ::= { extremeEapsSharedPortVlanEntry 3 }
+
+    extremeEapsSharedPortVlanPortTable OBJECT-TYPE    
+        SYNTAX      SEQUENCE OF ExtremeEapsSharedPortVlanPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains the EAPS shared port's vlan-port's 
+                     information"
+        ::= { extremeEaps 8 }
+
+    extremeEapsSharedPortVlanPortEntry OBJECT-TYPE
+        SYNTAX      ExtremeEapsSharedPortVlanPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An individual entry of this table describes the EAPS
+                     shared port's vlan port information. It will describe the
+                     status of the vlan port under its protection."
+        INDEX       { extremeEapsSharedPortIfIndex,
+                      extremeEapsSharedPortVlanName,
+                      extremeEapsSharedPortSegmentPort,
+                      extremeEapsName
+                    }
+        ::= { extremeEapsSharedPortVlanPortTable 1 }
+
+    ExtremeEapsSharedPortVlanPortEntry ::= SEQUENCE { 
+        extremeEapsSharedPortVlanPortStatus    EapsSharedPortVlanPortStatus
+    }
+
+    extremeEapsSharedPortVlanPortStatus OBJECT-TYPE
+        SYNTAX      EapsSharedPortVlanPortStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The status of a vlan port which is getting protected
+                     by an EAPS shared port."
+        ::= { extremeEapsSharedPortVlanPortEntry 1 }
+
+END

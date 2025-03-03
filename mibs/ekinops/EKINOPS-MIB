@@ -1,0 +1,167 @@
+-- *****************************************************************
+-- EKINOPS.TXT:  MIB
+--
+--MIB Part Number:3MI02000AHAA
+--MIB Version:01
+--
+-- Copyright (c) 2006 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        enterprises                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION
+                	FROM SNMPv2-TC;
+
+ekinops MODULE-IDENTITY
+        LAST-UPDATED "200903160000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          11, rue Louis de Broglie
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.fr"
+        DESCRIPTION
+          "Initial version of this MIB module."
+	REVISION "200408180000Z"
+	DESCRIPTION
+	  "Initial Version."  
+	REVISION "200504040000Z"
+	DESCRIPTION
+	  "Add the EkiMode type"  
+	REVISION "200506080000Z"
+	DESCRIPTION
+	  "Add the EkiSynchroMode type"  
+	REVISION "200601190000Z"
+	DESCRIPTION
+	  "Add the EkiLineProtocol type"  
+	REVISION "200610260000Z"
+	DESCRIPTION
+	  "Add the EkiStmProtocol type"  
+	REVISION "200705240000Z"
+	DESCRIPTION
+	  "Only one textual convention for all protocols"
+	REVISION "200903160000Z"
+	DESCRIPTION
+	  "Clear Channel Protocol insertion"  
+        ::= { enterprises 20044 }
+
+
+--- #####################################################
+--- 	SYMBOLIC NAMES DEFINITION
+--- #####################################################
+
+EkiState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "states for flags"
+    SYNTAX INTEGER {
+		disabled(1),
+		enabled(2)
+           }
+
+EkiOnOff ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "states for flags"
+    SYNTAX INTEGER {
+		off(1),
+		on(2)
+           }
+
+EkiProtocol ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Differents protocols on the SFP or XFP"
+    SYNTAX INTEGER {
+		protGBE(1),
+		prot1GFC(2),
+		prot2GFC(3),
+		protOC48(4),
+		protclearchannel(6),
+		prot10GBE(8),
+		protOC192(9),
+		protStm1(10),
+		protStm4(11),
+		prot2GBE(12),
+		prot4GFC(13),
+		protEscon(14),
+		protFastEth(15)
+           }
+
+EkiMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "mode for flags"
+    SYNTAX INTEGER {
+		auto(1),
+		manual(2)
+           }
+
+EkiSynchroMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Synchronization sources description"
+    SYNTAX INTEGER {
+		internal(1),
+		external(2)
+           }
+
+EkiApiState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Api errors descriptions"
+    SYNTAX INTEGER {
+			 moduleNotResponding(128),
+			 messageFormatError(129),
+			 cmdExecutionError(130),
+			 unknownArticleError(132),
+			 unknownMessageError(133)
+		   }
+
+EkiMeasureType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Measure type identifier"
+    SYNTAX INTEGER (0..15)
+
+
+EkiLoadGWSW ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Types of article files"
+    SYNTAX INTEGER {
+		gW(1),
+		sW(2)
+           }
+
+EkiLoadState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Current state of the article file"
+    SYNTAX INTEGER {
+		idle(1),
+		downloading(2)
+           }
+
+EkiLoadPermutMethod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Permutation method for the current article"
+    SYNTAX INTEGER {
+		manual(0),
+		autoImmediate(1),
+        	autoScheduled(2)
+           }
+
+EkiLoadPermutMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Permutation mode for the current article"
+    SYNTAX INTEGER {
+		coldReset(0),
+		warmReset(1)
+        }
+
+
+
+END

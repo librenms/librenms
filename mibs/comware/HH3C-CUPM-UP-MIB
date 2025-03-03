@@ -1,0 +1,138 @@
+-- =================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The MIB of data and configuration on user plane.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 Created by huanglei
+--     Initial version 2020-09-10
+-- =================================================================
+HH3C-CUPM-UP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+        Integer32
+    FROM SNMPv2-SMI;
+
+hh3cCupmUp MODULE-IDENTITY
+    LAST-UPDATED "202009110000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB provides config information of UP(User Plane)."
+    REVISION "202009110000Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 195 }
+
+--
+-- Node definitions
+--
+
+-- Traps are defined below.
+hh3cCupmUpNotifications OBJECT IDENTIFIER ::= { hh3cCupmUp 0 }
+
+hh3cCupmUpProtoTnlUp NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCupmUpVbVxlanID,
+            hh3cCupmUpVbSrcAddrType,
+            hh3cCupmUpVbSrcAddr,
+            hh3cCupmUpVbDestAddrType,
+            hh3cCupmUpVbDestAddr,
+            hh3cCupmUpVbVpnName
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when
+         UP device connects to VXLAN tunnel."
+    ::= { hh3cCupmUpNotifications 1 }
+
+hh3cCupmUpProtoTnlDown NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCupmUpVbVxlanID,
+            hh3cCupmUpVbSrcAddrType,
+            hh3cCupmUpVbSrcAddr,
+            hh3cCupmUpVbDestAddrType,
+            hh3cCupmUpVbDestAddr,
+            hh3cCupmUpVbVpnName
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when
+         UP device disconnects to VXLAN tunnel."
+    ::= { hh3cCupmUpNotifications 2 }
+
+-- =================================================================
+-- TrapObjects are defined below.
+
+hh3cCupmUpNotifyVarObjects OBJECT IDENTIFIER ::= { hh3cCupmUp 1 }
+
+hh3cCupmUpVbVxlanID OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Part of the index for this table, this value
+         identifies the VXLAN protocol tunnel."
+    ::= { hh3cCupmUpNotifyVarObjects 1 }
+
+hh3cCupmUpVbSrcAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of local address to be used at a remote
+         host for connecting VXLAN protocol tunnel."
+    ::= { hh3cCupmUpNotifyVarObjects 2 }
+
+hh3cCupmUpVbSrcAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Specifies the local address to be used at a remote
+         host for connecting VXLAN protocol tunnel.  The host
+         address type is determined by the object value of corresponding
+         hh3cCupmCpProtoTnlSrcAddrType."
+    ::= { hh3cCupmUpNotifyVarObjects 3 }
+
+hh3cCupmUpVbDestAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of remote host for connecting the VXLAN
+         protocol tunnel."
+    ::= { hh3cCupmUpNotifyVarObjects 4 }
+
+hh3cCupmUpVbDestAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Specifies the remote host for connecting the VXLAN
+         protocol tunnel."
+    ::= { hh3cCupmUpNotifyVarObjects 5 }
+
+hh3cCupmUpVbVpnName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The VPN name, to which the rule will be applied.
+         Default value is zero-length."
+    ::= { hh3cCupmUpNotifyVarObjects 6 }
+
+END

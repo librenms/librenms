@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+
+sudo -u librenms /opt/librenms/lnms smokeping:generate --targets > /etc/smokeping/config.d/librenms-targets.conf
+sudo -u librenms /opt/librenms/lnms smokeping:generate --probes  > /etc/smokeping/config.d/librenms-probes.conf
+
+systemctl reload smokeping > /dev/null 2<&1

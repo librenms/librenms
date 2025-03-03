@@ -1,0 +1,852 @@
+F3-POPM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter64
+             FROM SNMPv2-SMI
+    DateAndTime, TruthValue, VariablePointer, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    neIndex, shelfIndex, slotIndex
+             FROM  CM-ENTITY-MIB
+    cmEthernetAccPortEntry, cmEthernetNetPortEntry 
+             FROM  CM-FACILITY-MIB
+    cmEthernetAccPortStatsEntry, cmEthernetNetPortStatsEntry,
+    cmEthernetAccPortHistoryEntry, cmEthernetNetPortHistoryEntry
+             FROM  CM-PERFORMANCE-MIB
+    fsp150cm
+             FROM  ADVA-MIB 
+    PerfCounter64
+             FROM  CM-COMMON-MIB;
+
+
+f3POPMMib MODULE-IDENTITY
+    LAST-UPDATED    "201110100000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module documents the Precision Optical Power
+             Monitoring features provided by the F3 product line
+             of products.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201110100000Z"
+    DESCRIPTION
+            "Notes from release 201110100000Z,
+             (1)Added following variables for clearing POPM alarms
+                 f3EthernetAccPortPOPMonitorClearAction,
+                 f3EthernetNetPortPOPMonitorClearAction 
+
+             Notes from release 201109060000Z,
+             (1)Initial MIB version for release FSP150CM 3.4." 
+    ::= {fsp150cm 16}
+
+-- 
+-- OID definitions
+-- 
+f3POPMObjects        OBJECT IDENTIFIER ::= {f3POPMMib 1}
+f3POPMPerfObjects    OBJECT IDENTIFIER ::= {f3POPMMib 2}
+f3POPMConformance    OBJECT IDENTIFIER ::= {f3POPMMib 3}
+
+-- 
+-- Textual Conventions 
+-- 
+POPMGlitchRejectionLevel ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Provides ability to manage the glitch rejection level,
+                   none   -- no glitch rejection
+                   low    -- single glitch rejection
+                   medium -- three glitch rejection
+                   high   -- five glitch rejection
+         ."
+    SYNTAX       INTEGER {
+                   none (1),  
+                   low (2),  
+                   medium (3),
+                   high (4)  
+                 }
+
+POPMState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Provides the enumerations for POPM State
+                   not-applicable  --not applicable state
+                   inoperable      --enabled, port is unassigned 
+                   not-available   --not available state 
+                   calibrating     --enabled, operational, computing
+                   monitoring      --enabled, operational, monitoring 
+                   paused          --enabled, signal out-of-range, 
+                                         signal out-of-variance 
+                   inhibited-R     --enabled, LOS (revertive)   
+                   inhibited-NR    --enabled, sampling error (non-revertive)
+         ."
+    SYNTAX       INTEGER {
+                   not-applicable (1),
+                   inoperable (2),
+                   not-available (3),
+                   calibrating (4),
+                   monitoring (5),
+                   paused (6),
+                   inhibited-R (7),
+                   inhibited-NR (8)
+                 }
+
+POPMClearAlarmsAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Provides ability to clear the alarms on POPR function."
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   clear (1)
+                 }
+
+--
+--  Ethernet Access Port - Precision Optical Power Monitor
+--
+f3EthernetAccPortPOPMonitorTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EthernetAccPortPOPMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table provides ability to manage the
+             Precision Optical Power feature on 
+             Ethernet Access Ports."
+    ::= { f3POPMObjects 2 }
+
+f3EthernetAccPortPOPMonitorEntry OBJECT-TYPE
+    SYNTAX      F3EthernetAccPortPOPMonitorEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3EthernetAccPortPOPMonitorTable."
+    AUGMENTS { cmEthernetAccPortEntry }
+    ::= { f3EthernetAccPortPOPMonitorTable 1 }
+
+F3EthernetAccPortPOPMonitorEntry ::= SEQUENCE {
+    f3EthernetAccPortPOPMonitorEnabled               TruthValue,
+    f3EthernetAccPortPOPMonitorOperRangeHi           Integer32,
+    f3EthernetAccPortPOPMonitorOperRangeLow          Integer32,
+    f3EthernetAccPortPOPMonitorVariance              Integer32,
+    f3EthernetAccPortPOPMonitorWindowSize            Integer32,
+    f3EthernetAccPortPOPMonitorGlitchRejectionLevel  POPMGlitchRejectionLevel,
+    f3EthernetAccPortPOPMonitorState                 POPMState,
+    f3EthernetAccPortPOPMonitorClearAction           POPMClearAlarmsAction
+}
+
+f3EthernetAccPortPOPMonitorEnabled OBJECT-TYPE
+     SYNTAX     TruthValue
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object enables/disables Precision Optical Power monitoring
+          on the Ethernet Access Port."
+     ::= { f3EthernetAccPortPOPMonitorEntry 1 }
+
+f3EthernetAccPortPOPMonitorOperRangeHi OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object provides the higher operating range, in 10ths of dbm, 
+          for Precision Optical Power monitoring."
+     ::= { f3EthernetAccPortPOPMonitorEntry 2 }
+
+f3EthernetAccPortPOPMonitorOperRangeLow OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object provides the lower operating range, in 10ths of dbm, for 
+          Precision Optical Power monitoring."
+     ::= { f3EthernetAccPortPOPMonitorEntry 3 }
+
+f3EthernetAccPortPOPMonitorVariance OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object provides the maximum absolute variance, 
+          from average, in 10ths of dbm, for 
+          Precision Optical Power monitoring."
+     ::= { f3EthernetAccPortPOPMonitorEntry 4 }
+
+f3EthernetAccPortPOPMonitorWindowSize OBJECT-TYPE
+     SYNTAX     Integer32 (1..3600)
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object provides the window size (time in seconds), for 
+          Precision Optical Power monitoring."
+     ::= { f3EthernetAccPortPOPMonitorEntry 5 }
+
+f3EthernetAccPortPOPMonitorGlitchRejectionLevel OBJECT-TYPE
+     SYNTAX     POPMGlitchRejectionLevel 
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object provides the maximum number of 
+          sequential variance violations constituting a 
+          glitch."
+     ::= { f3EthernetAccPortPOPMonitorEntry 6 }
+
+f3EthernetAccPortPOPMonitorState OBJECT-TYPE
+     SYNTAX     POPMState 
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object provides the current state of the 
+          Precision Optical Monitoring processing." 
+     ::= { f3EthernetAccPortPOPMonitorEntry 7 }
+
+f3EthernetAccPortPOPMonitorClearAction OBJECT-TYPE
+     SYNTAX     POPMClearAlarmsAction 
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object provides the ability to clear outstanding 
+          Precision Optical Monitoring alarms." 
+     ::= { f3EthernetAccPortPOPMonitorEntry 8 }
+
+
+--
+--  Ethernet Network Port - Precision Optical Power Monitor
+--
+f3EthernetNetPortPOPMonitorTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EthernetNetPortPOPMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table provides ability to manage the
+             Precision Optical Power feature on 
+             Ethernet Network Ports."
+    ::= { f3POPMObjects 1 }
+
+f3EthernetNetPortPOPMonitorEntry OBJECT-TYPE
+    SYNTAX      F3EthernetNetPortPOPMonitorEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3EthernetNetPortPOPMonitorTable."
+    AUGMENTS { cmEthernetNetPortEntry }
+    ::= { f3EthernetNetPortPOPMonitorTable 1 }
+
+F3EthernetNetPortPOPMonitorEntry ::= SEQUENCE {
+    f3EthernetNetPortPOPMonitorEnabled               TruthValue,
+    f3EthernetNetPortPOPMonitorOperRangeHi           Integer32,
+    f3EthernetNetPortPOPMonitorOperRangeLow          Integer32,
+    f3EthernetNetPortPOPMonitorVariance              Integer32,
+    f3EthernetNetPortPOPMonitorWindowSize            Integer32,
+    f3EthernetNetPortPOPMonitorGlitchRejectionLevel  POPMGlitchRejectionLevel,
+    f3EthernetNetPortPOPMonitorState                 POPMState,
+    f3EthernetNetPortPOPMonitorClearAction           POPMClearAlarmsAction
+}
+
+f3EthernetNetPortPOPMonitorEnabled OBJECT-TYPE
+     SYNTAX     TruthValue
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object enables/disables Precision Optical Power monitoring
+          on the Ethernet Network Port."
+     ::= { f3EthernetNetPortPOPMonitorEntry 1 }
+
+f3EthernetNetPortPOPMonitorOperRangeHi OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object provides the higher operating range, in 10ths of dbm, 
+          for Precision Optical Power monitoring."
+     ::= { f3EthernetNetPortPOPMonitorEntry 2 }
+
+f3EthernetNetPortPOPMonitorOperRangeLow OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object provides the lower operating range, in 10ths of dbm, for 
+          Precision Optical Power monitoring."
+     ::= { f3EthernetNetPortPOPMonitorEntry 3 }
+
+f3EthernetNetPortPOPMonitorVariance OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object provides the maximum absolute variance, 
+          from average, in 10ths of dbm, for 
+          Precision Optical Power monitoring."
+     ::= { f3EthernetNetPortPOPMonitorEntry 4 }
+
+f3EthernetNetPortPOPMonitorWindowSize OBJECT-TYPE
+     SYNTAX     Integer32 (1..3600)
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object provides the window size (time in seconds), for 
+          Precision Optical Power monitoring."
+     ::= { f3EthernetNetPortPOPMonitorEntry 5 }
+
+f3EthernetNetPortPOPMonitorGlitchRejectionLevel OBJECT-TYPE
+     SYNTAX     POPMGlitchRejectionLevel 
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object provides the maximum number of 
+          sequential variance violations constituting a 
+          glitch."
+     ::= { f3EthernetNetPortPOPMonitorEntry 6 }
+
+f3EthernetNetPortPOPMonitorState OBJECT-TYPE
+     SYNTAX     POPMState 
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This object provides the current state of the 
+          Precision Optical Monitoring processing." 
+     ::= { f3EthernetNetPortPOPMonitorEntry 7 }
+
+f3EthernetNetPortPOPMonitorClearAction OBJECT-TYPE
+     SYNTAX     POPMClearAlarmsAction 
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object provides the ability to clear outstanding 
+          Precision Optical Monitoring alarms." 
+     ::= { f3EthernetNetPortPOPMonitorEntry 8 }
+
+--
+-- Ethernet Access Port POPM Current Statistics Table
+--
+f3EthernetAccPortPOPMStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EthernetAccPortPOPMStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Ethernet Access Port Precision Optical Power 
+             related statistics.  
+             These reflect the current data."
+    ::= { f3POPMPerfObjects 1 }
+
+f3EthernetAccPortPOPMStatsEntry OBJECT-TYPE
+    SYNTAX      F3EthernetAccPortPOPMStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3EthernetAccPortPOPMStatsTable.
+             Entries exist in this table for each Ethernet interface/port."
+    AUGMENTS { cmEthernetAccPortStatsEntry }
+    ::= { f3EthernetAccPortPOPMStatsTable 1 }
+
+F3EthernetAccPortPOPMStatsEntry ::= SEQUENCE {
+    f3EthernetAccPortPOPMStatsOPR               Integer32,
+    f3EthernetAccPortPOPMStatsAOPR              Integer32, 
+    f3EthernetAccPortPOPMStatsOPRVar            Integer32, 
+    f3EthernetAccPortPOPMStatsOPRMaxVar         Integer32,
+    f3EthernetAccPortPOPMStatsOPRGlitchRejects  Unsigned32,
+    f3EthernetAccPortPOPMStatsOPRRTR            Unsigned32,
+    f3EthernetAccPortPOPMStatsOPROOR            Unsigned32,
+    f3EthernetAccPortPOPMStatsOPROOV            Unsigned32
+}
+
+f3EthernetAccPortPOPMStatsOPR OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Precision Optical Power Receive (in dBm) for the physical layer.  
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled."
+     ::= { f3EthernetAccPortPOPMStatsEntry 1 }
+
+f3EthernetAccPortPOPMStatsAOPR OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average Precision Optical Power Receive (in dBm) for the physical 
+          layer.  This is applicable only if Precision Optical Power 
+          monitoring is enabled." 
+     ::= { f3EthernetAccPortPOPMStatsEntry 2 }
+
+f3EthernetAccPortPOPMStatsOPRVar OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Signed variance of Optical Power Receive, from average.
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled." 
+     ::= { f3EthernetAccPortPOPMStatsEntry 3 }
+
+f3EthernetAccPortPOPMStatsOPRMaxVar OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Signed maximum variance of Optical Power Receive, from average.  
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled." 
+     ::= { f3EthernetAccPortPOPMStatsEntry 4 }
+
+f3EthernetAccPortPOPMStatsOPRGlitchRejects OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of glitch rejections.  This is 
+          applicable only if Precision Optical Layer monitoring is enabled."
+     ::= { f3EthernetAccPortPOPMStatsEntry 5 }
+
+f3EthernetAccPortPOPMStatsOPRRTR OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the POPM state machine reverts to the running
+          state from the inhibited R state.  This is applicable only if
+          Precision Optical Layer monitoring is enabled."
+     ::= { f3EthernetAccPortPOPMStatsEntry 6 }
+
+f3EthernetAccPortPOPMStatsOPROOR OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the Precision Optical Power is out of range.
+          This is applicable only if Precision Optical Layer 
+          monitoring is enabled."
+     ::= { f3EthernetAccPortPOPMStatsEntry 7 }
+
+f3EthernetAccPortPOPMStatsOPROOV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the Precision Optical Power out of variance 
+          occurrences.  This is applicable only if Precision Optical Layer 
+          monitoring is enabled."
+     ::= { f3EthernetAccPortPOPMStatsEntry 8 }
+
+--
+-- Ethernet Access Port POPM Current Statistics Table
+--
+f3EthernetAccPortPOPMHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EthernetAccPortPOPMHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Ethernet Access Port Precision Optical Power 
+             related statistics.  
+             These reflect the current data."
+    ::= { f3POPMPerfObjects 2 }
+
+f3EthernetAccPortPOPMHistoryEntry OBJECT-TYPE
+    SYNTAX      F3EthernetAccPortPOPMHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3EthernetAccPortPOPMHistoryTable.
+             Entries exist in this table for each Ethernet interface/port."
+    AUGMENTS { cmEthernetAccPortHistoryEntry }
+    ::= { f3EthernetAccPortPOPMHistoryTable 1 }
+
+F3EthernetAccPortPOPMHistoryEntry ::= SEQUENCE {
+    f3EthernetAccPortPOPMHistoryOPR               Integer32,
+    f3EthernetAccPortPOPMHistoryAOPR              Integer32, 
+    f3EthernetAccPortPOPMHistoryOPRVar            Integer32, 
+    f3EthernetAccPortPOPMHistoryOPRMaxVar         Integer32,
+    f3EthernetAccPortPOPMHistoryOPRGlitchRejects  Unsigned32,
+    f3EthernetAccPortPOPMHistoryOPRRTR            Unsigned32,
+    f3EthernetAccPortPOPMHistoryOPROOR            Unsigned32,
+    f3EthernetAccPortPOPMHistoryOPROOV            Unsigned32
+}
+
+f3EthernetAccPortPOPMHistoryOPR OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Precision Optical Power Receive (in dBm) for the physical layer.  
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled."
+     ::= { f3EthernetAccPortPOPMHistoryEntry 1 }
+
+f3EthernetAccPortPOPMHistoryAOPR OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average Precision Optical Power Receive (in dBm) for the physical 
+          layer.  This is applicable only if Precision Optical Power 
+          monitoring is enabled." 
+     ::= { f3EthernetAccPortPOPMHistoryEntry 2 }
+
+f3EthernetAccPortPOPMHistoryOPRVar OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Signed variance of Optical Power Receive, from average.
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled." 
+     ::= { f3EthernetAccPortPOPMHistoryEntry 3 }
+
+f3EthernetAccPortPOPMHistoryOPRMaxVar OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Signed maximum variance of Optical Power Receive, from average.  
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled." 
+     ::= { f3EthernetAccPortPOPMHistoryEntry 4 }
+
+f3EthernetAccPortPOPMHistoryOPRGlitchRejects OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of glitch rejections.  This is 
+          applicable only if Precision Optical Layer monitoring is enabled."
+     ::= { f3EthernetAccPortPOPMHistoryEntry 5 }
+
+f3EthernetAccPortPOPMHistoryOPRRTR OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the POPM state machine reverts to the running
+          state from the inhibited R state.  This is applicable only if
+          Precision Optical Layer monitoring is enabled."
+     ::= { f3EthernetAccPortPOPMHistoryEntry 6 }
+
+f3EthernetAccPortPOPMHistoryOPROOR OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the Precision Optical Power is out of range.
+          This is applicable only if Precision Optical Layer 
+          monitoring is enabled."
+     ::= { f3EthernetAccPortPOPMHistoryEntry 7 }
+
+f3EthernetAccPortPOPMHistoryOPROOV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the Precision Optical Power out of variance 
+          occurrences.  This is applicable only if Precision Optical Layer 
+          monitoring is enabled."
+     ::= { f3EthernetAccPortPOPMHistoryEntry 8 }
+
+
+--
+-- Ethernet Network Port POPM Current Statistics Table
+--
+f3EthernetNetPortPOPMStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EthernetNetPortPOPMStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Ethernet Network Port Precision Optical Power 
+             related statistics.  
+             These reflect the current data."
+    ::= { f3POPMPerfObjects 3 }
+
+f3EthernetNetPortPOPMStatsEntry OBJECT-TYPE
+    SYNTAX      F3EthernetNetPortPOPMStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3EthernetNetPortPOPMStatsTable.
+             Entries exist in this table for each Ethernet interface/port."
+    AUGMENTS { cmEthernetNetPortStatsEntry }
+    ::= { f3EthernetNetPortPOPMStatsTable 1 }
+
+F3EthernetNetPortPOPMStatsEntry ::= SEQUENCE {
+    f3EthernetNetPortPOPMStatsOPR               Integer32,
+    f3EthernetNetPortPOPMStatsAOPR              Integer32, 
+    f3EthernetNetPortPOPMStatsOPRVar            Integer32, 
+    f3EthernetNetPortPOPMStatsOPRMaxVar         Integer32,
+    f3EthernetNetPortPOPMStatsOPRGlitchRejects  Unsigned32,
+    f3EthernetNetPortPOPMStatsOPRRTR            Unsigned32,
+    f3EthernetNetPortPOPMStatsOPROOR            Unsigned32,
+    f3EthernetNetPortPOPMStatsOPROOV            Unsigned32
+}
+
+f3EthernetNetPortPOPMStatsOPR OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Precision Optical Power Receive (in dBm) for the physical layer.  
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled."
+     ::= { f3EthernetNetPortPOPMStatsEntry 1 }
+
+f3EthernetNetPortPOPMStatsAOPR OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average Precision Optical Power Receive (in dBm) for the physical 
+          layer.  This is applicable only if Precision Optical Power 
+          monitoring is enabled." 
+     ::= { f3EthernetNetPortPOPMStatsEntry 2 }
+
+f3EthernetNetPortPOPMStatsOPRVar OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Signed variance of Optical Power Receive, from average.
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled." 
+     ::= { f3EthernetNetPortPOPMStatsEntry 3 }
+
+f3EthernetNetPortPOPMStatsOPRMaxVar OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Signed maximum variance of Optical Power Receive, from average.  
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled." 
+     ::= { f3EthernetNetPortPOPMStatsEntry 4 }
+
+f3EthernetNetPortPOPMStatsOPRGlitchRejects OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of glitch rejections.  This is 
+          applicable only if Precision Optical Layer monitoring is enabled."
+     ::= { f3EthernetNetPortPOPMStatsEntry 5 }
+
+f3EthernetNetPortPOPMStatsOPRRTR OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the POPM state machine reverts to the running
+          state from the inhibited R state.  This is applicable only if
+          Precision Optical Layer monitoring is enabled."
+     ::= { f3EthernetNetPortPOPMStatsEntry 6 }
+
+f3EthernetNetPortPOPMStatsOPROOR OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the Precision Optical Power is out of range.
+          This is applicable only if Precision Optical Layer 
+          monitoring is enabled."
+     ::= { f3EthernetNetPortPOPMStatsEntry 7 }
+
+f3EthernetNetPortPOPMStatsOPROOV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the Precision Optical Power out of variance 
+          occurrences.  This is applicable only if Precision Optical Layer 
+          monitoring is enabled."
+     ::= { f3EthernetNetPortPOPMStatsEntry 8 }
+
+--
+-- Ethernet Network Port POPM Current History Table
+--
+f3EthernetNetPortPOPMHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3EthernetNetPortPOPMHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Ethernet Network Port Precision Optical Power 
+             related statistics.  
+             These reflect the current data."
+    ::= { f3POPMPerfObjects 4 }
+
+f3EthernetNetPortPOPMHistoryEntry OBJECT-TYPE
+    SYNTAX      F3EthernetNetPortPOPMHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3EthernetNetPortPOPMHistoryTable.
+             Entries exist in this table for each Ethernet interface/port."
+    AUGMENTS { cmEthernetNetPortHistoryEntry }
+    ::= { f3EthernetNetPortPOPMHistoryTable 1 }
+
+F3EthernetNetPortPOPMHistoryEntry ::= SEQUENCE {
+    f3EthernetNetPortPOPMHistoryOPR               Integer32,
+    f3EthernetNetPortPOPMHistoryAOPR              Integer32, 
+    f3EthernetNetPortPOPMHistoryOPRVar            Integer32, 
+    f3EthernetNetPortPOPMHistoryOPRMaxVar         Integer32,
+    f3EthernetNetPortPOPMHistoryOPRGlitchRejects  Unsigned32,
+    f3EthernetNetPortPOPMHistoryOPRRTR            Unsigned32,
+    f3EthernetNetPortPOPMHistoryOPROOR            Unsigned32,
+    f3EthernetNetPortPOPMHistoryOPROOV            Unsigned32
+}
+
+f3EthernetNetPortPOPMHistoryOPR OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Precision Optical Power Receive (in dBm) for the physical layer.  
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled."
+     ::= { f3EthernetNetPortPOPMHistoryEntry 1 }
+
+f3EthernetNetPortPOPMHistoryAOPR OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Average Precision Optical Power Receive (in dBm) for the physical 
+          layer.  This is applicable only if Precision Optical Power 
+          monitoring is enabled." 
+     ::= { f3EthernetNetPortPOPMHistoryEntry 2 }
+
+f3EthernetNetPortPOPMHistoryOPRVar OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Signed variance of Optical Power Receive, from average.
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled." 
+     ::= { f3EthernetNetPortPOPMHistoryEntry 3 }
+
+f3EthernetNetPortPOPMHistoryOPRMaxVar OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Signed maximum variance of Optical Power Receive, from average.  
+          This is applicable only if Precision Optical Power monitoring 
+          is enabled." 
+     ::= { f3EthernetNetPortPOPMHistoryEntry 4 }
+
+f3EthernetNetPortPOPMHistoryOPRGlitchRejects OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of glitch rejections.  This is 
+          applicable only if Precision Optical Layer monitoring is enabled."
+     ::= { f3EthernetNetPortPOPMHistoryEntry 5 }
+
+f3EthernetNetPortPOPMHistoryOPRRTR OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the POPM state machine reverts to the running
+          state from the inhibited R state.  This is applicable only if
+          Precision Optical Layer monitoring is enabled."
+     ::= { f3EthernetNetPortPOPMHistoryEntry 6 }
+
+f3EthernetNetPortPOPMHistoryOPROOR OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the Precision Optical Power is out of range.
+          This is applicable only if Precision Optical Layer 
+          monitoring is enabled."
+     ::= { f3EthernetNetPortPOPMHistoryEntry 7 }
+
+f3EthernetNetPortPOPMHistoryOPROOV OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of times the Precision Optical Power out of variance 
+          occurrences.  This is applicable only if Precision Optical Layer 
+          monitoring is enabled."
+     ::= { f3EthernetNetPortPOPMHistoryEntry 8 }
+
+--
+-- Conformance
+--
+f3POPMCompliances OBJECT IDENTIFIER ::= {f3POPMConformance 1}
+f3POPMGroups      OBJECT IDENTIFIER ::= {f3POPMConformance 2}
+
+f3POPMCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the POPM Object 
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3POPMFacilityGroup, f3POPMStatsGroup
+        }
+    ::= { f3POPMCompliances 1 }
+
+f3POPMFacilityGroup OBJECT-GROUP
+    OBJECTS {
+      f3EthernetAccPortPOPMonitorEnabled, 
+      f3EthernetAccPortPOPMonitorOperRangeHi, 
+      f3EthernetAccPortPOPMonitorOperRangeLow, 
+      f3EthernetAccPortPOPMonitorVariance,
+      f3EthernetAccPortPOPMonitorWindowSize, 
+      f3EthernetAccPortPOPMonitorGlitchRejectionLevel,
+      f3EthernetAccPortPOPMonitorState,
+      f3EthernetAccPortPOPMonitorClearAction,
+
+      f3EthernetNetPortPOPMonitorEnabled, 
+      f3EthernetNetPortPOPMonitorOperRangeHi, 
+      f3EthernetNetPortPOPMonitorOperRangeLow, 
+      f3EthernetNetPortPOPMonitorVariance,
+      f3EthernetNetPortPOPMonitorWindowSize, 
+      f3EthernetNetPortPOPMonitorGlitchRejectionLevel,
+      f3EthernetNetPortPOPMonitorState,
+      f3EthernetNetPortPOPMonitorClearAction
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the F3 POPM Functionality
+             ."
+    ::= { f3POPMGroups 1 }
+
+f3POPMStatsGroup OBJECT-GROUP
+    OBJECTS {
+      f3EthernetAccPortPOPMStatsOPR, f3EthernetAccPortPOPMStatsAOPR, 
+      f3EthernetAccPortPOPMStatsOPRVar, f3EthernetAccPortPOPMStatsOPRMaxVar,
+      f3EthernetAccPortPOPMStatsOPRGlitchRejects, 
+      f3EthernetAccPortPOPMStatsOPRRTR,
+      f3EthernetAccPortPOPMStatsOPROOR, f3EthernetAccPortPOPMStatsOPROOV,
+
+      f3EthernetAccPortPOPMHistoryOPR, f3EthernetAccPortPOPMHistoryAOPR, 
+      f3EthernetAccPortPOPMHistoryOPRVar, f3EthernetAccPortPOPMHistoryOPRMaxVar,
+      f3EthernetAccPortPOPMHistoryOPRGlitchRejects, 
+      f3EthernetAccPortPOPMHistoryOPRRTR,
+      f3EthernetAccPortPOPMHistoryOPROOR, f3EthernetAccPortPOPMHistoryOPROOV,
+
+      f3EthernetNetPortPOPMStatsOPR, f3EthernetNetPortPOPMStatsAOPR, 
+      f3EthernetNetPortPOPMStatsOPRVar, f3EthernetNetPortPOPMStatsOPRMaxVar,
+      f3EthernetNetPortPOPMStatsOPRGlitchRejects, 
+      f3EthernetNetPortPOPMStatsOPRRTR,
+      f3EthernetNetPortPOPMStatsOPROOR, f3EthernetNetPortPOPMStatsOPROOV,
+
+      f3EthernetNetPortPOPMHistoryOPR, f3EthernetNetPortPOPMHistoryAOPR, 
+      f3EthernetNetPortPOPMHistoryOPRVar, f3EthernetNetPortPOPMHistoryOPRMaxVar,
+      f3EthernetNetPortPOPMHistoryOPRGlitchRejects, 
+      f3EthernetNetPortPOPMHistoryOPRRTR,
+      f3EthernetNetPortPOPMHistoryOPROOR, f3EthernetNetPortPOPMHistoryOPROOV
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the F3 POPM Functionality
+             ."
+    ::= { f3POPMGroups 2 }
+
+END

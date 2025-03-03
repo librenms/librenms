@@ -1,0 +1,29 @@
+os: ascom
+text: 'Ascom'
+type: network
+icon: ascom
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir: ascom
+poller_modules:
+    storage: false
+    applications: false
+    bgp-peers: false
+    ipmi: false
+    ospf: false
+    ucd-diskio: false
+    ucd-mib: false
+discovery_modules:
+    fdb-table: false
+    storage: false
+    bgp-peers: false
+    ntp: false
+    stp: false
+    ucd-diskio: false
+    vlans: false
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.27614

@@ -1,0 +1,202 @@
+NBS-TUNABLE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE,
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB;
+
+nbsTunableMib  MODULE-IDENTITY
+    LAST-UPDATED "201706280000Z"  -- June 28, 2017
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "MIB for representing Tunable Optics parameters"
+
+    ::= { nbs 203 }
+
+nbsTunableGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "MIB for representing Tunable Optics parameters"
+
+    ::= { nbsTunableMib 1 }
+
+-- *******************************************************************
+
+--
+-- the nbsTunableChannelTable
+--
+
+nbsTunableChannelTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsTunableChannelTable."
+
+        ::= { nbsTunableGrp 1 }
+
+nbsTunableChannelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsTunableChannelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A table to report and configure tunable optics settings."
+
+        ::= { nbsTunableGrp 2 }
+
+NbsTunableChannelEntry ::= SEQUENCE {
+        nbsTunableChannelIfIndex      InterfaceIndex,
+        nbsTunableChannelFreqStart    INTEGER,
+        nbsTunableChannelFreqEnd      INTEGER,
+        nbsTunableChannelFreqStep     INTEGER,
+        nbsTunableChannelFreqExponent INTEGER,
+        nbsTunableChannelFreqAdmin    INTEGER,
+        nbsTunableChannelFreqOper     INTEGER,
+        nbsTunableChannelFreqDefault  INTEGER
+}
+
+nbsTunableChannelEntry      OBJECT-TYPE
+        SYNTAX      NbsTunableChannelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Describes a setting for an interface's tunable optics."
+        INDEX { nbsTunableChannelIfIndex }
+
+        ::= { nbsTunableChannelTable 1 }
+
+nbsTunableChannelIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of this optic's port"
+        ::= { nbsTunableChannelEntry 1 }
+
+nbsTunableChannelFreqStart OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The first allowable frequency for this tunable optic, in
+           GigaHertz (GHz), unless FreqExponent != 9.
+
+           For L-Band, ITU Grid 48 is '184800'
+           For Q-Band, ITU Grid 48 is '184850'
+           For C-Band, ITU Grid 1 is '190100'
+           For H-Band, ITU Grid 1 is '190150'
+
+           If GHz does not provide the appropriate resolution, the
+           tunable optic may report a FreqExponent less than 9.
+
+           If 32 bits is insufficient to cover the range in GHz, the
+           tunable optic may report a FreqExponent greater than 9.
+
+           Not supported value: 0"
+
+
+        DEFVAL { 190100 }
+        ::= { nbsTunableChannelEntry 2 }
+
+nbsTunableChannelFreqEnd OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The last allowable frequency (inclusive) for this tunable
+           optic, in GigaHertz (GHz), unless FreqExponent != 9.
+
+           For L-Band, ITU Grid 99 is '189900'
+           For Q-Band, ITU Grid 99 is '189950'
+           For C-Band, ITU Grid 72 is '197200'
+           For H-Band, ITU Grid 72 is '197250'
+
+           If GHz does not provide the appropriate resolution, the
+           tunable optic may report a FreqExponent less than 9.
+
+           If 32 bits is insufficient to cover the range in GHz, the
+           tunable optic may report a FreqExponent greater than 9.
+
+           Not supported value: 0"
+
+        DEFVAL { 197200 }
+        ::= { nbsTunableChannelEntry 3 }
+
+nbsTunableChannelFreqStep OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The spacing of the allowable frequencies that this tunable
+           optic supports, in GigaHertz (GHz), unless FreqExponent != 9.
+
+           100 indicates the standard ITU grid spacing of 100GHz.
+
+           For example, if this tunable optic supports both C and H
+           band, or both Q and L band, FreqStep should report 50.
+
+           If this tunable optic supports steps finer than 1GHz,
+           the tunable optic may report a FreqExponent less than 9.
+
+           Not supported value: 0"
+
+        DEFVAL { 100 }
+        ::= { nbsTunableChannelEntry 4 }
+
+nbsTunableChannelFreqExponent OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The exponent of all the Freq values (including FreqStep). 9
+           (the default) indicates all units are in GigaHertz (GHz)."
+
+        DEFVAL { 9 }
+        ::= { nbsTunableChannelEntry 5 }
+
+nbsTunableChannelFreqAdmin OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The administratively desired frequency of this tunable
+           optic, in GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0"
+
+        ::= { nbsTunableChannelEntry 6 }
+
+nbsTunableChannelFreqOper OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The current operational frequency of this tunable
+           optic, in GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0"
+
+        ::= { nbsTunableChannelEntry 7 }
+
+nbsTunableChannelFreqDefault OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The default frequency of this tunable optic, in GigaHertz
+           (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0"
+
+        ::= { nbsTunableChannelEntry 8 }
+
+END

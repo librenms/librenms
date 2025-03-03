@@ -2,7 +2,7 @@
 Copy the skel.snmprec file to the desired filename this must start with the os name. This skel.snmprec file contains empty sysDescr and sysObjectID entries.
 
 ## File format
-Data file format is optimized to be compact, human-readable and inexpensive to parse. It's also important to store full and exact response information in a most intact 
+Data file format is optimized to be compact, human-readable and inexpensive to parse. It's also important to store full and exact response information in a most intact
 form. Here's an example data file content:
 
 1.3.6.1.2.1.1.1.0|4|Linux 2.6.25.5-smp SMP Tue Jun 19 14:58:11 CDT 2007 i686

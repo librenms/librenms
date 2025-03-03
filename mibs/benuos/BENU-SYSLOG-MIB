@@ -1,0 +1,195 @@
+BENU-SYSLOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    IpAddress, Integer32, Unsigned32
+    FROM SNMPv2-SMI
+    InetPortNumber
+    FROM INET-ADDRESS-MIB
+    benuPlatform
+    FROM BENU-PLATFORM-MIB;
+
+benuSyslog MODULE-IDENTITY
+    LAST-UPDATED "201501090000Z"  -- 09 January 2015
+    ORGANIZATION "Benu Networks"
+    CONTACT-INFO "Benu Networks Inc,
+      300 Concord Road,
+      Billerca MA 01821
+      Email: support@benunets.com"
+    DESCRIPTION
+       "Initial creation
+        MIB module for Benu Networks Chassis.
+        Copyright (C) 2001, 2008 by Benu Networks, Inc.
+        All rights reserved."
+
+    REVISION      "201501090000Z"  -- 09 January 2015
+    DESCRIPTION
+           "Added a branch for notifications" 
+
+    REVISION      "201411060000Z"  -- 06 November 2014
+    DESCRIPTION
+           "Removed bSyslogTrapSeverity and bSyslogSeverityTrap" 
+
+    REVISION      "201311220000Z"  -- 22 November 2013
+    DESCRIPTION
+           "Data types are corrected and removed an unwanted IMPORT"
+
+    ::= { benuPlatform 3 }
+
+          bSyslogNotifications  OBJECT IDENTIFIER ::= { benuSyslog 0 }
+
+          --
+          -- syslog group should be present in all products.
+          --
+
+               bSyslogSize OBJECT-TYPE
+                   SYNTAX  Unsigned32
+                   MAX-ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "Current size in bytes of the syslog file."
+                   ::= { benuSyslog 1 }
+
+               bSyslogMaxSize OBJECT-TYPE
+                   SYNTAX  Integer32 (4096..5242880)
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                           "Maximum size in bytes of the syslog file."
+                   DEFVAL { 4096 }
+                   ::= { benuSyslog 2 }
+
+               bSyslogServerEnable OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                             enabled(1),
+			     disabled(2)
+			     }
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                           "Enable or disable logging to remote syslog
+                            servers."
+                   ::= { benuSyslog 3 }
+
+               bSyslogServerTable OBJECT-TYPE
+                   SYNTAX  SEQUENCE OF BSyslogServerEntry
+                   MAX-ACCESS  not-accessible
+                   STATUS  current
+                   DESCRIPTION
+                            "Table of remote syslog servers, of which
+			    there can be at most 3 entries."
+                   ::= { benuSyslog 4 }
+
+               bSyslogServerEntry OBJECT-TYPE
+                   SYNTAX BSyslogServerEntry
+                   MAX-ACCESS  not-accessible
+                   STATUS  current
+                   DESCRIPTION
+                            "syslog table entry."
+                   INDEX { bSyslogServerIndex }
+               ::= { bSyslogServerTable 1 }
+
+               BSyslogServerEntry  ::=
+                   SEQUENCE {
+                       bSyslogServerIndex
+                           Unsigned32,
+                       bSyslogServerAddress
+                           IpAddress,
+                       bSyslogServerPort
+                           InetPortNumber
+                   }
+
+               --
+               -- start of syslog server table
+               --
+
+               bSyslogServerIndex OBJECT-TYPE
+                   SYNTAX  Unsigned32
+                   MAX-ACCESS  not-accessible
+                   STATUS  current
+                   DESCRIPTION
+                           "Index into the remote syslog server table."
+                   ::= { bSyslogServerEntry 1 }
+
+               bSyslogServerAddress OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   MAX-ACCESS  read-only 
+                   STATUS  current
+                   DESCRIPTION
+                           "The IP address of this syslog server."
+                   ::= { bSyslogServerEntry 2 }
+
+               bSyslogServerPort OBJECT-TYPE
+                   SYNTAX  InetPortNumber
+                   MAX-ACCESS  read-only
+                   STATUS  current
+                   DESCRIPTION
+                           "The port number of this syslog server."
+                   ::= { bSyslogServerEntry 3 }
+
+               -- end of syslog server table
+
+
+               bSyslogSeverity OBJECT-TYPE
+                   SYNTAX  INTEGER {
+						   emergencies(0),
+                        			   alerts(1),
+			                           critical(2),
+						   errors(3),
+						   warnings(4),
+						   notifications(5),
+						   informational(6),
+                                                   debugging(7)
+						   }
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                           "Severity of syslog messages reported/sent to a
+						   remote syslog server."
+                   ::= { benuSyslog 5 }
+
+               bSyslogConsoleSeverity OBJECT-TYPE
+                   SYNTAX  INTEGER {
+						   emergencies(0),
+                        			   alerts(1),
+			                           critical(2),
+						   errors(3),
+						   warnings(4),
+						   notifications(5),
+						   informational(6),
+                                                   debugging(7)
+			   }
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                           "Severity of syslog messages reported/sent to a
+						   console."
+                   ::= { benuSyslog 6 }
+
+               bSyslogClear OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                           true(1),
+			   false(2)
+			   }
+                   MAX-ACCESS  read-write
+                   STATUS  current
+                   DESCRIPTION
+                           "Indicates whether syslog file contains syslog
+			    messages. This value is FALSE if syslog contains
+			    syslog messages, TRUE otherwise. Set to TRUE to
+			    clear all messages from the syslog file."
+                   ::= { benuSyslog 7 }
+
+
+        -- traps
+
+
+        -- conformance information
+
+
+        -- compliance statements
+
+
+        -- units of conformance
+
+END

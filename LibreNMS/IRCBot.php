@@ -15,21 +15,35 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  * */
 
 namespace LibreNMS;
 
-use LibreNMS\Exceptions\DatabaseConnectException;
+use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\Eventlog;
+use App\Models\Port;
+use App\Models\Service;
+use App\Models\User;
+use LibreNMS\DB\Eloquent;
+use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Mail;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\Time;
+use LibreNMS\Util\Version;
 
 class IRCBot
 {
+    private $config;
 
-    private $last_activity = '';
+    private $user;
+
+    private $last_activity = 0;
 
     private $data = '';
 
-    private $authd = array();
+    private $authd = [];
 
     private $debug = false;
 
@@ -43,9 +57,11 @@ class IRCBot
 
     private $nick = 'LibreNMS';
 
-    private $chan = array();
+    private $tempnick = null;
 
-    private $commands = array(
+    private $chan = [];
+
+    private $commands = [
         'auth',
         'quit',
         'listdevices',
@@ -58,28 +74,39 @@ class IRCBot
         'help',
         'reload',
         'join',
-    );
+    ];
 
-    private $external = array();
+    private $command = '';
+
+    private $external = [];
 
     private $tick = 62500;
 
+    private $j = 0;
+
+    private $socket = [];
+
+    private $floodcount = 0;
+
+    private $max_retry = 5;
+
+    private $nickwait;
+
+    private $buff;
+
+    private $tokens;
 
     public function __construct()
     {
-        global $config, $database_link;
         $this->log('Setting up IRC-Bot..');
-        if (is_resource($database_link)) {
-            $this->sql = $database_link;
-        }
 
-        $this->config = $config;
-        $this->debug  = $this->config['irc_debug'];
+        $this->config = Config::getAll();
+        $this->debug = $this->config['irc_debug'];
         $this->config['irc_authtime'] = $this->config['irc_authtime'] ? $this->config['irc_authtime'] : 3;
-        $this->max_retry              = $this->config['irc_maxretry'];
-        $this->server                 = $this->config['irc_host'];
+        $this->max_retry = $this->config['irc_maxretry'];
+        $this->server = $this->config['irc_host'];
         if ($this->config['irc_port'][0] == '+') {
-            $this->ssl  = true;
+            $this->ssl = true;
             $this->port = substr($this->config['irc_port'], 1);
         } else {
             $this->port = $this->config['irc_port'];
@@ -89,22 +116,13 @@ class IRCBot
             $this->nick = $this->config['irc_nick'];
         }
 
-        if ($this->config['irc_chan']) {
-            if (is_array($this->config['irc_chan'])) {
-                $this->chan = $this->config['irc_chan'];
-            } elseif (strstr($this->config['irc_chan'], ',')) {
-                $this->chan = explode(',', $this->config['irc_chan']);
-            } else {
-                $this->chan = array($this->config['irc_chan']);
-            }
-        }
-
         if ($this->config['irc_alert_chan']) {
             if (strstr($this->config['irc_alert_chan'], ',')) {
                 $this->config['irc_alert_chan'] = explode(',', $this->config['irc_alert_chan']);
-            } else {
-                $this->config['irc_alert_chan'] = array($this->config['irc_alert_chan']);
+            } elseif (! is_array($this->config['irc_alert_chan'])) {
+                $this->config['irc_alert_chan'] = [$this->config['irc_alert_chan']];
             }
+            $this->chan = $this->config['irc_alert_chan'];
         }
 
         if ($this->config['irc_pass']) {
@@ -114,34 +132,42 @@ class IRCBot
         $this->loadExternal();
         $this->log('Starting IRC-Bot..');
         $this->init();
-    }//end __construct()
+    }
 
+    //end __construct()
 
     private function loadExternal()
     {
-        if (!$this->config['irc_external']) {
+        if (! $this->config['irc_external']) {
             return true;
         }
 
         $this->log('Caching external commands...');
-        if (!is_array($this->config['irc_external'])) {
+        if (! is_array($this->config['irc_external'])) {
             $this->config['irc_external'] = explode(',', $this->config['irc_external']);
         }
 
         foreach ($this->config['irc_external'] as $ext) {
-            if (($this->external[$ext] = file_get_contents('includes/ircbot/'.$ext.'.inc.php')) == '') {
+            $this->log("Command $ext...");
+            if (($this->external[$ext] = file_get_contents('includes/ircbot/' . $ext . '.inc.php')) == '') {
+                $this->log('failed!');
                 unset($this->external[$ext]);
             }
         }
 
-        return $this->log('Cached '.sizeof($this->external).' commands.');
-    }//end load_external()
+        return $this->log('Cached ' . count($this->external) . ' commands.');
+    }
 
+    //end load_external()
 
     private function init()
     {
         if ($this->config['irc_alert']) {
-            $this->connectAlert();
+            if (! $this->connectAlert()) {
+                sleep(5);
+
+                return false;
+            }
         }
 
         $this->last_activity = time();
@@ -151,138 +177,199 @@ class IRCBot
         $this->connect();
         $this->log('Connected');
         if ($this->pass) {
-            fwrite($this->socket['irc'], 'PASS '.$this->pass."\n\r");
+            fwrite($this->socket['irc'], 'PASS ' . $this->pass . "\n\r");
         }
 
         $this->doAuth();
+        $this->nickwait = 0;
         while (true) {
             foreach ($this->socket as $n => $socket) {
-                if (!is_resource($socket) || feof($socket)) {
+                if (! is_resource($socket) || feof($socket)) {
                     $this->log("Socket '$n' closed. Restarting.");
                     break 2;
                 }
+            }
+
+            if (isset($this->tempnick)) {
+                if ($this->nickwait > 100) {
+                    $this->ircRaw('NICK ' . $this->nick);
+                    $this->nickwait = 0;
+                }
+                $this->nickwait += 1;
             }
 
             $this->getData();
             if ($this->config['irc_alert']) {
                 $this->alertData();
             }
-            
+
             if ($this->config['irc_conn_timeout']) {
                 $inactive_seconds = time() - $this->last_activity;
                 $max_inactive = $this->config['irc_conn_timeout'];
                 if ($inactive_seconds > $max_inactive) {
-                    $this->log("No data from server since " . $max_inactive . " seconds. Restarting.");
+                    $this->log('No data from server since ' . $max_inactive . ' seconds. Restarting.');
                     break;
                 }
             }
 
-
             usleep($this->tick);
         }
+        sleep(10);
 
         return $this->init();
-    }//end init()
+    }
 
+    //end init()
 
     private function connectAlert()
     {
-        $f = $this->config['install_dir'].'/.ircbot.alert';
-        if (( file_exists($f) && filetype($f) != 'fifo' && !unlink($f) ) || ( !file_exists($f) && !shell_exec("mkfifo $f && echo 1") )) {
+        $container_dir = '/data';
+        if (file_exists($container_dir) and posix_getpwuid(fileowner($container_dir))['name'] == 'librenms') {
+            $f = $container_dir . '/.ircbot.alert';
+        } else {
+            $f = $this->config['install_dir'] . '/.ircbot.alert';
+        }
+        if ((file_exists($f) && filetype($f) != 'fifo' && ! unlink($f)) || (! file_exists($f) && ! shell_exec("mkfifo $f && echo 1"))) {
             $this->log('Error - Cannot create Alert-File');
+
             return false;
         }
 
-        if (($this->socket['alert'] = fopen($f, 'r+'))) {
+        if ($this->socket['alert'] = fopen($f, 'r+')) {
             $this->log('Opened Alert-File');
             stream_set_blocking($this->socket['alert'], false);
+
             return true;
         }
 
         $this->log('Error - Cannot open Alert-File');
-        return false;
-    }//end connect_alert()
 
+        return false;
+    }
+
+    //end connect_alert()
 
     private function read($buff)
     {
-        $r                  = fread($this->socket[$buff], 64);
+        $r = fread($this->socket[$buff], 8192);
         $this->buff[$buff] .= $r;
-        $r                  = strlen($r);
+        $r = strlen($r);
         if (strstr($this->buff[$buff], "\n")) {
-            $tmp               = explode("\n", $this->buff[$buff], 2);
-            $this->buff[$buff] = substr($this->buff[$buff], (strlen($tmp[0]) + 1));
+            $tmp = explode("\n", $this->buff[$buff], 2);
+            $this->buff[$buff] = substr($this->buff[$buff], strlen($tmp[0]) + 1);
             if ($this->debug) {
-                $this->log("Returning buffer '$buff': '".trim($tmp[0])."'");
+                $this->log("Returning buffer '$buff': '" . trim($tmp[0]) . "'");
             }
 
             return $tmp[0];
         }
 
         if ($this->debug && $r > 0) {
-            $this->log("Expanding buffer '$buff' = '".trim($this->buff[$buff])."'");
+            $this->log("Expanding buffer '$buff' = '" . trim($this->buff[$buff]) . "'");
         }
 
         return false;
-    }//end read()
+    }
 
+    //end read()
 
     private function alertData()
     {
         if (($alert = $this->read('alert')) !== false) {
             $alert = json_decode($alert, true);
-            if (!is_array($alert)) {
+            if (! is_array($alert)) {
                 return false;
             }
+            if ($this->debug) {
+                $this->log('Alert received ' . $alert['title']);
+                $this->log('Alert state ' . $alert['state']);
+                $this->log('Alert severity ' . $alert['severity']);
+                $this->log('Alert channels ' . print_r($this->config['irc_alert_chan'], true));
+            }
 
-            switch ($alert['state']) :
-                case 3:
+            switch ($alert['state']) {
+                case AlertState::WORSE:
                     $severity_extended = '+';
                     break;
-                case 4:
+                case AlertState::BETTER:
                     $severity_extended = '-';
                     break;
                 default:
                     $severity_extended = '';
-            endswitch;
+            }
+            $severity = '';
+            if (isset($alert['severity'])) {
+                $severity = str_replace(['warning', 'critical', 'normal'], [$this->_color('Warning', 'yellow'), $this->_color('Critical', 'red'), $this->_color('Info', 'lightblue')], $alert['severity']) . $severity_extended . ' ';
+            }
 
-            $severity = str_replace(array('warning', 'critical'), array(chr(3).'8Warning', chr(3).'4Critical'), $alert['severity']).$severity_extended.chr(3).' ';
-            if ($alert['state'] == 0 and $this->config['irc_alert_utf8']) {
-                $severity = str_replace(array('Warning', 'Critical'), array('W̶a̶r̶n̶i̶n̶g̶', 'C̶r̶i̶t̶i̶c̶a̶l̶'), $severity);
+            if ($alert['state'] == AlertState::RECOVERED and $this->config['irc_alert_utf8']) {
+                $severity = str_replace(['Warning', 'Critical'], ['̶W̶a̶r̶n̶i̶n̶g', '̶C̶r̶i̶t̶i̶c̶a̶l'], $severity);
             }
 
             if ($this->config['irc_alert_chan']) {
                 foreach ($this->config['irc_alert_chan'] as $chan) {
-                    $this->ircRaw('PRIVMSG '.$chan.' :'.$severity.trim($alert['title']).' - Rule: '.trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? ' - Faults:' : ''));
-                    foreach ($alert['faults'] as $k => $v) {
-                        $this->ircRaw('PRIVMSG '.$chan.' :#'.$k.' '.$v['string']);
-                    }
+                    $this->sendAlert($chan, $severity, $alert);
+                    $this->ircRaw('BOTFLOODCHECK');
                 }
             } else {
                 foreach ($this->authd as $nick => $data) {
                     if ($data['expire'] >= time()) {
-                        $this->ircRaw('PRIVMSG '.$nick.' :'.$severity.trim($alert['title']).' - Rule: '.trim($alert['name'] ? $alert['name'] : $alert['rule']).(sizeof($alert['faults']) > 0 ? ' - Faults'.(sizeof($alert['faults']) > 3 ? ' (showing first 3 out of '.sizeof($alert['faults']).' )' : '' ).':' : ''));
-                        foreach ($alert['faults'] as $k => $v) {
-                            $this->ircRaw('PRIVMSG '.$nick.' :#'.$k.' '.$v['string']);
-                            if ($k >= 3) {
-                                break;
-                            }
-                        }
+                        $this->sendAlert($nick, $severity, $alert);
                     }
                 }
             }
-        }//end if
-    }//end alertData()
+        }
+    }
 
+    //end alertData()
+
+    private function sendAlert($sendto, $severity, $alert)
+    {
+        $sendto = explode(' ', $sendto)[0];
+        $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $severity . trim($alert['title']));
+        if ($this->config['irc_alert_short']) {
+            // Only send the title if set to short
+
+            return;
+        }
+
+        foreach (explode("\n", $alert['msg']) as $line) {
+            $line = trim($line);
+            if (strlen($line) < 1) {
+                continue;
+            }
+            $line = $this->_html2irc($line);
+            $line = strip_tags($line);
+
+            // We don't need to repeat the title
+            if (trim($line) != trim($alert['title'])) {
+                $this->log("Sending alert $line");
+                if ($this->config['irc_floodlimit'] > 100) {
+                    $this->floodcount += strlen($line);
+                } elseif ($this->config['irc_floodlimit'] > 1) {
+                    $this->floodcount += 1;
+                }
+                if (($this->config['irc_floodlimit'] > 0) && ($this->floodcount > $this->config['irc_floodlimit'])) {
+                    $this->log('Reached floodlimit ' . $this->floodcount);
+                    $this->ircRaw('BOTFLOODCHECK');
+                    sleep(2);
+                    $this->floodcount = 0;
+                }
+                $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $line);
+            }
+        }
+    }
+
+    //end sendAlert()
 
     private function getData()
     {
         if (($data = $this->read('irc')) !== false) {
             $this->last_activity = time();
             $this->data = $data;
-            $ex         = explode(' ', $this->data);
+            $ex = explode(' ', $this->data);
             if ($ex[0] == 'PING') {
-                return $this->ircRaw('PONG '.$ex[1]);
+                return $this->ircRaw('PONG ' . $ex[1]);
             }
 
             if ($ex[1] == 376 || $ex[1] == 422 || ($ex[1] == 'MODE' && $ex[2] == $this->nick)) {
@@ -292,13 +379,67 @@ class IRCBot
                 }
             }
 
-            $this->command = str_replace(array(chr(10), chr(13)), '', $ex[3]);
+            if ($this->config['irc_ctcp'] && preg_match('/^:' . chr(1) . '.*/', $ex[3])) {
+                // Handle CTCP
+                $ctcp = trim(preg_replace('/[^A-Z]/', '', $ex[3]));
+                $ctcp_reply = null;
+                $this->log('Received irc CTCP: ' . $ctcp . ' from ' . $this->getUser($this->data));
+                switch ($ctcp) {
+                    case 'VERSION':
+                        $ctcp_reply = chr(1) . "$ctcp " . $this->config['irc_ctcp_version'] . chr(1);
+                        break;
+                    case 'PING':
+                        $ctcp_reply = chr(1) . "$ctcp " . $ex[4] . ' ' . $ex[5] . chr(1);
+                        break;
+                    case 'TIME':
+                        $ctcp_reply = chr(1) . "$ctcp " . date('c') . chr(1);
+                        break;
+                }
+                if ($ctcp_reply !== null) {
+                    $this->log('Sending irc CTCP: ' . 'NOTICE ' . $this->getUser($this->data) . ' :' . $ctcp_reply);
+
+                    return $this->ircRaw('NOTICE ' . $this->getUser($this->data) . ' :' . $ctcp_reply);
+                }
+            }
+
+            if (($ex[1] == 'NICK') && (preg_replace('/^:/', '', $ex[2]) == $this->nick)) {
+                // Nickname changed successfully
+                if ($this->debug) {
+                    $this->log('Regained our real nick');
+                }
+                unset($this->tempnick);
+            }
+            if (($ex[1] == 433) || ($ex[1] == 437)) {
+                // Nickname already in use / temp unavailable
+                if ($this->debug) {
+                    $this->log('Nickname already in use...');
+                }
+                if ($ex[2] != '*') {
+                    $this->tempnick = $ex[2];
+                }
+                if (! isset($this->tempnick)) {
+                    $this->tempnick = $this->nick . rand(0, 99);
+                }
+                if ($this->debug) {
+                    $this->log('Using temp nick ' . $this->tempnick);
+                }
+
+                return $this->ircRaw('NICK ' . $this->tempnick);
+            }
+            if ($ex[1] == 421) {
+                // Unknown command
+                if ($ex[3] == 'BOTFLOODCHECK') {
+                    $this->floodcount = 0;
+                }
+            }
+            $this->command = str_replace([chr(10), chr(13)], '', $ex[3]);
             if (strstr($this->command, ':.')) {
                 $this->handleCommand();
             }
         }
-    }//end getData()
+    }
 
+    //end getData()
 
     private function joinChan($chan = false)
     {
@@ -307,93 +448,121 @@ class IRCBot
         }
 
         foreach ($this->chan as $chan) {
-            $this->ircRaw('JOIN '.$chan);
+            $this->ircRaw('JOIN ' . $chan);
         }
 
         return true;
-    }//end joinChan()
+    }
 
+    //end joinChan()
 
     private function handleCommand()
     {
         $this->command = str_replace(':.', '', $this->command);
-        $tmp           = explode(':.'.$this->command.' ', $this->data);
-        $this->user    = $this->getAuthdUser();
+        $tmp = explode(':.' . $this->command . ' ', $this->data);
+        $this->user = $this->getAuthdUser();
+        $this->log('isAuthd-1? ' . $this->isAuthd());
+        if (! $this->isAuthd() && (isset($this->config['irc_auth']))) {
+            $this->hostAuth();
+        }
+        $this->log('isAuthd-2? ' . $this->isAuthd());
         if ($this->isAuthd() || trim($this->command) == 'auth') {
             $this->proceedCommand(str_replace("\n", '', trim($this->command)), trim($tmp[1]));
         }
 
         $this->authd[$this->getUser($this->data)] = $this->user;
-        return false;
-    }//end handleCommand()
 
+        return false;
+    }
+
+    //end handleCommand()
 
     private function proceedCommand($command, $params)
     {
         $command = strtolower($command);
         if (in_array($command, $this->commands)) {
             $this->chkdb();
-            $this->log($command." ( '".$params."' )");
-            return $this->{'_'.$command}($params);
+            $this->log($command . " ( '" . $params . "' )");
+
+            return $this->{'_' . $command}($params);
         } elseif ($this->external[$command]) {
             $this->chkdb();
-            $this->log($command." ( '".$params."' ) [Ext]");
+            $this->log($command . " ( '" . $params . "' ) [Ext]");
+
             return eval($this->external[$command]);
         }
 
         return false;
-    }//end proceedCommand()
+    }
 
+    //end proceedCommand()
 
     private function respond($msg)
     {
         $chan = $this->getChan($this->data);
-        return $this->sendMessage($msg, strstr($chan, '#') ? $chan : $this->getUser($this->data));
-    }//end respond()
 
+        return $this->sendMessage($msg, strstr($chan, '#') ? $chan : $this->getUser($this->data));
+    }
+
+    //end respond()
 
     private function getChan($param)
     {
         $data = explode('PRIVMSG ', $this->data, 3);
         $data = explode(' ', $data[1], 2);
-        return $data[0];
-    }//end getChan()
 
+        return $data[0];
+    }
+
+    //end getChan()
 
     private function getUser($param)
     {
         $arrData = explode('!', $param, 2);
-        return str_replace(':', '', $arrData[0]);
-    }//end getUser()
 
+        return str_replace(':', '', $arrData[0]);
+    }
+
+    //end getUser()
+
+    private function getUserHost($param)
+    {
+        $arrData = explode(' ', $param, 2);
+
+        return str_replace(':', '', $arrData[0]);
+    }
+
+    //end getUserHost()
 
     private function connect($try = 0)
     {
         if ($try > $this->max_retry) {
             $this->log('Failed too many connection attempts, aborting');
-            return die();
+
+            return exit;
         }
 
-        $this->log('Trying to connect ('.($try + 1).') to '.$this->server.':'.$this->port.($this->ssl ? ' (SSL)' : ''));
+        $this->log('Trying to connect (' . ($try + 1) . ') to ' . $this->server . ':' . $this->port . ($this->ssl ? ' (SSL)' : ''));
         if ($this->socket['irc']) {
+            $this->ircRaw('QUIT :Reloading');
             fclose($this->socket['irc']);
         }
 
         if ($this->ssl) {
-            $server = 'ssl://'.$this->server;
+            $server = 'ssl://' . $this->server;
         } else {
             $server = $this->server;
         }
 
         if ($this->ssl && $this->config['irc_disable_ssl_check']) {
-            $ssl_context_params = array('ssl'=>array('allow_self_signed'=> true, 'verify_peer' => false, 'verify_peer_name' => false ));
+            $ssl_context_params = ['ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]];
             $ssl_context = stream_context_create($ssl_context_params);
-            $this->socket['irc'] = stream_socket_client($server.':'.$this->port, $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $ssl_context);
+            $this->socket['irc'] = stream_socket_client($server . ':' . $this->port, $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $ssl_context);
         } else {
             $this->socket['irc'] = fsockopen($server, $this->port);
         }
 
-        if (!is_resource($this->socket['irc'])) {
+        if (! is_resource($this->socket['irc'])) {
             if ($try < 5) {
                 sleep(5);
             } elseif ($try < 10) {
@@ -401,344 +570,427 @@ class IRCBot
             } else {
                 sleep(300);
             }
+
             return $this->connect($try + 1);
         } else {
             stream_set_blocking($this->socket['irc'], false);
+
             return true;
         }
-    }//end connect()
+    }
 
+    //end connect()
 
     private function doAuth()
     {
-        if ($this->ircRaw('USER '.$this->nick.' 0 '.$this->nick.' :'.$this->nick) && $this->ircRaw('NICK '.$this->nick)) {
+        if ($this->ircRaw('USER ' . $this->nick . ' 0 ' . $this->nick . ' :' . $this->nick) && $this->ircRaw('NICK ' . $this->nick)) {
             return true;
         }
 
         return false;
-    }//end doAuth()
+    }
 
+    //end doAuth()
 
     private function sendMessage($message, $chan)
     {
         if ($this->debug) {
-            $this->log("Sending 'PRIVMSG ".trim($chan).' :'.trim($message)."'");
+            $this->log("Sending 'PRIVMSG " . trim($chan) . ' :' . trim($message) . "'");
         }
 
-        return $this->ircRaw('PRIVMSG '.trim($chan).' :'.trim($message));
-    }//end sendMessage()
+        return $this->ircRaw('PRIVMSG ' . trim($chan) . ' :' . trim($message));
+    }
 
+    //end sendMessage()
 
     private function log($msg)
     {
-        echo '['.date('r').'] '.trim($msg)."\n";
-        return true;
-    }//end log()
+        $log = '[' . date('r') . '] IRCbot ' . trim($msg) . "\n";
+        echo $log;
+        file_put_contents($this->config['log_dir'] . '/irc.log', $log, FILE_APPEND);
 
+        return true;
+    }
+
+    //end log()
 
     private function chkdb()
     {
-        if (!is_resource($this->sql)) {
+        if (! Eloquent::isConnected()) {
             try {
-                $this->sql = dbConnect(
-                    $this->config['db_host'],
-                    $this->config['db_user'],
-                    $this->config['db_pass'],
-                    $this->config['db_name'],
-                    $this->config['db_port'],
-                    $this->config['db_socket']
-                );
-            } catch (DatabaseConnectException $e) {
+                Eloquent::DB()->statement('SELECT VERSION()');
+            } catch (\PDOException $e) {
                 $this->log('Cannot connect to MySQL: ' . $e->getMessage());
-                return die();
+
+                return exit;
             }
         }
-        return true;
-    }//end chkdb()
 
+        return true;
+    }
+
+    //end chkdb()
 
     private function isAuthd()
     {
         if ($this->user['expire'] >= time()) {
             $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
+
             return true;
         } else {
             return false;
         }
-    }//end isAuthd()
+    }
 
+    //end isAuthd()
 
     private function getAuthdUser()
     {
         return $this->authd[$this->getUser($this->data)];
-    }//end get_user()
+    }
 
+    //end getAuthUser()
+
+    private function hostAuth()
+    {
+        $this->log('HostAuth');
+        global $authorizer;
+        foreach ($this->config['irc_auth'] as $nms_user => $hosts) {
+            foreach ($hosts as $host) {
+                $host = preg_replace("/\*/", '.*', $host);
+                if ($this->debug) {
+                    $this->log("HostAuth on irc matching $host to " . $this->getUserHost($this->data));
+                }
+                if (preg_match("/$host/", $this->getUserHost($this->data))) {
+                    $user = User::firstWhere('username', $nms_user);
+                    $this->user['user'] = $user;
+                    $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
+                    if ($this->debug) {
+                        $this->log("HostAuth on irc for '" . $user->username . "', ID: '" . $user->user_id . "', Host: '" . $host);
+                    }
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    //end hostAuth
 
     private function ircRaw($params)
     {
-        return fputs($this->socket['irc'], $params."\r\n");
-    }//end irc_raw()
+        return fwrite($this->socket['irc'], $params . "\r\n");
+    }
 
+    //end irc_raw()
 
     private function _auth($params)
     {
+        global $authorizer;
         $params = explode(' ', $params, 2);
         if (strlen($params[0]) == 64) {
             if ($this->tokens[$this->getUser($this->data)] == $params[0]) {
                 $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
-                $tmp_user = get_user($this->user['id']);
-                $tmp = get_userlevel($tmp_user['username']);
-                $this->user['level'] = $tmp;
-                if ($this->user['level'] < 5) {
-                    foreach (dbFetchRows('SELECT device_id FROM devices_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
-                        $this->user['devices'][] = $tmp['device_id'];
-                    }
-
-                    foreach (dbFetchRows('SELECT port_id FROM ports_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
-                        $this->user['ports'][] = $tmp['port_id'];
-                    }
-                }
 
                 return $this->respond('Authenticated.');
             } else {
                 return $this->respond('Nope.');
             }
         } else {
-            $user_id = get_userid(mres($params[0]));
-            $user = get_user($user_id);
-            if ($user['email'] && $user['username'] == $params[0]) {
+            $user = User::firstWhere('username', $params[0]);
+            if ($user->email && $user->username == $params[0]) {
                 $token = hash('gost', openssl_random_pseudo_bytes(1024));
                 $this->tokens[$this->getUser($this->data)] = $token;
-                $this->user['name'] = $params[0];
-                $this->user['id']   = $user['user_id'];
+                $this->user['user'] = $user;
                 if ($this->debug) {
-                    $this->log("Auth for '".$params[0]."', ID: '".$user['user_id']."', Token: '".$token."', Mail: '".$user['email']."'");
+                    $this->log("Auth for '" . $params[0] . "', ID: '" . $user->user_id . "', Token: '" . $token . "', Mail: '" . $user->email . "'");
                 }
 
-                if (send_mail($user['email'], 'LibreNMS IRC-Bot Authtoken', "Your Authtoken for the IRC-Bot:\r\n\r\n".$token."\r\n\r\n") === true) {
+                try {
+                    Mail::send($user->email, 'LibreNMS IRC-Bot Authtoken', "Your Authtoken for the IRC-Bot:\r\n\r\n" . $token . "\r\n\r\n");
+
                     return $this->respond('Token sent!');
-                } else {
-                    return $this->respond('Sorry, seems like mail doesnt like us.');
+                } catch (\Exception $e) {
+                    return $this->respond('Sorry, seems like mail doesnt like us. ' . $e->getMessage());
                 }
             } else {
                 return $this->respond('Who are you again?');
             }
         }//end if
-        return false;
-    }//end _auth()
+    }
 
+    //end _auth()
 
-    private function _reload()
+    private function _reload($params)
     {
-        if ($this->user['level'] == 10) {
-            global $config;
-            $config = array();
-            include 'includes/defaults.inc.php';
-            include 'config.php';
-            include 'includes/definitions.inc.php';
+        if ($this->user['user']->can('irc.reload')) {
+            if ($params == 'external') {
+                $this->respond('Reloading external scripts.');
+
+                return $this->loadExternal();
+            }
+            LibrenmsConfig::reload();
             $this->respond('Reloading configuration & defaults');
-            if ($config != $this->config) {
-                return $this->__construct();
+            if (LibrenmsConfig::getAll() != $this->config) {
+                $this->__construct();
+
+                return;
             }
         } else {
             return $this->respond('Permission denied.');
         }
-    }//end _reload()
+    }
 
+    //end _reload()
 
     private function _join($params)
     {
-        if ($this->user['level'] == 10) {
+        if ($this->user['user']->can('irc.join')) {
             return $this->joinChan($params);
         } else {
             return $this->respond('Permission denied.');
         }
-    }//end _join()
+    }
 
+    //end _join()
 
     private function _quit($params)
     {
-        if ($this->user['level'] == 10) {
-            return die();
+        if ($this->user['user']->can('irc.quit')) {
+            $this->ircRaw('QUIT :Requested');
+
+            return exit;
         } else {
             return $this->respond('Permission denied.');
         }
-    }//end _quit()
+    }
 
+    //end _quit()
 
     private function _help($params)
     {
-        foreach ($this->commands as $cmd) {
-            $msg .= ', '.$cmd;
+        $msg = implode(', ', $this->commands);
+        if (count($this->external) > 0) {
+            $msg .= ', ' . implode(', ', array_keys($this->external));
         }
 
-        $msg = substr($msg, 2);
         return $this->respond("Available commands: $msg");
-    }//end _help()
+    }
 
+    //end _help()
 
     private function _version($params)
     {
-        $versions       = version_info(false);
-        $schema_version = $versions['db_schema'];
-        $version        = substr($versions['local_sha'], 0, 7);
+        $version = Version::get();
 
-        $msg = $this->config['project_name_version'].', Version: '.$version.', DB schema: #'.$schema_version.', PHP: '.PHP_VERSION;
+        $msg = $this->config['project_name'] . ', Version: ' . $version->name() . ', DB schema: ' . $version->databaseMigrationCount() . ', PHP: ' . PHP_VERSION;
+
         return $this->respond($msg);
-    }//end _version()
+    }
 
+    //end _version()
 
     private function _log($params)
     {
         $num = 1;
-        if ($params > 1) {
-            $num = $params;
+        $hostname = '';
+        $params = explode(' ', $params);
+        if ($params[0] > 1) {
+            $num = $params[0];
+        }
+        if (strlen($params[1]) > 0) {
+            $hostname = preg_replace("/[^A-z0-9\.\-]/", '', $params[1]);
         }
 
-        if ($this->user['level'] < 5) {
-            $tmp = dbFetchRows('SELECT `event_id`,`host`,`datetime`,`message`,`type` FROM `eventlog` WHERE `host` IN ('.implode(',', $this->user['devices']).') ORDER BY `event_id` DESC LIMIT '.mres($num));
-        } else {
-            $tmp = dbFetchRows('SELECT `event_id`,`host`,`datetime`,`message`,`type` FROM `eventlog` ORDER BY `event_id` DESC LIMIT '.mres($num));
+        $tmp = Eventlog::with('device')->hasAccess($this->user['user'])->whereIn('device_id', function ($query) use ($hostname) {
+            return $query->where('hostname', 'like', $hostname . '%')->select('device_id');
+        })->select(['event_id', 'datetime', 'type', 'message'])->orderBy('event_id')->limit((int) $num)->get();
+
+        /** @var Eventlog $logline */
+        foreach ($tmp as $logline) {
+            $response = $logline->datetime . ' ';
+            $response .= $this->_color($logline->device->displayName(), null, null, 'bold') . ' ';
+            if ($this->config['irc_alert_utf8']) {
+                if (preg_match('/critical alert/', $logline->message)) {
+                    $response .= preg_replace('/critical alert/', $this->_color('critical alert', 'red'), $logline->message) . ' ';
+                } elseif (preg_match('/warning alert/', $logline->message)) {
+                    $response .= preg_replace('/warning alert/', $this->_color('warning alert', 'yellow'), $logline->message) . ' ';
+                } elseif (preg_match('/recovery/', $logline->message)) {
+                    $response .= preg_replace('/recovery/', $this->_color('recovery', 'green'), $logline->message) . ' ';
+                } else {
+                    $response .= $logline->message . ' ';
+                }
+            } else {
+                $response .= $logline->message . ' ';
+            }
+            if ($logline->type != 'NULL') {
+                $response .= $logline->type . ' ';
+            }
+            if ($this->config['irc_floodlimit'] > 100) {
+                $this->floodcount += strlen($response);
+            } elseif ($this->config['irc_floodlimit'] > 1) {
+                $this->floodcount += 1;
+            }
+            if (($this->config['irc_floodlimit'] > 0) && ($this->floodcount > $this->config['irc_floodlimit'])) {
+                $this->ircRaw('BOTFLOODCHECK');
+                sleep(2);
+                $this->floodcount = 0;
+            }
+            $this->respond($response);
         }
 
-        foreach ($tmp as $device) {
-            $hostid = dbFetchRow('SELECT `hostname` FROM `devices` WHERE `device_id` = '.$device['host']);
-            $this->respond($device['event_id'].' '.$hostid['hostname'].' '.$device['datetime'].' '.$device['message'].' '.$device['type']);
-        }
-
-        if (!$hostid) {
+        if (! $tmp) {
             $this->respond('Nothing to see, maybe a bug?');
         }
 
         return true;
-    }//end _log()
+    }
 
+    //end _log()
 
     private function _down($params)
     {
-        if ($this->user['level'] < 5) {
-            $tmp = dbFetchRows('SELECT `hostname` FROM `devices` WHERE status=0 AND `device_id` IN ('.implode(',', $this->user['devices']).')');
-        } else {
-            $tmp = dbFetchRows('SELECT `hostname` FROM `devices` WHERE status=0');
-        }
+        $devices = Device::hasAccess($this->user['user'])->isDown()
+            ->select(['device_id', 'hostname', 'sysName', 'display', 'ip'])->get();
 
-        foreach ($tmp as $db) {
-            if ($db['hostname']) {
-                $msg .= ', '.$db['hostname'];
-            }
-        }
+        $msg = $devices->map->displayName()->implode(', ');
 
-        $msg = substr($msg, 2);
-        $msg = $msg ? $msg : 'Nothing to show :)';
-        return $this->respond($msg);
-    }//end _down()
+        return $this->respond($msg ?: 'Nothing to show :)');
+    }
 
+    //end _down()
 
     private function _device($params)
     {
-        $params   = explode(' ', $params);
+        $params = explode(' ', $params);
         $hostname = $params[0];
-        $device   = dbFetchRow('SELECT * FROM `devices` WHERE `hostname` = ?', array($hostname));
-        if (!$device) {
+        $device = Device::hasAccess($this->user['user'])->firstWhere('hostname', $hostname);
+        if (! $device) {
             return $this->respond('Error: Bad or Missing hostname, use .listdevices to show all devices.');
         }
 
-        if ($this->user['level'] < 5 && !in_array($device['device_id'], $this->user['devices'])) {
-            return $this->respond('Error: Permission denied.');
-        }
+        $status = $device->status ? 'Up ' . Time::formatInterval($device->uptime) : 'Down';
+        $status .= $device->ignore ? '*Ignored*' : '';
+        $status .= $device->disabled ? '*Disabled*' : '';
 
-        $status  = $device['status'] ? 'Up '.formatUptime($device['uptime']) : 'Down';
-        $status .= $device['ignore'] ? '*Ignored*' : '';
-        $status .= $device['disabled'] ? '*Disabled*' : '';
-        return $this->respond($device['os'].' '.$device['version'].' '.$device['features'].' '.$status);
-    }//end _device()
+        return $this->respond($device->displayName() . ': ' . $device->os . ' ' . $device->version . ' ' . $device->features . ' ' . $status);
+    }
 
+    //end _device()
 
     private function _port($params)
     {
-        $params   = explode(' ', $params);
+        $params = explode(' ', $params);
         $hostname = $params[0];
-        $ifname   = $params[1];
-        if (!$hostname || !$ifname) {
+        $ifname = $params[1];
+        if (! $hostname || ! $ifname) {
             return $this->respond('Error: Missing hostname or ifname.');
         }
 
-        $device = dbFetchRow('SELECT * FROM `devices` WHERE `hostname` = ?', array($hostname));
-        $port   = dbFetchRow('SELECT * FROM `ports` WHERE (`ifName` = ? OR `ifDescr` = ?) AND device_id = ?', array($ifname, $ifname, $device['device_id']));
-        if ($this->user['level'] < 5 && !in_array($port['port_id'], $this->user['ports']) && !in_array($device['device_id'], $this->user['devices'])) {
-            return $this->respond('Error: Permission denied.');
+        $device = Device::hasAccess($this->user['user'])->firstWhere('hostname', $hostname);
+        if (! $device) {
+            return $this->respond('Error: Bad or Missing hostname, use .listdevices to show all devices.');
         }
 
-        $bps_in  = formatRates($port['ifInOctets_rate'] * 8);
-        $bps_out = formatRates($port['ifOutOctets_rate'] * 8);
-        $pps_in  = format_bi($port['ifInUcastPkts_rate']);
-        $pps_out = format_bi($port['ifOutUcastPkts_rate']);
-        return $this->respond($port['ifAdminStatus'].'/'.$port['ifOperStatus'].' '.$bps_in.' > bps > '.$bps_out.' | '.$pps_in.'pps > PPS > '.$pps_out.'pps');
-    }//end _port()
+        $port = $device->ports()->hasAccess($this->user['user'])->where('ifName', $ifname)->orWhere('ifDescr', $ifname);
+        if (! $port) {
+            return $this->respond('Error: Port not found or you do not have access.');
+        }
 
+        $bps_in = Number::formatSi($port['ifInOctets_rate'] * 8, 2, 0, 'bps');
+        $bps_out = Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 0, 'bps');
+        $pps_in = Number::formatBi($port['ifInUcastPkts_rate'], 2, 0, 'pps');
+        $pps_out = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 0, 'pps');
+
+        return $this->respond($port['ifAdminStatus'] . '/' . $port['ifOperStatus'] . ' ' . $bps_in . ' > bps > ' . $bps_out . ' | ' . $pps_in . ' > PPS > ' . $pps_out);
+    }
+
+    //end _port()
 
     private function _listdevices($params)
     {
-        if ($this->user['level'] < 5) {
-            $tmp = dbFetchRows('SELECT `hostname` FROM `devices` WHERE `device_id` IN ('.implode(',', $this->user['devices']).')');
-        } else {
-            $tmp = dbFetchRows('SELECT `hostname` FROM `devices`');
-        }
+        $devices = Device::hasAccess($this->user['user'])->pluck('hostname');
 
-        foreach ($tmp as $device) {
-            $msg .= ', '.$device['hostname'];
-        }
+        $msg = $devices->implode(', ');
 
-        $msg = substr($msg, 2);
-        $msg = $msg ? $msg : 'Nothing to show..?';
-        return $this->respond($msg);
-    }//end _listdevices()
+        return $this->respond($msg ?: 'Nothing to show..?');
+    }
 
+    //end _listdevices()
 
     private function _status($params)
     {
-        $params     = explode(' ', $params);
+        $params = explode(' ', $params);
         $statustype = $params[0];
-        if ($this->user['level'] < 5) {
-            $d_w = ' WHERE device_id IN ('.implode(',', $this->user['devices']).')';
-            $d_a = ' AND   device_id IN ('.implode(',', $this->user['devices']).')';
-            $p_w = ' WHERE  port_id IN ('.implode(',', $this->user['ports']).') OR device_id IN ('.implode(',', $this->user['devices']).')';
-            $p_a = ' AND (I.port_id IN ('.implode(',', $this->user['ports']).') OR I.device_id IN ('.implode(',', $this->user['devices']).'))';
-        }
 
         switch ($statustype) {
             case 'devices':
             case 'device':
             case 'dev':
-                $devcount = array_pop(dbFetchRow('SELECT count(*) FROM devices'.$d_w));
-                $devup    = array_pop(dbFetchRow("SELECT count(*) FROM devices  WHERE status = '1' AND `ignore` = '0'".$d_a));
-                $devdown  = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE status = '0' AND `ignore` = '0'".$d_a));
-                $devign   = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE `ignore` = '1'".$d_a));
-                $devdis   = array_pop(dbFetchRow("SELECT count(*) FROM devices WHERE `disabled` = '1'".$d_a));
-                $msg      = 'Devices: '.$devcount.' ('.$devup.' up, '.$devdown.' down, '.$devign.' ignored, '.$devdis.' disabled'.')';
+                $devcount = Device::hasAccess($this->user['user'])->count();
+                $devup = Device::hasAccess($this->user['user'])->isUp()->count();
+                $devdown = Device::hasAccess($this->user['user'])->isDown()->count();
+                $devign = Device::hasAccess($this->user['user'])->isIgnored()->count();
+                $devdis = Device::hasAccess($this->user['user'])->isDisabled()->count();
+                if ($devup > 0) {
+                    $devup = $this->_color($devup, 'green');
+                }
+                if ($devdown > 0) {
+                    $devdown = $this->_color($devdown, 'red');
+                    $devcount = $this->_color($devcount, 'yellow', null, 'bold');
+                } else {
+                    $devcount = $this->_color($devcount, 'green', null, 'bold');
+                }
+                $msg = 'Devices: ' . $devcount . ' (' . $devup . ' up, ' . $devdown . ' down, ' . $devign . ' ignored, ' . $devdis . ' disabled' . ')';
                 break;
 
             case 'ports':
             case 'port':
             case 'prt':
-                $prtcount = array_pop(dbFetchRow('SELECT count(*) FROM ports'.$p_w));
-                $prtup    = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D  WHERE I.ifOperStatus = 'up' AND I.ignore = '0' AND I.device_id = D.device_id AND D.ignore = '0'".$p_a));
-                $prtdown  = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE I.ifOperStatus = 'down' AND I.ifAdminStatus = 'up' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'".$p_a));
-                $prtsht   = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE I.ifAdminStatus = 'down' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'".$p_a));
-                $prtign   = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '1' OR D.ignore = '1')".$p_a));
-                $prterr   = array_pop(dbFetchRow("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')".$p_a));
-                $msg      = 'Ports: '.$prtcount.' ('.$prtup.' up, '.$prtdown.' down, '.$prtign.' ignored, '.$prtsht.' shutdown'.')';
+                $prtcount = Port::hasAccess($this->user['user'])->count();
+                $prtup = Port::hasAccess($this->user['user'])->isUp()->count();
+                $prtdown = Port::hasAccess($this->user['user'])->isDown()->whereHas('device', fn ($q) => $q->where('ignore', 0))->count();
+                $prtsht = Port::hasAccess($this->user['user'])->isShutdown()->whereHas('device', fn ($q) => $q->where('ignore', 0))->count();
+                $prtign = Port::hasAccess($this->user['user'])->where(function ($query) {
+                    $query->isIgnored()->orWhereHas('device', fn ($q) => $q->where('ignore', 1));
+                })->count();
+//                $prterr   = dbFetchCell("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')".$p_a);
+                if ($prtup > 0) {
+                    $prtup = $this->_color($prtup, 'green');
+                }
+                if ($prtdown > 0) {
+                    $prtdown = $this->_color($prtdown, 'red');
+                    $prtcount = $this->_color($prtcount, 'yellow', null, 'bold');
+                } else {
+                    $prtcount = $this->_color($prtcount, 'green', null, 'bold');
+                }
+                $msg = 'Ports: ' . $prtcount . ' (' . $prtup . ' up, ' . $prtdown . ' down, ' . $prtign . ' ignored, ' . $prtsht . ' shutdown' . ')';
                 break;
 
             case 'services':
             case 'service':
             case 'srv':
-                $srvcount = array_pop(dbFetchRow('SELECT count(service_id) FROM services'.$d_w));
-                $srvup    = array_pop(dbFetchRow("SELECT count(service_id) FROM services  WHERE service_status = '1' AND service_ignore ='0'".$d_a));
-                $srvdown  = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_ignore = '0'".$d_a));
-                $srvign   = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_ignore = '1'".$d_a));
-                $srvdis   = array_pop(dbFetchRow("SELECT count(service_id) FROM services WHERE service_disabled = '1'".$d_a));
-                $msg      = 'Services: '.$srvcount.' ('.$srvup.' up, '.$srvdown.' down, '.$srvign.' ignored, '.$srvdis.' disabled'.')';
+                $status_counts = [];
+                $status_colors = [0 => 'green', 3 => 'lightblue', 1 => 'yellow', 2 => 'red'];
+                $srvcount = Service::hasAccess($this->user['user'])->count();
+                $srvign = Service::hasAccess($this->user['user'])->isIgnored()->count();
+                $srvdis = Service::hasAccess($this->user['user'])->isDisabled()->count();
+                $service_status = Service::hasAccess($this->user['user'])->isActive()->groupBy('service_status')
+                    ->select('service_status', \DB::raw('count(*) as count'))->get()
+                    ->pluck('count', 'service_status');
+
+                foreach ($status_colors as $status => $color) {
+                    if ($service_status->has($status)) {
+                        $status_counts[$status] = $this->_color($service_status->get($status), $color);
+                        $srvcount = $this->_color($srvcount, $color, null, 'bold'); // upgrade the main count color
+                    } else {
+                        $status_counts[$status] = 0;
+                    }
+                }
+
+                $msg = "Services: $srvcount ({$status_counts[0]} up, {$status_counts[2]} down, {$status_counts[1]} warning, {$status_counts[3]} unknown, $srvign ignored, $srvdis disabled)";
                 break;
 
             default:
@@ -747,5 +999,93 @@ class IRCBot
         }//end switch
 
         return $this->respond($msg);
-    }//end _status()
+    }
+
+    //end _status()
+
+    private function _color($text, $fg_color, $bg_color = null, $other = null)
+    {
+        $colors = [
+            'white' => '00',
+            'black' => '01',
+            'blue' => '02',
+            'green' => '03',
+            'red' => '04',
+            'brown' => '05',
+            'purple' => '06',
+            'orange' => '07',
+            'yellow' => '08',
+            'lightgreen' => '09',
+            'cyan' => '10',
+            'lightcyan' => '11',
+            'lightblue' => '12',
+            'pink' => '13',
+            'grey' => '14',
+            'lightgrey' => '15',
+        ];
+        $ret = chr(3);
+        if (array_key_exists($fg_color, $colors)) {
+            $ret .= $colors[$fg_color];
+            if (array_key_exists($bg_color, $colors)) {
+                $ret .= ',' . $colors[$fg_color];
+            }
+        }
+        switch ($other) {
+            case 'bold':
+                $ret .= chr(2);
+                break;
+            case 'underline':
+                $ret .= chr(31);
+                break;
+            case 'italics':
+            case 'reverse':
+                $ret .= chr(22);
+                break;
+        }
+        $ret .= $text;
+        $ret .= chr(15);
+
+        return $ret;
+    }
+
+    // end _color
+
+    private function _html2irc($string)
+    {
+        $string = urldecode($string);
+        $string = preg_replace('#<b>#i', chr(2), $string);
+        $string = preg_replace('#</b>#i', chr(2), $string);
+        $string = preg_replace('#<i>#i', chr(22), $string);
+        $string = preg_replace('#</i>#i', chr(22), $string);
+        $string = preg_replace('#<u>#i', chr(31), $string);
+        $string = preg_replace('#</u>#i', chr(31), $string);
+
+        $colors = [
+            'white' => '00',
+            'black' => '01',
+            'blue' => '02',
+            'green' => '03',
+            'red' => '04',
+            'brown' => '05',
+            'purple' => '06',
+            'orange' => '07',
+            'yellow' => '08',
+            'lightgreen' => '09',
+            'cyan' => '10',
+            'lightcyan' => '11',
+            'lightblue' => '12',
+            'pink' => '13',
+            'grey' => '14',
+            'lightgrey' => '15',
+        ];
+
+        foreach ($colors as $color => $code) {
+            $string = preg_replace("#<$color>#i", chr(3) . $code, $string);
+            $string = preg_replace("#</$color>#i", chr(3), $string);
+        }
+
+        return $string;
+    }
+
+    // end _html2irc
 }//end class

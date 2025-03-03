@@ -1,0 +1,657 @@
+UBNT-AFLTU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64, IpAddress
+    FROM SNMPv2-SMI
+  MODULE-COMPLIANCE, OBJECT-GROUP
+    FROM SNMPv2-CONF
+  DisplayString, MacAddress
+    FROM SNMPv2-TC
+  ubntAFLTU, ubntAFLTUGroups 
+    FROM UBNT-MIB;
+
+afLTUMIB MODULE-IDENTITY
+    LAST-UPDATED "201806050000Z"
+    ORGANIZATION "Ubiquiti Networks, Inc."
+    CONTACT-INFO "support@ubnt.com"
+    DESCRIPTION  "The AFLTU MIB module for Ubiquiti Networks, Inc. entities"
+    REVISION "201806050000Z"
+    DESCRIPTION "AFLTU.v0.1 revision"
+    ::= { ubntAFLTU 1 }
+
+afLTUCompliances  OBJECT IDENTIFIER ::= {ubntAFLTUGroups 1}
+afLTUGroups       OBJECT IDENTIFIER ::= {ubntAFLTUGroups 2}
+
+afLTUConfig       OBJECT IDENTIFIER ::= {afLTUMIB 2}
+afLTUStatus       OBJECT IDENTIFIER ::= {afLTUMIB 3}
+afLTUStats        OBJECT IDENTIFIER ::= {afLTUMIB 5}
+afLTUethStats     OBJECT IDENTIFIER ::= {afLTUMIB 6}
+afLTUgpsStats     OBJECT IDENTIFIER ::= {afLTUMIB 7}
+
+--=== MODULE OBJECTS
+
+--=== AFLTU Config
+
+afLTURole OBJECT-TYPE
+  SYNTAX	INTEGER {
+		        ap  (0),
+		        cpe (1)
+		      } 
+  MAX-ACCESS 	  read-write
+  STATUS 	      current
+  DESCRIPTION 	"Wireless Role (ap/cpe)"
+  ::= { afLTUConfig 1 }
+                  
+afLTUFrequency OBJECT-TYPE
+  SYNTAX     	  Integer32
+  UNITS         "MHz"
+  MAX-ACCESS 	  read-write
+  STATUS 	      current
+  DESCRIPTION 	"The main frequency to use in MHz."
+  ::= { afLTUConfig 2 }
+
+afLTUAltFreqList OBJECT-TYPE
+  SYNTAX     	  DisplayString (SIZE (1..100))
+  MAX-ACCESS 	  read-write
+  STATUS 	      current
+  DESCRIPTION 	"The list of alternative frequencies in MHz. Multiple frequencies should be separated with commas. For example: '5250,5670,5800'."
+  ::= { afLTUConfig 3 }
+        
+afLTUBandwidth OBJECT-TYPE
+  SYNTAX     	  INTEGER {bw10M(10),bw20M(20),bw30M(30),bw40M(40),bw50M(50),bw60M(60),bw80M(80),bw100M(100)}
+  UNITS         "MHz"
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION   "Wireless channel bandwidth in MHz."
+  ::= { afLTUConfig 4 }
+
+afLTUSsid OBJECT-TYPE
+  SYNTAX     	DisplayString (SIZE (1..15))
+  MAX-ACCESS 	read-write
+  STATUS 	current
+  DESCRIPTION 	"Radio SSID"
+  ::= { afLTUConfig 5 }
+        
+afLTUTxEIRP OBJECT-TYPE
+  SYNTAX        Integer32  (-10..100)
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION   "Tx EIRP in dBm."
+  ::= { afLTUConfig 6 }
+
+afLTUAntennaGain OBJECT-TYPE
+  SYNTAX        Integer32 (0..40)
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION   "Antenna gain in dBi."
+  ::= { afLTUConfig 7 }
+
+afLTUCableLoss OBJECT-TYPE
+  SYNTAX        Integer32 (0..10)
+  MAX-ACCESS    read-write
+  STATUS        current
+  DESCRIPTION   "Cable loss in dB."
+  ::= { afLTUConfig 8 }
+        
+afLTUTxRate OBJECT-TYPE
+  SYNTAX      Integer32
+  UNITS       "x"
+  MAX-ACCESS  read-write
+  STATUS 	    current
+  DESCRIPTION "Tx modulation."
+  ::= { afLTUConfig 9 }
+        
+afLTUTxRateAuto OBJECT-TYPE
+  SYNTAX      INTEGER  {
+                disabled  (0),
+                enabled   (1)
+        	    } 
+  MAX-ACCESS 	read-write
+  STATUS 	    current
+  DESCRIPTION "Automatic Tx moduleation selection. If this is enabled, afLTUTxRate is the maximum modulation for the selection algorithm to select."
+  ::= { afLTUConfig 10 }
+        
+afLTUDistanceScale OBJECT-TYPE
+  SYNTAX     	Integer32 (0..5)
+  MAX-ACCESS 	read-write
+  STATUS 	    current
+  DESCRIPTION 	"Distance Scale, options are:
+                 0 = 0km
+                 1 = <1km
+                 2 = <5km
+                 3 = <10km
+                 4 = <20km
+                 5 = <40km"
+  ::= { afLTUConfig 11 }
+  
+--=== AFLTU Status
+
+afLTUMac OBJECT-TYPE
+  SYNTAX        MacAddress
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "The MAC address of this device"
+  ::= { afLTUStatus 1 }
+
+afLTUDevModel OBJECT-TYPE
+  SYNTAX	    DisplayString
+  MAX-ACCESS 	read-only
+  STATUS 	    current
+  DESCRIPTION 	"The device model."
+  ::= { afLTUStatus 2 }
+ 
+afLTUDevName OBJECT-TYPE
+  SYNTAX	    DisplayString
+  MAX-ACCESS 	read-only
+  STATUS 	    current
+  DESCRIPTION 	"The device name."
+  ::= { afLTUStatus 3 }
+  
+afLTUFirmwareVersion OBJECT-TYPE
+  SYNTAX	    DisplayString
+  MAX-ACCESS 	read-only
+  STATUS 	    current
+  DESCRIPTION 	"The firmware version running."
+  ::= { afLTUStatus 4 }
+  
+afLTUMemoryUsage OBJECT-TYPE
+  SYNTAX	    Integer32
+  UNITS         "%"
+  MAX-ACCESS 	read-only
+  STATUS 	    current
+  DESCRIPTION 	"The percentage of total memory usage."
+  ::= { afLTUStatus 5 }
+  
+afLTUCpuUsage OBJECT-TYPE
+  SYNTAX	    Integer32
+  UNITS         "%"
+  MAX-ACCESS 	read-only
+  STATUS 	    current
+  DESCRIPTION 	"The percentage of total CPU usage."
+  ::= { afLTUStatus 6 }
+
+afLTUUptime OBJECT-TYPE
+  SYNTAX	    Counter64
+  UNITS       "s"
+  MAX-ACCESS 	read-only
+  STATUS 	    current
+  DESCRIPTION 	"The uptime of the device in seconds."
+  ::= { afLTUStatus 7 }
+
+--=== AFLTU Station table
+
+afLTUStationTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF AfLTUStationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Remote station table for status and statistics."
+  ::= { afLTUMIB 4 }
+
+afLTUStationEntry OBJECT-TYPE
+  SYNTAX      AfLTUStationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "An entry in the afLTUStationTable"
+  INDEX       { afLTUStaRemoteMac }
+  ::= { afLTUStationTable 1 }
+
+AfLTUStationEntry ::= SEQUENCE {
+  afLTUStaTxRate                     INTEGER,
+  afLTUStaRxRate                     INTEGER,
+  afLTUStaTxCapacity                 Integer32,
+  afLTUStaRxCapacity                 Integer32,
+  afLTUStaRxPower0                   Integer32,
+  afLTUStaRxPower1                   Integer32,
+  afLTUStaIdealRxPower0              Integer32,
+  afLTUStaIdealRxPower1              Integer32,
+  afLTUStaRxPowerLevel0              Integer32,
+  afLTUStaRxPowerLevel1              Integer32,
+  afLTUStaRemoteMac                  MacAddress,
+  afLTUStaRemoteDevModel             DisplayString,
+  afLTUStaRemoteDevName              DisplayString,
+  afLTUStaRemoteFirmwareVersion      DisplayString,
+  afLTUStaRemoteTxEIRP               Integer32,
+  afLTUStaRemoteRxPower0             Integer32,
+  afLTUStaRemoteRxPower1             Integer32,
+  afLTUStaRemoteIdealRxPower0        Integer32,
+  afLTUStaRemoteIdealRxPower1        Integer32,
+  afLTUStaRemoteRxPowerLevel0        Integer32,
+  afLTUStaRemoteRxPowerLevel1        Integer32,
+  afLTUStaRemoteLatency              Integer32,
+  afLTUStaRemoteDistance             Integer32,
+  afLTUStaRemoteConnectionTime       Counter64,
+  afLTUStaRemoteLastIp               IpAddress,
+  afLTUStaRemoteRegistrationAttempts Integer32
+}
+
+afLTUStaTxRate OBJECT-TYPE
+  SYNTAX     	Integer32
+  UNITS       "x"
+  MAX-ACCESS 	read-write
+  STATUS 	    current
+  DESCRIPTION "Current select Tx modulation"
+  ::= { afLTUStationEntry 1 }
+
+afLTUStaRxRate OBJECT-TYPE
+  SYNTAX     	Integer32
+  UNITS       "x"
+  MAX-ACCESS 	read-write
+  STATUS 	    current
+  DESCRIPTION "Current select Rx modulation"
+  ::= { afLTUStationEntry 2 }
+
+afLTUStaTxCapacity OBJECT-TYPE
+  SYNTAX	    Integer32
+  UNITS       "Kbps"
+  MAX-ACCESS 	read-only
+  STATUS 	    current
+  DESCRIPTION 	"Transmit Capacity."
+  ::= { afLTUStationEntry 3 }
+
+afLTUStaRxCapacity OBJECT-TYPE
+  SYNTAX	    Integer32
+  UNITS       "Kbps"
+  MAX-ACCESS 	read-only
+  STATUS 	    current
+  DESCRIPTION 	"Receive Capacity."
+  ::= { afLTUStationEntry 4 }
+
+afLTUStaRxPower0 OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "dBm"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Measured receive chain0 strength in dBm"
+  ::= { afLTUStationEntry 5 }
+
+afLTUStaRxPower1 OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "dBm"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Measured receive chain1 strength in dBm"
+  ::= { afLTUStationEntry 6 }
+
+afLTUStaIdealRxPower0 OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "dBm"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "The ideal chain0 receive power in dBm."
+  ::= { afLTUStationEntry 7 }
+
+afLTUStaIdealRxPower1 OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "dBm"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "The ideal chain1 receive power in dBm."
+  ::= { afLTUStationEntry 8 }
+
+afLTUStaRxPowerLevel0 OBJECT-TYPE
+  SYNTAX        Integer32 (-1..100)
+  UNITS         "%"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Measuared receive chain0 strength in % measured. 100% means that the measured received power is equal to the ideal power. -1 means that we are not able to get the information."
+  ::= { afLTUStationEntry 9 }
+
+afLTUStaRxPowerLevel1 OBJECT-TYPE
+  SYNTAX        Integer32 (-1..100)
+  UNITS         "%"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Mresuared receive chain1 strength in %. 100% means that the measured received power is equal to the ideal power. -1 means that we are not able to get the information."
+  ::= { afLTUStationEntry 10 }
+
+afLTUStaRemoteMac OBJECT-TYPE
+  SYNTAX        MacAddress
+  MAX-ACCESS    not-accessible
+  STATUS        current
+  DESCRIPTION   "The MAC address of the remote station"
+  ::= { afLTUStationEntry 11 }
+
+afLTUStaRemoteDevModel OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "The device model of the remote station"
+  ::= { afLTUStationEntry 12 }
+
+afLTUStaRemoteDevName OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "The device name of the remote station."
+  ::= { afLTUStationEntry 13 }
+
+afLTUStaRemoteFirmwareVersion OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "The firmware version of the remote station."
+  ::= { afLTUStationEntry 14 }
+
+afLTUStaRemoteTxEIRP OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "dBm"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Remote Station transmit signal strength in dBm."
+  ::= { afLTUStationEntry 15 }
+
+afLTUStaRemoteRxPower0 OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "dBm"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Measured receive chain0 strength in dBm at remote"
+  ::= { afLTUStationEntry 16 }
+
+afLTUStaRemoteRxPower1 OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "dBm"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Measured receive chain1 strength in dBm at remote"
+  ::= { afLTUStationEntry 17 }
+
+afLTUStaRemoteIdealRxPower0 OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "dBm"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "The ideal chain0 receive power in dBm at remote."
+  ::= { afLTUStationEntry 18 }
+
+afLTUStaRemoteIdealRxPower1 OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "dBm"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "The ideal chain1 receive power in dBm at remote."
+  ::= { afLTUStationEntry 19 }
+
+afLTUStaRemoteRxPowerLevel0 OBJECT-TYPE
+  SYNTAX        Integer32 (-1..100)
+  UNITS         "%"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Remoate measuared receive chain0 strength in % measured. 100% means that the measured received power is equal to the ideal power. -1 means that we are not able to get the information."
+  ::= { afLTUStationEntry 20 }
+
+afLTUStaRemoteRxPowerLevel1 OBJECT-TYPE
+  SYNTAX        Integer32 (-1..100)
+  UNITS         "%"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Remoate measuared receive chain1 strength in % measured. 100% means that the measured received power is equal to the ideal power. -1 means that we are not able to get the information."
+  ::= { afLTUStationEntry 21 }
+
+afLTUStaRemoteLatency OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "ms"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Remote Station latency in milliseconds."
+  ::= { afLTUStationEntry 22 }
+
+afLTUStaRemoteDistance OBJECT-TYPE
+  SYNTAX        Integer32
+  UNITS         "km"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Remote Station distance in kilometers."
+  ::= { afLTUStationEntry 23 }
+
+afLTUStaRemoteConnectionTime OBJECT-TYPE
+  SYNTAX        Counter64
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Remote Station connection time of current session."
+  ::= { afLTUStationEntry 24 }
+
+afLTUStaRemoteLastIp OBJECT-TYPE
+  SYNTAX        IpAddress
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Remote Station last known IP address."
+  ::= { afLTUStationEntry 25 }
+
+afLTUStaRemoteRegistrationAttempts OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Remote Station registration attempts."
+  ::= { afLTUStationEntry 26 }
+
+--=== AFLTU Statistics
+
+afLTUTxBytes OBJECT-TYPE
+  SYNTAX        Counter64
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Total tx bytes."
+  ::= { afLTUStats 1 }
+
+afLTUTxPps OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "packet per second for tx."
+  ::= { afLTUStats 2 }
+
+afLTURxBytes OBJECT-TYPE
+  SYNTAX        Counter64
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Total tx bytes."
+  ::= { afLTUStats 3 }
+
+afLTURxPps OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "packet per second for rx."
+  ::= { afLTUStats 4 }
+
+afLTUConnected OBJECT-TYPE
+  SYNTAX        INTEGER  {
+                disconnected  (0),
+                connected   (1)
+                }
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION "Radio connected"
+  ::= { afLTUStats 5 }
+
+--=== AFLTU ethernet port Statistics
+
+afLTUethTxBytes OBJECT-TYPE
+  SYNTAX        Counter64
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Total tx bytes."
+  ::= { afLTUethStats 1 }
+
+afLTUethTxPps OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "packet per second for tx."
+  ::= { afLTUethStats 2 }
+
+afLTUethRxBytes OBJECT-TYPE
+  SYNTAX        Counter64
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "Total tx bytes."
+  ::= { afLTUethStats 3 }
+
+afLTUethRxPps OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "packet per second for rx."
+  ::= { afLTUethStats 4 }
+
+afLTUethConnected OBJECT-TYPE
+  SYNTAX        INTEGER  {
+                disconnected  (0),
+                connected   (1)
+                }
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION "Ethernet Data port plugged"
+  ::= { afLTUethStats 5 }
+
+--=== AFLTU gps Statistics
+afLTUgpsStatus OBJECT-TYPE
+  SYNTAX        INTEGER {
+                absent(0),
+                off(1),
+                on(2)
+                }
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "GPS status"
+  ::= { afLTUgpsStats 1 }
+
+afLTUgpsDimensions OBJECT-TYPE
+  SYNTAX        INTEGER {
+                unknown(0),
+                nofix(1),
+                fix2d(2),
+                fix3d(3)
+                }
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "GPS Fix Obtained"
+  ::= { afLTUgpsStats 2 }
+
+afLTUgpsLat OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "GPS Latitude"
+  ::= { afLTUgpsStats 3 }
+
+afLTUgpsLon OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "GPS Longitude"
+  ::= { afLTUgpsStats 4 }
+
+afLTUgpsAltMeter OBJECT-TYPE
+  SYNTAX        DisplayString
+  UNITS         "(m)"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "GPS Altitude (m)"
+  ::= { afLTUgpsStats 5 }
+
+afLTUgpsAltFeet OBJECT-TYPE
+  SYNTAX        DisplayString
+  UNITS         "(ft)"
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "GPS Altitude (ft)"
+  ::= { afLTUgpsStats 6 }
+
+afLTUgpsSatsVisible OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "GPS Satellites Visible"
+  ::= { afLTUgpsStats 7 }
+
+afLTUgpsSatsTracked OBJECT-TYPE
+  SYNTAX        Integer32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "GPS Satellites Tracked"
+  ::= { afLTUgpsStats 8 }
+
+afLTUgpsHDOP OBJECT-TYPE
+  SYNTAX        DisplayString
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION   "GPS Horizontal Dilution of Precision"
+  ::= { afLTUgpsStats 9 }
+
+ubntAFLTUStatusGroup OBJECT-GROUP OBJECTS {
+  afLTURole,
+  afLTUFrequency,
+  afLTUAltFreqList,
+  afLTUBandwidth,
+  afLTUSsid,
+  afLTUTxEIRP,
+  afLTUAntennaGain,
+  afLTUCableLoss,
+  afLTUTxRate,
+  afLTUTxRateAuto,
+  afLTUDistanceScale,
+  afLTUMac,
+  afLTUDevModel,
+  afLTUDevName,
+  afLTUFirmwareVersion,
+  afLTUMemoryUsage,
+  afLTUCpuUsage,
+  afLTUUptime,
+  afLTUTxBytes,
+  afLTUTxPps,
+  afLTURxBytes,
+  afLTURxPps,
+  afLTUConnected,
+  afLTUethTxBytes,
+  afLTUethTxPps,
+  afLTUethRxBytes,
+  afLTUethRxPps,
+  afLTUethConnected,
+  afLTUgpsStatus,
+  afLTUgpsDimensions,
+  afLTUgpsLat,
+  afLTUgpsLon,
+  afLTUgpsAltMeter,
+  afLTUgpsAltFeet,
+  afLTUgpsSatsVisible,
+  afLTUgpsSatsTracked,
+  afLTUgpsHDOP,
+  afLTUStaTxRate,
+  afLTUStaRxRate,
+  afLTUStaTxCapacity,
+  afLTUStaRxCapacity,
+  afLTUStaRxPower0,
+  afLTUStaRxPower1,
+  afLTUStaIdealRxPower0,
+  afLTUStaIdealRxPower1,
+  afLTUStaRxPowerLevel0,
+  afLTUStaRxPowerLevel1,
+  afLTUStaRemoteDevModel,
+  afLTUStaRemoteDevName,
+  afLTUStaRemoteFirmwareVersion,
+  afLTUStaRemoteTxEIRP,
+  afLTUStaRemoteRxPower0,
+  afLTUStaRemoteRxPower1,
+  afLTUStaRemoteIdealRxPower0,
+  afLTUStaRemoteIdealRxPower1,
+  afLTUStaRemoteRxPowerLevel0,
+  afLTUStaRemoteRxPowerLevel1,
+  afLTUStaRemoteLatency,
+  afLTUStaRemoteDistance,
+  afLTUStaRemoteConnectionTime,
+  afLTUStaRemoteLastIp,
+  afLTUStaRemoteRegistrationAttempts}
+  STATUS current
+  DESCRIPTION "Status and statistics for AirFiberLTU monitoring"
+  ::= { afLTUGroups 1 }
+
+ubntAFLTUStatusCompliance MODULE-COMPLIANCE
+  STATUS        current
+  DESCRIPTION   "The compliance statement for Ubiquiti AirFiberLTU entities."
+  MODULE
+  GROUP         ubntAFLTUStatusGroup
+  DESCRIPTION   "This group is for Ubiquiti systems."
+  ::= { afLTUGroups 2 }
+END

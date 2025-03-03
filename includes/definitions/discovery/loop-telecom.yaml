@@ -1,0 +1,148 @@
+mib: L-AM3440-A-Private
+modules:
+  os:
+    hardware_mib: L-AM3440-A-Private
+    serial: L-AM3440-A-Private::ccSerialNumber.0
+    version: L-AM3440-A-Private::ccPROMVersion.0
+  sensors:
+    state:
+      data:
+        - oid: dualPowerTable
+          value: power1Status
+          state_name: power1Status
+          num_oid: ".1.3.6.1.4.1.823.34441.1.10.3.{{ $index }}"
+          index: "power1Status.{{ $index }}"
+          descr: Power 1 Status
+          group: Power Information
+          states:
+            - { value: 1, generic: 1, graph: 0, descr: "Off" }
+            - { value: 2, generic: 0, graph: 0, descr: dc-100w }
+            - { value: 3, generic: 0, graph: 0, descr: dc-150w }
+            - { value: 4, generic: 2, graph: 0, descr: dc-150w }
+            - { value: 5, generic: 0, graph: 0, descr: ac }
+            - { value: 6, generic: 3, graph: 0, descr: none }
+            - { value: 7, generic: 0, graph: 0, descr: dc-125v }
+
+        - oid: dualPowerTable
+          value: power2Status
+          num_oid: ".1.3.6.1.4.1.823.34441.1.10.4.{{ $index }}"
+          index: "power2Status.{{ $index }}"
+          descr: Power 2 Status
+          group: Power Information
+          states:
+            - { value: 1, generic: 1, graph: 0, descr: "Off" }
+            - { value: 2, generic: 0, graph: 0, descr: dc-100w }
+            - { value: 3, generic: 0, graph: 0, descr: dc-150w }
+            - { value: 4, generic: 2, graph: 0, descr: dc-150w }
+            - { value: 5, generic: 0, graph: 0, descr: ac }
+            - { value: 6, generic: 3, graph: 0, descr: none }
+            - { value: 7, generic: 0, graph: 0, descr: dc-125v }
+
+        - oid: ccConsoleStatus
+          num_oid: ".1.3.6.1.4.1.823.34441.1.4.21.{{ $index }}"
+          index: 'ccConsoleStatus.{{ $index }}'
+          descr: Console state
+          group: Remote access
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'No active users' }
+            - { value: 3, generic: 2, graph: 0, descr: 'Console is locked' }
+            - { value: 4, generic: 0, graph: 0, descr: 'Console is active' }
+            - { value: 10, generic: 0, graph: 0, descr: telnet1-login }
+            - { value: 11, generic: 0, graph: 0, descr: telnet2-login }
+            - { value: 12, generic: 0, graph: 0, descr: telnet3-login }
+            - { value: 13, generic: 0, graph: 0, descr: telnet4-login }
+            - { value: 14, generic: 0, graph: 0, descr: telnet5-login }
+            - { value: 15, generic: 0, graph: 0, descr: ssh1-active }
+            - { value: 16, generic: 0, graph: 0, descr: ssh2-active }
+            - { value: 17, generic: 0, graph: 0, descr: ssh3-active }
+            - { value: 18, generic: 0, graph: 0, descr: ssh4-active }
+            - { value: 19, generic: 0, graph: 0, descr: ssh5-active }
+
+        - oid: ccConsoleLockoutState
+          num_oid: ".1.3.6.1.4.1.823.34441.1.4.34.{{ $index }}"
+          index: 'ccConsoleLockoutState.{{ $index }}'
+          descr: Local console state
+          group: Remote access
+          states:
+            - { value: 1, generic: 2, graph: 0, descr: 'Locked' }
+            - { value: 2, generic: 0, graph: 0, descr: 'Open' }
+
+        - oid:  ccTelnetLockoutState
+          num_oid: ".1.3.6.1.4.1.823.34441.1.4.35.{{ $index }}"
+          index: 'ccTelnetLockoutState.{{ $index }}'
+          descr: Remote console state
+          group: Remote access
+          states:
+            - { value: 1, generic: 2, graph: 0, descr: 'Locked' }
+            - { value: 2, generic: 0, graph: 0, descr: 'Open' }
+
+    power:
+      data:
+        - oid:  dualPowerTable
+          value: powerConsumption
+          num_oid: ".1.3.6.1.4.1.823.34441.1.10.5.{{ $index }}"
+          index: "powerConsumption.{{ $index }}"
+          descr: Power consumption
+    temperature:
+      data:
+        - oid: c1Temperature
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.11.{{ $index }}'
+          snmp_flags: '-OQUsb'
+          index: 'c1Temperature.{{ $index }}'
+          descr: Chassis 1
+          high_limit: 90
+
+        - oid:  dpwmTemperature
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.16.{{ $index }}'
+          snmp_flags: '-OQUsb'
+          index: ' dpwmTemperature.{{ $index }}'
+          descr: DPWM Temperature
+          high_limit: 90
+
+    voltage:
+      data:
+        - oid: dpwmInputVoltage
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.15.{{ $index }}'
+          descr:  DWMP Input Voltage
+          index: 'dpwmInputVoltage.{{ $index }}'
+
+        - oid: dpwmCH0Voltage
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.17.{{ $index }}'
+          descr:  DWMP Chanel 0 Voltage
+          index: 'dpwmCH0Voltage.{{ $index }}'
+
+        - oid: dpwmCH1Voltage
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.18.{{ $index }}'
+          descr:  DWMP Chanel 1 Voltage
+          index: 'dpwmCH1Voltage.{{ $index }}'
+
+        - oid: dpwmCH2Voltage
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.19.{{ $index }}'
+          descr:  DWMP Chanel 2 Voltage
+          index: 'dpwmCH2Voltage.{{ $index }}'
+
+        - oid: dpwmCH3Voltage
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.20.{{ $index }}'
+          descr:  DWMP Chanel 3 Voltage
+          index: 'dpwmCH3Voltage.{{ $index }}'
+    current:
+      data:
+        - oid: dpwmCH0Current
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.21.{{ $index }}'
+          descr:  DWMP Chanel 0 current
+          index: 'dpwmCH0Current.{{ $index }}'
+
+        - oid: dpwmCH1Current
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.22.{{ $index }}'
+          descr:  DWMP Chanel 1 current
+          index: 'dpwmCH1Current.{{ $index }}'
+
+        - oid: dpwmCH2Current
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.23.{{ $index }}'
+          descr:  DWMP Chanel 2 current
+          index: 'dpwmCH2Current.{{ $index }}'
+
+        - oid: dpwmCH3Current
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.24.{{ $index }}'
+          descr:  DWMP Chanel 3 current
+          index: 'dpwmCH3Current.{{ $index }}'

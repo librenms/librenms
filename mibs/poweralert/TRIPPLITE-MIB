@@ -352,7 +352,7 @@ tlUpsAlarmLoadLevelAboveThreshold OBJECT-IDENTITY
     "The load level is above the designated threshold."
   ::= { tlUpsWellKnownAlarms 3 }
 
-tlUpsAlarmOutputCurrentChanged OBJECT_IDENTITY
+tlUpsAlarmOutputCurrentChanged OBJECT-IDENTITY
   STATUS current
   DESCRIPTION
     "The output current changed from its last known value."

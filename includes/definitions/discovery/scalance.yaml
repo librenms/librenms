@@ -1,0 +1,171 @@
+mib: SN-MSPS-SCX200-MIB
+modules:
+    os:
+        sysDescr_regex: '/SCALANCE (?<hardware>[^,]+), (?<features>[^,]+)/'
+        serial: '.1.3.6.1.4.1.4329.6.3.2.1.1.3.0'
+        version: '.1.3.6.1.4.1.4329.6.3.2.1.1.5.0'
+#    processors:
+#        data:
+#            -
+#                # snMspsDiagnosticsUsageTable contains multiple disaparate items with no formal type identifiers, specific OIDs used
+#                oid: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue.0
+#                num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.0'
+#                snmp_flags: ['-OaeQUs', '-Pu'] # display name HEX as ASCII
+#    mempools:
+#        pre-cache:
+#            data:
+#                -
+#                    oid:
+#                        - SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageName 
+#        data:
+#            -
+#
+#            #oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.1'
+#                percent_used: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue
+#                warn_percent: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageHighWarning
+#                #index: 1
+#                skip_values:
+#                    -
+#                        oid: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageName
+#                        op: 'regex'
+#                        value: '/CPU/'
+#                        #-
+#                        #oid: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue.0
+#                        #op: 'exists'
+#                        #value: true
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ifName
+                        #- snMspsKeyPlugHwSerialNumber
+        temperature:
+            data:
+                -
+                    oid: snMspsDiagnosticsTemperatureTable
+                    value: snMspsDiagnosticsTemperatureValue
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.79.7.1.16.{{ $index }}'
+                    descr: snMspsDiagnosticsTemperatureName
+                    snmp_flags: ['-OaeQUs', '-Pu'] # display name HEX as ASCII
+                    index: snMspsDiagnosticsTemperatureValue.{{ $index }}
+        dbm:
+            data:
+                -
+                    oid: snMspsSfpTable
+                    value: snMspsSfpTxPowerdBm
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.46.10.1.35.{{ $index }}'
+                    divisor: 10
+                    descr: '{{ $ifName }} Transmit Power'
+                    index: 'snMspsSfpTxPowerdBm.{{ $index }}'
+                    low_limit: snMspsSfpTxPowerMindBm
+                    high_limit: snMspsSfpTxPowerMaxdBm
+                    skip_values:
+                        -
+                            oid: snMspsSfpStatus
+                            op: '=='
+                            value: 2 # false
+
+                -
+                    oid: snMspsSfpTable
+                    value: snMspsSfpRxPowerdBm
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.46.10.1.32.{{ $index }}'
+                    divisor: 10
+                    descr: '{{ $ifName }} Receive Power'
+                    index: 'snMspsSfpRxPowerdBm.{{ $index }}'
+                    low_limit: snMspsSfpTxPowerMindBm
+                    high_limit: snMspsSfpTxPowerMaxdBm
+                    skip_values:
+                        -
+                            oid: snMspsSfpStatus
+                            op: '=='
+                            value: 2 # false
+        voltage:
+            data:
+                -   
+                    oid: snMspsSfpTable
+                    value: snMspsSfpVoltage
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.46.10.1.13.{{ $index }}'
+                    divisor: 100
+                    descr: '{{ $ifName }} Supply Voltage'
+                    index: 'snMspsSfpVoltage.{{ $index }}'
+                    low_limit: snMspsSfpVoltageMin
+                    high_limit: snMspsSfpVoltageMax
+                    skip_values:
+                        -
+                            oid: snMspsSfpStatus
+                            op: '=='
+                            value: 2 # false
+        current:
+            data:
+                -   
+                    oid: snMspsSfpTable
+                    value: snMspsSfpCurrent
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.46.10.1.16.{{ $index }}'
+                    divisor: 100000
+                    descr: '{{ $ifName }} Bias Current'
+                    index: 'snMspsSfpCurrent.{{ $index }}'
+                    low_limit: snMspsSfpCurrentMin
+                    high_limit: snMspsSfpCurrentMax
+                    skip_values:
+                        -
+                            oid: snMspsSfpStatus
+                            op: '=='
+                            value: 2 # false
+        state:
+            data:
+                -
+                    oid: snMspsFaultState
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.28.1.0'
+                    descr: "Faults"
+                    group: System
+                    state_name: "Faults"
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'noFault' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'fault' }
+                -
+                    oid: snMspsPowerSupply1State
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.28.4.{{ $index }}'
+                    descr: "Power Supply 1"
+                    group: Power
+                    state_name: "Power Supply 1"
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'active' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'inactive' }
+                -
+                    oid: snMspsPowerSupply2State
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.28.5.{{ $index }}'
+                    descr: "Power Supply 2"
+                    group: Power
+                    state_name: "Power Supply 2"
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'active' }
+                        - { value: 1, generic: 2, graph: 0, descr: 'inactive' }
+                -
+                    oid: snMspsCplugState
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.35.1.0'
+                    descr: 'C-Plug'
+                    group: Plugs
+                    state_name: "C-Plug"
+                    states:
+                        - { value: 1, generic: 2, graph: 0 , descr: 'notPresent' }
+                        - { value: 4, generic: 2, graph: 0, descr: 'notAccepted' }
+                        - { value: 5, generic: 0, graph: 1, descr: 'accepted' }
+                        - { value: 6, generic: 2, graph: 0, descr: 'factory' }
+                        - { value: 7, generic: 2, graph: 0, descr: 'missing' }
+# probable KEY-PLUG only supported for Scalance W series
+#                -
+#                    oid: snMspsKeyPlugState
+#                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.35.1.0'
+#                    descr: 'KEY-PLUG [{{ $snMspsKeyPlugHwSerialNumber }}]'
+#                    group: Plugs
+#                    state_name: "KEY-Plug"
+#                    states:
+#                        - { value: 1, generic: 2, graph: 0 , descr: 'notPresent' }
+#                        - { value: 4, generic: 2, graph: 0, descr: 'notAccepted' }
+#                        - { value: 5, generic: 0, graph: 0, descr: 'accepted' }
+#                        - { value: 7, generic: 2, graph: 0, descr: 'missing' }
+#                        - { value: 8, generic: 2, graph: 0, descr: 'wrong' }
+#                        - { value: 9, generic: 2, graph: 0, descr: 'unknown' }
+#                        - { value: 10, generic: 2, graph: 0, descr: 'defective' }
+# END

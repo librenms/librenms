@@ -1,0 +1,738 @@
+-- --------------------------------------------------------------------
+-- Ascom IPDect MIB
+--
+-- Copyright (c) 2007-2013, Ascom Sweden AB.
+-- All rights reserved.
+-- *****************************************************************
+ASCOM-IPDECT-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+MODULE-IDENTITY, OBJECT-TYPE,NOTIFICATION-TYPE, IpAddress, enterprises FROM SNMPv2-SMI
+OBJECT-GROUP FROM SNMPv2-CONF
+ifIndex FROM RFC1213-MIB;
+
+
+ascomIpdectMIB MODULE-IDENTITY
+LAST-UPDATED "1310070000Z"
+ORGANIZATION "Ascom Sweden AB"
+CONTACT-INFO
+"Ascom Sweden AB
+P.O. Box 8783
+SE-402 76 Gothenburg
+Phone: +46 31 559 300"
+
+DESCRIPTION
+"Updated ipDectFaultCode, ipDectAlarmCode"
+REVISION "1706270000Z"
+DESCRIPTION
+"Ascom IPDect MIB"
+REVISION "1702150000Z"
+DESCRIPTION
+"Added masterAbnormalCallRelease"
+REVISION "1401170000Z"
+DESCRIPTION
+"Added dectMasterConnectionTimeout"
+REVISION "1310070000Z"
+DESCRIPTION
+"Added masterActive, masterInactive"
+REVISION "1310040000Z"
+DESCRIPTION
+"Added dectCipherTimeout, masterLimitStaticRadiosReached"
+REVISION "1305140000Z"
+DESCRIPTION
+"Added configPutFailed"
+REVISION "1305070000Z"
+DESCRIPTION
+"Updated ipDectFaultCode, ipDectAlarmCode"
+REVISION "1304220000Z"
+DESCRIPTION
+"Updated ipDectFaultCode, ipDectAlarmCode"
+REVISION "1209110000Z"
+DESCRIPTION
+"Removed underscores from enum values"
+REVISION "1208310000Z"
+DESCRIPTION
+"Updated ipDectFaultCode, ipDectAlarmCode"
+REVISION "1011230000Z"
+DESCRIPTION
+"Updated ipDectFaultCode, ipDectAlarmCode"
+REVISION "1006170000Z"
+DESCRIPTION
+"Updated ipDectFaultCode, ipDectAlarmCode"
+REVISION "0809250000Z"
+DESCRIPTION
+"Updated ipDectFaultCode, ipDectAlarmCode"
+REVISION "0712010000Z"
+DESCRIPTION
+"First draft of the Ascom IPDect MIB"
+REVISION "0712010000Z"
+DESCRIPTION
+"Initial version of this MIB module."
+::= { ascomIpdect 1 }
+
+
+ascom OBJECT IDENTIFIER ::= { enterprises 27614}
+ascomTraps OBJECT IDENTIFIER ::= { ascom 0 }
+ascomMibs OBJECT IDENTIFIER ::= { ascom 1 }
+ascomIpdect OBJECT IDENTIFIER ::= { ascomMibs 1 }
+
+ipDectAttr OBJECT IDENTIFIER ::= { ascomIpdectMIB 1 }
+ipDectFaults OBJECT IDENTIFIER ::= { ascomIpdectMIB 2 }
+
+
+ipDectFaultLogEntries OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Number of rows in ipDectFaultLogTable."
+	::= { ipDectAttr 1 }
+
+ipDectAlarmLogEntries OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Number of rows in ipDectActiveAlarmsTable."
+	::= { ipDectAttr 2 }
+
+
+ipDectLastErrorCode OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Last error code reported in one of the traps."
+	::= { ipDectAttr 3 }
+	 
+	 
+--
+-- IP DECT Fault Log
+--
+
+ipDectFaultLogTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IpDectFaultLogEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Table used for reading the fault log."
+	::= { ipDectFaults 1 }
+
+
+ipDectFaultLogEntry OBJECT-TYPE
+	SYNTAX IpDectFaultLogEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Each entry in this table contains an entry from the fault log. "
+	INDEX { ipDectFaultIndex  }
+	::= { ipDectFaultLogTable 1 }
+
+
+IpDectFaultLogEntry ::=
+	SEQUENCE {
+		ipDectFaultIndex INTEGER,
+		ipDectFaultDate OCTET STRING,
+		ipDectFaultTime OCTET STRING,
+		ipDectFaultActivity INTEGER,
+		ipDectFaultCode INTEGER,
+		ipDectFaultSeverity INTEGER,
+		ipDectFaultSource OCTET STRING,
+		ipDectFaultIp IpAddress,
+		ipDectFaultDescription OCTET STRING
+	}
+
+ipDectFaultIndex OBJECT-TYPE
+	SYNTAX INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The entry's position in the list."
+	::= { ipDectFaultLogEntry 1 }
+
+
+ipDectFaultDate OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Date the fault occurred."
+	::= { ipDectFaultLogEntry 2 }
+
+ipDectFaultTime OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Time of day the fault occurred."
+	::= { ipDectFaultLogEntry 3 }
+
+ipDectFaultActivity OBJECT-TYPE
+	SYNTAX INTEGER {
+		alarm(0),
+		alarmCleared(1),
+		alarmTimeout(2),
+		error(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Event, set or cleared."
+	::= { ipDectFaultLogEntry 4 }
+
+ipDectFaultCode OBJECT-TYPE
+	SYNTAX INTEGER {
+		gwInterfaceDown(65537),
+		gwRegDown(65538),
+		gwProtocolError(65539),
+		usersTheLdapReplicatorIsNotConnected(196609),
+		radioCpuResourcesAreNotAvailable(196865),
+		masterStandbyActive(197121),
+		masterUserRegDown(197122),
+		masterEmergencyRegDown(197123),
+		masterRadioRegDown(197124),
+		masterPrimaryOrRedundantTrunkIsDown(197125),
+		masterActive(197126),
+		masterInactive(197127),
+		masterLimitStaticRadiosReached(197128),
+		masterAbnormalCallRelease(197136),
+		mobmInboundMobmRegDown(197377),
+		mobmOutboundMobmRegDown(197378),
+		mobmMasterRegDown(197379),
+		mobmStandbyActive(197380),
+		cmInboundMobmRegDown(197633),
+		rtpNoMediaDataReceived(327681),
+		rtpExcessiveLossOfData(327682),
+		rtpWrongPayloadTypeReceived(327683),
+		rtpStunFailure(327684),
+		rtpSrtpAuthFailure(327685),
+		rtpSrtcpAuthFailure(327686),
+		rtpIceFailure(327688),
+		rtpSrtpAuthFailure(327689),
+		h323UnexpectedMessageReceived(393217),
+		h323StatusEnquiry(393218),
+		h323SignalingTCPFailed(393219),
+		h323SignalingTimeout(393220),
+		h323SrtpKeyMismatch(393221),
+		h323MediaIncompatible(393222),
+		sipNatDiscoverFailure(458753),
+		sipOverloadDetected(458755),
+		sipCoderSelectionFailure(458756),
+		sipMediaConfigFailure(458757),
+		sipDnsFailed(458758),
+		sipIntMediaNegotiationFailed(458759),
+		sipDnsFailed(458763),
+		webmInvalidUrl(524289),
+		webmCoderMissingInUrl(524290),
+		cmdRestart(720897),
+		tlsUnexpectedMessage(786698),
+		tlsUnexpectedMessage(786954),
+		tlsBadMac(786708),
+		tlsBadMac(786964),
+		tlsDecryptionFailed(786709),
+		tlsDecryptionFailed(786965),
+		tlsRecordOverflow(786710),
+		tlsRecordOverflow(786966),
+		tlsDecompressionFailure(786718),
+		tlsDecompressionFailure(786974),
+		tlsHandshakeFailure(786728),
+		tlsHandshakeFailure(786984),
+		tlsNoCertificate(786729),
+		tlsNoCertificate(786985),
+		tlsBadCertificate(786730),
+		tlsBadCertificate(786986),
+		tlsUnsupportedCertificate(786731),
+		tlsUnsupportedCertificate(786987),
+		tlsRevocedCertificate(786732),
+		tlsRevocedCertificate(786988),
+		tlsExpiredCertificate(786733),
+		tlsExpiredCertificate(786989),
+		tlsUnknownCertificate(786734),
+		tlsUnknownCertificate(786990),
+		tlsIllegalParameter(786735),
+		tlsIllegalParameter(786991),
+		tlsUnknownCA(786736),
+		tlsUnknownCA(786992),
+		tlsAccessDenied(786737),
+		tlsAccessDenied(786993),
+		tlsDecodeError(786738),
+		tlsDecodeError(786994),
+		tlsDecryptionError(786739),
+		tlsDecryptionError(786995),
+		tlsExportRestriction(786748),
+		tlsExportRestriction(787004),
+		tlsProtocolVersion(786758),
+		tlsProtocolVersion(787014),
+		tlsInsufficientSecurity(786759),
+		tlsInsufficientSecurity(787015),
+		tlsInternalError(786768),
+		tlsInternalError(787024),
+		tlsUserCancelled(786778),
+		tlsUserCancelled(787034),
+		tlsNoRenegotiation(786788),
+		tlsNoRenegotiation(787044),
+		kerberosServiceNotFound(787459),
+		kerberosServerUnreachable(787462),
+		kerberosCrossRealmFailure(787463),
+		x509SystemTimeNotSet(790528),
+		x509CertificateNearExpiration(790529),
+		rfpDisconnected(917505),
+		rfpMalfunctioning(917506),
+		rfpDisabled(917507),
+		rfpSwDlFailed(917508),
+		rfpUnsynchronized(917509),
+		rfpAlienSyncLost(917510),
+		rfpDetectedSysidCollision(917512),
+		rfpSyncMasterFailedToResynchronizeToReference(917513),
+		rfpRestarted(917514),
+		envHighTemperature(983041),
+		envHighPowerConsumption(983042),
+		envSupplyVoltageLow(983044),
+		envSupplyVoltageHigh(983048),
+		envFanFailure(983056),
+		syncRingBroken(1048577),
+		syncRefSignalLost(1048578),
+		syncLost(1048580),
+		syncUnsynchronizedToReference(1048584),
+		ipInterfaceDown(1114112),
+		ipInterfaceNotConfigured(1114113),
+		ipDhcpServerNotResponding(1114114),
+		ipInvalidUdpRtpPortRange(1114137),
+		ipInvalidUdpNatPortRange(1114138),
+		ipInvalidNatPortRange(1114139),
+		ipArpPoisoningDetected(1114177),
+		ipOutOfTcpNatPorts(1114182),
+		ipOutOfTcpPorts(1114183),
+		ipTcpBindError(1114185),
+		ipOutOfUdpRtpPorts(1114192),
+		ipOutOfUdpPorts(1114193),
+		ipUdpBindError(1114195),
+		ipNoRouteToDestination(1114202),
+		ipNoRouteToDestinationIfDown(1114203),
+		ipNoRouteToDestinationIfUnknown(1114204),
+		ipNoRouteToDestinationIfNotConfigured(1114205),
+		ipNoRouteToDestinationNoGateway(1114206),
+		ipNoRouteToDestinationLoop(1114207),
+		boxMemoryLow(1179649),
+		rfpBusyForSpeech(1310721),
+		dectDefEncKeyTimeout(1310821),
+		dectCipherTimeout(1310822),
+		dectMasterConnectionTimeout(1310823),
+		sysBusyForSpeech(1376257),
+		provisioningDataCommunicationsError(1638401),
+		provisioningDataCommunicationsPutError(1638402),
+		uniteCommunicationFailure(1703937),
+		cuniteCommunicationFailure(1704192),
+		icpConnectionDown(2097152),
+		updateScriptGetFailed(2162689),
+                bootGetFailed(2162690),
+                firmwareGetFailed(2162691),
+                configGetFailed(2162692),
+                bmcGetFailed(2162693),
+		configPutFailed(2162694)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+	"Fault code."
+	::= { ipDectFaultLogEntry 5 }
+
+
+ipDectFaultSeverity OBJECT-TYPE
+	SYNTAX INTEGER {
+		indeterminate(0),
+		major(1),
+		critical(2),
+		none(99)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indeterminate, major or critical."
+	::= { ipDectFaultLogEntry 6 }
+
+ipDectFaultSource OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The source of the fault."
+	::= { ipDectFaultLogEntry 7 }
+
+ipDectFaultIp OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The IP address where the fault occurred."
+	::= { ipDectFaultLogEntry 8 }
+
+ipDectFaultDescription OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Textual description of the fault."
+	::= { ipDectFaultLogEntry 9 }
+
+
+--
+-- IP DECT Active Alarms List
+--
+
+ipDectActiveAlarmsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IpDectActiveAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Table used for reading the active alarms."
+	::= { ipDectFaults 2 }
+
+
+ipDectActiveAlarmsEntry OBJECT-TYPE
+	SYNTAX IpDectActiveAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Each entry in this table contains an entry from the active alarms list. "
+	INDEX { ipDectActiveAlarmsIndex }
+	::= { ipDectActiveAlarmsTable 1 }
+
+
+
+IpDectActiveAlarmsEntry::=
+	SEQUENCE {
+		ipDectActiveAlarmsIndex INTEGER,
+		ipDectAlarmDate OCTET STRING,
+		ipDectAlarmTime OCTET STRING,
+		ipDectAlarmCode INTEGER,
+		ipDectAlarmSeverity INTEGER,
+		ipDectAlarmSource OCTET STRING,
+		ipDectAlarmIp IpAddress,
+		ipDectAlarmDescription OCTET STRING
+	}
+
+ipDectActiveAlarmsIndex OBJECT-TYPE
+	SYNTAX INTEGER (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The entry's position in the list."
+	::= { ipDectActiveAlarmsEntry 1 }
+
+
+ipDectAlarmDate OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Date the fault occurred."
+	::= { ipDectActiveAlarmsEntry 2 }
+
+ipDectAlarmTime OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Time of day the fault occurred."
+::= { ipDectActiveAlarmsEntry 3 }
+
+ipDectAlarmCode OBJECT-TYPE
+	SYNTAX INTEGER {
+		gwInterfaceDown(65537),
+		gwRegDown(65538),
+		gwProtocolError(65539),
+		usersTheLdapReplicatorIsNotConnected(196609),
+		radioCpuResourcesAreNotAvailable(196865),
+		masterStandbyActive(197121),
+		masterUserRegDown(197122),
+		masterEmergencyRegDown(197123),
+		masterRadioRegDown(197124),
+		masterPrimaryOrRedundantTrunkIsDown(197125),
+		masterActive(197126),
+		masterInactive(197127),
+		masterLimitStaticRadiosReached(197128),
+		masterAbnormalCallRelease(197136),
+		mobmInboundMobmRegDown(197377),
+		mobmOutboundMobmRegDown(197378),
+		mobmMasterRegDown(197379),
+		mobmStandbyActive(197380),
+		cmInboundMobmRegDown(197633),
+		rtpNoMediaDataReceived(327681),
+		rtpExcessiveLossOfData(327682),
+		rtpWrongPayloadTypeReceived(327683),
+		rtpStunFailure(327684),
+		rtpSrtpAuthFailure(327685),
+		rtpSrtcpAuthFailure(327686),
+		rtpIceFailure(327688),
+		rtpSrtpAuthFailure(327689),
+		h323UnexpectedMessageReceived(393217),
+		h323StatusEnquiry(393218),
+		h323SignalingTCPFailed(393219),
+		h323SignalingTimeout(393220),
+		h323SrtpKeyMismatch(393221),
+		h323MediaIncompatible(393222),
+		sipNatDiscoverFailure(458753),
+		sipOverloadDetected(458755),
+		sipCoderSelectionFailure(458756),
+		sipMediaConfigFailure(458757),
+		sipDnsFailed(458758),
+		sipIntMediaNegotiationFailed(458759),
+		sipDnsFailed(458763),
+		webmInvalidUrl(524289),
+		webmCoderMissingInUrl(524290),
+		cmdRestart(720897),
+		tlsUnexpectedMessage(786698),
+		tlsUnexpectedMessage(786954),
+		tlsBadMac(786708),
+		tlsBadMac(786964),
+		tlsDecryptionFailed(786709),
+		tlsDecryptionFailed(786965),
+		tlsRecordOverflow(786710),
+		tlsRecordOverflow(786966),
+		tlsDecompressionFailure(786718),
+		tlsDecompressionFailure(786974),
+		tlsHandshakeFailure(786728),
+		tlsHandshakeFailure(786984),
+		tlsNoCertificate(786729),
+		tlsNoCertificate(786985),
+		tlsBadCertificate(786730),
+		tlsBadCertificate(786986),
+		tlsUnsupportedCertificate(786731),
+		tlsUnsupportedCertificate(786987),
+		tlsRevocedCertificate(786732),
+		tlsRevocedCertificate(786988),
+		tlsExpiredCertificate(786733),
+		tlsExpiredCertificate(786989),
+		tlsUnknownCertificate(786734),
+		tlsUnknownCertificate(786990),
+		tlsIllegalParameter(786735),
+		tlsIllegalParameter(786991),
+		tlsUnknownCA(786736),
+		tlsUnknownCA(786992),
+		tlsAccessDenied(786737),
+		tlsAccessDenied(786993),
+		tlsDecodeError(786738),
+		tlsDecodeError(786994),
+		tlsDecryptionError(786739),
+		tlsDecryptionError(786995),
+		tlsExportRestriction(786748),
+		tlsExportRestriction(787004),
+		tlsProtocolVersion(786758),
+		tlsProtocolVersion(787014),
+		tlsInsufficientSecurity(786759),
+		tlsInsufficientSecurity(787015),
+		tlsInternalError(786768),
+		tlsInternalError(787024),
+		tlsUserCancelled(786778),
+		tlsUserCancelled(787034),
+		tlsNoRenegotiation(786788),
+		tlsNoRenegotiation(787044),
+		kerberosServiceNotFound(787459),
+		kerberosServerUnreachable(787462),
+		kerberosCrossRealmFailure(787463),
+		x509SystemTimeNotSet(790528),
+		x509CertificateNearExpiration(790529),
+		rfpDisconnected(917505),
+		rfpMalfunctioning(917506),
+		rfpDisabled(917507),
+		rfpSwDlFailed(917508),
+		rfpUnsynchronized(917509),
+		rfpAlienSyncLost(917510),
+		rfpDetectedSysidCollision(917512),
+		rfpSyncMasterFailedToResynchronizeToReference(917513),
+		rfpRestarted(917514),
+		envHighTemperature(983041),
+		envHighPowerConsumption(983042),
+		envSupplyVoltageLow(983044),
+		envSupplyVoltageHigh(983048),
+		envFanFailure(983056),
+		syncRingBroken(1048577),
+		syncRefSignalLost(1048578),
+		syncLost(1048580),
+		syncUnsynchronizedToReference(1048584),
+		ipInterfaceDown(1114112),
+		ipInterfaceNotConfigured(1114113),
+		ipDhcpServerNotResponding(1114114),
+		ipInvalidUdpRtpPortRange(1114137),
+		ipInvalidUdpNatPortRange(1114138),
+		ipInvalidNatPortRange(1114139),
+		ipArpPoisoningDetected(1114177),
+		ipOutOfTcpNatPorts(1114182),
+		ipOutOfTcpPorts(1114183),
+		ipTcpBindError(1114185),
+		ipOutOfUdpRtpPorts(1114192),
+		ipOutOfUdpPorts(1114193),
+		ipUdpBindError(1114195),
+		ipNoRouteToDestination(1114202),
+		ipNoRouteToDestinationIfDown(1114203),
+		ipNoRouteToDestinationIfUnknown(1114204),
+		ipNoRouteToDestinationIfNotConfigured(1114205),
+		ipNoRouteToDestinationNoGateway(1114206),
+		ipNoRouteToDestinationLoop(1114207),
+		boxMemoryLow(1179649),
+		rfpBusyForSpeech(1310721),
+		dectDefEncKeyTimeout(1310821),
+		dectCipherTimeout(1310822),
+		dectMasterConnectionTimeout(1310823),
+		sysBusyForSpeech(1376257),
+		provisioningDataCommunicationsError(1638401),
+		provisioningDataCommunicationsPutError(1638402),
+		uniteCommunicationFailure(1703937),
+		cuniteCommunicationFailure(1704192),
+		icpConnectionDown(2097152),
+		updateScriptGetFailed(2162689),
+                bootGetFailed(2162690),
+                firmwareGetFailed(2162691),
+                configGetFailed(2162692),
+                bmcGetFailed(2162693),
+		configPutFailed(2162694)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Fault code."
+	::= { ipDectActiveAlarmsEntry 4 }
+
+ipDectAlarmSeverity OBJECT-TYPE
+	SYNTAX INTEGER {
+		indeterminate(0),
+		major(1),
+		critical(2)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indeterminate, major or critical."
+	::= { ipDectActiveAlarmsEntry 5 }
+
+ipDectAlarmSource OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The source of the fault."
+	::= { ipDectActiveAlarmsEntry 6 }
+
+ipDectAlarmIp OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The IP-address where the fault occurred."
+	::= { ipDectActiveAlarmsEntry 7 }
+
+ipDectAlarmDescription OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Textual description of the fault."
+	::= { ipDectActiveAlarmsEntry 8 }
+
+
+---
+--- Traps
+---
+--- Refer to http://www.ietf.org/rfc/rfc1908.txt section 2.2 for more info on SNMP v1 traps vs. SNMP v2c notifications.
+
+ascomColdStart NOTIFICATION-TYPE
+STATUS current
+DESCRIPTION
+"A power cycle took place."
+::= { ascomTraps 0 }
+
+ascomWarmStart NOTIFICATION-TYPE
+STATUS current
+DESCRIPTION
+"The device has been reset administratively."
+::= { ascomTraps 1 }
+
+ascomLinkDown NOTIFICATION-TYPE
+OBJECTS { ifIndex }
+STATUS current
+DESCRIPTION
+"An interface link went down."
+::= { ascomTraps 2 }
+
+ascomLinkUp NOTIFICATION-TYPE
+OBJECTS { ifIndex }
+STATUS current
+DESCRIPTION
+"An interface link went up."
+::= { ascomTraps 3 }
+
+ascomAuthenticationFailure NOTIFICATION-TYPE
+STATUS current
+DESCRIPTION
+"An SNMP PDU with a wrong community string has been received."
+::= { ascomTraps 4 }
+
+ipDectSetCriticalAlarmTrap NOTIFICATION-TYPE
+OBJECTS { ipDectLastErrorCode }
+STATUS current
+DESCRIPTION
+"This trap is sent when a critical alarm has been set."
+::= { ascomTraps 11 }
+
+ipDectSetMajorAlarmTrap NOTIFICATION-TYPE
+OBJECTS { ipDectLastErrorCode }
+STATUS current
+DESCRIPTION
+"This trap is sent when a major alarm has been set."
+::= { ascomTraps 12 }
+
+ipDectSetMinorAlarmTrap NOTIFICATION-TYPE
+OBJECTS { ipDectLastErrorCode }
+STATUS current
+DESCRIPTION
+"This trap is sent when a minor alarm has been set."
+::= { ascomTraps 13 }
+
+ipDectSetIndeterminateAlarmTrap NOTIFICATION-TYPE
+OBJECTS { ipDectLastErrorCode }
+STATUS current
+DESCRIPTION
+"This trap is sent when an indeterminate alarm has been set."
+::= { ascomTraps 14 }
+
+ipDectClearAlarmTrap NOTIFICATION-TYPE
+OBJECTS { ipDectLastErrorCode }
+STATUS current
+DESCRIPTION
+"This trap is sent when an indeterminate alarm has been cleared."
+::= { ascomTraps 15 }
+
+ipDectCriticalFaultTrap NOTIFICATION-TYPE
+OBJECTS { ipDectLastErrorCode }
+STATUS current
+DESCRIPTION
+"This trap is sent when a critical error has occurred."
+::= { ascomTraps 16 }
+
+ipDectMajorFaultTrap NOTIFICATION-TYPE
+OBJECTS { ipDectLastErrorCode }
+STATUS current
+DESCRIPTION
+"This trap is sent when a major error has occurred."
+::= { ascomTraps 17 }
+
+ipDectMinorFaultTrap NOTIFICATION-TYPE
+OBJECTS { ipDectLastErrorCode }
+STATUS current
+DESCRIPTION
+"This trap is sent when a minor error has occurred.."
+::= { ascomTraps 18 }
+
+ipDectIndeterminateFaultTrap NOTIFICATION-TYPE
+OBJECTS { ipDectLastErrorCode }
+STATUS current
+DESCRIPTION
+"This trap is sent when an indeterminate error has occurred."
+::= { ascomTraps 19 }
+
+
+END
+
+

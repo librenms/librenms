@@ -1,0 +1,407 @@
+-- ################################################################################
+
+
+
+
+
+EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY FROM SNMPv2-SMI
+		OBJECT-TYPE     FROM SNMPv2-SMI
+		NOTIFICATION-TYPE FROM SNMPv2-SMI
+		Unsigned32	FROM SNMPv2-SMI
+		IpAddress         FROM SNMPv2-SMI
+                MacAddress, DateAndTime FROM SNMPv2-TC
+		sysUpTime, sysDescr, ifIndex, DisplayString   FROM RFC1213-MIB
+		TruthValue	FROM SNMPv2-TC
+                extremeAgent    FROM EXTREME-BASE-MIB
+		extremeCurrentTemperature	FROM EXTREME-SYSTEM-MIB;
+
+        extremeStackable MODULE-IDENTITY
+                LAST-UPDATED "201712061500Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme Stackable MIB objects"
+
+                REVISION "201712061500Z" -- Tue Dec 6 15:00 UTC 2017
+                DESCRIPTION "Change extremeStackingPortLinkSpeed description."
+
+                REVISION "201710101515Z" -- Tue Oct 10 15:15 UTC 2017
+                DESCRIPTION "Change extremeStackDetecton from read-write to read-only."
+
+                REVISION "201410131030Z" -- Mon Oct 13 10:30 UTC 2014
+                DESCRIPTION "Added table objects for current image booted and
+                             switch boot time."
+
+                REVISION "200409270915Z" -- Mon Sept 27 09:15 UTC 2004
+                DESCRIPTION "Initial version."
+        ::= { extremeAgent 33 }
+
+-- 
+-- Stack Detection Scalar 
+--
+	extremeStackDetection OBJECT-TYPE
+             SYNTAX TruthValue
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"This field provides the information as to whether the stacking
+             is enabled (True) or disabled (False) for the system. The stacking
+	     feature is supported from extremeware version 7.4 and above"
+		    ::= { extremeStackable 1 }
+
+--
+--	StackMember Table
+--
+
+	extremeStackMemberTable OBJECT-TYPE
+             SYNTAX SEQUENCE OF ExtremeStackMemberEntry
+	     MAX-ACCESS	not-accessible
+	     STATUS current
+	     DESCRIPTION
+		"A table containing information about each stack member that are
+             a part of this stacking. If extremeStackDetection is not enabled,
+             we wouldnt not have any rows for this table."
+		    ::= { extremeStackable 2 }
+
+	extremeStackMemberEntry OBJECT-TYPE
+	     SYNTAX ExtremeStackMemberEntry
+	     MAX-ACCESS not-accessible
+	     STATUS current
+	     DESCRIPTION
+		"Entry in the table for a StackMember Entity"
+	     INDEX	{ extremeStackMemberSlotId }
+	     	    ::= { extremeStackMemberTable 1 }
+
+	ExtremeStackMemberEntry ::= SEQUENCE {
+	     extremeStackMemberSlotId		INTEGER,
+	     extremeStackMemberType	        OBJECT IDENTIFIER,	
+	     extremeStackMemberOperStatus	INTEGER,
+	     extremeStackMemberRole		INTEGER,
+	     extremeStackMemberEntPhysicalIndex INTEGER,
+	     extremeStackMemberMACAddress       MacAddress,	
+	     extremeStackMemberCurImageVersion  DisplayString,
+	     extremeStackMemberPriImageVersion  DisplayString,
+	     extremeStackMemberSecImageVersion  DisplayString,
+	     extremeStackMemberBootRomVersion   DisplayString,
+	     extremeStackMemberCurConfig	DisplayString,
+	     extremeStackMemberConfigSelected	INTEGER,
+	     extremeStackMemberImageSelected	INTEGER,
+	     extremeStackMemberStackPriority	INTEGER,
+	     extremeStackMemberMgmtIpAddress	IpAddress,
+	     extremeStackMemberSysLocation      DisplayString,
+             extremeStackMemberAutoConfig	TruthValue, 	  
+	     extremeStackMemberStackStatus	INTEGER,
+	     extremeStackMemberImageBooted      INTEGER,
+	     extremeStackMemberBootTime         DateAndTime
+	}
+
+	extremeStackMemberSlotId OBJECT-TYPE
+	     SYNTAX INTEGER(1..8)
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The slot id of the stack member in the stack"
+	     	   ::= { extremeStackMemberEntry 1 }
+
+	extremeStackMemberType OBJECT-TYPE
+	     SYNTAX OBJECT IDENTIFIER
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The type of device of the stack member. This field reflects
+ 	    the individual sysOid of the member"
+	     	   ::= { extremeStackMemberEntry 2 }
+
+	extremeStackMemberOperStatus OBJECT-TYPE
+	     SYNTAX INTEGER {
+		up (1),
+		down(2),
+		mismatch (3)
+	     }
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The operational status of the stack member. When the stack 
+	comes up, if there is a vector mismatch namely license mismatch or
+	platform mismatch between the master and the member, the member
+	remains in the mismatch state. Further communication with the member
+	is not possible"
+	     	   ::= { extremeStackMemberEntry 3 }
+
+	extremeStackMemberRole OBJECT-TYPE
+	     SYNTAX INTEGER {
+		master (1),
+		slave  (2),
+		backup (3)
+	     }
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The role of the stack member as to whether it is acting as a
+	master,backup or a slave"
+	     	   ::= { extremeStackMemberEntry 4 }
+
+	extremeStackMemberEntPhysicalIndex OBJECT-TYPE
+	     SYNTAX INTEGER 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The entPhysicalIndex of the corresponding device as defined
+	in the ENTITY-MIB"
+	     	   ::= { extremeStackMemberEntry 5 }
+
+	extremeStackMemberMACAddress OBJECT-TYPE
+	     SYNTAX MacAddress 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The Mac address of the stack member"
+	     	   ::= { extremeStackMemberEntry 6 }
+
+	extremeStackMemberCurImageVersion OBJECT-TYPE
+	     SYNTAX DisplayString (SIZE(0..255)) 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The current image version of the stack member"
+	     	   ::= { extremeStackMemberEntry 7 }
+
+	extremeStackMemberPriImageVersion OBJECT-TYPE
+	     SYNTAX DisplayString (SIZE(0..255)) 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The primary image version of the stack member"
+	     	   ::= { extremeStackMemberEntry 8 }
+
+	extremeStackMemberSecImageVersion OBJECT-TYPE
+	     SYNTAX DisplayString (SIZE(0..255)) 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The secondary image version of the stack member"
+	     	   ::= { extremeStackMemberEntry 9 }
+
+	extremeStackMemberBootRomVersion OBJECT-TYPE
+	     SYNTAX DisplayString (SIZE(0..255)) 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The boot rom version of the stack member"
+	     	   ::= { extremeStackMemberEntry 10 }
+
+	extremeStackMemberCurConfig OBJECT-TYPE
+	     SYNTAX DisplayString (SIZE(0..255)) 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The current configuration of the stack member"
+	     	   ::= { extremeStackMemberEntry 11 }
+
+	extremeStackMemberConfigSelected OBJECT-TYPE
+	     SYNTAX INTEGER {
+		primary   (1),
+		secondary (2),
+		other     (3)
+	     }
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The config selected to be used on reboot for the stack member"
+	     	   ::= { extremeStackMemberEntry 12 }
+
+	extremeStackMemberImageSelected OBJECT-TYPE
+	     SYNTAX INTEGER {
+		primary   (1),
+		secondary (2)
+	     }
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The  image selected to be used on reboot for the stack member"
+	     	   ::= { extremeStackMemberEntry 13 }
+
+	extremeStackMemberStackPriority OBJECT-TYPE
+	     SYNTAX INTEGER 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The stack priority of the stack member. The stack priority is
+	used for the master election algorithm. The member with the highest 
+	priority comes up as the master. If there are more than one switch with
+	highest priority, the member with the least MAC among them comes up as
+	the master"
+	     	   ::= { extremeStackMemberEntry 14 }
+
+	extremeStackMemberMgmtIpAddress OBJECT-TYPE
+	     SYNTAX IpAddress 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The fallback mgmt ip address which was configured through CLI
+	for this stack member. This ipaddress can be used to communicate with 
+	this member, if it comes up as the master. The ipaddress is associated
+	with the vlan configured"
+	     	   ::= { extremeStackMemberEntry 15 }
+
+	extremeStackMemberSysLocation OBJECT-TYPE
+	      SYNTAX      DisplayString (SIZE (0..255))
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                  "The physical location of this node (e.g., `telephone
+        closet, 3rd floor').  If the location is unknown, the value
+        is the zero-length string."
+	     	   ::= { extremeStackMemberEntry 16 }
+
+	extremeStackMemberAutoConfig OBJECT-TYPE
+	     SYNTAX TruthValue
+	     MAX-ACCESS read-only
+	     STATUS 	current
+	     DESCRIPTION
+		   " This field provides the information whether the config
+	of the stack member is autogenerated(true) or not(false)" 
+	     	   ::= { extremeStackMemberEntry 17 }
+			
+
+	extremeStackMemberStackStatus OBJECT-TYPE
+	     SYNTAX INTEGER {
+		enable  (1),
+		disable (2)
+	     } 
+	     MAX-ACCESS read-write
+	     STATUS current
+	     DESCRIPTION
+		"This status is used for disabling the stacking feature for
+	the stack member. If stacking is enabled for the stack member we get
+	the information as enable, if we mark it as disable, the stack member
+	is removed from the stack and the corresponding row disappears"
+	     	   ::= { extremeStackMemberEntry 18 }
+
+        extremeStackMemberImageBooted OBJECT-TYPE
+             SYNTAX INTEGER { primary(1), secondary(2) }
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The image with which the stack member was last booted, which it is currently running."
+                   ::= { extremeStackMemberEntry 19 }
+
+        extremeStackMemberBootTime OBJECT-TYPE
+             SYNTAX  DateAndTime
+             MAX-ACCESS read-only
+             STATUS      current
+             DESCRIPTION
+                "The date and time when the switch was last booted."
+                   ::= { extremeStackMemberEntry 20 }
+
+--
+--  	Stacking Port Table
+--
+	extremeStackingPortTable OBJECT-TYPE
+             SYNTAX SEQUENCE OF ExtremeStackingPortEntry
+	     MAX-ACCESS	not-accessible
+	     STATUS current
+	     DESCRIPTION
+		"A table containing information about each stacking port
+	in the stack. If extremeStackDetection is not enabled, we would not
+	have any rows for this table"
+		    ::= { extremeStackable 3 }
+
+	extremeStackingPortEntry OBJECT-TYPE
+	     SYNTAX ExtremeStackingPortEntry
+	     MAX-ACCESS not-accessible
+	     STATUS current
+	     DESCRIPTION
+		"Entry in the table for each stacking port in the stack"
+	     INDEX	{ extremeStackingPortIfIndex }
+	     	    ::= { extremeStackingPortTable 1 }
+
+	ExtremeStackingPortEntry ::= SEQUENCE {
+	     extremeStackingPortIfIndex		INTEGER,
+	     extremeStackingPortRemoteMac       MacAddress,
+	     extremeStackingPortLinkSpeed	Unsigned32,
+	     extremeStackingPortLinkStatus	INTEGER
+	}
+
+          extremeStackingPortIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER(1..65535)
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "A unique value for each interface.  Its value
+                      ranges between 1 and the value of ifNumber.  The
+                      value for each interface must remain constant at
+                      least from one re-initialization of the entity's
+                      network management system to the next re-
+                      initialization."
+	     	   ::= { extremeStackingPortEntry 1 }
+
+	extremeStackingPortRemoteMac OBJECT-TYPE
+	     SYNTAX MacAddress 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The Mac address of the remote system, this stacking port 
+	is connected to. The value of the mac address will be 00:00:00:00:00:00
+	if the stacking link is not active."
+	     	   ::= { extremeStackingPortEntry 2 }
+
+	extremeStackingPortLinkSpeed OBJECT-TYPE
+	     SYNTAX Unsigned32 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The Speed of the stacking port link in Gbps."
+	     	   ::= { extremeStackingPortEntry 3 }
+
+	extremeStackingPortLinkStatus OBJECT-TYPE
+	     SYNTAX INTEGER {
+		up (1),
+		down  (2) 
+	    } 
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"The Link status of the stacking port link "
+	     	   ::= { extremeStackingPortEntry 4 }
+
+
+    extremeStackableTraps     OBJECT IDENTIFIER
+		    ::= { extremeStackable 4 }
+
+	extremeStackTrapsPrefix     OBJECT IDENTIFIER
+            ::= { extremeStackableTraps 0 }
+
+    extremeStackMemberOverheat NOTIFICATION-TYPE
+            OBJECTS {sysUpTime, sysDescr, extremeCurrentTemperature,
+			extremeStackMemberSlotId}
+            STATUS  current
+            DESCRIPTION
+                    "The extremeStackMemberOverheat notification is generated
+                     when the temperature of the stack member reaches the 
+		threshold temperature"
+                ::= { extremeStackTrapsPrefix 1 }
+
+    extremeStackMemberStatusChanged NOTIFICATION-TYPE
+            OBJECTS { extremeStackMemberSlotId, extremeStackMemberOperStatus}
+            STATUS  current
+            DESCRIPTION
+                    "The extremeStackMemberStatusChanged notification is 
+		generated when the operational status of the stack member 
+		changes"
+                ::= { extremeStackTrapsPrefix 2 }
+
+    extremeStackingPortStatusChanged NOTIFICATION-TYPE
+            OBJECTS { ifIndex, extremeStackingPortRemoteMac,
+		extremeStackingPortLinkSpeed, extremeStackingPortLinkStatus}
+            STATUS  current
+            DESCRIPTION
+                    "The extremeStackingPortStatusChanged notification is 
+		generated when the operational status of the stacking port 
+		changes"
+                ::= { extremeStackTrapsPrefix 3 }
+
+
+END

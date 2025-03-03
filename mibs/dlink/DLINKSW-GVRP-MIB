@@ -1,0 +1,405 @@
+--  *****************************************************************
+--  DLINKSW-GVRP-MIB.mib : GVRP MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+DLINKSW-GVRP-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,       
+        Unsigned32
+                FROM SNMPv2-SMI            
+        TruthValue,RowStatus
+                FROM SNMPv2-TC  
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF                            
+        dot1dBasePort
+                FROM BRIDGE-MIB  
+        Dlink2kVlanList                 
+                FROM DLINKSW-TC-MIB                 
+        dlinkIndustrialCommon           
+                FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwGvrpMIB MODULE-IDENTITY
+        LAST-UPDATED "201304170000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "         D-Link Corporation
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:    +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for GVRP."
+        REVISION "201304170000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file."           
+    ::= { dlinkIndustrialCommon 33 }
+    
+-- -----------------------------------------------------------------------------
+    dGvrpMIBNotifications     OBJECT IDENTIFIER ::= { dlinkSwGvrpMIB 0 }
+    dGvrpMIBObjects           OBJECT IDENTIFIER ::= { dlinkSwGvrpMIB 1 }
+    dGvrpMIBConformance       OBJECT IDENTIFIER ::= { dlinkSwGvrpMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dGvrpGlobalMgmt  OBJECT IDENTIFIER ::={dGvrpMIBObjects 1}        
+     
+    dGvrpDynamicVlanCreation OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether dynamic VLAN creation is enabled."
+        ::= { dGvrpGlobalMgmt 1 }
+
+    dGvrpNniGvrpBpduAddress OBJECT-TYPE
+        SYNTAX          INTEGER {
+            dot1d(1),
+            dot1ad(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the GVRP BPDU address in service provider
+            site.
+            'dot1d' - The GVRP BPDU protocol address is 802.1d GVRP address:
+                      01:80:CC:00:00:21
+            'dot1ad' - The GVRP BPDU protocol address is 802.1ad GVRP address:
+                      01:80:CC:00:00:0D
+            "
+       ::= { dGvrpGlobalMgmt 2 }
+
+-- -----------------------------------------------------------------------------                              
+    dGvrpInterface OBJECT IDENTIFIER ::= { dGvrpMIBObjects 2 }
+
+    dGvrpInterfaceTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DGvrpInterfaceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains the interface-specific GVRP parameters."
+        ::= { dGvrpInterface 1 }
+
+    dGvrpInterfaceEntry OBJECT-TYPE
+        SYNTAX          DGvrpInterfaceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates the GVRP parameters for a port/port-channel."
+        INDEX { dot1dBasePort }
+        ::= { dGvrpInterfaceTable 1 }
+
+    DGvrpInterfaceEntry ::=
+        SEQUENCE {           
+            dGvrpIfAdvertiseVlanLstFirst2K      Dlink2kVlanList, 
+            dGvrpIfAdvertiseVlanLstSecond2K     Dlink2kVlanList,
+            dGvrpIfForbiddenVlanLstFirst2K      Dlink2kVlanList, 
+            dGvrpIfForbiddenVlanLstSecond2K     Dlink2kVlanList
+        }
+   
+    dGvrpIfAdvertiseVlanLstFirst2K  OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the VLANs in a string of octets containing
+            one bit per VLAN for VLANs 1 to 2048. 
+            If the bit is set to '1', then the VLAN is allowed to be
+            advertised by the GVRP protocol on the interface.
+            "         
+        ::= { dGvrpInterfaceEntry 1 }
+    
+    dGvrpIfAdvertiseVlanLstSecond2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the VLANs in a string of octets containing
+            one bit per VLAN for VLANs 2049 to 4094. 
+            If the bit is set to '1', then the VLAN is allowed to be
+            advertised by the GVRP protocol on the interface.
+            "      
+        ::= { dGvrpInterfaceEntry 2 }     
+        
+    dGvrpIfForbiddenVlanLstFirst2K  OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the VLANs in a string of octets containing
+            one bit per VLAN for VLANs 1 to 2048. 
+            If the bit is set to '1', then the interface is forbidden to be the
+            VLAN's member."         
+        ::= { dGvrpInterfaceEntry 3 }
+    
+    dGvrpIfForbiddenVlanLstSecond2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the VLANs in a string of octets containing
+            one bit per VLAN for VLANs 2049 to 4094. 
+            If the bit is set to '1', then the interface is forbidden to be the
+            VLAN's member."      
+        ::= { dGvrpInterfaceEntry 4 }      
+        
+-- -----------------------------------------------------------------------------     
+    dGvrpStatistics OBJECT IDENTIFIER ::= { dGvrpMIBObjects 3 }      
+    
+    dGvrpClearAllStatistics OBJECT-TYPE
+        SYNTAX          INTEGER {
+            clear(1),
+            noOp(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to clear GVRP statistics on all interfaces when
+            set to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        ::= { dGvrpStatistics 1 }
+    
+-- -----------------------------------------------------------------------------
+    dGvrpIfStatisticsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DGvrpIfStatisticsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "This table contains the statistics for GVRP capable ports.
+            "
+        ::= { dGvrpStatistics 2 }
+
+    dGvrpIfStatisticsEntry OBJECT-TYPE
+        SYNTAX          DGvrpIfStatisticsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry represents the statistics of a GVRP capable port."
+        INDEX    { dot1dBasePort }
+        ::= { dGvrpIfStatisticsTable 1 }
+
+    DGvrpIfStatisticsEntry ::= SEQUENCE {        
+        dGvrpIfStatRxJoinEmpty      Unsigned32,
+        dGvrpIfStatRxJoinIn         Unsigned32,
+        dGvrpIfStatRxLeaveEmpty     Unsigned32,
+        dGvrpIfStatRxLeaveIn        Unsigned32,
+        dGvrpIfStatRxLeaveAll       Unsigned32,
+        dGvrpIfStatRxEmpty          Unsigned32,
+        dGvrpIfStatTxJoinEmpty      Unsigned32,
+        dGvrpIfStatTxJoinIn         Unsigned32,
+        dGvrpIfStatTxLeaveEmpty     Unsigned32,
+        dGvrpIfStatTxLeaveIn        Unsigned32,
+        dGvrpIfStatTxLeaveAll       Unsigned32,
+        dGvrpIfStatTxEmpty          Unsigned32,
+        dGvrpIfStatClear            INTEGER
+    }
+      
+    dGvrpIfStatRxJoinEmpty OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP JoinEmpty message received
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 1}
+
+    dGvrpIfStatRxJoinIn OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP JoinIn message received
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 2 }
+
+    dGvrpIfStatRxLeaveEmpty OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP LeaveEmpty message received
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 3 }
+
+    dGvrpIfStatRxLeaveIn OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP LeaveIn message received
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 4 }
+
+    dGvrpIfStatRxLeaveAll OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP LeaveAll message received
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 5 }
+
+    dGvrpIfStatRxEmpty OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP Empty message received
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 6 }
+
+    dGvrpIfStatTxJoinEmpty OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP JoinEmpty message transmitted
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 7 }
+
+    dGvrpIfStatTxJoinIn OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP JoinIn message transmitted
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 8 }
+
+    dGvrpIfStatTxLeaveEmpty OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP LeaveEmpty message transmitted
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 9 }
+
+    dGvrpIfStatTxLeaveIn OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP LeaveIn message transmitted
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 10 }
+
+    dGvrpIfStatTxLeaveAll OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP LeaveAll message transmitted
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 11 }
+
+    dGvrpIfStatTxEmpty OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of GVRP Empty message transmitted
+            on the interface."
+        ::= { dGvrpIfStatisticsEntry 12 }
+
+    dGvrpIfStatClear OBJECT-TYPE
+        SYNTAX  INTEGER {
+            clear(1),
+            noOp(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to clear GVRP statistics on the interface when
+            set to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        ::= { dGvrpIfStatisticsEntry 13 }
+
+--  *************************************************************************** 
+--  Conformance
+--  ***************************************************************************
+    dGvrpCompliances  OBJECT IDENTIFIER         ::= { dGvrpMIBConformance 1 }
+
+    dGvrpGroups  OBJECT IDENTIFIER        ::= { dGvrpMIBConformance 2 } 
+    
+    dGvrpCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+            DLINKSW-GVRP-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS    {   
+            dGvrpBasicCfgGroup
+        }
+        
+        GROUP dGvrpServiceProviderCfgGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            the VLAN tunnel.
+            "
+            
+        GROUP dGvrpStatisticsGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            the management of GVRP statistics.
+            "    
+            
+        ::= { dGvrpCompliances 1 }
+
+    dGvrpBasicCfgGroup OBJECT-GROUP
+        OBJECTS             {   
+            dGvrpDynamicVlanCreation,
+            dGvrpIfAdvertiseVlanLstFirst2K, 
+            dGvrpIfAdvertiseVlanLstSecond2K,
+            dGvrpIfForbiddenVlanLstFirst2K, 
+            dGvrpIfForbiddenVlanLstSecond2K
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects configures basic GVRP functions."
+        ::= { dGvrpGroups 1 }
+     
+    dGvrpServiceProviderCfgGroup OBJECT-GROUP
+        OBJECTS             {   
+            dGvrpNniGvrpBpduAddress
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects configures GVRP in service provider site."
+        ::= { dGvrpGroups 2 }
+
+    dGvrpStatisticsGroup OBJECT-GROUP
+        OBJECTS    {   
+            dGvrpClearAllStatistics,
+            dGvrpIfStatRxJoinEmpty, 
+            dGvrpIfStatRxJoinIn,    
+            dGvrpIfStatRxLeaveEmpty,
+            dGvrpIfStatRxLeaveIn,   
+            dGvrpIfStatRxLeaveAll,  
+            dGvrpIfStatRxEmpty,     
+            dGvrpIfStatTxJoinEmpty, 
+            dGvrpIfStatTxJoinIn,    
+            dGvrpIfStatTxLeaveEmpty,
+            dGvrpIfStatTxLeaveIn,   
+            dGvrpIfStatTxLeaveAll,  
+            dGvrpIfStatTxEmpty,     
+            dGvrpIfStatClear       
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects provides the management of GVRP statistics. 
+            "
+        ::= { dGvrpGroups 4 }
+    
+   
+
+END
+

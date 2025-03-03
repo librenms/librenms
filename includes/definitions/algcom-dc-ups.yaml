@@ -1,0 +1,14 @@
+os: algcom-dc-ups
+text: 'ALGCOM DC UPS'
+type: power
+icon: algcom
+
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_temperature, text: Temperature }
+
+discovery:
+    - sysObjectID:
+            - .1.3.6.1.4.1.49136
+mib_dir: algcom

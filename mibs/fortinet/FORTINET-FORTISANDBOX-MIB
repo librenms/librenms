@@ -1,0 +1,641 @@
+--
+-- MODULE-IDENTITY
+--  OrgName
+--     Fortinet Technologies, Inc.
+--  ContactInfo
+--     Technical Support
+--     e-mail: support@fortinet.com
+--     http://www.fortinet.com
+--
+
+FORTINET-FORTISANDBOX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    FnBoolState, FnIndex, fnAdminEntry, fnSysSerial, fortinet
+        FROM FORTINET-CORE-MIB
+    ifEntry, ifName
+        FROM IF-MIB
+    InetAddress, InetAddressPrefixLength, InetAddressType, InetPortNumber
+        FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    sysName
+        FROM SNMPv2-MIB
+    Counter32, Counter64, Gauge32, Unsigned32, Integer32, IpAddress,
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, TimeTicks, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    DisplayString, TEXTUAL-CONVENTION, AutonomousType
+        FROM SNMPv2-TC;
+
+fnFortiSandboxMib MODULE-IDENTITY
+    LAST-UPDATED "201402240000Z"
+    ORGANIZATION
+        "Fortinet Technologies, Inc."
+    CONTACT-INFO
+        "
+         Technical Support
+         email: support@fortinet.com
+         http://www.fortinet.com"
+    DESCRIPTION
+        "MIB module for Fortinet FortiSandbox devices."
+    REVISION    "201402240000Z"
+    DESCRIPTION
+        "Initial version of FORTINET-FORTISANDBOX-MIB."
+    ::= { fortinet 118 }
+
+
+FsaAdminPermLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "enumerated type for administrative permissions"
+    SYNTAX      INTEGER { readAdmin(0), writeAdmin(1), domainAdmin(15),
+                    superAdmin(255) }
+
+FsaUserAuthType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "enumerated type for user authentication types"
+    SYNTAX      INTEGER { local(1), radiusSingle(2), radiusMultiple(3),
+                    ldap(4) }
+
+FsaSessProto ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "data type for session protocols"
+    SYNTAX      INTEGER { ip(0), icmp(1), igmp(2), ipip(4), tcp(6),
+                    egp(8), pup(12), udp(17), idp(22), ipv6(41),
+                    rsvp(46), gre(47), esp(50), ah(51), ospf(89),
+                    pim(103), comp(108), raw(255) }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaModel
+--
+
+fsaModel OBJECT IDENTIFIER ::= { fnFortiSandboxMib 1 }
+
+-- fsaModel start
+
+fsa1000D          OBJECT IDENTIFIER ::= { fsaModel 10004 }
+fsa3000D          OBJECT IDENTIFIER ::= { fsaModel 30004 }
+fsaVM		  OBJECT IDENTIFIER ::= { fsaModel 20000 }
+fsa3500D	  OBJECT IDENTIFIER ::= { fsaModel 30005 }
+fsa3000E          OBJECT IDENTIFIER ::= { fsaModel 30006 }
+fsa2000E          OBJECT IDENTIFIER ::= { fsaModel 30007 }
+fsa1000F          OBJECT IDENTIFIER ::= { fsaModel 30008 }
+fsa500F           OBJECT IDENTIFIER ::= { fsaModel 30009 }
+-- fsaModel end
+
+--
+-- fortinet.fnFortiSandboxMib.fsaTraps
+--
+
+fsaTraps OBJECT IDENTIFIER
+    ::= { fnFortiSandboxMib 2 }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaTraps
+--
+
+fsaTrapPrefix OBJECT IDENTIFIER
+    ::= { fsaTraps 0 }
+
+fsaTrapMalware NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsaTrapJobId }
+    STATUS      current
+    DESCRIPTION
+        "A malware has been detected"
+    ::= { fsaTrapPrefix 501 }
+
+fsaTrapCPUHigh NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsaTrapCPUrate}
+    STATUS      current
+    DESCRIPTION
+        "The CPU usage is too high"
+    ::= { fsaTrapPrefix 502 }
+
+fsaTrapMemHigh NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsaTrapMUrate }
+    STATUS      current
+    DESCRIPTION
+        "The memory usage is too high"
+    ::= { fsaTrapPrefix 503 }
+
+fsaTrapDUHigh NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsaTrapDUrate }
+    STATUS      current
+    DESCRIPTION
+        "The hard drive space usage is too high"
+    ::= { fsaTrapPrefix 504 }
+
+fsaTrapPSUC NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsaTrapPSUFailure }
+    STATUS      current
+    DESCRIPTION
+        "The power supply unit state has changed"
+    ::= { fsaTrapPrefix 505 }
+
+fsaTrapHCT NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsaTrapHCTopology }
+    STATUS      current
+    DESCRIPTION
+        "The topology map of HC has changed"
+    ::= { fsaTrapPrefix 506 }
+
+fsaTrapHCH NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsaTrapHCHealth }
+    STATUS      current
+    DESCRIPTION
+        "The health status of HC has changed"
+    ::= { fsaTrapPrefix 507 }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaTrapObjects
+--
+
+fsaTrapObjects OBJECT IDENTIFIER
+    ::= { fnFortiSandboxMib 6 }
+
+fsaTrapJobId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "JOB ID of the malware identified in trap"
+    ::= { fsaTrapObjects 1 }
+
+fsaTrapCPUrate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "CPU usage rate identified in trap"
+    ::= { fsaTrapObjects 2 }
+
+fsaTrapMUrate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Memory usage rate identified in trap"
+    ::= { fsaTrapObjects 3 }
+
+fsaTrapDUrate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Disk usage rate identified in trap"
+    ::= { fsaTrapObjects 4 }
+
+fsaTrapPSUFailure OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Power supply state identified in trap"
+    ::= { fsaTrapObjects 5 }
+
+fsaTrapHCTopology OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The topology map of HC identified in trap"
+    ::= { fsaTrapObjects 6 }
+
+fsaTrapHCHealth OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The health status of HC identified in trap"
+    ::= { fsaTrapObjects 7 }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaSystem
+--
+
+fsaSystem OBJECT IDENTIFIER
+    ::= { fnFortiSandboxMib 3 }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaSystem.fsaSystemInfo
+--
+
+fsaSystemInfo OBJECT IDENTIFIER
+    ::= { fsaSystem 1 }
+
+fsaSysVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Firmware version of the device"
+    ::= { fsaSystemInfo 1 }
+
+fsaSysCpuUsage OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current CPU usage (percentage)"
+    ::= { fsaSystemInfo 2 }
+
+fsaSysMemUsage OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current memory utilization (percentage)"
+    ::= { fsaSystemInfo 3 }
+
+fsaSysMemCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total physical memory (RAM) installed (KB)"
+    ::= { fsaSystemInfo 4 }
+
+fsaSysDiskUsage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current hard disk usage (MB), if disk is present"
+    ::= { fsaSystemInfo 5 }
+
+fsaSysDiskCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total hard disk capacity (MB), if disk is present"
+    ::= { fsaSystemInfo 6 }
+
+fsaSysCpuUsageExcludedNice OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current CPU usage excluded nice processes usage (percentage)"
+    ::= { fsaSystemInfo 7 }
+
+fsaSysUpTime OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "hundredths of a second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The 64bit time (in hundredths of a second) since the network management portion of the system was last re-initialized."
+    ::= { fsaSystemInfo 8 }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaSystem.fsaSoftware
+--
+
+fsaSoftware OBJECT IDENTIFIER
+    ::= { fsaSystem 2 }
+
+fsaSysTracer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sandbox tracer engine version installed on the device"
+    ::= { fsaSoftware 1 }
+
+fsaSysRating OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sandbox rating engine version installed on the device"
+    ::= { fsaSoftware 2 }
+
+fsaSysTool OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sandbox system tools version installed on the device"
+    ::= { fsaSoftware 3 }
+
+fsaSysSniffer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Traffic sniffer version installed on the device"
+    ::= { fsaSoftware 4 }
+
+fsaSysIPS OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Network alerts signature database version installed on the device"
+    ::= { fsaSoftware 5 }
+
+fsaSysAndroidA OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Android analytic engine version installed on the device"
+    ::= { fsaSoftware 6 }
+
+fsaSysAndroidR OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Android rating engine version installed on the device"
+    ::= { fsaSoftware 7 }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaUsers
+--
+
+fsaFwUsers OBJECT IDENTIFIER
+    ::= { fnFortiSandboxMib 4 }
+
+fsaFwUserInfo OBJECT IDENTIFIER
+    ::= { fsaFwUsers 1 }
+
+fsaFwUserNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of user accounts in fsaFwUserTable"
+    ::= { fsaFwUserInfo 1 }
+
+fsaFwUserAuthTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Idle period after which a firewall-authentication user's session
+         is automatically expired"
+    ::= { fsaFwUserInfo 2 }
+
+fsaFwUserTables OBJECT IDENTIFIER
+    ::= { fsaFwUsers 2 }
+
+fsaFwUserTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FsaFwUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of local and proxy (Radius server)
+         user accounts for use with firewall user authentication"
+    ::= { fsaFwUserTables 1 }
+
+fsaFwUserEntry OBJECT-TYPE
+    SYNTAX      FsaFwUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to a particular user account"
+    INDEX       { fsaFwUserIndex }
+    ::= { fsaFwUserTable 1 }
+
+FsaFwUserEntry ::= SEQUENCE {
+    fsaFwUserIndex   FnIndex,
+    fsaFwUserName    DisplayString,
+    fsaFwUserAuth    FsaUserAuthType,
+    fsaFwUserState   FnBoolState
+}
+
+fsaFwUserIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index for uniquely identifying the users in fsaFwUserTable"
+    ::= { fsaFwUserEntry 1 }
+
+fsaFwUserName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User-name of the specified account"
+    ::= { fsaFwUserEntry 2 }
+
+fsaFwUserAuth OBJECT-TYPE
+    SYNTAX      FsaUserAuthType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of authentication the account uses (local, RADIUS, LDAP, etc.)"
+    ::= { fsaFwUserEntry 3 }
+
+fsaFwUserState OBJECT-TYPE
+    SYNTAX      FnBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the user account (enable/disable)"
+    ::= { fsaFwUserEntry 4 }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaJobInfo
+--
+
+fsaJobInfo OBJECT IDENTIFIER
+    ::= { fnFortiSandboxMib 5 }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaJobQueue
+--
+
+fsaJobQueue OBJECT IDENTIFIER
+    ::= { fsaJobInfo 1 }
+
+fsaFTypeExe OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pending Executables/DLL/VBS/BAT/PS1/JAR/MSI files on the device"
+    ::= { fsaJobQueue 1 }
+
+fsaFTypePDF OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pending PDF files on the device"
+    ::= { fsaJobQueue 2 }
+
+fsaFTypeDOC OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pending Office files on the device"
+    ::= { fsaJobQueue 3 }
+
+fsaFTypeFLASH OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pending Flash files on the device"
+    ::= { fsaJobQueue 4 }
+
+fsaFTypeWEB OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pending Web files on the device"
+    ::= { fsaJobQueue 5 }
+
+fsaFTypeAndroid OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pending Android files on the device"
+    ::= { fsaJobQueue 6 }
+
+fsaFTypeMAC OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pending Android files on the device"
+    ::= { fsaJobQueue 7 }
+
+fsaFTypeURL OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pending URL jobs on the device"
+    ::= { fsaJobQueue 8 }
+
+fsaFTypeExtra OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pending user defined files on the device"
+    ::= { fsaJobQueue 9 }
+
+fsaFTypeNOVM OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pending Non Sandboxing files on the device"
+    ::= { fsaJobQueue 10 }
+
+fsaFTypePre OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Job Queue Assignment Pending files on the device"
+    ::= { fsaJobQueue 11 }
+
+fsaJobProcessing OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Processing jobs on the device"
+    ::= { fsaJobQueue 12 }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaMibConformance
+--
+
+fsaMibConformance OBJECT IDENTIFIER
+    ::= { fnFortiSandboxMib 10 }
+
+--
+-- fortinet.fnFortiSandboxMib.fsaMibConformance
+--
+
+fsaSystemObjectGroup OBJECT-GROUP
+    OBJECTS     { fsaSysVersion, fsaSysCpuUsage,
+                  fsaSysMemUsage, fsaSysMemCapacity,
+                  fsaSysDiskUsage, fsaSysDiskCapacity,
+                  fsaSysCpuUsageExcludedNice,fsaSysUpTime }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to the system status of the device."
+    ::= { fsaMibConformance 1 }
+
+fsaSoftwareObjectGroup OBJECT-GROUP
+    OBJECTS     { fsaSysTracer, fsaSysRating, fsaSysTool,
+                  fsaSysSniffer, fsaSysIPS,
+                  fsaSysAndroidA, fsaSysAndroidR }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to software running on the device."
+    ::= { fsaMibConformance 2 }
+
+
+fsaUserObjectGroup OBJECT-GROUP
+    OBJECTS     { fsaFwUserNumber, fsaFwUserAuthTimeout,
+                  fsaFwUserName, fsaFwUserAuth,
+                  fsaFwUserState }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to Firewall functionality on FortiSandbox devices."
+    ::= { fsaMibConformance 3 }
+
+fsaJobObjectGroup OBJECT-GROUP
+    OBJECTS     { fsaFTypeExe, fsaFTypePDF, fsaFTypeDOC, fsaFTypeFLASH,
+                  fsaFTypeWEB, fsaFTypeAndroid, fsaFTypeMAC, fsaFTypeURL, fsaFTypeExtra,
+                  fsaFTypeNOVM, fsaFTypePre, fsaJobProcessing
+    }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to jobs on the device."
+    ::= { fsaMibConformance 4 }
+
+fsaNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { fsaTrapMalware,fsaTrapCPUHigh,
+                    fsaTrapMemHigh, fsaTrapDUHigh, fsaTrapPSUC,fsaTrapHCT,fsaTrapHCH }
+    STATUS      current
+    DESCRIPTION
+        "Notifications that can be generated from a FortiSandbox device."
+    ::= { fsaMibConformance 5 }
+
+
+fsaMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the application MIB."
+
+    MODULE      -- this module
+
+        GROUP   fsaNotificationGroup
+        DESCRIPTION
+              "Notifications are feature dependant. See manual for feature
+               information."
+
+        GROUP   fsaSystemObjectGroup
+        DESCRIPTION
+              "Model and feature specific."
+
+        GROUP   fsaSoftwareObjectGroup
+        DESCRIPTION
+              "Model and feature specific."
+
+        GROUP   fsaJobObjectGroup
+        DESCRIPTION
+              "Model and feature specific."
+
+    ::= { fsaMibConformance 100 }
+
+END -- end of module FORTINET-FORTISANDBOX-MIB.

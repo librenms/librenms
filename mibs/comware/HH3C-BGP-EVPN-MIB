@@ -1,0 +1,376 @@
+-- =============================================================================
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This MIB module contains managed object definitions for
+--              Border Gateway Protocol (BGP) Ethernet Virtual Private Network (EVPN).
+-- Reference:
+-- Version: V1.1
+-- History:
+--   V1.0 2017-11-20 Initial version Created by AnXiaoFeng
+--   V1.1 2018-07-07 Update hh3cBgpEvpnNbrPrefixTable by shanyangyang
+-- =============================================================================
+HH3C-BGP-EVPN-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cBgpEvpn MODULE-IDENTITY
+    LAST-UPDATED "201807071430Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB contains managed object definitions for the
+         Border Gateway Protocol (BGP) Ethernet Virtual Private
+         Network (EVPN) as defined in : ."
+    REVISION
+        "201807071430Z"
+    DESCRIPTION
+        "Change the objects of hh3cBgpEvpnNbrPrefixTable." 
+    REVISION
+        "201711291431Z"
+    DESCRIPTION
+        "modified according to review suggestions."
+    REVISION
+        "201711041431Z"
+    DESCRIPTION
+        "Initial version of this MIB."
+    ::= { hh3cCommon 172 }
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+hh3cBgpEvpnObjects OBJECT IDENTIFIER ::= { hh3cBgpEvpn 1 }
+hh3cBgpEvpnConf    OBJECT IDENTIFIER ::= { hh3cBgpEvpnObjects 1 }
+
+-- =============================================================================
+-- hh3cBgpEvpnNbrAddrTable Definition
+-- =============================================================================
+hh3cBgpEvpnNbrAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cBgpEvpnNbrAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies per-interface BGP EVPN neighbor
+         addresses for both PEs and CEs."
+    ::= { hh3cBgpEvpnConf 1 }
+
+hh3cBgpEvpnNbrAddrEntry OBJECT-TYPE
+    SYNTAX      Hh3cBgpEvpnNbrAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created by an LSR for
+         every VRF capable of supporting BGP EVPN.  The
+         indexing provides an ordering of BGP prefixes
+         per VRF."
+    INDEX {
+            hh3cBgpEvpnNbrAddr
+          }
+    ::= { hh3cBgpEvpnNbrAddrTable 1 }
+
+Hh3cBgpEvpnNbrAddrEntry ::= SEQUENCE {
+    hh3cBgpEvpnNbrAddr         IpAddress,
+    hh3cBgpEvpnNbrAsNumber     Unsigned32
+}
+
+hh3cBgpEvpnNbrAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Denotes the BGP neighbor address."
+    ::= { hh3cBgpEvpnNbrAddrEntry 1 }
+
+hh3cBgpEvpnNbrAsNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Autonomous System that the BGP's neighbor in."
+    ::= { hh3cBgpEvpnNbrAddrEntry 2 }
+
+-- =============================================================================
+-- End of hh3cBgpEvpnNbrAddrTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cBgpEvpnNbrPrefixTable Definition
+-- =============================================================================
+hh3cBgpEvpnNbrPrefixTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cBgpEvpnNbrPrefixEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies per-VRF vpnv4 multi-protocol
+         prefixes supported by BGP EVPN"
+    ::= { hh3cBgpEvpnConf 2 }
+
+hh3cBgpEvpnNbrPrefixEntry OBJECT-TYPE
+    SYNTAX      Hh3cBgpEvpnNbrPrefixEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created by an LSR for
+         every BGP prefix associated with a VRF supporting a
+         BGP EVPN.  The indexing provides an ordering of
+         BGP prefixes per VRF."
+    INDEX {
+            hh3cBgpEvpnPAtrRD,
+            hh3cBgpEvpnPAtrAddrPrefix,
+            hh3cBgpEvpnPAtrAddrPrefixLen,
+            hh3cBgpEvpnPAtrPeer
+          }
+    ::= { hh3cBgpEvpnNbrPrefixTable 1 }
+
+Hh3cBgpEvpnNbrPrefixEntry ::= SEQUENCE {
+    hh3cBgpEvpnPAtrRD              OCTET STRING,
+    hh3cBgpEvpnPAtrAddrPrefix      OCTET STRING,
+    hh3cBgpEvpnPAtrAddrPrefixLen   Integer32,
+    hh3cBgpEvpnPAtrPeer            IpAddress,
+    hh3cBgpEvpnPAtrRouteType       Unsigned32,
+    hh3cBgpEvpnPAtrOrigin          INTEGER,
+    hh3cBgpEvpnPAtrASPathSegment   OCTET STRING,
+    hh3cBgpEvpnPAtrNextHop         IpAddress,
+    hh3cBgpEvpnPAtrMultiExitDisc   Integer32,
+    hh3cBgpEvpnPAtrLocalPref       Integer32,
+    hh3cBgpEvpnPAtrIGMPFlags       INTEGER,
+    hh3cBgpEvpnPAtrMaxRespTime     Unsigned32,
+    hh3cBgpEvpnPAtrPMSITunnel      OCTET STRING,
+    hh3cBgpEvpnPAtrL2VNI           Unsigned32,
+    hh3cBgpEvpnPAtrL3VNI           Unsigned32,
+    hh3cBgpEvpnPAtrBest            TruthValue,
+    hh3cBgpEvpnPAtrUnknown         OCTET STRING
+}
+
+hh3cBgpEvpnPAtrRD OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (3..21))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The route distinguisher."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 1 }
+
+hh3cBgpEvpnPAtrAddrPrefix OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..86))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The EVPN information in the Network Layer
+        Reachability Information field. BGP EVPN
+        prefix includes:
+        [1][ESI][EthernetTagID]:
+           ESI: each Ethernet segment(ES) is identified
+           by a unique non-zero identifier called an
+           Ethernet Segment Identifier.
+           EthernetTagID: This attribute identifies a
+           particular broadcast domain in an EVPN instance.
+        [2][EthernetTagID][MACLength][MAC][IPAddressLength][IPAddress]
+        [3][EthernetTagID][IPAddressLength][IPAddress]
+        [4][ESI][IPAddressLength][IPAddress]
+        [5][EthernetTagID][IPAddressLength][IPAddress]
+        [6][EthernetTagID][MulticastSourceLength]
+           [MulticastSourceAddress][MulticastGroupLength]
+           [MulticastGroupAddress][OriginatorRouterLength]
+           [OriginatorRouterAddress]
+        [7][ESI][EthernetTagID][MulticastSourceLength]
+           [MulticastSourceAddress][MulticastGroupLength]
+           [MulticastGroupAddress][OriginatorRouterLength]
+           [OriginatorRouterAddress][LeaveGroupSyn]
+           LeaveGroupSyn: This attribute identifies the
+           specific (x, G) leave group synchronization
+           procedure initiated by the advertising PE,
+           which increments the value whenever it
+           initiates a procedure.
+        [8][ESI][EthernetTagID][MulticastSourceLength]
+           [MulticastSourceAddress][MulticastGroupLength]
+           [MulticastGroupAddress][OriginatorRouterLength]
+           [OriginatorRouterAddress][LeaveGroupSyn]"
+    ::= { hh3cBgpEvpnNbrPrefixEntry 2 }
+
+hh3cBgpEvpnPAtrAddrPrefixLen OBJECT-TYPE
+    SYNTAX      Integer32  (0..300)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Length in bits of the Network
+        Layer Reachability Information field."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 3 }
+
+hh3cBgpEvpnPAtrPeer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the peer where the path
+         information was learned."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 4 }
+
+hh3cBgpEvpnPAtrRouteType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Defines the following Route Types:
+         1 - Ethernet Auto-Discovery (A-D) route
+         2 - MAC/IP Advertisement route
+         3 - Inclusive Multicast Ethernet Tag route
+         4 - Ethernet Segment route
+         5 - IP Prefix Route
+         6 - Selective Multicast Ethernet Tag Route
+         7 - IGMP Join Synch Route
+         8 - IGMP Leave Synch Route"
+    ::= { hh3cBgpEvpnNbrPrefixEntry 5 }
+
+hh3cBgpEvpnPAtrOrigin OBJECT-TYPE
+    SYNTAX      INTEGER { igp(1),-- networks are interior
+                          egp(2),-- networks learned via EGP
+                          incomplete(3) -- undetermined
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ultimate origin of the path
+         information."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 6 }
+
+hh3cBgpEvpnPAtrASPathSegment OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (2..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sequence of AS path segments.  Each AS
+         path segment is represented by a triple
+         <type, length, value>.
+
+          The type is a 1-octet field which has two
+          possible values:
+              1      AS_SET: unordered set of ASs a
+                     route in the UPDATE
+                     message has traversed
+              2      AS_SEQUENCE: ordered set of ASs
+                     a route in the UPDATE
+                     message has traversed.
+                     The length is a 1-octet field containing the
+                     number of ASs in the value field.
+
+                     The value field contains one or more AS
+                     numbers, each AS is represented in the octet
+                     string as a pair of octets according to the
+                     following algorithm:
+                     first-byte-of-pair = ASNumber / 256;
+                     second-byte-of-pair = ASNumber & 255;"
+    ::= { hh3cBgpEvpnNbrPrefixEntry 7 }
+
+hh3cBgpEvpnPAtrNextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of the router that should be
+         used for the destination network.  This address is
+         the NEXT_HOP address received in the UPDATE packet."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 8 }
+
+hh3cBgpEvpnPAtrMultiExitDisc OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MED attribute received in the UPDATE packet.
+         When the actual value is range from 2147483647 to
+         4294967295,the return value will be 2147483647."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 9 }
+
+hh3cBgpEvpnPAtrLocalPref OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local preference attribute received in the UPDATE packet.
+         When the actual value is range from 2147483647 to 4294967295,
+         the return value will be 2147483647."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 10 }
+
+hh3cBgpEvpnPAtrIGMPFlags OBJECT-TYPE
+    SYNTAX      INTEGER { igmpv1(1),
+                          igmpv2(2),
+                          igmpv3(3)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This attribute indicates support for IGMP version."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 11 }
+
+hh3cBgpEvpnPAtrMaxRespTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Response Time is the duration of (x, G)
+         leave group synchronization procedure."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 12 }
+
+hh3cBgpEvpnPAtrPMSITunnel OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (9..21))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This attribute identifies the
+         P-tunnel used for sending broadcast."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 13 }
+
+hh3cBgpEvpnPAtrL2VNI OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "L2 VXLAN ID."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 14 }
+
+hh3cBgpEvpnPAtrL3VNI OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "L3 VXLAN ID."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 15 }
+
+hh3cBgpEvpnPAtrBest OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An indication of whether this route
+         was chosen as the best BGP4 route for
+         this destination."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 16 }
+
+hh3cBgpEvpnPAtrUnknown OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "One or more path attributes not
+         understood by this BGP4 speaker."
+    ::= { hh3cBgpEvpnNbrPrefixEntry 17 }
+
+-- =============================================================================
+-- End of hh3cBgpEvpnNbrPrefixTable Definition
+-- =============================================================================
+-- End of HH3C-BGP-EVPN-MIB
+END

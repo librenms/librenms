@@ -1,0 +1,15 @@
+modules:
+    mempools:
+        pre-cache:
+            oids:
+                - GBNPlatformOAM-MIB::cpuDescription
+        data:
+            -
+                total: GBNPlatformOAM-MIB::memorySize
+                free: GBNPlatformOAM-MIB::memoryIdle
+                precision: 1048576
+                descr: '{{ GBNPlatformOAM-MIB::cpuDescription }} Memory'
+    os:
+        hardware: GBNPlatformOAM-MIB::productName.0
+        version: GBNPlatformOAM-MIB::softwareVersion.0
+        serial: GBNPlatformOAM-MIB::prodSerialNo.0

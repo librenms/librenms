@@ -15,56 +15,51 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Tests;
 
+use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
-class RrdDefinitionTest extends \PHPUnit_Framework_TestCase
+class RrdDefinitionTest extends TestCase
 {
-    public function testEmpty()
+    public function testEmpty(): void
     {
-
-        $this->assertEmpty((string)new RrdDefinition());
+        $this->assertEmpty((string) new RrdDefinition());
     }
 
-    /**
-     * @expectedException \LibreNMS\Exceptions\InvalidRrdTypeException
-     */
-    public function testWrongType()
+    public function testWrongType(): void
     {
-        global $config;
-        $config['rrd']['step'] = 300;
-        $config['rrd']['heartbeat'] = 600;
+        $this->expectException(\LibreNMS\Exceptions\InvalidRrdTypeException::class);
+        Config::set('rrd.step', 300);
+        Config::set('rrd.heartbeat', 600);
         $def = new RrdDefinition();
         $def->addDataset('badtype', 'Something unexpected');
     }
 
-    public function testNameEscaping()
+    public function testNameEscaping(): void
     {
-        global $config;
-        $config['rrd']['step'] = 300;
-        $config['rrd']['heartbeat'] = 600;
+        Config::set('rrd.step', 300);
+        Config::set('rrd.heartbeat', 600);
         $expected = 'DS:bad_name-is_too_lon:GAUGE:600:0:100 ';
         $def = RrdDefinition::make()->addDataset('b a%d$_n:a^me-is_too_lon%g.', 'GAUGE', 0, 100, 600);
 
-        $this->assertEquals($expected, (string)$def);
+        $this->assertEquals($expected, (string) $def);
     }
 
-    public function testCreation()
+    public function testCreation(): void
     {
-        global $config;
-        $config['rrd']['step'] = 300;
-        $config['rrd']['heartbeat'] = 600;
+        Config::set('rrd.step', 300);
+        Config::set('rrd.heartbeat', 600);
         $expected = 'DS:pos:COUNTER:600:0:125000000000 ' .
-                    'DS:unbound:DERIVE:600:U:U ';
+            'DS:unbound:DERIVE:600:U:U ';
 
         $def = new RrdDefinition();
         $def->addDataset('pos', 'COUNTER', 0, 125000000000);

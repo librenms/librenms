@@ -1,0 +1,175 @@
+ESO-CONSORTIUM-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+          MODULE-IDENTITY, OBJECT-IDENTITY,
+             snmpModules                        FROM SNMPv2-SMI
+             AutonomousType                     FROM SNMPv2-TC
+             enterprises                        FROM SNMPv2-SMI;
+
+      esoConsortiumMIB MODULE-IDENTITY
+          LAST-UPDATED "200302030000Z"		-- 03 February 2003
+          ORGANIZATION "ESO (Extended Security Options) Consortium"
+          CONTACT-INFO "
+                  ESO Consortium Coordinator
+                  SNMP Research
+
+                  Postal Address:
+
+                  SNMP Research, Inc
+                  3001 Kimberlin Heights Rd.
+                  Knoxville, TN 37920-9716
+                  USA
+
+                  Tel:     +1 865 573 1434
+                  Fax:     +1 865 573 9197
+                  E-mail:  eso-consortium@snmp.com
+                  WWW:     http://www.snmp.com/eso"
+
+          DESCRIPTION
+                " The ESO Consortium is an umbrella organization for
+                  registration of not-yet-standardized SNMP security
+                  modules in the enterprise space.  The objects
+                  published here are intended to provide a common
+                  naming and registration for authentication and 
+                  privacy protocol extensions to the SNMP USM
+                  Module (RFC3414).  The authentication and privacy
+                  protocol objects specified herein are intended to be
+                  used as values for usmUserAuthProtocol and
+                  usmUserPrivProtocol when managing SNMPv3 users
+                  via the snmpUsmMIB.
+                "
+          REVISION     "200302030000Z"          -- 03 February 2003, midnight
+          DESCRIPTION  
+                " Changes in preparation for public release.
+                  -  Added Object Identities for AES use while
+                     AES is being standardized.
+                  -  As of this writing, there are no
+                     additional authentication protocols specified
+                     in this document.
+                "
+
+          REVISION     "200302030000Z"          -- 03 February 2003, midnight
+          DESCRIPTION  
+                "Initial version, intended to be published as
+                 an Internet Draft.
+                "
+
+          ::= { enterprises 14832 } 
+
+--
+-- esoConsortiumMIB.1: Object Identities
+--
+      esoConsortiumMIBObjectIdentities OBJECT IDENTIFIER 
+          ::= { esoConsortiumMIB 1 }
+
+--
+-- 3DES Privacy Protocol for SNMPv3 USM security model 
+--
+
+      usm3DESPrivProtocol OBJECT-IDENTITY
+          STATUS        current
+          DESCRIPTION  
+                " The 3DES-EDE Symmetric Encryption Protocol.
+                  This is the protocol as specified in
+                  draft-reeder-snmpv3-usm-3desede-00, and in the
+                  updates to that draft available at 
+                  http://www.snmp.com/eso/.
+                "
+
+          REFERENCE    
+                " - Data Encryption Standard, National Institute of
+                    Standards and Technology.  Federal Information
+                    Processing Standard (FIPS) Publication 46-3, (1999,
+                    pending approval).  Will supersede FIPS Publication 
+                    46-2.
+
+                  - Data Encryption Algorithm, American National
+                    Standards Institute.  ANSI X3.92-1981,
+                    (December, 1980).
+
+                  - DES Modes of Operation, National Institute of
+                    Standards and Technology.  Federal Information
+                    Processing Standard (FIPS) Publication 81,
+                    (December, 1980).
+
+                  - Data Encryption Algorithm - Modes of Operation,
+                    American National Standards Institute.
+                    ANSI X3.106-1983, (May 1983).
+                 "
+          ::= { esoConsortiumMIBObjectIdentities 1 }
+
+--
+-- AES Privacy Protocols for SNMPv3 USM security model 
+--
+
+       usmAESCfb128PrivProtocol OBJECT-IDENTITY
+          STATUS        current
+          DESCRIPTION  
+                "The CFB128-AES-128 Privacy Protocol.
+
+                 This is the protocol as specified in
+                 draft-blumenthal-aes-usm-04.txt available at
+                 http://www.snmp.com/eso.  This object replaces the 
+                 usmAesCfb128Protocol OBJECT-IDENTITY.
+                 This assignment is made separately here, as the
+                 assignments in draft-blumenthal-aes-usm-04
+                 are transient.
+
+                 Note that while draft-blumenthal-aes-usm-04
+                 is referenced here, no interoperability problems
+                 have been encountered with draft-blumenthal-aes-usm-05
+                 (also available at http://www.snmp.com/eso) for 
+                 this privacy protocol.
+                "
+
+          REFERENCE    
+                "- The AES Cipher Algorithm in the SNMP's 
+                   User-based Security Model.
+                   Internet Draft draft-blumenthal-aes-usm-04.
+
+                 - Specification for the ADVANCED ENCRYPTION
+                   STANDARD (DRAFT). Federal Information Processing
+                   Standard (FIPS) Publication 197.
+                   (November 2001).
+
+                 - Dworkin, M., NIST Recommendation for Block
+                   Cipher Modes of Operation, Methods and
+                   Techniques (DRAFT).
+                   NIST Special Publication 800-38A
+                   (December 2001). 
+                "
+          ::= { esoConsortiumMIBObjectIdentities 2 } 
+
+       usmAESCfb192PrivProtocol OBJECT-IDENTITY
+          STATUS        current
+          DESCRIPTION  
+                "The CFB128-AES-192 Privacy Protocol.
+
+                 Note that this object replaces the usmAesCfb192Protocol
+                 OBJECT-IDENTITY of draft-blumenthal-aes-usm-04
+                 (available at http://www.snmp.com/eso).
+                 This assignment is made separately here, as the
+                 assignments in draft-blumenthal-aes-usm-04
+                 are transient."
+          REFERENCE    
+                "See References for usmAESCfb128PrivProtocol (above)"
+
+           ::= { esoConsortiumMIBObjectIdentities 3 } 
+
+       usmAESCfb256PrivProtocol OBJECT-IDENTITY
+          STATUS        current
+          DESCRIPTION  
+                "The CFB128-AES-256 Privacy Protocol.
+
+                 Note that this object replaces the usmAesCfb256Protocol
+                 OBJECT-IDENTITY of draft-blumenthal-aes-usm-04.
+                 (available at http://www.snmp.com/eso).
+                 This assignment is made separately here, as the
+                 assignments in draft-blumenthal-aes-usm-04
+                 are transient."
+          REFERENCE    
+                "See References for usmAESCfb128PrivProtocol (above)"
+
+           ::= { esoConsortiumMIBObjectIdentities 4 } 
+
+END

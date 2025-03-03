@@ -1,0 +1,1110 @@
+--  *****************************************************************
+--  DLINKSW-NTP-MIB.mib : D-Link NTP MIB
+--
+--  Copyright (c) 2014 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-NTP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF 
+        TEXTUAL-CONVENTION,
+        TruthValue,
+        RowStatus
+            FROM SNMPv2-TC
+        InetAddressType,
+        InetAddress,  
+        InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB
+        DisplayString
+            FROM RFC1213-MIB
+        InterfaceIndex, InterfaceIndexOrZero
+            FROM IF-MIB       
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+            
+    dlinkSwNtpMIB MODULE-IDENTITY
+        LAST-UPDATED "201409150000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "The Structure of NTP for the proprietary enterprise."
+        REVISION "201409150000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file. 
+            "
+    ::= { dlinkIndustrialCommon 182 }
+
+
+-- -----------------------------------------------------------------------------
+    dNtpMIBNotifications    OBJECT IDENTIFIER ::= { dlinkSwNtpMIB 0 }
+    dNtpMIBObjects          OBJECT IDENTIFIER ::= { dlinkSwNtpMIB 1 }
+    dNtpMIBConformance      OBJECT IDENTIFIER ::= { dlinkSwNtpMIB 2 }
+-- -----------------------------------------------------------------------------
+
+-- ********************************************************************
+--  dNtpCtrl	OBJECT IDENTIFIER ::= { dNtpMIBObjects  1 }
+-- ********************************************************************
+	dNtpCtrl	OBJECT IDENTIFIER ::= { dNtpMIBObjects  1 }
+    dNtpServiceEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables/disables the NTP service on the device."
+        DEFVAL          { false }    
+        ::= { dNtpCtrl 1 }
+    dNtpAuthenticateEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables/disables NTP authentication on the device."
+        DEFVAL          { true }    
+        ::= { dNtpCtrl 2 }
+    dNtpUpdateCalendarEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables/disables periodically update calendar."
+        DEFVAL          { false }    
+        ::= { dNtpCtrl 3 }
+    dNtpMaxAssociations OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object used to configure the maximum number of NTP peers and
+             clients on the device."
+        DEFVAL          { 32 }    
+        ::= { dNtpCtrl 4 }
+
+    dNtpBroadcastDelay OBJECT-TYPE
+        SYNTAX          INTEGER (1..999999)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object used to configure NTP broadcast delay in millisecond."
+        DEFVAL          { 300 }    
+        ::= { dNtpCtrl 5 }
+        
+    dNtpControlKey OBJECT-TYPE
+        SYNTAX          INTEGER 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object used to Specify the key ID for the NTP control message."
+        DEFVAL          { 0 }    
+        ::= { dNtpCtrl 6 }
+    dNtpRequestKey OBJECT-TYPE
+        SYNTAX          INTEGER 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object used to Specify the key ID for the NTP mode 7 packets."
+        DEFVAL          { 0 }    
+        ::= { dNtpCtrl 7 }
+    dNtpMasterStratum  OBJECT-TYPE
+        SYNTAX          INTEGER(0..15)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object used to configure switch act as NTP master clock.
+             Note:Valid stratum is 1-15, 0 for disable."
+        ::= { dNtpCtrl 8 }
+-- ********************************************************************
+--  dNtpAccessGroupTable	OBJECT IDENTIFIER ::= { dNtpMIBObjects  2 }
+-- ********************************************************************
+
+	dNtpAccessGroupTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF DNtpAccessGroupEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the access group of NTP."
+		::= { dNtpMIBObjects 2 }
+	
+	dNtpAccessGroupEntry OBJECT-TYPE
+		SYNTAX DNtpAccessGroupEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This is a list of information contained in the dNtpAccessGroupTable."
+		INDEX   { 
+			dNtpAccessGroupVrfName,
+			dNtpAccessGroupIpAddressType,
+			dNtpAccessGroupIpAddress,
+			dNtpAccessGroupIpAddressPrefixLength}
+		::= { dNtpAccessGroupTable 1 }
+		
+	DNtpAccessGroupEntry ::=
+		SEQUENCE {
+		  dNtpAccessGroupVrfName
+		      DisplayString,
+		  dNtpAccessGroupIpAddressType
+		      InetAddressType,
+		  dNtpAccessGroupIpAddress
+		      InetAddress,
+		  dNtpAccessGroupIpAddressPrefixLength
+		      InetAddressPrefixLength,
+		  dNtpAccessGroupIgnore
+		      TruthValue,
+		  dNtpAccessGroupNoModify
+		      TruthValue,
+		  dNtpAccessGroupNoQuery
+		      TruthValue,
+		  dNtpAccessGroupNoPeer
+		      TruthValue,
+		  dNtpAccessGroupNoServe
+		      TruthValue,
+		  dNtpAccessGroupNoTrust
+		      TruthValue,
+		  dNtpAccessGroupVersion
+		      TruthValue,
+		  dNtpAccessGroupRowStatus
+		      RowStatus
+		}
+    dNtpAccessGroupVrfName	OBJECT-TYPE
+	    SYNTAX	        DisplayString (SIZE  (0..12))
+	    MAX-ACCESS      not-accessible
+	    STATUS	        current
+	    DESCRIPTION
+		    "This object indicates the name of the routing forwarding instance.
+		    A zero length string indicates the VRF name is not specified.
+            For the platform that doesn't support VRF, only a zero length string
+            is allowed for this object.
+		    "
+	    ::= { dNtpAccessGroupEntry 1 }
+
+
+	dNtpAccessGroupIpAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType {ipv4(1), ipv6(2), ipv6z(4) }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The Internet address type of access group." 
+        ::= { dNtpAccessGroupEntry 2 }
+
+    dNtpAccessGroupIpAddress OBJECT-TYPE
+        SYNTAX          InetAddress (SIZE (4|16|20))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "IP address expressed in dotted-quad form is the address of a host or network.
+            Note:use 0.0.0.0 for default entry" 
+        ::= { dNtpAccessGroupEntry 3 }
+    
+    dNtpAccessGroupIpAddressPrefixLength OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The length of the prefix associated with the IP address of this entry."
+        ::= { dNtpAccessGroupEntry 4 }	
+    dNtpAccessGroupIgnore OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object can deny packets of all kinds, including NTP control queries."
+        DEFVAL          { false }    
+        ::= { dNtpAccessGroupEntry 5 }
+     
+    dNtpAccessGroupNoModify OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object can deny NTP control queries which attempt to modify 
+             the state of the server."
+        DEFVAL          { false }    
+        ::= { dNtpAccessGroupEntry 6 }
+
+    dNtpAccessGroupNoQuery OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object can deny all NTP control queries."
+        DEFVAL          { false }    
+        ::= { dNtpAccessGroupEntry 7 }
+		
+    dNtpAccessGroupNoPeer OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object can deny packets that might mobilize 
+              an association unless authenticated."
+        DEFVAL          { false }    
+        ::= { dNtpAccessGroupEntry 8 }
+		
+    dNtpAccessGroupNoServe OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object can deny all packets except NTP control queries."
+        DEFVAL          { false }    
+        ::= { dNtpAccessGroupEntry 9 }
+		
+    dNtpAccessGroupNoTrust OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object can deny packets that are not cryptographically authenticated."
+        DEFVAL          { false }    
+        ::= { dNtpAccessGroupEntry 10 }
+		
+    dNtpAccessGroupVersion OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object can deny packets that do not match the current NTP version."
+        DEFVAL          { false }    
+        ::= { dNtpAccessGroupEntry 11 }
+		
+	dNtpAccessGroupRowStatus OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the state of the access group entry."
+		::= { dNtpAccessGroupEntry 99 }	
+		
+-- ********************************************************************
+--   dNtpAccessInterfaceTable	OBJECT IDENTIFIER ::= { dNtpMIBObjects  3 }
+-- ********************************************************************
+
+	dNtpAccessInterfaceTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF DNtpAccessInterfaceEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the interface control of NTP."
+		::= { dNtpMIBObjects 3 }
+	
+	dNtpAccessInterfaceEntry OBJECT-TYPE
+		SYNTAX DNtpAccessInterfaceEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This is a list of information contained in the dNtpAccessInterfaceTable."
+		INDEX   {dNtpAccessInterfaceIfIndex}
+		::= { dNtpAccessInterfaceTable 1 }
+		
+	DNtpAccessInterfaceEntry ::=
+		SEQUENCE {
+		  dNtpAccessInterfaceIfIndex
+		      InterfaceIndex,
+		  dNtpAccessInterfaceEnabled
+		      TruthValue
+		}
+    dNtpAccessInterfaceIfIndex	OBJECT-TYPE
+	    SYNTAX	        InterfaceIndex
+	    MAX-ACCESS      not-accessible
+	    STATUS	        current
+	    DESCRIPTION
+		    "The ifIndex value of the interface is determined by the agent."
+	    ::= { dNtpAccessInterfaceEntry 1 }
+
+    dNtpAccessInterfaceEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Indicate if NTP receive packet from this interface."
+        DEFVAL          { true }    
+        ::= { dNtpAccessInterfaceEntry 2 }
+        
+-- ********************************************************************
+--   dNtpAuthenticationKeyTable	OBJECT IDENTIFIER ::= { dNtpMIBObjects  4 }
+-- ********************************************************************
+
+	dNtpAuthenticationKeyTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF DNtpAuthenticationKeyEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the access group of NTP."
+		::= { dNtpMIBObjects 4 }
+	
+	dNtpAuthenticationKeyEntry OBJECT-TYPE
+		SYNTAX DNtpAuthenticationKeyEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This is a list of information contained in the
+			 dNtpAuthenticationKeyTable."
+		INDEX   {dNtpAuthenticationKeyId}
+		::= { dNtpAuthenticationKeyTable 1 }
+		
+	DNtpAuthenticationKeyEntry ::=
+		SEQUENCE {
+		  dNtpAuthenticationKeyId
+		      INTEGER,
+		  dNtpAuthenticationKeyType
+		      DisplayString,
+		  dNtpAuthenticationKeyValue
+		      DisplayString,
+		  dNtpAuthenticationKeyTrusted
+		      TruthValue,
+		  dNtpAuthenticationKeyStatus
+		      RowStatus
+		}
+    dNtpAuthenticationKeyId  OBJECT-TYPE
+        SYNTAX          INTEGER(1..255)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object used to define authentication key ID for NTP."
+        ::= { dNtpAuthenticationKeyEntry 1 }
+		
+    dNtpAuthenticationKeyType  OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE  (1..12))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object used to define authentication key type for NTP.
+             Note: Only support md5 now."
+        ::= { dNtpAuthenticationKeyEntry 2 }
+		
+    dNtpAuthenticationKeyValue  OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE  (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object used to define authentication key value for NTP."
+        ::= { dNtpAuthenticationKeyEntry 3 }
+        
+    dNtpAuthenticationKeyTrusted OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to trust an NTP key on the device."
+        DEFVAL          { false }    
+        ::= { dNtpAuthenticationKeyEntry 4 }
+        
+	dNtpAuthenticationKeyStatus OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the state of the authentication key entry."
+		::= { dNtpAuthenticationKeyEntry 99 }	
+		
+-- ********************************************************************
+--   dNtpCfgBroadcastClientTable	OBJECT IDENTIFIER ::= { dNtpMIBObjects  5 }
+-- ********************************************************************
+
+	dNtpCfgBroadcastClientTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF DNtpCfgBroadcastClientEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the broadcast client of NTP."
+		::= { dNtpMIBObjects 5 }
+	
+	dNtpCfgBroadcastClientEntry OBJECT-TYPE
+		SYNTAX DNtpCfgBroadcastClientEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This is a list of information contained in the dNtpCfgBroadcastClientTable."
+		INDEX   {dNtpCfgBroadcastClientIfIndex}
+		::= { dNtpCfgBroadcastClientTable 1 }
+		
+	DNtpCfgBroadcastClientEntry ::=
+		SEQUENCE {
+		  dNtpCfgBroadcastClientIfIndex
+		      InterfaceIndex,
+		  dNtpCfgBroadcastClientKeyId
+		      INTEGER,
+		  dNtpCfgBroadcastClientStatus
+		      RowStatus
+		}
+    dNtpCfgBroadcastClientIfIndex	OBJECT-TYPE
+	    SYNTAX	        InterfaceIndex
+	    MAX-ACCESS      not-accessible
+	    STATUS	        current
+	    DESCRIPTION
+		    "The ifIndex value of the interface is determined by the agent."
+	    ::= { dNtpCfgBroadcastClientEntry 1 }
+
+    dNtpCfgBroadcastClientKeyId OBJECT-TYPE
+        SYNTAX          INTEGER(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Defines the authentication key ID used for this entry.
+             0 means no key ID used."
+        DEFVAL          { 0 }    
+        ::= { dNtpCfgBroadcastClientEntry 2 }
+        
+	dNtpCfgBroadcastClientStatus OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the state of the NTP broadcast client entry."
+		::= { dNtpCfgBroadcastClientEntry 99 }	
+-- ********************************************************************
+--   dNtpCfgBroadcastServerTable	OBJECT IDENTIFIER ::= { dNtpMIBObjects  6 }
+-- ********************************************************************
+
+	dNtpCfgBroadcastServerTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF DNtpCfgBroadcastServerEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the broadcast server of NTP."
+		::= { dNtpMIBObjects 6 }
+	
+	dNtpCfgBroadcastServerEntry OBJECT-TYPE
+		SYNTAX DNtpCfgBroadcastServerEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This is a list of information contained in the dNtpCfgBroadcastServerTable."
+		INDEX   {dNtpCfgBroadcastServerIfIndex}
+		::= { dNtpCfgBroadcastServerTable 1 }
+		
+	DNtpCfgBroadcastServerEntry ::=
+		SEQUENCE {
+		  dNtpCfgBroadcastServerIfIndex
+		      InterfaceIndex,
+		  dNtpCfgBroadcastServerVersion
+		      INTEGER,
+		  dNtpCfgBroadcastServerKeyId
+		      INTEGER,
+		  dNtpCfgBroadcastServerStatus
+		      RowStatus
+		}
+    dNtpCfgBroadcastServerIfIndex	OBJECT-TYPE
+	    SYNTAX	        InterfaceIndex
+	    MAX-ACCESS      not-accessible
+	    STATUS	        current
+	    DESCRIPTION
+		    "The ifIndex value of the interface is determined by the agent."
+	    ::= { dNtpCfgBroadcastServerEntry 1 }
+
+
+    dNtpCfgBroadcastServerVersion OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Defines the NTP version number."
+        DEFVAL          { 4 }    
+        ::= { dNtpCfgBroadcastServerEntry 2 }
+		
+    dNtpCfgBroadcastServerKeyId OBJECT-TYPE
+        SYNTAX          INTEGER(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Defines the authentication key ID used for this entry.
+             0 means no key ID used."
+        DEFVAL          { 0 }    
+        ::= { dNtpCfgBroadcastServerEntry 3 }
+        
+	dNtpCfgBroadcastServerStatus OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the state of the NTP broadcast server entry."
+		::= { dNtpCfgBroadcastServerEntry 99 }	
+-- ********************************************************************
+--   dNtpCfgMulticastClientTable	OBJECT IDENTIFIER ::= { dNtpMIBObjects  7 }
+-- ********************************************************************
+
+	dNtpCfgMulticastClientTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF DNtpCfgMulticastClientEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the multicast client of NTP."
+		::= { dNtpMIBObjects 7 }
+	
+	dNtpCfgMulticastClientEntry OBJECT-TYPE
+		SYNTAX DNtpCfgMulticastClientEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This is a list of information contained in the dNtpCfgMulticastClientTable."
+		INDEX   {
+			dNtpCfgMulticastClientIfIndex,
+			dNtpCfgMulticastClientIpAddressType,
+			dNtpCfgMulticastClientIpAddress}
+		::= { dNtpCfgMulticastClientTable 1 }
+		
+	DNtpCfgMulticastClientEntry ::=
+		SEQUENCE {
+		  dNtpCfgMulticastClientIfIndex
+		      InterfaceIndex,
+		  dNtpCfgMulticastClientIpAddressType
+		      InetAddressType,
+		  dNtpCfgMulticastClientIpAddress
+		      InetAddress,
+		  dNtpCfgMulticastClientKeyId
+		      INTEGER,
+		  dNtpCfgMulticastClientStatus
+		      RowStatus
+		}
+    dNtpCfgMulticastClientIfIndex	OBJECT-TYPE
+	    SYNTAX	        InterfaceIndex
+	    MAX-ACCESS      not-accessible
+	    STATUS	        current
+	    DESCRIPTION
+		    "This object indicates the ifIndex value of the interface
+		     is determined by the agent."
+	    ::= { dNtpCfgMulticastClientEntry 1 }
+
+	dNtpCfgMulticastClientIpAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType {ipv4(1), ipv6(2)}
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The Internet address type of Ntp peer." 
+        ::= { dNtpCfgMulticastClientEntry 2 }
+
+    dNtpCfgMulticastClientIpAddress OBJECT-TYPE
+        SYNTAX          InetAddress (SIZE (4|16))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "IP address expressed in dotted-quad form is the address of Ntp peer." 
+        ::= { dNtpCfgMulticastClientEntry 3 }
+
+    dNtpCfgMulticastClientKeyId OBJECT-TYPE
+        SYNTAX          INTEGER(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Defines the authentication key ID used for this entry.
+             0 means no key ID used."
+        DEFVAL          { 0 }    
+        ::= { dNtpCfgMulticastClientEntry 4 }
+        
+
+	dNtpCfgMulticastClientStatus OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the state of the NTP multicast client entry."
+		::= { dNtpCfgMulticastClientEntry 99 }	
+-- ********************************************************************
+--   dNtpCfgMulticastServerTable	OBJECT IDENTIFIER ::= { dNtpMIBObjects  8 }
+-- ********************************************************************
+
+	dNtpCfgMulticastServerTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF DNtpCfgMulticastServerEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the multicast server of NTP."
+		::= { dNtpMIBObjects 8 }
+	
+	dNtpCfgMulticastServerEntry OBJECT-TYPE
+		SYNTAX DNtpCfgMulticastServerEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This is a list of information contained in the dNtpCfgMulticastServerTable."
+		INDEX   {
+			dNtpCfgMulticastServerIfIndex,
+			dNtpCfgMulticastServerIpAddressType,
+			dNtpCfgMulticastServerIpAddress}
+		::= { dNtpCfgMulticastServerTable 1 }
+		
+	DNtpCfgMulticastServerEntry ::=
+		SEQUENCE {
+		  dNtpCfgMulticastServerIfIndex
+		      InterfaceIndex,
+		  dNtpCfgMulticastServerIpAddressType
+		      InetAddressType,
+		  dNtpCfgMulticastServerIpAddress
+		      InetAddress,
+		  dNtpCfgMulticastServerVersion
+		      INTEGER,
+		  dNtpCfgMulticastServerKeyId
+		      INTEGER,
+		  dNtpCfgMulticastServerTtl
+		      INTEGER,
+		  dNtpCfgMulticastServerStatus
+		      RowStatus
+		}
+    dNtpCfgMulticastServerIfIndex	OBJECT-TYPE
+	    SYNTAX	        InterfaceIndex
+	    MAX-ACCESS      not-accessible
+	    STATUS	        current
+	    DESCRIPTION
+		    "This object indicates the ifIndex value of the interface
+		     is determined by the agent."
+	    ::= { dNtpCfgMulticastServerEntry 1 }
+
+	dNtpCfgMulticastServerIpAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType {ipv4(1), ipv6(2)}
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The Internet address type of Ntp peer." 
+        ::= { dNtpCfgMulticastServerEntry 2 }
+
+    dNtpCfgMulticastServerIpAddress OBJECT-TYPE
+        SYNTAX          InetAddress (SIZE (4|16))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "IP address expressed in dotted-quad form is the address of Ntp peer." 
+        ::= { dNtpCfgMulticastServerEntry 3 }
+
+    dNtpCfgMulticastServerVersion OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Defines the NTP version number."
+        DEFVAL          { 4 }    
+        ::= { dNtpCfgMulticastServerEntry 4 }
+		
+    dNtpCfgMulticastServerKeyId OBJECT-TYPE
+        SYNTAX          INTEGER(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Defines the authentication key ID used for this entry.
+             0 means no key ID used."
+        DEFVAL          { 0 }    
+        ::= { dNtpCfgMulticastServerEntry 5 }
+        
+
+    dNtpCfgMulticastServerTtl OBJECT-TYPE
+        SYNTAX          INTEGER(1..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object Specified the TTL value for NTP messages."
+        DEFVAL          { 16 }    
+        ::= { dNtpCfgMulticastServerEntry 6 }
+        
+	dNtpCfgMulticastServerStatus OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the state of the NTP multicast server entry."
+		::= { dNtpCfgMulticastServerEntry 99 }			
+-- ********************************************************************
+--   dNtpCfgPeerTable	OBJECT IDENTIFIER ::= { dNtpMIBObjects  9 }
+-- ********************************************************************
+
+	dNtpCfgPeerTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF DNtpCfgPeerEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the symmetric peer of NTP."
+		::= { dNtpMIBObjects 9 }
+	
+	dNtpCfgPeerEntry OBJECT-TYPE
+		SYNTAX DNtpCfgPeerEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This is a list of information contained in the dNtpCfgPeerTable."
+		INDEX   {
+			dNtpCfgPeerVrfName,
+			dNtpCfgPeerIpAddressType,
+			dNtpCfgPeerIpAddress}
+		::= { dNtpCfgPeerTable 1 }
+		
+	DNtpCfgPeerEntry ::=
+		SEQUENCE {
+		  dNtpCfgPeerVrfName
+		      DisplayString,
+		  dNtpCfgPeerIpAddressType
+		      InetAddressType,
+		  dNtpCfgPeerIpAddress
+		      InetAddress,
+		  dNtpCfgPeerVersion
+		      INTEGER,
+		  dNtpCfgPeerKeyId
+		      INTEGER,
+		  dNtpCfgPeerPrefer
+		      TruthValue,
+		  dNtpCfgPeerMinPoll
+		      INTEGER,
+		  dNtpCfgPeerMaxPoll
+		      INTEGER,
+		  dNtpCfgPeerStatus
+		      RowStatus
+		}
+    dNtpCfgPeerVrfName	OBJECT-TYPE
+	    SYNTAX	        DisplayString (SIZE  (0..12))
+	    MAX-ACCESS      not-accessible
+	    STATUS	        current
+	    DESCRIPTION
+		    "This object indicates the name of the routing forwarding instance.
+		    A zero length string indicates the VRF name is not specified.
+            For the platform that doesn't support VRF, only a zero length string
+            is allowed for this object."
+	    ::= { dNtpCfgPeerEntry 1 }
+
+	dNtpCfgPeerIpAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType {ipv4(1), ipv6(2), ipv6z(4) }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The Internet address type of Ntp peer." 
+        ::= { dNtpCfgPeerEntry 2 }
+
+    dNtpCfgPeerIpAddress OBJECT-TYPE
+        SYNTAX          InetAddress (SIZE (4|16|20))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "IP address expressed in dotted-quad form is the address of Ntp peer." 
+        ::= { dNtpCfgPeerEntry 3 }
+
+    dNtpCfgPeerVersion OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Defines the NTP version number."
+        DEFVAL          { 4 }    
+        ::= { dNtpCfgPeerEntry 4 }
+		
+    dNtpCfgPeerKeyId OBJECT-TYPE
+        SYNTAX          INTEGER(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Defines the authentication key ID used for this entry.
+             0 means no key ID used."
+        DEFVAL          { 0 }    
+        ::= { dNtpCfgPeerEntry 5 }
+        
+    dNtpCfgPeerPrefer OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to makes it be the preferred peer 
+             that provides synchronization."
+        DEFVAL          { false }    
+        ::= { dNtpCfgPeerEntry 6 }
+        
+    dNtpCfgPeerMinPoll OBJECT-TYPE
+        SYNTAX          INTEGER(3..16)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object Specified the minimum poll intervals for NTP 
+             messages, in seconds as a power of two."
+        DEFVAL          { 6 }    
+        ::= { dNtpCfgPeerEntry 7 }
+        
+    dNtpCfgPeerMaxPoll OBJECT-TYPE
+        SYNTAX          INTEGER(4..17)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object Specified the maximum poll intervals for NTP 
+             messages, in seconds as a power of two."
+        DEFVAL          { 10 }    
+        ::= { dNtpCfgPeerEntry 8 }
+        
+	dNtpCfgPeerStatus OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the state of the NTP peer entry."
+		::= { dNtpCfgPeerEntry 99 }	
+-- ********************************************************************
+--   dNtpCfgSrvTable	OBJECT IDENTIFIER ::= { dNtpMIBObjects  10 }
+-- ********************************************************************
+
+	dNtpCfgSrvTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF DNtpCfgSrvEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the server of NTP."
+		::= { dNtpMIBObjects 10 }
+	
+	dNtpCfgSrvEntry OBJECT-TYPE
+		SYNTAX DNtpCfgSrvEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This is a list of information contained in the dNtpCfgSrvTable."
+		INDEX   {
+			dNtpCfgSrvVrfName,
+			dNtpCfgSrvIpAddressType,
+			dNtpCfgSrvIpAddress}
+		::= { dNtpCfgSrvTable 1 }
+		
+	DNtpCfgSrvEntry ::=
+		SEQUENCE {
+		  dNtpCfgSrvVrfName
+		      DisplayString,
+		  dNtpCfgSrvIpAddressType
+		      InetAddressType,
+		  dNtpCfgSrvIpAddress
+		      InetAddress,
+		  dNtpCfgSrvVersion
+		      INTEGER,
+		  dNtpCfgSrvKeyId
+		      INTEGER,
+		  dNtpCfgSrvPrefer
+		      TruthValue,
+		  dNtpCfgSrvMinPoll
+		      INTEGER,
+		  dNtpCfgSrvMaxPoll
+		      INTEGER,
+		  dNtpCfgSrvStatus
+		      RowStatus
+		}
+    dNtpCfgSrvVrfName	OBJECT-TYPE
+	    SYNTAX	        DisplayString (SIZE  (0..12))
+	    MAX-ACCESS      not-accessible
+	    STATUS	        current
+	    DESCRIPTION
+		    "This object indicates the name of the routing forwarding instance.
+		    A zero length string indicates the VRF name is not specified.
+            For the platform that doesn't support VRF, only a zero length string
+            is allowed for this object."
+	    ::= { dNtpCfgSrvEntry 1 }
+
+	dNtpCfgSrvIpAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType {ipv4(1), ipv6(2), ipv6z(4) }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The Internet address type of Ntp peer." 
+        ::= { dNtpCfgSrvEntry 2 }
+
+    dNtpCfgSrvIpAddress OBJECT-TYPE
+        SYNTAX          InetAddress (SIZE (4|16|20))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "IP address expressed in dotted-quad form is the address of Ntp peer." 
+        ::= { dNtpCfgSrvEntry 3 }
+
+    dNtpCfgSrvVersion OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Defines the NTP version number."
+        DEFVAL          { 4 }    
+        ::= { dNtpCfgSrvEntry 4 }
+		
+    dNtpCfgSrvKeyId OBJECT-TYPE
+        SYNTAX          INTEGER(0..255)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Defines the authentication key ID used for this entry.
+             0 means no key ID used."
+        DEFVAL          { 0 }    
+        ::= { dNtpCfgSrvEntry 5 }
+        
+    dNtpCfgSrvPrefer OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to makes it be the preferred peer 
+             that provides synchronization."
+        DEFVAL          { false }    
+        ::= { dNtpCfgSrvEntry 6 }
+        
+    dNtpCfgSrvMinPoll OBJECT-TYPE
+        SYNTAX          INTEGER(3..16)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object Specified the minimum poll intervals for NTP 
+             messages, in seconds as a power of two."
+        DEFVAL          { 6 }    
+        ::= { dNtpCfgSrvEntry 7 }
+        
+    dNtpCfgSrvMaxPoll OBJECT-TYPE
+        SYNTAX          INTEGER(4..17)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object Specified the maximum poll intervals for NTP 
+             messages, in seconds as a power of two."
+        DEFVAL          { 10 }    
+        ::= { dNtpCfgSrvEntry 8 }
+        
+	dNtpCfgSrvStatus OBJECT-TYPE
+		SYNTAX  RowStatus
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+		      "This object describes the state of the NTP peer entry."
+		::= { dNtpCfgSrvEntry 99 }	
+
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************			   		
+	dNtpCompliances OBJECT IDENTIFIER ::= { dNtpMIBConformance 1 }
+		
+	dNtpCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINK-NTP-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dNtpCtrlGroup	   		   
+		}
+				
+		GROUP    dNtpCtrlGroup 
+        DESCRIPTION
+           "This group is conditionally mandatory and must be implemented by
+		    the agent only if NTP feature is supported."
+		        
+		GROUP    dNtpAclGroup
+        DESCRIPTION
+           "This group is conditionally mandatory and must be implemented by
+		   the agent only if NTP feature is supported."
+        
+		GROUP    dNtpBroadcastGroup
+        DESCRIPTION
+           "This group is should be implemented by the agent support broadcast NTP."
+        
+		GROUP    dNtpMulticastGroup
+        DESCRIPTION
+           "This group is should be implemented by the agent support multicast NTP."
+        
+		GROUP    dNtpPeerCfgGroup
+        DESCRIPTION
+           "This group is conditionally mandatory and must be implemented by
+		   the agent only if NTP feature is supported."
+        
+		GROUP    dNtpSrvCfgGroup
+        DESCRIPTION
+           "This group is conditionally mandatory and must be implemented by
+		   the agent only if NTP feature is supported."
+        
+		::= { dNtpCompliances 1 }
+
+-- units of conformance		
+	dNtpGroups OBJECT IDENTIFIER ::= { dNtpMIBConformance 2 }
+		
+	dNtpCtrlGroup OBJECT-GROUP
+		OBJECTS { 		    
+		    dNtpServiceEnabled,
+		    dNtpAuthenticateEnabled,
+		    dNtpAccessInterfaceEnabled,
+		    dNtpMaxAssociations,
+		    dNtpControlKey,
+		    dNtpRequestKey,
+		    dNtpMasterStratum
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides control for NTP."
+		::= { dNtpGroups 1 }
+		
+		
+	dNtpAclGroup OBJECT-GROUP
+		OBJECTS {
+		  dNtpAccessGroupIgnore,
+		  dNtpAccessGroupNoModify,
+		  dNtpAccessGroupNoQuery,
+		  dNtpAccessGroupNoPeer,
+		  dNtpAccessGroupNoServe,
+		  dNtpAccessGroupNoTrust,
+		  dNtpAccessGroupVersion,
+		  dNtpAccessGroupRowStatus,
+		  dNtpAccessInterfaceEnabled
+     	}
+		STATUS          current
+		DESCRIPTION 
+			"A collection of objects provides configuration for NTP access group."
+		::= { dNtpGroups 2 }
+			
+	dNtpBroadcastGroup OBJECT-GROUP
+		OBJECTS { 		    
+		    dNtpBroadcastDelay,
+		    dNtpCfgBroadcastClientKeyId,
+		    dNtpCfgBroadcastClientStatus,
+		    dNtpCfgBroadcastServerVersion,
+		    dNtpCfgBroadcastServerKeyId,
+		    dNtpCfgBroadcastServerStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides broadcast node for NTP."
+		::= { dNtpGroups 3 }
+	
+	dNtpMulticastGroup OBJECT-GROUP
+		OBJECTS { 		    
+		    dNtpCfgMulticastClientKeyId,
+		    dNtpCfgMulticastClientStatus,
+		    dNtpCfgMulticastServerVersion,
+		    dNtpCfgMulticastServerKeyId,
+		    dNtpCfgMulticastServerTtl,
+		    dNtpCfgMulticastServerStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides multicast node for NTP."
+		::= { dNtpGroups 4 }
+	
+	dNtpPeerCfgGroup OBJECT-GROUP
+		OBJECTS { 		    
+		    dNtpCfgPeerVersion,
+		    dNtpCfgPeerKeyId,
+		    dNtpCfgPeerPrefer,
+		    dNtpCfgPeerMinPoll,
+		    dNtpCfgPeerMaxPoll,
+		    dNtpCfgPeerStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides peer configur for NTP."
+		::= { dNtpGroups 5 }
+	
+	dNtpSrvCfgGroup OBJECT-GROUP
+		OBJECTS { 		    
+		    dNtpCfgSrvVersion,
+		    dNtpCfgSrvKeyId,
+		    dNtpCfgSrvPrefer,
+		    dNtpCfgSrvMinPoll,
+		    dNtpCfgSrvMaxPoll,
+		    dNtpCfgSrvStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides peer configur for NTP."
+		::= { dNtpGroups 6 }
+	
+END

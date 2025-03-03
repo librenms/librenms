@@ -1,0 +1,131 @@
+-- =================================================================
+-- Copyright (c) 2004-2009 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This file describes the hh3c MIB implementation of l2 isolation
+-- Reference:
+-- Version:     V1.0 Created by y04444 Initial version
+-- History:
+-- V1.0 Initial version
+-- =================================================================
+HH3C-L2ISOLATE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    TruthValue,
+    MacAddress,
+    RowStatus
+        FROM SNMPv2-TC
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32
+        FROM SNMPv2-SMI;
+
+hh3cL2Isolate MODULE-IDENTITY
+    LAST-UPDATED "200905060000Z"            -- May 06th, 2009 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "The MIB module is used for l2 isolation."
+    REVISION    "200905060000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { hh3cCommon 103 }
+
+hh3cL2IsolateObject OBJECT IDENTIFIER ::= { hh3cL2Isolate 1 }
+
+-- =================================================================
+--  1st Table of hh3cL2Isolate: hh3cL2IsolateEnableTable
+-- =================================================================
+hh3cL2IsolateEnableTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2IsolateEnableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for enabling/disabling layer-2-isolate for VLAN."
+    ::= { hh3cL2IsolateObject 1 }
+
+hh3cL2IsolateEnableEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2IsolateEnableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for enabling/disabling layer-2-isolate for VLAN."
+    INDEX
+        {
+            hh3cL2IsolateVLANIndex
+        }
+    ::= { hh3cL2IsolateEnableTable 1 }
+
+Hh3cL2IsolateEnableEntry ::= SEQUENCE
+    {
+        hh3cL2IsolateVLANIndex        Integer32,
+        hh3cL2IsolateEnable           TruthValue
+    }
+
+hh3cL2IsolateVLANIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents index of VLAN for layer-2-isolate."
+    ::= { hh3cL2IsolateEnableEntry 1 }
+
+hh3cL2IsolateEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the layer-2-isolate status of VLAN."
+    ::= { hh3cL2IsolateEnableEntry 2 }
+
+-- =================================================================
+--   2nd Table of hh3cL2Isolate: hh3cL2IsolatePermitMACTable
+-- =================================================================
+hh3cL2IsolatePermitMACTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2IsolatePermitMACEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table represents the permitting MAC address for the specific VLAN."
+    ::= { hh3cL2IsolateObject 2 }
+
+hh3cL2IsolatePermitMACEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2IsolatePermitMACEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents the permitting MAC address for the specific VLAN."
+    INDEX
+        {
+            hh3cL2IsolateVLANIndex,
+            hh3cL2IsoLatePermitMAC
+        }
+    ::= { hh3cL2IsolatePermitMACTable 1 }
+
+Hh3cL2IsolatePermitMACEntry ::= SEQUENCE
+    {
+        hh3cL2IsoLatePermitMAC            MacAddress,
+        hh3cL2IsoLatePermitMACRowStatus   RowStatus
+    }
+
+hh3cL2IsoLatePermitMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address permitted in the VLAN."
+    ::= { hh3cL2IsolatePermitMACEntry 1 }
+
+hh3cL2IsoLatePermitMACRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "RowStatus. Three actions are used: active, CreateAndGo, destroy."
+    ::= { hh3cL2IsolatePermitMACEntry 2 }
+
+END

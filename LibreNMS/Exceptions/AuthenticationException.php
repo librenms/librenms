@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,8 +28,12 @@ namespace LibreNMS\Exceptions;
 class AuthenticationException extends \Exception
 {
     // Redefine the exception so message defaults to a generic 'Invalid credentials'
-    public function __construct($message = 'Invalid credentials', $code = 0, \Exception $previous = null)
+    public function __construct($message = 'Invalid credentials', $hide_message = false, $code = 0, \Exception $previous = null)
     {
+        if ($hide_message) {
+            $message = '';
+        }
+
         parent::__construct($message, $code, $previous);
     }
 }

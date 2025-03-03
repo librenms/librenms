@@ -1,0 +1,8 @@
+os: teracom
+text: 'TeraCom'
+type: environment
+icon: teracom
+mib_dir: teracom
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.38783

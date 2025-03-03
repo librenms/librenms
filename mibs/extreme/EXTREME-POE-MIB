@@ -1,0 +1,433 @@
+
+-- ============================================================================
+--
+-- Extreme Services
+--
+
+EXTREME-POE-MIB DEFINITIONS ::= BEGIN
+	IMPORTS 
+        MODULE-IDENTITY 	FROM SNMPv2-SMI
+	    OBJECT-TYPE 		FROM SNMPv2-SMI
+	    NOTIFICATION-TYPE	FROM SNMPv2-SMI
+	    Integer32		    FROM SNMPv2-SMI
+	    Gauge32 		    FROM SNMPv2-SMI
+	    Counter32 		    FROM SNMPv2-SMI
+        TruthValue		    FROM SNMPv2-TC
+       	extremeAgent 		FROM EXTREME-BASE-MIB
+        extremeV2Traps		FROM EXTREME-BASE-MIB
+        pethMainPseGroupIndex,
+        pethPsePortGroupIndex,
+        pethPsePortIndex    FROM POWER-ETHERNET-MIB;
+
+
+
+        extremePoE MODULE-IDENTITY
+                LAST-UPDATED "0007240000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme Power over Ethernet MIB objects"
+        ::= { extremeAgent 27 }
+
+        extremePethMain   OBJECT IDENTIFIER ::= {extremePoE 1}
+        extremePethPort   OBJECT IDENTIFIER ::= {extremePoE 2}
+--        powerEthernetMIB  OBJECT IDENTIFIER ::= {extremePoE 3}
+        extremePethSystem OBJECT IDENTIFIER ::= {extremePoE 4}
+--        extremePethTraps  OBJECT IDENTIFIER ::= {extremeV2Traps 12}
+
+
+-- extremePethSystem
+extremePethSystemAdminEnable OBJECT-TYPE
+          SYNTAX INTEGER   {
+                  enable(1),
+                  disable(2)
+          }
+          MAX-ACCESS            read-write
+          STATUS                current
+          DESCRIPTION
+                  "Controls whether inline power is provided by the system."
+          DEFVAL                { enable }
+          ::= { extremePethSystem 1 }
+
+extremePethSystemDisconnectPrecedence OBJECT-TYPE
+          SYNTAX INTEGER   {
+                  lowestPriority(1),
+                  denyPort(2)
+          }
+          MAX-ACCESS            read-write
+          STATUS                current
+          DESCRIPTION
+               "Controls the disconnect function of power management.
+                When the power drain exceeds the available power budget,
+                due to a rise in power consumption after power is allocated
+                to the ports, the PoE controller disconnects one of the ports
+                to prevent overload on the power supply. There are two controls:
+                Lowest-priority: next port connected causes a shutdown of the 
+                                 lowest priority port.
+                Deny-port:       next port is denied power, regardless of priority."
+          DEFVAL                { denyPort }
+          ::= { extremePethSystem 2 }
+
+extremePethSystemUsageThreshold OBJECT-TYPE
+          SYNTAX      Integer32  (1..99)
+          UNITS      "%"
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                  "The usage threshold expressed in percents for
+                   comparing the measured power and initiating
+                   an alarm if the threshold is exceeded."
+          ::= { extremePethSystem 3 }
+
+extremePethSystemPowerSupplyMode OBJECT-TYPE
+          SYNTAX INTEGER   {
+                  redundant(1),
+                  loadSharing(2),
+                  notApplicable(3)
+          }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+                  "Controls whether the power supply operate in
+                   redundant or load-sharing mode.  Systems which do not
+                   provide redundant or load-sharing operations will return
+                   an error on setting, and notApplicable on read."
+         ::= { extremePethSystem 4 }
+
+extremePethSystemLegacyEnable OBJECT-TYPE
+          SYNTAX INTEGER   {
+                  enable(1),
+                  disable(2)
+          }
+          MAX-ACCESS            read-write
+          STATUS                current
+          DESCRIPTION
+                  "Controls whether legacy is supported by the system.  This is only supported on 
+                   S300-24 stackables currently."
+          DEFVAL                { disable }
+          ::= { extremePethSystem 5 }
+
+
+
+-- Per Slot Table
+extremePethPseSlotTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF ExtremePethPseSlotEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A table of objects that provides power management capabilities per slot."
+          ::= { extremePethMain 2 }
+
+extremePethPseSlotEntry OBJECT-TYPE
+          SYNTAX      ExtremePethPseSlotEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A set of objects that display and control the power characteristics of a slot."
+          INDEX    { extremePethSlotNumber }
+          ::= { extremePethPseSlotTable 1 }
+
+ExtremePethPseSlotEntry ::= SEQUENCE {
+        extremePethSlotNumber                 Integer32,
+        extremePethSlotPowerLimit             Integer32,
+        extremePethSlotConsumptionPower       Gauge32,
+        extremePethSlotClearConnectHistory    INTEGER,
+        extremePethSlotReservedConsumptionPower Gauge32,
+        extremePethSlotCommonConsumptionPower Gauge32,
+        extremePethSlotAdminEnable            INTEGER,
+        extremePethSlotPoeStatus              INTEGER,
+        extremePethSlotPoeResetSystem         INTEGER,
+	    extremePethSlotMaxAvailPower          Gauge32,
+        extremePethSlotMaxCapacity            Gauge32,
+        extremePethSlotBackupPSU              INTEGER,
+        extremePethSlotPSUActive              INTEGER,
+	    extremePethSlotMeasuredPower          Gauge32,
+     	extremePethSlotMainPseIndex		      Integer32
+}
+
+extremePethSlotNumber  OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS            not-accessible
+          STATUS                current
+          DESCRIPTION
+                  "Slot number. This is the same as the Group Index"
+          ::= { extremePethPseSlotEntry 1 }
+
+extremePethSlotPowerLimit  OBJECT-TYPE
+          SYNTAX                Integer32
+          UNITS                 "watts"
+          MAX-ACCESS            read-write
+          STATUS                current
+          DESCRIPTION
+                  "The configured maximum amount of inline power available to
+                  slot. The operational power available to the slot is based
+                  upon other operational and configuration parameters, such as
+                  the power-supply mode and status. This number is provided by
+                  the object extremePethSlotMaxAvailPower.  extremePethSlotPowerLimit 
+                  may be greater than extremePethSlotMaxAvailPower, however, cannot 
+                  exceed the maximum slot capacity, provided by extremePethSlotMaxCapacity"
+          ::= { extremePethPseSlotEntry 2 }
+
+extremePethSlotConsumptionPower  OBJECT-TYPE
+          SYNTAX                Gauge32
+          UNITS                 "watts"
+          MAX-ACCESS            read-only
+          STATUS                current
+          DESCRIPTION
+                  "The amount of power allocated to PoE devices on the slot expressed in mWatts.
+                   The amount of power allocated to a PoE device is based upon the PoE device 
+                   class and/or the port's extremePethPortViolationPrecedence setting. For
+                   example, in the default configuration of extremePethPortViolationPrecedence 
+                   set to maxAdvertisedOperator(3), and the extremePethPortOperatorLimit set to 
+                   15400, a PoE device is allocated 15.4 watts."
+          ::= { extremePethPseSlotEntry 3 }
+
+extremePethSlotClearConnectHistory  OBJECT-TYPE
+          SYNTAX                INTEGER { set(1),
+                                          clear(2)
+                                        }
+          MAX-ACCESS            read-write
+          STATUS                current
+          DESCRIPTION
+                  "Clears the port connection history of the specified slot.
+                   Reading the value always reurns clear(2)."
+          ::= { extremePethPseSlotEntry 4 }
+
+extremePethSlotReservedConsumptionPower  OBJECT-TYPE
+          SYNTAX                Gauge32
+          UNITS                 "Milliwatts"
+          MAX-ACCESS            read-only
+          STATUS                current
+          DESCRIPTION
+                  "The amount of reserved power consumed on the slot expressed in Milliwatts."
+          ::= { extremePethPseSlotEntry 5 }
+
+extremePethSlotCommonConsumptionPower  OBJECT-TYPE
+          SYNTAX                Gauge32
+          UNITS                 "Milliwatts"
+          MAX-ACCESS            read-only
+          STATUS                current
+          DESCRIPTION
+                  "The amount of common power allocated on the slot expressed in Milliwatts.
+                   This value is computed by the formula:
+                   extremePethSlotConsumptionPower - extremePethSlotReservedConsumptionPower."
+          ::= { extremePethPseSlotEntry 6 }
+
+extremePethSlotAdminEnable OBJECT-TYPE
+          SYNTAX INTEGER   {
+                  enable(1),
+                  disable(2)
+          }
+          MAX-ACCESS            read-write
+          STATUS                current
+          DESCRIPTION           "Controls whether inline power is provided by the slot."
+          DEFVAL                { enable }
+          ::= { extremePethPseSlotEntry 7 }
+
+extremePethSlotPoeStatus OBJECT-TYPE
+          SYNTAX INTEGER   {
+                  initializing(1),
+                  operational(2),
+                  downloadFail(3),
+                  calibrationRequired(4),
+                  invalidFirmware(5),
+                  mismatchVersion(6),
+                  updating(7),
+                  invalidDevice(8),
+                  notOperational(9),
+                  other(10)
+          }
+          MAX-ACCESS            read-only
+          STATUS                current
+          DESCRIPTION           
+             "Describes the status of the PoE system on the slot.
+              initializing - PoE controller is under initialization,
+              operational - PoE controller is operational and is ready or
+                            providing power,
+              downloadFail - PoE controller required update and the update
+                             failed, PoE reset is required to re-update,
+              calibrationRequired - PoE contoller is operational, however
+                                    calibration is required to provide power,
+              invalidFirmware - PoE controller contains invalid firmware,
+              mismatchVersion - PoE controller update completed, however
+                                version mismatches expected, reboot,
+              updating        - PoE controller is being updated,
+              invalidDevice   - PoE controller detected an invalid/bad PoE
+                                device.
+              notOperational  - PoE controller is not yet operational
+              other           - PoE controller is in undefined stats."
+          ::= { extremePethPseSlotEntry 8 }
+
+extremePethSlotPoeResetSystem OBJECT-TYPE
+          SYNTAX                INTEGER { set(1), clear(2) }
+          MAX-ACCESS		    read-write
+          STATUS		        current
+          DESCRIPTION
+                "Resets the PoE system on the slot. Reading returns clear(2)"
+          ::= { extremePethPseSlotEntry 9 }
+
+extremePethSlotMaxAvailPower  OBJECT-TYPE
+          SYNTAX                Gauge32
+          UNITS                 "watts"
+          MAX-ACCESS            read-only
+          STATUS                current
+          DESCRIPTION
+                  "The maximum power available to the slot expressed in Watts.
+	               The value depends on various configuration parameters and
+                   power-supply modes and status."
+          ::= { extremePethPseSlotEntry 10 }
+
+extremePethSlotMaxCapacity  OBJECT-TYPE
+          SYNTAX                Gauge32
+          UNITS                 "watts"
+          MAX-ACCESS            read-only
+          STATUS                current
+          DESCRIPTION
+                  "The maximum capacity of the slot expressed in Watts. This
+                   provides the hardware limitation of the slot. Actual
+                   amount of power is dependant on system status. The
+                   object extremePethSlotPowerLimit must not be greater than
+                   this amount."
+          ::= { extremePethPseSlotEntry 11 }
+
+extremePethSlotBackupPSU OBJECT-TYPE
+          SYNTAX INTEGER   {
+                  none(1),
+                  internal(2),
+                  external(3),
+                  notApplicable(4)
+          }
+          MAX-ACCESS            read-write
+          STATUS                current
+          DESCRIPTION           "Controls the backup power supply for inline power for the slot.
+                                 A system which does not allow the backup PSU to be
+                                 configured will return an error upon setting."
+          ::= { extremePethPseSlotEntry 12 }
+
+extremePethSlotPSUActive OBJECT-TYPE
+          SYNTAX INTEGER   {
+                  none(1),
+                  internal(2),
+                  external(3)
+          }
+          MAX-ACCESS            read-only
+          STATUS                current
+          DESCRIPTION           "Inline Power supply status indication for the slot. Indicates which PSU
+                                 is currently active.  In the case of a failover a none indication can
+                                 occur until one of the PSU has finished powering up."
+          ::= { extremePethPseSlotEntry 13 }
+
+extremePethSlotMeasuredPower  OBJECT-TYPE
+          SYNTAX                Gauge32
+          UNITS                 "milliwatts"
+          MAX-ACCESS            read-only
+          STATUS                current
+          DESCRIPTION
+                  "The measured amount of power for all PoE device on the 
+                   slot."
+          ::= { extremePethPseSlotEntry 14 }
+
+extremePethSlotMainPseIndex   OBJECT-TYPE
+          SYNTAX                Integer32
+          MAX-ACCESS            read-only
+          STATUS                current
+          DESCRIPTION
+                  "The index into the PethMainPseTable. Provides the
+	               mapping of the slot identifier to pethMainPseGroupIndex."
+          ::= { extremePethPseSlotEntry 15 }
+
+
+extremePethPsePortTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF ExtremePethPsePortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+              "A table of objects that extends the standard pethPsePortTable."
+          ::= { extremePethPort 1 }
+
+extremePethPsePortEntry OBJECT-TYPE
+          SYNTAX      ExtremePethPsePortEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+            "A set of objects that display and control the power characteristics 
+             of a powerEthernet PSE port. This table extends the standard pethPsePortTable."
+          INDEX    { pethPsePortGroupIndex, pethPsePortIndex }
+          ::= { extremePethPsePortTable 1 }
+
+ExtremePethPsePortEntry ::= SEQUENCE {
+	extremePethPortOperatorLimit        Integer32,
+    extremePethPortReservedBudget       Integer32,
+    extremePethPortViolationPrecedence  INTEGER,
+    extremePethPortClearFault           INTEGER,
+    extremePethPortResetPower           INTEGER,
+	extremePethPortMeasuredPower	    Gauge32
+}
+
+extremePethPortOperatorLimit  OBJECT-TYPE
+          SYNTAX Integer32 (3000..20000)  
+          UNITS			"Milliwatts"
+          MAX-ACCESS	read-write
+          STATUS		current
+          DESCRIPTION
+             "Controls individual port maximum power level."
+          DEFVAL 		{ 15400 }
+          ::= { extremePethPsePortEntry 1 }
+
+extremePethPortReservedBudget  OBJECT-TYPE
+          SYNTAX Integer32 (0..20000)  
+          UNITS			"Milliwatts"
+          MAX-ACCESS	read-write
+          STATUS		current
+          DESCRIPTION
+             "Controls individual port maximum power level. Value is 0 or 
+              in the range of 3000..20000"
+          DEFVAL 		{ 0 }
+          ::= { extremePethPsePortEntry  2 }
+
+extremePethPortViolationPrecedence OBJECT-TYPE
+          SYNTAX		INTEGER {advertisedClass(1),
+                                 operatorLimit(2),
+                                 maxAdvertisedOperator(3),
+                                 none(4) }  
+          MAX-ACCESS	read-write
+          STATUS		current
+          DESCRIPTION
+                "Sets the violation precedence for the specified ports. A value of 
+                 advertised-class will remove/deny power in the case an 802.3af compliant 
+                 PD consumes power beyond its advertised class limit. A value of 
+                 operator-limit will remove/deny power should the PD consume power 
+                 beyond the configured operator-limit. A value of max-class-operator will 
+                 remove/deny power if the PD consumes power beyond the maximum of the 
+                 detected class limit and the operator-limit. A value of none will 
+                 remove/deny power in case the PD device exceeds the maximum allowable 
+                 wattage according to regulatory maximum of 20 W. Default is 
+                 max-class-operator which allows operation of both 802.3af compliant and 
+                 legacy PDs."
+          ::= { extremePethPsePortEntry  3 }
+
+extremePethPortClearFault OBJECT-TYPE
+          SYNTAX        INTEGER { set(1), clear(2) }
+          MAX-ACCESS	read-write
+          STATUS		current
+          DESCRIPTION
+                "Clears the fault condition.  Reading always returns clear(2)."
+          ::= { extremePethPsePortEntry 4 }
+
+extremePethPortResetPower OBJECT-TYPE
+          SYNTAX        INTEGER { set(1), clear(2) }
+          MAX-ACCESS	read-write
+          STATUS		current
+          DESCRIPTION
+                "Resets the power on the port.  Reading always returns clear(2)"
+          ::= { extremePethPsePortEntry 5 }
+
+extremePethPortMeasuredPower  OBJECT-TYPE
+          SYNTAX                Gauge32
+          UNITS                 "Milliwatts"
+          MAX-ACCESS            read-only
+          STATUS                current
+          DESCRIPTION
+                  "The amount of power consumed on the port expressed in Milliwatts."
+          ::= { extremePethPsePortEntry 6 }
+
+END

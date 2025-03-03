@@ -1,0 +1,341 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-STATISTICS-HISTORY-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-STATISTICS-HISTORY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch
+        FROM PRVT-SWITCH-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC;
+
+prvtStatHistMIB MODULE-IDENTITY
+    LAST-UPDATED "201202200000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This MIB provides functionallity similar to RMON2-MIB.
+         Instead with OIDs mib is working with XPath 1.0 strings -
+         http://www.w3.org/TR/xpath. 
+         Profile tables will be initialized with currently available 
+         statistics."
+    REVISION    "201202200000Z"
+    DESCRIPTION 
+        "Initial version"
+    ::= { switch 180 }
+
+
+prvtStatHistObjects OBJECT IDENTIFIER
+    ::= { prvtStatHistMIB 1 }
+
+prvtStatHistShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/disable the statistics history on the device"
+    ::= { prvtStatHistObjects 1 }
+
+prvtStatHistGetInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..3600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Interval in seconds at which history statistics
+         will be gathered. Changes of this value will take
+         effect after current interval is over."
+    ::= { prvtStatHistObjects 2 }
+
+prvtStatHistType OBJECT-TYPE
+    SYNTAX      INTEGER { absolute(1), delta(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The method of sampling the selected variable.
+         Changes will take effect after current interval is over."
+    ::= { prvtStatHistObjects 3 }
+
+prvtStatHistProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStatHistProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Create profiles with XPath 1.0 pattern."
+    ::= { prvtStatHistObjects 4 }
+
+prvtStatHistProfileEntry OBJECT-TYPE
+    SYNTAX      PrvtStatHistProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtStatHistProfileTable."
+    INDEX       { prvtStatHistProfileName }
+    ::= { prvtStatHistProfileTable 1 }
+
+PrvtStatHistProfileEntry ::= SEQUENCE {
+    prvtStatHistProfileName             OCTET STRING,
+    prvtStatHistProfileRowStatus        RowStatus,
+    prvtStatHistProfileXPathTemplate    OCTET STRING
+}
+
+prvtStatHistProfileName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..128))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Profile identifier - string with length [ 1 .. 128 ]"
+    ::= { prvtStatHistProfileEntry 1 }
+
+prvtStatHistProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Create rows in prvtStatHistProfileTable."
+    ::= { prvtStatHistProfileEntry 2 }
+
+prvtStatHistProfileXPathTemplate OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "XPath 1.0 template - contains data model path, with '{%s}' as
+         key place holder - if we have multiply keys more '%s' must
+         be added. Changes of this value will take effect
+         after current interval is over."
+    ::= { prvtStatHistProfileEntry 3 }
+
+prvtStatHistControlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStatHistControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Control table binds profile to a keys."
+    ::= { prvtStatHistObjects 5 }
+
+prvtStatHistControlEntry OBJECT-TYPE
+    SYNTAX      PrvtStatHistControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtStatHistControlTable."
+    INDEX       { prvtStatHistControlId }
+    ::= { prvtStatHistControlTable 1 }
+
+PrvtStatHistControlEntry ::= SEQUENCE {
+    prvtStatHistControlId           Unsigned32,
+    prvtStatHistControlRowStatus    RowStatus,
+    prvtStatHistControlProfileName  OCTET STRING,
+    prvtStatHistControlXPathKey     OCTET STRING,
+    prvtStatHistControlValue        OCTET STRING,
+    prvtStatHistControlFirstDataId  OCTET STRING,
+    prvtStatHistControlLastDataId   OCTET STRING
+}
+
+prvtStatHistControlId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..200)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Control table identifier. Number [ 1 .. 200 ] "
+    ::= { prvtStatHistControlEntry 1 }
+
+prvtStatHistControlRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Create entry in prvtStatHistControlTable.
+         Changes of this value will take effect after
+         current interval is over."
+    ::= { prvtStatHistControlEntry 2 }
+
+prvtStatHistControlProfileName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..128))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Profile name from prvtStatHistProfileTable.
+         Changes of this value will take effect after
+         current interval is over."
+    ::= { prvtStatHistControlEntry 3 }
+
+prvtStatHistControlXPathKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "XPath key is applied to profile XPath-template.
+         Changes of this value will take effect after
+         current interval is over."
+    ::= { prvtStatHistControlEntry 4 }
+
+prvtStatHistControlValue OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current value of the prvtStatHistControlProfileName +
+         prvtStatHistControlXPathKey or empty if get operation was unsucceful.
+         To debug the problem, enable logs."
+    ::= { prvtStatHistControlEntry 5 }
+
+prvtStatHistControlFirstDataId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "prvtStatHistDataTable has maximum 120 elements.
+         This restriction is due to hardware limitation.
+         prvtStatHistControlFirstDataId will define first valid index
+         in prvtStatHistDataTable table thus making constantly increasing
+         prvtStatHistDataId more predicatable for management systems.
+         Value should be treated as unsigned 64 bits integer"
+    ::= { prvtStatHistControlEntry 6 }
+
+prvtStatHistControlLastDataId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "prvtStatHistDataTable has maximum 120 elements.
+         This restriction is due to hardware limitation.
+         prvtStatHistControlLastDataId will define last valid index
+         in prvtStatHistDataTable table thus making constantly increasing
+         prvtStatHistDataId more predicatable for management systems.
+         Value should be treated as unsigned 64 bits integer"
+    ::= { prvtStatHistControlEntry 7 }
+
+prvtStatHistDataTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStatHistDataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A historical sample of user-defined variables. This sample
+         is associated with the prvtStatHistControlEntry that set up the
+         parameters for a regular collection of these samples.
+         The prvtStatHistControlId value in the index identifies the
+         prvtStatHistControlEntry on whose behalf this entry was created."
+    ::= { prvtStatHistObjects 6 }
+
+prvtStatHistDataEntry OBJECT-TYPE
+    SYNTAX      PrvtStatHistDataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry in prvtStatHistDataTable"
+    INDEX       { prvtStatHistControlId, prvtStatHistDataId }
+    ::= { prvtStatHistDataTable 1 }
+
+PrvtStatHistDataEntry ::= SEQUENCE {
+    prvtStatHistDataId              OCTET STRING,
+    prvtStatHistDataIntervalStart   OCTET STRING,
+    prvtStatHistDataIntervalEnd     OCTET STRING,
+    prvtStatHistDataProfile         OCTET STRING,
+    prvtStatHistDataKey             OCTET STRING,
+    prvtStatHistDataValue           OCTET STRING,
+    prvtStatHistDataStatus          INTEGER
+}
+
+prvtStatHistDataId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Index of prvtStatHistDataTable - 64 unsigned integer,
+         constantly increasing."
+    ::= { prvtStatHistDataEntry 1 }
+
+prvtStatHistDataIntervalStart OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Show when current interval has started."
+    ::= { prvtStatHistDataEntry 2 }
+
+prvtStatHistDataIntervalEnd OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Show when current interval has ended"
+    ::= { prvtStatHistDataEntry 3 }
+
+prvtStatHistDataProfile OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Profile being used"
+    ::= { prvtStatHistDataEntry 4 }
+
+prvtStatHistDataKey OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Key being used"
+    ::= { prvtStatHistDataEntry 5 }
+
+prvtStatHistDataValue OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Result value, 64 unsinged int"
+    ::= { prvtStatHistDataEntry 6 }
+
+prvtStatHistDataStatus OBJECT-TYPE
+    SYNTAX      INTEGER { notAvailable(1), positive(2), negative(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Status of the operation."
+    ::= { prvtStatHistDataEntry 7 }
+
+END -- end of module PRVT-STATISTICS-HISTORY-MIB.

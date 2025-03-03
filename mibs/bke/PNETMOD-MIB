@@ -1,0 +1,255 @@
+--	PNETMOD-MIB 1.02
+--		History:
+--	1.00	6. 11.2012 David Chvalkovsky - modified from NSD1800-MIB
+--	1.01	9. 12.2015 Dusan Ferbas - comment compatibility
+--	1.02	19. 10.2017 Vit Pekarek - Output Fuse description fixed
+--
+--  This is a MIB for Powernet module
+
+
+PNETMOD-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+	OBJECT-TYPE
+		FROM RFC-1212
+	Gauge, enterprises
+		FROM RFC1155-SMI
+	DisplayString, sysName
+		FROM RFC1213-MIB;
+
+--
+-- Type Definitions
+--
+
+OnOff ::= INTEGER {
+	off (0),
+	on (1)
+	}                              
+
+OKFail ::= INTEGER {
+	OK (0),
+	Fail (1)
+	}
+
+ValueType ::= INTEGER {
+	DI (1),
+	AI (2)
+	}
+    
+AlarmDescription ::= INTEGER {
+	InputGridFailure (1),
+	InputFuseFailure (2),
+	PowerSourceFailure (3),
+	PowerSourceCurrentOutOfRange (4),	
+	BatteryVoltageOutOfRange (5),
+	BatteryCurrentChargeOutOfRange (6),
+	BatteryTemperatureOutOfRange (7),
+	BatteryFuseFailure (8),
+	OutputFuseFailure (9),
+	OutputStateDisconnected (10)
+	}
+  
+SignedNumber ::= INTEGER (-32758..32757)
+
+Index ::= INTEGER (0..255)
+
+TimeStamp ::= TimeTicks
+
+--
+-- Node Definitions
+--
+
+bke		OBJECT IDENTIFIER ::= { enterprises 27533 }
+
+pnetMod	OBJECT IDENTIFIER ::= { bke 5 }
+
+-- ---------------------------------------------------------- --
+-- grid Group
+-- ---------------------------------------------------------- --
+grid	OBJECT IDENTIFIER ::= { pnetMod 1 }                                      
+
+gridState OBJECT-TYPE
+	SYNTAX	OKFail
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Grid State Ok/Fail value"
+	::= { grid 1 }
+
+gridFuse OBJECT-TYPE
+	SYNTAX	OKFail
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Grid Fuse Ok/Fail value"
+	::= { grid 2 }
+
+-- ---------------------------------------------------------- --
+-- source Group
+-- ---------------------------------------------------------- --
+powerSource	OBJECT IDENTIFIER ::= { pnetMod 2 }
+
+powerSourceState OBJECT-TYPE
+	SYNTAX	OKFail
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Power Source State Ok/Fail value"
+	::= { powerSource 1 }
+
+powerSourceCurrent OBJECT-TYPE
+	SYNTAX	SignedNumber
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Power Source Current value XXXX divide by 10 to get XXX.X"
+	::= { powerSource 2 }
+  
+-- ---------------------------------------------------------- --
+-- accumulator Group
+-- ---------------------------------------------------------- --
+accumulator	OBJECT IDENTIFIER ::= { pnetMod 3 }
+
+accuVoltage OBJECT-TYPE
+	SYNTAX	SignedNumber
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Accumulator Voltage value XXXX divide by 10 to get XXX.X"
+	::= { accumulator 1 }
+
+accuCurrent OBJECT-TYPE
+	SYNTAX	SignedNumber
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Accumulator Current value XXXX divide by 10 to get XXX.X"
+	::= { accumulator 2 }
+
+accuTemperature OBJECT-TYPE
+	SYNTAX	SignedNumber
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Accumulator Temperature value -XXX divide by 10 to get -XX.X"
+	::= { accumulator 3 }
+
+accuFuse OBJECT-TYPE
+	SYNTAX	OKFail
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Accumulator Fuse Ok/Fail value"
+	::= { accumulator 4 }
+
+-- ---------------------------------------------------------- --
+-- output Group
+-- ---------------------------------------------------------- --
+output OBJECT IDENTIFIER ::= { pnetMod 4 }
+
+outFuse OBJECT-TYPE
+	SYNTAX	OKFail
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"Output Fuse Ok/Fail value"
+	::= { output 1 }
+  
+outState OBJECT-TYPE
+	SYNTAX	OnOff
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"Output State On/Off value"
+	::= { output 2 }
+
+-- ---------------------------------------------------------- --
+-- Alarm Group
+-- ---------------------------------------------------------- --
+alarms	OBJECT IDENTIFIER ::= { pnetMod 10 }
+
+alarmTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF AlarmEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"A list of input entries."
+	::= { alarms 1 }
+
+alarmEntry OBJECT-TYPE
+	SYNTAX	AlarmEntry
+	ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+		"An entry containing information applicable
+		to a particular input."
+	INDEX { alarmIndex }
+	::= { alarmTable 1 }
+
+AlarmEntry ::= SEQUENCE {
+  alarmIndex         Index,
+  alarmDescription   AlarmDescription,
+  valueType	         ValueType,
+  value	             SignedNumber,
+  alarmTimeStamp     TimeStamp
+}
+
+alarmIndex OBJECT-TYPE
+	SYNTAX	Index
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The input index."
+	::= { alarmEntry 1 }
+
+alarmDescription OBJECT-TYPE
+	SYNTAX	AlarmDescription
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The input alarm description."
+	::= { alarmEntry 2 }
+
+valueType OBJECT-TYPE
+	SYNTAX	ValueType
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The input digital or analog type."
+	::= { alarmEntry 3 }
+  
+value OBJECT-TYPE
+	SYNTAX	SignedNumber
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The input alarm value."
+	::= { alarmEntry 4 }
+  
+alarmTimeStamp OBJECT-TYPE
+	SYNTAX	TimeStamp
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The input alarm duration."
+	::= { alarmEntry 5 }
+
+-- ---------------------------------------------------------- --
+-- Trap Definitions
+-- ---------------------------------------------------------- --
+tsTrapAlarmStart TRAP-TYPE
+	ENTERPRISE	pnetMod
+	VARIABLES	{ sysName, alarmDescription, valueType, value }
+	DESCRIPTION
+		"This trap is sent each time an alarm is inserted
+		into the alarm table."
+	::= 1
+
+tsTrapAlarmEnd TRAP-TYPE
+	ENTERPRISE	pnetMod
+	VARIABLES	{ sysName, alarmDescription, valueType, value }
+	DESCRIPTION
+		"This trap is sent each time an alarm is removed
+		from the alarm table."
+	::= 2
+
+END

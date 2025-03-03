@@ -1,0 +1,380 @@
+-- MVR MIB overview:
+-- MVR MIB falls under lb6m MIB node of the private subtree.
+NETGEAR-MVR-PRIVATE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    lb6m                            FROM QUANTA-LB6M-REF-MIB
+    TruthValue, TimeInterval, DisplayString, RowStatus
+                                        FROM SNMPv2-TC
+    InterfaceIndex                      FROM IF-MIB
+    ifIndex, InterfaceIndex             FROM IF-MIB
+    VlanIndex                           FROM Q-BRIDGE-MIB
+    OBJECT-TYPE, MODULE-IDENTITY,IpAddress,Unsigned32
+                                        FROM SNMPv2-SMI;
+
+    fastpathMvr   MODULE-IDENTITY 
+        LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The Netgear Private MIB for MVR Configuration"
+
+      -- Revision history.
+    REVISION
+        "201101260000Z" -- 26 January 2011 12:00:00 GMT
+    DESCRIPTION
+        "Postal address updated."
+    REVISION
+        "200910210000Z" -- 21 October 2009 12:00:00 GMT
+    DESCRIPTION
+        "Initial version."
+                                        
+    ::= { lb6m 50 }
+
+    --**************************************************************************************
+    --    mvrGlobalConfig
+    --**************************************************************************************
+
+    mvrGlobalConfig OBJECT IDENTIFIER ::= { fastpathMvr 1 }
+
+
+    mvrAdminMode OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                   "Enable/Disable MVR. The value true(1) indicates that MVR is enabled 
+                    A value of false(2) indicates that MVR is disabled."
+        DEFVAL  { false }
+        ::= { mvrGlobalConfig 1 }
+
+    mvrModeType OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     compatible(1),
+                     dynamic(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION   
+                   "Shows/Changes MVR mode. 
+                    The value compatible(1) indicates that compatible mode is enabled.
+                    A value of dynamic(2) indicates that dynamic mode is enabled."
+        DEFVAL  { compatible }
+        ::= {mvrGlobalConfig 2 }
+
+    mvrMulticastVlanId OBJECT-TYPE
+        SYNTAX      VlanIndex
+        MAX-ACCESS  read-write
+        STATUS      current 
+        DESCRIPTION
+                   "Shows/Changes the Multicast Vlan number."
+        DEFVAL          { 1 }
+        ::= { mvrGlobalConfig 3 }
+
+    mvrMaxMulticastGroupsCount OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current 
+        DESCRIPTION
+                   "The maximum number of multicast groups that is supported by MVR."
+        ::= { mvrGlobalConfig 4 }
+
+    mvrCurrentMulticastGroupsCount OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current 
+        DESCRIPTION
+                   "The current number of MVR groups allocated."
+        ::= { mvrGlobalConfig 5 }
+
+    mvrQueryTime OBJECT-TYPE
+        SYNTAX      TimeInterval(1..100)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                   "Shows/Changes the MVR Query time, in centiseconds."
+        DEFVAL      { 5 }
+        ::= { mvrGlobalConfig 6 }
+
+    --**************************************************************************************
+    --    mvrPortTable
+    --**************************************************************************************
+
+    mvrPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MvrPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                   "A table of MVR control information about every bridge port.
+                    This is indexed by mvrBasePort."
+        ::= { fastpathMvr 2 }
+
+    mvrPortEntry OBJECT-TYPE
+        SYNTAX      MvrPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                   "MVR control information for a bridge port."
+        INDEX { ifIndex }
+        ::= { mvrPortTable 1 }
+
+    MvrPortEntry ::= SEQUENCE {
+           mvrPortMvrEnabled
+               TruthValue,
+           mvrPortType
+               INTEGER,
+           mvrPortImmediateLeaveMode
+               TruthValue,
+           mvrPortStatus
+               INTEGER
+       }
+
+    mvrPortMvrEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                   "Enable\Disable MVR on port. The value true(1) indicates that MVR is enabled.
+                    A value of false(2) indicates that MVR is disabled."
+        DEFVAL          { false }
+        ::= { mvrPortEntry 1 }
+
+    mvrPortType     OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     source(1),
+                     receiver(2),
+                     none(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                   "MVR Interface type."
+        DEFVAL  { none }
+        ::= { mvrPortEntry 2 }
+
+    mvrPortImmediateLeaveMode OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                   "Shows/Changes Immediate Leave mode for MVR port.
+                    The value true(1) indicates that the port is in Immediate Leave mode.
+                    A value of false(2) indicates that the port is not in Immediate Leave mode."
+        DEFVAL      { false }
+        ::= { mvrPortEntry 3}
+
+    mvrPortStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     activeInVlan(1),
+                     activeNotInVlan(2),
+                     inactiveInVlan(3),
+                     inactiveNotInVlan(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS          current
+        DESCRIPTION
+                   "The interface status."
+        ::= { mvrPortEntry 4 }
+
+
+    --**************************************************************************************
+    --    mvrGroupsTable
+    --**************************************************************************************
+
+    mvrGroupsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MvrGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                   "A table of MVR groups."
+        ::= { fastpathMvr 3 }
+
+    mvrGroupEntry OBJECT-TYPE
+        SYNTAX      MvrGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "MVR information of membership group."
+        INDEX { mvrGroupIPAddress}
+        ::= { mvrGroupsTable 1 }
+
+    MvrGroupEntry::= SEQUENCE {
+           mvrGroupIPAddress
+               IpAddress,
+           mvrGroupStatus
+               INTEGER,
+           mvrGroupRowStatus
+               RowStatus
+                 }
+
+    mvrGroupIPAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                   "The multicast Group IP address."
+        ::= { mvrGroupEntry 1 }
+
+    mvrGroupStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                     active(1),
+                     inactive(2)
+                    }       
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "The status of the specific MVR group."
+        ::= { mvrGroupEntry 2 }
+
+    mvrGroupRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                   "The status of this conceptual row.To create a row in this table,
+                    a manager must set this object to 'createAndGo'(4) .To delete a row in
+                    this table, a manager must set this object to `destroy'(6)"
+        ::= { mvrGroupEntry 3 } 
+
+
+    --**************************************************************************************
+    --    mvrPortMembershipTable
+    --**************************************************************************************
+    mvrPortMembershipTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MvrPortMembershipEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                   "A table of MVR membership groups."
+        ::= { fastpathMvr 4 }
+
+    mvrPortMembershipEntry OBJECT-TYPE
+        SYNTAX      MvrPortMembershipEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "MVR information of membership group."
+        INDEX { mvrPortMembershipGroupIPAddress,  mvrPortMembershipPortIfIndex}
+        ::= { mvrPortMembershipTable 1 }
+
+    MvrPortMembershipEntry::= SEQUENCE {
+           mvrPortMembershipGroupIPAddress
+               IpAddress,
+           mvrPortMembershipPortIfIndex
+               InterfaceIndex,
+           mvrPortMembershipRowStatus
+               RowStatus
+                 }
+
+    mvrPortMembershipGroupIPAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                   "The multicast Group IP address."
+        ::= { mvrPortMembershipEntry 1 }
+
+    mvrPortMembershipPortIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                   "Interface index in 'ifTable'."
+        ::= { mvrPortMembershipEntry 2 }
+
+    mvrPortMembershipRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                   "The status of this conceptual row.To create a row in this table,
+                    a manager must set this object to 'createAndGo'(4) .To delete a row in
+                    this table, a manager must set this object to `destroy'(6)"
+        ::= { mvrPortMembershipEntry 3 } 
+
+
+    --**************************************************************************************
+    --    mvrStatistics
+    --**************************************************************************************
+
+    mvrStatistics OBJECT IDENTIFIER ::= { fastpathMvr 5 }
+
+    mvrIGMPQueryReceived OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "Number of received IGMP Queries. "
+        ::= { mvrStatistics 1 }
+
+    mvrIGMPReportV1Received OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "Number of received IGMP Reports V1. "
+        ::= { mvrStatistics 2 }
+
+    mvrIGMPReportV2Received OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "Number of received IGMP Reports V1. "
+        ::= { mvrStatistics 3 }
+
+    mvrIGMPLeaveReceived OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "Number of received IGMP Leaves. "
+        ::= { mvrStatistics 4 }
+
+    mvrIGMPQueryTransmitted OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "Number of transmitted IGMP Queries. "
+        ::= { mvrStatistics 5 }
+
+    mvrIGMPReportV1Transmitted OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "Number of transmitted IGMP Reports V1. "
+        ::= { mvrStatistics 6 }
+
+     mvrIGMPReportV2Transmitted OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "Number of transmitted IGMP Reports V2. "
+        ::= { mvrStatistics 7 }
+
+    mvrIGMPLeaveTransmitted OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "Number of transmitted IGMP Leaves. "
+        ::= { mvrStatistics 8 }
+
+    mvrIGMPPacketReceiveFailures OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "Number of failures on receiving the IGMP packets. "
+        ::= { mvrStatistics 9 }
+
+    mvrIGMPPacketTransmitFailures OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                   "Number of failures on transmitting the IGMP packets. "
+        ::= { mvrStatistics 10 }
+
+END

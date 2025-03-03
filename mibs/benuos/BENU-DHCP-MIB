@@ -1,0 +1,1844 @@
+BENU-DHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Integer32, Unsigned32, MODULE-IDENTITY, OBJECT-TYPE,
+   OBJECT-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+
+   InetAddressIPv4 ,InetAddressPrefixLength
+      FROM INET-ADDRESS-MIB
+
+   benuWAG FROM BENU-WAG-MIB;
+
+bDhcpMIB  MODULE-IDENTITY
+            LAST-UPDATED "201512180000Z" -- December 18, 2015
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "The MIB module for entities implementing the server side of
+                the Bootstrap Protocol (BOOTP) and the Dynamic Host
+                Configuration protocol (DHCP) for IPv4 and IPv6.
+
+                Copyright (C) 2014 by Benu Networks, Inc.
+                All rights reserved."
+
+            REVISION "201512180000Z" -- December 18, 2015
+            DESCRIPTION "Added bDhcpHomeSubnetUsedAddrLow, bDhcpHomeSubnetUsedAddrHigh & added bDhcpv4NotifObjects for supporting Home wrt Home subnets."
+
+            REVISION "201511120000Z" -- November 12, 2015
+            DESCRIPTION "Added bDhcpSPWiFiGlobalTable and bDhcpHomeGlobalTable"
+
+            REVISION "201501290000Z" -- January 29, 2015
+            DESCRIPTION "Added max. values for ranges & subnet."
+
+            REVISION "201501160000Z" -- January 16, 2015
+            DESCRIPTION "Updated notification assignments to comply with standards (RFC 2578)."
+
+            REVISION "201407300000Z" -- July 30, 2014
+            DESCRIPTION "bDhcpGlobalTable updated with release indications sent."
+
+            REVISION "201404140000Z" -- April 14, 2014
+            DESCRIPTION "bDhcpSubnetTable updated with peak addresses held statistic."
+
+            REVISION "201310220000Z" --  October 22, 2013
+            DESCRIPTION "This version introduces support for DHCPv6"
+
+    ::= { benuWAG 6 }
+
+-- declare top-level MIB objects
+
+bDhcpNotifications OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "DHCP  Notifications are defined in this branch."
+   ::= { bDhcpMIB  0 }
+
+bDhcpv4MIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "DHCP v4 MIB objects information is defined in this branch."
+   ::= { bDhcpMIB 1 }
+
+bDhcpv4NotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "DHCP v4 Notifications are defined in this branch."
+   ::= { bDhcpMIB 2 }
+
+bDhcpv6MIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "DHCP v6 MIB objects information is defined in this branch."
+   ::= { bDhcpMIB 3 }
+
+bDhcpv6NotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "DHCP v6 Notifications are defined in this branch."
+   ::= { bDhcpMIB 4 }
+
+
+-- DHCP subnet table
+
+bDhcpSubnetTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BDhcpSubnetEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of subnets that are configured in this server."
+   ::= { bDhcpv4MIBObjects 1 }
+
+bDhcpSubnetEntry  OBJECT-TYPE
+   SYNTAX      BDhcpSubnetEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bDhcpSubnetTable."
+   INDEX {
+       bDhcpSubnetStatsInterval,
+       bDhcpSubnetIndex,
+       bDhcpSubnetRangeIndex
+   }
+   ::= { bDhcpSubnetTable 1 }
+
+BDhcpSubnetEntry ::= SEQUENCE {
+   bDhcpSubnetStatsInterval                      Integer32,
+   bDhcpSubnetIndex                              Integer32,
+   bDhcpSubnetRangeIndex                         Integer32,
+   bDhcpSubnetIntervalDuration                   Integer32,
+   bDhcpSubnetStartAddress                       InetAddressIPv4,
+   bDhcpSubnetEndAddress                         InetAddressIPv4,
+   bDhcpSubnetTotalAddresses                     Unsigned32,
+   bDhcpSubnetPeakFreeAddresses                  Unsigned32,
+   bDhcpSubnetPeakUsedAddresses                  Unsigned32,
+   bDhcpSubnetAddress                            InetAddressIPv4,
+   bDhcpSubnetMask                               InetAddressPrefixLength,
+   bDhcpSubnetUsedAddrLowThreshold               Unsigned32,
+   bDhcpSubnetUsedAddrHighThreshold              Unsigned32,
+   bDhcpSubnetPeakHoldAddresses                  Unsigned32
+}
+
+bDhcpSubnetStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval
+       for which statistics accumulation was completed. Older
+       the statistics interval data greater the interval index value.
+       In a system supporting a history of n intervals with
+       IntervalCount(1) and IntervalCount(n) the most and least recent
+       intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for 1 <= i <n .
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bDhcpSubnetEntry 1 }
+
+bDhcpSubnetIndex  OBJECT-TYPE
+   SYNTAX      Integer32 (1..144)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The index of the subnet entry in the table. DHCP supports max. 144
+subnets."
+   ::= { bDhcpSubnetEntry 2 }
+
+bDhcpSubnetRangeIndex  OBJECT-TYPE
+   SYNTAX      Integer32 (1..16)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The index of the range from the subnet entry in the table. DHCP
+supports max. 16 ranges per subnet."
+   ::= { bDhcpSubnetEntry 3 }
+
+bDhcpSubnetIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Duration of the interval in minutes."
+   ::= { bDhcpSubnetEntry 4 }
+
+bDhcpSubnetStartAddress  OBJECT-TYPE
+   SYNTAX      InetAddressIPv4
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The first subnet IP address."
+   ::= { bDhcpSubnetEntry 5 }
+
+bDhcpSubnetEndAddress  OBJECT-TYPE
+   SYNTAX      InetAddressIPv4
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The last subnet IP address."
+   ::= { bDhcpSubnetEntry 6 }
+
+bDhcpSubnetTotalAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The total number of addresses in the subnet ."
+   ::= { bDhcpSubnetEntry 7 }
+
+bDhcpSubnetPeakFreeAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The peak number of free IP addresses that are available in the subnet"
+   ::= { bDhcpSubnetEntry 8 }
+
+bDhcpSubnetPeakUsedAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The peak number of used IP addresses that are used in the subnet"
+   ::= { bDhcpSubnetEntry 9 }
+
+bDhcpSubnetAddress  OBJECT-TYPE
+   SYNTAX      InetAddressIPv4
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The IP address of the subnet entry in the table."
+   ::= { bDhcpSubnetEntry 10 }
+
+bDhcpSubnetMask  OBJECT-TYPE
+   SYNTAX      InetAddressPrefixLength
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The subnet mask of the subnet."
+   ::= { bDhcpSubnetEntry 11 }
+
+bDhcpSubnetUsedAddrLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The low threshold for used IP addresses in this subnet.
+        If the value for used IP addresses in this subnet
+        becomes equal to or less than this value and the current
+        condition for bDhcpSubnetUsedAddrHigh is raised, then a
+        bDhcpSubnetUsedAddrLow event will be generated. No more
+        bDhcpSubnetUsedAddrLow events will be generated for this
+        subnet during its execution until the value for used addresses
+        has exceeded the value of bDhcpSubnetUsedAddrHighThreshold."
+   ::= { bDhcpSubnetEntry 12 }
+
+bDhcpSubnetUsedAddrHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The high threshold for used IP addresses in this subnet.
+        If a bDhcpSubnetUsedAddrLow event has been generated (or no
+        bDhcpSubnetUsedAddrHigh was generated previously) for this
+        subnet, and the value for used IP addresses in this subnet
+        has exceeded this value then a bDhcpSubnetUsedAddrHigh
+        event will be generated. No more bDhcpSubnetUsedAddrHigh
+        events will be generated for this subnet during its execution
+        until the value for used addresses in this subnet becomes
+        equal to or less than the value of
+        bDhcpSubnetUsedAddrLowThreshold."
+   ::= { bDhcpSubnetEntry 13 }
+
+bDhcpSubnetPeakHoldAddresses OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The peak number of IP addresses that are held within this subnet."
+   ::= { bDhcpSubnetEntry 14 }
+
+-- DHCP Global Table information
+
+bDhcpGlobalTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BDhcpGlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of Global DHCP server information for various intervals."
+   ::= { bDhcpv4MIBObjects 2 }
+
+bDhcpGlobalEntry  OBJECT-TYPE
+   SYNTAX      BDhcpGlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bDhcpGlobalTable."
+   INDEX {
+       bDhcpGlobalStatsInterval
+   }
+   ::= { bDhcpGlobalTable 1 }
+
+BDhcpGlobalEntry ::= SEQUENCE {
+   bDhcpGlobalStatsInterval                Integer32,
+   bDhcpDiscoversRcvd                      Unsigned32,
+   bDhcpOffersSent                         Unsigned32,
+   bDhcpRequestsRcvd                       Unsigned32,
+   bDhcpDeclinesRcvd                       Unsigned32,
+   bDhcpAcksSent                           Unsigned32,
+   bDhcpNacksSent                          Unsigned32,
+   bDhcpReleasesRcvd                       Unsigned32,
+   bDhcpReleasesIndRcvd                    Unsigned32,
+   bDhcpReleasesSent                       Unsigned32,
+   bDhcpInformsRcvd                        Unsigned32,
+   bDhcpInformsAckSent                     Unsigned32,
+   bDhcpDropDiscover                       Unsigned32,
+   bDhcpDropRequest                        Unsigned32,
+   bDhcpDropRelease                        Unsigned32,
+   bDhcpLeasesAssigned                     Unsigned32,
+   bDhcpLeasesReleased                     Unsigned32,
+   bDhcpLeasesRelFail                      Unsigned32,
+   bDhcpLeasesExpired                      Unsigned32,
+   bDhcpLeasesRenewed                      Unsigned32,
+   bDhcpLeasesRenewFail                    Unsigned32,
+   bDhcpLeasesNotAssignServIntNotConfig    Unsigned32,
+   bDhcpLeasesNotAssignFreeBuffUnavail     Unsigned32,
+   bDhcpIntervalDuration                   Integer32,
+   bBootpRequestsRcvd                      Unsigned32,
+   bBootpRepliesSent                       Unsigned32,
+   bDhcpReleasesIndSent                    Unsigned32
+}
+
+bDhcpGlobalStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for 1 <= i <n .
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bDhcpGlobalEntry 1 }
+
+bDhcpDiscoversRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPDISCOVER packets received."
+   ::= { bDhcpGlobalEntry 2 }
+
+bDhcpOffersSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPOFFER packets sent."
+   ::= { bDhcpGlobalEntry 3 }
+
+bDhcpRequestsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPREQUEST packets received."
+   ::= { bDhcpGlobalEntry 4}
+
+bDhcpDeclinesRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPDECLINE packets received."
+   ::= { bDhcpGlobalEntry 5 }
+
+bDhcpAcksSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPACK packets sent."
+::={ bDhcpGlobalEntry 6 }
+
+bDhcpNacksSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPNACK packets sent."
+   ::= { bDhcpGlobalEntry 7 }
+
+bDhcpReleasesRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPRELEASE packets received."
+   ::= { bDhcpGlobalEntry 8 }
+
+bDhcpReleasesIndRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPRELEASE indication packets received."
+   ::= { bDhcpGlobalEntry 9 }
+
+bDhcpReleasesSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPRELEASE packets sent."
+   ::= { bDhcpGlobalEntry 10 }
+
+bDhcpInformsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPINFORM packets received."
+   ::= { bDhcpGlobalEntry 11 }
+
+bDhcpInformsAckSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPINFORM ACK packets sent."
+   ::= { bDhcpGlobalEntry 12 }
+
+bDhcpDropDiscover  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPDISCOVER packets dropped."
+   ::= { bDhcpGlobalEntry 13 }
+
+bDhcpDropRequest  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPREQUEST packets dropped."
+   ::= { bDhcpGlobalEntry 14 }
+
+bDhcpDropRelease  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPRELEASE packets dropped."
+   ::= { bDhcpGlobalEntry 15 }
+
+bDhcpLeasesAssigned  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases assigned on DHCP server"
+   ::= { bDhcpGlobalEntry 16 }
+
+bDhcpLeasesReleased  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases released on DHCP server"
+   ::= { bDhcpGlobalEntry 17 }
+
+bDhcpLeasesRelFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases release failed on DHCP server"
+   ::= { bDhcpGlobalEntry 18 }
+
+bDhcpLeasesExpired  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases expired on DHCP server"
+   ::= { bDhcpGlobalEntry 19 }
+
+bDhcpLeasesRenewed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases renewed on DHCP server"
+   ::= { bDhcpGlobalEntry 20 }
+
+bDhcpLeasesRenewFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases renew failed on DHCP server"
+   ::= { bDhcpGlobalEntry 21 }
+
+bDhcpLeasesNotAssignServIntNotConfig  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases not assigned due to interface not configured
+       on DHCP server"
+   ::= { bDhcpGlobalEntry 22 }
+
+bDhcpLeasesNotAssignFreeBuffUnavail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases not assigned due to unavailability of
+       free buffers"
+   ::= { bDhcpGlobalEntry 23 }
+
+bDhcpIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Duration of the interval in minutes"
+   ::= { bDhcpGlobalEntry 24 }
+
+bBootpRequestsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of BOOTP request mesages received"
+   ::= { bDhcpGlobalEntry 25 }
+
+bBootpRepliesSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of BOOTP reply mesages sent"
+   ::= { bDhcpGlobalEntry 26 }
+
+bDhcpReleasesIndSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPRELEASE indication packets sent."
+   ::= { bDhcpGlobalEntry 27 }
+
+-- DHCP Global Table information for SPWiFi
+
+bDhcpSPWiFiGlobalTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BDhcpSPWiFiGlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of Global DHCP server information for SPWiFi for various intervals."
+   ::= { bDhcpv4MIBObjects 4 }
+
+bDhcpSPWiFiGlobalEntry  OBJECT-TYPE
+   SYNTAX      BDhcpSPWiFiGlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bDhcpSPWiFiGlobalTable."
+   INDEX {
+       bDhcpSPWiFiGlobalStatsInterval
+   }
+   ::= { bDhcpSPWiFiGlobalTable 1 }
+
+BDhcpSPWiFiGlobalEntry ::= SEQUENCE {
+   bDhcpSPWiFiGlobalStatsInterval                Integer32,
+   bDhcpSPWiFiDiscoversRcvd                      Unsigned32,
+   bDhcpSPWiFiOffersSent                         Unsigned32,
+   bDhcpSPWiFiRequestsRcvd                       Unsigned32,
+   bDhcpSPWiFiDeclinesRcvd                       Unsigned32,
+   bDhcpSPWiFiAcksSent                           Unsigned32,
+   bDhcpSPWiFiNacksSent                          Unsigned32,
+   bDhcpSPWiFiReleasesRcvd                       Unsigned32,
+   bDhcpSPWiFiReleasesIndRcvd                    Unsigned32,
+   bDhcpSPWiFiReleasesSent                       Unsigned32,
+   bDhcpSPWiFiInformsRcvd                        Unsigned32,
+   bDhcpSPWiFiInformsAckSent                     Unsigned32,
+   bDhcpSPWiFiDropDiscover                       Unsigned32,
+   bDhcpSPWiFiDropRequest                        Unsigned32,
+   bDhcpSPWiFiDropRelease                        Unsigned32,
+   bDhcpSPWiFiLeasesAssigned                     Unsigned32,
+   bDhcpSPWiFiLeasesReleased                     Unsigned32,
+   bDhcpSPWiFiLeasesRelFail                      Unsigned32,
+   bDhcpSPWiFiLeasesExpired                      Unsigned32,
+   bDhcpSPWiFiLeasesRenewed                      Unsigned32,
+   bDhcpSPWiFiLeasesRenewFail                    Unsigned32,
+   bDhcpSPWiFiLeasesNotAssignServIntNotConfig    Unsigned32,
+   bDhcpSPWiFiLeasesNotAssignFreeBuffUnavail     Unsigned32,
+   bDhcpSPWiFiIntervalDuration                   Integer32,
+   bSPWiFiBootpRequestsRcvd                      Unsigned32,
+   bSPWiFiBootpRepliesSent                       Unsigned32,
+   bDhcpSPWiFiReleasesIndSent                    Unsigned32
+}
+
+bDhcpSPWiFiGlobalStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for 1 <= i <n .
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bDhcpSPWiFiGlobalEntry 1 }
+
+bDhcpSPWiFiDiscoversRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPDISCOVER packets received."
+   ::= { bDhcpSPWiFiGlobalEntry 2 }
+
+bDhcpSPWiFiOffersSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPOFFER packets sent."
+   ::= { bDhcpSPWiFiGlobalEntry 3 }
+
+bDhcpSPWiFiRequestsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPREQUEST packets received."
+   ::= { bDhcpSPWiFiGlobalEntry 4}
+
+bDhcpSPWiFiDeclinesRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPDECLINE packets received."
+   ::= { bDhcpSPWiFiGlobalEntry 5 }
+
+bDhcpSPWiFiAcksSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPACK packets sent."
+::={ bDhcpSPWiFiGlobalEntry 6 }
+
+bDhcpSPWiFiNacksSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPNACK packets sent."
+   ::= { bDhcpSPWiFiGlobalEntry 7 }
+
+bDhcpSPWiFiReleasesRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPRELEASE packets received."
+   ::= { bDhcpSPWiFiGlobalEntry 8 }
+
+bDhcpSPWiFiReleasesIndRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPRELEASE indication packets received."
+   ::= { bDhcpSPWiFiGlobalEntry 9 }
+
+bDhcpSPWiFiReleasesSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPRELEASE packets sent."
+   ::= { bDhcpSPWiFiGlobalEntry 10 }
+
+bDhcpSPWiFiInformsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPINFORM packets received."
+   ::= { bDhcpSPWiFiGlobalEntry 11 }
+
+bDhcpSPWiFiInformsAckSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPINFORM ACK packets sent."
+   ::= { bDhcpSPWiFiGlobalEntry 12 }
+
+bDhcpSPWiFiDropDiscover  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPDISCOVER packets dropped."
+   ::= { bDhcpSPWiFiGlobalEntry 13 }
+
+bDhcpSPWiFiDropRequest  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPREQUEST packets dropped."
+   ::= { bDhcpSPWiFiGlobalEntry 14 }
+
+bDhcpSPWiFiDropRelease  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPRELEASE packets dropped."
+   ::= { bDhcpSPWiFiGlobalEntry 15 }
+
+bDhcpSPWiFiLeasesAssigned  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of SPWiFi leases assigned on DHCP server"
+   ::= { bDhcpSPWiFiGlobalEntry 16 }
+
+bDhcpSPWiFiLeasesReleased  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of SPWiFi leases released on DHCP server"
+   ::= { bDhcpSPWiFiGlobalEntry 17 }
+
+bDhcpSPWiFiLeasesRelFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of SPWiFi leases release failed on DHCP server"
+   ::= { bDhcpSPWiFiGlobalEntry 18 }
+
+bDhcpSPWiFiLeasesExpired  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of SPWiFi leases expired on DHCP server"
+   ::= { bDhcpSPWiFiGlobalEntry 19 }
+
+bDhcpSPWiFiLeasesRenewed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of SPWiFi leases renewed on DHCP server"
+   ::= { bDhcpSPWiFiGlobalEntry 20 }
+
+bDhcpSPWiFiLeasesRenewFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of SPWiFi leases renew failed on DHCP server"
+   ::= { bDhcpSPWiFiGlobalEntry 21 }
+
+bDhcpSPWiFiLeasesNotAssignServIntNotConfig  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of SPWiFi leases not assigned due to interface not configured
+       on DHCP server"
+   ::= { bDhcpSPWiFiGlobalEntry 22 }
+
+bDhcpSPWiFiLeasesNotAssignFreeBuffUnavail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of SPWiFi leases not assigned due to unavailability of
+       free buffers"
+   ::= { bDhcpSPWiFiGlobalEntry 23 }
+
+bDhcpSPWiFiIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "SPWiFi duration of the interval in minutes"
+   ::= { bDhcpSPWiFiGlobalEntry 24 }
+
+bSPWiFiBootpRequestsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of SPWiFi BOOTP request mesages received"
+   ::= { bDhcpSPWiFiGlobalEntry 25 }
+
+bSPWiFiBootpRepliesSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of SPWiFi BOOTP reply mesages sent"
+   ::= { bDhcpSPWiFiGlobalEntry 26 }
+
+bDhcpSPWiFiReleasesIndSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of SPWiFi DHCPRELEASE indication packets sent."
+   ::= { bDhcpSPWiFiGlobalEntry 27 }
+
+-- DHCP Global Table information for Home
+
+bDhcpHomeGlobalTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BDhcpHomeGlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of Global DHCP server information for Home for various intervals."
+   ::= { bDhcpv4MIBObjects 5 }
+
+bDhcpHomeGlobalEntry  OBJECT-TYPE
+   SYNTAX      BDhcpHomeGlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bDhcpHomeGlobalTable."
+   INDEX {
+       bDhcpHomeGlobalStatsInterval
+   }
+   ::= { bDhcpHomeGlobalTable 1 }
+
+BDhcpHomeGlobalEntry ::= SEQUENCE {
+   bDhcpHomeGlobalStatsInterval                Integer32,
+   bDhcpHomeDiscoversRcvd                      Unsigned32,
+   bDhcpHomeOffersSent                         Unsigned32,
+   bDhcpHomeRequestsRcvd                       Unsigned32,
+   bDhcpHomeDeclinesRcvd                       Unsigned32,
+   bDhcpHomeAcksSent                           Unsigned32,
+   bDhcpHomeNacksSent                          Unsigned32,
+   bDhcpHomeReleasesRcvd                       Unsigned32,
+   bDhcpHomeReleasesIndRcvd                    Unsigned32,
+   bDhcpHomeReleasesSent                       Unsigned32,
+   bDhcpHomeInformsRcvd                        Unsigned32,
+   bDhcpHomeInformsAckSent                     Unsigned32,
+   bDhcpHomeDropDiscover                       Unsigned32,
+   bDhcpHomeDropRequest                        Unsigned32,
+   bDhcpHomeDropRelease                        Unsigned32,
+   bDhcpHomeLeasesAssigned                     Unsigned32,
+   bDhcpHomeLeasesReleased                     Unsigned32,
+   bDhcpHomeLeasesRelFail                      Unsigned32,
+   bDhcpHomeLeasesExpired                      Unsigned32,
+   bDhcpHomeLeasesRenewed                      Unsigned32,
+   bDhcpHomeLeasesRenewFail                    Unsigned32,
+   bDhcpHomeLeasesNotAssignServIntNotConfig    Unsigned32,
+   bDhcpHomeLeasesNotAssignFreeBuffUnavail     Unsigned32,
+   bDhcpHomeIntervalDuration                   Integer32,
+   bHomeBootpRequestsRcvd                      Unsigned32,
+   bHomeBootpRepliesSent                       Unsigned32,
+   bDhcpHomeReleasesIndSent                    Unsigned32
+}
+
+bDhcpHomeGlobalStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for 1 <= i <n .
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bDhcpHomeGlobalEntry 1 }
+
+bDhcpHomeDiscoversRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPDISCOVER packets received."
+   ::= { bDhcpHomeGlobalEntry 2 }
+
+bDhcpHomeOffersSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPOFFER packets sent."
+   ::= { bDhcpHomeGlobalEntry 3 }
+
+bDhcpHomeRequestsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPREQUEST packets received."
+   ::= { bDhcpHomeGlobalEntry 4}
+
+bDhcpHomeDeclinesRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPDECLINE packets received."
+   ::= { bDhcpHomeGlobalEntry 5 }
+
+bDhcpHomeAcksSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPACK packets sent."
+::={ bDhcpHomeGlobalEntry 6 }
+
+bDhcpHomeNacksSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPNACK packets sent."
+   ::= { bDhcpHomeGlobalEntry 7 }
+
+bDhcpHomeReleasesRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPRELEASE packets received."
+   ::= { bDhcpHomeGlobalEntry 8 }
+
+bDhcpHomeReleasesIndRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPRELEASE indication packets received."
+   ::= { bDhcpHomeGlobalEntry 9 }
+
+bDhcpHomeReleasesSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPRELEASE packets sent."
+   ::= { bDhcpHomeGlobalEntry 10 }
+
+bDhcpHomeInformsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPINFORM packets received."
+   ::= { bDhcpHomeGlobalEntry 11 }
+
+bDhcpHomeInformsAckSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPINFORM ACK packets sent."
+   ::= { bDhcpHomeGlobalEntry 12 }
+
+bDhcpHomeDropDiscover  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPDISCOVER packets dropped."
+   ::= { bDhcpHomeGlobalEntry 13 }
+
+bDhcpHomeDropRequest  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPREQUEST packets dropped."
+   ::= { bDhcpHomeGlobalEntry 14 }
+
+bDhcpHomeDropRelease  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPRELEASE packets dropped."
+   ::= { bDhcpHomeGlobalEntry 15 }
+
+bDhcpHomeLeasesAssigned  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Home leases assigned on DHCP server"
+   ::= { bDhcpHomeGlobalEntry 16 }
+
+bDhcpHomeLeasesReleased  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Home leases released on DHCP server"
+   ::= { bDhcpHomeGlobalEntry 17 }
+
+bDhcpHomeLeasesRelFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Home leases release failed on DHCP server"
+   ::= { bDhcpHomeGlobalEntry 18 }
+
+bDhcpHomeLeasesExpired  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Home leases expired on DHCP server"
+   ::= { bDhcpHomeGlobalEntry 19 }
+
+bDhcpHomeLeasesRenewed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Home leases renewed on DHCP server"
+   ::= { bDhcpHomeGlobalEntry 20 }
+
+bDhcpHomeLeasesRenewFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Home leases renew failed on DHCP server"
+   ::= { bDhcpHomeGlobalEntry 21 }
+
+bDhcpHomeLeasesNotAssignServIntNotConfig  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Home leases not assigned due to interface not configured
+       on DHCP server"
+   ::= { bDhcpHomeGlobalEntry 22 }
+
+bDhcpHomeLeasesNotAssignFreeBuffUnavail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Home leases not assigned due to unavailability of
+       free buffers"
+   ::= { bDhcpHomeGlobalEntry 23 }
+
+bDhcpHomeIntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Home duration of the interval in minutes"
+   ::= { bDhcpHomeGlobalEntry 24 }
+
+bHomeBootpRequestsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Home BOOTP request mesages received"
+   ::= { bDhcpHomeGlobalEntry 25 }
+
+bHomeBootpRepliesSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Home BOOTP reply mesages sent"
+   ::= { bDhcpHomeGlobalEntry 26 }
+
+bDhcpHomeReleasesIndSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Home DHCPRELEASE indication packets sent."
+   ::= { bDhcpHomeGlobalEntry 27 }
+
+
+-- DHCP v4 Scalars
+
+bDhcpv4ActiveClient       OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION 
+        "The number of DHCP v4 active clients."
+   ::= { bDhcpv4MIBObjects 3 }
+
+bDhcpv4ActiveSpWiFiClients       OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION 
+        "The number of DHCP v4 SP WiFi active clients."
+   ::= { bDhcpv4MIBObjects 6 }
+
+bDhcpv4ActiveHomeClients       OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION 
+        "The number of DHCP v4 active Home clients."
+   ::= { bDhcpv4MIBObjects 7 }
+
+-- DHCP v6 Scalars
+
+bDhcpv6ActiveClient       OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+        "The number of DHCP v6 active clients."
+   ::= { bDhcpv6MIBObjects 1 }
+
+-- DHCPv6 Global Table information
+
+bDhcpv6GlobalTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BDhcpv6GlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A list of Global DHCPv6 server information for various intervals."
+   ::= { bDhcpv6MIBObjects 2 }
+
+bDhcpv6GlobalEntry  OBJECT-TYPE
+   SYNTAX      BDhcpv6GlobalEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A logical row in the bDhcpv6GlobalTable."
+   INDEX {
+       bDhcpv6GlobalStatsInterval
+   }
+   ::= { bDhcpv6GlobalTable 1 }
+
+BDhcpv6GlobalEntry ::= SEQUENCE {
+   bDhcpv6GlobalStatsInterval                Integer32,
+   bDhcpv6SolicitsRcvd                       Unsigned32,
+   bDhcpv6OffersSent                         Unsigned32,
+   bDhcpv6RequestsRcvd                       Unsigned32,
+   bDhcpv6DeclinesRcvd                       Unsigned32,
+   bDhcpv6ReleasesRcvd                       Unsigned32,
+   bDhcpv6ReleaseIndRcvd                     Unsigned32,
+   bDhcpv6RenewRcvd                          Unsigned32,
+   bDhcpv6RebindRcvd                         Unsigned32,
+   bDhcpv6InformsRcvd                        Unsigned32,
+   bDhcpv6ConfirmsRcvd                       Unsigned32,
+   bDhcpv6ReplysSent                         Unsigned32,
+   bDhcpv6AdvertisesSent                     Unsigned32,
+   bDhcpv6UnknownMsgsRcvd                    Unsigned32,
+   bDhcpv6ReconfigsSent                      Unsigned32,
+   bDhcpv6DropSolicit                        Unsigned32,
+   bDhcpv6DropAdvertise                      Unsigned32,
+   bDhcpv6DropDupSolicit                     Unsigned32,
+   bDhcpv6DropRequest                        Unsigned32,
+   bDhcpv6DropRelease                        Unsigned32,
+   bDhcpv6DropDecline                        Unsigned32,
+   bDhcpv6DropRenew                          Unsigned32,
+   bDhcpv6DropRebind                         Unsigned32,
+   bDhcpv6DropConfirm                        Unsigned32,
+   bDhcpv6DropInform                         Unsigned32,
+   bDhcpv6DropRelay                          Unsigned32,
+   bDhcpv6DropReply                          Unsigned32,
+   bDhcpv6DropRelayReply                     Unsigned32,
+   bDhcpv6DropReconfig                       Unsigned32,
+   bDhcpv6LeasesOffered                      Unsigned32,
+   bDhcpv6LeasesAssigned                     Unsigned32,
+   bDhcpv6LeasesReleased                     Unsigned32,
+   bDhcpv6LeasesRelFail                      Unsigned32,
+   bDhcpv6LeasesExpired                      Unsigned32,
+   bDhcpv6LeasesExpiryFail                   Unsigned32,
+   bDhcpv6LeasesRenewed                      Unsigned32,
+   bDhcpv6LeasesRenewFail                    Unsigned32,
+   bDhcpv6InternalError                      Unsigned32,
+   bDhcpv6NoInterface                        Unsigned32,
+   bDhcpv6ClientIdNotPres                    Unsigned32,
+   bDhcpv6ServerIdNotPres                    Unsigned32,
+   bDhcpv6ORONotPres                         Unsigned32,
+   bDhcpv6ClientIdPres                       Unsigned32,
+   bDhcpv6ServerIdPres                       Unsigned32,
+   bDhcpv6UnicastSolicitRcvd                 Unsigned32,
+   bDhcpv6UnicastRequestRcvd                 Unsigned32,
+   bDhcpv6UnicastRenewRcvd                   Unsigned32,
+   bDhcpv6UnicastConfirmRcvd                 Unsigned32,
+   bDhcpv6UnicastDeclineRcvd                 Unsigned32,
+   bDhcpv6UnicastReleaseRcvd                 Unsigned32,
+   bDhcpv6UnicastRebindRcvd                  Unsigned32,
+   bDhcpv6RebindWithoutAddrRcvd              Unsigned32,
+   bDhcpv6ConfirmWithoutAddrRcvd             Unsigned32,
+   bDhcpv6DeclineWithoutAddrRcvd             Unsigned32,
+   bDhcpv6RebindWithoutAddrOrMoreRcvd        Unsigned32,
+   bDhcpv6RenewWithoutAddrOrMoreRcvd         Unsigned32,
+   bDhcpv6RebindFail                         Unsigned32,
+   bDhcpv6ReconfAcceptInSolicitMissing       Unsigned32,
+   bDhcpv6IntervalDuration                   Integer32
+}
+
+bDhcpv6GlobalStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval where the measurements were accumulated.
+       The interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics interval data greater the
+       interval index value.
+       In a system supporting a history of n intervals with IntervalCount(1) and
+       IntervalCount(n) the most and least recent intervals respectively, the following
+       applies at the end of a interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that
+         of IntervalCount(i+1) for 1 <= i <n .
+       - the value of IntervalCount(1) becomes that
+         of CurrentCount"
+   ::= { bDhcpv6GlobalEntry 1 }
+
+bDhcpv6SolicitsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Solicit packets received."
+   ::= { bDhcpv6GlobalEntry 2 }
+
+bDhcpv6OffersSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPOFFER packets sent."
+   ::= { bDhcpv6GlobalEntry 3 }
+
+bDhcpv6RequestsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Request packets received."
+   ::= { bDhcpv6GlobalEntry 4}
+
+bDhcpv6DeclinesRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Decline packets received."
+   ::= { bDhcpv6GlobalEntry 5 }
+
+bDhcpv6ReleasesRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Release packets received."
+   ::= { bDhcpv6GlobalEntry 6 }
+
+bDhcpv6ReleaseIndRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 ReleaseInd packets received."
+   ::= { bDhcpv6GlobalEntry 7 }
+
+bDhcpv6RenewRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Renew packets received."
+   ::= { bDhcpv6GlobalEntry 8 }
+
+bDhcpv6RebindRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Rebind packets received."
+   ::= { bDhcpv6GlobalEntry 9 }
+
+bDhcpv6InformsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Inform packets received."
+   ::= { bDhcpv6GlobalEntry 10 }
+
+bDhcpv6ConfirmsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Confirm packets received."
+   ::= { bDhcpv6GlobalEntry 11 }
+
+bDhcpv6ReplysSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Reply packets sent."
+   ::= { bDhcpv6GlobalEntry 12 }
+
+bDhcpv6AdvertisesSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Advertises packets sent."
+   ::= { bDhcpv6GlobalEntry 13 }
+
+bDhcpv6UnknownMsgsRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 UnknownMsg packets received."
+   ::= { bDhcpv6GlobalEntry 14 }
+
+bDhcpv6ReconfigsSent  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Reconfig packets sent."
+   ::= { bDhcpv6GlobalEntry 15 }
+
+bDhcpv6DropSolicit  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Solicit packets dropped."
+   ::= { bDhcpv6GlobalEntry 16 }
+
+bDhcpv6DropAdvertise  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Advertise packets dropped."
+   ::= { bDhcpv6GlobalEntry 17 }
+
+bDhcpv6DropDupSolicit  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Duplicate Solicit packets dropped."
+   ::= { bDhcpv6GlobalEntry 18 }
+
+bDhcpv6DropRequest  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Request packets dropped."
+   ::= { bDhcpv6GlobalEntry 19 }
+
+bDhcpv6DropRelease  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Release packets dropped."
+   ::= { bDhcpv6GlobalEntry 20 }
+
+bDhcpv6DropDecline  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Decline packets dropped."
+   ::= { bDhcpv6GlobalEntry 21 }
+
+bDhcpv6DropRenew  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Renew packets dropped."
+   ::= { bDhcpv6GlobalEntry 22 }
+
+bDhcpv6DropRebind  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Rebind packets dropped."
+   ::= { bDhcpv6GlobalEntry 23 }
+
+bDhcpv6DropConfirm  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Confirm packets dropped."
+   ::= { bDhcpv6GlobalEntry 24 }
+
+bDhcpv6DropInform  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Information-Request packets dropped."
+   ::= { bDhcpv6GlobalEntry 25 }
+
+bDhcpv6DropRelay  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Relay packets dropped."
+   ::= { bDhcpv6GlobalEntry 26 }
+
+bDhcpv6DropReply  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Reply packets dropped."
+   ::= { bDhcpv6GlobalEntry 27 }
+
+bDhcpv6DropRelayReply  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Relay-Reply packets dropped."
+   ::= { bDhcpv6GlobalEntry 28 }
+
+bDhcpv6DropReconfig  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of DHCPv6 Reconfig packets dropped."
+   ::= { bDhcpv6GlobalEntry 29 }
+
+bDhcpv6LeasesOffered  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases offered on DHCPv6 server"
+   ::= { bDhcpv6GlobalEntry 30 }
+
+bDhcpv6LeasesAssigned  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases assigned on DHCPv6 server"
+   ::= { bDhcpv6GlobalEntry 31 }
+
+bDhcpv6LeasesReleased  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases released on DHCPv6 server"
+   ::= { bDhcpv6GlobalEntry 32 }
+
+bDhcpv6LeasesRelFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases release failed on DHCPv6 server"
+   ::= { bDhcpv6GlobalEntry 33 }
+
+bDhcpv6LeasesExpired  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases expired on DHCPv6 server"
+   ::= { bDhcpv6GlobalEntry 34 }
+
+bDhcpv6LeasesExpiryFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases expiry failed on DHCPv6 server"
+   ::= { bDhcpv6GlobalEntry 35 }
+
+bDhcpv6LeasesRenewed  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases renewed  on DHCPv6 server"
+   ::= { bDhcpv6GlobalEntry 36 }
+
+bDhcpv6LeasesRenewFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of leases renew failed on DHCPv6 server"
+   ::= { bDhcpv6GlobalEntry 37 }
+
+bDhcpv6InternalError  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Internal Errors"
+   ::= { bDhcpv6GlobalEntry 38 }
+
+bDhcpv6NoInterface  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of No Interface Errors"
+   ::= { bDhcpv6GlobalEntry 39 }
+
+bDhcpv6ClientIdNotPres  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of ClientId Not Present Errors"
+   ::= { bDhcpv6GlobalEntry 40 }
+
+bDhcpv6ServerIdNotPres  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of ServerId Not Present Errors"
+   ::= { bDhcpv6GlobalEntry 41 }
+
+bDhcpv6ORONotPres  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of ORO Not Present Errors"
+   ::= { bDhcpv6GlobalEntry 42 }
+
+bDhcpv6ClientIdPres  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of ClientId Present Errors"
+   ::= { bDhcpv6GlobalEntry 43 }
+
+bDhcpv6ServerIdPres  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of ServerId Present Errors"
+   ::= { bDhcpv6GlobalEntry 44 }
+
+bDhcpv6UnicastSolicitRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Unicast Solicit Received Errors"
+   ::= { bDhcpv6GlobalEntry 45 }
+
+bDhcpv6UnicastRequestRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Unicast Request Received Errors"
+   ::= { bDhcpv6GlobalEntry 46 }
+
+bDhcpv6UnicastRenewRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Unicast Renew Received Errors"
+   ::= { bDhcpv6GlobalEntry 47 }
+
+bDhcpv6UnicastConfirmRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Unicast Confirm Received Errors"
+   ::= { bDhcpv6GlobalEntry 48 }
+
+bDhcpv6UnicastDeclineRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Unicast Decline Received Errors"
+   ::= { bDhcpv6GlobalEntry 49 }
+
+bDhcpv6UnicastReleaseRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Unicast Release Received Errors"
+   ::= { bDhcpv6GlobalEntry 50 }
+
+bDhcpv6UnicastRebindRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Unicast Rebind Received Errors"
+   ::= { bDhcpv6GlobalEntry 51 }
+
+bDhcpv6RebindWithoutAddrRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Rebind Without Addresses Received Errors"
+   ::= { bDhcpv6GlobalEntry 52 }
+
+bDhcpv6ConfirmWithoutAddrRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Confirm Without Addresses Received Errors"
+   ::= { bDhcpv6GlobalEntry 53 }
+
+bDhcpv6DeclineWithoutAddrRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Confirm Without Addresses Received Errors"
+   ::= { bDhcpv6GlobalEntry 54 }
+
+bDhcpv6RebindWithoutAddrOrMoreRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Rebind Without Addresses Or More Received Errors"
+   ::= { bDhcpv6GlobalEntry 55 }
+
+bDhcpv6RenewWithoutAddrOrMoreRcvd  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Rebind Without Addresses Or More Received Errors"
+   ::= { bDhcpv6GlobalEntry 56 }
+
+bDhcpv6RebindFail  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of Rebind Failures"
+   ::= { bDhcpv6GlobalEntry 57 }
+
+bDhcpv6ReconfAcceptInSolicitMissing   OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Reconfig-Accept option is Solicit is missing, 
+       wherein the configuration mandates"
+   ::= { bDhcpv6GlobalEntry 58 }
+
+bDhcpv6IntervalDuration  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Duration of the interval in minutes"
+   ::= { bDhcpv6GlobalEntry 59 }
+
+-- DHCPv4 server notifications for home
+
+bDhcpHomeSubnetHomeId  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+      "Home ID field is unique identifier for each home subnet. It maps to tunnel & vlan."
+   ::= { bDhcpv4NotifObjects 1 }
+
+bDhcpHomeSubnetStartAddress  OBJECT-TYPE
+    SYNTAX          InetAddressIPv4
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Home subnet's range start IPv4 Address."
+    ::= { bDhcpv4NotifObjects 2 }
+
+bDhcpHomeSubnetEndAddress  OBJECT-TYPE
+    SYNTAX          InetAddressIPv4
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Home subnet's range end IPv4 Address."
+    ::= { bDhcpv4NotifObjects 3 }
+
+bDhcpHomeSubnetTotalAddresses  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+      "The total number of addresses in the home subnet."
+   ::= { bDhcpv4NotifObjects 4 }
+
+bDhcpHomeSubnetUsedAddrLowThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "The low threshold for used IP addresses in this home subnet.
+        If the value for used IP addresses in this home subnet
+        becomes equal to or less than this value and the current
+        condition for bDhcpHomeSubnetUsedAddrHigh is raised, then a
+        bDhcpHomeSubnetUsedAddrLow event will be generated. No more
+        bDhcpHomeSubnetUsedAddrLow events will be generated for this
+        subnet during its execution until the value for used addresses
+        has exceeded the value of bDhcpHomeSubnetUsedAddrHighThreshold."
+   ::= { bDhcpv4NotifObjects 5 }
+
+bDhcpHomeSubnetUsedAddrHighThreshold  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "The high threshold for used IP addresses in this home subnet.
+        If a bDhcpHomeSubnetUsedAddrLow event has been generated (or no
+        bDhcpHomeSubnetUsedAddrHigh was generated previously) for this home
+        subnet, and the value for used IP addresses in this home subnet
+        has exceeded this value then a bDhcpHomeSubnetUsedAddrHigh
+        event will be generated. No more bDhcpHomeSubnetUsedAddrHigh
+        events will be generated for this subnet during its execution
+        until the value for used addresses in this subnet becomes
+        equal to or less than the value of
+        bDhcpHomeSubnetUsedAddrLowThreshold."
+   ::= { bDhcpv4NotifObjects 6 }
+
+-- DHCP Notifications
+
+bDhcpSubnetUsedAddrLow       NOTIFICATION-TYPE
+    OBJECTS         {
+                        bDhcpSubnetStartAddress, -- subnet identifier
+                        bDhcpSubnetEndAddress,   -- subnet identifier
+                        bDhcpSubnetTotalAddresses,
+                        bDhcpSubnetUsedAddrLowThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of used addresses
+         for a particular subnet is cleared, meaning that it
+         has fallen below the value of bDhcpSubnetUsedAddrLowThreshold
+         for that subnet."
+    ::= { bDhcpNotifications 1 }
+
+bDhcpSubnetUsedAddrHigh   NOTIFICATION-TYPE
+    OBJECTS         {
+                        bDhcpSubnetStartAddress, -- subnet identifier
+                        bDhcpSubnetEndAddress,   -- subnet identifier
+                        bDhcpSubnetTotalAddresses,
+                        bDhcpSubnetUsedAddrHighThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of used
+        addresses for a particular subnet is raised, meaning
+        that it has risen above the value of bDhcpSubnetUsedAddrHighThreshold
+        for that subnet."
+    ::= { bDhcpNotifications 2 }
+
+bDhcpHomeSubnetUsedAddrLow       NOTIFICATION-TYPE
+    OBJECTS         {
+                        bDhcpHomeSubnetHomeId, 
+                        bDhcpHomeSubnetStartAddress, -- subnet identifier
+                        bDhcpHomeSubnetEndAddress,   -- subnet identifier
+                        bDhcpHomeSubnetTotalAddresses,
+                        bDhcpHomeSubnetUsedAddrLowThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of used addresses
+         for a particular home subnet is cleared, meaning that it
+         has fallen below the value of bDhcpHomeSubnetUsedAddrLowThreshold
+         for that subnet."
+    ::= { bDhcpNotifications 3 }
+
+bDhcpHomeSubnetUsedAddrHigh   NOTIFICATION-TYPE
+    OBJECTS         {
+                        bDhcpHomeSubnetHomeId, 
+                        bDhcpHomeSubnetStartAddress, -- subnet identifier
+                        bDhcpHomeSubnetEndAddress,   -- subnet identifier
+                        bDhcpHomeSubnetTotalAddresses,
+                        bDhcpHomeSubnetUsedAddrHighThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of used
+        addresses for a particular home subnet is raised, meaning
+        that it has risen above the value of bDhcpHomeSubnetUsedAddrHighThreshold
+        for that subnet."
+    ::= { bDhcpNotifications 4 }
+
+
+END

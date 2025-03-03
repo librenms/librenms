@@ -1,0 +1,169 @@
+-- ============================================================================
+-- at-vlan.mib, Allied Telesis enterprise MIB:
+-- VLAN MIB for the AlliedWare Plus(tm) operating system
+--
+-- Copyright (c) 2009 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-VLAN-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            sysinfo
+                FROM AT-SMI-MIB
+            Integer32, Gauge32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            DisplayString, TruthValue
+                FROM SNMPv2-TC;
+
+
+        atVlanInfo MODULE-IDENTITY
+            LAST-UPDATED "201009070000Z"
+            ORGANIZATION
+                "Allied Telesis Labs New Zealand"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The VLAN MIB, for retrieving VLAN specific system data."
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200906300000Z"
+            DESCRIPTION
+                "Initial revision."
+            ::= { sysinfo 16 }
+
+
+
+
+--
+-- Node definitions
+--
+
+        atVlanStatistics OBJECT IDENTIFIER ::= { atVlanInfo 1 }
+
+
+        atVlanStatNumCollections OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of unique VLAN statistic gathering instances
+                defined on the device."
+            ::= { atVlanStatistics 1 }
+
+--  ---------------------------------------------------------- --
+--  The VLAN Statistics Table
+--  ---------------------------------------------------------- --
+        atVlanStatCollectionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtVlanStatCollectionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of VLAN statistic instances."
+            ::= { atVlanStatistics 2 }
+
+
+        atVlanStatCollectionEntry OBJECT-TYPE
+            SYNTAX AtVlanStatCollectionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each entry represents a unique VLAN statistic gathering
+                instance defined on the device."
+            INDEX { atVlanStatCollectionName }
+            ::= { atVlanStatCollectionTable 1 }
+
+
+        AtVlanStatCollectionEntry ::=
+            SEQUENCE {
+                atVlanStatCollectionName
+                    DisplayString,
+                atVlanStatCollectionVlanId
+                    Gauge32,
+                atVlanStatCollectionPortMap
+                    OCTET STRING,
+                atVlanStatCollectionIngressPkts
+                    Counter64,
+                atVlanStatCollectionIngressOctets
+                    Counter64,
+                atVlanStatCollectionResetStats
+                    TruthValue
+             }
+
+        atVlanStatCollectionName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of a VLAN statistics collection instance."
+            ::= { atVlanStatCollectionEntry 1 }
+
+
+        atVlanStatCollectionVlanId OBJECT-TYPE
+            SYNTAX Gauge32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The VLAN ID of ingress packets being monitored by this VLAN
+                statistics collection instance."
+            ::= { atVlanStatCollectionEntry 2 }
+
+
+        atVlanStatCollectionPortMap OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A bitwise port map indicating the switch ports being monitored
+                by this VLAN statistics collection instance. The bit position
+                within the string, maps to the port with the same index in
+                dot1dBasePortTable in BRIDGE-MIB. A binary '1' indicates that
+                the port is being monitored by this VLAN statistics collection
+                instance, with a '0' indicating that it is not."
+            ::= { atVlanStatCollectionEntry 3 }
+
+
+        atVlanStatCollectionIngressPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of ingress packets received and counted by this
+                VLAN statistics collection instance."
+            ::= { atVlanStatCollectionEntry 4 }
+
+
+        atVlanStatCollectionIngressOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of octets of data received from ingress packets
+                counted by this VLAN statistics collection instance."
+            ::= { atVlanStatCollectionEntry 5 }
+
+
+        atVlanStatCollectionResetStats OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "When read, this object will always return 2 (false). Setting
+                its value to 1 (true) will cause the matching VLAN statistics
+                collection instance's ingress packets and ingress octet values
+                to be reset to zero."
+            ::= { atVlanStatCollectionEntry 6 }
+
+
+
+    END
+
+--
+-- at-vlan.mib
+--
+

@@ -1,0 +1,323 @@
+-- =========================================================================
+-- Copyright (C) 2001,2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: RSA MIB
+-- Reference:
+-- Version: V1.1
+-- History:
+--  V1.0 2004-09-17 created by Yang Yang 02227
+--    Initial Version
+--  V1.1 2005-05-31 updated by gaolong
+--    Change module of this MIB
+-- =========================================================================
+HH3C-RSA-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hh3cCommon
+            FROM HH3C-OID-MIB
+        IpAddress,Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        DisplayString, RowStatus, DateAndTime, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC;
+
+
+        hh3cRSA MODULE-IDENTITY
+            LAST-UPDATED "200410100000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+                "The HH3C-RSA-MIB contains objects to Manage
+                RSA configuration."
+            REVISION "200410100000Z"
+            DESCRIPTION
+                "The initial revision of RSA module."
+            ::= { hh3cCommon 23 }
+
+
+        RSAKeyErrorCode ::= TEXTUAL-CONVENTION
+                 STATUS current
+                 DESCRIPTION
+                         "Indicates the reason that SSH peer public key fails to config
+                         or that SSH local key pair fails to create/refresh/destroy."
+                 SYNTAX INTEGER
+                         {
+                        rsaSuccess(1),
+                        rsaFailure(2),
+                        rsaErrNoMemory(3),
+                        rsaErrKeyNotReplaced(4),
+                        rsaErrKeyBackup(5),
+                        rsaErrKeySaved(6),
+                        rsaErrKeyGenerate(7),
+                        rsaErrKeyDestroy(8),
+                        rsaErrHostEncKeyBackup(9),
+                        rsaErrHostEncKeySave(10),
+                        rsaErrHostEncKeyGenerate(11),
+                        rsaErrHostEncKeyDestroy(12),
+                        rsaErrHostSigKeyBackup(13),
+                        rsaErrHostSigKeySave(14),
+                        rsaErrHostSigKeyGenerate(15),
+                        rsaErrHostSigKeyDestroy(16),
+                        rsaErrServerKeyBackup(17),
+                        rsaErrServerKeySave(18),
+                        rsaErrServerKeyGenerate(19),
+                        rsaErrServerKeyDestroy(20),
+                        rsaErrPeerKeyNotReplaced(21),
+                        rsaErrPeerKeyNumArriveMax(22),
+                        rsaErrPeerKeyNotRemoved(23),
+                        rsaErrPeerKeyNotExist(24),
+                        rsaStatusKeyExist(25),
+                        rsaStatusKeyNotExist(26),
+                        rsaStatusKeyInvalid(27),
+                        rsaStatusHostEncKeyExist(28),
+                        rsaStatusHostEncKeyNotExist(29),
+                        rsaStatusHostEncKeyInvalid(30),
+                        rsaStatusHostSigKeyExist(31),
+                        rsaStatusHostSigKeyNotExist(32),
+                        rsaStatusHostSigKeyInvalid(33),
+                        rsaStatusServerKeyExist(34),
+                        rsaStatusServerKeyNotExist(35),
+                        rsaStatusServerKeyInvalid(36)
+                        }
+
+        hh3cRSAMIBObjects OBJECT IDENTIFIER ::= { hh3cRSA 1 }
+        hh3cRSAPeerPublicKeyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cRSAPeerPublicKeyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The (conceptual) RSA Peer Public Key Table"
+            ::= { hh3cRSAMIBObjects 1 }
+
+
+        hh3cRSAPeerPublicKeyEntry OBJECT-TYPE
+            SYNTAX Hh3cRSAPeerPublicKeyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry (conceptual row) in the RSA Peer Public Key Table."
+            INDEX { hh3cRSAPeerPublicKeyName }
+            ::= { hh3cRSAPeerPublicKeyTable 1 }
+
+
+        Hh3cRSAPeerPublicKeyEntry ::=
+            SEQUENCE {
+                hh3cRSAPeerPublicKeyName
+                    OCTET STRING,
+                hh3cRSAPeerIpAddress
+                    IpAddress,
+                hh3cRSAPeerFQDN
+                    DisplayString,
+                hh3cRSAPeerPublicKeyCode
+                    OCTET STRING,
+                hh3cRSAPeerPublicKeyStatus
+                    RowStatus
+             }
+
+        hh3cRSAPeerPublicKeyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..64))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The RSA peer public key name."
+            ::= { hh3cRSAPeerPublicKeyEntry 1 }
+
+        hh3cRSAPeerIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates the IP Address of RSA Peer machine."
+            ::= { hh3cRSAPeerPublicKeyEntry 2 }
+
+        hh3cRSAPeerFQDN OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The Full Qualified Domain Name of RSA Peer Machine"
+            ::= { hh3cRSAPeerPublicKeyEntry 3 }
+
+
+        hh3cRSAPeerPublicKeyCode OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..1024))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The code of RSA peer public key."
+            ::= { hh3cRSAPeerPublicKeyEntry 4 }
+
+
+        hh3cRSAPeerPublicKeyStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this RSA peer public key entry.
+                Support Active Status and CreateAndGo and Destroy Operation "
+            ::= { hh3cRSAPeerPublicKeyEntry 5 }
+
+        hh3cRSALocalKeyPairTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cRSALocalKeyPairEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The (conceptual)RSA local Key Pair Table."
+            ::= { hh3cRSAMIBObjects 2 }
+
+
+        hh3cRSALocalKeyPairEntry OBJECT-TYPE
+            SYNTAX Hh3cRSALocalKeyPairEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry (conceptual row) in the RSA local Key Pair Table."
+            INDEX { hh3cRSALocalKeyIndex }
+            ::= { hh3cRSALocalKeyPairTable 1 }
+
+
+        Hh3cRSALocalKeyPairEntry ::=
+            SEQUENCE {
+                hh3cRSALocalKeyIndex
+                    INTEGER,
+                hh3cRSALocalHostKeyName
+                    DisplayString,
+                hh3cRSALocalHostKeyCode
+                    OCTET STRING,
+                hh3cRSALocalHostKeyCreatedTime
+                    DateAndTime,
+                hh3cRSALocalServerKeyName
+                    DisplayString,
+                hh3cRSALocalServerKeyCode
+                    OCTET STRING,
+                hh3cRSALocalServerKeyCreatedTime
+                    DateAndTime,
+                hh3cRSALocalKeyPairBits
+                    Integer32,
+                hh3cRSALocalKeyStatus
+                    RowStatus
+             }
+
+        hh3cRSALocalKeyIndex  OBJECT-TYPE
+            SYNTAX INTEGER (1..1)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The hh3cRSALocalKeyPairTable Table can only exist one entry at most."
+            ::= { hh3cRSALocalKeyPairEntry 1 }
+
+        hh3cRSALocalHostKeyName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates RSA Host local public key name.Its value is composed of systemname, a
+                underscore and the string of 'Host'"
+            ::= { hh3cRSALocalKeyPairEntry 2 }
+
+        hh3cRSALocalHostKeyCode OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (512..1024))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the code of RSA Host local pkey  that the length is
+                between 512 and 2048 bits."
+            ::= { hh3cRSALocalKeyPairEntry 3 }
+
+        hh3cRSALocalHostKeyCreatedTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the created time of RSA local Host key."
+            ::= { hh3cRSALocalKeyPairEntry 4 }
+
+        hh3cRSALocalServerKeyName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates RSA Host local public key name.Its value is composed of systemname, a
+                underscore and the string of 'Server'"
+            ::= { hh3cRSALocalKeyPairEntry 5 }
+
+        hh3cRSALocalServerKeyCode OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (512..1024))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the code of RSA Host local pkey  that the length is
+                between 512 and 2048 bits."
+            ::= { hh3cRSALocalKeyPairEntry 6 }
+
+        hh3cRSALocalServerKeyCreatedTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the created time of RSA local Host key."
+            ::= { hh3cRSALocalKeyPairEntry 7 }
+
+
+        hh3cRSALocalKeyPairBits OBJECT-TYPE
+            SYNTAX Integer32 (512..2048)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The bits of RSA local key pair, ranging between 512 and 2048.
+                 By default, the value is 512."
+            DEFVAL { 512 }
+            ::= { hh3cRSALocalKeyPairEntry 8 }
+
+
+        hh3cRSALocalKeyStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status column used for creating, deleting instances of
+                the columnar objects in the hh3cRSALocalKeyPairTable table."
+            ::= { hh3cRSALocalKeyPairEntry 9 }
+
+
+        hh3cRSAPeerKeyConfigFailReason OBJECT-TYPE
+            SYNTAX RSAKeyErrorCode
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The reason that RSA peer public key fails to config."
+            ::= { hh3cRSAMIBObjects 3 }
+
+
+        hh3cRSALocalKeyFailReason OBJECT-TYPE
+            SYNTAX RSAKeyErrorCode
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The reason that RSA local key pair fails to create, refresh
+                and destroy."
+            ::= { hh3cRSAMIBObjects 4 }
+
+        hh3cRSANotifications OBJECT IDENTIFIER ::= { hh3cRSA 2 }
+
+        hh3cRSALocalKeyPairOpeFail NOTIFICATION-TYPE
+            OBJECTS { hh3cRSALocalKeyFailReason }
+            STATUS current
+            DESCRIPTION
+                "The trap is generated while the RSA local key pair fails to
+                create, refresh and destory."
+            ::= { hh3cRSANotifications 1 }
+
+        hh3cRSAPeerKeyConfigFail NOTIFICATION-TYPE
+            OBJECTS { hh3cRSAPeerKeyConfigFailReason }
+            STATUS current
+            DESCRIPTION
+                "The trap is generated while the RSA peer public key fails to
+                configure."
+            ::= { hh3cRSANotifications 2 }
+    END

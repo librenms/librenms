@@ -1,0 +1,616 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+--
+-- CIENA-CES-PTP-MIB
+--
+
+CIENA-CES-PTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    cienaCesConfig, cienaCesNotifications
+        FROM CIENA-SMI
+    CienaGlobalState
+        FROM CIENA-TC
+    InterfaceIndex
+        FROM IF-MIB;
+
+cienaCesPtpMIB MODULE-IDENTITY
+        LAST-UPDATED "201706070000Z"
+        ORGANIZATION "Ciena Corp."
+        CONTACT-INFO
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
+            Email:  support@ciena.com" 
+        DESCRIPTION
+            "This module defines device configuration associated with PTP (Physical Termination Point) attributes."
+
+        REVISION "201706070000Z"
+        DESCRIPTION
+            "Updated contact info."
+
+        REVISION "201512140000Z"
+        DESCRIPTION
+            "Added cienaCesPtpCreatedNotification.
+             Added cienaCesPtpDeletedNotification."
+
+        REVISION "201510200000Z"
+        DESCRIPTION
+            "Added the following notifications:
+                 cienaCesPtpAdminStateChangeNotification
+                 cienaCesPtpOperStateChangeNotification
+                 cienaCesPtpAdminWavelengthChangeNotification
+                 cienaCesPtpAdminFrequencyChangeNotification
+                 cienaCesPtpTxPowerChangeNotification
+                 cienaCesPtpLineSysTypeChangeNotification
+                 cienaCesPtpOptimizationModeChangeNotification
+                 cienaCesPtpWavelengthSpacingChangeNotification
+             Fixed rounding error in PtpHundredths textual convention."
+               
+        REVISION "201509090000Z"
+        DESCRIPTION
+            "Initial creation."
+        ::= { cienaCesConfig 38 }
+
+--
+-- Textual conventions
+--
+PtpHundredths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT      "d-3"
+    STATUS            current
+    DESCRIPTION
+        "A value using Integer32 to represent a fixed-point decimal fraction
+         with hundredths precision. Objects using this textual-convention will
+         be scaled by a factor of 1/100."
+    SYNTAX            Integer32
+
+--
+-- Node definitions
+--
+cienaCesPtpMIBObjects OBJECT IDENTIFIER ::= { cienaCesPtpMIB 1 }
+
+--
+-- Config groups
+--
+cienaCesPtp OBJECT IDENTIFIER ::= { cienaCesPtpMIBObjects 1 }
+
+--
+-- Notification groups
+--
+cienaCesPtpMIBNotificationsPrefix OBJECT IDENTIFIER ::= { cienaCesNotifications 38 }
+cienaCesPtpMIBNotifications       OBJECT IDENTIFIER ::= { cienaCesPtpMIBNotificationsPrefix 0 }
+
+--
+-- Conformance groups
+--
+cienaCesPtpMIBConformance OBJECT IDENTIFIER ::= { cienaCesPtpMIB 2 }
+cienaCesPtpMIBCompliances OBJECT IDENTIFIER ::= { cienaCesPtpMIBConformance 1 }
+cienaCesPtpMIBGroups      OBJECT IDENTIFIER ::= { cienaCesPtpMIBConformance 2 }
+
+--
+-- Configuration information
+--
+
+--
+-- PTP Table
+--
+
+cienaCesPtpTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesPtpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing PTP attributes."
+    ::= { cienaCesPtp 1 }
+
+cienaCesPtpEntry  OBJECT-TYPE
+    SYNTAX      CienaCesPtpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the PTP table."
+    INDEX  { cienaCesPtpIfIndex }
+    ::= { cienaCesPtpTable 1 }
+
+CienaCesPtpEntry ::=  SEQUENCE {
+    cienaCesPtpIfIndex                   InterfaceIndex,
+    cienaCesPtpSlotIndex                 Unsigned32,
+    cienaCesPtpPortIndex                 Unsigned32,
+    cienaCesPtpPortNumber                Unsigned32,
+    cienaCesPtpIfDescr                   DisplayString,
+    cienaCesPtpModulationScheme          DisplayString,
+    cienaCesPtpSupportedOpuTypes         BITS,
+    cienaCesPtpAdminState                CienaGlobalState,
+    cienaCesPtpOperState                 CienaGlobalState,
+    cienaCesPtpAdminWavelength           PtpHundredths,
+    cienaCesPtpAdminFrequency            PtpHundredths,
+    cienaCesPtpTxPowerReduction          TruthValue,
+    cienaCesPtpTxPower                   PtpHundredths,
+    cienaCesPtpLineSysType               INTEGER,
+    cienaCesPtpOptimizationMode          INTEGER,
+    cienaCesPtpWavelengthSpacing         INTEGER,
+    cienaCesPtpSpectralOccupancy         INTEGER,
+    cienaCesPtpTxTuningMode              INTEGER,
+    cienaCesPtpRotation                  TruthValue,
+    cienaCesPtpCarrierCentering          INTEGER,
+    cienaCesPtpOchEnmMode                INTEGER,
+    cienaCesPtpChContentionDetect        TruthValue,
+    cienaCesPtpStormControl              TruthValue,
+    cienaCesPtpStormMode                 INTEGER,
+    cienaCesPtpStormPath1                Integer32,
+    cienaCesPtpStormPath2                Integer32,
+    cienaCesPtpSpliCntrl                 TruthValue,
+    cienaCesPtpChildOtuIfIndex           InterfaceIndex
+}
+
+cienaCesPtpIfIndex  OBJECT-TYPE
+    SYNTAX            InterfaceIndex
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION
+        "The interface index of the PTP."
+    ::= { cienaCesPtpEntry 1 }
+
+cienaCesPtpSlotIndex  OBJECT-TYPE
+    SYNTAX            Unsigned32 (1..38)
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Indicates the slot index associated with the PTP."
+    ::= { cienaCesPtpEntry 2 }
+
+cienaCesPtpPortIndex  OBJECT-TYPE
+    SYNTAX            Unsigned32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Indicates the port index associated with the PTP."
+    ::= { cienaCesPtpEntry 3 }
+
+cienaCesPtpPortNumber  OBJECT-TYPE
+    SYNTAX            Unsigned32 (1..65535)
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Indicates the port number associated with the PTP."
+    ::= { cienaCesPtpEntry 4 }
+
+cienaCesPtpIfDescr  OBJECT-TYPE
+    SYNTAX            DisplayString (SIZE (0..255))
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "A textual string containing information about the PTP interface."
+    ::= { cienaCesPtpEntry 5 }
+
+cienaCesPtpModulationScheme  OBJECT-TYPE
+    SYNTAX            DisplayString (SIZE (0..255))
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "A textual string containing the modulation scheme of the PTP."
+    ::= { cienaCesPtpEntry 6 }
+
+cienaCesPtpSupportedOpuTypes  OBJECT-TYPE
+    SYNTAX            BITS {
+                          experimental(0),
+                          asynchronousCbr(1),
+                          bitSynchronousCbr(2),
+                          atm(3),
+                          gfp(4),
+                          virtualConcatenatedSignal(5),
+                          hundredGBaseRIntoOpu4(6),
+                          fc1200IntoOdu2e(7),
+                          gfpIntoExtendedOpu2Payload(8),
+                          stm1IntoOdu0(9),
+                          stm4IntoOdu0(10),
+                          fc100IntoOdu0(11),
+                          fc200IntoOdu1(12),
+                          fc400IntoOduFlex(13),
+                          fc800IntoOduFlex(14),
+                          bitStreamWithOctetTiming(15),
+                          bitStreamWithoutOctetTiming(16),
+                          ibSdrIntoOduFlex(17),
+                          ibDdrIntoOduFlex(18),
+                          ibQdrIntoOduFlex(19),
+                          oduMultiplexForODTUkh(20),
+                          oduMultiplexForODTUktsAndODTUkh(21),
+                          nullTestSignal(22),
+                          prbsTestSignal(23),
+                          notAvailable(24)
+                      }
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "This object represents all supported OPU payload types for the PTP.
+         The individual bit position should be set to 1 for each payload type
+         supported on the PTP and 0 if the payload type is unsupported."
+    ::= { cienaCesPtpEntry 7 }
+
+cienaCesPtpAdminState  OBJECT-TYPE
+    SYNTAX            CienaGlobalState
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The administrative state of the PTP."
+    ::= { cienaCesPtpEntry 8 }
+
+cienaCesPtpOperState  OBJECT-TYPE
+    SYNTAX            CienaGlobalState
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The operational state of the PTP."
+    ::= { cienaCesPtpEntry 9 }
+
+cienaCesPtpAdminWavelength  OBJECT-TYPE
+    SYNTAX            PtpHundredths
+    UNITS             "nm"
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The wavelength of the laser expressed in nm. This value is directly
+         related to cienaCesPtpAdminFrequency and will be 0.00 when the laser
+         is unset or disabled. The laser wavelength (or frequency) must be set
+         before the laser can be turned on."
+    ::= { cienaCesPtpEntry 10 }
+
+cienaCesPtpAdminFrequency  OBJECT-TYPE
+    SYNTAX            PtpHundredths
+    UNITS             "GHz"
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The frequency of the laser expressed in GHz. This value is directly
+         related to cienaCesPtpAdminWavelength and will be 0.00 when the laser
+         is unset or disabled. The laser frequency (or wavelength) must be set
+         before the laser can be turned on."
+    ::= { cienaCesPtpEntry 11 }
+
+cienaCesPtpTxPowerReduction  OBJECT-TYPE
+    SYNTAX            TruthValue
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "This object has a value of true(1) when tx power reduction
+         (TX Blanking) is on and false(2) when it is off. The tx power
+         reduction mode cannot be turned on unless the OTN service layer is
+         disabled."
+    DEFVAL { false }
+    ::= { cienaCesPtpEntry 12 }
+
+cienaCesPtpTxPower  OBJECT-TYPE
+    SYNTAX            PtpHundredths
+    UNITS             "dBm"
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The output power of the laser expressed in dBm."
+    ::= { cienaCesPtpEntry 13 }
+
+cienaCesPtpLineSysType  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                          color(1),
+                          colorless(2),
+                          contentionless(3),
+                          csColor(4),
+                          csColorless(5),
+                          max(6)
+                      }
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The line system type of the PTP. The PTP must be otn-service disabled
+         before this value may be changed."
+    DEFVAL { color }
+    ::= { cienaCesPtpEntry 14 }
+
+cienaCesPtpOptimizationMode  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                          mode1(1),
+                          mode2(2),
+                          mode3(3),
+                          mode4(4),
+                          mode5(5),
+                          mode6(6),
+                          mode7(7),
+                          mode8(8),
+                          mode9(9),
+                          mode10(10),
+                          mode11(11),
+                          mode12(12),
+                          mode13(13),
+                          mode14(14),
+                          max(15)
+                      }
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The performance optimization mode. The PTP must be otn-service
+         disabled before this value may be changed."
+    DEFVAL { mode1 }
+    ::= { cienaCesPtpEntry 15 }
+
+cienaCesPtpWavelengthSpacing  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                           twelvePointFiveGHz(1),
+                           twentyFiveGHz(2),
+                           fiftyGHz(3),
+                           oneHundredGHz(4),
+                           max(5)
+                      }
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Wavelength spacing indicates the width of the wavelength expressed in
+         GHz. The PTP must be otn-service disabled before this value may be
+         changed."
+    DEFVAL { fiftyGHz }
+    ::= { cienaCesPtpEntry 16 }
+
+cienaCesPtpSpectralOccupancy  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                          narrow(1),
+                          wide(2),
+                          max(3)
+                      }
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The spectral occupancy of the PTP."
+    DEFVAL { narrow }
+    ::= { cienaCesPtpEntry 17 }
+
+cienaCesPtpTxTuningMode  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                          normal(1),
+                          accelerated(2),
+                          max(3)
+                      }
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The tuning mode of the PTP."
+    DEFVAL { normal }
+    ::= { cienaCesPtpEntry 18 }
+
+cienaCesPtpRotation  OBJECT-TYPE
+    SYNTAX            TruthValue
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "This object has a value of true(1) when the rotation option is on and
+         false(2) when it is off."
+    DEFVAL { false }
+    ::= { cienaCesPtpEntry 19 }
+
+cienaCesPtpCarrierCentering  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                          none(1),
+                          mode1(2),
+                          mode2(3),
+                          mode3(4),
+                          max(5)
+                      }
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The carrier centering mode of the PTP."
+    DEFVAL { none }
+    ::= { cienaCesPtpEntry 20 }
+
+cienaCesPtpOchEnmMode  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                          none(1),
+                          mode1(2),
+                          mode2(3),
+                          auto(4),
+                          max(5)
+                      }
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The interleaver mode of the PTP."
+    DEFVAL { mode2 }
+    ::= { cienaCesPtpEntry 21 }
+
+cienaCesPtpChContentionDetect  OBJECT-TYPE
+    SYNTAX            TruthValue
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "This object has a value of true(1) when channel contention detection
+         is on and false(2) when it is off."
+    DEFVAL { false }
+    ::= { cienaCesPtpEntry 22 }
+
+cienaCesPtpStormControl  OBJECT-TYPE
+    SYNTAX            TruthValue
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "This object has a value of true(1) when storm protection is on and
+         false(2) when it is off."
+    ::= { cienaCesPtpEntry 23 }
+
+cienaCesPtpStormMode  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                          matched(1),
+                          diverse(2),
+                          max(3)
+                      }
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The storm configuration of the PTP."
+    ::= { cienaCesPtpEntry 24 }
+
+cienaCesPtpStormPath1  OBJECT-TYPE
+    SYNTAX            Integer32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Storm dispersion path 1."
+    ::= { cienaCesPtpEntry 25 }
+
+cienaCesPtpStormPath2  OBJECT-TYPE
+    SYNTAX            Integer32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Storm dispersion path 2."
+    ::= { cienaCesPtpEntry 26 }
+
+cienaCesPtpSpliCntrl  OBJECT-TYPE
+    SYNTAX            TruthValue
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "This object has a value of true(1) when spli is enabled and false(2)
+         when it is disabled."
+    ::= { cienaCesPtpEntry 27 }
+
+cienaCesPtpChildOtuIfIndex  OBJECT-TYPE
+    SYNTAX            InterfaceIndex
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The interface index of the OTU mapped to the PTP."
+    ::= { cienaCesPtpEntry 28 }
+
+--
+-- Notifications
+--
+
+cienaCesPtpAdminStateChangeNotification NOTIFICATION-TYPE
+    OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesPtpIfIndex,
+                 cienaCesPtpAdminState
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent when cienaCesPtpAdminState is modified."
+    ::= { cienaCesPtpMIBNotifications 1 }
+
+cienaCesPtpOperStateChangeNotification NOTIFICATION-TYPE
+    OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesPtpIfIndex,
+                 cienaCesPtpOperState
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent when cienaCesPtpOperState is modified."
+    ::= { cienaCesPtpMIBNotifications 2 }
+
+cienaCesPtpAdminWavelengthChangeNotification NOTIFICATION-TYPE
+    OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesPtpIfIndex,
+                 cienaCesPtpAdminWavelength
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent when cienaCesPtpAdminWavelength is
+         modified."
+    ::= { cienaCesPtpMIBNotifications 3 }
+
+cienaCesPtpAdminFrequencyChangeNotification NOTIFICATION-TYPE
+    OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesPtpIfIndex,
+                 cienaCesPtpAdminFrequency
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent when cienaCesPtpAdminFrequency is modified."
+    ::= { cienaCesPtpMIBNotifications 4 }
+
+cienaCesPtpTxPowerChangeNotification NOTIFICATION-TYPE
+    OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesPtpIfIndex,
+                 cienaCesPtpTxPower
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent when cienaCesPtpTxPower is administratively
+         modified."
+    ::= { cienaCesPtpMIBNotifications 5 }
+
+cienaCesPtpLineSysTypeChangeNotification NOTIFICATION-TYPE
+    OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesPtpIfIndex,
+                 cienaCesPtpLineSysType
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent when cienaCesPtpLineSysType is modified."
+    ::= { cienaCesPtpMIBNotifications 6 }
+
+cienaCesPtpOptimizationModeChangeNotification NOTIFICATION-TYPE
+    OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesPtpIfIndex,
+                 cienaCesPtpOptimizationMode
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent when cienaCesPtpOptimizationMode is
+         modified."
+    ::= { cienaCesPtpMIBNotifications 7 }
+
+cienaCesPtpWavelengthSpacingChangeNotification NOTIFICATION-TYPE
+    OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesPtpIfIndex,
+                 cienaCesPtpWavelengthSpacing
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent when cienaCesPtpWavelengthSpacing is
+         modified."
+    ::= { cienaCesPtpMIBNotifications 8 }
+
+cienaCesPtpCreatedNotification NOTIFICATION-TYPE
+    OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesPtpIfIndex
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent when a PTP is created."
+    ::= { cienaCesPtpMIBNotifications 9 }
+
+cienaCesPtpDeletedNotification NOTIFICATION-TYPE
+    OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesPtpIfIndex
+            }
+    STATUS  current
+    DESCRIPTION
+        "This notification is sent when a PTP is deleted."
+    ::= { cienaCesPtpMIBNotifications 10 }
+
+END
+
+--
+-- CIENA-CES-PTP-MIB
+--

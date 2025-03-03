@@ -1,0 +1,427 @@
+-- File Name : PBI-MGSIGNALCHARACTERISTICS-MIB
+-- Date      : Thu Sep 21 14:37:54 CST 2006
+-- Author    : AdventNet Agent Toolkit Java Edition - MIB Editor 6
+
+
+
+PBI-MGSIGNALCHARACTERISTICS-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		RowStatus, DisplayString
+			FROM SNMPv2-TC
+		DisplayString
+			FROM RFC1213-MIB
+		mg
+			FROM PBI-MAIN-MIB
+		MODULE-IDENTITY, enterprises, OBJECT-TYPE, Integer32
+			FROM SNMPv2-SMI;
+
+	mgSignalCharacteristics	MODULE-IDENTITY
+		LAST-UPDATED	"200609210924Z"
+		ORGANIZATION	"Organization"
+		CONTACT-INFO	"Contact-info"
+		DESCRIPTION		"Description"
+		REVISION			"200609210924Z"
+		DESCRIPTION		""
+		::=  {  mg  2  }
+	  
+	tsOutTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  TsOutEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"  "
+		::=  { mgSignalCharacteristics  1 }
+		
+	mgPATTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MgPATEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"PSI/SI information relating to the PAT, reference ISO/IEC 13818-1 "
+		::=  { mgSignalCharacteristics  2 }
+		
+	mgPMTTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MgPMTEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"PSI/SI information relating to the PMT"
+		::=  { mgSignalCharacteristics  3 }
+		
+	mgNITTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MgNITEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"PSI/SI information relating to the NIT"
+		::=  { mgSignalCharacteristics  4 }
+		
+	mgSDTTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MgSDTEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"PSI/SI information relating to the SDT, reference DVB 300-468"
+		::=  { mgSignalCharacteristics  5 }
+		
+	mgFilterTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MgFilterEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  { mgSignalCharacteristics  6 }
+		
+	mgCATTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  MgCATEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"PSI/SI information relating to the CAT, reference ISO/IEC 13818-1 "
+		::=  { mgSignalCharacteristics  7 }
+		
+	tsInput OBJECT IDENTIFIER
+		::=  { mgSignalCharacteristics  8 }
+		
+	mgBATTable		OBJECT-TYPE    
+		SYNTAX		SEQUENCE  OF  MgBATEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	" PSI/SI information relating to the BAT, reference ISO/IEC 13818-1 "
+		::=  { mgSignalCharacteristics  9 }
+		
+ 	tsOutEntry	OBJECT-TYPE
+		SYNTAX		TsOutEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	" Row Description "
+		INDEX		{  channelOutput  }
+		::=  { tsOutTable 1 }  
+		
+  TsOutEntry  ::=  SEQUENCE {   
+	    channelOutput             INTEGER,
+	    bitRate 	                INTEGER,
+    	packetSize                INTEGER,  
+    	transportStreamID         INTEGER,
+    	otiginalNetworkID         INTEGER,
+    	networkID 		            INTEGER,	
+    	bitrateThreshosdPercent   INTEGER,
+    	outValidBitRate           INTEGER
+  }
+    
+  channelOutput	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"output channel number"
+		::=  {  tsOutEntry  1  }
+	
+	bitRate	OBJECT-TYPE	
+		SYNTAX			INTEGER  
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Transport stream output size, 3000EC: from 0 to 16Mpbs; 3000MX:from 0 to 100Mpbs; 3000TM: from 0 to 50Mpbs"
+		::=  {  tsOutEntry  2  }
+
+	packetSize	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Packet length, option: 188 or 204"
+		::=  {  tsOutEntry  3  }
+
+	transportStreamID	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The transport stream ID for this transport stream as read from the PAT, its value range: reference ISO/IEC 13818-1"
+		::=  {  tsOutEntry  4  }
+
+	otiginalNetworkID	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The original network ID for this transport stream as read from the NIT, its value range: reference DVB 300-468"
+		::=  {  tsOutEntry  5  }
+
+	networkID	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The network ID for this transport stream as read from the NIT, its value range: reference DVB 300-468"
+		::=  {  tsOutEntry  6  }  
+		
+  bitrateThreshosdPercent	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ts overflow percent value(0 - 100)"
+		::=  {  tsOutEntry  7  }
+		
+	outValidBitRate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"transport stream out valid bit rate"
+		::=  {  tsOutEntry  8  }
+
+	mgPATEntry	OBJECT-TYPE
+		SYNTAX		MgPATEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  channelInputPAT  }
+		::=  { mgPATTable 1 }
+
+	MgPATEntry  ::=  SEQUENCE {
+		channelInputPAT  INTEGER,
+    patSection       DisplayString
+	}
+
+	channelInputPAT	OBJECT-TYPE	
+		SYNTAX			INTEGER  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The physical input on which this transport stream appears"
+		::=  {  mgPATEntry  1  }
+
+  patSection	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )    
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The transport stream Relating to the PAT seciton, reference ISO/IEC 13818-1 "
+		::=  {  mgPATEntry  2  }
+
+	mgPMTEntry	OBJECT-TYPE
+		SYNTAX		MgPMTEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  channelInputPMT  }
+		::=  { mgPMTTable 1 }
+
+	MgPMTEntry  ::=  SEQUENCE {
+		channelInputPMT   INTEGER,
+		pmtProgramNumber  INTEGER,  
+		pmtPID            INTEGER,
+		pmtSection        DisplayString
+	}
+
+	channelInputPMT	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The physical input on which this transport stream appears"
+		::=  {  mgPMTEntry  1  }     
+        
+	pmtProgramNumber	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The PMT program number as read from PMT,reference ISO/IEC 13818-1"
+		::=  {  mgPMTEntry  2  }
+
+	pmtPID	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The PMT PID as read from PMT,reference ISO/IEC 13818-1"
+		::=  {  mgPMTEntry  3  }	
+
+  pmtSection	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )    
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The transport stream Relating to the PMT seciton, reference ISO/IEC 13818-1"
+		::=  {  mgPMTEntry  4  }
+
+	mgNITEntry	OBJECT-TYPE
+		SYNTAX		MgNITEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  channelInputNIT  }
+		::=  { mgNITTable 1 }
+
+	MgNITEntry  ::=  SEQUENCE {
+		channelInputNIT  INTEGER,  
+		networkType      INTEGER,
+		nitActualSection       DisplayString,       
+		nitOhtersSection       DisplayString
+	}
+		
+  channelInputNIT  	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The physical input on which this transport stream appears"
+		::=  {  mgNITEntry  1  }
+          
+  networkType  	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The network type include two types: actual NIT and others NIT,  reference DVB 300-468"
+		::=  {  mgNITEntry  2  }
+
+  nitActualSection	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )    
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Relating to the Actual section, its table ID is 0x40 in NIT,reference DVB 300-468"
+		::=  {  mgNITEntry  3  }   
+		
+	nitOhtersSection	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )    
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Relating to the others section , its table ID is 0x41 in NIT,reference DVB 300-468"
+		::=  {  mgNITEntry  4  }
+
+	mgSDTEntry	OBJECT-TYPE
+		SYNTAX		MgSDTEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  channelInputSDT  }
+		::=  { mgSDTTable 1 }
+
+	MgSDTEntry  ::=  SEQUENCE {
+		channelInputSDT  INTEGER,
+		sdtSection       DisplayString
+	}
+
+	channelInputSDT	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The physical input on which this transport stream appears"
+		::=  {  mgSDTEntry  1  }
+
+  sdtSection	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )    
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The transport stream relating to SDT seciton, reference DVB 300-468"
+		::=  {  mgSDTEntry  2  }
+
+	mgFilterEntry	OBJECT-TYPE
+		SYNTAX		MgFilterEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  channelInputFilter  }
+		::=  { mgFilterTable 1 }
+
+	MgFilterEntry  ::=  SEQUENCE {
+		channelInputFilter  INTEGER,
+		oldPID              DisplayString,  
+		newPID              DisplayString, 
+		oldProgramNumber    DisplayString,
+		newProgramNumber    DisplayString
+	}
+
+	channelInputFilter	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The physical input on which this transport stream appears"
+		::=  {  mgFilterEntry  1  }
+
+  oldPID	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The old PID will be filtered output"
+		::=  {  mgFilterEntry  2  }        
+		
+  newPID	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The new PID is bulit according to old PID"
+		::=  {  mgFilterEntry  3  }    
+		 
+  oldProgramNumber	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The old program number,they come from PAT and will be filtered output"
+		::=  {  mgFilterEntry  4  }
+
+  newProgramNumber	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The new program number, they are bulit and will be made a new PAT"
+		::=  {  mgFilterEntry  5  }
+
+	mgCATEntry	OBJECT-TYPE
+		SYNTAX		MgCATEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  channelInputCAT  }
+		::=  { mgCATTable 1 }
+
+	MgCATEntry  ::=  SEQUENCE {
+		channelInputCAT  INTEGER,
+    catSection       DisplayString
+	}
+
+	channelInputCAT	OBJECT-TYPE	
+		SYNTAX			INTEGER  ( -2147483648 .. 2147483647  ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The physical input on which this transport stream appears"
+		::=  {  mgCATEntry  1  }
+
+  catSection	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )    
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The transport stream Relating to the CAT seciton, reference ISO/IEC 13818-1 "
+		::=  {  mgCATEntry  2  }  
+	
+	channelInput 	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"channel number of input"
+		::=  {  tsInput  1  }
+		
+	stateLock 	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"0xFFFF is lock, other is unlock"
+		::=  {  tsInput  2  }
+		
+	tsIdPreference 	OBJECT-TYPE	
+		SYNTAX			INTEGER 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"transport stream identifier"
+		::=  {  tsInput  3  }	
+		
+	mgBATEntry	OBJECT-TYPE
+		SYNTAX		MgBATEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  channelBAT  }
+		::=  { mgBATTable 1 }
+
+	MgBATEntry  ::=  SEQUENCE {
+		channelBAT  		  INTEGER,
+   	batSection        DisplayString
+	}
+
+	channelBAT 	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"specify channel of get BAT "
+		::=  {  mgBATEntry  1  }
+		
+	batSection 	OBJECT-TYPE	
+		SYNTAX			DisplayString ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The transport stream Relating to the BAT seciton, reference ISO/IEC 13818-1 "
+		::=  {  mgBATEntry  2  }
+				
+END

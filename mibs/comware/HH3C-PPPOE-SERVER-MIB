@@ -1,0 +1,161 @@
+-- =================================================================
+-- Copyright (c) 2004-2009 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: PPPoE server MIB
+-- Reference:
+-- Version:     V1.1
+-- History:
+-- V1.0 Initial version by y04444
+-- V1.1 2009-09-07 Modify by yuhaibo
+--      Add PPPoE server trap
+-- =================================================================
+HH3C-PPPOE-SERVER-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, Counter32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI;
+
+hh3cPPPoEServer MODULE-IDENTITY
+    LAST-UPDATED "200905060000Z"            -- May 06th, 2009 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "The MIB module is used for PPPoE server."
+    REVISION    "200905060000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { hh3cCommon 102 }
+
+hh3cPPPoEServerObject OBJECT IDENTIFIER ::= { hh3cPPPoEServer 1 }
+
+--
+-- PPPOE SERVER MAXIMUM SESSIONS SUPPORT
+--
+
+hh3cPPPoEServerMaxSessions OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum sessions supported by PPPoE server."
+    ::= { hh3cPPPoEServerObject 1 }
+
+--
+-- PPPOE SERVER CURRENT SESSION NUMBERS
+--
+
+hh3cPPPoEServerCurrSessions OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of current sessions on the PPPoE server."
+    ::= { hh3cPPPoEServerObject 2 }
+
+--
+-- PPPOE SERVER AUTHENTICATION REQUEST NUMBERS
+--
+
+hh3cPPPoEServerAuthRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of authentication requests."
+    ::= { hh3cPPPoEServerObject 3 }
+
+--
+-- PPPOE SERVER AUTHENTICATION SUCCESS NUMBERS
+--
+
+hh3cPPPoEServerAuthSuccesses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of authentication succeses."
+    ::= { hh3cPPPoEServerObject 4 }
+
+--
+-- PPPOE SERVER AUTHENTICATION FAIL NUMBERS
+--
+
+hh3cPPPoEServerAuthFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of authentication failure."
+    ::= { hh3cPPPoEServerObject 5 }
+
+--
+-- PPPOE SERVER ABNORMAL OFFLINE COUNT THRESHOLD
+--
+
+hh3cPPPoESAbnormOffsThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold of abnormal offline count."
+    ::= { hh3cPPPoEServerObject 6 }
+
+--
+-- PPPOE SERVER ABNORMAL OFFLINE PERCENT THRESHOLD
+--
+
+hh3cPPPoESAbnormOffPerThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold of abnormal offline percent."
+    ::= { hh3cPPPoEServerObject 7 }
+
+--
+-- PPPOE SERVER NORMAL OFFLINE PERCENT THRESHOLD
+--
+
+hh3cPPPoESNormOffPerThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold of normal offline percent."
+    ::= { hh3cPPPoEServerObject 8 }
+
+--
+-- Define the PPPoE Server Traps.
+--
+    hh3cPPPoEServerTraps OBJECT IDENTIFIER ::= { hh3cPPPoEServer 2 }
+
+    hh3cPPPoeServerTrapPrefix OBJECT IDENTIFIER ::= { hh3cPPPoEServerTraps 0 }
+
+    hh3cPPPoESAbnormOffsAlarm NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION
+            "This trap is generated when the PPPoE server abnormal
+            offline counts over threshold in five minutes."
+        ::= { hh3cPPPoeServerTrapPrefix 1 }
+
+    hh3cPPPoESAbnormOffPerAlarm NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION
+            "This trap is generated when the PPPoE server abnormal
+            offline percent over threshold in five minutes."
+        ::= { hh3cPPPoeServerTrapPrefix 2 }
+
+    hh3cPPPoESNormOffPerAlarm NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION
+            "This trap is generated when the PPPoE server normal
+            offline percent under threshold in five minutes."
+        ::= { hh3cPPPoeServerTrapPrefix 3 }
+
+END

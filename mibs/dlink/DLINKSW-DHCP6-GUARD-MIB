@@ -1,0 +1,352 @@
+-- *****************************************************************
+-- DLINKSW-DHCP6-GUARD-MIB: DHCPv6 Guard MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-DHCP6-GUARD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Unsigned32,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    TruthValue,
+    RowStatus,
+    DisplayString
+        FROM SNMPv2-TC
+
+    ifIndex
+        FROM IF-MIB
+
+    dlinkIndustrialCommon
+        FROM DLINK-ID-REC-MIB;
+
+dlinkSwDhcp6GuardMIB MODULE-IDENTITY
+    LAST-UPDATED "201307180000Z"
+    ORGANIZATION "D-Link Corp."
+    CONTACT-INFO
+        "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+        "
+    DESCRIPTION
+        "This MIB module defines objects for DHCPv6 Guard."
+    REVISION    "201307180000Z"
+    DESCRIPTION
+         "This is the first version of the MIB file.
+         "
+    ::= { dlinkIndustrialCommon 142 }
+
+--
+-- Textual Conventions
+--
+
+
+dDhcp6GuardNotifications    OBJECT IDENTIFIER ::= { dlinkSwDhcp6GuardMIB 0 }
+dDhcp6GuardObjects          OBJECT IDENTIFIER ::= { dlinkSwDhcp6GuardMIB 1 }
+dDhcp6GuardConformance      OBJECT IDENTIFIER ::= { dlinkSwDhcp6GuardMIB 2 }
+
+dDhcp6GuardPolicy        OBJECT IDENTIFIER ::= { dDhcp6GuardObjects 1 }
+dDhcp6GuardInterface     OBJECT IDENTIFIER ::= { dDhcp6GuardObjects 2 }
+
+-- -----------------------------------------------------------------------------
+    dDhcp6GuardPolicyNumber  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in DHCPv6 Guard policy
+             table."
+        ::= { dDhcp6GuardPolicy 1 }
+
+    dDhcp6GuardPolicyTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6GuardPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains information about DHCPv6 Guard policies."
+        ::= { dDhcp6GuardPolicy 2 }
+
+    dDhcp6GuardPolicyEntry OBJECT-TYPE
+        SYNTAX          DDhcp6GuardPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defined in dDhcp6GuardPolicyTable. An entry is 
+            created/removed when a DHCPv6 Guard policy is created/deleted."
+        INDEX { dDhcp6GuardPolicyName }
+        ::= { dDhcp6GuardPolicyTable 1 }
+
+    DDhcp6GuardPolicyEntry ::= SEQUENCE {
+        dDhcp6GuardPolicyName              DisplayString,
+        dDhcp6GuardPolicyDeviceRole        INTEGER,
+        dDhcp6GuardPolicyRowStatus         RowStatus
+    }
+
+    dDhcp6GuardPolicyName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of the DHCPv6 Guard policy."
+        ::= { dDhcp6GuardPolicyEntry 1 }
+
+    dDhcp6GuardPolicyDeviceRole OBJECT-TYPE
+        SYNTAX      INTEGER {
+            client(1),
+            server(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Indicates the role of the attached device.
+             client: All DHCPv6 server messages are dropped on this port.
+             server: DHCPv6 server messages are allowed on this port.
+            "
+        DEFVAL { client }
+        ::= { dDhcp6GuardPolicyEntry 2 }
+        
+     dDhcp6GuardPolicyRowStatus  OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object allows the dynamic creation and deletion of a policy."
+        ::= { dDhcp6GuardPolicyEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dDhcp6GuardMatchAclTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6GuardMatchAclEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains a list of IPv6 access list associations for
+            DHCPv6 Guard policies. 
+            The IPv6 access list is used to verify the sender's IPv6 address
+            in server messages.
+            "
+        ::= { dDhcp6GuardPolicy 3 }
+
+    dDhcp6GuardMatchAclEntry OBJECT-TYPE
+        SYNTAX          DDhcp6GuardMatchAclEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined in dDhcp6GuardMatchAclTable. 
+            The first instance identifier index value identifies the 
+            dDhcp6GuardPolicyEntry that an IPv6 access list (dDhcp6GuardMatchAclEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dDhcp6GuardPolicyEntry is deleted."
+        INDEX { 
+            dDhcp6GuardPolicyName 
+        }
+        ::= { dDhcp6GuardMatchAclTable 1 }
+
+    DDhcp6GuardMatchAclEntry ::= SEQUENCE {
+        dDhcp6GuardMatchAccessListName        DisplayString,
+        dDhcp6GuardMatchAclRowStatus          RowStatus
+        }
+
+    dDhcp6GuardMatchAccessListName  OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the associated IPv6 access list
+            in a DHCPv6 Guard policy.
+            The IPv6 access list is used to filter DHCPv6 server message 
+            based on sender's IP address. 
+            If the IPv6 access list is not configured, all server messages
+            are bypassed."
+        ::= { dDhcp6GuardMatchAclEntry 1 }
+
+    dDhcp6GuardMatchAclRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dDhcp6GuardMatchAclEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dDhcp6GuardIfConfigTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6GuardIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to configure the DHCPv6 Guard
+            state at every interface capable of this feature.
+            "
+        ::= { dDhcp6GuardInterface 1 }
+
+    dDhcp6GuardIfConfigEntry OBJECT-TYPE
+        SYNTAX          DDhcp6GuardIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains the configuration to enable or
+            disable state for DHCPv6 Guard at every interface 
+            capable of this feature.
+            "
+        INDEX { ifIndex }
+        ::= { dDhcp6GuardIfConfigTable 1 }
+
+    DDhcp6GuardIfConfigEntry ::= SEQUENCE {
+        dDhcp6GuardIfEnabled       TruthValue
+    }
+
+    dDhcp6GuardIfEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables DHCPv6 Guard on the interface, if set this 
+            object to 'true'. 
+            Setting this object to 'false' disables the DHCPv6 Guard on the
+            interface.
+            "
+        ::= { dDhcp6GuardIfConfigEntry 1 }
+
+
+-- -----------------------------------------------------------------------------
+    dDhcp6GuardIfAttachTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6GuardIfAttachEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to attach a DHCPv6 Guard policy on
+            a physical port or port-channel interface.       
+            "
+        ::= { dDhcp6GuardInterface 2 }
+
+    dDhcp6GuardIfAttachEntry OBJECT-TYPE
+        SYNTAX          DDhcp6GuardIfAttachEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains the configuration to attach a DHCPv6 Guard
+            policy on a physical port or port-channel interface.   
+            "
+        INDEX { ifIndex }
+        ::= { dDhcp6GuardIfAttachTable 1 }
+
+    DDhcp6GuardIfAttachEntry ::= SEQUENCE {
+        dDhcp6GuardIfAttachPolicy       DisplayString,
+        dDhcp6GuardIfAttachRowStatus    RowStatus
+    }
+
+    dDhcp6GuardIfAttachPolicy OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the name of the attached DHCPv6 Guard
+            policy.
+            "
+       ::= { dDhcp6GuardIfAttachEntry 1 }
+
+    dDhcp6GuardIfAttachRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows."
+        ::= { dDhcp6GuardIfAttachEntry 99 }
+
+-- Conformance
+
+    dDhcp6GuardMIBCompliances OBJECT IDENTIFIER ::= { dDhcp6GuardConformance 1 }
+
+    dDhcp6GuardMIBGroups  OBJECT IDENTIFIER ::= { dDhcp6GuardConformance 2 }
+
+    dDhcp6GuardMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "The compliance statement for DLINKSW-DHCP6-GUARD-MIB"
+        MODULE
+        MANDATORY-GROUPS {
+            dDhcp6GuardIfConfigGroup
+        }
+
+        GROUP dDhcp6GuardPolicyGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            the configuration of DHCPv6 Guard policy."
+
+        GROUP dDhcp6GuardIfAttachGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            interface-specific configuration of attaching DHCPv6 Guard policy."
+
+        GROUP dDhcp6GuardMatchAclGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            filtering IPv6 DHCPv6 message by IPv6 access list."
+
+        ::= { dDhcp6GuardMIBCompliances 1 }
+
+-- Units of Conformance
+
+    dDhcp6GuardIfConfigGroup OBJECT-GROUP
+        OBJECTS {
+            dDhcp6GuardIfEnabled
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects which are used to configure as
+            well as show information regarding the DHCPv6 Guard feature
+            per interface."
+        ::= { dDhcp6GuardMIBGroups 1 }
+
+    dDhcp6GuardPolicyGroup OBJECT-GROUP
+        OBJECTS {
+            dDhcp6GuardPolicyNumber,
+            dDhcp6GuardPolicyDeviceRole,
+            dDhcp6GuardPolicyRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects which are used to configure as
+            well as show information regarding the DHCPv6 Guard policy."
+        ::= { dDhcp6GuardMIBGroups 2 }
+
+    dDhcp6GuardMatchAclGroup OBJECT-GROUP
+        OBJECTS {
+            dDhcp6GuardMatchAccessListName,
+            dDhcp6GuardMatchAclRowStatus  
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects which are used to configure as
+            well as show information regarding the IPv6 access list
+            in DHCPv6 Guard policy."
+        ::= { dDhcp6GuardMIBGroups 3 }
+
+    dDhcp6GuardIfAttachGroup OBJECT-GROUP
+        OBJECTS {
+            dDhcp6GuardIfAttachPolicy,
+            dDhcp6GuardIfAttachRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects which are used to configure as
+            well as show information regarding the attaching policy 
+            per interface.
+            "
+        ::= { dDhcp6GuardMIBGroups 4 }
+
+END
+
+

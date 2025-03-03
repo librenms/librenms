@@ -2,7 +2,8 @@ os: ios
 group: cisco
 text: 'Cisco IOS'
 type: network
-ifXmcbc: 1
+ifXmcbc: true
+mib_dir: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -10,39 +11,45 @@ over:
 icon: cisco
 discovery:
     -
-      sysDescr:
-          - 'Cisco Internetwork Operating System Software'
-          - 'IOS (tm)'
-          - 'Cisco IOS Software'
-          - 'Global Site Selector'
-      sysDescr_except:
-          - 'LINUX_IOSD'
-          - 'IOS-XE'
+        sysDescr:
+            - 'Cisco Internetwork Operating System Software'
+            - 'IOS (tm)'
+            - 'Cisco IOS Software'
+            - 'Global Site Selector'
+        sysDescr_except:
+            - 'LINUX_IOSD'
+            - 'IOS-XE'
+            - 'IOSXE'
+            - 'CAT3K_CAA'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9.1.2330 # ciscoIE10004TLM
+            - .1.3.6.1.4.1.9.1.2331 # ciscoIE10006TLM
+            - .1.3.6.1.4.1.9.1.2332 # ciscoIE10004PTSLM
+            - .1.3.6.1.4.1.9.1.2333 # ciscoIE10008PTSLM
 bad_ifXEntry:
     - cisco1941
     - cisco886Va
     - cisco2811
 poller_modules:
-    cisco-ace-serverfarms: 1
-    cisco-ace-loadbalancer: 1
-    cisco-cbqos: 1
-    cisco-cef: 1
-    cisco-mac-accounting: 1
-    cisco-voice: 1
-    cisco-remote-access-monitor: 1
-    cisco-sla: 1
-    cisco-ipsec-flow-monitor: 1
-    cipsec-tunnels: 1
-    cisco-otv: 1
-    cisco-vpdn: 1
-    ipmi: 0
+    cisco-ace-serverfarms: true
+    cisco-ace-loadbalancer: true
+    cisco-cef: true
+    cisco-mac-accounting: true
+    cisco-remote-access-monitor: true
+    slas: true
+    cisco-ipsec-flow-monitor: true
+    cipsec-tunnels: true
+    cisco-otv: true
+    cisco-vpdn: true
+    ipmi: false
+    xdsl: true
 discovery_modules:
-    cisco-cef: 1
-    cisco-sla: 1
-    cisco-mac-accounting: 1
-    cisco-otv: 1
-    cisco-pw: 1
-    cisco-vrf: 1
-    cisco-vrf-lite: 1
-register_mibs:
-    ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
+    cisco-cef: true
+    slas: true
+    cisco-mac-accounting: true
+    cisco-otv: true
+    cisco-pw: true
+    vrf: true
+    cisco-vrf-lite: true
+    xdsl: true

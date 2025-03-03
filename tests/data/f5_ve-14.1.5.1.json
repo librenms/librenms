@@ -1,0 +1,90 @@
+{
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "0",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "f5",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "TMM Memory",
+                    "mempool_perc": 15,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 266533864,
+                    "mempool_used_oid": ".1.3.6.1.4.1.3375.2.1.1.2.1.45.0",
+                    "mempool_free": 1537016856,
+                    "mempool_free_oid": null,
+                    "mempool_total": 1803550720,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                },
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "f5",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "Other Memory",
+                    "mempool_perc": 75,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 1762848768,
+                    "mempool_used_oid": ".1.3.6.1.4.1.3375.2.1.1.2.20.45.0",
+                    "mempool_free": 578830336,
+                    "mempool_free_oid": null,
+                    "mempool_total": 2341679104,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                },
+                {
+                    "mempool_index": "2",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "f5",
+                    "mempool_class": "system",
+                    "mempool_precision": 1,
+                    "mempool_descr": "Swap Memory",
+                    "mempool_perc": 50,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 536629248,
+                    "mempool_used_oid": ".1.3.6.1.4.1.3375.2.1.1.2.20.47.0",
+                    "mempool_free": 537108480,
+                    "mempool_free_oid": null,
+                    "mempool_total": 1073737728,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.3375.2.1.3.4.43",
+                    "sysDescr": "BIG-IP Virtual Edition : Linux 3.10.0-862.14.4.el7.ve.x86_64 : BIG-IP software release 14.1.5.1, build 0.0.6",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": null,
+                    "os": "f5",
+                    "type": "loadbalancer",
+                    "serial": null,
+                    "icon": "f5.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

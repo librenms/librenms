@@ -1,0 +1,954 @@
+BENU-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32,Unsigned32,TimeTicks
+    FROM SNMPv2-SMI
+    ifIndex,ifDescr,ifType,ifAdminStatus,ifOperStatus
+    FROM IF-MIB
+     benuPlatform
+    FROM BENU-PLATFORM-MIB
+     DisplayString
+    FROM SNMPv2-TC;
+
+
+benuChassisMIB MODULE-IDENTITY
+    LAST-UPDATED "201611180000Z" -- 18 November 2016
+    ORGANIZATION "Benu Networks"
+    CONTACT-INFO "Benu Networks Inc,
+      300 Concord Road,
+      Billerca MA 01821
+      Email: support@benunets.com"
+    DESCRIPTION
+       "Initial creation MIB module for Benu Networks Chassis.
+    Copyright (C) 2001, 2008 by Benu Networks, Inc.
+    All rights reserved."
+
+    REVISION      "201611180000Z" -- 18 November 2016
+    DESCRIPTION
+       "Added xMEG card type"
+
+    REVISION      "201610140000Z" -- 14 October 2016
+    DESCRIPTION
+       "Changes for xMEG platform"
+
+    REVISION      "201601260000Z" -- 26 January 2016
+    DESCRIPTION
+       "Added benuCardIfVirtualType"
+
+    REVISION      "201510140000Z" -- 14 October 2015
+    DESCRIPTION
+       "Added benuPowerSupplyTable"
+
+    REVISION      "201501270000Z" -- 27 January 2015
+    DESCRIPTION
+       "Updated benuChassisId from read-write to read-only.
+       Also, updated the description appropriately."
+
+    REVISION      "201501050000Z" -- 05 January 2015
+    DESCRIPTION
+       "Updated notification assignments to comply with standards (RFC 2578)."
+
+    REVISION      "201411140000Z"  -- 14 November 2014
+    DESCRIPTION
+            "changed benuChassisNotifObjects type to  scalar (2 to 0)"
+
+    REVISION      "201406270000Z"
+    DESCRIPTION
+       "Added new encapsulation column in Card interface table"
+    REVISION      "201311250000Z"
+    DESCRIPTION
+            "Added Fan Table "
+
+    REVISION "201212120000Z" -- 12 December 2012
+    DESCRIPTION
+       "Initial creation MIB module for Benu Networks Chassis"
+
+    ::= { benuPlatform 1 }
+
+benuChassisMIBObjects   OBJECT IDENTIFIER ::= { benuChassisMIB 1 }
+benuChassisNotifObjects OBJECT IDENTIFIER ::= { benuChassisMIB 0 }
+benuChassisNotifVariables  OBJECT IDENTIFIER ::= { benuChassisMIB 2 }
+
+-- MIB contains five groups
+
+benuChassisInfo        OBJECT IDENTIFIER ::= { benuChassisMIBObjects 1 }
+benuCardInfo           OBJECT IDENTIFIER ::= { benuChassisMIBObjects 2 }
+benuCardIfInfo         OBJECT IDENTIFIER ::= { benuChassisMIBObjects 3 }
+benuSensorInfo         OBJECT IDENTIFIER ::= { benuChassisMIBObjects 4 }
+benuChassisGeneralInfo OBJECT IDENTIFIER ::= { benuChassisMIBObjects 5 }
+benuFanInfo            OBJECT IDENTIFIER ::= { benuChassisMIBObjects 6 }
+benuPowerSupplyInfo    OBJECT IDENTIFIER ::= { benuChassisMIBObjects 7 }
+
+    --
+    -- chassis group information.
+    --
+
+benuChassisType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        meg100(1),
+        meg400(2),
+        meg1200(3),
+        meg50(4),
+        xMEG100(5),
+        xMEG10(6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Chassis type."
+    ::= { benuChassisInfo 1 }
+
+benuChassisHwVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Chassis hardware revision level, or an empty
+        string if unavailable."
+    ::= { benuChassisInfo 2 }
+
+benuChassisId OBJECT-TYPE   -- Serial Number
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique ID string. Defaults to chassis serial
+        number if available, otherwise empty"
+    ::= { benuChassisInfo 3 }
+
+benuChassisNumOfSlots OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of slots in this chassis, or -1 
+        if neither applicable nor determinable."
+    ::= { benuChassisInfo 4 }
+
+
+benuChassisPowerTrapEnable OBJECT-TYPE
+    SYNTAX     INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object controls SNMP traps for chassis Power Failure. 
+        If its value is set to enabled(1), then traps 
+        are generated. If the value is disabled(2), then traps 
+        are not generated.
+        By default, this object has the value enabled(1).
+        "
+    DEFVAL { enabled }
+
+    ::= { benuChassisInfo 5 }
+
+benuChassisFanTrapEnable OBJECT-TYPE
+    SYNTAX     INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object controls SNMP traps for chassis Fan Failure. 
+        If its value is set to enabled(1), then traps 
+        are generated. If the value is disabled(2), then traps 
+        are not generated.
+        By default, this object has the value enabled(1).
+        "
+    DEFVAL { enabled }
+
+    ::= { benuChassisInfo 6 }
+
+benuChassisSensorTrapEnable OBJECT-TYPE
+    SYNTAX     INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object controls SNMP traps for chassis senor Failure. 
+        If its value is set to enabled(1), then traps 
+        are generated. If the value is disabled(2), then traps 
+        are not generated.
+        By default, this object has the value enabled(1).
+        "
+    DEFVAL { enabled }
+
+    ::= { benuChassisInfo 7 }
+
+benuSysUpTimeAtLastChassisChange OBJECT-TYPE
+      SYNTAX      TimeTicks
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Time (in hundredths of a second) from the last 
+           cold start to the last change in the chassis'
+           configuration. This value will be updated
+           whenever the chassis experiences a change
+            in the count, type, or slot position of
+            a card in cardTable."
+      ::= { benuChassisInfo  8 }
+
+
+
+--
+--      The Benu Card Table
+--
+
+benuCardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BenuCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Chassis card table."
+    ::= { benuCardInfo 1 }
+
+benuCardEntry OBJECT-TYPE
+    SYNTAX      BenuCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Chassis card table."
+    INDEX { benuCardIndex }
+    ::= { benuCardTable 1 }
+
+BenuCardEntry ::= SEQUENCE {
+        benuCardIndex               Unsigned32,
+        benuCardType                INTEGER,
+        benuCardDescr               DisplayString,
+        benuCardSerial              DisplayString,
+        benuCardPartNumber          DisplayString,
+        benuCardHwVersion           DisplayString,
+        benuCardSwVersion           DisplayString,
+        benuCardSlotNumber          Integer32,
+        benuCardRamSize             Integer32,
+        benuCardPrimaryDiskSize     Integer32,
+        benuCardSecondaryDiskSize   Integer32,
+        benuCardOperStatus          INTEGER
+}
+
+
+benuCardIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index into cardTable (not physical chassis
+        slot number)."
+    ::= { benuCardEntry 1 }
+
+benuCardType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     unknown(0),
+                     rsm(1),
+                     switchFabric(2),
+                     shelfmgr(3),
+                     seFP(4),
+                     inputOutputCard(5),
+                     switchMesh(6),
+                     xmeg(7)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Functional type of this card."
+    ::= { benuCardEntry 2 }
+
+benuCardDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Text description of this card."
+    ::= { benuCardEntry 3 }
+
+benuCardSerial OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The serial number of this card, or zero if
+        unavailable."
+    ::= { benuCardEntry 4 }
+
+benuCardPartNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The part number of this card, or an 
+         empty string if unavailable."
+    ::= { benuCardEntry 5 }
+
+benuCardHwVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hardware revision level of this card, or an
+        empty string if unavailable."
+    ::= { benuCardEntry 6 }
+
+benuCardSwVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Version of the firmware or microcode
+        installed on this card, or an empty string if
+        unavailable."
+    ::= { benuCardEntry 7 }
+
+benuCardSlotNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Slot number relative to the containing card or 
+        chassis, or -1 if neither applicable nor 
+        determinable."
+    ::= { benuCardEntry 8 }
+
+benuCardRamSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of kilobytes of DRAM.
+         A value -1 means not available / not applicable
+         A value  0 means internal error."
+    ::= { benuCardEntry 9 }
+
+
+benuCardPrimaryDiskSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of kilobytes of Disk Memory (SATA or Hard Disk).
+         A value -1 means not available / not applicable.
+         A value  0 means internal error."
+    ::= { benuCardEntry 10 }
+
+benuCardSecondaryDiskSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of kilobytes of Disk Memory (SATA or Hard Disk).
+         A value -1 means not available / not applicable.
+         A value  0 means internal error."
+    ::= { benuCardEntry 11 }
+
+benuCardOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notSpecified(1), 
+                    up(2),
+                    down(3),
+                    standby(4),
+                    rom(5),
+                    flash(6),
+                    diag(7),
+                    boot(8),
+                    config(9)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational status of the card.
+        cardOperStatus is up when a card is
+        recognized by the device and is enabled for
+        operation. cardOperStatus is down if the
+        card is not recognized by the device, or if
+        it is not enabled for operation.
+        cardOperStatus is standby if the card is
+        enabled and acting as a standby slave.
+        Intermediate stages (rom,flash,diag,boot,config)
+        are also exposed." 
+    ::= { benuCardEntry 12 }
+
+
+    --
+    -- The card Interface table
+    --
+
+benuCardIfIndexTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BenuCardIfIndexEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION
+        "Chassis card Interface table."
+    ::= { benuCardIfInfo 1 }
+
+benuCardIfIndexEntry OBJECT-TYPE
+    SYNTAX      BenuCardIfIndexEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Chassis card table."
+    INDEX { benuCardIfIndex }
+    ::= { benuCardIfIndexTable 1 }
+
+BenuCardIfIndexEntry ::= SEQUENCE {
+        benuCardIfIndex              Unsigned32,
+        benuCardIfName               DisplayString,
+        benuCardIfPortNumber         Integer32,
+        benuCardIfSlotNumber          Integer32,
+        benuCardIfLinkUpDownEnable   INTEGER,
+        benuCardIfPortType           INTEGER,
+        benuCardIfBindName           DisplayString,
+        benuCardIfEncapsulation      DisplayString,
+        benuCardIfVirtualType        INTEGER
+}
+
+
+benuCardIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "matches RFC1213 ifTable IfIndex"
+    ::= { benuCardIfIndexEntry 1 }
+
+benuCardIfName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "matches RFC1213 ifXTable IfName"
+    ::= { benuCardIfIndexEntry 2 }
+
+benuCardIfPortNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Chassis port number, unique per port on a 
+        given card if available."
+    ::= { benuCardIfIndexEntry 3 }
+
+benuCardIfSlotNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Physical slot number of the card in 
+         the Chassis which contains this interface"
+    ::= { benuCardIfIndexEntry 4 }
+
+
+benuCardIfLinkUpDownEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2) 
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This enables and disables the sending of
+        the proprietary notifications 'benuLinkUpTrap'
+        and 'benuLinkDownTrap' that provide more 
+        information than the standard link up and 
+        link down notifications.  By default, these
+        traps are disabled." 
+    DEFVAL { disabled }
+    ::= { benuCardIfIndexEntry 5 }
+
+benuCardIfPortType OBJECT-TYPE
+    SYNTAX      INTEGER { 
+                                   none(0),
+                                   ethernet(1),
+                                   fastEthernet(2),
+                                   gigaEthernet(3),
+                                   tunnel(4),
+                                   ipGre(5),
+                                   vlan(6),
+                                   l2tp(7),
+                                   cable(8),
+                                   bridge(9),
+                                   ip(10),
+                                   multiBind(11),
+                                   p2p(12),
+                                   loopback(13),
+                                   multiBindLastResort(14),
+                                   lag(15),
+                                   max(16)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object is used to identify port types for
+        a given card."
+    ::= { benuCardIfIndexEntry 6 }
+
+
+benuCardIfBindName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "interface name which is bound to this port . 
+         This string will be empty if there is no interface 
+         bind to this port "
+    ::= { benuCardIfIndexEntry 7 }
+
+
+benuCardIfEncapsulation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The encapsulation method used by the port."
+    ::= { benuCardIfIndexEntry 8 }
+
+
+benuCardIfVirtualType OBJECT-TYPE
+    SYNTAX      INTEGER { 
+                                   physical(1),
+                                   virtual(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object is used to identify virtualized
+        interfaces."
+    ::= { benuCardIfIndexEntry 9 }
+
+
+
+--        The Sensor Table
+
+benuSensorTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF BenuSensorEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "Chassis card table."
+       ::= { benuSensorInfo 1 }
+
+benuSensorEntry OBJECT-TYPE
+       SYNTAX      BenuSensorEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "Chassis card table."
+       INDEX { benuSensorCardIndex , benuSensorIndex }
+       ::= { benuSensorTable 1 }
+
+BenuSensorEntry ::= SEQUENCE {
+    benuSensorCardIndex   Unsigned32,
+    benuSensorIndex       Unsigned32,
+    benuSensorName        DisplayString,
+    benuSensorType        INTEGER,
+    benuSensorValue       Integer32,
+    benuSensorMinThresh   Integer32,
+    benuSensorMaxThresh   Integer32,
+    benuSensorState       INTEGER,
+    benuSensorId          Integer32
+}
+
+
+benuSensorCardIndex OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+       "cardIndex of the card in the Chassis cardTable
+        which contains this sensor."
+       ::= { benuSensorEntry 1 }
+benuSensorIndex OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+       "Index into sensorTable."
+       ::= { benuSensorEntry 2 }
+
+benuSensorName OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "Name of the sensor."
+       ::= { benuSensorEntry 3 }
+
+benuSensorType OBJECT-TYPE
+       SYNTAX      INTEGER {
+                           other(0),
+                           temparature(1),
+                           voltage(2),
+                           electicCurrent(3),
+                           fan(4),
+                           power(5)
+                           }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "Type of the sensor."
+       ::= { benuSensorEntry 4 }
+
+benuSensorValue OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "Current Value of this sensor.
+        The unit types for different type of sensors:
+        temparature -- celcius
+        Fan         -- rpm
+        Volatage    -- volts
+        Electric Current -- amperes
+        Power            -- watts "
+       ::= { benuSensorEntry 5 } 
+
+benuSensorMinThresh OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "Minimum threshold for this sensor."
+       ::= { benuSensorEntry 6 } 
+
+benuSensorMaxThresh OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "Maximum threshold for this sensor."
+       ::= { benuSensorEntry 7 } 
+
+benuSensorState OBJECT-TYPE
+       SYNTAX      INTEGER {
+                           other(0),
+                           normal(1),
+                           critical(2)
+                           }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "State  of the sensor."
+       ::= { benuSensorEntry 8 }
+
+benuSensorId       OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "Unique ID of the sensor."
+       ::= { benuSensorEntry 9 } 
+
+--        The Fan Table
+
+benuFanTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF BenuFanEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "Chassis Fan table."
+       ::= { benuFanInfo 1 }
+
+benuFanEntry OBJECT-TYPE
+       SYNTAX      BenuFanEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "Chassis card table."
+       INDEX { benuFanCardIndex  }
+       ::= { benuFanTable 1 }
+
+BenuFanEntry ::= SEQUENCE {
+    benuFanCardIndex   Unsigned32,
+    benuFanMaxSpeed    Unsigned32,
+    benuFanCurSpeed    Unsigned32,
+    benuFanStatus      Integer32
+}
+benuFanCardIndex OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+       "cardIndex of the card in the Chassis cardTable
+        which contains this Fan."
+       ::= { benuFanEntry 1 }
+
+benuFanMaxSpeed OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "Maximum expected speed of each Fan.
+        This value is applicable to all Fans 
+        in the card.
+        Units : The value range is from 0 to 100"
+       ::= { benuFanEntry 2 }
+
+benuFanCurSpeed OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "Current speed of each Fan.
+        This value is applicable to all Fans 
+        in the card.
+        Units : The value range is from 0 to 100
+        and is less than or equal to benuFanMaxSpeed"
+       ::= { benuFanEntry 3 }
+
+benuFanStatus OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " A value of -1 means Not available / Not applicable.
+          The lower order 7 bits indicates status of 7 Fans.
+          A bit value of one indicates FAN is non-operational.
+          A bit value of zero indicates FAN is operational.
+          Examples : 
+          (a) Value of 1 ( 0000 0001 ) indicates FAN #1 is 
+              non-operational.
+          (b) Value of 9 ( 0000 1001 ) indicates FAN #1 and FAN #4 
+              are non-operational.
+          (c) Value of 73( 0100 1001 ) indicates FAN #1,FAN #4 and FAN #7
+              are non-operational. "
+    ::= { benuFanEntry 4 }
+
+--        The PowerSupply Table
+
+benuPowerSupplyTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF BenuPowerSupplyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Benu power supply state information."
+        ::= { benuPowerSupplyInfo 1 }
+
+benuPowerSupplyEntry OBJECT-TYPE
+        SYNTAX      BenuPowerSupplyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Power supply table."
+        INDEX { benuPowerSupplyIndex }
+        ::= { benuPowerSupplyTable 1 }
+
+BenuPowerSupplyEntry ::= SEQUENCE {
+        benuPowerSupplyIndex    INTEGER,
+        benuPowerSupplyName     DisplayString,
+        benuPowerSupplyPresent  INTEGER,
+        benuPowerSupplyType     INTEGER,
+        benuPowerSupplyPowered  INTEGER
+}
+
+benuPowerSupplyIndex OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        powerA(1),
+                        powerB(2)
+                    }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object is used to identify the power supply."
+        ::= { benuPowerSupplyEntry 1 }
+
+benuPowerSupplyName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the power supply."
+        ::= { benuPowerSupplyEntry 2 }
+
+benuPowerSupplyPresent OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        yes(1),
+                        no(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether or not the power supply is installed in the chassis."
+        ::= { benuPowerSupplyEntry 3 }
+
+benuPowerSupplyType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ac(1),
+                        dc(2),
+                        notApplicable(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the type of the power supply."
+        ::= { benuPowerSupplyEntry 4 }
+
+benuPowerSupplyPowered OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        powered(1),
+                        notPowered(2),
+                        notApplicable(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether or not the power supply is actively supplying power.
+             The value of notApplicable(3) will show if the entry for benuPowerSupplyPresent is no(2)."
+        ::= { benuPowerSupplyEntry 5 }
+
+
+--  Chassis MIB General Info
+
+benuSysUpTimeSinceLastConfigChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time (in hundredths of a second) since the last
+        configuration change in the system."
+    ::= { benuChassisGeneralInfo 1 }
+
+-- Chassis MIB traps Definitions
+
+
+benuChassisPowerFailureInfo OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    powerFailureA(1),
+                    powerFailureB(2),
+                    powerRestoredA(3),
+                    powerRestoredB(4)
+     }
+      MAX-ACCESS accessible-for-notify
+      STATUS     obsolete
+      DESCRIPTION
+        "Indicates the location of the Power Failure."
+      ::= { benuChassisNotifVariables 1 }
+
+benuChassisPowerFailure NOTIFICATION-TYPE 
+    OBJECTS { benuChassisPowerFailureCardInfo,
+               benuChassisPowerFailureInfo
+            } 
+    STATUS obsolete
+    DESCRIPTION
+        "A chassisPowerFailureTrap is generated when a Power
+        Failure is detected in the system"
+    ::= { benuChassisNotifObjects 1 }
+
+benuChassisFanFailureInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION "Indicates the location of the Fan Failure."
+    ::= { benuChassisNotifVariables 2 }
+
+benuChassisFanFailureTrap NOTIFICATION-TYPE
+    OBJECTS { benuChassisFanFailureInfo } 
+    STATUS current
+    DESCRIPTION
+        "A chassisFanFailureTrap is generated when a Fan 
+        Failure is detected in the system"
+    ::= { benuChassisNotifObjects 2 }
+
+
+benuLinkUpTrap NOTIFICATION-TYPE
+    OBJECTS {
+        ifIndex,
+        ifDescr,
+        ifType,
+        ifAdminStatus,
+        ifOperStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "A proprietary Link Up Notification for all 
+        interfaces. This notification contains more details 
+        than the standard 'linkUp' notification in RFC 2863."
+    ::= { benuChassisNotifObjects 3 }    
+
+benuLinkDownTrap  NOTIFICATION-TYPE
+    OBJECTS {
+        ifIndex,
+        ifDescr,
+        ifType,
+        ifAdminStatus, 
+        ifOperStatus
+    }
+    STATUS    current
+    DESCRIPTION
+        "A proprietary Link Down Notification for all 
+        interfaces. This notification contains more details 
+        than the standard 'linkDown' notification in RFC 2863."
+    ::= { benuChassisNotifObjects 4 }
+
+
+benuChassisPowerFailureCardInfo OBJECT-TYPE
+      SYNTAX  Unsigned32 
+      MAX-ACCESS accessible-for-notify
+      STATUS     obsolete
+      DESCRIPTION
+        "Indicates the  Card Index
+         Card Index starts from #1. "
+      ::= { benuChassisNotifVariables 3 }
+
+benuSensorCritical NOTIFICATION-TYPE
+    OBJECTS {
+                benuSensorName,
+                benuSensorType,
+                benuSensorValue,
+                benuSensorId
+     }
+     STATUS current
+     DESCRIPTION
+          "This notification signifies the transition
+           of the sensor state from normal to critical."
+     ::= { benuChassisNotifObjects 5 }
+
+benuSensorNormal  NOTIFICATION-TYPE
+    OBJECTS {
+                benuSensorName,
+                benuSensorType,
+                benuSensorValue,
+                benuSensorId
+     }
+     STATUS current
+     DESCRIPTION
+          "This notification signifies the transition
+           of the sensor state from critical to normal."
+     ::= { benuChassisNotifObjects 6 }
+
+benuChassisPowerInfo OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    powerSupplyA(1),
+                    powerSupplyB(2)
+     }
+      MAX-ACCESS accessible-for-notify
+      STATUS     current
+      DESCRIPTION
+        "Indicates the location of the Power Failure or recovery."
+      ::= { benuChassisNotifVariables 4 }
+
+benuChassisPowerFault NOTIFICATION-TYPE
+    OBJECTS { benuChassisPowerInfo
+            }
+    STATUS current
+    DESCRIPTION
+        "A chassisPowerFaultTrap is generated when a Power
+        Failure is detected in the system"
+    ::= { benuChassisNotifObjects 7 }
+
+benuChassisPowerRecovery NOTIFICATION-TYPE
+    OBJECTS { benuChassisPowerInfo
+            }
+    STATUS current
+    DESCRIPTION
+        "A chassisPowerRecoveryTrap is generated when a failed
+        Power supply recovery is detected in the system"
+    ::= { benuChassisNotifObjects 8 }
+
+benuChassisPowerPresent NOTIFICATION-TYPE
+    OBJECTS { benuChassisPowerInfo
+            }
+    STATUS current
+    DESCRIPTION
+        "A chassisPowerPresentTrap is generated when a 
+        redundant Power supply is inserted in the system"
+    ::= { benuChassisNotifObjects 9 }
+
+benuChassisPowerAbsent NOTIFICATION-TYPE
+    OBJECTS { benuChassisPowerInfo
+            }
+    STATUS current
+    DESCRIPTION
+        "A chassisPowerAbsentTrap is generated when a 
+        redundant Power supply is removed from the system"
+    ::= { benuChassisNotifObjects 10 }
+
+END

@@ -1,0 +1,841 @@
+CISCOSB-RADIUSSRV DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Radius Server Private Extension
+-- Version:    910
+-- Date:       June 2015
+IMPORTS
+    switch001, rlRadius,rlAAAEap                FROM CISCOSB-MIB
+    Unsigned32, IpAddress,Counter32,
+    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
+    VlanId                                      FROM Q-BRIDGE-MIB
+    TruthValue, RowStatus, DisplayString,
+    DateAndTime, TimeStamp,
+    TEXTUAL-CONVENTION, MacAddress              FROM SNMPv2-TC
+    InetAddressType,InetAddress,InetAddressIPv6 FROM INET-ADDRESS-MIB; -- RFC2851
+
+rlRadiusServ MODULE-IDENTITY
+        LAST-UPDATED "201506210000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for Authentication, Authorization and Accounting
+                 in CISCOSB devices."
+        REVISION "201506210000Z"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 226 }
+
+rlRadiusServEnable OBJECT-TYPE
+   SYNTAX       TruthValue
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "Specifies whether Radius Server enabled on the switch. "
+   ::= { rlRadiusServ 1 }
+
+rlRadiusServAcctPort  OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To define the accounting UDP port used for accounting requests."
+    DEFVAL  { 1813 }
+    ::= { rlRadiusServ 2 }
+
+rlRadiusServAuthPort  OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To define the authentication UDP port used for authentication requests."
+    DEFVAL  { 1812 }
+    ::= { rlRadiusServ 3 }
+
+rlRadiusServDefaultKey OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Default Secret key to be shared with this all Radius Clients server."
+    ::= { rlRadiusServ 4 }
+
+rlRadiusServDefaultKeyMD5 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Default Secret key MD5."
+    ::= { rlRadiusServ 5 }
+
+rlRadiusServTrapAcct  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To enable sending accounting traps."
+    ::= { rlRadiusServ 6 }
+
+rlRadiusServTrapAuthFailure  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To enable sending traps when an authentication failed and Access-Reject is sent."
+    ::= { rlRadiusServ 7 }
+
+rlRadiusServTrapAuthSuccess  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To enable sending traps when a user is successfully authorized."
+    ::= { rlRadiusServ 8 }
+
+-- rlRadiusServGroupEntry 
+
+rlRadiusServGroupTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlRadiusServGroupEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS
+        server group entry."
+    ::= { rlRadiusServ 9 }
+
+rlRadiusServGroupEntry OBJECT-TYPE
+    SYNTAX     RlRadiusServGroupEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS
+        server group entry."
+    INDEX      { rlRadiusServGroupName }
+    ::= { rlRadiusServGroupTable 1 }
+
+RlRadiusServGroupEntry ::= SEQUENCE {
+    rlRadiusServGroupName                    DisplayString,
+    rlRadiusServGroupVLAN                    INTEGER,
+    rlRadiusServGroupVLANName                DisplayString,
+    rlRadiusServGroupACL1                    DisplayString,
+    rlRadiusServGroupACL2                    DisplayString,
+    rlRadiusServGroupPrvLevel                INTEGER,
+    rlRadiusServGroupTimeRangeName           DisplayString,
+    rlRadiusServGroupStatus                  RowStatus
+}
+
+rlRadiusServGroupName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(1..32))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "To define Radius Server Group Name"
+   ::= { rlRadiusServGroupEntry 1 }
+
+rlRadiusServGroupVLAN OBJECT-TYPE
+   SYNTAX INTEGER (0|1..4094)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "To define Radius Assigned VLAN"
+   DEFVAL  { 0 }
+   ::= { rlRadiusServGroupEntry 2 }
+
+rlRadiusServGroupVLANName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..32))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "To define Radius Assigned VLAN name"
+   ::= { rlRadiusServGroupEntry 3 }
+
+rlRadiusServGroupACL1 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..32))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "To define first Radius Assigned ACL"
+   ::= { rlRadiusServGroupEntry 4 }
+
+rlRadiusServGroupACL2 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..32))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "To define second Radius Assigned ACL"
+   ::= { rlRadiusServGroupEntry 5 }
+
+rlRadiusServGroupPrvLevel OBJECT-TYPE
+   SYNTAX INTEGER (1..15)
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "To define the user privilege level"
+   ::= { rlRadiusServGroupEntry 6 }
+
+rlRadiusServGroupTimeRangeName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..32))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "To define the time user can connect"
+   ::= { rlRadiusServGroupEntry 7 }
+
+rlRadiusServGroupStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION        ""
+    ::= { rlRadiusServGroupEntry 8 }
+
+-- rlRadiusServUserEntry
+
+rlRadiusServUserTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlRadiusServUserEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS
+        server user entry."
+    ::= { rlRadiusServ 10 }
+
+rlRadiusServUserEntry OBJECT-TYPE
+    SYNTAX     RlRadiusServUserEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS
+        server User entry."
+    INDEX      { rlRadiusServUserName }
+    ::= { rlRadiusServUserTable 1 }
+
+RlRadiusServUserEntry ::= SEQUENCE {
+    rlRadiusServUserName                    DisplayString,
+    rlRadiusServUserPassword                DisplayString,
+    rlRadiusServUserPasswordMD5             OCTET STRING,
+    rlRadiusServUserGroupName               DisplayString,
+    rlRadiusServUserStatus                  RowStatus
+}
+
+rlRadiusServUserName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(1..32))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "To define Radius Server User Name"
+   ::= { rlRadiusServUserEntry 1 }
+
+rlRadiusServUserPassword OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(1..64))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Plain text Radius Server User Password"
+   ::= { rlRadiusServUserEntry 2 }
+
+rlRadiusServUserPasswordMD5 OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MD5 of the rlRadiusServUserPassword"
+    ::= { rlRadiusServUserEntry 3 }
+
+rlRadiusServUserGroupName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(1..32))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION       "Assigned Radius Server Group Name to specific user"
+   ::= { rlRadiusServUserEntry 4 }
+
+rlRadiusServUserStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION        ""
+    ::= { rlRadiusServUserEntry 5 }
+
+
+-- rlRadiusServClientInetEntry
+
+rlRadiusServClientInetTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlRadiusServClientInetEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS
+        server group entry."
+    ::= { rlRadiusServ 11 }
+
+rlRadiusServClientInetEntry OBJECT-TYPE
+    SYNTAX     RlRadiusServClientInetEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS Client entry."
+    INDEX      { rlRadiusServClientInetAddressType,
+                 rlRadiusServClientInetAddress }   
+    ::= { rlRadiusServClientInetTable 1 }
+
+
+RlRadiusServClientInetEntry ::= SEQUENCE {
+    rlRadiusServClientInetAddressType   InetAddressType,
+    rlRadiusServClientInetAddress       InetAddress,
+    rlRadiusServClientInetKey           DisplayString,
+    rlRadiusServClientInetKeyMD5        OCTET STRING,
+    rlRadiusServClientInetStatus        RowStatus,
+    rlRadiusServClientInetUseGlobalKey  TruthValue
+}
+
+rlRadiusServClientInetAddressType OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address type of RADIUS client reffered to
+         in this table entry."
+    ::= { rlRadiusServClientInetEntry 1}
+
+rlRadiusServClientInetAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS     read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address of the RADIUS client
+        referred to in this table entry."
+    ::= { rlRadiusServClientInetEntry 2 }
+
+rlRadiusServClientInetKey  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Secret key to be shared with this RADIUS client."
+    DEFVAL { "" }
+    ::= { rlRadiusServClientInetEntry 3 }
+
+rlRadiusServClientInetKeyMD5 OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MD5 of the rlRadiusServClientInetKey"
+    ::= { rlRadiusServClientInetEntry 4 }
+
+rlRadiusServClientInetStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION        ""
+    ::= { rlRadiusServClientInetEntry 5 }
+
+rlRadiusServClientInetUseGlobalKey OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If this field is set to true the value in field rlRadiusServClientInetKey
+        is ignored and instead the value in the MIB
+        rlRadiusServDefaultKey is used. Otherwise the value in
+        rlRadiusServClientInetKey is used."
+    DEFVAL { false }
+    ::= { rlRadiusServClientInetEntry 6 }
+
+-- Action MIBs
+
+
+rlRadiusServClearAccounting OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Setting this object to TRUE clears the Radius Accounting cache."
+    ::= { rlRadiusServ 12 }
+
+rlRadiusServClearRejectedUsers OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Setting this object to TRUE clears the Radius Rejected Users cache."
+    ::= { rlRadiusServ 13 }
+
+rlRadiusServClearStatistics OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Setting this object to TRUE clears the Radius server counters."
+    ::= { rlRadiusServ 14 }
+
+rlRadiusServClearUsersOfGivenGroup OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Clears users of specified Group. 0 string signes to clear all users."
+    ::= { rlRadiusServ 15 }
+
+
+rlRadiusServClearClientStatisticsTable        OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlRadiusServClearClientStatisticsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Action MIB to clear radius server statistics per client."
+    ::= { rlRadiusServ 16 }
+
+rlRadiusServClearClientStatisticsEntry OBJECT-TYPE
+    SYNTAX          RlRadiusServClearClientStatisticsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The row definition for this table."
+    INDEX { rlRadiusServClearClientStatisticsIndex }
+::= { rlRadiusServClearClientStatisticsTable 1 }
+
+RlRadiusServClearClientStatisticsEntry::= SEQUENCE {
+    rlRadiusServClearClientStatisticsIndex            INTEGER,
+    rlRadiusServClearClientStatisticsInetAddressType  InetAddressType,
+    rlRadiusServClearClientStatisticsInetAddress      InetAddress
+}
+
+rlRadiusServClearClientStatisticsIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index in the table. Already 1."
+    ::= { rlRadiusServClearClientStatisticsEntry 1 }
+
+rlRadiusServClearClientStatisticsInetAddressType OBJECT-TYPE
+   SYNTAX  InetAddressType
+   MAX-ACCESS  read-write
+   STATUS current
+   DESCRIPTION
+        "Clear statistics Inet address type parameter."
+   ::= { rlRadiusServClearClientStatisticsEntry 2 }
+
+rlRadiusServClearClientStatisticsInetAddress OBJECT-TYPE
+   SYNTAX  InetAddress
+   MAX-ACCESS  read-write
+   STATUS current
+   DESCRIPTION
+        "Clear statistics Inet address parameter."
+   ::= { rlRadiusServClearClientStatisticsEntry 3 }
+
+
+-- rlRadiusServRejectedEntry
+
+RlRadiusServUserType::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Radius Server user service type"
+    SYNTAX  INTEGER {
+        none(0),
+        x(1),
+        login(2)
+}
+
+RlRadiusServRejectedEventType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Rejected Users Event Type"
+    SYNTAX  INTEGER {
+        invalid(0),
+        reboot(2),
+        dateTimeChanged(3),
+        rejected(4)
+}
+
+RlRadiusServRejectedReasonType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Authentication service rejects reason"
+    SYNTAX  INTEGER {
+        noError(0),
+        unknownUser(1),        
+        illegalPassword(2),
+        notAllowedTime(3),
+        notSupportedEAPMethod(4),
+        notAllowedPrivLevel(5)
+}
+
+rlRadiusServRejectedTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlRadiusServRejectedEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS
+        server rejected user entry."
+    ::= { rlRadiusServ 17 }
+
+rlRadiusServRejectedEntry OBJECT-TYPE
+    SYNTAX     RlRadiusServRejectedEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS Rejected user entry."
+    INDEX      { rlRadiusServRejectedIndex }   
+    ::= { rlRadiusServRejectedTable 1 }
+
+
+RlRadiusServRejectedEntry ::= SEQUENCE {
+  rlRadiusServRejectedIndex               Unsigned32,
+  rlRadiusServRejectedUserName            DisplayString,
+  rlRadiusServRejectedUserType            RlRadiusServUserType,
+  rlRadiusServRejectedEvent               RlRadiusServRejectedEventType,
+  rlRadiusServRejectedDateTime            DisplayString,
+  rlRadiusServRejectedUpdatedDateTime     DisplayString,
+  rlRadiusServRejectedNASInetAddressType  InetAddressType,  
+  rlRadiusServRejectedNASInetAddress      InetAddress,
+  rlRadiusServRejectedNASPort             INTEGER,
+  rlRadiusServRejectedUserAddress         DisplayString,
+  rlRadiusServRejectedReason              RlRadiusServRejectedReasonType
+}
+
+rlRadiusServRejectedIndex OBJECT-TYPE
+   SYNTAX Unsigned32(1..4294967295)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "Rejected User Index"
+   ::= { rlRadiusServRejectedEntry 1 }
+
+rlRadiusServRejectedUserName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..32))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Rejected User Name.  In case of dateTimeChanged and reboot event contains 0."
+   ::= { rlRadiusServRejectedEntry 2 }
+
+rlRadiusServRejectedUserType OBJECT-TYPE
+   SYNTAX RlRadiusServUserType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Contains type of service."
+   ::= { rlRadiusServRejectedEntry 3 }
+
+rlRadiusServRejectedEvent OBJECT-TYPE
+   SYNTAX RlRadiusServRejectedEventType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Contains type of event."
+   ::= { rlRadiusServRejectedEntry 4 }
+
+rlRadiusServRejectedDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date of rejected event."
+   ::= { rlRadiusServRejectedEntry 5}
+
+rlRadiusServRejectedUpdatedDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "In case of dateTimeChanged event contains New assigned Date and Time. Otherwise contains 0."
+   ::= { rlRadiusServRejectedEntry 6 }
+
+rlRadiusServRejectedNASInetAddressType OBJECT-TYPE
+   SYNTAX  InetAddressType
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Rejected user NAS Inet address type. In case of dateTimeChange and reboot event contains 0."
+   ::= { rlRadiusServRejectedEntry 7 }
+
+rlRadiusServRejectedNASInetAddress OBJECT-TYPE
+   SYNTAX  InetAddress
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Rejected user NAS Inet address. In case of dateTimeChanged and reboot event contains 0."
+   ::= { rlRadiusServRejectedEntry 8 }
+
+rlRadiusServRejectedNASPort OBJECT-TYPE
+   SYNTAX  INTEGER
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Rejected user NAS port. In case of dateTimeChanged and reboot event contains 0."
+   ::= { rlRadiusServRejectedEntry 9 }
+
+rlRadiusServRejectedUserAddress OBJECT-TYPE
+   SYNTAX  DisplayString
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Rejected user Inet address type. In case of 1x user contains mac address string, in case of login contains inet address."
+   ::= { rlRadiusServRejectedEntry 10 }
+
+rlRadiusServRejectedReason OBJECT-TYPE
+   SYNTAX  RlRadiusServRejectedReasonType
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Rejected user reason."
+   ::= { rlRadiusServRejectedEntry 11 }
+
+
+-- rlRadiusServAcctLogEntry
+
+
+RlRadiusServAcctLogUserAuthType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "User Authentication Type"
+    SYNTAX  INTEGER {
+        none(0),
+        radius(1),
+        local(2),
+        remote(3)
+}
+
+RlRadiusServAcctLogEventType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Accounting Event Type"
+    SYNTAX  INTEGER {
+        invalid(0),
+        reboot(2),
+        dateTimeChanged(3),
+        start(4),
+        stop(5)
+}
+
+RlRadiusServAcctLogTerminationReasonType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Accounting User Termination reason"
+    SYNTAX  INTEGER {
+        noError(0),                
+        userRequest(1),
+        lostCarrier(2),
+        lostService(3),
+        idleTimeout(4),
+        sessionTimeout(5),
+        adminReset(6),
+        adminReboot(7),
+        portError(8),
+        nasError(9),
+        nasRequest(10),
+        nasReboot(11),
+        portUnneeded(12),
+        portPreempted(13),
+        portSuspended(14),
+        serviceUnavailable(15),
+        callback(16),
+        userError(17),
+        hostRequest(18)
+}
+
+rlRadiusServAcctLogTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlRadiusServAcctLogEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS
+        server accounting log entry."
+    ::= { rlRadiusServ 18 }
+
+rlRadiusServAcctLogEntry OBJECT-TYPE
+    SYNTAX     RlRadiusServAcctLogEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS server accounting log entry."
+    INDEX      { rlRadiusServAcctLogIndex }   
+    ::= { rlRadiusServAcctLogTable 1 }
+
+RlRadiusServAcctLogEntry ::= SEQUENCE {
+  rlRadiusServAcctLogIndex               Unsigned32,
+  rlRadiusServAcctLogUserName            DisplayString,
+  rlRadiusServAcctLogUserAuth            RlRadiusServAcctLogUserAuthType,
+  rlRadiusServAcctLogEvent               RlRadiusServAcctLogEventType,
+  rlRadiusServAcctLogDateTime            DisplayString,
+  rlRadiusServAcctLogUpdatedDateTime     DisplayString,  
+  rlRadiusServAcctLogSessionDuration     Unsigned32, 
+  rlRadiusServAcctLogNASInetAddressType  InetAddressType,  
+  rlRadiusServAcctLogNASInetAddress      InetAddress,
+  rlRadiusServAcctLogNASPort             INTEGER,
+  rlRadiusServAcctLogUserAddress         DisplayString,
+  rlRadiusServAcctLogTerminationReason   RlRadiusServAcctLogTerminationReasonType      
+}
+
+rlRadiusServAcctLogIndex OBJECT-TYPE
+   SYNTAX Unsigned32(1..4294967295)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "Accounting Log Index"
+   ::= { rlRadiusServAcctLogEntry 1 }
+
+rlRadiusServAcctLogUserName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..32))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Accounting Log User Name.  In case of dateTimeChanged and reboot event contains 0."
+   ::= { rlRadiusServAcctLogEntry 2 }
+
+rlRadiusServAcctLogUserAuth OBJECT-TYPE
+   SYNTAX RlRadiusServAcctLogUserAuthType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Contains type of authenticator."
+   ::= { rlRadiusServAcctLogEntry 3 }
+
+rlRadiusServAcctLogEvent OBJECT-TYPE
+   SYNTAX RlRadiusServAcctLogEventType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Contains type of event."
+   ::= { rlRadiusServAcctLogEntry 4 }
+
+rlRadiusServAcctLogDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date of accounting event."
+   ::= { rlRadiusServAcctLogEntry 5}
+
+rlRadiusServAcctLogUpdatedDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "In case of dateTimeChanged event contains New assigned Date and Time. Otherwise contains 0."
+   ::= { rlRadiusServAcctLogEntry 6 }
+
+rlRadiusServAcctLogSessionDuration OBJECT-TYPE
+   SYNTAX Unsigned32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Contains duration of user session in seconds. In case of dateTimeChanged and reboot event contains 0."
+   ::= { rlRadiusServAcctLogEntry 7 }
+
+rlRadiusServAcctLogNASInetAddressType OBJECT-TYPE
+   SYNTAX  InetAddressType
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Accounting log user NAS Inet address type. In case of dateTimeChanged and reboot event contains 0."
+   ::= { rlRadiusServAcctLogEntry 8 }
+
+rlRadiusServAcctLogNASInetAddress OBJECT-TYPE
+   SYNTAX  InetAddress
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Accounting log user NAS Inet address. In case of dateTimeChanged and reboot event contains 0."
+   ::= { rlRadiusServAcctLogEntry 9 }
+
+rlRadiusServAcctLogNASPort OBJECT-TYPE
+   SYNTAX  INTEGER
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Accounting log user NAS port. In case of dateTimeChanged and reboot event contains 0."
+   ::= { rlRadiusServAcctLogEntry 10 }
+
+rlRadiusServAcctLogUserAddress OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Accounting log user address. In case of 1x user contains mac address string, in case of login contains inet address."
+   ::= { rlRadiusServAcctLogEntry 11 }
+
+rlRadiusServAcctLogTerminationReason OBJECT-TYPE
+   SYNTAX  RlRadiusServAcctLogTerminationReasonType
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "User Session termination reason."
+   ::= { rlRadiusServAcctLogEntry 12 }
+
+-- rlRadiusServUnknownNasEntry
+
+RlRadiusServUnknownNasEventType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Unknown NAS Event Type"
+    SYNTAX  INTEGER {
+        invalid(0),
+        reboot(2),
+        dateTimeChanged(3),
+        nas(4)
+}
+
+rlRadiusServUnknownNasTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlRadiusServUnknownNasEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS
+        server unknown nas entry."
+    ::= { rlRadiusServ 19 }
+
+rlRadiusServUnknownNasEntry OBJECT-TYPE
+    SYNTAX     RlRadiusServUnknownNasEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION
+        "The (conceptual) table listing the RADIUS server unknown nas entry."
+    INDEX      { rlRadiusServUnknownNasIndex }   
+    ::= { rlRadiusServUnknownNasTable 1 }
+
+RlRadiusServUnknownNasEntry ::= SEQUENCE {
+  rlRadiusServUnknownNasIndex            Unsigned32,
+  rlRadiusServUnknownNasEvent            RlRadiusServUnknownNasEventType,
+  rlRadiusServUnknownNasDateTime         DisplayString,
+  rlRadiusServUnknownNasUpdatedDateTime  DisplayString,   
+  rlRadiusServUnknownNasInetAddressType  InetAddressType,  
+  rlRadiusServUnknownNasInetAddress      InetAddress      
+}
+
+rlRadiusServUnknownNasIndex OBJECT-TYPE
+   SYNTAX Unsigned32(1..4294967295)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION       "unknown nas Index"
+   ::= { rlRadiusServUnknownNasEntry 1 }
+
+rlRadiusServUnknownNasEvent OBJECT-TYPE
+   SYNTAX RlRadiusServUnknownNasEventType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Contains type of event."
+   ::= { rlRadiusServUnknownNasEntry 2 }
+
+rlRadiusServUnknownNasDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Date of unknown nas event."
+   ::= { rlRadiusServUnknownNasEntry 3}
+
+rlRadiusServUnknownNasUpdatedDateTime OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "In case of dateTimeChanged event contains New assigned Date and Time. Otherwise contains 0."
+   ::= { rlRadiusServUnknownNasEntry 4 }
+
+rlRadiusServUnknownNasInetAddressType OBJECT-TYPE
+   SYNTAX  InetAddressType
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Unknown nas Inet address type. In case of dateTimeChanged and reboot event contains 0."
+   ::= { rlRadiusServUnknownNasEntry 5 }
+
+rlRadiusServUnknownNasInetAddress OBJECT-TYPE
+   SYNTAX  InetAddress
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+        "Unknown nas Inet address. In case of dateTimeChanged and reboot event contains 0."
+   ::= { rlRadiusServUnknownNasEntry 9 }
+
+rlRadiusServClearUnknownNas OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Setting this object to TRUE clears the Radius Unknown Nas cache."
+    ::= { rlRadiusServ 20 }
+END

@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,7 +28,7 @@ namespace LibreNMS\Interfaces\Discovery\Sensors;
 interface WirelessErrorRateDiscovery
 {
     /**
-     * Discover wireless bit error rate.  This is in bps. Type is error-ratio.
+     * Discover wireless bit error rate.  This is in bps. Type is error-rate.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors

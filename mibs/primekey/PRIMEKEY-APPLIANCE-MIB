@@ -1,0 +1,590 @@
+PRIMEKEY-APPLIANCE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    enterprises
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, 
+    OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+primekey MODULE-IDENTITY
+    LAST-UPDATED "202107170000Z"
+    ORGANIZATION "www.primekey.com"
+    CONTACT-INFO    
+        "postal:    PrimeKey Solutions AB
+                    Solna Access, Plan A8,
+                    Sundbybergsvagen 1
+                    SE-171 73 Solna
+                    Sweden
+        email:      support@primekey.com"
+    DESCRIPTION
+	   "PrimeKey EJBCA Appliance MIB"
+
+
+    REVISION "202107170000Z"
+    DESCRIPTION "Adding HSM Audit Log Usage for special versions of appliance"
+
+    REVISION "202102260000Z"
+    DESCRIPTION "First Draft"
+    ::= { enterprises 22408 } -- 1.3.6.1.4.1 22408
+
+
+--
+-- general OBJECT IDENTIFIERS
+--
+-- OBJECTS in this file are in numerical order, please
+--
+primeKeyAppliancePrefixOne          OBJECT IDENTIFIER ::= { primekey 1 }
+primeKeyAppliancePrefixAnotherOne   OBJECT IDENTIFIER ::= { primeKeyAppliancePrefixOne 1 }
+pkAppliance     OBJECT IDENTIFIER ::= { primeKeyAppliancePrefixAnotherOne 2 }
+
+
+--
+-- OBJECT TYPES SFP (.1.3.6.1.4.1.22408.1.1.2.1)
+--
+
+pkSfp   OBJECT IDENTIFIER ::= { pkAppliance 1 }
+
+
+pkSfpTwo        OBJECT IDENTIFIER ::= { pkSfp 2 }
+pkSfpTwoV       OBJECT IDENTIFIER ::= { pkSfpTwo  118 } -- v
+pkASfpVmStatusX OBJECT IDENTIFIER ::= { pkSfpTwoV 109 } -- m
+pkASfpVmStatus  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Status of all VMs, 0 if all are running, 1 otherwise"
+    ::= { pkASfpVmStatusX 1 }   -- .1.3.6.1.4.1.22408.1.1.2.1.2.118.109.1
+
+
+pkSfpThree      OBJECT IDENTIFIER ::= { pkSfp 3 }
+pkSfpThreeC     OBJECT IDENTIFIER ::= { pkSfpThree   99 } -- c
+pkSfpThreeP     OBJECT IDENTIFIER ::= { pkSfpThreeC 112 } -- p
+pkASfpCpuTempX   OBJECT IDENTIFIER ::= { pkSfpThreeP 117 } -- u
+pkASfpCpuTemp    OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Temperature of the CPU in degrees celcius. Example: 34"
+    ::= { pkASfpCpuTempX 1 }   -- .1.3.6.1.4.1.22408.1.1.2.1.3.99.112.117.1
+
+
+
+pkSfpFour  OBJECT IDENTIFIER ::= { pkSfp 4 }
+pkSfpFourF OBJECT IDENTIFIER ::= { pkSfpFour  102 }  -- f
+pkSfpFourA OBJECT IDENTIFIER ::= { pkSfpFourF  97 }  -- a
+pkSfpFourN OBJECT IDENTIFIER ::= { pkSfpFourA 110 }  -- n
+
+pkASfpCpuFanX OBJECT IDENTIFIER ::= { pkSfpFourN 49 }  -- 1
+pkASfpCpuFan  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "rpm of cpu fan. Example: 1025"
+    ::= { pkASfpCpuFanX 1 }  -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.49.1
+
+pkASfpSysFan1X OBJECT IDENTIFIER ::= { pkSfpFourN 50 }  -- 2
+pkASfpSysFan1  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "rpm of system fan 1"
+    ::= { pkASfpSysFan1X 1 }  -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.50.1
+
+pkASfpSysFan2X OBJECT IDENTIFIER ::= { pkSfpFourN 51 }  -- 3
+pkASfpSysFan2  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "rpm of system fan 2"
+    ::= { pkASfpSysFan2X 1 }  -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.51.1
+
+pkASfpSysFan3X OBJECT IDENTIFIER ::= { pkSfpFourN 52 }  -- 4
+pkASfpSysFan3  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "rpm of system fan 3"
+    ::= { pkASfpSysFan3X 1 }  -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.52.1
+
+pkASfpCpuFanStatusX OBJECT IDENTIFIER ::= { pkSfpFourN 53 }  -- 5
+pkASfpCpuFanStatus  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "0 if cpu fan ok, 1 otherwise"
+    ::= { pkASfpCpuFanStatusX 1 }  -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.53.1
+
+pkASfpSysFansStatusX OBJECT IDENTIFIER ::= { pkSfpFourN 54 }  -- 6
+pkASfpSysFansStatus  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "0 if system fans are ok, 1 otherwise"
+    ::= { pkASfpSysFansStatusX 1 }  -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.54.1
+    
+
+
+
+pkSfpFourV OBJECT IDENTIFIER ::= { pkSfpFour  118 }  -- v
+pkSfpFourD OBJECT IDENTIFIER ::= { pkSfpFourV 100 }  -- d
+pkSfpFourB OBJECT IDENTIFIER ::= { pkSfpFourD  98 }  -- b
+
+pkAVdbUsagePercentX OBJECT IDENTIFIER ::= { pkSfpFourB  49 }  -- 1
+pkAVdbUsagePercent  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Database usage in %. Example: 35"
+    ::= { pkAVdbUsagePercentX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.49.1
+
+pkAVdbStatusX OBJECT IDENTIFIER ::= { pkSfpFourB  50 }  -- 2
+pkAVdbStatus  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "1 if space for db exceeds 80% usage, 0 otherwise"
+    ::= { pkAVdbStatusX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.50.1
+
+
+
+
+pkSfpFive  OBJECT IDENTIFIER ::= { pkSfp 5 }
+pkSfpFiveL OBJECT IDENTIFIER ::= { pkSfpFive  108 } -- l
+pkSfpFiveO OBJECT IDENTIFIER ::= { pkSfpFiveL 111 } -- o
+pkSfpFiveA OBJECT IDENTIFIER ::= { pkSfpFiveO  97 } -- a
+pkSfpFiveD OBJECT IDENTIFIER ::= { pkSfpFiveA 100 } -- d
+
+pkASfpLoadX OBJECT IDENTIFIER ::= { pkSfpFiveD 49 } -- 1
+pkASfpLoad  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Load average of the system. Intervals are 1 min, 5 min, 15 min. Values above 1.0 are possible. Example: 0.77 0.79 0.82"
+    ::= { pkASfpLoadX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.49.1
+
+pkASfpLoad1mX OBJECT IDENTIFIER ::= { pkSfpFiveD 50 } -- 2
+pkASfpLoad1m  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Load average of the system. Intervals is 1 min. Values above 1.0 are possible. Example: 0.77"
+    ::= { pkASfpLoad1mX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.50.1
+
+pkASfpLoad5mX OBJECT IDENTIFIER ::= { pkSfpFiveD 51 } -- 3
+pkASfpLoad5m  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Load average of the system. Intervals is 5 mins. Values above 1.0 are possible. Example: 0.79"
+    ::= { pkASfpLoad5mX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.51.1
+
+pkASfpLoad15mX OBJECT IDENTIFIER ::= { pkSfpFiveD 52 } -- 4
+pkASfpLoad15m  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Load average of the system. Intervals is 15 mins. Values above 1.0 are possible. Example: 0.82"
+    ::= { pkASfpLoad15mX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.52.1
+
+
+pkSfpFiveR    OBJECT IDENTIFIER ::= { pkSfpFive    114 } -- r
+pkSfpFiveRA   OBJECT IDENTIFIER ::= { pkSfpFiveR    97 } -- a
+pkSfpFiveRAI  OBJECT IDENTIFIER ::= { pkSfpFiveRA  105 } -- i
+pkSfpFiveRAID OBJECT IDENTIFIER ::= { pkSfpFiveRAI 100 } -- d
+
+pkASfpRaidStatusX OBJECT IDENTIFIER ::= { pkSfpFiveRAID 49 } -- 1
+pkASfpRaidStatus  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Status of RAID, 0 if clean or active, 1 otherwise"
+    ::= { pkASfpRaidStatusX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.49.1
+
+pkASfpRaidStatusStringX OBJECT IDENTIFIER ::= { pkSfpFiveRAID 50 } -- 2
+pkASfpRaidStatusString  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Status of RAID as string. Example: 'clean'"
+    ::= { pkASfpRaidStatusStringX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.50.1
+
+pkASfpRaidTotalDevicesStringX OBJECT IDENTIFIER ::= { pkSfpFiveRAID 51 } -- 3
+pkASfpRaidTotalDevicesString  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "String of tool output, total number of devices in the raid. Example: 'Total Devices : 2'"
+    ::= { pkASfpRaidTotalDevicesStringX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.51.1
+
+pkASfpRaidTotalDevicesX OBJECT IDENTIFIER ::= { pkSfpFiveRAID 52 } -- 4
+pkASfpRaidTotalDevices  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Total number of devices in the raid. Example: 2"
+    ::= { pkASfpRaidTotalDevicesX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.52.1
+
+pkASfpRaidActiveDevicesStringX OBJECT IDENTIFIER ::= { pkSfpFiveRAID 53 } -- 5
+pkASfpRaidActiveDevicesString  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "String of tool output, number of active devices in the raid. Example: 'Raid Devices : 2'"
+    ::= { pkASfpRaidActiveDevicesStringX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.53.1
+
+pkASfpRaidActiveDevicesX OBJECT IDENTIFIER ::= { pkSfpFiveRAID 54 } -- 6
+pkASfpRaidActiveDevices  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Number of active devices in the raid. Example: 2"
+    ::= { pkASfpRaidActiveDevicesX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.54.1
+
+
+
+pkSfpSix  OBJECT IDENTIFIER ::= { pkSfp 6 } 
+pkSfpSixM OBJECT IDENTIFIER ::= { pkSfpSix  109 } -- m
+pkSfpSixA OBJECT IDENTIFIER ::= { pkSfpSixM  97 } -- a
+pkSfpSixI OBJECT IDENTIFIER ::= { pkSfpSixA 105 } -- i
+pkSfpSixN OBJECT IDENTIFIER ::= { pkSfpSixI 110 } -- n
+pkSfpSixT OBJECT IDENTIFIER ::= { pkSfpSixN 116 } -- t
+
+pkASfpMaintenanceStateX OBJECT IDENTIFIER ::= { pkSfpSixT 49 } -- '1'
+pkASfpMaintenanceState  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "MaintenanceState Status: '0' Operational, '1' Offline, '2' Maintenance"
+    ::= { pkASfpMaintenanceStateX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.6.109.97.105.110.116.49.1
+
+pkASfpMaintenanceStateStringX OBJECT IDENTIFIER ::= { pkSfpSixT 50 } -- '2'
+pkASfpMaintenanceStateString  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "MaintenanceState String. Example: 'Operational'"
+    ::= { pkASfpMaintenanceStateStringX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.6.109.97.105.110.116.50.1
+
+
+
+pkSfpSeven  OBJECT IDENTIFIER ::= { pkSfp 7 }
+pkSfpSevenV OBJECT IDENTIFIER ::= { pkSfpSeven  118 } -- v
+pkSfpSevenE OBJECT IDENTIFIER ::= { pkSfpSevenV 101 } -- e
+pkSfpSevenR OBJECT IDENTIFIER ::= { pkSfpSevenE 114 } -- r
+pkSfpSevenS OBJECT IDENTIFIER ::= { pkSfpSevenR 115 } -- s
+pkSfpSevenI OBJECT IDENTIFIER ::= { pkSfpSevenS 105 } -- i
+pkSfpSevenO OBJECT IDENTIFIER ::= { pkSfpSevenI 111 } -- o
+pkAVersionX OBJECT IDENTIFIER ::= { pkSfpSevenO 110 } -- n
+pkAVersion  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "The software version of the operating system. Example: PrimeKeyAppliance.3.5.0"
+    ::= { pkAVersionX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.7.118.101.114.115.105.111.110.1
+
+
+
+pkSfpEight  OBJECT IDENTIFIER ::= { pkSfp 8 }
+pkSfpEightC OBJECT IDENTIFIER ::= { pkSfpEight   99 } -- c
+pkSfpEightL OBJECT IDENTIFIER ::= { pkSfpEightC 108 } -- l
+pkSfpEightU OBJECT IDENTIFIER ::= { pkSfpEightL 117 } -- u
+pkSfpEightS OBJECT IDENTIFIER ::= { pkSfpEightU 115 } -- s
+pkSfpEightT OBJECT IDENTIFIER ::= { pkSfpEightS 116 } -- t
+pkSfpEightE OBJECT IDENTIFIER ::= { pkSfpEightT 101 } -- e
+pkSfpEightR OBJECT IDENTIFIER ::= { pkSfpEightE 114 } -- r
+
+pkAClusterLocalNodeIDX OBJECT IDENTIFIER ::= { pkSfpEightR 49 } -- '1'
+pkAClusterLocalNodeID  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Cluster Local Node ID"
+    ::= { pkAClusterLocalNodeIDX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.49.1
+
+pkAClusterSizeX  OBJECT IDENTIFIER ::= { pkSfpEightR 50 } -- '2'
+pkAClusterSize   OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Cluster Size, total number of nodes"
+    ::= { pkAClusterSizeX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.50.1
+
+pkAClusterActiveNodesX OBJECT IDENTIFIER ::= { pkSfpEightR 51 } -- '3'
+pkAClusterActiveNodes  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Cluster: Number of currently active nodes in the cluster"
+    ::= { pkAClusterActiveNodesX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.51.1
+
+pkAClusterLocalGaleraStateX OBJECT IDENTIFIER ::= { pkSfpEightR 52 } -- '4'
+pkAClusterLocalGaleraState  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Cluster: Local db cluster (galera) state"
+    ::= { pkAClusterLocalGaleraStateX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.52.1
+
+pkAClusterLocalGaleraStateStringX OBJECT IDENTIFIER ::= { pkSfpEightR 53 } -- '5'
+pkAClusterLocalGaleraStateString  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Cluster: Local db cluster (galera) state as string. Example: 'Synced'"
+    ::= { pkAClusterLocalGaleraStateStringX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.53.1
+
+pkAClusterLTIDX OBJECT IDENTIFIER ::= { pkSfpEightR 54 } -- '6'
+pkAClusterLTID  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Cluster Local Last Transaction ID"
+    ::= { pkAClusterLTIDX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.54.1
+
+
+pkSfpEightH      OBJECT IDENTIFIER ::= { pkSfpEight      104 } -- h
+pkSfpEightHE     OBJECT IDENTIFIER ::= { pkSfpEightH     101 } -- e
+pkSfpEightHEA    OBJECT IDENTIFIER ::= { pkSfpEightHE     97 } -- a
+pkSfpEightHEAL   OBJECT IDENTIFIER ::= { pkSfpEightHEA   108 } -- l
+pkSfpEightHEALT  OBJECT IDENTIFIER ::= { pkSfpEightHEAL  116 } -- t
+pkSfpEightHEALTH OBJECT IDENTIFIER ::= { pkSfpEightHEALT 104 } -- h
+
+pkEjbca OBJECT IDENTIFIER ::= { pkSfpEightHEALTH 101 } -- e for EJBCA
+
+pkAEJBCAHealthStringX OBJECT IDENTIFIER ::= { pkEjbca 49 } -- '1'
+pkAEJBCAHealthString  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "EJBCA Healthcheck as raw string. Example: 'ALLOK'"
+    ::= { pkAEJBCAHealthStringX 1 } -- multiline .1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.101.49.1
+
+pkAEJBCAHealthX OBJECT IDENTIFIER ::= { pkEjbca 50 } -- '2'
+pkAEJBCAHealth  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "EJBCA Healthcheck returns 0 for 'ALLOK', 1 otherwise"
+    ::= { pkAEJBCAHealthX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.101.50.1
+
+
+pkSignServer OBJECT IDENTIFIER ::= { pkSfpEightHEALTH 115 } -- s for SignServer
+
+pkASignServerHealthStringX OBJECT IDENTIFIER ::= { pkSignServer 49 } -- '1'
+pkASignServerHealthString  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "SignServer Healthcheck as raw string. For example a multiline answer, HTML formatted HTTP Status code 503 'Service Unavailable'"
+    ::= { pkASignServerHealthStringX 1 } -- multiline .1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.115.49.1
+
+pkASignServerHealthX OBJECT IDENTIFIER ::= { pkSignServer 50 } -- '2'
+pkASignServerHealth  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "SignServer Healthcheck returns 0 for 'ALLOK', 1 otherwise"
+    ::= { pkASignServerHealthX 1 } -- .1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.115.50.1
+
+--
+-- OBJECT TYPES VHSM (.1.3.6.1.4.1.22408.1.1.2.2)
+--
+
+pkVhsm  OBJECT IDENTIFIER ::= { pkAppliance 2 }
+pkVhsmX OBJECT IDENTIFIER ::= { pkVhsm      4 }
+pkVhsmh OBJECT IDENTIFIER ::= { pkVhsmX 104 }   -- h
+pkVhsms OBJECT IDENTIFIER ::= { pkVhsmh 115 }   -- s
+pkVhsmm OBJECT IDENTIFIER ::= { pkVhsms 109 }   -- m
+
+pkAHsmStatusStringX OBJECT IDENTIFIER ::= { pkVhsmm 49 } -- 49 == ascii '1'
+pkAHsmStatusString  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Status of HSM as string, Example: STATUS_is_EXTERNALERASE"
+    ::= { pkAHsmStatusStringX 1 } -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.49.1
+
+
+pkAHsmStatusEnumX OBJECT IDENTIFIER ::= { pkVhsmm 50 } -- 50 == ascii '2'
+pkAHsmStatusEnum  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Enum of Status of HSM"
+    ::= { pkAHsmStatusEnumX 1 } -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.50.1
+
+
+pkAHsmStatusBoolX OBJECT IDENTIFIER ::= { pkVhsmm 51 } -- 51 == ascii '3'
+pkAHsmStatusBool  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Status of HSM, 0 if operational, 1 otherwise"
+    ::= { pkAHsmStatusBoolX 1 } -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.51.1
+
+
+pkAHsmBatteryIntX OBJECT IDENTIFIER ::= { pkVhsmm 52 } -- 52 == ascii '4'
+pkAHsmBatteryInt  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Battery voltage of HSM (Internal). Example: '3.101 V'"
+    ::= { pkAHsmBatteryIntX 1 } -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.52.1
+
+
+pkAHsmBatteryIntStatusX OBJECT IDENTIFIER ::= { pkVhsmm 53 } -- 53 == ascii '5'
+pkAHsmBatteryIntStatus  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Battery state (Internal), 0 if ok or absent, 1 otherwise"
+    ::= { pkAHsmBatteryIntStatusX 1 } -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.53.1
+
+
+pkAHsmSerialNumberX OBJECT IDENTIFIER ::= { pkVhsmm 54 } -- 54 == ascii '6'
+pkAHsmSerialNumber  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Serial Number of HSM. Example: CS620109"
+    ::= { pkAHsmSerialNumberX 1 } -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.54.1
+
+
+pkAHsmBatteryExtX OBJECT IDENTIFIER ::= { pkVhsmm 55 } -- 55 == ascii '7'
+pkAHsmBatteryExt  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Battery voltage of HSM (External). Example: 'External Battery: absence'"
+    ::= { pkAHsmBatteryExtX 1 } -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.55.1
+
+
+pkAHsmBatteryExtStatusX OBJECT IDENTIFIER ::= { pkVhsmm 56 } -- 56 == ascii '8'
+pkAHsmBatteryExtStatus  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "Battery state (External), 0 if ok or absent, 1 otherwise"
+    ::= { pkAHsmBatteryExtStatusX 1 } -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.56.1
+
+
+pkAHsmEidasAuditLogSizeX OBJECT IDENTIFIER ::= { pkVhsmm 57 } -- 57 == ascii '9'
+pkAHsmEidasAuditLogSize  OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+    "HSM Audit Log Usage/Size for the PKI Appliance eIDAS edition"
+    ::= { pkAHsmEidasAuditLogSizeX 1 } -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.57.1
+
+
+
+--
+-- COMPLIANCE and GROUP
+--
+
+pkACompliance  MODULE-COMPLIANCE 
+    STATUS current
+    DESCRIPTION "This specifies the objects that are required to claim 
+                 compliance."
+    MODULE
+      MANDATORY-GROUPS { pkAGroup } 
+    ::= { primeKeyAppliancePrefixAnotherOne 3 }
+
+pkAGroup OBJECT-GROUP
+    OBJECTS {
+        pkASfpVmStatus,                 -- .1.3.6.1.4.1.22408.1.1.2.1.2.118.109.1
+        pkASfpCpuTemp,                  -- .1.3.6.1.4.1.22408.1.1.2.1.3.99.112.117.1
+        pkASfpCpuFan,                   -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.49.1
+        pkASfpSysFan1,                  -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.50.1
+        pkASfpSysFan2,                  -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.51.1
+        pkASfpSysFan3,                  -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.52.1
+        pkASfpCpuFanStatus,             -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.53.1
+        pkASfpSysFansStatus,            -- .1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.54.1
+        pkAVdbUsagePercent,             -- .1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.49.1
+        pkAVdbStatus,                   -- .1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.50.1
+        pkASfpLoad,                     -- .1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.49.1
+        pkASfpLoad1m,                   -- .1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.50.1
+        pkASfpLoad5m,                   -- .1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.51.1
+        pkASfpLoad15m,                  -- .1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.52.1
+        pkASfpRaidStatus,               -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.49.1
+        pkASfpRaidStatusString,         -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.50.1
+        pkASfpRaidTotalDevicesString,   -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.51.1
+        pkASfpRaidTotalDevices,         -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.52.1
+        pkASfpRaidActiveDevicesString,  -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.53.1
+        pkASfpRaidActiveDevices,        -- .1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.54.1
+        pkASfpMaintenanceState,         -- .1.3.6.1.4.1.22408.1.1.2.1.6.109.97.105.110.116.49.1
+        pkASfpMaintenanceStateString,   -- .1.3.6.1.4.1.22408.1.1.2.1.6.109.97.105.110.116.50.1
+        pkAVersion,                     -- .1.3.6.1.4.1.22408.1.1.2.1.7.118.101.114.115.105.111.110.1
+        pkAClusterLocalNodeID,          -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.49.1
+        pkAClusterSize,                 -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.50.1
+        pkAClusterActiveNodes,          -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.51.1
+        pkAClusterLocalGaleraState,     -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.52.1
+        pkAClusterLocalGaleraStateString,--.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.53.1
+        pkAClusterLTID,                 -- .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.54.1
+
+        pkAEJBCAHealthString,           -- .1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.101.49.1
+        pkAEJBCAHealth,                 -- .1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.101.50.1
+        pkASignServerHealthString,      -- .1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.115.49.1
+        pkASignServerHealth,            -- .1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.115.50.1
+
+        pkAHsmStatusString,             -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.49.1
+        pkAHsmStatusEnum,               -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.50.1
+        pkAHsmStatusBool,               -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.51.1
+        pkAHsmBatteryInt,               -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.52.1
+        pkAHsmBatteryIntStatus,         -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.53.1
+        pkAHsmSerialNumber,             -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.54.1
+        pkAHsmBatteryExt,               -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.55.1
+        pkAHsmBatteryExtStatus,         -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.56.1
+        pkAHsmEidasAuditLogSize         -- .1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.57.1
+    }
+    STATUS current
+    DESCRIPTION "A group of objects of PRIMEKEY APPLIANCE MIB."
+    ::= { primeKeyAppliancePrefixAnotherOne 4 }
+
+END

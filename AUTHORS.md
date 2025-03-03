@@ -146,7 +146,7 @@ LibreNMS contributors:
 - Joseph Eames <j.eames@outlook.com> (j-ems)
 - Eric Conroy <eric@conroy.co> (NetworkNub)
 - Timothy Willey <developer@timothywilley.net> (twilley)
-- Jon Ward	<librenms@yonzb.net> (yon2004)
+- Jon Ward  <librenms@yonzb.net> (yon2004)
 - Ian Viemeister <github@ian.viemeister.com> (iviemeister)
 - Thane Gill <me@thanegill.com> (thanegill)
 - Christoffer Stokbæk <christoffers@easyspeedy.com> (stokbaek)
@@ -159,7 +159,7 @@ LibreNMS contributors:
 - Joachim Tingvold <joachim@tingvold.com> (jallakim)
 - Martin Zatloukal <slezi2@pvfree.net> (erotel)
 - Matthew Schwen <mschwen@gmail.com> (mattschwen)
-- Joel Cant <joel@linuxmod.co.uk> (NerdBlender
+- Joel Cant <joel@linuxmod.co.uk> (NerdBlender)
 - Aldemir Akpinar <aldemir.akpinar@gmail.com> (aldemira)
 - Rob Nichols <rob@ignition360.com> (rdnn)
 - Patrick Fruh <info@kaeltis.de> (Kaeltis)
@@ -173,7 +173,6 @@ LibreNMS contributors:
 - Robert Towster <rnt-github at towster.com> (towster)
 - Rocky Luke <rockyluke@offline.net> (rockyluke)
 - Tim Jackson <jackson.tim@gmail.com> (jackson-tim)
-- Jørn-Stian Lønsetteig <jeg@glemte.no> (gilrim)
 - Viktoria Rei Bauer <vbauer@stargazer.at> (ToeiRei)
 - Ryan Eno <ryaneno@gmail.com> (VimCommando)
 - Matt Peterson <matt@peterson.org> (dorkmatt)
@@ -205,6 +204,21 @@ LibreNMS contributors:
 - Dominik Bay <db@rrbone.net> (eimann)
 - Nick Peelman <nick@peelman.us> (peelman)
 - Patrick Ryon <patrick@slashdoom.com> (slashdoom)
+- Mike Williams <mike@mgww.net> (network-guy)
+- Rob J. Epping <librenms@renf.us> (robje)
+- Frank Petrilli <frank@petril.li> (frankpetrilli)
+- Joel Kociolek <joel@kociolek.org> (lejoko)
+- Rémy Jacquin <remy@remyj.fr> (remyj38)
+- PipoCanaja <pipocanaja@gmail.com> [pipocanaja](https://github.com/pipocanaja/)
+- Thomas Berberich <sourcehhdoctor@gmail.com> [SourceDoctor](https://github.com/SourceDoctor/)
+- Tim de Boer <tim+github@tim427.net> (tim427)
+- Pavle Obradovic <pobradovic08@gmail.com> (pobradovic08)
+- Jason Cheng <sanyu3u@gmail.com> (jasoncheng7115)
+- Daniel Baeza <doctoruve@gmail.com> (TheGreatDoc)
+- Thom Cleary <me@thomcat.rocks> (thomcatdotrocks)
+- Kayck Matias <kayckmatias04@gmail.com> [KayckMatias](https://github.com/KayckMatias/)
+- Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+- Cas de Reuver <cas@reuver.co> (casdr)
 
 Observium was written by:
 - Adam Armstrong

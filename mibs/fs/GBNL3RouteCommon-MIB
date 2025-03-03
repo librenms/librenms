@@ -1,0 +1,57 @@
+    GBNL3RouteCommon-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Counter32, Gauge32,
+        Unsigned32, Integer32,
+        IpAddress                               FROM SNMPv2-SMI
+        
+        RowStatus, TruthValue, 
+        DisplayString, MacAddress               FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL3                                   FROM ADMIN-MASTER-MIB;       
+
+    gbnL3RouteCommon MODULE-IDENTITY
+        LAST-UPDATED    "0105102004Z"  -- May 10, 2004
+        ORGANIZATION    "admin Systems, Inc."
+        CONTACT-INFO    "admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "ADMIN Generic router id MIB definition."
+
+        REVISION        "0105102004Z"  -- May 10, 2004
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL3 2 }
+
+
+
+------------------------------------------------------------------------------
+    routerId             OBJECT IDENTIFIER ::= { gbnL3RouteCommon 1 }
+------------------------------------------------------------------------------
+--
+--  routerId:
+--      
+--
+------------------------------------------------------------------------------
+--
+    routerIdConfig OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "此router id是配置的还是系统自动选举的"
+        ::= { routerId 1 }  
+        
+    routerIdValue OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "当前配置或选举的router id"
+        ::= { routerId 2 }        
+
+
+END

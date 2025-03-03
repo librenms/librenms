@@ -1,0 +1,232 @@
+-- ==================================================================
+-- Copyright (C) 2016 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+-- Reference:
+-- Version: V1.4
+-- History:
+-- V1.0 Created by luoqiang01280, 2004.06.08
+-- V1.1 2004-10-12 updated by gaolong
+--      Import TEXTUAL-CONVENTION.
+-- V1.2 2004-12-7 add hh3cvoiceVlanPortTable by liaoyuxia.
+-- V1.3 2009-5-15 add hh3cVoiceVlanPortLegacy and hh3cVoiceVlanPortQosTrust
+--                by zhangqingjun.
+-- V1.4 2016-12-1 add value 0 to hh3cVoiceVlanAgingTime by yuhaiyan.
+-- ==================================================================
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+HH3C-VOICE-VLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    RowStatus, TruthValue, MacAddress, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI;
+
+    hh3cVoiceVlan MODULE-IDENTITY
+
+    LAST-UPDATED     "201612010000Z"        -- Dec 01, 2016 at 00:00 GMT
+    ORGANIZATION
+            "New H3C Tech, Inc."
+    CONTACT-INFO
+            "Platform Team Beijing Institute New H3C Tech, Inc."
+    DESCRIPTION
+            "This MIB contains objects to manage the voice vlan operations, which is used on
+            lanswitch products. "
+    REVISION "201612010000Z"
+    DESCRIPTION
+        "add value 0 to hh3cVoiceVlanAgingTime."
+    REVISION "200905150000Z"
+    DESCRIPTION
+        "To fix bugs in the MIB file."
+    REVISION "200207010000Z"
+    DESCRIPTION
+    "The initial revision of this MIB module."
+        ::= { hh3cCommon 9 }
+
+-- =============================================================
+-- Textual Conventions
+-- =============================================================
+
+PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+    hh3cvoiceVlanOuiTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cVoiceVlanOuiEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION " A table containing the mac address which can be identified by voice vlan "
+        ::= { hh3cVoiceVlan  1  }
+
+    hh3cvoiceVlanOuiEntry OBJECT-TYPE
+        SYNTAX  Hh3cVoiceVlanOuiEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " A table containing the mac address which can be identified by voice vlan "
+                INDEX   { hh3cVoiceVlanOuiAddress }
+                ::= {hh3cvoiceVlanOuiTable 1}
+
+    Hh3cVoiceVlanOuiEntry    ::=
+    SEQUENCE {
+        hh3cVoiceVlanOuiAddress    MacAddress  ,
+        hh3cVoiceVlanOuiMask    MacAddress  ,
+        hh3cVoiceVlanOuiDescription    OCTET STRING  ,
+        hh3cVoiceVlanOuiRowStatus      RowStatus
+        }
+
+    hh3cVoiceVlanOuiAddress OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Mac address can be identified by voice vlan "
+        ::= { hh3cvoiceVlanOuiEntry 1 }
+
+    hh3cVoiceVlanOuiMask OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " The mask of mac address "
+        ::= { hh3cvoiceVlanOuiEntry 2 }
+
+    hh3cVoiceVlanOuiDescription OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..30))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " The description of oui "
+        ::= { hh3cvoiceVlanOuiEntry 3 }
+
+    hh3cVoiceVlanOuiRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION " Current operation status of the row  "
+        ::= { hh3cvoiceVlanOuiEntry 4 }
+
+    hh3cVoiceVlanEnabledId  OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Voice vlan enable status: enabled (2..4095), disabled (0xffffffff) "
+        ::= { hh3cVoiceVlan 2 }
+
+    hh3cVoiceVlanPortEnableList  OBJECT-TYPE
+        SYNTAX  PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Portlist of voice vlan enabled ports "
+        ::= { hh3cVoiceVlan 3 }
+
+    hh3cVoiceVlanAgingTime  OBJECT-TYPE
+        SYNTAX  Integer32 (0|5..43200)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Voice vlan aging time, the unit of which is minute.  0 means no aging."
+        DEFVAL { 1440 }
+        ::= { hh3cVoiceVlan  4 }
+
+    hh3cVoiceVlanConfigState  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        auto (1),
+        manual (2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Voice vlan configuration mode status "
+        ::= { hh3cVoiceVlan 5 }
+
+    hh3cVoiceVlanSecurityState  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        security (1),
+        normal (2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Voice vlan security mode status "
+        ::= { hh3cVoiceVlan 6 }
+
+    hh3cvoiceVlanPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cVoiceVlanPortEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION " A list of voice vlan mode entries."
+        ::= { hh3cVoiceVlan  7  }
+
+    hh3cvoiceVlanPortEntry OBJECT-TYPE
+        SYNTAX  Hh3cVoiceVlanPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " An entry containing voice vlan mode information,
+            which is applicable to a voice vlan enabled interface."
+        INDEX   { hh3cVoiceVlanPortifIndex }
+        ::= {hh3cvoiceVlanPortTable 1}
+
+    Hh3cVoiceVlanPortEntry ::=
+        SEQUENCE {
+            hh3cVoiceVlanPortifIndex    Integer32,
+            hh3cVoiceVlanPortMode       INTEGER,
+            hh3cVoiceVlanPortLegacy     TruthValue,
+            hh3cVoiceVlanPortQosTrust   TruthValue
+        }
+
+    hh3cVoiceVlanPortifIndex OBJECT-TYPE
+        SYNTAX Integer32(1..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION " The index of interface on which voice vlan function
+            is enabled."
+        REFERENCE "ifIndex in RFC1213"
+    ::= { hh3cvoiceVlanPortEntry 1 }
+
+    hh3cVoiceVlanPortMode OBJECT-TYPE
+        SYNTAX  INTEGER
+            {
+            auto (1),
+            manual (2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Voice vlan configuration mode status, which is
+            applicable to a voice vlan enabled interface."
+        ::= { hh3cvoiceVlanPortEntry 2 }
+
+    hh3cVoiceVlanPortLegacy OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Voice vlan configuration legacy status, which is
+            applicable to a voice vlan enabled interface."
+        ::= { hh3cvoiceVlanPortEntry 3 }
+
+    hh3cVoiceVlanPortQosTrust OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Voice vlan configuration qos trust status, which is
+            applicable to a voice vlan enabled interface."
+        ::= { hh3cvoiceVlanPortEntry 4 }
+END

@@ -1,0 +1,115 @@
+ARRIS-D5-CHANNEL-MODE-LOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    arrisD5UEQam
+        FROM ARRIS-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    Unsigned32,
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+    
+d5ChannelModeLogMib MODULE-IDENTITY
+    LAST-UPDATED "200908280800Z"
+    ORGANIZATION
+        "Arris International"
+    CONTACT-INFO
+        "Network Management
+         Postal: Arris International.
+         4300 Cork Airport Business Park
+         Cork Airport, Kinsale Road
+         Cork, Ireland.
+         Tel: +353 21 7305 800
+         Fax: +353 21 4321 972"
+    DESCRIPTION
+        "This MIB contains objects to monitor QAM channel mode changes on the ARRIS D5 UEQ."
+    REVISION "200908280800Z"
+    DESCRIPTION
+        "D5 UEQ CHANNEL MODE LOG MIB"
+    ::= {arrisD5UEQam 23}
+
+D5ChannelMode ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Type definition for channel modes."
+    SYNTAX INTEGER {
+        single(1),
+        dual(2),
+        quad(4),
+        hex(6),
+        octal(8)
+    }
+
+-----------------------------------------------------------------------
+-- Channel mode log table
+-----------------------------------------------------------------------
+d5ChannelModeLogTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5ChannelModeLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table lists channel mode changes on the D5 UEQ."
+    ::= { d5ChannelModeLogMib 1 }
+
+d5ChannelModeLogEntry OBJECT-TYPE
+    SYNTAX D5ChannelModeLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the D5 channel mode log table."
+    INDEX {d5ChannelModeLogIndex}
+    ::= { d5ChannelModeLogTable 1 }
+
+D5ChannelModeLogEntry ::= SEQUENCE {
+    d5ChannelModeLogIndex     Unsigned32,
+    d5ChannelModeLogTimeStamp Unsigned32,
+    d5ChannelModeLogIfIndex   InterfaceIndex,
+    d5ChannelModeCurrentValue D5ChannelMode,
+    d5ChannelModeNewValue     D5ChannelMode
+}
+
+d5ChannelModeLogIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table index for channel mode log entries."
+    ::= { d5ChannelModeLogEntry 1 }
+
+d5ChannelModeLogTimeStamp OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The POSIX time at which the channel change occurred."
+    ::= { d5ChannelModeLogEntry 2 }
+
+d5ChannelModeLogIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The interface index of the QAM port on which the channel mode change occurred."
+    ::= { d5ChannelModeLogEntry 3 }
+
+d5ChannelModeCurrentValue OBJECT-TYPE
+    SYNTAX D5ChannelMode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of the channel mode prior to the mode change."
+    ::= { d5ChannelModeLogEntry 4 }
+
+d5ChannelModeNewValue OBJECT-TYPE
+    SYNTAX D5ChannelMode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The new value of the channel mode."
+    ::= { d5ChannelModeLogEntry 5 }
+
+END

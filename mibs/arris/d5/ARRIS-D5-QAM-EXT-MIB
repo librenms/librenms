@@ -1,0 +1,73 @@
+ARRIS-D5-QAM-EXT-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS   
+			arrisD5UEQam
+				FROM ARRIS-MIB
+			ifIndex, InterfaceIndex         
+					FROM IF-MIB         
+			Integer32, OBJECT-TYPE, MODULE-IDENTITY          
+					FROM SNMPv2-SMI         
+			DisplayString            
+					FROM SNMPv2-TC;
+
+	d5QamExtMib MODULE-IDENTITY 
+			LAST-UPDATED "301107301100Z"
+			ORGANIZATION 
+					"Arris International"
+			CONTACT-INFO 
+					"Network Management
+					Postal: Arris International.
+									4300 Cork Airport Business Park
+									Cork Airport, Kinsale Road
+									Cork, Ireland.
+					Tel:    +353 21 7305 800
+					Fax:    +353 21 4321 972"
+			DESCRIPTION 
+					"This MIB contains objects related to the Arris D5 QAM card"
+			REVISION "200711301100Z"
+			DESCRIPTION 
+					"D5 DMTS QAM extension MIB"
+			::= { arrisD5UEQam 12 }
+
+
+	d5QamExtTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF D5QamExtEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+					"This table extends docsQamRF MIB with extra properties."
+			::= { d5QamExtMib 1 }
+
+
+	d5QamExtEntry OBJECT-TYPE
+			SYNTAX D5QamExtEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+					"An entry for a D5 QAM Extensions."
+			INDEX { ifIndex }
+			::= { d5QamExtTable 1 }
+
+
+			D5QamExtEntry ::=
+					SEQUENCE { 
+							d5QamExtProtocolMappingErm    DisplayString,
+							d5QamExtServingGroup          DisplayString
+					 }
+
+			d5QamExtProtocolMappingErm OBJECT-TYPE 
+				 SYNTAX       DisplayString
+				 MAX-ACCESS   read-write
+				 STATUS       current
+				 DESCRIPTION
+							"Contains text name of the NGOD ERM this QAM is assigned to."
+				 ::= { d5QamExtEntry 2 }
+
+			d5QamExtServingGroup OBJECT-TYPE 
+				 SYNTAX       DisplayString
+				 MAX-ACCESS   read-write
+				 STATUS       current
+				 DESCRIPTION
+							"Contains text name of serving group of this QAM."
+				 ::= { d5QamExtEntry 3 }
+END

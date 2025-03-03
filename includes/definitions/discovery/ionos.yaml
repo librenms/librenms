@@ -1,0 +1,21 @@
+mib: EQUIPMENT-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: equipStatusV2
+                    num_oid: '.1.3.6.1.4.1.1038.107.11.{{ $index }}'
+                    descr: Status of all equipment objects
+                    state_name: Severity
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: nonAlarmed }
+                        - { value: 2, generic: 0, graph: 0, descr: minor }
+                        - { value: 3, generic: 1, graph: 0, descr: major }
+                        - { value: 4, generic: 2, graph: 0, descr: critical }
+                        - { value: 5, generic: 1, graph: 0, descr: warning }
+                        - { value: 6, generic: 0, graph: 0, descr: invNonAlarmed }
+                        - { value: 7, generic: 0, graph: 0, descr: invMinor }
+                        - { value: 8, generic: 1, graph: 0, descr: invMajor }
+                        - { value: 9, generic: 2, graph: 0, descr: invCritical }
+                        - { value: 10, generic: 1, graph: 0, descr: invWarning }

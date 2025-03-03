@@ -1,0 +1,319 @@
+STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      OBJECT-TYPE, Integer32, MODULE-IDENTITY    FROM SNMPv2-SMI
+      TruthValue                                 FROM SNMPv2-TC
+      DisplayString                              FROM RFC1213-MIB
+      stormshieldMIB                             FROM STORMSHIELD-SMI-MIB;
+
+   snsHA MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield HA cluster"
+      REVISION      "201702200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 11 }
+
+   snsNbNode OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of firewalls in the HA cluster"
+      ::= { snsHA 1 }
+
+   snsNbDeadNode OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of firewalls registered in the HA cluster but not replying"
+      ::= { snsHA 2 }
+
+   snsNbActiveNode OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of active firewalls"
+      ::= { snsHA 3 }
+
+      snsNbHALinks OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of ethernet links used for HA communication"
+      ::= { snsHA 5 }
+
+   snsNbFaultyHALinks OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of faulty HA links"
+      ::= { snsHA 6 }
+
+   snsNodeTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsNode
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Firewalls part of the HA cluster"
+      ::= { snsHA 7 }
+
+   snsNode OBJECT-TYPE
+      SYNTAX SnsNode
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "HA node"
+      INDEX { snsNodeIndex }
+      ::= { snsNodeTable 1 }
+
+   SnsNode ::= SEQUENCE {
+      snsNodeIndex        Integer32,
+      snsFwSerial         DisplayString,
+      snsOnline           TruthValue,
+      snsModel            DisplayString,
+      snsVersion          DisplayString,
+      snsHALicence        DisplayString,
+      snsHAQuality        Integer32,
+      snsHAPriority       Integer32,
+      snsHAStatusForced   Integer32,
+      snsHAActive         TruthValue,
+      snsUptime           Integer32
+   }
+
+   snsNodeIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..2)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Index of each line in table"
+      ::= { snsNode 1 }
+
+   snsFwSerial OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Firewall serial"
+      ::= { snsNode 2 }
+
+   snsOnline OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Firewall is online"
+      ::= { snsNode 3 }
+
+   snsModel OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Firewall model"
+      ::= { snsNode 4 }
+
+   snsVersion OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Firewall firmware version"
+      ::= { snsNode 5 }
+
+   snsHALicence OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "HA Licence"
+      ::= { snsNode 6 }
+
+   snsHAQuality OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "HA Quality"
+      ::= { snsNode 7 }
+
+   snsHAPriority OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "HA Priority"
+      ::= { snsNode 8 }
+
+   snsHAStatusForced OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "HA status forced (-2 : Unknown forced status,
+         -1 : No peer found, 0 : No forced status,
+         1 : Forced active, 2 : Forced passive)"
+      ::= { snsNode 9 }
+
+   snsHAActive OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Is the firewall active ?"
+      ::= { snsNode 10 }
+
+   snsUptime OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Firewall uptime"
+      ::= { snsNode 11 }
+
+   snsHASyncStatus OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Firewall configuration synchronization status ?
+         (1: Synced, 0: Not synced, -1: Unknown / Error)"
+      ::= { snsHA 8 }
+
+   snsHAFwAdminRevison OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Firewall Admin Revision"
+      ::= { snsHA 9 }
+
+   snsNodePowerSupplyTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsNodePowerSupplyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Power supply status of Firewalls"
+      ::= { snsHA 10 }
+
+   snsNodePowerSupplyEntry OBJECT-TYPE
+      SYNTAX SnsNodePowerSupplyEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Power supply information"
+      INDEX { snsNodeIndex, snsNodePowerSupplyIndex }
+      ::= { snsNodePowerSupplyTable 1 }
+
+   SnsNodePowerSupplyEntry ::= SEQUENCE {
+      snsNodePowerSupplyIndex      Integer32,
+      snsNodePowerSupplyPowered    TruthValue
+   }
+
+   snsNodePowerSupplyIndex OBJECT-TYPE
+      SYNTAX Integer32 (0..255)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Index of each line in table"
+      ::= { snsNodePowerSupplyEntry 1 }
+
+   snsNodePowerSupplyPowered OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Power supply is powered by electricity ?"
+      ::= { snsNodePowerSupplyEntry 2 }
+
+
+   snsNodeDiskTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsNodeDiskEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Disks status of Firewalls"
+      ::= { snsHA 11 }
+
+   snsNodeDiskEntry OBJECT-TYPE
+      SYNTAX SnsNodeDiskEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Disk information"
+      INDEX { snsNodeIndex, snsNodeDiskIndex }
+      ::= { snsNodeDiskTable 1 }
+
+   SnsNodeDiskEntry ::= SEQUENCE {
+      snsNodeDiskIndex         Integer32,
+      snsNodeDiskName          DisplayString,
+      snsNodeDiskSmartResult   DisplayString,
+      snsNodeDiskIsRaid        Integer32,
+      snsNodeDiskRaidStatus    DisplayString,
+      snsNodeDiskPosition      DisplayString
+   }
+
+   snsNodeDiskIndex OBJECT-TYPE
+      SYNTAX Integer32 (0..255)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Index of each disk in table"
+      ::= { snsNodeDiskEntry 1 }
+
+   snsNodeDiskName OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Mount point name"
+      ::= { snsNodeDiskEntry 2 }
+
+   snsNodeDiskSmartResult OBJECT-TYPE
+      SYNTAX            DisplayString
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION       "Result of the smart infos tests"
+      ::= { snsNodeDiskEntry 3 }
+
+   snsNodeDiskIsRaid OBJECT-TYPE
+      SYNTAX            Integer32 (0..1)
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION       "Is the disk a member of a RAID array"
+      ::= { snsNodeDiskEntry 4 }
+
+   snsNodeDiskRaidStatus OBJECT-TYPE
+      SYNTAX            DisplayString
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION       "RAID Status"
+      ::= { snsNodeDiskEntry 5 }
+
+   snsNodeDiskPosition OBJECT-TYPE
+      SYNTAX            DisplayString
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION       "Disk Position"
+      ::= { snsNodeDiskEntry 6 }
+
+   snsNodeCpuTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsNodeCpuEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Cpus status of Firewalls"
+      ::= { snsHA 12 }
+
+   snsNodeCpuEntry OBJECT-TYPE
+      SYNTAX SnsNodeCpuEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "CPU information"
+      INDEX { snsNodeIndex, snsNodeCpuIndex }
+      ::= { snsNodeCpuTable 1 }
+
+   SnsNodeCpuEntry ::= SEQUENCE {
+      snsNodeCpuIndex           Integer32,
+      snsNodeCpuTemp            Integer32
+   }
+
+   snsNodeCpuIndex OBJECT-TYPE
+      SYNTAX Integer32 (0..255)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Index of each cpu in table"
+      ::= { snsNodeCpuEntry 1 }
+
+   snsNodeCpuTemp OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Temperature in Celsius degree"
+      ::= { snsNodeCpuEntry 2 }
+END

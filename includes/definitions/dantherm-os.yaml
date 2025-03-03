@@ -1,0 +1,13 @@
+os: dantherm-os
+text: 'Dantherm'
+type: network
+icon: dantherm
+group: dantherm
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysDescr:
+            - 'FreeCooling Controller, SNMP V1.0'

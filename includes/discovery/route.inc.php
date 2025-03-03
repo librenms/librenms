@@ -1,6 +1,9 @@
 <?php
-
-/* Copyright (C) 2014 Nicolas Armando <nicearma@yahoo.com> and Mathieu Millet <htam-net@github.net>
+/* Copyright (C) 2014 Nicolas Armando <nicearma@yahoo.com>
+ * Copyright (C) 2014 Mathieu Millet <htam-net@github.net>
+ * Copyright (C) 2019 PipoCanaja <pipocanaja@github.net>
+ * Copyright (C) 2022 Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,156 +15,328 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
+//We can use RFC1213 or IP-FORWARD-MIB or MPLS-L3VPN-STD-MIB
 
-//This file is a litle diferent, because the route depend of the vrf, not of the context, 
-//like the others, so if i use the context, you will have the same information n time the context how have the same VRF
-global $debug;
+use LibreNMS\Config;
+use LibreNMS\Util\IPv4;
 
+$ipForwardMibRoutesNumber = snmp_get($device, 'IP-FORWARD-MIB::inetCidrRouteNumber.0', '-Osqn');
 
-$ids = array();
+$ipForwardNb = snmp_get_multi($device, ['inetCidrRouteNumber.0', 'ipCidrRouteNumber.0'], '-OQUs', 'IP-FORWARD-MIB');
 
-// For the moment only will be cisco and the version 3
-if ($device['os_group'] == "cisco") {
-    //RFC1213-MIB
-    $mib = "RFC1213-MIB";
-    //IpRouteEntry
-    $vrfs_lite_cisco = array();
+//Get the configured max routes number
+$max_routes = 1000;
+if (null != Config::get('routes_max_number')) {
+    $max_routes = Config::get('routes_max_number');
+}
 
-    if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco']) != 0)) {
-        //i will only get one context of vrf, read the begin of this file
-        foreach ($device['vrf_lite_cisco'] as $vrf_lite) {
-            if (!key_exists($vrf_lite['vrf_name'], $vrfs_lite_cisco)) {
-                $vrfs_lite_cisco[$vrf_lite['vrf_name']] = $vrf_lite;
-            }
-        }
+//Init update/create tables;
+$create_row = [];
+$update_row = [];
+$delete_row = [];
+
+$mixed = [];
+
+//store timestamp so all update / creation will be synced on same timestamp
+$update_timestamp = dbFetchRows('select now() as now')[0]['now'];
+
+//Load current DB entries:
+$dbRoute = dbFetchRows('select * from `route` where `device_id` = ?', [$device['device_id']]);
+foreach ($dbRoute as $dbRow) {
+    $current = $mixed[$dbRow['context_name']][$dbRow['inetCidrRouteDestType']][$dbRow['inetCidrRouteDest']][$dbRow['inetCidrRoutePfxLen']][$dbRow['inetCidrRoutePolicy']][$dbRow['inetCidrRouteNextHopType']][$dbRow['inetCidrRouteNextHop']];
+    if (isset($current) && isset($current['db']) && count($current['db']) > 0) {
+        //We have duplicate routes in DB, we'll clean that.
+        $delete_row[$dbRow['route_id']] = 1;
+        $delete_row_data[$dbRow['route_id']] = $dbRow; //DEBUG DATA ONLY
     } else {
-        $vrfs_lite_cisco = array(array('context_name' => null));
+        $mixed[$dbRow['context_name']][$dbRow['inetCidrRouteDestType']][$dbRow['inetCidrRouteDest']][$dbRow['inetCidrRoutePfxLen']][$dbRow['inetCidrRoutePolicy']][$dbRow['inetCidrRouteNextHopType']][$dbRow['inetCidrRouteNextHop']]['db'] = $dbRow;
     }
+}
 
-    $tableRoute = array();
+if (file_exists(Config::get('install_dir') . "/includes/discovery/route/{$device['os']}.inc.php")) {
+    include Config::get('install_dir') . "/includes/discovery/route/{$device['os']}.inc.php";
+}
 
-    foreach ($vrfs_lite_cisco as $vrf_lite) {
-        $device['context_name'] = $vrf_lite['context_name'];
+//Not a single route will be discovered if the amount is over maximum
+// To prevent any bad behaviour on routers holding the full internet table
 
-        ////////////////ipRouteDest//////////////////
-        $oid = '.1.3.6.1.2.1.4.21.1.1';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
-        $resultHelp = trim($resultHelp);
-        $resultHelp = str_replace("$oid.", "", $resultHelp);
+//if the device does not support IP-FORWARD-MIB, we can still discover the ipv4 (only)
+//routes using RFC1213 but no way to limit the amount of routes here !!
 
-        foreach (explode("\n", $resultHelp) as $ipRouteDest) {
-            list($ip, $value) = explode(" ", $ipRouteDest);
-            $tableRoute[$ip]['ipRouteDest'] = $value;
+if (! isset($ipForwardNb['0']['inetCidrRouteNumber']) && $device['os'] != 'routeros') {
+    //RFC1213-MIB
+    $mib = 'RFC1213-MIB';
+    $tableRoute = [];
+
+    $oid = '.1.3.6.1.2.1.4.21';
+    $tableRoute = snmpwalk_group($device, $oid, $mib, 1, []);
+    d_echo('Routing table:');
+    d_echo($tableRoute);
+    echo 'RFC1213 ';
+    foreach ($tableRoute as $ipRoute) {
+        if (empty($ipRoute['ipRouteDest']) || $ipRoute['ipRouteDest'] == '') {
+            continue;
         }
 
-        /////////////////ipRouteIfIndex//////////////
-        $oid = '.1.3.6.1.2.1.4.21.1.2';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
-        $resultHelp = trim($resultHelp);
-        $resultHelp = str_replace("$oid.", "", $resultHelp);
-
-        foreach (explode("\n", $resultHelp) as $ipRouteIfIndex) {
-            list($ip, $value) = explode(" ", $ipRouteIfIndex);
-            $tableRoute[$ip]['ipRouteIfIndex'] = $value;
+        unset($entryClean);
+        $entryClean['inetCidrRouteDestType'] = 'ipv4';
+        $entryClean['inetCidrRouteDest'] = $ipRoute['ipRouteDest'];
+        $inetCidrRoutePfxLen = IPv4::netmask2cidr($ipRoute['ipRouteMask']); //CONVERT
+        $entryClean['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen;
+        $entryClean['inetCidrRoutePolicy'] = $ipRoute['ipRouteInfo'];
+        $entryClean['inetCidrRouteNextHopType'] = 'ipv4';
+        $entryClean['inetCidrRouteNextHop'] = $ipRoute['ipRouteNextHop'];
+        $entryClean['inetCidrRouteMetric1'] = $ipRoute['ipRouteMetric1'];
+        $entryClean['inetCidrRouteNextHopAS'] = '0';
+        $entryClean['inetCidrRouteProto'] = $ipRoute['ipRouteProto'];
+        $entryClean['inetCidrRouteType'] = $ipRoute['ipRouteType'];
+        $entryClean['inetCidrRouteIfIndex'] = $ipRoute['ipRouteIfIndex'];
+        $entryClean['context_name'] = '';
+        $entryClean['device_id'] = $device['device_id'];
+        $entryClean['port_id'] = \App\Facades\PortCache::getIdFromIfIndex($entryClean['inetCidrRouteIfIndex'], $device['device_id']);
+        $entryClean['updated_at'] = $update_timestamp;
+        $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
+        if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
+            //we already have a row in DB
+            $entryClean['route_id'] = $current['db']['route_id'];
+            $update_row[] = $entryClean;
+        } else {
+            $entry['created_at'] = ['NOW()'];
+            $create_row[] = $entryClean;
         }
+    }
+}
 
-        ///////////////ipRouteMetric1///////////////
-        $oid = '.1.3.6.1.2.1.4.21.1.3';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
-        $resultHelp = trim($resultHelp);
-        $resultHelp = str_replace("$oid.", "", $resultHelp);
+// Not a single route will be discovered if the amount is over maximum
+// To prevent any bad behaviour on routers holding the full internet table
 
-        foreach (explode("\n", $resultHelp) as $ipRouteMetric) {
-            list($ip, $value) = explode(" ", $ipRouteMetric);
-            $tableRoute[$ip]['ipRouteMetric'] = $value;
-        }
+// IP-FORWARD-MIB with inetCidrRouteTable
 
-        ////////////ipRouteNextHop//////////////////
-        $oid = '.1.3.6.1.2.1.4.21.1.7';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
-        $resultHelp = trim($resultHelp);
-        $resultHelp = str_replace("$oid.", "", $resultHelp);
-        foreach (explode("\n", $resultHelp) as $ipRouteNextHop) {
-            list($ip, $value) = explode(" ", $ipRouteNextHop);
-            $tableRoute[$ip]['ipRouteNextHop'] = $value;
-        }
-
-        ////////////ipRouteType/////////////////////
-        $oid = '.1.3.6.1.2.1.4.21.1.8';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
-        $resultHelp = trim($resultHelp);
-        $resultHelp = str_replace("$oid.", "", $resultHelp);
-
-        foreach (explode("\n", $resultHelp) as $ipRouteType) {
-            list($ip, $value) = explode(" ", $ipRouteType);
-            $tableRoute[$ip]['ipRouteType'] = $value;
-        }
-
-        ///////////ipRouteProto//////////////////////
-        $oid = '.1.3.6.1.2.1.4.21.1.9';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, null);
-        $resultHelp = trim($resultHelp);
-        $resultHelp = str_replace("$oid.", "", $resultHelp);
-
-
-        foreach (explode("\n", $resultHelp) as $ipRouteProto) {
-            list($ip, $value) = explode(" ", $ipRouteProto);
-            $tableRoute[$ip]['ipRouteProto'] = $value;
-        }
-
-        /*
-          ///////////ipRouteAge//////////////////////
-          $oid = '.1.3.6.1.2.1.4.21.1.10';
-          $resultHelp = snmp_walk($device, $oid, "-Osqn", $mib, NULL);
-          $resultHelp = str_replace("$oid.", "", $resultHelp);
-
-          foreach (explode("\n", $resultHelp) as $ipRouteAge) {
-              list($ip,$value)=explode(" ",$ipRouteAge);
-              $tableRoute[$ip]['ipRouteAge']=$value;
-          } */
-
-        ///////////ipRouteMask//////////////////////
-        $oid = '.1.3.6.1.2.1.4.21.1.11';
-        $resultHelp = snmp_walk($device, $oid, "-Osqn -Ln", $mib, null);
-        $resultHelp = trim($resultHelp);
-        $resultHelp = str_replace("$oid.", "", $resultHelp);
-
-        foreach (explode("\n", $resultHelp) as $ipRouteMask) {
-            list($ip, $value) = explode(" ", $ipRouteMask);
-            $tableRoute[$ip]['ipRouteMask'] = $value;
-        }
-
-        if ($debug) {
-            echo 'Table routage';
-            var_dump($tableRoute);
-        }
-
-        foreach ($tableRoute as $ipRoute) {
-            if (empty($ipRoute['ipRouteDest']) || $ipRoute['ipRouteDest'] == '') {
-                continue;
-            }
-
-            $oldRouteRow = dbFetchRow('select * from route where device_id = ? AND ipRouteDest = ? AND context_name = ?', array($device['device_id'], $ipRoute['ipRouteDest'], $device['context_name']));
-            if (!empty($oldRouteRow)) {
-                unset($oldRouteRow['discoveredAt']);
-                $changeRoute = array();
-                foreach ($ipRoute as $key => $value) {
-                    if ($oldRouteRow[$key] != $value) {
-                        $changeRoute[$key] = $value;
+if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCidrRouteNumber'] < $max_routes) {
+    // We have ip forward mib available
+    d_echo('IP FORWARD MIB (with inetCidr support)');
+    $mib = 'IP-FORWARD-MIB';
+    $oid = '.1.3.6.1.2.1.4.24.7.1';
+    $res = snmpwalk_group($device, $oid, $mib, 6, []);
+    $ipForwardNb['0']['inetCidrRouteNumber'] = count($res); // Some cisco devices report ipv4+ipv6 but only include ipv6 in this table
+    echo 'inetCidrRoute ';
+    foreach ($res as $inetCidrRouteDestType => $next1) {
+        //ipv4 or ipv6
+        foreach ($next1 as $inetCidrRouteDest => $next2) {
+            //we have only 1 child here, the mask
+            $inetCidrRoutePfxLen = array_keys($next2)[0];
+            $next3 = array_values($next2)[0];
+            $inetCidrRoutePolicy = array_keys($next3)[0];
+            $next4 = array_values($next3)[0];
+            foreach ($next4 as $inetCidrRouteNextHopType => $next5) {
+                foreach ($next5 as $inetCidrRouteNextHop => $entry) {
+                    $entry['inetCidrRouteDestType'] = $inetCidrRouteDestType;
+                    $entry['inetCidrRouteDest'] = normalize_snmp_ip_address($inetCidrRouteDest);
+                    $entry['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen;
+                    $entry['inetCidrRoutePolicy'] = $inetCidrRoutePolicy;
+                    $entry['inetCidrRouteNextHopType'] = $inetCidrRouteNextHopType;
+                    $entry['inetCidrRouteNextHop'] = normalize_snmp_ip_address($inetCidrRouteNextHop);
+                    $entry['context_name'] = '';
+                    $entry['device_id'] = $device['device_id'];
+                    $entry['port_id'] = \App\Facades\PortCache::getIdFromIfIndex($entry['inetCidrRouteIfIndex'], $device['device_id']);
+                    $entry['updated_at'] = $update_timestamp;
+                    unset($entry['inetCidrRouteAge']);
+                    unset($entry['inetCidrRouteMetric2']);
+                    unset($entry['inetCidrRouteMetric3']);
+                    unset($entry['inetCidrRouteMetric4']);
+                    unset($entry['inetCidrRouteMetric5']);
+                    unset($entry['inetCidrRouteStatus']);
+                    $entryPerType[$inetCidrRouteDestType]++;
+                    $current = $mixed[''][$inetCidrRouteDestType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$inetCidrRouteNextHopType][$inetCidrRouteNextHop];
+                    if (! empty($current['db']) && $delete_row[$current['db']['route_id']] != 1) {
+                        //we already have a row in DB
+                        $entry['route_id'] = $current['db']['route_id'];
+                        $update_row[] = $entry;
+                    } else {
+                        d_echo(isset($current));
+                        d_echo(isset($current['db']));
+                        d_echo($current['db']);
+                        d_echo($delete_row[$current['db']['route_id']]);
+                        $entry['created_at'] = ['NOW()'];
+                        $create_row[] = $entry;
                     }
                 }
-                if (!empty($changeRoute)) {
-                    dbUpdate($changeRoute, 'route', 'device_id = ? and ipRouteDest = ? and context_name = ?', array($device['device_id'], $ipRoute['ipRouteDest'], $device['context_name']));
-                }
-            } else {
-                $toInsert = array_merge($ipRoute, array('device_id' => $device['device_id'], 'context_name' => $device['context_name'], 'discoveredAt' => time()));
-                dbInsert($toInsert, 'route');
             }
         }
-        // unset($tableRoute);
     }
 
-    unset($vrfs_lite_cisco);
+    $ipForwardNb['0']['inetCidrRouteNumber'] = $entryPerType['ipv4'];
+    // Some cisco devices report ipv4+ipv6 in inetCidrRouteNumber
+    // But only include ipv6 in inetCidrRoute
+    // So we count the real amount of ipv4 we get, in order to get the missing ipv4 from ipCidrRouteTable if needed
 }
+
+// IP-FORWARD-MIB with ipCidrRouteTable in case ipCidrRouteTable has more entries than inetCidrRouteTable (Some older routers)
+
+if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRouteNumber'] < $max_routes) {
+    if (! isset($ipForwardNb['0']['inetCidrRouteNumber']) || $ipForwardNb['0']['ipCidrRouteNumber'] > $ipForwardNb['0']['inetCidrRouteNumber']) {
+        //device uses only ipCidrRoute and not inetCidrRoute
+        d_echo('IP FORWARD MIB (without inetCidr support)');
+        $ipCidrTable = SnmpQuery::walk('IP-FORWARD-MIB::ipCidrRouteTable')->table(6);
+        echo 'ipCidrRouteTable ';
+        // we need to translate the values to inetCidr structure;
+        //d_echo($ipCidrTable);
+        foreach ($ipCidrTable as $inetCidrRouteDest => $next1) {
+            foreach ($next1 as $ipCidrRouteMask => $next2) {
+                foreach ($next2 as $ipCidrRouteTos => $next3) {
+                    foreach ($next3 as $inetCidrRouteNextHop => $entry) {
+                        unset($entryClean);
+                        $entryClean['inetCidrRouteDestType'] = 'ipv4';
+                        $entryClean['inetCidrRouteDest'] = $inetCidrRouteDest;
+                        $entryClean['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen = IPv4::netmask2cidr($entry['IP-FORWARD-MIB::ipCidrRouteMask']); //CONVERT
+                        $entryClean['inetCidrRoutePolicy'] = $entry['IP-FORWARD-MIB::ipCidrRouteInfo'];
+                        $entryClean['inetCidrRouteNextHopType'] = 'ipv4';
+                        $entryClean['inetCidrRouteNextHop'] = $inetCidrRouteNextHop;
+                        $entryClean['inetCidrRouteMetric1'] = $entry['IP-FORWARD-MIB::ipCidrRouteMetric1'];
+                        $entryClean['inetCidrRouteProto'] = $entry['IP-FORWARD-MIB::ipCidrRouteProto'];
+                        $entryClean['inetCidrRouteType'] = $entry['IP-FORWARD-MIB::ipCidrRouteType'];
+                        $entryClean['inetCidrRouteIfIndex'] = $entry['IP-FORWARD-MIB::ipCidrRouteIfIndex'];
+                        $entryClean['inetCidrRouteNextHopAS'] = $entry['IP-FORWARD-MIB::ipCidrRouteNextHopAS'];
+                        $entryClean['context_name'] = '';
+                        $entryClean['device_id'] = $device['device_id'];
+                        $entryClean['port_id'] = PortCache::getIdFromIfIndex($entryClean['inetCidrRouteIfIndex'], $device['device_id']);
+                        $entryClean['updated_at'] = $update_timestamp;
+                        $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop] ?? null;
+                        if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
+                            //we already have a row in DB
+                            $entryClean['route_id'] = $current['db']['route_id'];
+                            $update_row[] = $entryClean;
+                        } else {
+                            $entryClean['created_at'] = ['NOW()'];
+                            $create_row[] = $entryClean;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// We can now check if we have MPLS VPN routing table available :
+// MPLS-L3VPN-STD-MIB::mplsL3VpnVrfRteTable
+// Route numbers : MPLS-L3VPN-STD-MIB::mplsL3VpnVrfPerfCurrNumRoutes
+
+$mib = 'MPLS-L3VPN-STD-MIB';
+$oid = 'mplsL3VpnVrfPerfCurrNumRoutes';
+$mpls_vpn_route_nb = snmpwalk_group($device, $oid, $mib, 6, []);
+$mpls_skip = false;
+
+if (! empty($mpls_vpn_route_nb) && count($mpls_vpn_route_nb) > 1) {
+    foreach ($mpls_vpn_route_nb as $vpnId => $route_nb) {
+        if ($route_nb['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
+            echo "Skipping all MPLS routes because vpn instance $vpnId has more than $max_routes routes.";
+            $mpls_skip = true;
+            break;
+        }
+    }
+}
+
+if ($mpls_skip == false) {
+    echo 'mplsL3VpnVrfRteTable ';
+    // We can discover the routes;
+    $oid = 'mplsL3VpnVrfRteTable';
+    $mpls_route_table = snmpwalk_group($device, $oid, $mib, 7, []);
+    foreach ($mpls_route_table as $vpnId => $inetCidrRouteTable) {
+        foreach ($inetCidrRouteTable as $inetCidrRouteDestType => $next1) {
+            //ipv4 or ipv6
+            foreach ($next1 as $inetCidrRouteDest => $next2) {
+                //we have only 1 child here, the mask
+                $inetCidrRoutePfxLen = array_keys($next2)[0];
+                $next3 = array_values($next2)[0];
+                $inetCidrRoutePolicy = array_keys($next3)[0];
+                $next4 = array_values($next3)[0];
+                foreach ($next4 as $inetCidrRouteNextHopType => $next5) {
+                    foreach ($next5 as $inetCidrRouteNextHop => $entry) {
+                        $entry['inetCidrRouteDestType'] = $inetCidrRouteDestType;
+                        $entry['inetCidrRouteDest'] = normalize_snmp_ip_address($inetCidrRouteDest);
+                        $entry['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen;
+                        $entry['inetCidrRoutePolicy'] = $inetCidrRoutePolicy;
+                        $entry['inetCidrRouteNextHopType'] = $inetCidrRouteNextHopType;
+                        $entry['inetCidrRouteNextHop'] = normalize_snmp_ip_address($inetCidrRouteNextHop);
+                        $entry['context_name'] = $vpnId;
+                        $entry['device_id'] = $device['device_id'];
+                        $entry['inetCidrRouteIfIndex'] = $entry['mplsL3VpnVrfRteInetCidrIfIndex'];
+                        $entry['port_id'] = \App\Facades\PortCache::getIdFromIfIndex($entry['inetCidrRouteIfIndex'], $device['device_id']);
+                        $entry['updated_at'] = $update_timestamp;
+                        $entry['inetCidrRouteType'] = $entry['mplsL3VpnVrfRteInetCidrType'];
+                        $entry['inetCidrRouteProto'] = $entry['mplsL3VpnVrfRteInetCidrProto'];
+                        $entry['inetCidrRouteMetric1'] = $entry['mplsL3VpnVrfRteInetCidrMetric1'];
+                        $entry['inetCidrRouteNextHopAS'] = $entry['mplsL3VpnVrfRteInetCidrNextHopAS'];
+                        unset($entry['mplsL3VpnVrfRteInetCidrPolicy']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrNextHop']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrNHopType']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrDest']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrDestType']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrPfxLen']);
+                        unset($entry['mplsL3VpnVrfRteXCPointer']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrMetric1']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrMetric2']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrMetric3']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrMetric4']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrMetric5']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrAge']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrProto']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrType']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrStatus']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrIfIndex']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrNextHopAS']);
+                        $current = $mixed[$vpnId][$inetCidrRouteDestType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$inetCidrRouteNextHopType][$inetCidrRouteNextHop];
+                        if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
+                            //we already have a row in DB
+                            $entry['route_id'] = $current['db']['route_id'];
+                            $update_row[] = $entry;
+                        } else {
+                            d_echo(isset($current));
+                            d_echo(isset($current['db']));
+                            d_echo($current['db']);
+                            d_echo(count($current['db'] ?? []));
+                            d_echo($delete_row[$current['db']['route_id']]);
+                            $entry['created_at'] = ['NOW()'];
+                            $create_row[] = $entry;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+echo "\nProcessing: ";
+
+// We can now process the data into the DB
+foreach ($delete_row as $k => $v) {
+    if ($v > 0) {
+        dbDelete(
+            'route',
+            '`route_id` = ?',
+            [$k]
+        );
+        echo '-';
+        d_echo($delete_row_data[$k]);
+    }
+}
+
+foreach ($update_row as $upd_entry) {
+    dbUpdate(
+        $upd_entry,
+        'route',
+        '`route_id` = ?',
+        [$upd_entry['route_id']]
+    );
+    echo '.';
+}
+
+foreach ($create_row as $new_entry) {
+    $new_entry['created_at'] = $update_timestamp;
+    dbInsert($new_entry, 'route');
+    echo '+';
+}
+
+// EOF

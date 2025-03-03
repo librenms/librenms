@@ -1,0 +1,352 @@
+NETGEAR-QOS-AUTOVOIP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress,
+    Integer32, Unsigned32                FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, RowStatus        FROM SNMPv2-TC
+    InterfaceIndexOrZero,InterfaceIndex  FROM IF-MIB
+    fastPathQOS                          FROM NETGEAR-QOS-MIB;
+
+    fastPathQOSAUTOVOIP MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitions for Quality of Service - VoIP Flex package."
+
+        -- Revision history.
+        REVISION
+          "201202180000Z" -- 21 Feb 2012 12:00:00 GMT
+        DESCRIPTION
+          "Added OUI based auto VoIP support."
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200711230000Z" -- 23 Nov 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+        REVISION
+          "200711230000Z" -- 3 Nov 2004 12:00:00 GMT
+        DESCRIPTION
+          "Initial revision."
+    ::= { fastPathQOS 4 }
+
+--*********************************************************************
+--   agentAutoVoIPCfgGroup
+--
+--      Note: System-wide configuration is supported for this 
+--            group by using an index value of 0.
+--*********************************************************************
+agentAutoVoIPCfgGroup OBJECT IDENTIFIER ::= { fastPathQOSAUTOVOIP 1 }
+
+agentAutoVoIPVLAN OBJECT-TYPE
+     SYNTAX      INTEGER 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION 
+                 "The VLAN to which all VoIP traffic is mapped to."
+
+     ::= { agentAutoVoIPCfgGroup 1 }
+
+agentAutoVoIPOUIPriority OBJECT-TYPE
+     SYNTAX      INTEGER 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION 
+                 "The priority to which all VoIP traffic with known OUI is mapped to."
+
+     ::= { agentAutoVoIPCfgGroup 2 }
+
+
+agentAutoVoIPProtocolPriScheme OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     trafficClass(1),
+                     remark(2)
+                  }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The priotization scheme which is used to priritize the voice data.
+                  "
+
+     ::= { agentAutoVoIPCfgGroup 3}
+
+agentAutoVoIPProtocolTcOrRemarkValue  OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..7)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "If 'agentAutoVoIPProtocolPriScheme' is  traffic class,
+                  then the object 'agentAutoVoIPProtocolTcOrRemarkValue' is
+                  CoS Queue value to which all VoIP traffic is mapped to.
+
+                  if 'agentAutoVoIPProtocolPriScheme' is remark,
+                  then the object 'agentAutoVoIPProtocolTcOrRemarkValue' is
+                  802.1p priority to which all VoIP traffic is remarked at the ingress port.
+                  This is used by Protocol based Auto VoIP"
+
+     ::= { agentAutoVoIPCfgGroup 4}
+
+-- Auto VoIP Profile Configuration table (global and per-port)
+agentAutoVoIPTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AgentAutoVoIPEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "A table providing configuration of Auto VoIP Profile."
+     
+     ::= { agentAutoVoIPCfgGroup 5 }             
+
+
+--************** Auto VoIP Interface Table **************
+     
+agentAutoVoIPEntry OBJECT-TYPE
+     SYNTAX      AgentAutoVoIPEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "Auto VoIP Profile configuration for a port."
+     INDEX   { agentAutoVoIPIntfIndex }
+     ::= { agentAutoVoIPTable 1 }
+
+
+AgentAutoVoIPEntry::=
+     SEQUENCE {
+        agentAutoVoIPIntfIndex
+            InterfaceIndex,
+        agentAutoVoIPProtocolMode
+            INTEGER,
+        agentAutoVoIPOUIMode
+            INTEGER,
+        agentAutoVoIPProtocolPortStatus
+            INTEGER,
+        agentAutoVoIPOUIPortStatus
+            INTEGER
+     }
+
+agentAutoVoIPIntfIndex OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This is a unique index for an entry in the  
+         agentAutoVoIPTable.  A non-zero value indicates  
+         the ifIndex for the corresponding interface entry  
+         in the ifTable.  A value of zero represents global
+         configuration, which in turn causes all interface
+         entries to be updated for a set operation, or 
+         reflects the most recent global setting for a get
+         operation."
+                
+     ::= { agentAutoVoIPEntry 1 }
+
+agentAutoVoIPProtocolMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                   enable(1),
+                   disable(2)
+                   }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION 
+                 "Enables / disables AutoVoIP Protocol profile on an interface."
+     DEFVAL { 2 }
+
+     ::= { agentAutoVoIPEntry 2 }
+
+agentAutoVoIPOUIMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                   enable(1),
+                   disable(2)
+                   }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "Enables / disables AutoVoIP OUI profile on an interface."
+     DEFVAL { 2 }
+
+     ::= { agentAutoVoIPEntry 3 }
+
+
+
+agentAutoVoIPProtocolPortStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+                   up(1),
+                   down(2)
+                   }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION 
+                 "AutoVoIP protocol profile operational status of an interface."
+
+     ::= { agentAutoVoIPEntry 4 }
+
+agentAutoVoIPOUIPortStatus OBJECT-TYPE
+     SYNTAX      INTEGER {
+                   up(1),
+                   down(2)
+                   }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION 
+                 "AutoVoIP OUI profile operational status of an interface."
+
+     ::= { agentAutoVoIPEntry 5 }
+
+
+--************** Auto VoIP OUI Table **************
+
+agentAutoVoIPOUITable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AgentAutoVoIPOUIEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "A table providing configuration of Auto VoIP Profile."
+
+     ::= { agentAutoVoIPCfgGroup 6 }
+
+agentAutoVoIPOUIEntry OBJECT-TYPE
+     SYNTAX      AgentAutoVoIPOUIEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "Auto VoIP Profile OUI configuration."
+     INDEX   { agentAutoVoIPOUIIndex }
+     ::= { agentAutoVoIPOUITable 1 }
+
+AgentAutoVoIPOUIEntry::=
+     SEQUENCE {
+        agentAutoVoIPOUIIndex
+            Integer32,
+        agentAutoVoIPOUI
+            OCTET STRING,
+        agentAutoVoIPOUIDesc
+            OCTET STRING,
+        agentAutoVoIPOUIRowStatus
+            RowStatus
+     }
+
+agentAutoVoIPOUIIndex OBJECT-TYPE
+     SYNTAX      Integer32 (1..128)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "The Auto VoIP OUI table index."
+     ::= { agentAutoVoIPOUIEntry 1 }
+
+agentAutoVoIPOUI OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE(3))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "The Organizationally Unique Identifier (OUI), as defined
+        in IEEE std 802-2001, is a 24 bit (three octets) globally
+        unique assigned number referenced by various standards,
+        of the information received from the remote system."
+     ::= { agentAutoVoIPOUIEntry 2 }
+
+agentAutoVoIPOUIDesc OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE(1..32))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "The Description of the Organizationally Unique Identifier (OUI),
+        as defined in IEEE std 802-2001(up to 32 characters)"
+     ::= { agentAutoVoIPOUIEntry 3 }
+
+agentAutoVoIPOUIRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+     "The row status variable is used according to installation and removal conventions for conceptual rows."
+
+     ::= { agentAutoVoIPOUIEntry 4 }
+
+--************** Auto VoIP Sessions Table **************
+
+agentAutoVoIPSessionTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AgentAutoVoIPSessionEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "A table providing configuration of Auto VoIP Profile."
+     
+     ::= { agentAutoVoIPCfgGroup 7 }             
+     
+agentAutoVoIPSessionEntry OBJECT-TYPE
+     SYNTAX      AgentAutoVoIPSessionEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "Auto VoIP Session Table."
+     INDEX   { agentAutoVoIPSessionIndex }
+     ::= { agentAutoVoIPSessionTable 1 }
+
+AgentAutoVoIPSessionEntry::=
+     SEQUENCE {
+        agentAutoVoIPSessionIndex
+            INTEGER,
+        agentAutoVoIPSourceIP
+            IpAddress,
+        agentAutoVoIPDestinationIP
+            IpAddress,
+        agentAutoVoIPSourceL4Port
+            INTEGER,
+        agentAutoVoIPDestinationL4Port
+            INTEGER,
+        agentAutoVoIPProtocol
+            INTEGER
+     }
+
+agentAutoVoIPSessionIndex OBJECT-TYPE
+     SYNTAX      INTEGER (0..127)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION 
+        "The Auto VoIP session index."
+     ::= { agentAutoVoIPSessionEntry 1 }
+
+agentAutoVoIPSourceIP OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION 
+        "The source IP address of the VoIP session."
+     ::= { agentAutoVoIPSessionEntry 2 }
+
+agentAutoVoIPDestinationIP OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION 
+        "The destination IP address of the VoIP session."
+     ::= { agentAutoVoIPSessionEntry 3 }
+
+agentAutoVoIPSourceL4Port OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION 
+        "The source L4 Port of the VoIP session."
+     ::= { agentAutoVoIPSessionEntry 4 }
+
+agentAutoVoIPDestinationL4Port OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION 
+        "The destination L4 Port of the VoIP session."
+     ::= { agentAutoVoIPSessionEntry 5 }
+
+agentAutoVoIPProtocol OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION 
+        "The Protocol of the VoIP session."
+     ::= { agentAutoVoIPSessionEntry 6 }
+
+END

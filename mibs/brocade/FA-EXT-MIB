@@ -1,0 +1,127 @@
+--
+-- Title: Fibre Channel Switch MIB.
+--
+
+FA-EXT-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+      DisplayString, TEXTUAL-CONVENTION
+      FROM SNMPv2-TC
+      Integer32, OBJECT-TYPE, OBJECT-IDENTITY,
+      MODULE-IDENTITY
+          FROM SNMPv2-SMI
+      sw
+      FROM SW-MIB
+      connUnitPortEntry
+      FROM FCMGMT-MIB;
+
+  faExt MODULE-IDENTITY
+    LAST-UPDATED "200807291830Z"
+    ORGANIZATION "Brocade Communications Systems, Inc.,"
+    CONTACT-INFO "Customer Support Group
+                  Brocade Communications Systems,
+                  1745 Technology Drive,
+                  San Jose, CA 95110 U.S.A
+                  Tel: +1-408-392-6061
+                  Fax: +1-408-392-6656
+                  Email: support@Brocade.COM
+                  WEB: www.brocade.com"
+
+
+    DESCRIPTION "The MIB module is Extension for FA-MIB.
+                 Copyright (c) 1996-2003 Brocade Communications Systems, Inc.
+                 All rights reserved."
+
+             ::= { sw 28 }
+
+  swSfpStatTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF SwSfpStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS    current
+        DESCRIPTION    "This represents the diagnostic stats of SFPs."
+  ::= { faExt 1 }
+
+  swSfpStatEntry OBJECT-TYPE
+        SYNTAX SwSfpStatEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "This represents the diagnostic stats of SFPs"
+        AUGMENTS {connUnitPortEntry}
+  ::= { swSfpStatTable 1 }
+
+  SwSfpStatEntry ::= SEQUENCE {
+        swSfpTemperature  OCTET STRING,
+        swSfpVoltage OCTET STRING,
+        swSfpCurrent OCTET STRING,
+        swSfpRxPower OCTET STRING,
+        swSfpTxPower OCTET STRING,
+        swSfpPoweronHrs Integer32,
+        swSfpOUI OCTET STRING,
+        swSfpUnitId   Integer32
+  }
+
+  swSfpTemperature OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(8))
+        UNITS  "centigrade"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "This object identifies the temperature of SFP"
+  ::= { swSfpStatEntry 1 }
+
+  swSfpVoltage OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(8))
+        UNITS  "milli voltage"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "This object identifies the voltage of SFP."
+  ::= { swSfpStatEntry 2 }
+
+  swSfpCurrent OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(8))
+        UNITS  "milli amphere"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This object identifies the current of SFP."
+  ::= { swSfpStatEntry 3 }
+
+  swSfpRxPower  OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(8))
+        UNITS           "dBm"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This object identifies the Rx power consumption of SFP."
+  ::= { swSfpStatEntry 4 }
+
+  swSfpTxPower  OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(8))
+        UNITS           "dBm"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This object identifies the Tx power consumption of SFP."
+  ::= { swSfpStatEntry 5 }
+
+  swSfpPoweronHrs OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS           "hours"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This object identifies the power on hours of SFP.
+                                This is applicable only to 16G SFPs."
+  ::= { swSfpStatEntry 6 }
+
+  swSfpOUI OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This object represents the OUI of the SFP"
+  ::= { swSfpStatEntry 7 }
+
+  swSfpUnitId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This object identifies unit ID of SFP.
+                                This is applicable only to QSFP."
+  ::= { swSfpStatEntry 8 }
+
+END

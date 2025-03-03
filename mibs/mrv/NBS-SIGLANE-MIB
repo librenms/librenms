@@ -1,0 +1,533 @@
+NBS-SIGLANE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    MODULE-IDENTITY, OBJECT-IDENTITY, Counter64
+        FROM SNMPv2-SMI
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    DisplayString
+        FROM SNMPv2-TC
+
+    NbsCmmcChannelBand
+        FROM NBS-CMMCENUM-MIB
+
+    nbs, NbsTcMHz, NbsTcMilliDb, NbsTcMicroAmp, NbsTcTemperature
+        FROM NBS-MIB;
+
+nbsSigLaneMib  MODULE-IDENTITY
+    LAST-UPDATED "201710180000Z"  -- Oct 18, 2017
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+       "For technical support, please contact your service channel"
+
+    DESCRIPTION
+       "Signaling Lane mib - objects for the management of multi-lane
+        ports such as QSFP, CXP, and CFP."
+    ::= { nbs 236 }
+
+-- *******************************************************************
+-- NBS-SIGLANE-MIB local defines
+-- *******************************************************************
+
+
+nbsSigLanePortGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Ports which aggregate multiple signaling lanes"
+    ::= { nbsSigLaneMib 10 }
+
+nbsSigLaneLaneGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Individual signaling lanes within a port"
+    ::= { nbsSigLaneMib 20 }
+
+
+nbsSigLaneTraps  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "OBJECT-TYPE macros to be used in SNMP NOTIFICATION macros"
+    ::= { nbsSigLaneMib 100 }
+
+nbsSigLaneTraps0  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "NOTIFICATION-TYPE macros"
+    ::= { nbsSigLaneTraps 0 }
+
+
+-- *******************************************************************
+--
+-- the nbsSigLanePortGrp
+--
+-- *******************************************************************
+
+
+-- ******************************************************************
+--
+-- Objects for the Port Signaling Lane group
+--
+-- ********************************************************************
+
+nbsSigLanePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsSigLanePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A table that describes signaling lanes for a QSFP[+] or CFP port."
+    ::= { nbsSigLanePortGrp 1 }
+
+nbsSigLanePortEntry      OBJECT-TYPE
+    SYNTAX      NbsSigLanePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Contains a description of a particular port signaling lane."
+    INDEX { nbsSigLanePortIfIndex }
+    ::= { nbsSigLanePortTable 1 }
+
+NbsSigLanePortEntry::= SEQUENCE {
+    nbsSigLanePortIfIndex         InterfaceIndex,
+    nbsSigLanePortFacility        INTEGER,
+    nbsSigLanePortLanes           INTEGER
+--  nbsSigLanePortTherm           NbsTcTemperature   use nbsCmmcPortTemperature
+}
+
+nbsSigLanePortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The index to the MIB-II Interface table entry which represents this
+        port.  This value should be 0 if there is no corresponding MIB-II
+        interface entry."
+    ::= { nbsSigLanePortEntry 1 }
+
+nbsSigLanePortFacility OBJECT-TYPE
+    SYNTAX      INTEGER {
+        other   (1),
+        fiber   (2),
+        lambda  (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "fiber(2) indicates that lane signaling is conducted on separate
+        fibers.
+
+        lambda(3) indicates that lane signaling is conducted on different
+        wavelengths on a single SMF fiber."
+    ::= { nbsSigLanePortEntry 10 }
+
+nbsSigLanePortLanes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of signaling lanes in this port"
+    ::= { nbsSigLanePortEntry 20 }
+
+
+
+
+-- *******************************************************************
+--
+-- the nbsSigLaneLaneGrp
+--
+-- *******************************************************************
+
+nbsSigLaneLaneTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsSigLaneLaneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A table that describes (fiber/lambda) network signaling lanes for a
+        multi-lane port."
+    ::= { nbsSigLaneLaneGrp 1 }
+
+nbsSigLaneLaneEntry      OBJECT-TYPE
+    SYNTAX      NbsSigLaneLaneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Contains a description of a particular (fiber/lambda) signaling lane."
+    INDEX { nbsSigLaneLaneIfIndex, nbsSigLaneLaneIndex }
+    ::= { nbsSigLaneLaneTable 1 }
+
+
+NbsSigLaneLaneEntry ::= SEQUENCE {
+    nbsSigLaneLaneIfIndex         InterfaceIndex,
+    nbsSigLaneLaneIndex           INTEGER,
+    nbsSigLaneLaneFrequency       NbsTcMHz,
+    nbsSigLaneLaneWavelengthX     DisplayString,
+    nbsSigLaneLaneChannelBand     NbsCmmcChannelBand,
+    nbsSigLaneLaneChannelNumber   INTEGER,
+    nbsSigLaneLaneTxDisable       INTEGER,
+    nbsSigLaneLaneFaultsCaps      OCTET STRING,
+    nbsSigLaneLaneFaultsOper      OCTET STRING,
+
+    nbsSigLaneLaneTxPowerLevel    INTEGER,
+    nbsSigLaneLaneTxPower         NbsTcMilliDb,
+    nbsSigLaneLaneTxPowerAdmin    NbsTcMilliDb,
+    nbsSigLaneLaneRxPowerLevel    INTEGER,
+    nbsSigLaneLaneRxPower         NbsTcMilliDb,
+    nbsSigLaneLaneBiasAmpsLevel   INTEGER,
+    nbsSigLaneLaneBiasAmps        NbsTcMicroAmp,
+    nbsSigLaneLaneLaserTempLevel  INTEGER,
+    nbsSigLaneLaneLaserTemp       NbsTcTemperature,
+
+    nbsSigLaneLaneEthTxAllOctets  Counter64,
+    nbsSigLaneLaneEthTxAllFrames  Counter64,
+
+    nbsSigLaneLaneEthRxAllOctets  Counter64,
+    nbsSigLaneLaneEthRxAllFrames  Counter64
+}
+
+nbsSigLaneLaneIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The index to the MIB-II Interface table entry which contains this
+        (fiber/lambda) lane."
+    ::= { nbsSigLaneLaneEntry 1 }
+
+nbsSigLaneLaneIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Ordinal index for the signaling lane in a port:
+            1..4  for QSFP[+] 4 x 10G
+            1..4  for CFP 4 x 25G
+            1..4  for CFP 4 x 28G
+            1..10 for CFP 10 x 10G"
+    ::= { nbsSigLaneLaneEntry 2 }
+
+nbsSigLaneLaneFrequency   OBJECT-TYPE
+    SYNTAX      NbsTcMHz
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nominal frequency, in MHz."
+    ::= { nbsSigLaneLaneEntry 10 }
+
+nbsSigLaneLaneWavelengthX   OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(4..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The nominal wavelength (nanometers) is an ASCII string
+        to be human-readable. CWDM wavelengths use 4 digits.
+        DWDM wavelengths use seven digits and a decimal point.
+
+        Not supported value: 'N/A'"
+    ::= { nbsSigLaneLaneEntry 11 }
+
+nbsSigLaneLaneChannelBand OBJECT-TYPE
+        SYNTAX      NbsCmmcChannelBand
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The ITU grid labels DWDM channels with a letter 'band' and a
+           numeric channel.  Within this mib, the band is indicated by
+           this object, and the channel number is shown in the object
+           nbsOsaChannelNumber.
+
+           Frequencies of at least 180100 GHz but less than 190100 GHz
+           are considered the L spectrum, and frequencies of at least
+           190100 but less than 200100 GHz are considered the C spectrum.
+
+           Frequencies evenly divisible by 100 GHz are designated with
+           a 'C' or 'L' prepended to the channel number.  Frequencies
+           that are offset by 50 GHz are designated 'H' within the C
+           spectrum, and 'Q' within the L spectrum."
+        ::= { nbsSigLaneLaneEntry 12 }
+
+nbsSigLaneLaneChannelNumber OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The channel number can be derived by extracting the two middle
+           digits from the six digit frequency in GHz."
+        ::= { nbsSigLaneLaneEntry 13 }
+
+nbsSigLaneLaneTxDisable  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        no           (2),
+        yes          (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object controls the lane's transmitter:
+
+        notSupported(1), returned if transmitter not configurable, i.e. always
+          enabled;
+
+        no(2), to enable the transmitter;
+
+        yes(3), to disable the transmitter"
+    ::= { nbsSigLaneLaneEntry 14 }
+
+nbsSigLaneLaneFaultsCaps OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the supported nbsSigLaneLaneFaultsOper bit(s).
+
+        A zero length OCTET STRING indicates this information is not provided."
+    ::= { nbsSigLaneLaneEntry 15 }
+
+nbsSigLaneLaneFaultsOper OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object provides operational lane fault conditions:
+
+        The first octet provides Tx information:
+
+            Bit 0: Tx LOS if set
+
+            Bit 1: Tx Fault if set
+
+            Bit 2: Tx LOL if set
+
+            Bit 3: Tx Adaptive EQ Fault if set
+
+        The second octet provides Rx information:
+
+            Bit 0: Rx LOS if set
+
+            Bit 2: Rx LOL if set
+
+        OCTET STRING bitmasks count the leftmost bit (MSB) as 0.
+
+        A zero length OCTET STRING indicates this information is not provided."
+    ::= { nbsSigLaneLaneEntry 16 }
+
+nbsSigLaneLaneTxPowerLevel  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        lowAlarm     (2),
+        lowWarning   (3),
+        ok           (4),
+        highWarning  (5),
+        highAlarm    (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of this lane's
+        measured received power, reported in nbsSigLaneLaneTxPower:
+
+        notSupported(1), if (nbsSigLaneLaneTxPower = 0x80000000);
+
+        lowAlarm(2),
+          if nbsSigLaneLaneTxPower < nbsSigLanePortTxPowerVendorMin;
+
+        lowWarning(3),
+          if nbsSigLaneLaneTxPower > nbsSigLanePortTxPowerVendorMin
+          and nbsSigLaneLaneTxPower < nbsSigLanePortTxPowerUserMin;
+
+        ok(4), if nbsSigLaneLaneTxPower is within thresholds;
+
+        highWarning(5),
+          if nbsSigLaneLaneTxPower < nbsSigLanePortTxPowerVendorMax
+          and nbsSigLaneLaneTxPower > nbsSigLanePortTxPowerUserMax;
+
+        highAlarm(6),
+          if nbsSigLaneLaneTxPower > nbsSigLanePortTxPowerVendorMax"
+    DEFVAL { ok }
+    ::= { nbsSigLaneLaneEntry 20 }
+
+nbsSigLaneLaneTxPower OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The output power (in milli dBm) of this lane.
+
+        Not supported value: 0x80000000"
+    DEFVAL { -2147483648 }
+    ::= { nbsSigLaneLaneEntry 21 }
+
+nbsSigLaneLaneTxPowerAdmin OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The desired output power (in milli dBm) for this lane; the value
+        should be within the supported bounds of the given pluggable.
+        For a CFP/CFP2 supporting configurable Tx power, this is applied
+        in the corresponding MSA B41x register.
+
+        Not supported value: 0x80000000"
+    DEFVAL { -2147483648 }
+    ::= { nbsSigLaneLaneEntry 22 }
+
+nbsSigLaneLaneRxPowerLevel  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        lowAlarm     (2),
+        lowWarning   (3),
+        ok           (4),
+        highWarning  (5),
+        highAlarm    (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of this lane's
+        measured received power, reported in nbsSigLaneLaneRxPower:
+
+        notSupported(1), if (nbsSigLaneLaneRxPower = 0x80000000);
+
+        lowAlarm(2),
+          if nbsSigLaneLaneRxPower < nbsSigLanePortRxPowerVendorMin;
+
+        lowWarning(3),
+          if nbsSigLaneLaneRxPower > nbsSigLanePortRxPowerVendorMin
+          and nbsSigLaneLaneRxPower < nbsSigLanePortRxPowerUserMin;
+
+        ok(4), if nbsSigLaneLaneRxPower is within thresholds;
+
+        highWarning(5),
+          if nbsSigLaneLaneRxPower < nbsSigLanePortRxPowerVendorMax
+          and nbsSigLaneLaneRxPower > nbsSigLanePortRxPowerUserMax;
+
+        highAlarm(6),
+          if nbsSigLaneLaneRxPower > nbsSigLanePortRxPowerVendorMax"
+    DEFVAL { ok }
+    ::= { nbsSigLaneLaneEntry 30 }
+
+nbsSigLaneLaneRxPower OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The received optical power (in milli dBm) of this lane.
+
+        Not supported value: 0x80000000"
+    DEFVAL { -2147483648 }
+    ::= { nbsSigLaneLaneEntry 31 }
+
+nbsSigLaneLaneBiasAmpsLevel  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        lowAlarm     (2),
+        lowWarning   (3),
+        ok           (4),
+        highWarning  (5),
+        highAlarm    (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of laser bias current,
+        as reported in nbsSigLaneLaneBiasAmps:
+
+        notSupported(1), if (nbsSigLaneLaneBiasAmps = -1);
+
+        lowAlarm(2), if below nbsSigLanePortBiasAmpsVendorMin;
+
+        ok(4), if within the recommended operating range;
+
+        highAlarm(6), if above nbsSigLanePortBiasAmpsVendorMax."
+    DEFVAL { ok }
+    ::= { nbsSigLaneLaneEntry 40 }
+
+nbsSigLaneLaneBiasAmps OBJECT-TYPE
+    SYNTAX      NbsTcMicroAmp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The bias current (in microAmps) of this lane.
+
+        Not supported value: -1"
+    DEFVAL { -1 }
+    ::= { nbsSigLaneLaneEntry 41 }
+
+nbsSigLaneLaneLaserTempLevel  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        lowAlarm     (2),
+        lowWarning   (3),
+        ok           (4),
+        highWarning  (5),
+        highAlarm    (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of laser temperature,
+        as reported in nbsSigLaneLaneLaserTemp:
+
+        notSupported(1), if (nbsSigLaneLaneLaserTemp = 0x80000000);
+
+        lowAlarm(2), if below nbsSigLanePortLaserTempVendorMin;
+
+        ok(4), if within the recommended operating range;
+
+        highAlarm(6), if above nbsSigLanePortLaserTempVendorMax."
+    DEFVAL { ok }
+    ::= { nbsSigLaneLaneEntry 50 }
+
+nbsSigLaneLaneLaserTemp OBJECT-TYPE
+    SYNTAX      NbsTcTemperature
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The temperature (in degrees Celsius) of this lane.
+
+        Not supported value: 0x80000000"
+    DEFVAL { -2147483648 }
+    ::= { nbsSigLaneLaneEntry 51 }
+
+nbsSigLaneLaneEthTxAllOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The count of bytes in all Ethernet frames transmitted.
+
+        Not supported value: 0xFFFFFFFFFFFFFFFF"
+    ::= { nbsSigLaneLaneEntry 60 }
+
+nbsSigLaneLaneEthTxAllFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The count of all Ethernet frames transmitted.
+
+        Not supported value: 0xFFFFFFFFFFFFFFFF"
+    ::= { nbsSigLaneLaneEntry 61 }
+
+nbsSigLaneLaneEthRxAllOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The count of bytes in all Ethernet frames received.
+
+        Not supported value: 0xFFFFFFFFFFFFFFFF"
+    ::= { nbsSigLaneLaneEntry 70 }
+
+nbsSigLaneLaneEthRxAllFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The count of all Ethernet frames received.
+
+        Not supported value: 0xFFFFFFFFFFFFFFFF"
+    ::= { nbsSigLaneLaneEntry 71 }
+
+
+END

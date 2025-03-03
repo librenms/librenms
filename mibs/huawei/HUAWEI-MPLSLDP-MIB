@@ -1,0 +1,2182 @@
+-- ===================================================================
+-- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: This MIB contains private managed object and notification 
+--              trap definitions for MPLS LDP.
+-- Reference:
+-- Version: V2.46
+-- ===================================================================
+
+
+    HUAWEI-MPLSLDP-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            InterfaceIndex            
+                FROM IF-MIB
+            InterfaceIndexOrZero
+                FROM IF-MIB
+            InetAddress            
+                FROM INET-ADDRESS-MIB            
+            EnabledStatus
+                FROM P-BRIDGE-MIB            
+            MplsLdpIdentifier, MplsLsrIdentifier
+                FROM MPLS-TC-STD-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            DisplayString, RowStatus                        
+                FROM SNMPv2-TC
+            TimeTicks, Integer32, Unsigned32, IpAddress, Counter32, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI;
+    
+    
+        hwMplsLdp MODULE-IDENTITY 
+            LAST-UPDATED "201411061640Z"        -- Nov 6, 2014 at 16:40:00 GMT            
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                 Bantian, Longgang
+                 Shenzhen 518129
+                 People's Republic of China 
+                 Website: http://www.huawei.com
+                   Email: support@huawei.com
+                "
+            DESCRIPTION 
+                "This MIB contains private managed object and notification trap 
+                definitions for MPLS LDP."
+--
+-- Revision history
+-- 
+        REVISION    "201411061640Z"   
+        DESCRIPTION "V2.46, delete LDP GR timer  range's validity check, include hwLdpGrNeighborLivenessTimer,hwLdpGrReconnectTimer,hwLdpGrRecoveryTimer."
+
+
+        REVISION    "201408221126Z"   
+        DESCRIPTION "V2.45, add hwMplsLdpSessionDownReason object type sessionProtectTimerExp(30)."
+
+        REVISION    "201405281126Z"   
+        DESCRIPTION "V2.44, add four nodes for LDP session statistics: hwLdpLocalOperationalSessionNumber, hwLdpRemoteOperationalSessionNumber,
+	            hwLdpLocalAndRemoteOperationalSessionNumber and hwLdpTotalOperationalSessionNumber."
+      
+        REVISION    "201401151600Z"   
+        DESCRIPTION "V2.43, add hwMplsLdpSessionDownReason object type modifyMp2mp(29)."
+
+        REVISION    "201307151600Z"   
+        DESCRIPTION "V2.42, add hwMplsLdpSessionDownReason object type modifyP2mp(28)."
+
+        REVISION    "201306141000Z"   
+        DESCRIPTION "V2.41, add trap hwMplsLdpHostIngressLspDownClear, hwMplsLdpHostIngressLspDown, and the trap VB:
+        hwLdpLspDownReason, hwLdpLspDownMplsLsrId, hwLdpLspDownOutIfIndex, hwLdpLspDownOutIfMainIp, hwLdpLspDownOutIfState, hwLdpLspDownDownstreamPeerLsrId."
+        
+        REVISION    "201301151000Z"   
+        DESCRIPTION "V2.30,  modify the name for these nodes:hwLdpPolicyPeerGroupOutBoundRange, hwLdpPolicyPeerGroupOutBoundFecIpPrefix,
+            hwLdpPolicyPeerGroupOutBoundBgpRange, hwLdpPolicyPeerGroupOutBoundBgpIpPrefix, hwLdpPolicyPeerGroupInBoundRange,
+            hwLdpPolicyPeerGroupInBoundIpPrefix, hwLdpPolicyPeerGroupRowStatus.correct name is :hwLdpPeerGroupOutBoundRange,hwLdpPeerGroupOutBoundFecIpPrefix,
+            hwLdpPeerGroupOutBoundBgpRange, hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange,
+            hwLdpPeerGroupInBoundIpPrefix, hwLdpPeerGroupRowStatus."
+
+        REVISION    "201301071000Z"   
+        DESCRIPTION "V2.20, add two nodes hwLdpRemoteLocalLsrIdIfIndex and hwLdpInterfaceLocalLsrIdIfIndex."
+        
+        REVISION    "201207141000Z"   
+        DESCRIPTION "V2.10, set the length of hwLdpPeerGroupName."
+
+        REVISION    "201111161000Z"   
+        DESCRIPTION "V2.02, delete the default value in the description for these nodes: hwLdpGrReconnectTimer, hwLdpGrRecoveryTimer, hwLdpGrNeighborLivenessTimer."
+ 
+        REVISION    "201109281000Z"   
+        DESCRIPTION "V2.01, modify the description for these nodes: hwMplsLdpSessionTable, hwMplsLdpSessionEntry, hwMplsLdpSessionStateTable, hwMplsLdpSessionStateEntry,
+hwMplsLspTriggerIpPrefix, hwMplsLspTriggerBgpRouteIpPrefix, hwLdpDeleteGtsmAll, hwMplsFrrLspTriggerIpPrefix, hwLdpVpnTable, hwLdpVpnEntry, hwMplsVpnFrrLspTriggerIpPrefix,
+hwLdpRemoteEntityTable, hwLdpRemoteEntityEntry, hwLdpPeerTable. change the SYNTAX from DisplayString to OCTET STRING for these nodes: hwLdpPropagateIpPrefix,
+hwMplsLspTriggerIpPrefix, hwMplsLspTriggerBgpRouteIpPrefix, hwMplsFrrLspTriggerIpPrefix, hwMplsVpnFrrLspTriggerIpPrefix."
+  
+        REVISION    "201109071000Z"   
+        DESCRIPTION "V2.00, modify the description for these nodes, hwMplsLspTriggerIpPrefix, hwMplsLspTrigger, hwMplsFrrLspTriggerIpPrefix, hwMplsFrrLspTrigger, 
+hwLdpOutBoundPolicyPeerAllFecIpPrefix, hwLdpOutBoundPolicyPeerAllRange, hwLdpInBoundPolicyPeerAllIpPrefix, 
+hwLdpInBoundPolicyPeerAllRange, hwLdpOutBoundPolicyPeerAllBgpIpPrefix, hwLdpOutBoundPolicyPeerAllBgpRange, 
+hwMplsVpnFrrLspTrigger, hwMplsVpnFrrLspTriggerIpPrefix, hwLdpPeerOutBoundPolicyRange, hwLdpPeerOutBoundPolicyFecIpPrefix, 
+hwLdpPeerOutBoundPolicyBgpRange, hwLdpPeerOutBoundPolicyBgpIpPrefix, hwLdpPeerOutBoundPolicyFecRange, 
+hwLdpPeerInBoundPolicyFecIpPrefix, hwLdpPeerGroupOutBoundRange, hwLdpPeerGroupOutBoundFecIpPrefix, hwLdpPeerGroupOutBoundBgpRange, 
+hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInBoundIpPrefix."
+
+        REVISION    "201105101000Z"   
+        DESCRIPTION "V1.03, add four nodes for MPLS LDP Graceful-Delete, hwLdpVpnGracefulDeleteCapability, hwLdpVpnGracefulDeleteTimer, hwLdpGracefulDeleteCapability, hwLdpGracefulDeleteTimer."
+
+        REVISION    "201008111600Z"   
+        DESCRIPTION "V1.02, some description is modified."
+ 
+        REVISION    "201007121600Z"   
+        DESCRIPTION "V1.01, some nodes support the set operation."
+        
+        REVISION    "200903101600Z"   
+        DESCRIPTION "V1.00, initial version."
+            ::= { hwDatacomm 143 }
+
+
+
+    
+--
+-- Node definitions
+--
+    
+        hwMplsLdpInfo OBJECT IDENTIFIER ::= { hwMplsLdp 1 }
+        
+        hwMplsLdpProcessName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the process name of LDP running on the router. By default, the value is LDP."
+            ::= { hwMplsLdpInfo 1 }
+        
+        hwMplsLdpLspFec OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the destination address of an LSP. 
+                 The value is either a destination IP address or a prefix of an IP address."
+            ::= { hwMplsLdpInfo 2 }
+        
+        hwMplsLdpLspInLabel OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates that labels are pushed into all the packets for direct MPLS forwarding."
+            ::= { hwMplsLdpInfo 3 }
+        
+        hwMplsLdpLspOutLabel OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates that all the packets swap labels for MPLS forwarding."
+            ::= { hwMplsLdpInfo 4 }
+        
+        hwMplsLdpLspOutIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the index of the outgoing interface of the LSP."
+            ::= { hwMplsLdpInfo 5 }
+        
+        hwMplsLdpLspDownReason OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                routeDelete(1),
+                lspmNotify(2),
+                canNotRecoveryFromGr(3),
+                recvReleaseMsg(4),
+                recvWithdrawMsg(5),
+                upStreamLost(6),
+                downStreamLost(7),
+                otherReason(8)
+            }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the cause that the LSP becomes Down.
+                 Options:
+                 1. routeDelete(1)          -indicates that a route has been deleted.
+                 2. lspmNotify(2)           -indicates that LSPM notify.
+                 3. canNotRecoveryFromGr(3) -indicates that the recovery from GR was failed.
+                 4. recvReleaseMsg(4)       -indicates that the release message was received.
+                 5. recvWithdrawMsg(5)      -indicates that the withdraw message was received.
+                 6. upStreamLost(6)         -indicates that the upstream route was lost.
+                 7. downStreamLost(7)       -indicates that the downstream route was lost.
+                 8. otherReason(8)          -indicates that another cause was involved.
+                "
+            ::= { hwMplsLdpInfo 6 }
+
+--Mpls Ldp Session Table
+        
+        hwMplsLdpSessionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsLdpSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object is used to display the session parameters and session age.
+                 The index of this table is hwMplsLdpSessionPeerLsrId.
+                "
+            ::= { hwMplsLdpInfo 7 }
+        
+        hwMplsLdpSessionEntry OBJECT-TYPE
+            SYNTAX HwMplsLdpSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object is used to display the session parameters and session age.
+                 The index of this entry is hwMplsLdpSessionPeerLsrId.
+                "
+            INDEX { hwMplsLdpSessionPeerLsrId }
+            ::= { hwMplsLdpSessionTable 1 }
+        
+        HwMplsLdpSessionEntry ::=
+            SEQUENCE { 
+                hwMplsLdpSessionPeerLsrId
+                    MplsLdpIdentifier,
+                hwMplsLdpSessionIfIndex
+                    Integer32,
+                hwMplsLdpSessionDownReason
+                    INTEGER,
+                hwMplsLdpSessionAge
+                    TimeTicks
+             }
+
+        hwMplsLdpSessionPeerLsrId OBJECT-TYPE
+            SYNTAX MplsLdpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the LSR ID of the peer in a session."
+            ::= { hwMplsLdpSessionEntry 1 }
+        
+        hwMplsLdpSessionIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the index of the interface on which the session is established."
+            ::= { hwMplsLdpSessionEntry 2 }
+        
+        hwMplsLdpSessionDownReason OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                sessionUp(0),
+                helloHoldTimerExp(1),
+                ssnHoldTimerExp(2),
+                resetMplsLdp(3),
+                undoMplsLdp(4),
+                undoMpls(5),
+                undoMplsLdpRemotePeer(6),
+                modifyGRConfig(7),
+                modifyGRTimer(8),
+                modifyKeepaliveTimer(9),
+                modifyMD5Config(10),
+                ssnRoleSwitch(11),
+                modifyMTUConfig(12),
+                modifyTransportAddress(13),
+                modifyLDPLsrID(14),
+                recvNotification(15),
+                transportAddressNotMatch(16),
+                protocolGR(17),
+                ifStatusChanged(18),
+                tcpDown(19),
+                otherReason(20),
+                sentNotification(21),
+                canntBuildSessionRelation(22),
+                receiveErrorMessageFromPeer(23),
+                receiveSocketError(24), 
+                sessionDelete(25),
+                modifyCapabilityAnnouncementConfig(26),
+                modifyLocalLsrID(27),
+                modifyP2MP(28),
+                modifyMP2MP(29),
+                sessionProtectTimerExp(30)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the cause that the session becomes Down.
+                 Options:
+                 1. sessionUp(0)                  -indicates that the session was Up.
+                 2. helloHoldTimerExp(1)          -indicates that the Hello hold timer expired.
+                 3. ssnHoldTimerExp(2)            -indicates that the session hold timer expired.
+                 4. resetMplsLdp(3)               -indicates MPLS LDP was reset.
+                 5. undoMplsLdp(4)                -indicates that MPLS LDP was disabled.
+                 6. undoMpls(5)                   -indicates that MPLS was disabled.
+                 7. undoMplsLdpRemotePeer(6)      -indicates that the remote peer was deleted.
+                 8. modifyGRConfig(7)             -indicates that GR capability was modified.
+                 9. modifyGRTimer(8)              -indicates that the GR timer was modified.
+                 10. modifyKeepaliveTimer(9)      -indicates that the keepalive timer was modified.
+                 11. modifyMD5Config(10)          -indicates that MD5 was configured.
+                 12. ssnRoleSwitch(11)            -indicates that the session role was switched.
+                 13. modifyMTUConfig(12)          -indicates that the MTU was modified.
+                 14. modifyTransportAddress(13)   -indicates that the transport address was modified.
+                 15. modifyLDPLsrID(14)           -indicates that the LDP LSR ID was modified.
+                 16. recvNotification(15)         -indicates that the notification message was received.
+                 17. transportAddressNotMatch(16) -indicates that the transport address was not matched.
+                 18. protocolGR(17)               -indicates that the protocol GR was in processing.
+                 19. ifStatusChanged(18)          -indicates that the interface status was changed.
+                 20. tcpDown(19)                  -indicates that TCP was Down.
+                 21. otherReason(20)              -indicates that another cause was involved.
+                 22. sentNotification(21)         -indicates that the notification was sent.
+                 23. canntBuildSessionRelation(22)    -indicates that the session relation cannot be built.
+                 24. receiveErrorMessageFromPeer(23)  -indicates that error message from peer was received.
+                 25. receiveSocketError(24)        -indicates that error pakcet from socket was received.
+                 26. sessionDelete(25)           -indicates that the session was deleted.
+                 27. modifyCapabilityAnnouncementConfig(26)    -indicates that the capability-announcement was modified.
+                 28. modifyLocalLsrID(27)     -indicates that the Local LSR ID was modified.
+                 29. modifyP2MP(28)               -indicates that the mLDP P2MP was modified.
+                 30. modifyMP2MP(29)            -indicates that the mLDP MP2MP was modified.
+                 31. sessionProtectTimerExp(30)        -indicates that the session protection timer expired.
+                "
+            ::= { hwMplsLdpSessionEntry 3 }        
+        
+
+        hwMplsLdpSessionAge OBJECT-TYPE
+            SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the duration since the session is set up."
+            ::= { hwMplsLdpSessionEntry 4 }
+
+--Mpls Ldp Session State Table
+        
+        hwMplsLdpSessionStateTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsLdpSessionStateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object is used to display the detailed state parameters of the session.
+                 The index of this table is hwMplsLdpSessionPeerId.
+                "
+            ::= { hwMplsLdpInfo 8 }
+        
+        hwMplsLdpSessionStateEntry OBJECT-TYPE
+            SYNTAX HwMplsLdpSessionStateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object is used to display the detailed state parameters of the session.
+                 The index of this entry is hwMplsLdpSessionPeerId.
+                "
+            INDEX { hwMplsLdpSessionPeerId }
+            ::= { hwMplsLdpSessionStateTable 1 }
+        
+        HwMplsLdpSessionStateEntry ::=
+            SEQUENCE { 
+                hwMplsLdpSessionPeerId
+                    MplsLdpIdentifier,
+                hwMplsLdpSessionLsrId
+                    MplsLdpIdentifier,
+                hwMplsLdpSessionTcpConnectionState
+                    OCTET STRING,
+                hwMplsLdpSessionState
+                    OCTET STRING,
+                hwMplsLdpSessionRole
+                    OCTET STRING,
+                hwMplsLdpSessionFtFlag
+                    OCTET STRING,
+                hwMplsLdpSessionMd5Flag
+                    OCTET STRING,
+                hwMplsLdpSessionReconnectTimer
+                    Unsigned32,
+                hwMplsLdpSessionRecoveryTimer
+                    Unsigned32,
+                hwMplsLdpSessionKeepAliveTimer
+                    Unsigned32,
+                hwMplsLdpSessionKeepAliveMsgReceived
+                    Unsigned32,
+                hwMplsLdpSessionKeepAliveMsgSent
+                    Unsigned32,
+                hwMplsLdpSessionLabelAdvMode
+                    OCTET STRING,
+                hwMplsLdpSessionLocalLabelResourceStatus
+                    OCTET STRING,
+                hwMplsLdpSessionPeerLabelResourceStatus
+                    OCTET STRING,
+                hwMplsLdpSessionAgeStatus
+                    TimeTicks
+             }
+
+        hwMplsLdpSessionPeerId OBJECT-TYPE
+            SYNTAX MplsLdpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the LSR ID of the LDP peer to which the session is connected."
+            ::= { hwMplsLdpSessionStateEntry 1 }
+        
+        hwMplsLdpSessionLsrId OBJECT-TYPE
+            SYNTAX MplsLdpIdentifier
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the ID of the local LSR."
+            ::= { hwMplsLdpSessionStateEntry 2 }
+        
+        hwMplsLdpSessionTcpConnectionState OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the TCP link status of the session."
+            ::= { hwMplsLdpSessionStateEntry 3 }
+        
+        hwMplsLdpSessionState OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the current status of the session."
+            ::= { hwMplsLdpSessionStateEntry 4 }
+        
+        hwMplsLdpSessionRole OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the session roles."
+            ::= { hwMplsLdpSessionStateEntry 5 }
+        
+        hwMplsLdpSessionFtFlag OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the FT of the session is enabled."
+            ::= { hwMplsLdpSessionStateEntry 6 }
+        
+        hwMplsLdpSessionMd5Flag OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the MD5 is enabled for the peer."
+            ::= { hwMplsLdpSessionStateEntry 7 }
+        
+        hwMplsLdpSessionReconnectTimer OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of the GR reconnection timer after the negotiation.
+                 Unit: seconds
+                "
+            ::= { hwMplsLdpSessionStateEntry 8 }
+        
+        hwMplsLdpSessionRecoveryTimer OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of the GR recovery timer after the negotiation.
+                 Unit: seconds
+                "
+            ::= { hwMplsLdpSessionStateEntry 9 }
+        
+        hwMplsLdpSessionKeepAliveTimer OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of the KeepAlive timer after the negotiation.
+                 Unit: seconds
+                "
+            ::= { hwMplsLdpSessionStateEntry 10 }
+        
+        hwMplsLdpSessionKeepAliveMsgReceived OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of the KeepAlive messages that the session obtains."
+            ::= { hwMplsLdpSessionStateEntry 11 }
+        
+        hwMplsLdpSessionKeepAliveMsgSent OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of the KeepAlive messages that the session sends."
+            ::= { hwMplsLdpSessionStateEntry 12 }
+        
+        hwMplsLdpSessionLabelAdvMode OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the label distribution mode of the session."
+            ::= { hwMplsLdpSessionStateEntry 13 }
+        
+        hwMplsLdpSessionLocalLabelResourceStatus OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the status of the local label resources of the session."
+            ::= { hwMplsLdpSessionStateEntry 14 }
+        
+        hwMplsLdpSessionPeerLabelResourceStatus OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the status of the label resources of the LDP peer."
+            ::= { hwMplsLdpSessionStateEntry 15 }
+        
+        hwMplsLdpSessionAgeStatus OBJECT-TYPE
+            SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the existence time of the session."
+            ::= { hwMplsLdpSessionStateEntry 16 }
+        
+        hwLdpCapabilityConfig OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the global configuration or deletion of the LDP capability. 
+                 Before enabling LDP capability, ensure that the MPLS capability is enabled globally."
+            ::= { hwMplsLdpInfo 9 }
+            
+        hwLdpLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to change the LDP LSR ID. 
+                 The default LDP LSR ID has the same value as the MPLS LSR ID. 
+                 It is recommended not to change the LDP LSR ID unless necessary."
+            ::= { hwMplsLdpInfo 10 }
+
+        hwLdpPropagateIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration or deletion of the transit policy for the LDP. 
+                 The object has a valid length ranging from 1 to 169 characters. 
+                 The length 0 characters shows that the transit policy is deleted."
+            ::= { hwMplsLdpInfo 11 }
+
+        hwLdpGlobalRemotePwe3 OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration or deletion of the policy for the LDP remote session. 
+                 When the object is enabled, it is forbidden to send mapping message to the remote peer. 
+                 By default, the policy is disabled, which means that there is no limitation to send mapping message to the remote peer."
+            ::= { hwMplsLdpInfo 12 }
+
+        hwLdpMtuSignaling OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration or deletion of the MTU signaling function. 
+                 By default, the MTU signaling function is enabled, and the MTU TLV type in the LDP message is 0x900.
+                "
+            ::= { hwMplsLdpInfo 13 }
+
+
+        hwLdpMtuApplyTlv OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object conflicts with the object hwLdpMtuSignaling. 
+                 If the object is enabled, it indicates that the MTU TLV type in the LDP message is 0x601 according to the RFC 3988."
+            ::= { hwMplsLdpInfo 14 }
+            
+        hwLdpGrCapabilityConfig OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration or deletion of the LDP GR capability."
+            ::= { hwMplsLdpInfo 15 }
+
+        hwLdpGrNeighborLivenessTimer OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to configure the value of GR neighbor life timer.
+                 When the status of hwLdpGrCapabilityConfig is enabled, the default value returned by the object is valid.
+                 Unit: seconds 
+                "
+            ::= { hwMplsLdpInfo 16 }
+
+        hwLdpGrReconnectTimer OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to configure the value of GR reconnect timer.
+                 When the status of hwLdpGrCapabilityConfig is enabled, the default value returned by the object is valid. 
+                 Unit: seconds 
+                "
+            ::= { hwMplsLdpInfo 17 }
+
+        hwLdpGrRecoveryTimer OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to configure the value of GR recovery timer.
+                 When the status of hwLdpGrCapabilityConfig is enabled, the default value returned by the object is valid.
+                 Unit: seconds 
+                "
+            ::= { hwMplsLdpInfo 18 }
+            
+        hwMplsLspTrigger OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                all(1),
+                none(2),
+                host(3),
+                ipprefix(4)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to configure the LDP policy for the ingress LSP and egress LSP.
+                 Options:
+                 1. all(1)      -indicates that all FECs are triggered for the IGP.
+                 2. none(2)     -indicates that no FEC is triggered for the IGP.
+                 3. host(3)     -indicates that the host FEC is triggered for the IGP.
+                 4. ipprefix(4) -indicates that the ip-prefix list is triggered for the IGP. 
+                                 If the object is set as ipprefix, the value of hwMplsLspTriggerIpPrefix must be set together.
+                 Default: host
+                "
+            ::= { hwMplsLdpInfo 19 }
+            
+        hwMplsLspTriggerIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix when configuring the LDP policy for the ingress LSP and egress LSP.
+                 The object has a valid length ranging from 1 to 169 characters. 
+                 If the object is set with a value, the value of hwMplsLspTrigger must be set as ipprefix."
+            ::= { hwMplsLdpInfo 20 }
+
+        hwMplsLspTriggerBgpRoute OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the policy of triggering the BGP route to create the LDP LSP.
+                 Default: disabled
+                "
+            ::= { hwMplsLdpInfo 21 }   
+                     
+        hwMplsLspTriggerBgpRouteIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix when triggering the BGP route to create the LDP LSP.
+                 The object has a valid length ranging from 1 to 169 characters. "
+            ::= { hwMplsLdpInfo 22 }
+        hwLdpReset OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                reset(1),
+                resetall(2),
+                ready(3)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the reset of the LDP protocol.
+                 Options:
+                 1. reset(1)    -indicates the reset of the LDP protocol.
+                 2. resetall(2) -indicates the reset of all LDP instances.
+                 3. ready(3)    -indicates that it is ready to reset LDP. This value cannot be set.
+                "
+            ::= { hwMplsLdpInfo 23 }  
+        hwLdpOutBoundSplitHorizonAll OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to set the flag of global split horizon.
+                 Default: disabled
+                "
+            ::= { hwMplsLdpInfo 24 }  
+            
+        hwLdpDeleteGtsmAll OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                delete(1),
+                ready(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the deletion of the global GTSM configurations.
+                Options:
+                1. delete(1) -indicates that global GTSM configurations are to be deleted.
+                2. ready(2)  -indicates that it is ready to delete global GTSM configurations.
+                "
+            ::= { hwMplsLdpInfo 25 }
+
+        hwMplsFrrLspTrigger OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                all(1),
+                none(2),
+                host(3),
+                ipPrefix(4)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to configure the LDP policy of global instance for LDP Auto FRR.
+                 Options:
+                 1. all(1)      -indicates that all FECs are triggered for the IGP.
+                 2. none(2)     -indicates that no FEC is triggered for the IGP.
+                 3. host(3)     -indicates that the host FEC is triggered for the IGP.
+                 4. ipprefix(4) -indicates that the ip-prefix list is triggered for the IGP. 
+                                 If the object is set as ipprefix, the value of hwMplsFrrLspTriggerIpPrefix must be set together.
+                 Default: host
+                "
+            ::= { hwMplsLdpInfo 26 }  
+            
+        hwMplsFrrLspTriggerIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix when configuring LDP Auto FRR for the public network instance.
+                 The object has a valid length ranging from 1 to 169 characters. 
+                 If the object is set with a value, the value of hwMplsFrrLspTrigger must be set as ipprefix."
+            ::= { hwMplsLdpInfo 27 }
+
+        hwLdpBackOffTimerInit OBJECT-TYPE
+            SYNTAX Integer32 (5..2147483)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the initial value of backoff timer.
+                 Default: 15
+                 Unit: seconds
+                "
+            ::= { hwMplsLdpInfo 28 }
+
+        hwLdpBackOffTimerMax OBJECT-TYPE
+            SYNTAX Integer32 (5..2147483)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the maximum value of backoff timer.
+                 Default: 120
+                 Unit: seconds
+                "
+            ::= { hwMplsLdpInfo 29 }
+
+        hwLdpLongestMatch OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the LDP is enabled with the function of searching for routes according to the longest match rule to establish LSPs.
+                 Default: disabled
+                " 
+            ::= { hwMplsLdpInfo 30 }
+
+        hwLdpRemotePeerAutoDodRequest OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether the remote peer is globally enabled with the capability of automatically sending a DoD request."
+            ::= { hwMplsLdpInfo 37 }  
+        hwLdpCapabilityAnnouncementConfig OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether LDP has Capability-Announcement ability."
+            ::= { hwMplsLdpInfo 38 } 
+            
+     
+-- Ldp Vpn Table
+             
+        hwLdpVpnTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLdpVpnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object is used to configure or delete the LDP multi-instance.
+                 The index of this table is hwLdpVpnInstanceId.
+                 Make sure the relevant VPN instance is already created.
+                "
+            ::= { hwMplsLdpInfo 50 }
+        
+        hwLdpVpnEntry OBJECT-TYPE
+            SYNTAX HwLdpVpnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object is used to configure or delete the LDP multi-instance.
+                 The index of this entry is hwLdpVpnInstanceId.
+                 Make sure the relevant VPN instance is already created.
+                "
+            INDEX { hwLdpVpnInstanceId }
+            ::= { hwLdpVpnTable 1 }
+        
+        HwLdpVpnEntry ::=
+            SEQUENCE {
+                hwLdpVpnInstanceId
+                    Unsigned32, 
+                hwLdpVpnLsrId
+                    IpAddress,
+                hwLdpVpnSplitHorizonAll
+                    EnabledStatus,
+                hwLdpVpnReset
+                    INTEGER,
+                hwMplsVpnFrrLspTrigger
+                    INTEGER,                    
+                hwMplsVpnFrrLspTriggerIpPrefix
+                    OCTET STRING,
+                hwLdpVpnGracefulDeleteCapability
+                    EnabledStatus,
+                hwLdpVpnGracefulDeleteTimer
+                    Integer32,
+                hwLdpVpnRowStatus
+                    RowStatus
+             }
+
+        hwLdpVpnInstanceId OBJECT-TYPE
+            SYNTAX Unsigned32 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the ID of the VPN instance. 
+                 You can find the correct VPN instance ID based on hwL3vpnVrfIndex of hwL3vpnStatisticsTable."
+            ::= { hwLdpVpnEntry 1 }
+             
+        hwLdpVpnLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to configure the LDP LSR ID. 
+                 If the value of the LDP LSR ID is the same as the value of the MPLS LSR ID, the LDP LSR ID is deleted. 
+                 It is recommended not to change the LDP LSR ID unless necessary."
+            ::= { hwLdpVpnEntry 11 }
+            
+        hwLdpVpnSplitHorizonAll OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to set the flag of split horizon for all LDP VPN peers.
+                 Default: disabled
+                "
+            DEFVAL{ disabled }
+            ::= { hwLdpVpnEntry 12 }
+             
+            
+        hwLdpVpnReset OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                reset(1),
+                ready(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the reset of the LDP multi-instance corresponding to the VPN.
+                 Options:
+                 1.reset(1) -indicates that the LDP multi-instance will be reset.
+                 2.ready(2) -indicates that it is ready to reset ldp multi-instance. This value cannot be set.
+                "
+            ::= { hwLdpVpnEntry 13 }
+             
+
+        hwMplsVpnFrrLspTrigger OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                all(1),
+                none(2),
+                host(3),
+                ipPrefix(4)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to configure the LDP policy of vpn instance for LDP Auto FRR.
+                 Options:
+                 1. all(1)      -indicates that all FECs are triggered for the IGP.
+                 2. none(2)     -indicates that no FEC is triggered for the IGP.
+                 3. host(3)     -indicates that the host FEC is triggered for the IGP.
+                 4. ipprefix(4) -indicates that the ip-prefix list is triggered for the IGP. 
+                                 If the object is set as ipprefix, the value of hwMplsVpnFrrLspTriggerIpPrefix must be set together.
+                "
+            ::= { hwLdpVpnEntry 14 }
+             
+        hwMplsVpnFrrLspTriggerIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix when configuring the LDP policy of vpn instance for LDP Auto FRR. 
+                 The object has a valid length ranging from 1 to 169 characters. 
+                 If the object is set with a value, the value of hwMplsVpnFrrLspTrigger must be set as ipprefix."
+            ::= { hwLdpVpnEntry 15 }
+              
+        hwLdpVpnGracefulDeleteCapability   OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the LDP graceful-delete capability is enabled for a VPN instance."
+            ::= { hwLdpVpnEntry 16 }
+              
+        hwLdpVpnGracefulDeleteTimer   OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the value of a graceful-delete timer for a VPN instance. 
+                 When the status of hwLdpVpnGracefulDeleteCapability is enabled, the default value returned by the object is valid.
+                 Default: 5
+                 Unit: seconds
+                "
+             ::= { hwLdpVpnEntry 17 }
+            
+        hwLdpVpnRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether one entry of hwLdpVpnTable is created or destroyed. 
+                 The value of this object can be CreatAndGo or Destroy. 
+                 When the value of the object is set as CreatAndGo, and the entry is correctly created, 
+                 the status of the object will change into active."
+            ::= { hwLdpVpnEntry 51 }          
+             
+-- Ldp Remote Entity Table             
+             
+        hwLdpRemoteEntityTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLdpRemoteEntityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object is used to configure or delete the LDP remote peer.
+                 The index of this table is hwLdpRemoteName.
+                "
+            ::= { hwMplsLdpInfo 51 }
+        
+        hwLdpRemoteEntityEntry OBJECT-TYPE
+            SYNTAX HwLdpRemoteEntityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object is used to configure or delete the LDP remote peer.
+                 The index of this entry is hwLdpRemoteName.
+                "
+            INDEX { hwLdpRemoteName }
+            ::= { hwLdpRemoteEntityTable 1 }
+        
+        HwLdpRemoteEntityEntry ::=
+            SEQUENCE { 
+                hwLdpRemoteName
+                    DisplayString,
+                hwLdpRemoteIp
+                    IpAddress,
+                hwLdpRemotePwe3
+                    EnabledStatus,
+                hwLdpRemoteKeepaliveTimer
+                    Integer32,
+                hwLdpRemoteHelloTimer
+                    Integer32,
+                hwLdpRemoteKeepaliveSendTimer
+                    Integer32,
+                hwLdpRemoteHelloSendTimer
+                    Integer32,
+                hwLdpRemoteIgpSyncTimer
+                    Integer32,
+                hwLdpRemoteIpAutoDoDRequest
+                    EnabledStatus,
+                hwLdpRemoteIpAutoDoDRequestBlock
+                    EnabledStatus,
+                hwLdpRemoteLabelAdvertisementMode
+                    INTEGER,
+                hwLdpRemoteLocalLsrIdIfIndex
+                    InterfaceIndexOrZero,
+                hwLdpRemoteRowStatus
+                    RowStatus
+             }
+             
+        hwLdpRemoteName OBJECT-TYPE
+            SYNTAX DisplayString 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the LDP remote peer.
+                 Range: 1-32 characters
+                "
+            ::= { hwLdpRemoteEntityEntry 1 }
+            
+        hwLdpRemoteIp OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration of the remote peer LSR ID. 
+                 If being set, the ID cannot be modified. 
+                 To modify the ID, delete the original ID and create a new one. 
+                 If the ID is set as 0.0.0.0, it indicates that the ID is deleted."
+            ::= { hwLdpRemoteEntityEntry 11 }
+            
+        hwLdpRemotePwe3 OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration or deletion of the policy for the remote LDP session. 
+                 When the object is enabled, it is forbidden to send the mapping message to the remote peer.
+                 Default: disabled
+                "
+            DEFVAL { disabled }
+            ::= { hwLdpRemoteEntityEntry 12 }
+
+        hwLdpRemoteKeepaliveTimer OBJECT-TYPE
+            SYNTAX Integer32 (30..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of LDP Keepalive timer.
+                 Default: 45
+                 Unit: seconds
+                "
+            ::= { hwLdpRemoteEntityEntry 13 }
+
+        hwLdpRemoteHelloTimer OBJECT-TYPE
+            SYNTAX Integer32 (3..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of LDP Hello hold timer.
+                 Default: 45
+                 Unit: seconds
+                "
+            ::= { hwLdpRemoteEntityEntry 14 }
+
+        hwLdpRemoteKeepaliveSendTimer OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of LDP Keepalive send timer. 
+                 By default, the value of the timer is 0, configuration does not take effect.
+                 Default: 0
+                 Unit: seconds
+                "
+            ::= { hwLdpRemoteEntityEntry 15 }
+
+        hwLdpRemoteHelloSendTimer OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of LDP Hello send timer. 
+                 By default, the value of the timer is 0, configuration does not take effect.
+                 Default: 0
+                 Unit: seconds
+                "
+            ::= { hwLdpRemoteEntityEntry 16 }
+
+        hwLdpRemoteIgpSyncTimer OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of IGP-Sync timer.
+                 Default: 10
+                 Unit: seconds
+                "
+            ::= { hwLdpRemoteEntityEntry 17 }
+             
+        hwLdpRemoteIpAutoDoDRequest OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object identifies whether the remote peer is enabled with the capability of automatically sending a DoD request.
+                 Default: disabled
+                "
+        DEFVAL { disabled }               
+            ::= { hwLdpRemoteEntityEntry 18 }
+            
+        hwLdpRemoteIpAutoDoDRequestBlock OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the remote ip auto dod request function blocked.
+                 Default: disabled
+                "
+            ::= { hwLdpRemoteEntityEntry 19 }
+        
+        hwLdpRemoteLabelAdvertisementMode OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+                dod(1),
+                du(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the label distribution mode.
+                 Options:
+                 1. dod(1) -indicates that the label distribution mode is dod.
+                 2. du(2)  -indicates that the label distribution mode is du.
+                 Default: du 
+                "
+            ::= { hwLdpRemoteEntityEntry 20 }
+
+        hwLdpRemoteLocalLsrIdIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to specify the interface that the local LDP LSR-ID based on remote entity is assigned to. 
+                 Value: 0..2147483647  
+                 The default value of the object is the interface that the global LDP LSR ID is assigned to. 
+                 If the global LDP LSR ID is not assigned to any interface, then the value of the object is 0.
+                 If set 0, the value of the object will be the default value.
+                 "
+            ::= { hwLdpRemoteEntityEntry 21 } 
+            
+        hwLdpRemoteRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether one entry of hwLdpRemoteEntityTable is created or destroyed. 
+                 The value of this object can be CreatAndGo or Destroy. 
+                 When the value of the object is set as CreatAndGo, and the entry is correctly created, 
+                 the status of the object will change into active."
+            ::= { hwLdpRemoteEntityEntry 51 }  
+             
+-- Ldp Peer Table            
+             
+        hwLdpPeerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLdpPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object is used to configure the LDP peer.
+                 The index of this table is hwLdpPeerLsrId.
+                "
+            ::= { hwMplsLdpInfo 52 }
+        
+        hwLdpPeerEntry OBJECT-TYPE
+            SYNTAX HwLdpPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry of the peer feature table, used to configure and display features, 
+                 such as the MD5 password and split horizon policy negotiated with the local peer.
+                 The index of this entry is hwLdpPeerLsrId.
+                "
+            INDEX { hwLdpPeerLsrId }
+            ::= { hwLdpPeerTable 1 }
+        
+        HwLdpPeerEntry ::=
+            SEQUENCE { 
+                hwLdpPeerLsrId
+                    IpAddress,
+                hwLdpPeerMd5Type
+                    INTEGER,
+                hwLdpPeerMd5Password
+                    OCTET STRING,
+                hwLdpPeerGtsmHops
+                    Integer32,
+                hwLdpPeerSplitHorizon
+                    EnabledStatus,
+                hwLdpPeerReset
+                    INTEGER,
+                hwLdpPeerKeychainName
+                    OCTET STRING,
+                hwLdpPeerOutBoundPolicyRange
+                    INTEGER,
+                hwLdpPeerOutBoundPolicyFecIpPrefix
+                    OCTET STRING,
+                hwLdpPeerOutBoundPolicyBgpRange
+                    INTEGER,
+                hwLdpPeerOutBoundPolicyBgpIpPrefix
+                    OCTET STRING,
+                hwLdpPeerInBoundPolicyRange
+                    INTEGER,
+                hwLdpPeerInBoundPolicyFecIpPrefix
+                    OCTET STRING,
+                hwLdpPeerRowStatus
+                    RowStatus
+             }
+             
+             
+             
+        hwLdpPeerLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the LSR ID of the LDP peer."
+            ::= { hwLdpPeerEntry 1 }
+
+        hwLdpPeerMd5Type OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                cipher(1),
+                plain(2),
+                null(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the Md5 type.
+                 Options:
+                 1. cipher(1) -indicates that the MD5 password is in cipher text mode.
+                 2. plain(2)  -indicates that the MD5 password is in plain text mode.
+                 3. null(3)   -indicates that the MD5 type is null, which means that the MD5 authentication is not configured for the LDP peer. 
+                "
+            ::= { hwLdpPeerEntry 11 }
+            
+        hwLdpPeerMd5Password OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MD5 password of LDP neighbor. 
+                 To delete the password, set the password length as zero.
+                 When read, it always returns an Octet string with the length of zero.
+                "
+            ::= { hwLdpPeerEntry 12 }
+            
+        hwLdpPeerGtsmHops OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of GTSM hops. 
+                 The valid number of GTSM hops ranges from 1 to 255. 
+                 To clear the configuration of GTSM hops, set the number of GTSM hops as 0."
+            ::= { hwLdpPeerEntry 13 }
+             
+        hwLdpPeerSplitHorizon OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to set the flag of split horizon for the specified LDP peer.
+                 Default: disabled
+                "
+            DEFVAL { disabled }
+            ::= { hwLdpPeerEntry 14 }
+            
+        hwLdpPeerReset OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                reset(1),
+                ready(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the reset of the neighbor services.
+                 Options:
+                 1. reset(1) -indicates that the neighbor services will be reset. Only when the object is ready, can this value take effect.
+                 2. ready(2) -indicates that it is ready to reset the neighbor services. This value cannot be set.
+                "
+            ::= { hwLdpPeerEntry 15 }
+            
+        hwLdpPeerKeychainName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the Keychain name. To cancel the Keychain authentication, set the Keychain name length as 0."
+            ::= { hwLdpPeerEntry 18 }
+         
+        hwLdpPeerOutBoundPolicyRange OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                clear(1),
+                none(2),
+                ipprefix(3),
+                host(4)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the range of IGP routes for an outbound policy. The default value is clear. 
+                 If the object is set as ipprefix, the value of hwLdpPeerOutBoundPolicyFecIpPrefix must be set together."
+            ::= { hwLdpPeerEntry 19 }
+            
+        hwLdpPeerOutBoundPolicyFecIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix list name of IGP routes for an outbound policy. 
+                 If the object is set with a value, the value of hwLdpPeerOutBoundPolicyRange must be set as ipprefix."
+            ::= { hwLdpPeerEntry 20 }
+            
+        hwLdpPeerOutBoundPolicyBgpRange OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                clear(1),
+                none(2),
+                ipprefix(3)            
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the range of BGP routes for an outbound policy. The default value is clear. 
+                 If the object is set as ipprefix, the value of hwLdpPeerOutBoundPolicyBgpIpPrefix must be set together."
+            ::= { hwLdpPeerEntry 21 }   
+        
+        hwLdpPeerOutBoundPolicyBgpIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix list name of BGP routes for the outbound policy. 
+                 If the object is set with a value, the value of hwLdpPeerOutBoundPolicyBgpRange must be set as ipprefix."
+            ::= { hwLdpPeerEntry 22 }     
+                
+        hwLdpPeerInBoundPolicyRange OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                clear(1),
+                none(2),
+                ipprefix(3),
+                host(4)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the route range for the inbound policy. The default value is clear. 
+                 If the object is set as ipprefix, the value of hwLdpPeerInBoundPolicyFecIpPrefix must be set together."
+            ::= { hwLdpPeerEntry 23 }
+        
+        hwLdpPeerInBoundPolicyFecIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix list name for the inbound policy. 
+                 If the object is set with a value, the value of hwLdpPeerInBoundPolicyRange must be set as ipprefix."
+            ::= { hwLdpPeerEntry 24 } 
+            
+        hwLdpPeerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether one entry of hwLdpPeerTable is created or destroyed. 
+                 The value of this object can be CreatAndGo or Destroy. 
+                 When the value of the object is set as CreatAndGo, and the entry is correctly created, 
+                 the status of the object will change into active."
+            ::= { hwLdpPeerEntry 51 }
+             
+-- Ldp Vpn Peer Table             
+             
+        hwLdpVpnPeerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLdpVpnPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to create and delete peer configurations in the LDP multi-instance.
+                 The indexs of this table are hwLdpVpnInstanceId, hwLdpVpnPeerLsrId.
+                 Make sure the corresponding LDP VPN-instance is already created in hwLdpVpnTable.
+                "
+            ::= { hwMplsLdpInfo 53 }
+        
+        hwLdpVpnPeerEntry OBJECT-TYPE
+            SYNTAX HwLdpVpnPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry of the VPN peer feature table, used to configure and display features, 
+                 such as the MD5 password and split horizon policy negotiated with the local peer on the VPN.
+                 The indexs of this entry are hwLdpVpnInstanceId, hwLdpVpnPeerLsrId.
+                 Make sure the corresponding LDP VPN-instance is already created in hwLdpVpnTable.
+                "
+            INDEX { hwLdpVpnInstanceId,
+                    hwLdpVpnPeerLsrId }
+            ::= { hwLdpVpnPeerTable 1 }
+        
+        HwLdpVpnPeerEntry ::=
+            SEQUENCE { 
+                hwLdpVpnPeerLsrId
+                    IpAddress,
+                hwLdpVpnPeerMd5Type
+                    INTEGER,
+                hwLdpVpnPeerMd5Password
+                    OCTET STRING,
+                hwLdpVpnPeerSplitHorizon
+                    EnabledStatus,
+                hwLdpVpnPeerReset
+                    INTEGER,
+                hwLdpVpnPeerKeychainName
+                    OCTET STRING,
+                hwLdpVpnPeerRowStatus
+                    RowStatus
+             }
+
+           
+        hwLdpVpnPeerLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the LSR ID of the LDP peer."
+            ::= { hwLdpVpnPeerEntry 1 }
+            
+        hwLdpVpnPeerMd5Type OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                cipher(1),
+                plain(2),
+                null(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the Md5 type.
+                 1. cipher(1) -indicates that the MD5 password is in cipher text mode.
+                 2. plain(2)  -indicates that the MD5 password is in plain text mode.
+                 3. null(3)   -indicates that the MD5 type is null, which means that the MD5 authentication is not configured for the LDP peer. 
+                "
+            ::= { hwLdpVpnPeerEntry 11 }
+            
+        hwLdpVpnPeerMd5Password OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MD5 password of VPN LDP neighbor. 
+                 To delete the password, set the password length as zero.
+                 When read, it always returns an Octet string with the length of zero.
+                "
+            ::= { hwLdpVpnPeerEntry 12 }
+            
+        hwLdpVpnPeerSplitHorizon OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to set the flag of split horizon for the specified LDP peer.
+                 Default: disabled
+                "
+            DEFVAL { disabled }
+            ::= { hwLdpVpnPeerEntry 13 }
+            
+        hwLdpVpnPeerReset OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                reset(1),
+                ready(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the reset of the neighbor services.
+                 Options:
+                 1. reset(1) -indicates that the neighbor services will be reset. Only when the object is ready, can this value take effect.
+                 2. ready(2) -indicates that it is ready to reset the neighbor services. This value cannot be set.
+                "
+            ::= { hwLdpVpnPeerEntry 14 }
+            
+        hwLdpVpnPeerKeychainName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the Keychain name. To cancel the Keychain authentication, set the Keychain name length as 0."
+            ::= { hwLdpVpnPeerEntry 17 }
+ 
+        hwLdpVpnPeerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether one entry of hwLdpVpnPeerTable is created or destroyed. 
+                 The value of this object can be CreatAndGo or Destroy. 
+                 When the value of the object is set as CreatAndGo, and the entry is correctly created, 
+                 the status of the object will change into active."
+            ::= { hwLdpVpnPeerEntry 51 }
+             
+-- Ldp Interface Table             
+             
+        hwLdpInterfaceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLdpInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure or delete the LDP capability on the interface.
+                 The index of this table is hwLdpInterfaceIndex.
+                "
+            ::= { hwMplsLdpInfo 54 }
+        
+        hwLdpInterfaceEntry OBJECT-TYPE
+            SYNTAX HwLdpInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry of the LDP interface table, 
+                 used to configure and display the LDP negotiation parameters on the interface enabled with LDP capabilities.
+                 The index of this entry is hwLdpInterfaceIndex.
+                "
+            INDEX { hwLdpInterfaceIndex }
+            ::= { hwLdpInterfaceTable 1 }
+        
+        HwLdpInterfaceEntry ::=
+            SEQUENCE { 
+                hwLdpInterfaceIndex
+                    InterfaceIndex,
+                hwLdpStaticFrrProtectTimer
+                    Integer32,
+                hwLdpKeepAliveTimer
+                    Integer32,
+                hwLdpIgpSyncTimer
+                    Integer32,
+                hwLdpHelloTimer
+                    Integer32,
+                hwLdpTransportAddressIfIndex
+                    InterfaceIndexOrZero,
+                hwLdpKeepAliveSendTimer
+                    Integer32,
+                hwLdpHelloSendTimer
+                    Integer32,
+                hwLdpInterfaceLabelAdvertisementMode
+                    INTEGER,
+                hwLdpInterfaceLocalLsrIdIfIndex
+                    InterfaceIndexOrZero,
+                hwLdpInterfaceRowStatus
+                    RowStatus
+             }
+             
+        hwLdpInterfaceIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface index. 
+                 You can get the correct interface index based on ifIndex of ifTable."
+            ::= { hwLdpInterfaceEntry 1 }
+
+        hwLdpStaticFrrProtectTimer OBJECT-TYPE
+            SYNTAX Integer32 (5..30)
+            MAX-ACCESS read-create
+            STATUS obsolete
+            DESCRIPTION
+                "This object indicates the value of static FRR protect timer.
+                 Default: 10
+                 Unit: seconds
+                "
+            DEFVAL { 10 }
+            ::= { hwLdpInterfaceEntry 11 }
+            
+        hwLdpKeepAliveTimer OBJECT-TYPE
+            SYNTAX Integer32 (30..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of Keepalive timer.
+                 Default: 45
+                 Unit: seconds
+                "
+            ::= { hwLdpInterfaceEntry 12 }
+            
+        hwLdpIgpSyncTimer OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of IGP-Sync timer. By default, the timer is set to 10 seconds.
+                 Default: 10
+                 Unit: seconds
+                "
+            ::= { hwLdpInterfaceEntry 13 }
+
+        hwLdpHelloTimer OBJECT-TYPE
+            SYNTAX Integer32 (3..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of Hello hold timer. By default, the value of the timer is 15 seconds.
+                 Default: 15
+                 Unit: seconds
+                "
+            ::= { hwLdpInterfaceEntry 14 }
+              
+        hwLdpTransportAddressIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to specify the interface that the Transport Address is assigned to. 
+                 Value: 0..2147483647
+                 The default value of the object for the public interface is the interface that the LDP LSR ID is assigned to. 
+                 If the LDP LSR ID is not assigned to any interface, then the value of the object is 0, and 0 cannot be set.
+                 The default value of the object for the private interface is the private interface itself. 
+                 Based on mplsL3VpnIfConfRowStatus of mplsL3VpnIfConfTable, you can find which interface belongs to the VPN.
+                 The interface must be bound with the same VPN instance.
+                 "
+            ::= { hwLdpInterfaceEntry 15 }
+ 
+        hwLdpKeepAliveSendTimer OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of LDP Keepalive send timer.
+                 Default: 0
+                 Unit: seconds
+                "
+            ::= { hwLdpInterfaceEntry 16 }
+
+        hwLdpHelloSendTimer OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the value of LDP Hello send timer.
+                 Default: 0
+                 Unit: seconds
+                "
+            ::= { hwLdpInterfaceEntry 17 }
+            
+        hwLdpInterfaceLabelAdvertisementMode OBJECT-TYPE
+            SYNTAX INTEGER 
+            {
+                dod(1),
+                du(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the label distribution mode.
+                 Options:
+                 1. dod(1) -indicates that the label distribution mode is dod.
+                 2. du(2)  -indicates that the label distribution mode is du.
+                 Default: du 
+                "
+            ::= { hwLdpInterfaceEntry 18 }
+
+        hwLdpInterfaceLocalLsrIdIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the way to specify the interface that the local LDP LSR-ID based on interface is assigned to. 
+                 Value: 0..2147483647  
+                 The default value of the object for the public interface is the interface that the global LDP LSR ID is assigned to. 
+                 If the global LDP LSR ID is not assigned to any interface, then the value of the object is 0.
+                 If set 0, the value of the object will be the default value.
+                 The default value of the object for the private interface is the interface that the global LDP LSR ID of VPN Instance is assigned to. 
+                 Based on mplsL3VpnIfConfRowStatus of mplsL3VpnIfConfTable, you can find which interface belongs to the VPN.
+                 The interface which the object specified must be bound with the same VPN instance with the interface which is configured.
+                 "
+            ::= { hwLdpInterfaceEntry 19 } 
+        
+        hwLdpInterfaceRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether one entry of hwLdpInterfaceTable is created or destroyed. 
+                 The value of this object can be CreatAndGo or Destroy. 
+                 When the value of the object is set as CreatAndGo, and the entry is correctly created, 
+                 the status of the object will change into active."
+            ::= { hwLdpInterfaceEntry 51 }
+            
+        -- Ldp PeerGroup Table            
+        -- 1.3.6.1.4.1.2011.5.25.143.1.58     
+        hwLdpPeerGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLdpPeerGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure an LDP peer group. "
+            ::= { hwMplsLdpInfo 58 }
+        
+        hwLdpPeerGroupEntry OBJECT-TYPE
+            SYNTAX HwLdpPeerGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry of this table."
+            INDEX { hwLdpPeerGroupName }
+            ::= { hwLdpPeerGroupTable 1 }
+        
+        HwLdpPeerGroupEntry ::=
+            SEQUENCE { 
+                hwLdpPeerGroupName
+                    OCTET STRING,
+                hwLdpPeerGroupOutBoundRange
+                    INTEGER,
+                hwLdpPeerGroupOutBoundFecIpPrefix
+                    OCTET STRING,
+                hwLdpPeerGroupOutBoundBgpRange
+                    INTEGER,
+                hwLdpPeerGroupOutBoundBgpIpPrefix
+                    OCTET STRING,
+                hwLdpPeerGroupInBoundRange
+                    INTEGER,
+                hwLdpPeerGroupInBoundIpPrefix
+                    OCTET STRING,
+                hwLdpPeerGroupRowStatus
+                    RowStatus
+             } 
+            
+        hwLdpPeerGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..110))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of a peer group."
+            ::= { hwLdpPeerGroupEntry 1 }
+            
+        hwLdpPeerGroupOutBoundRange OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                clear(1),
+                none(2),
+                ipprefix(3),
+                host(4)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the range of IGP routes for an outbound policy. 
+                 The default value is clear. If the object is set as ipprefix, the value of hwLdpPeerGroupOutBoundFecIpPrefix must be set together."
+            ::= { hwLdpPeerGroupEntry 11 }
+             
+        hwLdpPeerGroupOutBoundFecIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix list name of IGP routes for an outbound policy. 
+                 If the object is set with a value, the value of hwLdpPeerGroupOutBoundRange must be set as ipprefix."
+            ::= { hwLdpPeerGroupEntry 12 }
+            
+        hwLdpPeerGroupOutBoundBgpRange OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                clear(1),
+                none(2),
+                ipprefix(3)            
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the range of BGP routes for an outbound policy. The default value is clear. 
+                 If the object is set as ipprefix, the value of hwLdpPeerGroupOutBoundBgpIpPrefix must be set together."
+            ::= { hwLdpPeerGroupEntry 13 }
+             
+        hwLdpPeerGroupOutBoundBgpIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix list name of BGP routes for an outbound policy. 
+                 If the object is set with a value, the value of hwLdpPeerGroupOutBoundBgpRange must be set as ipprefix."
+            ::= { hwLdpPeerGroupEntry 14 }
+        
+        hwLdpPeerGroupInBoundRange OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                clear(1),
+                none(2),
+                ipprefix(3),
+                host(4)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the route range for an inbound policy. The default value is clear. 
+                 If the object is set as ipprefix, the value of hwLdpPeerGroupInBoundIpPrefix must be set together."
+            ::= { hwLdpPeerGroupEntry 15 }
+             
+        hwLdpPeerGroupInBoundIpPrefix OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix list name of routes for an inbound policy. 
+                 If the object is set with a value, the value of hwLdpPeerGroupInBoundRange must be set as ipprefix."
+            ::= { hwLdpPeerGroupEntry 16 }
+        
+        hwLdpPeerGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether one entry of hwLdpPolicyPeerGroupTable is created or destroyed. The value of this object is CreatAndGo or Destroy. When the value of the object is set to CreatAndGo, and the entry is correctly created, the status of the object will change into active."
+            ::= { hwLdpPeerGroupEntry 51 }
+        -- 1.3.6.1.4.1.2011.5.25.143.1.59
+        hwLdpOutBoundPolicyPeerAllRange  OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                all(1),
+                none(2),
+                ipprefix(3),
+                host(4)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the range of IGP routes for a global outbound LDP policy. The default value is all.
+                 If the object is set as ipprefix, the value of hwLdpOutBoundPolicyPeerAllFecIpPrefix  must be set together."
+            ::= { hwMplsLdpInfo 59 }
+        -- 1.3.6.1.4.1.2011.5.25.143.1.60    
+        hwLdpOutBoundPolicyPeerAllFecIpPrefix  OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix list name of IGP routes for a global outbound LDP policy. The default value is NULL. 
+                 If the object is set with a value, the value of hwLdpOutBoundPolicyPeerAllRange must be set as ipprefix."
+            ::= { hwMplsLdpInfo 60 } 
+        -- 1.3.6.1.4.1.2011.5.25.143.1.61               
+        hwLdpOutBoundPolicyPeerAllBgpRange  OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                all(1),
+                none(2),
+                ipprefix(3)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the range of BGP routes for a global outbound LDP policy. The default value is all.
+                 If the object is set as ipprefix, the value of hwLdpOutBoundPolicyPeerAllBgpIpPrefix must be set together."
+
+            ::= { hwMplsLdpInfo 61 }
+        -- 1.3.6.1.4.1.2011.5.25.143.1.62    
+        hwLdpOutBoundPolicyPeerAllBgpIpPrefix   OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix list name of BGP routes for a global outbound LDP policy. The default value is NULL. 
+                 If the object is set with a value, the value of hwLdpOutBoundPolicyPeerAllBgpRange must be set as ipprefix."
+            ::= { hwMplsLdpInfo 62 }
+        -- 1.3.6.1.4.1.2011.5.25.143.1.63         
+        hwLdpInBoundPolicyPeerAllRange  OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                all(1),
+                none(2),
+                ipprefix(3),
+                host(4)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the range of routes for a global inbound LDP policy. The default value is all.
+                 If the object is set as ipprefix, the value of hwLdpInBoundPolicyPeerAllIpPrefix must be set together."
+            ::= { hwMplsLdpInfo 63 }
+        -- 1.3.6.1.4.1.2011.5.25.143.1.64    
+        hwLdpInBoundPolicyPeerAllIpPrefix   OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP prefix list name of routes for a global inbound LDP policy. The default value is NULL. 
+                 If the object is set with a value, the value of hwLdpInBoundPolicyPeerAllRange must be set as ipprefix."
+            ::= { hwMplsLdpInfo 64 }
+        -- 1.3.6.1.4.1.2011.5.25.143.1.65    
+        hwLdpGracefulDeleteCapability   OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the LDP graceful-delete capability is enabled."
+            ::= { hwMplsLdpInfo 65 }
+        -- 1.3.6.1.4.1.2011.5.25.143.1.66    
+        hwLdpGracefulDeleteTimer   OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the value of a graceful-delete timer. 
+                 When the status of hwLdpGracefulDeleteCapability is enabled, the default value returned by the object is valid.
+                 Default: 5
+                 Unit: seconds
+                "
+             ::= { hwMplsLdpInfo 66 }
+             
+ -- Ldp Lsp down reason
+             
+        hwLdpLspDownReason OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                other(1),
+                sessionDown(2),
+                routeChange(3),
+                canNotRecoveryFromGr(4),
+                policyChange(5)
+            }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The LDP LSP down reason. 
+                 Options:
+                 1. other(1)                     -indicates other reasons.
+                 2. session down(2)   		 -indicates the ldp session went down.
+                 3. route change(3)   		 -indicates the route changed.
+                 4. cannot recovery from GR(4)   -indicates LSP cannot recovery from graceful-restart.
+                 5. policy change(5)             -indicates the policy changed.
+                "
+            ::= { hwMplsLdpInfo 67 }
+
+        hwLdpLspDownMplsLsrId OBJECT-TYPE
+            SYNTAX        MplsLsrIdentifier
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the LSR ID of failed router."
+            ::= { hwMplsLdpInfo 68 }
+            
+        hwLdpLspDownOutIfIndex OBJECT-TYPE
+            SYNTAX      InterfaceIndex
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+                "This object indicates the outgoing interface index of the failed router."
+            ::= { hwMplsLdpInfo 69 } 
+            
+        hwLdpLspDownOutIfMainIp OBJECT-TYPE
+            SYNTAX      IpAddress
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+                "This object indicates the main ip address of the failed router's outgoing interface."
+            ::= { hwMplsLdpInfo 70 }  
+            
+        hwLdpLspDownOutIfState OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                up(1),     
+                down(2)
+            }
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The state of the failed router's outgoing interface. 
+                 Options:
+                 1. up(1)      -indicates that the state of the outgoing interface is Up.
+                 2. down(2)    -indicates that the state of the outgoing interface is Down.
+                "
+            ::= { hwMplsLdpInfo 71 }
+
+        hwLdpLspDownDownstreamPeerLsrId OBJECT-TYPE
+            SYNTAX        MplsLdpIdentifier
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the failed router's downstream peer's LSR ID."
+            ::= { hwMplsLdpInfo 72 }
+ 
+        hwLdpSessionStatistics OBJECT IDENTIFIER ::= { hwMplsLdpInfo 73 }
+
+        hwLdpLocalOperationalSessionNumber OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the number of local LDP operational sessions."
+            ::= { hwLdpSessionStatistics 1 }
+            
+        hwLdpRemoteOperationalSessionNumber OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the number of remote LDP operational sessions."
+            ::= { hwLdpSessionStatistics 2 }
+            
+        hwLdpLocalAndRemoteOperationalSessionNumber OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the number of local and remote LDP operational sessions."
+            ::= { hwLdpSessionStatistics 3 }
+            
+        hwLdpTotalOperationalSessionNumber OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the total number of LDP operational sessions."
+            ::= { hwLdpSessionStatistics 4 } 
+ 
+        hwMplsLdpTrap OBJECT IDENTIFIER ::= { hwMplsLdp 2 }
+        
+        hwMplsLdpSessionDown NOTIFICATION-TYPE
+            OBJECTS { hwMplsLdpSessionDownReason, hwMplsLdpSessionIfIndex }
+            STATUS obsolete
+            DESCRIPTION 
+                "When the trap indicating that a session is down is sent, the cause for the down LDP session is displayed.
+                "
+            ::= { hwMplsLdpTrap 1 }
+        
+        hwMplsLdpLspDown NOTIFICATION-TYPE
+            OBJECTS { hwMplsLdpLspFec, hwMplsLdpLspInLabel, hwMplsLdpLspOutLabel, 
+                      hwMplsLdpLspOutIfIndex, hwMplsLdpLspDownReason }
+            STATUS obsolete
+            DESCRIPTION 
+                "When the trap indicating that a session is down is sent, the cause for the down LSP session is displayed."
+            ::= { hwMplsLdpTrap 2 }
+
+        hwMplsLdpHostIngressLspDownClear NOTIFICATION-TYPE
+            OBJECTS { hwMplsLdpLspFec }
+            STATUS current
+            DESCRIPTION 
+                "A trap is sent to clear the down trap of a specified FEC's ingress lsp."
+            ::= { hwMplsLdpTrap 3 }
+
+        hwMplsLdpHostIngressLspDown NOTIFICATION-TYPE
+            OBJECTS { hwMplsLdpLspFec, hwLdpLspDownReason, hwLdpLspDownMplsLsrId, hwLdpLspDownOutIfIndex, hwLdpLspDownOutIfMainIp, hwLdpLspDownOutIfState, hwLdpLspDownDownstreamPeerLsrId }
+            STATUS current
+            DESCRIPTION 
+                "A trap is sent when all the ingress lsp of a specified FEC went down."
+            ::= { hwMplsLdpTrap 4 }
+
+        hwMplsLdpConformance OBJECT IDENTIFIER ::= { hwMplsLdp 3 }
+        
+        hwMplsLdpCompliances MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The Compliance statement for systems supporting
+                the HUAWEI-MPLSLDP-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwMplsLdpInfoGroup }
+            ::= { hwMplsLdpConformance 1 }
+        
+        hwMplsLdpGroup OBJECT IDENTIFIER ::= { hwMplsLdpConformance 2 }
+        
+        hwMplsLdpInfoGroup OBJECT-GROUP
+            OBJECTS { hwMplsLdpLspDownReason, hwMplsLdpLspFec, hwMplsLdpLspInLabel, hwMplsLdpLspOutLabel, hwMplsLdpSessionAge, 
+                      hwMplsLdpSessionIfIndex, hwMplsLdpSessionAgeStatus, hwMplsLdpSessionPeerLabelResourceStatus, 
+                      hwMplsLdpSessionLocalLabelResourceStatus, hwMplsLdpSessionLabelAdvMode, 
+                      hwMplsLdpSessionKeepAliveMsgSent, hwMplsLdpSessionKeepAliveMsgReceived, hwMplsLdpSessionKeepAliveTimer, 
+                      hwMplsLdpSessionRecoveryTimer, hwMplsLdpSessionReconnectTimer, 
+                      hwMplsLdpSessionMd5Flag, hwMplsLdpSessionFtFlag, hwMplsLdpSessionRole, hwMplsLdpSessionState, hwMplsLdpSessionTcpConnectionState, 
+                      hwMplsLdpSessionLsrId, hwLdpRemotePeerAutoDodRequest, hwLdpCapabilityAnnouncementConfig, hwMplsLdpSessionDownReason, 
+                      hwMplsLdpProcessName, hwMplsLdpLspOutIfIndex, hwLdpOutBoundPolicyPeerAllRange,
+                      hwLdpOutBoundPolicyPeerAllFecIpPrefix, hwLdpOutBoundPolicyPeerAllBgpRange, hwLdpOutBoundPolicyPeerAllBgpIpPrefix, 
+                      hwLdpInBoundPolicyPeerAllRange, hwLdpInBoundPolicyPeerAllIpPrefix, hwLdpGracefulDeleteCapability, hwLdpGracefulDeleteTimer,
+                      hwLdpLspDownReason, hwLdpLspDownMplsLsrId, hwLdpLspDownOutIfIndex, hwLdpLspDownOutIfMainIp, hwLdpLspDownOutIfState, hwLdpLspDownDownstreamPeerLsrId }                         
+            STATUS current
+            DESCRIPTION 
+                "Infomation about LDP LSP."
+            ::= { hwMplsLdpGroup 1 }
+        
+        hwMplsLdpNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsLdpSessionDown }
+            STATUS obsolete
+            DESCRIPTION 
+                "Notification information included in the mib."
+            ::= { hwMplsLdpGroup 2 }
+        
+        hwMplsLdpLspDownNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsLdpLspDown }
+            STATUS obsolete
+            DESCRIPTION 
+                "No use."
+            ::= { hwMplsLdpGroup 3 }
+            
+        hwMplsLdpGlobalGroup OBJECT-GROUP
+            OBJECTS { hwLdpCapabilityConfig, hwLdpLsrId, hwLdpPropagateIpPrefix, hwLdpGlobalRemotePwe3, hwLdpMtuSignaling, 
+                    hwLdpMtuApplyTlv, hwLdpGrCapabilityConfig, hwLdpGrNeighborLivenessTimer, hwLdpGrReconnectTimer, hwLdpGrRecoveryTimer, 
+                    hwMplsLspTrigger, hwMplsLspTriggerIpPrefix, hwMplsLspTriggerBgpRoute, hwMplsLspTriggerBgpRouteIpPrefix, hwLdpReset, 
+                    hwLdpOutBoundSplitHorizonAll, hwLdpDeleteGtsmAll, hwMplsFrrLspTrigger, hwMplsFrrLspTriggerIpPrefix, hwLdpBackOffTimerInit, 
+                    hwLdpBackOffTimerMax, hwLdpLongestMatch }
+            STATUS current
+            DESCRIPTION
+                "Information about Ldp Global configuration."
+            ::= { hwMplsLdpGroup 4 }
+        hwMplsLdpVpnGlobalGroup OBJECT-GROUP
+            OBJECTS { hwLdpVpnLsrId, hwLdpVpnSplitHorizonAll, hwLdpVpnReset, 
+                      hwMplsVpnFrrLspTrigger, hwMplsVpnFrrLspTriggerIpPrefix, 
+                      hwLdpVpnGracefulDeleteCapability, hwLdpVpnGracefulDeleteTimer, hwLdpVpnRowStatus }
+            STATUS current
+            DESCRIPTION
+                "Information about Ldp Vpn configuration."
+            ::= { hwMplsLdpGroup 5 }
+        hwMplsLdpRemoteEntityGroup OBJECT-GROUP
+            OBJECTS { hwLdpRemoteIp, hwLdpRemotePwe3, hwLdpRemoteKeepaliveTimer, hwLdpRemoteHelloTimer, 
+                      hwLdpRemoteKeepaliveSendTimer, hwLdpRemoteHelloSendTimer, hwLdpRemoteIgpSyncTimer, 
+                      hwLdpRemoteIpAutoDoDRequest, hwLdpRemoteIpAutoDoDRequestBlock, hwLdpRemoteLabelAdvertisementMode,hwLdpRemoteLocalLsrIdIfIndex, hwLdpRemoteRowStatus}
+            STATUS current
+            DESCRIPTION
+                "Information about remote entity."
+            ::= { hwMplsLdpGroup 6 }
+        hwMplsLdpPeerGroup OBJECT-GROUP
+            OBJECTS { hwLdpPeerMd5Type, hwLdpPeerMd5Password, hwLdpPeerGtsmHops, hwLdpPeerSplitHorizon, hwLdpPeerReset, 
+                      hwLdpPeerKeychainName, hwLdpPeerOutBoundPolicyRange, hwLdpPeerOutBoundPolicyFecIpPrefix, hwLdpPeerOutBoundPolicyBgpRange,
+                       hwLdpPeerOutBoundPolicyBgpIpPrefix, hwLdpPeerInBoundPolicyRange, hwLdpPeerInBoundPolicyFecIpPrefix, hwLdpPeerRowStatus }
+            STATUS current
+            DESCRIPTION
+                "Information about Ldp Peer."
+            ::= { hwMplsLdpGroup 7 }
+        hwMplsLdpVpnPeerGroup OBJECT-GROUP
+            OBJECTS { hwLdpVpnPeerMd5Type, hwLdpVpnPeerMd5Password, hwLdpVpnPeerSplitHorizon,
+                  hwLdpVpnPeerReset, hwLdpVpnPeerKeychainName, hwLdpVpnPeerRowStatus }
+            STATUS current
+            DESCRIPTION
+                "Information about Ldp Vpn Peer."
+            ::= { hwMplsLdpGroup 8 }
+        hwMplsLdpInterfaceGroup OBJECT-GROUP
+            OBJECTS { hwLdpKeepAliveTimer, hwLdpIgpSyncTimer,
+                  hwLdpHelloTimer, hwLdpTransportAddressIfIndex, hwLdpKeepAliveSendTimer,
+              hwLdpHelloSendTimer, hwLdpInterfaceLabelAdvertisementMode,hwLdpInterfaceLocalLsrIdIfIndex, hwLdpInterfaceRowStatus }
+            STATUS current
+            DESCRIPTION
+                "Information about Ldp interface capability."
+            ::= { hwMplsLdpGroup 9 }
+            
+        hwLdpLspDownReasonGroup OBJECT-GROUP
+            OBJECTS { hwLdpLspDownReason, hwLdpLspDownMplsLsrId, hwLdpLspDownOutIfIndex, hwLdpLspDownOutIfMainIp, hwLdpLspDownOutIfState, hwLdpLspDownDownstreamPeerLsrId }
+            STATUS current
+            DESCRIPTION 
+                "Information about Ldp ingress Lsp down reason."
+            ::= { hwMplsLdpGroup 10 }
+            
+        hwMplsLdpHostIngressLspDownNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsLdpHostIngressLspDownClear, hwMplsLdpHostIngressLspDown }
+            STATUS current
+            DESCRIPTION 
+                "Notification information included in the mib."
+            ::= { hwMplsLdpGroup 11 }
+            
+        hwLdpPolicyPeerGroupGroup OBJECT-GROUP
+            OBJECTS { hwLdpPeerGroupOutBoundRange, hwLdpPeerGroupOutBoundFecIpPrefix,
+                      hwLdpPeerGroupOutBoundBgpRange, hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange,
+                      hwLdpPeerGroupInBoundIpPrefix, hwLdpPeerGroupRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Information about Ldp Policies of peer groups."
+            ::= { hwMplsLdpGroup 15 }
+            
+        hwMplsLdpFrrProtectGroup OBJECT-GROUP
+            OBJECTS { hwLdpStaticFrrProtectTimer }
+            STATUS obsolete
+            DESCRIPTION
+                "Information about Ldp FRR protect timer."
+            ::= { hwMplsLdpGroup 16 } 
+    
+       hwMplsLdpSessionStatisticsGroup OBJECT-GROUP
+            OBJECTS { hwLdpLocalOperationalSessionNumber, hwLdpRemoteOperationalSessionNumber, hwLdpLocalAndRemoteOperationalSessionNumber, hwLdpTotalOperationalSessionNumber }
+            STATUS current
+            DESCRIPTION
+                "Information about Ldp Session Statistics."
+            ::= { hwMplsLdpGroup 17}  
+    END
+
+--
+-- HUAWEI-MPLSLDP-MIB.mib
+--

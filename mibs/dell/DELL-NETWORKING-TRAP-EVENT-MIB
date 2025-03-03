@@ -1,0 +1,444 @@
+-- *****************************************************************
+-- DELL-NETWORKING-TRAP-ALRM-MIB
+--
+--
+-- Copyright (c) 2003-2014 by Dell Inc. All Rights Reserved.
+-- All rights reserved.
+-- *****************************************************************
+--
+
+DELL-NETWORKING-TRAP-EVENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, TimeTicks
+            FROM SNMPv2-SMI
+        DateAndTime, DisplayString, RowPointer
+            FROM SNMPv2-TC
+        dellNetMgmt
+            FROM DELL-NETWORKING-SMI
+        ;
+ 
+dellNetTrapEventMib   MODULE-IDENTITY
+        LAST-UPDATED    "201202210000Z"
+        ORGANIZATION    "Dell Inc"
+        CONTACT-INFO
+            "http://www.dell.com/support"
+
+        DESCRIPTION
+            "Dell Networking OS Trap Alarm MIB.
+            Dell Networking OS Trap Event MIB allows users to track or to view 
+            the trap events logged by the system.  There are two types
+            of trap event tables, hostory trap event table and active
+            trap event table.
+
+            All the traps sent by the system are logged to history trap
+            event table. The trap that need action will logged to active
+            trap event table; 'Card down' trap event will go to the active
+            trap event table, and the trap will be cleared as soon as
+            'Card Up' event is issued. 
+            "
+        REVISION        "201202210000Z" -- Feb 21, 2012
+        DESCRIPTION
+            "Add historyTrapEventPort to dellNetHistoryTrapEventTable and
+             activeTrapEventPort to dellNetActiveTrapEventTable.
+            "
+        REVISION        "200510050000Z"
+        DESCRIPTION
+            "The initial reversion.
+            "
+        ::= { dellNetMgmt 6 }   
+
+
+dellNetTrapEventObjects  OBJECT IDENTIFIER ::= { dellNetTrapEventMib 1 }
+dellNetHistoryTrapEvent  OBJECT IDENTIFIER ::= { dellNetTrapEventObjects 1 } 
+dellNetActiveTrapEvent   OBJECT IDENTIFIER ::= { dellNetTrapEventObjects 2 } 
+dellNetTrapVarbindEvent  OBJECT IDENTIFIER ::= { dellNetTrapEventObjects 3 } 
+
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+
+
+dellNetChassisBootupTime OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The dellNetChassisBootupTime used the timestamp to uniquely
+         identify the system between system reboots.
+          
+         Each time an NMS connects to a chassis, it should verify
+         its dellNetChassisBootupTime. If the time is different, it should
+         refresh its history and active tables. 
+
+         But, if the dellNetChassisBootupTime is the same, then it should
+         query the dellNetLastTrapEventSeqId and update its history and active
+         tables  from its own dellNetLastTrapEventSeqId to the chassis
+         dellNetLastTrapEventSeqId.
+        "
+    ::= { dellNetHistoryTrapEvent 1 }
+
+dellNetLastTrapEventSeqId OBJECT-TYPE
+    SYNTAX        Integer32 (1..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "
+         dellNetLastTrapEventSeqId is a sequential ID indicated the number of 
+         traps sent by the syatem since chassis is loaded.  The same id can
+         also be used as the index to the history and active tables.
+            
+         Anytime, if an NMS dropped its connection with a chassis, it should
+         sync up its history tables from its own dellNetLastTrapEventSeqId to
+         the chassis dellNetLastTrapEventSeqId.
+        "
+    ::= { dellNetHistoryTrapEvent 2 }
+
+dellNetMaxHistoryTableSize OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "
+         dellNetMaxHistoryTableSize is the maximum rows in history table.
+         This also limits the active/varbind tables.
+         Whenever there is a chance of overflow, the oldest entry 
+         will be deleted form the history table.
+         Respective entry from active table also will be deleted 
+         and the corresponding varbind entries will be deleted 
+         from varbind table.
+        "
+    ::= { dellNetHistoryTrapEvent 3 }
+
+dellNetHistoryTrapEventTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DellNetHistoryTrapEventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of history trap event table."
+    ::= { dellNetHistoryTrapEvent 4 }
+
+dellNetHistoryTrapEventEntry OBJECT-TYPE
+    SYNTAX DellNetHistoryTrapEventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of history trap event table.
+	"
+
+    INDEX { historyTrapEventSeqId }
+    ::= { dellNetHistoryTrapEventTable 1 }
+
+
+DellNetHistoryTrapEventEntry ::= SEQUENCE {
+    historyTrapEventSeqId 	Integer32,
+    historyTrapEventSeverity 	Integer32,
+    historyTrapEventType 	Integer32,
+    historyTrapEventMsg 	DisplayString,
+    historyTrapEventOid 	RowPointer,
+    historyTrapEventSlot 	Integer32,
+    historyTrapEventTimeStamp 	TimeTicks,
+    historyTrapEventPort 	Integer32
+
+    }
+
+historyTrapEventSeqId OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+         historyTrapEventSeqId is a sequential ID and the index to
+         history trap table.
+        "
+    ::= { dellNetHistoryTrapEventEntry 1 }
+
+historyTrapEventSeverity OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The trap severity level. 
+        "
+    ::= { dellNetHistoryTrapEventEntry 2 }
+
+historyTrapEventType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The trap category type.  
+        "
+    ::= { dellNetHistoryTrapEventEntry 3 }
+
+historyTrapEventMsg OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The message or the description of the trap.
+        "
+    ::= { dellNetHistoryTrapEventEntry 4 }
+
+historyTrapEventOid OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The OID of this trap.
+        "
+    ::= { dellNetHistoryTrapEventEntry 5 }
+
+historyTrapEventSlot OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         Corresponsding to chAlarmVarSlot in trap definition.
+         For example if card is down, this field will have the
+         card slot number.
+         The value of -1 is used for non-applicable case.
+        "
+    ::= { dellNetHistoryTrapEventEntry 6 }
+
+historyTrapEventTimeStamp OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The timestamp when the trap is sent.
+        "
+    ::= { dellNetHistoryTrapEventEntry 7 }
+
+historyTrapEventPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         Corresponsding to chAlarmVarPort in trap definition.
+         This field may be used for other instance depending on
+         the trap type, for example, tray number in case of fan
+         or power supply trap.
+         The value of -1 is used for non-applicable case.
+        "
+    ::= { dellNetHistoryTrapEventEntry 8 }
+
+-- End of dellNetHistoryTrapEventTable
+
+
+-- Active Trap Event table.
+
+dellNetActiveTrapEventTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DellNetActiveTrapEventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of active trap event table."
+    ::= { dellNetActiveTrapEvent 1 }
+
+dellNetActiveTrapEventEntry OBJECT-TYPE
+    SYNTAX DellNetActiveTrapEventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of active trap event table.
+	"
+
+    INDEX { activeTrapEventSeqId }
+    ::= { dellNetActiveTrapEventTable 1 }
+
+
+DellNetActiveTrapEventEntry ::= SEQUENCE {
+    activeTrapEventSeqId 	Integer32,
+    activeTrapEventSeverity 	Integer32,
+    activeTrapEventType 	Integer32,
+    activeTrapEventMsg 		DisplayString,
+    activeTrapEventOid 		RowPointer,
+    activeTrapEventSlot     	Integer32,
+    activeTrapEventTimeStamp 	TimeTicks,
+    activeTrapEventPort 	Integer32
+
+    }
+
+activeTrapEventSeqId OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+         activeTrapEventSeqId is a sequential ID and the index to
+         active trap table.
+        "
+    ::= { dellNetActiveTrapEventEntry 1 }
+
+activeTrapEventSeverity OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The trap severity level.
+        "
+    ::= { dellNetActiveTrapEventEntry 2 }
+
+activeTrapEventType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The trap category type.
+        "
+    ::= { dellNetActiveTrapEventEntry 3 }
+
+activeTrapEventMsg OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The message or the description of the trap.
+        "
+    ::= { dellNetActiveTrapEventEntry 4 }
+
+activeTrapEventOid OBJECT-TYPE
+    SYNTAX RowPointer
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The OID of this trap.
+        "
+    ::= { dellNetActiveTrapEventEntry 5 }
+
+activeTrapEventSlot OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         Corresponsding to chAlarmVarSlot in trap definition.
+         For example if card is down, this field will have the
+         card slot number.
+         The value of -1 is used for non-applicable case.
+        "
+    ::= { dellNetActiveTrapEventEntry 6 }
+
+activeTrapEventTimeStamp OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The timestamp when the trap is sent.
+        "
+    ::= { dellNetActiveTrapEventEntry 7 }
+
+activeTrapEventPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         Corresponsding to chAlarmVarPort in trap definition.
+         This field may be used for other instance depending on
+         the trap type, for example, tray number in case of fan
+         or power supply trap.
+         The value of -1 is used for non-applicable case.
+        "
+    ::= { dellNetActiveTrapEventEntry 8 }
+
+-- End of dellNetActiveTrapEventTable
+
+-- Trap Event varbind table.
+
+dellNetTrapEventVarbindTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DellNetTrapEventVarbindEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of trap event varbind table."
+    ::= { dellNetTrapVarbindEvent 1 }
+
+dellNetTrapEventVarbindEntry OBJECT-TYPE
+    SYNTAX DellNetTrapEventVarbindEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of trap event varbind table.
+	"
+    INDEX { trapEventVarbindSeqId, trapEventVarbindId }
+    ::= { dellNetTrapEventVarbindTable 1 }
+
+
+DellNetTrapEventVarbindEntry ::= SEQUENCE {
+    trapEventVarbindSeqId 	Integer32,
+    trapEventVarbindId 		Integer32,
+    trapEventVarbindOid		OBJECT IDENTIFIER,
+    trapEventVarbindType 	Integer32,
+    trapEventVarbindValue 	DisplayString
+    }
+
+trapEventVarbindSeqId OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+         trapEventVarbindSeqId is a sequential ID and the index to
+         varbind trap table.
+        "
+    ::= { dellNetTrapEventVarbindEntry 1 }
+
+trapEventVarbindId OBJECT-TYPE
+    SYNTAX Integer32 (1..32)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+         trapEventVarbindId is the ID and the index to
+         history trap table.
+        "
+    ::= { dellNetTrapEventVarbindEntry 2 }
+
+trapEventVarbindOid OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The OID of this trap.
+        "
+    ::= { dellNetTrapEventVarbindEntry 3 }
+
+trapEventVarbindType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         The trap category type.
+        "
+    ::= { dellNetTrapEventVarbindEntry 4 }
+
+trapEventVarbindValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         This is the result or data in this trap.
+        "
+    ::= { dellNetTrapEventVarbindEntry 5 }
+
+END

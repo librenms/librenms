@@ -1,0 +1,44 @@
+mib: SFA-INFO
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: tempTable
+                    value: tempStatus
+                    num_oid: '.1.3.6.1.4.1.6894.2.2.1.4.{{ $index }}'
+                    descr: 'Temperature Sensor {{ $index }}'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: critical, graph: 1, generic: 2 }
+                -
+                    oid: fanTable
+                    value: fanStatus
+                    num_oid: '.1.3.6.1.4.1.6894.2.4.1.4.{{ $index }}'
+                    descr: 'Fan Sensor {{ $index }}'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: healthy, graph: 1, generic: 0 }
+                        - { value: 2, descr: failure, graph: 1, generic: 2 }
+                -
+                    oid: powerTable
+                    value: powerStatus
+                    num_oid: '.1.3.6.1.4.1.6894.2.6.1.4.{{ $index }}'
+                    descr: 'Power Supply Sensor {{ $index }}'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: healthy, graph: 1, generic: 0 }
+                        - { value: 2, descr: failure, graph: 1, generic: 2 }
+                -
+                    oid: physicalDiskTable
+                    value: physDiskState
+                    num_oid: '.1.3.6.1.4.1.6894.2.9.1.7.{{ $index }}'
+                    descr: 'Disk Sensor {{ $index }}'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: failed, graph: 1, generic: 2 }
+                        - { value: 3, descr: predictedfailure, graph: 1, generic: 1 }
+                        - { value: 4, descr: unknown, graph: 1, generic: 3 }

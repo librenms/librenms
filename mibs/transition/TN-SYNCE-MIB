@@ -1,0 +1,511 @@
+-- ***********************************************************************************************
+-- TN-SYNCE-MIB.smi:  Transition Networks Enterprise MIB for TN device SyncE feature
+--
+-- Copyright (c) 2013 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+--
+
+TN-SYNCE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    TruthValue FROM SNMPv2-TC
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    entPhysicalIndex FROM ENTITY-MIB
+    tnProducts FROM TRANSITION-SMI;
+
+tnSynceMIB MODULE-IDENTITY
+    LAST-UPDATED "201305160000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+                "       Transition Networks
+                        Technical Support
+
+                        10900 Red Circle Drive
+                        Minnetonka, MN 55343 USA
+                        Tel: +1-800-526-9267
+
+                    E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib provides functionalities for managing SyncE."
+
+    REVISION      "201305160000Z"
+    DESCRIPTION
+        "Initial Revision of this module"
+        ::= { tnProducts 122 }
+
+tnSynce            OBJECT IDENTIFIER ::= { tnSynceMIB 1 }
+
+tnSyncETable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnSyncEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Table to manage SyncE for each device."
+    ::= { tnSynce 1 }
+
+tnSyncEEntry OBJECT-TYPE
+    SYNTAX TnSyncEEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing SyncE for each device."
+    INDEX   { entPhysicalIndex }
+    ::= { tnSyncETable 1 }
+
+TnSyncEEntry ::=
+    SEQUENCE {
+        tnSyncEStateMode        INTEGER,
+        tnSyncEStateWTRTime     INTEGER,
+        tnSyncEStateSSMHoldOver INTEGER,
+        tnSyncEStateSSMFreeRun  INTEGER,
+        tnSyncEAlarmStateLOL    TruthValue,
+        tnSyncEAlarmStateDHOLD  TruthValue,
+        tnSyncESelState         INTEGER,
+        tnSyncEClkSrc           INTEGER
+    }
+
+tnSyncEStateMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    manual(1),
+                    selected(2),
+                    nonrevertive(3),
+                    revertive(4),
+                    holdover(5),
+                    freerun(6)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Clock source selection mode
+     manual:       Selector is manually set to the chosen clock source
+     selected:     Selector is manually set to the pt. selected clock source (not possible in unlocked mode)
+     nonrevertive: Selector is automatically selecting the best clock source - non revertively
+     revertive:    Selector is automatically selecting the best clock source - revertively
+     holdover:     Selector is forced in holdover
+     freerun:      Selector is forced in free run"
+    ::= { tnSyncEEntry 1 }
+
+tnSyncEStateWTRTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "WTR (Wait-to-Restore) time in minutes(0-12 min) '0' is disable"
+    ::= { tnSyncEEntry 2 }
+
+tnSyncEStateSSMHoldOver  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(0),
+                    prc(1),
+                    ssua(2),
+                    ssub(3),
+                    eec2(4),
+                    eec1(5),
+                    dnu(6),
+                    inv(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Synchronization Status Messaging Hold Over.
+    Hold Over is switching over to Local Reference Clock if primary and secondary nodes fail
+    prc = Primary Reference Clock
+    eec2 Ethernet Equipment Clock 1.544 kpbs
+    eec1 Ethernet Equipment Clock 2.048 kpbs"
+    ::= { tnSyncEEntry 3 }
+
+tnSyncEStateSSMFreeRun OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                     none(0),
+                     prc(1),
+                     ssua(2),
+                     ssub(3),
+                     eec2(4),
+                     eec1(5),
+                     dnu(6),
+                     inv(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Synchronization Status Messaging Free Run"
+    ::= { tnSyncEEntry 4 }
+
+tnSyncEAlarmStateLOL OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Alarm State Loss of Lock (LOL)"
+    ::= { tnSyncEEntry 5 }
+
+tnSyncEAlarmStateDHOLD OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alarm State Digital Hold (DHOLD)"
+    ::= { tnSyncEEntry 6 }
+
+tnSyncESelState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    lockedto(1),
+                    holdover(2),
+                    freerun(3),
+                    prelock2(4),
+                    prelock(5),
+                    lossoflock(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Clock Selection State
+                 Note: prelock2, prelock and lossoflock
+                 are not available on all products"
+    ::= { tnSyncEEntry 7 }
+
+tnSyncEClkSrc OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Clock Source"
+    ::= { tnSyncEEntry 8 }
+
+--
+-- SyncEClkSource
+--
+tnSyncEClkSourceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnSyncEClkSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of SyncE ClkSource"
+    ::= { tnSynce 2 }
+
+tnSyncEClkSourceEntry  OBJECT-TYPE
+    SYNTAX      TnSyncEClkSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table,tnSyncEClkSourceTable"
+    INDEX       { entPhysicalIndex, tnSyncEClkSourceIndex }
+    ::= { tnSyncEClkSourceTable 1 }
+
+TnSyncEClkSourceEntry ::= SEQUENCE
+{
+    tnSyncEClkSourceIndex    INTEGER,
+    tnSyncEConfPort          INTEGER,
+    tnSyncEConfSSMOverwrite  INTEGER,
+    tnSyncEConfHoldOff       INTEGER,
+    tnSyncEConfANEG          INTEGER,
+    tnSyncEPriority          INTEGER,
+    tnSyncEClear             TruthValue,
+    tnSyncEAlarmStateLOCS    TruthValue,
+    tnSyncEAlarmStateSSM     TruthValue,
+    tnSyncEAlarmStateWTR     TruthValue,
+    tnSyncENominated         TruthValue
+}
+
+tnSyncEClkSourceIndex  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Index of SyncE ClkSource table. 1-SYNCE_NOMINATED_MAX"
+    ::= { tnSyncEClkSourceEntry 1 }
+
+tnSyncEConfPort  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SyncE Configuration Port. 0-MAX_PORT.
+                 a port value of 0 means not nominated"
+    ::= { tnSyncEClkSourceEntry 2 }
+
+tnSyncEConfSSMOverwrite OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(0),
+                    prc(1),
+                    ssua(2),
+                    ssub(3),
+                    eec2(4),
+                    eec1(5),
+                    dnu(6)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Clock source SSM overwrite"
+    ::= { tnSyncEClkSourceEntry 3 }
+
+tnSyncEConfHoldOff  OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "The hold off timer value in 100 ms.
+           Valid values are: 0 for disable. The range 3-18. The value 100 for test"
+    ::= { tnSyncEClkSourceEntry 4 }
+
+tnSyncEConfANEG OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                     none(0),
+                     slave(1),
+                     master(2),
+                     forced(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Auto Negotiate : 1000BaseT ANEG mode
+        slave:  Activate prefer slave negotiation
+        master: Activate prefer master negotiation
+        forced: Activate forced slave negotiation."
+    ::= { tnSyncEClkSourceEntry 5 }
+
+tnSyncEPriority OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Clock source priority setting. (SYNCE_PRIORITY_MAX = CLOCK_INPUT_MAX = 2 i.e. 0,1)"
+    ::= { tnSyncEClkSourceEntry 6 }
+
+tnSyncEClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SyncE Clear."
+    ::= { tnSyncEClkSourceEntry 7 }
+
+tnSyncEAlarmStateLOCS OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SyncE Alarm State LOCS."
+    ::= { tnSyncEClkSourceEntry 8 }
+
+tnSyncEAlarmStateSSM OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION " SyncE Alarm State SSM."
+    ::= { tnSyncEClkSourceEntry 9 }
+
+tnSyncEAlarmStateWTR OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SyncE Alarm State WRT."
+    ::= { tnSyncEClkSourceEntry 10 }
+
+tnSyncENominated OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SyncE Nominated."
+    ::= { tnSyncEClkSourceEntry 11 }
+
+--
+-- SyncE port table
+--
+tnSyncEPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnSyncEPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of SyncEPort."
+    ::= { tnSynce 3 }
+
+
+tnSyncEPortEntry OBJECT-TYPE
+    SYNTAX TnSyncEPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing tnSynce."
+    INDEX   { entPhysicalIndex, tnSyncEStatePortIndex }
+    ::= { tnSyncEPortTable 1 }
+
+TnSyncEPortEntry ::=
+    SEQUENCE {
+                tnSyncEStatePortIndex INTEGER,
+                tnSyncEStateTxSSM INTEGER,
+                tnSyncEStateRxSSM INTEGER,
+                tnSyncEStateSSMMode INTEGER,
+                tnSyncESSMEnabled  INTEGER
+             }
+
+tnSyncEStatePortIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SyncE Port index, 0-SYNCE_PORT_COUNT."
+    ::= { tnSyncEPortEntry 1 }
+
+tnSyncEStateTxSSM OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(0),
+                    prc(1),
+                    ssua(2),
+                    ssub(3),
+                    dnu(4),
+                    eec2(5),
+                    eec1(6),
+                    inv(7),
+                    fail(8),
+                    link(9)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SyncE Transmit SSM State."
+    ::= { tnSyncEPortEntry 2 }
+
+tnSyncEStateRxSSM OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(0),
+                    prc(1),
+                    ssua(2),
+                    ssub(3),
+                    dnu(4),
+                    eec2(5),
+                    eec1(6),
+                    inv(7),
+                    fail(8),
+                    link(9)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SyncE Receive SSM State."
+    ::= { tnSyncEPortEntry 3 }
+
+tnSyncEStateSSMMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    master(1),
+                    slave(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SyncE SSM Mode."
+    ::= { tnSyncEPortEntry 4 }
+
+tnSyncESSMEnabled OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SyncE SSM Enabled."
+    ::= { tnSyncEPortEntry 5 }
+
+--
+-- SyncE External I/O
+--
+tnSyncEExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnSyncEExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of SyncE External I/O"
+    ::= { tnSynce 4 }
+
+tnSyncEExtEntry  OBJECT-TYPE
+    SYNTAX      TnSyncEExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table,tnSyncEExtTable"
+    INDEX       { entPhysicalIndex }
+    ::= { tnSyncEExtTable 1 }
+
+TnSyncEExtEntry ::= SEQUENCE
+{
+    tnSyncEExtInState        INTEGER,
+    tnSyncEExtOutState       INTEGER,
+    tnSyncEExtInFreq         INTEGER,
+    tnSyncEExtOutFreq        INTEGER,
+    tnSyncEExtImpedance      INTEGER,
+    tnSyncEActualInFreq      INTEGER,
+    tnSyncEActualOutFreq     INTEGER
+}
+
+tnSyncEExtInState  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "External I/O in direction state."
+    ::= { tnSyncEExtEntry 1 }
+
+tnSyncEExtOutState  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "External I/O out direction state."
+    ::= { tnSyncEExtEntry 2 }
+
+tnSyncEExtInFreq  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    f8kHz(1),
+                    f64kHz(2),
+                    f1544kHz(3),
+                    f2048kHz(4),
+                    f10000kHz(5),
+                    f19440kHz(6),
+                    f25Mhz(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "External I/O in direction frequency
+                 8k-25Mhz table of values."
+    ::= { tnSyncEExtEntry 3 }
+
+tnSyncEExtOutFreq  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    f8kHz(1),
+                    f64kHz(2),
+                    f1544kHz(3),
+                    f2048kHz(4),
+                    f10000kHz(5),
+                    f19440kHz(6),
+                    f25Mhz(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "External I/O out direction frequency
+                 8k-25Mhz table of values"
+    ::= { tnSyncEExtEntry 4 }
+
+tnSyncEExtImpedance  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    imp50(1),
+                    imp75(2),
+                    hi-Z(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "External I/O Impedance."
+    ::= { tnSyncEExtEntry 5 }
+
+tnSyncEActualInFreq  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The actual input frequency in Hz."
+    ::= { tnSyncEExtEntry 6 }
+
+tnSyncEActualOutFreq  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The actual output frequency in Hz. If output state is disabled set to 0"
+    ::= { tnSyncEExtEntry 7 }
+END

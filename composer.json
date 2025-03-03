@@ -1,52 +1,186 @@
 {
     "name": "librenms/librenms",
-    "description": "A fully featured network monitoring system that provides a wealth of features and device support.",
     "type": "project",
-    "keywords": ["network", "monitoring", "snmp", "laravel"],
-    "homepage": "http://www.librenms.org/",
-    "license": "GPL-3.0",
-    "support": {
-        "source": "https://github.com/librenms/librenms/",
-        "docs": "http://docs.librenms.org/",
-        "forum": "https://community.librenms.org/",
-        "issues": "https://github.com/librenms/librenms/issues/",
-        "irc": "irc://irc.freenode.org/#librenms"
-    },
-    "config": {
-        "platform": {"php": "5.3.9"}
-    },
-    "require": {
-        "php": ">=5.3.9",
-        "ezyang/htmlpurifier": "^4.8",
-        "phpmailer/phpmailer": "^5.2.21",
-        "slim/slim": "^2.6",
+    "description": "A fully featured network monitoring system that provides a wealth of features and device support.",
+    "keywords":
+    [
+        "network",
+        "monitoring",
+        "discovery",
+        "alerting",
+        "billing",
+        "snmp",
+        "distributed"
+    ],
+    "homepage": "https://www.librenms.org/",
+    "license": "GPL-3.0-or-later",
+    "require":
+    {
+        "php": "^8.1",
+        "ext-curl": "*",
+        "ext-gd": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-pcre": "*",
+        "ext-pdo": "*",
+        "ext-session": "*",
+        "ext-simplexml": "*",
+        "ext-xml": "*",
+        "ext-zlib": "*",
+        "amenadiel/jpgraph": "^4",
+        "clue/socket-raw": "^1.4",
+        "dapphp/radius": "^3.0",
+        "doctrine/dbal": "^3.5",
         "easybook/geshi": "^1.0.8",
-        "amenadiel/jpgraph": "^3.6",
-        "tecnickcom/tcpdf": "~6.2.0",
-        "xjtuwangke/passwordhash": "dev-master",
+        "enshrined/svg-sanitize": "^0.20.0",
+        "ezyang/htmlpurifier": "^4.8",
+        "fico7489/laravel-pivot": "^3.0",
+        "influxdata/influxdb-client-php": "^3.4",
+        "influxdb/influxdb-php": "^1.15",
+        "justinrainbow/json-schema": "^5.2",
+        "laravel-notification-channels/webpush": "^7.1",
+        "laravel/framework": "^10.8",
+        "laravel/tinker": "^2.8",
+        "laravel/ui": "^4.2",
+        "librenms/laravel-vue-i18n-generator": "dev-master",
+        "librenms/plugin-interfaces": "^1.0",
+        "mews/purifier": "^3.4",
+        "nunomaduro/laravel-console-summary": "^1.9",
+        "paragonie/sodium_compat": "<2.0",
         "pear/console_color2": "^0.1",
         "pear/console_table": "^1.3",
-        "dapphp/radius": "^2.0",
-        "php-amqplib/php-amqplib": "^2.0",
-        "symfony/yaml": "^2.8",
-        "rmccue/requests": "^1.7"
+        "pear/net_dns2": "^1.5",
+        "php-amqplib/php-amqplib": "^3.1",
+        "phpmailer/phpmailer": "~6.0",
+        "predis/predis": "^2.0",
+        "silber/bouncer": "^1.0",
+        "socialiteproviders/manager": "^4.3",
+        "spatie/laravel-ignition": "^2.0",
+        "symfony/yaml": "^6.2",
+        "tecnickcom/tcpdf": "^6.4",
+        "tightenco/ziggy": "^1.6.0"
     },
-    "require-dev": {
-        "squizlabs/php_codesniffer": "2.6.*",
-        "phpunit/phpunit": "4.*",
-        "jakub-onderka/php-parallel-lint": "*",
-        "jakub-onderka/php-console-highlighter": "*",
-        "fojuth/readmegen": "1.*"
+    "require-dev":
+    {
+        "barryvdh/laravel-debugbar": "^3.8",
+        "barryvdh/laravel-ide-helper": "^2.13",
+        "composer/composer": "^2.4",
+        "fakerphp/faker": "^1.9.1",
+        "friendsofphp/php-cs-fixer": "^v3.4",
+        "larastan/larastan": "^2.9",
+        "laravel/dusk": "^8.2.2",
+        "mockery/mockery": "^1.4.4",
+        "nunomaduro/collision": "^7.0",
+        "php-parallel-lint/php-parallel-lint": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-mockery": "^1.0",
+        "phpunit/phpunit": "^9.5.10"
     },
-    "autoload": {
-        "psr-4": {
-            "LibreNMS\\": "LibreNMS",
-            "LibreNMS\\Tests\\": "tests"
+    "suggest":
+    {
+        "ext-gmp": "Used for browser push notifications",
+        "ext-ldap": "*",
+        "ext-memcached": "Required if you utilize wrapper based distributed polling",
+        "ext-mysqlnd": "*",
+        "ext-posix": "Allows for additional validation tests"
+    },
+    "config":
+    {
+        "discard-changes": true,
+        "optimize-autoloader": true,
+        "platform-check": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": false
         }
     },
-    "scripts": {
+    "extra":
+    {
+        "laravel":
+        {
+            "dont-discover":
+            [
+                "nunomaduro/laravel-console-summary",
+                "facade/ignition",
+                "socialiteproviders/manager"
+            ]
+        }
+    },
+    "autoload":
+    {
+        "psr-4":
+        {
+            "App\\": "app",
+            "LibreNMS\\": "LibreNMS",
+            "LibreNMS\\Plugins\\": "html/plugins",
+            "LibreNMS\\Tests\\": "tests",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        },
+        "classmap":
+        [
+            "vendor/dapphp/radius"
+        ],
+        "files":
+        [
+            "includes/helpers.php"
+        ],
+        "exclude-from-classmap":
+        [
+            "/vendor/laravel/laravel/database/",
+            "/vendor/laravel/laravel/app/",
+            "/html/plugins"
+        ]
+    },
+    "scripts":
+    {
+        "pre-install-cmd": "LibreNMS\\ComposerHelper::preInstall",
+        "post-install-cmd":
+        [
+            "LibreNMS\\ComposerHelper::postInstall",
+            "Illuminate\\Foundation\\ComposerScripts::postInstall",
+            "@php artisan vue-i18n:generate --multi-locales --format=umd",
+            "@php artisan view:cache",
+            "@php artisan optimize",
+            "@php artisan config:clear",
+            "@python-requirements"
+        ],
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
-        "post-autoload-dump": "LibreNMS\\ComposerHelper::postAutoloadDump",
-        "commit": "LibreNMS\\ComposerHelper::commit"
-    }
+        "post-update-cmd":
+        [
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate"
+        ],
+        "post-autoload-dump":
+        [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-root-package-install": "LibreNMS\\ComposerHelper::postRootPackageInstall",
+        "post-create-project-cmd":
+        [
+            "@php artisan key:generate --ansi"
+        ],
+        "python-requirements":
+        [
+            "scripts/dynamic_check_requirements.py || pip3 install --user -r requirements.txt || :"
+        ]
+    },
+    "support":
+    {
+        "issues": "https://github.com/librenms/librenms/issues/",
+        "forum": "https://community.librenms.org/",
+        "chat": "https://discord.gg/librenms",
+        "source": "https://github.com/librenms/librenms/",
+        "docs": "https://docs.librenms.org/"
+    },
+    "funding":
+    [
+        {
+            "type": "opencollective",
+            "url": "https://opencollective.com/librenms"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }

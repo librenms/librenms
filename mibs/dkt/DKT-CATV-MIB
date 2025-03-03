@@ -1,0 +1,60 @@
+DKT-CATV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    Counter32                   FROM SNMPv2-SMI
+    OBJECT-GROUP				FROM SNMPv2-CONF
+    dkt                         FROM DKT-MIB;
+
+catvMIB MODULE-IDENTITY
+    LAST-UPDATED  "200812170000Z"
+    ORGANIZATION "DKT A/S"
+    CONTACT-INFO
+        "postal:  DKT A/S
+                  Fanoevej 6
+                  DK-4060 Kirke Saaby
+                  Denmark
+
+         email:   info@dktcomega.com"
+    DESCRIPTION   "DKT CATV MIB."
+    ::= { dkt 11 }
+
+catvVersion OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Version string for the CATV module"
+    ::= { catvMIB 1 }
+
+catvSwitch OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Switch CATV module on or off. 1 = on 0 = off"
+    ::= { catvMIB 2 }
+
+catvSignalDetect OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CATV Rx signal detect. 1 = signal, 0 = no signal"
+    ::= { catvMIB 3 }
+
+
+catvModuleGroup OBJECT-GROUP
+    OBJECTS {
+		catvVersion,
+		catvSwitch,
+		catvSignalDetect
+    }
+    STATUS current
+    DESCRIPTION
+        "The objects are related to the DKT CATV module."
+    ::= { catvMIB 4 }
+
+END
+
+

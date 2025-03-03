@@ -1,0 +1,215 @@
+-- =================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Ths mib is extracted from draft-ietf-isis-wg-mib-13.txt.
+--              Because the draft MIB is not proposed as a standard, so the
+--              content of this drafted MIB are moved under Huawei 3Com private
+--              branch and 'hh3c' is added to all MIB objects as prefixes
+-- Reference:
+-- Version: V1.2
+-- History:
+-- V1.0 2020-08-05 The initial version, created by Chen ZiChao
+-- V1.1 2021-04-06 updated by zhangyao
+--      Add the hh3cIsisAdjacencyProtocolChange NOTIFICATION of hh3cIsisNotifications.
+-- V1.2 2021-05-06 updated by zhangyao
+--      Add the hh3cIsisCircTable.
+-- =================================================================
+HH3C-ISIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    isisNotificationSysLevelIndex, isisNotificationCircIfIndex, isisPduLspId
+        FROM ISIS-MIB
+    IndexInteger
+        FROM DIFFSERV-MIB            -- RFC3289
+    InterfaceIndex, ifName
+        FROM IF-MIB;                 -- RFC2863
+
+hh3cIsis MODULE-IDENTITY
+    LAST-UPDATED "202105061038Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+  DESCRIPTION
+      "Add the hh3cIsisCircTable."
+  REVISION "202105061038Z"
+  DESCRIPTION
+      "Add the hh3cIsisAdjacencyProtocolChange NOTIFICATION of hh3cIsisNotifications."
+  REVISION "202104061038Z"
+  DESCRIPTION
+      "This document describes a management information base for
+       the IS-IS Routing protocol, as described in ISO 10589,
+       when it is used to construct routing tables for IP networks,
+       as described in RFC 1195.
+
+       This document defines an experimental portion of the
+       Management Information Base (MIB) for use with network
+       management protocols in the Internet community.
+
+       This document is based on a 1994 IETF draft by Chris Gunner.
+       This version has been modified to include MIB-II syntax, to
+       exclude portions of the protocol that are not relevant to IP,
+       and to add management support for current practice."
+    REVISION "202008051100Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 59 }
+
+-- Top-level structure of the MIB
+
+hh3cIsisNotifications       OBJECT IDENTIFIER ::= { hh3cIsis 0 }
+hh3cIsisObjects             OBJECT IDENTIFIER ::= { hh3cIsis 1 }
+
+-- hh3cIsisObjects definitions
+
+hh3cIsisSystem              OBJECT IDENTIFIER ::= { hh3cIsisObjects 1 }
+hh3cIsisNotification        OBJECT IDENTIFIER ::= { hh3cIsisObjects 2 }
+hh3cIsisCirc                OBJECT IDENTIFIER ::= { hh3cIsisObjects 3 }
+
+-- The System Table
+
+hh3cIsisSysTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cIsisSysEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The set of instance of the Integrated IS-IS
+         protocol existing on the system."
+    ::= { hh3cIsisSystem 1 }
+
+hh3cIsisSysEntry OBJECT-TYPE
+    SYNTAX Hh3cIsisSysEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each row defines information specific to a single
+         instance of the IS-IS protocol existing on the system."
+    REFERENCE "ISIS.poi cLNSISISBasic-P (1)"
+    INDEX { hh3cIsisSysInstance }
+    ::= { hh3cIsisSysTable 1 }
+
+-- Type definitions
+
+Hh3cIsisSysEntry ::=
+    SEQUENCE {
+        hh3cIsisSysInstance
+            Integer32
+    }
+
+hh3cIsisSysInstance OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS
+         instance to which this row corresponds.
+         This object follows the index behavior."
+    ::= { hh3cIsisSysEntry 1 }
+
+-- The Circuit Table
+
+hh3cIsisCircTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cIsisCircEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of circuits used by this
+         Intermediate System."
+    ::= { hh3cIsisCirc 1 }
+
+hh3cIsisCircEntry OBJECT-TYPE
+    SYNTAX Hh3cIsisCircEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An hh3cIsisCircEntry exists for each circuit configured
+         for Integrated IS-IS on this system."
+    INDEX { hh3cIsisSysInstance, hh3cIsisCircIndex }
+    ::= { hh3cIsisCircTable 1 }
+
+Hh3cIsisCircEntry ::=
+    SEQUENCE {
+        hh3cIsisCircIndex
+            IndexInteger,
+        hh3cIsisCircIfIndex
+            InterfaceIndex
+    }
+
+hh3cIsisCircIndex OBJECT-TYPE
+        SYNTAX IndexInteger
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An index used to uniquely identify this circuit."
+    ::= { hh3cIsisCircEntry 1 }
+
+hh3cIsisCircIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of ifIndex for the interface to which this
+             circuit corresponds."
+    ::= { hh3cIsisCircEntry 2 }
+
+
+-- The IS-IS Notification Table
+
+-- The IS-IS Notification Table records fields that are
+-- required for notifications
+
+hh3cIsisNotificationObjects  OBJECT IDENTIFIER ::= { hh3cIsisNotification 1 }
+
+hh3cIsisAdjProtoType OBJECT-TYPE
+    SYNTAX INTEGER {
+       ipv4 (1),
+       ipv6 (2)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The adjacency protocol type for this notification."
+    ::= { hh3cIsisNotificationObjects 1 }
+
+hh3cIsisAdjProtoState OBJECT-TYPE
+    SYNTAX INTEGER {
+         down (1),
+         initializing (2),
+         up (3)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The state of the adjacency protocol."
+    ::= { hh3cIsisNotificationObjects 2 }
+
+-- Notification Configuration
+
+hh3cIsisAdjacencyProtocolChange NOTIFICATION-TYPE
+    OBJECTS {
+        isisNotificationSysLevelIndex,
+        isisNotificationCircIfIndex,
+        isisPduLspId,
+        hh3cIsisAdjProtoType,
+        hh3cIsisAdjProtoState,
+        ifName
+    }
+    STATUS current
+    DESCRIPTION
+        "A notification sent when the IPv4 or IPv6 protocol
+         of an adjacency changes.
+         The first 6 bytes of the isisPduLspId are the
+         SystemID of the adjacent IS.
+         The hh3cIsisAdjProtoType is the type of adjacency protocol.
+         The hh3cIsisAdjProtoState is the state of adjacency protocol."
+    ::= { hh3cIsisNotifications 1 }
+
+END

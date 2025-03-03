@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,22 +26,61 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 
 class XirrusAos extends OS implements
+    OSPolling,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessFrequencyPolling,
     WirelessNoiseFloorDiscovery,
     WirelessUtilizationDiscovery,
+    WirelessRateDiscovery,
+    WirelessRssiDiscovery,
     WirelessSnrDiscovery
 {
+    public function pollOS(DataStorageInterface $datastore): void
+    {
+        $associations = [];
+
+        // if this config flag is true, don't poll for stations
+        // this in case of large APs which may have many stations
+        // to prevent causing long polling times
+        if (\LibreNMS\Config::get('xirrus_disable_stations') != true) {
+            // station associations
+            // custom RRDs and graph as each AP may have 16 radios
+            $assoc = snmpwalk_cache_oid($this->getDeviceArray(), 'XIRRUS-MIB::stationAssociationIAP', [], 'XIRRUS-MIB');
+            foreach ($assoc as $s) {
+                $radio = array_pop($s);
+                $associations[$radio] = (int) $associations[$radio] + 1;
+            }
+            unset($radio);
+            unset($assoc);
+            // write to rrds
+            foreach ($associations as $radio => $count) {
+                $measurement = 'xirrus_users';
+                $rrd_name = [$measurement, $radio];
+                $rrd_def = RrdDefinition::make()->addDataset('stations', 'GAUGE', 0, 3200);
+                $fields = [
+                    'stations' => $count,
+                ];
+                $tags = compact('radio', 'rrd_name', 'rrd_def');
+                $datastore->put($this->getDeviceArray(), $measurement, $tags, $fields);
+            }
+            $this->enableGraph('xirrus_stations');
+        }
+    }
 
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -51,9 +90,10 @@ class XirrusAos extends OS implements
     public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.21013.1.2.12.1.2.22.0'; // XIRRUS-MIB::globalNumStations.0
-        return array(
+
+        return [
             new WirelessSensor('clients', $this->getDeviceId(), $oid, 'xirrus', 0, 'Clients'),
-        );
+        ];
     }
 
     /**
@@ -71,7 +111,7 @@ class XirrusAos extends OS implements
      * Poll wireless frequency as MHz
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
+     * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
     public function pollWirelessFrequency(array $sensors)
@@ -87,6 +127,28 @@ class XirrusAos extends OS implements
     public function discoverWirelessNoiseFloor()
     {
         return $this->discoverSensor('noise-floor', 'realtimeMonitorNoiseFloor', '.1.3.6.1.4.1.21013.1.2.24.7.1.10.');
+    }
+
+    /**
+     * Discover wireless rate. This is in bps. Type is rate.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array
+     */
+    public function discoverWirelessRate()
+    {
+        return $this->discoverSensor('rate', 'realtimeMonitorAverageDataRate', '.1.3.6.1.4.1.21013.1.2.24.7.1.7.');
+    }
+
+    /**
+     * Discover wireless RSSI (Received Signal Strength Indicator). This is in dBm. Type is rssi.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array
+     */
+    public function discoverWirelessRssi()
+    {
+        return $this->discoverSensor('rssi', 'realtimeMonitorAverageRSSI', '.1.3.6.1.4.1.21013.1.2.24.7.1.8.');
     }
 
     /**
@@ -115,9 +177,9 @@ class XirrusAos extends OS implements
     private function discoverSensor($type, $oid, $oid_num_prefix)
     {
         $names = $this->getCacheByIndex('realtimeMonitorIfaceName', 'XIRRUS-MIB');
-        $nf = snmp_cache_oid($oid, $this->getDevice(), array(), 'XIRRUS-MIB');
+        $nf = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], 'XIRRUS-MIB');
 
-        $sensors = array();
+        $sensors = [];
         foreach ($nf as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 $type,
@@ -126,7 +188,7 @@ class XirrusAos extends OS implements
                 'xirrus',
                 $index,
                 $names[$index],
-                $type == 'frequency' ? WirelessSensor::channelToFrequency($entry[$oid]) :$entry[$oid]
+                $type == 'frequency' ? WirelessSensor::channelToFrequency($entry[$oid]) : $entry[$oid]
             );
         }
 
