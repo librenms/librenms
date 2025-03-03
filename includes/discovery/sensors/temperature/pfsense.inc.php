@@ -10,4 +10,3 @@ if ($device['os'] === 'pfsense') {
         discover_sensor($valid['sensor'], 'temperature', $device, $temp_oid, 0, 'pfsense', 'CPU Temperature', 1, 1, null, null, null, null, $temp);
     }
 }
-
