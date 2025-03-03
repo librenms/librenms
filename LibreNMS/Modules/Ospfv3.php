@@ -154,8 +154,8 @@ class Ospfv3 implements Module
                     $ospf_port['ospfv3_instance_id'] = $ospf_instance_id;
                     $ospf_port['ospfv3IfDesignatedRouter'] = long2ip($ospf_port['ospfv3IfDesignatedRouter']);
                     $ospf_port['ospfv3IfBackupDesignatedRouter'] = long2ip($ospf_port['ospfv3IfBackupDesignatedRouter']);
-                    $ospf_port['ospfv3AreaScopeLsaCksumSum'] ??= '';
-                    $ospf_port['ospfv3IfIndex'] ??= '';
+                    $ospf_port['ospfv3AreaScopeLsaCksumSum'] ??= 0;
+                    $ospf_port['ospfv3IfIndex'] ??= 0;
 
                     return Ospfv3Port::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
