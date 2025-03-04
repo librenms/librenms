@@ -14,7 +14,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
- * iLert Transport
+ * ilert Transport
  *
  * @author t.plueer <t.plueer@first-colo.net>, l.prosch <l.prosch@first-colo.net>
  * @copyright 2024 firstcolo
@@ -83,7 +83,7 @@ class Ilert extends Transport
                 [
                     'title' => 'Integration Key',
                     'name' => 'integration-key',
-                    'descr' => 'iLert Integration Key',
+                    'descr' => 'ilert Integration Key',
                     'type' => 'text',
                 ],
             ],
