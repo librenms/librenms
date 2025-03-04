@@ -90,6 +90,10 @@ if ($port->macs()->exists()) {
     $menu_options['arp'] = 'ARP Table';
 }
 
+if ($port->nd()->exists()) {
+    $menu_options['nd'] = 'IPv6 ND';
+}
+
 if ($port->fdbEntries()->exists()) {
     $menu_options['fdb'] = 'FDB Table';
 }
