@@ -1665,6 +1665,7 @@ function list_oxidized(Illuminate\Http\Request $request)
     foreach ($devices as $device) {
         $output = [
             'hostname' => $device->hostname,
+            'sysname' => $device->sysName,
             'os' => $device->os,
             'ip' => $device->ip,
         ];
