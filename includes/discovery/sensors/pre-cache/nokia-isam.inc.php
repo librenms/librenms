@@ -9,8 +9,11 @@ echo 'ISAM Slot/Port Mapping for '.$eqptHolderActualType.'';
 $eqptHolderTable = [
     'NFXS-B' => 'Shelf: ISAM 7330',
     'NFXR-A' => 'Shelf: ISAM 7356',
-    'NFXS-F' => 'Shelf: ISAM 7360',
-    'CFXR-A' => 'Shelf: ISAM 7362',
+    'NFXS-D' => 'Shelf: ISAM 7360 (FX-16)',
+    'NFXS-E' => 'Shelf: ISAM 7360 (FX-8)',
+    'NFXS-F' => 'Shelf: ISAM 7360 (FX-4)',
+    'CFXR-A' => 'Shelf: ISAM 7362 (DF-16GW)',
+    'CFXS-C' => 'Shelf: ISAM 7362 (SF-8GW)',
 ];
 
 if ($asamPortNumberingMethod == 'positionBasedSlotId') {
