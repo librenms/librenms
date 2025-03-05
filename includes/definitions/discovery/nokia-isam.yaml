@@ -1,4 +1,4 @@
-mib: ASAM-SYSTEM-MIB:ASAM-EQUIP-MIB
+mib: ASAM-SYSTEM-MIB:ASAM-EQUIP-MIB:ASAM-ALARM-MIB
 modules:
     mempools:
         pre-cache:
@@ -30,9 +30,37 @@ modules:
                     oid: eqptFanMode
                     num_oid: .1.3.6.1.4.1.637.61.1.23.1.9.0
                     descr: Fan Mode
+                    group: 'Hardware'
                     state_name: fanMode
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: default }
                         - { value: 1, generic: 1, graph: 0, descr: eco }
                         - { value: 2, generic: 0, graph: 0, descr: protect }
                         - { value: 3, generic: 0, graph: 0, descr: classic }
+                -
+                    oid: asamNumberofAlarmEntries
+                    num_oid:  .1.3.6.1.4.1.637.61.1.3.4.0
+                    descr: 'Alarm: Current Count'
+                    group: 'Alarms'
+                    state_name: alarmCount
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 0 }
+                        - { value: 1, generic: 1, graph: 0, descr: 1 }
+                        - { value: 2, generic: 1, graph: 0, descr: 2 }
+                        - { value: 3, generic: 2, graph: 0, descr: 3 }
+                        - { value: 4, generic: 2, graph: 0, descr: 4 }
+                        - { value: 5, generic: 2, graph: 0, descr: 5 }
+                        - { value: 6, generic: 2, graph: 0, descr: 6 }
+                -
+                    oid: asamCurrentAlarmSeverityStatus
+                    num_oid: .1.3.6.1.4.1.637.61.1.3.5.0
+                    descr: 'Alarm: Current Status'
+                    group: 'Alarms'
+                    state_name: alarmCurrentSeverityStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: NoDefect }
+                        - { value: 2, generic: 3, graph: 0, descr: Indeterminate }
+                        - { value: 4, generic: 1, graph: 0, descr: Warning }
+                        - { value: 8, generic: 1, graph: 0, descr: Minor }
+                        - { value: 16, generic: 2, graph: 0, descr: Major }
+                        - { value: 32, generic: 2, graph: 0, descr: Critical }
