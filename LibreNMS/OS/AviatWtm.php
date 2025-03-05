@@ -33,6 +33,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class AviatWtm extends OS implements
     OSDiscovery,
@@ -51,7 +52,7 @@ class AviatWtm extends OS implements
     public function discoverWirelessFrequency()
     {
         $sensors = [];
-        $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        $name = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck();
         $frequency = snmpwalk_cache_oid($this->getDeviceArray(), 'aviatRfFreqTx', [], 'AVIAT-RF-MIB:');
         foreach ($frequency as $index => $data) {
             $sensors[] = new WirelessSensor(
@@ -79,7 +80,7 @@ class AviatWtm extends OS implements
     public function discoverWirelessRate()
     {
         $sensors = [];
-        $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        $name = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck();
 
         $tx = snmpwalk_cache_oid($this->getDeviceArray(), 'aviatModemCurCapacityTx', [], 'AVIAT-MODEM-MIB');
         foreach ($tx as $index => $data) {
@@ -121,7 +122,7 @@ class AviatWtm extends OS implements
     public function discoverWirelessRssi()
     {
         $sensors = [];
-        $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        $name = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck();
         $rsl = snmpwalk_cache_oid($this->getDeviceArray(), 'aviatRxPerformRslReadingCurrent', [], 'AVIAT-RXPERFORMANCE-MIB');
 
         foreach ($rsl as $index => $data) {
@@ -150,7 +151,7 @@ class AviatWtm extends OS implements
     public function discoverWirelessSnr()
     {
         $sensors = [];
-        $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        $name = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck();
         $snr = snmpwalk_cache_oid($this->getDeviceArray(), 'aviatRxPerformCinrReadingCurrent', [], 'AVIAT-RXPERFORMANCE-EX-MIB');
 
         foreach ($snr as $index => $data) {
@@ -179,7 +180,7 @@ class AviatWtm extends OS implements
     public function discoverWirelessPower()
     {
         $sensors = [];
-        $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        $name = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalName')->pluck();
         $power = snmpwalk_cache_oid($this->getDeviceArray(), 'aviatRxPerformTxpowReadingCurrent', [], 'AVIAT-RXPERFORMANCE-EX-MIB');
 
         foreach ($power as $index => $data) {

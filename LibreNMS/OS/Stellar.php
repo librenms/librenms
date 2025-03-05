@@ -6,6 +6,7 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Stellar extends OS implements
     WirelessClientsDiscovery,
@@ -14,10 +15,10 @@ class Stellar extends OS implements
     public function discoverWirelessClients()
     {
         $sensors = [];
-        $device = $this->getDeviceArray();
+        $hardware = $this->getDevice()->hardware;
 
         $ssid = [];
-        $ssid_data = $this->getCacheTable('apWlanEssid', $device['hardware']);
+        $ssid_data = SnmpQuery::hideMib()->mibs([$hardware])->walk('apWlanEssid')->table(1);
 
         foreach ($ssid_data as $ssid_entry) {
             if ($ssid_entry['apWlanEssid'] == 'athmon2') {
@@ -29,7 +30,7 @@ class Stellar extends OS implements
             }
         }
 
-        $client_ws_data = $this->getCacheTable('apClientWlanService', $device['hardware']);
+        $client_ws_data = SnmpQuery::hideMib()->mibs([$hardware])->walk('apClientWlanService')->table(1);
 
         if (empty($client_ws_data)) {
             $total_clients = 0;
@@ -37,7 +38,7 @@ class Stellar extends OS implements
             $total_clients = count($client_ws_data);
         }
 
-        $combined_oid = sprintf('%s::%s', $device['hardware'], 'apClientWlanService');
+        $combined_oid = sprintf('%s::%s', $hardware, 'apClientWlanService');
         $oid = snmp_translate($combined_oid, 'ALL', 'nokia/stellar', '-On');
 
         if (empty($oid)) {
@@ -68,9 +69,9 @@ class Stellar extends OS implements
     {
         $data = [];
         if (! empty($sensors)) {
-            $device = $this->getDeviceArray();
+            $hardware = $this->getDevice()->hardware;
 
-            $client_ws_data = $this->getCacheTable('apClientWlanService', $device['hardware']);
+            $client_ws_data = SnmpQuery::hideMib()->mibs([$hardware])->walk('apClientWlanService')->table(1);
 
             if (empty($client_ws_data)) {
                 $total_clients = 0;
