@@ -11,7 +11,7 @@ IMPORTS
                 FROM Q-BRIDGE-MIB
         InetAddressType, InetAddress, InetAddressIPv6, InetAddressPrefixLength
                 FROM INET-ADDRESS-MIB
-        InterfaceIndex, ifIndex
+        InterfaceIndex, ifIndex, ifOperStatus
                 FROM IF-MIB
         EnabledStatus
                 FROM P-BRIDGE-MIB
@@ -19,6 +19,8 @@ IMPORTS
                 FROM BRIDGE-MIB
         Dot1agCfmMepId, dot1agCfmMdIndex, dot1agCfmMaIndex, dot1agCfmMepIdentifier, dot1agCfmMepIdentifier, dot1agCfmMepDbRMepIdentifier
                 FROM IEEE8021-CFM-MIB
+        dot1vProtocolPortEntry
+                FROM Q-BRIDGE-MIB			
         dot1xAuthConfigEntry
                 FROM IEEE8021-PAE-MIB;
 
@@ -27,7 +29,7 @@ edgecorenetworks    OBJECT IDENTIFIER ::= { accton 10 }
 edgeCoreNetworksMgt OBJECT IDENTIFIER ::= { edgecorenetworks 1 }
 
 es3528mv2MIB MODULE-IDENTITY
-        LAST-UPDATED "201109260000Z"
+        LAST-UPDATED "201508070000Z"
         ORGANIZATION "Edgecore Networks, Inc."
         CONTACT-INFO
                 "Edgecore Networks, Inc.
@@ -88,6 +90,7 @@ ipv6RaGuardMgt      OBJECT IDENTIFIER ::= { es3528mv2MIBObjects 67 }
 udldMgt             OBJECT IDENTIFIER ::= { es3528mv2MIBObjects 69 }
 dhcpv6SnoopMgt      OBJECT IDENTIFIER ::= { es3528mv2MIBObjects 71 }
 ip6SrcGuardMgt      OBJECT IDENTIFIER ::= { es3528mv2MIBObjects 74 }
+snmpPrivateTrapMgt  OBJECT IDENTIFIER ::= { es3528mv2MIBObjects 79 }
 -- -------------------------------------------------------------
 -- Textual Conventions
 -- -------------------------------------------------------------
@@ -485,7 +488,9 @@ PortEntry ::= SEQUENCE
     portComboForcedMode         INTEGER,
     portMasterSlaveModeCfg      INTEGER,
     portMacAddrLearningStatus   EnabledStatus,
-    portMacAddrLearningCount    Counter32
+    portMacAddrLearningCount    Counter32,
+    portUpTime                  TimeTicks,
+    portShutdownReason          BITS
 }
 
 portIndex OBJECT-TYPE
@@ -771,6 +776,33 @@ portMacAddrLearningCount OBJECT-TYPE
         DESCRIPTION "The current number of learned MAC addresses."
         ::= { portEntry 18 }
 
+portUpTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The port up time (in hundredths of a second)."
+        ::= { portEntry 19 }
+
+portShutdownReason OBJECT-TYPE
+        SYNTAX      BITS
+                    {
+                        admin(0),
+                        stpLbd(1),
+                        stpBpduGuard(2),
+                        networkAccessPortLinkDetection(3),
+                        networkAccessPortDynamicQos(4),
+                        portSec(5),
+                        lbd(6),
+                        atcBstorm(7),
+                        atcMstorm(8),
+                        udld(9)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The reason of port shutdown. The value is 0 if no
+                     shutdown action is applied to this port."
+        ::= { portEntry 20 }
+
 --
 -- cable diagnostics
 --
@@ -807,8 +839,12 @@ CableDiagResultEntry ::= SEQUENCE
     cableDiagResultIfIndex            InterfaceIndex,
     cableDiagResultStatusPairA        INTEGER,
     cableDiagResultStatusPairB        INTEGER,
+    cableDiagResultStatusPairC        INTEGER,
+    cableDiagResultStatusPairD        INTEGER,
     cableDiagResultDistancePairA      Integer32,
     cableDiagResultDistancePairB      Integer32,
+    cableDiagResultDistancePairC      Integer32,
+    cableDiagResultDistancePairD      Integer32,
     cableDiagResultTime               DisplayString
 }
 
@@ -826,28 +862,27 @@ cableDiagResultStatusPairA OBJECT-TYPE
                         ok(2),
                         open(3),
                         short(4),
+                        unknown(7),
                         impedanceMismatch(8),
                         failed(9),
                         notSupported(10),
-                        noCable(11)
+                        noCable(11),
+                        underTesting(12)
                     }
         MAX-ACCESS  read-only
         STATUS      current
-        DESCRIPTION "The result of cable diagnostics. If there is no fault
-                     on the cable, the value is ok(2). Value notTestedYet(1)
+        DESCRIPTION "The result of cable diagnostics. Value notTestedYet(1)
                      means the pair is not tested yet. Value ok(2) means the
                      pair works well. Value open(3) means there is a lack of
                      continuity between pins at each end of the pair. Value
-                     short(4) means conductors are short-circuited together on
-                     the pair. Value openShort(5) means the pair has open
-                     and short issues. Value crosstalk(6) means the pair is
-                     incorrectly connected at one end. Value unknown(7) means
-                     pair has an error matching none of the above. Value
-                     impedanceMismatch(8) means different quality cables
-                     connected together. Value failed(9) means test failed.
-                     Value notSupported(10) means cable diagnostics is not
-                     supported. Value noCable(11) means there is no connected
-                     cable."
+                     short(4) means conductors are short-circuited together
+                     on the pair. Value impedanceMismatch(8) means different
+                     quality cables connected together. Value failed(9) means
+                     test failed. Value notSupported(10) means cable diagnostics
+                     is not supported. Value noCable(11) means there is no
+                     connected cable. Value underTesting(12) means cable diag is
+                     still running. Value unknown(7) means pair has an error
+                     matching none of the above."
         ::= { cableDiagResultEntry 2 }
 
 cableDiagResultStatusPairB OBJECT-TYPE
@@ -857,36 +892,96 @@ cableDiagResultStatusPairB OBJECT-TYPE
                         ok(2),
                         open(3),
                         short(4),
+                        unknown(7),
                         impedanceMismatch(8),
                         failed(9),
                         notSupported(10),
-                        noCable(11)
+                        noCable(11),
+                        underTesting(12)
                     }
         MAX-ACCESS  read-only
         STATUS      current
-        DESCRIPTION "The result of cable diagnostics. If there is no fault
-                     on the cable, the value is ok(2). Value notTestedYet(1)
+        DESCRIPTION "The result of cable diagnostics. Value notTestedYet(1)
                      means the pair is not tested yet. Value ok(2) means the
                      pair works well. Value open(3) means there is a lack of
                      continuity between pins at each end of the pair. Value
-                     short(4) means conductors are short-circuited together on
-                     the pair. Value openShort(5) means the pair has open
-                     and short issues. Value crosstalk(6) means the pair is
-                     incorrectly connected at one end. Value unknown(7) means
-                     pair has an error matching none of the above. Value
-                     impedanceMismatch(8) means different quality cables
-                     connected together. Value failed(9) means test failed.
-                     Value notSupported(10) means cable diagnostics is not
-                     supported. Value noCable(11) means there is no connected
-                     cable."
+                     short(4) means conductors are short-circuited together
+                     on the pair. Value impedanceMismatch(8) means different
+                     quality cables connected together. Value failed(9) means
+                     test failed. Value notSupported(10) means cable diagnostics
+                     is not supported. Value noCable(11) means there is no
+                     connected cable. Value underTesting(12) means cable diag is
+                     still running. Value unknown(7) means pair has an error
+                     matching none of the above."
         ::= { cableDiagResultEntry 3 }
+
+cableDiagResultStatusPairC OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        notTestedYet(1),
+                        ok(2),
+                        open(3),
+                        short(4),
+                        unknown(7),
+                        impedanceMismatch(8),
+                        failed(9),
+                        notSupported(10),
+                        noCable(11),
+                        underTesting(12)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The result of cable diagnostics. Value notTestedYet(1)
+                     means the pair is not tested yet. Value ok(2) means the
+                     pair works well. Value open(3) means there is a lack of
+                     continuity between pins at each end of the pair. Value
+                     short(4) means conductors are short-circuited together
+                     on the pair. Value impedanceMismatch(8) means different
+                     quality cables connected together. Value failed(9) means
+                     test failed. Value notSupported(10) means cable diagnostics
+                     is not supported. Value noCable(11) means there is no
+                     connected cable. Value underTesting(12) means cable diag is
+                     still running. Value unknown(7) means pair has an error
+                     matching none of the above."
+        ::= { cableDiagResultEntry 4 }
+
+cableDiagResultStatusPairD OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        notTestedYet(1),
+                        ok(2),
+                        open(3),
+                        short(4),
+                        unknown(7),
+                        impedanceMismatch(8),
+                        failed(9),
+                        notSupported(10),
+                        noCable(11),
+                        underTesting(12)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The result of cable diagnostics. Value notTestedYet(1)
+                     means the pair is not tested yet. Value ok(2) means the
+                     pair works well. Value open(3) means there is a lack of
+                     continuity between pins at each end of the pair. Value
+                     short(4) means conductors are short-circuited together
+                     on the pair. Value impedanceMismatch(8) means different
+                     quality cables connected together. Value failed(9) means
+                     test failed. Value notSupported(10) means cable diagnostics
+                     is not supported. Value noCable(11) means there is no
+                     connected cable. Value underTesting(12) means cable diag is
+                     still running. Value unknown(7) means pair has an error
+                     matching none of the above."
+        ::= { cableDiagResultEntry 5 }
 
 cableDiagResultDistancePairA OBJECT-TYPE
         SYNTAX      Integer32
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION "Displays the fault distance of pair A of the cable
-                     in meters."
+                     in meters. 0 will be displayed if cableDiagResultStatusPairA
+                     equals to Value underTesting(12)."
         ::= { cableDiagResultEntry 6 }
 
 cableDiagResultDistancePairB OBJECT-TYPE
@@ -894,8 +989,27 @@ cableDiagResultDistancePairB OBJECT-TYPE
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION "Displays the fault distance of pair B of the cable
-                     in meters."
+                     in meters. 0 will be displayed if cableDiagResultStatusPairB
+                     equals to Value underTesting(12)."
         ::= { cableDiagResultEntry 7 }
+
+cableDiagResultDistancePairC OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Displays the fault distance of pair C of the cable
+                     in meters. 0 will be displayed if cableDiagResultStatusPairC
+                     equals to Value underTesting(12)."
+        ::= { cableDiagResultEntry 8 }
+
+cableDiagResultDistancePairD OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Displays the fault distance of pair D of the cable
+                     in meters. 0 will be displayed if cableDiagResultStatusPairD
+                     equals to Value underTesting(12)."
+        ::= { cableDiagResultEntry 9 }
 
 cableDiagResultTime OBJECT-TYPE
         SYNTAX      DisplayString(SIZE(0..20))
@@ -987,7 +1101,7 @@ portUtilEntry OBJECT-TYPE
 
 PortUtilEntry ::= SEQUENCE
 {
-    portUtilIfIndex     Integer32,
+    portUtilIfIndex     InterfaceIndex,
     portInOctetRate     Counter64,
     portInPacketRate    Counter64,
     portInUtil          Integer32,
@@ -997,7 +1111,7 @@ PortUtilEntry ::= SEQUENCE
 }
 
 portUtilIfIndex OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The port and trunk interface of the portUtilTable.
@@ -1067,12 +1181,12 @@ portVlanTrunkingEntry OBJECT-TYPE
 
 PortVlanTrunkingEntry ::= SEQUENCE
 {
-    portVlanTrunkingIfIndex     Integer32,
+    portVlanTrunkingIfIndex     InterfaceIndex,
     portVlanTrunkingStatus      EnabledStatus
 }
 
 portVlanTrunkingIfIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      InterfaceIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "The port and trunk interface of the portVlanTrunkingTable.
@@ -1087,6 +1201,598 @@ portVlanTrunkingStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Whether vlan trunking is enabled."
     ::= { portVlanTrunkingEntry 2 }
+
+--
+-- portHist
+--
+
+portHist OBJECT IDENTIFIER ::= { portMgt 8 }
+
+portHistControlTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF PortHistControlEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of history control entries."
+    ::= { portHist 1 }
+
+portHistControlEntry OBJECT-TYPE
+    SYNTAX     PortHistControlEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of parameters that set up a periodic sampling of
+        statistics."
+    INDEX { portHistControlIndex }
+    ::= { portHistControlTable 1 }
+
+PortHistControlEntry ::= SEQUENCE {
+    portHistControlIndex             Integer32,
+    portHistControlName              DisplayString,
+    portHistControlDataSource        InterfaceIndex,
+    portHistControlInterval          Integer32,
+    portHistControlBucketsRequested  Integer32,
+    portHistControlBucketsGranted    Integer32,
+    portHistControlStatus            RowStatus
+}
+
+portHistControlIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        portHistControl table."
+    ::= { portHistControlEntry 1 }
+
+portHistControlName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..31))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "A textual name of the entity. It is mandatory that
+        this only contain printable ASCII characters."
+    ::= { portHistControlEntry 2 }
+
+portHistControlDataSource OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object identifies the source of the data for
+        which historical data was collected and
+        placed in a media-specific table on behalf of this
+        portHistControlEntry.  This source can be any
+        interface on this device."
+    ::= { portHistControlEntry 3 }
+
+portHistControlInterval OBJECT-TYPE
+    SYNTAX     Integer32 (1..86400)
+    UNITS      "Minutes"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The interval in seconds over which the data is
+        sampled for each bucket in the part of the
+        media-specific table associated with this
+        portHistControlEntry.  This interval can
+        be set to any number of seconds between 1 and
+        86400 (1 day)."
+    DEFVAL { 1 }
+    ::= { portHistControlEntry 4 }
+
+portHistControlBucketsRequested OBJECT-TYPE
+    SYNTAX     Integer32 (1..96)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The requested number of discrete time intervals
+        over which data is to be saved in the part of the
+        media-specific table associated with this
+        portHistControlEntry."
+    DEFVAL { 1 }
+    ::= { portHistControlEntry 5 }
+
+portHistControlBucketsGranted OBJECT-TYPE
+    SYNTAX     Integer32 (1..96)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of discrete sampling intervals
+        over which data shall be saved in the part of
+        the media-specific table associated with this
+        portHistControlEntry."
+    ::= { portHistControlEntry 6 }
+
+portHistControlStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The status of this portHistControl entry."
+    ::= { portHistControlEntry 7 }
+
+portHistCurrentTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF PortHistCurrentEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of Ethernet history entries."
+    ::= { portHist 2 }
+
+portHistCurrentEntry OBJECT-TYPE
+    SYNTAX     PortHistCurrentEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An historical sample of Ethernet statistics on a particular
+        Ethernet interface.  This sample is associated with the
+        portHistControlEntry which set up the parameters for
+        a regular collection of these samples."
+    INDEX { portHistCurrentIndex }
+    ::= { portHistCurrentTable 1 }
+
+PortHistCurrentEntry ::= SEQUENCE {
+    portHistCurrentIndex                 Integer32,
+    portHistCurrentSampleIndex           Integer32,
+    portHistCurrentIntervalStart         TimeTicks,
+    portHistCurrentInOctets              Counter64,
+    portHistCurrentInUcastPkts           Counter64,
+    portHistCurrentInMulticastPkts       Counter64,
+    portHistCurrentInBroadcastPkts       Counter64,
+    portHistCurrentInDiscards            Counter64,
+    portHistCurrentInErrors              Counter64,
+    portHistCurrentInUnknownProtos       Counter64,
+    portHistCurrentOutOctets             Counter64,
+    portHistCurrentOutUcastPkts          Counter64,
+    portHistCurrentOutMulticastPkts      Counter64,
+    portHistCurrentOutBroadcastPkts      Counter64,
+    portHistCurrentOutDiscards           Counter64,
+    portHistCurrentOutErrors             Counter64,
+    portHistCurrentInUtilization         Integer32,
+    portHistCurrentOutUtilization        Integer32
+}
+
+portHistCurrentIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The history of which this entry is a part.  The
+        history identified by a particular value of this
+        index is the same history as identified
+        by the same value of portHistControlIndex."
+    ::= { portHistCurrentEntry 1 }
+
+portHistCurrentSampleIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies the particular
+        sample this entry represents among all samples
+        associated with the same portHistControlEntry.
+        This index starts at 1 and increases by one
+        as each new sample is taken."
+    ::= { portHistCurrentEntry 2 }
+
+portHistCurrentIntervalStart OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime at the start of the interval
+        over which this sample was measured."
+    ::= { portHistCurrentEntry 3 }
+
+portHistCurrentInOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of octets received on the interface,
+        including framing characters."
+    ::= { portHistCurrentEntry 4 }
+
+portHistCurrentInUcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets, delivered by this sub-layer to a
+        higher (sub-)layer, which were not addressed to a multicast
+        or broadcast address at this sub-layer."
+    ::= { portHistCurrentEntry 5 }
+
+portHistCurrentInMulticastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets, delivered by this sub-layer to a
+        higher (sub-)layer, which were addressed to a multicast
+        address at this sub-layer.  For a MAC layer protocol, this
+        includes both Group and Functional addresses."
+    ::= { portHistCurrentEntry 6 }
+
+portHistCurrentInBroadcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets, delivered by this sub-layer to a
+        higher (sub-)layer, which were addressed to a broadcast
+        address at this sub-layer."
+    ::= { portHistCurrentEntry 7 }
+
+portHistCurrentInDiscards OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of inbound packets which were chosen to be
+        discarded even though no errors had been detected to prevent
+        their being deliverable to a higher-layer protocol.  One
+        possible reason for discarding such a packet could be to
+        free up buffer space."
+    ::= { portHistCurrentEntry 8 }
+
+portHistCurrentInErrors OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "For packet-oriented interfaces, the number of inbound
+        packets that contained errors preventing them from
+        being deliverable to a higher-layer protocol.  For
+        character-oriented or fixed-length interfaces, the
+        number of inbound transmission units that contained
+        errors preventing them from being deliverable to a
+        higher-layer protocol."
+    ::= { portHistCurrentEntry 9 }
+
+portHistCurrentInUnknownProtos OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "For packet-oriented interfaces, the number of packets
+        received via the interface which were discarded because of
+        an unknown or unsupported protocol.  For character-oriented
+        or fixed-length interfaces that support protocol
+        multiplexing the number of transmission units received via
+        the interface which were discarded because of an unknown or
+        unsupported protocol.  For any interface that does not
+        support protocol multiplexing, this counter will always be
+        0."
+    ::= { portHistCurrentEntry 10 }
+
+portHistCurrentOutOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of octets transmitted out of the
+        interface, including framing characters."
+    ::= { portHistCurrentEntry 11 }
+
+portHistCurrentOutUcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets that higher-level protocols
+        requested be transmitted, and which were not addressed to a
+        multicast or broadcast address at this sub-layer, including
+        those that were discarded or not sent."
+    ::= { portHistCurrentEntry 12 }
+
+portHistCurrentOutMulticastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets that higher-level protocols
+        requested be transmitted, and which were addressed to a
+        multicast address at this sub-layer, including those that
+        were discarded or not sent.  For a MAC layer protocol, this
+        includes both Group and Functional addresses."
+    ::= { portHistCurrentEntry 13 }
+
+portHistCurrentOutBroadcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets that higher-level protocols
+        requested be transmitted, and which were addressed to a
+        broadcast address at this sub-layer, including those that
+        were discarded or not sent."
+    ::= { portHistCurrentEntry 14 }
+
+portHistCurrentOutDiscards OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of outbound packets which were chosen to be
+        discarded even though no errors had been detected to prevent
+        their being transmitted.  One possible reason for discarding
+        such a packet could be to free up buffer space."
+    ::= { portHistCurrentEntry 15 }
+
+portHistCurrentOutErrors OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "For packet-oriented interfaces, the number of outbound
+        packets that could not be transmitted because of errors.
+        For character-oriented or fixed-length interfaces, the
+        number of outbound transmission units that could not be
+        transmitted because of errors."
+    ::= { portHistCurrentEntry 16 }
+
+portHistCurrentInUtilization OBJECT-TYPE
+    SYNTAX     Integer32 (0..10000)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The best estimate of the mean physical layer
+         network utilization on this interface during this
+         sampling interval, in hundredths of a percent."
+    ::= { portHistCurrentEntry 17 }
+
+portHistCurrentOutUtilization OBJECT-TYPE
+    SYNTAX     Integer32 (0..10000)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The best estimate of the mean physical layer
+         network utilization on this interface during this
+         sampling interval, in hundredths of a percent."
+    ::= { portHistCurrentEntry 18 }
+
+portHistPreviousTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF PortHistPreviousEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of Ethernet history entries."
+    ::= { portHist 3 }
+
+portHistPreviousEntry OBJECT-TYPE
+    SYNTAX     PortHistPreviousEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An historical sample of Ethernet statistics on a particular
+        Ethernet interface.  This sample is associated with the
+        portHistControlEntry which set up the parameters for
+        a regular collection of these samples."
+    INDEX { portHistPreviousIndex , portHistPreviousSampleIndex }
+    ::= { portHistPreviousTable 1 }
+
+PortHistPreviousEntry ::= SEQUENCE {
+    portHistPreviousIndex                 Integer32,
+    portHistPreviousSampleIndex           Integer32,
+    portHistPreviousIntervalStart         TimeTicks,
+    portHistPreviousInOctets              Counter64,
+    portHistPreviousInUcastPkts           Counter64,
+    portHistPreviousInMulticastPkts       Counter64,
+    portHistPreviousInBroadcastPkts       Counter64,
+    portHistPreviousInDiscards            Counter64,
+    portHistPreviousInErrors              Counter64,
+    portHistPreviousInUnknownProtos       Counter64,
+    portHistPreviousOutOctets             Counter64,
+    portHistPreviousOutUcastPkts          Counter64,
+    portHistPreviousOutMulticastPkts      Counter64,
+    portHistPreviousOutBroadcastPkts      Counter64,
+    portHistPreviousOutDiscards           Counter64,
+    portHistPreviousOutErrors             Counter64,
+    portHistPreviousInUtilization         Integer32,
+    portHistPreviousOutUtilization        Integer32
+}
+
+portHistPreviousIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The history of which this entry is a part.  The
+        history identified by a particular value of this
+        index is the same history as identified
+        by the same value of portHistControlIndex."
+    ::= { portHistPreviousEntry 1 }
+
+portHistPreviousSampleIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies the particular
+        sample this entry represents among all samples
+        associated with the same portHistControlEntry.
+        This index starts at 1 and increases by one
+        as each new sample is taken."
+    ::= { portHistPreviousEntry 2 }
+
+portHistPreviousIntervalStart OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime at the start of the interval
+        over which this sample was measured."
+    ::= { portHistPreviousEntry 3 }
+
+portHistPreviousInOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of octets received on the interface,
+        including framing characters."
+    ::= { portHistPreviousEntry 4 }
+
+portHistPreviousInUcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets, delivered by this sub-layer to a
+        higher (sub-)layer, which were not addressed to a multicast
+        or broadcast address at this sub-layer."
+    ::= { portHistPreviousEntry 5 }
+
+portHistPreviousInMulticastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets, delivered by this sub-layer to a
+        higher (sub-)layer, which were addressed to a multicast
+        address at this sub-layer.  For a MAC layer protocol, this
+        includes both Group and Functional addresses."
+    ::= { portHistPreviousEntry 6 }
+
+portHistPreviousInBroadcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets, delivered by this sub-layer to a
+        higher (sub-)layer, which were addressed to a broadcast
+        address at this sub-layer."
+    ::= { portHistPreviousEntry 7 }
+
+portHistPreviousInDiscards OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of inbound packets which were chosen to be
+        discarded even though no errors had been detected to prevent
+        their being deliverable to a higher-layer protocol.  One
+        possible reason for discarding such a packet could be to
+        free up buffer space."
+    ::= { portHistPreviousEntry 8 }
+
+portHistPreviousInErrors OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "For packet-oriented interfaces, the number of inbound
+        packets that contained errors preventing them from
+        being deliverable to a higher-layer protocol.  For
+        character-oriented or fixed-length interfaces, the
+        number of inbound transmission units that contained
+        errors preventing them from being deliverable to a
+        higher-layer protocol."
+    ::= { portHistPreviousEntry 9 }
+
+portHistPreviousInUnknownProtos OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "For packet-oriented interfaces, the number of packets
+        received via the interface which were discarded because of
+        an unknown or unsupported protocol.  For character-oriented
+        or fixed-length interfaces that support protocol
+        multiplexing the number of transmission units received via
+        the interface which were discarded because of an unknown or
+        unsupported protocol.  For any interface that does not
+        support protocol multiplexing, this counter will always be
+        0."
+    ::= { portHistPreviousEntry 10 }
+
+portHistPreviousOutOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of octets transmitted out of the
+        interface, including framing characters."
+    ::= { portHistPreviousEntry 11 }
+
+portHistPreviousOutUcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets that higher-level protocols
+        requested be transmitted, and which were not addressed to a
+        multicast or broadcast address at this sub-layer, including
+        those that were discarded or not sent."
+    ::= { portHistPreviousEntry 12 }
+
+portHistPreviousOutMulticastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets that higher-level protocols
+        requested be transmitted, and which were addressed to a
+        multicast address at this sub-layer, including those that
+        were discarded or not sent.  For a MAC layer protocol, this
+        includes both Group and Functional addresses."
+    ::= { portHistPreviousEntry 13 }
+
+portHistPreviousOutBroadcastPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of packets that higher-level protocols
+        requested be transmitted, and which were addressed to a
+        broadcast address at this sub-layer, including those that
+        were discarded or not sent."
+    ::= { portHistPreviousEntry 14 }
+
+portHistPreviousOutDiscards OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of outbound packets which were chosen to be
+        discarded even though no errors had been detected to prevent
+        their being transmitted.  One possible reason for discarding
+        such a packet could be to free up buffer space."
+    ::= { portHistPreviousEntry 15 }
+
+portHistPreviousOutErrors OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "For packet-oriented interfaces, the number of outbound
+        packets that could not be transmitted because of errors.
+        For character-oriented or fixed-length interfaces, the
+        number of outbound transmission units that could not be
+        transmitted because of errors."
+    ::= { portHistPreviousEntry 16 }
+
+portHistPreviousInUtilization OBJECT-TYPE
+    SYNTAX     Integer32 (0..10000)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The best estimate of the mean physical layer
+         network utilization on this interface during this
+         sampling interval, in hundredths of a percent."
+    ::= { portHistPreviousEntry 17 }
+
+portHistPreviousOutUtilization OBJECT-TYPE
+    SYNTAX     Integer32 (0..10000)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The best estimate of the mean physical layer
+         network utilization on this interface during this
+         sampling interval, in hundredths of a percent."
+    ::= { portHistPreviousEntry 18 }
 
 --
 -- Show Media Information
@@ -1779,7 +2485,9 @@ StaPortEntry ::= SEQUENCE
     staPortRootGuardStatus          EnabledStatus,
     staPortBpduGuardAutoRecovery            EnabledStatus,
     staPortBpduGuardAutoRecoveryInterval    Unsigned32,
-    staPortTcPropStop               TruthValue
+    staPortTcPropStop               TruthValue,
+    staPortBpduVlanId               Integer32,
+    staPortBpduTagPriority          Integer32
 }
 
 -- for MST, RSTP
@@ -1980,6 +2688,42 @@ staPortTcPropStop         OBJECT-TYPE
          Don't enable on potentially ring port.
         "
     ::= { staPortEntry 21 }
+
+staPortBpduVlanId OBJECT-TYPE
+    SYNTAX      Integer32(0|1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Configure VLAN ID of tagged BPDU on the specified port.
+
+          Setting this to 0 means that the untagged BPDU transmitted.
+
+          When setting the specified port working on TRUNK mode and
+          allowed the VLAN id, the tagged BPDU should be transmitted
+          on the specified port.
+          "
+    ::= { staPortEntry 22 }
+
+staPortBpduTagPriority OBJECT-TYPE
+    SYNTAX      Integer32(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Configure Tag Priority of tagged BPDU on the specified port.
+
+          The default value of tag priority is 0.
+
+          When setting the specified port working on the specified VLAN
+          ID, the tag priority of tagged BPDU is carried on the specified
+          port.
+          
+          Only if the range of specified VLAN ID is 1-4094, the tag priority 
+          can be configured to a specified value. While the specified VLAN ID 
+          is 0, the tag priority is configured FAILED. So before tag prority
+          will be configured, please configure VLAN ID of tagged BPDU on the
+          specified port.
+          "
+    ::= { staPortEntry 23 }
 
 staProtocolType OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -2739,7 +3483,9 @@ StaLoopbackDetectionPortEntry    ::= SEQUENCE
         staLoopbackDetectionPortStatus             EnabledStatus,
         staLoopbackDetectionPortTrapStatus         EnabledStatus,
         staLoopbackDetectionPortReleaseMode        INTEGER,
-        staLoopbackDetectionPortRelease            INTEGER
+        staLoopbackDetectionPortRelease            INTEGER,
+        staLoopbackDetectionPortAction             INTEGER, 
+        staLoopbackDetectionPortShutdownInterval   INTEGER
 }
 
 staLoopbackDetectionPortIfIndex        OBJECT-TYPE
@@ -2766,7 +3512,7 @@ staLoopbackDetectionPortTrapStatus    OBJECT-TYPE
                      to be sent when the loopback BPDUs have been detected."
         ::= { staLoopbackDetectionPortEntry  3 }
 
- staLoopbackDetectionPortReleaseMode   OBJECT-TYPE
+staLoopbackDetectionPortReleaseMode   OBJECT-TYPE
         SYNTAX     INTEGER
         {
             auto(1),
@@ -2791,6 +3537,24 @@ staLoopbackDetectionPortRelease    OBJECT-TYPE
         DESCRIPTION "Set this to release(2) to release the port from discarding state.
                      noRelease(1) will always be obtained when reading this variable."
         ::= { staLoopbackDetectionPortEntry  5 }
+
+staLoopbackDetectionPortAction   OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+            shutdown(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Setting this to block(1) indicates that this port can be executed block operation.
+                     Setting this to shutdown(2) indicates that this port can be execute shutdown operation."
+        ::= { staLoopbackDetectionPortEntry  6 }
+
+staLoopbackDetectionPortShutdownInterval    OBJECT-TYPE
+        SYNTAX      INTEGER(60..86400)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Set this to release the port after the specified value seconds while the port action is shutdown."
+        ::= { staLoopbackDetectionPortEntry  7 }
 
 staSystemBPDUFlooding    OBJECT-TYPE
         SYNTAX      INTEGER
@@ -2871,14 +3635,14 @@ mirrorEntry OBJECT-TYPE
 
 MirrorEntry ::= SEQUENCE
 {
-    mirrorDestinationPort  Integer32,
-    mirrorSourcePort       Integer32,
+    mirrorDestinationPort  InterfaceIndex,
+    mirrorSourcePort       InterfaceIndex,
     mirrorType             INTEGER,
     mirrorStatus           ValidStatus
 }
 
 mirrorDestinationPort OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The destination port interface for mirrored packets.
@@ -2888,7 +3652,7 @@ mirrorDestinationPort OBJECT-TYPE
         ::= { mirrorEntry 1 }
 
 mirrorSourcePort OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The source port interface for mirrored packets.
@@ -2938,13 +3702,13 @@ vlanMirrorEntry OBJECT-TYPE
 
 VlanMirrorEntry ::= SEQUENCE
 {
-    vlanMirrorDestinationPort  Integer32,
-    vlanMirrorSourceVlan       Integer32,
+    vlanMirrorDestinationPort  InterfaceIndex,
+    vlanMirrorSourceVlan       VlanIndex,
     vlanMirrorStatus           ValidStatus
 }
 
 vlanMirrorDestinationPort OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The destination port interface for mirrored packets.
@@ -2954,7 +3718,7 @@ vlanMirrorDestinationPort OBJECT-TYPE
         ::= { vlanMirrorEntry 1 }
 
 vlanMirrorSourceVlan OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      VlanIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The source VLAN for mirrored packets. The interface
@@ -3118,13 +3882,13 @@ macMirrorEntry OBJECT-TYPE
 
 MacMirrorEntry ::= SEQUENCE
 {
-    macMirrorDestinationPort  Integer32,
+    macMirrorDestinationPort  InterfaceIndex,
     macMirrorSourceMacAddr    MacAddress,
     macMirrorStatus           ValidStatus
 }
 
 macMirrorDestinationPort OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The destination port interface for mirrored packets.
@@ -3602,17 +4366,6 @@ igmpSnoopMulticastGroupStatus OBJECT-TYPE
     DESCRIPTION
         "The set of ports which are static IGMP member ports."
     ::= { igmpSnoopMulticastGroupEntry 5 }
-
-igmpSnoopReportSuppressionStatus OBJECT-TYPE
-    SYNTAX      EnabledStatus
-    MAX-ACCESS  read-write
-    STATUS      deprecated
-    DESCRIPTION
-        "Parameter to enable or disable IGMP snooping report suppression on the device.
-        When enabled, the device will suppress superabundance report.
-        Only the First copy of Report Packet for same Group will be forwarded to route ports."
-    DEFVAL      { disabled }
-    ::= { igmpSnoopMgt 16 }
 
 igmpSnoopFilterStatus OBJECT-TYPE
     SYNTAX      EnabledStatus
@@ -4102,7 +4855,7 @@ igmpSnoopProxyReporting OBJECT-TYPE
         STATUS      current
         DESCRIPTION "Parameter to enable or disable IGMP snooping proxy reporting
                      on the device."
-        DEFVAL      { disable }
+        DEFVAL      { disabled }
         ::= { igmpSnoopGlobalMgt 1 }
 
 igmpSnoopRouterAlertOptionCheck OBJECT-TYPE
@@ -4174,7 +4927,7 @@ igmpSnoopMrouterForwardMode OBJECT-TYPE
         ::= { igmpSnoopGlobalMgt 8 }
 
 igmpSnoopForwardingPriority OBJECT-TYPE
-    SYNTAX      Integer32(0..6|65535)
+    SYNTAX      Integer32(0..7|65535)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -4874,6 +5627,95 @@ dhcpOption82RelayServerAddrServerIp OBJECT-TYPE
           DESCRIPTION "The IP address of the relay server."
           ::= { dhcpOption82RelayServerAddrEntry 2 }
 
+dhcpOption82VlanConfigTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF DhcpOption82VlanConfigEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION "A table contains DHCP option82 configurations 
+                       for existing VLANs."
+          ::= { dhcpOption82 7 }          
+
+dhcpOption82VlanConfigEntry    OBJECT-TYPE
+        SYNTAX      DhcpOption82VlanConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An instance contains the configuration to enable
+                     or disable DHCP option82 for each existing VLAN."
+        INDEX       { dhcpOption82VlanIndex }
+        ::= { dhcpOption82VlanConfigTable 1 }
+
+DhcpOption82VlanConfigEntry  ::= SEQUENCE
+{
+        dhcpOption82VlanIndex      VlanIndex,
+        dhcpOption82VlanStatus     EnabledStatus
+}
+
+dhcpOption82VlanIndex      OBJECT-TYPE
+        SYNTAX      VlanIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object indicates the VLAN ID on which DHCP Option82
+                     feature is configured."
+        ::= { dhcpOption82VlanConfigEntry 1 }
+
+dhcpOption82VlanStatus     OBJECT-TYPE
+        SYNTAX     EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates whether DHCP Option82 is enabled in
+                     this VLAN."
+        ::= { dhcpOption82VlanConfigEntry 2 }
+
+--
+dhcpOption82PortConfigTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DhcpOption82PortConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains DHCP option82 configurations 
+                     for port interfaces."
+        ::= { dhcpOption82 8 }
+
+dhcpOption82PortConfigEntry    OBJECT-TYPE
+        SYNTAX      DhcpOption82PortConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An instance contains the configuration to enable
+                     or disable DHCP option82 at each port interface."
+        INDEX       { dhcpOption82PortIfIndex }
+        ::= { dhcpOption82PortConfigTable 1 }
+
+DhcpOption82PortConfigEntry    ::= SEQUENCE
+{
+        dhcpOption82PortIfIndex        InterfaceIndex,
+        dhcpOption82PortStatus         EnabledStatus
+}
+
+dhcpOption82PortIfIndex        OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ifIndex value of the port."
+        ::= { dhcpOption82PortConfigEntry 1 }
+
+dhcpOption82PortStatus    OBJECT-TYPE
+        SYNTAX     EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates whether the port is enabled 
+                     for DHCP Option82."
+        ::= { dhcpOption82PortConfigEntry 2 }
+--
+dhcpDynamicProvisionStatus OBJECT-TYPE
+    SYNTAX     EnabledStatus
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "A per-system enable/disable configuration to decide whether to use
+        the specified configuration file in DHCP packet. It shall use the specified
+        configuration file in DHCP packet if this configuration is disabled and the
+        start-up configuration file is Factory_Default_Config.cfg."
+    ::= { dhcpMgt 6 }
+
 arpCacheDeleteAll OBJECT-TYPE
         SYNTAX      INTEGER
                     {
@@ -5028,13 +5870,13 @@ vlanDot1qTunnelPortEntry OBJECT-TYPE
 
 VlanDot1qTunnelPortEntry ::= SEQUENCE
 {
-    vlanDot1qTunnelPortIndex                Integer32,
+    vlanDot1qTunnelPortIndex                InterfaceIndex,
     vlanDot1qTunnelPortMode                 INTEGER,
     vlanDot1qTunnelPortEtherType            Unsigned32
 }
 
 vlanDot1qTunnelPortIndex OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The port and the trunk (excluding trunk members) interface of
@@ -5230,6 +6072,37 @@ voiceVlanPortRemainAge OBJECT-TYPE
         ::= { voiceVlanPortEntry 7 }
 
 --
+-- dot1vProtocolExPortTable
+--
+
+dot1vProtocolExPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1vProtocolExPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table that contains protocol Vlan priority information."
+    ::= { vlanMgt 10 }
+
+dot1vProtocolExPortEntry OBJECT-TYPE
+    SYNTAX      Dot1vProtocolExPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A list of protocol VLAN user priority sets for each port."
+    AUGMENTS   { dot1vProtocolPortEntry }
+    ::= { dot1vProtocolExPortTable 1 }
+
+Dot1vProtocolExPortEntry ::= SEQUENCE
+{
+    dot1vProtocolExPortGroupPriority     INTEGER
+}
+
+dot1vProtocolExPortGroupPriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the priority in the added tag for qualified frames."
+    ::= { dot1vProtocolExPortEntry   1 }
+
+--
 -- macVlanMgt
 --
 
@@ -5254,7 +6127,7 @@ MacVlanEntry ::= SEQUENCE
         macVlanId               VlanId,
         macVlanPriority         Integer32,
         macVlanStatus           ValidStatus,
-        macVlanMacMask          MacAddress,
+        macVlanMacMask          MacAddress
 }
 
 macVlanMacAddress OBJECT-TYPE
@@ -5460,7 +6333,7 @@ vlanL2ProtocolTunnelPortEntry OBJECT-TYPE
 
 VlanL2ProtocolTunnelPortEntry ::= SEQUENCE
 {
-    vlanL2ptPortIndex           Integer32,
+    vlanL2ptPortIndex           InterfaceIndex,
     vlanL2ptPortSta             EnabledStatus,
     vlanL2ptPortLldp            EnabledStatus,
     vlanL2ptPortCdp             EnabledStatus,
@@ -5469,7 +6342,7 @@ VlanL2ProtocolTunnelPortEntry ::= SEQUENCE
 }
 
 vlanL2ptPortIndex OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The port and the trunk (excluding trunk members) interface
@@ -5660,6 +6533,44 @@ vlanDot1qTunnelSrvCvidPortAction OBJECT-TYPE
         STATUS      current
         DESCRIPTION "Sets to assignSvid(2) to assign service VLAN ID."
         ::= { vlanDot1qTunnelSrvCvidPortEntry 6 }
+
+vlanMacAddrLearningTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF VlanMacAddrLearningEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for VLAN MAC learning configuration."
+        ::= { vlanMgt 23 }
+
+vlanMacAddrLearningEntry OBJECT-TYPE
+        SYNTAX      VlanMacAddrLearningEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for VLAN MAC learning configuration."
+        INDEX       { vlanMacAddrLearningIndex }
+        ::= { vlanMacAddrLearningTable 1 }
+
+VlanMacAddrLearningEntry ::= SEQUENCE
+{
+    vlanMacAddrLearningIndex        Unsigned32,
+    vlanMacAddrLearningStatus       EnabledStatus
+}
+
+vlanMacAddrLearningIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The vlan id of the VLAN"
+        ::= { vlanMacAddrLearningEntry 1 }
+
+vlanMacAddrLearningStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Set this variable to enabled(1) to start to learn MAC
+                     addresses. Set this variable to disabled(2) to stop to
+                     learn MAC addresses."
+        DEFVAL      { enabled }
+        ::= { vlanMacAddrLearningEntry 2 }
 
 --
 -- priorityMgt
@@ -6040,6 +6951,28 @@ trapMacNotifyAction OBJECT-TYPE
     DESCRIPTION "The parameter indicates which result triggers the trap."
     ::= { trapVar 68 }
 
+-- For SNMP authentication failure
+trapVarSnmpAuthenInfoIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The IP address type of the user who fails in SNMP authentication."
+    ::= { trapVar 69 }
+
+trapVarSnmpAuthenInfoIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The IP address of the user who fails in SNMP authentication."
+    ::= { trapVar 70 }
+
+trapVarSnmpAuthenInfoMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The MAC address of the user who fails in SNMP authentication."
+    ::= { trapVar 71 }
+
 --
 -- qosMgt
 --
@@ -6072,7 +7005,7 @@ rateLimitPortEntry OBJECT-TYPE
 
 RateLimitPortEntry ::= SEQUENCE
 {
-    rlPortIndex              Integer32,
+    rlPortIndex              InterfaceIndex,
     rlPortInputStatus        EnabledStatus,
     rlPortOutputStatus       EnabledStatus,
     rlPortInputLimitInKilo   Integer32,
@@ -6080,7 +7013,7 @@ RateLimitPortEntry ::= SEQUENCE
 }
 
 rlPortIndex OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The port and the trunk (including trunk member) interface of
@@ -6124,111 +7057,6 @@ rlPortOutputLimitInKilo OBJECT-TYPE
         ::= { rateLimitPortEntry 11 }
 
 cosMgt        OBJECT IDENTIFIER ::= { qosMgt 3 }
-
---prioAclToCosMappingTable
-prioAclToCosMappingTable OBJECT-TYPE
-        SYNTAX      SEQUENCE OF PrioAclToCosMappingEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Table for ACL to CoS Mapping."
-        ::= { cosMgt 1 }
-
-prioAclToCosMappingEntry OBJECT-TYPE
-        SYNTAX      PrioAclToCosMappingEntry
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "Entry for ACL to CoS Mapping."
-        INDEX       { prioAclToCosMappingIfIndex, prioAclToCosMappingAclName }
-        ::= { prioAclToCosMappingTable 1 }
-
-PrioAclToCosMappingEntry ::= SEQUENCE
-{
-    prioAclToCosMappingIfIndex    InterfaceIndex,
-    prioAclToCosMappingAclName  DisplayString,
-    prioAclToCosMappingCosValue      Integer32,
-    prioAclToCosMappingStatus      RowStatus
-}
-
-prioAclToCosMappingIfIndex OBJECT-TYPE
-        SYNTAX      InterfaceIndex
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "The port interface of the prioAclToCosMappingEntry. The interface
-                     identified by a particular value of this index is the
-                     same interface as identified by the same value of
-                     ifIndex in the IF-MIB."
-        ::= { prioAclToCosMappingEntry 1 }
-
-prioAclToCosMappingAclName OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(1..16))
-        MAX-ACCESS  not-accessible
-        STATUS      current
-        DESCRIPTION "The name of an IP ACL. Within a feature a unique name is
-                     used to identify the list to which the entry belongs
-                     in the device."
-        ::= { prioAclToCosMappingEntry 2 }
-
-prioAclToCosMappingCosValue OBJECT-TYPE
-        SYNTAX      Integer32 (0..7)
-        MAX-ACCESS  read-create
-        STATUS      current
-        DESCRIPTION "CoS value of the prioAclToCosMappingTable."
-        ::= { prioAclToCosMappingEntry 3 }
-
-prioAclToCosMappingStatus OBJECT-TYPE
-        SYNTAX      RowStatus
-        MAX-ACCESS  read-create
-        STATUS      current
-        DESCRIPTION
-            "The status of this conceptual row entry. This object isused to manage the
-            creation and deletion of conceptual rows.
-
-            The status column has six defined values:
-
-                 - 'active', which indicates that the conceptual row is
-                 available for use by the managed device;
-
-                 - 'notInService', which indicates that the conceptual
-                 row exists in the agent, but is unavailable for use by
-                 the managed device (see NOTE below);
-
-                 - 'notReady', which indicates that the conceptual row
-                 exists in the agent, but is missing information
-                 necessary in order to be available for use by the
-                 managed device;
-
-                 - 'createAndGo', which is supplied by a management
-                 station wishing to create a new instance of a
-                 conceptual row and to have its status automatically set
-                 to active, making it available for use by the managed
-                 device;
-
-                 - 'createAndWait', which is supplied by a management
-                 station wishing to create a new instance of a
-                 conceptual row (but not make it available for use by
-                 the managed device); and,
-
-                 - 'destroy', which is supplied by a management station
-                 wishing to delete all of the instances associated with
-                 an existing conceptual row.
-
-            Whereas five of the six values (all except 'notReady') may
-            be specified in a management protocol set operation, only
-            three values will be returned in response to a management
-            protocol retrieval operation:  'notReady', 'notInService' or
-            'active'.  That is, when queried, an existing conceptual row
-            has only three states:  it is either available for use by
-            the managed device (the status column has value 'active');
-            it is not available for use by the managed device, though
-            the agent has sufficient information to make it so (the
-            status column has value 'notInService'); or, it is not
-            available for use by the managed device, and an attempt to
-            make it so would fail because the agent has insufficient
-            information (the state column has value 'notReady').
-
-            For a detailed description of this object, please refer to
-            SNMPv2-TC MIB."
-        ::= { prioAclToCosMappingEntry 4 }
 
 prioIfClassificationModeTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF PrioIfClassificationModeEntry
@@ -6284,9 +7112,8 @@ prioIfClassificationModeStatus OBJECT-TYPE
          value of IP packets."
     ::= { prioIfClassificationModeEntry 2 }
 
-
 --
--- The mapping table from CoS/CFI to internal QoS label
+-- The interface mapping table from CoS/CFI to internal QoS label
 --
 
 prioCosToDscpTable OBJECT-TYPE
@@ -6313,10 +7140,11 @@ prioCosToDscpEntry OBJECT-TYPE
 
 PrioCosToDscpEntry ::= SEQUENCE
 {
-    prioCosToDscpIfValue                InterfaceIndex,
-    prioCosToDscpCosValue             Integer32,
-    prioCosToDscpCFIValue             Integer32,
-    prioCosToDscpDscpValue            Integer32
+    prioCosToDscpIfValue    InterfaceIndex,
+    prioCosToDscpCosValue   Integer32,
+    prioCosToDscpCFIValue   Integer32,
+    prioCosToDscpPhbValue   Integer32,
+    prioCosToDscpColorValue INTEGER
 }
 
 prioCosToDscpIfValue OBJECT-TYPE
@@ -6334,8 +7162,8 @@ prioCosToDscpCosValue OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The CoS value (0~7) mapped to an internal QoS label value which is
-         composed of PHB(3 bits) and drop precedence(2 bits)."
+        "The CoS value (0 to 7) mapped to an internal QoS label value which is
+         composed of PHB (3 bits) and drop precedence (2 bits)."
     ::= { prioCosToDscpEntry 2 }
 
 prioCosToDscpCFIValue OBJECT-TYPE
@@ -6344,93 +7172,33 @@ prioCosToDscpCFIValue OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The CFI value (0 or 1) mapped to an internal QoS label value which is
-         composed of PHB(3 bits) and drop precedence(2 bits)."
+         composed of PHB (3 bits) and drop precedence (2 bits)."
     ::= { prioCosToDscpEntry 3 }
 
-prioCosToDscpDscpValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..63)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The DSCP value used to represent the internal QoS label (3 bits PHB+2
-         bits Drop precedence). The MSB 4 bits of DSCP is used to represent PHB
-         value of QoS label; The LSB 2 bits of DSCP are used to represent the
-         drop precedence value of QoS label. Green(0), Yellow(3), Red(1). In a
-         word, PHB=(DSCP>>2), Drop precedence=(DSCP & 0x3).
-
-         Note: The setting range of PHB value must be 0~7 and the setting drop
-         precedence value must be one of the values (0,1,3)."
-    ::= { prioCosToDscpEntry 4 }
-
---
--- The mapping table from IP precedence to internal Qos label
---
-
-prioPrecToDscpTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF PrioPrecToDscpEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table for IP precedence to internal QoS label mapping. This table
-         setting will take effect only when the interface QoS mapping
-         classification mode is set to IP precedence mode."
-    ::= { cosMgt 4 }
-
-prioPrecToDscpEntry OBJECT-TYPE
-    SYNTAX      PrioPrecToDscpEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry for IP precedence to internal QoS label mapping."
-    INDEX
-    {
-        prioPrecToDscpIfValue,
-        prioPrecToDscpPrecValue
-    }
-    ::= { prioPrecToDscpTable 1 }
-
-PrioPrecToDscpEntry ::= SEQUENCE
-{
-    prioPrecToDscpIfValue             InterfaceIndex,
-    prioPrecToDscpPrecValue           Integer32,
-    prioPrecToDscpDscpValue           Integer32
-}
-
-prioPrecToDscpIfValue OBJECT-TYPE
-    SYNTAX      InterfaceIndex
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The port or trunk interface of the device. The interface identified by
-         a particular value of this index is the same interface as identified
-         by the same value of ifIndex in the IF-MIB."
-    ::= { prioPrecToDscpEntry 1 }
-
-prioPrecToDscpPrecValue OBJECT-TYPE
+prioCosToDscpPhbValue OBJECT-TYPE
     SYNTAX      Integer32 (0..7)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The IP precedence value mapped to internal QoS label value which is
-         composed of PHB (3 bits) and drop precedence (2 bits)."
-    ::= { prioPrecToDscpEntry 2 }
-
-prioPrecToDscpDscpValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..63)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The DSCP value used to represent internal QoS label (3 bits PHB + 2
-         bits Drop precedence). The MSB 4 bits of DSCP are used to represent
-         PHB value of QoS label; The LSB 2 bits of DSCP are used to represent
-         the drop precedence value of QoS label. Green(0),Yellow(3), Red(1).
-         In a word, PHB=(DSCP>>2), Drop precedence=(DSCP & 0x3). Note: The
-         setting range of PHB value must be 0~7 and the setting drop precedence
-         value must be one of values(0,1,3)."
-    ::= { prioPrecToDscpEntry 3 }
+        "The PHB value of internal QoS label."
+    ::= { prioCosToDscpEntry 5 }
+
+prioCosToDscpColorValue OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    green(0),
+                    red(1),
+                    yellow(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The drop precedence value of internal QoS label. Green(0), Yellow(3),
+         Red(1)."
+    ::= { prioCosToDscpEntry 6 }
 
 --
--- The mapping table from DSCP to internal Qos label
+-- The interface mapping table from DSCP to internal Qos label
 --
 
 prioDscpToDscpTable OBJECT-TYPE
@@ -6458,9 +7226,10 @@ prioDscpToDscpEntry OBJECT-TYPE
 
 PrioDscpToDscpEntry ::= SEQUENCE
 {
-    prioDscpToDscpIfValue                    InterfaceIndex,
-    prioDscpToDscpIngressDscpValue           Integer32,
-    prioDscpToDscpDscpValue                  Integer32
+    prioDscpToDscpIfValue           InterfaceIndex,
+    prioDscpToDscpIngressDscpValue  Integer32,
+    prioDscpToDscpPhbValue          Integer32,
+    prioDscpToDscpColorValue        INTEGER
 }
 
 prioDscpToDscpIfValue OBJECT-TYPE
@@ -6482,247 +7251,30 @@ prioDscpToDscpIngressDscpValue OBJECT-TYPE
          value."
     ::= { prioDscpToDscpEntry 2 }
 
-prioDscpToDscpDscpValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..63)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The DSCP value used to represent internal QoS label (3 bits PHB + 2
-         bits Drop precedence). The MSB 4 bits of DSCP are used to represent
-         PHB value of Qos label. The LSB 2 bits of DSCP are used to represent
-         the drop precedence value of QoS label. Green(0),Yellow(3), Red(1).
-         In a word, PHB=(DSCP>>2), Drop precedence=(DSCP & 0x3).
-
-         Note: The setting range of PHB value must be 0~7 and the setting drop
-         precedence value must be one of values (0,1,3)."
-    ::= { prioDscpToDscpEntry 3 }
-
---
--- The mapping table from TCP/UDP destination port number to internal Qos label
---
-
-prioDstPortToDscpTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF PrioDstPortToDscpEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table for TCP/UDP destination port number to internal Qos label
-         mapping. This table setting will always take effect for TCP/UDP
-         packets no matter of what interface QoS mapping classification mode is
-         set."
-    ::= { cosMgt 6 }
-
-prioDstPortToDscpEntry OBJECT-TYPE
-    SYNTAX      PrioDstPortToDscpEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry for TCP/UDP destination port to internal QoS label mapping."
-    INDEX
-    {
-        prioDstPortToDscpIfValue,
-        prioDstPortToDscpProtocolValue,
-        prioDstPortToDscpDstPortValue
-    }
-    ::= { prioDstPortToDscpTable 1 }
-
-PrioDstPortToDscpEntry ::= SEQUENCE
-{
-    prioDstPortToDscpIfValue            InterfaceIndex,
-    prioDstPortToDscpProtocolValue      INTEGER,
-    prioDstPortToDscpDstPortValue       Integer32,
-    prioDstPortToDscpDscpValue          Integer32
-}
-
-prioDstPortToDscpIfValue OBJECT-TYPE
-    SYNTAX      InterfaceIndex
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The port or the trunk interface of the device. The interface
-         identified by a particular value of this index is the same interface
-         as identified by the same value of ifIndex in the IF-MIB."
-    ::= { prioDstPortToDscpEntry 1 }
-
-prioDstPortToDscpProtocolValue OBJECT-TYPE
-    SYNTAX      INTEGER
-                         {
-                              tcp(6),
-                              udp(17)
-                        }
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The protocol value (TCP:6, UDP:17) which will be mapped to internal
-         QoS label value."
-::= { prioDstPortToDscpEntry 2 }
-
-prioDstPortToDscpDstPortValue OBJECT-TYPE
-    SYNTAX      Integer32(1..65535)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The destination port number value which will be mapped to internal
-         QoS label value."
-    ::= { prioDstPortToDscpEntry 3 }
-
-prioDstPortToDscpDscpValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..63)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The DSCP value used to represent internal QoS label (3 bits PHB + 2
-         bits Drop precedence). The MSB 4 bits of DSCP is used to represent PHB
-         value of QoS label. The LSB 2 bits of DSCP is used to represent the
-         drop precedence value of Qos label. Green(0),Yellow(3), Red(1). In a
-         word, PHB=(DSCP>>2), Drop precedence=(DSCP & 0x3). Note: The setting
-         range of PHB value must be 0~7 and the setting drop precedence value
-         must be one of values (0,1,3)."
-    ::= { prioDstPortToDscpEntry 4 }
-
-
---
--- The mapping table from internal Qos label to CoS and CFI
---
-
-prioDscpToCosTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF PrioDscpToCosEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table for internal QoS label to CoS and CFI mapping."
-    ::= { cosMgt 7 }
-
-prioDscpToCosEntry OBJECT-TYPE
-    SYNTAX      PrioDscpToCosEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry for internal QoS label to CoS and CFI mapping."
-    INDEX
-    {
-        prioDscpToCosIfValue,
-        prioDscpToCosPHBValue,
-        prioDscpToCosDropPrecedenceValue
-    }
-    ::= { prioDscpToCosTable 1 }
-
-PrioDscpToCosEntry ::= SEQUENCE
-{
-    prioDscpToCosIfValue                InterfaceIndex,
-    prioDscpToCosPHBValue               Integer32,
-    prioDscpToCosDropPrecedenceValue    INTEGER,
-    prioDscpToCosCFICosValue            Integer32
-}
-
-prioDscpToCosIfValue OBJECT-TYPE
-    SYNTAX      InterfaceIndex
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The port or trunk interface of the device. The interface identified by
-         a particular value of this index is the same interface as identified
-         by the same value of ifIndex in the IF-MIB."
-    ::= { prioDscpToCosEntry 1 }
-
-prioDscpToCosPHBValue OBJECT-TYPE
+prioDscpToDscpPhbValue OBJECT-TYPE
     SYNTAX      Integer32 (0..7)
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The PHB value of internal QoS label."
-    ::= { prioDscpToCosEntry 2 }
+    ::= { prioDscpToDscpEntry 4 }
 
-prioDscpToCosDropPrecedenceValue OBJECT-TYPE
+prioDscpToDscpColorValue OBJECT-TYPE
     SYNTAX      INTEGER
                 {
                     green(0),
                     red(1),
                     yellow(3)
                 }
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The drop precedence value of internal QoS label. Green(0), Yellow(3),
          Red(1)."
-    ::= { prioDscpToCosEntry 3 }
+    ::= { prioDscpToDscpEntry 5 }
 
-prioDscpToCosCFICosValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..16)
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The remarked CFI and CoS value mapped from the internal Qos label
-         value when the packet leaves the device. The egress remarked CFI
-         value equals to (prioDscpToCosCFICosValue >>3) and the egress
-         remarked CoS value equals to (prioDscpToCosCFICosValue & 0x7)."
-    ::= { prioDscpToCosEntry 4 }
-
--- The mapping table for packet priority to drop precedence mapping.
-
-prioPrioToDropPrecTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF PrioPrioToDropPrecEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Table for packet priority to drop precedence mapping."
-    ::= { cosMgt 8 }
-
-prioPrioToDropPrecEntry OBJECT-TYPE
-    SYNTAX      PrioPrioToDropPrecEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "Entry for packet priority to drop precedence mapping."
-    INDEX
-    {
-        prioPrioToDropPrecIfValue,
-        prioPrioToDropPrecPriorityValue
-    }
-    ::= { prioPrioToDropPrecTable 1 }
-
-PrioPrioToDropPrecEntry ::= SEQUENCE
-{
-    prioPrioToDropPrecIfValue    		InterfaceIndex,
-    prioPrioToDropPrecPriorityValue     Integer32,
-    prioPrioToDropPrecPrecValue         INTEGER
-}
-
-prioPrioToDropPrecIfValue OBJECT-TYPE
-    SYNTAX      InterfaceIndex
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The port or the trunk interface of the device. The interface
-         identified by a particular value of this index is the same interface
-         as identified by the same value of ifIndex in the IF-MIB."
-    ::= { prioPrioToDropPrecEntry 1 }
-
-
-prioPrioToDropPrecPriorityValue OBJECT-TYPE
-    SYNTAX      Integer32 (0..7)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The value of packet default priority."
-    ::= { prioPrioToDropPrecEntry 2 }
-
-prioPrioToDropPrecPrecValue OBJECT-TYPE
-    SYNTAX      INTEGER
-                {
-                    green(0),
-                    red(1),
-                    yellow(3)
-                }
-
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-         "The drop precedence value of internal QoS label. Green(0),Yellow(3),
-         Red(1)."
-    ::= { prioPrioToDropPrecEntry 3 }
-
--- The mapping table from PHB to queue
+--
+-- The interface mapping table from PHB to queue
 --
 
 prioDscpToQueueTable OBJECT-TYPE
@@ -6748,9 +7300,9 @@ prioDscpToQueueEntry OBJECT-TYPE
 
 PrioDscpToQueueEntry ::= SEQUENCE
 {
-    prioDscpToQueueIfValue             InterfaceIndex,
-    prioDscpToQueuePHBValue            Integer32,
-    prioDscpToQueueQueueValue          Integer32
+    prioDscpToQueueIfValue      InterfaceIndex,
+    prioDscpToQueuePHBValue     Integer32,
+    prioDscpToQueueQueueValue   Integer32
 }
 
 prioDscpToQueueIfValue OBJECT-TYPE
@@ -6778,6 +7330,10 @@ prioDscpToQueueQueueValue OBJECT-TYPE
     DESCRIPTION
         "The queue value which is mapped from the PHB value of QoS label."
     ::= { prioDscpToQueueEntry 3 }
+
+-- End of interface tables for Cos priority management: cosMgt(3).
+-- Corresponding global tables are defined in cosGlobalMgt(6).
+
 
 --
 --diffServMgt
@@ -7129,7 +7685,9 @@ diffServClassMapElementIndexTypeList OBJECT-TYPE
                  diffServMacAceEntry. When the type is ipAce(2), the maping
                  index of differServClasssMapElementIndexList is the
                  diffServIpAceEntry. When the type is acl(3), the maping index
-                 of differServClasssMapElementIndexList is the diffServAclEntry."
+                 of differServClasssMapElementIndexList is the diffServAclEntry.
+                 When the type is ipv6Ace(4), the maping index of 
+                 differServClasssMapElementIndexList is the diffServIpv6AceEntry."
     ::= { diffServClassMapEntry 5 }
 
 diffServClassMapElementIndexList OBJECT-TYPE
@@ -7148,7 +7706,10 @@ diffServClassMapElementIndexList OBJECT-TYPE
                  diffServMacAceEntry. When the type is ipAce(2), the maping
                  index of differServClasssMapElementIndexList is the
                  diffServIpAceEntry. When the type is acl(3), the maping index
-                 of differServClasssMapElementIndexList is the diffServAclEntry."
+                 of differServClasssMapElementIndexList is the diffServAclEntry.
+                 When type is ipv6Ace(4), the maping index of
+                 differServClasssMapElementIndexList is the
+                 diffServIpv6AceEntry."
     ::= { diffServClassMapEntry 6 }
 
 diffServClassMapStatus OBJECT-TYPE
@@ -7223,7 +7784,8 @@ diffServClassMapAttachCtlElementIndexType OBJECT-TYPE
     SYNTAX    INTEGER {
                      macAce(1),
                      ipAce(2),
-                     acl(3)
+                     acl(3),
+                     ipv6Ace(4)
                 }
     MAX-ACCESS  read-write
     STATUS      current
@@ -7234,7 +7796,9 @@ diffServClassMapAttachCtlElementIndexType OBJECT-TYPE
                  ipAce(2), the index of diffServClassMapAttachCtlElementIndex
                  is the index of diffServIpAceEntry. When the type is acl(3),
                  the index of diffServClassMapAttachCtlElementIndex is the
-                 index of diffServAclEntry."
+                 index of diffServAclEntry. When type is ipv6Ace(4), the index of
+                 diffServClassMapAttachCtlElementIndex is the index of
+                 diffServIpv6AceEntry."
     ::= { diffServClassMapAttachCtl 2 }
 
 diffServClassMapAttachCtlElementIndex OBJECT-TYPE
@@ -7252,7 +7816,8 @@ diffServClassMapAttachCtlElementIndex OBJECT-TYPE
                  index of differServClasssMapElementIndexList is the
                  diffServIpAceEntry. When the type is acl(3), the maping index
                  of differServClasssMapElementIndexList is the
-                 diffServAclEntry."
+                 diffServAclEntry. When type is ipv6Ace(4), the maping index of
+                 differServClasssMapElementIndexList is the diffServIpv6AceEntry."
     ::= { diffServClassMapAttachCtl 3 }
 
 diffServClassMapAttachCtlAction OBJECT-TYPE
@@ -8978,43 +9543,6 @@ diffServArpAclName OBJECT-TYPE
                      in the device."
         ::= { diffServArpEntry 1 }
 
-diffServTcamMgt     OBJECT IDENTIFIER ::= { diffServMgt 25 }
-
-diffServTcamTotalPolicyControlEntries OBJECT-TYPE
-        SYNTAX      Integer32
-        MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION "The total number of policy control entries."
-        ::= { diffServTcamMgt 1 }
-
-diffServTcamFreePolicyControlEntries OBJECT-TYPE
-        SYNTAX      Integer32
-        MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION "The free number of policy control entries."
-        ::= { diffServTcamMgt 2 }
-
-diffServTcamUtilization OBJECT-TYPE
-        SYNTAX      Integer32(0..10000)
-        MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION "TCAM utilization in hundredths of a percent."
-        ::= { diffServTcamMgt 3 }
-
-diffServTcamEntriesUsedBySystem OBJECT-TYPE
-        SYNTAX      Integer32
-        MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION "The number of policy control entries used by system."
-        ::= { diffServTcamMgt 4 }
-
-diffServTcamEntriesUsedByUser OBJECT-TYPE
-        SYNTAX      Integer32
-        MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION "The number of policy control entries used by user."
-        ::= { diffServTcamMgt 5 }
-
 diffServAclHwCounterTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF DiffServAclHwCounterEntry
         MAX-ACCESS  not-accessible
@@ -9108,7 +9636,7 @@ diffServPolicyMapPortEntry OBJECT-TYPE
         STATUS      current
         DESCRIPTION "Entry for diffServPolicyMapPortTable."
         INDEX       { 
-                        diffServPortIfIndex,
+                        diffServPolicyMapPortIfIndex,
                         diffServPolicyMapPortDirection
                     }
         ::= { diffServPolicyMapPortTable 1 }
@@ -9359,7 +9887,113 @@ diffServAccessGroupStatus OBJECT-TYPE
                  SNMPv2-TC MIB.
                  "
     ::= { diffServAccessGroupEntry 7 }
+
+diffServTcamTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DiffServTcamEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The conceptual table of all of DiffServTcamEntry."
+        ::= { diffServMgt 29 }
+
+diffServTcamEntry OBJECT-TYPE
+        SYNTAX      DiffServTcamEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The conceptual row for diffServTcamTable."
+        INDEX       {
+                        diffServTcamUnit,
+                        diffServTcamDevice,
+                        diffServTcamPool
+                    }
+        ::= { diffServTcamTable 1 }
+
+DiffServTcamEntry ::= SEQUENCE
+{
+    diffServTcamUnit            Integer32,
+    diffServTcamDevice          Integer32,
+    diffServTcamPool            Integer32,
+    diffServTcamPoolCapability  BITS,
+    diffServTcamTotal           Integer32,
+    diffServTcamFree            Integer32,
+    diffServTcamUsed            Integer32
+}
+
+diffServTcamUnit OBJECT-TYPE
+        SYNTAX      Integer32(1..8)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object identifies the switch within the system
+                     for which this entry contains information."
+        ::= { diffServTcamEntry 1 }
         
+diffServTcamDevice OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The device id of the specified unit."
+        ::= { diffServTcamEntry 2 }
+        
+diffServTcamPool OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The TCAM pool index of the specified unit and device."
+        ::= { diffServTcamEntry 3 }
+        
+diffServTcamPoolCapability OBJECT-TYPE
+        SYNTAX      BITS
+                    {
+                        macAcl(0),
+                        ipAcl(1),
+                        ipv6StdAcl(2),
+                        ipv6ExtAcl(3),
+                        macDiffServ(4),
+                        ipDiffServ(5),
+                        ipv6StdDiffServ(6),
+                        ipv6ExtDiffServ(7),
+                        egressMacAcl(8),
+                        egressIpAcl(9),
+                        egressIpv6StdAcl(10),
+                        egressIpv6ExtAcl(11),
+                        egressMacDiffServ(12),
+                        egressIpDiffServ(13),
+                        egressIpv6StdDiffServ(14),
+                        egressIpv6ExtDiffServ(15),
+                        webAuth(16),
+                        ipSourceGuard(17),
+                        ipv6SourceGuard(18),
+                        cpuInterface(19),
+                        rateLimit(20),
+                        linkLocal(21),
+                        reserved(22)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The bitmap value used to identify which functions
+                     supported on this pool."
+        ::= { diffServTcamEntry 4 }
+        
+diffServTcamTotal OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of TCAM pool entry."
+        ::= { diffServTcamEntry 5 }
+        
+diffServTcamFree OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The free number of TCAM pool entry."
+        ::= { diffServTcamEntry 6 }
+
+diffServTcamUsed OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The used number of TCAM pool entry."
+        ::= { diffServTcamEntry 7 }
+
 --
 -- securityMgt
 --
@@ -9781,7 +10415,8 @@ PortSecPortEntry ::= SEQUENCE
       portSecPortIndex      InterfaceIndex,
       portSecPortStatus     EnabledStatus,
       portSecAction         INTEGER,
-      portSecMaxMacCount       Integer32
+      portSecMaxMacCount    Integer32,
+      portSecAutoSaveStatus EnabledStatus
 }
 
 portSecPortIndex OBJECT-TYPE
@@ -9835,6 +10470,14 @@ portSecMaxMacCount OBJECT-TYPE
                       to learn the MAC, and auto enabled the portSecPortStatus when
                       the MAC has reached this value."
         ::= { portSecPortEntry 4 }
+
+portSecAutoSaveStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Set enabled(1) to enable the feature and set disabled(2) to
+                     disable the feature."
+        ::= { portSecPortEntry 7  }
 
 --
 -- portSecMacAsPermanentMgt
@@ -10172,9 +10815,6 @@ SshConnInfoEntry ::= SEQUENCE
    sshConnMinorVersion   Integer32,
    sshConnStatus         INTEGER,
 --both sshv1 & sshv2 end
---sshv1 only start
-   sshConnEncryptionType INTEGER,
---sshv1 only end
 --both sshv1 & sshv2 start
    sshConnUserName       DisplayString,
    sshDisconnect         INTEGER,
@@ -12261,7 +12901,7 @@ AppFilterPortEntry ::= SEQUENCE
 {
       appFilterPortIndex        InterfaceIndex,
       appFilterProtocolType     INTEGER,
-      appFilterPktStatus        INTEGER,
+      appFilterPktStatus        INTEGER
 }
 
 appFilterPortIndex OBJECT-TYPE
@@ -12278,7 +12918,7 @@ appFilterProtocolType OBJECT-TYPE
         SYNTAX        INTEGER
                       {
                         cdp(1),
-                        pvst(2),
+                        pvst(2)
                       }
         MAX-ACCESS    not-accessible
         STATUS        current
@@ -12418,7 +13058,7 @@ remoteLogServerStatus OBJECT-TYPE
 
 remoteLogServerUdpPort OBJECT-TYPE
          SYNTAX      Integer32 (1..65535)
-         MAX-ACCESS  not-accessible
+         MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION  "The UDP port number of the remote log Server"
          ::= { remoteLogServerInetEntry 4 }
@@ -13843,13 +14483,13 @@ mcastStormEntry OBJECT-TYPE
 
 McastStormEntry ::= SEQUENCE
 {
-    mcastStormIfIndex      Integer32,
+    mcastStormIfIndex      InterfaceIndex,
     mcastStormStatus       EnabledStatus,
     mcastStormOctetRate    Integer32
 }
 
 mcastStormIfIndex OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The port and the trunk (including trunk members) interface of
@@ -13898,13 +14538,13 @@ bcastStormEntry OBJECT-TYPE
 
 BcastStormEntry ::= SEQUENCE
 {
-    bcastStormIfIndex      Integer32,
+    bcastStormIfIndex      InterfaceIndex,
     bcastStormStatus       EnabledStatus,
     bcastStormOctetRate    Integer32
 }
 
 bcastStormIfIndex OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "The port and the trunk (including trunk members) interface of
@@ -13951,13 +14591,13 @@ unknownUcastStormEntry OBJECT-TYPE
 
 UnknownUcastStormEntry  ::= SEQUENCE
 {
-    unknownUcastStormIfIndex    Integer32,
+    unknownUcastStormIfIndex    InterfaceIndex,
     unknownUcastStormStatus     EnabledStatus,
     unknownUcastStormOctetRate  Integer32
 }
 
 unknownUcastStormIfIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      InterfaceIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "The port or trunk interface of the portTable. The interface
@@ -14022,7 +14662,7 @@ atcBcastStormEntry OBJECT-TYPE
 
 AtcBcastStormEntry ::= SEQUENCE
 {
-    atcBcastStormIfIndex                Integer32,
+    atcBcastStormIfIndex                InterfaceIndex,
     atcBcastStormEnable                 EnabledStatus,
     atcBcastStormAutoRelease            EnabledStatus,
     atcBcastStormSampleType             INTEGER,
@@ -14037,7 +14677,7 @@ AtcBcastStormEntry ::= SEQUENCE
 }
 
 atcBcastStormIfIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      InterfaceIndex
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION "The specified port on which the ATC is applied."
@@ -14174,7 +14814,7 @@ atcMcastStormEntry OBJECT-TYPE
 
 AtcMcastStormEntry ::= SEQUENCE
 {
-    atcMcastStormIfIndex                Integer32,
+    atcMcastStormIfIndex                InterfaceIndex,
     atcMcastStormEnable                 EnabledStatus,
     atcMcastStormAutoRelease            EnabledStatus,
     atcMcastStormSampleType             INTEGER,
@@ -14189,7 +14829,7 @@ AtcMcastStormEntry ::= SEQUENCE
 }
 
 atcMcastStormIfIndex OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      InterfaceIndex
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION "The specified port on which the ATC is applied."
@@ -14302,27 +14942,27 @@ atcMcastStormTcReleaseTrapStatus OBJECT-TYPE
 -- cpuStatus
 
          cpuCurrentUti            OBJECT-TYPE
-            SYNTAX      INTEGER(1..100)
+            SYNTAX      Integer32 (1..100)
             UNITS       "%"
-            ACCESS      read-only
+            MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
                 "The current CPU utilization in percent in the past 5 seconds."
             ::= { cpuStatus 1 }
 
         cpuStatMaxUti            OBJECT-TYPE
-            SYNTAX      INTEGER(1..100)
+            SYNTAX      Integer32 (1..100)
             UNITS       "%"
-            ACCESS      read-only
+            MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
                 "The maximum CPU utilization in percent in the past 60 seconds."
             ::= { cpuStatus 2 }
 
         cpuStatAvgUti            OBJECT-TYPE
-            SYNTAX      INTEGER(1..100)
+            SYNTAX      Integer32 (1..100)
             UNITS       "%"
-            ACCESS      read-only
+            MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
                 "The average CPU utilization in percent in the past 60 seconds."
@@ -14330,7 +14970,7 @@ atcMcastStormTcReleaseTrapStatus OBJECT-TYPE
 
         cpuPeakTime            OBJECT-TYPE
             SYNTAX      DisplayString
-            ACCESS      read-only
+            MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
                 "The time when the CPU utilization reaches cpuUtiRisingThreshold
@@ -14339,9 +14979,9 @@ atcMcastStormTcReleaseTrapStatus OBJECT-TYPE
             ::= { cpuStatus 4 }
 
         cpuPeakDuration       OBJECT-TYPE
-            SYNTAX      INTEGER
+            SYNTAX      Integer32
             UNITS       "second"
-            ACCESS      read-only
+            MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
                 "The duration from the CPU utilization reaches cpuUtiRisingThreshold
@@ -14349,18 +14989,18 @@ atcMcastStormTcReleaseTrapStatus OBJECT-TYPE
             ::= { cpuStatus 5 }
 
         cpuUtiRisingThreshold            OBJECT-TYPE
-            SYNTAX      INTEGER(1..100)
+            SYNTAX      Integer32 (1..100)
             UNITS       "%"
-            ACCESS      read-write
+            MAX-ACCESS  read-write
             STATUS      current
             DESCRIPTION
                 "The rising threshold of the cpu utilization."
             ::= { cpuStatus 6 }
 
         cpuUtiFallingThreshold           OBJECT-TYPE
-            SYNTAX      INTEGER(1..100)
+            SYNTAX      Integer32 (1..100)
             UNITS       "%"
-            ACCESS      read-write
+            MAX-ACCESS  read-write
             STATUS      current
             DESCRIPTION
                 "The falling threshold of the cpu utilization."
@@ -14369,54 +15009,170 @@ atcMcastStormTcReleaseTrapStatus OBJECT-TYPE
 -- memoryStatus
 
          memoryTotal    OBJECT-TYPE
-            SYNTAX      INTEGER
-            ACCESS      read-only
+            SYNTAX      Integer32
+            MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
                 "The total amount of the memory in kilobytes."
             ::= { memoryStatus 1 }
 
           memoryAllocated       OBJECT-TYPE
-            SYNTAX      INTEGER
-            ACCESS      read-only
+            SYNTAX      Integer32
+            MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
                 "The amount of the memory allocated in kilobytes."
             ::= { memoryStatus 2 }
 
           memoryFreed    OBJECT-TYPE
-            SYNTAX      INTEGER
-            ACCESS      read-only
+            SYNTAX      Integer32
+            MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
                 "The amount of the free memory in kilobytes."
             ::= { memoryStatus 3}
 
          memoryFreedInPercent         OBJECT-TYPE
-            SYNTAX      INTEGER(1..100)
-            ACCESS      read-only
+            SYNTAX      Integer32 (1..100)
+            MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
                 "the memory freed in proportion to the total memory."
             ::= { memoryStatus 4 }
 
          memoryUtiRisingThreshold            OBJECT-TYPE
-            SYNTAX      INTEGER(1..100)
+            SYNTAX      Integer32 (1..100)
             UNITS       "%"
-            ACCESS      read-write
+            MAX-ACCESS  read-write
             STATUS      current
             DESCRIPTION
                  "The rising threshold of the memory utilization."
             ::= { memoryStatus 5 }
 
          memoryUtiFallingThreshold            OBJECT-TYPE
-            SYNTAX      INTEGER(1..100)
+            SYNTAX      Integer32 (1..100)
             UNITS       "%"
-            ACCESS      read-write
+            MAX-ACCESS  read-write
             STATUS      current
             DESCRIPTION
                  "The falling threshold of the memory utilization."
             ::= { memoryStatus 6 }
+
+-- taskCpuTable
+
+taskCpuTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TaskCpuEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table of descriptive and status information describing the
+             CPU utilization of each task."
+        ::= { sysResourceMgt 4 }
+
+taskCpuEntry OBJECT-TYPE
+        SYNTAX      TaskCpuEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the table, describing the CPU utilization of one
+             task."
+        INDEX       { taskCpuName }
+        ::= { taskCpuTable 1 }
+
+TaskCpuEntry ::= SEQUENCE
+{
+        taskCpuName             DisplayString,
+        taskCpuCurrentUti       Integer32,
+        taskCpuStatMaxUti       Integer32,
+        taskCpuStatAvgUti       Integer32
+}
+
+taskCpuName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..15))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The name of the task."
+        ::= { taskCpuEntry 1 }
+
+taskCpuCurrentUti OBJECT-TYPE
+        SYNTAX      Integer32 (1..10000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current CPU utilization in hundredths of a percent in the
+             past 5 seconds."
+        ::= { taskCpuEntry 2 }
+
+taskCpuStatMaxUti OBJECT-TYPE
+        SYNTAX      Integer32 (1..10000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum CPU utilization in hundredths of a percent in the
+             past 60 seconds."
+        ::= { taskCpuEntry 3 }
+
+taskCpuStatAvgUti OBJECT-TYPE
+        SYNTAX      Integer32 (1..10000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The average CPU utilization in hundredths of a percent in the
+             past 60 seconds."
+        ::= { taskCpuEntry 4 }
+
+-- cpuGuard
+
+cpuGuard                OBJECT IDENTIFIER ::= { sysResourceMgt 5 }
+
+cpuGuardStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The CPU guard status."
+        ::= { cpuGuard 1 }
+
+cpuGuardHighWatermark OBJECT-TYPE
+        SYNTAX      Integer32 (20..100)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The CPU guard high-watermark."
+        ::= { cpuGuard 2 }
+
+cpuGuardLowWatermark OBJECT-TYPE
+        SYNTAX      Integer32 (20..100)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The CPU guard low-watermark."
+        ::= { cpuGuard 3 }
+
+cpuGuardMaxThreshold OBJECT-TYPE
+        SYNTAX      Integer32 (50..500)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The CPU guard maximum threshold."
+        ::= { cpuGuard 4 }
+
+cpuGuardMinThreshold     OBJECT-TYPE
+        SYNTAX      Integer32 (50..500)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The CPU guard minimum threshold."
+        ::= { cpuGuard 5 }
+
+cpuGuardTrapStatus       OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The CPU guard trap status."            
+        ::= { cpuGuard 6 }
+
+cpuGuardCurrentThreshold OBJECT-TYPE
+        SYNTAX      Integer32 (50..500)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The current CPU guard threshold."
+        ::= { cpuGuard 7 }
 
 --
 --mvrMgt
@@ -14424,7 +15180,7 @@ atcMcastStormTcReleaseTrapStatus OBJECT-TYPE
 
 
 mvrForwardingPriority OBJECT-TYPE
-        SYNTAX  Integer32(0..6|65535)
+        SYNTAX  Integer32(0..7|65535)
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "Configure MVR multicast stream forwarding priority.
@@ -14924,8 +15680,8 @@ mvrProxyQueryInterval OBJECT-TYPE
 mvrSourcePortmode OBJECT-TYPE
         SYNTAX      INTEGER
         {
-            dynamic(0),
-            forward(1)
+            dynamic(1),
+            forward(2)
         }
         MAX-ACCESS  read-write
         STATUS      current
@@ -16000,7 +16756,7 @@ mvr6VlanStatisticsClearStatistics OBJECT-TYPE
         ::= { mvr6VlanStatisticsEntry 14}
 
 mvr6ForwardingPriority OBJECT-TYPE
-        SYNTAX  Integer32(0..6|65535)
+        SYNTAX  Integer32(0..7|65535)
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "Configure MVR multicast stream forwarding priority.
@@ -16146,7 +16902,8 @@ dhcpSnoopPortConfigEntry    OBJECT-TYPE
 DhcpSnoopPortConfigEntry    ::= SEQUENCE
 {
         dhcpSnoopPortIfIndex        InterfaceIndex,
-        dhcpSnoopPortTrustEnable    EnabledStatus
+        dhcpSnoopPortTrustEnable    EnabledStatus,
+        dhcpSnoopPortMaxNumber      Integer32 
 }
 
 dhcpSnoopPortIfIndex        OBJECT-TYPE
@@ -16163,6 +16920,15 @@ dhcpSnoopPortTrustEnable    OBJECT-TYPE
         DESCRIPTION "This object indicates whether the port or trunk is trusted
                      for DHCP Snooping purpose."
         ::= { dhcpSnoopPortConfigEntry 2 }
+        
+dhcpSnoopPortMaxNumber OBJECT-TYPE
+        SYNTAX      Integer32(1..1024|65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates the max client number of per port.
+                     If the value is 65535, it means the filter-only mode is
+                     enabled."
+        ::= { dhcpSnoopPortConfigEntry 6} 
 --
 dhcpSnoopBindingsTable      OBJECT-TYPE
         SYNTAX      SEQUENCE OF DhcpSnoopBindingsEntry
@@ -16179,7 +16945,7 @@ dhcpSnoopBindingsEntry      OBJECT-TYPE
         DESCRIPTION "An instance contains the Mac address, IP address type,
                      IP address, VLAN number, interface number, leased time and
                      status."
-        INDEX       { dhcpSnoopBindingsVlanIndex, dhcpSnoopBindingsMacAddress }
+        INDEX       { dhcpSnoopBindingsIpAddress, dhcpSnoopBindingsMacAddress }
         ::= { dhcpSnoopBindingsTable 1 }
 
 DhcpSnoopBindingsEntry      ::= SEQUENCE
@@ -16195,7 +16961,7 @@ DhcpSnoopBindingsEntry      ::= SEQUENCE
 
 dhcpSnoopBindingsVlanIndex      OBJECT-TYPE
         SYNTAX      VlanIndex
-        MAX-ACCESS  not-accessible
+        MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION "This object indicates the VLAN which a DHCP client host
                      belongs to."
@@ -16227,7 +16993,7 @@ dhcpSnoopBindingsEntryType      OBJECT-TYPE
 
 dhcpSnoopBindingsIpAddress      OBJECT-TYPE
         SYNTAX      IpAddress
-        MAX-ACCESS  read-only
+        MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "This object indicates the allocated IP address of
                      a DHCP client host."
@@ -16557,7 +17323,10 @@ ipSrcGuardConfigEntry       OBJECT-TYPE
 IpSrcGuardConfigEntry       ::= SEQUENCE
 {
         ipSrcGuardPortIfIndex       InterfaceIndex,
-        ipSrcGuardMode              INTEGER
+        ipSrcGuardMode              INTEGER,
+        ipSrcGuardTableMode         INTEGER,
+        ipSrcGuardAclMaxBinding     INTEGER,
+        ipSrcGuardMacMaxBinding     INTEGER
 }
 
 ipSrcGuardPortIfIndex       OBJECT-TYPE
@@ -16569,7 +17338,10 @@ ipSrcGuardPortIfIndex       OBJECT-TYPE
         ::= { ipSrcGuardConfigEntry 1 }
 
 ipSrcGuardMode      OBJECT-TYPE
-        SYNTAX      INTEGER { diabled(0), srcIp(1), srcIpMac(2) }
+        SYNTAX      INTEGER 
+                    { diabled(0), 
+                      srcIp(1), 
+                      srcIpMac(2) }
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "This object indicates whether Ip Source Guard is enabled
@@ -16579,6 +17351,36 @@ ipSrcGuardMode      OBJECT-TYPE
                      If the value equals 2, it means Ip Source Guard is enabled
                      and packets are filtered by checking source ip and source mac."
         ::= { ipSrcGuardConfigEntry 2 }
+
+ipSrcGuardTableMode OBJECT-TYPE
+        SYNTAX      INTEGER 
+                    { acl(1), 
+                      mac(2)}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates the table mode IP Source Guard select.
+                     If the value equals 1, it means IP Source Guard choose ACL mode
+                     to filter packet. If the value equals 2, it means IP Source 
+                     Guard choose MAC mode to filter packet."
+        ::= { ipSrcGuardConfigEntry 3}
+
+ipSrcGuardAclMaxBinding OBJECT-TYPE
+        SYNTAX      INTEGER (1..16)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates the maximum binding number in ACL mode.
+                     The number of IP Source Guard bindings in ACL mode will 
+                     be limited by this value."
+        ::= { ipSrcGuardConfigEntry 4}
+
+ipSrcGuardMacMaxBinding OBJECT-TYPE
+        SYNTAX      INTEGER (1..1024)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object indicates the maximum binding numer in MAC mode.
+                     The number of IP Source Guard bindings in MAC mode will 
+                     be limited by this value."
+        ::= { ipSrcGuardConfigEntry 5}
 --
 
 ipSrcGuardAclTable     OBJECT-TYPE
@@ -16658,6 +17460,84 @@ ipSrcGuardAclBindingStatus     OBJECT-TYPE
                      conceptual row exists in the agent, but is unavailable for use
                      by the managed device."
         ::= { ipSrcGuardAclEntry 6}
+
+ipSrcGuardMacTable     OBJECT-TYPE
+        SYNTAX      SEQUENCE OF IpSrcGuardMacEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table contains the IP Source Guard MAC binding information
+                     learned by the device or configured by the user."
+        ::= { ipSrcGuardMgt 4 }
+
+ipSrcGuardMacEntry     OBJECT-TYPE
+        SYNTAX      IpSrcGuardMacEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An instance contains the IP address, Mac address,
+                     VLAN number, interface number and status."
+        INDEX   { ipSrcGuardMacBindingMacAddress,
+                  ipSrcGuardMacBindingIpAddress}
+        ::= { ipSrcGuardMacTable 1 }
+
+IpSrcGuardMacEntry     ::= SEQUENCE
+{
+        ipSrcGuardMacBindingMacAddress        MacAddress,
+        ipSrcGuardMacBindingIpAddress         IpAddress,
+        ipSrcGuardMacBindingStartVlan         Integer32,
+        ipSrcGuardMacBindingEndVlan           Integer32,                  
+        ipSrcGuardMacBindingPortList          OCTET STRING,
+        ipSrcGuardMacBindingStatus            RowStatus
+}
+
+ipSrcGuardMacBindingMacAddress     OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object indicates the MAC address of a MAC binding entry."
+        ::= { ipSrcGuardMacEntry 1 }
+
+ipSrcGuardMacBindingIpAddress     OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object indicates the IP address of a MAC binding entry."
+        ::= { ipSrcGuardMacEntry 2 }
+
+ipSrcGuardMacBindingStartVlan      OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object indicates the start VLAN which a MAC binding belongs to."
+        ::= { ipSrcGuardMacEntry 3}
+
+ipSrcGuardMacBindingEndVlan    OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object indicates the end VLAN which a MAC binding belongs to."
+        ::= { ipSrcGuardMacEntry 4}
+
+ipSrcGuardMacBindingPortList   OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(0..128))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object indicates the port or trunk where a MAC binding associated."
+        ::= { ipSrcGuardMacEntry 5}
+
+ipSrcGuardMacBindingStatus     OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The status of this conceptual row entry. This object issued to
+                     manage the creation and deletion of conceptual rows.
+                     The status column has six defined values:  - 'active', which
+                     indicates that the conceptual row is available for use by the
+                     managed device;  - 'notInService', which indicates that the
+                     conceptual row exists in the agent, but is unavailable for use
+                     by the managed device."
+        ::= { ipSrcGuardMacEntry 6}
+
+
 --
 -- upnpMgt
 --
@@ -18508,6 +19388,33 @@ udldGlobalMessageInterval OBJECT-TYPE
         DEFVAL { 15 }
         ::= { udldMgt 1 }
 
+udldGlobalDetectionInterval OBJECT-TYPE
+        SYNTAX      INTEGER(5..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The detection interval (in seconds) used for UDLD detection
+                     process."
+        DEFVAL { 5 }
+        ::= { udldMgt 4 }
+
+udldGlobalRecoveryInterval OBJECT-TYPE
+        SYNTAX      INTEGER(30..86400)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The recovery interval (in seconds) used to recover
+                     interface shut down by UDLD automatically."
+        DEFVAL { 300 }
+        ::= { udldMgt 5 }
+
+udldGlobalRecovery OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This parameter is used to enable/disable auto recovery
+                     feature."
+        DEFVAL      { disabled }
+       ::= { udldMgt 6 }
+
 udldPortTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF UdldPortEntry
         MAX-ACCESS  not-accessible
@@ -18582,7 +19489,8 @@ udldPortPortState OBJECT-TYPE
                                 bidirectional(3),
                                 mismatchWithneighborStateReported(4),
                                 transmitToReceiveLoop(5),
-                                unidirectional(6)
+                                unidirectional(6),
+                                aggressiveModeFailure(7)
                             }
         MAX-ACCESS  read-only
         STATUS      current
@@ -18875,8 +19783,7 @@ mldSnoopRouterStaticEntry OBJECT-TYPE
 MldSnoopRouterStaticEntry ::=
     SEQUENCE {
         mldSnoopRouterStaticVlanIndex Unsigned32,
-        mldSnoopRouterStaticPorts     PortList,
-        mldSnoopRouterStaticStatus    ValidStatus
+        mldSnoopRouterStaticPorts     PortList
     }
 
 mldSnoopRouterStaticVlanIndex OBJECT-TYPE
@@ -18897,14 +19804,6 @@ mldSnoopRouterStaticPorts OBJECT-TYPE
     DESCRIPTION "The set of ports which are static router ports."
     ::= { mldSnoopRouterStaticEntry 2 }
 
-mldSnoopRouterStaticStatus OBJECT-TYPE
-        SYNTAX      ValidStatus
-        MAX-ACCESS  read-create
-        STATUS      current
-        DESCRIPTION "Setting this to valid(1) creates an entry.
-                     Setting this to invalid(2) destroys an entry."
-        ::= { mldSnoopRouterStaticEntry 3 }
-
 mldSnoopMulticastCurrentTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF MldSnoopMulticastCurrentEntry
     MAX-ACCESS  not-accessible
@@ -18918,13 +19817,15 @@ mldSnoopMulticastCurrentEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Entry for current multicast addresses."
     INDEX   { mldSnoopMulticastCurrentVlanIndex,
-              mldSnoopMulticastCurrentIpAddress }
+              mldSnoopMulticastCurrentIpAddress,
+              mldSnoopMulticastCurrentSourceIpAddress }
         ::= { mldSnoopMulticastCurrentTable 1 }
 
 MldSnoopMulticastCurrentEntry ::=
     SEQUENCE {
         mldSnoopMulticastCurrentVlanIndex Unsigned32,
         mldSnoopMulticastCurrentIpAddress InetAddressIPv6,
+        mldSnoopMulticastCurrentSourceIpAddress InetAddressIPv6,
         mldSnoopMulticastCurrentPorts     PortList
     }
 
@@ -18946,6 +19847,13 @@ mldSnoopMulticastCurrentIpAddress OBJECT-TYPE
     DESCRIPTION "IPv6 address of multicast group."
     ::= { mldSnoopMulticastCurrentEntry 2 }
 
+mldSnoopMulticastCurrentSourceIpAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "IPv6 address of the source."
+    ::= { mldSnoopMulticastCurrentEntry 3 }
+
 mldSnoopMulticastCurrentPorts OBJECT-TYPE
     SYNTAX      PortList
     MAX-ACCESS  read-only
@@ -18953,7 +19861,7 @@ mldSnoopMulticastCurrentPorts OBJECT-TYPE
     DESCRIPTION "The set of ports which are members of a multicast group,
                  including static members. Please refer to
                  mldSnoopMulticastStaticTable."
-    ::= { mldSnoopMulticastCurrentEntry 3 }
+    ::= { mldSnoopMulticastCurrentEntry 4 }
 
 mldSnoopMulticastStaticTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF MldSnoopMulticastStaticEntry
@@ -18975,8 +19883,7 @@ MldSnoopMulticastStaticEntry ::=
     SEQUENCE {
         mldSnoopMulticastStaticVlanIndex Unsigned32,
         mldSnoopMulticastStaticIpAddress InetAddressIPv6,
-            mldSnoopMulticastStaticPorts     PortList,
-            mldSnoopMulticastStaticStatus    ValidStatus
+            mldSnoopMulticastStaticPorts     PortList
     }
 
 mldSnoopMulticastStaticVlanIndex OBJECT-TYPE
@@ -19003,14 +19910,6 @@ mldSnoopMulticastStaticPorts OBJECT-TYPE
     STATUS      current
     DESCRIPTION "The set of ports which are members."
     ::= { mldSnoopMulticastStaticEntry 3 }
-
-mldSnoopMulticastStaticStatus OBJECT-TYPE
-        SYNTAX      ValidStatus
-        MAX-ACCESS  read-create
-        STATUS      current
-        DESCRIPTION "Setting this to valid(1) creates an entry.
-                     Setting this to invalid(2) destroys an entry."
-        ::= { mldSnoopMulticastStaticEntry 4 }
 
 mldSnoopCurrentVlanTable OBJECT-TYPE
         SYNTAX      SEQUENCE OF MldSnoopCurrentVlanEntry
@@ -20117,10 +21016,18 @@ ip6SrcGuardBindingStatus		OBJECT-TYPE
                      by the managed device."
 		::= {ip6SrcGuardAddrEntry 6}
 
+--
+-- snmpPrivateTrapMgt
+--
 
+-- Management of SNMP private traps.
 
-
-
+snmpAuthenInfoTrapStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Whether the SNMP authentication information trap is enabled(1) or disabled(2)."
+        ::= { snmpPrivateTrapMgt 1 }
 
 --
 -- trap definitions
@@ -20257,7 +21164,7 @@ swAtcMcastStormTcReleaseTrap NOTIFICATION-TYPE
         ::= { es3528mv2TrapsPrefix 77 }
 
 stpBpduGuardPortShutdownTrap NOTIFICATION-TYPE
-        OBJECTS     { ifindex }
+        OBJECTS     { ifIndex }
         STATUS   current
         DESCRIPTION "This trap will be sent when an interface is shut down
                      because of BPDU guard."
@@ -20460,8 +21367,8 @@ userAuthenticationSuccessTrap NOTIFICATION-TYPE
     OBJECTS     {
                     trapVarLoginUserName,
                     trapVarSessionType,
-                    trapVarLoginInetAddressTypes,
-                    trapVarLoginInetAddres
+                    trapVarLoginInetAddressType,
+                    trapVarLoginInetAddress
                 }
     STATUS      current
     DESCRIPTION "This trap will be triggered if authentication is successful."
@@ -20471,8 +21378,8 @@ loginTrap NOTIFICATION-TYPE
     OBJECTS     {
                     trapVarLoginUserName,
                     trapVarSessionType,
-                    trapVarLoginInetAddressTypes,
-                    trapVarLoginInetAddres
+                    trapVarLoginInetAddressType,
+                    trapVarLoginInetAddress
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when user login."
@@ -20482,8 +21389,8 @@ logoutTrap NOTIFICATION-TYPE
     OBJECTS     {
                     trapVarLoginUserName,
                     trapVarSessionType,
-                    trapVarLoginInetAddressTypes,
-                    trapVarLoginInetAddres
+                    trapVarLoginInetAddressType,
+                    trapVarLoginInetAddress
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when user logout."
@@ -20493,8 +21400,8 @@ fileCopyTrap NOTIFICATION-TYPE
     OBJECTS     {
                     trapVarLoginUserName,
                     trapVarSessionType,
-                    trapVarLoginInetAddressTypes,
-                    trapVarLoginInetAddres,
+                    trapVarLoginInetAddressType,
+                    trapVarLoginInetAddress,
                     fileCopySrcOperType,
                     fileCopySrcFileName,
                     fileCopyDestOperType,
@@ -20509,13 +21416,13 @@ fileCopyTrap NOTIFICATION-TYPE
     DESCRIPTION "This trap is sent when file copy is executed.
                  If the copy action is triggered by system,
                  the login user information(trapVarLoginUserName/
-                 trapVarSessionType/trapVarLoginInetAddressTypes/
-                 trapVarLoginInetAddres) will be null value."
+                 trapVarSessionType/trapVarLoginInetAddressType/
+                 trapVarLoginInetAddress) will be null value."
     ::= { es3528mv2TrapsPrefix 208 }
 
 userauthCreateUserTrap NOTIFICATION-TYPE
     OBJECTS     {
-                    userAuthUserName,
+                    userAuthUserName
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when create user account."
@@ -20523,7 +21430,7 @@ userauthCreateUserTrap NOTIFICATION-TYPE
 
 userauthDeleteUserTrap NOTIFICATION-TYPE
     OBJECTS     {
-                    userAuthUserName,
+                    userAuthUserName
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when delete user account."
@@ -20532,10 +21439,32 @@ userauthDeleteUserTrap NOTIFICATION-TYPE
 userauthModifyUserPrivilegeTrap NOTIFICATION-TYPE
     OBJECTS     {
                     userAuthUserName,
-                    userAuthPrivilege,
+                    userAuthPrivilege
                 }
     STATUS      current
     DESCRIPTION "This trap is sent when modify user privilege."
     ::= { es3528mv2TrapsPrefix 211 }
 
+cpuGuardControlTrap NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION "This trap is sent when CPU utilization 
+                 rises above the high-watermark first time or when CPU utilization
+                 rises from below the low-watermark to above the high-watermark."
+    ::= { es3528mv2TrapsPrefix 213 }
+
+cpuGuardReleaseTrap NOTIFICATION-TYPE
+    STATUS      current 
+    DESCRIPTION "This trap is sent when CPU utilization falls from
+                 above the high-watermark to below the low-watermark."
+    ::= { es3528mv2TrapsPrefix 214 }
+
+snmpAuthenInfoTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    trapVarSnmpAuthenInfoIpAddrType,
+                    trapVarSnmpAuthenInfoIpAddr,
+                    trapVarSnmpAuthenInfoMacAddr
+                }
+    STATUS      current
+    DESCRIPTION "This trap is sent when SNMP authentication is failed."
+    ::= { es3528mv2TrapsPrefix 215 }
 END

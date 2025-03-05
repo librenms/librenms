@@ -1,0 +1,11 @@
+
+Accton-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        enterprises FROM RFC1155-SMI;
+
+accton                  OBJECT IDENTIFIER ::= { enterprises             259 }
+edgecorenetworks        OBJECT IDENTIFIER ::= { accton                   10 }
+edgeCoreNetworksMgt     OBJECT IDENTIFIER ::= { edgecorenetworks          1 }
+ecs5510-48sMIB          OBJECT IDENTIFIER ::= { edgeCoreNetworksMgt      14 }
+rnd                     OBJECT IDENTIFIER ::= { ecs5510-48sMIB           89 }
+END
