@@ -538,14 +538,14 @@ return [
             ],
             'edge_font_face' => [
                 'description' => 'Fonte',
-                'help' => 'Fonte padrão para as etiquetas das conexões',
+                'help' => 'Fonte padrão para as etiquetas dos links',
             ],
             'edge_font_size' => [
-                'description' => 'Tamanho do Texto da Conexão',
-                'help' => 'Tamanho padrão da fonte para as etiquetas das conexões',
+                'description' => 'Tamanho do Texto do Link',
+                'help' => 'Tamanho padrão da fonte para as etiquetas dos links',
             ],
             'edge_seperation' => [
-                'description' => 'Separação das Conexões',
+                'description' => 'Separação dos Links',
                 'help' => 'Separação padrão das conexões para novos mapas',
             ],
             'height' => [
