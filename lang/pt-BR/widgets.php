@@ -62,6 +62,6 @@ return [
         'title' => 'Principais Interfaces',
     ],
     'worldmap' => [
-        'title' => 'Mapa Mundial',
+        'title' => 'Mapa-mundi',
     ],
 ];
