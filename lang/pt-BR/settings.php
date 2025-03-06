@@ -1448,7 +1448,7 @@ return [
             'help' => 'Limpeza feita pelo script daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Excluir portas deletadas',
+            'description' => 'Purgar portas deletadas',
             'help' => 'Limpeza feita pelo script daily.sh',
         ],
         'prometheus' => [
