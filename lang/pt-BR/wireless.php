@@ -11,10 +11,10 @@ return [
     |
     */
 
-    'title' => 'Sem Fio',
+    'title' => 'Wireless',
     'ap-count' => [
         'short' => 'APs',
-        'long' => 'Contagem de APs',
+        'long' => 'Contagem de Pontos de Acesso',
         'unit' => '',
     ],
     'clients' => [
