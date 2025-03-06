@@ -286,7 +286,7 @@ def poll_worker(
                     executable, wrappers[wrapper_type]["option"], device_id
                 )
                 if modules is not None and len(str(modules).strip()):
-                    module_str = re.sub("\s", "", str(modules).strip())
+                    module_str = re.sub(r"\s", "", str(modules).strip())
                     command = command + " -m {}".format(module_str)
 
                 # enable debug output otherwise, set -q for lnms commands
