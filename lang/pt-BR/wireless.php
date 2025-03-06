@@ -7,7 +7,7 @@ return [
     | Wireless Sensors Language Lines
     |--------------------------------------------------------------------------
     |
-    | As seguintes linhas de linguagem são usadas para traduzir nomes e unidades de sensores sem fio
+    | As seguintes linhas de linguagem são usadas para traduzir nomes e unidades de sensores wireless
     |
     */
 
