@@ -13,7 +13,7 @@ return [
         'os' => 'Sistema Operacional',
         'discovery' => 'Descoberta',
         'graphing' => 'Gráficos',
-        'poller' => 'Poller',
+        'poller' => 'Coletor de Dados',
         'system' => 'Sistema',
         'webui' => 'Interface Web',
     ],
@@ -59,7 +59,7 @@ return [
         ],
         'poller' => [
             'availability' => ['name' => 'Disponibilidade do Dispositivo'],
-            'distributed' => ['name' => 'Poller Distribuído'],
+            'distributed' => ['name' => 'Coleta de Dados Distribuída'],
             'graphite' => ['name' => 'Datastore: Graphite'],
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
             'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
@@ -69,7 +69,7 @@ return [
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'dispatcherservice' => ['name' => 'Serviço de Dispatcher'],
-            'poller_modules' => ['name' => 'Módulos de Poller'],
+            'poller_modules' => ['name' => 'Módulos de Coleta de Dados'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Limpeza'],
@@ -735,12 +735,12 @@ return [
             ],
         ],
         'distributed_poller' => [
-            'description' => 'Habilitar Polling Distribuído (requer configuração adicional)',
-            'help' => 'Habilitar polling distribuído em todo o sistema. Isso é destinado ao compartilhamento de carga, não ao polling remoto. Você deve ler a documentação para etapas de habilitação: https://docs.librenms.org/Extensions/Distributed-Poller/',
+            'description' => 'Habilitar Coleta de Dados Distribuída (requer configuração adicional)',
+            'help' => 'Habilitar coleta de dados distribuída em todo o sistema. Isso é destinado ao compartilhamento de carga, não à coleta remota. Leia a documentação para verificar as etapas de habilitação: https://docs.librenms.org/Extensions/Distributed-Poller/',
         ],
         'default_poller_group' => [
-            'description' => 'Grupo Poller Padrão',
-            'help' => 'O grupo poller padrão que todos os pollers devem pesquisar, se nenhum estiver definido em config.php',
+            'description' => 'Grupo de Coleta de Dados Padrão',
+            'help' => 'O grupo de coleta padrão que todos os coletores devem pesquisar, se nenhum estiver definido em config.php',
         ],
         'distributed_poller_memcached_host' => [
             'description' => 'Host Memcached',
@@ -760,7 +760,7 @@ return [
         ],
         'email_backend' => [
             'description' => 'Método de envio de e-mails',
-            'help' => 'O backend a ser usado para enviar e-mails, podenndo ser mail, sendmail ou SMTP',
+            'help' => 'O backend a ser usado para enviar e-mails, podendo ser mail, sendmail ou SMTP',
             'options' => [
                 'mail' => 'mail',
                 'sendmail' => 'sendmail',
@@ -963,6 +963,10 @@ return [
             'description' => 'Nome do campo contendo o nome de usuário',
             'help' => 'Pode ser um campo ENV ou HTTP-header como REMOTE_USER, PHP_AUTH_USER ou uma variante personalizada',
         ],
+        'http_auth_guest' => [
+            'description' => 'Http Auth guest user',
+            'help' => 'If set, allows all http users to authenticate and assigns unknown users to give local username',
+        ],
         'http_proxy' => [
             'description' => 'Proxy HTTP',
             'help' => 'Defina isso como fallback se a variável de ambiente http_proxy não estiver disponível.',
@@ -1077,11 +1081,31 @@ return [
             ],
             'debug' => [
                 'description' => 'Depuração',
-                'help' => 'Para ativar ou desativar a saída detalhada via CLI',
+                'help' => 'Ativa ou desativa a saída detalhada via CLI',
+            ],
+            'log_file' => [
+                'description' => 'Arquivo de Logs',
+                'help' => 'Define outro arquivo de log, se desejado, para depuração',
             ],
             'groups-exclude' => [
                 'description' => 'Grupos de dispositivos excluídos',
                 'help' => 'Grupos de dispositivos excluídos do envio de dados para InfluxDBv2',
+            ],
+            'timeout' => [
+                'description' => 'Tempo Limite',
+                'help' => 'Tempo limite em segundos',
+            ],
+            'verify' => [
+                'description' => 'Verificar',
+                'help' => 'Verifica o certificado',
+            ],
+            'batch_size' => [
+                'description' => 'Tamanho do Lote',
+                'help' => 'Quantidade de métricas a serem agrupadas antes de serem enviadas',
+            ],
+            'max_retry' => [
+                'description' => 'Número máximo de tentativas',
+                'help' => 'Quantidade de tentativas a serem realizadas',
             ],
         ],
         'ipmitool' => [
@@ -1093,8 +1117,8 @@ return [
         ],
         'mac_oui' => [
             'enabled' => [
-                'description' => 'Habilitar pesquisa de OUI MAC',
-                'help' => 'Habilitar pesquisa de fornecedor de endereço MAC (OUI) (dados são baixados pelo script daily.sh)',
+                'description' => 'Habilitar pesquisa de MAC OUI',
+                'help' => 'Habilitar pesquisa de fornecedor do dispositivo (OUI) (dados são baixados pelo script daily.sh)',
             ],
         ],
         'mono_font' => [
@@ -1111,8 +1135,13 @@ return [
             'description' => 'Exibir links de rede no mapa',
             'help' => 'Mostrar os links de rede entre as diferentes localizações no mapa (tipo weathermap)',
         ],
-        'nfdump' => [
-            'description' => 'Caminho para nfdump',
+        'network_map_worldmap_show_disabled_alerts' => [
+            'description' => 'Exibir dispositivos com alertas desativados',
+            'help' => 'Exibe os dispositivos que possuam alertas desativados no mapa de rede',
+        ],
+        'network_map_worldmap_link_type' => [
+            'description' => 'Fonte do mapa de rede',
+            'help' => 'Selecione a fonte de dados para os links do mapa de rede',
         ],
         'nfsen_enable' => [
             'description' => 'Habilitar NfSen',
@@ -1268,7 +1297,7 @@ return [
         ],
         'ping_rrd_step' => [
             'description' => 'Frequência de Ping',
-            'help' => 'Com que frequência executar. Define o valor padrão para todos os nós. Aviso! Se você mudar isso, você deve fazer mudanças adicionais. Verifique os documentos de Fast Ping.',
+            'help' => 'Com que frequência executar. Valor padrão para todos os nós. Aviso! Se você mudar isso, você deve fazer mudanças adicionais. Verifique os documentos de Fast Ping.',
         ],
         'poller_modules' => [
             'unix-agent' => [
@@ -1279,6 +1308,9 @@ return [
             ],
             'ipmi' => [
                 'description' => 'IPMI',
+            ],
+            'qos' => [
+                'description' => 'QoS',
             ],
             'sensors' => [
                 'description' => 'Sensores',
@@ -1321,6 +1353,9 @@ return [
             ],
             'ospf' => [
                 'description' => 'OSPF',
+            ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
             ],
             'isis' => [
                 'description' => 'ISIS',
@@ -1480,7 +1515,7 @@ return [
                 'help' => 'Envia relatório de uso e versão para o LibreNMS. Para excluir estatísticas anônimas, visite a página Sobre. Você pode visualizar estatísticas em https://stats.librenms.org',
             ],
             'dump_errors' => [
-                'description' => 'Despejar erros de depuração (Poderá quebrar sua instalação)',
+                'description' => 'Despejar erros de depuração (Poderá corromper sua instalação)',
                 'help' => 'Despejar erros que normalmente são ocultados para que você, como desenvolvedor, possa encontrar e corrigir possíveis problemas.',
             ],
             'throttle' => [
@@ -1527,69 +1562,126 @@ return [
             'description' => 'Define a versão do rrdtool no seu servidor',
             'help' => 'Qualquer coisa acima de 1.5.5 suporta todos os recursos que o LibreNMS usa, não defina um valor maior do que a versão instalada',
         ],
+        'schedule_type' => [
+            'alerting' => [
+                'description' => 'Alertar',
+                'help' => 'Método de agendamento de tarefas de alerta. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_billing_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'cron' => 'Cron (alerts.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+            'billing' => [
+                'description' => 'Tarifação',
+                'help' => 'Método de agendamento de tarefas de tarifação. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_billing_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'cron' => 'Cron (poll-billing.php e billing-calculate.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+            'discovery' => [
+                'description' => 'Descoberta',
+                'help' => 'Método de agendamento de tarefas de descoberta. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_discovery_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'cron' => 'Cron (discovery.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+            'ping' => [
+                'description' => 'Fast Ping',
+                'help' => 'Método de agendamento de tarefas de Fast Ping. O modo legado usará cron se a entrada do crontab existir e usará o serviço de dispatcher se a opção de configuração legada service_ping_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'disabled' => 'Desativado (Pings apenas durante coleta de dados)',
+                    'cron' => 'Cron (ping.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+            'poller' => [
+                'description' => 'Coletor de Dados',
+                'help' => 'Método de agendamento de tarefas do coletor de dados. O modo legado usará cron se a entrada do crontab existir e usará o serviço de dispatcher se a opção de configuração legada service_poller_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'cron' => 'Cron (poller.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+            'services' => [
+                'description' => 'Serviços',
+                'help' => 'Método de agendamento de tarefas de serviços. O modo legado usará cron se a entrada do crontab existir e usará o serviço de dispatcher se a opção de configuração legada service_services_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'cron' => 'Cron (check-services.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+        ],
         'service_master_timeout' => [
             'description' => 'Tempo de Expiração do Dispatcher Mestre',
-            'help' => 'O tempo antes que o bloqueio mestre expire. Se o mestre desaparecer, levará esse tempo para outro nó assumir. No entanto, se demorar mais do que o tempo limite para despachar o trabalho, você terá múltiplos mestres',
+            'help' => 'O tempo antes da expiração do bloqueio mestre. Se o mestre ficar indisponível, levará esse tempo para outro nó assumir. No entanto, se levar mais tempo do que o limite para despachar o trabalho, haverá múltiplos mestres.',
         ],
         'service_poller_workers' => [
-            'description' => 'Workers de Poller',
-            'help' => 'Quantidade de workers de polling a serem gerados. Define o valor padrão para todos os nós.',
+            'description' => 'Workers de Coleta de Dados',
+            'help' => 'Quantidade de workers de coleta de dados a serem gerados. Valor padrão para todos os nós.',
         ],
         'service_poller_frequency' => [
-            'description' => 'Frequência de Polling (Aviso!)',
-            'help' => 'Com que frequência pollar os dispositivos. Define o valor padrão para todos os nós. Aviso! Alterar isso sem corrigir os arquivos rrd quebrará os gráficos. Veja a documentação para mais informações.',
+            'description' => 'Frequência de Coleta de Dados (Aviso!)',
+            'help' => 'Com que frequência coletar dados dos dispositivos. Valor padrão para todos os nós. Aviso! Alterar isso sem corrigir os arquivos rrd corromperá os gráficos. Veja a documentação para mais informações.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Repetir Dispositivo Inativo',
-            'help' => 'Se um dispositivo estiver inativo quando a polling for tentada, este é o tempo de espera antes de tentar novamente. Define o valor padrão para todos os nós.',
+            'help' => 'Se um dispositivo estiver inativo quando a coleta de dados for feita, este é o tempo de espera antes de tentar novamente. Valor padrão para todos os nós.',
         ],
         'service_discovery_workers' => [
             'description' => 'Workers de Descoberta',
-            'help' => 'Quantidade de workers de descoberta a serem executados. Configurar muito alto pode causar sobrecarga. Define o valor padrão para todos os nós.',
+            'help' => 'Quantidade de workers de descoberta a serem executados. Configurar muito alto pode causar sobrecarga. Valor padrão para todos os nós.',
         ],
         'service_discovery_frequency' => [
             'description' => 'Frequência de Descoberta',
-            'help' => 'Com que frequência executar a descoberta de dispositivos. Define o valor padrão para todos os nós. O padrão é 4 vezes ao dia.',
+            'help' => 'Com que frequência executar a descoberta de dispositivos. Valor padrão para todos os nós. O padrão é 4 vezes ao dia.',
         ],
         'service_services_workers' => [
             'description' => 'Workers de Serviços',
-            'help' => 'Quantidade de workers de serviços. Define o valor padrão para todos os nós.',
+            'help' => 'Quantidade de workers de serviços. Valor padrão para todos os nós.',
         ],
         'service_services_frequency' => [
-            'description' => 'Frequência de Serviços',
-            'help' => 'Com que frequência executar serviços. Isso deve coincidir com a frequência de polling. Define o valor padrão para todos os nós.',
+            'description' => 'Frequência dos Serviços',
+            'help' => 'Com que frequência executar os serviços. Isso deve coincidir com a frequência de polling. Valor padrão para todos os nós.',
         ],
         'service_billing_frequency' => [
             'description' => 'Frequência de Tarifação',
-            'help' => 'Com que frequência coletar dados de tarifação. Define o valor padrão para todos os nós.',
+            'help' => 'Com que frequência coletar dados de tarifação. Valor padrão para todos os nós.',
         ],
         'service_billing_calculate_frequency' => [
             'description' => 'Frequência de Cálculo de Tarifação',
-            'help' => 'Com que frequência calcular a tarifação. Define o valor padrão para todos os nós.',
+            'help' => 'Com que frequência calcular a tarifação. Valor padrão para todos os nós.',
         ],
         'service_alerting_frequency' => [
             'description' => 'Frequência de Alertas',
-            'help' => 'Com que frequência as regras de alerta são verificadas. Note que os dados são atualizados apenas com base na frequência de polling. Define o valor padrão para todos os nós.',
+            'help' => 'Com que frequência as regras de alerta são verificadas. Note que os dados são atualizados apenas com base na frequência da coleta de dados. Valor padrão para todos os nós.',
         ],
         'service_update_enabled' => [
             'description' => 'Manutenção Diária Habilitada',
-            'help' => 'Executa o script de manutenção daily.sh e reinicia o serviço de dispatcher depois. Define o valor padrão para todos os nós.',
+            'help' => 'Executa o script de manutenção daily.sh e reinicia o serviço de dispatcher depois. Valor padrão para todos os nós.',
         ],
         'service_update_frequency' => [
             'description' => 'Frequência de Manutenção',
-            'help' => 'Com que frequência executar a manutenção diária. O padrão é 1 dia. É altamente recomendável não alterar isso. Define o valor padrão para todos os nós.',
+            'help' => 'Com que frequência executar a manutenção diária. O padrão é 1 dia. É altamente recomendável não alterar isso. Valor padrão para todos os nós.',
         ],
         'service_loglevel' => [
             'description' => 'Nível de Log',
-            'help' => 'Nível de log do serviço de dispatcher. Define o valor padrão para todos os nós.',
+            'help' => 'Nível de log do serviço de dispatcher. Valor padrão para todos os nós.',
         ],
         'service_watchdog_enabled' => [
             'description' => 'Watchdog Habilitado',
-            'help' => 'O Watchdog monitora o arquivo de log e reinicia o serviço se ele não for atualizado. Define o valor padrão para todos os nós.',
+            'help' => 'O Watchdog monitora o arquivo de log e reinicia o serviço se ele não for atualizado. Valor padrão para todos os nós.',
         ],
         'service_watchdog_log' => [
             'description' => 'Arquivo de Log a ser Monitorado',
-            'help' => 'O padrão é o arquivo de log do LibreNMS. Define o valor padrão para todos os nós.',
+            'help' => 'O padrão é o arquivo de log do LibreNMS. Valor padrão para todos os nós.',
         ],
         'sfdp' => [
             'description' => 'Caminho para sfdp',
@@ -1644,7 +1736,7 @@ return [
             ],
             'timeout' => [
                 'description' => 'Tempo de Espera',
-                'help' => 'Tempo de espera SNMP em segundos',
+                'help' => 'Tempo de espera em segundos',
             ],
             'retries' => [
                 'description' => 'Repetições',
@@ -1710,11 +1802,11 @@ return [
             'description' => 'Caminho para traceroute',
         ],
         'twofactor' => [
-            'description' => 'Autentica',
+            'description' => 'Autenticação em Dois Fatores',
             'help' => 'Permitir que os usuários ativem e usem Senhas de Uso Único Baseadas em Tempo (TOTP) ou Baseadas em Contador (HOTP)',
         ],
         'twofactor_lock' => [
-            'description' => 'Tempo de Limitação de Autenticação em Dois Fatores (segundos)',
+            'description' => 'Tempo de Retardo para Autenticação de Dois Fatores (segundos)',
             'help' => 'Tempo de bloqueio para esperar em segundos antes de permitir novas tentativas se a Autenticação em Dois Fatores falhar 3 vezes consecutivas - solicitará ao usuário que aguarde esse tempo. Defina como 0 para desativar, resultando em um bloqueio permanente da conta e uma mensagem ao usuário para contatar o administrador',
         ],
         'unix-agent' => [
@@ -1779,10 +1871,6 @@ return [
                 'description' => 'Usar gráficos empilhados',
                 'help' => 'Exibir gráficos empilhados em vez de gráficos invertidos',
             ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Desativar percentual para gráficos de estatísticas globalmente',
-                'help' => 'Desativa a exibição dos valores e linhas percentuais para gráficos que exibem esses',
-            ],
             'graph_type' => [
                 'description' => 'Definir o tipo de gráfico',
                 'help' => 'Definir o tipo de gráfico padrão',
@@ -1794,6 +1882,10 @@ return [
             'min_graph_height' => [
                 'description' => 'Definir a altura mínima do gráfico',
                 'help' => 'Altura mínima do gráfico (padrão: 300)',
+            ],
+            'graph_stat_percentile_disable' => [
+                'description' => 'Desativar percentual para gráficos de estatísticas globalmente',
+                'help' => 'Desativa a exibição dos valores e linhas percentuais para gráficos que exibem esses',
             ],
         ],
         'device_display_default' => [
@@ -1809,6 +1901,14 @@ return [
         'device_location_map_open' => [
             'description' => 'Abrir Mapa de Localização',
             'help' => 'O Mapa de Localização é exibido por padrão',
+        ],
+        'device_location_map_show_devices' => [
+            'description' => 'Exibir dispositivos no mapa de localização',
+            'help' => 'Exibir todos os dispositivos no mapa de localização quando estiver visível',
+        ],
+        'device_location_map_show_device_dependencies' => [
+            'description' => 'Exibir dependências dos dispositivos no mapa de localização',
+            'help' => 'Exibir links entre dispositivos no mapa de localização com base nas dependências dos pais',
         ],
         'whois' => [
             'description' => 'Caminho para whois',
@@ -1852,4 +1952,7 @@ return [
         'executable' => ':value não é um executável válido',
         'directory' => ':value não é um diretório válido',
     ],
+    'nfdump' => [
+        'description' => 'Caminho para nfdump',
+        ],
 ];
