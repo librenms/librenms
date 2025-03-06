@@ -725,7 +725,7 @@ return [
                 'description' => 'VRF',
             ],
             'wireless' => [
-                'description' => 'Sem Fio',
+                'description' => 'Wireless',
             ],
             'xdsl' => [
                 'description' => 'xDSL',
@@ -1349,7 +1349,7 @@ return [
                 'description' => 'UCD DiskIO',
             ],
             'wireless' => [
-                'description' => 'Sem Fio',
+                'description' => 'Wireless',
             ],
             'ospf' => [
                 'description' => 'OSPF',
