@@ -66,7 +66,7 @@ return [
         'exit' => 'Ctrl-C para parar',
         'removed' => 'Dispositivo :id removido',
         'updated' => 'Dispositivo :hostname (:id) atualizado',
-        'setup' => 'Configurando snmpsim venv em :dir',    
+        'setup' => 'Configurando snmpsim venv em :dir',
     ],
     'device:add' => [
         'description' => 'Adicionar um novo dispositivo',
@@ -270,5 +270,5 @@ return [
     ],
     'maintenance:database-cleanup' => [
         'description' => 'Limpeza do banco de dados para remover itens órfãos.',
-    ],    
+    ],
 ];
