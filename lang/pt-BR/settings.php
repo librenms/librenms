@@ -689,15 +689,12 @@ return [
             'processors' => [
                 'description' => 'Processadores',
             ],
-
             'qos' => [
                 'description' => 'QoS',
-    
             ],
             'route' => [
                 'description' => 'Rota',
             ],
-
             'sensors' => [
                 'description' => 'Sensores',
             ],
@@ -708,7 +705,6 @@ return [
             'storage' => [
                 'description' => 'Armazenamento',
             ],
-
             'stp' => [
                 'description' => 'STP',
             ],
@@ -1954,5 +1950,5 @@ return [
     ],
     'nfdump' => [
         'description' => 'Caminho para nfdump',
-        ],
+    ],
 ];
