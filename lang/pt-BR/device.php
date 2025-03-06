@@ -7,7 +7,7 @@ return [
         'icon' => 'Ícone',
         'ip' => 'IP',
         'location' => 'Localização',
-        'os' => 'SO do Dispositivo',
+        'os' => 'Sistema Operacional do Dispositivo',
         'serial' => 'Serial',
         'sysName' => 'sysName',
         'version' => 'Versão do SO',
