@@ -71,7 +71,7 @@ class SSOAuthorizer extends MysqlAuthorizer
 
     public function getExternalUsername()
     {
-        return $this->authSSOGetAttr(Config::get('sso.user_attr'), '');
+        return $this->authSSOGetAttr(Config::get('sso.user_attr'));
     }
 
     /**

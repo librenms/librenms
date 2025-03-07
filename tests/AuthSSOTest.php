@@ -91,8 +91,11 @@ class AuthSSOTest extends DBTestCase
 
         Config::set('sso.mode', 'header');
 
+        $user = Str::random();
+
         $_SERVER['REMOTE_ADDR'] = '::1';
-        $_SERVER['REMOTE_USER'] = Str::random();
+        $_SERVER['REMOTE_USER'] = $user;
+        $_SERVER['HTTP_REMOTE_USER'] = $user;
 
         $_SERVER['HTTP_MAIL'] = 'test@example.org';
         $_SERVER['HTTP_DISPLAYNAME'] = 'Test User';
@@ -102,6 +105,7 @@ class AuthSSOTest extends DBTestCase
     {
         $user = Str::random();
         $_SERVER['REMOTE_USER'] = $user;
+        $_SERVER['HTTP_REMOTE_USER'] = $user;
 
         return $user;
     }
