@@ -21,6 +21,7 @@ return [
     'mtu_label' => 'MTU :mtu',
     'tabs' => [
         'arp' => 'ARP Table',
+        'nd' => 'IPv6 ND',
         'fdb' => 'FDB Table',
         'links' => 'Neighbors',
         'transceivers' => 'Transceivers',

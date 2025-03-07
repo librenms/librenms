@@ -41,6 +41,7 @@ class RoutingController implements DeviceTab
         //dd($device);
         $this->tabs = [
             'ospf' => $device->ospfInstances()->count(),
+            'ospfv3' => $device->ospfv3Instances()->count(),
             'isis' => $device->isisAdjacencies()->count(),
             'bgp' => $device->bgppeers()->count(),
             'vrf' => $device->vrfs()->count(),

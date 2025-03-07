@@ -838,6 +838,10 @@
             "default": true,
             "type": "boolean"
         },
+        "autodiscovery.ospfv3": {
+            "default": true,
+            "type": "boolean"
+        },
         "autodiscovery.snmpscan": {
             "default": true,
             "type": "boolean"
@@ -5372,6 +5376,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.ospfv3": {
+            "order": 331,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "poller_modules.isis": {
             "order": 450,
             "group": "poller",
@@ -6268,6 +6279,9 @@
             "section": "cleanup",
             "order": 1,
             "type": "integer"
+        },
+        "syslog_xlate": {
+            "type": "array"
         },
         "temp_dir": {
             "type": "directory"
