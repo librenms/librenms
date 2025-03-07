@@ -301,7 +301,7 @@ def poll_worker(
                     timeout=PER_DEVICE_TIMEOUT,
                     valid_exit_codes=VALID_EXIT_CODES,
                 )
-                if exit_code not in [0, 6]:
+                if exit_code not in VALID_EXIT_CODES:
                     logger.error(
                         "Thread {} exited with code {}".format(
                             threading.current_thread().name, exit_code
