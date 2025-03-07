@@ -780,6 +780,9 @@ systems with LibreNMS, for example [Flapjack](http://flapjack.io).
 
 ## OpsGenie
 
+> ⚠️ **Atlassian have announced the EOL of Opsgenie on the 5th April 2027.
+[Read more here](https://www.atlassian.com/blog/announcements/evolution-of-it-operations)
+
 Using OpsGenie LibreNMS integration, LibreNMS forwards alerts to
 OpsGenie with detailed information. OpsGenie acts as a dispatcher for
 LibreNMS alerts, determines the right people to notify based on
