@@ -29,6 +29,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Dnos extends OS implements ProcessorDiscovery
 {
@@ -104,7 +105,7 @@ class Dnos extends OS implements ProcessorDiscovery
      */
     private function findProcessors(&$processors, $oid, $mib, $num_oid, $name, $type = null)
     {
-        $data = $this->getCacheByIndex($oid, $mib);
+        $data = SnmpQuery::cache()->walk("$mib::$oid")->pluck();
         foreach ($data as $index => $usage) {
             $processors[] = Processor::discover(
                 $type ?: $this->getName(),

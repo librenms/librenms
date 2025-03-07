@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessXpiDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFrequencyDiscovery, WirelessErrorsDiscovery, WirelessMseDiscovery, WirelessPowerDiscovery, WirelessRateDiscovery
 {
@@ -68,7 +69,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
 
     public function discoverWirelessXpi()
     {
-        $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+        $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
         $divisor = 100;
@@ -140,7 +141,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      */
     public function discoverWirelessRate()
     {
-        $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+        $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
 
@@ -183,7 +184,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      */
     public function discoverWirelessErrors()
     {
-        $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+        $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
 
@@ -211,7 +212,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      */
     public function discoverWirelessMse()
     {
-        $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+        $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
         $divisor = 100;
@@ -242,7 +243,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
      */
     public function discoverWirelessPower()
     {
-        $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+        $ifNames = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
 
         $sensors = [];
 

@@ -85,12 +85,11 @@ class Arubaos extends OS implements
      */
     public function discoverWirelessApCount()
     {
-        $mib = 'WLSX-SWITCH-MIB';
-        $data = $this->getCacheTable('wlsxSwitchTotalNumAccessPoints', $mib);
+        $value = SnmpQuery::get('WLSX-SWITCH-MIB::wlsxSwitchTotalNumAccessPoints.0')->value();
         $sensors = [];
 
-        foreach ($data as $key => $value) {
-            $oid = snmp_translate($mib . '::' . $key, 'ALL', 'arubaos', '-On');
+        if (is_numeric($value)) {
+            $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.1.0';
             $value = intval($value);
 
             $low_warn_const = 1; // Default warning threshold = 1 down AP
