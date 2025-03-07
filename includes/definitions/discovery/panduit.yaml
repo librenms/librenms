@@ -1,11 +1,13 @@
 mib: PANDUIT-MIB
 modules:
     os:
-        sysDescr_regex: '/(?<hardware>MSM\S+) .* Serial number (?<serial>\S+) - Firmware version (?<version>\S+)/'
-        features: PANDUIT-MIB::pdug5Model.1
         hardware: PANDUIT-MIB::pdug5PartNumber.1
         serial: PANDUIT-MIB::pdug5SerialNumber.1
         version: PANDUIT-MIB::pdug5FirmwareVersion.1
+        features: RFC1213-MIB::sysDescr.0
+        features_replace: 
+          - '/SN:/'
+          - '/PN:Device Model:\S+/'
     sensors:
         state:
               data:

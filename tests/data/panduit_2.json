@@ -9,7 +9,7 @@
                     "sysContact": "<private>",
                     "version": "3.3.2",
                     "hardware": "P24D40M",
-                    "features": "100-240V, 16A, 3.7kVA, 50/60Hz",
+                    "features": "PDU Metered  Rating:100-240V, 16A, 3.7kVA, 50/60Hz",
                     "location": null,
                     "os": "panduit",
                     "type": "power",

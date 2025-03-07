@@ -9,7 +9,7 @@
                     "sysContact": "<private>",
                     "version": "2.3.21",
                     "hardware": "P42D04M",
-                    "features": "346-415V, 32A, 22.0kVA, 50/60Hz",
+                    "features": "PDU Metered",
                     "location": "<private>",
                     "os": "panduit",
                     "type": "power",
