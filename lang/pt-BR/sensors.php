@@ -37,7 +37,7 @@ return [
         'unit_long' => 'Picosegundos por Nanômetro',
     ],
     'cooling' => [
-        'short' => 'Resfriamento',
+        'short' => 'Refrigeração',
         'long' => '',
         'unit' => 'W',
         'unit_long' => 'Watts',
@@ -86,19 +86,19 @@ return [
     ],
     'humidity' => [
         'short' => 'Umidade',
-        'long' => 'Porcentagem de Umidade',
+        'long' => 'Percentual de Umidade',
         'unit' => '%',
         'unit_long' => 'Porcento',
     ],
     'load' => [
         'short' => 'Carga',
-        'long' => 'Porcentagem de Carga',
+        'long' => 'Percentual de Carga',
         'unit' => '%',
         'unit_long' => 'Porcento',
     ],
     'loss' => [
         'short' => 'Perda',
-        'long' => 'Porcentagem de Perda',
+        'long' => 'Percentual de Perda',
         'unit' => '%',
         'unit_long' => 'Porcento',
     ],
@@ -186,7 +186,7 @@ return [
         'unit_long' => 'Litros por Minuto',
     ],
     'percent' => [
-        'short' => 'Porcentagem',
+        'short' => 'Porcento',
         'long' => 'Porcentagem',
         'unit' => '%',
         'unit_long' => 'Porcento',

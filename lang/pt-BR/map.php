@@ -3,7 +3,7 @@
 return [
     'custom' => [
         'title' => [
-            'edit_dialog' => 'Selecionar Mapa Personalizado para Editar',
+            'edit_dialog' => 'Selecione um Mapa Personalizado para Editar',
             'create' => 'Criar Novo Mapa Personalizado',
             'view' => ':name | Mapa Personalizado',
             'edit' => 'Editar Mapa Personalizado',
@@ -13,6 +13,17 @@ return [
         'view' => [
             'loading' => 'Carregando dados',
             'no_devices' => 'Nenhum dispositivo encontrado',
+        ],
+        'nodeimage' => [
+            'delete' => 'Excluir Imagem',
+            'upload' => 'Subir Imagem',
+            'name' => 'Nome da Imagem',
+            'new' => 'Nova Imagem',
+            'title' => [
+                'edit' => 'Editar Imagem de Nó',
+                'manage' => 'Gerenciar Imagens de Nó',
+                'new' => 'Nova Imagem de Nó',
+            ],
         ],
         'edit' => [
             'text_font' => 'Fonte do Texto',
@@ -43,8 +54,10 @@ return [
             ],
             'map' => [
                 'settings_title' => 'Configurações do Mapa',
+                'selectall' => 'Selecionar Todos',
                 'name' => 'Nome',
-                'menu_group' => 'Menu Grupo',
+                'menu_group' => 'Grupo',
+                'multiselect_info' => 'Clique e segure ou mantenha pressionada a tecla Ctrl para selecionar vários nós.',
                 'no_group' => 'Sem Grupo',
                 'width' => 'Largura',
                 'height' => 'Altura',
@@ -62,11 +75,21 @@ return [
                 'rerender' => 'Re-Renderizar Mapa',
                 'save' => 'Salvar Mapa',
                 'legend' => [
+                    'customcolours' => 'Cores Personalizadas',
+                    'colour' => 'Cor',
+                    'colour_lower_pct' => 'Porcentagem Inicial',
+                    'colour_down' => 'Cor para Dispositivo Inativo',
+                    'colour_invalid' => 'Cor para Percentual Desconhecido',
                     'font_size' => 'Tamanho do Texto da Legenda',
-                    'steps' => 'Etapas da Legenda',
+                    'steps' => 'Passo da Legenda',
                     'hideinvalid' => 'Ocultar Inválidos',
                     'hideoverspeed' => 'Ocultar 100%+',
                 ],
+                'legend_title' => 'Configurações da Legenda',
+                'legend_toggle' => 'Alternar LEgenda',
+                'zoom' => 'Pan e Zoom',
+                'dragnodes' => 'Mover Nós',
+                'physics' => 'Motor de Física',
             ],
             'node' => [
                 'new' => 'Novo Nó',
@@ -126,9 +149,12 @@ return [
                 'border_color' => 'Cor da Borda',
             ],
             'edge' => [
-                'new' => 'Nova Aresta',
-                'add' => 'Adicionar Aresta',
-                'defaults_title' => 'Configuração Padrão da Aresta',
+                'new' => 'Novo Link',
+                'add' => 'Adicionar Link',
+                'edit' => 'Editar Link',
+                'defaults_title' => 'Configurações Padrão dos Links',
+                'dynamic_width' => 'Largura Dinâmica',
+                'fixed_width' => 'Largura Fixa',
                 'from' => 'De',
                 'to' => 'Para',
                 'port_select' => 'Selecionar Porta',
@@ -149,8 +175,15 @@ return [
                 ],
                 'show_usage_percent' => 'Mostrar percentual de uso',
                 'show_usage_bps' => 'Mostrar uso em bps',
-                'label' => 'Rótulo',
-                'recenter' => 'Recentrar Linha',
+                'text_align' => 'Alinhamento do Texto',
+                'align_options' => [
+                    'horizontal' => 'Horizontal',
+                    'top' => 'Topo',
+                    'middle' => 'Meio',
+                    'bottom' => 'Fundo',
+                ],
+                'label' => 'Etiqueta',
+                'recenter' => 'Recentralizar Linha',
             ],
             'validate' => [
                 'width_format' => 'A largura deve ser um número seguido de px ou %',
@@ -160,6 +193,9 @@ return [
                 'height_percent' => 'A altura em porcentagem deve estar entre 10 e 100',
                 'height_pixels' => 'A altura em pixels deve ser de pelo menos 200',
             ],
+        ],
+        'widget' => [
+            'not_found' => 'Nenhum mapa selecionado. Edite o widget para selecionar um mapa.',
         ],
     ],
 ];

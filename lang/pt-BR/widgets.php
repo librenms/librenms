@@ -16,6 +16,9 @@ return [
     'component-status' => [
         'title' => 'Status do Componente',
     ],
+    'custom-map' => [
+        'title' => 'Mapa Personalizado',
+    ],
     'device-summary-horiz' => [
         'title' => 'Resumo de Dispositivos Horizontal',
     ],
@@ -59,6 +62,6 @@ return [
         'title' => 'Principais Interfaces',
     ],
     'worldmap' => [
-        'title' => 'Mapa Mundial',
+        'title' => 'Mapa-mundi',
     ],
 ];
