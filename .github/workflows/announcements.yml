@@ -11,33 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Out Repository
-        uses: actions/checkout@v3
-
-      - name: Check for Specific Label
-        id: check_label
-        run: |
-          LABEL_FOUND=false
-          for label in "${{ github.event.pull_request.labels[*].name }}"; do
-            if [[ "$label" == "Breaking-Change" ]]; then
-              LABEL_FOUND=true
-              break
-            fi
-          done
-
-          if [[ "$LABEL_FOUND" != "true" ]]; then
-            echo "PR does not contain the specific label. Skipping."
-            exit 0
-          fi
-
-
       - name: Send Notification to Discord
+        if: contains(github.event.issue.labels.*.name, 'Breaking-Change')
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_ANNOUNCEMENT }}
+          DISCORD_WEBHOOK_URL: "${{ secrets.DISCORD_WEBHOOK_URL_ANNOUNCEMENT }}"
         run: |
-          PR_TITLE=${{ github.event.pull_request.title }}
-          PR_MESSAGE=${{ github.event.pull_request.body }}
-          PR_URL=${{ github.event.pull_request.html_url }}
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_MESSAGE="${{ github.event.pull_request.body }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
 
           curl -X POST -H "Content-Type: application/json" \
           -d "{

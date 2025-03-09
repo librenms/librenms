@@ -191,7 +191,7 @@ if (! empty($peers)) {
                     $address = (string) $peer_ip;
                     $bgpPeer = $bgpPeers[$address];
                     $peer_data = [];
-                    if (count(array_keys($bgpPeer)) == 1) { // We have only one vrf with a peer with this IP
+                    if ($bgpPeer && count(array_keys($bgpPeer)) == 1) { // We have only one vrf with a peer with this IP
                         $vrfInstance = array_keys($bgpPeer)[0];
                         $peer_data['bgpPeerState'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerState'];
                         $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerAdminStatus'];

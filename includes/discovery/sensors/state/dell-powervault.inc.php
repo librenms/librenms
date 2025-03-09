@@ -23,8 +23,6 @@ if (is_array($pre_cache['dell-powervault'])) {
             create_state_index($descr, $states);
 
             discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, $null, $value);
-
-            create_sensor_to_state_index($device, $txmcs_state_name, 1);
         }
     }
 }

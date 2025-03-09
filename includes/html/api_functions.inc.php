@@ -23,6 +23,7 @@ use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
+use App\Models\Ospfv3Port;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -834,6 +835,34 @@ function list_ospf_ports(Illuminate\Http\Request $request)
     return api_success($ospf_ports, 'ospf_ports', null, 200, $ospf_ports->count());
 }
 
+function list_ospfv3(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
+
+    $ospf_neighbours = \App\Models\OspfNbr::whereHasAccess(Auth::user())
+        ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
+        ->whereNotNull('ospfv3NbrState')->where('ospfv3NbrState', '!=', '')
+        ->get();
+
+    if ($ospf_neighbours->isEmpty()) {
+        return api_error(500, 'Error retrieving ospfv3_nbrs');
+    }
+
+    return api_success($ospf_neighbours, 'ospfv3_neighbours');
+}
+
+function list_ospfv3_ports(Illuminate\Http\Request $request)
+{
+    $ospf_ports = Ospfv3Port::hasAccess(Auth::user())
+              ->get();
+    if ($ospf_ports->isEmpty()) {
+        return api_error(404, 'Ospfv3 ports do not exist');
+    }
+
+    return api_success($ospf_ports, 'ospfv3_ports', null, 200, $ospf_ports->count());
+}
+
 function get_graph_by_portgroup(Request $request)
 {
     $id = $request->route('id');
@@ -1324,7 +1353,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
 {
     $id = $request->route('id');
 
-    $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
+    $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity`,`R`.`name`,`R`.`proc`,`R`.`notes` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
     $sql .= 'AND `A`.`state` IN ';
     if ($request->has('state')) {
         $param = explode(',', $request->get('state'));
