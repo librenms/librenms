@@ -48,7 +48,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     foreach ($arp_data as $ifIndex => $data) {
         $interface = get_port_by_index_cache($device['device_id'], $ifIndex);
 
-        if (!$interface) {
+        if (! $interface) {
             d_echo("Skipping arp/nd on interface with index $ifIndex - interface not found (hint: was it filtered out with bad_if/bad_if_regexp/bad_iftype/bad_ifoperstatus?)");
             continue;
         }
