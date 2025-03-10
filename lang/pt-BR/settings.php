@@ -13,7 +13,7 @@ return [
         'os' => 'Sistema Operacional',
         'discovery' => 'Descoberta',
         'graphing' => 'Gráficos',
-        'poller' => 'Poller',
+        'poller' => 'Coletor de Dados',
         'system' => 'Sistema',
         'webui' => 'Interface Web',
     ],
@@ -32,6 +32,7 @@ return [
             'ldap' => ['name' => 'Configurações de LDAP'],
             'radius' => ['name' => 'Configurações do Radius'],
             'socialite' => ['name' => 'Configurações do Socialite'],
+            'http' => ['name' => 'Configurações de Autenticação HTTP'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Configurações de Grupo de Dispositivos'],
@@ -58,7 +59,7 @@ return [
         ],
         'poller' => [
             'availability' => ['name' => 'Disponibilidade do Dispositivo'],
-            'distributed' => ['name' => 'Poller Distribuído'],
+            'distributed' => ['name' => 'Coleta de Dados Distribuída'],
             'graphite' => ['name' => 'Datastore: Graphite'],
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
             'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
@@ -67,17 +68,20 @@ return [
             'prometheus' => ['name' => 'Datastore: Prometheus'],
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
-            'poller_modules' => ['name' => 'Módulos de Poller'],
+            'dispatcherservice' => ['name' => 'Serviço de Dispatcher'],
+            'poller_modules' => ['name' => 'Módulos de Coleta de Dados'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Limpeza'],
             'proxy' => ['name' => 'Proxy'],
             'updates' => ['name' => 'Atualizações'],
+            'scheduledtasks' => ['name' => 'Tarefas Agendadas'],
             'server' => ['name' => 'Servidor'],
             'reporting' => ['name' => 'Relatórios'],
         ],
         'webui' => [
             'availability-map' => ['name' => 'Configurações do Mapa de Disponibilidade'],
+            'custom-map' => ['name' => 'Configurações de Mapas Customizados'],
             'graph' => ['name' => 'Configurações de Gráficos'],
             'dashboard' => ['name' => 'Configurações do Painel'],
             'port-descr' => ['name' => 'Análise de Descrição de Interfaces'],
@@ -121,7 +125,7 @@ return [
             ],
             'mute_alerts' => [
                 'description' => 'Silenciar Alertas',
-                'help' => 'O alerta deve ser visto apenas na WebUI',
+                'help' => 'O alerta deve ser visto apenas na interface web',
             ],
             'invert_rule_match' => [
                 'description' => 'Inverter Correspondência de Regra',
@@ -136,7 +140,7 @@ return [
                 'help' => 'Notificar se o alerta for reconhecido',
             ],
             'invert_map' => [
-                'description' => 'Todos os dispositivos exceto na lista',
+                'description' => 'Todos os dispositivos exceto os da lista',
                 'help' => 'Alertar apenas para dispositivos que não estão listados',
             ],
         ],
@@ -146,7 +150,7 @@ return [
                 'help' => 'Reconhecer até que o alerta seja limpo',
             ],
             'admins' => [
-                'description' => 'Emitir alertas para administradores (obsoleto)',
+                'description' => 'Emitir alertas para Administradores (obsoleto)',
                 'help' => 'Obsoleto, use o transporte de alerta por e-mail em vez disso.',
             ],
             'default_copy' => [
@@ -158,7 +162,7 @@ return [
                 'help' => 'Obsoleto, use o transporte de alerta por e-mail em vez disso.',
             ],
             'default_mail' => [
-                'description' => 'Contato padrão (obsoleto)',
+                'description' => 'Contato Padrão (obsoleto)',
                 'help' => 'Obsoleto, use o transporte de alerta por e-mail em vez disso.',
             ],
             'default_only' => [
@@ -166,8 +170,8 @@ return [
                 'help' => 'Obsoleto, use o transporte de alerta por e-mail em vez disso.',
             ],
             'disable' => [
-                'description' => 'Desativar alertas',
-                'help' => 'Parar a geração de alertas',
+                'description' => 'Desativar Alertas',
+                'help' => 'Para a geração de alertas',
             ],
             'acknowledged' => [
                 'description' => 'Enviar alertas reconhecidos',
@@ -187,12 +191,12 @@ return [
             ],
             'transports' => [
                 'mail' => [
-                    'description' => 'Ativar alertas por e-mail',
+                    'description' => 'Ativar Alertas por E-mail',
                     'help' => 'Transporte de alertas por e-mail',
                 ],
             ],
             'tolerance_window' => [
-                'description' => 'Janela de tolerância para cron',
+                'description' => 'Janela de tolerância para o cron',
                 'help' => 'Janela de tolerância em segundos',
             ],
             'users' => [
@@ -209,16 +213,16 @@ return [
             'help' => 'Realizar descoberta em um dispositivo reiniciado',
         ],
         'allow_duplicate_sysName' => [
-            'description' => 'Permitir sysName duplicado',
+            'description' => 'Permitir sysName Duplicado',
             'help' => 'Por padrão, sysNames duplicados são desabilitados para prevenir que um dispositivo com múltiplas interfaces seja adicionado várias vezes',
         ],
         'allow_unauth_graphs' => [
-            'description' => 'Permitir acesso a gráficos não autenticados',
-            'help' => 'Permite que qualquer um acesse aos gráficos sem fazer login',
+            'description' => 'Permitir acesso aos gráficos sem autenticação',
+            'help' => 'Permite que qualquer pessoa acesse os gráficos sem fazer login no sistema',
         ],
         'allow_unauth_graphs_cidr' => [
             'description' => 'Permitir acesso aos gráficos para as redes informadas',
-            'help' => 'Permitir acesso aos gráficos não autenticados para as redes informadas (não se aplica quando gráficos não autenticados estão habilitados)',
+            'help' => 'Permitir acesso aos gráficos sem autenticação somente para as redes informadas (não se aplica quando gráficos sem autenticação está habilitado)',
         ],
         'api' => [
             'cors' => [
@@ -248,7 +252,7 @@ return [
                 ],
                 'origin' => [
                     'description' => 'Permitir Origens de Solicitação',
-                    'help' => 'Corresponder à origem da solicitação. Curingas podem ser usados, por exemplo, *.meudominio.com',
+                    'help' => 'Corresponde à origem da solicitação. Curingas podem ser usados, por exemplo, *.meudominio.com',
                 ],
             ],
         ],
@@ -273,19 +277,19 @@ return [
         ],
         'auth' => [
             'allow_get_login' => [
-                'description' => 'Permitir login via GET (Inseguro)',
+                'description' => 'Permitir Login via GET (Inseguro)',
                 'help' => 'Permitir login colocando variáveis de nome de usuário e senha na solicitação GET da URL, útil para sistemas de exibição onde você não pode fazer login interativamente. Isso é considerado inseguro porque a senha será exibida nos logs e logins não são limitados por taxa, o que pode abrir brechas para ataques de força bruta.',
             ],
             'socialite' => [
                 'redirect' => [
-                    'description' => 'Redirecionar página de login',
+                    'description' => 'Redirecionar Página de Login',
                     'help' => 'A página de login deve redirecionar imediatamente para o primeiro provedor definido.<br><br>DICAS: Você pode evitar isso adicionando ?redirect=0 na URL',
                 ],
                 'register' => [
-                    'description' => 'Permitir registro via provedor',
+                    'description' => 'Permitir Registro via Provedor',
                 ],
                 'configs' => [
-                    'description' => 'Configurações do provedor',
+                    'description' => 'Configurações do Provedor',
                 ],
                 'scopes' => [
                     'description' => 'Escopos que devem ser incluídos na solicitação de autenticação',
@@ -298,7 +302,7 @@ return [
             'help' => 'grupos e usuários devem estar sob este dn. Exemplo: dc=exemplo,dc=com',
         ],
         'auth_ad_check_certificates' => [
-            'description' => 'Verificar certificado',
+            'description' => 'Verificar Certificado',
             'help' => 'Verificar certificados quanto à validade. Alguns servidores usam certificados autoassinados, e, se desativar esta opção, permitirá o uso destes.',
         ],
         'auth_ad_debug' => [
@@ -310,19 +314,19 @@ return [
             'help' => 'Exemplo de Domínio do Active Directory: exemplo.com',
         ],
         'auth_ad_group_filter' => [
-            'description' => 'Filtro de grupo LDAP',
+            'description' => 'Filtro de Grupo LDAP',
             'help' => 'Filtro LDAP do Active Directory para selecionar grupos',
         ],
         'auth_ad_groups' => [
-            'description' => 'Acesso ao grupo',
-            'help' => 'Definir grupos que têm acesso e nível',
+            'description' => 'Grupos de Acesso',
+            'help' => 'Definir grupos que têm acesso e respectivos níveis',
         ],
         'auth_ad_require_groupmembership' => [
-            'description' => 'Exigir associação a grupo',
+            'description' => 'Exigir Associação a um Grupo',
             'help' => 'Permitir login apenas se os usuários fizerem parte de um grupo definido',
         ],
         'auth_ad_user_filter' => [
-            'description' => 'Filtro de usuário LDAP',
+            'description' => 'Filtro de Usuário LDAP',
             'help' => 'Filtro LDAP do Active Directory para selecionar usuários',
         ],
         'auth_ad_url' => [
@@ -340,11 +344,11 @@ return [
             'help' => 'DN completo do usuário de bind',
         ],
         'auth_ldap_bindpassword' => [
-            'description' => 'Senha de bind',
+            'description' => 'Senha de Bind',
             'help' => 'Senha para o usuário de bind',
         ],
         'auth_ldap_binduser' => [
-            'description' => 'Nome de usuário de bind',
+            'description' => 'Nome de Usuário de Bind',
             'help' => 'Usado para consultar o servidor LDAP quando nenhum usuário está logado (alertas, API, etc)',
         ],
         'auth_ad_binddn' => [
@@ -352,11 +356,11 @@ return [
             'help' => 'DN completo do usuário de bind',
         ],
         'auth_ad_bindpassword' => [
-            'description' => 'Senha de bind',
+            'description' => 'Senha de Bind',
             'help' => 'Senha para o usuário de bind',
         ],
         'auth_ad_binduser' => [
-            'description' => 'Nome de usuário de bind',
+            'description' => 'Nome de Usuário de Bind',
             'help' => 'Usado para consultar o servidor AD quando nenhum usuário está logado (alertas, API, etc)',
         ],
         'auth_ad_starttls' => [
@@ -369,15 +373,15 @@ return [
             ],
         ],
         'auth_ldap_cache_ttl' => [
-            'description' => 'Expiração do cache LDAP',
+            'description' => 'Expiração do Cache LDAP',
             'help' => 'Armazena temporariamente os resultados das consultas LDAP. Melhora as velocidades, mas os dados podem estar desatualizados.',
         ],
         'auth_ldap_debug' => [
-            'description' => 'Mostrar depuração',
+            'description' => 'Depuração',
             'help' => 'Exibe informações de depuração. Pode expor informações privadas, não deixe habilitado.',
         ],
         'auth_ldap_cacertfile' => [
-            'description' => 'Substituir CA Cert TLS do sistema',
+            'description' => 'Substituir CA Cert TLS do Sistema',
             'help' => 'Usar CA Cert fornecido para LDAPS.',
         ],
         'auth_ldap_ignorecert' => [
@@ -385,41 +389,41 @@ return [
             'help' => 'Não exigir um Certificado TLS válido para LDAPS.',
         ],
         'auth_ldap_emailattr' => [
-            'description' => 'Atributo de e-mail',
+            'description' => 'Atributo de E-mail',
         ],
         'auth_ldap_group' => [
-            'description' => 'DN do grupo de acesso',
+            'description' => 'DN para Grupo de Acesso',
             'help' => 'Nome distinto para um grupo que concede acesso normal. Exemplo: cn=nome_grupo,ou=grupos,dc=exemplo,dc=com',
         ],
         'auth_ldap_groupbase' => [
-            'description' => 'DN base do grupo',
+            'description' => 'DN Base de Grupo',
             'help' => 'Nome distinto para pesquisar grupos. Exemplo: ou=grupo,dc=exemplo,dc=com',
         ],
         'auth_ldap_groupmemberattr' => [
-            'description' => 'Atributo de membro do grupo',
+            'description' => 'Atributo para Membro do Grupo',
         ],
         'auth_ldap_groupmembertype' => [
-            'description' => 'Encontrar membros do grupo por',
+            'description' => 'Encontrar membros de grupo por',
             'options' => [
-                'username' => 'Nome de usuário',
-                'fulldn' => 'DN completo (usando prefixo e sufixo)',
+                'username' => 'Nome de Usuário',
+                'fulldn' => 'DN Completo (usando prefixo e sufixo)',
                 'puredn' => 'Pesquisa de DN (pesquisa usando atributo uid)',
             ],
         ],
         'auth_ldap_groups' => [
-            'description' => 'Acesso de grupo',
-            'help' => 'Definir grupos que têm acesso e nível',
+            'description' => 'Grupos de Acesso',
+            'help' => 'Definir grupos que têm acesso e seus respectivos níveis',
         ],
         'auth_ldap_require_groupmembership' => [
-            'description' => 'Verificação de associação ao grupo LDAP',
+            'description' => 'Verificar associação ao grupo LDAP',
             'help' => 'Executar (ou pular) ldap_compare quando o provedor permitir (ou não) para a ação Comparar.',
         ],
         'auth_ldap_port' => [
             'description' => 'Porta LDAP',
-            'help' => 'Porta para conectar aos servidores. Para LDAP deve ser 389, para LDAPS deve ser 636',
+            'help' => 'Porta de conexão aos servidores. Para LDAP deve ser 389, para LDAPS deve ser 636',
         ],
         'auth_ldap_prefix' => [
-            'description' => 'Prefixo do usuário',
+            'description' => 'Prefixo de usuário',
             'help' => 'Usado para transformar um nome de usuário em um nome distinto',
         ],
         'auth_ldap_server' => [
@@ -436,36 +440,40 @@ return [
             ],
         ],
         'auth_ldap_suffix' => [
-            'description' => 'Sufixo do usuário',
+            'description' => 'Sufixo de Usuário',
             'help' => 'Usado para transformar um nome de usuário em um nome distinto',
         ],
         'auth_ldap_timeout' => [
             'description' => 'Tempo de espera da conexão',
-            'help' => 'Se um ou mais servidores não responderem, tempos de espera mais altos causarão acesso lento. Muito baixo pode causar falhas de conexão em alguns casos',
+            'help' => 'Se um ou mais servidores não responderem, tempos de espera mais altos causarão lentidão no acesso. Muito baixo pode causar falhas de conexão em alguns casos',
         ],
         'auth_ldap_uid_attribute' => [
-            'description' => 'Atributo de ID único',
+            'description' => 'Atributo único de ID',
             'help' => 'Atributo LDAP para identificar usuários, deve ser numérico',
         ],
         'auth_ldap_userdn' => [
             'description' => 'Usar DN completo do usuário',
-            'help' => 'Usa o DN completo do usuário como valor do atributo de membro em um grupo, em vez de membro: nome de usuário usando o prefixo e sufixo. (é membro: uid=nome_de_usuário,ou=grupos,dc=dominio,dc=com)',
+            'help' => 'Usa o DN completo do usuário como valor do atributo de membro em um grupo, em vez de membro: nome de usuário usando o prefixo e sufixo. (membro: uid=nome_de_usuário,ou=grupos,dc=dominio,dc=com)',
+        ],
+        'auth_ldap_userlist_filter' => [
+            'description' => 'Filtro de Usuário LDAP Personalizado',
+            'help' => 'Filtro LDAP personalizado para limitar o número de respostas se você tiver um diretório LDAP com milhares de usuários.',
         ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Wildcard OU do usuário',
             'help' => 'Pesquisar usuário correspondente ao nome de usuário independentemente do OU definido no sufixo do usuário. Útil se seus usuários estiverem em diferentes OUs. Nome de usuário de bind, se definido, ainda usa o sufixo do usuário',
         ],
         'auth_ldap_version' => [
-            'description' => 'Versão LDAP',
-            'help' => 'Versão LDAP para usar na comunicação com o servidor. Normalmente, isso deve ser v3',
+            'description' => 'Versão do LDAP',
+            'help' => 'Versão do LDAP para usar na comunicação com o servidor. Normalmente, deve ser v3',
             'options' => [
                 '2' => '2',
                 '3' => '3',
             ],
         ],
         'auth_mechanism' => [
-            'description' => 'Método de Autorização (Cuidado!)',
-            'help' => 'Método de autorização. Cuidado, você pode perder a capacidade de fazer login. Você pode reverter isso para mysql configurando $config["auth_mechanism"] = "mysql"; em seu config.php',
+            'description' => 'Método de Autenticação (Cuidado!)',
+            'help' => 'Método de autenticação dos usuários. Cuidado, você poderá ficar impossibilitado de fazer login no sistema. Pode ser revertido isso para mysql configurando $config["auth_mechanism"] = "mysql"; em seu config.php',
             'options' => [
                 'mysql' => 'MySQL (padrão)',
                 'active_directory' => 'Active Directory',
@@ -479,7 +487,7 @@ return [
         ],
         'auth_remember' => [
             'description' => 'Duração do Lembrar-me',
-            'help' => 'Número de dias para manter um usuário logado ao marcar a caixa de seleção Lembrar-me no login.',
+            'help' => 'Número de dias para manter um usuário logado ao marcar a caixa de seleção Lembrar-me no login',
         ],
         'authlog_purge' => [
             'description' => 'Entradas de log de autenticação mais antigas que',
@@ -491,11 +499,99 @@ return [
         ],
         'transit_descr' => [
             'description' => 'Tipos de Portas de Trânsito',
-            'help' => 'Portas do(s) tipo(s) de descrição listados serão exibidas no menu de portas de trânsito. Veja a documentação de Análise de Descrição de Interface para mais informações.',
+            'help' => 'Portas do(s) tipo(s) de descrição listados serão exibidas no menu de portas de trânsito. Veja a documentação de Análise de Descrição de Interface para mais informações',
         ],
         'core_descr' => [
             'description' => 'Tipos de Portas Principais',
-            'help' => 'Portas do(s) tipo(s) de descrição listados serão exibidas no menu de portas principais. Veja a documentação de Análise de Descrição de Interface para mais informações.',
+            'help' => 'Portas do(s) tipo(s) de descrição listados serão exibidas no menu de portas principais. Veja a documentação de Análise de Descrição de Interface para mais informações',
+        ],
+        'custom_map' => [
+            'background_type' => [
+                'description' => 'Tipo de Plano de Fundo',
+                'help' => 'Tipo de plano de fundo padrão para novos mapas. Requer um conjunto de dados de plano de fundo',
+            ],
+            'background_data' => [
+                'color' => [
+                    'description' => 'Cor de Fundo',
+                    'help' => 'Cor inicial para o plano de fundo do mapa',
+                ],
+                'lat' => [
+                    'description' => 'Latitude do Mapa de Fundo',
+                    'help' => 'Latitude inicial para o mapa geográfico de fundo',
+                ],
+                'lng' => [
+                    'description' => 'Longitude do Mapa de Fundo',
+                    'help' => 'Longitude inicial para o mapa geográfico de fundo',
+                ],
+                'layer' => [
+                    'description' => 'Camada do Mapa de Fundo',
+                    'help' => 'Camada inicial do mapa para o mapa geográfico de fundo',
+                ],
+                'zoom' => [
+                    'description' => 'Zoom do Mapa de Fundo',
+                    'help' => 'Zoom inicial para o mapa geográfico de fundo',
+                ],
+            ],
+            'edge_font_color' => [
+                'description' => 'Cor do Texto',
+                'help' => 'Cor padrão da fonte para as etiquetas das conexões',
+            ],
+            'edge_font_face' => [
+                'description' => 'Fonte',
+                'help' => 'Fonte padrão para as etiquetas dos links',
+            ],
+            'edge_font_size' => [
+                'description' => 'Tamanho do Texto do Link',
+                'help' => 'Tamanho padrão da fonte para as etiquetas dos links',
+            ],
+            'edge_seperation' => [
+                'description' => 'Separação dos Links',
+                'help' => 'Separação padrão das conexões para novos mapas',
+            ],
+            'height' => [
+                'description' => 'Altura do Mapa',
+                'help' => 'Altura padrão para novos mapas',
+            ],
+            'node_align' => [
+                'description' => 'Alinhamento dos Nós',
+                'help' => 'Alinhamento padrão dos nós para novos mapas',
+            ],
+            'node_background' => [
+                'description' => 'Cor de Fundo dos Nós',
+                'help' => 'Cor de fundo padrão para as etiquetas dos nós',
+            ],
+            'node_border' => [
+                'description' => 'Borda dos Nós',
+                'help' => 'Cor padrão das bordas dos nós',
+            ],
+            'node_font_color' => [
+                'description' => 'Cor do Texto dos Nós',
+                'help' => 'Cor padrão da fonte das etiquetas dos nós',
+            ],
+            'node_font_face' => [
+                'description' => 'Fonte dos Nós',
+                'help' => 'Fonte padrão para as etiquetas dos nós',
+            ],
+            'node_font_size' => [
+                'description' => 'Tamanho do Texto dos Nós',
+                'help' => 'Tamanho padrão da fonte das etiquetas dos nós',
+            ],
+            'node_size' => [
+                'description' => 'Tamanho dos Nós',
+                'help' => 'Tamanho padrão dos nós',
+            ],
+            'node_type' => [
+                'description' => 'Tipo de Exibição dos Nós',
+                'help' => 'Tipo de exibição padrão para os nós',
+            ],
+            'reverse_arrows' => [
+                'description' => 'Setas de Conexão Reversas',
+                'help' => 'Direção padrão das setas. Em direção ao centro (padrão) ou em direção às extremidades',
+            ],
+            'width' => [
+                'description' => 'Largura do Mapa',
+                'help' => 'Largura padrão para novos mapas',
+            ],
         ],
         'customers_descr' => [
             'description' => 'Tipos de Portas de Clientes',
@@ -593,11 +689,12 @@ return [
             'processors' => [
                 'description' => 'Processadores',
             ],
-
+            'qos' => [
+                'description' => 'QoS',
+            ],
             'route' => [
                 'description' => 'Rota',
             ],
-
             'sensors' => [
                 'description' => 'Sensores',
             ],
@@ -608,7 +705,6 @@ return [
             'storage' => [
                 'description' => 'Armazenamento',
             ],
-
             'stp' => [
                 'description' => 'STP',
             ],
@@ -625,7 +721,7 @@ return [
                 'description' => 'VRF',
             ],
             'wireless' => [
-                'description' => 'Sem Fio',
+                'description' => 'Wireless',
             ],
             'xdsl' => [
                 'description' => 'xDSL',
@@ -635,12 +731,12 @@ return [
             ],
         ],
         'distributed_poller' => [
-            'description' => 'Habilitar Polling Distribuído (requer configuração adicional)',
-            'help' => 'Habilitar polling distribuído em todo o sistema. Isso é destinado ao compartilhamento de carga, não ao polling remoto. Você deve ler a documentação para etapas de habilitação: https://docs.librenms.org/Extensions/Distributed-Poller/',
+            'description' => 'Habilitar Coleta de Dados Distribuída (requer configuração adicional)',
+            'help' => 'Habilitar coleta de dados distribuída em todo o sistema. Isso é destinado ao compartilhamento de carga, não à coleta remota. Leia a documentação para verificar as etapas de habilitação: https://docs.librenms.org/Extensions/Distributed-Poller/',
         ],
         'default_poller_group' => [
-            'description' => 'Grupo Poller Padrão',
-            'help' => 'O grupo poller padrão que todos os pollers devem pesquisar, se nenhum estiver definido em config.php',
+            'description' => 'Grupo de Coleta de Dados Padrão',
+            'help' => 'O grupo de coleta padrão que todos os coletores devem pesquisar, se nenhum estiver definido em config.php',
         ],
         'distributed_poller_memcached_host' => [
             'description' => 'Host Memcached',
@@ -655,12 +751,12 @@ return [
             'help' => 'Tenta usar TLS antes de recorrer a não criptografado',
         ],
         'email_attach_graphs' => [
-            'description' => 'Anexar imagens de gráficos',
+            'description' => 'Anexar gráficos',
             'help' => 'Isso gerará um gráfico quando o alerta for acionado e o anexará ao e-mail.',
         ],
         'email_backend' => [
-            'description' => 'Como enviar e-mails',
-            'help' => 'O backend a ser usado para enviar e-mails, pode ser mail, sendmail ou SMTP',
+            'description' => 'Método de envio de e-mails',
+            'help' => 'O backend a ser usado para enviar e-mails, podendo ser mail, sendmail ou SMTP',
             'options' => [
                 'mail' => 'mail',
                 'sendmail' => 'sendmail',
@@ -863,6 +959,10 @@ return [
             'description' => 'Nome do campo contendo o nome de usuário',
             'help' => 'Pode ser um campo ENV ou HTTP-header como REMOTE_USER, PHP_AUTH_USER ou uma variante personalizada',
         ],
+        'http_auth_guest' => [
+            'description' => 'Http Auth guest user',
+            'help' => 'If set, allows all http users to authenticate and assigns unknown users to give local username',
+        ],
         'http_proxy' => [
             'description' => 'Proxy HTTP',
             'help' => 'Defina isso como fallback se a variável de ambiente http_proxy não estiver disponível.',
@@ -977,11 +1077,31 @@ return [
             ],
             'debug' => [
                 'description' => 'Depuração',
-                'help' => 'Para ativar ou desativar a saída detalhada via CLI',
+                'help' => 'Ativa ou desativa a saída detalhada via CLI',
+            ],
+            'log_file' => [
+                'description' => 'Arquivo de Logs',
+                'help' => 'Define outro arquivo de log, se desejado, para depuração',
             ],
             'groups-exclude' => [
                 'description' => 'Grupos de dispositivos excluídos',
                 'help' => 'Grupos de dispositivos excluídos do envio de dados para InfluxDBv2',
+            ],
+            'timeout' => [
+                'description' => 'Tempo Limite',
+                'help' => 'Tempo limite em segundos',
+            ],
+            'verify' => [
+                'description' => 'Verificar',
+                'help' => 'Verifica o certificado',
+            ],
+            'batch_size' => [
+                'description' => 'Tamanho do Lote',
+                'help' => 'Quantidade de métricas a serem agrupadas antes de serem enviadas',
+            ],
+            'max_retry' => [
+                'description' => 'Número máximo de tentativas',
+                'help' => 'Quantidade de tentativas a serem realizadas',
             ],
         ],
         'ipmitool' => [
@@ -993,8 +1113,8 @@ return [
         ],
         'mac_oui' => [
             'enabled' => [
-                'description' => 'Habilitar pesquisa de OUI MAC',
-                'help' => 'Habilitar pesquisa de fornecedor de endereço MAC (OUI) (dados são baixados pelo script daily.sh)',
+                'description' => 'Habilitar pesquisa de MAC OUI',
+                'help' => 'Habilitar pesquisa de fornecedor do dispositivo (OUI) (dados são baixados pelo script daily.sh)',
             ],
         ],
         'mono_font' => [
@@ -1011,8 +1131,13 @@ return [
             'description' => 'Exibir links de rede no mapa',
             'help' => 'Mostrar os links de rede entre as diferentes localizações no mapa (tipo weathermap)',
         ],
-        'nfdump' => [
-            'description' => 'Caminho para nfdump',
+        'network_map_worldmap_show_disabled_alerts' => [
+            'description' => 'Exibir dispositivos com alertas desativados',
+            'help' => 'Exibe os dispositivos que possuam alertas desativados no mapa de rede',
+        ],
+        'network_map_worldmap_link_type' => [
+            'description' => 'Fonte do mapa de rede',
+            'help' => 'Selecione a fonte de dados para os links do mapa de rede',
         ],
         'nfsen_enable' => [
             'description' => 'Habilitar NfSen',
@@ -1130,7 +1255,7 @@ return [
         ],
         'password' => [
             'min_length' => [
-                'description' => 'Comprimento mínimo da senha',
+                'description' => 'Comprimento Mínimo da Senha',
                 'help' => 'Senhas mais curtas do que o comprimento dado serão rejeitadas',
             ],
         ],
@@ -1168,7 +1293,7 @@ return [
         ],
         'ping_rrd_step' => [
             'description' => 'Frequência de Ping',
-            'help' => 'Com que frequência executar. Define o valor padrão para todos os nós. Aviso! Se você mudar isso, você deve fazer mudanças adicionais. Verifique os documentos de Fast Ping.',
+            'help' => 'Com que frequência executar. Valor padrão para todos os nós. Aviso! Se você mudar isso, você deve fazer mudanças adicionais. Verifique os documentos de Fast Ping.',
         ],
         'poller_modules' => [
             'unix-agent' => [
@@ -1179,6 +1304,9 @@ return [
             ],
             'ipmi' => [
                 'description' => 'IPMI',
+            ],
+            'qos' => [
+                'description' => 'QoS',
             ],
             'sensors' => [
                 'description' => 'Sensores',
@@ -1217,10 +1345,13 @@ return [
                 'description' => 'UCD DiskIO',
             ],
             'wireless' => [
-                'description' => 'Sem Fio',
+                'description' => 'Wireless',
             ],
             'ospf' => [
                 'description' => 'OSPF',
+            ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
             ],
             'isis' => [
                 'description' => 'ISIS',
@@ -1313,7 +1444,7 @@ return [
             'help' => 'Limpeza feita pelo script daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Excluir portas deletadas',
+            'description' => 'Purgar portas deletadas',
             'help' => 'Limpeza feita pelo script daily.sh',
         ],
         'prometheus' => [
@@ -1326,8 +1457,8 @@ return [
                 'help' => 'A URL do Prometheus Push Gateway para enviar dados',
             ],
             'Job' => [
-                'description' => 'Job',
-                'help' => 'Etiqueta de job para métricas exportadas',
+                'description' => 'Tarefa',
+                'help' => 'Etiqueta de tarefa para métricas exportadas',
             ],
             'attach_sysname' => [
                 'description' => 'Anexar sysName do Dispositivo',
@@ -1339,7 +1470,7 @@ return [
             ],
         ],
         'public_status' => [
-            'description' => 'Mostrar status publicamente',
+            'description' => 'Mostrar Status Publicamente',
             'help' => 'Mostra o status de alguns dispositivos na página de login sem autenticação.',
         ],
         'routes_max_number' => [
@@ -1380,7 +1511,7 @@ return [
                 'help' => 'Envia relatório de uso e versão para o LibreNMS. Para excluir estatísticas anônimas, visite a página Sobre. Você pode visualizar estatísticas em https://stats.librenms.org',
             ],
             'dump_errors' => [
-                'description' => 'Despejar erros de depuração (Poderá quebrar sua instalação)',
+                'description' => 'Despejar erros de depuração (Poderá corromper sua instalação)',
                 'help' => 'Despejar erros que normalmente são ocultados para que você, como desenvolvedor, possa encontrar e corrigir possíveis problemas.',
             ],
             'throttle' => [
@@ -1427,69 +1558,126 @@ return [
             'description' => 'Define a versão do rrdtool no seu servidor',
             'help' => 'Qualquer coisa acima de 1.5.5 suporta todos os recursos que o LibreNMS usa, não defina um valor maior do que a versão instalada',
         ],
+        'schedule_type' => [
+            'alerting' => [
+                'description' => 'Alertar',
+                'help' => 'Método de agendamento de tarefas de alerta. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_billing_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'cron' => 'Cron (alerts.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+            'billing' => [
+                'description' => 'Tarifação',
+                'help' => 'Método de agendamento de tarefas de tarifação. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_billing_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'cron' => 'Cron (poll-billing.php e billing-calculate.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+            'discovery' => [
+                'description' => 'Descoberta',
+                'help' => 'Método de agendamento de tarefas de descoberta. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_discovery_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'cron' => 'Cron (discovery.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+            'ping' => [
+                'description' => 'Fast Ping',
+                'help' => 'Método de agendamento de tarefas de Fast Ping. O modo legado usará cron se a entrada do crontab existir e usará o serviço de dispatcher se a opção de configuração legada service_ping_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'disabled' => 'Desativado (Pings apenas durante coleta de dados)',
+                    'cron' => 'Cron (ping.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+            'poller' => [
+                'description' => 'Coletor de Dados',
+                'help' => 'Método de agendamento de tarefas do coletor de dados. O modo legado usará cron se a entrada do crontab existir e usará o serviço de dispatcher se a opção de configuração legada service_poller_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'cron' => 'Cron (poller.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+            'services' => [
+                'description' => 'Serviços',
+                'help' => 'Método de agendamento de tarefas de serviços. O modo legado usará cron se a entrada do crontab existir e usará o serviço de dispatcher se a opção de configuração legada service_services_enabled estiver definida como verdadeiro.',
+                'options' => [
+                    'legacy' => 'Legado (Irrestrito)',
+                    'cron' => 'Cron (check-services.php)',
+                    'dispatcher' => 'Serviço de Dispatcher',
+                ],
+            ],
+        ],
         'service_master_timeout' => [
             'description' => 'Tempo de Expiração do Dispatcher Mestre',
-            'help' => 'O tempo antes que o bloqueio mestre expire. Se o mestre desaparecer, levará esse tempo para outro nó assumir. No entanto, se demorar mais do que o tempo limite para despachar o trabalho, você terá múltiplos mestres',
+            'help' => 'O tempo antes da expiração do bloqueio mestre. Se o mestre ficar indisponível, levará esse tempo para outro nó assumir. No entanto, se levar mais tempo do que o limite para despachar o trabalho, haverá múltiplos mestres.',
         ],
         'service_poller_workers' => [
-            'description' => 'Workers de Poller',
-            'help' => 'Quantidade de workers de polling a serem gerados. Define o valor padrão para todos os nós.',
+            'description' => 'Workers de Coleta de Dados',
+            'help' => 'Quantidade de workers de coleta de dados a serem gerados. Valor padrão para todos os nós.',
         ],
         'service_poller_frequency' => [
-            'description' => 'Frequência de Polling (Aviso!)',
-            'help' => 'Com que frequência pollar os dispositivos. Define o valor padrão para todos os nós. Aviso! Alterar isso sem corrigir os arquivos rrd quebrará os gráficos. Veja a documentação para mais informações.',
+            'description' => 'Frequência de Coleta de Dados (Aviso!)',
+            'help' => 'Com que frequência coletar dados dos dispositivos. Valor padrão para todos os nós. Aviso! Alterar isso sem corrigir os arquivos rrd corromperá os gráficos. Veja a documentação para mais informações.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Repetir Dispositivo Inativo',
-            'help' => 'Se um dispositivo estiver inativo quando a polling for tentada, este é o tempo de espera antes de tentar novamente. Define o valor padrão para todos os nós.',
+            'help' => 'Se um dispositivo estiver inativo quando a coleta de dados for feita, este é o tempo de espera antes de tentar novamente. Valor padrão para todos os nós.',
         ],
         'service_discovery_workers' => [
             'description' => 'Workers de Descoberta',
-            'help' => 'Quantidade de workers de descoberta a serem executados. Configurar muito alto pode causar sobrecarga. Define o valor padrão para todos os nós.',
+            'help' => 'Quantidade de workers de descoberta a serem executados. Configurar muito alto pode causar sobrecarga. Valor padrão para todos os nós.',
         ],
         'service_discovery_frequency' => [
             'description' => 'Frequência de Descoberta',
-            'help' => 'Com que frequência executar a descoberta de dispositivos. Define o valor padrão para todos os nós. O padrão é 4 vezes ao dia.',
+            'help' => 'Com que frequência executar a descoberta de dispositivos. Valor padrão para todos os nós. O padrão é 4 vezes ao dia.',
         ],
         'service_services_workers' => [
             'description' => 'Workers de Serviços',
-            'help' => 'Quantidade de workers de serviços. Define o valor padrão para todos os nós.',
+            'help' => 'Quantidade de workers de serviços. Valor padrão para todos os nós.',
         ],
         'service_services_frequency' => [
-            'description' => 'Frequência de Serviços',
-            'help' => 'Com que frequência executar serviços. Isso deve coincidir com a frequência de polling. Define o valor padrão para todos os nós.',
+            'description' => 'Frequência dos Serviços',
+            'help' => 'Com que frequência executar os serviços. Isso deve coincidir com a frequência de polling. Valor padrão para todos os nós.',
         ],
         'service_billing_frequency' => [
             'description' => 'Frequência de Tarifação',
-            'help' => 'Com que frequência coletar dados de tarifação. Define o valor padrão para todos os nós.',
+            'help' => 'Com que frequência coletar dados de tarifação. Valor padrão para todos os nós.',
         ],
         'service_billing_calculate_frequency' => [
             'description' => 'Frequência de Cálculo de Tarifação',
-            'help' => 'Com que frequência calcular a tarifação. Define o valor padrão para todos os nós.',
+            'help' => 'Com que frequência calcular a tarifação. Valor padrão para todos os nós.',
         ],
         'service_alerting_frequency' => [
             'description' => 'Frequência de Alertas',
-            'help' => 'Com que frequência as regras de alerta são verificadas. Note que os dados são atualizados apenas com base na frequência de polling. Define o valor padrão para todos os nós.',
+            'help' => 'Com que frequência as regras de alerta são verificadas. Note que os dados são atualizados apenas com base na frequência da coleta de dados. Valor padrão para todos os nós.',
         ],
         'service_update_enabled' => [
             'description' => 'Manutenção Diária Habilitada',
-            'help' => 'Executa o script de manutenção daily.sh e reinicia o serviço de dispatcher depois. Define o valor padrão para todos os nós.',
+            'help' => 'Executa o script de manutenção daily.sh e reinicia o serviço de dispatcher depois. Valor padrão para todos os nós.',
         ],
         'service_update_frequency' => [
             'description' => 'Frequência de Manutenção',
-            'help' => 'Com que frequência executar a manutenção diária. O padrão é 1 dia. É altamente recomendável não alterar isso. Define o valor padrão para todos os nós.',
+            'help' => 'Com que frequência executar a manutenção diária. O padrão é 1 dia. É altamente recomendável não alterar isso. Valor padrão para todos os nós.',
         ],
         'service_loglevel' => [
             'description' => 'Nível de Log',
-            'help' => 'Nível de log do serviço de dispatcher. Define o valor padrão para todos os nós.',
+            'help' => 'Nível de log do serviço de dispatcher. Valor padrão para todos os nós.',
         ],
         'service_watchdog_enabled' => [
             'description' => 'Watchdog Habilitado',
-            'help' => 'O Watchdog monitora o arquivo de log e reinicia o serviço se ele não for atualizado. Define o valor padrão para todos os nós.',
+            'help' => 'O Watchdog monitora o arquivo de log e reinicia o serviço se ele não for atualizado. Valor padrão para todos os nós.',
         ],
         'service_watchdog_log' => [
             'description' => 'Arquivo de Log a ser Monitorado',
-            'help' => 'O padrão é o arquivo de log do LibreNMS. Define o valor padrão para todos os nós.',
+            'help' => 'O padrão é o arquivo de log do LibreNMS. Valor padrão para todos os nós.',
         ],
         'sfdp' => [
             'description' => 'Caminho para sfdp',
@@ -1544,7 +1732,7 @@ return [
             ],
             'timeout' => [
                 'description' => 'Tempo de Espera',
-                'help' => 'Tempo de espera SNMP em segundos',
+                'help' => 'Tempo de espera em segundos',
             ],
             'retries' => [
                 'description' => 'Repetições',
@@ -1610,12 +1798,12 @@ return [
             'description' => 'Caminho para traceroute',
         ],
         'twofactor' => [
-            'description' => 'Dois Fatores',
+            'description' => 'Autenticação em Dois Fatores',
             'help' => 'Permitir que os usuários ativem e usem Senhas de Uso Único Baseadas em Tempo (TOTP) ou Baseadas em Contador (HOTP)',
         ],
         'twofactor_lock' => [
-            'description' => 'Tempo de Limitação de Dois Fatores (segundos)',
-            'help' => 'Tempo de bloqueio para esperar em segundos antes de permitir novas tentativas se a autenticação de Dois Fatores falhar 3 vezes consecutivas - solicitará ao usuário que aguarde esse tempo. Defina como 0 para desativar, resultando em um bloqueio permanente da conta e uma mensagem ao usuário para contatar o administrador',
+            'description' => 'Tempo de Retardo para Autenticação de Dois Fatores (segundos)',
+            'help' => 'Tempo de bloqueio para esperar em segundos antes de permitir novas tentativas se a Autenticação em Dois Fatores falhar 3 vezes consecutivas - solicitará ao usuário que aguarde esse tempo. Defina como 0 para desativar, resultando em um bloqueio permanente da conta e uma mensagem ao usuário para contatar o administrador',
         ],
         'unix-agent' => [
             'connection-timeout' => [
@@ -1679,10 +1867,6 @@ return [
                 'description' => 'Usar gráficos empilhados',
                 'help' => 'Exibir gráficos empilhados em vez de gráficos invertidos',
             ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Desativar percentual para gráficos de estatísticas globalmente',
-                'help' => 'Desativa a exibição dos valores e linhas percentuais para gráficos que exibem esses',
-            ],
             'graph_type' => [
                 'description' => 'Definir o tipo de gráfico',
                 'help' => 'Definir o tipo de gráfico padrão',
@@ -1694,6 +1878,10 @@ return [
             'min_graph_height' => [
                 'description' => 'Definir a altura mínima do gráfico',
                 'help' => 'Altura mínima do gráfico (padrão: 300)',
+            ],
+            'graph_stat_percentile_disable' => [
+                'description' => 'Desativar percentual para gráficos de estatísticas globalmente',
+                'help' => 'Desativa a exibição dos valores e linhas percentuais para gráficos que exibem esses',
             ],
         ],
         'device_display_default' => [
@@ -1709,6 +1897,14 @@ return [
         'device_location_map_open' => [
             'description' => 'Abrir Mapa de Localização',
             'help' => 'O Mapa de Localização é exibido por padrão',
+        ],
+        'device_location_map_show_devices' => [
+            'description' => 'Exibir dispositivos no mapa de localização',
+            'help' => 'Exibir todos os dispositivos no mapa de localização quando estiver visível',
+        ],
+        'device_location_map_show_device_dependencies' => [
+            'description' => 'Exibir dependências dos dispositivos no mapa de localização',
+            'help' => 'Exibir links entre dispositivos no mapa de localização com base nas dependências dos pais',
         ],
         'whois' => [
             'description' => 'Caminho para whois',
@@ -1731,8 +1927,8 @@ return [
         ],
     ],
     'twofactor' => [
-        'description' => 'Habilitar Autenticação de Dois Fatores',
-        'help' => 'Habilita a autenticação de Dois Fatores. Você deve configurar cada conta para torná-la ativa.',
+        'description' => 'Habilitar Autenticação em Dois Fatores',
+        'help' => 'Habilita a Autenticação em Dois Fatores. Você deve configurar cada conta para torná-la ativa.',
     ],
     'units' => [
         'days' => 'dias',
@@ -1751,5 +1947,8 @@ return [
         'array' => 'Formato inválido',
         'executable' => ':value não é um executável válido',
         'directory' => ':value não é um diretório válido',
+    ],
+    'nfdump' => [
+        'description' => 'Caminho para nfdump',
     ],
 ];
