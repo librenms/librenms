@@ -14,9 +14,9 @@ const mix = require('laravel-mix');
 mix.setPublicPath('html/')
     .js('resources/js/app.js', 'js')
     .vue()
-    .sass('resources/sass/app.scss', 'css/vendor.css')
     .postCss('resources/css/app.css', 'css', [
-        require('tailwindcss'),
+        require('@tailwindcss/postcss'),
     ])
+    .sass('resources/sass/app.scss', 'css/vendor.css')
     .extract()
     .version('html/js/lang/*.js');
