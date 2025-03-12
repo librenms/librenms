@@ -86,6 +86,7 @@ class ModuleTestHelper
         Config::set('hide_rrd_disabled', true);
         Config::set('influxdb.enable', false);
         Config::set('influxdbv2.enable', false);
+        Config::set('kafka.enable', false);
         Config::set('graphite.enable', false);
         Config::set('prometheus.enable', false);
     }
