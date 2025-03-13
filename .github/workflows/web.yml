@@ -29,6 +29,8 @@ jobs:
         run: composer install --no-progress --prefer-dist --optimize-autoloader
       - name: Generate Application Key
         run: php artisan key:generate
+      - name: Migrate Database
+        run: php artisan migrate
       - name: Upgrade Chrome Driver
         run: php artisan dusk:chrome-driver --detect
       - name: Start Chrome Driver

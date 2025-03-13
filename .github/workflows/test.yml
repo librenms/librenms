@@ -163,6 +163,9 @@ jobs:
         name: Setup SQLite
         run: sqlite3 database/testing.sqlite ""
       -
+        name: Migrate Database
+        run: php artisan migrate
+      -
         name: Artisan serve
         if: matrix.skip-web-check != '1'
         run: |
