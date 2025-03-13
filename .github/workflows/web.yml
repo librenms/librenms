@@ -12,21 +12,29 @@ jobs:
 
   dusk-php:
     runs-on: ubuntu-latest
-    env:
-      APP_URL: "http://127.0.0.1:8000"
-      APP_ENV: testing
-      DB_TEST_DATABASE: librenms_phpunit_78hunjuybybh
-      DB_TEST_USERNAME: root
-      DB_TEST_PASSWORD: root
-      MAIL_MAILER: log
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare The Environment
-        run: cp .env.example .env
+      -
+        name: Init env
+        run: |
+          cat > .env <<EOL
+          APP_KEY=
+          APP_URL=http://127.0.0.1:8000
+          APP_ENV=testing
+          DB_HOST=127.0.0.1
+          DB_DATABASE=librenms_phpunit_78hunjuybybh
+          DB_USERNAME=root
+          DB_PASSWORD=root
+          DB_TEST_HOST=127.0.0.1
+          DB_TEST_DATABASE=librenms_phpunit_78hunjuybybh
+          DB_TEST_USERNAME=root
+          DB_TEST_PASSWORD=root
+          MAIL_MAILER: log
+          EOL
       - name: Create Database
         run: |
           sudo systemctl start mysql
-          mysql --user="$DB_TEST_USERNAME" --password="$DB_TEST_PASSWORD" -e "CREATE DATABASE \`$DB_TEST_DATABASE\` character set UTF8mb4 collate utf8mb4_bin;"
+          mysql --user="root" --password="root" -e "CREATE DATABASE \`$DB_TEST_DATABASE\` character set UTF8mb4 collate utf8mb4_bin;"
       - name: Install Composer Dependencies
         run: composer install --no-progress --prefer-dist --optimize-autoloader
       - name: Generate Application Key
