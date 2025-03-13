@@ -42,7 +42,7 @@ class DevCheckCommand extends LnmsCommand
     public function __construct()
     {
         parent::__construct();
-        $this->addArgument('check', InputArgument::OPTIONAL, __('commands.dev:check.arguments.check', ['checks' => '[unit, lint, style, dusk]']), 'all');
+        $this->addArgument('check', InputArgument::OPTIONAL, __('commands.dev:check.arguments.check', ['checks' => '[unit, lint, style, web]']), 'all');
         $this->addOption('os', 'o', InputOption::VALUE_REQUIRED);
         $this->addOption('module', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('fail-fast', 'f', InputOption::VALUE_NONE);
