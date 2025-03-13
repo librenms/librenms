@@ -19,6 +19,11 @@ jobs:
       matrix:
         include:
           -
+            php-version: 8.4
+            name: Unit
+            skip-unit-check: 1
+            database: mariadb:10.11
+          -
             php-version: 8.3
             name: Unit
             skip-web-check: 1
@@ -28,11 +33,6 @@ jobs:
             name: Unit
             skip-web-check: 1
             database: mysql:8.0
-          -
-            php-version: 8.2
-            name: Web
-            skip-unit-check: 1
-            database: mariadb:10.11
     services:
       database:
         image: ${{ matrix.database }}
