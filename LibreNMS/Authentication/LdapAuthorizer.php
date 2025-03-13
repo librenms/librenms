@@ -326,7 +326,13 @@ class LdapAuthorizer extends AuthorizerBase
             throw new LdapMissingException();
         }
 
-        $this->ldap_connection = @ldap_connect(Config::get('auth_ldap_server'), Config::get('auth_ldap_port', 389));
+        $port = Config::get('auth_ldap_port');
+        $uri = Config::get('auth_ldap_server');
+        if ($port) {
+            $uri .= ":$port";
+        }
+
+        $this->ldap_connection = @ldap_connect($uri);
 
         if (! $this->ldap_connection) {
             throw new AuthenticationException('Unable to connect to ldap server');

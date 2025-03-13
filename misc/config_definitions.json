@@ -686,7 +686,7 @@
             }
         },
         "auth_ldap_port": {
-            "default": 389,
+            "default": null,
             "group": "auth",
             "section": "ldap",
             "order": 1,

@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Authentication;
 
+use LDAP\Connection;
 use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -168,7 +169,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         return $user_id;
     }
 
-    protected function getConnection()
+    protected function getConnection(): ?Connection
     {
         return $this->ldap_connection;
     }
