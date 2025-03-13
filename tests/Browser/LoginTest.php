@@ -5,8 +5,10 @@ namespace LibreNMS\Tests\Browser;
 use App\Models\User;
 use App\Models\UserPref;
 use Hash;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use LibreNMS\Config;
+use LibreNMS\Tests\Browser\Pages\DashboardPage;
 use LibreNMS\Tests\Browser\Pages\LoginPage;
 use LibreNMS\Tests\Browser\Pages\TwoFactorPage;
 use LibreNMS\Tests\DuskTestCase;
@@ -18,11 +20,14 @@ use LibreNMS\Tests\DuskTestCase;
  */
 class LoginTest extends DuskTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->artisan('migrate');
-    }
+    use DatabaseTruncation;
+    protected array $connectionsToTruncate = ['testing', 'testing_persistent'];
+
+//    protected function setUp(): void
+//    {
+//        parent::setUp();
+//        $this->artisan('migrate');
+//    }
 
     /**
      * @throws \Throwable
@@ -38,11 +43,12 @@ class LoginTest extends DuskTestCase
                 ->type('username', $user->username)
                 ->type('password', 'wrong_password')
                 ->press('@login')
+                ->waitFor('@login')
                 ->assertPathIs('/login')
                 ->type('username', $user->username)
                 ->type('password', $password)
                 ->press('@login')
-                ->assertPathIs('/')
+                ->on(new DashboardPage())
                 ->logout();
 
             $user->delete();
@@ -70,13 +76,14 @@ class LoginTest extends DuskTestCase
             $browser->visit(new LoginPage())
                 ->type('username', $user->username)
                 ->type('password', $password)
-                ->press('#login')
+                ->press('@login')
                 ->on(new TwoFactorPage())
                 ->assertFocused('@input')
                 ->keys('@input', '999999', '{enter}') // try the wrong code first
+                ->waitFor('@input')
                 ->assertPathIs('/2fa')
                 ->keys('@input', '634456', '{enter}')
-                ->assertPathIs('/')
+                ->on(new DashboardPage())
                 ->logout();
 
             $user->delete();
