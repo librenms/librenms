@@ -33,7 +33,7 @@ jobs:
           DB_TEST_DATABASE=librenms_phpunit_78hunjuybybh
           DB_TEST_USERNAME=root
           DB_TEST_PASSWORD=root
-          MAIL_MAILER:=log
+          MAIL_MAILER=log
           EOL
       - name: Create Database
         run: |
