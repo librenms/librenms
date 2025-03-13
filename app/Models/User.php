@@ -164,7 +164,6 @@ class User extends Authenticatable
      */
     public function hasBrowserPushTransport(): bool
     {
-
         return AlertTransport::query()
             ->where('transport_type', 'browserpush')
             ->where(function (Builder $q) {
