@@ -13,7 +13,11 @@ jobs:
   dusk-php:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       -
         name: Init env
         run: |
@@ -34,7 +38,7 @@ jobs:
       - name: Create Database
         run: |
           sudo systemctl start mysql
-          mysql --user="root" --password="root" -e "CREATE DATABASE \`$DB_TEST_DATABASE\` character set UTF8mb4 collate utf8mb4_bin;"
+          mysql --user="root" --password="root" -e "CREATE DATABASE \`librenms_phpunit_78hunjuybybh\` character set UTF8mb4 collate utf8mb4_bin;"
       - name: Install Composer Dependencies
         run: composer install --no-progress --prefer-dist --optimize-autoloader
       - name: Generate Application Key
