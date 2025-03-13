@@ -23,7 +23,6 @@ class LoginTest extends DuskTestCase
     use DatabaseTruncation;
     protected array $connectionsToTruncate = ['testing', 'testing_persistent'];
 
-
 //    protected function setUp(): void
 //    {
 //        parent::setUp();

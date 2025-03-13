@@ -47,7 +47,7 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
 
     public static function upgrade($exception)
     {
-        if ($exception instanceof QueryException || $exception->getPrevious() instanceof QueryException ) {
+        if ($exception instanceof QueryException || $exception->getPrevious() instanceof QueryException) {
             try {
                 $validator = new Validator();
                 (new Database())->validate($validator);
