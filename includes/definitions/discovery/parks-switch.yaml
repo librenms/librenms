@@ -1,0 +1,98 @@
+mib: PARKS-PK700
+modules:
+    ports-stack: false
+    cisco-vrf-lite: false
+    transceivers: false
+    hr-device: false
+    discovery-protocols: false
+    bgp-peers: false
+    vlans: false
+    ucd-diskio: false
+    stp: false
+    wireless: false
+    mpls: false
+    fdb-table: false
+    storage: false
+    mempools:
+        data:
+            -
+                free: '.1.3.6.1.4.1.50224.3.1.1.17.0'
+                percent_used: '.1.3.6.1.4.1.50224.3.1.1.18.0'
+                descr: Memory
+    processors:
+        data:
+            -
+                oid:  cpuUsage  # OID do processador
+                num_oid: '.1.3.6.1.4.1.50224.3.1.1.17.0'  # OID do processador
+                descr: Processor
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid: modulePortName
+                    num_oid: '.1.3.6.1.4.1.50224.3.2.4.1.2.{{ $index }}'  # OID do sensor de temperatura
+                    descr: ''
+                    index: 'modulePortName.{{ $index }}'
+                    transform: hexToString
+                -
+                    oid:  moduleState
+                    num_oid: '.1.3.6.1.4.1.50224.3.2.4.1.5.{{ $index }}'  # OID do sensor de temperatura
+                    descr: ''
+                    index: 'moduleState.{{ $index }}'
+
+        entity: false
+        temperature:
+            data:
+                -
+                    oid: mainChipTemperature
+                    num_oid: '.1.3.6.1.4.1.50224.3.1.1.23.0'  # OID do sensor de temperatura
+                    descr: "Temperatura Chip"
+                    unit: "C"  # Unidade Celsius
+                -
+                    oid:  moduleTemperature
+                    num_oid: '.1.3.6.1.4.1.50224.3.2.4.1.8.{{ $index }}'  # OID do sensor de temperatura
+                    descr: 'Temperatura SFP  {{ $modulePortName }}'
+                    unit: "C"  # Unidade Celsius
+                    divisor: 100
+                    index: 'moduleTemperature.{{ $index }}'
+                    skip_value_lt: 1
+
+
+        dbm:
+            data:
+                -
+                    oid: moduleRxPower
+                    num_oid: '.1.3.6.1.4.1.50224.3.2.4.1.12.{{ $index }}'
+                    descr: 'Rx Port {{ $modulePortName }}'
+                    unit: "dBm"  # Unidade dBm
+                    divisor: 100
+                    index: 'moduleRxPower.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: moduleRxPower
+                            op: '='
+                            value: -2147483648
+                        -
+                            oid: moduleState
+                            op: '='
+                            value: 1
+                -
+                    oid: moduleTxPower
+                    num_oid: '.1.3.6.1.4.1.50224.3.2.4.1.11.{{ $index }}'
+                    descr: 'Tx Port {{ $modulePortName }}'
+                    unit: "dBm"  # Unidade dBm
+                    divisor: 100
+                    index: 'moduleTxPower.{{ $index }}'
+                    skip_values:
+                       -
+                           oid: moduleTxPower
+                           op: '='
+                           value: -2147483648
+                       -
+                           oid: moduleState
+                           op: '='
+                           value: 1
+
+        ignored_oids:
+                -
+                    entPhysicalDescr
