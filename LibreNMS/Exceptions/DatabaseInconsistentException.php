@@ -39,7 +39,7 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
      */
     private $validationResults;
 
-    public function __construct($validationResults, $message = '', $code = 0, Throwable $previous = null)
+    public function __construct($validationResults, $message = '', $code = 0, ?Throwable $previous = null)
     {
         $this->validationResults = $validationResults;
         parent::__construct($message, $code, $previous);
