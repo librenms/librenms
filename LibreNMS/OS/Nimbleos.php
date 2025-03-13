@@ -30,13 +30,14 @@ class Nimbleos extends OS implements StoragePolling
 
     public function pollStorage(Collection $storages): Collection
     {
-        $data = SnmpQuery::walk(['NIMBLE-MIB::volSizeHigh', 'NIMBLE-MIB::volSizeLow'])->table(1);
+        $data = SnmpQuery::walk(['NIMBLE-MIB::volSizeHigh', 'NIMBLE-MIB::volSizeLow','NIMBLE-MIB::volUsageHigh','NIMBLE-MIB::volUsageLow'])->table(1);
 
         /** @var Storage $storage */
         foreach ($storages as $storage) {
             if (isset($data[$storage->storage_index])) {
                 $used = ($data[$storage->storage_index]['NIMBLE-MIB::volUsageHigh'] << 32) + $data[$storage->storage_index]['NIMBLE-MIB::volUsageLow'];
-                $storage->fillUsage($used, $storage->storage_size);
+                $size = ($data[$storage->storage_index]['NIMBLE-MIB::volSizeHigh'] << 32) + $data[$storage->storage_index]['NIMBLE-MIB::volSizeLow'];
+                $storage->fillUsage($used, $size);
             }
         }
 
