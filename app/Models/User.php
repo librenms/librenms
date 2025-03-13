@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use NotificationChannels\WebPush\HasPushSubscriptions;
@@ -163,11 +164,15 @@ class User extends Authenticatable
      */
     public function hasBrowserPushTransport(): bool
     {
-        $user_id = \Auth::id();
 
         return AlertTransport::query()
             ->where('transport_type', 'browserpush')
-            ->where('transport_config', 'regexp', "\"user\":\"(0|$user_id)\"")
+            ->where(function (Builder $q) {
+                $user_id = Auth::id();
+
+                return $q->where('transport_config', 'like', '%"user":"0"%')
+                    ->orWhere('transport_config', 'like', "%\"user\":\"$user_id\"%");
+            })
             ->exists();
     }
 
