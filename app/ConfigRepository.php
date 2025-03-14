@@ -25,6 +25,7 @@
 
 namespace App;
 
+use App\Models\Callback;
 use App\Models\GraphType;
 use Exception;
 use Illuminate\Database\QueryException;
@@ -33,6 +34,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Version;
 use Log;
 use Symfony\Component\Yaml\Yaml;
 

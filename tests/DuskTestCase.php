@@ -15,7 +15,6 @@ abstract class DuskTestCase extends BaseTestCase
     use DatabaseTruncation;
     protected array $connectionsToTruncate = ['testing', 'testing_persistent'];
 
-
     /**
      * Prepare for Dusk test execution.
      *
