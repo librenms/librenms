@@ -48,7 +48,7 @@ jobs:
       - name: Migrate Database
         run: php artisan migrate
       - name: Dump DB
-        run: mysql --user="root" --password="root" -e "SELECT * from migrations;"
+        run: mysql --user="root" --password="root" -e "USE librenms_phpunit_78hunjuybybh; SELECT * from migrations;"
       - name: Upgrade Chrome Driver
         run: php artisan dusk:chrome-driver --detect
       - name: Start Chrome Driver
