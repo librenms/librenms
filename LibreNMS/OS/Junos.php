@@ -59,7 +59,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         preg_match('/Juniper Networks, Inc. (?<hardware>\S+) .* kernel JUNOS (?<version>[^, ]+)[, ]/', $device->sysDescr, $parsed);
         if (isset($data[2]['hrSWInstalledName'])) {
-            preg_match('/\[(.+)]/', $data[2]['hrSWInstalledName'], $parsedVersion);
+            preg_match('/\[(.+?)]/', $data[2]['hrSWInstalledName'], $parsedVersion);
         }
 
         $device->hardware = $data[0]['jnxBoxDescr'] ?? (isset($parsed['hardware']) ? 'Juniper ' . strtoupper($parsed['hardware']) : null);
