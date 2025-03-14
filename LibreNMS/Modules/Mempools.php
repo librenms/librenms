@@ -27,7 +27,7 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Models\Mempool;
-use App\Observers\MempoolObserver;
+use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
@@ -77,7 +77,7 @@ class Mempools implements Module
         // check if linux or similar and calculate available ram
         $this->calculateAvailable($mempools);
 
-        MempoolObserver::observe(\App\Models\Mempool::class);
+        ModuleModelObserver::observe(\App\Models\Mempool::class);
         $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
         Log::info('');

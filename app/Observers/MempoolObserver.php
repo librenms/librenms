@@ -25,23 +25,27 @@
 
 namespace App\Observers;
 
+use App\Models\Mempool;
 use Log;
 use Rrd;
 
-class MempoolObserver extends ModuleModelObserver
+class MempoolObserver
 {
-    /** @param \App\Models\Mempool $model  */
-    public function updated($model): void
+    public function updating(Mempool $mempool): void
     {
-        parent::updated($model);
+        // prevent update of mempool_perc_warn
+        $mempool->mempool_perc_warn = $mempool->getOriginal('mempool_perc_warn');
+    }
 
-        if ($model->isDirty('mempool_class')) {
-            Log::debug("Mempool class changed $model->mempool_descr ($model->mempool_id)");
+    public function updated(Mempool $mempool): void
+    {
+        if ($mempool->isDirty('mempool_class')) {
+            Log::debug("Mempool class changed $mempool->mempool_descr ($mempool->mempool_id)");
             $device = [
-                'device_id' => $model->device->device_id,
-                'hostname' => $model->device->hostname,
+                'device_id' => $mempool->device->device_id,
+                'hostname' => $mempool->device->hostname,
             ];
-            Rrd::renameFile($device, ['mempool', $model->mempool_type, $model->getOriginal('mempool_class'), $model->mempool_index], ['mempool', $model->mempool_type, $model->mempool_class, $model->mempool_index]);
+            Rrd::renameFile($device, ['mempool', $mempool->mempool_type, $mempool->getOriginal('mempool_class'), $mempool->mempool_index], ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index]);
         }
     }
 }
