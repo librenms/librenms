@@ -112,7 +112,7 @@ parameters:
 
 		-
 			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
-			count: 1
+			count: 2
 			path: app/Console/Commands/AddUserCommand.php
 
 		-

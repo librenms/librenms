@@ -28,6 +28,7 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Models\User;
 use Bouncer;
+use Database\Seeders\RolesSeeder;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
@@ -69,6 +70,12 @@ class AddUserCommand extends LnmsCommand
         }
 
         $roles = Bouncer::role()->pluck('name');
+
+        // missing roles, add them
+        if ($roles->isEmpty()) {
+            (new RolesSeeder)->run();
+            $roles = Bouncer::role()->pluck('name');
+        }
 
         $this->validate([
             'username' => ['required', Rule::unique('users', 'username')->where('auth_type', 'mysql')],
