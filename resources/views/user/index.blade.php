@@ -112,7 +112,7 @@
 
                         roles.forEach((role) => {
                             let label = document.createElement('span');
-                            label.className = 'label label-info tw-mr-1';
+                            label.className = 'label label-info tw:mr-1';
                             label.innerText = role;
                             div.appendChild(label);
                         })

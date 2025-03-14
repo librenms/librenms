@@ -5,9 +5,9 @@
                 <h5 class="modal-title" id="bgModalLabel">{{ __('map.custom.edit.bg.title') }}</h5>
             </div>
 
-            <div class="modal-body tw-p-10">
-                <x-tabs class="tw-text-2xl" @tab-change="type=$event.detail" x-effect="activeTab = type">
-                    <x-tab value="image" name="{{ __('map.custom.edit.bg.image') }}" class="tw-mt-10">
+            <div class="modal-body tw:p-10">
+                <x-tabs class="tw:text-2xl" @tab-change="type=$event.detail" x-effect="activeTab = type">
+                    <x-tab value="image" name="{{ __('map.custom.edit.bg.image') }}" class="tw:mt-10">
                         <x-input id="bgimage"
                                  x-ref="bgimage"
                                  type="file"
@@ -20,17 +20,17 @@
                             <button type="button" class="btn btn-danger" @click="clearImage">{{ __('map.custom.edit.bg.clear_background') }}</button>
                         </div>
                     </x-tab>
-                    <x-tab value="color" name="{{ __('map.custom.edit.bg.color') }}" class="tw-mt-10">
+                    <x-tab value="color" name="{{ __('map.custom.edit.bg.color') }}" class="tw:mt-10">
                         <x-input id="bg-color" type="color" x-model="color"
-                                 class="tw-cursor-pointer tw-h-24 tw-w-48"
+                                 class="tw:cursor-pointer tw:h-24 tw:w-48"
                         ></x-input>
                     </x-tab>
-                    <x-tab value="map" name="{{ __('map.custom.edit.bg.map') }}" class="tw-mt-5">
+                    <x-tab value="map" name="{{ __('map.custom.edit.bg.map') }}" class="tw:mt-5">
                         <x-input id="bg-lat" label="{{ __('map.custom.edit.bg.lat') }}" x-model="lat"></x-input>
                         <x-input id="bg-lng" label="{{ __('map.custom.edit.bg.lng') }}" x-model="lng"></x-input>
                         <x-input id="bg-zoom" label="{{ __('map.custom.edit.bg.zoom') }}" x-model="zoom"></x-input>
-                        <button type="button" class="btn btn-primary tw-mt-2" @click="adjustMap">{{ __('map.custom.edit.bg.adjust_map') }}</button>
-                        <button type="button" class="btn btn-primary tw-mt-2" @click="setMapAsImage" title="{{ __('map.custom.edit.bg.as_image_hint') }}" :disabled="saving_map_as_image" x-show="show_image_export">
+                        <button type="button" class="btn btn-primary tw:mt-2" @click="adjustMap">{{ __('map.custom.edit.bg.adjust_map') }}</button>
+                        <button type="button" class="btn btn-primary tw:mt-2" @click="setMapAsImage" title="{{ __('map.custom.edit.bg.as_image_hint') }}" :disabled="saving_map_as_image" x-show="show_image_export">
                             <i class="fa-solid fa-circle-notch fa-spin" x-show="saving_map_as_image"></i>
                             {{ __('map.custom.edit.bg.as_image') }}
                         </button>
@@ -38,7 +38,7 @@
                     <x-tab value="none" name="{{ __('map.custom.edit.bg.none') }}"></x-tab>
                 </x-tabs>
                 <div x-show="error">
-                    <div class="tw-text-red-600" x-text="error"></div>
+                    <div class="tw:text-red-600" x-text="error"></div>
                 </div>
             </div>
 

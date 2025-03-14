@@ -51,7 +51,7 @@
         </form>
 
         @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
-        <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post" class="tw-mt-5">
+        <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post" class="tw:mt-5">
             {{ csrf_field() }}
             <button type="submit" id="login" class="btn btn-success btn-block">
                 <i class="fab fa-btn fa-{{ $provider }}"></i> {{ __('Login with') }} {{ ucfirst($provider) }}

@@ -3,14 +3,14 @@
 @section('title', __('map.custom.title.manage'))
 
 @section('content')
-<div class="tw-px-3 sm:tw-px-6 tw-mx-auto">
+<div class="tw:px-3 tw:sm:px-6 tw:mx-auto">
     @include('map.custom-map-modal')
     @include('map.custom-map-delete-modal')
     @include('map.custom-map-clone-modal')
 
-    <x-panel id="manage-custom-maps" body-class="!tw-pb-0" class="tw-mx-auto tw-max-w-screen-lg">
+    <x-panel id="manage-custom-maps" body-class="tw:pb-0!" class="tw:mx-auto tw:max-w-(--breakpoint-lg)">
         <x-slot name="title">
-            <div class="tw-flex tw-justify-between tw-items-center">
+            <div class="tw:flex tw:justify-between tw:items-center">
                 <div>
                     {{ __('map.custom.title.manage') }}
                 </div>
@@ -23,28 +23,28 @@
         </x-slot>
 
         @foreach($maps as $group_name => $group)
-            <x-panel id="map-group-{{ $group_uuid = uniqid() }}" body-class="!tw-p-0">
+            <x-panel id="map-group-{{ $group_uuid = uniqid() }}" body-class="tw:p-0!">
                 @if($group_name)
                     <x-slot name="title">{{ $group_name }}</x-slot>
                 @endif
                 @foreach($group as $map)
-                    <div id="map-{{ $map->custom_map_id }}" class="even:tw-bg-gray-50 dark:even:tw-bg-zinc-900">
-                        <div class="tw-flex tw-justify-between tw-p-3 tw-items-center hover:tw-bg-gray-100 dark:hover:tw-bg-gray-600">
+                    <div id="map-{{ $map->custom_map_id }}" class="tw:even:bg-gray-50 tw:dark:even:bg-zinc-900">
+                        <div class="tw:flex tw:justify-between tw:p-3 tw:items-center tw:hover:bg-gray-100 tw:dark:hover:bg-gray-600">
                             <div>
                                 <i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
                                 <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{{ $map->name }}</a>
                             </div>
-                            <div class="tw-whitespace-nowrap">
+                            <div class="tw:whitespace-nowrap">
                                 <button class="btn btn-info"
                                         onclick="startMapClone(this)"
                                         data-map-name="{{ $map->name }}"
                                         data-map-id="{{ $map->custom_map_id }}"
                                 ><i class="fa fa-copy" aria-hidden="true"></i>
-                                    <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Clone') }}</span>
+                                    <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('Clone') }}</span>
                                 </button>
                                 <a class="btn btn-default" href="{{ route('maps.custom.edit', $map->custom_map_id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
-                                    <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Edit') }}</span>
+                                    <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('Edit') }}</span>
                                 </a>
                                 <button class="btn btn-danger"
                                         onclick="startMapDelete(this)"
@@ -52,7 +52,7 @@
                                         data-map-group-id="#map-group-{{ $group_uuid }}"
                                         data-map-id="{{ $map->custom_map_id }}"
                                 ><i class="fa fa-trash" aria-hidden="true"></i>
-                                    <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Delete') }}</span>
+                                    <span class="tw:hidden tw:sm:inline" aria-hidden="false">{{ __('Delete') }}</span>
                                 </button>
                             </div>
                         </div>

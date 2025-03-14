@@ -22,7 +22,7 @@
                     @endif
 
                     @if(!$vars)
-                        <span class="tw-inline-flex">
+                        <span class="tw:inline-flex">
                             <x-port-link :port="$port->port">{{ $port->port->getShortLabel() }}</x-port-link>
                             @if($port->untagged)<span>&nbsp;(U)</span>@endif
                             @if(!$loop->last)<span>,</span>@endif

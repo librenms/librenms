@@ -853,11 +853,11 @@
             for (const mutation of mutationList) {
                 if (mutation.addedNodes.length) {
                     if(Array.from(mutation.addedNodes).some(({classList}) => classList.contains("vis-back"))) {
-                        document.getElementById("custom-map").classList.add("tw-cursor-crosshair")
+                        document.getElementById("custom-map").classList.add("tw:cursor-crosshair")
                     }
                 } else if (mutation.removedNodes.length) {
                     if(Array.from(mutation.removedNodes).some(({classList}) => classList.contains("vis-back"))) {
-                        document.getElementById("custom-map").classList.remove("tw-cursor-crosshair")
+                        document.getElementById("custom-map").classList.remove("tw:cursor-crosshair")
                     }
                 }
             }

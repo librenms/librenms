@@ -10,11 +10,11 @@
                     <form>
                         <div>{{ __('tools.oui.prompt') }}</div>
                         <div>
-                            <textarea name="query" class="tw-border-2" cols="30" rows="5">{{ $query }}</textarea>
+                            <textarea name="query" class="tw:border-2" cols="30" rows="5">{{ $query }}</textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">{{ __('Search') }}</button>
                     </form>
-                    <table class="table-condensed !tw-mb-0 tw-mt-5">
+                    <table class="table-condensed tw:mb-0! tw:mt-5">
                         @foreach($results as $result)
                             <tr>
                                 <td style="width: 0.01%; white-space: nowrap;">{{ $result['mac'] }}</td>
