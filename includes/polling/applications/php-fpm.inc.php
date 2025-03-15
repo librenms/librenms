@@ -125,7 +125,7 @@ $removed_pools = array_diff($old_pools, $new_pools);
 
 // if we have any changes in pools, log it
 if (count($added_pools) > 0 || count($removed_pools) > 0) {
-    $log_message = 'Suricata Instance Change:';
+    $log_message = 'PHP-FPM Pool Change:';
     $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
     $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';
     Eventlog::log($log_message, $device['device_id'], 'application');

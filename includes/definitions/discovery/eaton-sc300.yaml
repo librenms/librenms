@@ -1,0 +1,148 @@
+mib: RpsSc300Mib
+modules:
+    os:
+        hardware:
+            - RpsSc300Mib::systemType.0
+        serial:
+            - RpsSc300Mib::systemSerialNumber.0
+            - RpsSc300Mib::serialNumber.0
+        serial_template: 'System:{{ RpsSc300Mib::systemSerialNumber.0 }} Product:{{ RpsSc300Mib::serialNumber.0 }}'
+        version:
+            - RpsSc300Mib::hardwareVersion.0
+            - RpsSc300Mib::softwareVersion.0
+        version_template: 'HW:{{ RpsSc300Mib::hardwareVersion.0 }} SW:{{ RpsSc300Mib::softwareVersion.0 }}'
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: acVoltage
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.40.10.{{ $index }}'
+                    descr: 'Average Input Voltage'
+                    index: 'acavg.{{ $index }}'
+                -
+                    oid: rectifierValuesTable
+                    value: rectifierInputVoltage
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.30.1.90.{{ $index }}'
+                    descr: 'Rect {{ $index }} AC Voltage'
+                    index: 'ac.{{ $index }}'
+                    skip_values:
+                    -
+                      oid: rectifierSerialNumber
+                      op: '=='
+                      value: "0"
+                -
+                    oid: busVoltage
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.70.10.20.{{ $index }}'
+                    divisor: 100
+                    descr: 'Bus Voltage'
+                    index: 'bus.{{ $index }}'
+                    low_limit: minimumSystemVoltage
+                    low_warn_limit: minimumSystemVoltage
+                    warn_limit: maximumSystemVoltage
+                    high_limit: maximumSystemVoltage
+                -
+                    oid: rectifierValuesTable
+                    value: rectifierReportedVoltage
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.30.1.95.{{ $index }}'
+                    descr: 'Rect {{ $index }} DC Voltage'
+                    index: 'dc.{{ $index }}'
+                    divisor: 100
+                    low_limit: 0
+                    low_warn_limit: 0
+                    warn_limit: rectifierMinimumOvsdSetPoint
+                    high_limit:  rectifierMaximumOvsdSetPoint
+                    skip_values:
+                    -
+                      oid: rectifierSerialNumber
+                      op: '=='
+                      value: "0"
+        current:
+            data:
+                -
+                    oid: batteryCurrent
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.100.40.{{ $index }}'
+                    descr: 'Battery Current'
+                    index: 'batteryCurrent.{{ $index }}'
+                -
+                    oid: rectifierCurrent
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.20.{{ $index }}'
+                    descr: 'Total Rectifier Current'
+                -
+                    oid: loadCurrent
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.50.10.{{ $index }}'
+                    descr: 'Total Load Current' 
+                -
+                    oid: rectifierValuesTable
+                    value: rectifierReportedCurrent
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.30.1.100.{{ $index }}'
+                    descr: 'Rect {{ $index }} Current'
+                    skip_values:
+                    -
+                      oid: rectifierSerialNumber
+                      op: '=='
+                      value: "0"
+        load:
+            data:
+                -
+                    oid: systemPower
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.50.20.{{ $index }}'
+                    descr: 'Total Load'
+                    index: 'totalLoad.{{ $index }}'
+                -
+                    oid: rectifierValuesTable
+                    value: rectifierOutputPower
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.30.1.105.{{ $index }}'
+                    descr: 'Rect {{ $index }} Load'
+                    index: 'rectLoad.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: rectifierSerialNumber
+                      op: '=='
+                      value: "0"
+
+        temperature:
+            data:
+                -
+                    oid: batteryTemperature
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.100.30.{{ $index }}'
+                    descr: 'Battery Temperature'
+                    index: 'battery-Temperature.{{ $index }}'
+                -
+                    oid: highestRectifierHeatsinkTemperature
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.29.{{ $index }}'
+                    descr: 'Highest Rectifier Heatsink Temperature'
+                    index: 'highestRectTemp.{{ $index }}'
+                -
+                    oid: rectifierValuesTable
+                    value: rectifierHeatsinkTemperature
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.30.1.110.{{ $index }}'
+                    descr: 'Rect {{ $index }} Temperature'
+                    index: 'rectTemp.{{ $index }}'
+                    skip_values:
+                    -
+                      oid: rectifierSerialNumber
+                      op: '=='
+                      value: "0"
+        state:
+            data:
+                -
+                    oid: digitalInputTable
+                    value: diState
+                    num_oid: '.1.3.6.1.4.1.1918.2.14.10.90.40.1.20.{{ $index }}'
+                    descr: '{{ $diName }}'
+                    index: 'di.{{ $index }}'
+                    states:
+                      - { descr: 'OK',      graph: 0, value: 0, generic: 0 }
+                      - { descr: 'Warning', graph: 0, value: 1, generic: 1 }
+                      - { descr: 'Major',   graph: 0, value: 2, generic: 2 }
+                      - { descr: 'Minor',   graph: 0, value: 3, generic: 2 }
+                      - { descr: 'Reserved',graph: 0, value: 4, generic: 3 }
+                      - { descr: 'Critical',graph: 0, value: 5, generic: 2 }
+                      - { descr: 'Control', graph: 0, value: 6, generic: 3 }
+                    skip_values:
+                    -
+                      oid: diStatus
+                      op: '=='
+                      value: "0"
+
