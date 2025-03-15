@@ -32,7 +32,7 @@ $no_refresh = true;
                             <tr>
                                 <th data-column-id="id" data-visible="false">ID</th>
                                 <th data-column-id="hostname" data-formatter="hostname" data-order="asc">Hostname</th>
-                                <th data-column-id="sysname" data-visible="false">SysName</th>
+                                <th data-column-id="sysname" data-formatter="sysname" data-order="asc">SysName</th>
                                 <th data-column-id="last_status" data-formatter="status">Last Status</th>
                                 <th data-column-id="last_update">Last Update</th>
                                 <th data-column-id="model">Model</th>
