@@ -26,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ospfv3_ports', function (Blueprint $table) {
-            $table->integer('ospfv3IfInstId');
+            $table->integer('ospfv3IfInstId')->after('ospfv3IfIndex');
         });
     }
 };
