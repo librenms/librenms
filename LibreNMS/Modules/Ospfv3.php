@@ -129,7 +129,7 @@ class Ospfv3 implements Module
                 ->mapTable(function ($ospf_area, $ospf_area_id) use ($context_name, $os) {
                     return Ospfv3Area::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
-                        'ospfv3AreaId' => is_int($ospf_area_id) ? long2ip($ospf_area_id) : $ospf_area_id,
+                        'ospfv3AreaId' => $ospf_area_id,
                         'context_name' => $context_name,
                     ], $ospf_area);
                 });
