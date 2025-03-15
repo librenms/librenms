@@ -111,7 +111,7 @@ foreach ($instances as $instance) {
                       <td>' . $ospfPort->ospfv3IfMetricValue . '</td>
                       <td><span class="label label-' . $port_status_color . '">' . $ospfPort->ospfv3IfAdminStatus . '</span></td>
                       <td>' . (filter_var($ospfPort->ospfv3IfAreaId, FILTER_VALIDATE_IP) ? $ospfPort->ospfv3IfAreaId : long2ip($ospfPort->ospfv3IfAreaId)) . '</td>
-                      </tr>
+                    </tr>
                   </tbody>';
     }
     echo '
