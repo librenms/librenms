@@ -5,12 +5,15 @@ namespace LibreNMS\Tests;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Support\Collection;
 use Laravel\Dusk\TestCase as BaseTestCase;
 
 abstract class DuskTestCase extends BaseTestCase
 {
     use CreatesApplication;
+    use DatabaseTruncation;
+    protected array $connectionsToTruncate = ['testing', 'testing_persistent'];
 
     /**
      * Prepare for Dusk test execution.
