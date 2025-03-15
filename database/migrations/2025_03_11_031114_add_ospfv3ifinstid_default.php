@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ospfv3_ports', function (Blueprint $table) {
-            $table->integer('ospfv3IfInstId')->default(1)->change();
+            $table->dropColumn('ospfv3IfInstId');
         });
     }
 
@@ -25,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ospfv3_ports', function (Blueprint $table) {
-            $table->integer('ospfv3IfInstId')->default(null)->change();
+            $table->integer('ospfv3IfInstId');
         });
     }
 };
