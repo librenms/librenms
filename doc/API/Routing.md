@@ -513,7 +513,6 @@ Output:
           "port_id": 2838,
           "ospfv3_port_id": "2",
           "ospfv3IfIndex": "2",
-          "ospfv3IfInstId": "0",
           "ospfv3IfAreaId": "0",
           "ospfv3IfType": "broadcast",
           "ospfv3IfAdminStatus": "enabled",

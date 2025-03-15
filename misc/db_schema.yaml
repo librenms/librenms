@@ -1511,7 +1511,6 @@ ospfv3_ports:
     - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3_port_id, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfIndex, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3IfInstId, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfv3IfAreaId, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfType, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfv3IfAdminStatus, Type: varchar(32), 'Null': true, Extra: '' }
