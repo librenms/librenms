@@ -157,6 +157,8 @@ class Ospfv3 implements Module
                     $ospf_port['ospfv3AreaScopeLsaCksumSum'] ??= 0;
                     $ospf_port['ospfv3IfIndex'] ??= 0;
 
+                    unset($ospf_port['ospfv3IfInstId']);
+
                     return Ospfv3Port::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
                         'ospfv3_instance_id' => $ospf_instance_id,
