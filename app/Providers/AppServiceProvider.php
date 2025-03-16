@@ -151,6 +151,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);
         \App\Models\User::observe(\App\Observers\UserObserver::class);
         \App\Models\Vminfo::observe(\App\Observers\VminfoObserver::class);
+        \App\Models\WirelessSensor::observe(\App\Observers\WirelessSensorObserver::class);
     }
 
     private function bootCustomValidators()
