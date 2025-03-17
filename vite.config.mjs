@@ -4,10 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue2';
 
 export default defineConfig({
-    build: {
-        outDir: 'html/build',
-        emptyOutDir: true, // also necessary
-    },
     plugins: [
         laravel({
             publicDirectory: 'html',
