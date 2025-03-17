@@ -56,10 +56,9 @@ class TranslationGenerateCommand extends LnmsCommand
             $manifest = [];
         }
 
-
         foreach (glob(public_path('js/lang/*.js')) as $file) {
             $file_name = str_replace(public_path(), '', $file);
-            $locale = basename(str_replace(('/js/lang/'), '', $file_name), '.js');
+            $locale = basename(str_replace('/js/lang/', '', $file_name), '.js');
             $manifest[$locale] = $file_name . '?id=' . substr(md5(file_get_contents($file)), 0, 20);
         }
 
