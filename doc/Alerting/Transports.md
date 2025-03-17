@@ -462,21 +462,21 @@ IBM On Call Manager uses the webhook to send the name of the alert rule, along w
 ```
 
 ## Ilert
-This integration uses the [iLert Event API](https://api.ilert.com/api-docs/#tag/events) 
-which allows you to use all available iLert parameters such as links, images, comments, etc.
+This integration uses the [ilert Event API](https://api.ilert.com/api-docs/#tag/events) 
+which allows you to use all available ilert parameters such as links, images, comments, etc.
 
 To create an API Alert source, navigate to Alert Sources -> Alerts Sources -> Create a new alert source. Follow the on screen instructions and at the end, you will be able view the integration key which you will need to input into LibreNMS.
 
 This transport will send over the following fields:
 
 `integrationKey` - The integration key you generated earlier.
-`eventType` - The type of alert such as Alerting, Acknowledged or Recovered translated to iLert event types.
+`eventType` - The type of alert such as Alerting, Acknowledged or Recovered translated to ilert event types.
 `summary` - The title of the alert.
 `details` - The output from the alert template associated with the rule.
 `alertKey` - The alert id.
-`priority` - The priority translated to the iLert priority values of HIGH (Critical) or LOW (Warning or OK)
+`priority` - The priority translated to the ilert priority values of HIGH (Critical) or LOW (Warning or OK)
 
-To customise what is sent to iLert and override or add additional fields, you can create a custom template which outputs the correct information via JSON. For this to work you **must** send over a summary and details values. As an example:
+To customise what is sent to ilert and override or add additional fields, you can create a custom template which outputs the correct information via JSON. For this to work you **must** send over a summary and details values. As an example:
 
 ```json
 {
@@ -779,6 +779,9 @@ systems with LibreNMS, for example [Flapjack](http://flapjack.io).
 | Nagios FIFO | /path/to/my.fifo |
 
 ## OpsGenie
+
+> ⚠️ **Atlassian have announced the EOL of Opsgenie on the 5th April 2027.
+[Read more here](https://www.atlassian.com/blog/announcements/evolution-of-it-operations)
 
 Using OpsGenie LibreNMS integration, LibreNMS forwards alerts to
 OpsGenie with detailed information. OpsGenie acts as a dispatcher for

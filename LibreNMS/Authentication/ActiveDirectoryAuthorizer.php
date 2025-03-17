@@ -6,6 +6,7 @@
 
 namespace LibreNMS\Authentication;
 
+use LDAP\Connection;
 use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -17,7 +18,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 
     protected static $CAN_UPDATE_PASSWORDS = false;
 
-    protected $ldap_connection;
+    protected Connection|null $ldap_connection = null;
     protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
 
     public function authenticate($credentials)
@@ -253,7 +254,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
     }
 
-    protected function getConnection()
+    protected function getConnection(): ?Connection
     {
         $this->init(); // make sure connected and bound
 

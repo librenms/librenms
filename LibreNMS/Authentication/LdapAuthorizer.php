@@ -3,6 +3,7 @@
 namespace LibreNMS\Authentication;
 
 use ErrorException;
+use LDAP\Connection;
 use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -10,7 +11,7 @@ use LibreNMS\Exceptions\LdapMissingException;
 
 class LdapAuthorizer extends AuthorizerBase
 {
-    protected $ldap_connection;
+    protected Connection|null $ldap_connection = null;
     private $userloginname = '';
 
     public function authenticate($credentials)
@@ -326,7 +327,14 @@ class LdapAuthorizer extends AuthorizerBase
             throw new LdapMissingException();
         }
 
-        $this->ldap_connection = @ldap_connect(Config::get('auth_ldap_server'), Config::get('auth_ldap_port', 389));
+        $port = Config::get('auth_ldap_port');
+        $uri = Config::get('auth_ldap_server');
+        if ($port && ! str_contains($uri, '://')) {
+            $scheme = $port == 636 ? 'ldaps://' : 'ldap://';
+            $uri = $scheme . $uri . ':' . $port;
+        }
+
+        $this->ldap_connection = @ldap_connect($uri);
 
         if (! $this->ldap_connection) {
             throw new AuthenticationException('Unable to connect to ldap server');

@@ -917,6 +917,18 @@ ipv6_addresses:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ipv6_address_id], Unique: true, Type: BTREE }
     ipv6_addresses_port_id_index: { Name: ipv6_addresses_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+ipv6_nd:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: port_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ipv6_address, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 ipv6_networks:
   Columns:
     - { Field: ipv6_network_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1499,7 +1511,6 @@ ospfv3_ports:
     - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3_port_id, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfIndex, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3IfInstId, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfv3IfAreaId, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfType, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfv3IfAdminStatus, Type: varchar(32), 'Null': true, Extra: '' }

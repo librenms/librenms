@@ -101,8 +101,13 @@ setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 
 ## Install PHP dependencies
 
+Change to the LibreNMS user:
 ```
 su - librenms
+```
+
+Then run the composer wrapper script and exit back to the root user:
+```
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
@@ -636,6 +641,9 @@ for normal linux commands.
 ln -s /opt/librenms/lnms /usr/bin/lnms
 cp /opt/librenms/misc/lnms-completion.bash /etc/bash_completion.d/
 ```
+
+`lnms config` is the preferred method for [Configuration](../Support/Configuration.md)
+
 
 ## Configure snmpd
 
