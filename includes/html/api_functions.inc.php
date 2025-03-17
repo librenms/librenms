@@ -18,7 +18,11 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
 use App\Models\Eventlog;
+use App\Models\Ipv4Address;
 use App\Models\Ipv4Mac;
+use App\Models\Ipv4Network;
+use App\Models\Ipv6Address;
+use App\Models\Ipv6Network;
 use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
@@ -2847,28 +2851,70 @@ function list_sensors()
     return api_success($sensors, 'sensors');
 }
 
-function list_ip_addresses()
+function list_ip_addresses(Illuminate\Http\Request $request)
 {
-    $ipv4_addresses = dbFetchRows('SELECT * FROM `ipv4_addresses`');
-    $ipv6_addresses = dbFetchRows('SELECT * FROM `ipv6_addresses`');
-    $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
-    if ($ip_addresses_count == 0) {
-        return api_error(404, 'IP addresses do not exist');
+    $address_family = $request->route('address_family');
+
+    if ($address_family === 'ipv4') {
+        $ipv4_addresses = Ipv4Address::get();
+        if ($ipv4_addresses->isEmpty()) {
+            return api_error(404, 'IPv4 Addresses do not exist');
+        }
+
+        return api_success($ipv4_addresses, 'ip_addresses', null, 200, $ipv4_addresses->count());
     }
 
-    return api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
+    if ($address_family === 'ipv6') {
+        $ipv6_addresses = Ipv6Address::get();
+        if ($ipv6_addresses->isEmpty()) {
+            return api_error(404, 'IPv6 Addresses do not exist');
+        }
+
+        return api_success($ipv6_addresses, 'ip_addresses', null, 200, $ipv6_addresses->count());
+    }
+
+    if (empty($address_family)) {
+        $ipv4_addresses = Ipv4Address::get()->toArray();
+        $ipv6_addresses = Ipv6Address::get()->toArray();
+        $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
+        if ($ip_addresses_count == 0) {
+            return api_error(404, 'IP addresses do not exist');
+        }
+
+        return api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses', null, 200, $ip_addresses_count);
+    }
 }
 
-function list_ip_networks()
+function list_ip_networks(Illuminate\Http\Request $request)
 {
-    $ipv4_networks = dbFetchRows('SELECT * FROM `ipv4_networks`');
-    $ipv6_networks = dbFetchRows('SELECT * FROM `ipv6_networks`');
-    $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
-    if ($ip_networks_count == 0) {
-        return api_error(404, 'IP networks do not exist');
-    }
+    $address_family = $request->route('address_family');
 
-    return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
+    if ($address_family === 'ipv4') {
+        $ipv4_networks = Ipv4Network::get();
+        if ($ipv4_networks->isEmpty()) {
+            return api_error(404, 'IPv4 Networks do not exist');
+        }
+
+        return api_success($ipv4_networks, 'ip_networks', null, 200, $ipv4_networks->count());
+    }
+    if ($address_family === 'ipv6') {
+        $ipv6_networks = Ipv6Network::get();
+        if ($ipv6_networks->isEmpty()) {
+            return api_error(404, 'IPv6 Networks do not exist');
+        }
+
+        return api_success($ipv6_networks, 'ip_networks', null, 200, $ipv6_networks->count());
+    }
+    if (empty($address_family)) {
+        $ipv4_networks = Ipv4Network::get()->toArray();
+        $ipv6_networks = Ipv6Network::get()->toArray();
+        $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
+        if ($ip_networks_count == 0) {
+            return api_error(404, 'IP networks do not exist');
+        }
+
+        return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks', null, 200, $ip_networks_count);
+    }
 }
 
 function list_arp(Illuminate\Http\Request $request)
