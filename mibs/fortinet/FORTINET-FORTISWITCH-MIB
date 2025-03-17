@@ -15,16 +15,19 @@ IMPORTS
         FROM FORTINET-CORE-MIB
     sysName
         FROM SNMPv2-MIB
+    ifName
+        FROM IF-MIB
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF 	
-    Gauge32, MODULE-IDENTITY, 
-    NOTIFICATION-TYPE, OBJECT-TYPE
+    Gauge32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, IpAddress
         FROM SNMPv2-SMI
     DisplayString
-        FROM SNMPv2-TC;
+        FROM SNMPv2-TC
+    dot1dTpFdbAddress, dot1dTpFdbPort
+	FROM BRIDGE-MIB;
 
 fnFortiSwitchMib MODULE-IDENTITY
-    LAST-UPDATED "201109280000Z"
+    LAST-UPDATED "202401050000Z"
     ORGANIZATION 
         "Fortinet Technologies, Inc."
     CONTACT-INFO 
@@ -34,17 +37,30 @@ fnFortiSwitchMib MODULE-IDENTITY
          http://www.fortinet.com"
     DESCRIPTION 
         "MIB module for Fortinet FortiSwitch devices."
-    REVISION    "201109280000Z"
+    REVISION    "202204010000Z"
     DESCRIPTION
-        "Initial version of FORTINET-FORTISWITCH-MIB."
+        "Updated version of FORTINET-FORTISWITCH-MIB."
     ::= { fortinet 106 }
-    
---
--- fortinet.fnFortiSwitchMib.fsModel
---
 
-fsModel OBJECT IDENTIFIER
-    ::= { fnFortiSwitchMib 1 }
+--  
+-- fsCoreMib.fsCommon
+--  
+
+fsCommon OBJECT IDENTIFIER ::= { fnFortiSwitchMib 1 }
+
+--  
+-- fsCoreMib.fsCommon.fsSystem
+--  
+fsSys OBJECT IDENTIFIER ::= { fsCommon 1 }
+
+fsSysSerial OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device serial number. This is the same serial number as given
+        in the ENTITY-MIB tables for the base entity."
+    ::= { fsSys 1 }
 
 --
 -- fortinet.fnFortiSwitchMib.fsTraps
@@ -55,6 +71,121 @@ fsTraps OBJECT IDENTIFIER
 
 fsTrapPrefix OBJECT IDENTIFIER
     ::= { fsTraps 0 }
+
+fsTrapObjects OBJECT IDENTIFIER 
+    ::= { fsTraps 1 }
+
+fsLlvTrapMsg OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Message associated with a learning limit violation."
+    ::= { fsTrapObjects 1 }
+
+fsLearningTrapVid OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "VLAN ID associated with a MAC learning event."
+    ::= { fsTrapObjects 2 }
+
+fsLearningTrapType OBJECT-TYPE
+    SYNTAX      INTEGER { add(1), delete(2), movefrom(3), moveto(4) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Type associated with a MAC learning event (add/delete/movefrom/moveto)."
+    ::= { fsTrapObjects 3 }
+
+fsSensorName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Name of the sensor associated with a trap message."
+    ::= { fsTrapObjects 4 }
+
+fsSensorType OBJECT-TYPE
+    SYNTAX      INTEGER { temperature(1), poe(2), cpu(3), memory(4), disk(6) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Type of sensor associated with a trap message (temperature/PoE/CPU/memory/disk)."
+    ::= { fsTrapObjects 5 }
+
+fsSensorIdx OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Index of the sensor associated with a trap message."
+    ::= { fsTrapObjects 6 }
+
+fsSensorFanEventType OBJECT-TYPE
+    SYNTAX      INTEGER { detected(1), undetected(2), resumed(3), failure(4)}
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Type of event associated with the fan trap message (detected/undetected/resumed/failure)."
+    ::= { fsTrapObjects 7 }
+
+fsSensorPsuEventType OBJECT-TYPE
+    SYNTAX      INTEGER { up(1), connected(2), good(3), down(4), disconnected(5), bad(6)}
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Type of event associated with the PSU trap message (up/connected/good/down/disconnected/bad)."
+    ::= { fsTrapObjects 8 }
+
+fsAlarmEventType OBJECT-TYPE
+    SYNTAX      INTEGER { inrange(1), warning(2), outofrange(3), cleared(4) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Type of event associated with the alarm trap message (inrange/warning/outofrange/cleared)."
+    ::= { fsTrapObjects 9 }
+
+fsAlarmThresholdValue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Threshold value."
+    ::= { fsTrapObjects 10 }
+
+fsAlarmThresholdUnits OBJECT-TYPE
+    SYNTAX      INTEGER { celcius(1), watts(2), percentage(3), unknown(4) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Type of units associated with this threshold value (celcius/watts/percentage/unknown)."
+    ::= { fsTrapObjects 11 }
+
+fsIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "IP address associated with a trap message (e.g. IP Conflict)."
+    ::= { fsTrapObjects 12 }
+
+fsJsonString OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..1360))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "JSON string associated with an automation-generated trap message."
+    ::= { fsTrapObjects 13 }
+
+fsSwitchStormContrl OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Storm control status."
+    ::= { fsTrapObjects 14 }
 
 --
 -- fortinet.fnFortiSwitchMib.fsTrunkMemPrefix
@@ -71,20 +202,6 @@ fsTrunkMember OBJECT-TYPE
         "Trunk members of the device, including this trunk member's corresponding blade's serial number and its slot name"
     ::= { fsTrunkMemPrefix 1 }
 
-fsTrapHBFail NOTIFICATION-TYPE
-    OBJECTS     { fnSysSerial, sysName, fsTrunkMember}
-    STATUS      current
-    DESCRIPTION 
-        "Indicates no heart beat packets received."
-    ::= { fsTrapPrefix 701 }
-
-fsTrapHBReceived NOTIFICATION-TYPE
-    OBJECTS     { fnSysSerial,sysName, fsTrunkMember}
-    STATUS      current
-    DESCRIPTION 
-        "Indicates heart beat pacekts have been received."
-    ::= { fsTrapPrefix 702 }
-
 fsTrapMemberDown NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial,sysName,fsTrunkMember }
     STATUS      current
@@ -98,6 +215,104 @@ fsTrapMemberUp NOTIFICATION-TYPE
     DESCRIPTION 
         "A trunk member has joined this trunk"
     ::= { fsTrapPrefix 704 }
+
+fsTrapLlvViolation NOTIFICATION-TYPE 
+    OBJECTS     { fnSysSerial, sysName, fsLlvTrapMsg }
+    STATUS      current
+    DESCRIPTION 
+        "Trap messages for learning limit violations."
+    ::= { fsTrapPrefix 705 }
+
+fsTrapLearningEvent NOTIFICATION-TYPE 
+    OBJECTS     { fnSysSerial, sysName, dot1dTpFdbAddress, fsLearningTrapVid, dot1dTpFdbPort, fsLearningTrapType }
+    STATUS      current
+    DESCRIPTION 
+        "A new MAC address learning event occurred (add/delete/move)."
+    ::= { fsTrapPrefix 706 }
+
+fsTrapSensorFault NOTIFICATION-TYPE 
+    OBJECTS     { fnSysSerial, sysName, fsSensorName, fsSensorType }
+    STATUS      current
+    DESCRIPTION 
+        "Trap message indicates that a faulty sensor was detected."
+    ::= { fsTrapPrefix 707 }
+
+fsTrapSensorAlarm NOTIFICATION-TYPE 
+    OBJECTS     { fnSysSerial, sysName, fsSensorName, fsSensorType, fsAlarmEventType, fsAlarmThresholdValue, fsAlarmThresholdUnits }
+    STATUS      current
+    DESCRIPTION 
+        "Trap messages for temperature, PoE, CPU, memory, and disk sensor alarms."
+    ::= { fsTrapPrefix 708 }
+
+fsTrapFanDetect NOTIFICATION-TYPE 
+    OBJECTS     { fnSysSerial, sysName, fsSensorIdx, fsSensorFanEventType }
+    STATUS      current
+    DESCRIPTION 
+        "Trap message associated with fan sensor detection."
+    ::= { fsTrapPrefix 709 }
+
+fsTrapPsuStatus NOTIFICATION-TYPE 
+    OBJECTS     { fnSysSerial, sysName, fsSensorIdx, fsSensorPsuEventType }
+    STATUS      current
+    DESCRIPTION 
+        "Trap message associated with PSU status changes."
+    ::= { fsTrapPrefix 710 }
+
+fsTrapStormControl NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsSwitchStormContrl }
+    STATUS      current
+    DESCRIPTION
+        "Trap message indicates a storm-control status change (drop start/stop)."
+    ::= { fsTrapPrefix 711 }
+
+fsTrapIpConflict NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsIpAddress, ifName }
+    STATUS      current
+    DESCRIPTION 
+        "Trap message associated with IP Conflict Detection."
+    ::= { fsTrapPrefix 801 }
+
+fsTrapTrunkMemberHBOutOfSync NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, ifName, ifName }
+    STATUS      current
+    DESCRIPTION 
+        "Trap message indicates a trunk member HB is out of sync (trunk = ifName1, member = ifName2)."
+    ::= { fsTrapPrefix 802 }
+
+fsTrapStitch1 NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsJsonString }
+    STATUS      current
+    DESCRIPTION 
+        "Custom SNMP trap triggerable from automation stitch."
+    ::= { fsTrapPrefix 901 }
+
+fsTrapStitch2 NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsJsonString }
+    STATUS      current
+    DESCRIPTION 
+        "Custom SNMP trap triggerable from automation stitch."
+    ::= { fsTrapPrefix 902 }
+
+fsTrapStitch3 NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsJsonString }
+    STATUS      current
+    DESCRIPTION 
+        "Custom SNMP trap triggerable from automation stitch."
+    ::= { fsTrapPrefix 903 }
+
+fsTrapStitch4 NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsJsonString }
+    STATUS      current
+    DESCRIPTION 
+        "Custom SNMP trap triggerable from automation stitch."
+    ::= { fsTrapPrefix 904 }
+
+fsTrapStitch5 NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fsJsonString }
+    STATUS      current
+    DESCRIPTION 
+        "Custom SNMP trap triggerable from automation stitch."
+    ::= { fsTrapPrefix 905 }
 
 --
 -- fortinet.fnFortiSwitchMib.fsSystem
@@ -157,16 +372,87 @@ fsSysDiskCapacity OBJECT-TYPE
         "Total hard disk capacity (KB), if disk is present"
     ::= { fsSystemInfo 6 }
 
-fsSoftware OBJECT IDENTIFIER
-    ::= { fsSystem 2 }
 
-fsDirverVersion OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE(0..128))
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION 
-        "Current driver version of this device"
-    ::= { fsSoftware 1 }
+
+--
+-- fortinet.fnFortiSwitchMib.fsModel
+--
+
+fsModel OBJECT IDENTIFIER ::= { fnFortiSwitchMib 5 }
+
+-- fsModel start
+
+s448ef		OBJECT IDENTIFIER ::= { fsModel 4487}		 -- FortiSwitch-448E-FPOE
+s124dn		OBJECT IDENTIFIER ::= { fsModel 1241}		 -- FortiSwitch-124D
+fs3d32		OBJECT IDENTIFIER ::= { fsModel 30321}		 -- FortiSwitch-3032D
+s248ep		OBJECT IDENTIFIER ::= { fsModel 2485}		 -- FortiSwitch-248E-POE
+s124dp		OBJECT IDENTIFIER ::= { fsModel 1242}		 -- FortiSwitch-124D-POE
+s148ep		OBJECT IDENTIFIER ::= { fsModel 1248}		 -- FortiSwitch-148E-POE
+sm24gf		OBJECT IDENTIFIER ::= { fsModel 12413}		 -- FortiSwitch-124G-FPOE
+s548dn		OBJECT IDENTIFIER ::= { fsModel 5482}		 -- FortiSwitch-548D
+sr24dn		OBJECT IDENTIFIER ::= { fsModel 1243}		 -- FortiSwitchRugged-124D
+s248dp		OBJECT IDENTIFIER ::= { fsModel 2481}		 -- FortiSwitch-248D-POE
+s448en		OBJECT IDENTIFIER ::= { fsModel 4485}		 -- FortiSwitch-448E
+s424dp		OBJECT IDENTIFIER ::= { fsModel 4242}		 -- FortiSwitch-424D-POE
+fs3e32		OBJECT IDENTIFIER ::= { fsModel 30322}		 -- FortiSwitch-3032E
+fs2f48		OBJECT IDENTIFIER ::= { fsModel 20481}		 -- FortiSwitch-2048F
+s108en		OBJECT IDENTIFIER ::= { fsModel 1082}		 -- FortiSwitch-108E
+s148fp		OBJECT IDENTIFIER ::= { fsModel 1485}		 -- FortiSwitch-148F-POE
+s224ep		OBJECT IDENTIFIER ::= { fsModel 2244}		 -- FortiSwitch-224E-POE
+sm10gf		OBJECT IDENTIFIER ::= { fsModel 1102}		 -- FortiSwitch-110G-FPOE
+st1e24		OBJECT IDENTIFIER ::= { fsModel 10243}		 -- FortiSwitch-T1024E
+s548df		OBJECT IDENTIFIER ::= { fsModel 5481}		 -- FortiSwitch-548D-FPOE
+s624fn		OBJECT IDENTIFIER ::= { fsModel 6241}		 -- FortiSwitch-624F
+s426ef		OBJECT IDENTIFIER ::= { fsModel 42405}		 -- FortiSwitch-M426E-FPOE
+fs1d24		OBJECT IDENTIFIER ::= { fsModel 10241}		 -- FortiSwitch-1024D
+s148en		OBJECT IDENTIFIER ::= { fsModel 1247}		 -- FortiSwitch-148E
+s224df		OBJECT IDENTIFIER ::= { fsModel 2242}		 -- FortiSwitch-224D-FPOE
+s524dn		OBJECT IDENTIFIER ::= { fsModel 5242}		 -- FortiSwitch-524D
+s524df		OBJECT IDENTIFIER ::= { fsModel 5241}		 -- FortiSwitch-524D-FPOE
+fs24vm		OBJECT IDENTIFIER ::= { fsModel 241}		 -- FortiSwitch-24VM
+s248dn		OBJECT IDENTIFIER ::= { fsModel 2483}		 -- FortiSwitch-248D
+s224en		OBJECT IDENTIFIER ::= { fsModel 2243}		 -- FortiSwitch-224E
+s448df		OBJECT IDENTIFIER ::= { fsModel 4483}		 -- FortiSwitch-448D-FPOE
+s124ef		OBJECT IDENTIFIER ::= { fsModel 1246}		 -- FortiSwitch-124E-FPOE
+s648fn		OBJECT IDENTIFIER ::= { fsModel 6481}		 -- FortiSwitch-648F
+s108dv		OBJECT IDENTIFIER ::= { fsModel 1085}		 -- FortiSwitch-108D-VM
+s124ff		OBJECT IDENTIFIER ::= { fsModel 1249}		 -- FortiSwitch-124F-FPOE
+s148ff		OBJECT IDENTIFIER ::= { fsModel 1486}		 -- FortiSwitch-148F-FPOE
+sr24fp		OBJECT IDENTIFIER ::= { fsModel 42406}		 -- FortiSwitchRugged-424F-POE
+s448dn		OBJECT IDENTIFIER ::= { fsModel 4482}		 -- FortiSwitch-448D
+fs1e24		OBJECT IDENTIFIER ::= { fsModel 10242}		 -- FortiSwitch-1024E
+s424ef		OBJECT IDENTIFIER ::= { fsModel 42403}		 -- FortiSwitch-424E-FPOE
+fs1e48		OBJECT IDENTIFIER ::= { fsModel 10482}		 -- FortiSwitch-1048E
+s448ep		OBJECT IDENTIFIER ::= { fsModel 4486}		 -- FortiSwitch-448E-POE
+s424en		OBJECT IDENTIFIER ::= { fsModel 42401}		 -- FortiSwitch-424E
+s124ep		OBJECT IDENTIFIER ::= { fsModel 1245}		 -- FortiSwitch-124E-POE
+s424ei		OBJECT IDENTIFIER ::= { fsModel 42404}		 -- FortiSwitch-424E-Fiber
+sr12dp		OBJECT IDENTIFIER ::= { fsModel 1121}		 -- FortiSwitchRugged-112D-POE
+s424df		OBJECT IDENTIFIER ::= { fsModel 4243}		 -- FortiSwitch-424D-FPOE
+s448dp		OBJECT IDENTIFIER ::= { fsModel 4484}		 -- FortiSwitch-448D-POE
+s424dn		OBJECT IDENTIFIER ::= { fsModel 4241}		 -- FortiSwitch-424D
+s124fp		OBJECT IDENTIFIER ::= { fsModel 12411}		 -- FortiSwitch-124F-POE
+s624ff		OBJECT IDENTIFIER ::= { fsModel 6242}		 -- FortiSwitch-624F-FPOE
+sr16fp		OBJECT IDENTIFIER ::= { fsModel 2161}		 -- FortiSwitchRugged-216F-POE
+s124fn		OBJECT IDENTIFIER ::= { fsModel 12410}		 -- FortiSwitch-124F
+s648ff		OBJECT IDENTIFIER ::= { fsModel 6482}		 -- FortiSwitch-648F-FPOE
+fs1d48		OBJECT IDENTIFIER ::= { fsModel 10481}		 -- FortiSwitch-1048D
+s424ep		OBJECT IDENTIFIER ::= { fsModel 42402}		 -- FortiSwitch-424E-POE
+s248ef		OBJECT IDENTIFIER ::= { fsModel 2484}		 -- FortiSwitch-248E-FPOE
+s108fn		OBJECT IDENTIFIER ::= { fsModel 1086}		 -- FortiSwitch-108F
+s248df		OBJECT IDENTIFIER ::= { fsModel 2482}		 -- FortiSwitch-248D-FPOE
+s108ef		OBJECT IDENTIFIER ::= { fsModel 1084}		 -- FortiSwitch-108E-FPOE
+tf1f24		OBJECT IDENTIFIER ::= { fsModel 10244}		 -- FortiSwitch-T1024F-FPOE
+s108fp		OBJECT IDENTIFIER ::= { fsModel 1087}		 -- FortiSwitch-108F-POE
+s148fn		OBJECT IDENTIFIER ::= { fsModel 1484}		 -- FortiSwitch-148F
+s108ff		OBJECT IDENTIFIER ::= { fsModel 1088}		 -- FortiSwitch-108F-FPOE
+fs108d		OBJECT IDENTIFIER ::= { fsModel 1081}		 -- FortiSwitch-108D-POE
+s108ep		OBJECT IDENTIFIER ::= { fsModel 1083}		 -- FortiSwitch-108E-POE
+fs224d		OBJECT IDENTIFIER ::= { fsModel 2241}		 -- FortiSwitch-224D-POE
+sm24gn		OBJECT IDENTIFIER ::= { fsModel 12412}		 -- FortiSwitch-124G
+s124en		OBJECT IDENTIFIER ::= { fsModel 1244}		 -- FortiSwitch-124E
+
+-- fsModel end
 
 --
 -- fortinet.fnFortiSwitchMib.fsMibConformance
@@ -176,7 +462,7 @@ fsMibConformance OBJECT IDENTIFIER
     ::= { fnFortiSwitchMib 100 }
 
 fsNotificationGroup NOTIFICATION-GROUP
-    NOTIFICATIONS { fsTrapHBFail, fsTrapHBReceived, fsTrapMemberDown, fsTrapMemberUp }
+    NOTIFICATIONS { fsTrapMemberDown, fsTrapMemberUp }
     STATUS      current
     DESCRIPTION 
         "Notifications that can be generated from a FortiSwitch device."
@@ -185,8 +471,7 @@ fsNotificationGroup NOTIFICATION-GROUP
 fsSystemObjectGroup OBJECT-GROUP
     OBJECTS     { fsSysVersion, fsSysCpuUsage,
                   fsSysMemUsage, fsSysMemCapacity,
-                  fsSysDiskUsage, fsSysDiskCapacity,
-		  fsDirverVersion }
+                  fsSysDiskUsage, fsSysDiskCapacity }
     STATUS      current
     DESCRIPTION
         "Objects pertaining to the system status of the device."
