@@ -610,7 +610,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
         if ((isset($tmp_alerts['ifDescr'])) && (isset($tmp_alerts['ifAlias'])) && ($tmp_alerts['ifDescr'] != $tmp_alerts['ifAlias'])) {
             // IfAlias has been set, so display it on alarms
             $fault_detail .= $tmp_alerts['ifAlias'] . '; ';
-            unset ($tmp_alerts['label']);
+            unset($tmp_alerts['label']);
         }
         $fallback = false;
     }
