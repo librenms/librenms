@@ -143,7 +143,7 @@ snmp.max_repeaters: 30
 **CAUTION**: The above example uses the correct, flattened notation whereas you might be tempted to create a
 block for `snmp` with sub-keys `community` and `max_repeaters`.  Do **NOT** do this as the whole `snmp`
 block will be overwritten, replaced with only those two sub-keys.  The config keys in your `seeders` file
-should follow the exact name you see in **Global Settings**.
+must match those specified in `misc/config_definitions.json`.
 
 ## Directories
 
