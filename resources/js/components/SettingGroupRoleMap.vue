@@ -24,21 +24,21 @@
 
 <template>
     <div v-tooltip="disabled ? $t('settings.readonly') : false">
-        <div v-for="(data, group) in localList" class="tw-flex">
+        <div v-for="(data, group) in localList" class="tw:flex">
             <input type="text"
-                   class="form-control !tw-w-auto"
+                   class="form-control tw:w-auto!"
                    :value="group"
                    :readonly="disabled"
                    :placeholder="options.groupPlaceholder"
                    @blur="updateItem(group, $event.target.value)"
                    @keyup.enter="updateItem(group, $event.target.value)"
             >
-            <librenms-select class="form-control tw-flex-grow" @change="updateRoles(group, $event)" route-name="ajax.select.role" :value="data.roles" multiple :disabled="disabled" :allow-clear="false"></librenms-select>
+            <librenms-select class="form-control tw:grow" @change="updateRoles(group, $event)" route-name="ajax.select.role" :value="data.roles" multiple :disabled="disabled" :allow-clear="false"></librenms-select>
             <button v-if="!disabled" @click="removeItem(group)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
         </div>
-        <div v-if="!disabled" class="tw-flex">
-            <input type="text" class="form-control !tw-w-auto" v-model="newItem" :placeholder="options.groupPlaceholder">
-            <librenms-select class="form-control tw-flex-grow" v-model="newItemRoles" route-name="ajax.select.role" placeholder="Role" multiple :disabled="disabled" :allow-clear="false"></librenms-select>
+        <div v-if="!disabled" class="tw:flex">
+            <input type="text" class="form-control tw:w-auto!" v-model="newItem" :placeholder="options.groupPlaceholder">
+            <librenms-select class="form-control tw:grow" v-model="newItemRoles" route-name="ajax.select.role" placeholder="Role" multiple :disabled="disabled" :allow-clear="false"></librenms-select>
             <button @click="addItem" type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
         </div>
     </div>

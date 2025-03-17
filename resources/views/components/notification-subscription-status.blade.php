@@ -4,7 +4,7 @@
     <div x-show="supported">
         <div>
             <span x-text="enabled ? '{{ __('components.notification-subscription-status.enabled') }}' : '{{ __('components.notification-subscription-status.disabled') }}'"></span>
-            <button x-on:click="toggle()" type="button" class="tw-float-right tw-border tw-border-gray-500 tw-text-gray-500 hover:tw-bg-gray-500 hover:tw-text-gray-100 tw-rounded tw-px-4 tw-py-2" x-text="enabled ? '{{ __('components.notification-subscription-status.disable') }}' : '{{ __('components.notification-subscription-status.enable') }}'"></button>
+            <button x-on:click="toggle()" type="button" class="tw:float-right tw:border tw:border-gray-500 tw:text-gray-500 tw:hover:bg-gray-500 tw:hover:text-gray-100 tw:rounded tw:px-4 tw:py-2" x-text="enabled ? '{{ __('components.notification-subscription-status.disable') }}' : '{{ __('components.notification-subscription-status.enable') }}'"></button>
         </div>
     </div>
     @else

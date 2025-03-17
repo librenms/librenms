@@ -83,9 +83,9 @@
     <script>
         // Apply color scheme
         if ('{{ LibreNMS\Config::get('applied_site_style') }}' === 'dark') {
-            document.documentElement.classList.add('tw-dark')
+            document.documentElement.classList.add('tw:dark')
         } else {
-            document.documentElement.classList.remove('tw-dark')
+            document.documentElement.classList.remove('tw:dark')
         }
     </script>
     @auth

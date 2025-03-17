@@ -5,7 +5,7 @@
 
     @foreach($data['stpInstances'] as $instance)
         <x-panel class="stp-panel">
-            <x-slot name="title"><span class="tw-font-bold">{{ trans('stp.stp_info') }}</span></x-slot>
+            <x-slot name="title"><span class="tw:font-bold">{{ trans('stp.stp_info') }}</span></x-slot>
             <table class="table table-condensed table-striped table-hover">
                 <tr>
                     <td>{{ trans('stp.root_bridge') }}</td>
@@ -91,7 +91,7 @@
 
     @if($data['stpPorts'])
         <x-panel class="stp-panel">
-            <x-slot name="title"><span class="tw-font-bold">{{ trans('stp.stp_ports') }}</span></x-slot>
+            <x-slot name="title"><span class="tw:font-bold">{{ trans('stp.stp_ports') }}</span></x-slot>
             <div class="table-responsive">
                 <table id="stp-ports" class="table table-condensed table-hover">
                     <thead>
