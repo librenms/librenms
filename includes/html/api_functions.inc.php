@@ -2856,7 +2856,7 @@ function list_ip_addresses(Illuminate\Http\Request $request)
         $ipv4_addresses = Ipv4Address::get();
         if ($ipv4_addresses->isEmpty()) {
             return api_error(404, 'IPv4 Addresses do not exist');
-	}
+        }
 
         return api_success($ipv4_addresses, 'ip_addresses', null, 200, $ipv4_addresses->count());
     }
