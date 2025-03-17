@@ -126,10 +126,10 @@ class Ospfv3 implements Module
             $ospf_areas = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPFV3-MIB::ospfv3AreaTable')
-                ->mapTable(function ($ospf_area, $ospf_area_id) use ($context_name, $os) {
+                ->mapTable(function ($ospf_area, $ospfv3AreaId) use ($context_name, $os) {
                     return Ospfv3Area::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
-                        'ospfv3AreaId' => $ospf_area_id,
+                        'ospfv3AreaId' => $ospfv3AreaId,
                         'context_name' => $context_name,
                     ], $ospf_area);
                 });
@@ -148,10 +148,10 @@ class Ospfv3 implements Module
             $ospf_ports = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPFV3-MIB::ospfv3IfTable')
-                ->mapTable(function ($ospf_port, $ifIndex, $ospf_instance_id) use ($context_name, $os) {
+                ->mapTable(function ($ospf_port, $ospfv3IfIndex, $ospfv3IfInstId) use ($context_name, $os) {
                     // find port_id
-                    $ospf_port['port_id'] = (int) PortCache::getIdFromIfIndex($ifIndex, $os->getDeviceId());
-                    $ospf_port['ospfv3_instance_id'] = $ospf_instance_id;
+                    $ospf_port['port_id'] = (int) PortCache::getIdFromIfIndex($ospfv3IfIndex, $os->getDeviceId());
+                    $ospf_port['ospfv3_instance_id'] = $ospfv3IfInstId;
                     $ospf_port['ospfv3IfDesignatedRouter'] = long2ip($ospf_port['ospfv3IfDesignatedRouter']);
                     $ospf_port['ospfv3IfBackupDesignatedRouter'] = long2ip($ospf_port['ospfv3IfBackupDesignatedRouter']);
                     $ospf_port['ospfv3AreaScopeLsaCksumSum'] ??= 0;
@@ -161,8 +161,8 @@ class Ospfv3 implements Module
 
                     return Ospfv3Port::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
-                        'ospfv3_instance_id' => $ospf_instance_id,
-                        'ospfv3_port_id' => $ifIndex,
+                        'ospfv3_instance_id' => $ospfv3IfInstId,
+                        'ospfv3_port_id' => $ospfv3IfIndex,
                         'context_name' => $context_name,
                     ], $ospf_port);
                 });
@@ -181,19 +181,19 @@ class Ospfv3 implements Module
             $ospf_neighbours = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPFV3-MIB::ospfv3NbrTable')
-                ->mapTable(function ($ospf_nbr, $ifIndex, $ospf_instance_id, $ospfv3NbrRtrId) use ($context_name, $os) {
+                ->mapTable(function ($ospf_nbr, $ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) use ($context_name, $os) {
                     // get neighbor port_id
                     // Needs searching by Link-Local addressing, but those do not appear to be indexed.
                     $ip_raw = $ospf_nbr['ospfv3NbrAddress'];
                     $ospf_nbr['ospfv3NbrAddress'] = IP::fromHexString($ip_raw, true)->compressed() ?? IP::parse($ip_raw, true)->compressed() ?? $ospf_nbr['ospfv3NbrAddress'];
                     $ospf_nbr['port_id'] = PortCache::getIdFromIp($ospf_nbr['ospfv3NbrAddress'], $context_name); // search all devices
-                    $ospf_nbr['ospfv3_instance_id'] = $ospf_instance_id;
+                    $ospf_nbr['ospfv3_instance_id'] = $ospfv3NbrIfInstId;
                     $ospf_nbr['ospfv3NbrRtrId'] = long2ip($ospfv3NbrRtrId);
 
                     return Ospfv3Nbr::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
-                        'ospfv3_instance_id' => $ospf_instance_id,
-                        'ospfv3_nbr_id' => $ifIndex,
+                        'ospfv3_instance_id' => $ospfv3NbrIfInstId,
+                        'ospfv3_nbr_id' => $ospfv3NbrIfIndex,
                         'context_name' => $context_name,
                     ], $ospf_nbr);
                 });
