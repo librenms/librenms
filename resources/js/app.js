@@ -4,8 +4,6 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-console.log("App.js updated at: " + new Date());
-
 import './bootstrap';
 
 import Vue from 'vue';
