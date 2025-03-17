@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ospfv3_nbrs', function (Blueprint $table) {
-            $table->integer('ospfv3NbrIfIndex')->nullable(true)->change();
+            $table->integer('ospfv3NbrIfIndex')->nullable()->change();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ospfv3_nbrs', function (Blueprint $table) {
-            $table->integer('ospfv3NbrIfIndex')->nullable(false)->change();
+            $table->integer('ospfv3NbrIfIndex')->nullable(false)->default(null)->change();
         });
     }
 };
