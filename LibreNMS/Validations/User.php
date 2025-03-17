@@ -103,10 +103,13 @@ class User extends BaseValidation
                         "$dir/storage/framework/sessions/",
                         "$dir/storage/framework/views/",
                         "$dir/storage/debugbar/",
-                        "$dir/composer.json",  // files are restored before update and modified when plugins are installed
-                        "$dir/composer.lock",
                         "$dir/.pki/", // ignore files/folders created by setting the librenms home directory to the install directory
                     ];
+
+                    // files are restored before update and modified when plugins are installed
+                    if (file_exists("$dir/composer.plugins.json")) {
+                        array_push($ignore_files, "$dir/composer.json", "$dir/composer.lock");
+                    }
 
                     $files = array_filter(explode(PHP_EOL, $find_result), function ($file) use ($ignore_files) {
                         if (Str::startsWith($file, $ignore_files)) {
