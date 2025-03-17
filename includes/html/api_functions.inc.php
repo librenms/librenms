@@ -2858,7 +2858,7 @@ function list_ip_addresses(Illuminate\Http\Request $request)
             return api_error(404, 'IPv4 Addresses do not exist');
 	}
 
-	return api_success($ipv4_addresses, 'ip_addresses', null, 200, $ipv4_addresses->count());
+        return api_success($ipv4_addresses, 'ip_addresses', null, 200, $ipv4_addresses->count());
     }
 
     if ($address_family === 'ipv6') {
@@ -2867,7 +2867,7 @@ function list_ip_addresses(Illuminate\Http\Request $request)
             return api_error(404, 'IPv6 Addresses do not exist');
         }
 
-	return api_success($ipv6_addresses, 'ip_addresses', null, 200, $ipv6_addresses->count());
+        return api_success($ipv6_addresses, 'ip_addresses', null, 200, $ipv6_addresses->count());
     }
 
     if (empty($address_family)) {
@@ -2910,7 +2910,7 @@ function list_ip_networks(Illuminate\Http\Request $request)
             return api_error(404, 'IP networks do not exist');
         }
 
-	return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks', null, 200, $ip_networks_count);
+        return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks', null, 200, $ip_networks_count);
     }
 }
 
