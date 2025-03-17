@@ -1,5 +1,46 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss' prefix(tw);
 
-@import 'toast.css';
+@import './toast.css' layer(utilities);
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+
+  --color-dark-gray-100: #4f565d;
+  --color-dark-gray-200: #3e444c;
+  --color-dark-gray-300: #353a41;
+  --color-dark-gray-400: #2e3338;
+  --color-dark-gray-500: #272b30;
+  --color-dark-white-100: #f9fafb;
+  --color-dark-white-200: #c8c8c8;
+  --color-dark-white-300: #bebfbf;
+  --color-dark-white-400: #acb6bf;
+
+  --border-width-0_5: 0.5px;
+
+  --shadow-inner-glow: inset 0 0 11px rgba(0, 0, 0, 0.1);
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
