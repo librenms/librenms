@@ -8,10 +8,10 @@
 //@import '~bootstrap/scss/bootstrap'; // Conflicts with normal css
 
 // Vue Select
-@import "~vue-select/src/scss/vue-select.scss";
+@import "vue-select/src/scss/vue-select.scss";
 
 // Vue Multiselect
 @import "../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
 
 // Vue Tabs
-@import '~vue-nav-tabs/themes/vue-tabs.scss';
+@import 'vue-nav-tabs/themes/vue-tabs.scss';

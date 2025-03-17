@@ -7,11 +7,13 @@
         "build": "vite build"
     },
     "devDependencies": {
-        "@tailwindcss/postcss": "^4.0.13",
+        "@tailwindcss/vite": "^4.0.14",
+        "@vitejs/plugin-vue2": "^1.1.2",
         "autoprefixer": "^10.4.2",
         "axios": "^1.7.4",
         "bootstrap": "^4.5.3",
         "jquery": "^3.5.1",
+        "laravel-vite-plugin": "^1.0",
         "lodash": "^4.17.21",
         "popper.js": "^1.16.1",
         "postcss": "^8.4.31",
@@ -19,10 +21,9 @@
         "sass": "^1.49.0",
         "sass-loader": "^12.4.0",
         "tailwindcss": "^4.0.13",
+        "vite": "^6.0",
         "vue-loader": "^15.9.8",
-        "vue-template-compiler": "^2.6.14",
-        "vite": "^3.0.2",
-        "laravel-vite-plugin": "^0.6.0"
+        "vue-template-compiler": "^2.6.14"
     },
     "dependencies": {
         "babel-helper-vue-jsx-merge-props": "^2.0.3",
@@ -35,7 +36,6 @@
         "vue-multiselect": "^2.1.6",
         "vue-nav-tabs": "^0.5.7",
         "vue-select": "^3.16.0",
-        "vuedraggable": "^2.24.3",
-        "@vitejs/plugin-vue2": "^1.1.2"
+        "vuedraggable": "^2.24.3"
     }
 }

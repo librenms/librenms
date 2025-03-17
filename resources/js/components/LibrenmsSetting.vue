@@ -51,7 +51,9 @@
 </template>
 
 <script>
-    export default {
+import _ from 'lodash';
+
+export default {
         name: "LibrenmsSetting",
         props: {
             'setting': {type: Object, required: true},
@@ -94,9 +96,9 @@
                         }
                     })
             },
-            debouncePersistValue: _.debounce(function (value) {
+            debouncePersistValue: function (value) {
                 this.persistValue(value)
-            }, 500),
+            },
             changeValue(value) {
                 if (['select', 'boolean', 'multiple'].includes(this.setting.type)) {
                     // no need to debounce
@@ -161,7 +163,7 @@
                 const component = 'Setting' +  this.setting.type.toString()
                     .replace(/(-[a-z]|^[a-z])/g, (group) => group.toUpperCase().replace('-', ''));
 
-                return typeof Vue.options.components[component] !== 'undefined' ? component : 'SettingNull';
+                return typeof this.$options.components[component] !== 'undefined' ? component : SettingNull;
             }
         }
     }

@@ -22,6 +22,7 @@
     <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
     <meta name="theme-color" content="#ffffff">
 
+    @vite(['resources/sass/app.scss', 'resources/css/app.css', 'resources/js/app.js'])
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap-switch.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet">
@@ -40,7 +41,6 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=27112024" rel="stylesheet">
     <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet">
@@ -105,6 +105,8 @@
 @if(Auth::check())
     <script>updateResolution();</script>
 @endif
+
+@routes
 
 @if(Request::get('bare') == 'yes')
     <style>body { padding-top: 0 !important; padding-bottom: 0 !important; }</style>
