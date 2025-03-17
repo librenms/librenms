@@ -96,9 +96,9 @@ export default {
                         }
                     })
             },
-            debouncePersistValue: function (value) {
+            debouncePersistValue: _.debounce(function (value) {
                 this.persistValue(value)
-            },
+            }, 500),
             changeValue(value) {
                 if (['select', 'boolean', 'multiple'].includes(this.setting.type)) {
                     // no need to debounce
