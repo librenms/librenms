@@ -4,6 +4,12 @@ echo 'AXIS Temperatures ';
 
 // Set Temp Limits based on Device Description
 switch (true) {
+    case stristr($device['sysDescr'], 'P1375'):
+        $high_limit = 55;
+        $high_warn_limit = 50;
+        $low_warn_limit = -5;
+        $low_limit = -10;
+        break;
     case stristr($device['sysDescr'], 'P1425-LE'):
         $high_limit = 50;
         $high_warn_limit = 40;
