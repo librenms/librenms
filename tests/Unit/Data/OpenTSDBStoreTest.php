@@ -25,13 +25,12 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use PHPUnit\Framework\Attributes\Group;
 use Carbon\Carbon;
 use LibreNMS\Data\Store\OpenTSDB;
 use LibreNMS\Tests\TestCase;
 
-/**
- * @group datastores
- */
+#[Group('datastores')]
 class OpenTSDBStoreTest extends TestCase
 {
     protected $timestamp = 990464400;

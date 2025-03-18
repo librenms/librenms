@@ -25,6 +25,9 @@
 
 namespace LibreNMS\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -60,13 +63,10 @@ class OSDiscoveryTest extends TestCase
 
     /**
      * Test each OS provided by osProvider
-     *
-     * @group os
-     *
-     * @dataProvider osProvider
-     *
      * @param  string  $os_name
      */
+    #[Group('os')]
+    #[DataProvider('osProvider')]
     public function testOSDetection($os_name): void
     {
         if (! getenv('SNMPSIM')) {
@@ -97,9 +97,8 @@ class OSDiscoveryTest extends TestCase
 
     /**
      * Test that all files have been tested (removed from self::$unchecked_files
-     *
-     * @depends testOSDetection
      */
+    #[Depends('testOSDetection')]
     public function testAllFilesTested(): void
     {
         $this->assertEmpty(

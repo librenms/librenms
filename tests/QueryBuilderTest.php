@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
@@ -42,13 +43,12 @@ class QueryBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider loadQueryData
-     *
      * @param  string  $legacy
      * @param  array  $builder
      * @param  string  $display
      * @param  string  $sql
      */
+    #[DataProvider('loadQueryData')]
     public function testQueryConversion($legacy, $builder, $display, $sql, $query): void
     {
         if (! empty($legacy)) {

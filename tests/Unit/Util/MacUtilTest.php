@@ -2,6 +2,8 @@
 
 namespace LibreNMS\Tests\Unit\Util;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Mac;
 
@@ -37,11 +39,8 @@ class MacUtilTest extends TestCase
         $this->assertEquals('0c85255ce500', Mac::parseBridge('80620c85255ce500')->hex());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider validMacProvider
-     */
+    #[Test]
+    #[DataProvider('validMacProvider')]
     public function testMacToHex(string $from, string $to): void
     {
         $this->assertEquals($to, Mac::parse($from)->hex());

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use PHPUnit\Framework\Attributes\Requires;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
@@ -56,9 +57,8 @@ class IpTest extends TestCase
 
     /**
      * See https://github.com/librenms/librenms/pull/13468 for more info
-     *
-     * @requires PHP >= 7.4
      */
+    #[Requires('PHP >= 7.4')]
     public function testIsValidIPv6ExcludeReserved(): void
     {
         $this->assertFalse(IPv6::isValid('::1', true));

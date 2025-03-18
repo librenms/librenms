@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
@@ -46,17 +47,13 @@ class YamlSchemaTest extends TestCase
         $this->validateFileAgainstSchema('/misc/config_definitions.json', '/misc/config_schema.json');
     }
 
-    /**
-     * @group os
-     */
+    #[Group('os')]
     public function testOSDefinitionSchema(): void
     {
         $this->validateYamlFilesAgainstSchema('/includes/definitions', '/misc/os_schema.json');
     }
 
-    /**
-     * @group os
-     */
+    #[Group('os')]
     public function testOSMatchFilename(): void
     {
         foreach ($this->listFiles('/includes/definitions/*.yaml') as $filename => $file) {
@@ -68,9 +65,7 @@ class YamlSchemaTest extends TestCase
         }
     }
 
-    /**
-     * @group os
-     */
+    #[Group('os')]
     public function testDiscoveryDefinitionSchema(): void
     {
         $this->validateYamlFilesAgainstSchema('/includes/definitions/discovery', '/misc/discovery_schema.json');

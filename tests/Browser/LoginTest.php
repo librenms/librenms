@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Browser;
 
+use PHPUnit\Framework\Attributes\Group;
 use App\Models\User;
 use App\Models\UserPref;
 use Hash;
@@ -15,9 +16,8 @@ use LibreNMS\Tests\DuskTestCase;
 
 /**
  * Class LoginTest
- *
- * @group browser
  */
+#[Group('browser')]
 class LoginTest extends DuskTestCase
 {
     use DatabaseTruncation;

@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
@@ -65,11 +67,9 @@ class OSModulesTest extends DBTestCase
 
     /**
      * Test all modules for a particular OS
-     *
-     * @group os
-     *
-     * @dataProvider dumpedDataProvider
      */
+    #[Group('os')]
+    #[DataProvider('dumpedDataProvider')]
     public function testDataIsValid($os, $variant, $modules): void
     {
         // special case if data provider throws exception
@@ -82,15 +82,12 @@ class OSModulesTest extends DBTestCase
 
     /**
      * Test all modules for a particular OS
-     *
-     * @group os
-     *
-     * @dataProvider dumpedDataProvider
-     *
      * @param  string  $os  base os
      * @param  string  $variant  optional variant
      * @param  array  $modules  modules to test for this os
      */
+    #[Group('os')]
+    #[DataProvider('dumpedDataProvider')]
     public function testOS($os, $variant, $modules): void
     {
         // Lock testing time
