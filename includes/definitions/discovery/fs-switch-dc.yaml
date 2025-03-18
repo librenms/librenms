@@ -22,6 +22,12 @@ modules:
                 descr: '{{ $fsNodeCPUTotalName }}'
                 warn_percent: fsNodeCPUTotalCritical
     sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ifAdminStatus
+                    snmp_flags: ['-OtbeQUs']
         dbm:
             data:
                 -
@@ -44,6 +50,11 @@ modules:
                             oid: fsFiberRXpower
                             op: '='
                             value: -10000
+                        -
+                            oid: ifAdminStatus
+                            op: '='
+                            value: 2
+                -
                 -
                     oid: fsFiberTable
                     value: fsFiberTXpower
@@ -64,6 +75,11 @@ modules:
                             oid: fsFiberTXpower
                             op: '='
                             value: -10000
+                        -
+                            oid: ifAdminStatus
+                            op: '='
+                            value: 2
+                -
         fanspeed:
             data:
                 -
