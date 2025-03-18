@@ -189,8 +189,13 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
      */
     public function handleError($level, $message, $file = '', $line = 0, $context = []): bool
     {
+        // ignore errors surpressed by @, if error reporting is set to 0 in the ini, handle it below
+        if (error_reporting() === 0 && ini_get('error_reporting') !== '0') {
+            return true;
+        }
+            
         // report errors if they are allowed
-        if (error_reporting() & $level && $this->errorReportingLevel & $level) {
+        if ($this->errorReportingLevel & $level) {
             Flare::report(new ErrorException($message, 0, $level, $file, $line));
         }
 
