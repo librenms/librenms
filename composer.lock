@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dce860444092e12df87923653c5476bf",
+    "content-hash": "f5c1ca5d2e8ba6d52c9302248e0fc62f",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -5822,81 +5822,6 @@
             "time": "2024-04-27T21:32:50+00:00"
         },
         {
-            "name": "silber/bouncer",
-            "version": "v1.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/JosephSilber/bouncer.git",
-                "reference": "502221b6724fe806aa01ffe08070edaa10222101"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/JosephSilber/bouncer/zipball/502221b6724fe806aa01ffe08070edaa10222101",
-                "reference": "502221b6724fe806aa01ffe08070edaa10222101",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/auth": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/cache": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/container": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/contracts": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/database": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "php": "^7.2|^8.0"
-            },
-            "require-dev": {
-                "illuminate/console": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "illuminate/events": "^6.0|^7.0|^8.0|^9.0|^10.0",
-                "larapack/dd": "^1.1",
-                "mockery/mockery": "^1.3.3",
-                "phpunit/phpunit": "^8.0|^9.0"
-            },
-            "suggest": {
-                "illuminate/console": "Allows running the bouncer:clean artisan command",
-                "illuminate/events": "Required for multi-tenancy support"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "Bouncer": "Silber\\Bouncer\\BouncerFacade"
-                    },
-                    "providers": [
-                        "Silber\\Bouncer\\BouncerServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Silber\\Bouncer\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Joseph Silber",
-                    "email": "contact@josephsilber.com"
-                }
-            ],
-            "description": "Eloquent roles and abilities.",
-            "keywords": [
-                "abilities",
-                "acl",
-                "capabilities",
-                "eloquent",
-                "laravel",
-                "permissions",
-                "roles"
-            ],
-            "support": {
-                "issues": "https://github.com/JosephSilber/bouncer/issues",
-                "source": "https://github.com/JosephSilber/bouncer/tree/v1.0.1"
-            },
-            "time": "2023-02-10T16:47:25+00:00"
-        },
-        {
             "name": "socialiteproviders/manager",
             "version": "v4.8.1",
             "source": {
@@ -6349,6 +6274,89 @@
                 }
             ],
             "time": "2025-02-20T13:13:55+00:00"
+        },
+        {
+            "name": "spatie/laravel-permission",
+            "version": "6.16.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-permission.git",
+                "reference": "4fa03c06509e037a4d42c131d0f181e3e4bbd483"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/4fa03c06509e037a4d42c131d0f181e3e4bbd483",
+                "reference": "4fa03c06509e037a4d42c131d0f181e3e4bbd483",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/auth": "^8.12|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/container": "^8.12|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/contracts": "^8.12|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/database": "^8.12|^9.0|^10.0|^11.0|^12.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "laravel/passport": "^11.0|^12.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0|^10.0",
+                "phpunit/phpunit": "^9.4|^10.1|^11.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\Permission\\PermissionServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-main": "6.x-dev",
+                    "dev-master": "6.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Spatie\\Permission\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Permission handling for Laravel 8.0 and up",
+            "homepage": "https://github.com/spatie/laravel-permission",
+            "keywords": [
+                "acl",
+                "laravel",
+                "permission",
+                "permissions",
+                "rbac",
+                "roles",
+                "security",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-permission/issues",
+                "source": "https://github.com/spatie/laravel-permission/tree/6.16.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-02-28T20:29:57+00:00"
         },
         {
             "name": "spomky-labs/base64url",
