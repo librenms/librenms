@@ -77,7 +77,6 @@ modules:
                             oid: IF-MIB::ifAdminStatus
                             op: '='
                             value: 2
-                -
         fanspeed:
             data:
                 -
