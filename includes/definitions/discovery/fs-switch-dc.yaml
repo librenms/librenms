@@ -26,7 +26,7 @@ modules:
             data:
                 -
                     oid:
-                        - ifAdminStatus
+                        - IF-MIB::ifAdminStatus
         dbm:
             data:
                 -
@@ -50,7 +50,7 @@ modules:
                             op: '='
                             value: -10000
                         -
-                            oid: ifAdminStatus
+                            oid: IF-MIB::ifAdminStatus
                             op: '='
                             value: 2
                 -
@@ -74,7 +74,7 @@ modules:
                             op: '='
                             value: -10000
                         -
-                            oid: ifAdminStatus
+                            oid: IF-MIB::ifAdminStatus
                             op: '='
                             value: 2
                 -
