@@ -1,4 +1,4 @@
-<div<div x-data="notificationSubscriptionStatus()">
+<div x-data="notificationSubscriptionStatus()">
     <div x-show="! supported">{{ __('components.notification-subscription-status.no-support') }}</div>
     @if($userHasTransport)
     <div x-show="supported">
@@ -61,4 +61,4 @@
             }
         }
     </script>
-</di</div>
+</div>
