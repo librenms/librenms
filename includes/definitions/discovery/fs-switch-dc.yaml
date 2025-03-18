@@ -27,7 +27,6 @@ modules:
                 -
                     oid:
                         - ifAdminStatus
-                    snmp_flags: ['-OtbeQUs']
         dbm:
             data:
                 -
