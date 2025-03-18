@@ -135,7 +135,7 @@ class MibTest extends TestCase
      *
      * @return array path, filename, mib_name
      */
-    public function mibFiles()
+    public static function mibFiles(): array
     {
         $file_list = [];
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(Config::get('mib_dir'))) as $file) {
@@ -147,7 +147,7 @@ class MibTest extends TestCase
             $file_list[$mib_path] = [
                 str_replace(Config::get('install_dir'), '.', $file->getPath()),
                 $file->getFilename(),
-                $this->extractMibName($file->getPathname()),
+                self::extractMibName($file->getPathname()),
             ];
         }
 
@@ -159,7 +159,7 @@ class MibTest extends TestCase
      *
      * @return array
      */
-    public function mibDirs()
+    public function mibDirs(): array
     {
         $dirs = glob(Config::get('mib_dir') . '/*', GLOB_ONLYDIR);
         array_unshift($dirs, Config::get('mib_dir'));
@@ -176,12 +176,9 @@ class MibTest extends TestCase
     /**
      * Extract the mib name from a file
      *
-     * @param  string  $file
-     * @return mixed
-     *
      * @throws Exception
      */
-    private function extractMibName($file)
+    private static function extractMibName(string $file): string
     {
         // extract the mib name (tried regex, but was too complex and I had to read the whole file)
         $mib_name = null;

@@ -47,7 +47,7 @@ class MacUtilTest extends TestCase
         $this->assertEquals($to, Mac::parse($from)->hex());
     }
 
-    public function validMacProvider(): array
+    public static function validMacProvider(): array
     {
         return [
             ['00:00:00:00:00:01', '000000000001'],
