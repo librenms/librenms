@@ -27,6 +27,7 @@ use LibreNMS\Util\StringHelpers;
 
 $cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', [], 'RITTAL-CMC-III-MIB', null);
 $cmc_iii_sensors = [];
+$last_index_prefix = $current_index_prefix = "";
 
 foreach ($cmc_iii_var_table as $index => $entry) {
     $var_name_parts = explode('.', $entry['cmcIIIVarName']);
@@ -35,7 +36,10 @@ foreach ($cmc_iii_var_table as $index => $entry) {
     $var_type = $entry['cmcIIIVarType'];
     $sensor_id = count($cmc_iii_sensors);
 
-    if ($cmc_iii_sensors[$sensor_id]['name'] != $sensor_name) {
+    $index_r = explode('.', $index);
+    if( count($index_r) > 1 ) $current_index_prefix = $index_r[0];
+
+    if ($cmc_iii_sensors[$sensor_id]['name'] != $sensor_name || $last_index_prefix != $current_index_prefix ) {
         if ($sensor_id == 0) {
             $sensor_id = 1;
         } else {
@@ -44,6 +48,8 @@ foreach ($cmc_iii_var_table as $index => $entry) {
 
         $cmc_iii_sensors[$sensor_id]['name'] = $sensor_name;
         $cmc_iii_sensors[$sensor_id]['desc'] = $entry['cmcIIIVarValueStr'] ?: $sensor_name;
+
+        $last_index_prefix = $current_index_prefix;
     }
 
     switch ($var_type) {
