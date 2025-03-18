@@ -42,7 +42,7 @@ class RoleController extends SelectController
         $this->authorize('viewAny', Role::class);
 
         return Role::query()->pluck('name')
-            ->whenEmpty(fn () => collect(['admin', 'global-read', 'user']));;
+            ->whenEmpty(fn () => collect(['admin', 'global-read', 'user']));
     }
 
     /**

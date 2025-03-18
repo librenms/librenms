@@ -63,7 +63,7 @@ class Mail extends Transport
     public static function configTemplate(): array
     {
         $roles = ['None' => ''];
-        foreach(Role::query()->pluck('name')->all() as $name) {
+        foreach (Role::query()->pluck('name')->all() as $name) {
             $roles[$name] = Str::title(str_replace('-', ' ', $name));
         }
 
