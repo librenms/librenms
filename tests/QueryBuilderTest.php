@@ -25,10 +25,10 @@
 
 namespace LibreNMS\Tests;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class QueryBuilderTest extends TestCase
 {

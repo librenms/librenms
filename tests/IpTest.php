@@ -25,10 +25,10 @@
 
 namespace LibreNMS\Tests;
 
-use PHPUnit\Framework\Attributes\Requires;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
+use PHPUnit\Framework\Attributes\Requires;
 
 class IpTest extends TestCase
 {

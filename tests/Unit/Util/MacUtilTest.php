@@ -2,10 +2,10 @@
 
 namespace LibreNMS\Tests\Unit\Util;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Mac;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 class MacUtilTest extends TestCase
 {

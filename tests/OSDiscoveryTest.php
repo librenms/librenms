@@ -25,9 +25,6 @@
 
 namespace LibreNMS\Tests;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Depends;
-use PHPUnit\Framework\Attributes\Group;
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -35,6 +32,9 @@ use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Util\Debug;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 
 class OSDiscoveryTest extends TestCase
 {
@@ -63,6 +63,7 @@ class OSDiscoveryTest extends TestCase
 
     /**
      * Test each OS provided by osProvider
+     *
      * @param  string  $os_name
      */
     #[Group('os')]

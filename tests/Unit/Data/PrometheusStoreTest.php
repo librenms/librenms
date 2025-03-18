@@ -25,11 +25,11 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
-use PHPUnit\Framework\Attributes\Group;
 use Illuminate\Support\Facades\Http as LaravelHttp;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Prometheus;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 #[Group('datastores')]
 class PrometheusStoreTest extends TestCase

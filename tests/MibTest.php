@@ -25,11 +25,11 @@
 
 namespace LibreNMS\Tests;
 
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -41,6 +41,7 @@ class MibTest extends TestCase
 {
     /**
      * Test mib file in a directory for errors
+     *
      * @param  string  $dir
      */
     #[Group('mibs')]
@@ -55,6 +56,7 @@ class MibTest extends TestCase
 
     /**
      * Test that each mib only exists once.
+     *
      * @param  string  $path
      * @param  string  $file
      * @param  string  $mib_name
@@ -84,6 +86,7 @@ class MibTest extends TestCase
 
     /**
      * Test that the file name matches the mib name
+     *
      * @param  string  $path
      * @param  string  $file
      * @param  string  $mib_name
@@ -101,6 +104,7 @@ class MibTest extends TestCase
 
     /**
      * Test each mib file for errors
+     *
      * @param  string  $path
      * @param  string  $file
      * @param  string  $mib_name
