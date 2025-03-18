@@ -28,11 +28,10 @@ namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
 use App\Models\User;
-use Bouncer;
-use Database\Seeders\RolesSeeder;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -70,13 +69,8 @@ class AddUserCommand extends LnmsCommand
             $this->warn(__('commands.user:add.wrong-auth'));
         }
 
-        $roles = Bouncer::role()->pluck('name');
-
-        // missing roles, add them
-        if ($roles->isEmpty()) {
-            (new RolesSeeder)->run();
-            $roles = Bouncer::role()->pluck('name');
-        }
+        $roles = Role::query()->pluck('name')
+            ->whenEmpty(fn () => collect(['admin', 'global-read', 'user']));
 
         $this->validate([
             'username' => ['required', Rule::unique('users', 'username')->where('auth_type', 'mysql')],

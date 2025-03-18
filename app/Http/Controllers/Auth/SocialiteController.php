@@ -151,7 +151,7 @@ class SocialiteController extends Controller
 
         $default_role = LibreNMSConfig::get('auth.socialite.default_role');
         if ($default_role !== null && $default_role != 'none') {
-            $user->setRoles([$default_role], true);
+            $user->syncRoles([$default_role]);
         }
     }
 

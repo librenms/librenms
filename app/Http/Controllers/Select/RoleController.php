@@ -27,13 +27,11 @@
 namespace App\Http\Controllers\Select;
 
 use Illuminate\Http\Request;
-use Silber\Bouncer\BouncerFacade as Bouncer;
+use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends SelectController
 {
-    protected ?string $idField = 'name';
-    protected ?string $textField = 'title';
-
     protected function searchFields(Request $request)
     {
         return ['name'];
@@ -41,7 +39,21 @@ class RoleController extends SelectController
 
     protected function baseQuery(Request $request)
     {
-        return Bouncer::role()
-            ->whereRaw('1 = ' . ((int) $request->user()->can('viewAny', Bouncer::role())));
+        $this->authorize('viewAny', Role::class);
+
+        return Role::query()->pluck('name')
+            ->whenEmpty(fn () => collect(['admin', 'global-read', 'user']));;
+    }
+
+    /**
+     * @param  Role  $role
+     * @return array
+     */
+    public function formatItem($role): array
+    {
+        return [
+            'id' => $role->name,
+            'text' => Str::title(str_replace('-', ' ', $role->name)),
+        ];
     }
 }

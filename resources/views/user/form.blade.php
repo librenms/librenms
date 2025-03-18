@@ -30,13 +30,13 @@
     </div>
 </div>
 
-@can('viewAny', Bouncer::role())
+@can('viewAny', \Spatie\Permission\Models\Role::class)
     <div class="form-group @if($errors->has('roles')) has-error @endif">
         <label for="level" class="control-label col-sm-3">{{ __('Roles') }}</label>
         <div class="col-sm-9">
-            <select class="form-control" id="roles" name="roles[]" multiple @cannot('manage', Bouncer::role()) readonly @endcannot>
-                @foreach(Bouncer::role()->all() as $role)
-                    <option value="{{ $role->name }}" @if(collect(old('roles', $user->roles->pluck('name')))->contains($role->name)) selected @endif>{{ __($role->title) }}</option>
+            <select class="form-control" id="roles" name="roles[]" multiple @cannot('manage', \Spatie\Permission\Models\Role::class) readonly @endcannot>
+                @foreach(\Spatie\Permission\Models\Role::query()->all() as $role)
+                    <option value="{{ $role->name }}" @if(collect(old('roles', $user->getRoleNames()))->contains($role->name)) selected @endif>{{ __($role->name) }}</option>
                 @endforeach
             </select>
             <span class="help-block">{{ $errors->first('roles') }}</span>

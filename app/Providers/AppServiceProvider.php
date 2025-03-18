@@ -7,6 +7,7 @@ use App\Models\Sensor;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
@@ -58,6 +59,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // define super admin and global read
+        Gate::before(function ($user, $ability) {
+            dump($ability); // TODO global read only
+
+            return $user->hasRole('admin') ? true : null;
+        });
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();

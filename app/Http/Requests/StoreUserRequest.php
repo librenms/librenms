@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
-use Silber\Bouncer\BouncerFacade as Bouncer;
+use Spatie\Permission\Models\Role;
 
 class StoreUserRequest extends FormRequest
 {
@@ -19,7 +19,7 @@ class StoreUserRequest extends FormRequest
     public function authorize(): bool
     {
         if ($this->user()->can('create', User::class)) {
-            if ($this->user()->cannot('manage', Bouncer::role())) {
+            if ($this->user()->cannot('manage', Role::class)) {
                 unset($this['roles']);
             }
 
@@ -47,7 +47,7 @@ class StoreUserRequest extends FormRequest
             'email' => 'nullable|email|max:64',
             'descr' => 'nullable|max:30|alpha_space',
             'roles' => 'array',
-            'roles.*' => Rule::in(Bouncer::role()->pluck('name')),
+            'roles.*' => Rule::in(Role::query()->pluck('name')),
             'new_password' => 'required|confirmed|min:' . Config::get('password.min_length', 8),
             'dashboard' => 'int',
         ];

@@ -67,8 +67,6 @@ class AuthSSOTest extends DBTestCase
         Config::set('sso.group_delimiter', ';');
         Config::set('sso.group_level_map', null);
         Config::set('sso.static_level', -1);
-        /** @phpstan-ignore-next-line */
-        \Bouncer::refresh();
     }
 
     // Set up $_SERVER in env mode

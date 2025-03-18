@@ -25,10 +25,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use Exception;
+use Illuminate\Support\Str;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use Spatie\Permission\Models\Role;
 
 class Mail extends Transport
 {
@@ -60,7 +62,10 @@ class Mail extends Transport
 
     public static function configTemplate(): array
     {
-        $roles = array_merge(['None' => ''], \Bouncer::role()->pluck('name', 'title')->all());
+        $roles = ['None' => ''];
+        foreach(Role::query()->pluck('name')->all() as $name) {
+            $roles[$name] = Str::title(str_replace('-', ' ', $name));
+        }
 
         return [
             'config' => [
