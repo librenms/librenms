@@ -193,7 +193,7 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
         if (error_reporting() === 0 && ini_get('error_reporting') !== '0') {
             return true;
         }
-            
+
         // report errors if they are allowed
         if ($this->errorReportingLevel & $level) {
             Flare::report(new ErrorException($message, 0, $level, $file, $line));
