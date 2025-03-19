@@ -82,7 +82,12 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
             }
             $username = Config::get('auth_ldap_binddn');
             $password = Config::get('auth_ldap_bindpassword');
-            $bind_result = ldap_bind($this->ldap_connection, $username, $password);
+            $bind_result = false;
+            try {
+                $bind_result = ldap_bind($this->ldap_connection, $username, $password);
+            } catch (\ErrorException) {
+                // bind failed
+            }
             if (! $bind_result) {
                 throw new AuthenticationException('Fatal error: LDAP bind configured but not successfully authenticated:' . ldap_error($this->ldap_connection));
             }

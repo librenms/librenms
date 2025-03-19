@@ -391,16 +391,21 @@ class LdapAuthorizer extends AuthorizerBase
         }
 
         // With specified bind user
-        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ldap_timeout', 5));
-        $bind_result = ldap_bind($this->ldap_connection, $username, $password);
-        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
+        $bind_result = false;
+        try {
+            ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ldap_timeout', 5));
+            $bind_result = ldap_bind($this->ldap_connection, $username, $password);
+            ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
 
-        if (Config::get('auth_ldap_debug')) {
-            echo 'Bind result: ' . ldap_error($this->ldap_connection) . PHP_EOL;
-        }
+            if (Config::get('auth_ldap_debug')) {
+                echo 'Bind result: ' . ldap_error($this->ldap_connection) . PHP_EOL;
+            }
 
-        if ($bind_result) {
-            return;
+            if ($bind_result) {
+                return;
+            }
+        } catch (\ErrorException $e) {
+            // if bind with user fails, try anonymous bind
         }
 
         // Anonymous

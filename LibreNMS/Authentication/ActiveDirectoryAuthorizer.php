@@ -248,12 +248,16 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         }
         $username .= '@' . Config::get('auth_ad_domain');
 
-        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ad_timeout', 5));
-        $bind_result = ldap_bind($this->ldap_connection, $username, $password);
-        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
+        try {
+            ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ad_timeout', 5));
+            $bind_result = ldap_bind($this->ldap_connection, $username, $password);
+            ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
 
-        if ($bind_result) {
-            return $bind_result;
+            if ($bind_result) {
+                return $bind_result;
+            }
+        } catch (\ErrorException) {
+            // if bind with user fails, try anonymous bind
         }
 
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ad_timeout', 5));
