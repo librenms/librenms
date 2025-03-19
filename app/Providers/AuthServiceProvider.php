@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Guards\ApiTokenGuard;
+use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -47,17 +48,31 @@ class AuthServiceProvider extends ServiceProvider
             return new ApiTokenGuard($userProvider, $request);
         });
 
-        Gate::define('global-admin', function ($user) {
-            return $user->hasGlobalAdmin();
+        Gate::define('global-admin', function (User $user) {
+            return $user->hasAnyRole('admin', 'demo');
         });
-        Gate::define('admin', function ($user) {
-            return $user->isAdmin();
+        Gate::define('admin', function (User $user) {
+            return $user->hasRole('admin');
         });
-        Gate::define('global-read', function ($user) {
-            return $user->hasGlobalRead();
+        Gate::define('global-read', function (User $user) {
+            return $user->hasAnyRole('admin', 'global-read');
         });
-        Gate::define('device', function ($user, $device) {
+        Gate::define('device', function (User $user, $device) {
             return $user->canAccessDevice($device);
         });
+
+        // define super admin and global read
+        Gate::before(function (User $user, string $ability) {
+            if ($user->hasRole('admin')) {
+                return true;  // super admin
+            }
+
+            if (in_array($ability, ['view', 'viewAny']) && $user->hasRole('global-read')) {
+                return true; // global read access
+            }
+
+            return null;
+        });
+
     }
 }

@@ -35,7 +35,7 @@
         <label for="level" class="control-label col-sm-3">{{ __('Roles') }}</label>
         <div class="col-sm-9">
             <select class="form-control" id="roles" name="roles[]" multiple @cannot('manage', \Spatie\Permission\Models\Role::class) readonly @endcannot>
-                @foreach(\Spatie\Permission\Models\Role::query()->all() as $role)
+                @foreach(\Spatie\Permission\Models\Role::query()->get() as $role)
                     <option value="{{ $role->name }}" @if(collect(old('roles', $user->getRoleNames()))->contains($role->name)) selected @endif>{{ __($role->name) }}</option>
                 @endforeach
             </select>
