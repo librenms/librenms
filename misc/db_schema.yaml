@@ -1488,7 +1488,6 @@ ospfv3_nbrs:
     - { Field: ospfv3_instance_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3_nbr_id, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3NbrIfId, Type: 'int', 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrIfIndex, Type: 'int', 'Null': true, Extra: '' }
     - { Field: ospfv3NbrIfInstId, Type: 'int', 'Null': false, Extra: '' }
     - { Field: ospfv3NbrAddressType, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3NbrAddress, Type: varchar(39), 'Null': false, Extra: '' }
