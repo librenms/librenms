@@ -57,7 +57,9 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveByLegacyId($identifier)
     {
+        error_reporting(0);
         $legacy_user = LegacyAuth::get()->getUser($identifier);
+        error_reporting(-1);
 
         return $this->retrieveByCredentials(['username' => $legacy_user['username'] ?? null]);
     }
@@ -114,6 +116,8 @@ class LegacyUserProvider implements UserProvider
      */
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
+        error_reporting(0);
+
         $authorizer = LegacyAuth::get();
 
         try {
@@ -137,6 +141,8 @@ class LegacyUserProvider implements UserProvider
             $username = $username ?? Session::get('username', $credentials['username']);
 
             DB::table('authlog')->insert(['user' => $username, 'address' => Request::ip(), 'result' => $auth_message]);
+        } finally {
+            error_reporting(-1);
         }
 
         return false;
@@ -150,6 +156,8 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
+        error_reporting(0);
+
         $auth = LegacyAuth::get();
         $type = LegacyAuth::getType();
 
@@ -162,12 +170,18 @@ class LegacyUserProvider implements UserProvider
         $auth_id = $auth->getUserid($username);
         $new_user = $auth->getUser($auth_id);
 
+        error_reporting(-1);
+
         if (empty($new_user)) {
             // some legacy auth create users in the authenticate method, if it doesn't exist yet, lets try authenticate (Laravel calls retrieveByCredentials first)
             try {
+                error_reporting(0);
+
                 $auth->authenticate($credentials);
                 $auth_id = $auth->getUserid($username);
                 $new_user = $auth->getUser($auth_id);
+
+                error_reporting(-1);
             } catch (AuthenticationException $ae) {
                 toast()->error($ae->getMessage());
             }
