@@ -30,8 +30,8 @@ use Symfony\Component\Process\Process;
 
 class CiHelper
 {
-    private array $changed;
-    private array $os;
+    private ?array $changed = null;
+    private ?array $os = null;
     private array $unitEnv = [];
     private array $duskEnv = ['APP_ENV' => 'testing'];
     private Snmpsim|null $snmpsim = null;
