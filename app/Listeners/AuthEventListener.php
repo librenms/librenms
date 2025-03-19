@@ -3,9 +3,10 @@
 namespace App\Listeners;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Request;
 
 class AuthEventListener
@@ -21,6 +22,22 @@ class AuthEventListener
     }
 
     /**
+     * Handle the failed auth event.
+     *
+     * @param  Failed  $event
+     * @return void
+     */
+    public function failed(Failed $event)
+    {
+        $username = $event->credentials['username'] ?? 'Not found';
+
+        Log::channel('auth')->info('Failed', [
+            'user' => $username,
+            'address' => Request::ip(),
+        ]);
+    }
+
+    /**
      * Handle the login event.
      *
      * @param  Login  $event
@@ -31,7 +48,10 @@ class AuthEventListener
         /** @var User $user */
         $user = $event->user ?: (object) ['username' => 'Not found'];
 
-        DB::table('authlog')->insert(['user' => $user->username ?: '', 'address' => Request::ip(), 'result' => 'Logged In']);
+        Log::channel('auth')->info('Logged In', [
+            'user' => $user->username,
+            'address' => Request::ip(),
+        ]);
 
         toast()->info('Welcome ' . ($user->realname ?: $user->username));
     }
@@ -47,6 +67,9 @@ class AuthEventListener
         /** @var User $user */
         $user = $event->user ?: (object) ['username' => 'Not found'];
 
-        DB::table('authlog')->insert(['user' => $user->username ?: '', 'address' => Request::ip(), 'result' => 'Logged Out']);
+        Log::channel('auth')->info('Logged Out', [
+            'user' => $user->username,
+            'address' => Request::ip(),
+        ]);
     }
 }
