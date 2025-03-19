@@ -18,7 +18,7 @@ return new class extends Migration
             ['name' => 'user', 'title' => 'User'],
         ]);
 
-        $roles = array_column((array) DB::table('roles')->select(['id', 'name'])->get(), 'id', 'name');
+        $roles = DB::table('roles')->pluck('id', 'name')->all();
 
         foreach (DB::table('users')->select(['user_id', 'level'])->get() as $user) {
             $role = match ($user->level) {

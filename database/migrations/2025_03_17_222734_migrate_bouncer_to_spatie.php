@@ -24,18 +24,21 @@ return new class extends Migration
             ]);
         }
 
-        // Migrate user-role ass    ignments
+        // Migrate user-role assignments
         $rolesByUserId = DB::table('assigned_roles')
             ->join('roles', 'assigned_roles.role_id', '=', 'roles.id')
             ->where('assigned_roles.entity_type', 'App\\Models\\User') // Adjust namespace if needed
             ->select(
                 'assigned_roles.entity_id as user_id',
-                DB::raw('GROUP_CONCAT(roles.name ORDER BY roles.name ASC SEPARATOR ",") as roles')
+                'roles.name as role_name'
             )
-            ->groupBy('assigned_roles.entity_id')
-            ->pluck('roles', 'user_id')->map(function ($roles) {
-                return explode(',', $roles);
+            ->orderBy('roles.name')
+            ->get()
+            ->groupBy('user_id')
+            ->map(function ($userRoles) {
+                return $userRoles->pluck('role_name')->toArray();
             });
+
 
         $newRoleIds = DB::table('roles')->pluck('id', 'name');
 
