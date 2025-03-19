@@ -60,10 +60,8 @@ class AddUserCommand extends LnmsCommand
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): int
     {
         if (Config::get('auth_mechanism') != 'mysql') {
             $this->warn(__('commands.user:add.wrong-auth'));
@@ -94,7 +92,7 @@ class AddUserCommand extends LnmsCommand
 
         $user->setPassword($password);
         $user->save();
-        $user->assign($this->option('role'));
+        $user->assignRole($this->option('role'));
 
         $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $user->save();

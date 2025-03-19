@@ -141,7 +141,7 @@ class AuthSSOTest extends DBTestCase
         // Retrieve it and validate
         $dbuser = User::thisAuth()->where('username', $user)->firstOrNew();
         $this->assertSame($dbuser->realname, $a->authSSOGetAttr(Config::get('sso.realname_attr')));
-        $this->assertEmpty($dbuser->getRoles());
+        $this->assertEmpty($dbuser->getRoleNames());
         $this->assertSame($dbuser->email, $a->authSSOGetAttr(Config::get('sso.email_attr')));
 
         // Change a few things and reauth
