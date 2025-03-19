@@ -3,7 +3,8 @@
 use App\Models\UserWidget;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      *
