@@ -54,42 +54,34 @@ class User extends Authenticatable
 
     /**
      * Test if this user has global read access
-     *
-     * @return bool
      */
-    public function hasGlobalRead()
+    public function hasGlobalRead(): bool
     {
-        return $this->isA('admin', 'global-read');
+        return $this->can('global-read');
     }
 
     /**
      * Test if this user has global admin access
-     *
-     * @return bool
      */
-    public function hasGlobalAdmin()
+    public function hasGlobalAdmin(): bool
     {
-        return $this->isA('admin', 'demo');
+        return $this->can('global-admin');
     }
 
     /**
      * Test if the User is an admin.
-     *
-     * @return bool
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->isA('admin');
+        return $this->can('admin');
     }
 
     /**
      * Test if this user is the demo user
-     *
-     * @return bool
      */
-    public function isDemo()
+    public function isDemo(): bool
     {
-        return $this->isA('demo');
+        return $this->hasRole('demo');
     }
 
     /**
@@ -98,7 +90,7 @@ class User extends Authenticatable
      * @param  Device|int  $device  can be a device Model or device id
      * @return bool
      */
-    public function canAccessDevice($device)
+    public function canAccessDevice($device): bool
     {
         return $this->hasGlobalRead() || Permissions::canAccessDevice($device, $this->user_id);
     }
