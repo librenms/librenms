@@ -22,9 +22,6 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
-use LibreNMS\Util\Snmpsim;
-
 $install_dir = realpath(__DIR__ . '/..');
 
 $init_modules = ['web', 'discovery', 'polling', 'nodb'];
@@ -35,22 +32,7 @@ chdir($install_dir);
 ini_set('display_errors', '1');
 //error_reporting(E_ALL & ~E_WARNING);
 
-$snmpsim = new Snmpsim('127.1.6.2', 1162);
-if (getenv('SNMPSIM')) {
-    if (! getenv('GITHUB_ACTIONS')) {
-        $snmpsim->setupVenv();
-        $snmpsim->start();
-    }
-
-    // make PHP hold on a reference to $snmpsim so it doesn't get destructed
-    register_shutdown_function(function (Snmpsim $ss) {
-        $ss->stop();
-    }, $snmpsim);
-}
-
 if (getenv('DBTEST')) {
-    global $migrate_result, $migrate_output;
-
     // create testing table if needed
     $db_config = \config('database.connections.testing');
     $connection = new PDO("mysql:host={$db_config['host']};port={$db_config['port']}", $db_config['username'], $db_config['password']);
@@ -62,25 +44,9 @@ if (getenv('DBTEST')) {
     }
     unset($connection); // close connection
 
-    // sqlite db file
-    // $dbFile = fopen(storage_path('testing.sqlite'), 'a+');
-    // ftruncate($dbFile, 0);
-    // fclose($dbFile);
-
-    // try to avoid erasing people's primary databases
-    if ($db_config['database'] !== \config('database.connections.mysql.database', 'librenms')) {
-        if (! getenv('SKIP_DB_REFRESH')) {
-            echo 'Refreshing database...';
-            $migrate_result = Artisan::call('migrate:fresh', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
-            $migrate_output = Artisan::output();
-            echo "done\n";
-        }
-    } else {
-        echo "Info: Refusing to reset main database: {$db_config['database']}.  Running migrations.\n";
-        $migrate_result = Artisan::call('migrate', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
-        $migrate_output = Artisan::output();
-    }
-    unset($db_config);
+    // migrate testing database to make sure it is up-to-date
+    Artisan::call('migrate', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
+    Artisan::output();
 }
 
 LibrenmsConfig::invalidateAndReload();
