@@ -41,7 +41,7 @@ abstract class SimpleTableController extends Controller
     /**
      * Validate the given request with the given rules.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  array  $rules
      * @param  array  $messages
      * @param  array  $customAttributes

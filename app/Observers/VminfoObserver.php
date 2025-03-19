@@ -11,7 +11,7 @@ class VminfoObserver
     /**
      * Handle the Vminfo "created" event.
      *
-     * @param  \App\Models\Vminfo  $vminfo
+     * @param  Vminfo  $vminfo
      * @return void
      */
     public function created(Vminfo $vminfo)
@@ -22,7 +22,7 @@ class VminfoObserver
     /**
      * Handle the Vminfo "updated" event.
      *
-     * @param  \App\Models\Vminfo  $vminfo
+     * @param  Vminfo  $vminfo
      * @return void
      */
     public function updating(Vminfo $vminfo)
@@ -35,7 +35,7 @@ class VminfoObserver
     /**
      * Handle the Vminfo "deleted" event.
      *
-     * @param  \App\Models\Vminfo  $vminfo
+     * @param  Vminfo  $vminfo
      * @return void
      */
     public function deleted(Vminfo $vminfo)
@@ -46,7 +46,7 @@ class VminfoObserver
     /**
      * Handle the Vminfo "restored" event.
      *
-     * @param  \App\Models\Vminfo  $vminfo
+     * @param  Vminfo  $vminfo
      * @return void
      */
     public function restored(Vminfo $vminfo)
@@ -57,7 +57,7 @@ class VminfoObserver
     /**
      * Handle the Vminfo "force deleted" event.
      *
-     * @param  \App\Models\Vminfo  $vminfo
+     * @param  Vminfo  $vminfo
      * @return void
      */
     public function forceDeleted(Vminfo $vminfo)

@@ -130,7 +130,7 @@ class OSModulesTest extends DBTestCase
                 if ($expected_data[$module]['poller'] !== 'matches discovery') {
                     $expected = $expected_data[$module]['poller']; // we have specific poller data, update expected
                 }
-            // pass through discovery expected data
+                // pass through discovery expected data
             } else {
                 $expected = null; // no poller data, clear discovery's expected
             }
@@ -171,7 +171,7 @@ class OSModulesTest extends DBTestCase
         });
 
         $this->app->bind(Fping::class, function ($app) {
-            $mock = \Mockery::mock(\LibreNMS\Data\Source\Fping::class);
+            $mock = \Mockery::mock(Fping::class);
             $mock->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
 
             return $mock;

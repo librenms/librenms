@@ -282,7 +282,7 @@ class LdapAuthorizer extends AuthorizerBase
      * @internal
      *
      * @param  bool  $skip_bind  do not attempt to bind on connection
-     * @return \LDAP\Connection
+     * @return Connection
      *
      * @throws AuthenticationException
      */

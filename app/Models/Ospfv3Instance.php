@@ -53,11 +53,11 @@ class Ospfv3Instance extends DeviceRelatedModel
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function widgets(): HasMany
     {
-        return $this->hasMany(\App\Models\UserWidget::class, 'dashboard_id');
+        return $this->hasMany(UserWidget::class, 'dashboard_id');
     }
 }

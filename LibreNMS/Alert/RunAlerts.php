@@ -336,12 +336,12 @@ class RunAlerts
                     $ret .= ' Better';
                     $state = AlertState::BETTER;
                     $alert['details']['diff'] = ['resolved' => $resolved_diff];
-                // Failsafe if the diff didn't return any results
+                    // Failsafe if the diff didn't return any results
                 } elseif ($current_alert_count > $previous_alert_count) {
                     $ret .= ' Worse';
                     $state = AlertState::WORSE;
                     Eventlog::log('Alert got worse but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
-                // Failsafe if the diff didn't return any results
+                    // Failsafe if the diff didn't return any results
                 } elseif ($current_alert_count < $previous_alert_count) {
                     $ret .= ' Better';
                     $state = AlertState::BETTER;
@@ -423,7 +423,7 @@ class RunAlerts
             $element2_key = $this->generateComparisonKeyForFault($element2, $element2_ids);
 
             if (! isset($array1_keys[$element2_key])) {
-                $added_elements [] = $element2;
+                $added_elements[] = $element2;
             } else {
                 // Remove matched elements
                 unset($array1_keys[$element2_key]);

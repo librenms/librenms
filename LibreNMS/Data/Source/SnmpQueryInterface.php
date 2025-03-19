@@ -117,7 +117,7 @@ interface SnmpQueryInterface
      * Commonly used to fetch a single or multiple explicit values.
      *
      * @param  array|string  $oid
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * @return SnmpResponse
      */
     public function get($oid): SnmpResponse;
 
@@ -126,7 +126,7 @@ interface SnmpQueryInterface
      * Fetches all OIDs under a given OID, commonly used with tables.
      *
      * @param  array|string  $oid
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * @return SnmpResponse
      */
     public function walk($oid): SnmpResponse;
 
@@ -135,7 +135,7 @@ interface SnmpQueryInterface
      * snmpnext retrieves the first oid after the given oid.
      *
      * @param  array|string  $oid
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * @return SnmpResponse
      */
     public function next($oid): SnmpResponse;
 
