@@ -142,9 +142,9 @@ class OSDiscoveryTest extends TestCase
     private function genDevice($community): Device
     {
         return new Device([
-            'hostname' => $this->getSnmpsim()->ip,
+            'hostname' => $this->getSnmpsimIp(),
             'snmpver' => 'v2c',
-            'port' => $this->getSnmpsim()->port,
+            'port' => $this->getSnmpsimPort(),
             'timeout' => 3,
             'retries' => 0,
             'snmp_max_repeaters' => 10,
