@@ -41,8 +41,8 @@ class RolesSeeder extends Seeder
 
         // update cache to know about the newly created permissions (required if using WithoutModelEvents in seeders)
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-        Role::create(['name' => 'admin']);
-        Role::create(['name' => 'global-read']);
-        Role::create(['name' => 'user']);
+        Role::findOrCreate('admin');
+        Role::findOrCreate('global-read');
+        Role::findOrCreate('user');
     }
 }
