@@ -30,10 +30,10 @@ return new class extends Migration
             ->where('assigned_roles.entity_type', 'App\\Models\\User') // Adjust namespace if needed
             ->select(
                 'assigned_roles.entity_id as user_id',
-                DB::raw('GROUP_CONCAT(roles.name ORDER BY roles.name ASC SEPARATOR ", ") as roles')
+                DB::raw('GROUP_CONCAT(roles.name ORDER BY roles.name ASC SEPARATOR ",") as roles')
             )
             ->groupBy('assigned_roles.entity_id')
-            ->get()->pluck('roles', 'user_id')->map(function ($roles) {
+            ->pluck('roles', 'user_id')->map(function ($roles) {
                 return explode(',', $roles);
             });
 
