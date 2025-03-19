@@ -39,7 +39,6 @@ return new class extends Migration
                 return $userRoles->pluck('role_name')->toArray();
             });
 
-
         $newRoleIds = DB::table('roles')->pluck('id', 'name');
 
         foreach ($rolesByUserId as $user_id => $roles) {
