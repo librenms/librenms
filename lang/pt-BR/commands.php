@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'config:clear' => [
+        'description' => 'Limpa o cache de configuração. Isso permitirá que quaisquer alterações feitas desde o último carregamento completo da configuração sejam refletidas na configuração atual.',
+    ],
     'config:get' => [
         'description' => 'Obter valor de configuração',
         'arguments' => [
@@ -63,6 +66,7 @@ return [
         'exit' => 'Ctrl-C para parar',
         'removed' => 'Dispositivo :id removido',
         'updated' => 'Dispositivo :hostname (:id) atualizado',
+        'setup' => 'Configurando snmpsim venv em :dir',
     ],
     'device:add' => [
         'description' => 'Adicionar um novo dispositivo',
@@ -75,7 +79,7 @@ return [
             'v3' => 'Usar SNMP v3',
             'display-name' => "Uma string para exibir como nome deste dispositivo, padrão é o nome do host.\nPode ser um modelo simples usando substituições: {{ \$hostname }}, {{ \$sysName }}, {{ \$sysName_fallback }}, {{ \$ip }}",
             'force' => 'Apenas adicione o dispositivo, não faça verificações de segurança',
-            'group' => 'Grupo de poller (para polling distribuído)',
+            'group' => 'Grupo de coletores de dados (para coletor de dados distribuído)',
             'ping-fallback' => 'Adicionar o dispositivo apenas para ping se não responder ao SNMP',
             'port-association-mode' => 'Define como as portas são mapeadas. ifName é sugerido para Linux/Unix',
             'community' => 'Comunidade SNMP v1 ou v2',
@@ -93,7 +97,7 @@ return [
         ],
         'validation-errors' => [
             'port.between' => 'A porta deve ser entre 1-65535',
-            'poller-group.in' => 'O grupo de poller fornecido não existe',
+            'poller-group.in' => 'O grupo de coletores de dados não existe',
         ],
         'messages' => [
             'save_failed' => 'Falha ao salvar dispositivo :hostname',
@@ -110,7 +114,7 @@ return [
     'device:poll' => [
         'description' => 'Obter dados do dispositivo(s) conforme definido pela descoberta',
         'arguments' => [
-            'device spec' => 'Especificação do dispositivo para poll: device_id, nome do host, curinga (*), ímpar, par, todos',
+            'device spec' => 'Especificação do dispositivo para coleta de dados: device_id, nome do host, curinga (*), ímpar, par, todos',
         ],
         'options' => [
             'modules' => 'Especificar módulo único a ser executado. Módulos separados por vírgulas, submódulos podem ser adicionados com /',
@@ -120,10 +124,10 @@ return [
             'db_connect' => 'Falha ao conectar ao banco de dados. Verifique se o serviço de banco de dados está em execução e as configurações de conexão.',
             'db_auth' => 'Falha ao conectar ao banco de dados. Verifique as credenciais: :error',
             'no_devices' => 'Nenhum dispositivo encontrado correspondendo à especificação fornecida.',
-            'none_up' => 'Dispositivo estava fora do ar, não foi possível fazer poll.|Todos os dispositivos estavam fora do ar, não foi possível fazer poll.',
-            'none_polled' => 'Nenhum dispositivo foi pollado.',
+            'none_up' => 'Dispositivo estava fora do ar, não foi possível fazer a coleta dos dados.|Todos os dispositivos estavam fora do ar, não foi possível fazer a coleta dos dados.',
+            'none_polled' => 'Nenhum dispositivo teve dados coletados.',
         ],
-        'polled' => 'Fez poll em :count dispositivos em :time',
+        'polled' => 'Fez a coleta de dados em :count dispositivos em :time',
     ],
     'key:rotate' => [
         'description' => 'Rotacionar APP_KEY, isso descriptografa todos os dados criptografados com a chave antiga fornecida e os armazena com a nova chave em APP_KEY.',
@@ -159,7 +163,7 @@ return [
         ],
     ],
     'maintenance:fetch-ouis' => [
-        'description' => 'Buscar MAC OUIs e armazená-los em cache para exibir nomes de fornecedores para endereços MAC',
+        'description' => 'Buscar MAC OUIs e armazená-los em cache para exibir nomes de fornecedores',
         'options' => [
             'force' => 'Ignorar quaisquer configurações ou bloqueios que impeçam a execução do comando',
             'wait' => 'Aguardar um tempo aleatório, usado pelo agendador para evitar sobrecarga do servidor',
@@ -188,7 +192,7 @@ return [
     'plugin:enable' => [
         'description' => 'Habilitar o plugin mais recente com o nome fornecido',
         'arguments' => [
-            'plugin' => 'O nome do plugin a ser habilitado ou "all" para desativar todos os plugins',
+            'plugin' => 'O nome do plugin a ser habilitado ou "todos" para desativar todos os plugins',
         ],
         'already_enabled' => 'Plugin já habilitado',
         'enabled' => ':count plugin habilitado|:count plugins habilitados',
@@ -200,7 +204,7 @@ return [
         'synthetic' => 'Campos adicionais:',
         'counts' => 'Contagens de relacionamento:',
         'arguments' => [
-            'device spec' => 'Especificação do dispositivo para poll: device_id, nome do host, curinga (*), ímpar, par, todos',
+            'device spec' => 'Especificação do dispositivo para coleta de dados: device_id, nome do host, curinga (*), ímpar, par, todos',
         ],
         'options' => [
             'list-fields' => 'Imprimir uma lista de campos válidos',
@@ -230,10 +234,11 @@ return [
     'snmp:fetch' => [
         'description' => 'Executar consulta SNMP em um dispositivo',
         'arguments' => [
-            'device spec' => 'Especificação do dispositivo para poll: device_id, nome do host, curinga (*), ímpar, par, todos',
+            'device spec' => 'Especificação do dispositivo para coleta de dados: device_id, nome do host, curinga (*), ímpar, par, todos',
             'oid(s)' => 'Um ou mais OID SNMP para buscar. Deve ser MIB::oid ou um oid numérico',
         ],
         'failed' => 'Comando SNMP falhou!',
+        'numeric' => 'Numérico',
         'oid' => 'OID',
         'options' => [
             'output' => 'Especificar o formato de saída :formats',
@@ -241,6 +246,7 @@ return [
             'depth' => 'Profundidade para agrupar a tabela snmp. Geralmente o mesmo número de itens no índice da tabela',
         ],
         'not_found' => 'Dispositivo não encontrado',
+        'textual' => 'Textual',
         'value' => 'Valor',
     ],
     'translation:generate' => [
@@ -261,5 +267,8 @@ return [
         'password-request' => 'Por favor, insira a senha do usuário',
         'success' => 'Usuário adicionado com sucesso: :username',
         'wrong-auth' => 'Aviso! Você não poderá fazer login com este usuário porque não está usando autenticação MySQL',
+    ],
+    'maintenance:database-cleanup' => [
+        'description' => 'Limpeza do banco de dados para remover itens órfãos.',
     ],
 ];

@@ -553,7 +553,7 @@
             "order": 1,
             "type": "text",
             "validate": {
-                "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\]))*$#"]
+                "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(:\\d+)?)*$#"]
             }
         },
         "auth_ad_require_groupmembership": {
@@ -686,7 +686,7 @@
             }
         },
         "auth_ldap_port": {
-            "default": 389,
+            "default": null,
             "group": "auth",
             "section": "ldap",
             "order": 1,
