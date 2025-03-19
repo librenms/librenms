@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Yaml\Yaml;
 
 class DocsTest extends TestCase
@@ -32,9 +33,7 @@ class DocsTest extends TestCase
     private $hidden_pages = [
     ];
 
-    /**
-     * @group docs
-     */
+    #[Group('docs')]
     public function testDocExist(): void
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));

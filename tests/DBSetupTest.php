@@ -51,7 +51,7 @@ class DBSetupTest extends DBTestCase
         $this->assertSame(0, $result, 'Errors loading DB Schema: ' . Artisan::output());
     }
 
-    public function testSchema()
+    public function testSchema(): void
     {
         $files = array_map(function ($migration_file) {
             return basename($migration_file, '.php');

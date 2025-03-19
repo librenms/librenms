@@ -32,6 +32,9 @@ use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Util\Debug;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 
 class OSDiscoveryTest extends TestCase
 {
@@ -61,12 +64,10 @@ class OSDiscoveryTest extends TestCase
     /**
      * Test each OS provided by osProvider
      *
-     * @group os
-     *
-     * @dataProvider osProvider
-     *
      * @param  string  $os_name
      */
+    #[Group('os')]
+    #[DataProvider('osProvider')]
     public function testOSDetection($os_name): void
     {
         if (! getenv('SNMPSIM')) {
@@ -97,9 +98,8 @@ class OSDiscoveryTest extends TestCase
 
     /**
      * Test that all files have been tested (removed from self::$unchecked_files
-     *
-     * @depends testOSDetection
      */
+    #[Depends('testOSDetection')]
     public function testAllFilesTested(): void
     {
         $this->assertEmpty(
