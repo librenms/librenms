@@ -28,6 +28,8 @@ namespace LibreNMS\Tests;
 use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -40,12 +42,10 @@ class MibTest extends TestCase
     /**
      * Test mib file in a directory for errors
      *
-     * @group mibs
-     *
-     * @dataProvider mibDirs
-     *
      * @param  string  $dir
      */
+    #[Group('mibs')]
+    #[DataProvider('mibDirs')]
     public function testMibDirectory($dir): void
     {
         $output = shell_exec('snmptranslate -M +' . Config::get('mib_dir') . ":$dir -m +ALL SNMPv2-MIB::system 2>&1");
@@ -57,14 +57,12 @@ class MibTest extends TestCase
     /**
      * Test that each mib only exists once.
      *
-     * @group mibs
-     *
-     * @dataProvider mibFiles
-     *
      * @param  string  $path
      * @param  string  $file
      * @param  string  $mib_name
      */
+    #[Group('mibs')]
+    #[DataProvider('mibFiles')]
     public function testDuplicateMibs($path, $file, $mib_name): void
     {
         global $console_color;
@@ -89,14 +87,12 @@ class MibTest extends TestCase
     /**
      * Test that the file name matches the mib name
      *
-     * @group mibs
-     *
-     * @dataProvider mibFiles
-     *
      * @param  string  $path
      * @param  string  $file
      * @param  string  $mib_name
      */
+    #[Group('mibs')]
+    #[DataProvider('mibFiles')]
     public function testMibNameMatches($path, $file, $mib_name): void
     {
         global $console_color;
@@ -109,14 +105,12 @@ class MibTest extends TestCase
     /**
      * Test each mib file for errors
      *
-     * @group mibs
-     *
-     * @dataProvider mibFiles
-     *
      * @param  string  $path
      * @param  string  $file
      * @param  string  $mib_name
      */
+    #[Group('mibs')]
+    #[DataProvider('mibFiles')]
     public function testMibContents($path, $file, $mib_name): void
     {
         global $console_color;

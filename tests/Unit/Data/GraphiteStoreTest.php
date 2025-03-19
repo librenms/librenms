@@ -28,10 +28,9 @@ namespace LibreNMS\Tests\Unit\Data;
 use Carbon\Carbon;
 use LibreNMS\Data\Store\Graphite;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group datastores
- */
+#[Group('datastores')]
 class GraphiteStoreTest extends TestCase
 {
     protected $timestamp = 997464400;

@@ -12,12 +12,12 @@ use LibreNMS\Tests\Browser\Pages\DashboardPage;
 use LibreNMS\Tests\Browser\Pages\LoginPage;
 use LibreNMS\Tests\Browser\Pages\TwoFactorPage;
 use LibreNMS\Tests\DuskTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Class LoginTest
- *
- * @group browser
  */
+#[Group('browser')]
 class LoginTest extends DuskTestCase
 {
     use DatabaseTruncation;
