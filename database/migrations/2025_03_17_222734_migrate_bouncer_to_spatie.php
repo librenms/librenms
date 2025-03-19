@@ -37,10 +37,10 @@ return new class extends Migration
                 return explode(',', $roles);
             });
 
-        $newRoleIds = DB::table('roles')->pluck( 'id', 'name');
+        $newRoleIds = DB::table('roles')->pluck('id', 'name');
 
         foreach ($rolesByUserId as $user_id => $roles) {
-            foreach($roles as $role) {
+            foreach ($roles as $role) {
                 DB::table('model_has_roles')->insert([
                     'role_id' => $newRoleIds[$role],
                     'model_type' => 'App\Models\User',
