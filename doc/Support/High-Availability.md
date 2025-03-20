@@ -55,6 +55,9 @@ A HA setup for the WebUI is achieved by running multiple instances of LibreNMS c
 
 Distributed polling allows multiple pollers to work together, providing load distribution and failover capability.
 
+Important! The poller does not support MySQL Galera clustering, so you need to use a TCP load balancer such as Nginx or HAProxy
+in front of the cluster to point to the cluster nodes.
+
 ### Implementation
 
 1. **Configure distributed polling**:
