@@ -8065,7 +8065,6 @@
                     "ospfv3_instance_id": 0,
                     "ospfv3_nbr_id": "2",
                     "ospfv3NbrIfId": 1147535360,
-                    "ospfv3NbrIfIndex": 2,
                     "ospfv3NbrIfInstId": 0,
                     "ospfv3NbrAddressType": "ipv6",
                     "ospfv3NbrAddress": "fe80::1d7:101:98cf:af80",
