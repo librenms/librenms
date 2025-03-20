@@ -42,7 +42,7 @@
                     <td>{{ trans('stp.designated_root') }}</td>
                     <td>
                         {{ \LibreNMS\Util\Mac::parse($instance['designatedRoot'])->readable() }}
-                        @if($url = \LibreNMS\Util\Url::deviceLink(\App\Facades\DeviceCache::get(\App\Models\Stp::where('bridgeAddress', $instance['designatedRoot'])->value('device_id'))))
+                        @if($url = \LibreNMS\Util\Url::deviceLink(\App\Facades\DeviceCache::get(\App\Models\Stp::where('bridgeAddress', $instance['designatedRoot'])->whereNot('bridgeAddress', '')->value('device_id'))))
                             ({!! $url !!})
                         @elseif($drVendor = \LibreNMS\Util\Mac::parse($instance['designatedRoot'])->vendor())
                             ({{ $drVendor }})
