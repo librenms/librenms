@@ -19,19 +19,21 @@ For simplicity, the web-ui and poller can be configured to use the same Redis Se
 
 ## Note about RRD Files
 
-Pollers need to write RRD data to files on disk to store polled data. To ensure high availability, it's recommended to use RRDCached which accept RRD data over TCP/IP. This allows multiple pollers to write to the same RRD files using network connection. This is outlined in [RRDCached.md](../Extensions/RRDCached.md).
+Pollers need to write RRD data to files on disk to store polled data. To ensure high availability, it's recommended to 
+use RRDCached which accept RRD data over TCP/IP. 
+This allows multiple pollers to write to the same RRD files using network connection.
+This is outlined in [RRDCached.md](../Extensions/RRDCached.md).
 
 You can also use a shared storage for the RRD files over NFS with GlusterFS or similar.
 
+
 ## WebUI High Availability
 
-A HA setup for the WebUI is achieved by running multiple instances of LibreNMS connected to the same backend services. This allows for load balancing and failover capabilities.
+The WebUI achieves HA through multiple LibreNMS instances sharing these backend services:
 
-### Requirements
-
-1. **Load Balancer**: A load balancer (such as HAProxy, NGINX, or cloud-based solutions) to distribute traffic across LibreNMS instances
-2. **High Availability Database**: MySQL/MariaDB with clustering
-3. **High Availability Redis**: For session management and caching
+- Clustered Database
+- Redis with Sentinel
+- Centralized RRD Storage
 
 ### Implementation
 
@@ -49,7 +51,7 @@ A HA setup for the WebUI is achieved by running multiple instances of LibreNMS c
    - Ensure identical `.env` configurations across all instances. Remember to set `APP_KEY` to the same value on all instances.
 
 4. **Configure RRD Access**:
-    Either use Use RRDCached that allows all instaces to access the same RRD files. Or use a shared storage for the RRD files over NFS or similar.
+    Either use Use RRDCached that allows all instances to access the same RRD files. Or use a shared storage for the RRD files over NFS or similar.
 
 ## Polling High Availability
 
