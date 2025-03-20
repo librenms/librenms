@@ -23,56 +23,32 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"blobs\":{\"bar\":\"1\",\"foo\":\" 2\"},\"warns\":[]}",
+                    "data": "{\"blobs\":{\"test\":\"foo\"},\"warns\":[]}",
                     "deleted_at": null
                 }
             ],
             "application_metrics": [
                 {
-                    "metric": "blobs___bar___exit",
+                    "metric": "blobs___test___exit",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "text_debug"
                 },
                 {
-                    "metric": "blobs___bar___exit_signal",
+                    "metric": "blobs___test___exit_signal",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "text_debug"
                 },
                 {
-                    "metric": "blobs___bar___has_coredump",
+                    "metric": "blobs___test___has_coredump",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "text_debug"
                 },
                 {
-                    "metric": "blobs___bar___size",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "text_debug"
-                },
-                {
-                    "metric": "blobs___foo___exit",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "text_debug"
-                },
-                {
-                    "metric": "blobs___foo___exit_signal",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "text_debug"
-                },
-                {
-                    "metric": "blobs___foo___has_coredump",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "text_debug"
-                },
-                {
-                    "metric": "blobs___foo___size",
-                    "value": 2,
+                    "metric": "blobs___test___size",
+                    "value": 3,
                     "value_prev": null,
                     "app_type": "text_debug"
                 },
