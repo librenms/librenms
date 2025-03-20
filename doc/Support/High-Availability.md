@@ -7,6 +7,16 @@ High Availability (HA) in LibreNMS ensures continuous operation and minimizes do
 - **Polling**: The data collection process
 - **WebUI**: The web interface for users
 
+To achieve high availability, you need to ensure that the following components are redundant:
+
+1. **Database**: MySQL/MariaDB with clustering
+2. **Redis w/ Redis Sentinel**: For session management and caching
+3. **RRD Files**: For storing polled data
+
+Also make sure that the **poller uses a distributed setup** which must be [LibreNMS Dispatcher service](../Extensions/Dispatcher-Service.md).
+
+For simplicity, the web-ui and poller can be configured to use the same Redis Sentinel cluster.
+
 ## Note about RRD Files
 
 Pollers need to write RRD data to files on disk to store polled data. To ensure high availability, it's recommended to use RRDCached which accept RRD data over TCP/IP. This allows multiple pollers to write to the same RRD files using network connection. This is outlined in [RRDCached.md](../Extensions/RRDCached.md).
