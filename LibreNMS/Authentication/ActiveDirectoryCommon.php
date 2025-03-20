@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Authentication;
 
+use LDAP\Connection;
 use LibreNMS\Config;
 
 trait ActiveDirectoryCommon
@@ -219,5 +220,5 @@ trait ActiveDirectoryCommon
      *
      * @return resource
      */
-    abstract protected function getConnection();
+    abstract protected function getConnection(): ?Connection;
 }

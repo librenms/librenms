@@ -144,7 +144,7 @@ class User extends Authenticatable
         return false;
     }
 
-    public function getNotifications(string $type = null): int|Collection
+    public function getNotifications(?string $type = null): int|Collection
     {
         return match ($type) {
             'total' => $this->notifications()->count(),

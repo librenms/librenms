@@ -28,10 +28,9 @@ use InfluxDB\Point;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\InfluxDB;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group datastores
- */
+#[Group('datastores')]
 class InfluxDBStoreTest extends TestCase
 {
     public function testBadSettings(): void

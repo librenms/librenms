@@ -39,7 +39,7 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
      */
     private $validationResults;
 
-    public function __construct($validationResults, $message = '', $code = 0, Throwable $previous = null)
+    public function __construct($validationResults, $message = '', $code = 0, ?Throwable $previous = null)
     {
         $this->validationResults = $validationResults;
         parent::__construct($message, $code, $previous);
@@ -48,16 +48,20 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
     public static function upgrade($exception)
     {
         if ($exception instanceof QueryException || $exception->getPrevious() instanceof QueryException) {
-            $validator = new Validator();
-            (new Database())->validate($validator);
+            try {
+                $validator = new Validator();
+                (new Database())->validate($validator);
 
-            // get only failed results
-            $results = array_filter($validator->getResults('database'), function (ValidationResult $result) {
-                return $result->getStatus() === ValidationResult::FAILURE;
-            });
+                // get only failed results
+                $results = array_filter($validator->getResults('database'), function (ValidationResult $result) {
+                    return $result->getStatus() === ValidationResult::FAILURE;
+                });
 
-            if ($results) {
-                return new static($results, $exception->getMessage(), 0, $exception);
+                if ($results) {
+                    return new static($results, $exception->getMessage(), 0, $exception);
+                }
+            } catch (\Exception) {
+                return null;
             }
         }
 

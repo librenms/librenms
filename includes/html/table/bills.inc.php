@@ -55,7 +55,7 @@ if (! Auth::user()->hasGlobalRead()) {
     $param[] = Auth::id();
 }
 
-if (sizeof($wheres) > 0) {
+if (count($wheres) > 0) {
     $query .= 'WHERE ' . implode(' AND ', $wheres) . "\n";
 }
 $orderby = 'ORDER BY bills.bill_name';

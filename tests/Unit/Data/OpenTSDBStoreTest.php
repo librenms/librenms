@@ -26,12 +26,12 @@
 namespace LibreNMS\Tests\Unit\Data;
 
 use Carbon\Carbon;
+use LibreNMS\Config;
 use LibreNMS\Data\Store\OpenTSDB;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group datastores
- */
+#[Group('datastores')]
 class OpenTSDBStoreTest extends TestCase
 {
     protected $timestamp = 990464400;
@@ -42,12 +42,14 @@ class OpenTSDBStoreTest extends TestCase
 
         // fix the date
         Carbon::setTestNow(Carbon::createFromTimestamp($this->timestamp));
+        Config::set('opentsdb.enable', true);
     }
 
     protected function tearDown(): void
     {
         // restore Carbon:now() to normal
         Carbon::setTestNow();
+        Config::set('opentsdb.enable', false);
 
         parent::tearDown();
     }
@@ -57,7 +59,7 @@ class OpenTSDBStoreTest extends TestCase
         $mockFactory = \Mockery::mock(\Socket\Raw\Factory::class);
 
         $mockFactory->shouldReceive('createClient')
-            ->andThrow('Socket\Raw\Exception', 'Failed to handle connect exception');
+            ->andThrow('Socket\Raw\Exception', 'Failed to handle connect exception')->once();
 
         new OpenTSDB($mockFactory);
     }
@@ -68,7 +70,7 @@ class OpenTSDBStoreTest extends TestCase
         $opentsdb = $this->mockOpenTSDB($mockSocket);
 
         $mockSocket->shouldReceive('write')
-            ->andThrow('Socket\Raw\Exception', 'Did not handle socket exception');
+            ->andThrow('Socket\Raw\Exception', 'Did not handle socket exception')->once();
 
         $opentsdb->put(['hostname' => 'test'], 'fake', [], ['one' => 1]);
     }
@@ -84,9 +86,9 @@ class OpenTSDBStoreTest extends TestCase
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
 
         $mockSocket->shouldReceive('write')
-            ->with("put net.testmeasure $this->timestamp 234234.000000 hostname=testhost ifName=testifname type=testtype key=ifIn\n");
+            ->with("put net.testmeasure $this->timestamp 234234.000000 hostname=testhost ifName=testifname type=testtype key=ifIn\n")->once();
         $mockSocket->shouldReceive('write')
-            ->with("put net.testmeasure $this->timestamp 53453.000000 hostname=testhost ifName=testifname type=testtype key=ifOut\n");
+            ->with("put net.testmeasure $this->timestamp 53453.000000 hostname=testhost ifName=testifname type=testtype key=ifOut\n")->once();
         $opentsdb->put($device, $measurement, $tags, $fields);
     }
 
@@ -101,9 +103,9 @@ class OpenTSDBStoreTest extends TestCase
         $fields = ['ifIn' => 897238, 'ifOut' => 2342];
 
         $mockSocket->shouldReceive('write')
-            ->with("put net.port.ifin $this->timestamp 897238.000000 hostname=testhost ifName=testifname type=testtype\n");
+            ->with("put net.port.ifin $this->timestamp 897238.000000 hostname=testhost ifName=testifname type=testtype\n")->once();
         $mockSocket->shouldReceive('write')
-            ->with("put net.port.ifout $this->timestamp 2342.000000 hostname=testhost ifName=testifname type=testtype\n");
+            ->with("put net.port.ifout $this->timestamp 2342.000000 hostname=testhost ifName=testifname type=testtype\n")->once();
         $opentsdb->put($device, $measurement, $tags, $fields);
     }
 
