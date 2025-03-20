@@ -25,10 +25,10 @@ jobs:
 
       -
         name: Lint Code Base
-        uses: super-linter/super-linter@v7
+        uses: docker://ghcr.io/github/super-linter:slim-v4
         env:
           VALIDATE_BASH: true
-          VALIDATE_PHP_BUILTIN: true
+          # VALIDATE_PHP_BUILTIN: true # temp disable until it supports PHP 8.1
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_PYTHON_BLACK: true
 
