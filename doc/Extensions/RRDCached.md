@@ -50,7 +50,7 @@ T = Tune RRD files.
 
 It is recommended that you monitor your LibreNMS server with LibreNMS
 so you can view the disk I/O usage delta.
-This can be done with the [RRDCached plugin](applications/RRDCached.md).
+This can be done with the [RRDCached plugin](Applications/RRDCached.md).
 
 
 ## Installation
