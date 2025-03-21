@@ -13,11 +13,8 @@ jobs:
   dusk-php:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       -
         name: Init env
         run: |
@@ -38,23 +35,56 @@ jobs:
       - name: Create Database
         run: |
           sudo systemctl start mysql
-          mysql --user="root" --password="root" -e "CREATE DATABASE \`librenms_phpunit_78hunjuybybh\` character set UTF8mb4 collate utf8mb4_bin;"
+          mysql --user="root" --password="root" -e "CREATE DATABASE librenms_phpunit_78hunjuybybh character set utf8mb4 collate utf8mb4_unicode_ci;"
+      - name: Enable MySQL Query Log
+        run: mysql --user="root" --password="root" -e "SET GLOBAL general_log_file='/var/log/mysql/mysql_query.log'; SET GLOBAL log_output = 'FILE'; SET GLOBAL log_output = 'FILE'; SET GLOBAL general_log = 1; SHOW VARIABLES LIKE 'general_log%';"
       - name: Setup SQLite
         run: sqlite3 database/testing.sqlite ""
+      -
+        name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      -
+        name: Cache composer
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-${{ matrix.php }}-${{ secrets.CACHE_VERSION }}-
       - name: Install Composer Dependencies
         run: composer install --no-progress --prefer-dist --optimize-autoloader
       - name: Generate Application Key
         run: php artisan key:generate
       - name: Migrate Database
-        run: php artisan migrate --database=testing
+        run: php artisan migrate
+      - name: Migrate Test Database
+        run: php artisan migrate --env=testing
       - name: Upgrade Chrome Driver
         run: php artisan dusk:chrome-driver --detect
       - name: Start Chrome Driver
         run: ./vendor/laravel/dusk/bin/chromedriver-linux --port=9515 &
       - name: Run Laravel Server
         run: php artisan serve --no-reload &
+      - name: sleep
+        run: sleep 3
+      - name: dump home
+        run: curl http://127.0.0.1:8000/login
       - name: Run Dusk Tests
         run: php artisan dusk
+      - name: Dump LibreNMS logs
+        if: failure()
+        run: cat logs/librenms.log || true
+      - name: copy log file
+        if: failure()
+        run: |
+          sudo mv /var/log/mysql/mysql_query.log ./logs/mysql_query.log
+          sudo chmod 744 ./logs/mysql_query.log
+      - name: Upload MySQL query log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mysql-query-log
+          path: ./logs/mysql_query.log
       - name: Upload Screenshots
         if: failure()
         uses: actions/upload-artifact@v4
