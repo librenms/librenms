@@ -40,6 +40,9 @@ class StateTranslation extends Model implements Keyable
         'state_value',
         'state_generic_value',
     ];
+    protected $casts = [
+        'state_generic_value' => 'integer',
+    ];
 
     public function stateIndex(): BelongsTo
     {
