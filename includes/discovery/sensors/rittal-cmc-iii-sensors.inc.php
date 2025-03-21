@@ -27,7 +27,7 @@ use LibreNMS\Util\StringHelpers;
 
 $cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', [], 'RITTAL-CMC-III-MIB', null);
 $cmc_iii_sensors = [];
-$last_index_prefix = $current_index_prefix = "";
+$last_index_prefix = $current_index_prefix = '';
 $unique_desc_counter = [];
 
 foreach ($cmc_iii_var_table as $index => $entry) {
@@ -38,7 +38,9 @@ foreach ($cmc_iii_var_table as $index => $entry) {
     $sensor_id = count($cmc_iii_sensors);
 
     $index_r = explode('.', $index);
-    if( count($index_r) > 1 ) $current_index_prefix = $index_r[0];
+    if (count($index_r) > 1) {
+        $current_index_prefix = $index_r[0];
+    }
 
     if ($cmc_iii_sensors[$sensor_id]['name'] != $sensor_name || $last_index_prefix != $current_index_prefix) {
         if ($sensor_id == 0) {
@@ -53,7 +55,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
         $cmc_iii_sensors[$sensor_id]['desc'] = $sensor_desc;
 
         // count descriptions => used to generate unique description count suffix later
-        if (!isset($unique_desc_counter[$sensor_desc])) {
+        if (! isset($unique_desc_counter[$sensor_desc])) {
             $unique_desc_counter[$sensor_desc] = [];
         }
         array_push($unique_desc_counter[$sensor_desc], $sensor_id);
