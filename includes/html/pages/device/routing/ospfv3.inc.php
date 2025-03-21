@@ -65,6 +65,7 @@ foreach ($instances as $instance) {
                         <tr>
                           <th>Area ID</th>
                           <th>Ports(Enabled)</th>
+                          <th>LSAs</th>
                           <th>Status</th>
                         </tr>
                       </thead>';
@@ -77,6 +78,7 @@ foreach ($instances as $instance) {
                         <tr>
                           <td>' . long2ip($area->ospfv3AreaId) . '</td>
                           <td>' . $area_port_count . '(' . $area_port_count_enabled . ')</td>
+                          <td>' . $area->ospfv3AreaScopeLsaCount . '</td>
                           <td><span class="label label-' . $status_color . '">' . $instance->ospfv3AdminStatus . '</span></td>
                         </tr>
                       </tbody>';

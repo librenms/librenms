@@ -27,8 +27,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Ospfv3Area extends DeviceRelatedModel
+class Ospfv3Area extends DeviceRelatedModel implements Keyable
 {
     public $timestamps = false;
     protected $fillable = [
@@ -57,5 +58,10 @@ class Ospfv3Area extends DeviceRelatedModel
     public function ospfv3Ports(): HasMany
     {
         return $this->hasMany(Ospfv3Port::class);
+    }
+
+    public function getCompositeKey(): string
+    {
+        return "$this->device_id-$this->ospfv3AreaId-$this->context_name";
     }
 }
