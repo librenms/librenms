@@ -239,6 +239,44 @@ $(document).ready(function () {
     }, 300000);
 });
 
+// Add export button to bootgrid tables
+$(document).on('initialized.rs.jquery.bootgrid', function(e) {
+    var grid = $(e.target);
+    var tableId = grid.attr('id');
+    
+    if ($('#' + tableId + '-export-button').length === 0) {
+        var exportUrl = grid.data('ajaxurl');
+        // legacy table
+        if (exportUrl && exportUrl.indexOf('ajax_table_export.php') === -1) {
+            exportUrl += '/export';
+        }
+
+        if (exportUrl) {
+            var actionsContainer = null;
+            var panel = grid.closest('.panel');
+            
+            if (panel.length) {
+                actionsContainer = panel.find('div.actions');
+            }
+            
+            if (actionsContainer && actionsContainer.length) {
+                var exportButton = $(
+                    '<div id="' + tableId + '-export-button" class="btn-group mr-2 bootgrid-export-button">' +
+                    '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                    '<i class="fa fa-download"></i> <span class="caret"></span>' +
+                    '</button>' +
+                    '<ul class="dropdown-menu">' +
+                    '<li><a href="' + exportUrl + '" target="_blank"><i class="fa fa-file-text-o"></i> Export to CSV</a></li>' +
+                    '</ul>' +
+                    '</div>'
+                );
+                
+                actionsContainer.prepend(exportButton);
+            }
+        }
+    }
+});
+
 var jsFilesAdded = [];
 var jsLoadingFiles = {};
 function loadjs(filename, func){
