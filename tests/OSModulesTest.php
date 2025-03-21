@@ -36,6 +36,8 @@ use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Number;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Util\Color;
 
 class OSModulesTest extends DBTestCase
@@ -65,11 +67,9 @@ class OSModulesTest extends DBTestCase
 
     /**
      * Test all modules for a particular OS
-     *
-     * @group os
-     *
-     * @dataProvider dumpedDataProvider
      */
+    #[Group('os')]
+    #[DataProvider('dumpedDataProvider')]
     public function testDataIsValid($os, $variant, $modules): void
     {
         // special case if data provider throws exception
@@ -83,14 +83,12 @@ class OSModulesTest extends DBTestCase
     /**
      * Test all modules for a particular OS
      *
-     * @group os
-     *
-     * @dataProvider dumpedDataProvider
-     *
      * @param  string  $os  base os
      * @param  string  $variant  optional variant
      * @param  array  $modules  modules to test for this os
      */
+    #[Group('os')]
+    #[DataProvider('dumpedDataProvider')]
     public function testOS($os, $variant, $modules): void
     {
         // Lock testing time
@@ -106,7 +104,7 @@ class OSModulesTest extends DBTestCase
 
             $filename = $helper->getJsonFilepath(true);
             $expected_data = $helper->getTestData();
-            $results = $helper->generateTestData($this->getSnmpsim(), true);
+            $results = $helper->generateTestData($this->getSnmpsimIp(), $this->getSnmpsimPort(), true);
         } catch (FileNotFoundException|InvalidModuleException $e) {
             $this->fail($e->getMessage());
         }
@@ -128,9 +126,15 @@ class OSModulesTest extends DBTestCase
                 continue;
             }
 
-            if ($expected_data[$module]['poller'] !== 'matches discovery') {
-                $expected = $expected_data[$module]['poller'] ?? null;
+            if (isset($expected_data[$module]['poller'])) {
+                if ($expected_data[$module]['poller'] !== 'matches discovery') {
+                    $expected = $expected_data[$module]['poller']; // we have specific poller data, update expected
+                }
+            // pass through discovery expected data
+            } else {
+                $expected = null; // no poller data, clear discovery's expected
             }
+
             $actual = $results[$module]['poller'] ?? null;
             $this->checkTestData($expected, $actual, 'Polled', $os, $module, $filename, $helper, $phpunit_debug);
         }
@@ -141,7 +145,7 @@ class OSModulesTest extends DBTestCase
         $this->travelBack();
     }
 
-    public function dumpedDataProvider()
+    public static function dumpedDataProvider(): array
     {
         $modules = [];
 

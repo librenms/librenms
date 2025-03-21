@@ -33,6 +33,7 @@ use App\Models\Device;
 use App\Models\IsisAdjacency;
 use App\Models\Mpls;
 use App\Models\OspfInstance;
+use App\Models\Ospfv3Instance;
 use App\Models\Port;
 use App\Models\PrinterSupply;
 use App\Models\Pseudowire;
@@ -70,6 +71,7 @@ class ObjectCache
                 'vrf' => Vrf::hasAccess($user)->count(),
                 'mpls' => Mpls::hasAccess($user)->count(),
                 'ospf' => OspfInstance::hasAccess($user)->count(),
+                'ospfv3' => Ospfv3Instance::hasAccess($user)->count(),
                 'isis' => IsisAdjacency::hasAccess($user)->count(),
                 'cisco-otv' => Component::hasAccess($user)->where('type', 'Cisco-OTV')->count(),
                 'bgp' => BgpPeer::hasAccess($user)->count(),
@@ -233,6 +235,40 @@ class ObjectCache
                 case 'ignored':
                     return $query->isIgnored()->count();
                 case 'disabled':
+                    return $query->isDisabled()->count();
+                case 'total':
+                default:
+                    return $query->count();
+            }
+        });
+    }
+
+    /**
+     * @param  array  $fields  array of counts to get. Valid options: total, ok, critical, disable_notify
+     * @return array
+     */
+    public static function sensorCounts($fields = ['total'], $device_id = 0)
+    {
+        $result = [];
+        foreach ($fields as $field) {
+            $result[$field] = self::getSensorCount($field, $device_id);
+        }
+
+        return $result;
+    }
+
+    private static function getSensorCount($field, $device_id)
+    {
+        return Cache::remember("ObjectCache:sensor_{$field}_count:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
+            $query = Sensor::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+                $query->where('device_id', $device_id);
+            });
+            switch ($field) {
+                case 'ok':
+                    return $query->count() - $query->isCritical()->count();
+                case 'critical':
+                    return $query->isCritical()->count();
+                case 'disable_notify':
                     return $query->isDisabled()->count();
                 case 'total':
                 default:

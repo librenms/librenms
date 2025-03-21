@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Eventlog;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -122,7 +123,7 @@ if (count($added_sets) > 0 || count($removed_sets) > 0) {
     $log_message = 'Poudriere jail/ports/sets Change:';
     $log_message .= count($added_sets) > 0 ? ' Added ' . implode(',', $added_sets) : '';
     $log_message .= count($removed_sets) > 0 ? ' Removed ' . implode(',', $added_sets) : '';
-    log_event($log_message, $device, 'application');
+    Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
 // all done so update the app metrics

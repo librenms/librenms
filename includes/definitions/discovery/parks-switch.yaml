@@ -1,0 +1,66 @@
+mib: PARKS-PK700
+modules:
+    mempools:
+        data:
+            -
+                free: '.1.3.6.1.4.1.50224.3.1.1.17.0'
+                percent_used: '.1.3.6.1.4.1.50224.3.1.1.18.0'
+                descr: Memory
+    processors:
+        data:
+            -
+                oid:  cpuUsage
+                num_oid: '.1.3.6.1.4.1.50224.3.1.1.17.0'
+                descr: Processor
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid: 
+                        - modulePortName
+                        - moduleState
+        temperature:
+            data:
+                -
+                    oid: mainChipTemperature
+                    num_oid: '.1.3.6.1.4.1.50224.3.1.1.23.0'  # OID do sensor de temperatura
+                    descr: "Chip temperature"
+                -
+                    oid:  moduleTemperature
+                    num_oid: '.1.3.6.1.4.1.50224.3.2.4.1.8.{{ $index }}'  # OID do sensor de temperatura
+                    descr: 'SFP Temperature {{ $modulePortName }}'
+                    divisor: 100
+                    index: 'moduleTemperature.{{ $index }}'
+                    skip_value_lt: 1
+        dbm:
+            data:
+                -
+                    oid: moduleRxPower
+                    num_oid: '.1.3.6.1.4.1.50224.3.2.4.1.12.{{ $index }}'
+                    descr: 'Rx Port {{ $modulePortName }}'
+                    divisor: 100
+                    index: 'moduleRxPower.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: moduleRxPower
+                            op: '='
+                            value: -2147483648
+                        -
+                            oid: moduleState
+                            op: '='
+                            value: 1
+                -
+                    oid: moduleTxPower
+                    num_oid: '.1.3.6.1.4.1.50224.3.2.4.1.11.{{ $index }}'
+                    descr: 'Tx Port {{ $modulePortName }}'
+                    divisor: 100
+                    index: 'moduleTxPower.{{ $index }}'
+                    skip_values:
+                       -
+                           oid: moduleTxPower
+                           op: '='
+                           value: -2147483648
+                       -
+                           oid: moduleState
+                           op: '='
+                           value: 1

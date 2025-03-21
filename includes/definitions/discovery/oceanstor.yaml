@@ -3,6 +3,15 @@ modules:
     os:
         version: ISM-STORAGE-SVC-MIB::version.0
         serial: ISM-STORAGE-SVC-MIB::deviceId.0
+    storage:
+        data:
+            -
+                descr: File System
+                type: dsk
+                size: ISM-STORAGE-SVC-MIB::totalCapacity.0
+                used: ISM-STORAGE-SVC-MIB::usedCapacity.0
+                used_num_oid: .1.3.6.1.4.1.34774.4.1.1.4.0
+                units: 1048576
     sensors:
         temperature:
             data:

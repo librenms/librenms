@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
@@ -70,18 +71,26 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'percent' => 'percent',
     ];
 
-    // ---- Helper Functions ----
+    // ---- Helper Methods ----
 
-    public function classDescr()
+    public function classDescr(): string
     {
-        $nice = collect([
-            'ber' => 'BER',
-            'dbm' => 'dBm',
-            'eer' => 'EER',
-            'snr' => 'SNR',
-        ]);
+        return __('sensors.' . $this->sensor_class . '.short');
+    }
 
-        return $nice->get($this->sensor_class, ucwords(str_replace('_', ' ', $this->sensor_class)));
+    public function classDescrLong(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.long');
+    }
+
+    public function unit(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.unit');
+    }
+
+    public function unitLong(): string
+    {
+        return __('sensors.' . $this->sensor_class . '.unit_long');
     }
 
     public function icon()
@@ -135,12 +144,10 @@ class Sensor extends DeviceRelatedModel implements Keyable
      */
     public function formatValue(): string
     {
-        $units = __('sensors.' . $this->sensor_class . '.unit');
-
         return match ($this->sensor_class) {
-            'current', 'power' => Number::formatSi($this->sensor_current, 3, 3, $units),
-            'dbm' => round($this->sensor_current, 3) . " $units",
-            default => "$this->sensor_current $units",
+            'current', 'power' => Number::formatSi($this->sensor_current, 3, 0, $this->unit()),
+            'dbm' => round($this->sensor_current, 3) . ' ' . $this->unit(),
+            default => $this->sensor_current . ' ' . $this->unit(),
         };
     }
 
@@ -164,6 +171,18 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return Severity::Ok;
     }
 
+    public function hasThresholds(): bool
+    {
+        return $this->sensor_limit_low !== null
+            || $this->sensor_limit_low_warn !== null
+            || $this->sensor_limit_warn !== null
+            || $this->sensor_limit !== null;
+    }
+
+    public function doesntHaveThresholds(): bool
+    {
+        return ! $this->hasThresholds();
+    }
     // ---- Define Relationships ----
 
     public function events(): MorphMany
@@ -189,6 +208,25 @@ class Sensor extends DeviceRelatedModel implements Keyable
     public function syncGroup(): string
     {
         return "$this->sensor_class-$this->poller_type";
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public function scopeIsCritical($query)
+    {
+        return $query->whereColumn('sensor_current', '<', 'sensor_limit_low')
+            ->orWhereColumn('sensor_current', '>', 'sensor_limit');
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public function scopeIsDisabled($query)
+    {
+        return $query->where('sensor_alert', 0);
     }
 
     public function __toString()

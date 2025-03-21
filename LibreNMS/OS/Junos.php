@@ -25,9 +25,9 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\EntPhysical;
-use App\Models\Port;
 use App\Models\Sla;
 use App\Models\Transceiver;
 use Carbon\Carbon;
@@ -59,7 +59,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         preg_match('/Juniper Networks, Inc. (?<hardware>\S+) .* kernel JUNOS (?<version>[^, ]+)[, ]/', $device->sysDescr, $parsed);
         if (isset($data[2]['hrSWInstalledName'])) {
-            preg_match('/\[(.+)]/', $data[2]['hrSWInstalledName'], $parsedVersion);
+            preg_match('/^JUNOS.*\[(.+?)]/', $data[2]['hrSWInstalledName'], $parsedVersion);
         }
 
         $device->hardware = $data[0]['jnxBoxDescr'] ?? (isset($parsed['hardware']) ? 'Juniper ' . strtoupper($parsed['hardware']) : null);
@@ -297,17 +297,16 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
     public function discoverTransceivers(): Collection
     {
-        $ifIndexToPortId = Port::query()->where('device_id', $this->getDeviceId())->select(['port_id', 'ifIndex', 'ifName'])->get()->keyBy('ifIndex');
         $entPhysical = SnmpQuery::walk('ENTITY-MIB::entityPhysical')->table(1);
 
-        $jnxDomCurrentTable = SnmpQuery::cache()->walk('JUNIPER-DOM-MIB::jnxDomCurrentTable')->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId, $entPhysical) {
-            $ent = $this->findTransceiverEntityByPortName($entPhysical, $ifIndexToPortId->get($ifIndex)?->ifName);
+        $jnxDomCurrentTable = SnmpQuery::cache()->walk('JUNIPER-DOM-MIB::jnxDomCurrentTable')->mapTable(function ($data, $ifIndex) use ($entPhysical) {
+            $ent = $this->findTransceiverEntityByPortName($entPhysical, PortCache::getNameFromIfIndex($ifIndex, $this->getDevice()));
             if (empty($ent)) {
                 return null; // no module
             }
 
             return new Transceiver([
-                'port_id' => $ifIndexToPortId->get($ifIndex)->port_id,
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
                 'type' => $ent['ENTITY-MIB::entPhysicalName'] ?? null,
                 'vendor' => $ent['ENTITY-MIB::entPhysicalMfgName'] ?? null,
@@ -325,27 +324,57 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         // could use improvement by mapping JUNIPER-IFOPTICS-MIB::jnxOpticsConfigTable for a tiny bit more info
         return SnmpQuery::cache()->walk('JUNIPER-IFOPTICS-MIB::jnxOpticsPMCurrentTable')
-            ->mapTable(function ($data, $ifIndex) use ($ifIndexToPortId) {
+            ->mapTable(function ($data, $ifIndex) {
                 return new Transceiver([
-                    'port_id' => $ifIndexToPortId->get($ifIndex)->port_id,
+                    'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex),
                     'index' => $ifIndex,
                     'entity_physical_index' => $ifIndex,
                 ]);
             });
     }
 
-    private function findTransceiverEntityByPortName(array $entPhysical, string $ifName): array
+    private function findTransceiverEntityByPortName(array $entPhysical, ?string $ifName): array
     {
-        if (preg_match('#-(\d+/\d+/\d+)#', $ifName, $matches)) {
-            $expected_tail = ' @ ' . $matches[1];
+        if (! $ifName) {
+            return [];
+        }
 
-            foreach ($entPhysical as $entity) {
-                if (isset($entity['ENTITY-MIB::entPhysicalDescr']) && str_ends_with($entity['ENTITY-MIB::entPhysicalDescr'], $expected_tail)) {
-                    return $entity;
+        // Regex to capture three digit-groups (FPC/PIC/Port) from the ifName
+        // e.g., et-0/0/0, et-0/0/0:2.0, et-1/2/3:100
+        if (! preg_match('#-(\d+)/(\d+)/(\d+)#', $ifName, $matches)) {
+            // No match; bail out.
+            return [];
+        }
+
+        // [0] is the full match, [1..3] are captures
+        [, $fpc, $pic, $port] = $matches;
+
+        // EVO result from QFX5130     - ENTITY-MIB::entPhysicalDescr[75] = QSFP56-DD-400GBASE-DR4 @ /Chassis[0]/Fpc[0]/Pic[0]/Port[0]
+        // non-EVO result from QFX5120 - ENTITY-MIB::entPhysicalDescr[287] = QSFP28-100G-AOC-3M @ 0/0/1
+        $expectedSuffixes = [
+            // Short form, e.g. " @ 0/0/1"
+            ' @ ' . $fpc . '/' . $pic . '/' . $port,
+
+            // Chassis form, e.g. " @ /Chassis[0]/Fpc[0]/Pic[0]/Port[0]"
+            ' @ /Chassis[0]/Fpc[' . $fpc . ']/Pic[' . $pic . ']/Port[' . $port . ']',
+        ];
+
+        // Check if any entity description ends with one of the expected suffixes
+        foreach ($entPhysical as $entity) {
+            if (! isset($entity['ENTITY-MIB::entPhysicalDescr'])) {
+                continue;
+            }
+
+            $descr = $entity['ENTITY-MIB::entPhysicalDescr'];
+
+            foreach ($expectedSuffixes as $suffix) {
+                if (str_ends_with($descr, $suffix)) {
+                    return $entity; // Found a match
                 }
             }
         }
 
+        // Nothing matched
         return [];
     }
 }

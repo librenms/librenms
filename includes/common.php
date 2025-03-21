@@ -180,18 +180,6 @@ function get_port_by_id($port_id)
     }
 }
 
-function get_device_id_by_port_id($port_id)
-{
-    if (is_numeric($port_id)) {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_numeric($device_id)) {
-            return $device_id;
-        } else {
-            return false;
-        }
-    }
-}
-
 function ifclass($ifOperStatus, $ifAdminStatus)
 {
     // fake a port model
@@ -201,13 +189,6 @@ function ifclass($ifOperStatus, $ifAdminStatus)
 function device_by_name($name)
 {
     return device_by_id_cache(getidbyname($name));
-}
-
-function accesspoint_by_id($ap_id, $refresh = '0')
-{
-    $ap = dbFetchRow('SELECT * FROM `access_points` WHERE `accesspoint_id` = ?', [$ap_id]);
-
-    return $ap;
 }
 
 function device_by_id_cache($device_id, $refresh = false)
@@ -222,40 +203,9 @@ function device_by_id_cache($device_id, $refresh = false)
     return $device;
 }
 
-function truncate($substring, $max = 50, $rep = '...')
-{
-    if (strlen($substring) < 1) {
-        $string = $rep;
-    } else {
-        $string = $substring;
-    }
-    $leave = $max - strlen($rep);
-    if (strlen($string) > $max) {
-        return substr_replace($string, $rep, $leave);
-    } else {
-        return $string;
-    }
-}
-
 function gethostbyid($device_id)
 {
     return DeviceCache::get((int) $device_id)->hostname;
-}
-
-function strgen($length = 16)
-{
-    $entropy = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e',
-        'E', 'f', 'F', 'g', 'G', 'h', 'H', 'i', 'I', 'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n',
-        'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R', 's', 'S', 't', 'T', 'u', 'U', 'v', 'V', 'w',
-        'W', 'x', 'X', 'y', 'Y', 'z', 'Z', ];
-    $string = '';
-
-    for ($i = 0; $i < $length; $i++) {
-        $key = mt_rand(0, 61);
-        $string .= $entropy[$key];
-    }
-
-    return $string;
 }
 
 function getifbyid($id)
@@ -268,19 +218,9 @@ function getidbyname($hostname)
     return DeviceCache::getByHostname($hostname)->device_id;
 }
 
-function zeropad($num, $length = 2)
-{
-    return str_pad($num, $length, '0', STR_PAD_LEFT);
-}
-
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
     return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
-}
-
-function get_dev_attribs($device_id)
-{
-    return DeviceCache::get((int) $device_id)->getAttribs();
 }
 
 function get_dev_attrib($device, $attrib_type)
@@ -418,22 +358,6 @@ function is_customoid_graph($type, $subtype)
 } // is_customoid_graph
 
 /**
- * Parse location field for coordinates
- *
- * @param string location The location field to look for coords in.
- * @return array|bool Containing the lat and lng coords
- **/
-function parse_location($location)
-{
-    preg_match('/\[(-?[0-9. ]+), *(-?[0-9. ]+)\]/', $location, $tmp_loc);
-    if (is_numeric($tmp_loc[1]) && is_numeric($tmp_loc[2])) {
-        return ['lat' => $tmp_loc[1], 'lng' => $tmp_loc[2]];
-    }
-
-    return false;
-}//end parse_location()
-
-/**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
  *
  * @param  string  $ip  A binary string containing an IP address, as returned from MySQL's INET6_ATON function
@@ -525,7 +449,9 @@ function get_ports_mapped($device_id, $with_statistics = false)
 function get_port_id($ports_mapped, $port, $port_association_mode)
 {
     // Get port_id according to port_association_mode used for this device
-    $port_id = null;
+    if (! in_array($port_association_mode, ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
+        return null;
+    }
 
     /*
      * Information an all ports is available through $ports_mapped['ports']
@@ -536,11 +462,15 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
     */
     $maps = $ports_mapped['maps'];
 
-    if (in_array($port_association_mode, ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
-        $port_id = $maps[$port_association_mode][$port[$port_association_mode]] ?? null;
+    // get the port association key
+    $key = null;
+    if (isset($port[$port_association_mode])) {
+        $key = $port[$port_association_mode];
+    } elseif ($port_association_mode == 'ifName' && isset($port['ifDescr'])) {
+        $key = $port['ifDescr']; // port does not have ifName, try ifDescr otherwise ports will break
     }
 
-    return $port_id;
+    return $maps[$port_association_mode][$key] ?? null;
 }
 
 /**
@@ -555,7 +485,7 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
  */
 function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
 {
-    if (sizeof($tables) == 1 && $x != 0) {
+    if (count($tables) == 1 && $x != 0) {
         if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', [$tables[0], $target]) == 1) {
             return array_merge($last, [$tables[0] . '.' . $target]);
         } else {
@@ -588,7 +518,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
             }
 
             $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', [$table]);
-            if (sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
+            if (count($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
                 //Search for new candidates to expand
                 $ntables = [];
                 [$tmp] = explode('_', $glues[0]['COLUMN_NAME'], 2);
@@ -623,24 +553,6 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
     }
 
     //You should never get here.
-    return false;
-}
-
-/**
- * Determine if a given string contains a given substring.
- *
- * @param  string  $haystack
- * @param  string|array  $needles
- * @return bool
- */
-function str_i_contains($haystack, $needles)
-{
-    foreach ((array) $needles as $needle) {
-        if ($needle != '' && stripos($haystack, $needle) !== false) {
-            return true;
-        }
-    }
-
     return false;
 }
 
@@ -811,6 +723,27 @@ function get_vm_parent_id($device)
     }
 
     return dbFetchCell('SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?', [$device['hostname'], $device['hostname'] . '.' . Config::get('mydomain')]);
+}
+
+/**
+ * Converts ieee754 32-bit floating point decimal represenation to decimal
+ */
+function ieee754_to_decimal($value)
+{
+    $hex = dechex($value);
+    $binary = str_pad(base_convert($hex, 16, 2), 32, '0', STR_PAD_LEFT);
+    $sign = (int) $binary[0];
+    $exponent = bindec(substr($binary, 1, 8)) - 127;
+    $mantissa = substr($binary, 9);
+    $mantissa_value = 1;
+    for ($i = 0; $i < strlen($mantissa); $i++) {
+        if ($mantissa[$i] == '1') {
+            $mantissa_value += pow(2, -($i + 1));
+        }
+    }
+    $value = pow(-1, $sign) * $mantissa_value * pow(2, $exponent);
+
+    return $value;
 }
 
 /**

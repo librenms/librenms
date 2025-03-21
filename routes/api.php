@@ -21,6 +21,8 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::get('bgp/{id}', 'LegacyApiController@get_bgp')->name('get_bgp');
         Route::get('ospf', 'LegacyApiController@list_ospf')->name('list_ospf');
         Route::get('ospf_ports', 'LegacyApiController@list_ospf_ports')->name('list_ospf_ports');
+        Route::get('ospfv3', 'LegacyApiController@list_ospf')->name('list_ospfv3');
+        Route::get('ospfv3_ports', 'LegacyApiController@list_ospfv3_ports')->name('list_ospfv3_ports');
         Route::get('oxidized/{hostname?}', 'LegacyApiController@list_oxidized')->name('list_oxidized');
         Route::get('devicegroups/{name}', 'LegacyApiController@get_devices_by_group')->name('get_devices_by_group');
         Route::get('devicegroups', 'LegacyApiController@get_device_groups')->name('get_device_groups');
@@ -40,9 +42,9 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::prefix('resources')->group(function () {
             Route::get('links/{id}', 'LegacyApiController@get_link')->name('get_link');
             Route::get('locations', 'LegacyApiController@list_locations')->name('list_locations');
-            Route::get('ip/addresses', 'LegacyApiController@list_ip_addresses')->name('list_ip_addresses');
+            Route::get('ip/addresses/{address_family?}', 'LegacyApiController@list_ip_addresses')->name('list_ip_addresses');
             Route::get('ip/arp/{query}/{cidr?}', 'LegacyApiController@list_arp')->name('list_arp');
-            Route::get('ip/networks', 'LegacyApiController@list_ip_networks')->name('list_ip_networks');
+            Route::get('ip/networks/{address_family?}', 'LegacyApiController@list_ip_networks')->name('list_ip_networks');
             Route::get('ip/networks/{id}/ip', 'LegacyApiController@get_network_ip_addresses')->name('get_network_ip_addresses');
         });
 
@@ -136,6 +138,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
 
     Route::prefix('ports')->group(function () {
         Route::get('{portid}', 'LegacyApiController@get_port_info')->name('get_port_info');
+        Route::get('{portid}/fdb', 'LegacyApiController@get_port_fdb')->name('get_port_fdb');
         Route::get('{portid}/ip', 'LegacyApiController@get_port_ip_addresses')->name('get_port_ip_info');
         Route::get('{portid}/transceiver', 'LegacyApiController@get_port_transceiver')->name('get_port_transceiver');
         Route::patch('transceiver/metric/{metric}', 'LegacyApiController@update_transceiver_metric_thresholds')->name('update_transceiver_metric_thresholds');

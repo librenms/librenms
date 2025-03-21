@@ -28,27 +28,27 @@ namespace LibreNMS\Tests;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class QueryBuilderTest extends TestCase
 {
-    private $data_file = 'tests/data/misc/querybuilder.json';
+    private static string $data_file = 'tests/data/misc/querybuilder.json';
 
     public function testHasQueryData(): void
     {
         $this->assertNotEmpty(
             $this->loadQueryData(),
-            "Could not load query builder test data from $this->data_file"
+            'Could not load query builder test data from ' . self::$data_file
         );
     }
 
     /**
-     * @dataProvider loadQueryData
-     *
      * @param  string  $legacy
      * @param  array  $builder
      * @param  string  $display
      * @param  string  $sql
      */
+    #[DataProvider('loadQueryData')]
     public function testQueryConversion($legacy, $builder, $display, $sql, $query): void
     {
         if (! empty($legacy)) {
@@ -64,10 +64,10 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals($query[1], $qbq->getBindings(), 'Fluent bindings do not match');
     }
 
-    public function loadQueryData()
+    public static function loadQueryData(): array
     {
         $base = Config::get('install_dir');
-        $data = file_get_contents("$base/$this->data_file");
+        $data = file_get_contents("$base/" . self::$data_file);
 
         return json_decode($data, true);
     }

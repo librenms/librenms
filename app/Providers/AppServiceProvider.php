@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Sensor;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -9,7 +10,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
-use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;
@@ -31,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->singleton('device-cache', function () {
             return new \LibreNMS\Cache\Device();
+        });
+        $this->app->singleton('port-cache', function () {
+            return new \LibreNMS\Cache\Port();
         });
         $this->app->singleton('git', function () {
             return new \LibreNMS\Util\Git();
@@ -61,13 +64,13 @@ class AppServiceProvider extends ServiceProvider
         $this->bootObservers();
     }
 
-    private function bootCustomBladeDirectives()
+    private function bootCustomBladeDirectives(): void
     {
         Blade::if('config', function ($key, $value = true) {
-            return \LibreNMS\Config::get($key) == $value;
+            return LibrenmsConfig::get($key) == $value;
         });
         Blade::if('notconfig', function ($key) {
-            return ! \LibreNMS\Config::get($key);
+            return ! LibrenmsConfig::get($key);
         });
         Blade::if('admin', function () {
             return auth()->check() && auth()->user()->isAdmin();
@@ -88,6 +91,15 @@ class AppServiceProvider extends ServiceProvider
 
         Blade::directive('graphImage', function ($vars, $flags = 0) {
             return "<?php echo \LibreNMS\Util\Graph::getImageData($vars, $flags); ?>";
+        });
+
+        Blade::directive('vuei18n', function () {
+            $manifest_file = public_path('js/lang/manifest.json');
+            $manifest = is_readable($manifest_file) ? json_decode(file_get_contents($manifest_file), true) : [];
+            $locales = array_unique(['en', app()->getLocale()]);
+            $output = array_map(fn ($locale) => '<script src="' . asset($manifest[$locale] ?? "/js/lang/$locale.js") . '"></script>', $locales);
+
+            return implode(PHP_EOL, $output);
         });
     }
 
@@ -114,7 +126,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->alias(\LibreNMS\Interfaces\Geocoder::class, 'geocoder');
         $this->app->bind(\LibreNMS\Interfaces\Geocoder::class, function ($app) {
-            $engine = Config::get('geoloc.engine');
+            $engine = LibrenmsConfig::get('geoloc.engine');
 
             switch ($engine) {
                 case 'mapquest':
@@ -141,12 +153,15 @@ class AppServiceProvider extends ServiceProvider
     private function bootObservers()
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
+        \App\Models\Mempool::observe(\App\Observers\MempoolObserver::class);
         \App\Models\Package::observe(\App\Observers\PackageObserver::class);
+        \App\Models\Qos::observe(\App\Observers\QosObserver::class);
         \App\Models\Sensor::observe(\App\Observers\SensorObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);
         \App\Models\User::observe(\App\Observers\UserObserver::class);
         \App\Models\Vminfo::observe(\App\Observers\VminfoObserver::class);
+        \App\Models\WirelessSensor::observe(\App\Observers\WirelessSensorObserver::class);
     }
 
     private function bootCustomValidators()

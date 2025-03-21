@@ -17,11 +17,17 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\Eventlog;
+use App\Models\Ipv4Address;
 use App\Models\Ipv4Mac;
+use App\Models\Ipv4Network;
+use App\Models\Ipv6Address;
+use App\Models\Ipv6Network;
 use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
+use App\Models\Ospfv3Port;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -39,6 +45,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
 use LibreNMS\Util\Graph;
@@ -204,12 +211,12 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
-        $port['in_rate'] = Number::formatSi($in_rate, 2, 3, 'bps');
-        $port['out_rate'] = Number::formatSi($out_rate, 2, 3, 'bps');
+        $port['in_rate'] = Number::formatSi($in_rate, 2, 0, 'bps');
+        $port['out_rate'] = Number::formatSi($out_rate, 2, 0, 'bps');
         $port['in_perc'] = Number::calculatePercent($in_rate, $port['ifSpeed']);
         $port['out_perc'] = Number::calculatePercent($out_rate, $port['ifSpeed']);
-        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
-        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
+        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 0, '');
+        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 0, '');
 
         //only return requested columns
         if ($request->has('columns')) {
@@ -832,6 +839,34 @@ function list_ospf_ports(Illuminate\Http\Request $request)
     return api_success($ospf_ports, 'ospf_ports', null, 200, $ospf_ports->count());
 }
 
+function list_ospfv3(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = \App\Facades\DeviceCache::get($hostname)->device_id;
+
+    $ospf_neighbours = \App\Models\OspfNbr::whereHasAccess(Auth::user())
+        ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
+        ->whereNotNull('ospfv3NbrState')->where('ospfv3NbrState', '!=', '')
+        ->get();
+
+    if ($ospf_neighbours->isEmpty()) {
+        return api_error(500, 'Error retrieving ospfv3_nbrs');
+    }
+
+    return api_success($ospf_neighbours, 'ospfv3_neighbours');
+}
+
+function list_ospfv3_ports(Illuminate\Http\Request $request)
+{
+    $ospf_ports = Ospfv3Port::hasAccess(Auth::user())
+              ->get();
+    if ($ospf_ports->isEmpty()) {
+        return api_error(404, 'Ospfv3 ports do not exist');
+    }
+
+    return api_success($ospf_ports, 'ospfv3_ports', null, 200, $ospf_ports->count());
+}
+
 function get_graph_by_portgroup(Request $request)
 {
     $id = $request->route('id');
@@ -1116,6 +1151,21 @@ function get_port_ip_addresses(Illuminate\Http\Request $request)
     });
 }
 
+function get_port_fdb(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+
+    return check_port_permission($port_id, null, function ($port_id) {
+        $fdb = PortsFdb::where('port_id', $port_id)->get();
+
+        if ($fdb->isEmpty()) {
+            return api_error(404, "Port {$port_id} does not have any MAC addresses in fdb");
+        }
+
+        return api_success($fdb, 'macs');
+    });
+}
+
 function get_network_ip_addresses(Illuminate\Http\Request $request)
 {
     $network_id = $request->route('id');
@@ -1145,8 +1195,11 @@ function get_port_info(Illuminate\Http\Request $request)
     $port_id = $request->route('portid');
 
     return check_port_permission($port_id, null, function ($port_id) {
-        // use hostname as device_id if it's all digits
-        $port = dbFetchRows('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
+        $with = request()->input('with');
+        $allowed = ['vlans', 'device'];
+        $port = Port::where('port_id', $port_id)
+                    ->when(in_array($with, $allowed), fn ($q) => $q->with($with))
+                    ->get();
 
         return api_success($port, 'port');
     });
@@ -1182,13 +1235,13 @@ function update_port_description(Illuminate\Http\Request $request)
     if ($description == 'repoll') {
         // No description provided, clear description
         del_dev_attrib($port, 'ifName:' . $ifName); // "port" object has required device_id
-        log_event("$ifName Port ifAlias cleared via API", $device, 'interface', 3, $port_id);
+        Eventlog::log("$ifName Port ifAlias cleared via API", $device, 'interface', Severity::Notice, $port_id);
 
         return api_success_noresult(200, 'Port description cleared.');
     } else {
         // Prevent poller from overwriting new description
         set_dev_attrib($port, 'ifName:' . $ifName, 1); // see above
-        log_event("$ifName Port ifAlias set via API: $description", $device, 'interface', 3, $port_id);
+        Eventlog::log("$ifName Port ifAlias set via API: $description", $device, 'interface', Severity::Notice, $port_id);
 
         return api_success_noresult(200, 'Port description updated.');
     }
@@ -1272,7 +1325,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
 
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = \DeviceCache::get($hostname);
 
     $data = json_decode($request->getContent(), true);
     $field = 'notes';
@@ -1281,7 +1334,7 @@ function update_device_port_notes(Illuminate\Http\Request $request): JsonRespons
         return api_error(400, 'Port field to patch has not been supplied.');
     }
 
-    if (set_dev_attrib($device_id, 'port_id_notes:' . $portid, $content)) {
+    if ($device->setAttrib('port_id_notes:' . $portid, $content)) {
         return api_success_noresult(200, 'Port ' . $field . ' field has been updated');
     } else {
         return api_error(500, 'Port ' . $field . ' field failed to be updated');
@@ -1307,7 +1360,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
 {
     $id = $request->route('id');
 
-    $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
+    $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity`,`R`.`name`,`R`.`proc`,`R`.`notes` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
     $sql .= 'AND `A`.`state` IN ';
     if ($request->has('state')) {
         $param = explode(',', $request->get('state'));
@@ -1725,15 +1778,15 @@ function list_bills(Illuminate\Http\Request $request)
         $overuse = '';
 
         if (strtolower($bill['bill_type']) == 'cdr') {
-            $allowed = Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
-            $used = Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
+            $allowed = Number::formatSi($bill['bill_cdr'], 2, 0, '') . 'bps';
+            $used = Number::formatSi($rate_data['rate_95th'], 2, 0, '') . 'bps';
             if ($bill['bill_cdr'] > 0) {
                 $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
-            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 3, ''));
+            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 0, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
             $allowed = Billing::formatBytes($bill['bill_quota']);
             $used = Billing::formatBytes($rate_data['total_data']);
@@ -2798,28 +2851,70 @@ function list_sensors()
     return api_success($sensors, 'sensors');
 }
 
-function list_ip_addresses()
+function list_ip_addresses(Illuminate\Http\Request $request)
 {
-    $ipv4_addresses = dbFetchRows('SELECT * FROM `ipv4_addresses`');
-    $ipv6_addresses = dbFetchRows('SELECT * FROM `ipv6_addresses`');
-    $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
-    if ($ip_addresses_count == 0) {
-        return api_error(404, 'IP addresses do not exist');
+    $address_family = $request->route('address_family');
+
+    if ($address_family === 'ipv4') {
+        $ipv4_addresses = Ipv4Address::get();
+        if ($ipv4_addresses->isEmpty()) {
+            return api_error(404, 'IPv4 Addresses do not exist');
+        }
+
+        return api_success($ipv4_addresses, 'ip_addresses', null, 200, $ipv4_addresses->count());
     }
 
-    return api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses');
+    if ($address_family === 'ipv6') {
+        $ipv6_addresses = Ipv6Address::get();
+        if ($ipv6_addresses->isEmpty()) {
+            return api_error(404, 'IPv6 Addresses do not exist');
+        }
+
+        return api_success($ipv6_addresses, 'ip_addresses', null, 200, $ipv6_addresses->count());
+    }
+
+    if (empty($address_family)) {
+        $ipv4_addresses = Ipv4Address::get()->toArray();
+        $ipv6_addresses = Ipv6Address::get()->toArray();
+        $ip_addresses_count = count(array_merge($ipv4_addresses, $ipv6_addresses));
+        if ($ip_addresses_count == 0) {
+            return api_error(404, 'IP addresses do not exist');
+        }
+
+        return api_success(array_merge($ipv4_addresses, $ipv6_addresses), 'ip_addresses', null, 200, $ip_addresses_count);
+    }
 }
 
-function list_ip_networks()
+function list_ip_networks(Illuminate\Http\Request $request)
 {
-    $ipv4_networks = dbFetchRows('SELECT * FROM `ipv4_networks`');
-    $ipv6_networks = dbFetchRows('SELECT * FROM `ipv6_networks`');
-    $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
-    if ($ip_networks_count == 0) {
-        return api_error(404, 'IP networks do not exist');
-    }
+    $address_family = $request->route('address_family');
 
-    return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks');
+    if ($address_family === 'ipv4') {
+        $ipv4_networks = Ipv4Network::get();
+        if ($ipv4_networks->isEmpty()) {
+            return api_error(404, 'IPv4 Networks do not exist');
+        }
+
+        return api_success($ipv4_networks, 'ip_networks', null, 200, $ipv4_networks->count());
+    }
+    if ($address_family === 'ipv6') {
+        $ipv6_networks = Ipv6Network::get();
+        if ($ipv6_networks->isEmpty()) {
+            return api_error(404, 'IPv6 Networks do not exist');
+        }
+
+        return api_success($ipv6_networks, 'ip_networks', null, 200, $ipv6_networks->count());
+    }
+    if (empty($address_family)) {
+        $ipv4_networks = Ipv4Network::get()->toArray();
+        $ipv6_networks = Ipv6Network::get()->toArray();
+        $ip_networks_count = count(array_merge($ipv4_networks, $ipv6_networks));
+        if ($ip_networks_count == 0) {
+            return api_error(404, 'IP networks do not exist');
+        }
+
+        return api_success(array_merge($ipv4_networks, $ipv6_networks), 'ip_networks', null, 200, $ip_networks_count);
+    }
 }
 
 function list_arp(Illuminate\Http\Request $request)

@@ -119,6 +119,7 @@ class PortsController implements DeviceTab
         $relationships = ['groups', 'ipv4', 'ipv6', 'vlans', 'adsl', 'vdsl'];
         if ($this->detail) {
             $relationships[] = 'links';
+            $relationships[] = 'transceivers';
             $relationships[] = 'pseudowires.endpoints';
             $relationships[] = 'ipv4Networks.ipv4';
             $relationships[] = 'ipv6Networks.ipv6';
@@ -286,6 +287,10 @@ class PortsController implements DeviceTab
 
         if ($device->macs()->exists()) {
             $tabs[] = ['name' => __('port.tabs.arp'), 'url' => 'arp'];
+        }
+
+        if ($device->nd()->exists()) {
+            $tabs[] = ['name' => __('port.tabs.nd'), 'url' => 'nd'];
         }
 
         if ($device->portsFdb()->exists()) {

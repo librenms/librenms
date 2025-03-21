@@ -10,7 +10,7 @@
             @foreach($tabs as $tab)
                 @if($tab->visible($device))
                     <li role="presentation" @if( $current_tab == $tab->slug() ) class="active" @endif>
-                        <a href="{{ route('device', [$device_id, $tab->slug()]) }}" class="tw-whitespace-nowrap">
+                        <a href="{{ route('device', [$device_id, $tab->slug()]) }}" class="tw:whitespace-nowrap">
                             <i class="fa {{ $tab->icon() }} fa-lg icon-theme" aria-hidden="true"></i>
                             {{ $tab->name() }}
                         </a>
@@ -25,7 +25,7 @@
                    @if(isset($primary_device_link['onclick']))onclick="{{ $primary_device_link['onclick'] }}" @endif
                    @if($primary_device_link['external'])target="_blank" rel="noopener" @endif
                    title="{{ $primary_device_link['title'] }}"
-                > <i class="fa {{ $primary_device_link['icon'] }} fa-lg icon-theme"></i>
+                >&nbsp;<i class="fa {{ $primary_device_link['icon'] }} fa-lg icon-theme"></i>
                 </a>
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.4.82.4",
+                    "sysDescr": "Juniper Networks, Inc. qfx5100-24q-2p Ethernet Switch, kernel JUNOS 14.1X53-D40.8, Build date: 2016-11-09 02:23:05 UTC Copyright (c) 1996-2016 Juniper Networks, Inc.",
+                    "sysContact": "<private>",
+                    "version": "14.1X53-D40.8",
+                    "hardware": "Juniper Virtual Chassis Switch",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "junos",
+                    "type": "network",
+                    "serial": "VG3716220239",
+                    "icon": "junos.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

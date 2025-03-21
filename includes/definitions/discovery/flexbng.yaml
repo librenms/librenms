@@ -1,0 +1,121 @@
+mib: NETELASTIC-FLEXBNG-PPPOE:NETELASTIC-FLEXBNG-SYSINFO:NETELASTIC-FLEXBNG-IPPOOLV6
+modules:
+    processors:
+        data:
+            -
+                oid: NETELASTIC-FLEXBNG-SYSINFO::cpuUsage
+                num_oid: '.1.3.6.1.4.1.54268.1.8.1.1.{{ $index }}'
+    mempools:
+        data:
+            -
+                percent_used: NETELASTIC-FLEXBNG-SYSINFO::memUsage
+                descr: Memory Usage
+                index: 0
+    sensors:
+        count:
+            data:
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::connection-success
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.1.{{ $index }}'
+                    descr: 'PPPoE request connection success count'
+                    index: 'connection-success.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::connection
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.2.{{ $index }}'
+                    descr: 'PPPoE request connection count'
+                    index: 'connection.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::discovery-timeout
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.3.{{ $index }}'
+                    descr: 'PPPoE discovery timeout count'
+                    index: 'discovery-timeout.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::lcp-fail
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.4.{{ $index }}'
+                    descr: 'Common LCP fail count'
+                    index: 'lcp-fail.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::lcp-fail-other
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.5.{{ $index }}'
+                    descr: 'Other LCP fail count'
+                    index: 'lcp-fail-other.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::auth-fail
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.6.{{ $index }}'
+                    descr: 'Auth common fail count'
+                    index: 'auth-fail.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::auth-fail-other
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.7.{{ $index }}'
+                    descr: 'Other auth fail count'
+                    index: 'auth-fail-other.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::ipcp-fail
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.8.{{ $index }}'
+                    descr: 'Common IPCP fail count'
+                    index: 'ipcp-fail.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::ipcp-fail-other
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.9.{{ $index }}'
+                    descr: 'Other IPCP fail count'
+                    index: 'ipcp-fail-other.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::ipv4-assign-fail
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.10.{{ $index }}'
+                    descr: 'IPv4 address assign fail'
+                    index: 'ipv4-assign-fail.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-PPPOE::user-disconnect
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.1.11.{{ $index }}'
+                    descr: 'Number of received PADT'
+                    index: 'user-disconnect.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-IPPOOL::totalValidIpNumber
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.2.3.1.{{ $index }}'
+                    descr: 'Total IPv4 pool size'
+                    index: 'totalValidIpNumber.{{ $index }}'
+                    group: PPPoE
+                -
+                    oid: NETELASTIC-FLEXBNG-IPPOOL::totalUsedIpNumber
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.2.3.2.{{ $index }}'
+                    descr: 'Total IPv4 pool used'
+                    index: 'totalUsedIpNumber.{{ $index }}'
+                    group: PPPoE
+        percent:
+            data:
+                -
+                    oid: NETELASTIC-FLEXBNG-IPPOOL::totalAllocatePercent
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.2.3.3.{{ $index }}'
+                    descr: 'IPv4 pool allocated'
+                    index: 'totalAllocatePercent.{{ $index }}'
+                    group: 'IP Pool'
+                -
+                    oid: NETELASTIC-FLEXBNG-IPPOOLV6::addrAllocatePercent
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.3.3.1.3.{{ $index }}'
+                    descr: 'IPv6 address allocated %'
+                    index: 'addrAllocatePercent.{{ $index }}'
+                    group: 'IP Pool'
+                -
+                    oid: NETELASTIC-FLEXBNG-IPPOOLV6::prefixAllocatePercent
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.3.1.1.2.{{ $index }}'
+                    descr: 'IPv6 delegation pool allocated %'
+                    index: 'prefixAllocatePercent.{{ $index }}'
+                    group: 'IP Pool'
+                -
+                    oid: NETELASTIC-FLEXBNG-IPPOOL::groupTable
+                    value: NETELASTIC-FLEXBNG-IPPOOL::groupAllocatePercent
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.2.1.1.5.{{ $str_index_as_numeric }}'
+                    descr: '{{ NETELASTIC-FLEXBNG-IPPOOL::groupName }} DHCP Pool Used %'
+                    index: 'groupTable.{{ $index }}'
+                    group: 'IP Pool'

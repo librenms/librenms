@@ -8,7 +8,10 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\StateTranslation;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -25,7 +28,9 @@ function parse_modules($type, $options)
     $override = false;
 
     if (! empty($options['m'])) {
-        Config::set("{$type}_modules", []);
+        // get all modules in the correct order and disable all
+        $modules = array_map(fn ($v) => false, Config::get("{$type}_modules", []));
+
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
             if (Str::contains($module, '/')) {
@@ -37,10 +42,13 @@ function parse_modules($type, $options)
 
             $dir = $type == 'poller' ? 'polling' : $type;
             if (is_file("includes/$dir/$module.inc.php")) {
-                Config::set("{$type}_modules.$module", 1);
+                $modules[$module] = true; // enable module
                 $override = true;
             }
         }
+
+        // filter disabled modules and set in global config
+        Config::set("{$type}_modules", array_filter($modules));
 
         // display selected modules
         $modules = array_map(function ($module) use ($type) {
@@ -49,7 +57,7 @@ function parse_modules($type, $options)
             return $module . ($submodules ? '(' . implode(',', $submodules) . ')' : '');
         }, array_keys(Config::get("{$type}_modules", [])));
 
-        d_echo("Override $type modules: " . implode(', ', $modules) . PHP_EOL);
+        Log::debug('Override ' . $type . ' modules: ' . implode(', ', $modules));
     }
 
     return $override;
@@ -70,58 +78,25 @@ function logfile($string)
     fclose($fd);
 }
 
-function percent_colour($perc)
-{
-    return \LibreNMS\Util\Color::percent(percent: $perc);
-}
-
-/**
- * @param  $device
- * @return string the path to the icon image for this device.  Close to square.
- */
-function getIcon($device)
-{
-    return 'images/os/' . getImageName($device);
-}
-
-/**
- * @param  $device
- * @return string an image tag with the icon for this device.  Close to square.
- */
-function getIconTag($device)
-{
-    return '<img src="' . getIcon($device) . '" title="' . getImageTitle($device) . '"/>';
-}
-
-function getImageTitle($device)
-{
-    return $device['icon'] ? str_replace(['.svg', '.png'], '', $device['icon']) : $device['os'];
-}
-
-function getImageName($device, $use_database = true, $dir = 'images/os/')
-{
-    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
-}
-
 function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);
     $new_rrd_dir = Rrd::dirFromHost($new);
 
     if (is_dir($new_rrd_dir)) {
-        log_event("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', 5);
+        Eventlog::log("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', Severity::Error);
 
         return "Renaming of $host failed due to existing RRD folder for $new\n";
     }
 
     if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
-        log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
+        Eventlog::log("Hostname changed -> $new ($source)", $id, 'system', Severity::Notice);
 
         return '';
     }
 
-    log_event("Renaming of $host failed", $id, 'system', 5);
+    Eventlog::log("Renaming of $host failed", $id, 'system', Severity::Error);
 
     return "Renaming of $host failed\n";
 }
@@ -208,32 +183,13 @@ function snmp2ipv6($ipv6_snmp)
     $ipv6_2 = [];
 
     for ($i = 0; $i <= 15; $i++) {
-        $ipv6[$i] = zeropad(dechex($ipv6[$i]));
+        $ipv6[$i] = Str::padLeft(dechex($ipv6[$i]), 2, '0');
     }
     for ($i = 0; $i <= 15; $i += 2) {
         $ipv6_2[] = $ipv6[$i] . $ipv6[$i + 1];
     }
 
     return implode(':', $ipv6_2);
-}
-
-/**
- * Log events to the event table
- *
- * @param  string  $text  message describing the event
- * @param  array|int  $device  device array or device_id
- * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
- * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
- * @param  int  $reference  the id of the referenced entity.  Supported types: interface
- */
-function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
-{
-    // handle legacy device array
-    if (is_array($device) && isset($device['device_id'])) {
-        $device = $device['device_id'];
-    }
-
-    \App\Models\Eventlog::log($text, $device, $type, Severity::tryFrom((int) $severity) ?? Severity::Info, $reference);
 }
 
 function hex2str($hex)
@@ -267,14 +223,14 @@ function is_port_valid($port, $device)
     if (empty($port['ifDescr'])) {
         // If these are all empty, we are just going to show blank names in the ui
         if (empty($port['ifAlias']) && empty($port['ifName'])) {
-            d_echo("ignored: empty ifDescr, ifAlias and ifName\n");
+            Log::debug('ignored: empty ifDescr, ifAlias and ifName');
 
             return false;
         }
 
         // ifDescr should not be empty unless it is explicitly allowed
         if (! Config::getOsSetting($device['os'], 'empty_ifdescr', Config::get('empty_ifdescr', false))) {
-            d_echo("ignored: empty ifDescr\n");
+            Log::debug('ignored: empty ifDescr');
 
             return false;
         }
@@ -286,13 +242,13 @@ function is_port_valid($port, $device)
     $ifType = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'] ?? '';
 
-    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
+    if (Str::contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')), ignoreCase: true)) {
         return true;
     }
 
     foreach (Config::getCombined($device['os'], 'bad_if') as $bi) {
-        if (str_i_contains($ifDescr, $bi)) {
-            d_echo("ignored by ifDescr: $ifDescr (matched: $bi)\n");
+        if (Str::contains($ifDescr, $bi, ignoreCase: true)) {
+            Log::debug("ignored by ifDescr: $ifDescr (matched: $bi)");
 
             return false;
         }
@@ -300,7 +256,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_if_regexp') as $bir) {
         if (preg_match($bir . 'i', $ifDescr)) {
-            d_echo("ignored by ifDescr: $ifDescr (matched: $bir)\n");
+            Log::debug("ignored by ifDescr: $ifDescr (matched: $bir)");
 
             return false;
         }
@@ -308,7 +264,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_ifname_regexp') as $bnr) {
         if (preg_match($bnr . 'i', $ifName)) {
-            d_echo("ignored by ifName: $ifName (matched: $bnr)\n");
+            Log::debug("ignored by ifName: $ifName (matched: $bnr)");
 
             return false;
         }
@@ -316,7 +272,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar . 'i', $ifAlias)) {
-            d_echo("ignored by ifName: $ifAlias (matched: $bar)\n");
+            Log::debug("ignored by ifAlias: $ifAlias (matched: $bar)");
 
             return false;
         }
@@ -324,7 +280,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_iftype') as $bt) {
         if (Str::contains($ifType, $bt)) {
-            d_echo("ignored by ifType: $ifType (matched: $bt )\n");
+            Log::debug("ignored by ifType: $ifType (matched: $bt )");
 
             return false;
         }
@@ -332,7 +288,7 @@ function is_port_valid($port, $device)
 
     foreach (Config::getCombined($device['os'], 'bad_ifoperstatus') as $bos) {
         if (Str::contains($ifOperStatus, $bos)) {
-            d_echo("ignored by ifOperStatus: $ifOperStatus (matched: $bos)\n");
+            Log::debug("ignored by ifOperStatus: $ifOperStatus (matched: $bos)");
 
             return false;
         }
@@ -358,38 +314,22 @@ function port_fill_missing_and_trim(&$port, $device)
     // When devices do not provide data, populate with other data if available
     if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
-        d_echo(' Using ifName as ifDescr');
+        Log::debug(' Using ifName as ifDescr');
     }
     $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('ifName:' . $port['ifName']);
     if (! empty($attrib)) {
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
-        d_echo(' ifAlias overriden by user');
+        Log::debug(' ifAlias overriden by user');
     } elseif (! isset($port['ifAlias']) || $port['ifAlias'] == '') {
         $port['ifAlias'] = $port['ifDescr'];
-        d_echo(' Using ifDescr as ifAlias');
+        Log::debug(' Using ifDescr as ifAlias');
     }
 
     if (! isset($port['ifName']) || $port['ifName'] == '') {
         $port['ifName'] = $port['ifDescr'];
-        d_echo(' Using ifDescr as ifName');
+        Log::debug(' Using ifDescr as ifName');
     }
-}
-
-function validate_device_id($id)
-{
-    if (empty($id) || ! is_numeric($id)) {
-        $return = false;
-    } else {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `devices` WHERE `device_id` = ?', [$id]);
-        if ($device_id == $id) {
-            $return = true;
-        } else {
-            $return = false;
-        }
-    }
-
-    return $return;
 }
 
 function convert_delay($delay)
@@ -430,29 +370,14 @@ function fix_integer_value($value)
 
 /**
  * Checks if the $hostname provided exists in the DB already
- *
- * @param  string  $hostname  The hostname to check for
- * @param  string  $sysName  The sysName to check
- * @return bool true if hostname already exists
- *              false if hostname doesn't exist
  */
-function host_exists($hostname, $sysName = null)
+function host_exists(string $hostname, ?string $sysName = null): bool
 {
-    $query = 'SELECT COUNT(*) FROM `devices` WHERE `hostname`=?';
-    $params = [$hostname];
-
-    if (! empty($sysName) && ! Config::get('allow_duplicate_sysName')) {
-        $query .= ' OR `sysName`=?';
-        $params[] = $sysName;
-
-        if (! empty(Config::get('mydomain'))) {
-            $full_sysname = rtrim($sysName, '.') . '.' . Config::get('mydomain');
-            $query .= ' OR `sysName`=?';
-            $params[] = $full_sysname;
-        }
-    }
-
-    return dbFetchCell($query, $params) > 0;
+    return Device::where('hostname', $hostname)
+        ->when(! empty($sysName), function ($query) use ($sysName) {
+            $query->when(! Config::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName', $sysName))
+                  ->when(! empty(Config::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim($sysName, '.') . '.' . Config::get('mydomain')));
+        })->exists();
 }
 
 /**
@@ -508,11 +433,6 @@ function create_state_index($state_name, $states = []): void
     }, $states));
 }
 
-function create_sensor_to_state_index($device, $state_name, $index)
-{
-    // no op
-}
-
 function delta_to_bits($delta, $period)
 {
     return round($delta * 8 / $period, 2);
@@ -520,7 +440,7 @@ function delta_to_bits($delta, $period)
 
 function report_this($message)
 {
-    return '<h2>' . $message . ' Please <a href="' . Config::get('project_issues') . '">report this</a> to the ' . Config::get('project_name') . ' developers.</h2>';
+    return '<h2>' . htmlentities($message) . ' Please <a href="' . htmlentities(Config::get('project_issues')) . '">report this</a> to the ' . htmlentities(Config::get('project_name')) . ' developers.</h2>';
 }//end report_this()
 
 function hytera_h2f($number, $nd)
@@ -799,7 +719,7 @@ function is_disk_valid($disk, $device)
 {
     foreach (Config::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
         if (preg_match($bir . 'i', $disk['diskIODevice'])) {
-            d_echo("Ignored Disk: {$disk['diskIODevice']} (matched: $bir)\n");
+            Log::debug("Ignored Disk: {$disk['diskIODevice']} (matched: $bir)");
 
             return false;
         }

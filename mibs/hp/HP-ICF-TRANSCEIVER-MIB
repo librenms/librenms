@@ -1,7 +1,7 @@
 HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
-        OBJECT-TYPE, MODULE-IDENTITY, Integer32, Unsigned32, TimeTicks 
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32, Unsigned32, TimeTicks
             FROM SNMPv2-SMI
         SnmpAdminString
             FROM SNMP-FRAMEWORK-MIB
@@ -15,18 +15,25 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
             FROM IF-MIB;
 
     hpicfTransceiverMIB MODULE-IDENTITY
-         LAST-UPDATED "201107250000Z" -- July 25, 2011
+         LAST-UPDATED "201202220000Z" -- Feb 22, 2012
          ORGANIZATION "HP Networking"
          CONTACT-INFO "Hewlett Packard Company
                        8000 Foothills Blvd.
                        Roseville, CA 95747"
          DESCRIPTION  "This MIB module describes HP transceiver
                        information."
+
+	 REVISION     "201202220000Z" -- Feb 22, 2012
+         DESCRIPTION  "Deprecated hpicfXcvrInfoGroup1 and hpicfXcvrCompliance1,
+                       Added  hpicfXcvrManufacDate, hpicfXcvrInfoGroup2
+		       and hpicfXcvrInfoCompliance2."
+
+
          REVISION     "201107250000Z" -- July 25, 2011
          DESCRIPTION  "Deprecated hpicfXcvrDiagnosticsTimeStamp, add
                        hpicfXcvrDiagnosticsTimeTicks."
          REVISION     "201106080000Z" -- June 8, 2011
-         DESCRIPTION  "Add objects for reporting phy and cable 
+         DESCRIPTION  "Add objects for reporting phy and cable
                        diagnostics information."
          REVISION     "201103140000Z" -- March 14, 2011
          DESCRIPTION  "Change hpicfXcvrInfoEntry INDEX to ifIndex and
@@ -48,7 +55,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
     hpicfXcvrObjects               OBJECT IDENTIFIER
           ::= { hpicfTransceiverMIB 1 }
 
-    hpicfXcvrInfo                  OBJECT IDENTIFIER 
+    hpicfXcvrInfo                  OBJECT IDENTIFIER
           ::= { hpicfXcvrObjects 1 }
 
 -- *******************************************************************
@@ -61,7 +68,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           STATUS      current
           DESCRIPTION
                  "A table of objects that display transceiver
-                  characteristics." 
+                  characteristics."
           ::= { hpicfXcvrInfo 1 }
 
     hpicfXcvrInfoEntry OBJECT-TYPE
@@ -97,10 +104,10 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
              hpicfXcvrTempLoAlarm    Integer32,
              hpicfXcvrTempHiWarn     Integer32,
              hpicfXcvrTempLoWarn     Integer32,
-             hpicfXcvrVccHiAlarm     Unsigned32, 
-             hpicfXcvrVccLoAlarm     Unsigned32, 
-             hpicfXcvrVccHiWarn      Unsigned32, 
-             hpicfXcvrVccLoWarn      Unsigned32, 
+             hpicfXcvrVccHiAlarm     Unsigned32,
+             hpicfXcvrVccLoAlarm     Unsigned32,
+             hpicfXcvrVccHiWarn      Unsigned32,
+             hpicfXcvrVccLoWarn      Unsigned32,
              hpicfXcvrBiasHiAlarm    Unsigned32,
              hpicfXcvrBiasLoAlarm    Unsigned32,
              hpicfXcvrBiasHiWarn     Unsigned32,
@@ -139,7 +146,8 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
              hpicfXcvrMdiPairDSkew Unsigned32,
              hpicfXcvrMdiPairABSwap INTEGER,
              hpicfXcvrMdiPairCDSwap INTEGER,
-             hpicfXcvrDiagnosticsTimeTicks TimeTicks
+             hpicfXcvrDiagnosticsTimeTicks TimeTicks,
+             hpicfXcvrManufacDate       SnmpAdminString
           }
 
     hpicfXcvrPortIndex OBJECT-TYPE
@@ -201,7 +209,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                  "A textual description of the central optical
                   wavelength.
 
-                  n/a will be reported for copper transceivers." 
+                  n/a will be reported for copper transceivers."
           ::= { hpicfXcvrInfoEntry 7 }
 
     hpicfXcvrTxDist OBJECT-TYPE
@@ -224,7 +232,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           STATUS      current
           DESCRIPTION
                  "This object indicates transceiver diagnostic support.
-                  May be one of Virtual Cable Test (VCT), Diagnostic 
+                  May be one of Virtual Cable Test (VCT), Diagnostic
                   Optical Monitoring (DOM), other or none."
           ::= { hpicfXcvrInfoEntry 9 }
 
@@ -265,7 +273,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 49120 is 49.120 degrees Celsius.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 11 }
 
@@ -283,7 +291,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                   Will be zero if the transceiver does not report
                   this object.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 12 }
 
@@ -295,7 +303,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           DESCRIPTION
                  "This is Tx bias current in microamps.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 13 }
 
@@ -312,7 +320,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   -in dBm (0 microwatts) will be reported as -99999999.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 14 }
 
@@ -329,7 +337,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   -in dBm (0 microwatts) will be reported as -99999999.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 15 }
 
@@ -379,11 +387,11 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                   Vcc low alarm(16)
                   Vcc high alarm(17)
                   Temp low alarm(18)
-                  Temp high alarm(19) 
+                  Temp high alarm(19)
 
                   Unused(20-31)
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 16 }
 
@@ -431,7 +439,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   Unused(17-31)
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 17 }
 
@@ -446,7 +454,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 49120 is 49.120 degrees Celsius.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 18 }
 
@@ -461,7 +469,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 49120 is 49.120 degrees Celsius.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 19 }
 
@@ -476,7 +484,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 49120 is 49.120 degrees Celsius.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 20 }
 
@@ -491,7 +499,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 49120 is 49.120 degrees Celsius.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 21 }
 
@@ -508,7 +516,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   Returns zero if not supported on the transceiver.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 22 }
 
@@ -525,7 +533,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   Returns zero if not supported on the transceiver.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 23 }
 
@@ -542,7 +550,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   Returns zero if not supported on the transceiver.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 24 }
 
@@ -559,7 +567,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   Returns zero if not supported on the transceiver.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 25 }
 
@@ -572,7 +580,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                  "Transceiver bias high alarm
                   threshold limit in microamps.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 26 }
 
@@ -585,7 +593,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                  "Transceiver bias low alarm
                   threshold limit in microamps.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 27 }
 
@@ -598,7 +606,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                  "Transceiver bias high warning
                   threshold limit in microamps.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 28 }
 
@@ -611,7 +619,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                  "Transceiver bias low warning
                   threshold limit in microamps.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 29 }
 
@@ -626,7 +634,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 10000 is 1 milliwatt.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 30 }
 
@@ -641,7 +649,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 10000 is 1 milliwatt.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 31 }
 
@@ -656,7 +664,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 10000 is 1 milliwatt.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 32 }
 
@@ -671,7 +679,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 10000 is 1 milliwatt.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 33 }
 
@@ -686,7 +694,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 10000 is 1 milliwatt.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 34 }
 
@@ -701,7 +709,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 10000 is 1 milliwatt.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 35 }
 
@@ -716,7 +724,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 10000 is 1 milliwatt.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 36 }
 
@@ -731,7 +739,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   As an example: 10000 is 1 milliwatt.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is DOM."
           ::= { hpicfXcvrInfoEntry 37 }
 
@@ -761,7 +769,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                  "This object indicates the link status as reported
                   by the physical entity.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 39 }
 
@@ -772,11 +780,11 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           STATUS      current
           DESCRIPTION
                  "This object indicates the speed in Mbps as reported
-                  by the physical entity. 
+                  by the physical entity.
 
                   Will be zero if speed and duplex are unresolved.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 40 }
 
@@ -794,7 +802,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   Will be unspecified if speed and duplex are unresolved.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 41 }
 
@@ -822,10 +830,10 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                          - Connector is faulty.
                   Failed = TDR test failed on cable pair.
                   Unspecified : This object is unavailable or not reported.
- 
+
                   As reported through cable diagnostics.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 42 }
 
@@ -840,13 +848,13 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   A gigabit link must be present for this object
                   to be non zero.
- 
+
                   Will be zero if not available or the transceiver
                   does not report this object.
 
                   Accuracy is +/- 10 meters.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 43 }
 
@@ -861,11 +869,11 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                   diagnostics.
 
                   Will be zero if no fault or the transceiver does not
-                  report this object. 
+                  report this object.
 
                   Accuracy is +/- 2 meters.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 44 }
 
@@ -885,7 +893,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                   Will be unspecified if the this object is unavailable
                   or not reported.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 45 }
 
@@ -895,16 +903,16 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           MAX-ACCESS  read-only
           STATUS      current
           DESCRIPTION
-                 "This object indicates the delay skew in nanoseconds 
+                 "This object indicates the delay skew in nanoseconds
                   of this cable pair and the fastest cable pair as
                   reported through cable diagnostics.
 
                   Will be zero if the lowest of the pairs or if the
-                  transceiver does not report this object.  
+                  transceiver does not report this object.
 
                   Accuracy is +/- 8 ns.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 46 }
 
@@ -915,7 +923,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                               open(2),
                               failed(3),
                               impedanceMismatch(4),
-                              unspecified(5) 
+                              unspecified(5)
                               }
           MAX-ACCESS  read-only
           STATUS      current
@@ -931,12 +939,12 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                          - Cable pair is damaged or
                          - Connector is faulty.
                   Failed = TDR test failed on cable pair.
-                  Unspecified : This object is unavailable or not 
-                                reported. 
- 
+                  Unspecified : This object is unavailable or not
+                                reported.
+
                   As reported through cable diagnostics.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 47 }
 
@@ -946,18 +954,18 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           MAX-ACCESS  read-only
           STATUS      current
           DESCRIPTION
-                  "This object indicates the cable pair length in 
+                  "This object indicates the cable pair length in
                   meters as reported by cable diagnostics.
 
                   A gigabit link must be present for this object
                   to be non zero.
- 
+
                   Will be zero if not available or the transceiver
-                  does not report this object. 
+                  does not report this object.
 
                   Accuracy is +/- 10 meters.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 48 }
 
@@ -972,11 +980,11 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                   diagnostics.
 
                   Will be zero if no fault or the transceiver does not
-                  report this object. 
+                  report this object.
 
                   Accuracy is +/- 2 meters.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 49 }
 
@@ -996,7 +1004,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                   Will be unspecified if the this object is unavailable
                   or not reported.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 50 }
 
@@ -1006,16 +1014,16 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           MAX-ACCESS  read-only
           STATUS      current
           DESCRIPTION
-                 "This object indicates the delay skew in nanoseconds 
+                 "This object indicates the delay skew in nanoseconds
                   of this cable pair and the fastest cable pair as
                   reported through cable diagnostics.
 
                   Will be zero if the lowest of the pairs or if the
-                  transceiver does not report this object.   
+                  transceiver does not report this object.
 
                   Accuracy is +/- 8 ns.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 51 }
 
@@ -1026,7 +1034,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                               open(2),
                               failed(3),
                               impedanceMismatch(4),
-                              unspecified(5) 
+                              unspecified(5)
                               }
           MAX-ACCESS  read-only
           STATUS      current
@@ -1042,11 +1050,11 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                          - Cable pair is damaged or
                          - Connector is faulty.
                   Failed = TDR test failed on cable pair.
-                  Unspecified : This object is unavailable or not reported. 
- 
+                  Unspecified : This object is unavailable or not reported.
+
                   As reported through cable diagnostics.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 52 }
 
@@ -1056,19 +1064,19 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           MAX-ACCESS  read-only
           STATUS      current
           DESCRIPTION
-                 "This object indicates the cable length in meters 
+                 "This object indicates the cable length in meters
                   of the cable pair as reported through cable
                   diagnostics.
 
                   A gigabit link must be present for this object
                   to be non zero.
- 
+
                   Will be zero if not available or the transceiver
-                  does not report this object.  
+                  does not report this object.
 
                   Accuracy is +/- 10 meters.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 53 }
 
@@ -1080,14 +1088,14 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           DESCRIPTION
                  "This object indicates the distance in meters to
                   a fault in the cable pair as reported through cable
-                  diagnostics. 
+                  diagnostics.
 
                   Will be zero if there is no fault or the
-                  transceiver does not report this object. 
-                 
+                  transceiver does not report this object.
+
                   Accuracy is +/- 2 meters.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 54 }
 
@@ -1107,7 +1115,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                   Will be unspecified if the this object is unavailable
                   or not reported.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 55 }
 
@@ -1117,16 +1125,16 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           MAX-ACCESS  read-only
           STATUS      current
           DESCRIPTION
-                 "This object indicates the delay skew in nanoseconds 
+                 "This object indicates the delay skew in nanoseconds
                   of this cable pair and the fastest cable pair as
                   reported through cable diagnostics.
 
                   Will be zero if the lowest of the pairs or if the
-                  transceiver does not report this object.   
+                  transceiver does not report this object.
 
                   Accuracy is +/- 8 ns.
-            
-                  The value of this object is valid when the value of 
+
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 56 }
 
@@ -1137,7 +1145,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                               open(2),
                               failed(3),
                               impedanceMismatch(4),
-                              unspecified(5) 
+                              unspecified(5)
                               }
           MAX-ACCESS  read-only
           STATUS      current
@@ -1153,12 +1161,12 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                          - Cable pair is damaged or
                          - Connector is faulty.
                   Failed = TDR test failed on cable pair.
-                  Unspecified : This object is unavailable or not 
-                                reported. 
- 
+                  Unspecified : This object is unavailable or not
+                                reported.
+
                   As reported through cable diagnostics.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 57 }
 
@@ -1168,19 +1176,19 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           MAX-ACCESS  read-only
           STATUS      current
           DESCRIPTION
-                 "This object indicates the cable length in meters 
+                 "This object indicates the cable length in meters
                   of the cable pair as reported through cable
                   diagnostics.
 
                   A gigabit link must be present for this object
                   to be non zero.
- 
+
                   Will be zero if not available or the transceiver
-                  does not report this object.  
+                  does not report this object.
 
                   Accuracy is +/- 10 meters.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 58 }
 
@@ -1195,11 +1203,11 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                   diagnostics.
 
                   Will be zero if no fault or the transceiver does not
-                  report this object. 
+                  report this object.
 
                   Accuracy is +/- 2 meters.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 59 }
 
@@ -1219,7 +1227,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                   Will be unspecified if the this object is unavailable
                   or not reported.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 60 }
 
@@ -1229,16 +1237,16 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           MAX-ACCESS  read-only
           STATUS      current
           DESCRIPTION
-                 "This object indicates the delay skew in nanoseconds 
+                 "This object indicates the delay skew in nanoseconds
                   of this cable pair and the fastest cable pair as
                   reported through cable diagnostics.
 
                   Will be zero if the lowest of the pairs or if the
-                  transceiver does not report this object.   
+                  transceiver does not report this object.
 
                   Accuracy is +/- 8 ns.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 61 }
 
@@ -1257,9 +1265,9 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   MDI  : Channel A received on MDI[1], Channel B on MDI[0]
                   MDIX : Channel A received on MDI[0], Channel B on MDI[1]
-                  Unspecified : This object is unavailable or not reported. 
+                  Unspecified : This object is unavailable or not reported.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 62 }
 
@@ -1278,9 +1286,9 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
 
                   MDI  : Channel C received on MDI[3], Channel D on MDI[2]
                   MDIX : Channel C received on MDI[2], Channel D on MDI[3].
-                  Unspecified : This object is unavailable or not reported. 
+                  Unspecified : This object is unavailable or not reported.
 
-                  The value of this object is valid when the value of 
+                  The value of this object is valid when the value of
                   the hpicfXcvrDiagnostics object is VCT or other."
           ::= { hpicfXcvrInfoEntry 63 }
 
@@ -1295,6 +1303,17 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
                   information was never updated, then this object
                   will contain a zero value."
           ::= { hpicfXcvrInfoEntry 64 }
+
+
+    hpicfXcvrManufacDate OBJECT-TYPE
+          SYNTAX      SnmpAdminString (SIZE(1..16))
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                 "A textual description of the transceiver
+                  Manufacturing date."
+          ::= { hpicfXcvrInfoEntry 65 }
+
 
 -- *******************************************************************
 -- Conformance Section
@@ -1329,10 +1348,10 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
              hpicfXcvrTempLoAlarm,
              hpicfXcvrTempHiWarn,
              hpicfXcvrTempLoWarn,
-             hpicfXcvrVccHiAlarm, 
-             hpicfXcvrVccLoAlarm, 
-             hpicfXcvrVccHiWarn, 
-             hpicfXcvrVccLoWarn, 
+             hpicfXcvrVccHiAlarm,
+             hpicfXcvrVccLoAlarm,
+             hpicfXcvrVccHiWarn,
+             hpicfXcvrVccLoWarn,
              hpicfXcvrBiasHiAlarm,
              hpicfXcvrBiasLoAlarm,
              hpicfXcvrBiasHiWarn,
@@ -1376,7 +1395,7 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
     DESCRIPTION
            "********* THIS GROUP IS DEPRECATED *********
 
-            A collection of objects representing transceiver 
+            A collection of objects representing transceiver
             information.
 
             This object has been deprecated and replaced with
@@ -1406,10 +1425,10 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
              hpicfXcvrTempLoAlarm,
              hpicfXcvrTempHiWarn,
              hpicfXcvrTempLoWarn,
-             hpicfXcvrVccHiAlarm, 
-             hpicfXcvrVccLoAlarm, 
-             hpicfXcvrVccHiWarn, 
-             hpicfXcvrVccLoWarn, 
+             hpicfXcvrVccHiAlarm,
+             hpicfXcvrVccLoAlarm,
+             hpicfXcvrVccHiWarn,
+             hpicfXcvrVccLoWarn,
              hpicfXcvrBiasHiAlarm,
              hpicfXcvrBiasLoAlarm,
              hpicfXcvrBiasHiWarn,
@@ -1441,21 +1460,93 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
              hpicfXcvrMdiPairCPolaritySwap,
              hpicfXcvrMdiPairCSkew,
              hpicfXcvrMdiPairDCableStatus,
-             hpicfXcvrMdiPairDCableLength,  
-             hpicfXcvrMdiPairDDistanceToFault,  
-             hpicfXcvrMdiPairDPolaritySwap, 
-             hpicfXcvrMdiPairDSkew,    
-             hpicfXcvrMdiPairABSwap,  
+             hpicfXcvrMdiPairDCableLength,
+             hpicfXcvrMdiPairDDistanceToFault,
+             hpicfXcvrMdiPairDPolaritySwap,
+             hpicfXcvrMdiPairDSkew,
+             hpicfXcvrMdiPairABSwap,
              hpicfXcvrMdiPairCDSwap,
              hpicfXcvrDiagnosticsTimeTicks
           }
-    STATUS  current
+    STATUS  deprecated
     DESCRIPTION
-           "A collection of objects representing transceiver 
+           "A collection of objects representing transceiver
             information."
           ::= { hpicfXcvrGroups 2 }
 
-    hpicfXcvrCompliances OBJECT IDENTIFIER ::=
+   hpicfXcvrInfoGroup2 OBJECT-GROUP
+          OBJECTS {
+             hpicfXcvrPortIndex,
+             hpicfXcvrPortDesc,
+             hpicfXcvrModel,
+             hpicfXcvrSerial,
+             hpicfXcvrType,
+             hpicfXcvrConnectorType,
+             hpicfXcvrWavelength,
+             hpicfXcvrTxDist,
+             hpicfXcvrDiagnostics,
+             hpicfXcvrDiagnosticsUpdate,
+             hpicfXcvrTemp,
+             hpicfXcvrVoltage,
+             hpicfXcvrBias,
+             hpicfXcvrRxPower,
+             hpicfXcvrTxPower,
+             hpicfXcvrAlarms,
+             hpicfXcvrErrors,
+             hpicfXcvrTempHiAlarm,
+             hpicfXcvrTempLoAlarm,
+             hpicfXcvrTempHiWarn,
+             hpicfXcvrTempLoWarn,
+             hpicfXcvrVccHiAlarm,
+             hpicfXcvrVccLoAlarm,
+             hpicfXcvrVccHiWarn,
+             hpicfXcvrVccLoWarn,
+             hpicfXcvrBiasHiAlarm,
+             hpicfXcvrBiasLoAlarm,
+             hpicfXcvrBiasHiWarn,
+             hpicfXcvrBiasLoWarn,
+             hpicfXcvrPwrOutHiAlarm,
+             hpicfXcvrPwrOutLoAlarm,
+             hpicfXcvrPwrOutHiWarn,
+             hpicfXcvrPwrOutLoWarn,
+             hpicfXcvrRcvPwrHiAlarm,
+             hpicfXcvrRcvPwrLoAlarm,
+             hpicfXcvrRcvPwrHiWarn,
+             hpicfXcvrRcvPwrLoWarn,
+             hpicfXcvrPhyLinkStatus,hpicfXcvrPhySpeed,
+             hpicfXcvrPhyDuplex,
+             hpicfXcvrMdiPairACableStatus,
+             hpicfXcvrMdiPairACableLength,
+             hpicfXcvrMdiPairADistanceToFault,
+             hpicfXcvrMdiPairAPolaritySwap,
+             hpicfXcvrMdiPairASkew,
+             hpicfXcvrMdiPairBCableStatus,
+             hpicfXcvrMdiPairBCableLength,
+             hpicfXcvrMdiPairBDistanceToFault,
+             hpicfXcvrMdiPairBPolaritySwap,
+             hpicfXcvrMdiPairBSkew,
+             hpicfXcvrMdiPairCCableStatus,
+             hpicfXcvrMdiPairCCableLength,
+             hpicfXcvrMdiPairCDistanceToFault,
+             hpicfXcvrMdiPairCPolaritySwap,
+             hpicfXcvrMdiPairCSkew,
+             hpicfXcvrMdiPairDCableStatus,
+             hpicfXcvrMdiPairDCableLength,
+             hpicfXcvrMdiPairDDistanceToFault,
+             hpicfXcvrMdiPairDPolaritySwap,
+             hpicfXcvrMdiPairDSkew,
+             hpicfXcvrMdiPairABSwap,
+             hpicfXcvrMdiPairCDSwap,
+             hpicfXcvrDiagnosticsTimeTicks,
+             hpicfXcvrManufacDate
+          }
+    STATUS  current
+    DESCRIPTION
+           "A collection of objects representing transceiver
+            information."
+          ::= { hpicfXcvrGroups 3 }
+
+   hpicfXcvrCompliances OBJECT IDENTIFIER ::=
         { hpicfXcvrConformance 2 }
 
     hpicfXcvrCompliance  MODULE-COMPLIANCE
@@ -1473,13 +1564,23 @@ HP-ICF-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
           ::= { hpicfXcvrCompliances 1 }
 
     hpicfXcvrCompliance1  MODULE-COMPLIANCE
+          STATUS  deprecated
+          DESCRIPTION
+                "Describes the requirements for conformance to the
+                transceiver MIB."
+    MODULE  -- this module
+          MANDATORY-GROUPS { hpicfXcvrInfoGroup1
+                              }
+          ::= { hpicfXcvrCompliances 2 }
+
+    hpicfXcvrCompliance2  MODULE-COMPLIANCE
           STATUS  current
           DESCRIPTION
                 "Describes the requirements for conformance to the
                 transceiver MIB."
     MODULE  -- this module
-          MANDATORY-GROUPS { hpicfXcvrInfoGroup1 }
-          ::= { hpicfXcvrCompliances 2 }
+          MANDATORY-GROUPS { hpicfXcvrInfoGroup2
+                              }
+          ::= { hpicfXcvrCompliances 3 }
+
 END
-
-

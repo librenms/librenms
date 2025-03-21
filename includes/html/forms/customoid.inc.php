@@ -39,7 +39,7 @@ if ($action == 'test') {
         $oid_value = $rawdata;
     } elseif (
         ! empty($_POST['unit']) &&
-        str_i_contains($rawdata, $unit) &&
+        Str::contains($rawdata, $unit, ignoreCase: true) &&
         is_numeric(trim(str_replace($unit, '', $rawdata)))
     ) {
         $oid_value = trim(str_replace($unit, '', $rawdata));

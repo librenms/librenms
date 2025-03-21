@@ -8,6 +8,7 @@
 @include('map.custom-node-modal')
 @include('map.custom-edge-modal')
 @include('map.custom-map-modal')
+@include('map.custom-legend-modal')
 @include('map.custom-map-list-modal')
 
 <div class="container-fluid">
@@ -18,6 +19,7 @@
       <button type=button value="mapbg" id="map-bgEndAdjustButton" class="btn btn-primary" onclick="endBackgroundMapAdjust()" style="display:none">{{ __('map.custom.edit.bg.adjust_map_finish') }}</button>
       <button type=button value="editnodedefaults" id="map-nodeDefaultsButton" class="btn btn-primary" onclick="nodeEdit(newnodeconf)">{{ __('map.custom.edit.node.edit_defaults') }}</button>
       <button type=button value="editedgedefaults" id="map-edgeDefaultsButton" class="btn btn-primary" onclick="edgeEditDefaults()">{{ __('map.custom.edit.edge.edit_defaults') }}</button>
+      <button type=button value="togglelegend" id="map-legendToggleButton" class="btn btn-primary" onclick="toggleLegend()">{{ __('map.custom.edit.map.legend_toggle') }}</button>
     </div>
     <div class="col-md-2">
       <center>
@@ -25,6 +27,7 @@
       </center>
     </div>
     <div class="col-md-5 text-right">
+      <button type=button value="mapselectall" id="map-selectallButton" class="btn btn-primary" onclick="network.selectNodes(network_nodes.getIds());" title="{{ __('map.custom.edit.map.multiselect_info') }}">{{ __('map.custom.edit.map.selectall') }}</button>
       <button type=button value="maprender" id="map-renderButton" class="btn btn-primary" style="display: none" onclick="CreateNetwork();">{{ __('map.custom.edit.map.rerender') }}</button>
       <button type=button value="mapsave" id="map-saveDataButton" class="btn btn-primary" style="display: none" onclick="saveMapData();">{{ __('map.custom.edit.map.save') }}</button>
       <button type=button value="maplist" id="map-listButton" class="btn btn-primary" onclick="mapList();">{{ __('map.custom.edit.map.list') }}</button>
@@ -57,7 +60,8 @@
 @endsection
 
 @section('javascript')
-<script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-network.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/vis-data.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/leaflet.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/L.Control.Locate.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/leaflet-image.js') }}"></script>
@@ -95,6 +99,7 @@
     var edge_nodes_map = [];
     var node_device_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
+    var nodeimage_base = '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", "");
     var network_options = {{ Js::from($map_conf) }}
 
     function edgeNodesRemove(nm_id, edgeid) {
@@ -336,10 +341,14 @@
             if(data.edges.length > 0 || data.nodes.length > 0) {
                 // Make sure a node is not dragged outside the canvas
                 nodepos = network.getPositions(data.nodes);
+                legendMoved = false;
                 $.each( nodepos, function( nodeid, node ) {
                     if ( nodeid.startsWith("legend_") ) {
-                        // Make sure the moved node is still on the map
-                        fixNodePos(nodeid, node);
+                        // Only move the legend once
+                        if (legendMoved) {
+                            return;
+                        }
+                        legendMoved = true;
 
                         // Get the current node config
                         cur_node = network_nodes.get(nodeid);
@@ -348,7 +357,19 @@
                         legend.x = legend.x + node.x - cur_node.x;
                         legend.y = legend.y + node.y - cur_node.y;
 
+                        // Make sure the top of the legend is still on the map
+                        fixNodePos("legend", legend);
+
                         redrawLegend();
+
+                        // Make sure the bottom of the legend is still on the map
+                        legendEndNode = network_nodes.get("legend_" + (legend.steps - 1))
+                        moveUp = legendEndNode.y - network_height + {{ $vmargin }};
+                        if (moveUp > 0) {
+                            legend.y -= moveUp;
+                            redrawLegend();
+                        }
+
                         return;
                     }
                     let move = fixNodePos(nodeid, node);
@@ -428,7 +449,32 @@
         return '#ff00ff';
     }
 
+    function toggleLegend() {
+        var width = $("#mapwidth").val();
+        var mapwdith = 100;
+        if (!isNaN(width)) {
+            mapwidth = width;
+        } else if (width.includes("px")) {
+            mapwidth = width.replace("px", "");
+        } else if (width.includes("%")) {
+            mapwidth = window.innerWidth * width.replace("%", "") / 100;
+        }
+
+        // Update the x and y coordinates
+        if (legend.x < 0) {
+            legend.x = mapwidth - 50;
+            legend.y = 100;
+        } else {
+            legend.x = -1;
+            legend.y = -1;
+        }
+        redrawLegend();
+    }
+
     function redrawLegend() {
+        // Save list of selected nodes because we are going to remove and re-add the legend
+        selectedNodes = network.selectionHandler.getSelectedNodes().map((n) => {return n.id});
+
         // Clear out the old legend
         old_nodes = network_nodes.get({filter: function(node) { return node.id.startsWith("legend_") }});
         old_nodes.forEach((node) => {
@@ -443,24 +489,47 @@
             y_pos += y_inc;
 
             if (!(Boolean(legend.hide_invalid))) {
-                let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "white"}, color: {background: "black"}};
+                let this_colour = 'black';
+                if(legend.colours) {
+                    this_colour = legend.colours['-1'];
+                }
+                let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "white"}, color: {background: this_colour}};
                 y_pos += y_inc;
                 network_nodes.add(legend_invalid);
             }
 
-            let pct_step;
-            if (Boolean(legend.hide_overspeed)) {
-                pct_step = 100.0 / (legend.steps - 1);
+            if(legend.colours) {
+                let i = 0;
+                Object.keys(legend.colours).sort((a,b) => parseInt(a) > parseInt(b)).forEach((pct_key) => {
+                    let this_pct = parseFloat(pct_key);
+                    if(!isNaN(this_pct) && this_pct >= 0.0) {
+                        let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "black"}, color: {background: legend.colours[pct_key]}};
+                        network_nodes.add(legend_step);
+                        y_pos += y_inc;
+                        i++;
+                    }
+                });
             } else {
-                pct_step = 150.0 / (legend.steps - 1);
-            }
-            for (let i=0; i < legend.steps; i++) {
-                let this_pct = Math.round(pct_step * i);
-                let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "black"}, color: {background: legendPctColour(this_pct)}};
-                network_nodes.add(legend_step);
-                y_pos += y_inc;
+                let pct_step;
+                if (Boolean(legend.hide_overspeed)) {
+                    pct_step = 100.0 / (legend.steps - 1);
+                } else {
+                    pct_step = 150.0 / (legend.steps - 1);
+                }
+                for (let i=0; i < legend.steps; i++) {
+                    let this_pct = Math.round(pct_step * i);
+                    let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size:
+ legend.font_size, color: "black"}, color: {background: legendPctColour(this_pct)}};
+                    network_nodes.add(legend_step);
+                    y_pos += y_inc;
+                }
             }
             network_nodes.flush();
+        }
+
+        // Re-select nodes if multiple nodes are selected
+        if (selectedNodes.length > 1) {
+            network.selectNodes(selectedNodes);
         }
     }
 
@@ -474,7 +543,6 @@
             swapArrows(Boolean(parseInt(data.reverse_arrows)));
         }
         reverse_arrows = parseInt(data.reverse_arrows);
-        redrawLegend();
 
         // update dimensions
         network_options.width = data.width;
@@ -484,11 +552,14 @@
         // Re-create the network because network.setSize() blanks out the map
         CreateNetwork();
 
-        editMapCancel();
+        $('#mapModal').modal('hide');
     }
 
     function editMapCancel() {
+        mapSettingsReset();
         $('#mapModal').modal('hide');
+        $("#savemap-alert").attr("class", "col-sm-12");
+        $("#savemap-alert").text("");
     }
 
     function saveMapData() {
@@ -503,18 +574,23 @@
                 edgeid = node.id.split("_")[0];
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
-                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, text_align: edge1.font.align, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), fixed_width: (edge1.width || null), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
             } else {
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
                 } else {
                     node.icon = null;
                 }
-                if("unselected" in node.image) {
+                if(node.image && "unselected" in node.image) {
                     if(node.image.unselected.indexOf(custom_image_base) == 0) {
                         node.image.unselected = node.image.unselected.replace(custom_image_base, "");
+                        node.nodeimage = null;
+                    } else if(node.image.unselected.indexOf(nodeimage_base) == 0) {
+                        node.nodeimage = node.image.unselected.replace(nodeimage_base, "");
+                        node.image = undefined;
                     } else {
-                        node.image = {};
+                        node.image = undefined;
+                        node.nodeimage = null;
                     }
                 }
                 nodes[node.id] = node;
@@ -530,6 +606,11 @@
                 edges: edges,
                 legend_x: legend.x,
                 legend_y: legend.y,
+                legend_steps: legend.steps,
+                legend_font_size: legend.font_size,
+                legend_hide_invalid: legend.hide_invalid,
+                legend_hide_overspeed: legend.hide_overspeed,
+                legend_colours: legend.colours,
             }),
             contentType: "application/json",
             dataType: 'json',
@@ -572,6 +653,7 @@
 
             // Legend nodes cannot be edited
             if (data.id.startsWith("legend_") ) {
+                $('#mapLegendModal').modal({backdrop: 'static', keyboard: false}, 'show');
                 return;
             }
         }
@@ -636,11 +718,13 @@
                 $.each( data.nodes, function( nodeid, node) {
                     var node_cfg = {};
                     node_cfg.id = nodeid;
+                    node_cfg.device_id = node.device_id;
+                    node_cfg.linked_map_id = node.linked_map_id;
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name, device_image: node.device_image};
-                        node_cfg.title = node.device_id;
+                        node_cfg.title = "Device " + node.device_id;
                     } else if(node.linked_map_id) {
-                        node_cfg.title = "map:" + node.linked_map_id;
+                        node_cfg.title = "Link to map " + node.linked_map_id;
                     } else {
                         node_cfg.title = null;
                     }
@@ -649,7 +733,7 @@
                     node_cfg.borderWidth = node.border_width;
                     node_cfg.x = node.x_pos;
                     node_cfg.y = node.y_pos;
-                    node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
+                    node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour, background: '#FFFFFF'};
                     node_cfg.size = node.size;
                     node_cfg.color = {background: node.colour_bg, border: node.colour_bdr};
                     if(node.style == "icon") {
@@ -660,16 +744,21 @@
                     if(node.style == "image" || node.style == "circularImage") {
                         if(node.image) {
                             node_cfg.image = {unselected: custom_image_base + node.image};
+                        } else if(node.nodeimage) {
+                            node_cfg.image = {unselected: nodeimage_base + node.nodeimage};
                         } else if (node.device_image) {
                             node_cfg.image = {unselected: node.device_image};
                         } else {
                             // If we do not get a valid image from the database, use defaults
                             node_cfg.shape = newnodeconf.shape;
                             node_cfg.icon = newnodeconf.icon;
-                            node_cfg.image = newnodeconf.image;
+                            node_cfg.image = newnodeconf.image || undefined;
                         }
                     } else {
-                        node_cfg.image = {};
+                        node_cfg.image = undefined;
+                    }
+                    if(! ["ellipse", "circle", "database", "box", "text"].includes(node.style)) {
+                        node_cfg.font.background = "#FFFFFF";
                     }
 
                     if (network_nodes.get(nodeid)) {
@@ -695,8 +784,11 @@
                         arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
                     }
 
-                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
-                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour, align: edge.text_align, background: '#FFFFFF'}, smooth: {type: edge.style}, arrowStrikethrough: false};
+                    if(edge.fixed_width) {
+                        edge1.width = edge2.width = parseFloat(edge.fixed_width) || null;
+                    }
 
                     // Special case for curved lines
                     if(edge2.smooth.type == "curvedCW") {
@@ -761,11 +853,11 @@
             for (const mutation of mutationList) {
                 if (mutation.addedNodes.length) {
                     if(Array.from(mutation.addedNodes).some(({classList}) => classList.contains("vis-back"))) {
-                        document.getElementById("custom-map").classList.add("tw-cursor-crosshair")
+                        document.getElementById("custom-map").classList.add("tw:cursor-crosshair")
                     }
                 } else if (mutation.removedNodes.length) {
                     if(Array.from(mutation.removedNodes).some(({classList}) => classList.contains("vis-back"))) {
-                        document.getElementById("custom-map").classList.remove("tw-cursor-crosshair")
+                        document.getElementById("custom-map").classList.remove("tw:cursor-crosshair")
                     }
                 }
             }

@@ -136,11 +136,19 @@ class Graph extends Component
      */
     public function filterAttributes($value, $key): bool
     {
-        return ! in_array($key, [
+        $filtered = [
             'legend',
             'height',
             'loading',
-        ]);
+        ];
+
+        // do not add class and style to the image, add them to the outer link
+        if ($this->link) {
+            $filtered[] = 'class';
+            $filtered[] = 'style';
+        }
+
+        return ! in_array($key, $filtered);
     }
 
     private function getSrc(): string

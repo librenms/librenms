@@ -29,7 +29,6 @@ use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\IntegerType;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\StringHelpers;
-use LibreNMS\Util\Time;
 
 class FunctionsTest extends TestCase
 {
@@ -98,26 +97,7 @@ class FunctionsTest extends TestCase
         $this->assertSame('BBQ', YamlDiscovery::getValueFromData('doubletable', 13, $data, $pre_cache));
     }
 
-    public function testParseAtTime(): void
-    {
-        $this->assertEquals(time(), Time::parseAt('now'), 'now did not match');
-        $this->assertEquals(time() + 180, Time::parseAt('+3m'), '+3m did not match');
-        $this->assertEquals(time() + 7200, Time::parseAt('+2h'), '+2h did not match');
-        $this->assertEquals(time() + 172800, Time::parseAt('+2d'), '+2d did not match');
-        $this->assertEquals(time() + 63115200, Time::parseAt('+2y'), '+2y did not match');
-        $this->assertEquals(time() - 180, Time::parseAt('-3m'), '-3m did not match');
-        $this->assertEquals(time() - 7200, Time::parseAt('-2h'), '-2h did not match');
-        $this->assertEquals(time() - 172800, Time::parseAt('-2d'), '-2d did not match');
-        $this->assertEquals(time() - 63115200, Time::parseAt('-2y'), '-2y did not match');
-        $this->assertEquals(429929439, Time::parseAt('429929439'));
-        $this->assertEquals(212334234, Time::parseAt(212334234));
-        $this->assertEquals(time() - 43, Time::parseAt('-43'), '-43 did not match');
-        $this->assertEquals(0, Time::parseAt('invalid'));
-        $this->assertEquals(606614400, Time::parseAt('March 23 1989 UTC'));
-        $this->assertEquals(time() + 86400, Time::parseAt('+1 day'));
-    }
-
-    public function testNumberCast()
+    public function testNumberCast(): void
     {
         $this->assertSame(-14.3, Number::cast(-14.3));
         $this->assertSame(0, Number::cast('b -35')); // cast must start with the number as old style php cast did
@@ -129,7 +109,7 @@ class FunctionsTest extends TestCase
         $this->assertSame(2, Number::cast('2.000'));
     }
 
-    public function testNumberAsUnsigned()
+    public function testNumberAsUnsigned(): void
     {
         $this->assertSame(42, Number::constrainInteger('42', IntegerType::int32));  /** @phpstan-ignore-line */
         $this->assertSame(2147483647, Number::constrainInteger(2147483647, IntegerType::int32));
@@ -146,7 +126,7 @@ class FunctionsTest extends TestCase
         $this->assertSame(2147483645, Number::constrainInteger(-2147483649, IntegerType::uint32));
     }
 
-    public function testNumberAsUnsignedValueExceedsMaxUnsignedValue()
+    public function testNumberAsUnsignedValueExceedsMaxUnsignedValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 

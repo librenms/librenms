@@ -56,12 +56,10 @@ class IpTest extends TestCase
 
     /**
      * See https://github.com/librenms/librenms/pull/13468 for more info
-     *
-     * @requires PHP >= 7.4
      */
     public function testIsValidIPv6ExcludeReserved(): void
     {
-        $this->assertFalse(IPv6::isValid('2001:db8:85a3::8a2e:370:7334', true));
+        $this->assertFalse(IPv6::isValid('::1', true));
     }
 
     public function testIpParse(): void

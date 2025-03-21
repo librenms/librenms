@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Ospfv3Nbr;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\StringHelpers;
@@ -215,8 +216,12 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 continue;
             }
 
-            $local_ifName = $lldp['lldpNeighborPortId'][$IndexId][1];
-            $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
+            $interface = get_port_by_ifIndex($device['device_id'], $IndexId);
+            if (! $interface['port_id']) {
+                $local_ifName = $lldp['lldpNeighborPortId'][$IndexId][1];
+                $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
+                $interface = get_port_by_id($local_port_id);
+            }
 
             $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId][1]);
             $remote_device_name = $lldp['lldpNeighborDeviceName'][$IndexId][1];
@@ -229,20 +234,22 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                     \LibreNMS\Util\Validate::hostname($remote_device_name) &&
                     ! can_skip_discovery($remote_device_name, $remote_device_ip) &&
                     Config::get('autodiscovery.xdp') === true) {
-                $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $local_ifName);
+                $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $interface);
             }
 
-            discover_link(
-                $local_port_id, //our port id from database
-                'lldp',
-                $remote_port_id, //remote port id from database if applicable
-                $remote_device_name, //remote device name from SNMP walk
-                $remote_port_descr, //remote port description from SNMP walk
-                null,
-                $remote_device_sysDescr, //remote device description from SNMP walk
-                $device['device_id'], //our device id
-                $remote_device_id //remote device id if applicable
-            );
+            if ($interface['port_id'] && $remote_device_name && $remote_port_descr) {
+                discover_link(
+                    $interface['port_id'], //our port id from database
+                    'lldp',
+                    $remote_port_id, //remote port id from database if applicable
+                    $remote_device_name, //remote device name from SNMP walk
+                    $remote_port_descr, //remote port description from SNMP walk
+                    null,
+                    $remote_device_sysDescr, //remote device description from SNMP walk
+                    $device['device_id'], //our device id
+                    $remote_device_id //remote device id if applicable
+                );
+            }
         }
     }
     echo PHP_EOL;
@@ -326,6 +333,8 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
             if ($device['os'] == 'aos7') {
                 $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
+            } elseif ($device['os'] == 'routeros') {
+                $ifIndex = $entry_key;
             } elseif (is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
                 $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
             } else {
@@ -395,7 +404,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
                 if ($remote_device['os'] == 'xos') {
                     $slot_port = explode(':', $remote_port_name);
-                    if (sizeof($slot_port) == 2) {
+                    if (count($slot_port) == 2) {
                         $n_slot = (int) $slot_port[0];
                         $n_port = (int) $slot_port[1];
                     } else {
@@ -481,9 +490,38 @@ if (Config::get('autodiscovery.ospf') === true) {
     echo PHP_EOL;
 }
 
+if (Config::get('autodiscovery.ospfv3') === true) {
+    echo ' OSPFv3 Discovery: ';
+    $ospf_nbrs = Ospfv3Nbr::select('ospfv3NbrAddress', 'device_id')
+       ->distinct()
+       ->where('device_id', $device['device_id'])
+       ->get();
+    foreach ($ospf_nbrs as $nbr) {
+        try {
+            $ip = IP::parse($nbr->ospfv3NbrAddress);
+
+            if ($ip->inNetworks(Config::get('autodiscovery.nets-exclude'))) {
+                echo 'x';
+                continue;
+            }
+
+            if (! $ip->inNetworks(Config::get('nets'))) {
+                echo 'i';
+                continue;
+            }
+
+            $name = gethostbyaddr($ip);
+            $remote_device_id = discover_new_device($name, $device, 'OSPFv3');
+        } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
+            //
+        }
+    }
+    echo PHP_EOL;
+}
+
 d_echo($link_exists);
 
-$sql = 'SELECT * FROM `links` AS L, `ports` AS I WHERE L.local_port_id = I.port_id AND I.device_id = ?';
+$sql = 'SELECT * FROM `links` AS L LEFT JOIN `ports` AS I ON L.local_port_id = I.port_id WHERE L.local_device_id = ?';
 foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
     $local_port_id = $test['local_port_id'];
     $remote_hostname = $test['remote_hostname'];

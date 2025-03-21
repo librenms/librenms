@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default {{ $navbar }} navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-default {{ $navbar }} navbar-sticky-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse">
@@ -74,6 +74,11 @@
                                                                        aria-hidden="true"></i> {{ __('Smokeping') }}</a>
                                 </li>
                                 @endconfig
+                                @config('mac_oui.enabled')
+                                <li><a href="{{ route('tool.oui-lookup') }}"><i class="fa fa-magnifying-glass fa-fw fa-lg"
+                                                                                              aria-hidden="true"></i> {{ __('tools.oui.title') }}</a>
+                                </li>
+                                @endconfig
                                 @config('oxidized.enabled')
                                 <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Oxidized') }}</a>
@@ -127,17 +132,18 @@
                        data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons hidden-md"
                                                  aria-hidden="true"></i> <span class="hidden-sm">{{ __('Devices') }}</span></a>
                     <ul class="dropdown-menu">
-                    @if($device_types->isNotEmpty())
-                        <li class="dropdown-submenu">
-                            <a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg"
-                                                              aria-hidden="true"></i> {{ __('All Devices') }}</a>
-                            <ul class="dropdown-menu scrollable-menu">
-                            @foreach($device_types as $type)
-                                <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
-                            @endforeach
-                        </ul></li>
+                    @if($no_devices_added)
+                    <li><a href="#"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('No Devices') }}</a>
                     @else
-                            <li class="dropdown-submenu"><a href="#">{{ __('No devices') }}</a></li>
+                    <li @class(['dropdown-submenu' => $device_types->isNotEmpty()])><a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Devices') }}</a>
+                        @if($device_types->isNotEmpty())
+                        <ul class="dropdown-menu scrollable-menu">
+                        @foreach($device_types as $type)
+                            <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
+                        @endforeach
+                        </ul>
+                        @endif
+                    </li>
                     @endif
 
                     @if($device_groups->isNotEmpty())
@@ -245,9 +251,8 @@
                                                 {{ ucfirst($map->name) }}
                                             </a></li>
                                         @endforeach
-                                        @if($map_group)</ul>@endif
+                                        @if($map_group)</ul></li>@endif
                                     @endforeach
-                            </li>
                         @endif
                         @admin
                         <li role="presentation" class="divider"></li>
@@ -259,6 +264,9 @@
                             <i class="fa fa-pen-to-square fa-fw fa-lg" aria-hidden="true"></i> {{ __('Edit Current Map') }}
                         </a></li>
                         @endif
+                        <li><a href="{{ route('maps.nodeimage.index') }}">
+                            <i class="fa fa-image fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Node Image Manager') }}
+                        </a></li>
                         @endadmin
 
                     </ul>
@@ -630,15 +638,14 @@
                         </li>
                         <li role="presentation" class="divider"></li>
                         @endadmin
-                        @if (isset($refresh))
-                        <li class="dropdown-submenu">
-                            <a href="#"><span class="countdown_timer" id="countdown_timer"></span></a>
+                        <li class="dropdown-submenu" id="countdown_timer_menu" style="display: none">
+                            <a href="#"><i class="fa fa-clock-o fa-fw fa-lg"></i> <span id="countdown_timer"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#"><span class="countdown_timer_status" id="countdown_timer_status"></span></a></li>
+                                <li><a href="#" id="countdown_timer_pause"><i class="fa fa-pause fa-fw fa-lg"></i> {{ __('Pause') }}</a></li>
+                                <li><a href="#" id="countdown_timer_refresh"><i class="fa fa-arrows-rotate fa-fw fa-lg"></i> {{ __('Refresh') }}</a></li>
                             </ul>
                         </li>
-                        <li role="presentation" class="divider"></li>
-                        @endif
+                        <li role="presentation" class="divider" id="countdown_timer_divider" style="display: none"></li>
                         <li><a href="{{ url('about') }}"><i class="fa-solid fa-circle-info fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => \LibreNMS\Config::get('project_name')]) }}
                             </a></li>

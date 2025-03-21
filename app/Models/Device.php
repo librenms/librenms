@@ -547,7 +547,6 @@ class Device extends BaseModel
     {
         return $query->where([
             ['status', '=', 0],
-            ['disable_notify', '=', 0],
             ['ignore', '=', 0],
             ['disabled', '=', 0],
         ]);
@@ -840,6 +839,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\MuninPlugin::class, 'device_id');
     }
 
+    public function nd(): HasMany
+    {
+        return $this->hasMany(Ipv6Nd::class, 'device_id');
+    }
+
     public function netscalerVservers(): HasMany
     {
         return $this->hasMany(NetscalerVserver::class, 'device_id');
@@ -863,6 +867,26 @@ class Device extends BaseModel
     public function ospfPorts(): HasMany
     {
         return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
+    }
+
+    public function ospfv3Areas(): HasMany
+    {
+        return $this->hasMany(\App\Models\Ospfv3Area::class, 'device_id');
+    }
+
+    public function ospfv3Instances(): HasMany
+    {
+        return $this->hasMany(\App\Models\Ospfv3Instance::class, 'device_id');
+    }
+
+    public function ospfv3Nbrs(): HasMany
+    {
+        return $this->hasMany(\App\Models\Ospfv3Nbr::class, 'device_id');
+    }
+
+    public function ospfv3Ports(): HasMany
+    {
+        return $this->hasMany(\App\Models\Ospfv3Port::class, 'device_id');
     }
 
     public function packages(): HasMany
@@ -1028,6 +1052,11 @@ class Device extends BaseModel
     public function rServers(): HasMany
     {
         return $this->hasMany(LoadbalancerRserver::class, 'device_id');
+    }
+
+    public function qos(): HasMany
+    {
+        return $this->hasMany(Qos::class, 'device_id');
     }
 
     public function slas(): HasMany

@@ -5,6 +5,13 @@ modules:
         serial: IMCO-BIG-MIB::imPM1SystemIDserNumb.0
         version: IMCO-BIG-MIB::imco3IdentSwVersion.0
     sensors:
+        temperature:
+            data:
+                -
+                    oid: imPm1BatLeg1Temperature
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.7.11.{{ $index }}'
+                    index: imPm1BatLeg1Temperature.{{ $index }}
+                    descr: Battery Temperature
         current:
             data:
                 -
@@ -81,11 +88,355 @@ modules:
                     oid: imPM1Power1Running1
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.32.{{ $index }}'
                     index: 'imPM1Power1Running1.{{ $index }}'
-                    descr: 'Power State'
+                    descr: 'Power Unit 1'
+                    group: Power
                     states:
-                        - { descr: Battery, graph: 0, value: 1, generic: 2 }
-                        - { descr: Online, graph: 0, value: 0, generic: 0 }
+                        - { descr: Ok , graph: 0, value: 0, generic: 0 }
+                        - { descr: Error , graph: 0, value: 1, generic: 2 }
 
+                -
+                    oid: imPM1Power1Running2
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.33.{{ $index }}'
+                    index: 'imPM1Power1Running2.{{ $index }}'
+                    descr: 'Power Unit 2'
+                    group: Power
+                    states:
+                        - { descr: Ok , graph: 0, value: 0, generic: 0 }
+                        - { descr: Error , graph: 0, value: 1, generic: 2 }
+
+                -
+                    oid: imPM1Power1Running3
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.34.{{ $index }}'
+                    index: 'imPM1Power1Running3.{{ $index }}'
+                    descr: 'Power Unit 3'
+                    group: Power
+                    states:
+                        - { descr: Ok , graph: 0, value: 0, generic: 0 }
+                        - { descr: Error , graph: 0, value: 1, generic: 2 }
+
+                -
+                    oid: imco3AlarmDescr
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.3.2.1.2.{{ $index }}'
+                    descr: 'Alarm'
+                    group: 'Alarms'
+                    index: '{{ $index }}'
+                    states:
+                        - { descr: Communication Lost, graph: 0, value: 1, generic: 2 }
+                        - { descr: Low Battery, graph: 0, value: 2, generic: 1 }
+                        - { descr: Running on Battery, graph: 0, value: 3, generic: 2 }
+                        - { descr: Action Alarm 4, graph: 0, value: 4, generic: 2 }
+                        - { descr: Action Alarm 5, graph: 0, value: 5, generic: 2 }
+                        - { descr: Action Alarm 6, graph: 0, value: 6, generic: 2 }
+                        - { descr: Action Alarm 7, graph: 0, value: 7, generic: 2 }
+                        - { descr: Action Alarm 8, graph: 0, value: 8, generic: 2 }
+                        - { descr: Time for Service, graph: 0, value: 9, generic: 2 }
+                        - { descr: General Surge Arrester Activated, graph: 0, value: 10, generic: 2 }
+                        - { descr: General Door 1 Opened, graph: 0, value: 11, generic: 2 }
+                        - { descr: General Door 2 Opened, graph: 0, value: 12, generic: 2 }
+                        - { descr: General Fan Alarm, graph: 0, value: 13, generic: 2 }
+                        - { descr: General Overtemperature, graph: 0, value: 14, generic: 2 }
+                        - { descr: General Undertemperature, graph: 0, value: 15, generic: 2 }
+                        - { descr: General User Alarm 1, graph: 0, value: 16, generic: 2 }
+                        - { descr: General User Alarm 2, graph: 0, value: 17, generic: 2 }
+                        - { descr: General User Alarm 3, graph: 0, value: 18, generic: 2 }
+                        - { descr: General User Alarm 4, graph: 0, value: 19, generic: 2 }
+                        - { descr: Time for Power Supply 1 Service, graph: 0, value: 20, generic: 2 }
+                        - { descr: Power Supply 1 Input Overvoltage, graph: 0, value: 21, generic: 2 }
+                        - { descr: Power Supply 1 Input Undervoltage, graph: 0, value: 22, generic: 2 }
+                        - { descr: Power Supply 1 Input Overcurrent, graph: 0, value: 23, generic: 2 }
+                        - { descr: Power Supply 1 Input Overload, graph: 0, value: 24, generic: 2 }
+                        - { descr: Power Supply 1 Output Overvoltage, graph: 0, value: 25, generic: 2 }
+                        - { descr: Power Supply 1 Output Undervoltage, graph: 0, value: 26, generic: 2 }
+                        - { descr: Power Supply 1 Output Overcurrent, graph: 0, value: 27, generic: 2 }
+                        - { descr: Power Supply 1 Output Overload, graph: 0, value: 28, generic: 2 }
+                        - { descr: Power Supply 1 Overtemperature, graph: 0, value: 29, generic: 2 }
+                        - { descr: Power Supply 1 Undertemperature, graph: 0, value: 30, generic: 2 }
+                        - { descr: Power Supply 1 Converter 1 Not Running, graph: 0, value: 31, generic: 2 }
+                        - { descr: Power Supply 1 Converter 2 Not Running, graph: 0, value: 32, generic: 2 }
+                        - { descr: Power Supply 1 Converter 3 Not Running, graph: 0, value: 33, generic: 2 }
+                        - { descr: Power Supply 1 Converter 4 Not Running, graph: 0, value: 34, generic: 2 }
+                        - { descr: Power Supply 1 Converter 5 Not Running, graph: 0, value: 35, generic: 2 }
+                        - { descr: Power Supply 1 Converter 6 Not Running, graph: 0, value: 36, generic: 2 }
+                        - { descr: Power Supply 1 Converter 7 Not Running, graph: 0, value: 37, generic: 2 }
+                        - { descr: Power Supply 1 Converter 8 Not Running, graph: 0, value: 38, generic: 2 }
+                        - { descr: Power Supply 1 Input Fuse Off, graph: 0, value: 39, generic: 2 }
+                        - { descr: Power Supply 1 Input Fuse 1 Off, graph: 0, value: 40, generic: 2 }
+                        - { descr: Power Supply 1 Input Fuse 2 Off, graph: 0, value: 41, generic: 2 }
+                        - { descr: Power Supply 1 Input Fuse 3 Off, graph: 0, value: 42, generic: 2 }
+                        - { descr: Power Supply 1 Input Breaker Off, graph: 0, value: 43, generic: 2 }
+                        - { descr: Power Supply 1 Input Breaker 1 Off, graph: 0, value: 44, generic: 2 }
+                        - { descr: Power Supply 1 Input Breaker 2 Off, graph: 0, value: 45, generic: 2 }
+                        - { descr: Power Supply 1 Input Breaker 3 Off, graph: 0, value: 46, generic: 2 }
+                        - { descr: Power Supply 1 Input Surge Arrester, graph: 0, value: 47, generic: 2 }
+                        - { descr: Power Supply 1 Output Fuse Off, graph: 0, value: 48, generic: 2 }
+                        - { descr: Power Supply 1 Output Fuse 1 Off, graph: 0, value: 49, generic: 2 }
+                        - { descr: Power Supply 1 Output Fuse 2 Off, graph: 0, value: 50, generic: 2 }
+                        - { descr: Power Supply 1 Output Breaker Off, graph: 0, value: 51, generic: 2 }
+                        - { descr: Power Supply 1 Output Breaker 1 Off, graph: 0, value: 52, generic: 2 }
+                        - { descr: Power Supply 1 Output Breaker 2 Off, graph: 0, value: 53, generic: 2 }
+                        - { descr: Power Supply 1 Fan Malfunction, graph: 0, value: 54, generic: 2 }
+                        - { descr: Power Supply 1 Output Out of Phase, graph: 0, value: 55, generic: 2 }
+                        - { descr: Power Supply 1 User Alarm 1, graph: 0, value: 56, generic: 2 }
+                        - { descr: Power Supply 1 User Alarm 2, graph: 0, value: 57, generic: 2 }
+                        - { descr: Time for Power Supply 2 Service, graph: 0, value: 58, generic: 2 }
+                        - { descr: Power Supply 2 Input Overvoltage, graph: 0, value: 59, generic: 2 }
+                        - { descr: Power Supply 2 Input Undervoltage, graph: 0, value: 60, generic: 2 }
+                        - { descr: Power Supply 2 Input Overcurrent, graph: 0, value: 61, generic: 2 }
+                        - { descr: Power Supply 2 Input Overload, graph: 0, value: 62, generic: 2 }
+                        - { descr: Power Supply 2 Output Overvoltage, graph: 0, value: 63, generic: 2 }
+                        - { descr: Power Supply 2 Output Undervoltage, graph: 0, value: 64, generic: 2 }
+                        - { descr: Power Supply 2 Output Overcurrent, graph: 0, value: 65, generic: 2 }
+                        - { descr: Power Supply 2 Output Overload, graph: 0, value: 66, generic: 2 }
+                        - { descr: Power Supply 2 Overtemperature, graph: 0, value: 67, generic: 2 }
+                        - { descr: Power Supply 2 Undertemperature, graph: 0, value: 68, generic: 2 }
+                        - { descr: Power Supply 2 Converter 1 Not Running, graph: 0, value: 69, generic: 2 }
+                        - { descr: Power Supply 2 Converter 2 Not Running, graph: 0, value: 70, generic: 2 }
+                        - { descr: Power Supply 2 Converter 3 Not Running, graph: 0, value: 71, generic: 2 }
+                        - { descr: Power Supply 2 Converter 4 Not Running, graph: 0, value: 72, generic: 2 }
+                        - { descr: Power Supply 2 Converter 5 Not Running, graph: 0, value: 73, generic: 2 }
+                        - { descr: Power Supply 2 Converter 6 Not Running, graph: 0, value: 74, generic: 2 }
+                        - { descr: Power Supply 2 Converter 7 Not Running, graph: 0, value: 75, generic: 2 }
+                        - { descr: Power Supply 2 Converter 8 Not Running, graph: 0, value: 76, generic: 2 }
+                        - { descr: Power Supply 2 Input Fuse Off, graph: 0, value: 77, generic: 2 }
+                        - { descr: Power Supply 2 Input Fuse 1 Off, graph: 0, value: 78, generic: 2 }
+                        - { descr: Power Supply 2 Input Fuse 2 Off, graph: 0, value: 79, generic: 2 }
+                        - { descr: Power Supply 2 Input Fuse 3 Off, graph: 0, value: 80, generic: 2 }
+                        - { descr: Power Supply 2 Input Breaker Off, graph: 0, value: 81, generic: 2 }
+                        - { descr: Power Supply 2 Input Breaker 1 Off, graph: 0, value: 82, generic: 2 }
+                        - { descr: Power Supply 2 Input Breaker 2 Off, graph: 0, value: 83, generic: 2 }
+                        - { descr: Power Supply 2 Input Breaker 3 Off, graph: 0, value: 84, generic: 2 }
+                        - { descr: Power Supply 2 Input Surge Arrester, graph: 0, value: 85, generic: 2 }
+                        - { descr: Power Supply 2 Output Fuse Off, graph: 0, value: 86, generic: 2 }
+                        - { descr: Power Supply 2 Output Fuse 1 Off, graph: 0, value: 87, generic: 2 }
+                        - { descr: Power Supply 2 Output Fuse 2 Off, graph: 0, value: 88, generic: 2 }
+                        - { descr: Power Supply 2 Output Breaker Off, graph: 0, value: 89, generic: 2 }
+                        - { descr: Power Supply 2 Output Breaker 1 Off, graph: 0, value: 90, generic: 2 }
+                        - { descr: Power Supply 2 Output Breaker 2 Off, graph: 0, value: 91, generic: 2 }
+                        - { descr: Power Supply 2 Fan Malfunction, graph: 0, value: 92, generic: 2 }
+                        - { descr: Power Supply 2 Output Out of Phase, graph: 0, value: 93, generic: 2 }
+                        - { descr: Power Supply 2 User Alarm 1, graph: 0, value: 94, generic: 2 }
+                        - { descr: Power Supply 2 User Alarm 2, graph: 0, value: 95, generic: 2 }
+                        - { descr: Time for Power Supply 3 Service, graph: 0, value: 96, generic: 2 }
+                        - { descr: Power Supply 3 Input Overvoltage, graph: 0, value: 97, generic: 2 }
+                        - { descr: Power Supply 3 Input Undervoltage, graph: 0, value: 98, generic: 2 }
+                        - { descr: Power Supply 3 Input Overcurrent, graph: 0, value: 99, generic: 2 }
+                        - { descr: Power Supply 3 Input Overload, graph: 0, value: 100, generic: 2 }
+                        - { descr: Power Supply 3 Output Overvoltage, graph: 0, value: 101, generic: 2 }
+                        - { descr: Power Supply 3 Output Undervoltage, graph: 0, value: 102, generic: 2 }
+                        - { descr: Power Supply 3 Output Overcurrent, graph: 0, value: 103, generic: 2 }
+                        - { descr: Power Supply 3 Output Overload, graph: 0, value: 104, generic: 2 }
+                        - { descr: Power Supply 3 Overtemperature, graph: 0, value: 105, generic: 2 }
+                        - { descr: Power Supply 3 Undertemperature, graph: 0, value: 106, generic: 2 }
+                        - { descr: Power Supply 3 Converter 1 Not Running, graph: 0, value: 107, generic: 2 }
+                        - { descr: Power Supply 3 Converter 2 Not Running, graph: 0, value: 108, generic: 2 }
+                        - { descr: Power Supply 3 Converter 3 Not Running, graph: 0, value: 109, generic: 2 }
+                        - { descr: Power Supply 3 Converter 4 Not Running, graph: 0, value: 110, generic: 2 }
+                        - { descr: Power Supply 3 Converter 5 Not Running, graph: 0, value: 111, generic: 2 }
+                        - { descr: Power Supply 3 Converter 6 Not Running, graph: 0, value: 112, generic: 2 }
+                        - { descr: Power Supply 3 Converter 7 Not Running, graph: 0, value: 113, generic: 2 }
+                        - { descr: Power Supply 3 Converter 8 Not Running, graph: 0, value: 114, generic: 2 }
+                        - { descr: Power Supply 3 Input Fuse Off, graph: 0, value: 115, generic: 2 }
+                        - { descr: Power Supply 3 Input Fuse 1 Off, graph: 0, value: 116, generic: 2 }
+                        - { descr: Power Supply 3 Input Fuse 2 Off, graph: 0, value: 117, generic: 2 }
+                        - { descr: Power Supply 3 Input Fuse 3 Off, graph: 0, value: 118, generic: 2 }
+                        - { descr: Power Supply 3 Input Breaker Off, graph: 0, value: 119, generic: 2 }
+                        - { descr: Power Supply 3 Input Breaker 1 Off, graph: 0, value: 120, generic: 2 }
+                        - { descr: Power Supply 3 Input Breaker 2 Off, graph: 0, value: 121, generic: 2 }
+                        - { descr: Power Supply 3 Input Breaker 3 Off, graph: 0, value: 122, generic: 2 }
+                        - { descr: Power Supply 3 Input Surge Arrester, graph: 0, value: 123, generic: 2 }
+                        - { descr: Power Supply 3 Output Fuse Off, graph: 0, value: 124, generic: 2 }
+                        - { descr: Power Supply 3 Output Fuse 1 Off, graph: 0, value: 125, generic: 2 }
+                        - { descr: Power Supply 3 Output Fuse 2 Off, graph: 0, value: 126, generic: 2 }
+                        - { descr: Power Supply 3 Output Breaker Off, graph: 0, value: 127, generic: 2 }
+                        - { descr: Power Supply 3 Output Breaker 1 Off, graph: 0, value: 128, generic: 2 }
+                        - { descr: Power Supply 3 Output Breaker 2 Off, graph: 0, value: 129, generic: 2 }
+                        - { descr: Power Supply 3 Fan Malfunction, graph: 0, value: 130, generic: 2 }
+                        - { descr: Power Supply 3 Output Out of Phase, graph: 0, value: 131, generic: 2 }
+                        - { descr: Power Supply 3 User Alarm 1, graph: 0, value: 132, generic: 2 }
+                        - { descr: Power Supply 3 User Alarm 2, graph: 0, value: 133, generic: 2 }
+                        - { descr: Battery Overvoltage, graph: 0, value: 134, generic: 2 }
+                        - { descr: Battery Undervoltage, graph: 0, value: 135, generic: 2 }
+                        - { descr: Battery Overcurrent, graph: 0, value: 136, generic: 2 }
+                        - { descr: Running on Battery, graph: 0, value: 137, generic: 2 }
+                        - { descr: Battery Low, graph: 0, value: 138, generic: 2 }
+                        - { descr: Time for Battery Service, graph: 0, value: 139, generic: 2 }
+                        - { descr: Battery Leg 1 Lifetime Expired, graph: 0, value: 140, generic: 2 }
+                        - { descr: Battery Leg 1 Overvoltage, graph: 0, value: 141, generic: 2 }
+                        - { descr: Battery Leg 1 Undervoltage, graph: 0, value: 142, generic: 2 }
+                        - { descr: Battery Leg 1 Overcurrent, graph: 0, value: 143, generic: 2 }
+                        - { descr: Battery Leg 1 Overtemperature, graph: 0, value: 144, generic: 2 }
+                        - { descr: Battery Leg 1 Undertemperature, graph: 0, value: 145, generic: 2 }
+                        - { descr: Running on Battery Leg 1, graph: 0, value: 146, generic: 2 }
+                        - { descr: Battery Leg 1 Low, graph: 0, value: 147, generic: 2 }
+                        - { descr: Battery Leg 1 Critical, graph: 0, value: 148, generic: 2 }
+                        - { descr: Battery Leg 1 Fuse Off, graph: 0, value: 149, generic: 2 }
+                        - { descr: Battery Leg 1 Breaker Off, graph: 0, value: 150, generic: 2 }
+                        - { descr: Battery Leg 1 LVD Off, graph: 0, value: 151, generic: 2 }
+                        - { descr: Battery Leg 1 User Alarm 1, graph: 0, value: 152, generic: 2 }
+                        - { descr: Battery Leg 1 User Alarm 2, graph: 0, value: 153, generic: 2 }
+                        - { descr: Time for Battery Leg 2 Service, graph: 0, value: 154, generic: 2 }
+                        - { descr: Battery Leg 2 Lifetime Expired, graph: 0, value: 155, generic: 2 }
+                        - { descr: Battery Leg 2 Overvoltage, graph: 0, value: 156, generic: 2 }
+                        - { descr: Battery Leg 2 Undervoltage, graph: 0, value: 157, generic: 2 }
+                        - { descr: Battery Leg 2 Overcurrent, graph: 0, value: 158, generic: 2 }
+                        - { descr: Battery Leg 2 Overtemperature, graph: 0, value: 159, generic: 2 }
+                        - { descr: Battery Leg 2 Undertemperature, graph: 0, value: 160, generic: 2 }
+                        - { descr: Running on Battery Leg 2, graph: 0, value: 161, generic: 2 }
+                        - { descr: Battery Leg 2 Low, graph: 0, value: 162, generic: 2 }
+                        - { descr: Battery Leg 2 Critical, graph: 0, value: 163, generic: 2 }
+                        - { descr: Battery Leg 2 Fuse Off, graph: 0, value: 164, generic: 2 }
+                        - { descr: Battery Leg 2 Breaker Off, graph: 0, value: 165, generic: 2 }
+                        - { descr: Battery Leg 2 LVD Off, graph: 0, value: 166, generic: 2 }
+                        - { descr: Battery Leg 2 User Alarm 1, graph: 0, value: 167, generic: 2 }
+                        - { descr: Battery Leg 2 User Alarm 2, graph: 0, value: 168, generic: 2 }
+                        - { descr: Time for Battery Leg 3 Service, graph: 0, value: 169, generic: 2 }
+                        - { descr: Battery Leg 3 Lifetime Expired, graph: 0, value: 170, generic: 2 }
+                        - { descr: Battery Leg 3 Overvoltage, graph: 0, value: 171, generic: 2 }
+                        - { descr: Battery Leg 3 Undervoltage, graph: 0, value: 172, generic: 2 }
+                        - { descr: Battery Leg 3 Overcurrent, graph: 0, value: 173, generic: 2 }
+                        - { descr: Battery Leg 3 Overtemperature, graph: 0, value: 174, generic: 2 }
+                        - { descr: Battery Leg 3 Undertemperature, graph: 0, value: 175, generic: 2 }
+                        - { descr: Running on Battery Leg 3, graph: 0, value: 176, generic: 2 }
+                        - { descr: Battery Leg 3 Low, graph: 0, value: 177, generic: 2 }
+                        - { descr: Battery Leg 3 Critical, graph: 0, value: 178, generic: 2 }
+                        - { descr: Battery Leg 3 Fuse Off, graph: 0, value: 179, generic: 2 }
+                        - { descr: Battery Leg 3 Breaker Off, graph: 0, value: 180, generic: 2 }
+                        - { descr: Battery Leg 3 LVD Off, graph: 0, value: 181, generic: 2 }
+                        - { descr: Battery Leg 3 User Alarm 1, graph: 0, value: 182, generic: 2 }
+                        - { descr: Battery Leg 3 User Alarm 2, graph: 0, value: 183, generic: 2 }
+                        - { descr: Distribution Fuse 1 Off, graph: 0, value: 184, generic: 2 }
+                        - { descr: Distribution Fuse 2 Off, graph: 0, value: 185, generic: 2 }
+                        - { descr: Distribution Fuse 3 Off, graph: 0, value: 186, generic: 2 }
+                        - { descr: Distribution Fuse 4 Off, graph: 0, value: 187, generic: 2 }
+                        - { descr: Distribution Fuse 5 Off, graph: 0, value: 188, generic: 2 }
+                        - { descr: Distribution Fuse 6 Off, graph: 0, value: 189, generic: 2 }
+                        - { descr: Distribution Fuse 7 Off, graph: 0, value: 190, generic: 2 }
+                        - { descr: Distribution Fuse 8 Off, graph: 0, value: 191, generic: 2 }
+                        - { descr: Distribution Fuse 9 Off, graph: 0, value: 192, generic: 2 }
+                        - { descr: Distribution Fuse 10 Off, graph: 0, value: 193, generic: 2 }
+                        - { descr: Distribution Fuse 11 Off, graph: 0, value: 194, generic: 2 }
+                        - { descr: Distribution Fuse 12 Off, graph: 0, value: 195, generic: 2 }
+                        - { descr: Distribution Fuse 13 Off, graph: 0, value: 196, generic: 2 }
+                        - { descr: Distribution Fuse 14 Off, graph: 0, value: 197, generic: 2 }
+                        - { descr: Distribution Fuse 15 Off, graph: 0, value: 198, generic: 2 }
+                        - { descr: Distribution Fuse 16 Off, graph: 0, value: 199, generic: 2 }
+                        - { descr: Distribution Fuse 17 Off, graph: 0, value: 200, generic: 2 }
+                        - { descr: Distribution Fuse 18 Off, graph: 0, value: 201, generic: 2 }
+                        - { descr: Distribution Fuse 19 Off, graph: 0, value: 202, generic: 2 }
+                        - { descr: Distribution Fuse 20 Off, graph: 0, value: 203, generic: 2 }
+                        - { descr: Distribution Fuse 21 Off, graph: 0, value: 204, generic: 2 }
+                        - { descr: Distribution Fuse 22 Off, graph: 0, value: 205, generic: 2 }
+                        - { descr: Distribution Fuse 23 Off, graph: 0, value: 206, generic: 2 }
+                        - { descr: Distribution Fuse 24 Off, graph: 0, value: 207, generic: 2 }
+                        - { descr: Distribution Fuse 25 Off, graph: 0, value: 208, generic: 2 }
+                        - { descr: Distribution Fuse 26 Off, graph: 0, value: 209, generic: 2 }
+                        - { descr: Distribution Fuse 27 Off, graph: 0, value: 210, generic: 2 }
+                        - { descr: Distribution Fuse 28 Off, graph: 0, value: 211, generic: 2 }
+                        - { descr: Distribution Fuse 29 Off, graph: 0, value: 212, generic: 2 }
+                        - { descr: Distribution Fuse 30 Off, graph: 0, value: 213, generic: 2 }
+                        - { descr: Distribution Fuse 31 Off, graph: 0, value: 214, generic: 2 }
+                        - { descr: Distribution Fuse 32 Off, graph: 0, value: 215, generic: 2 }
+                        - { descr: Distribution Breaker 1 Off, graph: 0, value: 216, generic: 2 }
+                        - { descr: Distribution Breaker 2 Off, graph: 0, value: 217, generic: 2 }
+                        - { descr: Distribution Breaker 3 Off, graph: 0, value: 218, generic: 2 }
+                        - { descr: Distribution Breaker 4 Off, graph: 0, value: 219, generic: 2 }
+                        - { descr: Distribution Breaker 5 Off, graph: 0, value: 220, generic: 2 }
+                        - { descr: Distribution Breaker 6 Off, graph: 0, value: 221, generic: 2 }
+                        - { descr: Distribution Breaker 7 Off, graph: 0, value: 222, generic: 2 }
+                        - { descr: Distribution Breaker 8 Off, graph: 0, value: 223, generic: 2 }
+                        - { descr: Distribution Breaker 9 Off, graph: 0, value: 224, generic: 2 }
+                        - { descr: Distribution Breaker 10 Off, graph: 0, value: 225, generic: 2 }
+                        - { descr: Distribution Breaker 11 Off, graph: 0, value: 226, generic: 2 }
+                        - { descr: Distribution Breaker 12 Off, graph: 0, value: 227, generic: 2 }
+                        - { descr: Distribution Breaker 13 Off, graph: 0, value: 228, generic: 2 }
+                        - { descr: Distribution Breaker 14 Off, graph: 0, value: 229, generic: 2 }
+                        - { descr: Distribution Breaker 15 Off, graph: 0, value: 230, generic: 2 }
+                        - { descr: Distribution Breaker 16 Off, graph: 0, value: 231, generic: 2 }
+                        - { descr: Distribution Breaker 17 Off, graph: 0, value: 232, generic: 2 }
+                        - { descr: Distribution Breaker 18 Off, graph: 0, value: 233, generic: 2 }
+                        - { descr: Distribution Breaker 19 Off, graph: 0, value: 234, generic: 2 }
+                        - { descr: Distribution Breaker 20 Off, graph: 0, value: 235, generic: 2 }
+                        - { descr: Distribution Breaker 21 Off, graph: 0, value: 236, generic: 2 }
+                        - { descr: Distribution Breaker 22 Off, graph: 0, value: 237, generic: 2 }
+                        - { descr: Distribution Breaker 23 Off, graph: 0, value: 238, generic: 2 }
+                        - { descr: Distribution Breaker 24 Off, graph: 0, value: 239, generic: 2 }
+                        - { descr: Distribution Breaker 25 Off, graph: 0, value: 240, generic: 2 }
+                        - { descr: Distribution Breaker 26 Off, graph: 0, value: 241, generic: 2 }
+                        - { descr: Distribution Breaker 27 Off, graph: 0, value: 242, generic: 2 }
+                        - { descr: Distribution Breaker 28 Off, graph: 0, value: 243, generic: 2 }
+                        - { descr: Distribution Breaker 29 Off, graph: 0, value: 244, generic: 2 }
+                        - { descr: Distribution Breaker 30 Off, graph: 0, value: 245, generic: 2 }
+                        - { descr: Distribution Breaker 31 Off, graph: 0, value: 246, generic: 2 }
+                        - { descr: Distribution Breaker 32 Off, graph: 0, value: 247, generic: 2 }
+                        - { descr: Distribution Breaker 33 Off, graph: 0, value: 248, generic: 2 }
+                        - { descr: Distribution Breaker 34 Off, graph: 0, value: 249, generic: 2 }
+                        - { descr: Distribution Breaker 35 Off, graph: 0, value: 250, generic: 2 }
+                        - { descr: Distribution Breaker 36 Off, graph: 0, value: 251, generic: 2 }
+                        - { descr: Distribution Breaker 37 Off, graph: 0, value: 252, generic: 2 }
+                        - { descr: Distribution Breaker 38 Off, graph: 0, value: 253, generic: 2 }
+                        - { descr: Distribution Breaker 39 Off, graph: 0, value: 254, generic: 2 }
+                        - { descr: Distribution Breaker 40 Off, graph: 0, value: 255, generic: 2 }
+                        - { descr: Distribution Breaker 41 Off, graph: 0, value: 256, generic: 2 }
+                        - { descr: Distribution Breaker 42 Off, graph: 0, value: 257, generic: 2 }
+                        - { descr: Distribution Breaker 43 Off, graph: 0, value: 258, generic: 2 }
+                        - { descr: Distribution Breaker 44 Off, graph: 0, value: 259, generic: 2 }
+                        - { descr: Distribution Breaker 45 Off, graph: 0, value: 260, generic: 2 }
+                        - { descr: Distribution Breaker 46 Off, graph: 0, value: 261, generic: 2 }
+                        - { descr: Distribution Breaker 47 Off, graph: 0, value: 262, generic: 2 }
+                        - { descr: Distribution Breaker 48 Off, graph: 0, value: 263, generic: 2 }
+                        - { descr: Distribution Breaker 49 Off, graph: 0, value: 264, generic: 2 }
+                        - { descr: Distribution Breaker 50 Off, graph: 0, value: 265, generic: 2 }
+                        - { descr: Distribution Breaker 51 Off, graph: 0, value: 266, generic: 2 }
+                        - { descr: Distribution Breaker 52 Off, graph: 0, value: 267, generic: 2 }
+                        - { descr: Distribution Breaker 53 Off, graph: 0, value: 268, generic: 2 }
+                        - { descr: Distribution Breaker 54 Off, graph: 0, value: 269, generic: 2 }
+                        - { descr: Distribution Breaker 55 Off, graph: 0, value: 270, generic: 2 }
+                        - { descr: Distribution Breaker 56 Off, graph: 0, value: 271, generic: 2 }
+                        - { descr: Distribution Breaker 57 Off, graph: 0, value: 272, generic: 2 }
+                        - { descr: Distribution Breaker 58 Off, graph: 0, value: 273, generic: 2 }
+                        - { descr: Distribution Breaker 59 Off, graph: 0, value: 274, generic: 2 }
+                        - { descr: Distribution Breaker 60 Off, graph: 0, value: 275, generic: 2 }
+                        - { descr: Distribution Breaker 61 Off, graph: 0, value: 276, generic: 2 }
+                        - { descr: Distribution Breaker 62 Off, graph: 0, value: 277, generic: 2 }
+                        - { descr: Distribution Breaker 63 Off, graph: 0, value: 278, generic: 2 }
+                        - { descr: Distribution Breaker 64 Off, graph: 0, value: 279, generic: 2 }
+                        - { descr: Distribution Strip Overtemperature, graph: 0, value: 280, generic: 2 }
+                        - { descr: Supply 1 Unit Any, graph: 0, value: 281, generic: 2 }
+                        - { descr: Supply 1 Unit All, graph: 0, value: 282, generic: 2 }
+                        - { descr: Supply 1 Unit Mains, graph: 0, value: 283, generic: 2 }
+                        - { descr: Supply 1 Unit Input Phase 1, graph: 0, value: 284, generic: 2 }
+                        - { descr: Supply 1 Unit Input Phase 2, graph: 0, value: 285, generic: 2 }
+                        - { descr: Supply 1 Unit Input Phase 3, graph: 0, value: 286, generic: 2 }
+                        - { descr: Supply 1 Unit Input Phase All, graph: 0, value: 287, generic: 2 }
+                        - { descr: Supply 1 Reserva 1, graph: 0, value: 288, generic: 2 }
+                        - { descr: Supply 1 Reserva 2, graph: 0, value: 289, generic: 2 }
+                        - { descr: Supply 1 Reserva 3, graph: 0, value: 290, generic: 2 }
+                        - { descr: Supply 1 Reserva 4, graph: 0, value: 291, generic: 2 }
+                        - { descr: Supply 1 Reserva 5, graph: 0, value: 292, generic: 2 }
+                        - { descr: Supply 2 Unit Any, graph: 0, value: 293, generic: 2 }
+                        - { descr: Supply 2 Unit All, graph: 0, value: 294, generic: 2 }
+                        - { descr: Supply 2 Unit Mains, graph: 0, value: 295, generic: 2 }
+                        - { descr: Supply 2 Unit Input Phase 1, graph: 0, value: 296, generic: 2 }
+                        - { descr: Supply 2 Unit Input Phase 2, graph: 0, value: 297, generic: 2 }
+                        - { descr: Supply 2 Unit Input Phase 3, graph: 0, value: 298, generic: 2 }
+                        - { descr: Supply 2 Unit Input Phase All, graph: 0, value: 299, generic: 2 }
+                        - { descr: Supply 2 Reserva 1, graph: 0, value: 300, generic: 2 }
+                        - { descr: Supply 2 Reserva 2, graph: 0, value: 301, generic: 2 }
+                        - { descr: Supply 2 Reserva 3, graph: 0, value: 302, generic: 2 }
+                        - { descr: Supply 2 Reserva 4, graph: 0, value: 303, generic: 2 }
+                        - { descr: Supply 2 Reserva 5, graph: 0, value: 304, generic: 2 }
+                        - { descr: Supply 3 Unit Any, graph: 0, value: 305, generic: 2 }
+                        - { descr: Supply 3 Unit All, graph: 0, value: 306, generic: 2 }
+                        - { descr: Supply 3 Unit Mains, graph: 0, value: 307, generic: 2 }
+                        - { descr: Supply 3 Unit Input Phase 1, graph: 0, value: 308, generic: 2 }
+                        - { descr: Supply 3 Unit Input Phase 2, graph: 0, value: 309, generic: 2 }
+                        - { descr: Supply 3 Unit Input Phase 3, graph: 0, value: 310, generic: 2 }
+                        - { descr: Supply 3 Unit Input Phase All, graph: 0, value: 311, generic: 2 }
+                        - { descr: Supply 3 Reserva 1, graph: 0, value: 312, generic: 2 }
+                        - { descr: Supply 3 Reserva 2, graph: 0, value: 313, generic: 2 }
+                        - { descr: Supply 3 Reserva 3, graph: 0, value: 314, generic: 2 }
+                        - { descr: Supply 3 Reserva 4, graph: 0, value: 315, generic: 2 }
+                        - { descr: Supply 3 Reserva 5, graph: 0, value: 316, generic: 2 }
         voltage:
             data:
                 -

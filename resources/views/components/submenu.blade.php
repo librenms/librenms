@@ -2,9 +2,9 @@
     <div class="panel-heading">
         @foreach ($menu as $header => $m)
             @if($loop->first)
-                <span class="tw-font-bold">{{ $title }} »</span>
+                <span class="tw:font-bold">{{ $title }} »</span>
             @else
-                <span class="tw-ml-4 tw-font-bold">{{ $header }}:</span>
+                <span class="tw:ml-4 tw:font-bold">{{ $header }}:</span>
             @endif
 
             @foreach($m as $sm)

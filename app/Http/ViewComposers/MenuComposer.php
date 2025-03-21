@@ -83,6 +83,7 @@ class MenuComposer
         $vars['package_count'] = Package::hasAccess($user)->count();
 
         $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->where('type', '!=', '')->orderBy('type')->pluck('type');
+        $vars['no_devices_added'] = ! Device::hasAccess($user)->exists();
 
         $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
@@ -177,6 +178,16 @@ class MenuComposer
                         'url' => 'ospf',
                         'icon' => 'circle-o-notch fa-rotate-180',
                         'text' => 'OSPF Devices',
+                    ],
+                ];
+            }
+
+            if ($routing_count['ospfv3']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'ospfv3',
+                        'icon' => 'circle-o-notch fa-rotate-180',
+                        'text' => 'OSPFv3 Devices',
                     ],
                 ];
             }

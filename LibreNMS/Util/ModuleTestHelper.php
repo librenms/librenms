@@ -239,7 +239,7 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    public static function findOsWithData($modules = [], string $os_filter = null)
+    public static function findOsWithData($modules = [], ?string $os_filter = null)
     {
         $os_list = [];
 
@@ -536,13 +536,9 @@ class ModuleTestHelper
      * Run discovery and polling against snmpsim data and create a database dump
      * Save the dumped data to tests/data/<os>.json
      *
-     * @param  Snmpsim  $snmpsim
-     * @param  bool  $no_save
-     * @return array|null
-     *
      * @throws FileNotFoundException
      */
-    public function generateTestData(Snmpsim $snmpsim, $no_save = false)
+    public function generateTestData(string $snmpSimIp, int $snmpSimPort, bool $noSave = false): ?array
     {
         global $device;
         Config::set('rrd.enable', false); // disable rrd
@@ -564,17 +560,17 @@ class ModuleTestHelper
         }
 
         // Remove existing device in case it didn't get removed previously
-        if (($existing_device = device_by_name($snmpsim->ip)) && isset($existing_device['device_id'])) {
+        if (($existing_device = device_by_name($snmpSimIp)) && isset($existing_device['device_id'])) {
             delete_device($existing_device['device_id']);
         }
 
         // Add the test device
         try {
             $new_device = new Device([
-                'hostname' => $snmpsim->ip,
+                'hostname' => $snmpSimIp,
                 'snmpver' => 'v2c',
                 'community' => $this->file_name,
-                'port' => $snmpsim->port,
+                'port' => $snmpSimPort,
                 'disabled' => 1, // disable to block normal pollers
             ]);
             (new ValidateDeviceAndCreate($new_device, true))->execute();
@@ -650,16 +646,18 @@ class ModuleTestHelper
         $data = array_merge_recursive($data, $this->dumpDb($device_id, $polled_modules, 'poller'));
 
         // Remove the test device, we don't need the debug from this
-        if ($device['hostname'] == $snmpsim->ip) {
+        if ($device['hostname'] == $snmpSimIp) {
             Debug::set(false);
             delete_device($device_id);
         }
 
-        if (! $no_save) {
+        if (! $noSave) {
             d_echo($data);
 
             // Save the data to the default test data location (or elsewhere if specified)
-            $existing_data = json_decode(file_get_contents($this->json_file), true);
+            $existing_data = is_readable($this->json_file)
+                ? json_decode(file_get_contents($this->json_file), true)
+                : [];
 
             // insert new data, don't store duplicate data
             foreach ($data as $module => $module_data) {

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Rewrite;
+
 $vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`port_id` = '" . $port['port_id'] . "' and PV.`device_id` = '" . $device['device_id'] . "' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
 
 echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
@@ -56,7 +58,7 @@ foreach ($vlans as $vlan) {
     $vsep = '';
     foreach ($vlan_ports as $otherport) {
         $otherport = cleanPort($otherport);
-        echo $vsep . generate_port_link($otherport, makeshortif($otherport['ifDescr']));
+        echo $vsep . generate_port_link($otherport, Rewrite::shortenIfName($otherport['ifDescr']));
         if ($otherport['untagged']) {
             echo '(U)';
         }

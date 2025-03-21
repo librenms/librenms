@@ -23,12 +23,15 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\PortsNac;
+use App\Models\Transceiver;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use SnmpQuery;
 
-class ArubaosCx extends \LibreNMS\OS implements NacPolling
+class ArubaosCx extends \LibreNMS\OS implements NacPolling, TransceiverDiscovery
 {
     protected ?string $entityVendorTypeMib = 'ARUBAWIRED-NETWORKING-OID';
 
@@ -37,10 +40,9 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling
         $nac = new Collection();
 
         $rowSet = [];
-        $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifName');
         $table = SnmpQuery::hideMib()->enumStrings()->walk('ARUBAWIRED-PORT-ACCESS-MIB::arubaWiredPortAccessClientTable')->table(2);
 
-        foreach ($table as $ifIndex => $entry) {
+        foreach ($table as $ifName => $entry) {
             foreach ($entry as $macKey => $macEntry) {
                 $rowSet[$macKey] = [
                     'domain' => '',
@@ -53,11 +55,11 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling
                 $rowSet[$macKey]['authc_status'] = $macEntry['arubaWiredPacAuthState'] ?? '';
                 $rowSet[$macKey]['mac_address'] = $macKey;
                 $rowSet[$macKey]['authz_by'] = $macEntry['arubaWiredPacOnboardedMethods'] ?? '';
-                $rowSet[$macKey]['authz_status'] = '';
+                $rowSet[$macKey]['authz_status'] = $macEntry['arubaWiredPacAppliedRole'] ?? '';
                 $rowSet[$macKey]['username'] = $macEntry['arubaWiredPacUserName'] ?? '';
                 $rowSet[$macKey]['vlan'] = $macEntry['arubaWiredPacVlanId'] ?? null;
-                $rowSet[$macKey]['port_id'] = $ifIndex_map->get($ifIndex, 0);
-                $rowSet[$macKey]['auth_id'] = $ifIndex;
+                $rowSet[$macKey]['port_id'] = (int) PortCache::getIdFromIfName($ifName, $this->getDevice());
+                $rowSet[$macKey]['auth_id'] = $ifName;
                 $rowSet[$macKey]['method'] = $macEntry['arubaWiredPacOnboardedMethods'] ?? '';
             }
         }
@@ -67,5 +69,25 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling
         }
 
         return $nac;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        return \SnmpQuery::cache()->walk('ARUBAWIRED-PM-MIB::arubaWiredPmXcvrTable')->mapTable(function ($data, $ifIndex) {
+            return new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => $ifIndex,
+                'type' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDescription'] ?? null,
+                'revision' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrPartNum'] ?? null,
+                'model' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrProductNum'] ?? null,
+                'serial' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrSerialNum'] ?? null,
+                'ddm' => ($data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDiagnostics'] ?? null) ? 1 : 0,
+                'cable' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrCableType'] ?? null,
+                'connector' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrConnectorType'] ?? null,
+                'distance' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrCableLength'] ?? null,
+                'wavelength' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrWavelength'] ?? null,
+                'entity_physical_index' => $ifIndex,
+            ]);
+        });
     }
 }
