@@ -243,6 +243,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('dash')->namespace('Widgets')->group(function () {
             Route::post('alerts', 'AlertsController');
             Route::post('alertlog', 'AlertlogController');
+            Route::post('alert-map', 'AlertMapController');
             Route::post('availability-map', 'AvailabilityMapController');
             Route::post('component-status', 'ComponentStatusController');
             Route::post('custom-map', 'CustomMapController');
