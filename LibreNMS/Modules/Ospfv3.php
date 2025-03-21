@@ -325,14 +325,18 @@ class Ospfv3 implements Module
         $ospf_port->device_id = $instance->device_id;
         $ospf_port->context_name = $instance->context_name;
 
-        // FIXME not on polling
-        $ospf_port->port_id = (int)PortCache::getIdFromIfIndex($ospfv3IfIndex, $instance->device_id);
+        // only search for port during discovery
+        if(count($data) > 5) {
+            $ospf_port->port_id = (int)PortCache::getIdFromIfIndex($ospfv3IfIndex, $instance->device_id);
+        }
+
         if (array_key_exists('ospfv3IfDesignatedRouter', $data)) {
             $ospf_port->ospfv3IfDesignatedRouter = long2ip($data['ospfv3IfDesignatedRouter']);
         }
         if (array_key_exists('ospfv3IfBackupDesignatedRouter', $data)) {
             $ospf_port->ospfv3IfBackupDesignatedRouter = long2ip($data['ospfv3IfBackupDesignatedRouter']);
         }
+
         $ospf_port->ospfv3_area_id = $ospf_areas
             ->firstWhere(function (Ospfv3Area $area) use ($ospf_port) {
                 return $area->context_name == $ospf_port->context_name
@@ -354,9 +358,11 @@ class Ospfv3 implements Module
         $ospf_nbr->ospfv3_instance_id = $instance->id;
 
         $ospfv3NbrAddress = $this->parseNeighborAddress($data);
-        // FIXME not on polling
-        // Needs searching by Link-Local addressing, but those do not appear to be indexed.
-        $ospf_nbr->port_id = PortCache::getIdFromIp($ospfv3NbrAddress, $instance->context_name); // search all devices
+        // only search for port during discovery
+        if(count($data) > 2) {
+            // Needs searching by Link-Local addressing, but those do not appear to be indexed.
+            $ospf_nbr->port_id = PortCache::getIdFromIp($ospfv3NbrAddress, $instance->context_name); // search all devices
+        }
         $ospf_nbr->ospfv3NbrAddress = (string) $ospfv3NbrAddress;
 
         return $ospf_nbr;
@@ -409,6 +415,8 @@ class Ospfv3 implements Module
         $ospf_port['ospfv3IfBackupDesignatedRouter'] ??= '';  // missing on some devices
 
         $port->fill($ospf_port);
+        $port->port_id = (int)PortCache::getIdFromIfIndex($port->ospfv3IfIndex, $port->device_id); // this was skipped in initial poll
+
     }
 
     public function fetchAndFillNeighbor(Ospfv3Nbr $nbr): void
@@ -426,5 +434,7 @@ class Ospfv3 implements Module
                 "OSPFV3-MIB::ospfv3NbrRestartHelperAge.$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId",
                 "OSPFV3-MIB::ospfv3NbrRestartHelperExitReason.$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId",
             ])->valuesByIndex()["$nbr->ospfv3NbrIfIndex.$nbr->ospfv3NbrIfInstId.$nbr->ospfv3NbrRtrId"] ?? []);
+
+        $nbr->port_id = PortCache::getIdFromIp($nbr->ospfv3NbrAddress, $nbr->context_name); // this was skipped in initial poll
     }
 }
