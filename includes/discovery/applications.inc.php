@@ -53,7 +53,7 @@ if ($results) {
     $applications['postfixdetailed'] = 'postfix';
     $applications['suricata-stats'] = 'suricata';
     $applications['sagan-stats'] = 'sagan';
-    $applications['text_debug'] = 'text_blob';
+    $applications['text_blob'] = 'text_debug';
 }
 
 d_echo(PHP_EOL . 'Available: ' . implode(', ', array_keys($applications)) . PHP_EOL);
