@@ -141,6 +141,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.3.3.3.1.5.{{ $index }}"
                   index: "tlpEnvInputContactIndex.{{ $index }}"
                   descr: "{{ $tlpEnvInputContactName }}"
+                  state_name: tlpEnvInputContactCurrentState
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: Unknown }
                       - { value: 1, generic: 2, graph: 0, descr: Alarm }
@@ -148,6 +149,7 @@ modules:
                 - oid: "tlpPduDeviceMainLoadState"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.2.1.1.1.{{ $index }}"
                   descr: "Main Load State"
+                  state_name: tlpPduDeviceMainLoadState
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
                       - { value: 1, generic: 0, graph: 0, descr: off }
@@ -158,6 +160,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.3.1.1.4.{{ $index }}"
                   index: "tlpPduOutletState.{{ $index }}"
                   descr: "{{ $tlpPduOutletName }}"
+                  state_name: tlpPduOutletState
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
                       - { value: 1, generic: 0, graph: 0, descr: off }
@@ -167,6 +170,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.2.1.1.1.{{ $index }}"
                   index: "tlpUpsMainLoadState.{{ $index }}"
                   descr: "Main Load State"
+                  state_name: tlpUpsDeviceMainLoadState
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
                       - { value: 1, generic: 0, graph: 0, descr: off }
@@ -176,6 +180,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.1.1.1.1.{{ $index }}"
                   index: "tlpUpsBatteryStatus.{{ $subindex0 }}"
                   descr: "Battery {{ $subindex0 }} Status"
+                  state_name: tlpUpsBatteryStatus
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
                       - { value: 1, generic: 3, graph: 0, descr: unknown }
@@ -187,6 +192,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.1.2.1.4.{{ $index }}"
                   index: "tlpUpsBatteryDetailCharge.{{ $index }}"
                   descr: "Charging Status {{ $subindex0 }}"
+                  state_name: tlpUpsBatteryDetailCharge
                   states:
                       - { value: 0, generic: 1, graph: 0, descr: floating }
                       - { value: 1, generic: 1, graph: 0, descr: charging }
@@ -198,6 +204,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.1.5.1.1.{{ $index }}"
                   index: "tlpUpsBatteryPackDetailCondition.{{ $index }}"
                   descr: "Battery {{ $subindex0 }} Condition"
+                  state_name: tlpUpsBatteryPackDetailCondition
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
                       - { value: 1, generic: 0, graph: 0, descr: good }
@@ -208,6 +215,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.3.1.1.1.{{ $index }}"
                   index: "tlpUpsOutputSource.{{ $index }}"
                   descr: "Output Source"
+                  state_name: tlpUpsOutputSource
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
                       - { value: 1, generic: 3, graph: 0, descr: other }
@@ -226,6 +234,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.5.1.1.4.{{ $index }}"
                   index: "tlpUpsOutletIndex.{{ $index }}"
                   descr: "{{ $tlpUpsOutletName }}"
+                  state_name: tlpUpsOutletState
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
                       - { value: 1, generic: 0, graph: 0, descr: off }
