@@ -21,13 +21,18 @@ echo '
           </tr>
         </thead>
         <tbody>';
-$instances = Ospfv3Instance::where('ospfv3AdminStatus', 'enabled')
-    ->with(['device' => function ($query) {
-        return $query->withCount(['ospfv3Areas', 'ospfv3Ports', 'ospfv3Nbrs']);
-    }])->get();
-foreach ($instances as $instance) {
-    $port_count_enabled = $instance->device->ospfv3Ports()->where('ospfv3IfAdminStatus', 'enabled')->count();
+$instances = Ospfv3Instance::with([
+    'device'
+])->withCount([
+    'areas',
+    'ospfv3Ports',
+    'ospfv3Ports as ospfv3Ports_enabled_count' => function ($query) {
+        $query->where('ospfv3IfAdminStatus', 'enabled');
+    },
+    'nbrs',
+])->get();
 
+foreach ($instances as $instance) {
     $status_color = $instance->ospfv3AdminStatus == 'enabled' ? 'success' : 'default';
     $abr_status_color = $instance->ospfv3AreaBdrRtrStatus == 'true' ? 'success' : 'default';
     $asbr_status_color = $instance->ospfv3ASBdrRtrStatus == 'true' ? 'success' : 'default';
@@ -39,9 +44,9 @@ foreach ($instances as $instance) {
             <td><span class="label label-' . $status_color . '">' . $instance->ospfv3AdminStatus . '</span></td>
             <td><span class="label label-' . $abr_status_color . '">' . $instance->ospfv3AreaBdrRtrStatus . '</span></td>
             <td><span class="label label-' . $asbr_status_color . '">' . $instance->ospfv3ASBdrRtrStatus . '</span></td>
-            <td>' . $instance->device->ospfv3_areas_count . '</td>
-            <td>' . $instance->device->ospfv3_ports_count . '(' . $port_count_enabled . ')</td>
-            <td>' . $instance->device->ospfv3_nbrs_count . '</td>
+            <td>' . $instance->areas_count . '</td>
+            <td>' . $instance->ospfv3_ports_count . '(' . $instance->ospfv3Ports_enabled_count . ')</td>
+            <td>' . $instance->nbrs_count . '</td>
           </tr>';
 }
 echo '</tbody>
