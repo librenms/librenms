@@ -41,7 +41,7 @@ class AlertController extends Controller
 
         if ($alert->save()) {
             $rule_name = $alert->rule->name;
-            $act = strtolower($state_description) . "nowledged";
+            $act = strtolower($state_description) . 'nowledged';
             Eventlog::log("$username {$act} alert $rule_name note: $ack_msg", $alert->device_id, 'alert', Severity::Info, $alert->id);
 
             return response()->json([
