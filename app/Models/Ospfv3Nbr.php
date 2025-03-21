@@ -39,7 +39,6 @@ class Ospfv3Nbr extends DeviceRelatedModel
         'ospfv3_nbr_id',
         'context_name',
         'ospfv3NbrIfId',
-        'ospfv3NbrIfIndex',
         'ospfv3NbrAddress',
         'ospfv3NbrIfInstId',
         'ospfv3NbrAddressType',

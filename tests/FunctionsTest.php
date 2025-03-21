@@ -97,7 +97,7 @@ class FunctionsTest extends TestCase
         $this->assertSame('BBQ', YamlDiscovery::getValueFromData('doubletable', 13, $data, $pre_cache));
     }
 
-    public function testNumberCast()
+    public function testNumberCast(): void
     {
         $this->assertSame(-14.3, Number::cast(-14.3));
         $this->assertSame(0, Number::cast('b -35')); // cast must start with the number as old style php cast did
@@ -109,7 +109,7 @@ class FunctionsTest extends TestCase
         $this->assertSame(2, Number::cast('2.000'));
     }
 
-    public function testNumberAsUnsigned()
+    public function testNumberAsUnsigned(): void
     {
         $this->assertSame(42, Number::constrainInteger('42', IntegerType::int32));  /** @phpstan-ignore-line */
         $this->assertSame(2147483647, Number::constrainInteger(2147483647, IntegerType::int32));
@@ -126,7 +126,7 @@ class FunctionsTest extends TestCase
         $this->assertSame(2147483645, Number::constrainInteger(-2147483649, IntegerType::uint32));
     }
 
-    public function testNumberAsUnsignedValueExceedsMaxUnsignedValue()
+    public function testNumberAsUnsignedValueExceedsMaxUnsignedValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
