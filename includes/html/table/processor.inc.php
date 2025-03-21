@@ -54,6 +54,17 @@ if ($rowCount != -1) {
 }
 
 $sql = "SELECT * $sql";
+
+if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
+    $headers = [
+        'Device',
+        'Processor',
+        'Usage'
+    ];
+    
+    fputcsv($output, $headers);
+}
+
 foreach (dbFetchRows($sql, $param) as $processor) {
     $perc = round($processor['processor_usage'], 0);
     $graph_array['type'] = $graph_type;
@@ -70,34 +81,49 @@ foreach (dbFetchRows($sql, $param) as $processor) {
     $background = \LibreNMS\Util\Color::percentage($perc, $processor['processor_perc_warn']);
     $bar_link = \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 20, $perc, $perc . '%', 'ffffff', $background['left'], (100 - $perc) . '%', 'ffffff', $background['right']), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
-    $response[] = [
-        'hostname' => generate_device_link($processor),
-        'processor_descr' => $processor['processor_descr'],
-        'graph' => $mini_graph,
-        'processor_usage' => $bar_link,
-    ];
-    if ($vars['view'] == 'graphs') {
-        $graph_array['height'] = '100';
-        $graph_array['width'] = '216';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['id'] = $processor['processor_id'];
-        $graph_array['type'] = $graph_type;
-        $return_data = true;
-        include 'includes/html/print-graphrow.inc.php';
-        unset($return_data);
+    if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
+        $device_name = $processor['hostname'];
+        $processor_descr = $processor['processor_descr'];
+        $usage = $perc . '%';
+        
+        fputcsv($output, [
+            $device_name,
+            $processor_descr,
+            $usage
+        ]);
+    } else {
         $response[] = [
-            'hostname' => $graph_data[0],
-            'processor_descr' => $graph_data[1],
-            'graph' => $graph_data[2],
-            'processor_usage' => $graph_data[3],
+            'hostname' => generate_device_link($processor),
+            'processor_descr' => $processor['processor_descr'],
+        'graph' => $mini_graph,
+            'processor_usage' => $bar_link,
         ];
-    } //end if
+        
+        if ($vars['view'] == 'graphs') {
+            $graph_array['height'] = '100';
+            $graph_array['width'] = '216';
+            $graph_array['to'] = \LibreNMS\Config::get('time.now');
+            $graph_array['id'] = $processor['processor_id'];
+            $graph_array['type'] = $graph_type;
+            $return_data = true;
+            include 'includes/html/print-graphrow.inc.php';
+            unset($return_data);
+            $response[] = [
+                'hostname' => $graph_data[0],
+                'processor_descr' => $graph_data[1],
+                'graph' => $graph_data[2],
+                'processor_usage' => $graph_data[3],
+            ];
+        } //end if
+    }
 }//end foreach
 
-$output = [
-    'current' => $current,
-    'rowCount' => $rowCount,
-    'rows' => $response,
-    'total' => $total,
-];
-echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+if (!isset($_REQUEST['export'])) {
+    $output = [
+        'current' => $current,
+        'rowCount' => $rowCount,
+        'rows' => $response,
+        'total' => $total,
+    ];
+    echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+}
