@@ -474,7 +474,6 @@ Output:
             "port_id": "0",
             "ospfv3_nbr_id": "2",
             "ospfv3NbrIfId: "1147535360",
-            "ospfv3NbrIfIndex": "2",
             "ospfv3NbrIfInstId": "0",
             "ospfv3NbrRtrId": "167797515",
             "ospfv3NbrAddressType": "ipv6",

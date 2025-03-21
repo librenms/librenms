@@ -88,8 +88,8 @@ class PortStpController extends TableController
         $drMac = Mac::parse($stpPort->designatedRoot);
         $dbMac = Mac::parse($stpPort->designatedBridge);
 
-        $dr = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedRoot)->value('device_id'));
-        $db = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedBridge)->value('device_id'));
+        $dr = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedRoot)->whereNot('bridgeAddress', '000000000000')->value('device_id'));
+        $db = DeviceCache::get(Stp::where('bridgeAddress', $stpPort->designatedBridge)->whereNot('bridgeAddress', '')->value('device_id'));
 
         return [
             'port_id' => Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link><br /> {{ $port->getDescription() }}', ['port' => $stpPort->port]),

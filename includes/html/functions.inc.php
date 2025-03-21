@@ -607,6 +607,11 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
             $tmp_alerts = cleanPort($tmp_alerts);
             $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
         }
+        if ((isset($tmp_alerts['ifDescr'])) && (isset($tmp_alerts['ifAlias'])) && ($tmp_alerts['ifDescr'] != $tmp_alerts['ifAlias'])) {
+            // IfAlias has been set, so display it on alarms
+            $fault_detail .= $tmp_alerts['ifAlias'] . '; ';
+            unset($tmp_alerts['label']);
+        }
         $fallback = false;
     }
 

@@ -19,6 +19,14 @@ This setting has to be the exact version of rrdtool you are running.
 NOTE: This feature requires your client version of rrdtool to be 1.5.5
 or newer, in addition to your rrdcached version.
 
+## High-Availability
+
+It's adviced to only run one active instance of RRDCached and have a failover instance ready to take over in case of failure.
+A recommended setup is to use a network socket for RRDCached and have a load balancer in front of it such as Nginx.
+See [Securing RRDCached](#securing-rrcached) for more information.
+
+For HA, you must also use a shared storage for the RRD files over NFS with GlusterFS or similar.
+
 ## Distributed Poller Support Matrix
 
 Shared FS: Is a shared filesystem required?
@@ -42,6 +50,7 @@ T = Tune RRD files.
 
 It is recommended that you monitor your LibreNMS server with LibreNMS
 so you can view the disk I/O usage delta.
+This can be done with the [RRDCached plugin](Applications/RRDCached.md).
 
 
 ## Installation
