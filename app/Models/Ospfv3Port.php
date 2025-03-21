@@ -37,6 +37,7 @@ class Ospfv3Port extends PortRelatedModel
     protected $fillable = [
         'device_id',
         'ospfv3_instance_id',
+        'ospfv3_area_id',
         'port_id',
         'ospfv3IfInstId',
         'ospfv3_port_id',
@@ -63,7 +64,6 @@ class Ospfv3Port extends PortRelatedModel
 
     public function area(): BelongsTo
     {
-        return $this->belongsTo(Ospfv3Area::class, 'ospfv3IfAreaId', 'ospfv3AreaId')
-            ->where('ospfv3_instance_id', $this->ospfv3_instance_id);
+        return $this->belongsTo(Ospfv3Area::class);
     }
 }

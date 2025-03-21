@@ -56,7 +56,6 @@ class Ospfv3Area extends DeviceRelatedModel
 
     public function ospfv3Ports(): HasMany
     {
-        return $this->hasMany(Ospfv3Port::class, 'ospfv3IfAreaId', 'ospfv3AreaId')
-            ->where('ospfv3_instance_id', $this->ospfv3_instance_id);
+        return $this->hasMany(Ospfv3Port::class);
     }
 }

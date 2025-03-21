@@ -16,6 +16,7 @@ return new class extends Migration
             $table->increments('id');
             $table->unsignedInteger('device_id');
             $table->unsignedInteger('ospfv3_instance_id');
+            $table->unsignedInteger('ospfv3_area_id')->nullable();
             $table->unsignedInteger('port_id')->nullable();
             $table->unsignedInteger('ospfv3IfIndex');
             $table->unsignedInteger('ospfv3IfInstId');
@@ -43,6 +44,7 @@ return new class extends Migration
             $table->string('ospfv3IfLinkLSASuppression', 32)->nullable();
             $table->string('context_name', 128)->nullable();
             $table->unique(['device_id', 'ospfv3IfIndex', 'ospfv3IfInstId', 'context_name'], 'ospfv3_ports_device_id_index_context_name_unique');
+            $table->index('ospfv3_instance_id', 'ospfv3_area_id');
         });
     }
 

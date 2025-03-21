@@ -33,6 +33,7 @@ return new class extends Migration
             $table->string('ospfv3AreaTEEnabled', 32);
             $table->string('context_name', 128);
             $table->unique(['device_id', 'ospfv3AreaId', 'context_name']);
+            $table->index('ospfv3_instance_id', 'ospfv3AreaId');
         });
     }
 
