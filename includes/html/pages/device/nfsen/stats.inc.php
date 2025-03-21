@@ -41,7 +41,7 @@ echo '
 <select name = "stattype" id = "StatTypeSelector" size = 1>
 ';
 
-$option_default = $vars['stattype'] ?? \LibreNMS\Config::get('nfsen_stat_default');
+$option_default = $vars['stattype'] ?? \LibreNMS\Config::get('nfsen_stats_default');
 
 $stat_types = [
     'record' => 'Flow Records',

@@ -1164,7 +1164,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Top N Padrão',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Estatística Padrão',
         ],
         'nfsen_order_default' => [

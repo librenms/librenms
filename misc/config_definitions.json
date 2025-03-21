@@ -4927,7 +4927,7 @@
             "order": 7,
             "type": "integer"
         },
-        "nfsen_stat_default": {
+        "nfsen_stats_default": {
             "default": "srcip",
             "group": "external",
             "section": "nfsen",
