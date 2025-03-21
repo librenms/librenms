@@ -421,6 +421,7 @@ function add_device(Illuminate\Http\Request $request)
             'display',
             'overwrite_ip',
             'location_id',
+            'override_sysLocation',
             'port',
             'transport',
             'poller_group',
