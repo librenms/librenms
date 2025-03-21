@@ -42,5 +42,10 @@ class Ospfv3Area extends DeviceRelatedModel
         'ospfv3AreaSummary',
         'ospfv3AreaStubMetric',
         'ospfv3AreaStubMetricType',
+        'ospfv3AreaNssaTranslatorRole',
+        'ospfv3AreaNssaTranslatorState',
+        'ospfv3AreaNssaTranslatorStabInterval',
+        'ospfv3AreaNssaTranslatorEvents',
+        'ospfv3AreaTEEnabled',
     ];
 }

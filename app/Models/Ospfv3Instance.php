@@ -26,16 +26,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-
 class Ospfv3Instance extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $fillable = [
         'device_id',
-        'ospfv3_instance_id',
         'context_name',
+        'router_id',
         'ospfv3RouterId',
         'ospfv3AdminStatus',
         'ospfv3VersionNumber',
@@ -48,17 +45,16 @@ class Ospfv3Instance extends DeviceRelatedModel
         'ospfv3RxNewLsas',
         'ospfv3ExtAreaLsdbLimit',
         'ospfv3ExitOverflowInterval',
+        'ospfv3ReferenceBandwidth',
+        'ospfv3RestartSupport',
+        'ospfv3RestartInterval',
+        'ospfv3RestartStrictLsaChecking',
+        'ospfv3RestartStatus',
+        'ospfv3RestartAge',
+        'ospfv3RestartExitReason',
+        'ospfv3StubRouterSupport',
+        'ospfv3StubRouterAdvertisement',
+        'ospfv3DiscontinuityTime',
+        'ospfv3RestartTime',
     ];
-
-    // ---- Define Relationships ----
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
-    }
-
-    public function widgets(): HasMany
-    {
-        return $this->hasMany(\App\Models\UserWidget::class, 'dashboard_id');
-    }
 }

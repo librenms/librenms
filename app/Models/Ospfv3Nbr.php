@@ -28,7 +28,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Ospfv3Nbr extends DeviceRelatedModel
+class Ospfv3Nbr extends PortRelatedModel
 {
     use HasFactory;
 
@@ -36,8 +36,7 @@ class Ospfv3Nbr extends DeviceRelatedModel
     protected $fillable = [
         'device_id',
         'port_id',
-        'ospfv3_instance_id',
-        'ospfv3_nbr_id',
+        'router_id',
         'context_name',
         'ospfv3NbrIfId',
         'ospfv3NbrAddress',
@@ -52,5 +51,8 @@ class Ospfv3Nbr extends DeviceRelatedModel
         'ospfv3NbmaNbrStatus',
         'ospfv3NbmaNbrPermanence',
         'ospfv3NbrHelloSuppressed',
+        'ospfv3NbrRestartHelperStatus',
+        'ospfv3NbrRestartHelperAge',
+        'ospfv3NbrRestartHelperExitReason',
     ];
 }
