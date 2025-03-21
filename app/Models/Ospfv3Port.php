@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ospfv3Port extends PortRelatedModel
 {
@@ -57,4 +58,12 @@ class Ospfv3Port extends PortRelatedModel
         'ospfv3IfDemand',
         'ospfv3IfMetricValue',
     ];
+
+    // ---- Define Relationships ----
+
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Ospfv3Area::class, 'ospfv3IfAreaId', 'ospfv3AreaId')
+            ->where('ospfv3_instance_id', $this->ospfv3_instance_id);
+    }
 }

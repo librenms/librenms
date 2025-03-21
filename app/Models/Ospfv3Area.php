@@ -26,6 +26,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class Ospfv3Area extends DeviceRelatedModel
 {
     public $timestamps = false;
@@ -49,4 +51,12 @@ class Ospfv3Area extends DeviceRelatedModel
         'ospfv3AreaNssaTranslatorEvents',
         'ospfv3AreaTEEnabled',
     ];
+
+    // ---- Define Relationships ----
+
+    public function ospfv3Ports(): HasMany
+    {
+        return $this->hasMany(Ospfv3Port::class, 'ospfv3IfAreaId', 'ospfv3AreaId')
+            ->where('ospfv3_instance_id', $this->ospfv3_instance_id);
+    }
 }

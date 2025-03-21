@@ -16,7 +16,7 @@ return new class extends Migration
             $table->increments('id');
             $table->unsignedInteger('device_id');
             $table->unsignedInteger('ospfv3_instance_id');
-            $table->string('ospfv3AreaId', 32);
+            $table->unsignedInteger('ospfv3AreaId');
             $table->string('ospfv3AreaImportAsExtern', 32);
             $table->unsignedInteger('ospfv3AreaSpfRuns');
             $table->unsignedInteger('ospfv3AreaBdrRtrCount');
