@@ -27,23 +27,23 @@ modules:
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.4.1.1.4.{{ $index }}"
                   index: "tlpPduCircuitTotalCurrent.{{ $index }}"
                   divisor: 100
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Circuit {{ $subindex1 }}"
 
                 - oid: "tlpAtsOutputCurrent"
-                  num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.2.1.1.5.{{ $index }}"
+                  num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.2.1.1.5.1.{{ $index }}"
                   descr: "Current"
                   divisor: 100
                 - oid: "tlpPduOutputCurrent"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.2.1.1.5.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Total Output"
                   divisor: 100
                 - oid: "tlpPduOutletTable"
                   value: "tlpPduOutletCurrent"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.3.1.1.8.{{ $index }}"
                   index: "tlpPduOutletIndex.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "{{ $tlpPduOutletName }}"
                   divisor: 100
                 - oid: "tlpUpsOutputLineTable"
@@ -62,20 +62,20 @@ modules:
                 - oid: "tlpPduInputPhaseFrequency"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.1.2.1.3.{{ $index }}"
                   index: "tlpPduInputPhaseIndex.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Input"
                   divisor: 10
                 - oid: "tlpPduOutputFrequency"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.2.1.1.11.{{ $index }}"
                   index: "tlpPduOutputIndex.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Output"
                   divisor: 10
                 - oid: "tlpPduOutletTable"
                   value: "tlpPduOutletFrequency"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.3.1.1.22.{{ $index }}"
                   index: "tlpPduOutletIndex.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "{{ $tlpPduOutletName }}"
                   divisor: 10
                 - oid: "tlpUpsInputPhaseTable"
@@ -94,7 +94,7 @@ modules:
             data:
                 - oid: "tlpEnvHumidityHumidity"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.3.3.2.1.1.{{ $index }}"
-                  group: "{{ $tlpDeviceName }}"
+                  group: "{{ tlpDeviceName:0 }}"
                   descr: "Humidity"
                 - oid: tlEnvHumidity
                   num_oid: ".1.3.6.1.4.1.850.101.1.2.1.{{ $index }}"
@@ -120,13 +120,13 @@ modules:
                 - oid: "tlpPduOutputActivePower"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.2.1.1.8.{{ $index }}"
                   index: "tlpPduOutputIndex.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Output"
                 - oid: "tlpPduOutletTable"
                   value: "tlpPduOutletActivePower"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.3.1.1.9.{{ $index }}"
                   index: "tlpPduOutletIndex.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "{{ $tlpPduOutletName }}"
                 - oid: "tlpUpsOutputLineTable"
                   value: "tlpUpsOutputLinePower"
@@ -137,7 +137,7 @@ modules:
             data:
                 - oid: "tlpEnvDetail"
                   value: "tlpEnvInputContactCurrentState"
-                  group: "Contacts ({{ $tlpDeviceName }})"
+                  group: "Contacts ({{ tlpDeviceName:0 }})"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.3.3.3.1.5.{{ $index }}"
                   index: "tlpEnvInputContactIndex.{{ $index }}"
                   descr: "{{ $tlpEnvInputContactName }}"
@@ -234,7 +234,7 @@ modules:
             data:
                 - oid: "tlpEnvTemperatureC"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.3.3.1.1.1.{{ $index }}"
-                  group: "{{ $tlpDeviceName }}"
+                  group: "{{ tlpDeviceName:0 }}"
                   descr: "Temperature"
                   divisor: 10
                 - oid: tlEnvTemperatureC
@@ -259,7 +259,7 @@ modules:
                 - oid: "tlpAtsInputPhaseTable"
                   value: "tlpAtsInputPhaseVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.1.2.1.5.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Input"
                   index: "tlpAtsInputLineIndex.{{ $index }}"
                   divisor: 10
@@ -268,7 +268,7 @@ modules:
                 - oid: "tlpPduInputPhaseTable"
                   value: "tlpPduInputPhaseVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.1.2.1.4.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Input (Phase {{ $subindex0 }})"
                   index: "tlpPduInputPhaseIndex.{{ $index }}"
                   divisor: 10
@@ -276,7 +276,7 @@ modules:
                   high_limit: 240
                 - oid: "tlpAtsInputPhaseVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.1.2.1.5.1.1.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Input"
                   divisor: 10
                   multiplier: 1
@@ -285,7 +285,7 @@ modules:
                 - oid: "tlpPduOutputVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.2.1.1.4.{{ $index }}"
                   index: "tlpPduOutputIndex.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Output"
                   divisor: 10
                   low_limit: 110
@@ -294,14 +294,14 @@ modules:
                   value: "tlpPduOutletVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.3.1.1.7.{{ $index }}"
                   index: "tlpPduOutletIndex.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "{{ $tlpPduOutletName }}"
                   divisor: 10
                 - oid: "tlpPduCircuitTable"
                   value: "tlpPduCircuitInputVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.4.1.1.3.{{ $index }}"
                   index: "tlpPduOutletIndex.{{ $index }}"
-                  group: "{{ $tlpDeviceModel }} ({{ $subindex0 }})"
+                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "{{ $tlpPduCircuitPhase }}"
                   divisor: 10
                 - oid: "tlpUpsBattery"
