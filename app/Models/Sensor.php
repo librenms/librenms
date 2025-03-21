@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use LibreNMS\Enum\CheckStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
@@ -155,7 +154,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
     public function currentStatus(): Severity
     {
         if ($this->sensor_class === 'state') {
-            return CheckStatus::toSeverity((int) $this->state->state_generic_value);
+            return Severity::from($this->state->state_generic_value);
         }
         if ($this->sensor_limit !== null && $this->sensor_current >= $this->sensor_limit) {
             return Severity::Error;
