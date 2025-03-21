@@ -97,7 +97,7 @@ if (is_string($powerdns_dnsdist)) {
     ];
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
     update_application($app, $powerdns_dnsdist, $fields);
 }
 unset($powerdns_dnsdist);

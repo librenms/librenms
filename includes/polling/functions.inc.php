@@ -212,7 +212,7 @@ function record_sensor_data($device, $all_sensors)
             'rrd_name' => $rrd_name,
             'rrd_def' => $rrd_def,
         ];
-        data_update($device, 'sensor', $tags, $fields);
+        app('Datastore')->put($device, 'sensor', $tags, $fields);
 
         // FIXME also warn when crossing WARN level!
         if ($sensor['sensor_limit_low'] != '' && $prev_sensor_value > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {

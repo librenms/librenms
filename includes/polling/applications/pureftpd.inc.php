@@ -63,7 +63,7 @@ $fields = [
 ];
 $metrics[$dataset] = $fields;
 $tags = ['name' => $dataset, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //PureFTPd - connected Users
 $dataset = 'users';
@@ -75,7 +75,7 @@ $fields = [
 ];
 $metrics[$dataset] = $fields;
 $tags = ['name' => $dataset, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //PureFTPd - Bitrate
 $dataset = 'bitrate';
@@ -89,6 +89,6 @@ $fields = [
 ];
 $metrics[$dataset] = $fields;
 $tags = ['name' => $dataset, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 update_application($app, $output, $metrics);

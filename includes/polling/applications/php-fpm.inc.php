@@ -41,7 +41,7 @@ try {
     $app->data = ['version' => 'legacy'];
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     update_application($app, 'OK', $fields);
 
@@ -96,7 +96,7 @@ foreach ($extend_return['data']['pools'] as $pool => $pool_stats) {
         }
 
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
     }
 }
 
@@ -114,7 +114,7 @@ foreach ($var_mappings as $stat => $stat_key) {
     }
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 // check for added or removed pools

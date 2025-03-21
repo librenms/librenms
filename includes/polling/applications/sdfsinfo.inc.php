@@ -60,7 +60,7 @@ if (is_string($sdfsinfo)) {
     ];
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
     update_application($app, $sdfsinfo, $fields);
 
     unset($sdfsinfo, $rrd_name, $rrd_def, $data, $fields, $tags);

@@ -127,7 +127,7 @@ if (! empty($components) && is_array($components)) {
                 $rrd[$name] = $util_data[$util_oids[$name]];
             }
             $tags = compact('module', 'rrd_name', 'rrd_def', 'qfp_index');
-            data_update($device, $module, $tags, $rrd);
+            app('Datastore')->put($device, $module, $tags, $rrd);
             unset($filename, $rrd_filename, $rrd_name, $rrd_def, $rrd);
 
             /*
@@ -140,7 +140,7 @@ if (! empty($components) && is_array($components)) {
                 $rrd[$name] = $memory_data[$memory_oids[$name]];
             }
             $tags = compact('module', 'rrd_name', 'rrd_def', 'qfp_index');
-            data_update($device, $module, $tags, $rrd);
+            app('Datastore')->put($device, $module, $tags, $rrd);
             unset($filename, $rrd_filename, $rrd_name, $rrd_def, $rrd);
         }
     }

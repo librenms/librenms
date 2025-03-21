@@ -84,7 +84,7 @@ if ($device['os_group'] == 'cisco') {
                     ];
 
                     $tags = compact('entity', 'afi', 'index', 'rrd_name', 'rrd_def');
-                    data_update($device, 'cefswitching', $tags, $fields);
+                    app('Datastore')->put($device, 'cefswitching', $tags, $fields);
 
                     echo "\n";
                 }//end foreach

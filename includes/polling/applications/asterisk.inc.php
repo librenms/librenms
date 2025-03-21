@@ -51,7 +51,7 @@ $sip_tags = [
     'rrd_name' => $rrd_name,
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $sip_tags, $sip_fields);
+app('Datastore')->put($device, 'app', $sip_tags, $sip_fields);
 
 unset($rrd_name, $rrd_def, $sip_fields, $sip_tags);
 
@@ -77,7 +77,7 @@ $iax2_tags = [
     'rrd_name' => ['app', $name, 'iax2', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $iax2_tags, $iax2_fields);
+app('Datastore')->put($device, 'app', $iax2_tags, $iax2_fields);
 
 update_application($app, $rawdata, $asterisk_metrics);
 

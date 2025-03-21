@@ -40,7 +40,7 @@ $fields = [
     'size' => $data['size'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $set_rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $metrics = $fields;
 
@@ -73,7 +73,7 @@ foreach ($data['sets'] as $set_name => $set_data) {
         'size' => $set_data['size'],
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $set_rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     foreach ($set_data['files'] as $log_name => $log_size) {
         $rrd_name = ['app', $name, $app->app_id, $set_name . '_____-_____' . $log_name];
@@ -81,7 +81,7 @@ foreach ($data['sets'] as $set_name => $set_data) {
             'size' => $log_size,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $app_data['sets'][$set_name]['log_sizes'][$log_name] = $log_size;
 
@@ -94,7 +94,7 @@ foreach ($data['sets'] as $set_name => $set_data) {
             'size' => 0,
         ];
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-        data_update($device, 'app', $tags, $fields);
+        app('Datastore')->put($device, 'app', $tags, $fields);
 
         $app_data['sets'][$set_name]['log_sizes'][$log_name] = 0;
         $app_data['sets'][$set_name]['files'][] = $log_name;

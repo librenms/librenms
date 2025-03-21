@@ -38,7 +38,7 @@ foreach (array_keys($nfs_stat_keys) as $stat_name) {
     }
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_to_use, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $metrics[$stat_name] = $returned['data']['stats'][$stat_name];
 }

@@ -55,7 +55,7 @@ if (count($vp_rows)) {
         ];
 
         $tags = compact('ifIndex', 'vp_id', 'rrd_name', 'rrd_def');
-        data_update($device, 'atm-vp', $tags, $fields);
+        app('Datastore')->put($device, 'atm-vp', $tags, $fields);
     }//end foreach
 
     echo "\n";

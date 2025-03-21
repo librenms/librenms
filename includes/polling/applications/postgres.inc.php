@@ -56,7 +56,7 @@ $fields = [
 $metrics['none'] = $fields;
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //process each database
 $db_lines = explode("\n", $postgres);
@@ -93,7 +93,7 @@ while (isset($db_lines[$db_lines_int])) {
 
     $metrics[$dbname] = $fields;
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 
     $db_lines_int++;
 }

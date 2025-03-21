@@ -41,7 +41,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'access', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Auth
 $rrd_def = RrdDefinition::make()
@@ -67,7 +67,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'auth', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Acct
 $rrd_def = RrdDefinition::make()
@@ -95,7 +95,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'acct', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Proxy-Access
 $rrd_def = RrdDefinition::make()
@@ -117,7 +117,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'proxy_access', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Proxy-Auth
 $rrd_def = RrdDefinition::make()
@@ -143,7 +143,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'proxy_auth', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Proxy-Acct
 $rrd_def = RrdDefinition::make()
@@ -171,7 +171,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'proxy_acct', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Queue
 $rrd_name = ['app', $name, 'queue', $app->app_id];
@@ -200,7 +200,7 @@ $tags = [
     'rrd_name' => ['app', $name, 'queue', $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, $rawdata, $metrics);
 
 unset($lines, $freeradius, $rrd_name, $rrd_def, $fields, $tags);
