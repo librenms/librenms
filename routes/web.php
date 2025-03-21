@@ -246,30 +246,33 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // jquery bootgrid data controllers
-        Route::prefix('table')->group(function () {
-            Route::post('alert-schedule', Table\AlertScheduleController::class);
-            Route::post('customers', Table\CustomersController::class);
-            Route::post('device', Table\DeviceController::class);
-            Route::post('edit-ports', Table\EditPortsController::class);
-            Route::post('eventlog', Table\EventlogController::class);
-            Route::post('fdb-tables', Table\FdbTablesController::class);
-            Route::post('graylog', Table\GraylogController::class);
-            Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
-            Route::post('location', Table\LocationController::class);
-            Route::post('mempools', Table\MempoolsController::class);
-            Route::post('outages', Table\OutagesController::class);
-            Route::post('port-nac', Table\PortNacController::class)->name('table.port-nac');
-            Route::post('port-stp', Table\PortStpController::class);
-            Route::post('ports', Table\PortsController::class)->name('table.ports');
-            Route::post('processors', Table\ProcessorsController::class)->name('table.processors');
-            Route::post('routes', Table\RoutesTablesController::class);
-            Route::post('sensors', Table\SensorsController::class)->name('table.sensors');
-            Route::post('storages', Table\StoragesController::class)->name('table.storages');
-            Route::post('syslog', Table\SyslogController::class);
-            Route::post('tnmsne', Table\TnmsneController::class)->name('table.tnmsne');
-            Route::post('vlan-ports', Table\VlanPortsController::class)->name('table.vlan-ports');
-            Route::post('vlan-devices', Table\VlanDevicesController::class)->name('table.vlan-devices');
-            Route::post('vminfo', Table\VminfoController::class);
+        Route::prefix('table')->namespace('Table')->group(function () {
+            $tableControllers = [
+                'alert-schedule' => 'AlertScheduleController',
+                'customers' => 'CustomersController',
+                'device' => 'DeviceController',
+                'edit-ports' => 'EditPortsController',
+                'eventlog' => 'EventlogController',
+                'fdb-tables' => 'FdbTablesController',
+                'graylog' => 'GraylogController',
+                'inventory' => 'InventoryController',
+                'location' => 'LocationController',
+                'mempools' => 'MempoolsController',
+                'outages' => 'OutagesController',
+                'port-nac' => 'PortNacController',
+                'port-stp' => 'PortStpController',
+                'ports' => 'PortsController',
+                'routes' => 'RoutesTablesController',
+                'syslog' => 'SyslogController',
+                'tnmsne' => 'TnmsneController',
+                'vlan-ports' => 'VlanPortsController',
+                'vlan-devices' => 'VlanDevicesController',
+                'vminfo' => 'VminfoController',
+            ];
+            foreach ($tableControllers as $route => $controller) {
+                Route::post($route, $controller)->name("table.{$route}");
+                Route::get("{$route}/export", "{$controller}@export")->name("table.{$route}.export");
+            }
         });
 
         // dashboard widgets
@@ -325,8 +328,14 @@ Route::prefix('install')->group(function () {
 });
 
 // Legacy routes
-Route::any('/dummy_legacy_auth/{path?}', [LegacyController::class, 'dummy'])->middleware('auth');
-Route::any('/dummy_legacy_unauth/{path?}', [LegacyController::class, 'dummy']);
-Route::any('/{path?}', [LegacyController::class, 'index'])
+Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummy')->middleware('auth');
+Route::any('/dummy_legacy_unauth/{path?}', 'LegacyController@dummy');
+
+// Add the legacy table export route
+Route::get('/ajax_table_export.php', function() {
+    return include base_path('html/ajax_table_export.php');
+})->middleware('auth')->name('ajax_table_export');
+
+Route::any('/{path?}', 'LegacyController@index')
     ->where('path', '^((?!_debugbar).)*')
     ->middleware('auth');
