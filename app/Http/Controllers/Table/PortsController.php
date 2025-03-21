@@ -173,4 +173,67 @@ class PortsController extends TableController
             'actions' => (string) view('port.actions', ['port' => $port]),
         ];
     }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device ID',
+            'Hostname',
+            'Port',
+            'ifIndex',
+            'Status',
+            'Admin Status',
+            'Speed',
+            'MTU',
+            'Type',
+            'In Rate (bps)',
+            'Out Rate (bps)',
+            'In Errors',
+            'Out Errors',
+            'In Error Rate',
+            'Out Error Rate',
+            'Description',
+            'Last Change',
+            'Connector Present'
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param Port $port
+     * @return array
+     */
+    protected function formatExportRow($port)
+    {
+        $status = $port->ifOperStatus;
+        $adminStatus = $port->ifAdminStatus;
+        $speed = Number::formatSi($port->ifSpeed);
+        
+        return [
+            'device_id' => $port->device_id,
+            'hostname' => $port->device->hostname,
+            'port' => $port->ifName ?: $port->ifDescr,
+            'ifindex' => $port->ifIndex,
+            'status' => $status,
+            'admin_status' => $adminStatus,
+            'speed' => $speed,
+            'mtu' => $port->ifMtu,
+            'type' => Rewrite::normalizeIfType($port->ifType),
+            'in_rate' => Number::formatBi($port->ifInOctets_rate * 8) . 'bps',
+            'out_rate' => Number::formatBi($port->ifOutOctets_rate * 8) . 'bps',
+            'in_errors' => $port->ifInErrors,
+            'out_errors' => $port->ifOutErrors,
+            'in_errors_rate' => $port->poll_period ? Number::formatSi($port->ifInErrors_delta / $port->poll_period, 2, 0, 'EPS') : '',
+            'out_errors_rate' => $port->poll_period ? Number::formatSi($port->ifOutErrors_delta / $port->poll_period, 2, 0, 'EPS') : '',
+            'description' => $port->ifAlias,
+            'last_change' => $port->device ? ($port->device->uptime - ($port->ifLastChange / 100)) : 'N/A',
+            'connector_present' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no'
+        ];
+    }
 }

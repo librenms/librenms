@@ -31,7 +31,8 @@ $pagetitle[] = 'Health :: Storage';
         </div>
     </div>
     <div class="table-responsive">
-        <table id="storage" class="table table-hover table-condensed storage">
+        <table id="storage" class="table table-hover table-condensed storage"
+               data-ajaxurl="ajax_table_export.php?id=storage&view=<?php echo htmlspecialchars($vars['view']); ?>">
             <thead>
                 <tr>
                     <th data-column-id="device_hostname">Device</th>

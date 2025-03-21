@@ -358,4 +358,60 @@ class DeviceController extends TableController
 
         return $actions;
     }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device ID',
+            'Hostname',
+            'IP Address',
+            'Hardware',
+            'OS',
+            'Version',
+            'Features',
+            'Location',
+            'Uptime',
+            'Status',
+            'Type',
+            'Last Polled'
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param Device $device
+     * @return array
+     */
+    protected function formatExportRow($device)
+    {
+        $status = $device->status ? 'Up' : 'Down';
+        if ($device->disabled) {
+            $status = 'Disabled';
+        } elseif ($device->ignore) {
+            $status = 'Ignored';
+        }
+
+        $location = $device->location ? $device->location->location : '';
+
+        return [
+            'device_id' => $device->device_id,
+            'hostname' => $device->hostname,
+            'ip' => $device->ip,
+            'hardware' => Rewrite::ciscoHardware($device),
+            'os' => Config::getOsSetting($device->os, 'text', $device->os),
+            'version' => $device->version,
+            'features' => $device->features,
+            'location' => $location,
+            'uptime' => $device->status ? Time::formatInterval($device->uptime, true) : 'Down',
+            'status' => $status,
+            'type' => $device->type,
+            'last_polled' => $device->last_polled,
+        ];
+    }
 }

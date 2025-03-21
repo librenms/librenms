@@ -31,7 +31,8 @@ $pagetitle[] = 'Health :: Processor';
         </div>
     </div>
     <div class="table-responsive">
-        <table id="processor" class="table table-hover table-condensed processor">
+        <table id="processor" class="table table-hover table-condensed processor" 
+               data-ajaxurl="ajax_table_export.php?id=processor&view=<?php echo htmlspecialchars($vars['view']); ?>">
             <thead>
                 <tr>
                     <th data-column-id="device_hostname">Device</th>
