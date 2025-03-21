@@ -62,6 +62,19 @@ if ($rowCount != -1) {
 
 $sql = "SELECT * $sql";
 
+if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
+    $headers = [
+        'Device',
+        'Storage',
+        'Size',
+        'Used',
+        'Free',
+        'Usage'
+    ];
+    
+    fputcsv($output, $headers);
+}
+
 foreach (dbFetchRows($sql, $param) as $drive) {
     $perc = round($drive['storage_perc']);
     $total = Number::formatBi($drive['storage_size']);
@@ -82,37 +95,54 @@ foreach (dbFetchRows($sql, $param) as $drive) {
     $background = \LibreNMS\Util\Color::percentage($perc, $drive['storage_perc_warn']);
     $bar_link = \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 20, $perc, "$used / $total", 'ffffff', $background['left'], $free, 'ffffff', $background['right']), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
-    $response[] = [
-        'hostname' => generate_device_link($drive),
-        'storage_descr' => $drive['storage_descr'],
-        'graph' => $mini_graph,
-        'storage_used' => $bar_link,
-        'storage_perc' => $perc . '%',
-    ];
-    if ($vars['view'] == 'graphs') {
-        $graph_array['height'] = '100';
-        $graph_array['width'] = '216';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        $graph_array['id'] = $drive['storage_id'];
-        $graph_array['type'] = $graph_type;
-
-        $return_data = true;
-        include 'includes/html/print-graphrow.inc.php';
-        unset($return_data);
+    if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
+        $device_name = $drive['hostname'];
+        $storage_descr = $drive['storage_descr'];
+        
+        fputcsv($output, [
+            $device_name,
+            $storage_descr,
+            $total,
+            $used,
+            $free,
+            $perc . '%'
+        ]);
+    } else {
         $response[] = [
-            'hostname' => $graph_data[0],
-            'storage_descr' => $graph_data[1],
-            'graph' => $graph_data[2],
-            'storage_used' => $graph_data[3],
-            'storage_perc' => '',
+            'hostname' => generate_device_link($drive),
+            'storage_descr' => $drive['storage_descr'],
+            'graph' => $mini_graph,
+            'storage_used' => $bar_link,
+            'storage_perc' => $perc . '%',
         ];
-    } //end if
+        
+        if ($vars['view'] == 'graphs') {
+            $graph_array['height'] = '100';
+            $graph_array['width'] = '216';
+            $graph_array['to'] = \LibreNMS\Config::get('time.now');
+            $graph_array['id'] = $drive['storage_id'];
+            $graph_array['type'] = $graph_type;
+
+            $return_data = true;
+            include 'includes/html/print-graphrow.inc.php';
+            unset($return_data);
+            $response[] = [
+                'hostname' => $graph_data[0],
+                'storage_descr' => $graph_data[1],
+                'graph' => $graph_data[2],
+                'storage_used' => $graph_data[3],
+                'storage_perc' => '',
+            ];
+        } //end if
+    }
 }//end foreach
 
-$output = [
-    'current' => $current,
-    'rowCount' => $rowCount,
-    'rows' => $response,
-    'total' => $count,
-];
-echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+if (!isset($_REQUEST['export'])) {
+    $output = [
+        'current' => $current,
+        'rowCount' => $rowCount,
+        'rows' => $response,
+        'total' => $count,
+    ];
+    echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+}
