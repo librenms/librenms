@@ -35,6 +35,7 @@ class Ospfv3Port extends PortRelatedModel
     public $timestamps = false;
     protected $fillable = [
         'device_id',
+        'ospfv3_instance_id',
         'port_id',
         'ospfv3IfInstId',
         'ospfv3_port_id',

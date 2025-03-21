@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('ospfv3_ports', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('device_id');
+            $table->unsignedInteger('ospfv3_instance_id');
             $table->unsignedInteger('port_id')->nullable();
             $table->unsignedInteger('ospfv3IfIndex');
             $table->unsignedInteger('ospfv3IfInstId');

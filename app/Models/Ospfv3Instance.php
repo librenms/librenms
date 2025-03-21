@@ -26,6 +26,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class Ospfv3Instance extends DeviceRelatedModel
 {
     public $timestamps = false;
@@ -57,4 +59,21 @@ class Ospfv3Instance extends DeviceRelatedModel
         'ospfv3DiscontinuityTime',
         'ospfv3RestartTime',
     ];
+
+    // ---- Define Relationships ----
+
+    public function areas(): HasMany
+    {
+        return $this->hasMany(Ospfv3Area::class);
+    }
+
+    public function nbrs(): HasMany
+    {
+        return $this->hasMany(Ospfv3Nbr::class);
+    }
+
+    public function ospfv3Ports(): HasMany
+    {
+        return $this->hasMany(Ospfv3Port::class);
+    }
 }

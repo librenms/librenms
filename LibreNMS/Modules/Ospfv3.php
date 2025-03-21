@@ -108,9 +108,10 @@ class Ospfv3 implements Module
             $ospf_areas = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPFV3-MIB::ospfv3AreaTable')
-                ->mapTable(function ($ospf_area, $ospfv3AreaId) use ($context_name, $os) {
+                ->mapTable(function ($ospf_area, $ospfv3AreaId) use ($context_name, $os, $instance) {
                     return Ospfv3Area::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
+                        'ospfv3_instance_id' => $instance->id,
                         'ospfv3AreaId' => $ospfv3AreaId,
                         'context_name' => $context_name,
                     ], $ospf_area);
@@ -131,7 +132,7 @@ class Ospfv3 implements Module
             $ospf_ports = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPFV3-MIB::ospfv3IfTable')
-                ->mapTable(function ($ospf_port, $ospfv3IfIndex, $ospfv3IfInstId) use ($context_name, $os) {
+                ->mapTable(function ($ospf_port, $ospfv3IfIndex, $ospfv3IfInstId) use ($context_name, $os, $instance) {
                     // find port_id
                     $ospf_port['port_id'] = (int) PortCache::getIdFromIfIndex($ospfv3IfIndex, $os->getDeviceId());
                     $ospf_port['ospfv3IfDesignatedRouter'] = long2ip($ospf_port['ospfv3IfDesignatedRouter'] ?? 0);
@@ -139,6 +140,7 @@ class Ospfv3 implements Module
 
                     return Ospfv3Port::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
+                        'ospfv3_instance_id' => $instance->id,
                         'ospfv3IfInstId' => $ospfv3IfInstId,
                         'ospfv3IfIndex' => $ospfv3IfIndex,
                         'context_name' => $context_name,
@@ -160,7 +162,7 @@ class Ospfv3 implements Module
             $ospf_neighbors = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPFV3-MIB::ospfv3NbrTable')
-                ->mapTable(function ($ospf_nbr, $ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) use ($context_name, $os) {
+                ->mapTable(function ($ospf_nbr, $ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) use ($context_name, $os, $instance) {
                     // get neighbor port_id
                     // Needs searching by Link-Local addressing, but those do not appear to be indexed.
                     $ip_raw = $ospf_nbr['ospfv3NbrAddress'] ?? '';
@@ -170,6 +172,7 @@ class Ospfv3 implements Module
 
                     return Ospfv3Nbr::updateOrCreate([
                         'device_id' => $os->getDeviceId(),
+                        'ospfv3_instance_id' => $instance->id,
                         'ospfv3NbrIfIndex' => $ospfv3NbrIfIndex,
                         'ospfv3NbrIfInstId' => $ospfv3NbrIfInstId,
                         'ospfv3NbrRtrId' => $ospfv3NbrRtrId,

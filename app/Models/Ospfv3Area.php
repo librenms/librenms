@@ -31,6 +31,7 @@ class Ospfv3Area extends DeviceRelatedModel
     public $timestamps = false;
     protected $fillable = [
         'device_id',
+        'ospfv3_instance_id',
         'context_name',
         'ospfv3AreaId',
         'ospfv3AreaImportAsExtern',

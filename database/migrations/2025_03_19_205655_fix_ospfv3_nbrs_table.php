@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('ospfv3_nbrs', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('device_id');
+            $table->unsignedInteger('ospfv3_instance_id');
             $table->unsignedInteger('port_id')->nullable();
             $table->string('router_id', 32);
             $table->unsignedInteger('ospfv3NbrIfIndex');
