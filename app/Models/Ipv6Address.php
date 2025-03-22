@@ -50,6 +50,6 @@ class Ipv6Address extends PortRelatedModel implements Keyable
 
     public function getCompositeKey(): string
     {
-        return "$this->device_id-$this->ipv6_address-$this->ipv6_prefixlen-$this->port_id-$this->context_name";
+        return "$this->ipv6_address-$this->ipv6_prefixlen-$this->port_id-$this->context_name";
     }
 }

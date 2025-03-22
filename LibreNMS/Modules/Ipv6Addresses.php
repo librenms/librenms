@@ -16,6 +16,8 @@ use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Util\IP;
+use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use SnmpQuery;
 
@@ -204,7 +206,7 @@ class Ipv6Addresses implements Module
     /**
      * @throws InvalidIpException
      */
-    private function parseIp(string $ipAddressAddr, string $ifIndex): IPv6
+    private function parseIp(string $ipAddressAddr, string $ifIndex): IP|IPv4|IPv6|null
     {
         // mis-formatted showing in dot notation
         if (str_contains($ipAddressAddr, '.')) {
