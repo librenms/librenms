@@ -64,17 +64,24 @@ class Ipv6Addresses implements Module
         }
 
         // reject localhost and populate ipv6 networks
-        $ips = $ips->filter(fn (Ipv6Address $ip) => $ip->ipv6_compressed !== '::1')
-            ->each(function (Ipv6Address $ip) {
-                if ($ip->ipv6_network_id === null && $ip->ipv6_prefixlen > 0 && $ip->ipv6_prefixlen <= 128) {
-                    $network = Ipv6Network::firstOrCreate([
-                        'ipv6_network' => IPv6::parse($ip->ipv6_address)->getNetwork($ip->ipv6_prefixlen),
-                        'context_name' => $ip->context_name,
-                    ]);
+        $ips = $ips->reject(function (Ipv6Address $ip) {
+            if (! $ip->port_id) {
+                Log::debug("Skipping $ip->ipv6_compressed due to no matching port");
 
-                    $ip->ipv6_network_id = $network->ipv6_network_id;
-                }
-            });
+                return true;
+            }
+
+            return $ip->ipv6_compressed === '::1';
+        })->each(function (Ipv6Address $ip) {
+            if ($ip->ipv6_network_id === null && $ip->ipv6_prefixlen > 0 && $ip->ipv6_prefixlen <= 128) {
+                $network = Ipv6Network::firstOrCreate([
+                    'ipv6_network' => IPv6::parse($ip->ipv6_address)->getNetwork($ip->ipv6_prefixlen),
+                    'context_name' => $ip->context_name,
+                ]);
+
+                $ip->ipv6_network_id = $network->ipv6_network_id;
+            }
+        });
 
         ModuleModelObserver::observe(Ipv6Address::class);
         $this->syncModels($os->getDevice(), 'ipv6', $ips);
@@ -128,19 +135,23 @@ class Ipv6Addresses implements Module
         foreach ($device->getVrfContexts() as $context_name) {
             $ips = $ips->merge(SnmpQuery::context($context_name)
                 ->enumStrings()
-                ->walk(['IP-MIB::ipAddressTable'])
-                ->mapTable(function ($data, $ipAddressAddrType, $ipAddressAddr) use ($context_name, $device) {
+                ->abortOnFailure()
+                ->walk([
+                    'IP-MIB::ipAddressIfIndex.ipv6',
+                    'IP-MIB::ipAddressOrigin.ipv6',
+                    'IP-MIB::ipAddressPrefix.ipv6',
+                ])->mapTable(function ($data, $ipAddressAddrType, $ipAddressAddr) use ($context_name, $device) {
                     try {
                         Log::debug("Attempting to parse $ipAddressAddr");
-                        $ifIndex = $data['IP-MIB::ipAddressIfIndex'];
+                        $ifIndex = $data['IP-MIB::ipAddressIfIndex'] ?? 0;
 
                         // prefix len is the last index of the ipAddressPrefixTable, fetch it from the pointer
-                        preg_match('/(\d{1,3})]$/', $data['IP-MIB::ipAddressPrefix'], $prefix_match);
+                        preg_match('/(\d{1,3})]$/', $data['IP-MIB::ipAddressPrefix'] ?? '', $prefix_match);
                         $prefixlen = $prefix_match[1] ?? 0;
                         $ip = IPv6::fromHexString(str_replace(['"', "%$ifIndex"], '', $ipAddressAddr));
 
                         return new Ipv6Address([
-                            'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device) ?? 0,
+                            'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
                             'ipv6_address' => $ip->uncompressed(),
                             'ipv6_compressed' => $ip->compressed(),
                             'ipv6_prefixlen' => $prefixlen,
@@ -176,7 +187,7 @@ class Ipv6Addresses implements Module
                         };
 
                         return new Ipv6Address([
-                            'port_id' => PortCache::getIdFromIfIndex($ipv6IfIndex, $device) ?? 0,
+                            'port_id' => PortCache::getIdFromIfIndex($ipv6IfIndex, $device),
                             'ipv6_address' => $ip->uncompressed(),
                             'ipv6_compressed' => $ip->compressed(),
                             'ipv6_prefixlen' => $data['IPV6-MIB::ipv6AddrPfxLength'] ?? '',

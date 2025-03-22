@@ -33,7 +33,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery
                         'ipv6_compressed' => $ip->compressed(),
                         'ipv6_prefixlen' => $data['TPLINK-IPV6ADDR-MIB::ipv6ParaConfigPrefixLength'] ?? '',
                         'ipv6_origin' => $origin,
-                        'port_id' => PortCache::getIdFromIfIndex($ipv6ParaConfigIfIndex, $this->getDevice()) ?? 0,
+                        'port_id' => PortCache::getIdFromIfIndex($ipv6ParaConfigIfIndex, $this->getDevice()),
                     ]);
                 } catch (InvalidIpException $e) {
                     Log::error('Failed to parse IP: ' . $e->getMessage());
