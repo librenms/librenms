@@ -48,5 +48,5 @@ if (isset($this_port['cieIfInRuntsErrs'])) {
      */
     $ifName = $port['ifName'];
     $tags = compact('ifName', 'rrd_name', 'rrd_def');
-    data_update($device, 'drops', $tags, $rrd_data);
+    app('Datastore')->put($device, 'drops', $tags, $rrd_data);
 }

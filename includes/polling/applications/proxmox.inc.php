@@ -99,7 +99,7 @@ if (! empty($proxmox)) {
                 ],
                 'rrd_def' => $rrd_def,
             ];
-            data_update($device, 'app', $tags, $fields);
+            app('Datastore')->put($device, 'app', $tags, $fields);
 
             if (proxmox_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
                 dbUpdate([
