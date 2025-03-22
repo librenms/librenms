@@ -148,7 +148,14 @@ class Ipv6Addresses implements Module
                         // prefix len is the last index of the ipAddressPrefixTable, fetch it from the pointer
                         preg_match('/(\d{1,3})]$/', $data['IP-MIB::ipAddressPrefix'] ?? '', $prefix_match);
                         $prefixlen = $prefix_match[1] ?? 0;
-                        $ip = IPv6::fromHexString(str_replace(['"', "%$ifIndex"], '', $ipAddressAddr));
+
+                        if (str_contains($ipAddressAddr, '.')) {
+                            $cleanSnmpIp = implode('.', array_slice(explode('.', ltrim($ipAddressAddr, '.')), 0, 16));
+                            $ip = IPv6::fromSnmpString($cleanSnmpIp);
+                        } else {
+                            $cleanHexIp = str_replace(['"', "%$ifIndex"], '', $ipAddressAddr);
+                            $ip = IPv6::fromHexString($cleanHexIp);
+                        }
 
                         return new Ipv6Address([
                             'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
