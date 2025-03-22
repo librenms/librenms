@@ -19,7 +19,7 @@ use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IPv6;
 use SnmpQuery;
 
-class Ipv6Adresses implements Module
+class Ipv6Addresses implements Module
 {
     use SyncsModels;
 
@@ -76,6 +76,7 @@ class Ipv6Adresses implements Module
                 }
             });
 
+
         ModuleModelObserver::observe(Ipv6Address::class);
         $this->syncModels($os->getDevice(), 'ipv6', $ips);
     }
@@ -115,11 +116,10 @@ class Ipv6Adresses implements Module
 
         return [
             'ipv6_addresses' => $device->ipv6()
-                ->leftJoin('ports', 'ipv6_addresses.port_id', 'ports.port_id')
                 ->leftJoin('ipv6_networks', 'ipv6_addresses.ipv6_network_id', 'ipv6_networks.ipv6_network_id')
-                ->select(['ipv6_addresses.*', 'ipv6_network', 'ifIndex'])
+                ->select(['ipv6_addresses.*', 'ipv6_network', 'ifIndex']) // already joined with ports
                 ->orderBy('ipv6_address')->orderBy('ipv6_prefixlen')->orderBy('ifIndex')->orderBy('ipv6_addresses.context_name')
-                ->get()->map->makeHidden(['ipv6_address_id', 'ipv6_network_id', 'port_id']),
+                ->get()->map->makeHidden(['ipv6_address_id', 'ipv6_network_id', 'port_id', 'laravel_through_key']),
         ];
     }
 

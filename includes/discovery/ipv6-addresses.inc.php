@@ -6,4 +6,4 @@ if (empty($os) || ! $os instanceof OS) {
     $os = OS::make($device);
 }
 
-(new \LibreNMS\Modules\Ipv6Adresses())->discover($os);
+(new \LibreNMS\Modules\Ipv6Addresses())->discover($os);
