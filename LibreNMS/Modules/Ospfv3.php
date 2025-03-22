@@ -275,17 +275,17 @@ class Ospfv3 implements Module
                 ->leftJoin('ports', 'ospfv3_ports.port_id', 'ports.port_id')
                 ->select(['ospfv3_ports.*', 'ifIndex'])
                 ->orderBy('ospfv3IfInstId')->orderBy('ospfv3IfIndex')->orderBy('context_name')
-                ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
+                ->get()->map->makeHidden(['id', 'device_id', 'port_id', 'ospfv3_instance_id', 'ospfv3_area_id']),
             'ospfv3_instances' => $device->ospfv3Instances()
                 ->orderBy('context_name')
                 ->get()->map->makeHidden(['id', 'device_id']),
             'ospfv3_areas' => $device->ospfv3Areas()
                 ->orderBy('ospfv3AreaId')->orderBy('context_name')
-                ->get()->map->makeHidden(['id', 'device_id']),
+                ->get()->map->makeHidden(['id', 'device_id', 'ospfv3_instance_id']),
             'ospfv3_nbrs' => $device->ospfv3Nbrs()
                 ->orderBy('ospfv3NbrIfIndex')->orderBy('ospfv3NbrIfInstId')
                 ->orderBy('ospfv3NbrRtrId')->orderBy('context_name')
-                ->get()->map->makeHidden(['id', 'device_id']),
+                ->get()->map->makeHidden(['id', 'device_id', 'ospfv3_instance_id', 'port_id']),
         ];
     }
 
