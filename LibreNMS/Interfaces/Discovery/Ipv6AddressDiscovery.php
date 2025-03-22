@@ -1,6 +1,5 @@
 <?php
 
-
 namespace LibreNMS\Interfaces\Discovery;
 
 use Illuminate\Support\Collection;

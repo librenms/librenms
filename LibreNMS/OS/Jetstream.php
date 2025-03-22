@@ -21,7 +21,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery
                     $ip = IPv6::fromHexString($data['TPLINK-IPV6ADDR-MIB::ipv6ParaConfigAddress']);
 
                     // map to IP-MIB origin
-                    $origin = match($ipv6ParaConfigSourceType) {
+                    $origin = match ($ipv6ParaConfigSourceType) {
                         'assignedIp' => 'manual',
                         'autoIp', 'assignedEUI64Ip', 'assignedLinklocalIp', 'negotiate' => 'linklayer',
                         'dhcpv6' => 'dhcp',
@@ -37,8 +37,9 @@ class Jetstream extends OS implements Ipv6AddressDiscovery
                     ]);
                 } catch (InvalidIpException $e) {
                     Log::error('Failed to parse IP: ' . $e->getMessage());
+
                     return null;
                 }
             })->filter();
-        }
+    }
 }

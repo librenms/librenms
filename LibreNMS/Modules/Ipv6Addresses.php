@@ -155,6 +155,7 @@ class Ipv6Addresses implements Module
                         ]);
                     } catch (InvalidIpException $e) {
                         Log::error('Failed to parse IP: ' . $e->getMessage());
+
                         return null;
                     }
                 }));
@@ -174,7 +175,7 @@ class Ipv6Addresses implements Module
                 ->mapTable(function ($data, $ipv6IfIndex, $ipv6AddrAddress) use ($context_name, $device) {
                     try {
                         $ip = IPv6::parse($ipv6AddrAddress);
-                        $origin = match($data['IP-MIB::ipv6AddrType'] ?? null) {
+                        $origin = match ($data['IP-MIB::ipv6AddrType'] ?? null) {
                             'stateless' => 'linklayer',
                             'stateful' => 'manual',
                             'unknown' => 'unknown',
@@ -191,9 +192,10 @@ class Ipv6Addresses implements Module
                         ]);
                     } catch (InvalidIpException $e) {
                         Log::error('Failed to parse IP: ' . $e->getMessage());
+
                         return null;
                     }
-            }));
+                }));
         }
 
         return $ips->filter();
@@ -202,7 +204,7 @@ class Ipv6Addresses implements Module
     /**
      * @throws InvalidIpException
      */
-    private function parseIp(string $ipAddressAddr, string  $ifIndex): IPv6
+    private function parseIp(string $ipAddressAddr, string $ifIndex): IPv6
     {
         // mis-formatted showing in dot notation
         if (str_contains($ipAddressAddr, '.')) {
@@ -212,6 +214,7 @@ class Ipv6Addresses implements Module
             $cleanHexIp = str_replace(['"', "%$ifIndex"], '', $ipAddressAddr);
             $ip = IPv6::fromHexString($cleanHexIp);
         }
+
         return $ip;
     }
 
