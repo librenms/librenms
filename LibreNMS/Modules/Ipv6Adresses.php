@@ -76,8 +76,6 @@ class Ipv6Adresses implements Module
                 }
             });
 
-        dump($ips->toArray());
-
         ModuleModelObserver::observe(Ipv6Address::class);
         $this->syncModels($os->getDevice(), 'ipv6', $ips);
     }
@@ -111,7 +109,18 @@ class Ipv6Adresses implements Module
      */
     public function dump(Device $device, string $type): ?array
     {
-        // TODO: Implement dump() method.
+        if ($type == 'polling') {
+            return null;
+        }
+
+        return [
+            'ipv6_addresses' => $device->ipv6()
+                ->leftJoin('ports', 'ipv6_addresses.port_id', 'ports.port_id')
+                ->leftJoin('ipv6_networks', 'ipv6_addresses.ipv6_network_id', 'ipv6_networks.ipv6_network_id')
+                ->select(['ipv6_addresses.*', 'ipv6_network', 'ifIndex'])
+                ->orderBy('ipv6_address')->orderBy('ipv6_prefixlen')->orderBy('ifIndex')->orderBy('ipv6_addresses.context_name')
+                ->get()->map->makeHidden(['ipv6_address_id', 'ipv6_network_id', 'port_id']),
+        ];
     }
 
     private function discoverIpMib(Device $device): Collection
