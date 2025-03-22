@@ -155,3 +155,5 @@ printEntPhysical($device, $ent['entPhysicalIndex'], $level, 'liOpen');
 echo '</ul></div>';
 
 $pagetitle = 'Inventory';
+
+include 'physicalports.inc.php';
