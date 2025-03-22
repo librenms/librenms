@@ -135,7 +135,6 @@ class Ipv6Addresses implements Module
         foreach ($device->getVrfContexts() as $context_name) {
             $ips = $ips->merge(SnmpQuery::context($context_name)
                 ->enumStrings()
-                ->abortOnFailure()
                 ->walk([
                     'IP-MIB::ipAddressIfIndex.ipv6',
                     'IP-MIB::ipAddressOrigin.ipv6',
@@ -144,24 +143,13 @@ class Ipv6Addresses implements Module
                     try {
                         Log::debug("Attempting to parse $ipAddressAddr");
                         $ifIndex = $data['IP-MIB::ipAddressIfIndex'] ?? 0;
-
-                        // prefix len is the last index of the ipAddressPrefixTable, fetch it from the pointer
-                        preg_match('/(\d{1,3})]$/', $data['IP-MIB::ipAddressPrefix'] ?? '', $prefix_match);
-                        $prefixlen = $prefix_match[1] ?? 0;
-
-                        if (str_contains($ipAddressAddr, '.')) {
-                            $cleanSnmpIp = implode('.', array_slice(explode('.', ltrim($ipAddressAddr, '.')), 0, 16));
-                            $ip = IPv6::fromSnmpString($cleanSnmpIp);
-                        } else {
-                            $cleanHexIp = str_replace(['"', "%$ifIndex"], '', $ipAddressAddr);
-                            $ip = IPv6::fromHexString($cleanHexIp);
-                        }
+                        $ip = $this->parseIp($ipAddressAddr, $ifIndex);
 
                         return new Ipv6Address([
                             'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
                             'ipv6_address' => $ip->uncompressed(),
                             'ipv6_compressed' => $ip->compressed(),
-                            'ipv6_prefixlen' => $prefixlen,
+                            'ipv6_prefixlen' => $this->parsePrefix($data['IP-MIB::ipAddressPrefix'] ?? ''),
                             'ipv6_origin' => $data['IP-MIB::ipAddressOrigin'] ?? 'unknown',
                             'context_name' => $context_name,
                         ]);
@@ -209,5 +197,33 @@ class Ipv6Addresses implements Module
         }
 
         return $ips->filter();
+    }
+
+    /**
+     * @throws InvalidIpException
+     */
+    private function parseIp(string $ipAddressAddr, string  $ifIndex): IPv6
+    {
+        // mis-formatted showing in dot notation
+        if (str_contains($ipAddressAddr, '.')) {
+            $cleanSnmpIp = implode('.', array_slice(explode('.', ltrim($ipAddressAddr, '.')), 0, 16));
+            $ip = IPv6::fromSnmpString($cleanSnmpIp);
+        } else {
+            $cleanHexIp = str_replace(['"', "%$ifIndex"], '', $ipAddressAddr);
+            $ip = IPv6::fromHexString($cleanHexIp);
+        }
+        return $ip;
+    }
+
+    private function parsePrefix(string $prefix): string
+    {
+        // prefix len is the last index of the ipAddressPrefixTable, fetch it from the pointer
+        if (str_contains($prefix, '.')) {
+            return substr($prefix, strrpos($prefix, '.') + 1);
+        }
+
+        preg_match('/(\d{1,3})]$/', $prefix, $prefix_match);
+
+        return $prefix_match[1] ?? 0;
     }
 }
