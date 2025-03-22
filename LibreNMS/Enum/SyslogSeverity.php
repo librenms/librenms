@@ -46,15 +46,4 @@ class SyslogSeverity
         6 => self::INFO,
         7 => self::DEBUG,
     ];
-
-    const STATUS = [
-        self::EMERGENCY => CheckStatus::ERROR,
-        self::ALERT => CheckStatus::ERROR,
-        self::CRITICAL => CheckStatus::ERROR,
-        self::ERROR => CheckStatus::ERROR,
-        self::WARNING => CheckStatus::WARNING,
-        self::NOTICE => CheckStatus::OK,
-        self::DEBUG => CheckStatus::UNKNOWN,
-        self::INFO => CheckStatus::OK,
-    ];
 }
