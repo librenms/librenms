@@ -39,5 +39,5 @@ if ($id && file_exists("includes/html/table/$id.inc.php")) {
     include_once "includes/html/table/$id.inc.php";
 } else {
     http_response_code(404);
-    echo "Table not found";
+    echo 'Table not found';
 }

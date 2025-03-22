@@ -378,14 +378,14 @@ class DeviceController extends TableController
             'Uptime',
             'Status',
             'Type',
-            'Last Polled'
+            'Last Polled',
         ];
     }
 
     /**
      * Format a row for CSV export
      *
-     * @param Device $device
+     * @param  Device  $device
      * @return array
      */
     protected function formatExportRow($device)

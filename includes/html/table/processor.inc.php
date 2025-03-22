@@ -59,9 +59,9 @@ if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
     $headers = [
         'Device',
         'Processor',
-        'Usage'
+        'Usage',
     ];
-    
+
     fputcsv($output, $headers);
 }
 
@@ -85,20 +85,20 @@ foreach (dbFetchRows($sql, $param) as $processor) {
         $device_name = $processor['hostname'];
         $processor_descr = $processor['processor_descr'];
         $usage = $perc . '%';
-        
+
         fputcsv($output, [
             $device_name,
             $processor_descr,
-            $usage
+            $usage,
         ]);
     } else {
         $response[] = [
             'hostname' => generate_device_link($processor),
             'processor_descr' => $processor['processor_descr'],
-        'graph' => $mini_graph,
+            'graph' => $mini_graph,
             'processor_usage' => $bar_link,
         ];
-        
+
         if ($vars['view'] == 'graphs') {
             $graph_array['height'] = '100';
             $graph_array['width'] = '216';
@@ -118,7 +118,7 @@ foreach (dbFetchRows($sql, $param) as $processor) {
     }
 }//end foreach
 
-if (!isset($_REQUEST['export'])) {
+if (! isset($_REQUEST['export'])) {
     $output = [
         'current' => $current,
         'rowCount' => $rowCount,

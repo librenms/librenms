@@ -95,7 +95,7 @@ abstract class TableController extends PaginatedAjaxController
     /**
      * Export data as CSV
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function export(Request $request)
@@ -121,7 +121,7 @@ abstract class TableController extends PaginatedAjaxController
     /**
      * Prepare the query for export with all filters applied
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return Builder
      */
     protected function prepareExportQuery(Request $request)
@@ -130,7 +130,7 @@ abstract class TableController extends PaginatedAjaxController
 
         $this->filter($request, $query, $this->filterFields($request));
 
-        if ($request->has('searchPhrase') && !empty($request->get('searchPhrase'))) {
+        if ($request->has('searchPhrase') && ! empty($request->get('searchPhrase'))) {
             $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
         }
 
@@ -156,6 +156,7 @@ abstract class TableController extends PaginatedAjaxController
     {
         if (isset($this->model)) {
             $fields = \Schema::getColumnListing((new $this->model)->getTable());
+
             // Convert DB column names to human-readable format
             return array_map(function ($field) {
                 return ucwords(str_replace('_', ' ', $field));
@@ -168,34 +169,34 @@ abstract class TableController extends PaginatedAjaxController
     /**
      * Format a row for CSV export
      *
-     * @param mixed $item
+     * @param  mixed  $item
      * @return array
      */
     protected function formatExportRow($item)
     {
         // First try using formatItem if it exists
         $formatted = $this->formatItem($item);
-        
+
         // If formatItem returns an array, process it to remove HTML
         if (is_array($formatted)) {
             return array_map(function ($value) {
                 return is_string($value) ? trim(strip_tags($value)) : $value;
             }, $formatted);
         }
-        
+
         if (method_exists($item, 'toArray')) {
             return $item->toArray();
         }
-        
+
         return (array) $item;
     }
 
     /**
      * Generate CSV response from data
      *
-     * @param \Illuminate\Support\Collection $data
-     * @param array $headers
-     * @param string $filename
+     * @param  \Illuminate\Support\Collection  $data
+     * @param  array  $headers
+     * @param  string  $filename
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     protected function generateCsvResponse($data, $headers, $filename)

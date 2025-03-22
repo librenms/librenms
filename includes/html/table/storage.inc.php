@@ -69,9 +69,9 @@ if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
         'Size',
         'Used',
         'Free',
-        'Usage'
+        'Usage',
     ];
-    
+
     fputcsv($output, $headers);
 }
 
@@ -98,14 +98,14 @@ foreach (dbFetchRows($sql, $param) as $drive) {
     if (isset($_REQUEST['export']) && $_REQUEST['export'] === true) {
         $device_name = $drive['hostname'];
         $storage_descr = $drive['storage_descr'];
-        
+
         fputcsv($output, [
             $device_name,
             $storage_descr,
             $total,
             $used,
             $free,
-            $perc . '%'
+            $perc . '%',
         ]);
     } else {
         $response[] = [
@@ -115,7 +115,7 @@ foreach (dbFetchRows($sql, $param) as $drive) {
             'storage_used' => $bar_link,
             'storage_perc' => $perc . '%',
         ];
-        
+
         if ($vars['view'] == 'graphs') {
             $graph_array['height'] = '100';
             $graph_array['width'] = '216';
@@ -137,7 +137,7 @@ foreach (dbFetchRows($sql, $param) as $drive) {
     }
 }//end foreach
 
-if (!isset($_REQUEST['export'])) {
+if (! isset($_REQUEST['export'])) {
     $output = [
         'current' => $current,
         'rowCount' => $rowCount,
