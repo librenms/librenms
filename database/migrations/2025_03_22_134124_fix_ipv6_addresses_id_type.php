@@ -15,8 +15,8 @@ return new class extends Migration
         DB::table('ipv6_addresses')
             ->whereNull('ipv6_network_id') // NULL values
             ->orWhere('ipv6_network_id', '') // Empty strings
-            ->orWhereRaw("CAST(ipv6_network_id AS INTEGER) IS NULL") // Non-numeric values (e.g., 'abc')
-            ->orWhereRaw("CAST(ipv6_network_id AS INTEGER) != ipv6_network_id") // Non-integer values (e.g., '12.34')
+            ->orWhereRaw('CAST(ipv6_network_id AS INTEGER) IS NULL') // Non-numeric values (e.g., 'abc')
+            ->orWhereRaw('CAST(ipv6_network_id AS INTEGER) != ipv6_network_id') // Non-integer values (e.g., '12.34')
             ->update(['ipv6_network_id' => 0]);
 
         Schema::table('ipv6_addresses', function (Blueprint $table) {
