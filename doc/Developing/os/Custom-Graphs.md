@@ -59,7 +59,7 @@ if (is_numeric($users)) {
     );
 
     $tags = compact('rrd_def');
-    data_update($device, 'pulse_users', $tags, $fields);
+    app('Datastore')->put($device, 'pulse_users', $tags, $fields);
     $os->enableGraph('pulse_users');
 }
 
@@ -73,7 +73,7 @@ if (is_numeric($sessions)) {
     );
 
     $tags = compact('rrd_def');
-    data_update($device, 'pulse_sessions', $tags, $fields);
+    app('Datastore')->put($device, 'pulse_sessions', $tags, $fields);
     $os->enableGraph('pulse_sessions');
 }
 ```

@@ -51,7 +51,7 @@ foreach ($pwrstatd_data as $data) {
     $rrd_name = ['app', $name, $app->app_id, $sn];
     $metrics[$sn] = $fields;
     $tags = ['name' => $sn, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 update_application($app, $output, $metrics);

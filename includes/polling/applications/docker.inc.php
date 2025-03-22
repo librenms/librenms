@@ -76,7 +76,7 @@ foreach ($docker_data as $data) {
     $rrd_name = ['app', $name, $app->app_id, $container];
     $metrics[$container] = $fields;
     $tags = ['name' => $container, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 $rrd_def = RrdDefinition::make();
@@ -85,7 +85,7 @@ foreach ($totals as $status => $value) {
 }
 $rrd_name = ['app', $name, $app->app_id];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $totals);
+app('Datastore')->put($device, 'app', $tags, $totals);
 
 $metrics['total'] = $totals;
 

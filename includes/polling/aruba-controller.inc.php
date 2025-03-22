@@ -23,7 +23,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
     ];
 
     $tags = compact('rrd_name', 'rrd_def');
-    data_update($device, 'aruba-controller', $tags, $fields);
+    app('Datastore')->put($device, 'aruba-controller', $tags, $fields);
 
     // get AP data
     $aruba_apstats = SnmpQuery::enumStrings()->walk([
@@ -91,7 +91,7 @@ DEBUG);
                     'rrd_def' => $rrd_def,
                 ];
 
-                data_update($device, 'aruba', $tags, $fields);
+                app('Datastore')->put($device, 'aruba', $tags, $fields);
 
                 // sync to DB
                 $ap_key = $ap->getCompositeKey();

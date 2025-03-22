@@ -34,7 +34,7 @@ if (count($diskio_data)) {
             'writes' => $entry['diskIOWrites'],
         ];
 
-        data_update($device, 'ucd_diskio', $tags, $fields);
+        app('Datastore')->put($device, 'ucd_diskio', $tags, $fields);
     }//end foreach
 
     echo "\n";

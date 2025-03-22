@@ -66,7 +66,7 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
 
     $tags = compact('descr', 'unit', 'rrd_name', 'rrd_def');
 
-    data_update($device, 'customoid', $tags, $fields);
+    app('Datastore')->put($device, 'customoid', $tags, $fields);
     dbUpdate(['customoid_current' => $oid_value, 'lastupdate' => ['NOW()'], 'customoid_prev' => $prev_oid_value], 'customoids', '`customoid_id` = ?', [$customoid['customoid_id']]);
 }//end foreach
 
